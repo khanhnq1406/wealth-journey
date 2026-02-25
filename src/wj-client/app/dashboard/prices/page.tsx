@@ -23,8 +23,14 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "symbol", label: "Symbol Lookup" },
 ];
 
-function ChangeCell({ value, currency }: { value: number; currency: string }) {
-  if (value === 0) return <span className="text-gray-400">—</span>;
+function ChangeCell({
+  value,
+  currency,
+}: {
+  value: number | null | undefined;
+  currency: string;
+}) {
+  if (!value) return <span className="text-gray-400">—</span>;
   const isUp = value > 0;
   return (
     <span
@@ -101,7 +107,6 @@ const mobileColumns: MobileColumnDef<PriceItem>[] = [
   {
     id: "name",
     header: "Type",
-    showInCollapsed: true,
     cell: ({ row }) => (
       <div>
         <span className="font-medium text-gray-900 dark:text-dark-text">
@@ -114,7 +119,6 @@ const mobileColumns: MobileColumnDef<PriceItem>[] = [
   {
     id: "buy",
     header: "Buy",
-    showInCollapsed: true,
     cell: ({ row }) => (
       <span className="font-medium text-gray-900 dark:text-dark-text">
         {formatPriceValue(row.buy, row.currency)}
@@ -124,7 +128,6 @@ const mobileColumns: MobileColumnDef<PriceItem>[] = [
   {
     id: "sell",
     header: "Sell",
-    showInCollapsed: false,
     cell: ({ row }) => (
       <span className="text-gray-500 dark:text-gray-400">
         {formatPriceValue(row.sell, row.currency)}
@@ -134,7 +137,6 @@ const mobileColumns: MobileColumnDef<PriceItem>[] = [
   {
     id: "change",
     header: "Change",
-    showInCollapsed: false,
     cell: ({ row }) => (
       <ChangeCell value={row.changeBuy} currency={row.currency} />
     ),

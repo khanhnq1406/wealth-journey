@@ -23,9 +23,11 @@ type SilverPriceService interface {
 type CachedSilverPrice struct {
 	TypeCode   string
 	Name       string
-	Buy        int64  // Price in smallest currency unit (VND: 1, USD: cents)
-	Sell       int64  // Price in smallest currency unit
-	Currency   string // "VND" or "USD"
+	Buy        int64     // Price in smallest currency unit (VND: 1, USD: cents)
+	Sell       int64     // Price in smallest currency unit
+	ChangeBuy  int64     // Change in buy price in smallest currency unit
+	ChangeSell int64     // Change in sell price in smallest currency unit
+	Currency   string    // "VND" or "USD"
 	UpdateTime time.Time
 }
 
@@ -54,12 +56,16 @@ func (s *silverPriceService) FetchPriceForSymbol(ctx context.Context, symbol str
 
 	// Try cache first
 	cached, err := s.cache.Get(ctx, cacheKey, "VND")
-	if err == nil && cached > 0 {
+	if err == nil && cached != nil {
 		return &CachedSilverPrice{
-			TypeCode:   symbol,
-			Buy:        cached,
-			Currency:   "VND",
-			UpdateTime: time.Now(),
+			TypeCode:   cached.TypeCode,
+			Name:       cached.Name,
+			Buy:        cached.Buy,
+			Sell:       cached.Sell,
+			ChangeBuy:  cached.ChangeBuy,
+			ChangeSell: cached.ChangeSell,
+			Currency:   cached.Currency,
+			UpdateTime: time.Unix(cached.UpdateTime, 0),
 		}, nil
 	}
 
@@ -73,19 +79,33 @@ func (s *silverPriceService) FetchPriceForSymbol(ctx context.Context, symbol str
 	// VND prices are in VND x 1000, convert to VND x 1
 	buy := int64(apiPrice.Buy * 1000)
 	sell := int64(apiPrice.Sell * 1000)
+	changeBuy := int64(apiPrice.BuyChange * 1000)
+	changeSell := int64(apiPrice.SellChange * 1000)
 
 	price := &CachedSilverPrice{
 		TypeCode:   symbol,
 		Name:       apiPrice.Name,
 		Buy:        buy,
 		Sell:       sell,
+		ChangeBuy:  changeBuy,
+		ChangeSell: changeSell,
 		Currency:   apiPrice.Currency,
 		UpdateTime: apiPrice.UpdateAt,
 	}
 
 	// Cache the result (non-blocking)
 	go func() {
-		if err := s.cache.Set(context.Background(), cacheKey, price.Buy, "VND", cache.SilverPriceCacheTTL); err != nil {
+		cachedPrice := &cache.CachedSilverPrice{
+			TypeCode:   price.TypeCode,
+			Name:       price.Name,
+			Buy:        price.Buy,
+			Sell:       price.Sell,
+			ChangeBuy:  price.ChangeBuy,
+			ChangeSell: price.ChangeSell,
+			Currency:   price.Currency,
+			UpdateTime: price.UpdateTime.Unix(),
+		}
+		if err := s.cache.Set(context.Background(), cacheKey, cachedPrice, cache.SilverPriceCacheTTL); err != nil {
 			log.Printf("Warning: failed to cache silver price for %s: %v", cacheKey, err)
 		}
 	}()
@@ -98,13 +118,16 @@ func (s *silverPriceService) FetchPriceForSymbol(ctx context.Context, symbol str
 func (s *silverPriceService) fetchUSDSilverPrice(ctx context.Context) (*CachedSilverPrice, error) {
 	// Try cache first
 	cached, err := s.cache.Get(ctx, "XAGUSD", "USD")
-	if err == nil && cached > 0 {
+	if err == nil && cached != nil {
 		return &CachedSilverPrice{
-			TypeCode:   "XAGUSD",
-			Name:       "Silver World (XAG/USD)",
-			Buy:        cached,
-			Currency:   "USD",
-			UpdateTime: time.Now(),
+			TypeCode:   cached.TypeCode,
+			Name:       cached.Name,
+			Buy:        cached.Buy,
+			Sell:       cached.Sell,
+			ChangeBuy:  cached.ChangeBuy,
+			ChangeSell: cached.ChangeSell,
+			Currency:   cached.Currency,
+			UpdateTime: time.Unix(cached.UpdateTime, 0),
 		}, nil
 	}
 
@@ -127,13 +150,25 @@ func (s *silverPriceService) fetchUSDSilverPrice(ctx context.Context) (*CachedSi
 		Name:       "Silver World (XAG/USD)",
 		Buy:        priceInCents,
 		Sell:       priceInCents, // Use same price for sell (no spread in futures data)
+		ChangeBuy:  0,
+		ChangeSell: 0,
 		Currency:   "USD",
 		UpdateTime: time.Now(),
 	}
 
 	// Cache the result (non-blocking)
 	go func() {
-		if err := s.cache.Set(context.Background(), "XAGUSD", price.Buy, "USD", cache.SilverPriceCacheTTL); err != nil {
+		cachedPrice := &cache.CachedSilverPrice{
+			TypeCode:   price.TypeCode,
+			Name:       price.Name,
+			Buy:        price.Buy,
+			Sell:       price.Sell,
+			ChangeBuy:  price.ChangeBuy,
+			ChangeSell: price.ChangeSell,
+			Currency:   price.Currency,
+			UpdateTime: price.UpdateTime.Unix(),
+		}
+		if err := s.cache.Set(context.Background(), "XAGUSD", cachedPrice, cache.SilverPriceCacheTTL); err != nil {
 			log.Printf("Warning: failed to cache silver price for XAGUSD: %v", err)
 		}
 	}()
@@ -158,19 +193,33 @@ func (s *silverPriceService) FetchAllPrices(ctx context.Context) ([]*CachedSilve
 
 		buy := int64(apiPrice.Buy * 1000)
 		sell := int64(apiPrice.Sell * 1000)
+		changeBuy := int64(apiPrice.BuyChange * 1000)
+		changeSell := int64(apiPrice.SellChange * 1000)
 
 		price := &CachedSilverPrice{
 			TypeCode:   apiPrice.Name,
 			Name:       apiPrice.Name,
 			Buy:        buy,
 			Sell:       sell,
+			ChangeBuy:  changeBuy,
+			ChangeSell: changeSell,
 			Currency:   apiPrice.Currency,
 			UpdateTime: apiPrice.UpdateAt,
 		}
 		prices = append(prices, price)
 
 		go func(p *CachedSilverPrice) {
-			if err := s.cache.Set(context.Background(), p.TypeCode, p.Buy, p.Currency, cache.SilverPriceCacheTTL); err != nil {
+			cachedPrice := &cache.CachedSilverPrice{
+				TypeCode:   p.TypeCode,
+				Name:       p.Name,
+				Buy:        p.Buy,
+				Sell:       p.Sell,
+				ChangeBuy:  p.ChangeBuy,
+				ChangeSell: p.ChangeSell,
+				Currency:   p.Currency,
+				UpdateTime: p.UpdateTime.Unix(),
+			}
+			if err := s.cache.Set(context.Background(), p.TypeCode, cachedPrice, cache.SilverPriceCacheTTL); err != nil {
 				log.Printf("Warning: failed to cache silver price for %s: %v", p.TypeCode, err)
 			}
 		}(price)

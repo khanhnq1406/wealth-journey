@@ -34,6 +34,8 @@ type CachedSilverPrice struct {
 	Name       string `json:"name"`
 	Buy        int64  `json:"buy"`
 	Sell       int64  `json:"sell"`
+	ChangeBuy  int64  `json:"change_buy"`
+	ChangeSell int64  `json:"change_sell"`
 	Currency   string `json:"currency"`
 	UpdateTime int64  `json:"update_time"`
 }
@@ -44,16 +46,9 @@ func (c *SilverPriceCache) buildKey(symbol, currency string) string {
 }
 
 // Set stores a silver price in cache
-func (c *SilverPriceCache) Set(ctx context.Context, symbol string, price int64, currency string, ttl time.Duration) error {
-	key := c.buildKey(symbol, currency)
-	cachedPrice := &CachedSilverPrice{
-		TypeCode:   symbol,
-		Buy:        price,
-		Currency:   currency,
-		UpdateTime: time.Now().Unix(),
-	}
-
-	data, err := json.Marshal(cachedPrice)
+func (c *SilverPriceCache) Set(ctx context.Context, symbol string, price *CachedSilverPrice, ttl time.Duration) error {
+	key := c.buildKey(symbol, price.Currency)
+	data, err := json.Marshal(price)
 	if err != nil {
 		return fmt.Errorf("marshal silver price: %w", err)
 	}
@@ -62,23 +57,23 @@ func (c *SilverPriceCache) Set(ctx context.Context, symbol string, price int64, 
 }
 
 // Get retrieves a cached silver price
-func (c *SilverPriceCache) Get(ctx context.Context, symbol, currency string) (int64, error) {
+func (c *SilverPriceCache) Get(ctx context.Context, symbol, currency string) (*CachedSilverPrice, error) {
 	key := c.buildKey(symbol, currency)
 	data, err := c.client.Get(ctx, key).Bytes()
 	if err != nil {
 		if err == redis.Nil {
 			// Cache miss
-			return 0, fmt.Errorf("cache miss for %s", symbol)
+			return nil, nil
 		}
-		return 0, fmt.Errorf("failed to get silver price from cache: %w", err)
+		return nil, fmt.Errorf("failed to get silver price from cache: %w", err)
 	}
 
 	var price CachedSilverPrice
 	if err := json.Unmarshal(data, &price); err != nil {
-		return 0, fmt.Errorf("unmarshal silver price: %w", err)
+		return nil, fmt.Errorf("unmarshal silver price: %w", err)
 	}
 
-	return price.Buy, nil
+	return &price, nil
 }
 
 // Delete removes a silver price from cache

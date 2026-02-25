@@ -72,12 +72,14 @@ func (h *MarketPricesHandler) GetMarketPrices(c *gin.Context) {
 		silverItems = make([]*investmentv1.PriceItem, len(prices))
 		for i, p := range prices {
 			silverItems[i] = &investmentv1.PriceItem{
-				TypeCode:  p.TypeCode,
-				Buy:       p.Buy,
-				Sell:      p.Sell,
-				Currency:  p.Currency,
-				UpdatedAt: p.UpdateTime.Unix(),
-				Name:      p.Name,
+				TypeCode:   p.TypeCode,
+				Buy:        p.Buy,
+				Sell:       p.Sell,
+				ChangeBuy:  p.ChangeBuy,
+				ChangeSell: p.ChangeSell,
+				Currency:   p.Currency,
+				UpdatedAt:  p.UpdateTime.Unix(),
+				Name:       p.Name,
 			}
 		}
 	}()
