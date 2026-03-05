@@ -18,6 +18,14 @@ This directory contains the C4 model architecture documentation for the WealthJo
 |----------|-------------|
 | [Endpoint Snapshot](endpoint-snapshot.md) | Pre-restructure REST API endpoint inventory (75 endpoints) |
 
+## Architecture Decision Records (ADRs)
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| [ADR-001](adr-001-manual-di-over-wire.md) | Manual DI Provider Functions over Google Wire | Accepted |
+| [ADR-002](adr-002-constructor-injection.md) | Constructor Injection over Late-Binding Set* Methods | Accepted |
+| [ADR-003](adr-003-feature-based-frontend.md) | Feature-Based Frontend Module Organization | Accepted |
+
 ## Reading Guide
 
 - **New to the project?** Start with Level 1 (System Context) and work down.
