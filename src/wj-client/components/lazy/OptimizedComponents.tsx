@@ -56,7 +56,7 @@ export const TanStackTable = dynamic(
  */
 export const InvestmentDetailModal = dynamic(
   () =>
-    import("../modals/InvestmentDetailModal").then(
+    import("@/features/investment/components/InvestmentDetailModal").then(
       (mod) => mod.InvestmentDetailModal
     ),
   {
@@ -122,7 +122,7 @@ export const AccountBalanceChart = dynamic(
  * </Button>
  */
 export const preloadInvestmentDetailModal = () => {
-  import("../modals/InvestmentDetailModal");
+  import("@/features/investment/components/InvestmentDetailModal");
 };
 
 export const preloadTanStackTable = () => {
@@ -137,20 +137,20 @@ export const preloadCharts = () => {
 };
 
 export const preloadTransactionForms = () => {
-  import("../modals/forms/AddTransactionForm");
-  import("../modals/forms/EditTransactionForm");
-  import("../modals/forms/TransferMoneyForm");
+  import("@/features/transaction/forms/AddTransactionForm");
+  import("@/features/transaction/forms/EditTransactionForm");
+  import("@/features/wallet/forms/TransferMoneyForm");
 };
 
 export const preloadBudgetForms = () => {
-  import("../modals/forms/CreateBudgetForm");
-  import("../modals/forms/EditBudgetForm");
-  import("../modals/forms/CreateBudgetItemForm");
-  import("../modals/forms/EditBudgetItemForm");
+  import("@/features/budget/forms/CreateBudgetForm");
+  import("@/features/budget/forms/EditBudgetForm");
+  import("@/features/budget/forms/CreateBudgetItemForm");
+  import("@/features/budget/forms/EditBudgetItemForm");
 };
 
 export const preloadInvestmentForms = () => {
-  import("../modals/forms/AddInvestmentForm");
+  import("@/features/investment/forms/AddInvestmentForm");
 };
 
 /**
@@ -159,7 +159,7 @@ export const preloadInvestmentForms = () => {
  */
 export const CreateWalletForm = dynamic(
   () =>
-    import("../modals/forms/CreateWalletForm").then(
+    import("@/features/wallet/forms/CreateWalletForm").then(
       (mod) => mod.CreateWalletForm
     ),
   {
@@ -170,7 +170,7 @@ export const CreateWalletForm = dynamic(
 
 export const AddTransactionForm = dynamic(
   () =>
-    import("../modals/forms/AddTransactionForm").then(
+    import("@/features/transaction/forms/AddTransactionForm").then(
       (mod) => mod.AddTransactionForm
     ),
   {
@@ -181,7 +181,7 @@ export const AddTransactionForm = dynamic(
 
 export const TransferMoneyForm = dynamic(
   () =>
-    import("../modals/forms/TransferMoneyForm").then(
+    import("@/features/wallet/forms/TransferMoneyForm").then(
       (mod) => mod.TransferMoneyForm
     ),
   {
@@ -192,7 +192,7 @@ export const TransferMoneyForm = dynamic(
 
 export const AddInvestmentForm = dynamic(
   () =>
-    import("../modals/forms/AddInvestmentForm").then(
+    import("@/features/investment/forms/AddInvestmentForm").then(
       (mod) => mod.AddInvestmentForm
     ),
   {
@@ -203,7 +203,7 @@ export const AddInvestmentForm = dynamic(
 
 export const EditTransactionForm = dynamic(
   () =>
-    import("../modals/forms/EditTransactionForm").then(
+    import("@/features/transaction/forms/EditTransactionForm").then(
       (mod) => mod.EditTransactionForm
     ),
   {
@@ -214,7 +214,7 @@ export const EditTransactionForm = dynamic(
 
 export const CreateBudgetForm = dynamic(
   () =>
-    import("../modals/forms/CreateBudgetForm").then(
+    import("@/features/budget/forms/CreateBudgetForm").then(
       (mod) => mod.CreateBudgetForm
     ),
   {
@@ -225,7 +225,7 @@ export const CreateBudgetForm = dynamic(
 
 export const EditBudgetForm = dynamic(
   () =>
-    import("../modals/forms/EditBudgetForm").then(
+    import("@/features/budget/forms/EditBudgetForm").then(
       (mod) => mod.EditBudgetForm
     ),
   {
@@ -236,7 +236,7 @@ export const EditBudgetForm = dynamic(
 
 export const CreateBudgetItemForm = dynamic(
   () =>
-    import("../modals/forms/CreateBudgetItemForm").then(
+    import("@/features/budget/forms/CreateBudgetItemForm").then(
       (mod) => mod.CreateBudgetItemForm
     ),
   {
@@ -247,7 +247,7 @@ export const CreateBudgetItemForm = dynamic(
 
 export const EditBudgetItemForm = dynamic(
   () =>
-    import("../modals/forms/EditBudgetItemForm").then(
+    import("@/features/budget/forms/EditBudgetItemForm").then(
       (mod) => mod.EditBudgetItemForm
     ),
   {

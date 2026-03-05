@@ -32,7 +32,7 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { cn } from "@/lib/utils/cn";
 import { ExportButton, ExportOptions } from "@/components/export/ExportDialog";
 import { Button } from "@/components/Button";
-import { useExportTransactions } from "@/hooks/useExportTransactions";
+import { useExportTransactions } from "@/features/transaction/hooks/useExportTransactions";
 import { EyeIcon, EyeOffIcon } from "@/components/icons";
 
 // Date range helpers for quick filters
@@ -98,7 +98,7 @@ const EditTransactionForm = dynamic(
 // Lazy load ImportTransactionsForm
 const ImportTransactionsForm = dynamic(
   () =>
-    import("@/components/modals/forms/ImportTransactionsForm").then(
+    import("@/features/import/forms/ImportTransactionsForm").then(
       (mod) => mod.ImportTransactionsForm,
     ),
   { ssr: false },

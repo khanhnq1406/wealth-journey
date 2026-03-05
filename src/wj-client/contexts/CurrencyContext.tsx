@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { setAuth } from "@/redux/actions";
+import { setAuth } from "@/features/auth/store/actions";
 import {
   useMutationUpdatePreferences,
   useQueryGetAuth,

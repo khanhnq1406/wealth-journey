@@ -6,7 +6,7 @@ import {
   formatGoldQuantityDisplay,
   formatGoldPriceDisplay,
   getGoldUnitLabel,
-} from "@/lib/utils/gold-calculator";
+} from "@/features/investment/utils/gold-calculator";
 import {
   isSilverType,
   getSilverTypeLabel,
@@ -14,7 +14,7 @@ import {
   formatSilverPrice as formatSilverPriceUtil,
   getSilverMarketPriceUnit,
   SilverUnit,
-} from "@/lib/utils/silver-calculator";
+} from "@/features/investment/utils/silver-calculator";
 
 // Formatting helpers
 export const formatCurrency = (amount: number, currency: string = "VND"): string => {

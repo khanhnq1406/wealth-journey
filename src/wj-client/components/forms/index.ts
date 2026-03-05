@@ -1,2 +1,2 @@
-export { SymbolAutocomplete } from "./SymbolAutocomplete";
-export type { SymbolAutocompleteProps } from "./SymbolAutocomplete";
+export { SymbolAutocomplete } from "@/features/investment/components/SymbolAutocomplete";
+export type { SymbolAutocompleteProps } from "@/features/investment/components/SymbolAutocomplete";

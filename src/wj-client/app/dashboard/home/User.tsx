@@ -1,6 +1,6 @@
 "use client";
 
-import { store } from "@/redux/store";
+import { store } from "@/features/auth/store/store";
 import { ButtonType, resources } from "@/app/constants";
 import { Button } from "@/components/Button";
 import { memo, useCallback } from "react";

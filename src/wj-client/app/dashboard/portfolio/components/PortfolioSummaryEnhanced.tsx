@@ -12,7 +12,7 @@ import { DonutChartSVG } from "@/components/charts/DonutChartSVG";
 import { Button } from "@/components/Button";
 import { ButtonType, resources } from "@/app/constants";
 import Image from "next/image";
-import { usePortfolioHistoricalValues } from "@/hooks/usePortfolioHistoricalValues";
+import { usePortfolioHistoricalValues } from "@/features/investment/hooks/usePortfolioHistoricalValues";
 import { InvestmentType } from "@/gen/protobuf/v1/investment";
 import { PlusIcon, RefreshIcon } from "@/components/icons";
 

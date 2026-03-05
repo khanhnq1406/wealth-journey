@@ -3,8 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { LOCAL_STORAGE_TOKEN_NAME, routes } from "@/app/constants";
 import { useRouter } from "next/navigation";
-import { store } from "@/redux/store";
-import { setAuth } from "@/redux/actions";
+import { store } from "@/features/auth/store/store";
+import { setAuth } from "@/features/auth/store/actions";
 import { useQueryVerifyAuth } from "@/utils/generated/hooks";
 import { FullPageLoading } from "@/components/loading/FullPageLoading";
 

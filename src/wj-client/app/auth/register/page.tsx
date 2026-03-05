@@ -4,8 +4,8 @@ import Link from "next/link";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
 import { LOCAL_STORAGE_TOKEN_NAME, routes } from "@/app/constants";
-import { store } from "@/redux/store";
-import { setAuth } from "@/redux/actions";
+import { store } from "@/features/auth/store/store";
+import { setAuth } from "@/features/auth/store/actions";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useMutationRegister } from "@/utils/generated/hooks";

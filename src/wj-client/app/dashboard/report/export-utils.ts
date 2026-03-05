@@ -11,7 +11,7 @@ import {
   TrendData,
   ExpenseCategoryData,
   CategoryComparisonData,
-} from "@/utils/export/report-pdf-export";
+} from "@/features/report/utils/export/report-pdf-export";
 
 /**
  * Prepare report data for export
