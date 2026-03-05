@@ -4,9 +4,9 @@ Shows the internal structure of the Go backend — how HTTP requests flow throug
 
 ```mermaid
 C4Component
-    title WealthJourney Backend - Component Diagram
+    title WealthJourney Backend - Component Diagram (with Trust Boundaries)
 
-    Container_Boundary(transport, "Transport Layer") {
+    Container_Boundary(transport, "Transport Layer — TRUST BOUNDARY: Untrusted input enters here") {
         Component(gin, "Gin HTTP Server", "gin-gonic/gin", "Request routing, CORS, middleware pipeline")
         Component(auth_mw, "Auth Middleware", "JWT + Redis", "Extracts bearer token, verifies against Redis whitelist, sets user context")
         Component(rate_mw, "Rate Limiter", "Token bucket", "Per-IP (public) and per-user (protected) rate limiting")
@@ -14,7 +14,7 @@ C4Component
         Component(grpc_gw, "gRPC-Gateway", "grpc-ecosystem/grpc-gateway", "HTTP-to-gRPC reverse proxy")
     }
 
-    Container_Boundary(handlers, "HTTP Handlers") {
+    Container_Boundary(handlers, "HTTP Handlers — Input validated and user authenticated at this layer") {
         Component(auth_h, "Auth Handlers", "Register, Login, Logout, Verify", "Google OAuth token verification, JWT issuance")
         Component(wallet_h, "Wallet Handlers", "CRUD + Transfer + Balance", "Wallet management and fund operations")
         Component(txn_h, "Transaction Handlers", "CRUD + Reports", "Transaction management and financial reports")
@@ -25,7 +25,7 @@ C4Component
         Component(price_h, "Market Price Handlers", "Gold + Silver + Market", "Gold/silver type codes and combined market prices")
     }
 
-    Container_Boundary(services, "Service Layer (Business Logic)") {
+    Container_Boundary(services, "Service Layer — TRUST BOUNDARY: Data considered validated after this point") {
         Component(auth_svc, "Auth Service", "domain/auth", "Google token verification, JWT generation, session management")
         Component(user_svc, "User Service", "domain/service", "User CRUD, preferences, currency conversion orchestration")
         Component(wallet_svc, "Wallet Service", "domain/service", "Balance tracking, fund transfers, multi-currency support")
@@ -53,7 +53,7 @@ C4Component
         Component(portfolio_repo, "Portfolio History Repository", "GORM", "Historical portfolio value records")
     }
 
-    Container_Boundary(external, "External Integrations") {
+    Container_Boundary(external, "External Integrations — TRUST BOUNDARY: Untrusted external responses") {
         Component(yahoo_client, "Yahoo Finance Client", "pkg/yahoo", "Market price quotes, symbol search, rate throttling")
         Component(vang_client, "vang.today Client", "pkg/gold + pkg/silver", "Vietnamese gold/silver price fetching")
         Component(google_client, "Google OAuth Verifier", "domain/auth", "ID token verification via Google APIs")
@@ -113,6 +113,23 @@ C4Component
     Rel(auth_svc, google_client, "Verify ID tokens")
     Rel(import_svc, supabase_client, "File operations")
 ```
+
+## Trust Boundaries Within Backend
+
+| Boundary | Where | What Happens |
+|----------|-------|--------------|
+| **Untrusted → Auth Middleware** | Transport Layer entry | Raw HTTP request enters. JWT extracted and verified against Redis whitelist. Rate limiting applied. |
+| **Auth Middleware → Handlers** | After authentication | User ID set in context (from JWT, never from request params). Request is authenticated but input not yet validated. |
+| **Handlers → Service Layer** | Handler calls service method | Handler validates/parses request body. Service layer performs business validation + ownership checks. After service validation, data is considered trusted. |
+| **Service Layer → Repository** | Service calls repository | Data is validated and authorized. Repository only handles persistence logic (no business rules). |
+| **Service → External APIs** | Outbound to Yahoo/vang.today/Google | Responses are UNTRUSTED. Must validate types, ranges, handle timeouts. Cache with TTL for resilience. |
+| **External APIs → Service** | Inbound price/token data | All external data validated before storing. Numeric ranges checked. Graceful fallback to stale cache on failure. |
+
+**Security invariants:**
+- User ID ALWAYS comes from JWT context, never from request parameters
+- Every service method that accesses user data verifies ownership
+- External API failures never cause data corruption (cache fallback)
+- Database errors are wrapped before returning to client (no leaking internals)
 
 ## Data Flow Examples
 
