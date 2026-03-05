@@ -112,6 +112,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
       await updatePreferencesMutation.mutateAsync({
         preferences: {
           preferredCurrency: newCurrency,
+          language: "",
         },
       });
     },

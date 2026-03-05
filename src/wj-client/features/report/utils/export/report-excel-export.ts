@@ -14,7 +14,7 @@ import * as ExcelJS from "exceljs";
 import { formatCurrency as formatCurrencyUtil } from "@/utils/currency-formatter";
 
 // Re-export types from data-utils for convenience
-export type { PeriodType, DateRange } from "@/app/dashboard/report/PeriodSelector";
+export type { PeriodType, DateRange } from "@/app/[locale]/dashboard/report/PeriodSelector";
 
 /**
  * Summary data for Excel export

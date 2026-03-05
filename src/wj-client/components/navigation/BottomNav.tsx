@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "@/lib/navigation";
 import { cn } from "@/lib/utils/cn";
 import { memo } from "react";
 import { ZIndex } from "@/lib/utils/z-index";
@@ -132,45 +132,48 @@ export const BottomNav = memo(function BottomNav({
 /**
  * Helper function to create navigation items from routes
  * Use this to easily generate nav items with proper icons
+ * @param routes - Route paths record
+ * @param t - Optional translation function from useTranslations('nav')
  */
 export const createNavItems = (
-  routes: Record<string, string>
+  routes: Record<string, string>,
+  t?: (key: string) => string
 ): NavItem[] => {
   return [
     {
       href: routes.home,
-      label: "Home",
-      ariaLabel: "Go to home dashboard",
+      label: t ? t('home') : "Home",
+      ariaLabel: t ? t('home') : "Go to home dashboard",
       icon: <HomeIcon size="md" decorative />,
     },
     {
       href: routes.transaction,
-      label: "Transactions",
-      ariaLabel: "Go to transactions",
+      label: t ? t('transactions') : "Transactions",
+      ariaLabel: t ? t('transactions') : "Go to transactions",
       icon: <TransactionIcon size="md" decorative />,
     },
     {
       href: routes.wallets,
-      label: "Wallets",
-      ariaLabel: "Go to wallets",
+      label: t ? t('wallets') : "Wallets",
+      ariaLabel: t ? t('wallets') : "Go to wallets",
       icon: <WalletIcon size="md" decorative />,
     },
     {
       href: routes.portfolio,
-      label: "Portfolio",
-      ariaLabel: "Go to investment portfolio",
+      label: t ? t('portfolio') : "Portfolio",
+      ariaLabel: t ? t('portfolio') : "Go to investment portfolio",
       icon: <PortfolioIcon size="md" decorative />,
     },
     {
       href: routes.report,
-      label: "Reports",
-      ariaLabel: "Go to reports",
+      label: t ? t('reports') : "Reports",
+      ariaLabel: t ? t('reports') : "Go to reports",
       icon: <ReportsIcon size="md" decorative />,
     },
     {
       href: routes.budget,
-      label: "Budget",
-      ariaLabel: "Go to budget",
+      label: t ? t('budget') : "Budget",
+      ariaLabel: t ? t('budget') : "Go to budget",
       icon: <BudgetIcon size="md" decorative />,
     },
   ];

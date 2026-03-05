@@ -23,6 +23,7 @@ import {
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { formatCurrency } from "@/utils/currency-formatter";
 import { amountToSmallestUnit } from "@/lib/utils/units";
+import { useTranslations } from "next-intl";
 
 interface EditWalletFormProps {
   wallet: Wallet;
@@ -35,6 +36,9 @@ interface EditWalletFormProps {
  * Owns its mutation logic, error handling, and loading state.
  */
 export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
+  const tForm = useTranslations("wallet.form");
+  const tEdit = useTranslations("wallet.edit");
+  const tCommon = useTranslations("common");
   const { currency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [showAdjustment, setShowAdjustment] = useState(false);
@@ -44,7 +48,7 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
   const updateWalletMutation = useMutationUpdateWallet({
     onError: (error: any) => {
       setErrorMessage(
-        error.message || "Failed to update wallet. Please try again",
+        error.message || tForm("failedToUpdate"),
       );
     },
   });
@@ -52,7 +56,7 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
   const adjustBalanceMutation = useMutationAdjustBalance({
     onError: (error: any) => {
       setErrorMessage(
-        error.message || "Failed to adjust balance. Please try again",
+        error.message || tEdit("failedToAdjust"),
       );
     },
   });
@@ -185,10 +189,10 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
       if (nameChanged || adjustmentMade) {
         const message =
           nameChanged && adjustmentMade
-            ? "Wallet name and balance have been updated successfully"
+            ? tEdit("nameAndBalanceSuccess")
             : nameChanged
-              ? "Wallet name has been updated successfully"
-              : "Balance has been adjusted successfully";
+              ? tEdit("nameUpdatedSuccess")
+              : tEdit("balanceAdjustedSuccess");
         setSuccessMessage(message);
         setShowSuccess(true);
         setErrorMessage("");
@@ -228,12 +232,12 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
 
       {/* Wallet Name Section */}
       <div>
-        <h3 className="text-lg font-medium mb-3">Wallet Information</h3>
+        <h3 className="text-lg font-medium mb-3">{tEdit("walletInformation")}</h3>
         <FormInput
           name="walletName"
           control={control}
-          label="Name"
-          placeholder="Enter wallet's name"
+          label={tForm("name")}
+          placeholder={tForm("namePlaceholder")}
           required
           disabled={isLoading}
         />
@@ -242,27 +246,27 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
       {/* Balance Adjustment Section */}
       <div className="border-t pt-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-medium">Balance Adjustment</h3>
+          <h3 className="text-lg font-medium">{tEdit("balanceAdjustment")}</h3>
           <button
             type="button"
             onClick={() => setShowAdjustment(!showAdjustment)}
             className="text-sm text-gray-600 hover:text-gray-900"
             disabled={isLoading}
           >
-            {showAdjustment ? "Cancel" : "Adjust Balance"}
+            {showAdjustment ? tCommon("cancel") : tEdit("adjustBalance")}
           </button>
         </div>
 
         {showAdjustment && (
           <div className="space-y-3 bg-gray-50 p-4 rounded-md">
             <div className="text-sm text-gray-600 mb-2">
-              Current Balance: {formatCurrency(currentBalance, currency)}
+              {tEdit("currentBalance", { amount: formatCurrency(currentBalance, currency) })}
             </div>
 
             {/* Adjustment Type Radio Buttons */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Adjustment Type <span className="text-red-500">*</span>
+                {tEdit("adjustmentType")} <span className="text-red-500">*</span>
               </label>
               <div className="flex gap-4">
                 <label className="flex items-center">

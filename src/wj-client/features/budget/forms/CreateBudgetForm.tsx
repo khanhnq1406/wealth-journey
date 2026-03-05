@@ -15,6 +15,7 @@ import {
 import { Success } from "@/components/modals/Success";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { amountToSmallestUnit } from "@/lib/utils/units";
+import { useTranslations } from "next-intl";
 
 interface CreateBudgetFormProps {
   onSuccess?: () => void;
@@ -26,6 +27,7 @@ interface CreateBudgetFormProps {
  * After successful creation, calls onSuccess() callback (caller handles refetch + modal close).
  */
 export function CreateBudgetForm({ onSuccess }: CreateBudgetFormProps) {
+  const t = useTranslations("budget");
   const { currency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
@@ -57,14 +59,14 @@ export function CreateBudgetForm({ onSuccess }: CreateBudgetFormProps) {
         onSuccess: (data) => {
           const message =
             data?.message ||
-            `Budget "${data?.data?.name || ""}" has been created successfully`;
+            t("form.createdSuccess", { name: data?.data?.name || "" });
           setSuccessMessage(message);
           setShowSuccess(true);
           setErrorMessage("");
         },
         onError: (error: any) => {
           setErrorMessage(
-            error.message || "Failed to create budget. Please try again",
+            error.message || t("form.failedToCreate"),
           );
         },
       },
@@ -87,15 +89,15 @@ export function CreateBudgetForm({ onSuccess }: CreateBudgetFormProps) {
       <FormInput
         name="name"
         control={control}
-        label="Budget Name"
-        placeholder="e.g., Monthly Budget"
+        label={t("form.budgetName")}
+        placeholder={t("form.budgetNamePlaceholder")}
         required
       />
 
       <FormNumberInput
         name="total"
         control={control}
-        label="Total Amount"
+        label={t("form.totalAmount")}
         placeholder="0"
         suffix={currency}
         required
@@ -110,7 +112,7 @@ export function CreateBudgetForm({ onSuccess }: CreateBudgetFormProps) {
           loading={createBudget.isPending}
           htmlType="submit"
         >
-          Create
+          {t("form.create")}
         </Button>
       </div>
     </form>

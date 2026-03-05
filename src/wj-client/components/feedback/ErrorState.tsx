@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 
 export interface ErrorStateProps {
@@ -71,7 +72,7 @@ export interface ErrorStateProps {
 }
 
 export function ErrorState({
-  title = "Something went wrong",
+  title,
   message,
   code,
   primaryAction,
@@ -83,6 +84,9 @@ export function ErrorState({
   className,
   icon,
 }: ErrorStateProps) {
+  const t = useTranslations("feedback.errorState");
+  const tCommon = useTranslations("common");
+  const resolvedTitle = title ?? t("somethingWentWrong");
   const severityConfig = {
     error: {
       bg: "bg-red-50 dark:bg-red-900/20",
@@ -176,13 +180,13 @@ export function ErrorState({
       )}>
         {/* Title and Code */}
         <div className="flex items-center justify-center gap-2">
-          {title && (
+          {resolvedTitle && (
             <h3 className={cn(
               "font-semibold",
               config.textColor,
               variant === "compact" ? "text-base" : "text-lg sm:text-xl"
             )}>
-              {title}
+              {resolvedTitle}
             </h3>
           )}
           {code && (
@@ -215,7 +219,7 @@ export function ErrorState({
               config.iconColor,
               "hover:underline"
             )}>
-              Show details
+              {tCommon("showDetails")}
             </summary>
             <pre className={cn(
               "mt-2 p-3 rounded-lg text-xs overflow-x-auto",
@@ -327,61 +331,46 @@ export interface ErrorStatePresetProps {
   details?: string;
 }
 
-const errorPresets = {
-  network: {
-    title: "Network Error",
-    message: "Please check your internet connection and try again.",
-    icon: (
-      <svg className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
-      </svg>
-    ),
-  },
-  server: {
-    title: "Server Error",
-    message: "Our servers are experiencing issues. Please try again later.",
-    icon: (
-      <svg className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 01-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 01-2-2m-2-4h.01M17 16h.01" />
-      </svg>
-    ),
-  },
-  unauthorized: {
-    title: "Access Denied",
-    message: "You don't have permission to access this resource.",
-    icon: (
-      <svg className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-      </svg>
-    ),
-  },
-  "not-found": {
-    title: "Not Found",
-    message: "The requested resource could not be found.",
-    icon: (
-      <svg className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" />
-      </svg>
-    ),
-  },
-  timeout: {
-    title: "Request Timeout",
-    message: "The request took too long to complete. Please try again.",
-    icon: (
-      <svg className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-  },
-  unknown: {
-    title: "Unexpected Error",
-    message: "An unexpected error occurred. Please try again.",
-    icon: (
-      <svg className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
-    ),
-  },
+const errorPresetIcons = {
+  network: (
+    <svg className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
+    </svg>
+  ),
+  server: (
+    <svg className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 01-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 01-2-2m-2-4h.01M17 16h.01" />
+    </svg>
+  ),
+  unauthorized: (
+    <svg className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+    </svg>
+  ),
+  "not-found": (
+    <svg className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" />
+    </svg>
+  ),
+  timeout: (
+    <svg className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
+  unknown: (
+    <svg className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+  ),
+};
+
+const errorPresetTranslationKeys: Record<string, { title: string; message: string }> = {
+  network: { title: "networkError", message: "networkErrorDescription" },
+  server: { title: "serverError", message: "serverErrorDescription" },
+  unauthorized: { title: "accessDenied", message: "accessDeniedDescription" },
+  "not-found": { title: "notFound", message: "notFoundDescription" },
+  timeout: { title: "requestTimeout", message: "requestTimeoutDescription" },
+  unknown: { title: "unexpectedError", message: "unexpectedErrorDescription" },
 };
 
 export function ErrorStatePreset({
@@ -394,15 +383,18 @@ export function ErrorStatePreset({
   className,
   details,
 }: ErrorStatePresetProps) {
-  const preset = errorPresets[type];
+  const t = useTranslations("feedback.errorState");
+  const tCommon = useTranslations("common");
+  const keys = errorPresetTranslationKeys[type];
+  const icon = errorPresetIcons[type];
 
   return (
     <ErrorState
-      icon={preset.icon}
-      title={title || preset.title}
-      message={message || preset.message}
+      icon={icon}
+      title={title || t(keys.title as any)}
+      message={message || t(keys.message as any)}
       primaryAction={onRetry ? {
-        label: "Try Again",
+        label: tCommon("tryAgain"),
         onClick: onRetry,
       } : undefined}
       secondaryAction={secondaryAction}

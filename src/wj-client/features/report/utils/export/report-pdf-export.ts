@@ -19,7 +19,7 @@ import { formatCurrency as formatCurrencyUtil } from "@/utils/currency-formatter
 export type {
   PeriodType,
   DateRange,
-} from "@/app/dashboard/report/PeriodSelector";
+} from "@/app/[locale]/dashboard/report/PeriodSelector";
 
 /**
  * Summary data for PDF export

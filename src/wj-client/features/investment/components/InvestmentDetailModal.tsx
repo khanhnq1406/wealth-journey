@@ -34,7 +34,7 @@ import {
   isCustomInvestment,
   formatInvestmentPrice,
   formatUnrealizedPNL,
-} from "@/app/dashboard/portfolio/helpers";
+} from "@/app/[locale]/dashboard/portfolio/helpers";
 import { isGoldType } from "@/features/investment/utils/gold-calculator";
 import { isSilverType } from "@/features/investment/utils/silver-calculator";
 

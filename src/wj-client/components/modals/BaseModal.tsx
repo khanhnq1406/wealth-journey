@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 import { ZIndex } from "@/lib/utils/z-index";
 
@@ -82,6 +83,7 @@ export function BaseModal({
   id,
   ariaLabel,
 }: BaseModalProps) {
+  const tCommon = useTranslations("common");
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -577,7 +579,7 @@ export function BaseModal({
                   onClick={onClose}
                   // Touch-friendly minimum size (44x44px per iOS Human Interface Guidelines)
                   className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-dark-surface-hover dark:active:bg-dark-surface-active transition-colors flex-shrink-0"
-                  aria-label="Close modal"
+                  aria-label={tCommon("close")}
                   type="button"
                 >
                   <svg

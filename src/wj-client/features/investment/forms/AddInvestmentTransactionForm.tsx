@@ -29,7 +29,7 @@ import {
   calculateTransactionCost,
   formatCurrency,
 } from "@/lib/utils/units";
-import { getInvestmentUnitLabelFull } from "@/app/dashboard/portfolio/helpers";
+import { getInvestmentUnitLabelFull } from "@/app/[locale]/dashboard/portfolio/helpers";
 import {
   AddTransactionFormInput,
   addTransactionSchema,

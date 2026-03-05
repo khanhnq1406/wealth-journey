@@ -5,8 +5,10 @@ import Link from "next/link";
 import { store } from "@/features/auth/store/store";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 export default function LandingNavbar() {
+  const t = useTranslations("landing");
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -35,10 +37,10 @@ export default function LandingNavbar() {
   }, []);
 
   const navLinks = [
-    { name: "Features", href: "#features" },
+    { name: t("navbar.features"), href: "#features" },
     { name: "Bank Import", href: "#bank-import" },
     { name: "Investment Tracking", href: "#investment-tracking" },
-    { name: "How It Works", href: "#how-it-works" },
+    { name: t("navbar.howItWorks"), href: "#how-it-works" },
     // { name: "Pricing", href: "#pricing" },
   ];
 
@@ -126,7 +128,7 @@ export default function LandingNavbar() {
                   href="/auth/register"
                   className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-500 transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 min-h-[44px] flex items-center"
                 >
-                  Get Started
+                  {t("navbar.getStarted")}
                 </Link>
               </div>
             )}
@@ -233,7 +235,7 @@ export default function LandingNavbar() {
                         className="px-4 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-500 transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center mx-3"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
-                        Get Started
+                        {t("navbar.getStarted")}
                       </Link>
                     </motion.div>
                   </>

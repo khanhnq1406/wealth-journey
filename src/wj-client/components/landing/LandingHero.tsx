@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -70,6 +71,7 @@ function DashboardPreview() {
 }
 
 export default function LandingHero() {
+  const t = useTranslations("landing");
   const prefersReducedMotion = useReducedMotion();
 
   // Create motion variants that respect reduced motion preferences
@@ -104,8 +106,7 @@ export default function LandingHero() {
         <div className="text-center">
           <motion.div variants={safeItemVariants}>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 px-2">
-              Your <span className="text-primary-600">All-In-One</span>{" "}
-              Investment & Finance Platform
+              {t("hero.title")}
             </h1>
           </motion.div>
 
@@ -113,10 +114,7 @@ export default function LandingHero() {
             variants={safeItemVariants}
             className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 md:mb-10 max-w-3xl mx-auto px-4 leading-relaxed"
           >
-            Track{" "}
-            <strong>stocks, ETFs, mutual funds, crypto, gold & silver</strong>{" "}
-            in one unified portfolio. Plus budgets, expenses, and real-time
-            market data - everything you need in one place.
+            {t("hero.subtitle")}
           </motion.p>
 
           <motion.div
@@ -127,13 +125,13 @@ export default function LandingHero() {
               href="/auth/register"
               className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-primary-600 text-white rounded-md hover:bg-primary-500 transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center"
             >
-              Get Started for Free
+              {t("hero.getStarted")}
             </Link>
             <a
               href="#features"
               className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 border-2 border-primary-600 text-primary-600 rounded-md hover:bg-primary-600 hover:text-white transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center"
             >
-              Explore Features
+              {t("hero.learnMore")}
             </a>
           </motion.div>
 
