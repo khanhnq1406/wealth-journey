@@ -1,7 +1,7 @@
 "use client";
-import { store } from "@/redux/store";
+import { store } from "@/features/auth/store/store";
 import { BACKEND_URL, LOCAL_STORAGE_TOKEN_NAME, routes } from "../../constants";
-import { removeAuth } from "@/redux/actions";
+import { removeAuth } from "@/features/auth/store/actions";
 import { redirect } from "next/navigation";
 import { apiClient } from "@/utils/api-client";
 

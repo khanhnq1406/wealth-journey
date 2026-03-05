@@ -10,15 +10,26 @@ import (
 	"wealthjourney/domain/auth"
 	apperrors "wealthjourney/pkg/errors"
 	"wealthjourney/pkg/handler"
+	"wealthjourney/pkg/redis"
 	sessionv1 "wealthjourney/protobuf/v1"
 )
 
-// ListSessions lists all active sessions for the authenticated user
-func ListSessions(c *gin.Context) {
-	if !checkDependencies(c) {
-		return
-	}
+// SessionHandlers handles session management HTTP requests.
+type SessionHandlers struct {
+	authSrv *auth.Server
+	rdb     *redis.RedisClient
+}
 
+// NewSessionHandlers creates session handlers with injected dependencies.
+func NewSessionHandlers(authSrv *auth.Server, rdb *redis.RedisClient) *SessionHandlers {
+	return &SessionHandlers{
+		authSrv: authSrv,
+		rdb:     rdb,
+	}
+}
+
+// ListSessions lists all active sessions for the authenticated user
+func (h *SessionHandlers) ListSessions(c *gin.Context) {
 	// Get user email from context (set by AuthMiddleware)
 	userEmail, exists := c.Get("user_email")
 	if !exists {
@@ -35,8 +46,7 @@ func ListSessions(c *gin.Context) {
 		return
 	}
 
-	authServer := auth.NewServer(deps.DB, deps.RDB, deps.Cfg)
-	claims, err := authServer.ParseToken(token)
+	claims, err := h.authSrv.ParseToken(token)
 	if err != nil {
 		handler.UnauthorizedWithPath(c, "Invalid token")
 		return
@@ -45,7 +55,7 @@ func ListSessions(c *gin.Context) {
 	currentSessionID := claims.SessionID
 
 	// Get all sessions for user from Redis
-	sessionIDs, err := deps.RDB.GetUserSessions(email)
+	sessionIDs, err := h.rdb.GetUserSessions(email)
 	if err != nil {
 		log.Printf("[SESSION] Failed to get sessions: %v", err)
 		handler.HandleError(c, apperrors.NewInternalError("Failed to retrieve sessions"))
@@ -55,7 +65,7 @@ func ListSessions(c *gin.Context) {
 	// Build session info list
 	sessions := make([]*sessionv1.SessionInfo, 0, len(sessionIDs))
 	for _, sessionID := range sessionIDs {
-		metadata, err := deps.RDB.GetSession(sessionID)
+		metadata, err := h.rdb.GetSession(sessionID)
 		if err != nil {
 			log.Printf("[SESSION] Failed to get metadata for session %s: %v", sessionID, err)
 			continue
@@ -84,11 +94,7 @@ func ListSessions(c *gin.Context) {
 }
 
 // RevokeSession revokes a specific session
-func RevokeSession(c *gin.Context) {
-	if !checkDependencies(c) {
-		return
-	}
-
+func (h *SessionHandlers) RevokeSession(c *gin.Context) {
 	sessionID := c.Param("session_id")
 	if sessionID == "" {
 		handler.BadRequest(c, apperrors.NewValidationError("session_id is required"))
@@ -111,8 +117,7 @@ func RevokeSession(c *gin.Context) {
 		return
 	}
 
-	authServer := auth.NewServer(deps.DB, deps.RDB, deps.Cfg)
-	claims, err := authServer.ParseToken(token)
+	claims, err := h.authSrv.ParseToken(token)
 	if err != nil {
 		handler.UnauthorizedWithPath(c, "Invalid token")
 		return
@@ -127,7 +132,7 @@ func RevokeSession(c *gin.Context) {
 	}
 
 	// Verify session belongs to user
-	exists, err = deps.RDB.SessionExists(email, sessionID)
+	exists, err = h.rdb.SessionExists(email, sessionID)
 	if err != nil {
 		log.Printf("[SESSION] Error checking session: %v", err)
 		handler.HandleError(c, apperrors.NewInternalError("Failed to verify session"))
@@ -140,7 +145,7 @@ func RevokeSession(c *gin.Context) {
 	}
 
 	// Revoke session
-	if err := deps.RDB.RemoveSession(email, sessionID); err != nil {
+	if err := h.rdb.RemoveSession(email, sessionID); err != nil {
 		log.Printf("[SESSION] Failed to revoke session: %v", err)
 		handler.HandleError(c, apperrors.NewInternalError("Failed to revoke session"))
 		return
@@ -156,11 +161,7 @@ func RevokeSession(c *gin.Context) {
 }
 
 // RevokeAllSessions revokes all sessions except the current one
-func RevokeAllSessions(c *gin.Context) {
-	if !checkDependencies(c) {
-		return
-	}
-
+func (h *SessionHandlers) RevokeAllSessions(c *gin.Context) {
 	// Get user email from context
 	userEmail, exists := c.Get("user_email")
 	if !exists {
@@ -177,8 +178,7 @@ func RevokeAllSessions(c *gin.Context) {
 		return
 	}
 
-	authServer := auth.NewServer(deps.DB, deps.RDB, deps.Cfg)
-	claims, err := authServer.ParseToken(token)
+	claims, err := h.authSrv.ParseToken(token)
 	if err != nil {
 		handler.UnauthorizedWithPath(c, "Invalid token")
 		return
@@ -187,7 +187,7 @@ func RevokeAllSessions(c *gin.Context) {
 	currentSessionID := claims.SessionID
 
 	// Get all sessions
-	sessionIDs, err := deps.RDB.GetUserSessions(email)
+	sessionIDs, err := h.rdb.GetUserSessions(email)
 	if err != nil {
 		log.Printf("[SESSION] Failed to get sessions: %v", err)
 		handler.HandleError(c, apperrors.NewInternalError("Failed to retrieve sessions"))
@@ -198,7 +198,7 @@ func RevokeAllSessions(c *gin.Context) {
 	revokedCount := 0
 	for _, sessionID := range sessionIDs {
 		if sessionID != currentSessionID {
-			if err := deps.RDB.RemoveSession(email, sessionID); err != nil {
+			if err := h.rdb.RemoveSession(email, sessionID); err != nil {
 				log.Printf("[SESSION] Failed to revoke session %s: %v", sessionID, err)
 				continue
 			}

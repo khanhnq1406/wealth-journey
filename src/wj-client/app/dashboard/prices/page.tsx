@@ -7,7 +7,7 @@ import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
 import { TanStackTable } from "@/components/table/TanStackTable";
 import { MobileTable, MobileColumnDef } from "@/components/table/MobileTable";
-import { SymbolAutocomplete } from "@/components/forms/SymbolAutocomplete";
+import { SymbolAutocomplete } from "@/features/investment/components/SymbolAutocomplete";
 import {
   useQueryGetMarketPrices,
   useQueryGetMarketPrice,

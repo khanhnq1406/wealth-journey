@@ -5,7 +5,7 @@ import {
   TrendData,
   ExpenseCategoryData,
   CategoryComparisonData,
-} from "@/utils/export/report-pdf-export";
+} from "@/features/report/utils/export/report-pdf-export";
 
 describe("prepareReportExportData", () => {
   it("should transform report page data into ReportExportData format", () => {

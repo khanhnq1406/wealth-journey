@@ -49,7 +49,7 @@ import {
   UpdateSuccessBanner,
   WalletCashBalanceCard,
 } from "./components";
-import { TabType } from "@/components/modals/InvestmentDetailModal";
+import { TabType } from "@/features/investment/components/InvestmentDetailModal";
 
 const ModalType = {
   CREATE_WALLET: "CREATE_WALLET",

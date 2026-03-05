@@ -31,7 +31,7 @@ import {
   exportReportToPDF,
   exportReportToExcel,
   type ReportExportData,
-} from "@/utils/export";
+} from "@/features/report/utils/export";
 import { prepareReportExportData } from "./export-utils";
 import { PeriodSelector, PeriodType, DateRange } from "./PeriodSelector";
 import { SummaryCards, FinancialSummaryData } from "./SummaryCards";

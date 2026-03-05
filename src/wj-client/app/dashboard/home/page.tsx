@@ -17,9 +17,9 @@ import {
   EVENT_WalletGetMonthlyDominance,
 } from "@/utils/generated/hooks";
 import { BaseModal } from "@/components/modals/BaseModal";
-import { CreateWalletForm } from "@/components/modals/forms/CreateWalletForm";
-import { AddTransactionForm } from "@/components/modals/forms/AddTransactionForm";
-import { TransferMoneyForm } from "@/components/modals/forms/TransferMoneyForm";
+import { CreateWalletForm } from "@/features/wallet/forms/CreateWalletForm";
+import { AddTransactionForm } from "@/features/transaction/forms/AddTransactionForm";
+import { TransferMoneyForm } from "@/features/wallet/forms/TransferMoneyForm";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   EVENT_WalletListWallets,

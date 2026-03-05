@@ -1,47 +1,55 @@
 package handlers
 
 import (
+	"wealthjourney/domain/auth"
 	"wealthjourney/domain/service"
+	"wealthjourney/pkg/database"
 	"wealthjourney/pkg/jobs"
+	"wealthjourney/pkg/redis"
 )
-
 
 // AllHandlers contains all handler instances.
 type AllHandlers struct {
-	Wallet      *WalletHandlers
-	User        *UserHandlers
-	Auth        *AuthHandlers
-	Transaction *TransactionHandlers
-	Category    *CategoryHandlers
-	Budget      *BudgetHandlers
-	Investment  *InvestmentHandlers
+	Wallet       *WalletHandlers
+	User         *UserHandlers
+	Auth         *AuthHandlers
+	Session      *SessionHandlers
+	Transaction  *TransactionHandlers
+	Category     *CategoryHandlers
+	Budget       *BudgetHandlers
+	Investment   *InvestmentHandlers
 	Gold         *GoldHandler
 	Silver       *SilverHandler
 	MarketPrices *MarketPricesHandler
 	Import       *ImportHandler
 }
 
-// NewHandlers creates all handler instances with proper dependency injection.
-func NewHandlers(services *service.Services, repos *service.Repositories) *AllHandlers {
-	// Get dependencies
-	deps := GetDependencies()
+// HandlerDeps holds the infrastructure dependencies needed by NewHandlers.
+// This replaces the old package-level global `var deps`.
+type HandlerDeps struct {
+	DB      *database.Database
+	RDB     *redis.RedisClient
+	AuthSrv *auth.Server
+}
 
+// NewHandlers creates all handler instances with explicit dependency injection.
+func NewHandlers(services *service.Services, repos *service.Repositories, deps *HandlerDeps) *AllHandlers {
 	// Create FX rate service for currency conversion (for import service)
 	var fxService service.FXRateService
-	if deps != nil && deps.RDB != nil && repos.FXRate != nil {
+	if deps.RDB != nil && repos.FXRate != nil {
 		fxService = service.NewFXRateService(repos.FXRate, deps.RDB.GetClient())
 	}
 
 	// Create import job queue (Redis-based) with adapter
 	var adaptedQueue service.ImportJobQueue
-	if deps != nil && deps.RDB != nil {
+	if deps.RDB != nil {
 		redisQueue := jobs.NewRedisImportQueue(deps.RDB.GetClient())
 		adaptedQueue = jobs.NewImportQueueAdapter(redisQueue)
 	}
 
 	// Create market prices handler (requires Redis for price caching)
 	var marketPricesHandler *MarketPricesHandler
-	if deps != nil && deps.RDB != nil {
+	if deps.RDB != nil {
 		marketPricesHandler = NewMarketPricesHandler(
 			service.NewGoldPriceService(deps.RDB.GetClient()),
 			service.NewSilverPriceService(deps.RDB.GetClient()),
@@ -63,28 +71,17 @@ func NewHandlers(services *service.Services, repos *service.Repositories) *AllHa
 	)
 
 	return &AllHandlers{
-		Wallet:      NewWalletHandlers(services.Wallet),
-		User:        NewUserHandlers(services.User),
-		Auth:        NewAuthHandlers(services.User),
-		Transaction: NewTransactionHandlers(services.Transaction),
-		Category:    NewCategoryHandlers(services.Category),
-		Budget:      NewBudgetHandlers(services.Budget),
-		Investment:  NewInvestmentHandlers(services.Investment, services.PortfolioHistory, services.MarketData),
+		Wallet:       NewWalletHandlers(services.Wallet),
+		User:         NewUserHandlers(services.User),
+		Auth:         NewAuthHandlers(deps.AuthSrv),
+		Session:      NewSessionHandlers(deps.AuthSrv, deps.RDB),
+		Transaction:  NewTransactionHandlers(services.Transaction),
+		Category:     NewCategoryHandlers(services.Category),
+		Budget:       NewBudgetHandlers(services.Budget),
+		Investment:   NewInvestmentHandlers(services.Investment, services.PortfolioHistory, services.MarketData),
 		Gold:         NewGoldHandler(),
 		Silver:       NewSilverHandler(),
 		MarketPrices: marketPricesHandler,
 		Import:       NewImportHandler(repos.Import, importService),
-	}
-}
-
-// AuthHandlers handles authentication-related HTTP requests.
-type AuthHandlers struct {
-	userService service.UserService
-}
-
-// NewAuthHandlers creates auth handlers.
-func NewAuthHandlers(userService service.UserService) *AuthHandlers {
-	return &AuthHandlers{
-		userService: userService,
 	}
 }

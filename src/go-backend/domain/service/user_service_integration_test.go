@@ -41,7 +41,8 @@ func TestUserService_CurrencyChangeFlow(t *testing.T) {
 	// Create services
 	fxRateSvc := NewFXRateService(fxRateRepo, redisClient)
 	currencyCache := cache.NewCurrencyCache(redisClient)
-	userService := NewUserService(userRepo, walletRepo, txRepo, budgetRepo, budgetItemRepo, investmentRepo, fxRateSvc, currencyCache)
+	categorySvc := NewCategoryService(categoryRepo)
+	userService := NewUserService(userRepo, categorySvc, walletRepo, txRepo, budgetRepo, budgetItemRepo, investmentRepo, fxRateSvc, currencyCache, redisClient)
 
 	// Create test user with initial currency (VND)
 	user := &models.User{
@@ -300,7 +301,8 @@ func TestUserService_CurrencyChangePerformance(t *testing.T) {
 
 	fxRateSvc := NewFXRateService(fxRateRepo, redisClient)
 	currencyCache := cache.NewCurrencyCache(redisClient)
-	userService := NewUserService(userRepo, walletRepo, txRepo, budgetRepo, budgetItemRepo, investmentRepo, fxRateSvc, currencyCache)
+	categorySvc := NewCategoryService(categoryRepo)
+	userService := NewUserService(userRepo, categorySvc, walletRepo, txRepo, budgetRepo, budgetItemRepo, investmentRepo, fxRateSvc, currencyCache, redisClient)
 
 	// Create test user
 	user := &models.User{

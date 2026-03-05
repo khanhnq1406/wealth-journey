@@ -1,8 +1,8 @@
 "use client";
 
 import { ModalType, resources } from "@/app/constants";
-import { openModal } from "@/redux/actions";
-import { store } from "@/redux/store";
+import { openModal } from "@/features/auth/store/actions";
+import { store } from "@/features/auth/store/store";
 import { memo, useRef, useState } from "react";
 
 /**

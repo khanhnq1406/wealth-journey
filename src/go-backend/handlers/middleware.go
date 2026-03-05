@@ -8,14 +8,10 @@ import (
 	"wealthjourney/domain/auth"
 )
 
-// AuthMiddleware validates JWT tokens from Redis whitelist
-func AuthMiddleware() gin.HandlerFunc {
+// AuthMiddleware validates JWT tokens from Redis whitelist.
+// It accepts the auth server instance to avoid creating a new one per request.
+func AuthMiddleware(authSrv *auth.Server) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if !checkRedis(c) {
-			c.Abort()
-			return
-		}
-
 		// Extract token using helper function
 		token, ok := ExtractBearerToken(c)
 		if !ok {
@@ -23,9 +19,8 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Verify token using auth service
-		authServer := auth.NewServer(deps.DB, deps.RDB, deps.Cfg)
-		result, err := authServer.VerifyAuth(token)
+		// Verify token using the shared auth service instance
+		result, err := authSrv.VerifyAuth(token)
 
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{

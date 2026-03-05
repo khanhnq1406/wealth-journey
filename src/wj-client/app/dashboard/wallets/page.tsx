@@ -8,9 +8,9 @@ import { ButtonType } from "@/app/constants";
 import { WalletGrid } from "./WalletGrid";
 import { Wallet } from "@/gen/protobuf/v1/wallet";
 import { BaseModal } from "@/components/modals/BaseModal";
-import { CreateWalletForm } from "@/components/modals/forms/CreateWalletForm";
-import { EditWalletForm } from "@/components/modals/forms/EditWalletForm";
-import { DeleteWalletModal } from "@/components/modals/DeleteWalletModal";
+import { CreateWalletForm } from "@/features/wallet/forms/CreateWalletForm";
+import { EditWalletForm } from "@/features/wallet/forms/EditWalletForm";
+import { DeleteWalletModal } from "@/features/wallet/components/DeleteWalletModal";
 import {
   EVENT_WalletListWallets,
   EVENT_WalletGetTotalBalance,
@@ -18,7 +18,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { WalletListView } from "./WalletListView";
 import { WalletCardEnhanced } from "./WalletCardEnhanced";
-import { TransferMoneyForm } from "@/components/modals/forms/TransferMoneyForm";
+import { TransferMoneyForm } from "@/features/wallet/forms/TransferMoneyForm";
 import { cn } from "@/lib/utils/cn";
 
 type ViewMode = "grid" | "list";

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { store } from "@/redux/store";
+import { store } from "@/features/auth/store/store";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
