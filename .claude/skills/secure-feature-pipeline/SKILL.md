@@ -265,6 +265,11 @@ Save to: `docs/specs/YYYY-MM-DD-<feature>-spec.md`
 ### Sensitive Data Handling
 [What data is sensitive, how to protect it]
 
+### Issues & Risks Summary
+1. [Issue/risk a]
+2. [Issue/risk b]
+3. [Issue/risk c]
+
 ## Edge Cases & Error Handling
 [What can go wrong, how to handle it]
 
