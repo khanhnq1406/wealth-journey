@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, Fragment, useRef, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { formatCurrency as formatCurrencyUtil } from "@/utils/currency-formatter";
 import { useCurrency } from "@/contexts/CurrencyContext";
 
@@ -38,6 +39,7 @@ export const ExpandableTable = memo(function ExpandableTable({
   totals,
   onToggleWallet,
 }: ExpandableTableProps) {
+  const t = useTranslations("common");
   const { currency } = useCurrency();
   const scrollableRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
@@ -89,7 +91,7 @@ export const ExpandableTable = memo(function ExpandableTable({
           <thead className="sticky top-0 bg-white z-10 shadow-sm">
             <tr className="border-b-2 border-gray-200">
               <th className="text-left py-2 px-2 sm:py-3 sm:px-4 font-semibold text-xs sm:text-sm text-gray-700 whitespace-nowrap">
-                Wallet
+                {t("wallet")}
               </th>
               {months.map((month) => (
                 <th
@@ -100,7 +102,7 @@ export const ExpandableTable = memo(function ExpandableTable({
                 </th>
               ))}
               <th className="text-center py-2 px-2 sm:py-3 sm:px-4 font-semibold text-xs sm:text-sm text-gray-700 whitespace-nowrap">
-                Total
+                {t("total")}
               </th>
             </tr>
           </thead>
@@ -171,7 +173,7 @@ export const ExpandableTable = memo(function ExpandableTable({
                   <tr className="bg-gray-50">
                     <td className="py-1.5 px-2 sm:py-2 sm:px-4">
                       <div className="pl-4 sm:pl-6 text-xs text-gray-500">
-                        Income
+                        {t("income")}
                       </div>
                     </td>
                     {wallet.monthlyData.map((data, index) => (
@@ -196,7 +198,7 @@ export const ExpandableTable = memo(function ExpandableTable({
                   <tr className="bg-gray-50 border-b border-gray-200">
                     <td className="py-1.5 px-2 sm:py-2 sm:px-4">
                       <div className="pl-4 sm:pl-6 text-xs text-gray-500">
-                        Expense
+                        {t("expense")}
                       </div>
                     </td>
                     {wallet.monthlyData.map((data, index) => (
@@ -239,7 +241,7 @@ export const ExpandableTable = memo(function ExpandableTable({
           <tbody>
             <tr className="font-semibold">
               <td className="py-2 px-2 sm:py-3 sm:px-4 text-xs sm:text-sm">
-                Total
+                {t("total")}
               </td>
               {months.map((_, index) => (
                 <td

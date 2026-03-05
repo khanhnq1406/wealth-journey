@@ -1,6 +1,7 @@
 "use client";
 
 import React, { memo } from "react";
+import { useTranslations } from "next-intl";
 import { BaseCard } from "@/components/BaseCard";
 import { formatCurrency } from "@/utils/currency-formatter";
 import { useAnimatedNumber, useAnimatedPercentage } from "@/components/charts/useAnimatedNumber";
@@ -243,6 +244,7 @@ const Icons = {
  * - Trend sparklines
  */
 export const SummaryCards = memo(function SummaryCards({ data }: SummaryCardsProps) {
+  const t = useTranslations("report.summary");
   const {
     totalIncome,
     totalExpenses,
@@ -286,7 +288,7 @@ export const SummaryCards = memo(function SummaryCards({ data }: SummaryCardsPro
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
       {/* Total Income */}
       <SummaryCard
-        label="Total Income"
+        label={t("totalIncome")}
         value={formatCurrency(animatedIncome, currency)}
         color="green"
         icon={<Icons.Income />}
@@ -298,7 +300,7 @@ export const SummaryCards = memo(function SummaryCards({ data }: SummaryCardsPro
 
       {/* Total Expenses */}
       <SummaryCard
-        label="Total Expenses"
+        label={t("totalExpenses")}
         value={formatCurrency(animatedExpenses, currency)}
         color="red"
         icon={<Icons.Expense />}
@@ -310,7 +312,7 @@ export const SummaryCards = memo(function SummaryCards({ data }: SummaryCardsPro
 
       {/* Net Savings */}
       <SummaryCard
-        label="Net Savings"
+        label={t("netSavings")}
         value={formatCurrency(animatedSavings, currency)}
         subtitle={netSavings >= 0 ? "Positive cash flow" : "Negative cash flow"}
         color={netSavings >= 0 ? "blue" : "red"}
@@ -321,7 +323,7 @@ export const SummaryCards = memo(function SummaryCards({ data }: SummaryCardsPro
 
       {/* Savings Rate */}
       <SummaryCard
-        label="Savings Rate"
+        label={t("savingsRate")}
         value={`${animatedRate.toFixed(1)}%`}
         subtitle={savingsRate >= 20 ? "Excellent!" : savingsRate >= 10 ? "Good" : "Needs improvement"}
         color="neutral"
@@ -333,7 +335,7 @@ export const SummaryCards = memo(function SummaryCards({ data }: SummaryCardsPro
       {/* Top Expense Category */}
       {topExpenseCategory && (
         <SummaryCard
-          label="Top Expense"
+          label={t("topExpenseCategory")}
           value={formatCurrency(topExpenseCategory.amount, currency)}
           subtitle={topExpenseCategory.name}
           color="neutral"

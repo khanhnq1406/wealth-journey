@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { createColumnHelper } from "@tanstack/react-table";
 import { BaseCard } from "@/components/BaseCard";
 import { Button } from "@/components/Button";
@@ -17,11 +18,7 @@ import { formatPriceValue, formatChangeValue, PriceItem } from "./helpers";
 
 type Tab = "gold" | "silver" | "symbol";
 
-const TABS: { key: Tab; label: string }[] = [
-  { key: "gold", label: "Gold" },
-  { key: "silver", label: "Silver" },
-  { key: "symbol", label: "Symbol Lookup" },
-];
+// Tab labels are provided via translations below
 
 function ChangeCell({
   value,
@@ -156,6 +153,7 @@ function SymbolLookupTab({
   querySymbol,
   onSearch,
 }: SymbolLookupTabProps) {
+  const t = useTranslations("prices.symbolLookup");
   const {
     data: priceResp,
     isLoading,
@@ -185,12 +183,12 @@ function SymbolLookupTab({
       <div className="flex gap-2 items-end">
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
-            Symbol
+            {t("symbolLabel")}
           </label>
           <SymbolAutocomplete
             value={symbolInput}
             onChange={(symbol) => onSymbolInputChange(symbol)}
-            placeholder="Search symbol, e.g. AAPL, BTC..."
+            placeholder={t("searchPlaceholder")}
           />
         </div>
         <Button
@@ -200,13 +198,13 @@ function SymbolLookupTab({
           loading={isLoading}
           fullWidth={false}
         >
-          Search
+          {t("search")}
         </Button>
       </div>
 
       {(isError || (priceResp && !priceResp.success)) && (
         <p className="text-lred text-sm">
-          Failed to fetch price. The symbol may not be supported or available.
+          {t("failedToFetch")}
         </p>
       )}
 
@@ -237,7 +235,7 @@ function SymbolLookupTab({
 
       {!querySymbol && (
         <p className="text-center text-gray-400 py-8 text-sm">
-          Search for a stock, crypto, or ETF symbol to see its current price.
+          {t("emptyState")}
         </p>
       )}
     </div>
@@ -245,9 +243,17 @@ function SymbolLookupTab({
 }
 
 export default function PricesPage() {
+  const t = useTranslations("prices");
+  const tc = useTranslations("common");
   const [activeTab, setActiveTab] = useState<Tab>("gold");
   const [symbolInput, setSymbolInput] = useState("");
   const [querySymbol, setQuerySymbol] = useState("");
+
+  const TABS: { key: Tab; label: string }[] = [
+    { key: "gold", label: t("tabs.gold") },
+    { key: "silver", label: t("tabs.silver") },
+    { key: "symbol", label: t("tabs.symbolLookup") },
+  ];
 
   const { data, isLoading, isError, refetch, isFetching } =
     useQueryGetMarketPrices(
@@ -269,11 +275,11 @@ export default function PricesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900 dark:text-dark-text">
-            Market Prices
+            {t("title")}
           </h1>
           {lastUpdated && (
             <p className="text-xs text-gray-400 mt-0.5">
-              Last updated: {lastUpdated}
+              {t("lastUpdated", { time: lastUpdated })}
             </p>
           )}
         </div>
@@ -300,7 +306,7 @@ export default function PricesPage() {
               </svg>
             }
           >
-            Refresh
+            {tc("refresh")}
           </Button>
         )}
       </div>
@@ -328,7 +334,7 @@ export default function PricesPage() {
             <>
               {isError && (
                 <p className="text-lred text-sm text-center py-4">
-                  Failed to load gold prices. Try refreshing.
+                  {t("gold.failedToLoad")}
                 </p>
               )}
               {/* Desktop: TanStack Table */}
@@ -338,8 +344,8 @@ export default function PricesPage() {
                   columns={tanstackColumns}
                   isLoading={isLoading}
                   loadingRowCount={8}
-                  emptyMessage="No gold prices available"
-                  emptyDescription="Could not fetch gold prices from the price provider."
+                  emptyMessage={t("gold.emptyMessage")}
+                  emptyDescription={t("gold.emptyDescription")}
                   enableMobileExpansion={false}
                 />
               </div>
@@ -351,8 +357,8 @@ export default function PricesPage() {
                   isLoading={isLoading}
                   loadingRowCount={8}
                   getKey={(item) => item.typeCode}
-                  emptyMessage="No gold prices available"
-                  emptyDescription="Could not fetch gold prices from the price provider."
+                  emptyMessage={t("gold.emptyMessage")}
+                  emptyDescription={t("gold.emptyDescription")}
                   expandable
                 />
               </div>
@@ -363,7 +369,7 @@ export default function PricesPage() {
             <>
               {isError && (
                 <p className="text-lred text-sm text-center py-4">
-                  Failed to load silver prices. Try refreshing.
+                  {t("silver.failedToLoad")}
                 </p>
               )}
               {/* Desktop: TanStack Table */}
@@ -373,8 +379,8 @@ export default function PricesPage() {
                   columns={tanstackColumns}
                   isLoading={isLoading}
                   loadingRowCount={4}
-                  emptyMessage="No silver prices available"
-                  emptyDescription="Could not fetch silver prices from the price provider."
+                  emptyMessage={t("silver.emptyMessage")}
+                  emptyDescription={t("silver.emptyDescription")}
                   enableMobileExpansion={false}
                 />
               </div>
@@ -386,8 +392,8 @@ export default function PricesPage() {
                   isLoading={isLoading}
                   loadingRowCount={4}
                   getKey={(item) => item.typeCode}
-                  emptyMessage="No silver prices available"
-                  emptyDescription="Could not fetch silver prices from the price provider."
+                  emptyMessage={t("silver.emptyMessage")}
+                  emptyDescription={t("silver.emptyDescription")}
                   expandable
                 />
               </div>

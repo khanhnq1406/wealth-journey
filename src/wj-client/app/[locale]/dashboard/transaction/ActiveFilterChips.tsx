@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { TransactionFilters } from "./TransactionFilterModal";
 
 interface ActiveFilterChipsProps {
@@ -21,10 +22,12 @@ export function ActiveFilterChips({
   onRemoveFilter,
   onClearAll,
 }: ActiveFilterChipsProps) {
+  const t = useTranslations("common");
   const activeFilters = getActiveFilters(
     filters,
     walletOptions,
     categoryOptions,
+    t,
   );
 
   if (activeFilters.length === 0) {
@@ -68,9 +71,9 @@ export function ActiveFilterChips({
       <button
         onClick={onClearAll}
         className="flex-shrink-0 text-sm font-medium text-red-600 hover:text-red-700 active:text-red-800 transition-colors min-h-[36px] px-2 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 rounded"
-        aria-label="Clear all filters"
+        aria-label={t("clearAll")}
       >
-        Clear All
+        {t("clearAll")}
       </button>
     </div>
   );
@@ -86,13 +89,14 @@ function getActiveFilters(
   filters: TransactionFilters,
   walletOptions: { value: string; label: string }[],
   categoryOptions: { value: string; label: string }[],
+  t: (key: string) => string,
 ): FilterChip[] {
   const chips: FilterChip[] = [];
 
   if (filters.walletId) {
     const wallet = walletOptions.find((w) => w.value === filters.walletId);
     if (wallet) {
-      chips.push({ key: "walletId", label: "Wallet", value: wallet.label });
+      chips.push({ key: "walletId", label: t("wallet"), value: wallet.label });
     }
   }
 
@@ -103,7 +107,7 @@ function getActiveFilters(
     if (category) {
       chips.push({
         key: "categoryFilter",
-        label: "Category",
+        label: t("category"),
         value: category.label,
       });
     }
@@ -112,7 +116,7 @@ function getActiveFilters(
   if (filters.searchQuery) {
     chips.push({
       key: "searchQuery",
-      label: "Search",
+      label: t("search"),
       value: filters.searchQuery.length > 15
         ? `${filters.searchQuery.substring(0, 15)}...`
         : filters.searchQuery,
@@ -133,7 +137,7 @@ function getActiveFilters(
     }
     chips.push({
       key: "amountRange",
-      label: "Amount",
+      label: t("amount"),
       value,
     });
   }
@@ -146,13 +150,13 @@ function getActiveFilters(
     if (start && end) {
       value = `${start} - ${end}`;
     } else if (start) {
-      value = `From ${start}`;
+      value = `${t("from")} ${start}`;
     } else if (end) {
       value = `Until ${end}`;
     }
     chips.push({
       key: "dateRange",
-      label: "Date",
+      label: t("date"),
       value,
     });
   }

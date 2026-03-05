@@ -83,6 +83,14 @@ const SORT_KEYS = [
 
 export default function PortfolioPageEnhanced() {
   const t = useTranslations("investment");
+  const TYPE_FILTER_OPTIONS: SelectOption[] = TYPE_FILTER_KEYS.map((opt) => ({
+    value: opt.value,
+    label: t(opt.key),
+  }));
+  const SORT_OPTIONS: SelectOption[] = SORT_KEYS.map((opt) => ({
+    value: opt.value,
+    label: t(opt.key),
+  }));
   const { currency } = useCurrency();
   const [selectedWallet, setSelectedWallet] =
     useState<WalletFilterValue>("all");

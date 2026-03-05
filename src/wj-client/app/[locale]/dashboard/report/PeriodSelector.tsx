@@ -1,6 +1,7 @@
 "use client";
 
 import React, { memo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { BaseCard } from "@/components/BaseCard";
 import { Button } from "@/components/Button";
 import Image from "next/image";
@@ -118,44 +119,16 @@ export function getDateRangeForPeriod(period: PeriodType): DateRange {
 }
 
 /**
- * Period options list
+ * Period option values (labels resolved via translations inside component)
  */
-const PERIOD_OPTIONS: PeriodOption[] = [
-  {
-    value: "this-month",
-    label: "This Month",
-    getRange: () => getDateRangeForPeriod("this-month"),
-  },
-  {
-    value: "last-month",
-    label: "Last Month",
-    getRange: () => getDateRangeForPeriod("last-month"),
-  },
-  {
-    value: "this-quarter",
-    label: "This Quarter",
-    getRange: () => getDateRangeForPeriod("this-quarter"),
-  },
-  {
-    value: "last-quarter",
-    label: "Last Quarter",
-    getRange: () => getDateRangeForPeriod("last-quarter"),
-  },
-  {
-    value: "this-year",
-    label: "This Year",
-    getRange: () => getDateRangeForPeriod("this-year"),
-  },
-  {
-    value: "last-year",
-    label: "Last Year",
-    getRange: () => getDateRangeForPeriod("last-year"),
-  },
-  {
-    value: "custom",
-    label: "Custom",
-    getRange: () => getDateRangeForPeriod("custom"),
-  },
+const PERIOD_VALUES: { value: PeriodType; labelKey: string }[] = [
+  { value: "this-month", labelKey: "thisMonth" },
+  { value: "last-month", labelKey: "lastMonth" },
+  { value: "this-quarter", labelKey: "thisQuarter" },
+  { value: "last-quarter", labelKey: "lastQuarter" },
+  { value: "this-year", labelKey: "thisYear" },
+  { value: "last-year", labelKey: "lastYear" },
+  { value: "custom", labelKey: "custom" },
 ];
 
 /**
@@ -189,9 +162,18 @@ export const PeriodSelector = memo(function PeriodSelector({
   minDate,
   maxDate,
 }: PeriodSelectorProps) {
+  const t = useTranslations("report.periods");
+  const tr = useTranslations("report");
+  const tc = useTranslations("common");
   const [showCustomPicker, setShowCustomPicker] = useState(false);
   const [tempStartDate, setTempStartDate] = useState<string>("");
   const [tempEndDate, setTempEndDate] = useState<string>("");
+
+  const PERIOD_OPTIONS: PeriodOption[] = PERIOD_VALUES.map((pv) => ({
+    value: pv.value,
+    label: t(pv.labelKey),
+    getRange: () => getDateRangeForPeriod(pv.value),
+  }));
 
   const currentRange =
     selectedPeriod === "custom" && customRange
@@ -243,7 +225,7 @@ export const PeriodSelector = memo(function PeriodSelector({
         {/* Period Presets */}
         <div>
           <label className="text-sm font-medium text-neutral-700 mb-2 block">
-            Period
+            {tc("period")}
           </label>
           <div className="flex flex-wrap gap-2">
             {PERIOD_OPTIONS.filter((opt) => opt.value !== "custom").map(
@@ -269,7 +251,7 @@ export const PeriodSelector = memo(function PeriodSelector({
                   : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
               }`}
             >
-              Custom
+              {t("custom")}
             </button>
           </div>
         </div>
@@ -293,7 +275,7 @@ export const PeriodSelector = memo(function PeriodSelector({
             <div className="text-center">
               <div className="text-sm text-neutral-600">
                 {selectedPeriod === "custom"
-                  ? "Custom Range"
+                  ? t("custom")
                   : PERIOD_OPTIONS.find((opt) => opt.value === selectedPeriod)
                       ?.label}
               </div>
@@ -324,7 +306,7 @@ export const PeriodSelector = memo(function PeriodSelector({
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-medium text-neutral-600 mb-1 block">
-                  Start Date
+                  {t("startDate")}
                 </label>
                 <input
                   type="date"
@@ -337,7 +319,7 @@ export const PeriodSelector = memo(function PeriodSelector({
               </div>
               <div>
                 <label className="text-xs font-medium text-neutral-600 mb-1 block">
-                  End Date
+                  {t("endDate")}
                 </label>
                 <input
                   type="date"
@@ -356,14 +338,14 @@ export const PeriodSelector = memo(function PeriodSelector({
                 className="flex-1"
                 disabled={!tempStartDate || !tempEndDate}
               >
-                Apply Range
+                {t("applyRange")}
               </Button>
               <Button
                 type={ButtonType.SECONDARY}
                 onClick={() => setShowCustomPicker(false)}
                 className="flex-1"
               >
-                Cancel
+                {tc("cancel")}
               </Button>
             </div>
           </div>
@@ -373,7 +355,7 @@ export const PeriodSelector = memo(function PeriodSelector({
         {showCompare && onCompareChange && (
           <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
             <span className="text-sm text-neutral-700">
-              Compare with previous period
+              {tr("compareWithPrevious")}
             </span>
             <button
               onClick={() => onCompareChange(!compareWithPrevious)}

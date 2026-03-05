@@ -15,6 +15,7 @@
  */
 
 import { useState, useMemo, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { BaseCard } from "@/components/BaseCard";
 import {
   formatCurrency,
@@ -55,6 +56,8 @@ import {
 } from "@/gen/protobuf/v1/transaction";
 
 export default function ReportPageEnhanced() {
+  const t = useTranslations("report");
+  const tc = useTranslations("common");
   const [selectedPeriod, setSelectedPeriod] =
     useState<PeriodType>("this-month");
   const [customRange, setCustomRange] = useState<DateRange | undefined>();
@@ -323,9 +326,7 @@ export default function ReportPageEnhanced() {
       try {
         // Validate data exists
         if (!reportData || reportData.totals?.length === 0) {
-          alert(
-            "No data available to export. Please select a different time range.",
-          );
+          alert(t("noExportData"));
           return;
         }
 
@@ -392,7 +393,7 @@ export default function ReportPageEnhanced() {
         alert(
           error instanceof Error
             ? error.message
-            : "Failed to export. Please try again.",
+            : t("failedToExport"),
         );
       }
     },
@@ -416,18 +417,18 @@ export default function ReportPageEnhanced() {
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 px-6">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-neutral-900 mb-2">
-            Failed to Load Report
+            {t("failedToLoad")}
           </h2>
           <p className="text-neutral-600 mb-4">
             {error instanceof Error
               ? error.message
-              : "An unexpected error occurred"}
+              : t("failedToLoad")}
           </p>
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
           >
-            Try Again
+            {tc("tryAgain")}
           </button>
         </div>
       </div>
@@ -436,7 +437,7 @@ export default function ReportPageEnhanced() {
 
   // Show loading state
   if (isLoading) {
-    return <FullPageLoading text="Loading financial report..." />;
+    return <FullPageLoading text={t("loadingReport")} />;
   }
 
   return (
@@ -444,7 +445,7 @@ export default function ReportPageEnhanced() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">
-          Financial Report
+          {t("title")}
         </h1>
         <ExportButton
           onExport={handleExport}
@@ -493,11 +494,10 @@ export default function ReportPageEnhanced() {
                 />
               </svg>
               <h3 className="text-lg font-semibold text-neutral-900 mb-2">
-                No Data Available
+                {t("noDataAvailable")}
               </h3>
               <p className="text-neutral-600">
-                No transactions found for the selected period. Try selecting a
-                different time range.
+                {t("noDataDescription")}
               </p>
             </div>
           </BaseCard>
@@ -513,7 +513,7 @@ export default function ReportPageEnhanced() {
         >
           <BaseCard className="p-3 sm:p-4">
             <h3 className="text-base sm:text-lg font-bold text-neutral-900 mb-3 sm:mb-4">
-              Expense Breakdown
+              {t("expenseBreakdown")}
             </h3>
             <DonutChartSVG
               data={expenseCategories}
@@ -533,10 +533,10 @@ export default function ReportPageEnhanced() {
         >
           <BaseCard className="p-3 sm:p-4">
             <h3 className="text-base sm:text-lg font-bold text-neutral-900 mb-3 sm:mb-4">
-              Category Comparison
+              {t("categoryComparison")}
               {compareWithPrevious && (
                 <span className="text-xs sm:text-sm font-normal text-neutral-600 ml-2">
-                  vs Previous Period
+                  {t("vsPreviousPeriod")}
                 </span>
               )}
             </h3>
@@ -546,14 +546,14 @@ export default function ReportPageEnhanced() {
               series={[
                 {
                   dataKey: "thisMonth",
-                  name: "This Month",
+                  name: t("chartLabels.thisMonth"),
                   color: "#008148",
                 },
                 ...(compareWithPrevious
                   ? [
                       {
                         dataKey: "lastMonth",
-                        name: "Last Month",
+                        name: t("chartLabels.lastMonth"),
                         color: "#94A3B8",
                       } as const,
                     ]
@@ -580,7 +580,7 @@ export default function ReportPageEnhanced() {
       >
         <BaseCard className="p-3 sm:p-4">
           <h3 className="text-base sm:text-lg font-bold text-neutral-900 mb-3 sm:mb-4">
-            Income vs Expenses Trend
+            {t("incomeVsExpensesTrend")}
           </h3>
           <LineChart
             data={trendData}
@@ -588,21 +588,21 @@ export default function ReportPageEnhanced() {
             series={[
               {
                 dataKey: "income",
-                name: "Income",
+                name: t("chartLabels.income"),
                 color: "#22C55E",
                 showArea: true,
                 curveType: "monotone",
               },
               {
                 dataKey: "expenses",
-                name: "Expenses",
+                name: t("chartLabels.expenses"),
                 color: "#DC2626",
                 showArea: true,
                 curveType: "monotone",
               },
               {
                 dataKey: "net",
-                name: "Net Savings",
+                name: t("chartLabels.netSavings"),
                 color: "#008148",
                 showArea: false,
                 curveType: "monotone",
@@ -627,26 +627,26 @@ export default function ReportPageEnhanced() {
       >
         <BaseCard className="p-3 sm:p-4">
           <h3 className="text-base sm:text-lg font-bold text-neutral-900 mb-3 sm:mb-4">
-            Monthly Summary
+            {t("monthlySummary")}
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-xs sm:text-sm">
               <thead>
                 <tr className="border-b border-neutral-200">
                   <th className="text-left py-2 sm:py-3 px-2 sm:px-4 font-semibold text-neutral-700">
-                    Month
+                    {t("tableHeaders.month")}
                   </th>
                   <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-neutral-700">
-                    Income
+                    {t("tableHeaders.income")}
                   </th>
                   <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-neutral-700">
-                    Expenses
+                    {t("tableHeaders.expenses")}
                   </th>
                   <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-neutral-700">
-                    Net Savings
+                    {t("tableHeaders.netSavings")}
                   </th>
                   <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-neutral-700">
-                    Savings Rate
+                    {t("tableHeaders.savingsRate")}
                   </th>
                 </tr>
               </thead>

@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 
 export type QuickFilterType =
@@ -23,13 +24,13 @@ export interface QuickFilterChipsProps {
   className?: string;
 }
 
-const QUICK_FILTERS: QuickFilterChip[] = [
-  { type: "all", label: "All" },
-  { type: "income", label: "Income" },
-  { type: "expense", label: "Expense" },
-  { type: "today", label: "Today" },
-  { type: "week", label: "This Week" },
-  { type: "month", label: "This Month" },
+const QUICK_FILTER_KEYS: { type: QuickFilterType; labelKey: string }[] = [
+  { type: "all", labelKey: "all" },
+  { type: "income", labelKey: "income" },
+  { type: "expense", labelKey: "expense" },
+  { type: "today", labelKey: "today" },
+  { type: "week", labelKey: "thisWeek" },
+  { type: "month", labelKey: "thisMonth" },
 ];
 
 const FilterIcon = memo(function FilterIcon({
@@ -132,6 +133,11 @@ export const QuickFilterChips = memo(function QuickFilterChips({
   onFilterChange,
   className,
 }: QuickFilterChipsProps) {
+  const t = useTranslations("transaction.quickFilters");
+  const QUICK_FILTERS: QuickFilterChip[] = QUICK_FILTER_KEYS.map((qf) => ({
+    type: qf.type,
+    label: t(qf.labelKey),
+  }));
   const handleFilterClick = useCallback(
     (filterType: QuickFilterType) => {
       onFilterChange(filterType);

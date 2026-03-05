@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
 import { MultiSelect } from "@/components/select/MultiSelect";
@@ -20,6 +21,7 @@ export const ReportControls = memo(function ReportControls({
   onYearChange,
   onWalletsChange,
 }: ReportControlsProps) {
+  const t = useTranslations("common");
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedWalletIds, setSelectedWalletIds] = useState<string[]>([]);
 
@@ -69,13 +71,13 @@ export const ReportControls = memo(function ReportControls({
       <div className="flex sm:items-center gap-4 sm:flex-row flex-col">
         {/* Wallet Multi-Select */}
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">Wallets:</label>
+          <label className="text-sm font-medium">{t("wallet")}:</label>
           <div className="w-64">
             <MultiSelect
               options={walletOptions}
               values={selectedWalletIds}
               onChange={handleWalletsChange}
-              placeholder="All Wallets"
+              placeholder={t("all") + " " + t("wallet")}
             />
           </div>
         </div>
@@ -103,7 +105,7 @@ export const ReportControls = memo(function ReportControls({
         onClick={handleExport}
         className="w-fit px-4 py-2 text-sm"
       >
-        Export to CSV
+        {t("export")} CSV
       </Button>
     </div>
   );
