@@ -1,0 +1,926 @@
+{
+  "common": {
+    "appName": "WealthJourney",
+    "tagline": "Financial Management",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "add": "Add",
+    "remove": "Remove",
+    "close": "Close",
+    "done": "Done",
+    "retry": "Retry",
+    "tryAgain": "Try Again",
+    "refresh": "Refresh",
+    "search": "Search",
+    "apply": "Apply",
+    "clear": "Clear",
+    "clearAll": "Clear All",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "import": "Import",
+    "export": "Export",
+    "all": "All",
+    "none": "None",
+    "more": "More",
+    "less": "Less",
+    "showDetails": "Show details",
+    "hideDetails": "Hide details",
+    "processing": "Processing...",
+    "or": "or",
+    "and": "and",
+    "of": "of",
+    "to": "to",
+    "from": "From",
+    "date": "Date",
+    "amount": "Amount",
+    "name": "Name",
+    "type": "Type",
+    "status": "Status",
+    "actions": "Actions",
+    "currency": "Currency",
+    "note": "Note",
+    "reason": "Reason",
+    "description": "Description",
+    "total": "Total",
+    "balance": "Balance",
+    "current": "Current",
+    "custom": "Custom",
+    "income": "Income",
+    "expense": "Expense",
+    "user": "User",
+    "period": "Period",
+    "category": "Category",
+    "wallet": "Wallet",
+    "symbol": "Symbol",
+    "price": "Price",
+    "quantity": "Quantity",
+    "fees": "Fees",
+    "cash": "Cash",
+    "investment": "Investment",
+    "basic": "Basic",
+    "uncategorized": "Uncategorized",
+    "unknown": "Unknown",
+    "optional": "optional",
+    "required": "required",
+    "noDataFound": "No data found",
+    "noDataAvailable": "No data available",
+    "thereIsNoDataToDisplay": "There's no data to display at the moment."
+  },
+
+  "nav": {
+    "home": "Home",
+    "transactions": "Transactions",
+    "wallets": "Wallets",
+    "portfolio": "Portfolio",
+    "prices": "Prices",
+    "reports": "Reports",
+    "budget": "Budget",
+    "settings": "Settings",
+    "logout": "Logout",
+    "toggleMenu": "Toggle menu",
+    "closeMenu": "Close menu",
+    "mainNavigation": "Main navigation",
+    "mobileNavigation": "Mobile navigation"
+  },
+
+  "landing": {
+    "hero": {
+      "title": "Take Control of Your Financial Journey",
+      "subtitle": "Track expenses, manage investments, and build wealth with powerful analytics - all in one beautiful app.",
+      "getStarted": "Get Started Free",
+      "learnMore": "Learn More"
+    },
+    "features": {
+      "sectionTitle": "Everything You Need",
+      "sectionSubtitle": "Powerful features to help you manage your complete financial life",
+      "multiWallet": "Multi-Wallet Management",
+      "multiWalletDesc": "Manage multiple wallets for different purposes - cash, savings, investments, and more.",
+      "portfolioTracking": "Investment Portfolio Tracking",
+      "portfolioTrackingDesc": "Track stocks, crypto, gold, silver, ETFs and more with real-time market data.",
+      "mobileFirst": "Mobile-First Responsive Design",
+      "mobileFirstDesc": "Beautiful, touch-friendly interface that works perfectly on any device.",
+      "goldSilver": "Gold & Silver Investments",
+      "goldSilverDesc": "Track Vietnamese and world gold/silver with automatic unit conversions.",
+      "smartTransactions": "Smart Transaction Tracking",
+      "smartTransactionsDesc": "Categorize, search, and analyze all your income and expenses.",
+      "bankImport": "Bank Statement Import",
+      "bankImportDesc": "Import transactions from your bank CSV statements with smart duplicate detection.",
+      "analytics": "Advanced Analytics Dashboard",
+      "analyticsDesc": "Visualize your financial health with interactive charts and detailed reports.",
+      "reports": "Financial Reports & Export",
+      "reportsDesc": "Generate comprehensive reports and export to CSV, PDF, or Excel.",
+      "budgetPlanning": "Budget Planning & Tracking",
+      "budgetPlanningDesc": "Set budgets, track spending, and stay on top of your financial goals.",
+      "multiCurrency": "Multi-Currency Support",
+      "multiCurrencyDesc": "Seamlessly manage finances across different currencies with real-time conversion.",
+      "marketData": "Real-Time Market Data",
+      "marketDataDesc": "Get up-to-date prices for stocks, crypto, gold, and more from Yahoo Finance.",
+      "secureAuth": "Secure Google OAuth",
+      "secureAuthDesc": "Sign in securely with your Google account. No passwords to remember."
+    },
+    "investmentFeatures": {
+      "sectionTitle": "Investment Management",
+      "sectionSubtitle": "Track ALL your investments in one unified portfolio",
+      "allAssets": "All Assets, One Platform",
+      "allAssetsDesc": "Track ALL your investments in one unified portfolio",
+      "stocks": "Stocks",
+      "etfs": "ETFs",
+      "mutualFunds": "Mutual Funds",
+      "cryptocurrency": "Cryptocurrency",
+      "gold": "Gold",
+      "silver": "Silver",
+      "powerfulAnalytics": "Powerful Analytics",
+      "powerfulAnalyticsDesc": "FIFO accounting and smart metrics across ALL your assets",
+      "fifoCostBasis": "FIFO Cost Basis",
+      "realizedPnl": "Realized PNL",
+      "unrealizedPnl": "Unrealized PNL",
+      "assetAllocation": "Asset Allocation",
+      "performanceTracking": "Performance Tracking",
+      "realTimeUpdates": "Real-Time Updates",
+      "goldSilverSupport": "Gold & Silver Support",
+      "goldSilverSupportDesc": "Vietnam gold market + world gold prices with automatic unit conversions",
+      "sjcGold": "SJC Gold (10 Types)",
+      "worldGold": "World Gold (XAU)",
+      "taelGramOunce": "Tael/Gram/Ounce",
+      "multiCurrency": "Multi-Currency",
+      "livePricing": "Live Pricing"
+    },
+    "bankImport": {
+      "sectionTitle": "Bank Statement Import",
+      "sectionSubtitle": "Import your bank statements in seconds",
+      "csvFormat": "CSV",
+      "csvDesc": "Comma-separated values",
+      "bankStatement": "Bank Statements",
+      "bankStatementDesc": "Bank statements",
+      "smartDuplicate": "Smart Duplicate Detection",
+      "autoCategorization": "Auto-Categorization",
+      "multiCurrencySupport": "Multi-Currency Support",
+      "reviewEdit": "Review & Edit",
+      "lightningFast": "Lightning Fast",
+      "uploadStatement": "Upload Statement",
+      "reviewConfirm": "Review & Confirm",
+      "importComplete": "Import Complete"
+    },
+    "howItWorks": {
+      "sectionTitle": "How It Works",
+      "step1Title": "Sign In Securely",
+      "step1Desc": "Create your account securely using Google OAuth. No passwords to remember.",
+      "step2Title": "Set Up Your Wallets",
+      "step2Desc": "Set up BASIC or INVESTMENT wallets. Add your initial balance to get started.",
+      "step3Title": "Track Investments",
+      "step3Desc": "Track stocks, crypto, gold, and more. Record buys, sells, and dividends automatically.",
+      "step4Title": "Analyze Performance",
+      "step4Desc": "View real-time PNL, portfolio allocation, and detailed analytics for informed decisions.",
+      "step5Title": "Export Your Data",
+      "step5Desc": "Export your data to CSV for deeper analysis. Keep your financial data portable."
+    },
+    "comparison": {
+      "sectionTitle": "Why WealthJourney?",
+      "feature": "Feature",
+      "wealthJourney": "WealthJourney",
+      "others": "Others"
+    },
+    "cta": {
+      "title": "Ready to Start Your Financial Journey?",
+      "subtitle": "Join thousands of users managing their finances smarter.",
+      "getStartedFree": "Get Started Free",
+      "noCardRequired": "No credit card required"
+    },
+    "footer": {
+      "copyright": "WealthJourney. All rights reserved.",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service"
+    },
+    "navbar": {
+      "features": "Features",
+      "howItWorks": "How It Works",
+      "getStarted": "Get Started"
+    }
+  },
+
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to continue your financial journey",
+      "signingIn": "Signing you in...",
+      "googleLoginFailed": "Google login failed. Please try again.",
+      "genericError": "Oops, something went wrong. Please try again.",
+      "newToApp": "New to WealthJourney?",
+      "createAccount": "Create an account",
+      "termsAgreement": "By signing in, you agree to our",
+      "termsOfService": "Terms of Service",
+      "privacyPolicy": "Privacy Policy"
+    },
+    "register": {
+      "title": "Start your journey",
+      "subtitle": "Create your free account in seconds",
+      "creatingAccount": "Creating your account...",
+      "googleRegisterFailed": "Google registration failed. Please try again.",
+      "registrationFailed": "Registration failed. Please try again.",
+      "freeForever": "Free forever",
+      "bankLevelSecurity": "Bank-level security",
+      "noCreditCard": "No credit card",
+      "alreadyHaveAccount": "Already have an account?",
+      "signInInstead": "Sign in instead",
+      "termsAgreement": "By creating an account, you agree to our",
+      "termsOfService": "Terms of Service",
+      "privacyPolicy": "Privacy Policy"
+    }
+  },
+
+  "dashboard": {
+    "home": {
+      "myWallets": "My Wallets",
+      "balanceTrend": "Balance Trend",
+      "dominance": "Dominance",
+      "monthlyDominance": "Monthly Dominance",
+      "accountBalance": "Account Balance",
+      "analytics": "Analytics",
+      "totalNetWorth": "Total Net Worth",
+      "totalBalance": "Total balance",
+      "cashLabel": "Cash: {amount}",
+      "investmentsLabel": "Investments: {amount}",
+      "addTransaction": "+ Add Transaction",
+      "transfer": "Transfer",
+      "newWallet": "New Wallet"
+    },
+    "quickActions": {
+      "addTransaction": "Add Transaction",
+      "transferMoney": "Transfer Money",
+      "createNewWallet": "Create New Wallet"
+    }
+  },
+
+  "transaction": {
+    "title": "Transactions",
+    "searchPlaceholder": "Search transactions...",
+    "totalBalance": "Total balance",
+    "noTransactionsFound": "No transactions found",
+    "addFirstTransaction": "Add your first transaction or adjust filters",
+    "transactionAddedSuccess": "Transaction has been added successfully",
+    "failedToAdd": "Failed to add transaction. Please try again",
+    "quickFilters": {
+      "all": "All",
+      "income": "Income",
+      "expense": "Expense",
+      "today": "Today",
+      "thisWeek": "This Week",
+      "thisMonth": "This Month"
+    },
+    "sortOptions": {
+      "newestFirst": "Newest first",
+      "oldestFirst": "Oldest first",
+      "highestFirst": "Highest first",
+      "lowestFirst": "Lowest first"
+    },
+    "form": {
+      "title": "Add Transaction",
+      "editTitle": "Edit Transaction",
+      "income": "Income",
+      "expense": "Expense",
+      "amount": "Amount",
+      "wallet": "Wallet",
+      "selectWallet": "Select wallet",
+      "category": "Category",
+      "selectOrCreateCategory": "Select or create category...",
+      "dateTime": "Date & Time",
+      "note": "Note",
+      "notePlaceholder": "Enter note (optional)",
+      "addTransaction": "Add Transaction",
+      "updateTransaction": "Update Transaction",
+      "transactionUpdatedSuccess": "Transaction has been updated successfully",
+      "failedToUpdate": "Failed to update transaction. Please try again"
+    },
+    "delete": {
+      "title": "Delete Transaction",
+      "confirmMessage": "Are you sure you want to delete this transaction?",
+      "confirmButton": "Delete",
+      "cancelButton": "Cancel"
+    },
+    "import": {
+      "title": "Import Transactions",
+      "buttonLabel": "Import"
+    },
+    "export": {
+      "title": "Export Transactions"
+    },
+    "filter": {
+      "openFilters": "Open filters",
+      "clearSearch": "Clear search",
+      "toggleBalanceVisibility": "Toggle balance visibility"
+    }
+  },
+
+  "wallet": {
+    "title": "My Wallets",
+    "createWallet": "Create Wallet",
+    "editWallet": "Edit Wallet",
+    "createNewWallet": "Create new wallet",
+    "newWallet": "New wallet",
+    "errorLoading": "Error loading wallets",
+    "viewMode": {
+      "grid": "Grid view",
+      "list": "List view"
+    },
+    "filterTypes": {
+      "all": "All",
+      "cash": "Cash",
+      "investment": "Investment"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Enter wallet's name",
+      "initialBalance": "Initial Balance",
+      "walletType": "Wallet Type",
+      "selectWalletType": "Select wallet type",
+      "walletTypeBasic": "Basic",
+      "walletTypeInvestment": "Investment",
+      "create": "Create",
+      "save": "Save",
+      "createdSuccess": "Wallet \"{name}\" has been created successfully",
+      "failedToCreate": "Failed to create wallet. Please try again",
+      "failedToUpdate": "Failed to update wallet. Please try again"
+    },
+    "edit": {
+      "walletInformation": "Wallet Information",
+      "balanceAdjustment": "Balance Adjustment",
+      "adjustBalance": "Adjust Balance",
+      "currentBalance": "Current Balance: {amount}",
+      "adjustmentType": "Adjustment Type",
+      "addFunds": "Add funds",
+      "removeFunds": "Remove funds",
+      "adjustmentAmount": "Adjustment Amount ({currency})",
+      "adjustmentAmountPlaceholder": "Enter amount",
+      "adjustmentAmountHelp": "Enter the amount to add or remove from your wallet",
+      "projectedBalance": "Projected Balance: ",
+      "reasonLabel": "Reason (Optional)",
+      "reasonPlaceholder": "Why are you adjusting this balance?",
+      "auditNote": "This will create a transaction record for audit purposes.",
+      "nameUpdatedSuccess": "Wallet name has been updated successfully",
+      "balanceAdjustedSuccess": "Balance has been adjusted successfully",
+      "nameAndBalanceSuccess": "Wallet name and balance have been updated successfully",
+      "failedToAdjust": "Failed to adjust balance. Please try again"
+    },
+    "delete": {
+      "title": "Delete Wallet",
+      "description": "{walletName} will be deleted. What would you like to do with the transactions?",
+      "archiveOption": "Archive wallet (Recommended)",
+      "archiveDescription": "Wallet will be hidden but all transactions will be preserved for your records.",
+      "transferOption": "Transfer transactions to another wallet",
+      "transferDescription": "Move all transactions to another wallet with the same currency. The target wallet's balance will be updated accordingly.",
+      "selectTargetWallet": "Select a wallet...",
+      "noOtherWallets": "No other wallets with the same currency available.",
+      "deleteOnlyOption": "Delete wallet and keep transactions",
+      "deleteOnlyDescription": "Transactions will be preserved but the wallet reference will be removed.",
+      "notRecommended": "Not recommended.",
+      "selectTargetError": "Please select a target wallet",
+      "failedToProcess": "Failed to process wallet. Please try again",
+      "confirm": "Confirm"
+    },
+    "transfer": {
+      "title": "Transfer Money",
+      "amount": "Amount",
+      "fromWallet": "From",
+      "selectSourceWallet": "Select source wallet",
+      "toWallet": "To",
+      "selectDestinationWallet": "Select destination wallet",
+      "selectSourceFirst": "Select source wallet first",
+      "dateTime": "Date & Time",
+      "note": "Note",
+      "notePlaceholder": "Enter note (optional)",
+      "transferButton": "Transfer",
+      "transferSuccess": "Funds have been transferred successfully",
+      "failedToTransfer": "Failed to transfer funds. Please try again"
+    },
+    "unknownWallet": "Unknown Wallet"
+  },
+
+  "investment": {
+    "title": "Investment Portfolio",
+    "holdings": "Holdings",
+    "selectWallet": "Select Wallet",
+    "allInvestmentWallets": "All Investment Wallets",
+    "filterByType": "Filter by Type",
+    "sortBy": "Sort by",
+    "errorLoading": "Error loading portfolio",
+    "typeOptions": {
+      "allTypes": "All Types",
+      "cryptocurrency": "Cryptocurrency",
+      "stock": "Stock",
+      "etf": "ETF",
+      "mutualFund": "Mutual Fund",
+      "bond": "Bond",
+      "commodity": "Commodity",
+      "goldVietnam": "Gold (Vietnam)",
+      "goldWorld": "Gold (World)",
+      "silverVietnam": "Silver (Vietnam)",
+      "silverWorld": "Silver (World)",
+      "other": "Other"
+    },
+    "sortOptions": {
+      "nameAZ": "Name (A-Z)",
+      "valueHighLow": "Value (High-Low)",
+      "pnlHighLow": "PnL (High-Low)",
+      "pnlPercentHighLow": "PnL % (High-Low)"
+    },
+    "emptyWallets": {
+      "title": "No Investment Wallets",
+      "description": "Create an investment wallet to start tracking your portfolio",
+      "createButton": "Create Investment Wallet"
+    },
+    "emptyInvestments": {
+      "message": "No investments yet. Add your first investment to get started."
+    },
+    "modal": {
+      "createWallet": "Create Investment Wallet",
+      "addInvestment": "Add Investment",
+      "investmentDetails": "Investment Details"
+    },
+    "updateBanner": {
+      "progressTitle": "Fetching latest prices from market...",
+      "progressDescription": "This may take 5-15 seconds. We're checking for updates every 2 seconds.",
+      "successTitle": "Prices updated successfully!",
+      "successDescription": "Your portfolio is now showing the latest market prices."
+    },
+    "form": {
+      "addInvestment": "Add Investment",
+      "symbol": "Symbol",
+      "searchSymbol": "Search symbol...",
+      "investmentName": "Investment Name",
+      "investmentType": "Investment Type",
+      "selectType": "Select investment type",
+      "exchange": "Exchange",
+      "exchangePlaceholder": "e.g. NASDAQ, HOSE",
+      "isCustom": "Custom Investment",
+      "quantity": "Quantity",
+      "purchasePrice": "Purchase Price",
+      "pricePerUnit": "Price per Unit ({currency})",
+      "totalCost": "Total Cost",
+      "walletLabel": "Wallet",
+      "selectWalletPlaceholder": "Select investment wallet",
+      "create": "Create",
+      "failedToCreate": "Failed to create investment. Please try again"
+    },
+    "transactionTypes": {
+      "buy": "Buy",
+      "sell": "Sell",
+      "dividend": "Dividend",
+      "split": "Split",
+      "unknown": "Unknown"
+    },
+    "transactionTable": {
+      "type": "Type",
+      "quantity": "Quantity",
+      "price": "Price",
+      "fees": "Fees",
+      "total": "Total",
+      "date": "Date",
+      "deleteTransaction": "Delete transaction"
+    },
+    "transaction": {
+      "title": "Add Transaction",
+      "transactionType": "Transaction Type",
+      "selectTransactionType": "Select transaction type",
+      "buy": "Buy",
+      "sell": "Sell",
+      "dividend": "Dividend",
+      "quantity": "Quantity",
+      "pricePerUnit": "Price per Unit ({currency})",
+      "fees": "Fees ({currency})",
+      "transactionDate": "Transaction Date",
+      "transactionDateRequired": "Transaction date is required",
+      "walletBalance": "Wallet Balance:",
+      "transactionCost": "Transaction Cost:",
+      "remaining": "Remaining:",
+      "loadingRate": "Loading rate...",
+      "rateUnavailable": "Rate unavailable",
+      "exchangeRate": "Exchange rate: 1 {from} = {rate} {to}",
+      "insufficientBalance": "Insufficient wallet balance. You need {amount} more.",
+      "addTransaction": "Add Transaction",
+      "transactionAddedSuccess": "Transaction Added!",
+      "transactionAddedMessage": "Transaction added successfully",
+      "failedToAdd": "Failed to add transaction. Please try again",
+      "fixValidationErrors": "Please fix the validation errors"
+    },
+    "detail": {
+      "overview": "Overview",
+      "transactions": "Transactions",
+      "addTransaction": "Add Transaction",
+      "setPrice": "Set Price",
+      "loadingDetails": "Loading investment details...",
+      "investmentNotFound": "Investment not found",
+      "customInvestment": "Custom Investment",
+      "noMarketData": "No market data available",
+      "symbolLabel": "Symbol",
+      "nameLabel": "Name",
+      "currencyLabel": "Currency",
+      "quantityLabel": "Quantity",
+      "avgCost": "Avg Cost",
+      "currentPrice": "Current Price",
+      "refreshPrice": "Refresh price",
+      "setPriceManually": "Set price manually",
+      "totalCost": "Total Cost",
+      "currentValue": "Current Value",
+      "unrealizedPnl": "Unrealized PNL",
+      "unrealizedPnlPercent": "Unrealized PNL %",
+      "pnlNotAvailable": "N/A (Price not set)",
+      "realizedPnl": "Realized PNL",
+      "totalDividends": "Total Dividends",
+      "noTransactionsYet": "No transactions yet.",
+      "deleteInvestment": "Delete Investment",
+      "justNow": "Just now",
+      "minutesAgo": "{minutes}m ago",
+      "hoursAgo": "{hours}h ago",
+      "updated": "Updated {time}",
+      "customNoPriceWarning": "This is a custom investment without a set price. Click \"Set Price\" tab to update the current value.",
+      "deleteTransactionTitle": "Delete Transaction",
+      "deleteTransactionConfirm": "Are you sure you want to delete this transaction?",
+      "deleteTransactionRecalc": "This will recalculate your investment's quantity and cost basis.",
+      "deleteInvestmentConfirm": "Are you sure you want to delete {symbol}?",
+      "deleteInvestmentHoldings": "Warning: You still have {quantity} units. All holdings and transaction history will be permanently deleted.",
+      "deleteInvestmentHistory": "All transaction history for this investment will be deleted.",
+      "failedToDeleteTransaction": "Failed to delete transaction",
+      "failedToDeleteInvestment": "Failed to delete investment"
+    },
+    "priceForm": {
+      "symbolLabel": "Symbol:",
+      "currentPriceLabel": "Current Price:",
+      "notSet": "Not set",
+      "newPrice": "New Price",
+      "helperText": "Enter price per unit in {currency}",
+      "tip": "You can set price to 0 if market price is unavailable. This will show your holdings without profit/loss calculations.",
+      "invalidPrice": "Please enter a valid price (0 or greater)",
+      "updatePrice": "Update Price",
+      "priceUpdatedSuccess": "Price updated successfully!",
+      "failedToUpdatePrice": "Failed to update price"
+    },
+    "cashBalance": {
+      "title": "Cash Balance",
+      "availableCash": "Available Cash"
+    }
+  },
+
+  "budget": {
+    "title": "Budget",
+    "createBudget": "Create budget",
+    "newBudget": "New budget",
+    "noBudgetsYet": "No budgets yet",
+    "createFirstBudget": "Create your first budget to start tracking",
+    "errorLoading": "Error loading budgets",
+    "loadingBudgets": "Loading budgets...",
+    "modal": {
+      "createBudget": "Create Budget",
+      "editBudget": "Edit Budget",
+      "addBudgetItem": "Add Budget Item",
+      "editBudgetItem": "Edit Budget Item"
+    },
+    "form": {
+      "budgetName": "Budget Name",
+      "budgetNamePlaceholder": "e.g., Monthly Budget",
+      "totalAmount": "Total Amount",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "create": "Create",
+      "save": "Save",
+      "createdSuccess": "Budget \"{name}\" has been created successfully",
+      "failedToCreate": "Failed to create budget. Please try again",
+      "updatedSuccess": "Budget has been updated successfully",
+      "failedToUpdate": "Failed to update budget. Please try again",
+      "budgetItemName": "Budget Item Name",
+      "budgetItemNamePlaceholder": "e.g., Groceries",
+      "allocatedAmount": "Allocated Amount",
+      "addItem": "Add Item",
+      "budgetItemCreatedSuccess": "Budget item \"{name}\" has been added successfully",
+      "failedToCreateItem": "Failed to create budget item. Please try again",
+      "budgetItemUpdatedSuccess": "Budget item has been updated successfully",
+      "failedToUpdateItem": "Failed to update budget item. Please try again"
+    },
+    "card": {
+      "spent": "Spent",
+      "remaining": "Remaining",
+      "overBudget": "Over Budget",
+      "ofBudget": "of {amount}",
+      "addItem": "Add Item",
+      "editItem": "Edit Item",
+      "deleteItem": "Delete Item"
+    }
+  },
+
+  "report": {
+    "title": "Financial Report",
+    "failedToLoad": "Failed to Load Report",
+    "loadingReport": "Loading financial report...",
+    "noDataAvailable": "No Data Available",
+    "noDataDescription": "No transactions found for the selected period. Try selecting a different time range.",
+    "noExportData": "No data available to export. Please select a different time range.",
+    "failedToExport": "Failed to export. Please try again.",
+    "expenseBreakdown": "Expense Breakdown",
+    "categoryComparison": "Category Comparison",
+    "vsPreviousPeriod": "vs Previous Period",
+    "incomeVsExpensesTrend": "Income vs Expenses Trend",
+    "monthlySummary": "Monthly Summary",
+    "compareWithPrevious": "Compare with previous period",
+    "customRange": "Custom Range",
+    "tableHeaders": {
+      "month": "Month",
+      "income": "Income",
+      "expenses": "Expenses",
+      "netSavings": "Net Savings",
+      "savingsRate": "Savings Rate"
+    },
+    "chartLabels": {
+      "income": "Income",
+      "expenses": "Expenses",
+      "netSavings": "Net Savings",
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month"
+    },
+    "summary": {
+      "totalIncome": "Total Income",
+      "totalExpenses": "Total Expenses",
+      "netSavings": "Net Savings",
+      "savingsRate": "Savings Rate",
+      "topExpenseCategory": "Top Expense"
+    },
+    "periods": {
+      "thisMonth": "This Month",
+      "lastMonth": "Last Month",
+      "thisQuarter": "This Quarter",
+      "lastQuarter": "Last Quarter",
+      "thisYear": "This Year",
+      "lastYear": "Last Year",
+      "custom": "Custom",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "applyRange": "Apply Range"
+    }
+  },
+
+  "prices": {
+    "title": "Market Prices",
+    "lastUpdated": "Last updated: {time}",
+    "tabs": {
+      "gold": "Gold",
+      "silver": "Silver",
+      "symbolLookup": "Symbol Lookup"
+    },
+    "table": {
+      "type": "Type",
+      "buy": "Buy",
+      "sell": "Sell",
+      "change": "Change"
+    },
+    "symbolLookup": {
+      "symbolLabel": "Symbol",
+      "searchPlaceholder": "Search symbol, e.g. AAPL, BTC...",
+      "search": "Search",
+      "failedToFetch": "Failed to fetch price. The symbol may not be supported or available.",
+      "emptyState": "Search for a stock, crypto, or ETF symbol to see its current price."
+    },
+    "gold": {
+      "emptyMessage": "No gold prices available",
+      "emptyDescription": "Could not fetch gold prices from the price provider.",
+      "failedToLoad": "Failed to load gold prices. Try refreshing."
+    },
+    "silver": {
+      "emptyMessage": "No silver prices available",
+      "emptyDescription": "Could not fetch silver prices from the price provider.",
+      "failedToLoad": "Failed to load silver prices. Try refreshing."
+    }
+  },
+
+  "settings": {
+    "title": "Settings",
+    "language": {
+      "title": "Language",
+      "subtitle": "Choose your preferred language for the interface",
+      "save": "Save Language",
+      "failedToUpdate": "Failed to update language"
+    },
+    "sessions": {
+      "title": "Active Sessions",
+      "description": "Manage devices that are currently logged into your account",
+      "noActiveSessions": "No active sessions",
+      "currentLabel": "Current",
+      "lastActive": "Last active: {date}",
+      "created": "Created: {date}",
+      "expires": "Expires: {date}",
+      "revokeButton": "Revoke",
+      "revokeAllOthers": "Revoke All Others",
+      "revokeAllTitle": "Revoke All Sessions",
+      "revokeAllMessage": "Are you sure you want to revoke {count} other session(s)? Those devices will need to log in again.",
+      "revokeAllConfirm": "Revoke All"
+    },
+    "importTemplates": {
+      "title": "Import Templates",
+      "description": "Manage your saved import templates for reuse",
+      "loadingTemplates": "Loading templates...",
+      "noTemplates": "No templates saved yet. Create templates while importing files by checking \"Save as template\" in the column mapping step.",
+      "tableHeaders": {
+        "templateName": "Template Name",
+        "fileFormats": "File Formats",
+        "currency": "Currency",
+        "dateFormat": "Date Format",
+        "created": "Created",
+        "actions": "Actions"
+      },
+      "deleteTitle": "Delete Template",
+      "deleteMessage": "Are you sure you want to delete the template \"{name}\"? This action cannot be undone.",
+      "deleteConfirm": "Delete"
+    }
+  },
+
+  "feedback": {
+    "emptyState": {
+      "noDataFound": "No data found",
+      "noResultsFound": "No results found",
+      "noResultsDescription": "We couldn't find any matching results. Try adjusting your search or filters.",
+      "noTransactionsYet": "No transactions yet",
+      "noTransactionsDescription": "Start tracking your finances by adding your first transaction.",
+      "noWalletsFound": "No wallets found",
+      "noWalletsDescription": "Create a wallet to start managing your finances.",
+      "noInvestmentsYet": "No investments yet",
+      "noInvestmentsDescription": "Start building your portfolio by adding your first investment.",
+      "noBudgetsSet": "No budgets set",
+      "noBudgetsDescription": "Create budgets to better manage your spending.",
+      "noCategories": "No categories",
+      "noCategoriesDescription": "Categories help organize your transactions. Create your first category.",
+      "noDataAvailable": "No data available",
+      "noDataDescription": "There's no data to display at the moment."
+    },
+    "errorState": {
+      "somethingWentWrong": "Something went wrong",
+      "somethingWentWrongDescription": "We encountered an error while loading the data. Please try again.",
+      "networkError": "Network Error",
+      "networkErrorDescription": "Please check your internet connection and try again.",
+      "serverError": "Server Error",
+      "serverErrorDescription": "Our servers are experiencing issues. Please try again later.",
+      "accessDenied": "Access Denied",
+      "accessDeniedDescription": "You don't have permission to access this resource.",
+      "notFound": "Not Found",
+      "notFoundDescription": "The requested resource could not be found.",
+      "requestTimeout": "Request Timeout",
+      "requestTimeoutDescription": "The request took too long to complete. Please try again.",
+      "unexpectedError": "Unexpected Error",
+      "unexpectedErrorDescription": "An unexpected error occurred. Please try again."
+    },
+    "success": {
+      "defaultMessage": "Operation completed successfully!"
+    },
+    "loading": {
+      "loadingText": "Loading...",
+      "loadingData": "Loading data...",
+      "pleaseWait": "Please wait..."
+    }
+  },
+
+  "modals": {
+    "titles": {
+      "addTransaction": "Add Transaction",
+      "editTransaction": "Edit Transaction",
+      "transferMoney": "Transfer Money",
+      "createWallet": "Create Wallet",
+      "editWallet": "Edit Wallet",
+      "deleteWallet": "Delete Wallet",
+      "createBudget": "Create Budget",
+      "editBudget": "Edit Budget",
+      "addBudgetItem": "Add Budget Item",
+      "editBudgetItem": "Edit Budget Item",
+      "addInvestment": "Add Investment",
+      "investmentDetails": "Investment Details",
+      "createInvestmentWallet": "Create Investment Wallet",
+      "importTransactions": "Import Transactions",
+      "deleteTransaction": "Delete Transaction",
+      "deleteTemplate": "Delete Template",
+      "revokeAllSessions": "Revoke All Sessions"
+    },
+    "confirmation": {
+      "deleteTransactionMessage": "Are you sure you want to delete this transaction?",
+      "deleteConfirm": "Delete",
+      "cancelButton": "Cancel",
+      "areYouSure": "Are you sure?",
+      "thisActionCannotBeUndone": "This action cannot be undone.",
+      "confirm": "Confirm"
+    },
+    "importWizard": {
+      "selectWallet": "Select Wallet",
+      "selectBankTemplate": "Select Bank Template",
+      "uploadFile": "Upload File",
+      "columnMapping": "Column Mapping",
+      "review": "Review",
+      "saveAsTemplate": "Save as template",
+      "templateName": "Template Name",
+      "dragAndDrop": "Drag and drop your file here",
+      "browseFiles": "Browse Files",
+      "supportedFormats": "Supported formats: CSV",
+      "stepProgress": "Step {current} of {total}",
+      "duplicateDetection": "Duplicate Detection",
+      "categoryReview": "Category Review",
+      "readyToImport": "Ready to Import",
+      "transactionsReview": "Transactions Review",
+      "errorSummary": "Error Summary",
+      "currencyConversion": "Currency Conversion",
+      "dateRangeFilter": "Date Range Filter",
+      "importSuccess": "Import Successful!",
+      "importSuccessMessage": "Your transactions have been imported successfully.",
+      "importButton": "Import Transactions",
+      "transactionsImported": "{count} transaction(s) imported",
+      "skippedCount": "({count} skipped)",
+      "incomeLabel": "Income",
+      "expensesLabel": "Expenses",
+      "netChange": "Net Change",
+      "newBalance": "New Balance",
+      "duplicatesSkipped": "{count} duplicate(s) skipped",
+      "duplicatesMerged": "{count} duplicate(s) merged",
+      "undoNotice": "You can undo this import within 24 hours",
+      "undoNoticeDetail": "All imported transactions will be deleted and wallet balance will be restored.",
+      "undoImportButton": "Undo Import",
+      "undoImportTitle": "Undo Import?",
+      "undoImportDescription": "This will delete all {count} imported transactions and restore your wallet balance.",
+      "undoImportCannotReverse": "This action cannot be reversed. Are you sure?",
+      "yesUndoImport": "Yes, Undo Import",
+      "failedToUndoImport": "Failed to undo import: {error}"
+    }
+  },
+
+  "pwa": {
+    "installPrompt": {
+      "title": "Install WealthJourney",
+      "description": "Add to your home screen for the best experience",
+      "installButton": "Install",
+      "dismissButton": "Not now",
+      "benefits": {
+        "offlineAccess": "Works offline",
+        "homeScreen": "Quick access from home screen",
+        "nativeExperience": "Native app-like experience"
+      }
+    }
+  },
+
+  "currency": {
+    "selector": {
+      "label": "Display Currency",
+      "conversionInProgress": "Converting to {currency}..."
+    }
+  },
+
+  "search": {
+    "globalSearch": {
+      "placeholder": "Search...",
+      "shortcut": "Cmd+K",
+      "noResults": "No results found",
+      "recentSearches": "Recent Searches"
+    }
+  },
+
+  "validation": {
+    "required": "{field} is required",
+    "minLength": "{field} must be at least {min} characters",
+    "maxLength": "{field} must be at most {max} characters",
+    "invalidEmail": "Please enter a valid email address",
+    "invalidAmount": "Please enter a valid amount",
+    "amountMustBePositive": "Amount must be greater than 0",
+    "walletNameTaken": "A wallet with this name already exists",
+    "sameWalletTransfer": "Source and destination wallets must be different",
+    "insufficientBalance": "Insufficient balance"
+  },
+
+  "dates": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "thisWeek": "This Week",
+    "lastWeek": "Last Week",
+    "thisMonth": "This Month",
+    "lastMonth": "Last Month",
+    "thisQuarter": "This Quarter",
+    "lastQuarter": "Last Quarter",
+    "thisYear": "This Year",
+    "lastYear": "Last Year"
+  },
+
+  "export": {
+    "dialog": {
+      "title": "Export Options",
+      "format": "Format",
+      "csv": "CSV",
+      "pdf": "PDF",
+      "excel": "Excel",
+      "fileName": "File Name",
+      "includeCharts": "Include Charts",
+      "includeCategories": "Include Categories",
+      "selectCategories": "Select Categories",
+      "allCategories": "All Categories",
+      "exportButton": "Export"
+    }
+  }
+}

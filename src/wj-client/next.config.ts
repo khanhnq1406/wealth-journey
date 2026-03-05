@@ -1,4 +1,7 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts');
 
 const nextConfig: NextConfig = {
   images: {
@@ -29,7 +32,7 @@ const nextConfig: NextConfig = {
   // Memory optimization settings
   experimental: {
     // Reduce memory usage during compilation
-    optimizePackageImports: ['recharts', '@tanstack/react-query', '@tanstack/react-table'],
+    optimizePackageImports: ['recharts', '@tanstack/react-query', '@tanstack/react-table', 'next-intl'],
     // Optimize server actions
     serverActions: {
       bodySizeLimit: '2mb',
@@ -40,4 +43,4 @@ const nextConfig: NextConfig = {
   turbopack: {},
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

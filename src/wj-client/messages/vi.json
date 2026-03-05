@@ -1,0 +1,926 @@
+{
+  "common": {
+    "appName": "WealthJourney",
+    "tagline": "Quản lý Tài chính",
+    "loading": "Đang tải...",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "create": "Tạo mới",
+    "add": "Thêm",
+    "remove": "Xóa bỏ",
+    "close": "Đóng",
+    "done": "Xong",
+    "retry": "Thử lại",
+    "tryAgain": "Thử lại",
+    "refresh": "Làm mới",
+    "search": "Tìm kiếm",
+    "apply": "Áp dụng",
+    "clear": "Xóa",
+    "clearAll": "Xóa tất cả",
+    "submit": "Gửi",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước đó",
+    "yes": "Có",
+    "no": "Không",
+    "ok": "OK",
+    "import": "Nhập",
+    "export": "Xuất",
+    "all": "Tất cả",
+    "none": "Không có",
+    "more": "Thêm",
+    "less": "Ít hơn",
+    "showDetails": "Hiển thị chi tiết",
+    "hideDetails": "Ẩn chi tiết",
+    "processing": "Đang xử lý...",
+    "or": "hoặc",
+    "and": "và",
+    "of": "của",
+    "to": "đến",
+    "from": "Từ",
+    "date": "Ngày",
+    "amount": "Số tiền",
+    "name": "Tên",
+    "type": "Loại",
+    "status": "Trạng thái",
+    "actions": "Thao tác",
+    "currency": "Tiền tệ",
+    "note": "Ghi chú",
+    "reason": "Lý do",
+    "description": "Mô tả",
+    "total": "Tổng",
+    "balance": "Số dư",
+    "current": "Hiện tại",
+    "custom": "Tùy chỉnh",
+    "income": "Thu nhập",
+    "expense": "Chi tiêu",
+    "user": "Người dùng",
+    "period": "Kỳ",
+    "category": "Danh mục",
+    "wallet": "Ví",
+    "symbol": "Mã",
+    "price": "Giá",
+    "quantity": "Số lượng",
+    "fees": "Phí",
+    "cash": "Tiền mặt",
+    "investment": "Đầu tư",
+    "basic": "Cơ bản",
+    "uncategorized": "Chưa phân loại",
+    "unknown": "Không xác định",
+    "optional": "tùy chọn",
+    "required": "bắt buộc",
+    "noDataFound": "Không tìm thấy dữ liệu",
+    "noDataAvailable": "Không có dữ liệu",
+    "thereIsNoDataToDisplay": "Hiện tại không có dữ liệu để hiển thị."
+  },
+
+  "nav": {
+    "home": "Trang chủ",
+    "transactions": "Giao dịch",
+    "wallets": "Ví tiền",
+    "portfolio": "Danh mục đầu tư",
+    "prices": "Giá cả",
+    "reports": "Báo cáo",
+    "budget": "Ngân sách",
+    "settings": "Cài đặt",
+    "logout": "Đăng xuất",
+    "toggleMenu": "Bật/tắt menu",
+    "closeMenu": "Đóng menu",
+    "mainNavigation": "Điều hướng chính",
+    "mobileNavigation": "Điều hướng di động"
+  },
+
+  "landing": {
+    "hero": {
+      "title": "Kiểm Soát Hành Trình Tài Chính Của Bạn",
+      "subtitle": "Theo dõi chi tiêu, quản lý đầu tư và xây dựng tài sản với phân tích mạnh mẽ - tất cả trong một ứng dụng đẹp mắt.",
+      "getStarted": "Bắt đầu miễn phí",
+      "learnMore": "Tìm hiểu thêm"
+    },
+    "features": {
+      "sectionTitle": "Mọi Thứ Bạn Cần",
+      "sectionSubtitle": "Các tính năng mạnh mẽ giúp bạn quản lý toàn bộ tài chính",
+      "multiWallet": "Quản lý đa ví",
+      "multiWalletDesc": "Quản lý nhiều ví cho các mục đích khác nhau - tiền mặt, tiết kiệm, đầu tư và nhiều hơn nữa.",
+      "portfolioTracking": "Theo dõi Danh mục đầu tư",
+      "portfolioTrackingDesc": "Theo dõi cổ phiếu, tiền điện tử, vàng, bạc, ETF và nhiều hơn nữa với dữ liệu thị trường thời gian thực.",
+      "mobileFirst": "Thiết kế ưu tiên di động",
+      "mobileFirstDesc": "Giao diện đẹp, thân thiện cảm ứng, hoạt động hoàn hảo trên mọi thiết bị.",
+      "goldSilver": "Đầu tư Vàng & Bạc",
+      "goldSilverDesc": "Theo dõi vàng và bạc Việt Nam/thế giới với chuyển đổi đơn vị tự động.",
+      "smartTransactions": "Theo dõi giao dịch thông minh",
+      "smartTransactionsDesc": "Phân loại, tìm kiếm và phân tích tất cả thu nhập và chi tiêu của bạn.",
+      "bankImport": "Nhập sao kê ngân hàng",
+      "bankImportDesc": "Nhập giao dịch từ sao kê CSV ngân hàng với phát hiện trùng lặp thông minh.",
+      "analytics": "Bảng phân tích nâng cao",
+      "analyticsDesc": "Trực quan hóa sức khỏe tài chính với biểu đồ tương tác và báo cáo chi tiết.",
+      "reports": "Báo cáo tài chính & Xuất dữ liệu",
+      "reportsDesc": "Tạo báo cáo toàn diện và xuất sang CSV, PDF hoặc Excel.",
+      "budgetPlanning": "Lập kế hoạch & Theo dõi ngân sách",
+      "budgetPlanningDesc": "Đặt ngân sách, theo dõi chi tiêu và kiểm soát mục tiêu tài chính.",
+      "multiCurrency": "Hỗ trợ đa tiền tệ",
+      "multiCurrencyDesc": "Quản lý tài chính liền mạch qua các loại tiền tệ khác nhau với chuyển đổi thời gian thực.",
+      "marketData": "Dữ liệu thị trường thời gian thực",
+      "marketDataDesc": "Cập nhật giá mới nhất cho cổ phiếu, tiền điện tử, vàng và nhiều hơn nữa từ Yahoo Finance.",
+      "secureAuth": "Đăng nhập Google an toàn",
+      "secureAuthDesc": "Đăng nhập an toàn bằng tài khoản Google. Không cần nhớ mật khẩu."
+    },
+    "investmentFeatures": {
+      "sectionTitle": "Quản lý Đầu tư",
+      "sectionSubtitle": "Theo dõi TẤT CẢ khoản đầu tư trong một danh mục thống nhất",
+      "allAssets": "Tất cả tài sản, Một nền tảng",
+      "allAssetsDesc": "Theo dõi TẤT CẢ khoản đầu tư trong một danh mục thống nhất",
+      "stocks": "Cổ phiếu",
+      "etfs": "ETF",
+      "mutualFunds": "Quỹ tương hỗ",
+      "cryptocurrency": "Tiền điện tử",
+      "gold": "Vàng",
+      "silver": "Bạc",
+      "powerfulAnalytics": "Phân tích mạnh mẽ",
+      "powerfulAnalyticsDesc": "Kế toán FIFO và chỉ số thông minh trên TẤT CẢ tài sản",
+      "fifoCostBasis": "Giá vốn FIFO",
+      "realizedPnl": "Lãi/Lỗ đã thực hiện",
+      "unrealizedPnl": "Lãi/Lỗ chưa thực hiện",
+      "assetAllocation": "Phân bổ tài sản",
+      "performanceTracking": "Theo dõi hiệu suất",
+      "realTimeUpdates": "Cập nhật thời gian thực",
+      "goldSilverSupport": "Hỗ trợ Vàng & Bạc",
+      "goldSilverSupportDesc": "Thị trường vàng Việt Nam + giá vàng thế giới với chuyển đổi đơn vị tự động",
+      "sjcGold": "Vàng SJC (10 loại)",
+      "worldGold": "Vàng thế giới (XAU)",
+      "taelGramOunce": "Lượng/Gram/Ounce",
+      "multiCurrency": "Đa tiền tệ",
+      "livePricing": "Giá trực tiếp"
+    },
+    "bankImport": {
+      "sectionTitle": "Nhập sao kê ngân hàng",
+      "sectionSubtitle": "Nhập sao kê ngân hàng trong vài giây",
+      "csvFormat": "CSV",
+      "csvDesc": "Giá trị phân tách bằng dấu phẩy",
+      "bankStatement": "Sao kê ngân hàng",
+      "bankStatementDesc": "Sao kê ngân hàng",
+      "smartDuplicate": "Phát hiện trùng lặp thông minh",
+      "autoCategorization": "Tự động phân loại",
+      "multiCurrencySupport": "Hỗ trợ đa tiền tệ",
+      "reviewEdit": "Xem lại & Chỉnh sửa",
+      "lightningFast": "Nhanh chóng",
+      "uploadStatement": "Tải lên sao kê",
+      "reviewConfirm": "Xem lại & Xác nhận",
+      "importComplete": "Nhập hoàn tất"
+    },
+    "howItWorks": {
+      "sectionTitle": "Cách hoạt động",
+      "step1Title": "Đăng nhập an toàn",
+      "step1Desc": "Tạo tài khoản an toàn bằng Google OAuth. Không cần nhớ mật khẩu.",
+      "step2Title": "Thiết lập ví của bạn",
+      "step2Desc": "Thiết lập ví CƠ BẢN hoặc ĐẦU TƯ. Thêm số dư ban đầu để bắt đầu.",
+      "step3Title": "Theo dõi đầu tư",
+      "step3Desc": "Theo dõi cổ phiếu, tiền điện tử, vàng và nhiều hơn nữa. Ghi nhận mua, bán và cổ tức tự động.",
+      "step4Title": "Phân tích hiệu suất",
+      "step4Desc": "Xem lãi/lỗ thời gian thực, phân bổ danh mục và phân tích chi tiết để đưa ra quyết định sáng suốt.",
+      "step5Title": "Xuất dữ liệu",
+      "step5Desc": "Xuất dữ liệu sang CSV để phân tích sâu hơn. Giữ dữ liệu tài chính luôn di động."
+    },
+    "comparison": {
+      "sectionTitle": "Tại sao chọn WealthJourney?",
+      "feature": "Tính năng",
+      "wealthJourney": "WealthJourney",
+      "others": "Khác"
+    },
+    "cta": {
+      "title": "Sẵn sàng bắt đầu hành trình tài chính?",
+      "subtitle": "Cùng hàng nghìn người dùng quản lý tài chính thông minh hơn.",
+      "getStartedFree": "Bắt đầu miễn phí",
+      "noCardRequired": "Không cần thẻ tín dụng"
+    },
+    "footer": {
+      "copyright": "WealthJourney. Bảo lưu mọi quyền.",
+      "privacyPolicy": "Chính sách bảo mật",
+      "termsOfService": "Điều khoản dịch vụ"
+    },
+    "navbar": {
+      "features": "Tính năng",
+      "howItWorks": "Cách hoạt động",
+      "getStarted": "Bắt đầu"
+    }
+  },
+
+  "auth": {
+    "login": {
+      "title": "Chào mừng trở lại",
+      "subtitle": "Đăng nhập để tiếp tục hành trình tài chính",
+      "signingIn": "Đang đăng nhập...",
+      "googleLoginFailed": "Đăng nhập Google thất bại. Vui lòng thử lại.",
+      "genericError": "Đã xảy ra lỗi. Vui lòng thử lại.",
+      "newToApp": "Mới sử dụng WealthJourney?",
+      "createAccount": "Tạo tài khoản",
+      "termsAgreement": "Bằng việc đăng nhập, bạn đồng ý với",
+      "termsOfService": "Điều khoản dịch vụ",
+      "privacyPolicy": "Chính sách bảo mật"
+    },
+    "register": {
+      "title": "Bắt đầu hành trình",
+      "subtitle": "Tạo tài khoản miễn phí trong vài giây",
+      "creatingAccount": "Đang tạo tài khoản...",
+      "googleRegisterFailed": "Đăng ký Google thất bại. Vui lòng thử lại.",
+      "registrationFailed": "Đăng ký thất bại. Vui lòng thử lại.",
+      "freeForever": "Miễn phí mãi mãi",
+      "bankLevelSecurity": "Bảo mật cấp ngân hàng",
+      "noCreditCard": "Không cần thẻ tín dụng",
+      "alreadyHaveAccount": "Đã có tài khoản?",
+      "signInInstead": "Đăng nhập ngay",
+      "termsAgreement": "Bằng việc tạo tài khoản, bạn đồng ý với",
+      "termsOfService": "Điều khoản dịch vụ",
+      "privacyPolicy": "Chính sách bảo mật"
+    }
+  },
+
+  "dashboard": {
+    "home": {
+      "myWallets": "Ví của tôi",
+      "balanceTrend": "Xu hướng số dư",
+      "dominance": "Tỷ trọng",
+      "monthlyDominance": "Tỷ trọng theo tháng",
+      "accountBalance": "Số dư tài khoản",
+      "analytics": "Phân tích",
+      "totalNetWorth": "Tổng giá trị tài sản",
+      "totalBalance": "Tổng số dư",
+      "cashLabel": "Tiền mặt: {amount}",
+      "investmentsLabel": "Đầu tư: {amount}",
+      "addTransaction": "+ Thêm giao dịch",
+      "transfer": "Chuyển khoản",
+      "newWallet": "Ví mới"
+    },
+    "quickActions": {
+      "addTransaction": "Thêm giao dịch",
+      "transferMoney": "Chuyển tiền",
+      "createNewWallet": "Tạo ví mới"
+    }
+  },
+
+  "transaction": {
+    "title": "Giao dịch",
+    "searchPlaceholder": "Tìm kiếm giao dịch...",
+    "totalBalance": "Tổng số dư",
+    "noTransactionsFound": "Không tìm thấy giao dịch",
+    "addFirstTransaction": "Thêm giao dịch đầu tiên hoặc điều chỉnh bộ lọc",
+    "transactionAddedSuccess": "Giao dịch đã được thêm thành công",
+    "failedToAdd": "Không thể thêm giao dịch. Vui lòng thử lại",
+    "quickFilters": {
+      "all": "Tất cả",
+      "income": "Thu nhập",
+      "expense": "Chi tiêu",
+      "today": "Hôm nay",
+      "thisWeek": "Tuần này",
+      "thisMonth": "Tháng này"
+    },
+    "sortOptions": {
+      "newestFirst": "Mới nhất trước",
+      "oldestFirst": "Cũ nhất trước",
+      "highestFirst": "Cao nhất trước",
+      "lowestFirst": "Thấp nhất trước"
+    },
+    "form": {
+      "title": "Thêm giao dịch",
+      "editTitle": "Sửa giao dịch",
+      "income": "Thu nhập",
+      "expense": "Chi tiêu",
+      "amount": "Số tiền",
+      "wallet": "Ví",
+      "selectWallet": "Chọn ví",
+      "category": "Danh mục",
+      "selectOrCreateCategory": "Chọn hoặc tạo danh mục...",
+      "dateTime": "Ngày & Giờ",
+      "note": "Ghi chú",
+      "notePlaceholder": "Nhập ghi chú (tùy chọn)",
+      "addTransaction": "Thêm giao dịch",
+      "updateTransaction": "Cập nhật giao dịch",
+      "transactionUpdatedSuccess": "Giao dịch đã được cập nhật thành công",
+      "failedToUpdate": "Không thể cập nhật giao dịch. Vui lòng thử lại"
+    },
+    "delete": {
+      "title": "Xóa giao dịch",
+      "confirmMessage": "Bạn có chắc chắn muốn xóa giao dịch này?",
+      "confirmButton": "Xóa",
+      "cancelButton": "Hủy"
+    },
+    "import": {
+      "title": "Nhập giao dịch",
+      "buttonLabel": "Nhập"
+    },
+    "export": {
+      "title": "Xuất giao dịch"
+    },
+    "filter": {
+      "openFilters": "Mở bộ lọc",
+      "clearSearch": "Xóa tìm kiếm",
+      "toggleBalanceVisibility": "Bật/tắt hiển thị số dư"
+    }
+  },
+
+  "wallet": {
+    "title": "Ví của tôi",
+    "createWallet": "Tạo ví",
+    "editWallet": "Sửa ví",
+    "createNewWallet": "Tạo ví mới",
+    "newWallet": "Ví mới",
+    "errorLoading": "Lỗi khi tải danh sách ví",
+    "viewMode": {
+      "grid": "Xem dạng lưới",
+      "list": "Xem dạng danh sách"
+    },
+    "filterTypes": {
+      "all": "Tất cả",
+      "cash": "Tiền mặt",
+      "investment": "Đầu tư"
+    },
+    "form": {
+      "name": "Tên",
+      "namePlaceholder": "Nhập tên ví",
+      "initialBalance": "Số dư ban đầu",
+      "walletType": "Loại ví",
+      "selectWalletType": "Chọn loại ví",
+      "walletTypeBasic": "Cơ bản",
+      "walletTypeInvestment": "Đầu tư",
+      "create": "Tạo",
+      "save": "Lưu",
+      "createdSuccess": "Ví \"{name}\" đã được tạo thành công",
+      "failedToCreate": "Không thể tạo ví. Vui lòng thử lại",
+      "failedToUpdate": "Không thể cập nhật ví. Vui lòng thử lại"
+    },
+    "edit": {
+      "walletInformation": "Thông tin ví",
+      "balanceAdjustment": "Điều chỉnh số dư",
+      "adjustBalance": "Điều chỉnh số dư",
+      "currentBalance": "Số dư hiện tại: {amount}",
+      "adjustmentType": "Loại điều chỉnh",
+      "addFunds": "Nạp tiền",
+      "removeFunds": "Rút tiền",
+      "adjustmentAmount": "Số tiền điều chỉnh ({currency})",
+      "adjustmentAmountPlaceholder": "Nhập số tiền",
+      "adjustmentAmountHelp": "Nhập số tiền cần thêm hoặc rút từ ví",
+      "projectedBalance": "Số dư dự kiến: ",
+      "reasonLabel": "Lý do (Tùy chọn)",
+      "reasonPlaceholder": "Tại sao bạn điều chỉnh số dư này?",
+      "auditNote": "Thao tác này sẽ tạo một bản ghi giao dịch để kiểm tra.",
+      "nameUpdatedSuccess": "Tên ví đã được cập nhật thành công",
+      "balanceAdjustedSuccess": "Số dư đã được điều chỉnh thành công",
+      "nameAndBalanceSuccess": "Tên ví và số dư đã được cập nhật thành công",
+      "failedToAdjust": "Không thể điều chỉnh số dư. Vui lòng thử lại"
+    },
+    "delete": {
+      "title": "Xóa ví",
+      "description": "{walletName} sẽ bị xóa. Bạn muốn xử lý các giao dịch như thế nào?",
+      "archiveOption": "Lưu trữ ví (Khuyến nghị)",
+      "archiveDescription": "Ví sẽ bị ẩn nhưng tất cả giao dịch sẽ được lưu giữ cho hồ sơ của bạn.",
+      "transferOption": "Chuyển giao dịch sang ví khác",
+      "transferDescription": "Chuyển tất cả giao dịch sang ví khác cùng loại tiền tệ. Số dư của ví đích sẽ được cập nhật tương ứng.",
+      "selectTargetWallet": "Chọn ví...",
+      "noOtherWallets": "Không có ví nào khác với cùng loại tiền tệ.",
+      "deleteOnlyOption": "Xóa ví và giữ lại giao dịch",
+      "deleteOnlyDescription": "Giao dịch sẽ được giữ lại nhưng tham chiếu ví sẽ bị xóa.",
+      "notRecommended": "Không khuyến nghị.",
+      "selectTargetError": "Vui lòng chọn ví đích",
+      "failedToProcess": "Không thể xử lý ví. Vui lòng thử lại",
+      "confirm": "Xác nhận"
+    },
+    "transfer": {
+      "title": "Chuyển tiền",
+      "amount": "Số tiền",
+      "fromWallet": "Từ",
+      "selectSourceWallet": "Chọn ví nguồn",
+      "toWallet": "Đến",
+      "selectDestinationWallet": "Chọn ví đích",
+      "selectSourceFirst": "Chọn ví nguồn trước",
+      "dateTime": "Ngày & Giờ",
+      "note": "Ghi chú",
+      "notePlaceholder": "Nhập ghi chú (tùy chọn)",
+      "transferButton": "Chuyển",
+      "transferSuccess": "Chuyển tiền thành công",
+      "failedToTransfer": "Không thể chuyển tiền. Vui lòng thử lại"
+    },
+    "unknownWallet": "Ví không xác định"
+  },
+
+  "investment": {
+    "title": "Danh mục đầu tư",
+    "holdings": "Tài sản nắm giữ",
+    "selectWallet": "Chọn ví",
+    "allInvestmentWallets": "Tất cả ví đầu tư",
+    "filterByType": "Lọc theo loại",
+    "sortBy": "Sắp xếp theo",
+    "errorLoading": "Lỗi khi tải danh mục đầu tư",
+    "typeOptions": {
+      "allTypes": "Tất cả loại",
+      "cryptocurrency": "Tiền điện tử",
+      "stock": "Cổ phiếu",
+      "etf": "ETF",
+      "mutualFund": "Quỹ tương hỗ",
+      "bond": "Trái phiếu",
+      "commodity": "Hàng hóa",
+      "goldVietnam": "Vàng (Việt Nam)",
+      "goldWorld": "Vàng (Thế giới)",
+      "silverVietnam": "Bạc (Việt Nam)",
+      "silverWorld": "Bạc (Thế giới)",
+      "other": "Khác"
+    },
+    "sortOptions": {
+      "nameAZ": "Tên (A-Z)",
+      "valueHighLow": "Giá trị (Cao-Thấp)",
+      "pnlHighLow": "Lãi/Lỗ (Cao-Thấp)",
+      "pnlPercentHighLow": "Lãi/Lỗ % (Cao-Thấp)"
+    },
+    "emptyWallets": {
+      "title": "Chưa có ví đầu tư",
+      "description": "Tạo ví đầu tư để bắt đầu theo dõi danh mục của bạn",
+      "createButton": "Tạo ví đầu tư"
+    },
+    "emptyInvestments": {
+      "message": "Chưa có khoản đầu tư nào. Thêm khoản đầu tư đầu tiên để bắt đầu."
+    },
+    "modal": {
+      "createWallet": "Tạo ví đầu tư",
+      "addInvestment": "Thêm khoản đầu tư",
+      "investmentDetails": "Chi tiết đầu tư"
+    },
+    "updateBanner": {
+      "progressTitle": "Đang lấy giá mới nhất từ thị trường...",
+      "progressDescription": "Quá trình này có thể mất 5-15 giây. Chúng tôi kiểm tra cập nhật mỗi 2 giây.",
+      "successTitle": "Giá đã cập nhật thành công!",
+      "successDescription": "Danh mục đầu tư của bạn đang hiển thị giá thị trường mới nhất."
+    },
+    "form": {
+      "addInvestment": "Thêm khoản đầu tư",
+      "symbol": "Mã",
+      "searchSymbol": "Tìm mã chứng khoán...",
+      "investmentName": "Tên khoản đầu tư",
+      "investmentType": "Loại đầu tư",
+      "selectType": "Chọn loại đầu tư",
+      "exchange": "Sàn giao dịch",
+      "exchangePlaceholder": "VD: NASDAQ, HOSE",
+      "isCustom": "Đầu tư tùy chỉnh",
+      "quantity": "Số lượng",
+      "purchasePrice": "Giá mua",
+      "pricePerUnit": "Giá mỗi đơn vị ({currency})",
+      "totalCost": "Tổng chi phí",
+      "walletLabel": "Ví",
+      "selectWalletPlaceholder": "Chọn ví đầu tư",
+      "create": "Tạo",
+      "failedToCreate": "Không thể tạo khoản đầu tư. Vui lòng thử lại"
+    },
+    "transactionTypes": {
+      "buy": "Mua",
+      "sell": "Bán",
+      "dividend": "Cổ tức",
+      "split": "Chia tách",
+      "unknown": "Không xác định"
+    },
+    "transactionTable": {
+      "type": "Loại",
+      "quantity": "Số lượng",
+      "price": "Giá",
+      "fees": "Phí",
+      "total": "Tổng",
+      "date": "Ngày",
+      "deleteTransaction": "Xóa giao dịch"
+    },
+    "transaction": {
+      "title": "Thêm giao dịch",
+      "transactionType": "Loại giao dịch",
+      "selectTransactionType": "Chọn loại giao dịch",
+      "buy": "Mua",
+      "sell": "Bán",
+      "dividend": "Cổ tức",
+      "quantity": "Số lượng",
+      "pricePerUnit": "Giá mỗi đơn vị ({currency})",
+      "fees": "Phí ({currency})",
+      "transactionDate": "Ngày giao dịch",
+      "transactionDateRequired": "Ngày giao dịch là bắt buộc",
+      "walletBalance": "Số dư ví:",
+      "transactionCost": "Chi phí giao dịch:",
+      "remaining": "Còn lại:",
+      "loadingRate": "Đang tải tỷ giá...",
+      "rateUnavailable": "Không có tỷ giá",
+      "exchangeRate": "Tỷ giá: 1 {from} = {rate} {to}",
+      "insufficientBalance": "Số dư ví không đủ. Bạn cần thêm {amount}.",
+      "addTransaction": "Thêm giao dịch",
+      "transactionAddedSuccess": "Đã thêm giao dịch!",
+      "transactionAddedMessage": "Giao dịch đã được thêm thành công",
+      "failedToAdd": "Không thể thêm giao dịch. Vui lòng thử lại",
+      "fixValidationErrors": "Vui lòng sửa các lỗi xác thực"
+    },
+    "detail": {
+      "overview": "Tổng quan",
+      "transactions": "Giao dịch",
+      "addTransaction": "Thêm giao dịch",
+      "setPrice": "Đặt giá",
+      "loadingDetails": "Đang tải chi tiết đầu tư...",
+      "investmentNotFound": "Không tìm thấy khoản đầu tư",
+      "customInvestment": "Đầu tư tùy chỉnh",
+      "noMarketData": "Không có dữ liệu thị trường",
+      "symbolLabel": "Mã",
+      "nameLabel": "Tên",
+      "currencyLabel": "Tiền tệ",
+      "quantityLabel": "Số lượng",
+      "avgCost": "Giá vốn TB",
+      "currentPrice": "Giá hiện tại",
+      "refreshPrice": "Làm mới giá",
+      "setPriceManually": "Đặt giá thủ công",
+      "totalCost": "Tổng chi phí",
+      "currentValue": "Giá trị hiện tại",
+      "unrealizedPnl": "Lãi/Lỗ chưa thực hiện",
+      "unrealizedPnlPercent": "Lãi/Lỗ chưa thực hiện %",
+      "pnlNotAvailable": "N/A (Chưa đặt giá)",
+      "realizedPnl": "Lãi/Lỗ đã thực hiện",
+      "totalDividends": "Tổng cổ tức",
+      "noTransactionsYet": "Chưa có giao dịch nào.",
+      "deleteInvestment": "Xóa khoản đầu tư",
+      "justNow": "Vừa xong",
+      "minutesAgo": "{minutes} phút trước",
+      "hoursAgo": "{hours} giờ trước",
+      "updated": "Cập nhật {time}",
+      "customNoPriceWarning": "Đây là khoản đầu tư tùy chỉnh chưa có giá. Nhấn tab \"Đặt giá\" để cập nhật giá trị hiện tại.",
+      "deleteTransactionTitle": "Xóa giao dịch",
+      "deleteTransactionConfirm": "Bạn có chắc chắn muốn xóa giao dịch này?",
+      "deleteTransactionRecalc": "Thao tác này sẽ tính lại số lượng và giá vốn của khoản đầu tư.",
+      "deleteInvestmentConfirm": "Bạn có chắc chắn muốn xóa {symbol}?",
+      "deleteInvestmentHoldings": "Cảnh báo: Bạn vẫn còn {quantity} đơn vị. Tất cả tài sản và lịch sử giao dịch sẽ bị xóa vĩnh viễn.",
+      "deleteInvestmentHistory": "Toàn bộ lịch sử giao dịch của khoản đầu tư này sẽ bị xóa.",
+      "failedToDeleteTransaction": "Không thể xóa giao dịch",
+      "failedToDeleteInvestment": "Không thể xóa khoản đầu tư"
+    },
+    "priceForm": {
+      "symbolLabel": "Mã:",
+      "currentPriceLabel": "Giá hiện tại:",
+      "notSet": "Chưa đặt",
+      "newPrice": "Giá mới",
+      "helperText": "Nhập giá mỗi đơn vị bằng {currency}",
+      "tip": "Bạn có thể đặt giá bằng 0 nếu không có giá thị trường. Điều này sẽ hiển thị tài sản nắm giữ mà không tính lãi/lỗ.",
+      "invalidPrice": "Vui lòng nhập giá hợp lệ (0 hoặc lớn hơn)",
+      "updatePrice": "Cập nhật giá",
+      "priceUpdatedSuccess": "Giá đã cập nhật thành công!",
+      "failedToUpdatePrice": "Không thể cập nhật giá"
+    },
+    "cashBalance": {
+      "title": "Số dư tiền mặt",
+      "availableCash": "Tiền mặt khả dụng"
+    }
+  },
+
+  "budget": {
+    "title": "Ngân sách",
+    "createBudget": "Tạo ngân sách",
+    "newBudget": "Ngân sách mới",
+    "noBudgetsYet": "Chưa có ngân sách",
+    "createFirstBudget": "Tạo ngân sách đầu tiên để bắt đầu theo dõi",
+    "errorLoading": "Lỗi khi tải ngân sách",
+    "loadingBudgets": "Đang tải ngân sách...",
+    "modal": {
+      "createBudget": "Tạo ngân sách",
+      "editBudget": "Sửa ngân sách",
+      "addBudgetItem": "Thêm mục ngân sách",
+      "editBudgetItem": "Sửa mục ngân sách"
+    },
+    "form": {
+      "budgetName": "Tên ngân sách",
+      "budgetNamePlaceholder": "VD: Ngân sách tháng",
+      "totalAmount": "Tổng số tiền",
+      "startDate": "Ngày bắt đầu",
+      "endDate": "Ngày kết thúc",
+      "create": "Tạo",
+      "save": "Lưu",
+      "createdSuccess": "Ngân sách \"{name}\" đã được tạo thành công",
+      "failedToCreate": "Không thể tạo ngân sách. Vui lòng thử lại",
+      "updatedSuccess": "Ngân sách đã được cập nhật thành công",
+      "failedToUpdate": "Không thể cập nhật ngân sách. Vui lòng thử lại",
+      "budgetItemName": "Tên mục ngân sách",
+      "budgetItemNamePlaceholder": "VD: Đi chợ",
+      "allocatedAmount": "Số tiền phân bổ",
+      "addItem": "Thêm mục",
+      "budgetItemCreatedSuccess": "Mục ngân sách \"{name}\" đã được thêm thành công",
+      "failedToCreateItem": "Không thể tạo mục ngân sách. Vui lòng thử lại",
+      "budgetItemUpdatedSuccess": "Mục ngân sách đã được cập nhật thành công",
+      "failedToUpdateItem": "Không thể cập nhật mục ngân sách. Vui lòng thử lại"
+    },
+    "card": {
+      "spent": "Đã chi",
+      "remaining": "Còn lại",
+      "overBudget": "Vượt ngân sách",
+      "ofBudget": "trên {amount}",
+      "addItem": "Thêm mục",
+      "editItem": "Sửa mục",
+      "deleteItem": "Xóa mục"
+    }
+  },
+
+  "report": {
+    "title": "Báo cáo tài chính",
+    "failedToLoad": "Không thể tải báo cáo",
+    "loadingReport": "Đang tải báo cáo tài chính...",
+    "noDataAvailable": "Không có dữ liệu",
+    "noDataDescription": "Không tìm thấy giao dịch cho kỳ đã chọn. Hãy thử chọn khoảng thời gian khác.",
+    "noExportData": "Không có dữ liệu để xuất. Vui lòng chọn khoảng thời gian khác.",
+    "failedToExport": "Không thể xuất dữ liệu. Vui lòng thử lại.",
+    "expenseBreakdown": "Chi tiết chi tiêu",
+    "categoryComparison": "So sánh danh mục",
+    "vsPreviousPeriod": "so với kỳ trước",
+    "incomeVsExpensesTrend": "Xu hướng Thu nhập vs Chi tiêu",
+    "monthlySummary": "Tổng kết tháng",
+    "compareWithPrevious": "So sánh với kỳ trước",
+    "customRange": "Khoảng thời gian tùy chỉnh",
+    "tableHeaders": {
+      "month": "Tháng",
+      "income": "Thu nhập",
+      "expenses": "Chi tiêu",
+      "netSavings": "Tiết kiệm ròng",
+      "savingsRate": "Tỷ lệ tiết kiệm"
+    },
+    "chartLabels": {
+      "income": "Thu nhập",
+      "expenses": "Chi tiêu",
+      "netSavings": "Tiết kiệm ròng",
+      "thisMonth": "Tháng này",
+      "lastMonth": "Tháng trước"
+    },
+    "summary": {
+      "totalIncome": "Tổng thu nhập",
+      "totalExpenses": "Tổng chi tiêu",
+      "netSavings": "Tiết kiệm ròng",
+      "savingsRate": "Tỷ lệ tiết kiệm",
+      "topExpenseCategory": "Chi tiêu hàng đầu"
+    },
+    "periods": {
+      "thisMonth": "Tháng này",
+      "lastMonth": "Tháng trước",
+      "thisQuarter": "Quý này",
+      "lastQuarter": "Quý trước",
+      "thisYear": "Năm nay",
+      "lastYear": "Năm trước",
+      "custom": "Tùy chỉnh",
+      "startDate": "Ngày bắt đầu",
+      "endDate": "Ngày kết thúc",
+      "applyRange": "Áp dụng"
+    }
+  },
+
+  "prices": {
+    "title": "Giá thị trường",
+    "lastUpdated": "Cập nhật lần cuối: {time}",
+    "tabs": {
+      "gold": "Vàng",
+      "silver": "Bạc",
+      "symbolLookup": "Tra cứu mã"
+    },
+    "table": {
+      "type": "Loại",
+      "buy": "Mua",
+      "sell": "Bán",
+      "change": "Thay đổi"
+    },
+    "symbolLookup": {
+      "symbolLabel": "Mã",
+      "searchPlaceholder": "Tìm mã, VD: AAPL, BTC...",
+      "search": "Tìm kiếm",
+      "failedToFetch": "Không thể lấy giá. Mã có thể không được hỗ trợ hoặc không khả dụng.",
+      "emptyState": "Tìm kiếm mã cổ phiếu, tiền điện tử hoặc ETF để xem giá hiện tại."
+    },
+    "gold": {
+      "emptyMessage": "Không có giá vàng",
+      "emptyDescription": "Không thể lấy giá vàng từ nhà cung cấp.",
+      "failedToLoad": "Không thể tải giá vàng. Hãy thử làm mới."
+    },
+    "silver": {
+      "emptyMessage": "Không có giá bạc",
+      "emptyDescription": "Không thể lấy giá bạc từ nhà cung cấp.",
+      "failedToLoad": "Không thể tải giá bạc. Hãy thử làm mới."
+    }
+  },
+
+  "settings": {
+    "title": "Cài đặt",
+    "language": {
+      "title": "Ngôn ngữ",
+      "subtitle": "Chọn ngôn ngữ ưa thích cho giao diện",
+      "save": "Lưu ngôn ngữ",
+      "failedToUpdate": "Không thể cập nhật ngôn ngữ"
+    },
+    "sessions": {
+      "title": "Phiên đang hoạt động",
+      "description": "Quản lý các thiết bị đang đăng nhập vào tài khoản của bạn",
+      "noActiveSessions": "Không có phiên hoạt động",
+      "currentLabel": "Hiện tại",
+      "lastActive": "Hoạt động lần cuối: {date}",
+      "created": "Tạo lúc: {date}",
+      "expires": "Hết hạn: {date}",
+      "revokeButton": "Thu hồi",
+      "revokeAllOthers": "Thu hồi tất cả phiên khác",
+      "revokeAllTitle": "Thu hồi tất cả phiên",
+      "revokeAllMessage": "Bạn có chắc chắn muốn thu hồi {count} phiên khác? Các thiết bị đó sẽ cần đăng nhập lại.",
+      "revokeAllConfirm": "Thu hồi tất cả"
+    },
+    "importTemplates": {
+      "title": "Mẫu nhập",
+      "description": "Quản lý các mẫu nhập đã lưu để sử dụng lại",
+      "loadingTemplates": "Đang tải mẫu...",
+      "noTemplates": "Chưa có mẫu nào được lưu. Tạo mẫu khi nhập tệp bằng cách chọn \"Lưu làm mẫu\" ở bước ánh xạ cột.",
+      "tableHeaders": {
+        "templateName": "Tên mẫu",
+        "fileFormats": "Định dạng tệp",
+        "currency": "Tiền tệ",
+        "dateFormat": "Định dạng ngày",
+        "created": "Ngày tạo",
+        "actions": "Thao tác"
+      },
+      "deleteTitle": "Xóa mẫu",
+      "deleteMessage": "Bạn có chắc chắn muốn xóa mẫu \"{name}\"? Thao tác này không thể hoàn tác.",
+      "deleteConfirm": "Xóa"
+    }
+  },
+
+  "feedback": {
+    "emptyState": {
+      "noDataFound": "Không tìm thấy dữ liệu",
+      "noResultsFound": "Không tìm thấy kết quả",
+      "noResultsDescription": "Chúng tôi không tìm thấy kết quả phù hợp. Hãy thử điều chỉnh tìm kiếm hoặc bộ lọc.",
+      "noTransactionsYet": "Chưa có giao dịch",
+      "noTransactionsDescription": "Bắt đầu theo dõi tài chính bằng cách thêm giao dịch đầu tiên.",
+      "noWalletsFound": "Không tìm thấy ví",
+      "noWalletsDescription": "Tạo ví để bắt đầu quản lý tài chính.",
+      "noInvestmentsYet": "Chưa có khoản đầu tư",
+      "noInvestmentsDescription": "Bắt đầu xây dựng danh mục bằng cách thêm khoản đầu tư đầu tiên.",
+      "noBudgetsSet": "Chưa đặt ngân sách",
+      "noBudgetsDescription": "Tạo ngân sách để quản lý chi tiêu tốt hơn.",
+      "noCategories": "Chưa có danh mục",
+      "noCategoriesDescription": "Danh mục giúp tổ chức giao dịch. Tạo danh mục đầu tiên của bạn.",
+      "noDataAvailable": "Không có dữ liệu",
+      "noDataDescription": "Hiện tại không có dữ liệu để hiển thị."
+    },
+    "errorState": {
+      "somethingWentWrong": "Đã xảy ra lỗi",
+      "somethingWentWrongDescription": "Chúng tôi gặp lỗi khi tải dữ liệu. Vui lòng thử lại.",
+      "networkError": "Lỗi mạng",
+      "networkErrorDescription": "Vui lòng kiểm tra kết nối internet và thử lại.",
+      "serverError": "Lỗi máy chủ",
+      "serverErrorDescription": "Máy chủ đang gặp sự cố. Vui lòng thử lại sau.",
+      "accessDenied": "Truy cập bị từ chối",
+      "accessDeniedDescription": "Bạn không có quyền truy cập tài nguyên này.",
+      "notFound": "Không tìm thấy",
+      "notFoundDescription": "Không tìm thấy tài nguyên yêu cầu.",
+      "requestTimeout": "Hết thời gian yêu cầu",
+      "requestTimeoutDescription": "Yêu cầu mất quá lâu để hoàn thành. Vui lòng thử lại.",
+      "unexpectedError": "Lỗi không mong đợi",
+      "unexpectedErrorDescription": "Đã xảy ra lỗi không mong đợi. Vui lòng thử lại."
+    },
+    "success": {
+      "defaultMessage": "Thao tác hoàn tất thành công!"
+    },
+    "loading": {
+      "loadingText": "Đang tải...",
+      "loadingData": "Đang tải dữ liệu...",
+      "pleaseWait": "Vui lòng chờ..."
+    }
+  },
+
+  "modals": {
+    "titles": {
+      "addTransaction": "Thêm giao dịch",
+      "editTransaction": "Sửa giao dịch",
+      "transferMoney": "Chuyển tiền",
+      "createWallet": "Tạo ví",
+      "editWallet": "Sửa ví",
+      "deleteWallet": "Xóa ví",
+      "createBudget": "Tạo ngân sách",
+      "editBudget": "Sửa ngân sách",
+      "addBudgetItem": "Thêm mục ngân sách",
+      "editBudgetItem": "Sửa mục ngân sách",
+      "addInvestment": "Thêm khoản đầu tư",
+      "investmentDetails": "Chi tiết đầu tư",
+      "createInvestmentWallet": "Tạo ví đầu tư",
+      "importTransactions": "Nhập giao dịch",
+      "deleteTransaction": "Xóa giao dịch",
+      "deleteTemplate": "Xóa mẫu",
+      "revokeAllSessions": "Thu hồi tất cả phiên"
+    },
+    "confirmation": {
+      "deleteTransactionMessage": "Bạn có chắc chắn muốn xóa giao dịch này?",
+      "deleteConfirm": "Xóa",
+      "cancelButton": "Hủy",
+      "areYouSure": "Bạn có chắc không?",
+      "thisActionCannotBeUndone": "Thao tác này không thể hoàn tác.",
+      "confirm": "Xác nhận"
+    },
+    "importWizard": {
+      "selectWallet": "Chọn ví",
+      "selectBankTemplate": "Chọn mẫu ngân hàng",
+      "uploadFile": "Tải lên tệp",
+      "columnMapping": "Ánh xạ cột",
+      "review": "Xem lại",
+      "saveAsTemplate": "Lưu làm mẫu",
+      "templateName": "Tên mẫu",
+      "dragAndDrop": "Kéo và thả tệp vào đây",
+      "browseFiles": "Chọn tệp",
+      "supportedFormats": "Định dạng hỗ trợ: CSV",
+      "stepProgress": "Bước {current} / {total}",
+      "duplicateDetection": "Phát hiện trùng lặp",
+      "categoryReview": "Xem lại danh mục",
+      "readyToImport": "Sẵn sàng nhập",
+      "transactionsReview": "Xem lại giao dịch",
+      "errorSummary": "Tóm tắt lỗi",
+      "currencyConversion": "Chuyển đổi tiền tệ",
+      "dateRangeFilter": "Lọc theo khoảng ngày",
+      "importSuccess": "Nhập thành công!",
+      "importSuccessMessage": "Các giao dịch đã được nhập thành công.",
+      "importButton": "Nhập giao dịch",
+      "transactionsImported": "{count} giao dịch đã được nhập",
+      "skippedCount": "({count} bị bỏ qua)",
+      "incomeLabel": "Thu nhập",
+      "expensesLabel": "Chi tiêu",
+      "netChange": "Thay đổi ròng",
+      "newBalance": "Số dư mới",
+      "duplicatesSkipped": "{count} trùng lặp đã bỏ qua",
+      "duplicatesMerged": "{count} trùng lặp đã gộp",
+      "undoNotice": "Bạn có thể hoàn tác lần nhập này trong vòng 24 giờ",
+      "undoNoticeDetail": "Tất cả giao dịch đã nhập sẽ bị xóa và số dư ví sẽ được khôi phục.",
+      "undoImportButton": "Hoàn tác nhập",
+      "undoImportTitle": "Hoàn tác nhập?",
+      "undoImportDescription": "Thao tác này sẽ xóa tất cả {count} giao dịch đã nhập và khôi phục số dư ví.",
+      "undoImportCannotReverse": "Thao tác này không thể hoàn tác. Bạn có chắc không?",
+      "yesUndoImport": "Có, Hoàn tác nhập",
+      "failedToUndoImport": "Không thể hoàn tác nhập: {error}"
+    }
+  },
+
+  "pwa": {
+    "installPrompt": {
+      "title": "Cài đặt WealthJourney",
+      "description": "Thêm vào màn hình chính để có trải nghiệm tốt nhất",
+      "installButton": "Cài đặt",
+      "dismissButton": "Để sau",
+      "benefits": {
+        "offlineAccess": "Hoạt động ngoại tuyến",
+        "homeScreen": "Truy cập nhanh từ màn hình chính",
+        "nativeExperience": "Trải nghiệm như ứng dụng gốc"
+      }
+    }
+  },
+
+  "currency": {
+    "selector": {
+      "label": "Tiền tệ hiển thị",
+      "conversionInProgress": "Đang chuyển đổi sang {currency}..."
+    }
+  },
+
+  "search": {
+    "globalSearch": {
+      "placeholder": "Tìm kiếm...",
+      "shortcut": "Cmd+K",
+      "noResults": "Không tìm thấy kết quả",
+      "recentSearches": "Tìm kiếm gần đây"
+    }
+  },
+
+  "validation": {
+    "required": "{field} là bắt buộc",
+    "minLength": "{field} phải có ít nhất {min} ký tự",
+    "maxLength": "{field} tối đa {max} ký tự",
+    "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ",
+    "invalidAmount": "Vui lòng nhập số tiền hợp lệ",
+    "amountMustBePositive": "Số tiền phải lớn hơn 0",
+    "walletNameTaken": "Đã tồn tại ví với tên này",
+    "sameWalletTransfer": "Ví nguồn và ví đích phải khác nhau",
+    "insufficientBalance": "Số dư không đủ"
+  },
+
+  "dates": {
+    "today": "Hôm nay",
+    "yesterday": "Hôm qua",
+    "thisWeek": "Tuần này",
+    "lastWeek": "Tuần trước",
+    "thisMonth": "Tháng này",
+    "lastMonth": "Tháng trước",
+    "thisQuarter": "Quý này",
+    "lastQuarter": "Quý trước",
+    "thisYear": "Năm nay",
+    "lastYear": "Năm trước"
+  },
+
+  "export": {
+    "dialog": {
+      "title": "Tùy chọn xuất",
+      "format": "Định dạng",
+      "csv": "CSV",
+      "pdf": "PDF",
+      "excel": "Excel",
+      "fileName": "Tên tệp",
+      "includeCharts": "Bao gồm biểu đồ",
+      "includeCategories": "Bao gồm danh mục",
+      "selectCategories": "Chọn danh mục",
+      "allCategories": "Tất cả danh mục",
+      "exportButton": "Xuất"
+    }
+  }
+}
