@@ -53,8 +53,11 @@ func NewServices(repos *Repositories, redisClient *redis.Client) *Services {
 
 	walletSvc := NewWalletService(repos.Wallet, repos.User, repos.Transaction, repos.Category, categorySvc, fxRateSvc, currencyCache, repos.Investment, redisClient)
 
-	// Create portfolio history service
-	portfolioHistorySvc := NewPortfolioHistoryService(repos.PortfolioHistory, NewInvestmentService(repos.Investment, repos.Wallet, repos.InvestmentTransaction, marketDataSvc, repos.User, fxRateSvc, currencyCache, walletSvc), repos.User, fxRateSvc)
+	// Create investment service once (was previously created twice)
+	investmentSvc := NewInvestmentService(repos.Investment, repos.Wallet, repos.InvestmentTransaction, marketDataSvc, repos.User, fxRateSvc, currencyCache, walletSvc)
+
+	// Create portfolio history service using the same investment service instance
+	portfolioHistorySvc := NewPortfolioHistoryService(repos.PortfolioHistory, investmentSvc, repos.User, fxRateSvc)
 
 	return &Services{
 		Wallet:           walletSvc,
@@ -62,7 +65,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client) *Services {
 		Transaction:      NewTransactionService(repos.Transaction, repos.Wallet, repos.Category, repos.User, fxRateSvc, currencyCache),
 		Category:         categorySvc,
 		Budget:           NewBudgetService(repos.Budget, repos.BudgetItem, repos.User, fxRateSvc, currencyCache),
-		Investment:       NewInvestmentService(repos.Investment, repos.Wallet, repos.InvestmentTransaction, marketDataSvc, repos.User, fxRateSvc, currencyCache, walletSvc),
+		Investment:       investmentSvc,
 		FXRate:           fxRateSvc,
 		PortfolioHistory: portfolioHistorySvc,
 		MarketData:       marketDataSvc,

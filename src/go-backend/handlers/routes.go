@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"wealthjourney/domain/auth"
 	appmiddleware "wealthjourney/pkg/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -12,41 +13,42 @@ import (
 func RegisterRoutes(
 	v1 *gin.RouterGroup,
 	h *AllHandlers,
+	authSrv *auth.Server,
 	rateLimiter *appmiddleware.RateLimiter,
 	importRateLimiter interface{}, // Can be *ImportRateLimiter or *RedisImportRateLimiter
 ) {
 	// Auth routes (higher rate limit allowed for auth)
-	auth := v1.Group("/auth")
+	authGroup := v1.Group("/auth")
 	if rateLimiter != nil {
-		auth.Use(appmiddleware.RateLimitByIP(rateLimiter))
+		authGroup.Use(appmiddleware.RateLimitByIP(rateLimiter))
 	}
 	{
-		auth.POST("/register", Register)
-		auth.POST("/login", Login)
-		auth.POST("/logout", Logout)
-		auth.GET("/verify", VerifyAuth)
+		authGroup.POST("/register", h.Auth.Register)
+		authGroup.POST("/login", h.Auth.Login)
+		authGroup.POST("/logout", h.Auth.Logout)
+		authGroup.GET("/verify", h.Auth.VerifyAuth)
 	}
 
 	// Protected auth routes (require authentication)
 	authProtected := v1.Group("/auth")
-	authProtected.Use(AuthMiddleware())
+	authProtected.Use(AuthMiddleware(authSrv))
 	if rateLimiter != nil {
 		authProtected.Use(appmiddleware.RateLimitByIP(rateLimiter))
 	}
 	{
-		authProtected.GET("", GetAuth) // Get current authenticated user
+		authProtected.GET("", h.Auth.GetAuth) // Get current authenticated user
 	}
 
 	// Session management endpoints (protected)
 	sessions := v1.Group("/sessions")
-	sessions.Use(AuthMiddleware())
+	sessions.Use(AuthMiddleware(authSrv))
 	if rateLimiter != nil {
 		sessions.Use(appmiddleware.RateLimitByUser(rateLimiter))
 	}
 	{
-		sessions.GET("", ListSessions)
-		sessions.DELETE("/:session_id", RevokeSession)
-		sessions.DELETE("", RevokeAllSessions)
+		sessions.GET("", h.Session.ListSessions)
+		sessions.DELETE("/:session_id", h.Session.RevokeSession)
+		sessions.DELETE("", h.Session.RevokeAllSessions)
 	}
 
 	// User routes (protected)
@@ -54,7 +56,7 @@ func RegisterRoutes(
 	if rateLimiter != nil {
 		users.Use(appmiddleware.RateLimitByUser(rateLimiter))
 	}
-	users.Use(AuthMiddleware())
+	users.Use(AuthMiddleware(authSrv))
 	{
 		users.GET("", h.User.GetUser)           // Get current user
 		users.GET("/all", h.User.ListUsers)     // List all users (admin)
@@ -70,7 +72,7 @@ func RegisterRoutes(
 	if rateLimiter != nil {
 		wallets.Use(appmiddleware.RateLimitByUser(rateLimiter))
 	}
-	wallets.Use(AuthMiddleware())
+	wallets.Use(AuthMiddleware(authSrv))
 	{
 		wallets.POST("", h.Wallet.CreateWallet)
 		wallets.GET("", h.Wallet.ListWallets)
@@ -96,7 +98,7 @@ func RegisterRoutes(
 	if rateLimiter != nil {
 		transactions.Use(appmiddleware.RateLimitByUser(rateLimiter))
 	}
-	transactions.Use(AuthMiddleware())
+	transactions.Use(AuthMiddleware(authSrv))
 	{
 		transactions.POST("", h.Transaction.CreateTransaction)
 		transactions.GET("", h.Transaction.ListTransactions)
@@ -115,7 +117,7 @@ func RegisterRoutes(
 	if rateLimiter != nil {
 		categories.Use(appmiddleware.RateLimitByUser(rateLimiter))
 	}
-	categories.Use(AuthMiddleware())
+	categories.Use(AuthMiddleware(authSrv))
 	{
 		categories.POST("", h.Category.CreateCategory)
 		categories.GET("", h.Category.ListCategories)
@@ -129,7 +131,7 @@ func RegisterRoutes(
 	if rateLimiter != nil {
 		budgets.Use(appmiddleware.RateLimitByUser(rateLimiter))
 	}
-	budgets.Use(AuthMiddleware())
+	budgets.Use(AuthMiddleware(authSrv))
 	{
 		budgets.POST("", h.Budget.CreateBudget)
 		budgets.GET("", h.Budget.ListBudgets)
@@ -147,7 +149,7 @@ func RegisterRoutes(
 	if rateLimiter != nil {
 		investments.Use(appmiddleware.RateLimitByUser(rateLimiter))
 	}
-	investments.Use(AuthMiddleware())
+	investments.Use(AuthMiddleware(authSrv))
 	{
 		// Investment management routes
 		investments.GET("", h.Investment.ListUserInvestments) // NEW: List all user investments across all wallets
@@ -180,7 +182,7 @@ func RegisterRoutes(
 	if rateLimiter != nil {
 		investmentTransactions.Use(appmiddleware.RateLimitByUser(rateLimiter))
 	}
-	investmentTransactions.Use(AuthMiddleware())
+	investmentTransactions.Use(AuthMiddleware(authSrv))
 	{
 		investmentTransactions.PUT("/:id", h.Investment.EditTransaction)
 		investmentTransactions.DELETE("/:id", h.Investment.DeleteTransaction)
@@ -192,7 +194,7 @@ func RegisterRoutes(
 	if rateLimiter != nil {
 		portfolioSummary.Use(appmiddleware.RateLimitByUser(rateLimiter))
 	}
-	portfolioSummary.Use(AuthMiddleware())
+	portfolioSummary.Use(AuthMiddleware(authSrv))
 	{
 		portfolioSummary.GET("", h.Investment.GetAggregatedPortfolioSummary)
 	}
@@ -203,7 +205,7 @@ func RegisterRoutes(
 	if rateLimiter != nil {
 		portfolio.Use(appmiddleware.RateLimitByUser(rateLimiter))
 	}
-	portfolio.Use(AuthMiddleware())
+	portfolio.Use(AuthMiddleware(authSrv))
 	{
 		portfolio.GET("/historical-values", h.Investment.GetHistoricalPortfolioValues)
 	}
@@ -213,7 +215,7 @@ func RegisterRoutes(
 	if rateLimiter != nil {
 		imports.Use(appmiddleware.RateLimitByUser(rateLimiter))
 	}
-	imports.Use(AuthMiddleware())
+	imports.Use(AuthMiddleware(authSrv))
 	{
 		imports.GET("/templates", h.Import.ListBankTemplates)
 		imports.GET("/excel-sheets/:file_id", h.Import.ListExcelSheets)
@@ -235,7 +237,7 @@ func RegisterRoutes(
 	// Import operations with strict rate limiting
 	// Supports both in-memory (ImportRateLimiter) and Redis-based (RedisImportRateLimiter) rate limiting
 	importsRestricted := v1.Group("/import")
-	importsRestricted.Use(AuthMiddleware())
+	importsRestricted.Use(AuthMiddleware(authSrv))
 	if importRateLimiter != nil {
 		// Check type and apply appropriate middleware
 		switch limiter := importRateLimiter.(type) {

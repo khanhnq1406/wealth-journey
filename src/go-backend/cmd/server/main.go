@@ -58,9 +58,6 @@ func main() {
 	}
 	defer db.Close()
 
-	// Set dependencies for handlers
-	handlers.SetDependencies(db, cfg)
-
 	// Initialize repositories
 	repos := &service.Repositories{
 		User:                  repository.NewUserRepository(db),
@@ -91,8 +88,6 @@ func main() {
 	var underlyingRedisClient *redisv8.Client = nil
 	if redisClient != nil {
 		underlyingRedisClient = redisClient.GetClient()
-		// Set Redis in handlers for auth middleware
-		handlers.SetRedis(redisClient)
 	}
 
 	// Initialize storage provider
@@ -227,8 +222,16 @@ func main() {
 		}
 	}()
 
-	// Initialize handlers (must be after worker pool setup)
-	h := handlers.NewHandlers(services, repos)
+	// Initialize auth server (must be before handlers so it can be injected)
+	authSrv := auth.NewServer(db, redisClient, cfg)
+	authSrv.SetServices(services.User, services.Category)
+
+	// Initialize handlers with explicit dependency injection (no globals)
+	h := handlers.NewHandlers(services, repos, &handlers.HandlerDeps{
+		DB:      db,
+		RDB:     redisClient,
+		AuthSrv: authSrv,
+	})
 
 	// Initialize session cleanup job (runs every 6 hours)
 	// This cleans up expired sessions from Redis and database
@@ -566,7 +569,7 @@ func main() {
 	v1.Use(appmiddleware.RateLimitByIP(rateLimiter))
 
 	// Register routes
-	handlers.RegisterRoutes(v1, h, rateLimiter, importRateLimiter)
+	handlers.RegisterRoutes(v1, h, authSrv, rateLimiter, importRateLimiter)
 
 	// Global 404 handler
 	app.NoRoute(func(c *gin.Context) {
@@ -595,14 +598,7 @@ func main() {
 		}
 	}()
 
-	// Initialize and start gRPC server
-	authSrv := auth.NewServer(db, redisClient, cfg)
-	// Wire up user and category services to auth server for default category creation
-	authSrv.SetServices(services.User, services.Category)
-
-	// Make the auth server available to REST handlers
-	handlers.SetAuthServer(authSrv)
-
+	// Initialize and start gRPC server (reuses authSrv created above)
 	grpcSrv := grpcserver.NewServer(authSrv, services)
 	grpcPort := os.Getenv("GRPC_PORT")
 	if grpcPort == "" {
