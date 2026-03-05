@@ -621,19 +621,70 @@ func (s *userService) convertBudgetCurrencies(ctx context.Context, userID int32,
 	return nil
 }
 
-// UpdatePreferences updates a user's preferences, including currency preference.
+// supportedLanguages is the allowlist for language preferences.
+var supportedLanguages = map[string]bool{
+	"en": true,
+	"vi": true,
+}
+
+// UpdatePreferences updates a user's preferences, including currency and language.
 // This is the handler for the UpdatePreferences RPC call.
 func (s *userService) UpdatePreferences(ctx context.Context, userID int32, req *v1.UpdatePreferencesRequest) (*v1.UpdatePreferencesResponse, error) {
-	// Extract preferred currency from request
+	// Extract fields from request
 	var preferredCurrency string
+	var language string
 	if req.Preferences != nil {
 		preferredCurrency = req.Preferences.PreferredCurrency
+		language = req.Preferences.Language
 	}
 
-	// Call the existing implementation
-	updateResp, err := s.UpdateUserPreferences(ctx, userID, preferredCurrency)
-	if err != nil {
-		return nil, err
+	// Validate language if provided
+	if language != "" {
+		if len(language) > 5 {
+			return nil, apperrors.NewValidationError("unsupported language; valid values: en, vi")
+		}
+		if !supportedLanguages[language] {
+			return nil, apperrors.NewValidationError("unsupported language; valid values: en, vi")
+		}
+	}
+
+	// Handle currency update (existing logic via UpdateUserPreferences)
+	var updateResp *protobufv1.UpdateUserResponse
+	var err error
+
+	if preferredCurrency != "" {
+		updateResp, err = s.UpdateUserPreferences(ctx, userID, preferredCurrency)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// No currency change — get current user state for response
+		user, err := s.userRepo.GetByID(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+		updateResp = &protobufv1.UpdateUserResponse{
+			Success:   true,
+			Message:   "Preferences updated",
+			Data:      s.mapper.ModelToProto(user),
+			Timestamp: time.Now().Format(time.RFC3339),
+		}
+	}
+
+	// Handle language update (simple, no background job)
+	if language != "" {
+		user, err := s.userRepo.GetByID(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+		if user.PreferredLanguage != language {
+			user.PreferredLanguage = language
+			if err := s.userRepo.Update(ctx, user); err != nil {
+				return nil, fmt.Errorf("failed to update language preference: %w", err)
+			}
+			updateResp.Data = s.mapper.ModelToProto(user)
+			updateResp.Message = "Preferences updated"
+		}
 	}
 
 	// Convert response to UpdatePreferencesResponse format

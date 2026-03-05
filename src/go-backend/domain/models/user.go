@@ -17,6 +17,7 @@ type User struct {
 	DeletedAt           gorm.DeletedAt `gorm:"index" json:"-"`
 	PreferredCurrency   string         `gorm:"size:3;not null;default:'VND';index" json:"preferredCurrency"`
 	ConversionInProgress bool          `gorm:"default:false;index" json:"conversionInProgress"`
+	PreferredLanguage    string         `gorm:"size:5;not null;default:'vi'" json:"preferredLanguage"`
 }
 
 // TableName specifies the table name for User model

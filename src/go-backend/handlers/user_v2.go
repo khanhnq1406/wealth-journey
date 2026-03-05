@@ -223,7 +223,8 @@ func (h *UserHandlers) UpdatePreferences(c *gin.Context) {
 
 	var req struct {
 		Preferences *struct {
-			PreferredCurrency string `json:"preferredCurrency" binding:"required"`
+			PreferredCurrency string `json:"preferredCurrency"`
+			Language          string `json:"language"`
 		} `json:"preferences" binding:"required"`
 	}
 
@@ -236,6 +237,7 @@ func (h *UserHandlers) UpdatePreferences(c *gin.Context) {
 	protoReq := &v1.UpdatePreferencesRequest{
 		Preferences: &v1.UserPreferences{
 			PreferredCurrency: req.Preferences.PreferredCurrency,
+			Language:          req.Preferences.Language,
 		},
 	}
 
