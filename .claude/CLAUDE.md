@@ -17,6 +17,8 @@ WealthJourney is a comprehensive personal finance management application built w
 
 ## Architecture
 
+Full C4 architecture documentation lives in [docs/architecture/](docs/architecture/README.md) — start there for diagrams, trust boundaries, and ADRs.
+
 ### Project Structure
 
 ```
@@ -35,65 +37,59 @@ Personal_Financial_Management/
 │
 ├── src/
 │   ├── go-backend/                    # Go backend (Vercel deployment)
+│   │   ├── internal/                  # Application bootstrap (ADR-001, ADR-002)
+│   │   │   ├── app/                   # App lifecycle & DI providers
+│   │   │   │   ├── app.go            # Application init & graceful shutdown
+│   │   │   │   └── providers.go      # Manual dependency injection (no Wire)
+│   │   │   └── scheduler/            # Background job scheduler
+│   │   │       ├── scheduler.go      # Scheduler init & job registration
+│   │   │       ├── price_update_job.go        # Market price refresh (15m)
+│   │   │       ├── portfolio_snapshot_job.go   # Portfolio history (1h)
+│   │   │       ├── session_cleanup_adapter.go  # Expired sessions (6h)
+│   │   │       ├── file_cleanup_job.go         # Orphaned uploads (1h)
+│   │   │       └── db_keepalive_job.go         # Connection keepalive (2m)
 │   │   ├── domain/                    # Domain layer (DDD pattern)
 │   │   │   ├── auth/                  # Authentication logic
+│   │   │   ├── gateway/               # gRPC-Gateway proxy
 │   │   │   ├── grpcserver/            # gRPC server implementations
 │   │   │   ├── models/                # Database models (GORM)
-│   │   │   │   ├── user.go
-│   │   │   │   ├── wallet.go
-│   │   │   │   ├── transaction.go
-│   │   │   │   ├── category.go
-│   │   │   │   ├── budget.go
-│   │   │   │   ├── investment*.go     # Investment-related models
-│   │   │   │   ├── session.go
-│   │   │   │   ├── fx_rate.go
-│   │   │   │   ├── bank_template.go
-│   │   │   │   └── import_batch.go
 │   │   │   ├── repository/            # Data access layer
-│   │   │   │   ├── user_repository.go
-│   │   │   │   ├── wallet_repository.go
-│   │   │   │   └── ...
 │   │   │   └── service/               # Business logic layer
-│   │   │       ├── user_service.go
-│   │   │       ├── wallet_service.go
-│   │   │       ├── investment_service.go
-│   │   │       ├── market_data_service.go
-│   │   │       ├── gold_price_service.go
-│   │   │       ├── silver_price_service.go
-│   │   │       ├── fx_rate_service.go
-│   │   │       ├── import_service.go
-│   │   │       └── ...
 │   │   ├── handlers/                  # REST API handlers
-│   │   │   ├── auth.go
-│   │   │   ├── wallet_v2.go
-│   │   │   ├── transaction.go
-│   │   │   ├── investment.go
-│   │   │   ├── budget.go
-│   │   │   ├── gold.go
-│   │   │   ├── silver.go
-│   │   │   ├── import.go
-│   │   │   ├── session.go
-│   │   │   └── routes.go              # Route definitions
+│   │   │   ├── builder.go            # Handler DI builder
+│   │   │   ├── dependencies.go       # Handler dependencies
+│   │   │   ├── routes.go             # Route definitions
+│   │   │   ├── middleware.go          # HTTP middleware
+│   │   │   ├── health.go             # Health check
+│   │   │   ├── auth.go               # Authentication
+│   │   │   ├── user_v2.go            # User management
+│   │   │   ├── wallet_v2.go          # Wallet management
+│   │   │   ├── transaction.go        # Transactions
+│   │   │   ├── category.go           # Categories
+│   │   │   ├── budget.go             # Budgets
+│   │   │   ├── investment.go         # Investments
+│   │   │   ├── market_prices.go      # Combined market prices
+│   │   │   ├── gold.go               # Gold types
+│   │   │   ├── silver.go             # Silver types
+│   │   │   ├── import.go             # Bank statement import
+│   │   │   └── session.go            # Session management
 │   │   ├── cmd/                       # CLI commands (server, migrate)
-│   │   │   ├── main.go                # Server entrypoint
-│   │   │   └── migrate-*/             # Migration commands
+│   │   │   ├── main.go               # Server entrypoint
+│   │   │   └── migrate-*/            # Migration commands
 │   │   └── pkg/                       # Shared packages
 │   │       ├── config/                # Configuration
-│   │       ├── middleware/            # HTTP middleware
 │   │       ├── yahoo/                 # Yahoo Finance API client
 │   │       ├── gold/                  # Gold conversion utilities
 │   │       ├── silver/                # Silver conversion utilities
 │   │       ├── cache/                 # Redis caching
 │   │       └── metrics/               # Prometheus metrics
 │   │
-│   ├── wj-client/                     # Next.js frontend
+│   ├── wj-client/                     # Next.js frontend (feature-based, ADR-003)
 │   │   ├── app/                       # Next.js App Router pages
 │   │   │   ├── page.tsx               # Homepage (redirector)
 │   │   │   ├── layout.tsx             # Root layout
 │   │   │   ├── landing/page.tsx       # Landing page
 │   │   │   ├── auth/                  # Authentication pages
-│   │   │   │   ├── login/page.tsx
-│   │   │   │   └── register/page.tsx
 │   │   │   ├── dashboard/             # Dashboard pages
 │   │   │   │   ├── home/page.tsx      # Main dashboard
 │   │   │   │   ├── transaction/page.tsx
@@ -101,66 +97,38 @@ Personal_Financial_Management/
 │   │   │   │   ├── portfolio/page.tsx # Investment portfolio
 │   │   │   │   ├── budget/page.tsx
 │   │   │   │   ├── report/page.tsx
+│   │   │   │   ├── prices/page.tsx    # Market prices
 │   │   │   │   └── settings/          # Settings pages
-│   │   │   │       ├── sessions/page.tsx
-│   │   │   │       └── import-templates/page.tsx
 │   │   │   └── constants.tsx          # App constants
-│   │   ├── components/                # Reusable UI components
-│   │   │   ├── BaseCard.tsx           # Card wrapper
-│   │   │   ├── Button.tsx             # Button component
-│   │   │   ├── BottomNav.tsx          # Mobile navigation
-│   │   │   ├── CurrencySelector.tsx   # Currency selection
-│   │   │   ├── forms/                 # Form components
-│   │   │   │   ├── FormInput.tsx
-│   │   │   │   ├── FormSelect.tsx
-│   │   │   │   ├── SymbolAutocomplete.tsx
-│   │   │   │   └── enhanced/          # Enhanced form components
-│   │   │   ├── modals/                # Modal components
-│   │   │   │   ├── BaseModal.tsx
-│   │   │   │   ├── BottomSheet.tsx
-│   │   │   │   ├── Success.tsx
-│   │   │   │   ├── ConfirmationDialog.tsx
-│   │   │   │   ├── InvestmentDetailModal.tsx
-│   │   │   │   └── forms/             # Modal form components
-│   │   │   │       ├── AddTransactionForm.tsx
-│   │   │   │       ├── EditTransactionForm.tsx
-│   │   │   │       ├── CreateWalletForm.tsx
-│   │   │   │       ├── EditWalletForm.tsx
-│   │   │   │       ├── AddInvestmentForm.tsx
-│   │   │   │       ├── AddInvestmentTransactionForm.tsx
-│   │   │   │       ├── UpdateInvestmentPriceForm.tsx
-│   │   │   │       ├── ImportTransactionsForm.tsx
-│   │   │   │       └── ...
+│   │   ├── features/                  # Feature modules (bounded contexts)
+│   │   │   ├── auth/                  # Auth: hooks/, store/
+│   │   │   ├── wallet/                # Wallet: components/, forms/, utils/
+│   │   │   ├── transaction/           # Transaction: forms/, hooks/, utils/
+│   │   │   ├── budget/                # Budget: forms/, utils/
+│   │   │   ├── investment/            # Investment: components/, forms/, hooks/, utils/
+│   │   │   ├── import/                # Import: components/, forms/
+│   │   │   ├── market-prices/         # Market Prices: components/
+│   │   │   └── report/                # Report: utils/export/
+│   │   ├── components/                # Shared reusable UI components
+│   │   │   ├── cards/                 # Card components
+│   │   │   ├── charts/                # Chart/visualization components
+│   │   │   ├── forms/                 # Reusable form components (FormInput, FormSelect, etc.)
+│   │   │   ├── modals/                # Modal components (BaseModal, BottomSheet, etc.)
+│   │   │   ├── select/                # Select/dropdown components
+│   │   │   ├── table/                 # Table components (MobileTable, etc.)
 │   │   │   ├── loading/               # Loading indicators
-│   │   │   │   ├── LoadingSpinner.tsx
-│   │   │   │   └── FullPageLoading.tsx
-│   │   │   ├── select/                # Select components
-│   │   │   │   ├── CreatableSelect.tsx
-│   │   │   │   ├── MultiSelect.tsx
-│   │   │   │   └── Select.tsx
-│   │   │   └── pwa/                   # PWA components
-│   │   │       ├── PWAInstallPrompt.tsx
-│   │   │       └── InstallSteps.tsx
-│   │   ├── redux/                     # Redux state (auth only)
-│   │   │   ├── store.tsx
-│   │   │   ├── reducer.tsx
-│   │   │   └── actions.tsx
+│   │   │   ├── feedback/              # EmptyState, ErrorState, Toast
+│   │   │   ├── icons/                 # SVG icon library
+│   │   │   ├── navigation/            # Navigation components
+│   │   │   ├── pwa/                   # PWA components
+│   │   │   └── ...                    # 25+ component subdirectories
+│   │   ├── contexts/                  # React Contexts
+│   │   │   ├── CurrencyContext.tsx
+│   │   │   └── NotificationContext.tsx
+│   │   ├── hooks/                     # Shared custom React hooks
 │   │   ├── utils/                     # Utility functions
-│   │   │   ├── generated/             # Auto-generated API clients
-│   │   │   ├── currency-formatter.tsx
-│   │   │   ├── fetcher.tsx
-│   │   │   └── csv-export.ts
-│   │   ├── lib/                       # Library code
-│   │   │   ├── validation/            # Validation schemas (Zod)
-│   │   │   │   ├── investment.ts
-│   │   │   │   └── ...
-│   │   │   └── utils/                 # Helper utilities
-│   │   │       ├── gold-calculator.ts
-│   │   │       ├── silver-calculator.ts
-│   │   │       └── ...
-│   │   ├── hooks/                     # Custom React hooks
-│   │   │   ├── usePWAInstall.ts
-│   │   │   └── ...
+│   │   │   └── generated/             # Auto-generated API clients & hooks
+│   │   ├── lib/                       # Library code (shared utils, number-format, etc.)
 │   │   ├── gen/                       # Generated TypeScript types from protobuf
 │   │   ├── types/                     # TypeScript definitions
 │   │   └── tailwind.config.ts         # Tailwind theme
@@ -168,6 +136,14 @@ Personal_Financial_Management/
 │   └── wj-server/                     # Legacy Node.js backend (being phased out)
 │
 ├── docs/                              # Documentation
+│   ├── architecture/                  # C4 model diagrams & ADRs
+│   │   ├── c4-context.md             # L1: System context
+│   │   ├── c4-container.md           # L2: Containers & trust boundaries
+│   │   ├── c4-component-backend.md   # L3: Backend components
+│   │   ├── c4-component-frontend.md  # L3: Frontend components
+│   │   ├── c4-code-investment.md     # L4: Investment domain classes
+│   │   ├── flow-*.md                 # Dynamic behavior diagrams (5 files)
+│   │   └── adr-*.md                  # Architecture Decision Records (3 ADRs)
 │   ├── plans/                         # Implementation plans
 │   └── features/                      # Feature documentation
 └── Taskfile.yml                       # Task automation (like Makefile)
@@ -190,6 +166,34 @@ task proto:all  # Generates both Go and TypeScript code
 **Note:** Category management is integrated into `transaction.proto`, not a separate file.
 
 ## Frontend Development Guide (wj-client)
+
+### Feature-Based Module Architecture (ADR-003)
+
+The frontend uses **feature-based modules** under `features/` — each feature owns its components, forms, hooks, utils, and validation schemas. See [C4 Frontend Components](docs/architecture/c4-component-frontend.md).
+
+```
+features/
+├── auth/              # hooks/, store/ (Redux auth state)
+├── wallet/            # components/, forms/, utils/
+├── transaction/       # forms/, hooks/, utils/
+├── budget/            # forms/, utils/
+├── investment/        # components/, forms/, hooks/, utils/
+├── import/            # components/, forms/
+├── market-prices/     # components/
+└── report/            # utils/export/
+```
+
+**Import rules (enforced via ESLint `no-restricted-imports`):**
+- Pages → features (allowed)
+- Pages → shared components (allowed)
+- Features → shared components (allowed)
+- Features → features (FORBIDDEN — no cross-feature imports)
+- Shared → features (FORBIDDEN — shared must not know about features)
+
+**Where to put new code:**
+- **Feature-specific** forms, hooks, utils → `features/<domain>/`
+- **Reusable** across features → `components/` (shared layer)
+- **Feature-specific validation** → `features/<domain>/utils/` (NOT `lib/validation/`)
 
 ### Component Patterns
 
@@ -288,9 +292,7 @@ const valid = isValidNumberInput("1,000.50"); // true
 **Two-tier state management:**
 
 1. **Redux Toolkit** - Authentication state only
-   - [redux/store.tsx](src/wj-client/redux/store.tsx) - Redux store configuration
-   - [redux/reducer.tsx](src/wj-client/redux/reducer.tsx) - Auth reducer
-   - [redux/actions.tsx](src/wj-client/redux/actions.tsx) - Auth actions
+   - Auth store now in [features/auth/store/](src/wj-client/features/auth/store/) (moved from `redux/`)
    - **Note:** Modals are managed at component level, NOT in Redux
 
 2. **React Query (@tanstack/react-query)** - Server state
@@ -387,20 +389,26 @@ screens: {
 </div>
 ```
 
-### Reusable Components
+### Shared Components (components/)
 
-**Core components** in [components/](src/wj-client/components/):
+Reusable components shared across features, organized by category (25+ subdirectories):
 
-1. **[BaseCard.tsx](src/wj-client/components/BaseCard.tsx)** - White card wrapper with shadow
-2. **[Button.tsx](src/wj-client/components/Button.tsx)** - Primary/Secondary/Image buttons with loading states
-3. **[BaseModal.tsx](src/wj-client/components/modals/BaseModal.tsx)** - Modal container with form handling and swipe gestures
-4. **[BottomSheet.tsx](src/wj-client/components/modals/BottomSheet.tsx)** - Mobile-optimized bottom sheet
-5. **[LoadingSpinner.tsx](src/wj-client/components/loading/LoadingSpinner.tsx)** - Loading state indicator
-6. **[FullPageLoading.tsx](src/wj-client/components/loading/FullPageLoading.tsx)** - Full-screen loader
-7. **[CreatableSelect.tsx](src/wj-client/components/select/CreatableSelect.tsx)** - Select with dynamic option creation
-8. **[Select.tsx](src/wj-client/components/select/Select.tsx)** - Reusable select dropdown with keyboard navigation and custom render support
-9. **[SymbolAutocomplete.tsx](src/wj-client/components/forms/SymbolAutocomplete.tsx)** - Investment symbol search autocomplete with debounced API calls
-10. **[CurrencySelector.tsx](src/wj-client/components/CurrencySelector.tsx)** - Currency selection with mobile bottom sheet and desktop dropdown
+| Category | Key Components | Location |
+|----------|---------------|----------|
+| **Cards** | BaseCard | `components/cards/` or `components/BaseCard.tsx` |
+| **Buttons** | Button, ButtonGroup, FloatingActionButton | `components/Button.tsx` |
+| **Forms** | FormInput, FormSelect, FormNumberInput, SymbolAutocomplete | `components/forms/` |
+| **Modals** | BaseModal, BottomSheet, ConfirmationDialog, Success | `components/modals/` |
+| **Selects** | Select, CreatableSelect, MultiSelect, CurrencySelector | `components/select/` |
+| **Charts** | BarChart, LineChart, DonutChart, Sparkline | `components/charts/` |
+| **Tables** | MobileTable, TanStackTable, VirtualizedList | `components/table/` |
+| **Loading** | LoadingSpinner, FullPageLoading, Skeleton variants | `components/loading/` |
+| **Feedback** | EmptyState, ErrorState, Toast, Notification | `components/feedback/` |
+| **Icons** | SVG icon library (actions, finance, navigation, ui) | `components/icons/` |
+| **Navigation** | BottomNav, Sidebar, ActiveLink | `components/navigation/` |
+| **PWA** | PWAInstallPrompt, InstallSteps | `components/pwa/` |
+
+**React Contexts** in `contexts/`: `CurrencyContext`, `NotificationContext`
 
 ### Modal Management Pattern
 
@@ -543,6 +551,7 @@ app/
     ├── portfolio/page.tsx            # /dashboard/portfolio
     ├── budget/page.tsx               # /dashboard/budget
     ├── report/page.tsx               # /dashboard/report
+    ├── prices/page.tsx               # /dashboard/prices (market prices)
     └── settings/
         ├── sessions/page.tsx         # /dashboard/settings/sessions
         └── import-templates/page.tsx # /dashboard/settings/import-templates
@@ -647,21 +656,29 @@ export default function CustomInstallButton() {
 
 ### Domain-Driven Design Structure
 
-**Clean architecture** with clear separation:
+**Clean architecture** with clear separation (see [C4 Backend Components](docs/architecture/c4-component-backend.md)):
 
 ```
 go-backend/
+├── internal/            # Application bootstrap (ADR-001: Manual DI, ADR-002: Constructor Injection)
+│   ├── app/             # App lifecycle, DI providers (providers.go)
+│   └── scheduler/       # Background jobs (price updates, snapshots, cleanup)
 ├── domain/
 │   ├── models/          # GORM database models
 │   ├── repository/      # Data access interfaces + implementations
 │   ├── service/         # Business logic layer
-│   └── grpcserver/      # gRPC service implementations
-├── handlers/            # REST HTTP handlers (NOT api/handlers/)
-├── pkg/                 # Shared utilities (config, middleware, etc.)
-└── cmd/                 # Application entrypoints
+│   ├── auth/            # Authentication service
+│   ├── grpcserver/      # gRPC service implementations
+│   └── gateway/         # gRPC-Gateway proxy
+├── handlers/            # REST HTTP handlers + builder.go (DI wiring)
+├── pkg/                 # Shared utilities (yahoo, gold, silver, cache, config)
+└── cmd/                 # Application entrypoints & migrations
 ```
 
-**Note:** Handlers are in `handlers/`, not `api/handlers/` as previously documented.
+**Key architectural decisions:**
+- **ADR-001**: Manual DI provider functions in `internal/app/providers.go` (no Google Wire)
+- **ADR-002**: Constructor injection — all dependencies passed upfront, no `Set*()` methods
+- Wire new handlers in `handlers/builder.go` → `AllHandlers` struct + `NewHandlers()` function
 
 ### Repository Pattern
 
@@ -1193,12 +1210,13 @@ task proto:all
 **Step 3: Implement Backend**
 
 1. Add method to service interface in [service/interfaces.go](src/go-backend/domain/service/interfaces.go)
-2. Implement in [service/wallet_service.go](src/go-backend/domain/service/wallet_service.go)
-3. Add REST handler in [handlers/wallet_v2.go](src/go-backend/handlers/wallet_v2.go) (note: `handlers/`, not `api/handlers/`)
-4. Update routes in [handlers/routes.go](src/go-backend/handlers/routes.go)
+2. Implement in service layer (e.g., [service/wallet_service.go](src/go-backend/domain/service/wallet_service.go))
+3. Add REST handler in [handlers/](src/go-backend/handlers/)
+4. Wire handler in [handlers/builder.go](src/go-backend/handlers/builder.go) → `AllHandlers` struct + `NewHandlers()`
+5. Register routes in [handlers/routes.go](src/go-backend/handlers/routes.go)
 
 **Step 4: Use in Frontend**
-Auto-generated hooks are now available:
+Auto-generated hooks are available. Place feature-specific code in the appropriate `features/<domain>/` module:
 
 ```typescript
 import { useMutationMyNewFeature } from "@/utils/generated/hooks";
@@ -1335,65 +1353,57 @@ task dev
 
 ### Frontend (wj-client)
 
-| File                                                                                                                       | Purpose                                           |
-| -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
-| [src/wj-client/app/constants.tsx](src/wj-client/app/constants.tsx)                                                         | App constants (ModalType, ButtonType)             |
-| [src/wj-client/utils/generated/hooks.ts](src/wj-client/utils/generated/hooks.ts)                                           | Auto-generated React Query hooks                  |
-| [src/wj-client/redux/store.tsx](src/wj-client/redux/store.tsx)                                                             | Redux store configuration                         |
-| [src/wj-client/tailwind.config.ts](src/wj-client/tailwind.config.ts)                                                       | Tailwind theme configuration                      |
-| [src/wj-client/components/BaseCard.tsx](src/wj-client/components/BaseCard.tsx)                                             | Card wrapper component                            |
-| [src/wj-client/components/Button.tsx](src/wj-client/components/Button.tsx)                                                 | Button component                                  |
-| [src/wj-client/components/BottomNav.tsx](src/wj-client/components/BottomNav.tsx)                                           | Mobile bottom navigation                          |
-| [src/wj-client/components/CurrencySelector.tsx](src/wj-client/components/CurrencySelector.tsx)                             | Currency selection component                      |
-| [src/wj-client/components/modals/BaseModal.tsx](src/wj-client/components/modals/BaseModal.tsx)                             | Modal container                                   |
-| [src/wj-client/components/modals/BottomSheet.tsx](src/wj-client/components/modals/BottomSheet.tsx)                         | Mobile bottom sheet                               |
-| [src/wj-client/components/select/Select.tsx](src/wj-client/components/select/Select.tsx)                                   | Reusable select dropdown with keyboard navigation |
-| [src/wj-client/components/forms/SymbolAutocomplete.tsx](src/wj-client/components/forms/SymbolAutocomplete.tsx)             | Investment symbol search autocomplete             |
-| [src/wj-client/components/pwa/PWAInstallPrompt.tsx](src/wj-client/components/pwa/PWAInstallPrompt.tsx)                     | PWA installation prompt modal                     |
-| [src/wj-client/hooks/usePWAInstall.ts](src/wj-client/hooks/usePWAInstall.ts)                                               | PWA detection and install hook                    |
-| [src/wj-client/app/dashboard/home/page.tsx](src/wj-client/app/dashboard/home/page.tsx)                                     | Main dashboard page                               |
-| [src/wj-client/app/dashboard/portfolio/page.tsx](src/wj-client/app/dashboard/portfolio/page.tsx)                           | Investment portfolio page                         |
-| [src/wj-client/lib/utils/gold-calculator.ts](src/wj-client/lib/utils/gold-calculator.ts)                                   | Gold conversion utilities & type registry         |
-| [src/wj-client/lib/utils/silver-calculator.ts](src/wj-client/lib/utils/silver-calculator.ts)                               | Silver conversion utilities                       |
-| [src/wj-client/app/dashboard/portfolio/helpers.tsx](src/wj-client/app/dashboard/portfolio/helpers.tsx)                     | Portfolio formatting helpers (including gold)     |
-| [src/wj-client/components/modals/forms/AddInvestmentForm.tsx](src/wj-client/components/modals/forms/AddInvestmentForm.tsx) | Investment creation form (with gold/silver)       |
-| [src/wj-client/components/modals/forms/UpdateInvestmentPriceForm.tsx](src/wj-client/components/modals/forms/UpdateInvestmentPriceForm.tsx) | Manual price update form for custom investments |
-| [src/wj-client/components/modals/forms/ImportTransactionsForm.tsx](src/wj-client/components/modals/forms/ImportTransactionsForm.tsx) | Bank statement import form |
-| [src/wj-client/lib/validation/investment.ts](src/wj-client/lib/validation/investment.ts) | Investment form validation schemas |
+**Shared components & infrastructure:**
+
+| File | Purpose |
+|------|---------|
+| [src/wj-client/app/constants.tsx](src/wj-client/app/constants.tsx) | App constants (ModalType, ButtonType) |
+| [src/wj-client/utils/generated/hooks.ts](src/wj-client/utils/generated/hooks.ts) | Auto-generated React Query hooks |
+| [src/wj-client/tailwind.config.ts](src/wj-client/tailwind.config.ts) | Tailwind theme configuration |
+| [src/wj-client/contexts/CurrencyContext.tsx](src/wj-client/contexts/CurrencyContext.tsx) | Currency context provider |
+| [src/wj-client/contexts/NotificationContext.tsx](src/wj-client/contexts/NotificationContext.tsx) | Notification context provider |
+| [src/wj-client/components/modals/BaseModal.tsx](src/wj-client/components/modals/BaseModal.tsx) | Modal container |
+| [src/wj-client/components/forms/](src/wj-client/components/forms/) | Shared form components (FormInput, FormSelect, etc.) |
+| [src/wj-client/components/table/](src/wj-client/components/table/) | Table components (MobileTable, etc.) |
+| [src/wj-client/components/charts/](src/wj-client/components/charts/) | Chart components |
+| [src/wj-client/components/select/](src/wj-client/components/select/) | Select components |
+| [src/wj-client/components/pwa/](src/wj-client/components/pwa/) | PWA components |
+
+**Feature modules:**
+
+| Feature | Location | Key Contents |
+|---------|----------|-------------|
+| Auth | `features/auth/` | hooks/, store/ (Redux auth state) |
+| Wallet | `features/wallet/` | CreateWalletForm, EditWalletForm, wallet utils |
+| Transaction | `features/transaction/` | AddTransactionForm, EditTransactionForm, filters |
+| Budget | `features/budget/` | Budget forms, utils |
+| Investment | `features/investment/` | AddInvestmentForm, InvestmentDetailModal, portfolio helpers, gold/silver calculators |
+| Import | `features/import/` | Import wizard components, template management |
+| Market Prices | `features/market-prices/` | Price display tables, symbol lookup |
+| Report | `features/report/` | Financial tables, CSV/PDF export utils |
 
 ### Backend (go-backend)
 
-| File                                                                                                           | Purpose                                 |
-| -------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| [src/go-backend/cmd/main.go](src/go-backend/cmd/main.go)                                                       | Server entrypoint                       |
-| [src/go-backend/domain/models/wallet.go](src/go-backend/domain/models/wallet.go)                               | Wallet database model                   |
-| [src/go-backend/domain/service/wallet_service.go](src/go-backend/domain/service/wallet_service.go)             | Wallet business logic                   |
-| [src/go-backend/domain/repository/wallet_repository.go](src/go-backend/domain/repository/wallet_repository.go) | Wallet data access                      |
-| [src/go-backend/domain/service/investment_service.go](src/go-backend/domain/service/investment_service.go)     | Investment business logic               |
-| [src/go-backend/domain/service/market_data_service.go](src/go-backend/domain/service/market_data_service.go)   | Market data & Yahoo Finance integration |
-| [src/go-backend/domain/service/gold_price_service.go](src/go-backend/domain/service/gold_price_service.go)     | Gold price service interface            |
-| [src/go-backend/domain/service/silver_price_service.go](src/go-backend/domain/service/silver_price_service.go) | Silver price service interface          |
-| [src/go-backend/domain/service/fx_rate_service.go](src/go-backend/domain/service/fx_rate_service.go)           | FX rate service                         |
-| [src/go-backend/domain/service/import_service.go](src/go-backend/domain/service/import_service.go)             | Bank statement import service           |
-| [src/go-backend/handlers/routes.go](src/go-backend/handlers/routes.go)                                         | REST API routes                         |
-| [src/go-backend/handlers/wallet_v2.go](src/go-backend/handlers/wallet_v2.go)                                   | Wallet HTTP handlers                    |
-| [src/go-backend/handlers/investment.go](src/go-backend/handlers/investment.go)                                 | Investment HTTP handlers                |
-| [src/go-backend/handlers/gold.go](src/go-backend/handlers/gold.go)                                             | Gold types HTTP handler                 |
-| [src/go-backend/handlers/silver.go](src/go-backend/handlers/silver.go)                                         | Silver types HTTP handler               |
-| [src/go-backend/handlers/import.go](src/go-backend/handlers/import.go)                                         | Import HTTP handler                     |
-| [src/go-backend/pkg/yahoo/client.go](src/go-backend/pkg/yahoo/client.go)                                       | Yahoo Finance API client                |
-| [src/go-backend/pkg/yahoo/search.go](src/go-backend/pkg/yahoo/search.go)                                       | Yahoo Finance symbol search client      |
-| [src/go-backend/pkg/yahoo/quote.go](src/go-backend/pkg/yahoo/quote.go)                                         | Yahoo Finance quote client              |
-| [src/go-backend/pkg/yahoo/throttler.go](src/go-backend/pkg/yahoo/throttler.go)                                 | Rate limiting for Yahoo Finance API     |
-| [src/go-backend/pkg/metrics/yahoo_finance.go](src/go-backend/pkg/metrics/yahoo_finance.go)                     | Prometheus metrics for market data      |
-| [src/go-backend/pkg/gold/types.go](src/go-backend/pkg/gold/types.go)                                           | Gold type registry & constants          |
-| [src/go-backend/pkg/gold/converter.go](src/go-backend/pkg/gold/converter.go)                                   | Gold unit & currency conversions        |
-| [src/go-backend/pkg/gold/client.go](src/go-backend/pkg/gold/client.go)                                         | vang.today API client                   |
-| [src/go-backend/pkg/silver/types.go](src/go-backend/pkg/silver/types.go)                                       | Silver type registry & constants        |
-| [src/go-backend/pkg/silver/converter.go](src/go-backend/pkg/silver/converter.go)                               | Silver unit & currency conversions      |
-| [src/go-backend/pkg/cache/gold_price_cache.go](src/go-backend/pkg/cache/gold_price_cache.go)                   | Gold price cache (Redis)                |
-
-**Note:** Handlers are in `src/go-backend/handlers/`, not `src/go-backend/api/handlers/`.
+| File | Purpose |
+|------|---------|
+| [src/go-backend/internal/app/app.go](src/go-backend/internal/app/app.go) | Application lifecycle & init |
+| [src/go-backend/internal/app/providers.go](src/go-backend/internal/app/providers.go) | Manual DI provider functions |
+| [src/go-backend/internal/scheduler/scheduler.go](src/go-backend/internal/scheduler/scheduler.go) | Background job scheduler |
+| [src/go-backend/cmd/main.go](src/go-backend/cmd/main.go) | Server entrypoint |
+| [src/go-backend/handlers/builder.go](src/go-backend/handlers/builder.go) | Handler DI builder |
+| [src/go-backend/handlers/routes.go](src/go-backend/handlers/routes.go) | REST API routes |
+| [src/go-backend/domain/service/wallet_service.go](src/go-backend/domain/service/wallet_service.go) | Wallet business logic |
+| [src/go-backend/domain/service/investment_service.go](src/go-backend/domain/service/investment_service.go) | Investment business logic |
+| [src/go-backend/domain/service/market_data_service.go](src/go-backend/domain/service/market_data_service.go) | Market data & Yahoo Finance |
+| [src/go-backend/domain/service/gold_price_service.go](src/go-backend/domain/service/gold_price_service.go) | Gold price service |
+| [src/go-backend/domain/service/silver_price_service.go](src/go-backend/domain/service/silver_price_service.go) | Silver price service |
+| [src/go-backend/domain/service/fx_rate_service.go](src/go-backend/domain/service/fx_rate_service.go) | FX rate service |
+| [src/go-backend/domain/service/import_service.go](src/go-backend/domain/service/import_service.go) | Bank statement import |
+| [src/go-backend/domain/gateway/server.go](src/go-backend/domain/gateway/server.go) | gRPC-Gateway proxy |
+| [src/go-backend/pkg/yahoo/](src/go-backend/pkg/yahoo/) | Yahoo Finance client (client, search, quote, throttler) |
+| [src/go-backend/pkg/gold/](src/go-backend/pkg/gold/) | Gold types, converter, vang.today client |
+| [src/go-backend/pkg/silver/](src/go-backend/pkg/silver/) | Silver types & converter |
+| [src/go-backend/pkg/cache/](src/go-backend/pkg/cache/) | Redis caching (gold prices, etc.) |
 
 ## Testing Strategy
 
@@ -1448,59 +1458,48 @@ task deploy:backend          # Deploy backend
 task deploy:backend:preview  # Preview deployment
 ```
 
----
-
-**Last Updated:** 2026-02-23
-**Maintainer:** WealthJourney Team
-
----
-
 ## File Organization Best Practices
 
-### Component Co-location
+### Where to Put New Code
 
-**When to co-locate vs. separate:**
-
-1. **Page-specific components** - Co-locate in the same directory as `page.tsx`
-   - Example: `AccountBalance.tsx` in `app/dashboard/home/` (only used by home page)
-   - Example: `TransactionTable.tsx` in `app/dashboard/transaction/` (only used by transaction page)
-
-2. **Reusable components** - Place in `components/` directory
-   - Example: `Button.tsx` - used across the application
-   - Example: `BaseCard.tsx` - universal wrapper component
-   - Example: `FormInput.tsx` - used in multiple forms
-
-3. **Feature-specific components** - Group by feature in subdirectories
-   - `components/forms/` - All form-related components
-   - `components/modals/` - All modal components
-   - `components/select/` - All select/dropdown components
-   - `components/pwa/` - PWA-related components
-
-4. **Utility functions** - Place in `utils/` or `lib/`
-   - `utils/currency-formatter.tsx` - Formatting utilities
-   - `lib/validation/` - Validation schemas (Zod)
-   - `lib/utils/` - General helper functions (calculators, formatters)
+| Code Type | Location | Example |
+|-----------|----------|---------|
+| **Feature-specific forms** | `features/<domain>/forms/` | `features/wallet/forms/CreateWalletForm.tsx` |
+| **Feature-specific hooks** | `features/<domain>/hooks/` | `features/investment/hooks/usePortfolio.ts` |
+| **Feature-specific utils** | `features/<domain>/utils/` | `features/transaction/utils/filters.ts` |
+| **Feature validation schemas** | `features/<domain>/utils/` | `features/investment/utils/validation.ts` |
+| **Shared UI components** | `components/<category>/` | `components/forms/FormInput.tsx` |
+| **Page-specific components** | Co-locate in `app/<path>/` | `app/dashboard/home/AccountBalance.tsx` |
+| **Shared hooks** | `hooks/` | `hooks/useMobile.ts` |
+| **Shared utilities** | `lib/utils/` | `lib/utils/number-format.ts` |
+| **React contexts** | `contexts/` | `contexts/CurrencyContext.tsx` |
 
 ### Import Path Conventions
 
 **Use absolute imports with `@` alias:**
 
 ```typescript
-// Good
-import { Button } from "@/components/Button";
-import { useQueryListWallets } from "@/utils/generated/hooks";
-import { ModalType } from "@/app/constants";
+// Feature modules
+import { AddInvestmentForm } from "@/features/investment/forms/AddInvestmentForm";
 
-// Avoid relative paths when possible
-import { Button } from "../../../components/Button"; // Less preferred
+// Shared components
+import { Button } from "@/components/Button";
+import { BaseModal } from "@/components/modals/BaseModal";
+
+// Generated API hooks
+import { useQueryListWallets } from "@/utils/generated/hooks";
+
+// Constants
+import { ModalType } from "@/app/constants";
 ```
+
+**ESLint enforces migration from old paths** — importing from `@/components/modals/forms/`, `@/redux/`, or `@/lib/validation/` will trigger warnings pointing to the new `features/` locations.
 
 ## Validation
 
-**Frontend validation** uses Zod schemas in [lib/validation/](src/wj-client/lib/validation/):
+**Frontend validation** uses Zod schemas — now co-located with features in `features/<domain>/utils/`:
 
 - Type-safe validation schemas
-- Reusable across forms
 - Integration with React Hook Form
 - Client-side validation before API calls
 
@@ -1510,18 +1509,11 @@ import { Button } from "../../../components/Button"; // Less preferred
 - Database constraints in models
 - Error handling with typed errors (apperrors)
 
-## New Features Summary
+---
 
-The following features have been implemented but may not be fully documented above:
-
-1. **Silver Investment Management** - Similar to gold, with support for VND and USD silver investments
-2. **Bank Statement Import** - CSV import with customizable bank templates and field mapping
-3. **Session Management** - Track and manage active sessions across devices
-4. **Portfolio History Tracking** - Historical portfolio values for performance charts
-5. **FX Rate Service** - Multi-currency support with automatic rate updates
-6. **Enhanced Mobile Experience** - Bottom sheets, swipe gestures, safe area padding
-7. **Validation Schemas** - Comprehensive Zod schemas for form validation
+**Last Updated:** 2026-03-05
+**Maintainer:** WealthJourney Team
 
 ---
 
-This documentation is actively maintained. If you find any discrepancies between the documentation and the actual codebase, please verify the codebase implementation as the source of truth.
+This documentation is actively maintained. For full architecture details, see [docs/architecture/](docs/architecture/README.md). If you find discrepancies, verify the codebase implementation as the source of truth.

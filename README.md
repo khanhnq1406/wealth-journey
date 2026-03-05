@@ -131,27 +131,28 @@ WealthJourney is a comprehensive personal finance management application that em
 
 ## 🏗️ Architecture
 
-Protocol Buffer-first API design with clean separation of concerns:
+Protocol Buffer-first API design with C4-modeled architecture. Full diagrams, trust boundaries, and ADRs in [`docs/architecture/`](docs/architecture/README.md).
 
 ```
-┌──────────────────────────────────────────────────────┐
-│            Protocol Buffers (API Contract)           │
-│              Single Source of Truth                  │
-└───────────────────┬──────────────────────────────────┘
-                    │
-       ┌────────────┴────────────┐
-       ▼                         ▼
-┌─────────────┐          ┌─────────────┐
-│  Frontend   │  REST    │   Backend   │
-│  Next.js 15 │◄────────►│   Go 1.23   │
-│  React 19   │          │  Gin/gRPC   │
-│ TypeScript  │          │    GORM     │
-└─────────────┘          └──────┬──────┘
-                                │
-                         ┌──────┴──────┐
-                         ▼             ▼
-                   PostgreSQL      Redis
-                   (Supabase)    (Cache)
+┌──────────────────────────────────────────────────────────────┐
+│                Protocol Buffers (API Contract)               │
+│                   Single Source of Truth                      │
+└──────────────────────────┬───────────────────────────────────┘
+                           │
+          ┌────────────────┴────────────────┐
+          ▼                                 ▼
+┌──────────────────┐              ┌──────────────────┐
+│    Frontend      │    REST      │     Backend      │
+│   Next.js 15     │◄───────────►│    Go 1.23       │
+│ Feature Modules  │              │  Gin + gRPC      │
+│ (8 bounded       │              │  DI Providers    │
+│  contexts)       │              │  Bg Scheduler    │
+└──────────────────┘              └────────┬─────────┘
+                                           │
+                                    ┌──────┴──────┐
+                                    ▼             ▼
+                              PostgreSQL      Redis
+                              (Supabase)    (Cache/Queue)
 ```
 
 ### Tech Stack
@@ -160,10 +161,13 @@ Protocol Buffer-first API design with clean separation of concerns:
 | -------------------- | ----------------------------------------------------- |
 | **Frontend**         | Next.js 15, React 19, TypeScript 5, Tailwind CSS 3.4  |
 | **State Management** | Redux Toolkit (auth), React Query (server state)      |
+| **Frontend Arch**    | Feature-based modules (8 bounded contexts)            |
 | **Backend**          | Go 1.23, Gin (REST), gRPC, GORM                       |
+| **Backend Arch**     | DDD, manual DI (ADR-001), constructor injection (ADR-002) |
 | **Database**         | PostgreSQL 16 (Supabase), Redis 7                     |
 | **API Layer**        | Protocol Buffers, Buf, ts-proto                       |
 | **Auth**             | Google OAuth, JWT with Redis whitelist                |
+| **Background Jobs**  | Go scheduler (price updates, portfolio snapshots, cleanup) |
 | **Deployment**       | Vercel (frontend & backend)                           |
 | **External APIs**    | Yahoo Finance (market data), vang.today (gold prices) |
 
@@ -271,20 +275,25 @@ Personal_Financial_Management/
 │
 ├── src/
 │   ├── go-backend/              # Go backend (Domain-Driven Design)
+│   │   ├── internal/            # Application bootstrap
+│   │   │   ├── app/            # Lifecycle & DI providers (ADR-001, ADR-002)
+│   │   │   └── scheduler/     # Background jobs (prices, snapshots, cleanup)
 │   │   ├── domain/
 │   │   │   ├── models/         # GORM database models
 │   │   │   ├── repository/     # Data access layer
 │   │   │   ├── service/        # Business logic
-│   │   │   └── grpcserver/     # gRPC implementations
-│   │   ├── handlers/           # REST API handlers
-│   │   ├── pkg/
+│   │   │   ├── grpcserver/     # gRPC implementations
+│   │   │   └── gateway/        # gRPC-Gateway proxy
+│   │   ├── handlers/           # REST API handlers + DI builder
+│   │   ├── pkg/                # Shared packages
 │   │   │   ├── yahoo/          # Yahoo Finance API client
 │   │   │   ├── gold/           # Gold conversion utilities
+│   │   │   ├── silver/         # Silver conversion utilities
 │   │   │   └── cache/          # Redis caching
 │   │   └── cmd/                # CLI commands & migrations
 │   │
-│   └── wj-client/              # Next.js frontend
-│       ├── app/
+│   └── wj-client/              # Next.js frontend (feature-based modules)
+│       ├── app/                # Next.js App Router pages
 │       │   ├── landing/        # Landing page
 │       │   ├── auth/           # Login/Register
 │       │   └── dashboard/      # Dashboard pages
@@ -293,13 +302,26 @@ Personal_Financial_Management/
 │       │       ├── wallets/
 │       │       ├── portfolio/  # Investment tracking
 │       │       ├── budget/
-│       │       └── report/
-│       ├── components/         # Reusable UI components
-│       ├── utils/generated/    # Auto-generated API client
+│       │       ├── report/
+│       │       └── prices/     # Market prices
+│       ├── features/           # Feature modules (ADR-003)
+│       │   ├── auth/           # Auth: hooks, Redux store
+│       │   ├── wallet/         # Wallet: forms, components, utils
+│       │   ├── transaction/    # Transaction: forms, hooks, utils
+│       │   ├── budget/         # Budget: forms, utils
+│       │   ├── investment/     # Investment: forms, detail modal, calculators
+│       │   ├── import/         # Import: wizard components, forms
+│       │   ├── market-prices/  # Market prices: tables, symbol lookup
+│       │   └── report/         # Report: export utils
+│       ├── components/         # Shared reusable UI components (25+ categories)
+│       ├── contexts/           # React Contexts (Currency, Notification)
+│       ├── hooks/              # Shared custom hooks
+│       ├── utils/generated/    # Auto-generated API client & hooks
 │       ├── gen/                # Generated TS types from proto
-│       └── lib/                # Validation schemas & utilities
+│       └── lib/                # Shared utilities
 │
-├── docs/                       # Documentation
+├── docs/
+│   ├── architecture/           # C4 model diagrams, flows & ADRs
 │   ├── plans/                  # Implementation plans
 │   └── features/               # Feature documentation
 │
@@ -448,13 +470,14 @@ task proto:all
 
 - Add method to service interface
 - Implement in service layer
-- Add REST handler
-- Update routes
+- Add REST handler, wire in `handlers/builder.go`
+- Register routes in `handlers/routes.go`
 
 **4. Use in Frontend**
 
 - Auto-generated hooks are ready to use!
-- Import from `@/utils/generated/hooks`
+- Place feature-specific code in `features/<domain>/`
+- Shared components remain in `components/`
 
 ### Project Conventions
 
@@ -462,6 +485,8 @@ task proto:all
 - **Dates**: Unix timestamps (seconds)
 - **IDs**: `int32` for database IDs
 - **Deletes**: Soft delete with `gorm.DeletedAt`
+- **Frontend**: Feature-based modules in `features/` (no cross-feature imports)
+- **Backend**: Constructor injection via `internal/app/providers.go`
 - **Naming**:
   - Components: `PascalCase.tsx`
   - Utilities: `kebab-case.ts`
@@ -480,9 +505,13 @@ PostgreSQL database with the following core tables:
 | `investment`             | Portfolio holdings         | symbol, quantity, avg_price, current_price |
 | `investment_transaction` | Buy/sell/dividend records  | type, quantity, price, date                |
 | `investment_lot`         | FIFO cost basis tracking   | purchase_price, remaining_quantity         |
+| `market_data`            | Cached market prices       | symbol, price, currency, updated_at        |
+| `portfolio_history`      | Historical portfolio values| wallet_id, total_value, snapshot_date      |
 | `budget`                 | Budget tracking            | category_id, amount, period                |
 | `session`                | Active user sessions       | device, ip_address, last_active            |
+| `fx_rate`                | Exchange rate history      | from_currency, to_currency, rate           |
 | `import_batch`           | CSV import history         | file_name, status, imported_count          |
+| `bank_template`          | Bank CSV import templates  | bank_name, field_mapping, delimiter        |
 
 **Money Storage:** All amounts stored as `BIGINT` in smallest currency unit (e.g., VND × 100 for 2 decimals)
 
@@ -601,6 +630,12 @@ npm run test:e2e                               # Playwright/Cypress
 - [x] PWA support for mobile installation
 - [x] Session management across devices
 - [x] Real-time market data (Yahoo Finance integration)
+- [x] Market prices dashboard (gold, silver, symbol lookup)
+- [x] C4 architecture documentation with trust boundaries
+- [x] Feature-based frontend modules (ADR-003)
+- [x] Constructor injection & manual DI (ADR-001, ADR-002)
+- [x] Background scheduler (price updates, portfolio snapshots, cleanup)
+- [x] Portfolio history tracking for performance charts
 
 ### 🚧 In Progress
 
