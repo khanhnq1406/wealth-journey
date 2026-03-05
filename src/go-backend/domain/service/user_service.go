@@ -39,26 +39,10 @@ type userService struct {
 	mapper           *UserMapper
 }
 
-// NewUserService creates a new UserService.
-func NewUserService(userRepo repository.UserRepository) UserService {
-	return &userService{
-		userRepo:        userRepo,
-		categorySvc:     nil, // Set later to avoid circular dependency
-		walletRepo:      nil, // Set later via SetRepositories
-		transactionRepo: nil, // Set later via SetRepositories
-		budgetRepo:      nil, // Set later via SetRepositories
-		budgetItemRepo:  nil, // Set later via SetRepositories
-		investmentRepo:  nil, // Set later via SetRepositories
-		fxRateSvc:       nil, // Set later via SetRepositories
-		currencyCache:   nil, // Set later via SetRepositories
-		redisCache:      nil, // Set later via SetRepositories
-		mapper:          NewUserMapper(),
-	}
-}
-
-// SetRepositories sets the repositories and services needed for currency conversion.
-// This is called after initialization to avoid circular dependencies.
-func (s *userService) SetRepositories(
+// NewUserService creates a new UserService with all dependencies.
+func NewUserService(
+	userRepo repository.UserRepository,
+	categorySvc CategoryService,
 	walletRepo repository.WalletRepository,
 	transactionRepo repository.TransactionRepository,
 	budgetRepo repository.BudgetRepository,
@@ -67,20 +51,20 @@ func (s *userService) SetRepositories(
 	fxRateSvc FXRateService,
 	currencyCache *cache.CurrencyCache,
 	redisCache *redis.Client,
-) {
-	s.walletRepo = walletRepo
-	s.transactionRepo = transactionRepo
-	s.budgetRepo = budgetRepo
-	s.budgetItemRepo = budgetItemRepo
-	s.investmentRepo = investmentRepo
-	s.fxRateSvc = fxRateSvc
-	s.currencyCache = currencyCache
-	s.redisCache = redisCache
-}
-
-// SetCategoryService sets the category service (called after initialization to avoid circular dependency).
-func (s *userService) SetCategoryService(categorySvc CategoryService) {
-	s.categorySvc = categorySvc
+) UserService {
+	return &userService{
+		userRepo:        userRepo,
+		categorySvc:     categorySvc,
+		walletRepo:      walletRepo,
+		transactionRepo: transactionRepo,
+		budgetRepo:      budgetRepo,
+		budgetItemRepo:  budgetItemRepo,
+		investmentRepo:  investmentRepo,
+		fxRateSvc:       fxRateSvc,
+		currencyCache:   currencyCache,
+		redisCache:      redisCache,
+		mapper:          NewUserMapper(),
+	}
 }
 
 // GetUser retrieves a user by ID.

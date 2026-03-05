@@ -171,9 +171,7 @@ func ProvideAuthServer(
 	cfg *config.Config,
 	services *service.Services,
 ) *auth.Server {
-	authSrv := auth.NewServer(db, rdb, cfg)
-	authSrv.SetServices(services.User, services.Category)
-	return authSrv
+	return auth.NewServer(db, rdb, cfg, services.User, services.Category)
 }
 
 // ProvideHandlerDeps creates the handler dependencies struct.

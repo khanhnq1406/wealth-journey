@@ -21,42 +21,27 @@ type Services struct {
 	Import             ImportService
 }
 
-// NewServices creates all service instances.
+// NewServices creates all service instances with proper dependency ordering.
+// No Set* hacks — all dependencies are passed via constructors.
 func NewServices(repos *Repositories, redisClient *redis.Client) *Services {
+	// Phase 1: Services with no service dependencies
 	categorySvc := NewCategoryService(repos.Category)
-	userSvc := NewUserService(repos.User)
-
-	// Wire up the category service to user service for default category creation
-	if us, ok := userSvc.(*userService); ok {
-		us.SetCategoryService(categorySvc)
-	}
-
-	// Create FX rate service first (needed by other services)
 	fxRateSvc := NewFXRateService(repos.FXRate, redisClient)
-
-	// Create gold price service (needed by market data service)
 	goldPriceSvc := NewGoldPriceService(redisClient)
-
-	// Create silver price service (needed by market data service)
 	silverPriceSvc := NewSilverPriceService(redisClient)
-
-	// Create market data service
 	marketDataSvc := NewMarketDataService(repos.MarketData, goldPriceSvc, silverPriceSvc)
-
-	// Create currency cache
 	currencyCache := cache.NewCurrencyCache(redisClient)
 
-	// Wire up repositories for currency conversion after fxRateSvc and currencyCache are created
-	if us, ok := userSvc.(*userService); ok {
-		us.SetRepositories(repos.Wallet, repos.Transaction, repos.Budget, repos.BudgetItem, repos.Investment, fxRateSvc, currencyCache, redisClient)
-	}
+	// Phase 2: UserService (depends on categorySvc, fxRateSvc, currencyCache)
+	userSvc := NewUserService(
+		repos.User, categorySvc,
+		repos.Wallet, repos.Transaction, repos.Budget, repos.BudgetItem, repos.Investment,
+		fxRateSvc, currencyCache, redisClient,
+	)
 
+	// Phase 3: Services that depend on earlier services
 	walletSvc := NewWalletService(repos.Wallet, repos.User, repos.Transaction, repos.Category, categorySvc, fxRateSvc, currencyCache, repos.Investment, redisClient)
-
-	// Create investment service once (was previously created twice)
 	investmentSvc := NewInvestmentService(repos.Investment, repos.Wallet, repos.InvestmentTransaction, marketDataSvc, repos.User, fxRateSvc, currencyCache, walletSvc)
-
-	// Create portfolio history service using the same investment service instance
 	portfolioHistorySvc := NewPortfolioHistoryService(repos.PortfolioHistory, investmentSvc, repos.User, fxRateSvc)
 
 	return &Services{
@@ -69,7 +54,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client) *Services {
 		FXRate:           fxRateSvc,
 		PortfolioHistory: portfolioHistorySvc,
 		MarketData:       marketDataSvc,
-		Import:           nil, // Import service is created separately in main.go with job queue
+		Import:           nil, // Created separately with job queue
 	}
 }
 

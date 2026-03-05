@@ -45,21 +45,15 @@ type JWTClaims struct {
 	jwt.RegisteredClaims
 }
 
-// NewServer creates a new auth server
-func NewServer(db *database.Database, rdb *redis.RedisClient, cfg *config.Config) *Server {
+// NewServer creates a new auth server with all dependencies.
+func NewServer(db *database.Database, rdb *redis.RedisClient, cfg *config.Config, userSvc UserService, categorySvc CategoryService) *Server {
 	return &Server{
 		db:          db,
 		rdb:         rdb,
 		cfg:         cfg,
-		userSvc:     nil, // Set later via SetServices
-		categorySvc: nil, // Set later via SetServices
+		userSvc:     userSvc,
+		categorySvc: categorySvc,
 	}
-}
-
-// SetServices sets the user and category services after initialization
-func (s *Server) SetServices(userSvc UserService, categorySvc CategoryService) {
-	s.userSvc = userSvc
-	s.categorySvc = categorySvc
 }
 
 // UserData represents user information

@@ -32,7 +32,7 @@ func setupAuthTest(t *testing.T) (*auth.Server, *database.Database, *redis.Redis
 	rdb, err := redis.New(cfg)
 	require.NoError(t, err)
 
-	authServer := auth.NewServer(db, rdb, cfg)
+	authServer := auth.NewServer(db, rdb, cfg, nil, nil)
 
 	cleanup := func() {
 		db.Close()
