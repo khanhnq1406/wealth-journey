@@ -16,6 +16,7 @@ C4Component
 
     Container_Boundary(handlers, "HTTP Handlers — Input validated and user authenticated at this layer") {
         Component(auth_h, "Auth Handlers", "Register, Login, Logout, Verify", "Google OAuth token verification, JWT issuance")
+        Component(user_h, "User Handlers", "CRUD + Preferences", "Handles user CRUD, preferences (currency + language), and profile operations")
         Component(wallet_h, "Wallet Handlers", "CRUD + Transfer + Balance", "Wallet management and fund operations")
         Component(txn_h, "Transaction Handlers", "CRUD + Reports", "Transaction management and financial reports")
         Component(cat_h, "Category Handlers", "CRUD", "User-defined transaction categories")
@@ -27,7 +28,7 @@ C4Component
 
     Container_Boundary(services, "Service Layer — TRUST BOUNDARY: Data considered validated after this point") {
         Component(auth_svc, "Auth Service", "domain/auth", "Google token verification, JWT generation, session management")
-        Component(user_svc, "User Service", "domain/service", "User CRUD, preferences, currency conversion orchestration")
+        Component(user_svc, "User Service", "domain/service", "User CRUD, preferences (currency + language), currency conversion orchestration")
         Component(wallet_svc, "Wallet Service", "domain/service", "Balance tracking, fund transfers, multi-currency support")
         Component(txn_svc, "Transaction Service", "domain/service", "Transaction CRUD, financial reports, category breakdowns")
         Component(cat_svc, "Category Service", "domain/service", "Category CRUD, default category seeding for new users")
@@ -68,6 +69,7 @@ C4Component
     Rel(gin, auth_mw, "Applies to protected routes")
     Rel(gin, rate_mw, "Applies to all routes")
     Rel(gin, auth_h, "Routes /auth/*")
+    Rel(gin, user_h, "Routes /users/*")
     Rel(gin, wallet_h, "Routes /wallets/*")
     Rel(gin, txn_h, "Routes /transactions/*")
     Rel(gin, cat_h, "Routes /categories/*")
@@ -77,6 +79,7 @@ C4Component
     Rel(gin, price_h, "Routes /investments/market-prices")
 
     Rel(auth_h, auth_svc, "Delegates auth logic")
+    Rel(user_h, user_svc, "Delegates user ops")
     Rel(wallet_h, wallet_svc, "Delegates wallet ops")
     Rel(txn_h, txn_svc, "Delegates transaction ops")
     Rel(cat_h, cat_svc, "Delegates category ops")

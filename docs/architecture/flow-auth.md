@@ -94,6 +94,16 @@ sequenceDiagram
 - Session TTL is 7 days from creation (both Redis keys and JWT expiration)
 - Default categories are created for new users but failures don't block registration
 
+### Locale Sync After Login
+
+After the SPA receives the auth response and stores the JWT token, the client performs locale synchronization:
+
+1. Client reads `preferredLanguage` from the auth response
+2. Client sets the `wj-locale` cookie to the user's `preferredLanguage`
+3. If the current URL locale does not match `preferredLanguage`, the client redirects to `/{preferredLanguage}/dashboard/home`
+
+This ensures the UI language matches the user's stored preference immediately after login. See [i18n Flows](flow-i18n.md) for the full locale detection and language switch diagrams.
+
 ### Error Paths
 
 | Condition | Response | Rollback |

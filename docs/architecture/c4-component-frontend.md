@@ -16,7 +16,7 @@ C4Component
         Component(budget_page, "Budget Page", "app/dashboard/budget", "Budget tracking with progress indicators")
         Component(report_page, "Report Page", "app/dashboard/report", "Financial reports with exports")
         Component(prices_page, "Prices Page", "app/dashboard/prices", "Live gold/silver/market prices")
-        Component(settings, "Settings Pages", "app/dashboard/settings", "Sessions, import templates")
+        Component(settings, "Settings Pages", "app/dashboard/settings", "Sessions, import templates, language toggle")
     }
 
     Container_Boundary(features, "Feature Modules (Target State)") {
@@ -57,6 +57,11 @@ C4Component
         Component(rq_cache, "React Query Cache", "@tanstack/react-query", "Server state: wallets, transactions, investments, etc.")
     }
 
+    Container_Boundary(i18n, "Internationalization") {
+        Component(intl_mw, "next-intl Middleware", "middleware.ts", "Intercepts all requests, resolves locale from URL/cookie/Accept-Language, redirects locale-less URLs")
+        ComponentDb(intl_catalogs, "Translation Catalogs", "messages/en.json, messages/vi.json", "Static per-locale string catalogs")
+    }
+
     Rel(dashboard, wallet_feat, "Renders wallet list")
     Rel(dashboard, txn_feat, "Renders recent transactions")
     Rel(txn_page, txn_feat, "Renders transaction management")
@@ -88,6 +93,10 @@ C4Component
     Rel(gen_api, gen_types, "Uses request/response types")
     Rel(gen_hooks, rq_cache, "Manages server state cache")
     Rel(auth_feat, redux, "Manages auth state")
+
+    Rel(intl_mw, dashboard, "Resolves locale, provides translations")
+    Rel(intl_mw, intl_catalogs, "Loads per-locale strings")
+    Rel(settings, intl_mw, "Language toggle updates locale cookie")
 ```
 
 ## Feature Module Structure

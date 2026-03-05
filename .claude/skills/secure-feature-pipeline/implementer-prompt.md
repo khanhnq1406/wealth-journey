@@ -153,4 +153,14 @@ Task tool (general-purpose):
     - Security measures implemented
     - Self-review findings (if any)
     - Any issues or concerns
+
+    ## Progress File — NOT Your Responsibility
+
+    The orchestrator (not you) manages the progress file (`docs/reports/YYYY-MM-DD-<feature>-progress.md`).
+    After you report back and all three reviews pass, the orchestrator will:
+    1. Update the progress file with your task's status and commit hash
+    2. Commit your changes + the progress file
+    3. Show a summary to the user and wait for approval
+
+    You do NOT need to read, write, or commit the progress file. Just do your task and report back.
 ```
