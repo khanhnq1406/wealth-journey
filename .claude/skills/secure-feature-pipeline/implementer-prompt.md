@@ -28,6 +28,31 @@ Task tool (general-purpose):
     - **Handlers:** In `src/go-backend/handlers/`, NOT `api/handlers/`
     - **Generated code:** Don't manually edit files in `gen/`, `utils/generated/`, or `protobuf/`
 
+    ## Frontend/UI Tasks — Required Sub-Skills
+
+    If this task involves any frontend or UI work, you MUST follow these skills FIRST before writing any code:
+
+    1. **`ui-ux-pro-max` skill** — Design system, color palette, typography, accessibility rules, component patterns.
+       Run the design system generator:
+       ```bash
+       python3 .claude/skills/ui-ux-pro-max/scripts/search.py "fintech dashboard [feature keywords]" --design-system --stack nextjs
+       ```
+
+    2. **`responsive-design` skill** — Mobile-first layout with Tailwind CSS.
+       - Always start with mobile (unprefixed) styles, enhance at breakpoints
+       - This app uses a **custom `sm:` breakpoint at 800px** (not the default 640px) — defined in `src/wj-client/tailwind.config.ts`
+       - Use 2-3 breakpoints per property max
+       - Touch targets must be ≥ 44×44px
+       - No horizontal scroll on mobile
+
+    **Non-negotiable UI checklist before reporting back:**
+    - [ ] Mobile layout works at 375px (no horizontal scroll, touch targets ≥ 44px)
+    - [ ] Desktop layout works at 1024px+ (using `sm:` breakpoint at 800px)
+    - [ ] Color contrast ≥ 4.5:1 for normal text
+    - [ ] All interactive elements have `cursor-pointer`
+    - [ ] No emojis used as icons (use SVG from `components/icons/`)
+    - [ ] Hover/focus states visible
+
     ## Before You Begin
 
     If you have questions about:

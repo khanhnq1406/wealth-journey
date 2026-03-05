@@ -118,6 +118,8 @@ Before writing the spec, complete this analysis using the checklist in `./securi
 
 ### C4 Architecture Diagrams (REQUIRED)
 
+**REQUIRED SUB-SKILL:** Use the `c4-architecture` skill for Mermaid C4 diagram syntax, element types, relationship labeling, and best practices. Follow the conventions in that skill when creating or updating any C4 diagram.
+
 Before writing the spec, determine which C4 diagrams need to be **created or updated** for this feature. The project maintains C4 diagrams in `docs/architecture/` using **Mermaid syntax**.
 
 **Existing diagrams:**
@@ -228,6 +230,11 @@ Save to: `docs/specs/YYYY-MM-DD-<feature>-spec.md`
 
 ## UI/UX Changes
 [New/modified pages, components, flows]
+
+**REQUIRED for any frontend/UI work:**
+- Follow **mobile-first design** — use `responsive-design` skill for Tailwind breakpoints and layout
+- Follow **ui-ux-pro-max** skill for design system, color palette, typography, accessibility, and component patterns
+- This app uses `sm:` at 800px (custom breakpoint) — always verify against `tailwind.config.ts`
 
 ## Security & Risk Assessment
 
@@ -741,8 +748,13 @@ Use when ANY of these are true:
 - writing-plans patterns (from writing-plans skill)
 - subagent-driven-development patterns (from subagent-driven-development skill)
 
+**Required sub-skills by context:**
+- **Any UI/frontend work** → `ui-ux-pro-max` skill (design system, color, typography, accessibility, component patterns) + `responsive-design` skill (mobile-first Tailwind breakpoints, container queries)
+- **C4 or architecture diagrams** → `c4-architecture` skill (Mermaid C4 syntax, element types, best practices)
+
 **Subagents should follow:**
 - Existing codebase patterns (CLAUDE.md)
 - Protocol Buffer first API design
 - DDD architecture (models → repository → service → handler)
 - Financial data integrity rules (int64 for money, never float)
+- **Mobile-first design** for all frontend work (custom `sm:` breakpoint at 800px in `tailwind.config.ts`)
