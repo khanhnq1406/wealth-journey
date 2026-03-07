@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import {
   useMutationDeleteWallet,
   useQueryListWallets,
@@ -24,6 +25,8 @@ export function DeleteWalletModal({
   onCancel,
   isPending = false,
 }: DeleteWalletModalProps) {
+  const t = useTranslations("wallet.delete");
+  const tCommon = useTranslations("common");
   const [option, setOption] = useState<DeletionOption>("archive");
   const [targetWalletId, setTargetWalletId] = useState<number>(0);
   const [error, setError] = useState<string>("");
@@ -38,15 +41,13 @@ export function DeleteWalletModal({
   const deleteWalletMutation = useMutationDeleteWallet({
     onSuccess: (data) => {
       // Show success message
-      const message =
-        data?.message ||
-        `Wallet "${wallet.walletName}" has been ${option === "archive" ? "archived" : option === "transfer" ? "deleted" : "processed"} successfully`;
+      const message = data?.message || "";
       setSuccessMessage(message);
       setShowSuccess(true);
       setError("");
     },
     onError: (err: any) => {
-      setError(err.message || "Failed to process wallet. Please try again");
+      setError(err.message || t("failedToProcess"));
     },
   });
 
@@ -63,7 +64,7 @@ export function DeleteWalletModal({
       case "transfer":
         deletionOption = WalletDeletionOption.WALLET_DELETION_OPTION_TRANSFER;
         if (!targetWalletId) {
-          setError("Please select a target wallet");
+          setError(t("selectTargetError"));
           return;
         }
         break;
@@ -101,11 +102,10 @@ export function DeleteWalletModal({
 
   return (
     <>
-      <h2 className="text-xl font-bold mb-4">Delete Wallet</h2>
+      <h2 className="text-xl font-bold mb-4">{t("title")}</h2>
 
       <p className="text-gray-600 mb-4">
-        <strong>{wallet.walletName}</strong> will be deleted. What would you
-        like to do with the transactions?
+        {t("description", { walletName: wallet.walletName })}
       </p>
 
       <div className="space-y-3 mb-6">
@@ -119,10 +119,9 @@ export function DeleteWalletModal({
             disabled={isLoading}
           />
           <div>
-            <div className="font-medium">Archive wallet (Recommended)</div>
+            <div className="font-medium">{t("archiveOption")}</div>
             <div className="text-sm text-gray-500">
-              Wallet will be hidden but all transactions will be preserved for
-              your records.
+              {t("archiveDescription")}
             </div>
           </div>
         </label>
@@ -138,11 +137,10 @@ export function DeleteWalletModal({
           />
           <div className="flex-1">
             <div className="font-medium">
-              Transfer transactions to another wallet
+              {t("transferOption")}
             </div>
             <div className="text-sm text-gray-500 mb-2">
-              Move all transactions to another wallet with the same currency.
-              The target wallet&apos;s balance will be updated accordingly.
+              {t("transferDescription")}
             </div>
             {option === "transfer" && (
               <select
@@ -154,7 +152,7 @@ export function DeleteWalletModal({
                 required
                 aria-label="Select target wallet for transfer"
               >
-                <option value="">Select a wallet...</option>
+                <option value="">{t("selectTargetWallet")}</option>
                 {otherWallets.map((w) => (
                   <option key={w.id} value={w.id}>
                     {w.walletName} ({formatCurrency(w.balance?.amount ?? 0, w.currency)})
@@ -164,7 +162,7 @@ export function DeleteWalletModal({
             )}
             {option === "transfer" && otherWallets.length === 0 && (
               <div className="text-sm text-amber-600 mt-1">
-                No other wallets with the same currency available.
+                {t("noOtherWallets")}
               </div>
             )}
           </div>
@@ -181,12 +179,11 @@ export function DeleteWalletModal({
           />
           <div>
             <div className="font-medium text-red-600">
-              Delete wallet and keep transactions
+              {t("deleteOnlyOption")}
             </div>
             <div className="text-sm text-gray-500">
-              Transactions will be preserved but the wallet reference will be
-              removed.
-              <strong> Not recommended.</strong>
+              {t("deleteOnlyDescription")}{" "}
+              <strong>{t("notRecommended")}</strong>
             </div>
           </div>
         </label>
@@ -204,14 +201,14 @@ export function DeleteWalletModal({
           className="px-4 py-2 border rounded hover:bg-gray-50 disabled:opacity-50"
           disabled={isLoading}
         >
-          Cancel
+          {tCommon("cancel")}
         </button>
         <button
           onClick={handleSubmit}
           className="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 disabled:opacity-50"
           disabled={isLoading || (option === "transfer" && !targetWalletId)}
         >
-          {isLoading ? "Processing…" : "Confirm"}
+          {isLoading ? tCommon("processing") : t("confirm")}
         </button>
       </div>
     </>

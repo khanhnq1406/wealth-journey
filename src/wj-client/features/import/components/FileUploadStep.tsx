@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/Button";
 
@@ -90,6 +91,7 @@ export function FileUploadStep({
   onNext,
   isUploading,
 }: FileUploadStepProps) {
+  const t = useTranslations("import.fileUpload");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string>("");
   const [isDragOver, setIsDragOver] = useState(false);
@@ -97,7 +99,7 @@ export function FileUploadStep({
   const validateFile = (file: File): string | null => {
     const ext = file.name.split(".").pop()?.toLowerCase();
     if (!ext || !["xls", "xlsx", "pdf"].includes(ext)) {
-      return "Invalid file type. Please upload Excel (.xlsx, .xls) or PDF file.";
+      return t("invalidFileType");
     }
 
     let maxSize = MAX_FILE_SIZE.excel;
@@ -109,11 +111,11 @@ export function FileUploadStep({
 
     if (file.size > maxSize) {
       const maxSizeMB = Math.round(maxSize / (1024 * 1024));
-      return `File size exceeds maximum ${maxSizeMB}MB limit.`;
+      return t("fileTooLarge", { maxSizeMB });
     }
 
     if (file.size === 0) {
-      return "File is empty.";
+      return t("fileEmpty");
     }
 
     return null;
@@ -211,10 +213,10 @@ export function FileUploadStep({
           </svg>
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-dark-text">
-          Upload Bank Statement
+          {t("title")}
         </h2>
         <p className="text-sm sm:text-base text-neutral-600 dark:text-dark-text-secondary max-w-lg mx-auto">
-          Import transactions automatically from your Excel or PDF statement
+          {t("subtitle")}
         </p>
       </div>
 
@@ -232,7 +234,7 @@ export function FileUploadStep({
               clipRule="evenodd"
             />
           </svg>
-          Excel (.xlsx, .xls)
+          {t("excelFormat")}
         </span>
         <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-success-100 text-success-700 dark:bg-success-900 dark:text-success-300">
           <svg
@@ -246,7 +248,7 @@ export function FileUploadStep({
               clipRule="evenodd"
             />
           </svg>
-          PDF
+          {t("pdfFormat")}
         </span>
       </div>
 
@@ -327,19 +329,19 @@ export function FileUploadStep({
               <p className="text-lg sm:text-xl font-semibold text-neutral-700 dark:text-dark-text">
                 {isDragOver ? (
                   <span className="text-primary-600 dark:text-primary-400">
-                    Drop your file here
+                    {t("dropHere")}
                   </span>
                 ) : (
                   <>
-                    Drag & drop your file, or{" "}
+                    {t("dragAndDrop")}{" "}
                     <span className="text-primary-600 dark:text-primary-500 hover:text-primary-700 dark:hover:text-primary-400">
-                      browse
+                      {t("browse")}
                     </span>
                   </>
                 )}
               </p>
               <p className="text-xs sm:text-sm text-neutral-500 dark:text-dark-text-tertiary">
-                Maximum size: 10MB (Excel) • 20MB (PDF)
+                {t("maxSize")}
               </p>
             </div>
           </div>
@@ -375,7 +377,7 @@ export function FileUploadStep({
                 />
               </svg>
               <span className="ml-2 text-sm font-medium text-success-700 dark:text-success-300">
-                Ready to upload
+                {t("readyToUpload")}
               </span>
             </div>
           </div>
@@ -440,7 +442,7 @@ export function FileUploadStep({
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-            Clear
+            {t("clear")}
           </Button>
         )}
         <Button
@@ -451,10 +453,10 @@ export function FileUploadStep({
           className="min-h-[44px] text-base font-semibold"
         >
           {isUploading ? (
-            <>Uploading...</>
+            <>{t("uploading")}</>
           ) : (
             <>
-              Continue
+              {t("continue")}
               <svg
                 className="w-5 h-5 ml-2"
                 fill="none"

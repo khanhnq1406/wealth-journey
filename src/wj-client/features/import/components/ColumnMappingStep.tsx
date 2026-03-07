@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/Button";
 import { FormSelect } from "@/components/forms/FormSelect";
 import { FormInput } from "@/components/forms/FormInput";
@@ -74,6 +75,8 @@ export function ColumnMappingStep({
   // Create template mutation
   const createTemplateMutation = useMutationCreateUserTemplate();
 
+  const t = useTranslations("import.columnMapping");
+
   // Parse CSV and extract preview
   useEffect(() => {
     const parseCSVPreview = async () => {
@@ -87,9 +90,7 @@ export function ColumnMappingStep({
         if (fileExt === "xlsx" || fileExt === "xls" || fileExt === "pdf") {
           // For Excel and PDF files, skip frontend preview
           // Backend will handle parsing with auto-detection
-          setError(
-            `${fileExt.toUpperCase()} files are parsed automatically by the backend. Column mapping is not needed.`,
-          );
+          setError(t("excelAutoDetected", { ext: fileExt.toUpperCase() }));
           setLoading(false);
           return;
         }
@@ -189,13 +190,13 @@ export function ColumnMappingStep({
   const handleNext = async () => {
     // Validate required fields
     if (dateColumn === -1 || amountColumn === -1 || descriptionColumn === -1) {
-      setError("Please map at least Date, Amount, and Description columns");
+      setError(t("validateRequired"));
       return;
     }
 
     // Validate template name if saving
     if (saveAsTemplate && !templateName.trim()) {
-      setError("Please enter a template name");
+      setError(t("validateTemplateName"));
       return;
     }
 
@@ -222,9 +223,7 @@ export function ColumnMappingStep({
           fileFormats: [fileExt],
         });
       } catch (err: any) {
-        setError(
-          err.message || "Failed to save template. Continuing with import...",
-        );
+        setError(err.message || t("failedSaveTemplate"));
         // Continue with import even if template save fails
       }
     }
@@ -248,10 +247,10 @@ export function ColumnMappingStep({
   const columnOptions =
     preview?.headers.map((header, index) => ({
       value: index.toString(),
-      label: `Column ${index + 1}: ${header}`,
+      label: t("columnLabel", { n: index + 1, name: header }),
     })) || [];
 
-  const noneOption = { value: "-1", label: "None (Skip)" };
+  const noneOption = { value: "-1", label: t("noneSkip") };
   const allColumnOptions = [noneOption, ...columnOptions];
 
   if (loading) {
@@ -273,7 +272,7 @@ export function ColumnMappingStep({
           <p className="text-red-700 dark:text-red-300">{error}</p>
         </div>
         <Button variant="secondary" onClick={onBack}>
-          Back
+          {t("back")}
         </Button>
       </div>
     );
@@ -284,12 +283,10 @@ export function ColumnMappingStep({
       {/* Instructions */}
       <div className="text-sm sm:text-base text-neutral-600 dark:text-dark-text-secondary">
         <p className="mb-2">
-          Map CSV columns to transaction fields. Required fields are marked with
-          *.
+          {t("instructions")}
         </p>
         <p className="text-xs sm:text-sm text-neutral-500 dark:text-dark-text-tertiary">
-          We've auto-detected columns based on header names. Please verify the
-          mapping.
+          {t("autoDetected")}
         </p>
       </div>
 
@@ -305,7 +302,7 @@ export function ColumnMappingStep({
         <div className="border border-neutral-200 dark:border-dark-border rounded-lg overflow-hidden">
           <div className="bg-neutral-50 dark:bg-dark-surface-hover px-4 py-2 border-b border-neutral-200 dark:border-dark-border">
             <h3 className="text-sm font-semibold text-neutral-900 dark:text-dark-text">
-              File Preview (First 3 rows)
+              {t("filePreview")}
             </h3>
           </div>
           <div className="overflow-x-auto">
@@ -344,13 +341,13 @@ export function ColumnMappingStep({
       {/* Column Mapping Form */}
       <div className="space-y-4">
         <h3 className="text-base font-semibold text-neutral-900 dark:text-dark-text">
-          Column Mapping
+          {t("columnMappingTitle")}
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Required Fields */}
           <FormSelect
-            label="Date Column"
+            label={t("dateColumn")}
             value={dateColumn.toString()}
             onChange={(value) => setDateColumn(parseInt(value))}
             options={columnOptions}
@@ -358,7 +355,7 @@ export function ColumnMappingStep({
           />
 
           <FormSelect
-            label="Amount Column"
+            label={t("amountColumn")}
             value={amountColumn.toString()}
             onChange={(value) => setAmountColumn(parseInt(value))}
             options={columnOptions}
@@ -366,7 +363,7 @@ export function ColumnMappingStep({
           />
 
           <FormSelect
-            label="Description Column"
+            label={t("descriptionColumn")}
             value={descriptionColumn.toString()}
             onChange={(value) => setDescriptionColumn(parseInt(value))}
             options={columnOptions}
@@ -375,21 +372,21 @@ export function ColumnMappingStep({
 
           {/* Optional Fields */}
           <FormSelect
-            label="Type Column (Optional)"
+            label={t("typeColumn")}
             value={typeColumn.toString()}
             onChange={(value) => setTypeColumn(parseInt(value))}
             options={allColumnOptions}
           />
 
           <FormSelect
-            label="Category Column (Optional)"
+            label={t("categoryColumn")}
             value={categoryColumn.toString()}
             onChange={(value) => setCategoryColumn(parseInt(value))}
             options={allColumnOptions}
           />
 
           <FormSelect
-            label="Reference Column (Optional)"
+            label={t("referenceColumn")}
             value={referenceColumn.toString()}
             onChange={(value) => setReferenceColumn(parseInt(value))}
             options={allColumnOptions}
@@ -397,7 +394,7 @@ export function ColumnMappingStep({
 
           {/* Date Format & Currency */}
           <FormSelect
-            label="Date Format"
+            label={t("dateFormat")}
             value={dateFormat}
             onChange={(value) => setDateFormat(value)}
             options={DATE_FORMATS}
@@ -405,7 +402,7 @@ export function ColumnMappingStep({
           />
 
           <FormSelect
-            label="Currency"
+            label={t("currency")}
             value={currency}
             onChange={(value) => setCurrency(value)}
             options={CURRENCIES}
@@ -429,11 +426,10 @@ export function ColumnMappingStep({
               htmlFor="saveAsTemplate"
               className="text-sm font-medium text-neutral-900 dark:text-dark-text cursor-pointer"
             >
-              Save as template for reuse
+              {t("saveAsTemplate")}
             </label>
             <p className="text-xs text-neutral-500 dark:text-dark-text-tertiary mt-1">
-              Save this column mapping as a template to quickly import similar
-              files in the future.
+              {t("saveAsTemplateDesc")}
             </p>
           </div>
         </div>
@@ -441,10 +437,10 @@ export function ColumnMappingStep({
         {saveAsTemplate && (
           <div className="pl-7">
             <FormInput
-              label="Template Name"
+              label={t("templateName")}
               value={templateName}
               onChange={(e) => setTemplateName(e.target.value)}
-              placeholder="e.g., My Bank Credit Card Statement"
+              placeholder={t("templateNamePlaceholder")}
               required
             />
           </div>
@@ -454,7 +450,7 @@ export function ColumnMappingStep({
       {/* Action Buttons */}
       <div className="flex gap-3 pt-2">
         <Button variant="secondary" onClick={onBack}>
-          Back
+          {t("back")}
         </Button>
         <Button
           variant="primary"
@@ -468,8 +464,8 @@ export function ColumnMappingStep({
           }
         >
           {createTemplateMutation.isPending
-            ? "Saving Template..."
-            : "Next: Review Transactions"}
+            ? t("savingTemplate")
+            : t("nextReview")}
         </Button>
       </div>
     </div>

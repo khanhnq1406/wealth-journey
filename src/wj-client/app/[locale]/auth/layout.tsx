@@ -1,8 +1,11 @@
-export default function AuthLayout({
+import { getTranslations } from "next-intl/server";
+
+export default async function AuthLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const t = await getTranslations("auth");
   return (
     <div className="bg-primary-600 h-screen">
       <div className="block sm:grid grid-cols-[40%_60%]">
@@ -11,7 +14,7 @@ export default function AuthLayout({
             <img className="w-[80px] h-[80px]" src="/logo.svg" alt="Logo" />
             <div className="text-white">
               <p className="font-extrabold text-[30px]">WealthJourney</p>
-              <p>Your Trusted Guide to Financial Freedom</p>
+              <p>{t("tagline")}</p>
             </div>
           </div>
           <img src="/login-stock.svg" className="w-3/5" alt="Login picture" />

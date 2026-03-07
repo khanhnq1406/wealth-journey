@@ -277,7 +277,7 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
                     className="mr-2"
                     disabled={isLoading}
                   />
-                  <span className="text-sm">Add funds</span>
+                  <span className="text-sm">{tEdit("addFunds")}</span>
                 </label>
                 <label className="flex items-center">
                   <input
@@ -287,7 +287,7 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
                     className="mr-2"
                     disabled={isLoading}
                   />
-                  <span className="text-sm">Remove funds</span>
+                  <span className="text-sm">{tEdit("removeFunds")}</span>
                 </label>
               </div>
             </div>
@@ -295,19 +295,19 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
             <FormNumberInput
               name="adjustmentAmount"
               control={control}
-              label={`Adjustment Amount (${currency})`}
-              placeholder="Enter amount"
+              label={tEdit("adjustmentAmount", { currency })}
+              placeholder={tEdit("adjustmentAmountPlaceholder")}
               step="1"
               min={0}
               disabled={isLoading}
             />
             <div className="text-xs text-gray-500 ml-1 -mt-1">
-              Enter the amount to add or remove from your wallet
+              {tEdit("adjustmentAmountHelp")}
             </div>
 
             {adjustmentAmount !== 0 && adjustmentAmount !== undefined && (
               <div className="text-sm">
-                <span className="text-gray-600">Projected Balance: </span>
+                <span className="text-gray-600">{tEdit("projectedBalance")}</span>
                 <span
                   className={`font-medium ${projectedBalance < 0 ? "text-red-600" : "text-green-600"}`}
                 >
@@ -319,13 +319,13 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
             <FormInput
               name="reason"
               control={control}
-              label="Reason (Optional)"
-              placeholder="Why are you adjusting this balance?"
+              label={tEdit("reasonLabel")}
+              placeholder={tEdit("reasonPlaceholder")}
               disabled={isLoading}
             />
 
             <div className="text-xs text-gray-500 mt-2">
-              This will create a transaction record for audit purposes.
+              {tEdit("auditNote")}
             </div>
           </div>
         )}
@@ -338,7 +338,7 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
           loading={isLoading}
           htmlType="submit"
         >
-          Save
+          {tCommon("save")}
         </Button>
       </div>
     </form>

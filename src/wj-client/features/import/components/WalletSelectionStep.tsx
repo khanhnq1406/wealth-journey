@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/Button";
 import { useQueryListWallets } from "@/utils/generated/hooks";
 import { cn } from "@/lib/utils/cn";
@@ -24,6 +25,7 @@ export function WalletSelectionStep({
   onBack,
   onNext,
 }: WalletSelectionStepProps) {
+  const t = useTranslations("import.walletSelection");
   const [selectedWalletId, setSelectedWalletId] = useState<number | null>(null);
 
   const {
@@ -52,10 +54,10 @@ export function WalletSelectionStep({
             <div className="absolute inset-0 rounded-full border-4 border-primary-600 dark:border-primary-500 border-t-transparent animate-spin"></div>
           </div>
           <p className="text-lg font-medium text-neutral-900 dark:text-dark-text">
-            Loading your wallets...
+            {t("loadingWallets")}
           </p>
           <p className="mt-2 text-sm text-neutral-600 dark:text-dark-text-secondary">
-            This will just take a moment
+            {t("loadingMoment")}
           </p>
         </div>
       </div>
@@ -70,10 +72,10 @@ export function WalletSelectionStep({
             <ExclamationCircleIcon className="w-8 h-8 text-red-600 dark:text-red-400" />
           </div>
           <h3 className="text-lg font-semibold text-red-900 dark:text-red-100">
-            Failed to Load Wallets
+            {t("failedToLoad")}
           </h3>
           <p className="mt-2 text-sm text-red-700 dark:text-red-300">
-            {error?.message || "An unexpected error occurred. Please try again."}
+            {error?.message || t("unexpectedError")}
           </p>
         </div>
         <div className="flex justify-center">
@@ -83,7 +85,7 @@ export function WalletSelectionStep({
             className="min-h-[44px] px-6"
           >
             <ArrowLeftIcon className="w-5 h-5 mr-2" />
-            Back
+            {t("back")}
           </Button>
         </div>
       </div>
@@ -98,11 +100,10 @@ export function WalletSelectionStep({
             <WalletIcon className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
           </div>
           <h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100">
-            No Wallets Found
+            {t("noWalletsFound")}
           </h3>
           <p className="mt-2 text-sm text-yellow-700 dark:text-yellow-300 max-w-md">
-            You need to create at least one wallet before importing transactions.
-            Please go to the Wallets page to create your first wallet.
+            {t("noWalletsDesc")}
           </p>
         </div>
         <div className="flex justify-center">
@@ -112,7 +113,7 @@ export function WalletSelectionStep({
             className="min-h-[44px] px-6"
           >
             <ArrowLeftIcon className="w-5 h-5 mr-2" />
-            Back
+            {t("back")}
           </Button>
         </div>
       </div>
@@ -127,11 +128,10 @@ export function WalletSelectionStep({
           <WalletIcon className="w-8 h-8 text-primary-600 dark:text-primary-400" />
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-dark-text">
-          Select Destination Wallet
+          {t("title")}
         </h2>
         <p className="text-sm sm:text-base text-neutral-600 dark:text-dark-text-secondary max-w-lg mx-auto">
-          Choose the wallet where your imported transactions will be added. The
-          wallet balance will be updated automatically.
+          {t("subtitle")}
         </p>
       </div>
 
@@ -140,7 +140,7 @@ export function WalletSelectionStep({
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-100 dark:bg-dark-surface-secondary">
           <WalletIcon className="w-4 h-4 text-neutral-600 dark:text-dark-text-secondary" />
           <span className="text-sm font-medium text-neutral-700 dark:text-dark-text-secondary">
-            {wallets.length} wallet{wallets.length !== 1 ? "s" : ""} available
+            {wallets.length !== 1 ? t("walletsAvailablePlural", { count: wallets.length }) : t("walletsAvailable", { count: wallets.length })}
           </span>
         </div>
       </div>
@@ -153,7 +153,7 @@ export function WalletSelectionStep({
             <button
               key={wallet.id}
               onClick={() => handleSelectWallet(wallet.id)}
-              aria-label={`${wallet.walletName}, balance ${formatCurrency(wallet.balance?.amount || 0, wallet.balance?.currency || "VND")}. ${isSelected ? "Selected" : "Not selected"}`}
+              aria-label={`${wallet.walletName}, balance ${formatCurrency(wallet.balance?.amount || 0, wallet.balance?.currency || "VND")}. ${isSelected ? t("selected") : t("notSelected")}`}
               aria-pressed={isSelected}
               className={cn(
                 "relative min-h-[120px] p-5 rounded-2xl border-2 transition-all duration-200",
@@ -232,7 +232,7 @@ export function WalletSelectionStep({
           className="min-h-[44px] sm:w-auto"
         >
           <ArrowLeftIcon className="w-5 h-5 mr-2" />
-          Back
+          {t("back")}
         </Button>
         <Button
           variant="primary"
@@ -240,7 +240,7 @@ export function WalletSelectionStep({
           disabled={!selectedWalletId}
           className="min-h-[44px] flex-1 sm:flex-initial"
         >
-          Continue
+          {t("continue")}
           <ArrowRightIcon className="w-5 h-5 ml-2" />
         </Button>
       </div>

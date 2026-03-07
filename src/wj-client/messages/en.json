@@ -255,9 +255,70 @@
     },
     "comparison": {
       "sectionTitle": "Why WealthJourney?",
+      "title": "Stop Juggling Multiple Apps",
+      "description": "Most investors use Coinbase for crypto, Robinhood for stocks, spreadsheets for gold, and another app for budgets. WealthJourney gives you everything in one unified platform with powerful tools you'll love.",
       "feature": "Feature",
       "wealthJourney": "WealthJourney",
-      "others": "Others"
+      "others": "Others",
+      "otherApps": "Other Apps",
+      "items": {
+        "allInOne": {
+          "feature": "All-In-One Platform",
+          "wj": "Stocks, ETFs, Crypto, Gold, Silver + Budgets in ONE app",
+          "others": "Need 3-5 different apps"
+        },
+        "assetCoverage": {
+          "feature": "Investment Asset Coverage",
+          "wj": "6+ asset types unified (stocks, ETFs, funds, crypto, gold, silver)",
+          "others": "Stocks only or separate apps per asset"
+        },
+        "goldSilver": {
+          "feature": "Gold & Silver Support",
+          "wj": "Native support with 10+ SJC gold types",
+          "others": "Not available anywhere"
+        },
+        "marketData": {
+          "feature": "Market Data Integration",
+          "wj": "Yahoo Finance with real-time updates",
+          "others": "Manual entry or paid tier"
+        },
+        "multiCurrency": {
+          "feature": "Multi-Currency Support",
+          "wj": "12+ currencies with FX conversion",
+          "others": "Limited or premium-only"
+        },
+        "export": {
+          "feature": "Export & Reporting",
+          "wj": "CSV, PDF, Excel - unlimited",
+          "others": "Limited exports or paid tier"
+        },
+        "pricing": {
+          "feature": "Pricing",
+          "wj": "Free forever - no hidden costs",
+          "others": "Freemium or subscription"
+        }
+      }
+    },
+    "testimonials": {
+      "sectionTitle": "What Our Users Say",
+      "sectionSubtitle": "Join thousands of users who trust WealthJourney for their financial management needs",
+      "items": {
+        "user1": {
+          "name": "Nguyễn Văn A",
+          "role": "Investment Enthusiast",
+          "content": "WealthJourney has transformed how I track my investment portfolio. The FIFO cost basis tracking and real-time PNL calculations help me make informed decisions about my stock holdings."
+        },
+        "user2": {
+          "name": "Trần Thị B",
+          "role": "Gold Investor",
+          "content": "Managing gold investments has never been easier. I love how it automatically converts between Vietnamese tael and international ounces. The vang.today price integration is incredibly convenient!"
+        },
+        "user3": {
+          "name": "Lê Văn C",
+          "role": "Budget-Conscious Saver",
+          "content": "The budget tracking and categorization features help me stay on top of my spending. I can easily see where my money goes each month and adjust my habits accordingly. Highly recommended!"
+        }
+      }
     },
     "cta": {
       "title": "Ready to Start Your Financial Journey?",
@@ -293,6 +354,7 @@
     }
   },
   "auth": {
+    "tagline": "Your Trusted Guide to Financial Freedom",
     "login": {
       "title": "Welcome back",
       "subtitle": "Sign in to continue your financial journey",
@@ -500,7 +562,10 @@
     "selectWallet": "Select wallet",
     "deselectWallet": "Deselect wallet",
     "transferFrom": "Transfer from {name}",
-    "deleteWallet": "Delete {name}"
+    "deleteWallet": "Delete {name}",
+    "walletId": "Wallet ID",
+    "tapEyeReveal": "Tap eye icon to reveal",
+    "totalValue": "Total Value"
   },
   "investment": {
     "title": "Investment Portfolio",
@@ -1093,14 +1158,34 @@
   "pwa": {
     "installPrompt": {
       "title": "Install WealthJourney",
-      "description": "Add to your home screen for the best experience",
+      "description": "Get the full app experience with faster loading, offline access, and home screen convenience.",
       "installButton": "Install",
       "dismissButton": "Not now",
+      "dontShowAgain": "Don't show again",
+      "maybeLater": "Maybe Later",
+      "howToInstall": "How to Install",
       "benefits": {
         "offlineAccess": "Works offline",
         "homeScreen": "Quick access from home screen",
-        "nativeExperience": "Native app-like experience"
+        "nativeExperience": "Native app-like experience",
+        "fast": "Fast",
+        "offline": "Offline",
+        "homeScreenShort": "Home Screen"
       }
+    },
+    "installSteps": {
+      "iosTapShare": "Tap the Share button in Safari",
+      "iosScrollDown": "Scroll down and tap",
+      "iosAddToHomeScreen": "Add to Home Screen",
+      "iosTapAdd": "Tap",
+      "iosAdd": "Add",
+      "iosToConfirm": "to confirm",
+      "androidDescription": "You can install WealthJourney directly to your home screen for a native app experience.",
+      "androidInstallButton": "Install WealthJourney",
+      "androidOr": "Or tap the menu (⋮) and select \"Add to Home screen\"",
+      "genericInstallTitle": "To install WealthJourney as an app:",
+      "genericStep1": "Open this website in Chrome or Safari",
+      "genericStep2": "Use the browser menu to add to home screen"
     }
   },
   "currency": {
@@ -1111,10 +1196,24 @@
   },
   "search": {
     "globalSearch": {
-      "placeholder": "Search...",
+      "placeholder": "Search wallets, transactions, investments...",
       "shortcut": "Cmd+K",
       "noResults": "No results found",
-      "recentSearches": "Recent Searches"
+      "noResultsHint": "Try different keywords or check for typos",
+      "startSearching": "Start searching",
+      "startSearchingHint": "Search for wallets, transactions, and investments",
+      "recentSearches": "Recent Searches",
+      "clearRecentSearches": "Clear recent searches",
+      "results": "Results ({count})",
+      "suggestions": "Suggestions",
+      "toClose": "to close",
+      "navigate": "navigate",
+      "select": "select",
+      "searchBy": "Search by",
+      "searchByHint": "name, amount, or date",
+      "basicWallet": "Basic Wallet",
+      "investmentWallet": "Investment Wallet",
+      "shares": "{count} shares"
     }
   },
   "validation": {
@@ -1159,8 +1258,159 @@
     "steps": {
       "upload": "Upload",
       "selectWallet": "Select Wallet",
+      "bankTemplate": "Bank Template",
+      "columnMapping": "Column Mapping",
       "review": "Review",
       "complete": "Complete"
+    },
+    "duplicate": {
+      "reviewTitle": "Duplicate Review ({current} of {total})",
+      "matchPercent": "{confidence}% Match",
+      "strongMatch": "Strong Match",
+      "likelyMatch": "Likely Match",
+      "possibleMatch": "Possible Match",
+      "whyMatched": "Why matched:",
+      "importedTransaction": "Imported Transaction",
+      "existingTransaction": "Existing Transaction",
+      "amount": "Amount:",
+      "date": "Date:",
+      "description": "Description:",
+      "reference": "Reference:",
+      "category": "Category:",
+      "categoryNumber": "Category {id}",
+      "noCategory": "(not set)",
+      "noValue": "(none)",
+      "keyboardShortcuts": "Keyboard shortcuts: M = Merge, K = Keep Both, S = Skip, N = Not a Duplicate, ← → = Navigate, Esc = Cancel",
+      "merge": "Merge",
+      "keepBoth": "Keep Both",
+      "skipImport": "Skip Import",
+      "keep": "Keep",
+      "skip": "Skip",
+      "notDuplicate": "Not a Duplicate",
+      "notDup": "Not Dup",
+      "previous": "← Previous",
+      "next": "Next →",
+      "potentialDuplicates": "{count} Potential Duplicate",
+      "potentialDuplicatesPlural": "{count} Potential Duplicates",
+      "reviewToAvoid": "Review to avoid duplicate entries",
+      "matchOf": "Match {current} of {total}",
+      "new": "NEW",
+      "existing": "EXISTING",
+      "noCategory2": "No category",
+      "autoMergeHigh": "Auto-Merge All High Confidence ({count})"
+    },
+    "fileUpload": {
+      "title": "Upload Bank Statement",
+      "subtitle": "Import transactions automatically from your Excel or PDF statement",
+      "excelFormat": "Excel (.xlsx, .xls)",
+      "pdfFormat": "PDF",
+      "dropHere": "Drop your file here",
+      "dragAndDrop": "Drag & drop your file, or",
+      "browse": "browse",
+      "maxSize": "Maximum size: 10MB (Excel) • 20MB (PDF)",
+      "readyToUpload": "Ready to upload",
+      "clear": "Clear",
+      "uploading": "Uploading...",
+      "continue": "Continue",
+      "invalidFileType": "Invalid file type. Please upload Excel (.xlsx, .xls) or PDF file.",
+      "fileTooLarge": "File size exceeds maximum {maxSizeMB}MB limit.",
+      "fileEmpty": "File is empty."
+    },
+    "bankTemplate": {
+      "selectBankInstructions": "Select your bank to automatically configure column mapping.",
+      "customFormatHint": "Or choose \"Custom Format\" to manually map columns.",
+      "yourTemplates": "Your Templates",
+      "bankTemplates": "Bank Templates",
+      "customFormat": "Custom Format",
+      "customFormatDesc": "Manually configure column mapping for any bank",
+      "noTemplatesAvailable": "No bank templates available yet.",
+      "useCustomFormat": "Use \"Custom Format\" below to proceed with your import.",
+      "loadError": "Failed to load bank templates.",
+      "retry": "Retry",
+      "back": "Back",
+      "nextPreview": "Next: Preview"
+    },
+    "walletSelection": {
+      "title": "Select Destination Wallet",
+      "subtitle": "Choose the wallet where your imported transactions will be added. The wallet balance will be updated automatically.",
+      "walletsAvailable": "{count} wallet available",
+      "walletsAvailablePlural": "{count} wallets available",
+      "loadingWallets": "Loading your wallets...",
+      "loadingMoment": "This will just take a moment",
+      "failedToLoad": "Failed to Load Wallets",
+      "unexpectedError": "An unexpected error occurred. Please try again.",
+      "noWalletsFound": "No Wallets Found",
+      "noWalletsDesc": "You need to create at least one wallet before importing transactions. Please go to the Wallets page to create your first wallet.",
+      "back": "Back",
+      "continue": "Continue",
+      "selected": "Selected",
+      "notSelected": "Not selected"
+    },
+    "columnMapping": {
+      "instructions": "Map CSV columns to transaction fields. Required fields are marked with *.",
+      "autoDetected": "We've auto-detected columns based on header names. Please verify the mapping.",
+      "filePreview": "File Preview (First 3 rows)",
+      "columnMappingTitle": "Column Mapping",
+      "dateColumn": "Date Column",
+      "amountColumn": "Amount Column",
+      "descriptionColumn": "Description Column",
+      "typeColumn": "Type Column (Optional)",
+      "categoryColumn": "Category Column (Optional)",
+      "referenceColumn": "Reference Column (Optional)",
+      "dateFormat": "Date Format",
+      "currency": "Currency",
+      "noneSkip": "None (Skip)",
+      "columnLabel": "Column {n}: {name}",
+      "saveAsTemplate": "Save as template for reuse",
+      "saveAsTemplateDesc": "Save this column mapping as a template to quickly import similar files in the future.",
+      "templateName": "Template Name",
+      "templateNamePlaceholder": "e.g., My Bank Credit Card Statement",
+      "savingTemplate": "Saving Template...",
+      "nextReview": "Next: Review Transactions",
+      "back": "Back",
+      "validateRequired": "Please map at least Date, Amount, and Description columns",
+      "validateTemplateName": "Please enter a template name",
+      "excelAutoDetected": "{ext} files are parsed automatically by the backend. Column mapping is not needed.",
+      "failedSaveTemplate": "Failed to save template. Continuing with import..."
+    },
+    "success": {
+      "title": "Import Successful!",
+      "transactionsImported": "{count} transaction imported",
+      "transactionsImportedPlural": "{count} transactions imported",
+      "skipped": "({count} skipped)",
+      "income": "Income",
+      "expenses": "Expenses",
+      "netChange": "Net Change",
+      "newBalance": "New Balance",
+      "duplicatesSkipped": "{count} duplicate skipped",
+      "duplicatesSkippedPlural": "{count} duplicates skipped",
+      "duplicatesMerged": "{count} duplicate merged",
+      "duplicatesMergedPlural": "{count} duplicates merged",
+      "undoNotice": "You can undo this import within 24 hours",
+      "undoNoticeDesc": "All imported transactions will be deleted and wallet balance will be restored.",
+      "undoImport": "Undo Import",
+      "done": "Done",
+      "undoTitle": "Undo Import?",
+      "undoDesc": "This will delete all {count} imported transactions and restore your wallet balance.",
+      "undoCannotReverse": "This action cannot be reversed. Are you sure?",
+      "cancel": "Cancel",
+      "confirmUndo": "Yes, Undo Import"
+    },
+    "errorSection": {
+      "needFixes": "{count} Need Fixes",
+      "mustFix": "Must fix before import",
+      "row": "Row {n}",
+      "fix": "Fix",
+      "cancel": "Cancel",
+      "skip": "Skip",
+      "date": "Date:",
+      "amount": "Amount:",
+      "description": "Description:",
+      "saveChanges": "Save Changes",
+      "skipAll": "Skip All {count}"
+    },
+    "stepProgress": {
+      "stepOf": "Step {current} of {total}"
     }
   }
 }

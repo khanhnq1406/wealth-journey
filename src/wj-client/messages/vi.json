@@ -255,9 +255,70 @@
     },
     "comparison": {
       "sectionTitle": "Tại sao chọn WealthJourney?",
+      "title": "Thôi Dùng Nhiều Ứng Dụng",
+      "description": "Hầu hết nhà đầu tư dùng Coinbase cho crypto, Robinhood cho cổ phiếu, bảng tính cho vàng và ứng dụng khác cho ngân sách. WealthJourney cung cấp tất cả trong một nền tảng thống nhất với các công cụ mạnh mẽ.",
       "feature": "Tính năng",
       "wealthJourney": "WealthJourney",
-      "others": "Khác"
+      "others": "Khác",
+      "otherApps": "Ứng dụng khác",
+      "items": {
+        "allInOne": {
+          "feature": "Nền tảng tích hợp",
+          "wj": "Cổ phiếu, ETF, Crypto, Vàng, Bạc + Ngân sách trong MỘT ứng dụng",
+          "others": "Cần 3-5 ứng dụng khác nhau"
+        },
+        "assetCoverage": {
+          "feature": "Phạm vi tài sản đầu tư",
+          "wj": "Hơn 6 loại tài sản (cổ phiếu, ETF, quỹ, crypto, vàng, bạc)",
+          "others": "Chỉ cổ phiếu hoặc ứng dụng riêng lẻ"
+        },
+        "goldSilver": {
+          "feature": "Hỗ trợ vàng & bạc",
+          "wj": "Hỗ trợ gốc với hơn 10 loại vàng SJC",
+          "others": "Không có ở đâu khác"
+        },
+        "marketData": {
+          "feature": "Tích hợp dữ liệu thị trường",
+          "wj": "Yahoo Finance với cập nhật thời gian thực",
+          "others": "Nhập thủ công hoặc trả phí"
+        },
+        "multiCurrency": {
+          "feature": "Hỗ trợ đa tiền tệ",
+          "wj": "Hơn 12 tiền tệ với chuyển đổi tỷ giá",
+          "others": "Hạn chế hoặc chỉ dành cho gói cao cấp"
+        },
+        "export": {
+          "feature": "Xuất & Báo cáo",
+          "wj": "CSV, PDF, Excel - không giới hạn",
+          "others": "Hạn chế xuất hoặc trả phí"
+        },
+        "pricing": {
+          "feature": "Giá cả",
+          "wj": "Miễn phí mãi mãi - không có chi phí ẩn",
+          "others": "Freemium hoặc đăng ký"
+        }
+      }
+    },
+    "testimonials": {
+      "sectionTitle": "Người Dùng Nói Gì",
+      "sectionSubtitle": "Cùng hàng nghìn người dùng tin tưởng WealthJourney cho nhu cầu quản lý tài chính",
+      "items": {
+        "user1": {
+          "name": "Nguyễn Văn A",
+          "role": "Nhà đầu tư",
+          "content": "WealthJourney đã thay đổi cách tôi theo dõi danh mục đầu tư. Tính năng theo dõi giá vốn FIFO và tính toán PNL theo thời gian thực giúp tôi đưa ra quyết định sáng suốt về cổ phiếu."
+        },
+        "user2": {
+          "name": "Trần Thị B",
+          "role": "Nhà đầu tư vàng",
+          "content": "Quản lý đầu tư vàng chưa bao giờ dễ dàng hơn. Tôi thích cách ứng dụng tự động chuyển đổi giữa lượng vàng Việt Nam và ounce quốc tế. Tích hợp giá vang.today thực sự tiện lợi!"
+        },
+        "user3": {
+          "name": "Lê Văn C",
+          "role": "Người tiết kiệm",
+          "content": "Các tính năng theo dõi ngân sách và phân loại giúp tôi kiểm soát chi tiêu. Tôi có thể dễ dàng thấy tiền của mình đi đâu mỗi tháng và điều chỉnh thói quen. Rất khuyên dùng!"
+        }
+      }
     },
     "cta": {
       "title": "Sẵn sàng bắt đầu hành trình tài chính?",
@@ -293,6 +354,7 @@
     }
   },
   "auth": {
+    "tagline": "Người Bạn Đồng Hành Tin Cậy trên Con Đường Tự Do Tài Chính",
     "login": {
       "title": "Chào mừng trở lại",
       "subtitle": "Đăng nhập để tiếp tục hành trình tài chính",
@@ -500,7 +562,10 @@
     "selectWallet": "Chọn ví",
     "deselectWallet": "Bỏ chọn ví",
     "transferFrom": "Chuyển từ {name}",
-    "deleteWallet": "Xóa {name}"
+    "deleteWallet": "Xóa {name}",
+    "walletId": "Mã ví",
+    "tapEyeReveal": "Nhấn biểu tượng mắt để hiện",
+    "totalValue": "Tổng giá trị"
   },
   "investment": {
     "title": "Danh mục đầu tư",
@@ -1093,14 +1158,34 @@
   "pwa": {
     "installPrompt": {
       "title": "Cài đặt WealthJourney",
-      "description": "Thêm vào màn hình chính để có trải nghiệm tốt nhất",
+      "description": "Trải nghiệm đầy đủ với tải nhanh hơn, truy cập ngoại tuyến và tiện lợi từ màn hình chính.",
       "installButton": "Cài đặt",
       "dismissButton": "Để sau",
+      "dontShowAgain": "Không hiện lại",
+      "maybeLater": "Để sau",
+      "howToInstall": "Cách cài đặt",
       "benefits": {
         "offlineAccess": "Hoạt động ngoại tuyến",
         "homeScreen": "Truy cập nhanh từ màn hình chính",
-        "nativeExperience": "Trải nghiệm như ứng dụng gốc"
+        "nativeExperience": "Trải nghiệm như ứng dụng gốc",
+        "fast": "Nhanh",
+        "offline": "Ngoại tuyến",
+        "homeScreenShort": "Màn hình chính"
       }
+    },
+    "installSteps": {
+      "iosTapShare": "Nhấn nút Chia sẻ trong Safari",
+      "iosScrollDown": "Cuộn xuống và nhấn",
+      "iosAddToHomeScreen": "Thêm vào màn hình chính",
+      "iosTapAdd": "Nhấn",
+      "iosAdd": "Thêm",
+      "iosToConfirm": "để xác nhận",
+      "androidDescription": "Bạn có thể cài đặt WealthJourney trực tiếp vào màn hình chính để có trải nghiệm ứng dụng gốc.",
+      "androidInstallButton": "Cài đặt WealthJourney",
+      "androidOr": "Hoặc nhấn menu (⋮) và chọn \"Thêm vào màn hình chính\"",
+      "genericInstallTitle": "Để cài đặt WealthJourney như ứng dụng:",
+      "genericStep1": "Mở trang web này trong Chrome hoặc Safari",
+      "genericStep2": "Dùng menu trình duyệt để thêm vào màn hình chính"
     }
   },
   "currency": {
@@ -1111,10 +1196,24 @@
   },
   "search": {
     "globalSearch": {
-      "placeholder": "Tìm kiếm...",
+      "placeholder": "Tìm kiếm ví, giao dịch, đầu tư...",
       "shortcut": "Cmd+K",
       "noResults": "Không tìm thấy kết quả",
-      "recentSearches": "Tìm kiếm gần đây"
+      "noResultsHint": "Thử từ khóa khác hoặc kiểm tra lỗi chính tả",
+      "startSearching": "Bắt đầu tìm kiếm",
+      "startSearchingHint": "Tìm kiếm ví, giao dịch và đầu tư",
+      "recentSearches": "Tìm kiếm gần đây",
+      "clearRecentSearches": "Xóa lịch sử tìm kiếm",
+      "results": "Kết quả ({count})",
+      "suggestions": "Gợi ý",
+      "toClose": "để đóng",
+      "navigate": "điều hướng",
+      "select": "chọn",
+      "searchBy": "Tìm theo",
+      "searchByHint": "tên, số tiền hoặc ngày",
+      "basicWallet": "Ví cơ bản",
+      "investmentWallet": "Ví đầu tư",
+      "shares": "{count} cổ phiếu"
     }
   },
   "validation": {
@@ -1159,8 +1258,159 @@
     "steps": {
       "upload": "Tải lên",
       "selectWallet": "Chọn ví",
+      "bankTemplate": "Mẫu ngân hàng",
+      "columnMapping": "Ánh xạ cột",
       "review": "Xem xét",
       "complete": "Hoàn thành"
+    },
+    "duplicate": {
+      "reviewTitle": "Xem xét trùng lặp ({current}/{total})",
+      "matchPercent": "{confidence}% khớp",
+      "strongMatch": "Khớp mạnh",
+      "likelyMatch": "Có thể khớp",
+      "possibleMatch": "Khớp yếu",
+      "whyMatched": "Lý do khớp:",
+      "importedTransaction": "Giao dịch nhập",
+      "existingTransaction": "Giao dịch hiện có",
+      "amount": "Số tiền:",
+      "date": "Ngày:",
+      "description": "Mô tả:",
+      "reference": "Tham chiếu:",
+      "category": "Danh mục:",
+      "categoryNumber": "Danh mục {id}",
+      "noCategory": "(chưa đặt)",
+      "noValue": "(không có)",
+      "keyboardShortcuts": "Phím tắt: M = Gộp, K = Giữ cả hai, S = Bỏ qua, N = Không phải trùng lặp, ← → = Điều hướng, Esc = Hủy",
+      "merge": "Gộp",
+      "keepBoth": "Giữ cả hai",
+      "skipImport": "Bỏ qua nhập",
+      "keep": "Giữ",
+      "skip": "Bỏ qua",
+      "notDuplicate": "Không phải trùng lặp",
+      "notDup": "Không Trùng",
+      "previous": "← Trước",
+      "next": "Tiếp →",
+      "potentialDuplicates": "{count} giao dịch trùng lặp tiềm năng",
+      "potentialDuplicatesPlural": "{count} giao dịch trùng lặp tiềm năng",
+      "reviewToAvoid": "Xem xét để tránh nhập trùng",
+      "matchOf": "Khớp {current}/{total}",
+      "new": "MỚI",
+      "existing": "HIỆN CÓ",
+      "noCategory2": "Không có danh mục",
+      "autoMergeHigh": "Tự động gộp tất cả độ tin cậy cao ({count})"
+    },
+    "fileUpload": {
+      "title": "Tải lên sao kê ngân hàng",
+      "subtitle": "Nhập giao dịch tự động từ sao kê Excel hoặc PDF của bạn",
+      "excelFormat": "Excel (.xlsx, .xls)",
+      "pdfFormat": "PDF",
+      "dropHere": "Thả tệp của bạn vào đây",
+      "dragAndDrop": "Kéo & thả tệp, hoặc",
+      "browse": "duyệt",
+      "maxSize": "Kích thước tối đa: 10MB (Excel) • 20MB (PDF)",
+      "readyToUpload": "Sẵn sàng tải lên",
+      "clear": "Xóa",
+      "uploading": "Đang tải lên...",
+      "continue": "Tiếp tục",
+      "invalidFileType": "Loại tệp không hợp lệ. Vui lòng tải lên tệp Excel (.xlsx, .xls) hoặc PDF.",
+      "fileTooLarge": "Kích thước tệp vượt quá giới hạn {maxSizeMB}MB.",
+      "fileEmpty": "Tệp trống."
+    },
+    "bankTemplate": {
+      "selectBankInstructions": "Chọn ngân hàng để tự động cấu hình ánh xạ cột.",
+      "customFormatHint": "Hoặc chọn \"Định dạng tùy chỉnh\" để ánh xạ cột thủ công.",
+      "yourTemplates": "Mẫu của bạn",
+      "bankTemplates": "Mẫu ngân hàng",
+      "customFormat": "Định dạng tùy chỉnh",
+      "customFormatDesc": "Cấu hình thủ công ánh xạ cột cho bất kỳ ngân hàng nào",
+      "noTemplatesAvailable": "Chưa có mẫu ngân hàng nào.",
+      "useCustomFormat": "Sử dụng \"Định dạng tùy chỉnh\" bên dưới để tiếp tục nhập.",
+      "loadError": "Không thể tải mẫu ngân hàng.",
+      "retry": "Thử lại",
+      "back": "Quay lại",
+      "nextPreview": "Tiếp theo: Xem trước"
+    },
+    "walletSelection": {
+      "title": "Chọn ví đích",
+      "subtitle": "Chọn ví mà các giao dịch nhập sẽ được thêm vào. Số dư ví sẽ được cập nhật tự động.",
+      "walletsAvailable": "{count} ví khả dụng",
+      "walletsAvailablePlural": "{count} ví khả dụng",
+      "loadingWallets": "Đang tải ví của bạn...",
+      "loadingMoment": "Chỉ mất một chút",
+      "failedToLoad": "Không thể tải ví",
+      "unexpectedError": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.",
+      "noWalletsFound": "Không tìm thấy ví",
+      "noWalletsDesc": "Bạn cần tạo ít nhất một ví trước khi nhập giao dịch. Vui lòng đến trang Ví để tạo ví đầu tiên.",
+      "back": "Quay lại",
+      "continue": "Tiếp tục",
+      "selected": "Đã chọn",
+      "notSelected": "Chưa chọn"
+    },
+    "columnMapping": {
+      "instructions": "Ánh xạ các cột CSV sang các trường giao dịch. Các trường bắt buộc được đánh dấu *.",
+      "autoDetected": "Chúng tôi đã tự động phát hiện các cột dựa trên tên tiêu đề. Vui lòng xác minh ánh xạ.",
+      "filePreview": "Xem trước tệp (3 hàng đầu tiên)",
+      "columnMappingTitle": "Ánh xạ cột",
+      "dateColumn": "Cột ngày",
+      "amountColumn": "Cột số tiền",
+      "descriptionColumn": "Cột mô tả",
+      "typeColumn": "Cột loại (Tùy chọn)",
+      "categoryColumn": "Cột danh mục (Tùy chọn)",
+      "referenceColumn": "Cột tham chiếu (Tùy chọn)",
+      "dateFormat": "Định dạng ngày",
+      "currency": "Tiền tệ",
+      "noneSkip": "Không có (Bỏ qua)",
+      "columnLabel": "Cột {n}: {name}",
+      "saveAsTemplate": "Lưu làm mẫu để tái sử dụng",
+      "saveAsTemplateDesc": "Lưu ánh xạ cột này làm mẫu để nhanh chóng nhập các tệp tương tự trong tương lai.",
+      "templateName": "Tên mẫu",
+      "templateNamePlaceholder": "VD: Sao kê thẻ tín dụng ngân hàng",
+      "savingTemplate": "Đang lưu mẫu...",
+      "nextReview": "Tiếp theo: Xem lại giao dịch",
+      "back": "Quay lại",
+      "validateRequired": "Vui lòng ánh xạ ít nhất các cột Ngày, Số tiền và Mô tả",
+      "validateTemplateName": "Vui lòng nhập tên mẫu",
+      "excelAutoDetected": "Tệp {ext} được phân tích tự động bởi backend. Không cần ánh xạ cột.",
+      "failedSaveTemplate": "Không thể lưu mẫu. Tiếp tục nhập..."
+    },
+    "success": {
+      "title": "Nhập thành công!",
+      "transactionsImported": "{count} giao dịch đã nhập",
+      "transactionsImportedPlural": "{count} giao dịch đã nhập",
+      "skipped": "({count} đã bỏ qua)",
+      "income": "Thu nhập",
+      "expenses": "Chi tiêu",
+      "netChange": "Thay đổi ròng",
+      "newBalance": "Số dư mới",
+      "duplicatesSkipped": "{count} trùng lặp đã bỏ qua",
+      "duplicatesSkippedPlural": "{count} trùng lặp đã bỏ qua",
+      "duplicatesMerged": "{count} trùng lặp đã gộp",
+      "duplicatesMergedPlural": "{count} trùng lặp đã gộp",
+      "undoNotice": "Bạn có thể hoàn tác lần nhập này trong vòng 24 giờ",
+      "undoNoticeDesc": "Tất cả giao dịch đã nhập sẽ bị xóa và số dư ví sẽ được khôi phục.",
+      "undoImport": "Hoàn tác nhập",
+      "done": "Xong",
+      "undoTitle": "Hoàn tác nhập?",
+      "undoDesc": "Thao tác này sẽ xóa tất cả {count} giao dịch đã nhập và khôi phục số dư ví của bạn.",
+      "undoCannotReverse": "Hành động này không thể hoàn tác. Bạn có chắc không?",
+      "cancel": "Hủy",
+      "confirmUndo": "Có, Hoàn tác nhập"
+    },
+    "errorSection": {
+      "needFixes": "{count} Cần sửa",
+      "mustFix": "Phải sửa trước khi nhập",
+      "row": "Hàng {n}",
+      "fix": "Sửa",
+      "cancel": "Hủy",
+      "skip": "Bỏ qua",
+      "date": "Ngày:",
+      "amount": "Số tiền:",
+      "description": "Mô tả:",
+      "saveChanges": "Lưu thay đổi",
+      "skipAll": "Bỏ qua tất cả {count}"
+    },
+    "stepProgress": {
+      "stepOf": "Bước {current} trên {total}"
     }
   }
 }

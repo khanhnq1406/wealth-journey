@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 import { ParsedTransaction, ValidationError } from "@/gen/protobuf/v1/import";
 import { FormInput } from "@/components/forms/FormInput";
 import { Button } from "@/components/Button";
@@ -23,6 +24,7 @@ export const ErrorSection = React.memo(function ErrorSection({
 }: ErrorSectionProps) {
   const [expanded, setExpanded] = useState(true); // Auto-expand errors
   const [editingRow, setEditingRow] = useState<number | null>(null);
+  const t = useTranslations("import.errorSection");
 
   if (transactions.length === 0) {
     return null;
@@ -43,10 +45,10 @@ export const ErrorSection = React.memo(function ErrorSection({
           <span className="text-2xl">⚠️</span>
           <div className="text-left">
             <h3 className="font-semibold text-base text-danger-700 dark:text-danger-300">
-              {transactions.length} Need Fixes
+              {t("needFixes", { count: transactions.length })}
             </h3>
             <p className="text-sm text-danger-600 dark:text-danger-400">
-              Must fix before import
+              {t("mustFix")}
             </p>
           </div>
         </div>
@@ -71,7 +73,7 @@ export const ErrorSection = React.memo(function ErrorSection({
               {/* Row Header */}
               <div className="flex justify-between items-start mb-3">
                 <h4 className="font-semibold text-sm text-neutral-900 dark:text-dark-text">
-                  Row {tx.rowNumber}
+                  {t("row", { n: tx.rowNumber })}
                 </h4>
                 <div className="flex gap-2">
                   <button
@@ -80,13 +82,13 @@ export const ErrorSection = React.memo(function ErrorSection({
                     }
                     className="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
                   >
-                    {editingRow === tx.rowNumber ? "Cancel" : "Fix"}
+                    {editingRow === tx.rowNumber ? t("cancel") : t("fix")}
                   </button>
                   <button
                     onClick={() => onSkip(tx.rowNumber)}
                     className="text-xs text-neutral-600 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 font-medium"
                   >
-                    Skip
+                    {t("skip")}
                   </button>
                 </div>
               </div>
@@ -110,7 +112,7 @@ export const ErrorSection = React.memo(function ErrorSection({
               {editingRow === tx.rowNumber ? (
                 <div className="space-y-3 pt-3 border-t border-danger-200 dark:border-danger-800">
                   <FormInput
-                    label="Date"
+                    label={t("date").replace(":", "")}
                     type="text"
                     value={formatDate(tx.date)}
                     onChange={(e) =>
@@ -123,7 +125,7 @@ export const ErrorSection = React.memo(function ErrorSection({
                     size="sm"
                   />
                   <FormInput
-                    label="Amount"
+                    label={t("amount").replace(":", "")}
                     type="text"
                     inputMode="decimal"
                     value={formatAmount(tx.amount?.amount || 0, tx.amount?.currency || currency)}
@@ -137,7 +139,7 @@ export const ErrorSection = React.memo(function ErrorSection({
                     size="sm"
                   />
                   <FormInput
-                    label="Description"
+                    label={t("description").replace(":", "")}
                     type="text"
                     value={tx.description || ""}
                     onChange={(e) =>
@@ -154,19 +156,19 @@ export const ErrorSection = React.memo(function ErrorSection({
                     fullWidth
                     size="sm"
                   >
-                    Save Changes
+                    {t("saveChanges")}
                   </Button>
                 </div>
               ) : (
                 <div className="text-sm space-y-1 text-neutral-600 dark:text-dark-text-secondary">
                   <p>
-                    <strong>Date:</strong> {formatDate(tx.date)}
+                    <strong>{t("date")}</strong> {formatDate(tx.date)}
                   </p>
                   <p>
-                    <strong>Amount:</strong> {formatAmount(tx.amount?.amount || 0, tx.amount?.currency || currency)}
+                    <strong>{t("amount")}</strong> {formatAmount(tx.amount?.amount || 0, tx.amount?.currency || currency)}
                   </p>
                   <p>
-                    <strong>Description:</strong> {tx.description}
+                    <strong>{t("description")}</strong> {tx.description}
                   </p>
                 </div>
               )}
@@ -181,7 +183,7 @@ export const ErrorSection = React.memo(function ErrorSection({
               fullWidth
               size="sm"
             >
-              Skip All {transactions.length}
+              {t("skipAll", { count: transactions.length })}
             </Button>
           </div>
         </div>

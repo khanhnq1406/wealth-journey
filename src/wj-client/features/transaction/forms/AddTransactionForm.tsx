@@ -194,12 +194,12 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
         options={[
           {
             value: "income",
-            label: "Income",
+            label: t("income"),
             className: "bg-green-500 text-white",
           },
           {
             value: "expense",
-            label: "Expense",
+            label: t("expense"),
             className: "bg-red-500 text-white",
           },
         ]}
@@ -208,7 +208,7 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
       <FormNumberInput
         name="amount"
         control={control}
-        label="Amount"
+        label={t("amount")}
         suffix={currency}
         required
       />
@@ -256,7 +256,7 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
           loading={createTransaction.isPending}
           htmlType="submit"
         >
-          Add Transaction
+          {t("addTransaction")}
         </Button>
       </div>
     </form>

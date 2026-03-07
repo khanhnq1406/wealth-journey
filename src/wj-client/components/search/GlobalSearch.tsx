@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
 import { useQueryListWallets, useQueryListTransactions, useQueryListInvestments } from "@/utils/generated/hooks";
@@ -59,6 +60,7 @@ interface GlobalSearchProps {
  * ```
  */
 export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
+  const t = useTranslations("search.globalSearch");
   const router = useRouter();
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -175,7 +177,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           id: `wallet-${wallet.id}`,
           type: "wallet",
           title: wallet.walletName,
-          subtitle: wallet.type === 0 ? "Basic Wallet" : "Investment Wallet",
+          subtitle: wallet.type === 0 ? t("basicWallet") : t("investmentWallet"),
           amount: formatCurrency(wallet.balance, wallet.currency),
           url: `/dashboard/wallets`,
           icon: (
@@ -224,7 +226,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           type: "investment",
           title: investment.symbol || "Investment",
           subtitle: investment.name || "",
-          amount: `${investment.quantity?.toLocaleString()} shares`,
+          amount: t("shares", { count: investment.quantity?.toLocaleString() ?? 0 }),
           url: `/dashboard/portfolio`,
           icon: (
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -343,7 +345,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search wallets, transactions, investments..."
+              placeholder={t("placeholder")}
               className={cn(
                 "w-full bg-transparent border-none outline-none",
                 "text-neutral-900 dark:text-dark-text",
@@ -369,7 +371,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
 
           <div className="hidden sm:flex items-center gap-1 text-xs text-neutral-400 dark:text-dark-text-tertiary">
             <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">ESC</kbd>
-            <span>to close</span>
+            <span>{t("toClose")}</span>
           </div>
         </div>
 
@@ -390,9 +392,9 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
-              <p className="text-neutral-600 dark:text-dark-text-secondary font-medium">No results found</p>
+              <p className="text-neutral-600 dark:text-dark-text-secondary font-medium">{t("noResults")}</p>
               <p className="text-sm text-neutral-400 dark:text-dark-text-tertiary mt-1">
-                Try different keywords or check for typos
+                {t("noResultsHint")}
               </p>
             </div>
           )}
@@ -412,19 +414,19 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                   d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                 />
               </svg>
-              <p className="text-neutral-600 dark:text-dark-text-secondary font-medium">Start searching</p>
+              <p className="text-neutral-600 dark:text-dark-text-secondary font-medium">{t("startSearching")}</p>
               <p className="text-sm text-neutral-400 dark:text-dark-text-tertiary mt-1">
-                Search for wallets, transactions, and investments
+                {t("startSearchingHint")}
               </p>
               <div className="flex items-center justify-center gap-2 mt-4 text-xs text-neutral-400 dark:text-dark-text-tertiary">
                 <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">
                   ↑↓
                 </kbd>
-                <span>to navigate</span>
+                <span>{t("navigate")}</span>
                 <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">
                   Enter
                 </kbd>
-                <span>to select</span>
+                <span>{t("select")}</span>
               </div>
             </div>
           )}
@@ -433,7 +435,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           {!searchQuery.trim() && recentSearches.length > 0 && (
             <div className="p-2">
               <div className="px-3 py-2 text-xs font-semibold text-neutral-500 dark:text-dark-text-tertiary uppercase tracking-wider">
-                Recent Searches
+                {t("recentSearches")}
               </div>
               <div className="space-y-1">
                 {recentSearches.map((search, index) => (
@@ -465,7 +467,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
-                  Clear recent searches
+                  {t("clearRecentSearches")}
                 </button>
               </div>
             </div>
@@ -475,7 +477,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           {results.length > 0 && (
             <div className="p-2">
               <div className="px-3 py-2 text-xs font-semibold text-neutral-500 dark:text-dark-text-tertiary uppercase tracking-wider">
-                Results ({results.length})
+                {t("results", { count: results.length })}
               </div>
               <div className="space-y-1">
                 {results.map((result, index) => (
@@ -537,7 +539,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           {suggestions.length > 0 && results.length === 0 && (
             <div className="p-2">
               <div className="px-3 py-2 text-xs font-semibold text-neutral-500 dark:text-dark-text-tertiary uppercase tracking-wider">
-                Suggestions
+                {t("suggestions")}
               </div>
               <div className="space-y-1">
                 {suggestions.map((suggestion, index) => (
@@ -564,20 +566,20 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
         {/* Footer */}
         <div className="px-4 py-2 border-t border-neutral-200 dark:border-dark-border flex items-center justify-between text-xs text-neutral-400 dark:text-dark-text-tertiary">
           <div className="flex items-center gap-3">
-            <span className="hidden sm:inline">Search by</span>
+            <span className="hidden sm:inline">{t("searchBy")}</span>
             <div className="flex items-center gap-1">
-              <span className="hidden sm:inline">name, amount, or date</span>
+              <span className="hidden sm:inline">{t("searchByHint")}</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <kbd className="hidden sm:inline px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">
               ↑↓
             </kbd>
-            <span>navigate</span>
+            <span>{t("navigate")}</span>
             <kbd className="hidden sm:inline px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">
               Enter
             </kbd>
-            <span>select</span>
+            <span>{t("select")}</span>
           </div>
         </div>
       </div>
