@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/Button";
@@ -29,7 +30,7 @@ import {
   calculateTransactionCost,
   formatCurrency,
 } from "@/lib/utils/units";
-import { getInvestmentUnitLabelFull } from "@/app/dashboard/portfolio/helpers";
+import { getInvestmentUnitLabelFull } from "@/app/[locale]/dashboard/portfolio/helpers";
 import {
   AddTransactionFormInput,
   addTransactionSchema,
@@ -67,23 +68,6 @@ interface AddInvestmentTransactionFormProps {
   onSuccess?: () => void;
 }
 
-const transactionTypeOptions: SelectOption[] = [
-  {
-    value: String(InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_BUY),
-    label: "Buy",
-  },
-  {
-    value: String(InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_SELL),
-    label: "Sell",
-  },
-  {
-    value: String(
-      InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_DIVIDEND,
-    ),
-    label: "Dividend",
-  },
-];
-
 /**
  * Self-contained form component for adding investment transactions.
  * Follows the established pattern of other form components in the codebase.
@@ -99,15 +83,37 @@ export function AddInvestmentTransactionForm({
   symbol,
   onSuccess,
 }: AddInvestmentTransactionFormProps) {
+  const t = useTranslations("investment");
+  const tCommon = useTranslations("common");
   const queryClient = useQueryClient();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
 
+  const transactionTypeOptions: SelectOption[] = useMemo(
+    () => [
+      {
+        value: String(InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_BUY),
+        label: t("transaction.buy"),
+      },
+      {
+        value: String(InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_SELL),
+        label: t("transaction.sell"),
+      },
+      {
+        value: String(
+          InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_DIVIDEND,
+        ),
+        label: t("transaction.dividend"),
+      },
+    ],
+    [t],
+  );
+
   const addTransactionMutation = useMutationAddInvestmentTransaction({
     onSuccess: (data) => {
-      setSuccessMessage(data.message || "Transaction added successfully");
+      setSuccessMessage(data.message || t("transaction.transactionAddedMessage"));
       setShowSuccess(true);
       setErrorMessage("");
       // Invalidate investment queries
@@ -123,7 +129,7 @@ export function AddInvestmentTransactionForm({
     },
     onError: (error: any) => {
       setErrorMessage(
-        error.message || "Failed to add transaction. Please try again",
+        error.message || t("transaction.failedToAdd"),
       );
     },
   });
@@ -369,7 +375,7 @@ export function AddInvestmentTransactionForm({
         const fieldName = issue.path[0] as keyof AddTransactionFormInput;
         setError(fieldName, { message: issue.message });
       });
-      setErrorMessage("Please fix the validation errors");
+      setErrorMessage(t("transaction.fixValidationErrors"));
       return;
     }
 
@@ -456,10 +462,10 @@ export function AddInvestmentTransactionForm({
     return (
       <div className="text-center py-8 flex flex-col gap-2">
         <SuccessAnimation />
-        <h3 className="text-lg font-semibold">Transaction Added!</h3>
+        <h3 className="text-lg font-semibold">{t("transaction.transactionAddedSuccess")}</h3>
         <p className="text-gray-600 mb-6">{successMessage}</p>
         <Button type={ButtonType.PRIMARY} onClick={onSuccess}>
-          Done
+          {tCommon("done")}
         </Button>
       </div>
     );
@@ -474,9 +480,9 @@ export function AddInvestmentTransactionForm({
       <FormSelect
         name="type"
         control={control}
-        label="Transaction Type"
+        label={t("transaction.transactionType")}
         options={transactionTypeOptions}
-        placeholder="Select transaction type"
+        placeholder={t("transaction.selectTransactionType")}
         required
         disabled={isSubmitting}
         parseAsNumber={true}
@@ -488,10 +494,10 @@ export function AddInvestmentTransactionForm({
         control={control}
         label={
           isGoldInvestment && goldDisplayUnit
-            ? `Quantity (${getGoldUnitLabel(goldDisplayUnit)})`
+            ? `${t("transaction.quantity")} (${getGoldUnitLabel(goldDisplayUnit)})`
             : isSilverInvestment && silverDisplayUnit
-              ? `Quantity (${getSilverUnitLabel(silverDisplayUnit)})`
-              : "Quantity"
+              ? `${t("transaction.quantity")} (${getSilverUnitLabel(silverDisplayUnit)})`
+              : t("transaction.quantity")
         }
         placeholder={
           (isGoldInvestment && goldDisplayUnit === "tael") ||
@@ -524,7 +530,7 @@ export function AddInvestmentTransactionForm({
             ? `Price per ${getInvestmentUnitLabelFull(goldDisplayUnit || "oz", investmentType)} (${investmentCurrency})`
             : isSilverInvestment && silverDisplayUnit
               ? `Price per ${getInvestmentUnitLabelFull(silverDisplayUnit, investmentType)} (${investmentCurrency})`
-              : `Price per Unit (${investmentCurrency})`
+              : t("transaction.pricePerUnit", { currency: investmentCurrency })
         }
         placeholder="0.00"
         required
@@ -547,7 +553,7 @@ export function AddInvestmentTransactionForm({
       <FormNumberInput
         name="fees"
         control={control}
-        label={`Fees (${investmentCurrency})`}
+        label={t("transaction.fees", { currency: investmentCurrency })}
         placeholder="0.00"
         disabled={isSubmitting}
         min={0}
@@ -559,11 +565,11 @@ export function AddInvestmentTransactionForm({
         control={control}
         name="transactionDate"
         type="date"
-        label="Transaction Date"
+        label={t("transaction.transactionDate")}
         disabled={isSubmitting}
         required
         rules={{
-          required: "Transaction date is required",
+          required: t("transaction.transactionDateRequired"),
         }}
       />
 
@@ -574,18 +580,18 @@ export function AddInvestmentTransactionForm({
         currenciesMatch && (
           <div className="mt-4 p-3 bg-gray-50 rounded-md">
             <div className="flex justify-between text-sm">
-              <span>Wallet Balance:</span>
+              <span>{t("transaction.walletBalance")}</span>
               <span>{formatCurrency(walletBalance, walletCurrency)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span>Transaction Cost:</span>
+              <span>{t("transaction.transactionCost")}</span>
               <span className="text-red-600">
                 -{formatCurrency(totalCost, investmentCurrency)}
               </span>
             </div>
             <hr className="my-2" />
             <div className="flex justify-between font-medium">
-              <span>Remaining:</span>
+              <span>{t("transaction.remaining")}</span>
               <span
                 className={
                   walletBalance - totalCost < 0
@@ -606,7 +612,7 @@ export function AddInvestmentTransactionForm({
         !currenciesMatch && (
           <div className="mt-4 p-3 bg-gray-50 rounded-md">
             <div className="flex justify-between text-sm">
-              <span>Wallet Balance:</span>
+              <span>{t("transaction.walletBalance")}</span>
               <span>
                 {formatCurrency(walletBalance, walletCurrency)}
                 {exchangeRate && (
@@ -622,16 +628,16 @@ export function AddInvestmentTransactionForm({
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span>Transaction Cost:</span>
+              <span>{t("transaction.transactionCost")}</span>
               <span className="text-red-600">
                 -{formatCurrency(totalCost, investmentCurrency)}
               </span>
             </div>
             <hr className="my-2" />
             <div className="flex justify-between font-medium">
-              <span>Remaining:</span>
+              <span>{t("transaction.remaining")}</span>
               {isLoadingRate ? (
-                <span className="text-gray-400">Loading rate...</span>
+                <span className="text-gray-400">{t("transaction.loadingRate")}</span>
               ) : exchangeRate ? (
                 <span
                   className={
@@ -647,13 +653,16 @@ export function AddInvestmentTransactionForm({
                   )}
                 </span>
               ) : (
-                <span className="text-gray-400">Rate unavailable</span>
+                <span className="text-gray-400">{t("transaction.rateUnavailable")}</span>
               )}
             </div>
             {exchangeRate && (
               <p className="text-xs text-gray-500 mt-2">
-                Exchange rate: 1 {walletCurrency} ≈{" "}
-                {formatExchangeRate(exchangeRate)} {investmentCurrency}
+                {t("transaction.exchangeRate", {
+                  from: walletCurrency,
+                  rate: formatExchangeRate(exchangeRate),
+                  to: investmentCurrency,
+                })}
               </p>
             )}
           </div>
@@ -662,14 +671,14 @@ export function AddInvestmentTransactionForm({
       {/* Insufficient balance error */}
       {insufficientBalance && (
         <p className="text-red-600 text-sm mt-2">
-          Insufficient wallet balance. You need{" "}
-          {formatCurrency(
-            currenciesMatch
-              ? totalCost - walletBalance
-              : totalCost - walletBalanceInInvestmentCurrency,
-            investmentCurrency,
-          )}{" "}
-          more.
+          {t("transaction.insufficientBalance", {
+            amount: formatCurrency(
+              currenciesMatch
+                ? totalCost - walletBalance
+                : totalCost - walletBalanceInInvestmentCurrency,
+              investmentCurrency,
+            ),
+          })}
         </p>
       )}
 
@@ -681,7 +690,7 @@ export function AddInvestmentTransactionForm({
         loading={addTransactionMutation.isPending || isSubmitting}
         className="w-full"
       >
-        Add Transaction
+        {t("transaction.addTransaction")}
       </Button>
     </form>
   );

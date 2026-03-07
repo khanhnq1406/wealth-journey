@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { InvestmentType } from "@/gen/protobuf/v1/investment";
 import { useMutationUpdateInvestment } from "@/utils/generated/hooks";
 import { Button } from "@/components/Button";
@@ -27,6 +28,7 @@ export function UpdateInvestmentPriceForm({
   investmentType,
   onSuccess,
 }: UpdateInvestmentPriceFormProps) {
+  const t = useTranslations("investmentPrice.form");
   // Currencies with no decimal places (0 decimals)
   const zeroDecimalCurrencies = ["VND", "JPY", "KRW"];
   const hasDecimals = !zeroDecimalCurrencies.includes(currency);
@@ -48,7 +50,7 @@ export function UpdateInvestmentPriceForm({
       setShowSuccess(true);
     },
     onError: (error: any) => {
-      setErrorMessage(error.message || "Failed to update price");
+      setErrorMessage(error.message || t("failedToUpdate"));
     },
   });
 
@@ -58,7 +60,7 @@ export function UpdateInvestmentPriceForm({
 
     const priceDecimal = parseFloat(priceInput);
     if (isNaN(priceDecimal) || priceDecimal < 0) {
-      setErrorMessage("Please enter a valid price (0 or greater)");
+      setErrorMessage(t("invalidPrice"));
       return;
     }
 
@@ -77,23 +79,23 @@ export function UpdateInvestmentPriceForm({
   };
 
   if (showSuccess) {
-    return <Success message="Price updated successfully!" onDone={onSuccess} />;
+    return <Success message={t("successMessage")} onDone={onSuccess} />;
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="bg-gray-50 p-3 rounded-md">
         <p className="text-sm text-gray-600">
-          <strong>Symbol:</strong> {currentSymbol}
+          <strong>{t("symbol")}:</strong> {currentSymbol}
         </p>
         <p className="text-sm text-gray-600">
-          <strong>Current Price:</strong>{" "}
-          {currentPrice > 0 ? `${currency} ${displayPrice}` : "Not set"}
+          <strong>{t("currentPrice")}:</strong>{" "}
+          {currentPrice > 0 ? `${currency} ${displayPrice}` : t("notSet")}
         </p>
       </div>
 
       <FormInput
-        label="New Price"
+        label={t("newPrice")}
         name="price"
         type="number"
         step={hasDecimals ? "0.01" : "1"}
@@ -102,14 +104,12 @@ export function UpdateInvestmentPriceForm({
         onChange={(e) => setPriceInput(e.target.value)}
         placeholder={hasDecimals ? "0.00" : "0"}
         required
-        helperText={`Enter price per unit in ${currency}`}
+        helperText={t("pricePerUnit", { currency })}
       />
 
       <div className="bg-blue-50 p-3 rounded-md border border-blue-200">
         <p className="text-sm text-blue-800">
-          💡 <strong>Tip:</strong> You can set price to 0 if market price is
-          unavailable. This will show your holdings without profit/loss
-          calculations.
+          💡 <strong>Tip:</strong> {t("tip")}
         </p>
       </div>
 
@@ -126,7 +126,7 @@ export function UpdateInvestmentPriceForm({
           loading={updateMutation.isPending}
           htmlType="submit"
         >
-          Update Price
+          {t("updatePrice")}
         </Button>
       </div>
     </form>

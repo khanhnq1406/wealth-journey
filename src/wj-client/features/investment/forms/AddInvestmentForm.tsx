@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/Button";
@@ -70,40 +71,6 @@ interface AddInvestmentFormProps {
   onSuccess?: () => void;
 }
 
-const investmentTypeOptions: SelectOption[] = [
-  { value: String(InvestmentType.INVESTMENT_TYPE_STOCK), label: "Stock" },
-  { value: String(InvestmentType.INVESTMENT_TYPE_ETF), label: "ETF" },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND),
-    label: "Mutual Fund",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY),
-    label: "Cryptocurrency",
-  },
-  { value: String(InvestmentType.INVESTMENT_TYPE_BOND), label: "Bond" },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_COMMODITY),
-    label: "Commodity",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_GOLD_VND),
-    label: "Gold (Vietnam)",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_GOLD_USD),
-    label: "Gold (World)",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_SILVER_VND),
-    label: "Silver (Vietnam)",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_SILVER_USD),
-    label: "Silver (World)",
-  },
-  { value: String(InvestmentType.INVESTMENT_TYPE_OTHER), label: "Other" },
-];
 
 export function AddInvestmentForm({
   walletId: propWalletId,
@@ -111,10 +78,25 @@ export function AddInvestmentForm({
   walletCurrency: propWalletCurrency,
   onSuccess,
 }: AddInvestmentFormProps) {
+  const t = useTranslations("investment");
   const queryClient = useQueryClient();
   const { currency: preferredCurrency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
+
+  const investmentTypeOptions = useMemo<SelectOption[]>(() => [
+    { value: String(InvestmentType.INVESTMENT_TYPE_STOCK), label: t("typeOptions.stock") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_ETF), label: t("typeOptions.etf") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND), label: t("typeOptions.mutualFund") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY), label: t("typeOptions.cryptocurrency") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_BOND), label: t("typeOptions.bond") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_COMMODITY), label: t("typeOptions.commodity") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_GOLD_VND), label: t("typeOptions.goldVietnam") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_GOLD_USD), label: t("typeOptions.goldWorld") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_SILVER_VND), label: t("typeOptions.silverVietnam") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_SILVER_USD), label: t("typeOptions.silverWorld") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_OTHER), label: t("typeOptions.other") },
+  ], [t]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
   // Local wallet selection state (used when walletId not provided)
@@ -183,7 +165,7 @@ export function AddInvestmentForm({
 
   const createInvestmentMutation = useMutationCreateInvestment({
     onSuccess: (data) => {
-      setSuccessMessage(data.message || "Investment created successfully");
+      setSuccessMessage(data.message || t("errors.createdSuccessfully"));
       setShowSuccess(true);
       // Invalidate queries (both old and new aggregated endpoints)
       queryClient.invalidateQueries({
@@ -202,42 +184,41 @@ export function AddInvestmentForm({
     },
     onError: (error: any) => {
       // Parse error message and provide user-friendly alternatives
-      let errorMsg = error.message || "Failed to create investment";
+      let errorMsg = error.message || t("errors.failedToCreate");
 
       if (
         errorMsg.toLowerCase().includes("duplicate") ||
         errorMsg.toLowerCase().includes("already exists")
       ) {
-        errorMsg =
-          "An investment with this symbol already exists in this wallet";
+        errorMsg = t("errors.duplicateSymbol");
       } else if (errorMsg.toLowerCase().includes("currency")) {
-        errorMsg = "Invalid currency code. Please select a valid currency";
+        errorMsg = t("errors.invalidCurrency");
       } else if (
         errorMsg.toLowerCase().includes("balance") ||
         errorMsg.toLowerCase().includes("insufficient")
       ) {
-        errorMsg = "Insufficient wallet balance for this investment";
+        errorMsg = t("errors.insufficientBalance");
       } else if (errorMsg.toLowerCase().includes("symbol")) {
-        errorMsg = "Invalid symbol format. Please check and try again";
+        errorMsg = t("errors.invalidSymbol");
       } else if (errorMsg.toLowerCase().includes("quantity")) {
-        errorMsg = "Invalid quantity. Please enter a valid positive number";
+        errorMsg = t("errors.invalidQuantity");
       } else if (
         errorMsg.toLowerCase().includes("cost") ||
         errorMsg.toLowerCase().includes("price")
       ) {
-        errorMsg = "Invalid cost amount. Please enter a valid positive number";
+        errorMsg = t("errors.invalidCost");
       } else if (errorMsg.toLowerCase().includes("wallet")) {
-        errorMsg = "Invalid wallet or wallet not found";
+        errorMsg = t("errors.invalidWallet");
       } else if (
         errorMsg.toLowerCase().includes("not found") ||
         errorMsg.toLowerCase().includes("404")
       ) {
-        errorMsg = "Resource not found. Please try again";
+        errorMsg = t("errors.resourceNotFound");
       } else if (
         errorMsg.toLowerCase().includes("unauthorized") ||
         errorMsg.toLowerCase().includes("403")
       ) {
-        errorMsg = "You don't have permission to perform this action";
+        errorMsg = t("errors.unauthorized");
       }
 
       setErrorMessage(errorMsg);
@@ -337,7 +318,7 @@ export function AddInvestmentForm({
       setValue("currency", targetCurrency);
       // Pre-populate symbol/name to pass Zod validation (real guard is in onSubmit)
       setValue("symbol", "GOLD");
-      setValue("name", "Gold Investment");
+      setValue("name", t("form.defaultGoldName"));
     }
   }, [isGoldInvestment, investmentType, setValue]);
 
@@ -372,7 +353,7 @@ export function AddInvestmentForm({
       setValue("currency", targetCurrency);
       // Pre-populate symbol/name to pass Zod validation (real guard is in onSubmit)
       setValue("symbol", "SILVER");
-      setValue("name", "Silver Investment");
+      setValue("name", t("form.defaultSilverName"));
     }
   }, [isSilverInvestment, investmentType, setValue]);
 
@@ -458,19 +439,19 @@ export function AddInvestmentForm({
 
     // Validate wallet is selected
     if (!walletId) {
-      setErrorMessage("Please select a wallet");
+      setErrorMessage(t("form.selectWalletError"));
       return;
     }
 
     // Validate gold type is selected for gold investments
     if (isGoldInvestment && !selectedGoldType) {
-      setErrorMessage("Please select a gold type");
+      setErrorMessage(t("form.selectGoldTypeError"));
       return;
     }
 
     // Validate silver type is selected for silver investments
     if (isSilverInvestment && !selectedSilverType) {
-      setErrorMessage("Please select a silver type");
+      setErrorMessage(t("form.selectSilverTypeError"));
       return;
     }
 
@@ -576,11 +557,11 @@ export function AddInvestmentForm({
       {propWalletId === undefined && (
         <div className="mb-4">
           <BasicFormSelect
-            label="Investment Wallet"
+            label={t("form.investmentWalletLabel")}
             options={walletSelectOptions}
             value={selectedWalletId ? String(selectedWalletId) : undefined}
             onChange={(value) => setSelectedWalletId(parseInt(value, 10))}
-            placeholder="Select investment wallet"
+            placeholder={t("form.selectWalletPlaceholder")}
             disabled={isSubmitting || getListWallets.isLoading}
             required
           />
@@ -596,9 +577,9 @@ export function AddInvestmentForm({
       <FormSelect
         name="type"
         control={control}
-        label="Investment Type"
+        label={t("form.investmentType")}
         options={investmentTypeOptions}
-        placeholder="Select investment type"
+        placeholder={t("form.selectType")}
         required
         disabled={isSubmitting}
         className="mb-4"
@@ -628,10 +609,10 @@ export function AddInvestmentForm({
             />
             <div className="flex-1">
               <span className="font-medium text-gray-900">
-                Custom Investment
+                {t("form.isCustom")}
               </span>
               <p className="text-sm text-gray-500">
-                Create investment for assets not available in market data
+                {t("form.customInvestmentDescription")}
               </p>
             </div>
           </label>
@@ -650,7 +631,7 @@ export function AddInvestmentForm({
               <SymbolAutocomplete
                 value={watch("symbol")}
                 onChange={handleSymbolChange}
-                placeholder="Search for stocks, ETFs, crypto (e.g., AAPL, BTC, VTI)..."
+                placeholder={t("form.searchSymbolPlaceholder")}
                 // disabled={isSubmitting}
                 className="mt-1"
               />
@@ -687,13 +668,12 @@ export function AddInvestmentForm({
                 </ErrorMessage>
               )}
               <p className="text-xs text-gray-500 mt-1 ml-1">
-                Enter a unique identifier for your custom investment
+                {t("form.customSymbolInfo")}
               </p>
               {/* Info box for custom investments */}
               <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-200">
                 <p className="text-sm text-blue-800">
-                  <strong>Note:</strong> Custom investments don&apos;t have
-                  market prices. You can set the price manually after creation.
+                  {t("form.customPriceNote")}
                 </p>
               </div>
             </>
@@ -706,8 +686,8 @@ export function AddInvestmentForm({
         <FormInput
           name="name"
           control={control}
-          label="Name"
-          placeholder="Apple Inc., Bitcoin, Vanguard Total Stock Market ETF..."
+          label={t("form.nameLabel")}
+          placeholder={t("form.investmentNamePlaceholder")}
           required
           disabled={isSubmitting}
         />
@@ -717,7 +697,7 @@ export function AddInvestmentForm({
       {isGoldInvestment && (
         <div className="mb-4">
           <BasicFormSelect
-            label="Gold Type"
+            label={t("form.goldTypeLabel")}
             options={goldTypeOptions.map((opt) => ({
               value: opt.value,
               label: opt.label,
@@ -734,40 +714,40 @@ export function AddInvestmentForm({
                 // Currency is already set based on investment type, no need to override
               }
             }}
-            placeholder="Select gold type (SJC, XAU, etc.)"
+            placeholder={t("form.selectGoldTypePlaceholder")}
             disabled={isSubmitting}
             required
           />
           {selectedGoldType && (
             <div className="mt-2 space-y-1">
               <p className="text-xs text-gray-500 ml-1">
-                Unit: {selectedGoldType.unit} | Currency:{" "}
-                {selectedGoldType.currency}
+                {t("form.goldUnitCurrencyInfo", { unit: selectedGoldType.unit, currency: selectedGoldType.currency })}
               </p>
               {/* Market Price Display */}
               {goldPriceQuery.isLoading && (
-                <p className="text-xs text-gray-400 ml-1">Loading price...</p>
+                <p className="text-xs text-gray-400 ml-1">{t("form.loadingPrice")}</p>
               )}
               {goldPriceQuery.data?.data && (
                 <div className="p-2 bg-green-50 border border-green-200 rounded-md">
                   <p className="text-sm font-medium text-green-900">
-                    Current Market Price:{" "}
-                    {formatCurrency(
-                      goldPriceQuery.data.data.price,
-                      goldPriceQuery.data.data.currency,
-                    )}
-                    /{selectedGoldType.unit}
+                    {t("form.currentMarketPrice", {
+                      price: formatCurrency(
+                        goldPriceQuery.data.data.price,
+                        goldPriceQuery.data.data.currency,
+                      ),
+                      unit: selectedGoldType.unit,
+                    })}
                   </p>
                   {goldPriceQuery.data.data.isCached && (
                     <p className="text-xs text-gray-500 mt-0.5">
-                      (Cached price)
+                      {t("form.cachedPrice")}
                     </p>
                   )}
                 </div>
               )}
               {goldPriceQuery.isError && (
                 <p className="text-xs text-red-500 ml-1">
-                  Unable to fetch price
+                  {t("form.unableToFetchPrice")}
                 </p>
               )}
             </div>
@@ -779,7 +759,7 @@ export function AddInvestmentForm({
       {isSilverInvestment && (
         <div className="mb-4">
           <BasicFormSelect
-            label="Silver Type"
+            label={t("form.silverTypeLabel")}
             options={silverTypeOptions.map((opt: SilverTypeOption) => ({
               value: opt.value,
               label: opt.label,
@@ -799,39 +779,40 @@ export function AddInvestmentForm({
                 }
               }
             }}
-            placeholder="Select silver type (AG_VND, XAG, etc.)"
+            placeholder={t("form.selectSilverTypePlaceholder")}
             disabled={isSubmitting}
             required
           />
           {selectedSilverType && (
             <div className="mt-2 space-y-1">
               <p className="text-xs text-gray-500 ml-1">
-                Currency: {selectedSilverType.currency}
+                {t("form.silverCurrencyInfo", { currency: selectedSilverType.currency })}
               </p>
               {/* Market Price Display */}
               {silverPriceQuery.isLoading && (
-                <p className="text-xs text-gray-400 ml-1">Loading price...</p>
+                <p className="text-xs text-gray-400 ml-1">{t("form.loadingPrice")}</p>
               )}
               {silverPriceQuery.data?.data && (
                 <div className="p-2 bg-green-50 border border-green-200 rounded-md">
                   <p className="text-sm font-medium text-green-900">
-                    Current Market Price:{" "}
-                    {formatCurrency(
-                      silverPriceQuery.data.data.price,
-                      silverPriceQuery.data.data.currency,
-                    )}
-                    /{selectedSilverType.availableUnits[0] || "unit"}
+                    {t("form.currentMarketPrice", {
+                      price: formatCurrency(
+                        silverPriceQuery.data.data.price,
+                        silverPriceQuery.data.data.currency,
+                      ),
+                      unit: selectedSilverType.availableUnits[0] || "unit",
+                    })}
                   </p>
                   {silverPriceQuery.data.data.isCached && (
                     <p className="text-xs text-gray-500 mt-0.5">
-                      (Cached price)
+                      {t("form.cachedPrice")}
                     </p>
                   )}
                 </div>
               )}
               {silverPriceQuery.isError && (
                 <p className="text-xs text-red-500 ml-1">
-                  Unable to fetch price
+                  {t("form.unableToFetchPrice")}
                 </p>
               )}
             </div>
@@ -845,7 +826,7 @@ export function AddInvestmentForm({
           <>
             <div className="flex items-center gap-2 mb-1">
               <Label htmlFor="initialQuantity" required>
-                Quantity
+                {t("form.quantity")}
               </Label>
               {/* {selectedGoldType?.currency === "VND" && (
                 <Select
@@ -872,19 +853,20 @@ export function AddInvestmentForm({
               showRecommendations={false}
             />
             <p className="text-xs text-gray-500 -mt-2 ml-1">
-              Amount of gold in{" "}
-              {goldQuantityUnit === "tael"
-                ? "taels (lượng)"
-                : goldQuantityUnit === "oz"
-                  ? "oz"
-                  : "grams"}
+              {t("form.amountOfGold", {
+                unit: goldQuantityUnit === "tael"
+                  ? t("form.taelUnitLong")
+                  : goldQuantityUnit === "oz"
+                    ? "oz"
+                    : t("form.gramUnit"),
+              })}
             </p>
           </>
         ) : isSilverInvestment ? (
           <div className="flex flex-col gap-2">
             <div className="flex flex-col">
               <Label htmlFor="initialQuantity" required>
-                Quantity
+                {t("form.quantity")}
               </Label>
               <FormNumberInput
                 name="initialQuantity"
@@ -899,14 +881,15 @@ export function AddInvestmentForm({
                 showRecommendations={false}
               />
               <p className="text-xs text-gray-500 -mt-2 ml-1">
-                Amount of silver in{" "}
-                {silverQuantityUnit === "tael"
-                  ? "taels (lượng)"
-                  : silverQuantityUnit === "kg"
-                    ? "kg"
-                    : silverQuantityUnit === "oz"
-                      ? "oz"
-                      : "grams"}
+                {t("form.amountOfSilver", {
+                  unit: silverQuantityUnit === "tael"
+                    ? t("form.taelUnitLong")
+                    : silverQuantityUnit === "kg"
+                      ? t("form.kgUnit")
+                      : silverQuantityUnit === "oz"
+                        ? "oz"
+                        : t("form.gramUnit"),
+                })}
               </p>
             </div>
 
@@ -916,15 +899,15 @@ export function AddInvestmentForm({
               selectedSilverType.availableUnits.length > 1 && (
                 <div>
                   <BasicFormSelect
-                    label="Unit"
+                    label={t("form.unitLabel")}
                     options={selectedSilverType.availableUnits.map(
                       (unit: SilverUnit) => ({
                         value: unit,
                         label:
                           unit === "tael"
-                            ? "Tael (lượng)"
+                            ? t("form.taelUnit")
                             : unit === "kg"
-                              ? "Kg"
+                              ? t("form.kgUnit")
                               : unit,
                       }),
                     )}
@@ -944,7 +927,7 @@ export function AddInvestmentForm({
             <FormNumberInput
               name="initialQuantity"
               control={control}
-              label="Initial Quantity"
+              label={t("form.initialQuantityLabel")}
               placeholder={quantityConfig.placeholder}
               required
               disabled={isSubmitting}
@@ -952,7 +935,7 @@ export function AddInvestmentForm({
               step={quantityConfig.step}
             />
             <p className="text-xs text-gray-500 mt-1 -mb-3 ml-1">
-              Number of shares, coins, or units you hold
+              {t("form.quantityHint")}
             </p>
           </>
         )}
@@ -963,7 +946,7 @@ export function AddInvestmentForm({
         <FormSelect
           name="currency"
           control={control}
-          label="Currency"
+          label={t("form.currencyLabel")}
           options={[
             { value: "USD", label: "USD - US Dollar" },
             { value: "VND", label: "VND - Vietnamese Dong" },

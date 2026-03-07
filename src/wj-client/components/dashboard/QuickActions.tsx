@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils/cn";
 import { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 
 /**
  * Action item interface for quick action buttons
@@ -76,6 +77,8 @@ export function QuickActions({
   className,
   iconOnly = false,
 }: QuickActionsProps) {
+  const t = useTranslations("quickActions");
+
   if (actions.length === 0) {
     return null;
   }
@@ -98,7 +101,7 @@ export function QuickActions({
         className,
       )}
       role="navigation"
-      aria-label="Quick actions"
+      aria-label={t("sectionAriaLabel")}
     >
       {actions.map((action) => (
         <button

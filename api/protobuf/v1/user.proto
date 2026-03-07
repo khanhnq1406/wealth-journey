@@ -101,6 +101,7 @@ message DeleteUserRequest {
 // UserPreferences message
 message UserPreferences {
   string preferredCurrency = 1 [json_name = "preferredCurrency"];  // ISO 4217 currency code (e.g., "USD", "VND", "EUR")
+  string language = 2 [json_name = "language"];  // ISO 639-1: "en", "vi"
 }
 
 // UpdatePreferences request

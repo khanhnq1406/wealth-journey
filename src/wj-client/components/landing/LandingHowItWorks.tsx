@@ -1,35 +1,8 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
-
-const steps = [
-  {
-    number: "01",
-    name: "Sign Up with Google",
-    description: "Create your account securely using Google OAuth. No passwords to remember.",
-  },
-  {
-    number: "02",
-    name: "Create Your Wallets",
-    description: "Set up BASIC or INVESTMENT wallets. Add your initial balance to get started.",
-  },
-  {
-    number: "03",
-    name: "Add Investments & Transactions",
-    description: "Track stocks, crypto, gold, and more. Record buys, sells, and dividends automatically.",
-  },
-  {
-    number: "04",
-    name: "Monitor Performance & Insights",
-    description: "View real-time PNL, portfolio allocation, and detailed analytics for informed decisions.",
-  },
-  {
-    number: "05",
-    name: "Export & Analyze",
-    description: "Export your data to CSV for deeper analysis. Keep your financial data portable.",
-  },
-];
+import { useRef, useMemo } from "react";
+import { useTranslations } from "next-intl";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -51,8 +24,40 @@ const itemVariants = {
 };
 
 export default function LandingHowItWorks() {
+  const t = useTranslations("landing");
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
+
+  const steps = useMemo(
+    () => [
+      {
+        number: "01",
+        name: t("howItWorks.step1TitleAlt"),
+        description: t("howItWorks.step1Desc"),
+      },
+      {
+        number: "02",
+        name: t("howItWorks.step2TitleAlt"),
+        description: t("howItWorks.step2Desc"),
+      },
+      {
+        number: "03",
+        name: t("howItWorks.step3TitleAlt"),
+        description: t("howItWorks.step3Desc"),
+      },
+      {
+        number: "04",
+        name: t("howItWorks.step4TitleAlt"),
+        description: t("howItWorks.step4Desc"),
+      },
+      {
+        number: "05",
+        name: t("howItWorks.step5TitleAlt"),
+        description: t("howItWorks.step5Desc"),
+      },
+    ],
+    [t],
+  );
 
   return (
     <section id="how-it-works" className="py-16 sm:py-20 bg-neutral-50 [scroll-margin-top:5rem]">
@@ -65,10 +70,10 @@ export default function LandingHowItWorks() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Get Started in Minutes
+            {t("howItWorks.getStartedInMinutes")}
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            From sign-up to tracking your investments in just 5 simple steps.
+            {t("howItWorks.getStartedDesc")}
           </p>
         </motion.div>
 

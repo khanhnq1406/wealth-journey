@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { BaseModal } from "@/components/modals/BaseModal";
 import { ConfirmationDialog } from "@/components/modals/ConfirmationDialog";
 import { Button } from "@/components/Button";
@@ -27,6 +28,8 @@ export function ChangeRateModal({
   conversion,
   onConfirm,
 }: ChangeRateModalProps) {
+  const t = useTranslations("changeRate.modal");
+
   const [rateInput, setRateInput] = useState(
     conversion.exchangeRate.toString()
   );
@@ -76,12 +79,12 @@ export function ChangeRateModal({
 
     // Validation
     if (isNaN(newRate) || newRate <= 0) {
-      setError("Please enter a valid exchange rate greater than 0");
+      setError(t("invalidRate"));
       return;
     }
 
     if (newRate === conversion.exchangeRate) {
-      setError("New rate is the same as current rate");
+      setError(t("sameRate"));
       return;
     }
 
@@ -118,7 +121,7 @@ export function ChangeRateModal({
       <BaseModal
         isOpen={isOpen}
         onClose={handleCancel}
-        title={`Change Rate: ${conversion.fromCurrency} → ${conversion.toCurrency}`}
+        title={t("title", { from: conversion.fromCurrency, to: conversion.toCurrency })}
         maxWidth="max-w-lg"
       >
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -127,7 +130,7 @@ export function ChangeRateModal({
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-neutral-600 dark:text-dark-text-secondary">
-                Current Rate:
+                {t("currentRate")}
               </span>
               <span className="font-semibold text-neutral-900 dark:text-dark-text">
                 1 {conversion.fromCurrency} ={" "}
@@ -140,19 +143,19 @@ export function ChangeRateModal({
             </div>
             <div className="flex justify-between">
               <span className="text-neutral-600 dark:text-dark-text-secondary">
-                Source:
+                {t("source")}
               </span>
               <span className="font-medium text-neutral-900 dark:text-dark-text">
                 {conversion.rateSource === "auto"
-                  ? "Automatic"
+                  ? t("sourceAuto")
                   : conversion.rateSource === "manual"
-                  ? "Manual Override"
-                  : "Fallback Rate"}
+                  ? t("sourceManual")
+                  : t("sourceFallback")}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-neutral-600 dark:text-dark-text-secondary">
-                Transactions:
+                {t("transactions")}
               </span>
               <span className="font-medium text-neutral-900 dark:text-dark-text">
                 {conversion.transactionCount}
@@ -160,7 +163,7 @@ export function ChangeRateModal({
             </div>
             <div className="flex justify-between">
               <span className="text-neutral-600 dark:text-dark-text-secondary">
-                Current Total:
+                {t("currentTotal")}
               </span>
               <span className="font-semibold text-neutral-900 dark:text-dark-text">
                 {conversion.totalOriginal &&
@@ -181,7 +184,7 @@ export function ChangeRateModal({
 
         {/* New Rate Input */}
         <FormInput
-          label={`New Exchange Rate (1 ${conversion.fromCurrency} = ? ${conversion.toCurrency})`}
+          label={t("newRateLabel", { from: conversion.fromCurrency, to: conversion.toCurrency })}
           name="rate"
           type="number"
           step={conversion.toCurrency === "VND" ? "1" : "0.01"}
@@ -217,12 +220,11 @@ export function ChangeRateModal({
                   }
                 >
                   {rateDifference > 0 ? "+" : ""}
-                  {rateDifference.toFixed(2)}% from automatic rate
+                  {rateDifference.toFixed(2)}{t("fromAutoRate")}
                 </p>
                 {Math.abs(rateDifference) > 10 && (
                   <p className="text-warning-600 dark:text-warning-400 mt-1">
-                    <strong>Warning:</strong> This rate differs significantly
-                    from the automatic rate. Please verify it is correct.
+                    {t("warningSignificant")}
                   </p>
                 )}
               </div>
@@ -235,7 +237,7 @@ export function ChangeRateModal({
           <div className="bg-success-50 dark:bg-success-950 p-3 rounded-md border border-success-200 dark:border-success-800">
             <div className="text-sm">
               <span className="text-success-700 dark:text-success-300">
-                <strong>New Total:</strong>
+                <strong>{t("newTotal")}</strong>
               </span>
               <div className="mt-1 font-semibold text-success-800 dark:text-success-200">
                 {conversion.totalOriginal &&
@@ -265,10 +267,10 @@ export function ChangeRateModal({
             onClick={handleCancel}
             className="flex-1"
           >
-            Cancel
+            {t("cancel")}
           </Button>
           <Button type="submit" variant="primary" className="flex-1">
-            Apply New Rate
+            {t("applyRate")}
           </Button>
         </div>
       </form>
@@ -277,12 +279,10 @@ export function ChangeRateModal({
       {/* Warning Dialog for Large Rate Differences */}
       {showWarning && rateDifference !== null && (
         <ConfirmationDialog
-          title="Large Rate Difference"
-          message={`The new rate differs by ${Math.abs(rateDifference).toFixed(
-            1
-          )}% from the automatic rate. Are you sure you want to proceed?`}
-          confirmText="Proceed"
-          cancelText="Cancel"
+          title={t("warningTitle")}
+          message={t("warningMessage", { percent: Math.abs(rateDifference).toFixed(1) })}
+          confirmText={t("proceed")}
+          cancelText={t("cancel")}
           variant="default"
           onConfirm={handleConfirmWarning}
           onCancel={handleCancelWarning}

@@ -1,0 +1,131 @@
+{
+  "transaction": {
+    "title": "Giao dịch",
+    "searchPlaceholder": "Tìm kiếm giao dịch...",
+    "totalBalance": "Tổng số dư",
+    "noTransactionsFound": "Không tìm thấy giao dịch",
+    "addFirstTransaction": "Thêm giao dịch đầu tiên hoặc điều chỉnh bộ lọc",
+    "defaultLabel": "Giao dịch",
+    "transactionAddedSuccess": "Giao dịch đã được thêm thành công",
+    "failedToAdd": "Không thể thêm giao dịch. Vui lòng thử lại",
+    "quickFilters": {
+      "all": "Tất cả",
+      "income": "Thu nhập",
+      "expense": "Chi tiêu",
+      "today": "Hôm nay",
+      "thisWeek": "Tuần này",
+      "thisMonth": "Tháng này"
+    },
+    "sortOptions": {
+      "newestFirst": "Mới nhất trước",
+      "oldestFirst": "Cũ nhất trước",
+      "highestFirst": "Cao nhất trước",
+      "lowestFirst": "Thấp nhất trước"
+    },
+    "form": {
+      "title": "Thêm giao dịch",
+      "editTitle": "Sửa giao dịch",
+      "income": "Thu nhập",
+      "expense": "Chi tiêu",
+      "amount": "Số tiền",
+      "wallet": "Ví",
+      "selectWallet": "Chọn ví",
+      "category": "Danh mục",
+      "selectOrCreateCategory": "Chọn hoặc tạo danh mục...",
+      "dateTime": "Ngày & Giờ",
+      "note": "Ghi chú",
+      "notePlaceholder": "Nhập ghi chú (tùy chọn)",
+      "addTransaction": "Thêm giao dịch",
+      "updateTransaction": "Cập nhật giao dịch",
+      "transactionUpdatedSuccess": "Giao dịch đã được cập nhật thành công",
+      "failedToUpdate": "Không thể cập nhật giao dịch. Vui lòng thử lại",
+      "transactionAddedSuccess": "Giao dịch đã được thêm thành công",
+      "failedToAdd": "Không thể thêm giao dịch. Vui lòng thử lại",
+      "createNewCategory": "Tạo danh mục mới",
+      "newCategoryPlaceholder": "Nhập tên danh mục"
+    },
+    "delete": {
+      "title": "Xóa giao dịch",
+      "confirmMessage": "Bạn có chắc chắn muốn xóa giao dịch này?",
+      "confirmButton": "Xóa",
+      "cancelButton": "Hủy"
+    },
+    "import": {
+      "title": "Nhập giao dịch",
+      "buttonLabel": "Nhập"
+    },
+    "export": {
+      "title": "Xuất giao dịch"
+    },
+    "filter": {
+      "openFilters": "Mở bộ lọc",
+      "clearSearch": "Xóa tìm kiếm",
+      "toggleBalanceVisibility": "Bật/tắt hiển thị số dư",
+      "filters": "Bộ lọc",
+      "filterBy": "Lọc theo {label}",
+      "removeFilter": "Xóa bộ lọc {label}",
+      "sortBy": "Sắp xếp theo",
+      "sortTransactions": "Sắp xếp giao dịch",
+      "minAmount": "Số tiền tối thiểu",
+      "maxAmount": "Số tiền tối đa",
+      "noLimit": "Không giới hạn",
+      "selectStartDate": "Chọn ngày bắt đầu",
+      "selectEndDate": "Chọn ngày kết thúc",
+      "until": "Đến"
+    }
+  },
+  "transfer": {
+    "form": {
+      "amount": "Số tiền",
+      "from": "Từ",
+      "selectSourceWallet": "Chọn ví nguồn",
+      "selectSourceFirst": "Chọn ví nguồn trước",
+      "to": "Đến",
+      "selectDestWallet": "Chọn ví đích",
+      "dateTime": "Ngày & Giờ",
+      "note": "Ghi chú",
+      "notePlaceholder": "Nhập ghi chú (tùy chọn)",
+      "transfer": "Chuyển khoản",
+      "successDefault": "Tiền đã được chuyển thành công",
+      "failedToTransfer": "Chuyển khoản thất bại. Vui lòng thử lại"
+    }
+  },
+  "transactionCard": {
+    "today": "Hôm nay",
+    "yesterday": "Hôm qua",
+    "transfer": "Chuyển tiền",
+    "editAriaLabel": "Sửa giao dịch",
+    "deleteAriaLabel": "Xóa giao dịch",
+    "viewDetailsAriaLabel": "Xem chi tiết cho {title}",
+    "status": {
+      "pending": "Đang chờ",
+      "completed": "Hoàn thành",
+      "failed": "Thất bại",
+      "cancelled": "Đã hủy"
+    }
+  },
+  "transactionReview": {
+    "table": {
+      "row": "Hàng",
+      "date": "Ngày",
+      "description": "Mô tả",
+      "amount": "Số tiền",
+      "status": "Trạng thái",
+      "toggleAllRows": "Chọn/bỏ chọn tất cả hàng",
+      "toggleRow": "Chọn hàng {n}",
+      "selectAll": "Chọn tất cả",
+      "selected": "{count} đã chọn",
+      "totalRows": "Tổng hàng",
+      "valid": "Hợp lệ",
+      "errors": "Lỗi",
+      "statusError": "Lỗi",
+      "statusDuplicate": "Trùng {confidence}%",
+      "statusValid": "Hợp lệ",
+      "editDescription": "Sửa mô tả",
+      "original": "Gốc",
+      "showOriginal": "Xem mô tả gốc",
+      "save": "Lưu",
+      "cancel": "Hủy"
+    }
+  }
+}

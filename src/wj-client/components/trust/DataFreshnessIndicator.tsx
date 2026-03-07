@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface DataFreshnessIndicatorProps {
   lastUpdated: Date;
@@ -12,6 +13,7 @@ export function DataFreshnessIndicator({
   className = "",
 }: DataFreshnessIndicatorProps) {
   const [timeAgo, setTimeAgo] = useState("");
+  const t = useTranslations("dataFreshness");
 
   useEffect(() => {
     const updateTimeAgo = () => {
@@ -21,16 +23,16 @@ export function DataFreshnessIndicator({
       );
 
       if (diffInSeconds < 60) {
-        setTimeAgo("just now");
+        setTimeAgo(t("justNow"));
       } else if (diffInSeconds < 3600) {
         const minutes = Math.floor(diffInSeconds / 60);
-        setTimeAgo(`${minutes} minute${minutes > 1 ? "s" : ""} ago`);
+        setTimeAgo(t(minutes > 1 ? "minutesAgo" : "minuteAgo", { count: minutes }));
       } else if (diffInSeconds < 86400) {
         const hours = Math.floor(diffInSeconds / 3600);
-        setTimeAgo(`${hours} hour${hours > 1 ? "s" : ""} ago`);
+        setTimeAgo(t(hours > 1 ? "hoursAgo" : "hourAgo", { count: hours }));
       } else {
         const days = Math.floor(diffInSeconds / 86400);
-        setTimeAgo(`${days} day${days > 1 ? "s" : ""} ago`);
+        setTimeAgo(t(days > 1 ? "daysAgo" : "dayAgo", { count: days }));
       }
     };
 
@@ -41,7 +43,7 @@ export function DataFreshnessIndicator({
     const interval = setInterval(updateTimeAgo, 60000);
 
     return () => clearInterval(interval);
-  }, [lastUpdated]);
+  }, [lastUpdated, t]);
 
   return (
     <div
@@ -61,7 +63,7 @@ export function DataFreshnessIndicator({
           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
         />
       </svg>
-      <span>Updated {timeAgo}</span>
+      <span>{t("updated", { timeAgo })}</span>
     </div>
   );
 }

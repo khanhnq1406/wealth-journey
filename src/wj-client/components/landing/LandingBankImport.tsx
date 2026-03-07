@@ -1,184 +1,8 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { useRef, useState } from "react";
-
-const supportedFormats = [
-  {
-    icon: "📄",
-    format: "CSV",
-    description: "Comma-separated values",
-    maxSize: "10MB",
-  },
-  {
-    icon: "📊",
-    format: "Excel",
-    description: ".xlsx, .xls files",
-    maxSize: "10MB",
-  },
-  {
-    icon: "📋",
-    format: "PDF",
-    description: "Bank statements",
-    maxSize: "20MB",
-  },
-];
-
-const supportedBanks = [
-  { name: "Vietcombank", code: "VCB", logo: "🏦" },
-  { name: "Techcombank", code: "TCB", logo: "🏦" },
-  { name: "Vietinbank", code: "VTB", logo: "🏦" },
-  { name: "ACB", code: "ACB", logo: "🏦" },
-  { name: "MB Bank", code: "MB", logo: "🏦" },
-  { name: "Custom Format", code: "CUSTOM", logo: "⚙️" },
-];
-
-const importFeatures = [
-  {
-    icon: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-        />
-      </svg>
-    ),
-    title: "Smart Duplicate Detection",
-    description:
-      "99% accuracy prevents duplicate entries with multi-level matching (exact, strong, likely, possible).",
-  },
-  {
-    icon: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-        />
-      </svg>
-    ),
-    title: "Auto-Categorization",
-    description:
-      "Intelligent merchant database and keyword matching auto-suggests categories with confidence scores.",
-  },
-  {
-    icon: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-    ),
-    title: "Multi-Currency Support",
-    description:
-      "Automatic FX conversion for 12+ currencies with historical exchange rates from trusted APIs.",
-  },
-  {
-    icon: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-        />
-      </svg>
-    ),
-    title: "Review & Edit",
-    description:
-      "Inline editing with real-time validation. Fix errors, adjust categories, and handle duplicates before import.",
-  },
-  {
-    icon: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z"
-        />
-      </svg>
-    ),
-    title: "24-Hour Undo",
-    description:
-      "Made a mistake? Undo any import within 24 hours to restore the pre-import state completely.",
-  },
-  {
-    icon: (
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M13 10V3L4 14h7v7l9-11h-7z"
-        />
-      </svg>
-    ),
-    title: "Lightning Fast",
-    description:
-      "Import 500+ transactions in under 10 minutes with optimized parsing and bulk insert operations.",
-  },
-];
-
-const steps = [
-  {
-    number: 1,
-    title: "Upload Statement",
-    description:
-      "Drag & drop your CSV, Excel, or PDF bank statement. Supports up to 10,000 transactions per file.",
-    icon: "📤",
-  },
-  {
-    number: 2,
-    title: "Review & Confirm",
-    description:
-      "Smart system auto-categorizes transactions, detects duplicates, and flags errors for your review.",
-    icon: "✅",
-  },
-  {
-    number: 3,
-    title: "Import Complete",
-    description:
-      "Transactions imported instantly. View summary, edit categories, or undo within 24 hours if needed.",
-    icon: "🎉",
-  },
-];
+import { useRef, useMemo } from "react";
+import { useTranslations } from "next-intl";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -200,8 +24,177 @@ const itemVariants = {
 };
 
 export default function LandingBankImport() {
+  const t = useTranslations("landing");
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
+
+  const supportedFormats = useMemo(
+    () => [
+      {
+        icon: "📄",
+        format: t("bankImport.csvFormat"),
+        description: t("bankImport.csvDesc"),
+        maxSize: "10MB",
+      },
+      {
+        icon: "📊",
+        format: t("bankImport.excelFormat"),
+        description: t("bankImport.excelDesc"),
+        maxSize: "10MB",
+      },
+      {
+        icon: "📋",
+        format: t("bankImport.pdfFormat"),
+        description: t("bankImport.pdfDesc"),
+        maxSize: "20MB",
+      },
+    ],
+    [t],
+  );
+
+  const importFeatures = useMemo(
+    () => [
+      {
+        icon: (
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+        ),
+        title: t("bankImport.smartDuplicate"),
+        description: t("bankImport.smartDuplicateDesc"),
+      },
+      {
+        icon: (
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+            />
+          </svg>
+        ),
+        title: t("bankImport.autoCategorization"),
+        description: t("bankImport.autoCategorisationDesc"),
+      },
+      {
+        icon: (
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        ),
+        title: t("bankImport.multiCurrencySupport"),
+        description: t("bankImport.multiCurrencyDesc"),
+      },
+      {
+        icon: (
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+            />
+          </svg>
+        ),
+        title: t("bankImport.reviewEdit"),
+        description: t("bankImport.reviewEditDesc"),
+      },
+      {
+        icon: (
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z"
+            />
+          </svg>
+        ),
+        title: t("bankImport.twentyFourHourUndo"),
+        description: t("bankImport.twentyFourHourUndoDesc"),
+      },
+      {
+        icon: (
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            />
+          </svg>
+        ),
+        title: t("bankImport.lightningFast"),
+        description: t("bankImport.lightningFastDesc"),
+      },
+    ],
+    [t],
+  );
+
+  const steps = useMemo(
+    () => [
+      {
+        number: 1,
+        title: t("bankImport.uploadStatement"),
+        description: t("bankImport.uploadStatementDesc"),
+        icon: "📤",
+      },
+      {
+        number: 2,
+        title: t("bankImport.reviewConfirm"),
+        description: t("bankImport.reviewConfirmDesc"),
+        icon: "✅",
+      },
+      {
+        number: 3,
+        title: t("bankImport.importComplete"),
+        description: t("bankImport.importCompleteDesc"),
+        icon: "🎉",
+      },
+    ],
+    [t],
+  );
 
   return (
     <section
@@ -219,15 +212,13 @@ export default function LandingBankImport() {
         >
           <div className="inline-flex items-center justify-center px-4 py-2 mb-4 text-sm font-medium text-primary-700 bg-primary-100 rounded-full">
             <span className="mr-2">⚡</span>
-            Bulk Import
+            {t("bankImport.bulkImport")}
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Stop Typing, Start Importing
+            {t("bankImport.stopTyping")}
           </h2>
           <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto px-4">
-            Import hundreds of transactions in minutes. Upload your bank
-            statement in CSV, Excel, or PDF format and let our smart system
-            handle the rest. No more manual entry tedium.
+            {t("bankImport.stopTypingDesc")}
           </p>
         </motion.div>
 
@@ -251,7 +242,7 @@ export default function LandingBankImport() {
               </h3>
               <p className="text-sm text-gray-600 mb-1">{format.description}</p>
               <p className="text-xs text-primary-600 font-medium">
-                Max {format.maxSize}
+                {t("bankImport.maxSize", { size: format.maxSize })}
               </p>
             </div>
           ))}
@@ -322,7 +313,7 @@ export default function LandingBankImport() {
           transition={{ duration: 0.6, delay: 0.4 }}
         >
           <h3 className="text-2xl sm:text-3xl font-bold text-center mb-10">
-            How Bank Import Works
+            {t("bankImport.howBankImportWorks")}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {steps.map((step, index) => (
@@ -359,7 +350,7 @@ export default function LandingBankImport() {
               10,000
             </div>
             <div className="text-sm text-gray-600">
-              Max Transactions per Import
+              {t("bankImport.maxTransactions")}
             </div>
           </div>
           <div className="text-center p-6 bg-white rounded-xl shadow-md">
@@ -367,7 +358,7 @@ export default function LandingBankImport() {
               99%
             </div>
             <div className="text-sm text-gray-600">
-              Duplicate Detection Accuracy
+              {t("bankImport.duplicateAccuracy")}
             </div>
           </div>
           <div className="text-center p-6 bg-white rounded-xl shadow-md">
@@ -375,14 +366,14 @@ export default function LandingBankImport() {
               &lt;10min
             </div>
             <div className="text-sm text-gray-600">
-              Import 500+ Transactions
+              {t("bankImport.importSpeed")}
             </div>
           </div>
           <div className="text-center p-6 bg-white rounded-xl shadow-md">
             <div className="text-3xl sm:text-4xl font-extrabold text-primary-600 mb-2">
               24hrs
             </div>
-            <div className="text-sm text-gray-600">Undo Window Available</div>
+            <div className="text-sm text-gray-600">{t("bankImport.undoWindow")}</div>
           </div>
         </motion.div>
 
@@ -394,14 +385,13 @@ export default function LandingBankImport() {
           transition={{ duration: 0.6, delay: 0.6 }}
         >
           <p className="text-gray-700 mb-6 text-lg">
-            Stop forgetting to track expenses. Import your statement once a
-            month and stay on top of your finances.
+            {t("bankImport.ctaText")}
           </p>
           <a
             href="/auth/register"
             className="inline-block px-8 py-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-200 font-semibold text-lg focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
           >
-            Get Started Free
+            {t("bankImport.getStartedFree")}
           </a>
         </motion.div>
       </div>

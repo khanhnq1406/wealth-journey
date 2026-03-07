@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils/cn";
 import { memo } from "react";
+import { useTranslations } from "next-intl";
 
 interface SidebarToggleProps {
   isExpanded: boolean;
@@ -16,6 +17,7 @@ export const SidebarToggle = memo(function SidebarToggle({
   isExpanded,
   onToggle,
 }: SidebarToggleProps) {
+  const t = useTranslations("sidebarToggle");
   return (
     <button
       onClick={onToggle}
@@ -23,9 +25,9 @@ export const SidebarToggle = memo(function SidebarToggle({
         "hidden sm:flex items-center justify-center h-8 rounded-lg bg-white/10 hover:bg-white/20 hover:scale-105 active:scale-95 transition-all touch-target duration-300 ease-in-out",
         isExpanded ? "w-full" : "w-8",
       )}
-      aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
+      aria-label={isExpanded ? t("collapse") : t("expand")}
       aria-expanded={isExpanded}
-      title={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
+      title={isExpanded ? t("collapse") : t("expand")}
     >
       <svg
         className="w-5 h-5 text-white transition-transform duration-300 ease-in-out"

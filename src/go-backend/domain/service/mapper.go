@@ -81,6 +81,7 @@ func (m *UserMapper) ModelToProto(user *models.User) *protobufv1.User {
 		Picture:              user.Picture,
 		PreferredCurrency:    user.PreferredCurrency,
 		ConversionInProgress: user.ConversionInProgress,
+		PreferredLanguage:    user.PreferredLanguage,
 		CreatedAt:            user.CreatedAt.Unix(),
 		UpdatedAt:            user.UpdatedAt.Unix(),
 	}

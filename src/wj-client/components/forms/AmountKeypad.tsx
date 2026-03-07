@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 import { formatNumberWithCommas } from "@/lib/utils/number-format";
 
@@ -32,6 +33,7 @@ export const AmountKeypad = memo(function AmountKeypad({
   maxLength = 12,
   className,
 }: AmountKeypadProps) {
+  const t = useTranslations("common");
   const handleKeyPress = useCallback(
     (key: string) => {
       if (key === "⌫") {
@@ -103,9 +105,9 @@ export const AmountKeypad = memo(function AmountKeypad({
               ? "bg-primary-600 text-white hover:bg-primary-700 shadow-md hover:shadow-lg"
               : "bg-gray-200 dark:bg-dark-surface-hover text-gray-400 dark:text-dark-text-tertiary cursor-not-allowed"
           )}
-          aria-label="Continue"
+          aria-label={t("continue")}
         >
-          Continue
+          {t("continue")}
         </button>
       )}
     </div>

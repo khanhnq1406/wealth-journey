@@ -71,7 +71,7 @@ export const InvestmentDetailModal = dynamic(
  * These components are heavy and only used on specific pages
  */
 export const BalanceChart = dynamic(
-  () => import("../../app/dashboard/home/Balance").then((mod) => mod.Balance),
+  () => import("../../app/[locale]/dashboard/home/Balance").then((mod) => mod.Balance),
   {
     loading: () => <TableLoadingFallback />,
     ssr: false,
@@ -80,7 +80,7 @@ export const BalanceChart = dynamic(
 
 export const DominanceChart = dynamic(
   () =>
-    import("../../app/dashboard/home/Dominance").then((mod) => mod.Dominance),
+    import("../../app/[locale]/dashboard/home/Dominance").then((mod) => mod.Dominance),
   {
     loading: () => <TableLoadingFallback />,
     ssr: false,
@@ -89,7 +89,7 @@ export const DominanceChart = dynamic(
 
 export const MonthlyDominanceChart = dynamic(
   () =>
-    import("../../app/dashboard/home/MonthlyDominance").then(
+    import("../../app/[locale]/dashboard/home/MonthlyDominance").then(
       (mod) => mod.MonthlyDominance
     ),
   {
@@ -100,7 +100,7 @@ export const MonthlyDominanceChart = dynamic(
 
 export const AccountBalanceChart = dynamic(
   () =>
-    import("../../app/dashboard/home/AccountBalance").then(
+    import("../../app/[locale]/dashboard/home/AccountBalance").then(
       (mod) => mod.AccountBalance
     ),
   {
@@ -130,10 +130,10 @@ export const preloadTanStackTable = () => {
 };
 
 export const preloadCharts = () => {
-  import("../../app/dashboard/home/Balance");
-  import("../../app/dashboard/home/Dominance");
-  import("../../app/dashboard/home/MonthlyDominance");
-  import("../../app/dashboard/home/AccountBalance");
+  import("../../app/[locale]/dashboard/home/Balance");
+  import("../../app/[locale]/dashboard/home/Dominance");
+  import("../../app/[locale]/dashboard/home/MonthlyDominance");
+  import("../../app/[locale]/dashboard/home/AccountBalance");
 };
 
 export const preloadTransactionForms = () => {

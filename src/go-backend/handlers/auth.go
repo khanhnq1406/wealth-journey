@@ -155,5 +155,6 @@ func (h *AuthHandlers) GetAuth(c *gin.Context) {
 		"picture":              userData.Data.Picture,
 		"preferredCurrency":    userData.Data.PreferredCurrency,
 		"conversionInProgress": userData.Data.ConversionInProgress,
+		"preferredLanguage":    userData.Data.PreferredLanguage,
 	})
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { BaseModal } from "@/components/modals/BaseModal";
 import { FileUploadStep } from "@/features/import/components/FileUploadStep";
 import { WalletSelectionStep } from "@/features/import/components/WalletSelectionStep";
@@ -127,7 +128,12 @@ interface ImportTransactionsFormProps {
 export function ImportTransactionsForm({
   onSuccess,
 }: ImportTransactionsFormProps) {
+  const t = useTranslations("import.steps");
   const queryClient = useQueryClient();
+  const translatedSteps = useMemo(() => IMPORT_STEPS.map((step, i) => {
+    const labels = [t("upload"), t("selectWallet"), t("review"), t("complete")];
+    return { ...step, label: labels[i] ?? step.label };
+  }), [t]);
   const [isOpen, setIsOpen] = useState(true);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadedFileId, setUploadedFileId] = useState<string | null>(null);
@@ -355,7 +361,7 @@ export function ImportTransactionsForm({
       {/* Step Progress Indicator - Show on steps 1, 2, 5 only */}
       {(currentStep === 1 || currentStep === 2 || currentStep === 5) && (
         <div className="mb-6 pb-6 border-b border-gray-200 pt-1">
-          <StepProgress steps={IMPORT_STEPS} currentStep={currentStep} />
+          <StepProgress steps={translatedSteps} currentStep={currentStep} />
         </div>
       )}
 

@@ -17,6 +17,7 @@ import {
 import { Success } from "@/components/modals/Success";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { amountToSmallestUnit } from "@/lib/utils/units";
+import { useTranslations } from "next-intl";
 
 interface EditBudgetFormProps {
   budget: Budget;
@@ -30,20 +31,21 @@ interface EditBudgetFormProps {
  */
 export function EditBudgetForm({ budget, onSuccess }: EditBudgetFormProps) {
   const { currency } = useCurrency();
+  const t = useTranslations("budget.form");
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [showSuccess, setShowSuccess] = useState(false);
 
   const updateBudget = useMutationUpdateBudget({
     onSuccess: (data) => {
-      const message = data?.message || "Budget has been updated successfully";
+      const message = data?.message || t("updatedSuccess");
       setSuccessMessage(message);
       setShowSuccess(true);
       setErrorMessage("");
     },
     onError: (error: any) => {
       setErrorMessage(
-        error.message || "Failed to update budget. Please try again",
+        error.message || t("failedToUpdate"),
       );
     },
   });
@@ -93,8 +95,8 @@ export function EditBudgetForm({ budget, onSuccess }: EditBudgetFormProps) {
       <FormInput
         name="name"
         control={control}
-        label="Budget Name"
-        placeholder="e.g., Monthly Budget"
+        label={t("budgetName")}
+        placeholder={t("budgetNamePlaceholder")}
         required
         disabled={updateBudget.isPending}
       />
@@ -102,7 +104,7 @@ export function EditBudgetForm({ budget, onSuccess }: EditBudgetFormProps) {
       <FormNumberInput
         name="total"
         control={control}
-        label="Total Amount"
+        label={t("totalAmount")}
         placeholder="0"
         suffix={currency}
         required
@@ -118,7 +120,7 @@ export function EditBudgetForm({ budget, onSuccess }: EditBudgetFormProps) {
           loading={updateBudget.isPending}
           htmlType="submit"
         >
-          Save
+          {t("save")}
         </Button>
       </div>
     </form>

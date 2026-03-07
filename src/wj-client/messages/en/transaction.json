@@ -1,0 +1,131 @@
+{
+  "transaction": {
+    "title": "Transactions",
+    "searchPlaceholder": "Search transactions...",
+    "totalBalance": "Total balance",
+    "noTransactionsFound": "No transactions found",
+    "addFirstTransaction": "Add your first transaction or adjust filters",
+    "defaultLabel": "Transaction",
+    "transactionAddedSuccess": "Transaction has been added successfully",
+    "failedToAdd": "Failed to add transaction. Please try again",
+    "quickFilters": {
+      "all": "All",
+      "income": "Income",
+      "expense": "Expense",
+      "today": "Today",
+      "thisWeek": "This Week",
+      "thisMonth": "This Month"
+    },
+    "sortOptions": {
+      "newestFirst": "Newest first",
+      "oldestFirst": "Oldest first",
+      "highestFirst": "Highest first",
+      "lowestFirst": "Lowest first"
+    },
+    "form": {
+      "title": "Add Transaction",
+      "editTitle": "Edit Transaction",
+      "income": "Income",
+      "expense": "Expense",
+      "amount": "Amount",
+      "wallet": "Wallet",
+      "selectWallet": "Select wallet",
+      "category": "Category",
+      "selectOrCreateCategory": "Select or create category...",
+      "dateTime": "Date & Time",
+      "note": "Note",
+      "notePlaceholder": "Enter note (optional)",
+      "addTransaction": "Add Transaction",
+      "updateTransaction": "Update Transaction",
+      "transactionUpdatedSuccess": "Transaction has been updated successfully",
+      "failedToUpdate": "Failed to update transaction. Please try again",
+      "transactionAddedSuccess": "Transaction has been added successfully",
+      "failedToAdd": "Failed to add transaction. Please try again",
+      "createNewCategory": "Create new category",
+      "newCategoryPlaceholder": "Enter category name"
+    },
+    "delete": {
+      "title": "Delete Transaction",
+      "confirmMessage": "Are you sure you want to delete this transaction?",
+      "confirmButton": "Delete",
+      "cancelButton": "Cancel"
+    },
+    "import": {
+      "title": "Import Transactions",
+      "buttonLabel": "Import"
+    },
+    "export": {
+      "title": "Export Transactions"
+    },
+    "filter": {
+      "openFilters": "Open filters",
+      "clearSearch": "Clear search",
+      "toggleBalanceVisibility": "Toggle balance visibility",
+      "filters": "Filters",
+      "filterBy": "Filter by {label}",
+      "removeFilter": "Remove {label} filter",
+      "sortBy": "Sort By",
+      "sortTransactions": "Sort transactions",
+      "minAmount": "Min Amount",
+      "maxAmount": "Max Amount",
+      "noLimit": "No limit",
+      "selectStartDate": "Select start date",
+      "selectEndDate": "Select end date",
+      "until": "Until"
+    }
+  },
+  "transfer": {
+    "form": {
+      "amount": "Amount",
+      "from": "From",
+      "selectSourceWallet": "Select source wallet",
+      "selectSourceFirst": "Select source wallet first",
+      "to": "To",
+      "selectDestWallet": "Select destination wallet",
+      "dateTime": "Date & Time",
+      "note": "Note",
+      "notePlaceholder": "Enter note (optional)",
+      "transfer": "Transfer",
+      "successDefault": "Funds have been transferred successfully",
+      "failedToTransfer": "Failed to transfer funds. Please try again"
+    }
+  },
+  "transactionCard": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "transfer": "Transfer",
+    "editAriaLabel": "Edit transaction",
+    "deleteAriaLabel": "Delete transaction",
+    "viewDetailsAriaLabel": "View details for {title}",
+    "status": {
+      "pending": "Pending",
+      "completed": "Completed",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "transactionReview": {
+    "table": {
+      "row": "Row",
+      "date": "Date",
+      "description": "Description",
+      "amount": "Amount",
+      "status": "Status",
+      "toggleAllRows": "Toggle all rows",
+      "toggleRow": "Toggle row {n}",
+      "selectAll": "Select All",
+      "selected": "{count} selected",
+      "totalRows": "Total Rows",
+      "valid": "Valid",
+      "errors": "Errors",
+      "statusError": "Error",
+      "statusDuplicate": "Duplicate {confidence}%",
+      "statusValid": "Valid",
+      "editDescription": "Edit description",
+      "original": "Original",
+      "showOriginal": "Show original description",
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  }
+}

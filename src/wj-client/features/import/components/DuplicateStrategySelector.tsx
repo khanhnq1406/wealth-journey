@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { DuplicateHandlingStrategy } from "@/gen/protobuf/v1/import";
 import { cn } from "@/lib/utils/cn";
 
@@ -22,6 +23,8 @@ export function DuplicateStrategySelector({
   onStrategyChange,
   className,
 }: DuplicateStrategySelectorProps) {
+  const t = useTranslations("modals.importWizard.duplicateStrategy");
+
   if (duplicateCount === 0) {
     return null;
   }
@@ -29,26 +32,26 @@ export function DuplicateStrategySelector({
   const strategies = [
     {
       value: DuplicateHandlingStrategy.DUPLICATE_STRATEGY_SKIP_ALL,
-      label: "Skip All",
-      description: "Don't import any duplicates",
+      label: t("skipAll"),
+      description: t("skipAllDesc"),
       icon: "🚫",
     },
     {
       value: DuplicateHandlingStrategy.DUPLICATE_STRATEGY_AUTO_MERGE,
-      label: "Auto Merge",
-      description: "Update existing transactions",
+      label: t("autoMerge"),
+      description: t("autoMergeDesc"),
       icon: "🔄",
     },
     {
       value: DuplicateHandlingStrategy.DUPLICATE_STRATEGY_REVIEW_EACH,
-      label: "Review Each",
-      description: "Manually review duplicates",
+      label: t("reviewEach"),
+      description: t("reviewEachDesc"),
       icon: "👁️",
     },
     {
       value: DuplicateHandlingStrategy.DUPLICATE_STRATEGY_KEEP_ALL,
-      label: "Keep All",
-      description: "Import all as new transactions",
+      label: t("keepAll"),
+      description: t("keepAllDesc"),
       icon: "✅",
     },
   ];
@@ -59,10 +62,10 @@ export function DuplicateStrategySelector({
         <span className="text-xl">⚡</span>
         <div>
           <h3 className="text-sm font-semibold text-warning-700 dark:text-warning-300">
-            {duplicateCount} Potential Duplicate{duplicateCount !== 1 ? "s" : ""} Detected
+            {t(duplicateCount !== 1 ? "headingPlural" : "heading", { count: duplicateCount })}
           </h3>
           <p className="text-xs text-warning-600 dark:text-warning-400">
-            Choose how to handle duplicate transactions
+            {t("subtitle")}
           </p>
         </div>
       </div>
@@ -94,7 +97,7 @@ export function DuplicateStrategySelector({
 
       {selectedStrategy === DuplicateHandlingStrategy.DUPLICATE_STRATEGY_KEEP_ALL && (
         <div className="mt-3 p-2 bg-warning-100 dark:bg-warning-900/30 rounded text-xs text-warning-800 dark:text-warning-300">
-          ⚠️ Warning: This will import all {duplicateCount} potential duplicate{duplicateCount !== 1 ? "s" : ""} as new transactions
+          ⚠️ {t(duplicateCount !== 1 ? "keepAllWarningPlural" : "keepAllWarning", { count: duplicateCount })}
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { DuplicateMatch } from "@/gen/protobuf/v1/import";
 import { Button } from "@/components/Button";
 import { cn } from "@/lib/utils/cn";
@@ -18,6 +19,8 @@ export const DuplicateSection = React.memo(function DuplicateSection({
   onDuplicateHandled,
   currency = "VND",
 }: DuplicateSectionProps) {
+  const t = useTranslations("import.duplicate");
+  const locale = useLocale();
   const [expanded, setExpanded] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -87,10 +90,12 @@ export const DuplicateSection = React.memo(function DuplicateSection({
           <span className="text-2xl">⚡</span>
           <div className="text-left">
             <h3 className="font-semibold text-base text-warning-700 dark:text-warning-300">
-              {matches.length} Potential Duplicate{matches.length !== 1 ? "s" : ""}
+              {matches.length !== 1
+                ? t("potentialDuplicatesPlural", { count: matches.length })
+                : t("potentialDuplicates", { count: matches.length })}
             </h3>
             <p className="text-sm text-warning-600 dark:text-warning-400">
-              Review to avoid duplicate entries
+              {t("reviewToAvoid")}
             </p>
           </div>
         </div>
@@ -110,7 +115,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
           {/* Progress */}
           <div className="flex items-center justify-between text-sm">
             <p className="text-neutral-600 dark:text-dark-text-secondary">
-              Match {safeIndex + 1} of {matches.length}
+              {t("matchOf", { current: safeIndex + 1, total: matches.length })}
             </p>
             <div className="flex gap-1">
               {matches.map((_, idx) => (
@@ -152,40 +157,40 @@ export const DuplicateSection = React.memo(function DuplicateSection({
                 <div className="flex items-center gap-2">
                   <span className="text-lg">📥</span>
                   <h4 className="text-sm font-semibold text-primary-700 dark:text-primary-300">
-                    Imported Transaction
+                    {t("importedTransaction")}
                   </h4>
                 </div>
                 <span className="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full bg-primary-600 text-white">
-                  NEW
+                  {t("new")}
                 </span>
               </div>
               <div className="space-y-0 text-sm text-neutral-900 dark:text-dark-text divide-y divide-primary-200 dark:divide-primary-800">
                 <div className="flex justify-between py-2">
-                  <span className="font-medium">Amount:</span>
+                  <span className="font-medium">{t("amount")}</span>
                   <span className="font-bold">
                     {formatCurrency(imported?.amount?.amount || 0, imported?.amount?.currency || currency)}
                   </span>
                 </div>
                 <div className="flex justify-between py-2">
-                  <span className="font-medium">Date:</span>
-                  <span>{formatDate(imported?.date)}</span>
+                  <span className="font-medium">{t("date")}</span>
+                  <span>{formatDate(imported?.date, locale)}</span>
                 </div>
                 <div className="flex justify-between py-2 gap-3">
-                  <span className="font-medium">Description:</span>
+                  <span className="font-medium">{t("description")}</span>
                   <span className="text-right">{imported?.description}</span>
                 </div>
                 {imported?.referenceNumber && (
                   <div className="flex justify-between py-2">
-                    <span className="font-medium">Ref:</span>
+                    <span className="font-medium">{t("reference")}</span>
                     <span>{imported.referenceNumber}</span>
                   </div>
                 )}
                 <div className="flex justify-between py-2">
-                  <span className="font-medium">Category:</span>
+                  <span className="font-medium">{t("category")}</span>
                   {imported?.suggestedCategoryId ? (
-                    <span>Category {imported.suggestedCategoryId}</span>
+                    <span>{t("categoryNumber", { id: imported.suggestedCategoryId })}</span>
                   ) : (
-                    <span className="text-neutral-500 dark:text-neutral-400 italic">No category</span>
+                    <span className="text-neutral-500 dark:text-neutral-400 italic">{t("noCategory2")}</span>
                   )}
                 </div>
               </div>
@@ -197,34 +202,34 @@ export const DuplicateSection = React.memo(function DuplicateSection({
                 <div className="flex items-center gap-2">
                   <span className="text-lg">💾</span>
                   <h4 className="text-sm font-semibold text-neutral-900 dark:text-dark-text">
-                    Existing Transaction
+                    {t("existingTransaction")}
                   </h4>
                 </div>
                 <span className="inline-flex px-2.5 py-1 text-xs font-semibold rounded-full bg-neutral-600 text-white">
-                  EXISTING
+                  {t("existing")}
                 </span>
               </div>
               <div className="space-y-0 text-sm text-neutral-900 dark:text-dark-text divide-y divide-neutral-200 dark:divide-dark-border">
                 <div className="flex justify-between py-2">
-                  <span className="font-medium">Amount:</span>
+                  <span className="font-medium">{t("amount")}</span>
                   <span className="font-bold">
                     {formatCurrency(existing?.amount?.amount || 0, existing?.amount?.currency || currency)}
                   </span>
                 </div>
                 <div className="flex justify-between py-2">
-                  <span className="font-medium">Date:</span>
-                  <span>{formatDate(existing?.date)}</span>
+                  <span className="font-medium">{t("date")}</span>
+                  <span>{formatDate(existing?.date, locale)}</span>
                 </div>
                 <div className="flex justify-between py-2 gap-3">
-                  <span className="font-medium">Description:</span>
+                  <span className="font-medium">{t("description")}</span>
                   <span className="text-right">{existing?.note}</span>
                 </div>
                 <div className="flex justify-between py-2">
-                  <span className="font-medium">Category:</span>
+                  <span className="font-medium">{t("category")}</span>
                   {existing?.categoryId ? (
-                    <span>Category {existing.categoryId}</span>
+                    <span>{t("categoryNumber", { id: existing.categoryId })}</span>
                   ) : (
-                    <span className="text-neutral-500 dark:text-neutral-400 italic">No category</span>
+                    <span className="text-neutral-500 dark:text-neutral-400 italic">{t("noCategory2")}</span>
                   )}
                 </div>
               </div>
@@ -241,7 +246,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
               className="min-h-[48px] text-base font-semibold"
             >
               <span className="mr-1">🔗</span>
-              Merge
+              {t("merge")}
             </Button>
             <Button
               variant="secondary"
@@ -251,7 +256,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
               className="min-h-[48px] text-base font-semibold"
             >
               <span className="mr-1">📋</span>
-              Keep Both
+              {t("keepBoth")}
             </Button>
             <Button
               variant="secondary"
@@ -261,7 +266,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
               className="min-h-[48px] text-base font-semibold"
             >
               <span className="mr-1">⏭️</span>
-              Skip Import
+              {t("skipImport")}
             </Button>
           </div>
 
@@ -272,7 +277,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
               disabled={safeIndex === 0}
               className="flex-1 px-4 py-2 text-sm bg-neutral-200 dark:bg-dark-surface-hover text-neutral-700 dark:text-dark-text rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-300 dark:hover:bg-dark-surface-active transition-colors"
             >
-              ← Previous
+              {t("previous")}
             </button>
             <button
               onClick={() =>
@@ -281,7 +286,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
               disabled={safeIndex === matches.length - 1}
               className="flex-1 px-4 py-2 text-sm bg-neutral-200 dark:bg-dark-surface-hover text-neutral-700 dark:text-dark-text rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-300 dark:hover:bg-dark-surface-active transition-colors"
             >
-              Next →
+              {t("next")}
             </button>
           </div>
 
@@ -294,7 +299,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
                 fullWidth
                 size="sm"
               >
-                Auto-Merge All High Confidence ({highConfidenceCount})
+                {t("autoMergeHigh", { count: highConfidenceCount })}
               </Button>
             </div>
           )}
@@ -304,9 +309,9 @@ export const DuplicateSection = React.memo(function DuplicateSection({
   );
 });
 
-function formatDate(timestamp?: number): string {
+function formatDate(timestamp?: number, locale?: string): string {
   if (!timestamp) return "";
-  return new Date(timestamp * 1000).toLocaleDateString("vi-VN", {
+  return new Date(timestamp * 1000).toLocaleDateString(locale, {
     year: "numeric",
     month: "short",
     day: "numeric",

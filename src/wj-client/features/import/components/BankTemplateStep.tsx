@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   useQueryListBankTemplates,
   useQueryListUserTemplates,
@@ -40,6 +41,8 @@ export function BankTemplateStep({
   onNext,
   onBack,
 }: BankTemplateStepProps) {
+  const t = useTranslations("import.bankTemplate");
+  const tCommon = useTranslations("common");
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
 
   // Fetch bank templates
@@ -72,10 +75,10 @@ export function BankTemplateStep({
       {/* Instructions */}
       <div className="text-sm sm:text-base text-neutral-600 dark:text-dark-text-secondary">
         <p className="mb-2">
-          Select your bank to automatically configure column mapping.
+          {t("selectBankInstructions")}
         </p>
         <p className="text-xs sm:text-sm text-neutral-500 dark:text-dark-text-tertiary">
-          Or choose "Custom Format" to manually map columns.
+          {t("customFormatHint")}
         </p>
       </div>
 
@@ -95,7 +98,7 @@ export function BankTemplateStep({
       {isError && (
         <div className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
           <p className="text-red-700 dark:text-red-300 mb-3">
-            Failed to load bank templates.{" "}
+            {t("loadError")}{" "}
             {error?.message || "Please try again."}
           </p>
           <Button
@@ -103,7 +106,7 @@ export function BankTemplateStep({
             onClick={() => refetch()}
             className="text-sm"
           >
-            Retry
+            {t("retry")}
           </Button>
         </div>
       )}
@@ -116,7 +119,7 @@ export function BankTemplateStep({
             userTemplatesData.templates.length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold text-neutral-700 dark:text-dark-text-secondary mb-2 px-1">
-                  Your Templates
+                  {t("yourTemplates")}
                 </h3>
                 <div className="space-y-2 max-h-[25vh] overflow-y-auto -mx-1 px-1">
                   {userTemplatesData.templates.map((template) => (
@@ -155,7 +158,7 @@ export function BankTemplateStep({
           {/* Bank Templates Section */}
           <div>
             <h3 className="text-sm font-semibold text-neutral-700 dark:text-dark-text-secondary mb-2 px-1">
-              Bank Templates
+              {t("bankTemplates")}
             </h3>
             <div className="space-y-2 max-h-[25vh] overflow-y-auto -mx-1 px-1">
               {templatesData?.templates?.map((template) => (
@@ -190,10 +193,10 @@ export function BankTemplateStep({
               {templatesData?.templates?.length === 0 && (
                 <div className="text-center py-8 px-4 text-neutral-500 dark:text-neutral-400">
                   <p className="text-base mb-2">
-                    No bank templates available yet.
+                    {t("noTemplatesAvailable")}
                   </p>
                   <p className="text-sm">
-                    Use "Custom Format" below to proceed with your import.
+                    {t("useCustomFormat")}
                   </p>
                 </div>
               )}
@@ -215,10 +218,10 @@ export function BankTemplateStep({
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <h3 className="font-semibold text-base text-neutral-900 dark:text-dark-text">
-                  Custom Format
+                  {t("customFormat")}
                 </h3>
                 <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mt-1">
-                  Manually configure column mapping for any bank
+                  {t("customFormatDesc")}
                 </p>
               </div>
               {selectedTemplate === CUSTOM_TEMPLATE_ID && <CheckIcon />}
@@ -230,10 +233,10 @@ export function BankTemplateStep({
       {/* Action Buttons */}
       <div className="flex gap-3 pt-2">
         <Button variant="secondary" onClick={onBack}>
-          Back
+          {t("back")}
         </Button>
         <Button variant="primary" onClick={onNext} disabled={!selectedTemplate}>
-          Next: Preview
+          {t("nextPreview")}
         </Button>
       </div>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { useMobile } from "@/hooks/useMobile";
 import { InstallSteps } from "./InstallSteps";
@@ -22,6 +23,8 @@ export function PWAInstallPrompt({
   landingPageOnly = true,
   showDelay = 2000,
 }: PWAInstallPromptProps) {
+  const t = useTranslations("pwa.installPrompt");
+  const tCommon = useTranslations("common");
   const { isInstalled, platform, canInstall, promptInstall } = usePWAInstall();
   const isMobile = useMobile();
   const [isVisible, setIsVisible] = useState(false);
@@ -130,11 +133,10 @@ export function PWAInstallPrompt({
                     id="pwa-prompt-title"
                     className="text-xl font-bold text-gray-900 mb-1"
                   >
-                    Install WealthJourney
+                    {t("title")}
                   </h2>
                   <p className="text-sm text-gray-600">
-                    Get the full app experience with faster loading, offline
-                    access, and home screen convenience.
+                    {t("description")}
                   </p>
                 </div>
               </div>
@@ -142,7 +144,7 @@ export function PWAInstallPrompt({
               <button
                 onClick={handleDismiss}
                 className="flex-shrink-0 -mt-1 -mr-1 p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                aria-label="Close"
+                aria-label={tCommon("close")}
               >
                 <svg
                   className="w-5 h-5"
@@ -181,7 +183,7 @@ export function PWAInstallPrompt({
                     />
                   </svg>
                 </div>
-                <p className="text-xs font-medium text-gray-700">Fast</p>
+                <p className="text-xs font-medium text-gray-700">{t("benefits.fast")}</p>
               </div>
               <div className="text-center">
                 <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -199,7 +201,7 @@ export function PWAInstallPrompt({
                     />
                   </svg>
                 </div>
-                <p className="text-xs font-medium text-gray-700">Offline</p>
+                <p className="text-xs font-medium text-gray-700">{t("benefits.offline")}</p>
               </div>
               <div className="text-center">
                 <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -217,14 +219,14 @@ export function PWAInstallPrompt({
                     />
                   </svg>
                 </div>
-                <p className="text-xs font-medium text-gray-700">Home Screen</p>
+                <p className="text-xs font-medium text-gray-700">{t("benefits.homeScreenShort")}</p>
               </div>
             </div>
 
             {/* Installation Steps */}
             <div className="bg-fg rounded-xl p-5">
               <h3 className="text-sm font-semibold text-gray-900 mb-4">
-                How to Install
+                {t("howToInstall")}
               </h3>
               <InstallSteps platform={platform} onInstall={handleInstall} />
             </div>
@@ -236,13 +238,13 @@ export function PWAInstallPrompt({
               onClick={handleDismissPermanently}
               className="text-sm text-gray-500 hover:text-gray-700 transition-colors font-medium"
             >
-              Don't show again
+              {t("dontShowAgain")}
             </button>
             <button
               onClick={handleDismiss}
               className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-hover rounded-lg transition-colors"
             >
-              Maybe Later
+              {t("maybeLater")}
             </button>
           </div>
         </div>

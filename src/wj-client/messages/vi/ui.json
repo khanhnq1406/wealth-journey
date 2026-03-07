@@ -1,0 +1,320 @@
+{
+  "modals": {
+    "titles": {
+      "addTransaction": "Thêm giao dịch",
+      "editTransaction": "Sửa giao dịch",
+      "transferMoney": "Chuyển tiền",
+      "createWallet": "Tạo ví",
+      "editWallet": "Sửa ví",
+      "deleteWallet": "Xóa ví",
+      "createBudget": "Tạo ngân sách",
+      "editBudget": "Sửa ngân sách",
+      "addBudgetItem": "Thêm mục ngân sách",
+      "editBudgetItem": "Sửa mục ngân sách",
+      "addInvestment": "Thêm khoản đầu tư",
+      "investmentDetails": "Chi tiết đầu tư",
+      "createInvestmentWallet": "Tạo ví đầu tư",
+      "importTransactions": "Nhập giao dịch",
+      "deleteTransaction": "Xóa giao dịch",
+      "deleteTemplate": "Xóa mẫu",
+      "revokeAllSessions": "Thu hồi tất cả phiên"
+    },
+    "confirmation": {
+      "deleteTransactionMessage": "Bạn có chắc chắn muốn xóa giao dịch này?",
+      "deleteConfirm": "Xóa",
+      "cancelButton": "Hủy",
+      "areYouSure": "Bạn có chắc không?",
+      "thisActionCannotBeUndone": "Thao tác này không thể hoàn tác.",
+      "confirm": "Xác nhận"
+    },
+    "importWizard": {
+      "selectWallet": "Chọn ví",
+      "selectBankTemplate": "Chọn mẫu ngân hàng",
+      "uploadFile": "Tải lên tệp",
+      "columnMapping": "Ánh xạ cột",
+      "review": "Xem lại",
+      "saveAsTemplate": "Lưu làm mẫu",
+      "templateName": "Tên mẫu",
+      "dragAndDrop": "Kéo và thả tệp vào đây",
+      "browseFiles": "Chọn tệp",
+      "supportedFormats": "Định dạng hỗ trợ: CSV",
+      "stepProgress": "Bước {current} / {total}",
+      "duplicateDetection": "Phát hiện trùng lặp",
+      "categoryReview": "Xem lại danh mục",
+      "readyToImport": "Sẵn sàng nhập",
+      "transactionsReview": "Xem lại giao dịch",
+      "errorSummary": "Tóm tắt lỗi",
+      "currencyConversion": "Chuyển đổi tiền tệ",
+      "dateRangeFilter": "Lọc theo khoảng ngày",
+      "importSuccess": "Nhập thành công!",
+      "importSuccessMessage": "Các giao dịch đã được nhập thành công.",
+      "importButton": "Nhập giao dịch",
+      "transactionsImported": "{count} giao dịch đã được nhập",
+      "skippedCount": "({count} bị bỏ qua)",
+      "incomeLabel": "Thu nhập",
+      "expensesLabel": "Chi tiêu",
+      "netChange": "Thay đổi ròng",
+      "newBalance": "Số dư mới",
+      "duplicatesSkipped": "{count} trùng lặp đã bỏ qua",
+      "duplicatesMerged": "{count} trùng lặp đã gộp",
+      "undoNotice": "Bạn có thể hoàn tác lần nhập này trong vòng 24 giờ",
+      "undoNoticeDetail": "Tất cả giao dịch đã nhập sẽ bị xóa và số dư ví sẽ được khôi phục.",
+      "undoImportButton": "Hoàn tác nhập",
+      "undoImportTitle": "Hoàn tác nhập?",
+      "undoImportDescription": "Thao tác này sẽ xóa tất cả {count} giao dịch đã nhập và khôi phục số dư ví.",
+      "undoImportCannotReverse": "Thao tác này không thể hoàn tác. Bạn có chắc không?",
+      "yesUndoImport": "Có, Hoàn tác nhập",
+      "failedToUndoImport": "Không thể hoàn tác nhập: {error}"
+    }
+  },
+  "feedback": {
+    "emptyState": {
+      "noDataFound": "Không tìm thấy dữ liệu",
+      "noResultsFound": "Không tìm thấy kết quả",
+      "noResultsDescription": "Chúng tôi không tìm thấy kết quả phù hợp. Hãy thử điều chỉnh tìm kiếm hoặc bộ lọc.",
+      "noTransactionsYet": "Chưa có giao dịch",
+      "noTransactionsDescription": "Bắt đầu theo dõi tài chính bằng cách thêm giao dịch đầu tiên.",
+      "noWalletsFound": "Không tìm thấy ví",
+      "noWalletsDescription": "Tạo ví để bắt đầu quản lý tài chính.",
+      "noInvestmentsYet": "Chưa có khoản đầu tư",
+      "noInvestmentsDescription": "Bắt đầu xây dựng danh mục bằng cách thêm khoản đầu tư đầu tiên.",
+      "noBudgetsSet": "Chưa đặt ngân sách",
+      "noBudgetsDescription": "Tạo ngân sách để quản lý chi tiêu tốt hơn.",
+      "noCategories": "Chưa có danh mục",
+      "noCategoriesDescription": "Danh mục giúp tổ chức giao dịch. Tạo danh mục đầu tiên của bạn.",
+      "noDataAvailable": "Không có dữ liệu",
+      "noDataDescription": "Hiện tại không có dữ liệu để hiển thị."
+    },
+    "errorState": {
+      "somethingWentWrong": "Đã xảy ra lỗi",
+      "somethingWentWrongDescription": "Chúng tôi gặp lỗi khi tải dữ liệu. Vui lòng thử lại.",
+      "networkError": "Lỗi mạng",
+      "networkErrorDescription": "Vui lòng kiểm tra kết nối internet và thử lại.",
+      "serverError": "Lỗi máy chủ",
+      "serverErrorDescription": "Máy chủ đang gặp sự cố. Vui lòng thử lại sau.",
+      "accessDenied": "Truy cập bị từ chối",
+      "accessDeniedDescription": "Bạn không có quyền truy cập tài nguyên này.",
+      "notFound": "Không tìm thấy",
+      "notFoundDescription": "Không tìm thấy tài nguyên yêu cầu.",
+      "requestTimeout": "Hết thời gian yêu cầu",
+      "requestTimeoutDescription": "Yêu cầu mất quá lâu để hoàn thành. Vui lòng thử lại.",
+      "unexpectedError": "Lỗi không mong đợi",
+      "unexpectedErrorDescription": "Đã xảy ra lỗi không mong đợi. Vui lòng thử lại."
+    },
+    "success": {
+      "defaultMessage": "Thao tác hoàn tất thành công!"
+    },
+    "loading": {
+      "loadingText": "Đang tải...",
+      "loadingData": "Đang tải dữ liệu...",
+      "pleaseWait": "Vui lòng chờ..."
+    }
+  },
+  "emptyState": {
+    "noTransactions": {
+      "title": "Chưa có giao dịch",
+      "description": "Bắt đầu bằng cách thêm giao dịch đầu tiên để theo dõi tài chính của bạn."
+    },
+    "noWallets": {
+      "title": "Không tìm thấy ví",
+      "description": "Tạo ví để bắt đầu theo dõi số dư và giao dịch của bạn."
+    },
+    "noInvestments": {
+      "title": "Chưa có khoản đầu tư",
+      "description": "Thêm khoản đầu tư để theo dõi hiệu suất danh mục của bạn."
+    },
+    "noResults": {
+      "title": "Không tìm thấy kết quả",
+      "description": "Hãy thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm."
+    },
+    "noBudgets": {
+      "title": "Chưa đặt ngân sách",
+      "description": "Tạo ngân sách để quản lý chi tiêu theo danh mục."
+    },
+    "noCategories": {
+      "title": "Chưa có danh mục",
+      "description": "Tạo danh mục để tổ chức các giao dịch của bạn."
+    },
+    "error": {
+      "title": "Đã xảy ra lỗi",
+      "description": "Không thể tải dữ liệu. Vui lòng thử lại."
+    },
+    "networkError": {
+      "title": "Mất kết nối",
+      "description": "Vui lòng kiểm tra kết nối internet và thử lại."
+    }
+  },
+  "errorState": {
+    "tryAgain": "Thử lại",
+    "network": {
+      "title": "Lỗi kết nối",
+      "message": "Không thể kết nối. Vui lòng kiểm tra kết nối internet của bạn."
+    },
+    "server": {
+      "title": "Lỗi máy chủ",
+      "message": "Đã xảy ra lỗi phía máy chủ. Vui lòng thử lại sau."
+    },
+    "permission": {
+      "title": "Truy cập bị từ chối",
+      "message": "Bạn không có quyền truy cập tài nguyên này."
+    },
+    "notFound": {
+      "title": "Không tìm thấy",
+      "message": "Tài nguyên được yêu cầu không thể được tìm thấy."
+    },
+    "generic": {
+      "title": "Đã xảy ra lỗi",
+      "message": "Đã xảy ra lỗi không mong đợi. Vui lòng thử lại."
+    }
+  },
+  "formWizard": {
+    "goToStep": "Đến bước {number}: {title}",
+    "stepOf": "Bước {current} trong {total}",
+    "previousStepAriaLabel": "Đến bước trước",
+    "previous": "Trước",
+    "nextStepAriaLabel": "Đến bước tiếp theo",
+    "finishAriaLabel": "Hoàn thành",
+    "processing": "Đang xử lý...",
+    "finish": "Hoàn thành",
+    "next": "Tiếp theo"
+  },
+  "skeleton": {
+    "loading": "Đang tải..."
+  },
+  "pullToRefresh": {
+    "pull": "Kéo để làm mới",
+    "release": "Thả để làm mới",
+    "updating": "Đang cập nhật giá..."
+  },
+  "pwa": {
+    "installPrompt": {
+      "title": "Cài đặt WealthJourney",
+      "description": "Trải nghiệm đầy đủ với tải nhanh hơn, truy cập ngoại tuyến và tiện lợi từ màn hình chính.",
+      "installButton": "Cài đặt",
+      "dismissButton": "Để sau",
+      "dontShowAgain": "Không hiện lại",
+      "maybeLater": "Để sau",
+      "howToInstall": "Cách cài đặt",
+      "benefits": {
+        "offlineAccess": "Hoạt động ngoại tuyến",
+        "homeScreen": "Truy cập nhanh từ màn hình chính",
+        "nativeExperience": "Trải nghiệm như ứng dụng gốc",
+        "fast": "Nhanh",
+        "offline": "Ngoại tuyến",
+        "homeScreenShort": "Màn hình chính"
+      }
+    },
+    "installSteps": {
+      "iosTapShare": "Nhấn nút Chia sẻ trong Safari",
+      "iosScrollDown": "Cuộn xuống và nhấn",
+      "iosAddToHomeScreen": "Thêm vào màn hình chính",
+      "iosTapAdd": "Nhấn",
+      "iosAdd": "Thêm",
+      "iosToConfirm": "để xác nhận",
+      "androidDescription": "Bạn có thể cài đặt WealthJourney trực tiếp vào màn hình chính để có trải nghiệm ứng dụng gốc.",
+      "androidInstallButton": "Cài đặt WealthJourney",
+      "androidOr": "Hoặc nhấn menu (⋮) và chọn \"Thêm vào màn hình chính\"",
+      "genericInstallTitle": "Để cài đặt WealthJourney như ứng dụng:",
+      "genericStep1": "Mở trang web này trong Chrome hoặc Safari",
+      "genericStep2": "Dùng menu trình duyệt để thêm vào màn hình chính"
+    }
+  },
+  "search": {
+    "globalSearch": {
+      "placeholder": "Tìm kiếm ví, giao dịch, đầu tư...",
+      "shortcut": "Cmd+K",
+      "noResults": "Không tìm thấy kết quả",
+      "noResultsHint": "Thử từ khóa khác hoặc kiểm tra lỗi chính tả",
+      "startSearching": "Bắt đầu tìm kiếm",
+      "startSearchingHint": "Tìm kiếm ví, giao dịch và đầu tư",
+      "recentSearches": "Tìm kiếm gần đây",
+      "clearRecentSearches": "Xóa lịch sử tìm kiếm",
+      "results": "Kết quả ({count})",
+      "suggestions": "Gợi ý",
+      "toClose": "để đóng",
+      "navigate": "điều hướng",
+      "select": "chọn",
+      "searchBy": "Tìm theo",
+      "searchByHint": "tên, số tiền hoặc ngày",
+      "basicWallet": "Ví cơ bản",
+      "investmentWallet": "Ví đầu tư",
+      "shares": "{count} cổ phiếu",
+      "clearSearch": "Xóa tìm kiếm"
+    }
+  },
+  "select": {
+    "clearAriaLabel": "Xóa lựa chọn"
+  },
+  "datePicker": {
+    "placeholder": "Chọn ngày",
+    "clearDate": "Xóa ngày",
+    "previousMonth": "Tháng trước",
+    "nextMonth": "Tháng sau",
+    "previousYear": "Năm trước",
+    "nextYear": "Năm sau"
+  },
+  "currencySelector": {
+    "selectAriaLabel": "Chọn tiền tệ",
+    "selectTitle": "Chọn Tiền Tệ",
+    "optionsAriaLabel": "Tùy chọn tiền tệ",
+    "converting": "Đang chuyển đổi tiền tệ...",
+    "confirmTitle": "Thay đổi tiền tệ?",
+    "confirmMessage": "Bạn có chắc muốn thay đổi tiền tệ hiển thị sang {currencyName}?",
+    "confirmNote": "Điều này sẽ chuyển đổi tất cả dữ liệu tài chính của bạn. Quá trình này có thể mất vài phút.",
+    "confirmButton": "Thay đổi tiền tệ",
+    "cancelButton": "Hủy"
+  },
+  "dashboard": {
+    "home": {
+      "myWallets": "Ví của tôi",
+      "balanceTrend": "Xu hướng số dư",
+      "dominance": "Tỷ trọng",
+      "monthlyDominance": "Tỷ trọng theo tháng",
+      "accountBalance": "Số dư tài khoản",
+      "analytics": "Phân tích",
+      "totalNetWorth": "Tổng giá trị tài sản",
+      "totalBalance": "Tổng số dư",
+      "cashLabel": "Tiền mặt: {amount}",
+      "investmentsLabel": "Đầu tư: {amount}",
+      "addTransaction": "+ Thêm giao dịch",
+      "transfer": "Chuyển khoản",
+      "newWallet": "Ví mới"
+    },
+    "quickActions": {
+      "addTransaction": "Thêm giao dịch",
+      "transferMoney": "Chuyển tiền",
+      "createNewWallet": "Tạo ví mới"
+    }
+  },
+  "symbolAutocomplete": {
+    "minCharsHint": "Nhập ít nhất {count} ký tự để tìm kiếm",
+    "searching": "Đang tìm kiếm...",
+    "noResults": "Không tìm thấy kết quả cho \"{query}\". Thử từ khóa khác.",
+    "failedSearch": "Tìm kiếm ký hiệu thất bại. Vui lòng thử lại."
+  },
+  "connectionStatus": {
+    "unsecure": "Kết nối không an toàn",
+    "secure": "Kết nối an toàn"
+  },
+  "dataFreshness": {
+    "justNow": "vừa xong",
+    "minuteAgo": "{count} phút trước",
+    "minutesAgo": "{count} phút trước",
+    "hourAgo": "{count} giờ trước",
+    "hoursAgo": "{count} giờ trước",
+    "dayAgo": "{count} ngày trước",
+    "daysAgo": "{count} ngày trước",
+    "updated": "Cập nhật {timeAgo}"
+  },
+  "quickActions": {
+    "sectionAriaLabel": "Thao tác nhanh"
+  },
+  "featureDiscovery": {
+    "dismissAriaLabel": "Bỏ qua gợi ý"
+  },
+  "landingErrorBoundary": {
+    "title": "Đã xảy ra lỗi",
+    "description": "Chúng tôi xin lỗi vì sự bất tiện này. Vui lòng thử làm mới trang.",
+    "refreshButton": "Làm mới trang"
+  }
+}

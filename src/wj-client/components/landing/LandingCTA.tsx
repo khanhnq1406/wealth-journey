@@ -3,8 +3,10 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export default function LandingCTA() {
+  const t = useTranslations("landing");
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.3 });
 
@@ -40,24 +42,23 @@ export default function LandingCTA() {
         transition={{ duration: 0.6 }}
       >
         <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-          Start Your All-In-One Financial Journey Today
+          {t("cta.startJourney")}
         </h2>
         <p className="text-lg text-green-100 mb-10 max-w-2xl mx-auto">
-          Track cash, cards, crypto, gold, and investments in one powerful app.
-          Join thousands of users managing their complete financial portfolio.
+          {t("cta.joinDescription")}
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
           <Link
             href="/auth/register"
             className="w-full sm:w-auto px-8 py-4 bg-white text-primary-600 rounded-md hover:bg-gray-100 transition-colors duration-200 font-semibold text-center focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-600"
           >
-            Get Started for Free
+            {t("cta.getStartedForFree")}
           </Link>
           <Link
             href="/auth/login"
             className="w-full sm:w-auto px-8 py-4 border-2 border-white text-white rounded-md hover:bg-white/10 transition-colors duration-200 font-semibold text-center focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-600"
           >
-            Sign In
+            {t("cta.signIn")}
           </Link>
         </div>
 
@@ -70,19 +71,19 @@ export default function LandingCTA() {
         >
           <div className="flex flex-col items-center">
             <div className="text-2xl mb-2">💳</div>
-            <span className="text-sm text-green-100 font-medium">Multi-Wallet</span>
+            <span className="text-sm text-green-100 font-medium">{t("cta.multiWallet")}</span>
           </div>
           <div className="flex flex-col items-center">
             <div className="text-2xl mb-2">📈</div>
-            <span className="text-sm text-green-100 font-medium">Investments</span>
+            <span className="text-sm text-green-100 font-medium">{t("cta.investments")}</span>
           </div>
           <div className="flex flex-col items-center">
             <div className="text-2xl mb-2">🪙</div>
-            <span className="text-sm text-green-100 font-medium">Gold & Crypto</span>
+            <span className="text-sm text-green-100 font-medium">{t("cta.goldCrypto")}</span>
           </div>
           <div className="flex flex-col items-center">
             <div className="text-2xl mb-2">📊</div>
-            <span className="text-sm text-green-100 font-medium">Analytics</span>
+            <span className="text-sm text-green-100 font-medium">{t("cta.analytics")}</span>
           </div>
         </motion.div>
       </motion.div>

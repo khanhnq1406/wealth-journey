@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 export function ConnectionStatus() {
   const [isSecure, setIsSecure] = useState(true);
+  const t = useTranslations("connectionStatus");
 
   useEffect(() => {
     // Check if the connection is secure (HTTPS)
@@ -27,7 +29,7 @@ export function ConnectionStatus() {
           <path d="M10 13a1 1 0 011-1v2a1 1 0 11-2 0z" />
         </svg>
         <span className="text-xs font-medium text-danger-700">
-          Unsecure Connection
+          {t("unsecure")}
         </span>
       </div>
     );
@@ -48,7 +50,7 @@ export function ConnectionStatus() {
         />
       </svg>
       <span className="text-xs font-medium text-success-700">
-        Secure Connection
+        {t("secure")}
       </span>
     </div>
   );

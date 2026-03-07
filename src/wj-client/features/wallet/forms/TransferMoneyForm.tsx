@@ -23,6 +23,7 @@ import { toDateTimeLocal, getCurrentTimestamp } from "@/lib/utils/date";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { formatCurrency } from "@/utils/currency-formatter";
 import { amountToSmallestUnit } from "@/lib/utils/units";
+import { useTranslations } from "next-intl";
 
 interface TransferMoneyFormProps {
   onSuccess?: () => void;
@@ -34,6 +35,7 @@ interface TransferMoneyFormProps {
  * After successful transfer, calls onSuccess() callback (caller handles refetch + modal close).
  */
 export function TransferMoneyForm({ onSuccess }: TransferMoneyFormProps) {
+  const t = useTranslations("transfer.form");
   const { currency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
@@ -110,14 +112,14 @@ export function TransferMoneyForm({ onSuccess }: TransferMoneyFormProps) {
       {
         onSuccess: (data) => {
           const message =
-            data?.message || "Funds have been transferred successfully";
+            data?.message || t("successDefault");
           setSuccessMessage(message);
           setShowSuccess(true);
           setErrorMessage("");
         },
         onError: (error: any) => {
           setErrorMessage(
-            error.message || "Failed to transfer funds. Please try again",
+            error.message || t("failedToTransfer"),
           );
         },
       },
@@ -140,7 +142,7 @@ export function TransferMoneyForm({ onSuccess }: TransferMoneyFormProps) {
       <FormNumberInput
         name="amount"
         control={control}
-        label="Amount"
+        label={t("amount")}
         suffix={currency}
         required
       />
@@ -148,9 +150,9 @@ export function TransferMoneyForm({ onSuccess }: TransferMoneyFormProps) {
       <FormSelect
         name="fromWalletId"
         control={control}
-        label="From"
+        label={t("from")}
         options={walletOptions}
-        placeholder="Select source wallet"
+        placeholder={t("selectSourceWallet")}
         renderOption={renderWalletOption}
         required
       />
@@ -158,12 +160,12 @@ export function TransferMoneyForm({ onSuccess }: TransferMoneyFormProps) {
       <FormSelect
         name="toWalletId"
         control={control}
-        label="To"
+        label={t("to")}
         options={toWalletOptions}
         placeholder={
           !fromWalletId
-            ? "Select source wallet first"
-            : "Select destination wallet"
+            ? t("selectSourceFirst")
+            : t("selectDestWallet")
         }
         renderOption={renderWalletOption}
         required
@@ -173,14 +175,14 @@ export function TransferMoneyForm({ onSuccess }: TransferMoneyFormProps) {
       <FormDateTimePicker
         name="datetime"
         control={control}
-        label="Date & Time"
+        label={t("dateTime")}
       />
 
       <FormTextarea
         name="note"
         control={control}
-        label="Note"
-        placeholder="Enter note (optional)"
+        label={t("note")}
+        placeholder={t("notePlaceholder")}
         maxLength={500}
         showCharacterCount
       />
@@ -192,7 +194,7 @@ export function TransferMoneyForm({ onSuccess }: TransferMoneyFormProps) {
           loading={transferFunds.isPending}
           htmlType="submit"
         >
-          Transfer
+          {t("transfer")}
         </Button>
       </div>
     </form>

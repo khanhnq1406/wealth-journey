@@ -76,6 +76,12 @@ tasks:
     cmds:
       - go run cmd/migrate-gold-silver-types/main.go
 
+  backend:migrate-i18n-language:
+    desc: "Add preferred_language column to user table for i18n support"
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - go run cmd/migrate-i18n-language/main.go
+
   # Frontend tasks
   frontend:dev:
     desc: "Start frontend in development mode"

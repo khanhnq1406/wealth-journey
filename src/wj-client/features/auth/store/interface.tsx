@@ -9,6 +9,7 @@ export interface AuthPayload {
   fullname: string;
   picture: string;
   preferredCurrency?: string;  // ISO 4217 currency code (e.g., "USD", "VND", "EUR")
+  preferredLanguage?: string;  // ISO 639-1: "en" | "vi"
 }
 
 export interface AuthAction extends ReduxAction {

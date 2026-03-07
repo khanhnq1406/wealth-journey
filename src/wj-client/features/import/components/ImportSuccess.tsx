@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/Button";
 import { formatCurrency } from "@/utils/currency-formatter";
 import { ImportSummary } from "@/gen/protobuf/v1/import";
@@ -19,6 +20,7 @@ export function ImportSuccess({
   onDone,
   onUndoSuccess,
 }: ImportSuccessProps) {
+  const t = useTranslations("import.success");
   const [showUndoConfirm, setShowUndoConfirm] = useState(false);
 
   const undoMutation = useMutationUndoImport({
@@ -73,18 +75,17 @@ export function ImportSuccess({
             </svg>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-dark-text mb-2">
-            Undo Import?
+            {t("undoTitle")}
           </h2>
           <p className="text-sm sm:text-base text-neutral-600 dark:text-dark-text-secondary">
-            This will delete all {summary.totalImported} imported transactions
-            and restore your wallet balance.
+            {t("undoDesc", { count: summary.totalImported })}
           </p>
         </div>
 
         {/* Confirmation Message */}
         <div className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-2xl">
           <p className="text-sm text-red-700 dark:text-red-300 font-medium">
-            This action cannot be reversed. Are you sure?
+            {t("undoCannotReverse")}
           </p>
         </div>
 
@@ -109,7 +110,7 @@ export function ImportSuccess({
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             variant="primary"
@@ -130,7 +131,7 @@ export function ImportSuccess({
                 d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
               />
             </svg>
-            Yes, Undo Import
+            {t("confirmUndo")}
           </Button>
         </div>
       </div>
@@ -157,12 +158,10 @@ export function ImportSuccess({
           </svg>
         </div>
         <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-dark-text mb-2">
-          Import Successful!
+          {t("title")}
         </h2>
         <p className="text-sm sm:text-base text-neutral-600 dark:text-dark-text-secondary">
-          {summary.totalImported || 0} transaction
-          {summary.totalImported !== 1 ? "s" : ""} imported
-          {summary.totalSkipped > 0 && ` (${summary.totalSkipped} skipped)`}
+          {summary.totalImported !== 1 ? t("transactionsImportedPlural", { count: summary.totalImported || 0 }) : t("transactionsImported", { count: summary.totalImported || 0 })}{summary.totalSkipped > 0 && ` ${t("skipped", { count: summary.totalSkipped })}`}
         </p>
       </div>
 
@@ -184,7 +183,7 @@ export function ImportSuccess({
               />
             </svg>
             <p className="text-xs font-medium text-success-600 dark:text-success-400">
-              Income
+              {t("income")}
             </p>
           </div>
           <p className="text-xl sm:text-2xl font-bold text-success-700 dark:text-success-300">
@@ -207,7 +206,7 @@ export function ImportSuccess({
               />
             </svg>
             <p className="text-xs font-medium text-danger-600 dark:text-danger-400">
-              Expenses
+              {t("expenses")}
             </p>
           </div>
           <p className="text-xl sm:text-2xl font-bold text-danger-700 dark:text-danger-300">
@@ -230,7 +229,7 @@ export function ImportSuccess({
               />
             </svg>
             <p className="text-xs font-medium text-neutral-600 dark:text-dark-text-secondary">
-              Net Change
+              {t("netChange")}
             </p>
           </div>
           <p
@@ -260,7 +259,7 @@ export function ImportSuccess({
               />
             </svg>
             <p className="text-xs font-medium text-neutral-600 dark:text-dark-text-secondary">
-              New Balance
+              {t("newBalance")}
             </p>
           </div>
           <p className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-dark-text">
@@ -286,13 +285,9 @@ export function ImportSuccess({
             </svg>
             <div>
               <p className="text-sm font-medium text-blue-800 dark:text-blue-300">
-                {summary.duplicatesSkipped > 0 &&
-                  `${summary.duplicatesSkipped} duplicate${summary.duplicatesSkipped !== 1 ? "s" : ""} skipped`}
-                {summary.duplicatesMerged > 0 &&
-                  summary.duplicatesSkipped > 0 &&
-                  ", "}
-                {summary.duplicatesMerged > 0 &&
-                  `${summary.duplicatesMerged} duplicate${summary.duplicatesMerged !== 1 ? "s" : ""} merged`}
+                {summary.duplicatesSkipped > 0 && (summary.duplicatesSkipped !== 1 ? t("duplicatesSkippedPlural", { count: summary.duplicatesSkipped }) : t("duplicatesSkipped", { count: summary.duplicatesSkipped }))}
+                {summary.duplicatesMerged > 0 && summary.duplicatesSkipped > 0 && ", "}
+                {summary.duplicatesMerged > 0 && (summary.duplicatesMerged !== 1 ? t("duplicatesMergedPlural", { count: summary.duplicatesMerged }) : t("duplicatesMerged", { count: summary.duplicatesMerged }))}
               </p>
             </div>
           </div>
@@ -317,11 +312,10 @@ export function ImportSuccess({
           </svg>
           <div>
             <p className="text-sm font-medium text-warning-800 dark:text-warning-300">
-              You can undo this import within 24 hours
+              {t("undoNotice")}
             </p>
             <p className="text-xs text-warning-700 dark:text-warning-400 mt-1">
-              All imported transactions will be deleted and wallet balance will
-              be restored.
+              {t("undoNoticeDesc")}
             </p>
           </div>
         </div>
@@ -347,14 +341,14 @@ export function ImportSuccess({
               d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
             />
           </svg>
-          Undo Import
+          {t("undoImport")}
         </Button>
         <Button
           variant="primary"
           onClick={onDone}
           className="flex-1 min-h-[48px] flex items-center justify-center gap-2"
         >
-          Done
+          {t("done")}
           <svg
             className="w-5 h-5"
             fill="none"

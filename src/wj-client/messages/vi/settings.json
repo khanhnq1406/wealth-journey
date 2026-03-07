@@ -1,0 +1,48 @@
+{
+  "settings": {
+    "title": "Cài đặt",
+    "language": {
+      "title": "Ngôn ngữ",
+      "subtitle": "Chọn ngôn ngữ ưa thích cho giao diện",
+      "save": "Lưu ngôn ngữ",
+      "failedToUpdate": "Không thể cập nhật ngôn ngữ"
+    },
+    "sessions": {
+      "title": "Phiên đang hoạt động",
+      "description": "Quản lý các thiết bị đang đăng nhập vào tài khoản của bạn",
+      "noActiveSessions": "Không có phiên hoạt động",
+      "currentLabel": "Hiện tại",
+      "lastActive": "Hoạt động lần cuối: {date}",
+      "created": "Tạo lúc: {date}",
+      "expires": "Hết hạn: {date}",
+      "revokeButton": "Thu hồi",
+      "revokeAllOthers": "Thu hồi tất cả phiên khác",
+      "revokeAllTitle": "Thu hồi tất cả phiên",
+      "revokeAllMessage": "Bạn có chắc chắn muốn thu hồi {count} phiên khác? Các thiết bị đó sẽ cần đăng nhập lại.",
+      "revokeAllConfirm": "Thu hồi tất cả"
+    },
+    "importTemplates": {
+      "title": "Mẫu nhập",
+      "description": "Quản lý các mẫu nhập đã lưu để sử dụng lại",
+      "loadingTemplates": "Đang tải mẫu...",
+      "noTemplates": "Chưa có mẫu nào được lưu. Tạo mẫu khi nhập tệp bằng cách chọn \"Lưu làm mẫu\" ở bước ánh xạ cột.",
+      "tableHeaders": {
+        "templateName": "Tên mẫu",
+        "fileFormats": "Định dạng tệp",
+        "currency": "Tiền tệ",
+        "dateFormat": "Định dạng ngày",
+        "created": "Ngày tạo",
+        "actions": "Thao tác"
+      },
+      "deleteTitle": "Xóa mẫu",
+      "deleteMessage": "Bạn có chắc chắn muốn xóa mẫu \"{name}\"? Thao tác này không thể hoàn tác.",
+      "deleteConfirm": "Xóa"
+    }
+  },
+  "currency": {
+    "selector": {
+      "label": "Tiền tệ hiển thị",
+      "conversionInProgress": "Đang chuyển đổi sang {currency}..."
+    }
+  }
+}

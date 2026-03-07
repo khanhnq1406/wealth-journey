@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useId } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 
 export interface DatePreset {
@@ -182,6 +183,8 @@ export function FormDatePicker({
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const t = useTranslations("datePicker");
 
   // Update selected date when value prop changes
   useEffect(() => {
@@ -435,7 +438,7 @@ export function FormDatePicker({
                 handleClear();
               }}
               className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300"
-              aria-label="Clear date"
+              aria-label={t("clearDate")}
             >
               <svg
                 className="w-4 h-4"
@@ -504,7 +507,7 @@ export function FormDatePicker({
                 type="button"
                 onClick={() => navigateMonth(-1)}
                 className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                aria-label="Previous month"
+                aria-label={t("previousMonth")}
               >
                 <svg
                   className="w-5 h-5"
@@ -524,7 +527,7 @@ export function FormDatePicker({
                 type="button"
                 onClick={() => navigateYear(-1)}
                 className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                aria-label="Previous year"
+                aria-label={t("previousYear")}
               >
                 <svg
                   className="w-4 h-4"
@@ -554,7 +557,7 @@ export function FormDatePicker({
                 type="button"
                 onClick={() => navigateYear(1)}
                 className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                aria-label="Next year"
+                aria-label={t("nextYear")}
               >
                 <svg
                   className="w-4 h-4"
@@ -574,7 +577,7 @@ export function FormDatePicker({
                 type="button"
                 onClick={() => navigateMonth(1)}
                 className="p-1 rounded hover:bg-neutral-100 dark:hover:bg-neutral-700"
-                aria-label="Next month"
+                aria-label={t("nextMonth")}
               >
                 <svg
                   className="w-5 h-5"

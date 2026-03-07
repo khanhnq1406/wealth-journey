@@ -1,6 +1,7 @@
 "use client";
 
 import { FC, ReactNode } from "react";
+import { useTranslations } from "next-intl";
 
 interface Step {
   number: number;
@@ -34,6 +35,7 @@ export const StepProgress: FC<StepProgressProps> = ({
   currentStep,
   className = "",
 }) => {
+  const t = useTranslations("import.stepProgress");
   const totalSteps = steps.length;
   const currentStepIndex = steps.findIndex(
     (step) => step.number === currentStep,
@@ -47,7 +49,7 @@ export const StepProgress: FC<StepProgressProps> = ({
       <div className="sm:hidden">
         <div className="mb-2 flex items-center justify-between text-sm">
           <span className="text-gray-600 font-medium">
-            Step {currentStepIndex + 1} of {totalSteps}
+            {t("stepOf", { current: currentStepIndex + 1, total: totalSteps })}
           </span>
           <span className="text-sm text-gray-900 font-semibold">
             {currentStepData?.label}
@@ -59,7 +61,7 @@ export const StepProgress: FC<StepProgressProps> = ({
           aria-valuenow={currentStep}
           aria-valuemin={1}
           aria-valuemax={steps.length}
-          aria-label={`Step ${currentStep} of ${steps.length}: ${steps.find((s) => s.number === currentStep)?.label}`}
+          aria-label={`${t("stepOf", { current: currentStep, total: steps.length })}: ${steps.find((s) => s.number === currentStep)?.label}`}
         >
           <div
             className="bg-[#008148] h-2 rounded-full transition-all duration-500"
@@ -72,7 +74,7 @@ export const StepProgress: FC<StepProgressProps> = ({
       <div className="hidden sm:flex sm:justify-center">
         <ol
           className="flex items-center justify-center max-w-3xl w-full"
-          aria-label="Import progress steps"
+          aria-label={t("progressAriaLabel")}
         >
           {steps.map((step, index) => {
             const isCompleted = step.number < currentStep;

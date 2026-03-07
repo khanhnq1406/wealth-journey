@@ -22,6 +22,7 @@ import { SelectOption } from "@/components/forms/FormSelect";
 import { useMemo } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { amountToSmallestUnit } from "@/lib/utils/units";
+import { useTranslations } from "next-intl";
 
 interface CreateWalletFormProps {
   onSuccess?: () => void;
@@ -37,6 +38,8 @@ export function CreateWalletForm({
   onSuccess,
   defaultType,
 }: CreateWalletFormProps) {
+  const t = useTranslations("wallet");
+  const tForm = useTranslations("wallet.form");
   const createWallet = useMutationCreateWallet();
   const { currency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -63,8 +66,8 @@ export function CreateWalletForm({
   });
 
   const walletTypeOptions: SelectOption[] = [
-    { value: String(WalletType.BASIC), label: "Basic" },
-    { value: String(WalletType.INVESTMENT), label: "Investment" },
+    { value: String(WalletType.BASIC), label: tForm("walletTypeBasic") },
+    { value: String(WalletType.INVESTMENT), label: tForm("walletTypeInvestment") },
   ];
 
   const onSubmit = (data: CreateWalletFormOutput) => {
@@ -82,14 +85,14 @@ export function CreateWalletForm({
         onSuccess: (data) => {
           const message =
             data?.message ||
-            `Wallet "${data?.data?.walletName || ""}" has been created successfully`;
+            tForm("createdSuccess", { name: data?.data?.walletName || "" });
           setSuccessMessage(message);
           setShowSuccess(true);
           setErrorMessage("");
         },
         onError: (error: any) => {
           setErrorMessage(
-            error.message || "Failed to create wallet. Please try again",
+            error.message || tForm("failedToCreate"),
           );
         },
       },
@@ -112,8 +115,8 @@ export function CreateWalletForm({
       <FormInput
         name="walletName"
         control={control}
-        label="Name"
-        placeholder="Enter wallet's name"
+        label={tForm("name")}
+        placeholder={tForm("namePlaceholder")}
         required
         className="mb-3 sm:mb-4"
       />
@@ -121,16 +124,16 @@ export function CreateWalletForm({
       <FormNumberInput
         name="initialBalance"
         control={control}
-        label="Initial Balance"
+        label={tForm("initialBalance")}
         suffix={currency}
       />
 
       <FormSelect
         name="type"
         control={control}
-        label="Wallet Type"
+        label={tForm("walletType")}
         options={walletTypeOptions}
-        placeholder="Select wallet type"
+        placeholder={tForm("selectWalletType")}
         portal
       />
 
@@ -141,7 +144,7 @@ export function CreateWalletForm({
           loading={createWallet.isPending}
           htmlType="submit"
         >
-          Create
+          {tForm("create")}
         </Button>
       </div>
     </form>

@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { BaseModal } from "@/components/modals/BaseModal";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
@@ -34,7 +35,7 @@ import {
   isCustomInvestment,
   formatInvestmentPrice,
   formatUnrealizedPNL,
-} from "@/app/dashboard/portfolio/helpers";
+} from "@/app/[locale]/dashboard/portfolio/helpers";
 import { isGoldType } from "@/features/investment/utils/gold-calculator";
 import { isSilverType } from "@/features/investment/utils/silver-calculator";
 
@@ -59,21 +60,6 @@ const formatDate = (timestamp: number): string => {
   });
 };
 
-const getTransactionTypeLabel = (type: InvestmentTransactionType): string => {
-  switch (type) {
-    case InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_BUY:
-      return "Buy";
-    case InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_SELL:
-      return "Sell";
-    case InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_DIVIDEND:
-      return "Dividend";
-    case InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_SPLIT:
-      return "Split";
-    default:
-      return "Unknown";
-  }
-};
-
 type Transaction = {
   id: number;
   type: InvestmentTransactionType;
@@ -96,6 +82,8 @@ export function InvestmentDetailModal({
   onSuccess,
   activeTabProp,
 }: InvestmentDetailModalProps) {
+  const t = useTranslations("investment");
+  const tCommon = useTranslations("common");
   const [activeTab, setActiveTab] = useState<TabType>(
     activeTabProp || "overview",
   );
@@ -108,6 +96,21 @@ export function InvestmentDetailModal({
     string | null
   >(null);
   const queryClient = useQueryClient();
+
+  const getTransactionTypeLabel = (type: InvestmentTransactionType): string => {
+    switch (type) {
+      case InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_BUY:
+        return t("transactionTypes.buy");
+      case InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_SELL:
+        return t("transactionTypes.sell");
+      case InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_DIVIDEND:
+        return t("transactionTypes.dividend");
+      case InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_SPLIT:
+        return t("transactionTypes.split");
+      default:
+        return t("transactionTypes.unknown");
+    }
+  };
 
   // Fetch investment details
   const getInvestment = useQueryGetInvestment(
@@ -191,7 +194,7 @@ export function InvestmentDetailModal({
       setDeleteError(null);
     },
     onError: (error: any) => {
-      setDeleteError(error.message || "Failed to delete transaction");
+      setDeleteError(error.message || t("detail.failedToDeleteTransaction"));
     },
   });
 
@@ -220,7 +223,7 @@ export function InvestmentDetailModal({
       onClose();
     },
     onError: (error: any) => {
-      setDeleteInvestmentError(error.message || "Failed to delete investment");
+      setDeleteInvestmentError(error.message || t("detail.failedToDeleteInvestment"));
     },
   });
 
@@ -251,7 +254,7 @@ export function InvestmentDetailModal({
       {
         id: "type",
         accessorKey: "type",
-        header: "Type",
+        header: t("transactionTable.type"),
         cell: ({ row }) => {
           const type = row.original.type;
           return (
@@ -274,7 +277,7 @@ export function InvestmentDetailModal({
       {
         id: "quantity",
         accessorKey: "quantity",
-        header: "Quantity",
+        header: t("transactionTable.quantity"),
         cell: ({ row }) =>
           formatQuantity(
             row.original.quantity,
@@ -285,7 +288,7 @@ export function InvestmentDetailModal({
       {
         id: "price",
         accessorKey: "price",
-        header: "Price",
+        header: t("transactionTable.price"),
         cell: ({ row }) => {
           const nativeCurrency = investment?.currency || "USD";
           const price = row.original.price || 0;
@@ -319,7 +322,7 @@ export function InvestmentDetailModal({
       {
         id: "fees",
         accessorKey: "fees",
-        header: "Fees",
+        header: t("transactionTable.fees"),
         cell: ({ row }) => {
           const nativeCurrency = investment?.currency || "USD";
           const fees = row.original.fees || 0;
@@ -344,7 +347,7 @@ export function InvestmentDetailModal({
       {
         id: "cost",
         accessorKey: "cost",
-        header: "Total",
+        header: t("transactionTable.total"),
         cell: ({ row }) => {
           const nativeCurrency = investment?.currency || "USD";
           const cost = row.original.cost || 0;
@@ -369,7 +372,7 @@ export function InvestmentDetailModal({
       {
         id: "transactionDate",
         accessorKey: "transactionDate",
-        header: "Date",
+        header: t("transactionTable.date"),
         cell: ({ row }) => formatDate(row.original.transactionDate || 0),
       },
       {
@@ -382,8 +385,8 @@ export function InvestmentDetailModal({
               setDeletingTransactionId(row.original.id);
             }}
             className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-            title="Delete transaction"
-            aria-label="Delete transaction"
+            title={t("transactionTable.deleteTransaction")}
+            aria-label={t("transactionTable.deleteTransaction")}
           >
             <svg
               className="w-4 h-4"
@@ -402,7 +405,7 @@ export function InvestmentDetailModal({
         ),
       },
     ],
-    [investment?.type, investment?.currency, investment?.purchaseUnit],
+    [investment?.type, investment?.currency, investment?.purchaseUnit, t],
   );
 
   // Define mobile table columns
@@ -410,7 +413,7 @@ export function InvestmentDetailModal({
     () => [
       {
         id: "type",
-        header: "Type",
+        header: t("transactionTable.type"),
         accessorFn: (row) => {
           const type = row.type;
           return (
@@ -432,7 +435,7 @@ export function InvestmentDetailModal({
       },
       {
         id: "quantity",
-        header: "Quantity",
+        header: t("transactionTable.quantity"),
         accessorFn: (row) =>
           formatQuantity(
             row.quantity,
@@ -442,7 +445,7 @@ export function InvestmentDetailModal({
       },
       {
         id: "price",
-        header: "Price",
+        header: t("transactionTable.price"),
         accessorFn: (row) =>
           formatPrice(
             row.price || 0,
@@ -454,19 +457,19 @@ export function InvestmentDetailModal({
       },
       {
         id: "fees",
-        header: "Fees",
+        header: t("transactionTable.fees"),
         accessorFn: (row) =>
           formatCurrency(row.fees || 0, investment?.currency || "USD"),
       },
       {
         id: "cost",
-        header: "Total",
+        header: t("transactionTable.total"),
         accessorFn: (row) =>
           formatCurrency(row.cost || 0, investment?.currency || "USD"),
       },
       {
         id: "transactionDate",
-        header: "Date",
+        header: t("transactionTable.date"),
         accessorFn: (row) => formatDate(row.transactionDate || 0),
       },
       {
@@ -476,8 +479,8 @@ export function InvestmentDetailModal({
           <button
             onClick={() => setDeletingTransactionId(row.id)}
             className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-            title="Delete transaction"
-            aria-label="Delete transaction"
+            title={t("transactionTable.deleteTransaction")}
+            aria-label={t("transactionTable.deleteTransaction")}
           >
             <svg
               className="w-4 h-4"
@@ -496,7 +499,7 @@ export function InvestmentDetailModal({
         ),
       },
     ],
-    [investment?.type, investment?.currency, investment?.purchaseUnit],
+    [investment?.type, investment?.currency, investment?.purchaseUnit, t],
   );
 
   // Handle successful transaction addition
@@ -512,12 +515,12 @@ export function InvestmentDetailModal({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title={investment?.name || "Investment Details"}
+      title={investment?.name || t("modal.investmentDetails")}
       maxWidth="max-w-[80vw]"
     >
       {getInvestment.isLoading || getInvestment.isPending ? (
         <div className="flex items-center justify-center h-48">
-          <LoadingSpinner text="Loading investment details..." />
+          <LoadingSpinner text={t("detail.loadingDetails")} />
         </div>
       ) : investment ? (
         <div className="space-y-4">
@@ -531,7 +534,7 @@ export function InvestmentDetailModal({
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              Overview
+              {t("detail.overview")}
             </button>
             <button
               onClick={() => setActiveTab("transactions")}
@@ -541,7 +544,7 @@ export function InvestmentDetailModal({
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              Transactions
+              {t("detail.transactions")}
             </button>
             <button
               onClick={() => setActiveTab("add-transaction")}
@@ -551,7 +554,7 @@ export function InvestmentDetailModal({
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              Add Transaction
+              {t("detail.addTransaction")}
             </button>
             <button
               onClick={() => setActiveTab("set-price")}
@@ -561,7 +564,7 @@ export function InvestmentDetailModal({
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              Set Price
+              {t("detail.setPrice")}
             </button>
           </div>
 
@@ -572,30 +575,30 @@ export function InvestmentDetailModal({
               {isCustom && (
                 <div className="mb-4 p-3 bg-blue-50 rounded-md border border-blue-200 flex items-center gap-2">
                   <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded font-medium">
-                    Custom Investment
+                    {t("detail.customInvestment")}
                   </span>
                   <span className="text-sm text-blue-700">
-                    No market data available
+                    {t("detail.noMarketData")}
                   </span>
                 </div>
               )}
 
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Symbol</span>
+                <span className="text-gray-600">{t("detail.symbolLabel")}</span>
                 <span className="font-semibold">{investment.symbol}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Name</span>
+                <span className="text-gray-600">{t("detail.nameLabel")}</span>
                 <span>{investment.name}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Currency</span>
+                <span className="text-gray-600">{t("detail.currencyLabel")}</span>
                 <span className="font-medium">
                   {investment.currency || "USD"}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Quantity</span>
+                <span className="text-gray-600">{t("detail.quantityLabel")}</span>
                 <span className="font-medium">
                   {formatQuantity(
                     investment.quantity,
@@ -605,7 +608,7 @@ export function InvestmentDetailModal({
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Avg Cost</span>
+                <span className="text-gray-600">{t("detail.avgCost")}</span>
                 <span>
                   {formatPrice(
                     investment.averageCost || 0,
@@ -618,7 +621,7 @@ export function InvestmentDetailModal({
               </div>
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-600">Current Price</span>
+                  <span className="text-gray-600">{t("detail.currentPrice")}</span>
                   {!isCustomInvestment(investment) && (
                     <button
                       onClick={() =>
@@ -629,7 +632,7 @@ export function InvestmentDetailModal({
                       }
                       disabled={updatePricesMutation.isPending}
                       className="p-1 hover:bg-gray-100 rounded disabled:opacity-50 transition-colors"
-                      title="Refresh price"
+                      title={t("detail.refreshPrice")}
                     >
                       <svg
                         className={`w-4 h-4 text-gray-500 ${updatePricesMutation.isPending ? "animate-spin" : ""}`}
@@ -649,7 +652,7 @@ export function InvestmentDetailModal({
                   <button
                     onClick={() => setActiveTab("set-price")}
                     className="p-1 hover:bg-gray-100 rounded transition-colors"
-                    title="Set price manually"
+                    title={t("detail.setPriceManually")}
                   >
                     <svg
                       className="w-4 h-4 text-gray-500"
@@ -693,19 +696,19 @@ export function InvestmentDetailModal({
                       let colorClass: string;
 
                       if (diffMins < 1) {
-                        text = "Just now";
+                        text = t("detail.justNow");
                         colorClass = "text-primary-600";
                       } else if (diffMins < 5) {
-                        text = `${diffMins}m ago`;
+                        text = t("detail.minutesAgo", { minutes: diffMins });
                         colorClass = "text-primary-600";
                       } else if (diffMins < 15) {
-                        text = `${diffMins}m ago`;
+                        text = t("detail.minutesAgo", { minutes: diffMins });
                         colorClass = "text-primary-600";
                       } else if (diffMins < 60) {
-                        text = `${diffMins}m ago`;
+                        text = t("detail.minutesAgo", { minutes: diffMins });
                         colorClass = "text-yellow-600";
                       } else if (diffMins < 1440) {
-                        text = `${Math.floor(diffMins / 60)}h ago`;
+                        text = t("detail.hoursAgo", { hours: Math.floor(diffMins / 60) });
                         colorClass = "text-orange-600";
                       } else {
                         text = date.toLocaleDateString();
@@ -714,7 +717,7 @@ export function InvestmentDetailModal({
 
                       return (
                         <span className={`text-xs ${colorClass}`}>
-                          Updated {text}
+                          {t("detail.updated", { time: text })}
                         </span>
                       );
                     })()}
@@ -727,13 +730,12 @@ export function InvestmentDetailModal({
                 investment.currentPrice === 0 && (
                   <div className="mb-4 p-3 bg-yellow-50 rounded-md border border-yellow-200">
                     <p className="text-sm text-yellow-800">
-                      ⚠️ This is a custom investment without a set price. Click
-                      &quot;Set Price&quot; tab to update the current value.
+                      {t("detail.customNoPriceWarning")}
                     </p>
                   </div>
                 )}
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Total Cost</span>
+                <span className="text-gray-600">{t("detail.totalCost")}</span>
                 <div className="text-right">
                   <span>
                     {formatCurrency(
@@ -754,7 +756,7 @@ export function InvestmentDetailModal({
                 </div>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Current Value</span>
+                <span className="text-gray-600">{t("detail.currentValue")}</span>
                 <div className="text-right">
                   <span className="font-semibold">
                     {formatCurrency(
@@ -780,7 +782,7 @@ export function InvestmentDetailModal({
                   investment.currentPrice > 0) && (
                   <>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Unrealized PNL</span>
+                      <span className="text-gray-600">{t("detail.unrealizedPnl")}</span>
                       <div className="text-right">
                         <span
                           className={`font-semibold ${
@@ -807,7 +809,7 @@ export function InvestmentDetailModal({
                       </div>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Unrealized PNL %</span>
+                      <span className="text-gray-600">{t("detail.unrealizedPnlPercent")}</span>
                       <span
                         className={`font-semibold ${
                           (investment.unrealizedPnlPercent || 0) >= 0
@@ -826,12 +828,12 @@ export function InvestmentDetailModal({
                 {isCustomInvestment(investment) &&
                   investment.currentPrice === 0 && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Unrealized PNL</span>
-                      <span className="text-gray-500">N/A (Price not set)</span>
+                      <span className="text-gray-600">{t("detail.unrealizedPnl")}</span>
+                      <span className="text-gray-500">{t("detail.pnlNotAvailable")}</span>
                     </div>
                   )}
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Realized PNL</span>
+                  <span className="text-gray-600">{t("detail.realizedPnl")}</span>
                   <div className="text-right">
                     <span
                       className={`font-semibold ${
@@ -858,7 +860,7 @@ export function InvestmentDetailModal({
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Total Dividends</span>
+                  <span className="text-gray-600">{t("detail.totalDividends")}</span>
                   <span className="font-semibold text-primary-600">
                     {formatCurrency(
                       investment.totalDividends || 0,
@@ -887,7 +889,7 @@ export function InvestmentDetailModal({
                       d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                     />
                   </svg>
-                  Delete Investment
+                  {t("detail.deleteInvestment")}
                 </button>
               </div>
             </div>
@@ -905,7 +907,7 @@ export function InvestmentDetailModal({
                     getListInvestmentTransactions.isLoading ||
                     getListInvestmentTransactions.isPending
                   }
-                  emptyMessage="No transactions yet."
+                  emptyMessage={t("detail.noTransactionsYet")}
                   emptyDescription=""
                   className="text-sm"
                 />
@@ -921,7 +923,7 @@ export function InvestmentDetailModal({
                     getListInvestmentTransactions.isLoading ||
                     getListInvestmentTransactions.isPending
                   }
-                  emptyMessage="No transactions yet."
+                  emptyMessage={t("detail.noTransactionsYet")}
                   emptyDescription=""
                   maxHeight="45vh"
                   showScrollIndicator={transactions.length > 1}
@@ -983,33 +985,32 @@ export function InvestmentDetailModal({
           {activeTab !== "add-transaction" && activeTab !== "set-price" && (
             <div className="pt-4">
               <Button type={ButtonType.PRIMARY} onClick={onClose}>
-                Close
+                {tCommon("close")}
               </Button>
             </div>
           )}
         </div>
       ) : (
-        <div className="text-center text-danger-600">Investment not found</div>
+        <div className="text-center text-danger-600">{t("detail.investmentNotFound")}</div>
       )}
 
       {/* Delete Transaction Confirmation Dialog */}
       {deletingTransactionId !== null && (
         <ConfirmationDialog
-          title="Delete Transaction"
+          title={t("detail.deleteTransactionTitle")}
           message={
             <div>
-              <p>Are you sure you want to delete this transaction?</p>
+              <p>{t("detail.deleteTransactionConfirm")}</p>
               <p className="text-sm text-gray-500 mt-2">
-                This will recalculate your investment&apos;s quantity and cost
-                basis.
+                {t("detail.deleteTransactionRecalc")}
               </p>
               {deleteError && (
                 <p className="text-sm text-red-600 mt-2">{deleteError}</p>
               )}
             </div>
           }
-          confirmText="Delete"
-          cancelText="Cancel"
+          confirmText={tCommon("delete")}
+          cancelText={tCommon("cancel")}
           onConfirm={() => handleDeleteTransaction(deletingTransactionId)}
           onCancel={() => {
             setDeletingTransactionId(null);
@@ -1023,27 +1024,25 @@ export function InvestmentDetailModal({
       {/* Delete Investment Confirmation Dialog */}
       {showDeleteInvestment && (
         <ConfirmationDialog
-          title="Delete Investment"
+          title={t("detail.deleteInvestment")}
           message={
             <div>
               <p>
-                Are you sure you want to delete{" "}
-                <strong>{investment?.symbol}</strong>?
+                {t("detail.deleteInvestmentConfirm", { symbol: investment?.symbol || "" })}
               </p>
               {(investment?.quantity || 0) > 0 ? (
                 <p className="text-sm text-red-600 mt-2">
-                  Warning: You still have{" "}
-                  {formatQuantity(
-                    investment?.quantity || 0,
-                    investment?.type || 0,
-                    investment?.purchaseUnit,
-                  )}{" "}
-                  units. All holdings and transaction history will be
-                  permanently deleted.
+                  {t("detail.deleteInvestmentHoldings", {
+                    quantity: formatQuantity(
+                      investment?.quantity || 0,
+                      investment?.type || 0,
+                      investment?.purchaseUnit,
+                    ),
+                  })}
                 </p>
               ) : (
                 <p className="text-sm text-gray-500 mt-2">
-                  All transaction history for this investment will be deleted.
+                  {t("detail.deleteInvestmentHistory")}
                 </p>
               )}
               {deleteInvestmentError && (
@@ -1053,8 +1052,8 @@ export function InvestmentDetailModal({
               )}
             </div>
           }
-          confirmText="Delete Investment"
-          cancelText="Cancel"
+          confirmText={t("detail.deleteInvestment")}
+          cancelText={tCommon("cancel")}
           onConfirm={handleDeleteInvestment}
           onCancel={() => {
             setShowDeleteInvestment(false);

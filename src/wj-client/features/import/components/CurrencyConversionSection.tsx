@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { CurrencyConversion } from "@/gen/protobuf/v1/import";
 import { formatCurrency, formatExchangeRate } from "@/utils/currency-formatter";
 import { Button } from "@/components/Button";
@@ -17,6 +18,8 @@ export function CurrencyConversionSection({
   conversions,
   onChangeRate,
 }: CurrencyConversionSectionProps) {
+  const t = useTranslations("currencyConversion.section");
+
   if (!conversions || conversions.length === 0) {
     return null;
   }
@@ -38,11 +41,11 @@ export function CurrencyConversionSection({
   const getRateSourceLabel = (source: string): string => {
     switch (source) {
       case "auto":
-        return "Automatic";
+        return t("sourceAuto");
       case "manual":
-        return "Manual Override";
+        return t("sourceManual");
       case "fallback":
-        return "Fallback Rate";
+        return t("sourceFallback");
       default:
         return source;
     }
@@ -66,8 +69,9 @@ export function CurrencyConversionSection({
       <div className="flex items-center justify-between mb-4">
         <h3 className="flex items-center gap-2 text-lg font-semibold text-neutral-900 dark:text-dark-text">
           <span className="text-2xl">💱</span>
-          Currency Conversions ({totalTransactionCount} transaction
-          {totalTransactionCount !== 1 ? "s" : ""})
+          {totalTransactionCount !== 1
+            ? t("titlePlural", { count: totalTransactionCount })
+            : t("title", { count: totalTransactionCount })}
         </h3>
       </div>
 
@@ -100,7 +104,7 @@ export function CurrencyConversionSection({
                     )
                   }
                 >
-                  Change Rate
+                  {t("changeRate")}
                 </Button>
               </div>
 
@@ -108,7 +112,7 @@ export function CurrencyConversionSection({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
                 <div>
                   <span className="text-neutral-600 dark:text-dark-text-secondary">
-                    Source:{" "}
+                    {t("source")}{" "}
                   </span>
                   <span
                     className={`font-medium ${getRateSourceColor(
@@ -120,7 +124,7 @@ export function CurrencyConversionSection({
                 </div>
                 <div>
                   <span className="text-neutral-600 dark:text-dark-text-secondary">
-                    Date:{" "}
+                    {t("date")}{" "}
                   </span>
                   <span className="font-medium text-neutral-900 dark:text-dark-text">
                     {formatDate(conversion.rateDate)}
@@ -128,7 +132,7 @@ export function CurrencyConversionSection({
                 </div>
                 <div>
                   <span className="text-neutral-600 dark:text-dark-text-secondary">
-                    Transactions:{" "}
+                    {t("transactions")}{" "}
                   </span>
                   <span className="font-medium text-neutral-900 dark:text-dark-text">
                     {conversion.transactionCount}
@@ -140,7 +144,7 @@ export function CurrencyConversionSection({
               <div className="pt-3 border-t border-neutral-200 dark:border-dark-border">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-neutral-600 dark:text-dark-text-secondary">
-                    Total:
+                    {t("total")}
                   </span>
                   <div className="font-semibold text-neutral-900 dark:text-dark-text">
                     {conversion.totalOriginal &&
@@ -165,9 +169,7 @@ export function CurrencyConversionSection({
       {/* Info Note */}
       <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
         <p className="text-sm text-blue-700 dark:text-blue-300">
-          <strong>Note:</strong> Currency conversions are applied to all
-          transactions in foreign currencies. You can manually override the
-          exchange rate if needed.
+          <strong>Note:</strong> {t("note")}
         </p>
       </div>
     </div>

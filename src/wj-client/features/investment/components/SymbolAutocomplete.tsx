@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Select, SelectOption } from "@/components/select/Select";
 import { useQuerySearchSymbols } from "@/utils/generated/hooks";
 import { SearchResult } from "@/gen/protobuf/v1/investment";
@@ -65,6 +66,7 @@ export function SymbolAutocomplete({
   disabled = false,
   placeholder = "Search for stocks, ETFs, crypto...",
 }: SymbolAutocompleteProps) {
+  const t = useTranslations("symbolAutocomplete");
   const [inputValue, setInputValue] = useState("");
   const [searchError, setSearchError] = useState<string | null>(null);
 
@@ -92,8 +94,7 @@ export function SymbolAutocomplete({
   useEffect(() => {
     if (searchQuery.error) {
       setSearchError(
-        (searchQuery.error as any)?.message ||
-          "Failed to search symbols. Please try again.",
+        (searchQuery.error as any)?.message || t("failedSearch"),
       );
     }
   }, [searchQuery.error]);
@@ -158,7 +159,7 @@ export function SymbolAutocomplete({
         return (
           <div className={props.className}>
             <div className="px-4 py-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
-              Enter at least {MIN_QUERY_LENGTH} characters to search
+              {t("minCharsHint", { count: MIN_QUERY_LENGTH })}
             </div>
           </div>
         );
@@ -189,7 +190,7 @@ export function SymbolAutocomplete({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
               </svg>
-              Searching...
+              {t("searching")}
             </div>
           </div>
         );
@@ -205,8 +206,7 @@ export function SymbolAutocomplete({
         return (
           <div className={props.className}>
             <div className="px-4 py-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
-              No results found for "{debouncedQuery}". Try a different search
-              term.
+              {t("noResults", { query: debouncedQuery })}
             </div>
           </div>
         );
@@ -221,6 +221,7 @@ export function SymbolAutocomplete({
       searchQuery.isLoading,
       options.length,
       searchError,
+      t,
     ],
   );
 

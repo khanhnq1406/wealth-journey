@@ -12,9 +12,13 @@
 
 import * as ExcelJS from "exceljs";
 import { formatCurrency as formatCurrencyUtil } from "@/utils/currency-formatter";
+import type { ReportExportTranslations } from "./report-pdf-export";
 
 // Re-export types from data-utils for convenience
-export type { PeriodType, DateRange } from "@/app/dashboard/report/PeriodSelector";
+export type { PeriodType, DateRange } from "@/app/[locale]/dashboard/report/PeriodSelector";
+
+// Re-export the translations interface so callers can import from either file
+export type { ReportExportTranslations } from "./report-pdf-export";
 
 /**
  * Summary data for Excel export
@@ -74,6 +78,7 @@ export interface ReportExportData {
   period: string;
   dateRange: { start: Date; end: Date };
   currency: string;
+  translations?: ReportExportTranslations;
 }
 
 /**
@@ -157,26 +162,27 @@ function addWorksheetHeader(worksheet: ExcelJS.Worksheet, title: string, subtitl
  *
  * @param worksheet - ExcelJS worksheet instance
  * @param summaryData - Summary statistics
+ * @param translations - Optional translation strings
  */
-function addSummarySection(worksheet: ExcelJS.Worksheet, summaryData: SummaryData): void {
+function addSummarySection(worksheet: ExcelJS.Worksheet, summaryData: SummaryData, translations?: ReportExportTranslations): void {
   // Section header
-  const headerRow = worksheet.addRow(["Summary"]);
+  const headerRow = worksheet.addRow([translations?.summary ?? "Summary"]);
   headerRow.font = { bold: true, size: 14, color: { argb: BRAND_COLORS.green.argb } };
   headerRow.height = 22;
   worksheet.addRow([]);
 
   // Define metrics
   const metrics: Array<{ label: string; value: string }> = [
-    { label: "Total Income", value: formatCurrency(summaryData.totalIncome, summaryData.currency) },
-    { label: "Total Expenses", value: formatCurrency(summaryData.totalExpenses, summaryData.currency) },
-    { label: "Net Savings", value: formatCurrency(summaryData.netSavings, summaryData.currency) },
-    { label: "Savings Rate", value: `${summaryData.savingsRate}%` },
+    { label: translations?.totalIncome ?? "Total Income", value: formatCurrency(summaryData.totalIncome, summaryData.currency) },
+    { label: translations?.totalExpenses ?? "Total Expenses", value: formatCurrency(summaryData.totalExpenses, summaryData.currency) },
+    { label: translations?.netSavings ?? "Net Savings", value: formatCurrency(summaryData.netSavings, summaryData.currency) },
+    { label: translations?.savingsRate ?? "Savings Rate", value: `${summaryData.savingsRate}%` },
   ];
 
   // Add top expense category if available
   if (summaryData.topExpenseCategory) {
     metrics.push({
-      label: "Top Expense Category",
+      label: translations?.topExpenseCategory ?? "Top Expense Category",
       value: `${summaryData.topExpenseCategory.name} (${formatCurrency(summaryData.topExpenseCategory.amount, summaryData.currency)})`,
     });
   }
@@ -204,20 +210,22 @@ function addSummarySection(worksheet: ExcelJS.Worksheet, summaryData: SummaryDat
  * @param trendData - Array of monthly trend data
  * @param currency - Currency code
  * @param periodLabel - Period label for header
+ * @param translations - Optional translation strings
  */
-function createMonthlyBreakdownSheet(workbook: ExcelJS.Workbook, trendData: TrendData[], currency: string, periodLabel: string): void {
-  const worksheet = workbook.addWorksheet("Monthly Breakdown");
+function createMonthlyBreakdownSheet(workbook: ExcelJS.Workbook, trendData: TrendData[], currency: string, periodLabel: string, translations?: ReportExportTranslations): void {
+  const sheetTitle = translations?.monthlyBreakdown ?? "Monthly Breakdown";
+  const worksheet = workbook.addWorksheet(sheetTitle);
 
   // Add header
-  addWorksheetHeader(worksheet, "Monthly Breakdown", periodLabel);
+  addWorksheetHeader(worksheet, sheetTitle, periodLabel);
 
   // Define columns
   worksheet.columns = [
-    { header: "Month", key: "month", width: 18 },
-    { header: "Income", key: "income", width: 20 },
-    { header: "Expenses", key: "expenses", width: 20 },
-    { header: "Net Savings", key: "net", width: 20 },
-    { header: "Savings Rate", key: "savingsRate", width: 15 },
+    { header: translations?.month ?? "Month", key: "month", width: 18 },
+    { header: translations?.income ?? "Income", key: "income", width: 20 },
+    { header: translations?.expenses ?? "Expenses", key: "expenses", width: 20 },
+    { header: translations?.netSavings ?? "Net Savings", key: "net", width: 20 },
+    { header: translations?.savingsRateHeader ?? "Savings Rate", key: "savingsRate", width: 15 },
   ];
 
   // Style header row
@@ -232,13 +240,14 @@ function createMonthlyBreakdownSheet(workbook: ExcelJS.Workbook, trendData: Tren
   headerRow.height = 25;
 
   // Add data rows
+  const naText = translations?.notAvailable ?? "N/A";
   trendData.forEach((monthData) => {
     const row = worksheet.addRow({
       month: monthData.month,
       income: formatCurrency(monthData.income, currency),
       expenses: formatCurrency(monthData.expenses, currency),
       net: formatCurrency(monthData.net, currency),
-      savingsRate: monthData.savingsRate !== undefined ? `${monthData.savingsRate}%` : "N/A",
+      savingsRate: monthData.savingsRate !== undefined ? `${monthData.savingsRate}%` : naText,
     });
     row.alignment = { vertical: "middle", horizontal: "left" };
     row.height = 20;
@@ -273,20 +282,23 @@ function createMonthlyBreakdownSheet(workbook: ExcelJS.Workbook, trendData: Tren
  * @param expenseCategories - Array of expense category data
  * @param currency - Currency code
  * @param periodLabel - Period label for header
+ * @param translations - Optional translation strings
  */
 function createCategoryBreakdownSheet(
   workbook: ExcelJS.Workbook,
   expenseCategories: ExpenseCategoryData[],
   currency: string,
-  periodLabel: string
+  periodLabel: string,
+  translations?: ReportExportTranslations,
 ): void {
-  const worksheet = workbook.addWorksheet("Category Breakdown");
+  const sheetTitle = translations?.expenseCategoriesBreakdown ?? "Expense Categories Breakdown";
+  const worksheet = workbook.addWorksheet(sheetTitle.length > 31 ? "Category Breakdown" : sheetTitle);
 
   // Add header
-  addWorksheetHeader(worksheet, "Expense Categories Breakdown", periodLabel);
+  addWorksheetHeader(worksheet, sheetTitle, periodLabel);
 
   if (expenseCategories.length === 0) {
-    worksheet.addRow(["No expense data available for this period."]);
+    worksheet.addRow([translations?.noExpenseData ?? "No expense data available for this period."]);
     return;
   }
 
@@ -295,9 +307,9 @@ function createCategoryBreakdownSheet(
 
   // Define columns
   worksheet.columns = [
-    { header: "Category", key: "category", width: 30 },
-    { header: "Amount", key: "amount", width: 20 },
-    { header: "Percentage", key: "percentage", width: 15 },
+    { header: translations?.category ?? "Category", key: "category", width: 30 },
+    { header: translations?.amount ?? "Amount", key: "amount", width: 20 },
+    { header: translations?.percentage ?? "Percentage", key: "percentage", width: 15 },
   ];
 
   // Style header row
@@ -337,7 +349,7 @@ function createCategoryBreakdownSheet(
 
   // Add total row
   const totalRow = worksheet.addRow([
-    "Total",
+    translations?.total ?? "Total",
     formatCurrency(total, currency),
     "100.0%",
   ]);
@@ -371,25 +383,28 @@ function createCategoryBreakdownSheet(
  * @param comparisonData - Array of category comparison data
  * @param currency - Currency code
  * @param periodLabel - Period label for header
+ * @param translations - Optional translation strings
  */
 function createCategoryComparisonSheet(
   workbook: ExcelJS.Workbook,
   comparisonData: CategoryComparisonData[],
   currency: string,
-  periodLabel: string
+  periodLabel: string,
+  translations?: ReportExportTranslations,
 ): void {
-  const worksheet = workbook.addWorksheet("Category Comparison");
+  const sheetTitle = translations?.categoryComparison ?? "Category Comparison (Current vs Previous)";
+  const worksheet = workbook.addWorksheet(sheetTitle.length > 31 ? "Category Comparison" : sheetTitle);
 
   // Add header
-  addWorksheetHeader(worksheet, "Category Comparison (Current vs Previous)", periodLabel);
+  addWorksheetHeader(worksheet, sheetTitle, periodLabel);
 
   // Define columns
   worksheet.columns = [
-    { header: "Category", key: "category", width: 25 },
-    { header: "Current Period", key: "thisMonth", width: 20 },
-    { header: "Previous Period", key: "lastMonth", width: 20 },
-    { header: "Change", key: "change", width: 18 },
-    { header: "Change %", key: "changePercentage", width: 15 },
+    { header: translations?.category ?? "Category", key: "category", width: 25 },
+    { header: translations?.currentPeriod ?? "Current Period", key: "thisMonth", width: 20 },
+    { header: translations?.previousPeriod ?? "Previous Period", key: "lastMonth", width: 20 },
+    { header: translations?.change ?? "Change", key: "change", width: 18 },
+    { header: translations?.changePercent ?? "Change %", key: "changePercentage", width: 15 },
   ];
 
   // Style header row
@@ -471,42 +486,44 @@ export function generateReportExcel(
   data: ReportExportData,
   options: ReportExcelExportOptions = {}
 ): ExcelJS.Workbook {
-  const { summaryData, trendData, expenseCategories, categoryComparisonData, period, dateRange } = data;
+  const { summaryData, trendData, expenseCategories, categoryComparisonData, period, dateRange, translations } = data;
 
   // Create new workbook
   const workbook = new ExcelJS.Workbook();
 
   // Set workbook properties
-  workbook.creator = "WealthJourney Financial Reports";
+  workbook.creator = translations?.workbookCreator ?? "WealthJourney Financial Reports";
   workbook.created = new Date();
   workbook.modified = new Date();
 
   // Set period label for use in sheet headers
   const periodLabel = period.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
   const dateRangeStr = formatDateRange(dateRange.start, dateRange.end);
-  const periodSubtitle = `${periodLabel} (${dateRangeStr})`;
+  const periodSubtitle = translations?.period
+    ? `${translations.period} (${dateRangeStr})`
+    : `${periodLabel} (${dateRangeStr})`;
 
   // Create Summary sheet
-  const summarySheet = workbook.addWorksheet("Summary");
-  addWorksheetHeader(summarySheet, "Financial Report", periodSubtitle);
-  addSummarySection(summarySheet, summaryData);
+  const summarySheet = workbook.addWorksheet(translations?.summary ?? "Summary");
+  addWorksheetHeader(summarySheet, translations?.title ?? "Financial Report", periodSubtitle);
+  addSummarySection(summarySheet, summaryData, translations);
 
   // Freeze header rows in summary sheet
   summarySheet.views = [{ state: "frozen", xSplit: 0, ySplit: 3 }];
 
   // Create Monthly Breakdown sheet
   if (trendData && trendData.length > 0) {
-    createMonthlyBreakdownSheet(workbook, trendData, data.currency, periodSubtitle);
+    createMonthlyBreakdownSheet(workbook, trendData, data.currency, periodSubtitle, translations);
   }
 
   // Create Category Breakdown sheet
   if (expenseCategories && expenseCategories.length > 0) {
-    createCategoryBreakdownSheet(workbook, expenseCategories, data.currency, periodSubtitle);
+    createCategoryBreakdownSheet(workbook, expenseCategories, data.currency, periodSubtitle, translations);
   }
 
   // Create Category Comparison sheet if data available
   if (categoryComparisonData && categoryComparisonData.length > 0) {
-    createCategoryComparisonSheet(workbook, categoryComparisonData, data.currency, periodSubtitle);
+    createCategoryComparisonSheet(workbook, categoryComparisonData, data.currency, periodSubtitle, translations);
   }
 
   return workbook;

@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/Button";
 
@@ -108,6 +109,7 @@ export function FeatureDiscovery({
   onDismiss,
   onView,
 }: FeatureDiscoveryProps) {
+  const t = useTranslations("featureDiscovery");
   const [currentTip, setCurrentTip] = useState<FeatureTip | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [dismissedFeatures, setDismissedFeatures] = useState<Set<string>>(new Set());
@@ -341,7 +343,7 @@ export function FeatureDiscovery({
             <button
               onClick={handleDismiss}
               className="flex-shrink-0 text-neutral-400 dark:text-dark-text-tertiary hover:text-neutral-600 dark:hover:text-dark-text-secondary transition-colors"
-              aria-label="Dismiss tip"
+              aria-label={t("dismissAriaLabel")}
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />

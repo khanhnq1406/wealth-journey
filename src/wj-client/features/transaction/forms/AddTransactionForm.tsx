@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
@@ -46,6 +47,7 @@ interface AddTransactionFormProps {
  * After successful creation, calls onSuccess() callback (caller handles refetch + modal close).
  */
 export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
+  const t = useTranslations("transaction.form");
   const queryClient = useQueryClient();
   const { currency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -159,14 +161,14 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
       {
         onSuccess: (data) => {
           const message =
-            data?.message || "Transaction has been added successfully";
+            data?.message || t("transactionAddedSuccess");
           setSuccessMessage(message);
           setShowSuccess(true);
           setErrorMessage("");
         },
         onError: (error: any) => {
           setErrorMessage(
-            error.message || "Failed to add transaction. Please try again",
+            error.message || t("failedToAdd"),
           );
         },
       },
@@ -192,12 +194,12 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
         options={[
           {
             value: "income",
-            label: "Income",
+            label: t("income"),
             className: "bg-green-500 text-white",
           },
           {
             value: "expense",
-            label: "Expense",
+            label: t("expense"),
             className: "bg-red-500 text-white",
           },
         ]}
@@ -206,7 +208,7 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
       <FormNumberInput
         name="amount"
         control={control}
-        label="Amount"
+        label={t("amount")}
         suffix={currency}
         required
       />
@@ -214,18 +216,18 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
       <FormSelect
         name="walletId"
         control={control}
-        label="Wallet"
+        label={t("wallet")}
         options={walletOptions}
-        placeholder="Select wallet"
+        placeholder={t("selectWallet")}
         required
       />
 
       <FormCreatableSelect
         name="categoryId"
         control={control}
-        label="Category"
+        label={t("category")}
         options={categoryOptions}
-        placeholder="Select or create category..."
+        placeholder={t("selectOrCreateCategory")}
         required
         loading={categoriesLoading || createCategoryMutation.isPending}
         onCreate={handleCreateCategory}
@@ -234,15 +236,15 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
       <FormDateTimePicker
         name="date"
         control={control}
-        label="Date & Time"
+        label={t("dateTime")}
         required
       />
 
       <FormTextarea
         name="note"
         control={control}
-        label="Note"
-        placeholder="Enter note (optional)"
+        label={t("note")}
+        placeholder={t("notePlaceholder")}
         maxLength={500}
         showCharacterCount
       />
@@ -254,7 +256,7 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
           loading={createTransaction.isPending}
           htmlType="submit"
         >
-          Add Transaction
+          {t("addTransaction")}
         </Button>
       </div>
     </form>

@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useCallback, ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 
 export interface WizardStep {
@@ -42,6 +43,7 @@ export const FormWizard = memo(function FormWizard({
   className,
   hideProgress = false,
 }: FormWizardProps) {
+  const t = useTranslations("formWizard");
   const currentStep = steps[currentStepIndex];
   const isLastStep = currentStepIndex === steps.length - 1;
   const isFirstStep = currentStepIndex === 0;
@@ -86,7 +88,7 @@ export const FormWizard = memo(function FormWizard({
                         : "bg-gray-200 dark:bg-dark-surface-hover text-gray-500 dark:text-dark-text-tertiary",
                       !isAccessible && !isCurrent && "cursor-not-allowed opacity-50"
                     )}
-                    aria-label={`Go to step ${index + 1}: ${step.title}`}
+                    aria-label={t("goToStep", { number: index + 1, title: step.title })}
                     aria-current={isCurrent ? "step" : undefined}
                   >
                     {isCompleted ? (
@@ -166,7 +168,7 @@ export const FormWizard = memo(function FormWizard({
           {/* Mobile step title */}
           <div className="sm:hidden mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-dark-text">
-              Step {currentStepIndex + 1} of {steps.length}
+              {t("stepOf", { current: currentStepIndex + 1, total: steps.length })}
             </h2>
             <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
               {currentStep.title}
@@ -191,9 +193,9 @@ export const FormWizard = memo(function FormWizard({
               ? "bg-gray-100 dark:bg-dark-surface-hover text-gray-400 dark:text-dark-text-tertiary cursor-not-allowed"
               : "bg-white dark:bg-dark-surface text-gray-700 dark:text-dark-text border border-gray-300 dark:border-dark-border hover:bg-gray-50 dark:hover:bg-dark-surface-hover active:bg-gray-100 dark:active:bg-dark-surface-active"
           )}
-          aria-label="Go to previous step"
+          aria-label={t("previousStepAriaLabel")}
         >
-          Previous
+          {t("previous")}
         </button>
 
         {/* Next/Finish Button */}
@@ -209,7 +211,7 @@ export const FormWizard = memo(function FormWizard({
               : "bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 shadow-md hover:shadow-lg",
             isLoading && "opacity-70 cursor-wait"
           )}
-          aria-label={isLastStep ? "Finish" : "Go to next step"}
+          aria-label={isLastStep ? t("finishAriaLabel") : t("nextStepAriaLabel")}
         >
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
@@ -228,12 +230,12 @@ export const FormWizard = memo(function FormWizard({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
               </svg>
-              Processing...
+              {t("processing")}
             </span>
           ) : isLastStep ? (
-            "Finish"
+            t("finish")
           ) : (
-            "Next"
+            t("next")
           )}
         </button>
       </div>
