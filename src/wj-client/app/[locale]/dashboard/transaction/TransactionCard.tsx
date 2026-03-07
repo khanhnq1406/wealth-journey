@@ -4,7 +4,7 @@ import { memo, useState, useRef, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils/cn";
 import { formatCurrency } from "@/utils/currency-formatter";
 import { Transaction } from "@/gen/protobuf/v1/transaction";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 export interface TransactionCardProps {
   transaction: Transaction | null;
@@ -40,6 +40,7 @@ export const TransactionCard = memo(function TransactionCard({
   className,
 }: TransactionCardProps) {
   const tCommon = useTranslations("common");
+  const locale = useLocale();
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const touchStartX = useRef(0);
@@ -78,12 +79,12 @@ export const TransactionCard = memo(function TransactionCard({
   // Format transaction time
   const formatTime = useCallback((timestamp: number) => {
     const date = new Date(timestamp * 1000);
-    return date.toLocaleTimeString("en-US", {
+    return date.toLocaleTimeString(locale, {
       hour: "2-digit",
       minute: "2-digit",
       hour12: true,
     });
-  }, []);
+  }, [locale]);
 
   // Touch handlers for swipe
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -410,6 +411,7 @@ export const TransactionCard = memo(function TransactionCard({
 export function getDateGroupLabel(
   timestamp: number,
   tDates?: (key: string) => string,
+  locale?: string,
 ): string {
   const date = new Date(timestamp * 1000);
   const today = new Date();
@@ -437,7 +439,7 @@ export function getDateGroupLabel(
   monthAgo.setDate(monthAgo.getDate() - 30);
   if (date >= monthAgo) return tDates ? tDates("thisMonth") : "This Month";
 
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString(locale, {
     month: "short",
     year: "numeric",
   });

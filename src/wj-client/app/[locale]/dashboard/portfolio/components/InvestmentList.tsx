@@ -1,7 +1,7 @@
 "use client";
 
 import React, { memo, useMemo } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { InvestmentType } from "@/gen/protobuf/v1/investment";
 import { TanStackTable } from "@/components/lazy/OptimizedComponents";
 import { MobileTable } from "@/components/table/MobileTable";
@@ -67,6 +67,7 @@ function useInvestmentColumns(
   currency: string,
   showWalletColumn: boolean,
   t: (key: string) => string,
+  locale: string,
 ): ColumnDef<InvestmentData>[] {
   return useMemo(
     () => [
@@ -95,7 +96,7 @@ function useInvestmentColumns(
       {
         accessorKey: "type",
         header: t("table.type"),
-        cell: (info) => getInvestmentTypeLabel(info.getValue<number>() as any),
+        cell: (info) => getInvestmentTypeLabel(info.getValue<number>() as any, t),
       },
       {
         accessorKey: "quantity",
@@ -251,7 +252,7 @@ function useInvestmentColumns(
         header: t("table.lastUpdated"),
         cell: (info) => {
           const timestamp = info.getValue<number>();
-          const { text, colorClass } = formatTimeAgo(timestamp || 0);
+          const { text, colorClass } = formatTimeAgo(timestamp || 0, t as any, locale);
           return <span className={`text-xs ${colorClass}`}>{text}</span>;
         },
       },
@@ -284,6 +285,7 @@ function useMobileInvestmentColumns(
   currency: string,
   showWalletColumn: boolean,
   t: (key: string) => string,
+  locale: string,
 ) {
   return useMemo(
     () => [
@@ -310,7 +312,7 @@ function useMobileInvestmentColumns(
         id: "type",
         header: t("table.type"),
         accessorFn: (row: InvestmentData) =>
-          getInvestmentTypeLabel(row.type as any),
+          getInvestmentTypeLabel(row.type as any, t),
       },
       {
         id: "quantity",
@@ -384,12 +386,12 @@ function useMobileInvestmentColumns(
         id: "updatedAt",
         header: t("table.lastUpdated"),
         accessorFn: (row: InvestmentData) => {
-          const { text, colorClass } = formatTimeAgo(row.updatedAt || 0);
+          const { text, colorClass } = formatTimeAgo(row.updatedAt || 0, t as any, locale);
           return <span className={`text-xs ${colorClass}`}>{text}</span>;
         },
       },
     ],
-    [currency, showWalletColumn, t],
+    [currency, showWalletColumn, t, locale],
   );
 }
 
@@ -407,18 +409,21 @@ export const InvestmentList = memo(function InvestmentList({
   emptyMessage,
 }: InvestmentListProps) {
   const t = useTranslations("investment");
+  const locale = useLocale();
   const resolvedEmptyMessage = emptyMessage || t("emptyInvestments.message");
   const columns = useInvestmentColumns(
     (id) => onInvestmentClick?.(id),
     userCurrency,
     showWalletColumn,
     t as (key: string) => string,
+    locale,
   );
   const mobileColumns = useMobileInvestmentColumns(
     (id) => onInvestmentClick?.(id),
     userCurrency,
     showWalletColumn,
     t as (key: string) => string,
+    locale,
   );
 
   if (investments.length === 0) {

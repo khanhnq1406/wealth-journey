@@ -82,7 +82,6 @@
     "noDataAvailable": "Không có dữ liệu",
     "thereIsNoDataToDisplay": "Hiện tại không có dữ liệu để hiển thị."
   },
-
   "nav": {
     "home": "Trang chủ",
     "transactions": "Giao dịch",
@@ -98,7 +97,6 @@
     "mainNavigation": "Điều hướng chính",
     "mobileNavigation": "Điều hướng di động"
   },
-
   "landing": {
     "hero": {
       "title": "Kiểm Soát Hành Trình Tài Chính Của Bạn",
@@ -294,7 +292,6 @@
       "skipToMainContent": "Chuyển đến nội dung chính"
     }
   },
-
   "auth": {
     "login": {
       "title": "Chào mừng trở lại",
@@ -324,7 +321,6 @@
       "privacyPolicy": "Chính sách bảo mật"
     }
   },
-
   "dashboard": {
     "home": {
       "myWallets": "Ví của tôi",
@@ -347,7 +343,6 @@
       "createNewWallet": "Tạo ví mới"
     }
   },
-
   "transaction": {
     "title": "Giao dịch",
     "searchPlaceholder": "Tìm kiếm giao dịch...",
@@ -414,10 +409,10 @@
       "maxAmount": "Số tiền tối đa",
       "noLimit": "Không giới hạn",
       "selectStartDate": "Chọn ngày bắt đầu",
-      "selectEndDate": "Chọn ngày kết thúc"
+      "selectEndDate": "Chọn ngày kết thúc",
+      "until": "Đến"
     }
   },
-
   "wallet": {
     "title": "Ví của tôi",
     "createWallet": "Tạo ví",
@@ -507,7 +502,6 @@
     "transferFrom": "Chuyển từ {name}",
     "deleteWallet": "Xóa {name}"
   },
-
   "investment": {
     "title": "Danh mục đầu tư",
     "holdings": "Tài sản nắm giữ",
@@ -571,6 +565,12 @@
       "silverVietnam": "Bạc (Việt Nam)",
       "silverWorld": "Bạc (Thế giới)",
       "other": "Khác"
+    },
+    "timeAgo": {
+      "justNow": "Vừa xong",
+      "minutesAgo": "{count} phút trước",
+      "hoursAgo": "{count} giờ trước",
+      "never": "Chưa bao giờ"
     },
     "typeOptions": {
       "allTypes": "Tất cả loại",
@@ -739,13 +739,11 @@
       "errorLoadingPortfolio": "Lỗi khi tải danh mục đầu tư"
     }
   },
-
   "pullToRefresh": {
     "pull": "Kéo để làm mới",
     "release": "Thả để làm mới",
     "updating": "Đang cập nhật giá..."
   },
-
   "budget": {
     "title": "Ngân sách",
     "createBudget": "Tạo ngân sách",
@@ -789,10 +787,18 @@
       "budgetUsage": "Sử dụng ngân sách",
       "addItem": "Thêm mục",
       "editItem": "Sửa mục",
-      "deleteItem": "Xóa mục"
+      "deleteItem": "Xóa mục",
+      "timeRemaining": "Thời gian còn lại",
+      "daysRemaining": "Số ngày còn lại",
+      "days": "{count, plural, other {# ngày}}",
+      "categories": "{count, plural, other {# danh mục}}",
+      "transactions": "{count, plural, other {# giao dịch}}",
+      "addExpense": "Thêm chi tiêu",
+      "editBudget": "Chỉnh sửa ngân sách",
+      "overBudgetBy": "Vượt ngân sách {amount}",
+      "approachingLimit": "Đang tiếp cận giới hạn ngân sách"
     }
   },
-
   "report": {
     "title": "Báo cáo tài chính",
     "failedToLoad": "Không thể tải báo cáo",
@@ -827,7 +833,9 @@
       "expenses": "Chi tiêu",
       "netSavings": "Tiết kiệm ròng",
       "thisMonth": "Tháng này",
-      "lastMonth": "Tháng trước"
+      "lastMonth": "Tháng trước",
+      "spent": "Đã chi",
+      "remaining": "Còn lại"
     },
     "summary": {
       "totalIncome": "Tổng thu nhập",
@@ -880,7 +888,6 @@
       "workbookCreator": "Báo cáo tài chính WealthJourney"
     }
   },
-
   "prices": {
     "title": "Giá thị trường",
     "lastUpdated": "Cập nhật lần cuối: {time}",
@@ -913,7 +920,6 @@
       "failedToLoad": "Không thể tải giá bạc. Hãy thử làm mới."
     }
   },
-
   "settings": {
     "title": "Cài đặt",
     "language": {
@@ -954,7 +960,6 @@
       "deleteConfirm": "Xóa"
     }
   },
-
   "feedback": {
     "emptyState": {
       "noDataFound": "Không tìm thấy dữ liệu",
@@ -998,7 +1003,6 @@
       "pleaseWait": "Vui lòng chờ..."
     }
   },
-
   "modals": {
     "titles": {
       "addTransaction": "Thêm giao dịch",
@@ -1067,7 +1071,6 @@
       "failedToUndoImport": "Không thể hoàn tác nhập: {error}"
     }
   },
-
   "pwa": {
     "installPrompt": {
       "title": "Cài đặt WealthJourney",
@@ -1081,14 +1084,12 @@
       }
     }
   },
-
   "currency": {
     "selector": {
       "label": "Tiền tệ hiển thị",
       "conversionInProgress": "Đang chuyển đổi sang {currency}..."
     }
   },
-
   "search": {
     "globalSearch": {
       "placeholder": "Tìm kiếm...",
@@ -1097,7 +1098,6 @@
       "recentSearches": "Tìm kiếm gần đây"
     }
   },
-
   "validation": {
     "required": "{field} là bắt buộc",
     "minLength": "{field} phải có ít nhất {min} ký tự",
@@ -1109,7 +1109,6 @@
     "sameWalletTransfer": "Ví nguồn và ví đích phải khác nhau",
     "insufficientBalance": "Số dư không đủ"
   },
-
   "dates": {
     "today": "Hôm nay",
     "yesterday": "Hôm qua",
@@ -1122,7 +1121,6 @@
     "thisYear": "Năm nay",
     "lastYear": "Năm trước"
   },
-
   "export": {
     "dialog": {
       "title": "Tùy chọn xuất",

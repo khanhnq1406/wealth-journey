@@ -82,7 +82,6 @@
     "noDataAvailable": "No data available",
     "thereIsNoDataToDisplay": "There's no data to display at the moment."
   },
-
   "nav": {
     "home": "Home",
     "transactions": "Transactions",
@@ -98,7 +97,6 @@
     "mainNavigation": "Main navigation",
     "mobileNavigation": "Mobile navigation"
   },
-
   "landing": {
     "hero": {
       "title": "Take Control of Your Financial Journey",
@@ -294,7 +292,6 @@
       "skipToMainContent": "Skip to main content"
     }
   },
-
   "auth": {
     "login": {
       "title": "Welcome back",
@@ -324,7 +321,6 @@
       "privacyPolicy": "Privacy Policy"
     }
   },
-
   "dashboard": {
     "home": {
       "myWallets": "My Wallets",
@@ -347,7 +343,6 @@
       "createNewWallet": "Create New Wallet"
     }
   },
-
   "transaction": {
     "title": "Transactions",
     "searchPlaceholder": "Search transactions...",
@@ -414,10 +409,10 @@
       "maxAmount": "Max Amount",
       "noLimit": "No limit",
       "selectStartDate": "Select start date",
-      "selectEndDate": "Select end date"
+      "selectEndDate": "Select end date",
+      "until": "Until"
     }
   },
-
   "wallet": {
     "title": "My Wallets",
     "createWallet": "Create Wallet",
@@ -507,7 +502,6 @@
     "transferFrom": "Transfer from {name}",
     "deleteWallet": "Delete {name}"
   },
-
   "investment": {
     "title": "Investment Portfolio",
     "holdings": "Holdings",
@@ -571,6 +565,12 @@
       "silverVietnam": "Silver (Vietnam)",
       "silverWorld": "Silver (World)",
       "other": "Other"
+    },
+    "timeAgo": {
+      "justNow": "Just now",
+      "minutesAgo": "{count}m ago",
+      "hoursAgo": "{count}h ago",
+      "never": "Never"
     },
     "typeOptions": {
       "allTypes": "All Types",
@@ -739,7 +739,6 @@
       "errorLoadingPortfolio": "Error loading portfolio"
     }
   },
-
   "budget": {
     "title": "Budget",
     "createBudget": "Create budget",
@@ -783,16 +782,23 @@
       "budgetUsage": "Budget Usage",
       "addItem": "Add Item",
       "editItem": "Edit Item",
-      "deleteItem": "Delete Item"
+      "deleteItem": "Delete Item",
+      "timeRemaining": "Time Remaining",
+      "daysRemaining": "Days Remaining",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "categories": "{count, plural, one {# category} other {# categories}}",
+      "transactions": "{count, plural, one {# transaction} other {# transactions}}",
+      "addExpense": "Add expense",
+      "editBudget": "Edit budget",
+      "overBudgetBy": "Over budget by {amount}",
+      "approachingLimit": "Approaching budget limit"
     }
   },
-
   "pullToRefresh": {
     "pull": "Pull to refresh",
     "release": "Release to refresh",
     "updating": "Updating prices..."
   },
-
   "report": {
     "title": "Financial Report",
     "failedToLoad": "Failed to Load Report",
@@ -827,7 +833,9 @@
       "expenses": "Expenses",
       "netSavings": "Net Savings",
       "thisMonth": "This Month",
-      "lastMonth": "Last Month"
+      "lastMonth": "Last Month",
+      "spent": "Spent",
+      "remaining": "Remaining"
     },
     "summary": {
       "totalIncome": "Total Income",
@@ -880,7 +888,6 @@
       "workbookCreator": "WealthJourney Financial Reports"
     }
   },
-
   "prices": {
     "title": "Market Prices",
     "lastUpdated": "Last updated: {time}",
@@ -913,7 +920,6 @@
       "failedToLoad": "Failed to load silver prices. Try refreshing."
     }
   },
-
   "settings": {
     "title": "Settings",
     "language": {
@@ -954,7 +960,6 @@
       "deleteConfirm": "Delete"
     }
   },
-
   "feedback": {
     "emptyState": {
       "noDataFound": "No data found",
@@ -998,7 +1003,6 @@
       "pleaseWait": "Please wait..."
     }
   },
-
   "modals": {
     "titles": {
       "addTransaction": "Add Transaction",
@@ -1067,7 +1071,6 @@
       "failedToUndoImport": "Failed to undo import: {error}"
     }
   },
-
   "pwa": {
     "installPrompt": {
       "title": "Install WealthJourney",
@@ -1081,14 +1084,12 @@
       }
     }
   },
-
   "currency": {
     "selector": {
       "label": "Display Currency",
       "conversionInProgress": "Converting to {currency}..."
     }
   },
-
   "search": {
     "globalSearch": {
       "placeholder": "Search...",
@@ -1097,7 +1098,6 @@
       "recentSearches": "Recent Searches"
     }
   },
-
   "validation": {
     "required": "{field} is required",
     "minLength": "{field} must be at least {min} characters",
@@ -1109,7 +1109,6 @@
     "sameWalletTransfer": "Source and destination wallets must be different",
     "insufficientBalance": "Insufficient balance"
   },
-
   "dates": {
     "today": "Today",
     "yesterday": "Yesterday",
@@ -1122,7 +1121,6 @@
     "thisYear": "This Year",
     "lastYear": "Last Year"
   },
-
   "export": {
     "dialog": {
       "title": "Export Options",

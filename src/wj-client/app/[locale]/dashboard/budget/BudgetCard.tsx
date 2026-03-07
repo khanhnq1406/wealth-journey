@@ -283,7 +283,7 @@ export function BudgetCard({
             <div className="mt-4 sm:mt-5">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs font-medium text-gray-700">
-                  Budget Usage
+                  {t("card.budgetUsage")}
                 </span>
                 <span className={`text-xs font-bold ${statusColor}`}>
                   {percentage.toFixed(1)}%

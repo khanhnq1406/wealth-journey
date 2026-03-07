@@ -67,7 +67,7 @@ export const formatPrice = (price: number, type: InvestmentType, currency: strin
   return formatCurrencyUtil(price, currency);
 };
 
-export const getInvestmentTypeLabel = (type: InvestmentType): string => {
+export const getInvestmentTypeLabel = (type: InvestmentType, t?: (key: string) => string): string => {
   // Use gold calculator utility for gold types
   if (isGoldType(type)) {
     return getGoldTypeLabelUtil(type);
@@ -76,6 +76,27 @@ export const getInvestmentTypeLabel = (type: InvestmentType): string => {
   // Use silver calculator utility for silver types
   if (isSilverType(type)) {
     return getSilverTypeLabel(type);
+  }
+
+  if (t) {
+    switch (type) {
+      case InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY:
+        return t("typeOptions.cryptocurrency");
+      case InvestmentType.INVESTMENT_TYPE_STOCK:
+        return t("typeOptions.stock");
+      case InvestmentType.INVESTMENT_TYPE_ETF:
+        return t("typeOptions.etf");
+      case InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND:
+        return t("typeOptions.mutualFund");
+      case InvestmentType.INVESTMENT_TYPE_BOND:
+        return t("typeOptions.bond");
+      case InvestmentType.INVESTMENT_TYPE_COMMODITY:
+        return t("typeOptions.commodity");
+      case InvestmentType.INVESTMENT_TYPE_OTHER:
+        return t("typeLabels.other");
+      default:
+        return t("typeLabels.other");
+    }
   }
 
   switch (type) {
@@ -99,9 +120,13 @@ export const getInvestmentTypeLabel = (type: InvestmentType): string => {
 };
 
 // Format timestamp as relative time with freshness indicator
-export const formatTimeAgo = (timestamp: number): { text: string; colorClass: string } => {
+export const formatTimeAgo = (
+  timestamp: number,
+  t?: (key: string, params?: Record<string, string | number>) => string,
+  locale?: string,
+): { text: string; colorClass: string } => {
   if (!timestamp) {
-    return { text: "Never", colorClass: "text-gray-400" };
+    return { text: t ? t("timeAgo.never") : "Never", colorClass: "text-gray-400" };
   }
 
   const date = new Date(timestamp * 1000); // Convert Unix timestamp (seconds to ms)
@@ -113,23 +138,24 @@ export const formatTimeAgo = (timestamp: number): { text: string; colorClass: st
   let colorClass: string;
 
   if (diffMins < 1) {
-    text = "Just now";
+    text = t ? t("timeAgo.justNow") : "Just now";
     colorClass = "text-green-600";
   } else if (diffMins < 5) {
-    text = `${diffMins}m ago`;
+    text = t ? t("timeAgo.minutesAgo", { count: diffMins }) : `${diffMins}m ago`;
     colorClass = "text-green-600";
   } else if (diffMins < 15) {
-    text = `${diffMins}m ago`;
+    text = t ? t("timeAgo.minutesAgo", { count: diffMins }) : `${diffMins}m ago`;
     colorClass = "text-green-600";
   } else if (diffMins < 60) {
-    text = `${diffMins}m ago`;
+    text = t ? t("timeAgo.minutesAgo", { count: diffMins }) : `${diffMins}m ago`;
     colorClass = "text-yellow-600";
   } else if (diffMins < 1440) {
     // Less than 24 hours
-    text = `${Math.floor(diffMins / 60)}h ago`;
+    const hours = Math.floor(diffMins / 60);
+    text = t ? t("timeAgo.hoursAgo", { count: hours }) : `${hours}h ago`;
     colorClass = "text-orange-600";
   } else {
-    text = date.toLocaleDateString();
+    text = date.toLocaleDateString(locale);
     colorClass = "text-red-600";
   }
 

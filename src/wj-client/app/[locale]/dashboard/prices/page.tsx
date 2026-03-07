@@ -158,6 +158,7 @@ function SymbolLookupTab({
   onSearch,
 }: SymbolLookupTabProps) {
   const t = useTranslations("prices.symbolLookup");
+  const locale = useLocale();
   const {
     data: priceResp,
     isLoading,
@@ -221,7 +222,7 @@ function SymbolLookupTab({
               </p>
               <p className="text-xs text-gray-400 mt-0.5">
                 {priceData.timestamp
-                  ? new Date(priceData.timestamp * 1000).toLocaleTimeString()
+                  ? new Date(priceData.timestamp * 1000).toLocaleTimeString(locale)
                   : ""}
               </p>
             </div>

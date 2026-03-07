@@ -15,6 +15,7 @@ import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
 export default function Register() {
   const router = useRouter();
   const t = useTranslations("auth.register");
+  const tCommon = useTranslations("common");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -240,7 +241,7 @@ export default function Register() {
             >
               {t("termsOfService")}
             </Link>{" "}
-            and{" "}
+            {tCommon("and")}{" "}
             <Link
               href="#privacy"
               className="underline hover:text-neutral-700 dark:hover:text-dark-text-secondary transition-colors"

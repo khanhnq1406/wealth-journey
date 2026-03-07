@@ -34,7 +34,7 @@ import { ExportButton, ExportOptions } from "@/components/export/ExportDialog";
 import { Button } from "@/components/Button";
 import { useExportTransactions } from "@/features/transaction/hooks/useExportTransactions";
 import { EyeIcon, EyeOffIcon } from "@/components/icons";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 // Date range helpers for quick filters
 function getDateRangeForFilter(filter: QuickFilterType): {
@@ -110,6 +110,7 @@ export default function TransactionPage() {
   const tCommon = useTranslations("common");
   const tDelete = useTranslations("transaction.delete");
   const tDates = useTranslations("dates");
+  const locale = useLocale();
   const { currency } = useCurrency();
   const queryClient = useQueryClient();
 
@@ -269,7 +270,7 @@ export default function TransactionPage() {
     const groups: Record<string, typeof transactions> = {};
 
     transactions.forEach((transaction) => {
-      const groupLabel = getDateGroupLabel(transaction.date, tDates);
+      const groupLabel = getDateGroupLabel(transaction.date, tDates as any, locale);
       if (!groups[groupLabel]) {
         groups[groupLabel] = [];
       }
@@ -277,7 +278,7 @@ export default function TransactionPage() {
     });
 
     return groups;
-  }, [transactionsData, tDates]);
+  }, [transactionsData, tDates, locale]);
 
   // Handlers
   const handleDeleteTransaction = useCallback((transactionId: number) => {

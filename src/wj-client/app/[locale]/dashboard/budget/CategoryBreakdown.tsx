@@ -89,7 +89,7 @@ const CategoryItem = memo(function CategoryItem({
               <h4 className="font-semibold text-neutral-900">{name}</h4>
               {transactionCount !== undefined && (
                 <p className="text-xs text-neutral-500">
-                  {transactionCount} {transactionCount === 1 ? "transaction" : "transactions"}
+                  {t("card.transactions", { count: transactionCount })}
                 </p>
               )}
             </div>
@@ -103,7 +103,7 @@ const CategoryItem = memo(function CategoryItem({
                 onAddExpense?.(id);
               }}
               className="p-1.5 rounded-md hover:bg-green-100 text-green-600 transition-colors"
-              title="Add expense"
+              title={t("card.addExpense")}
             >
               <Image src={`${resources}/plus.svg`} alt="Add" width={16} height={16} />
             </button>
@@ -113,7 +113,7 @@ const CategoryItem = memo(function CategoryItem({
                 onEditBudget?.(id);
               }}
               className="p-1.5 rounded-md hover:bg-primary-100 text-primary-600 transition-colors"
-              title="Edit budget"
+              title={t("card.editBudget")}
             >
               <Image src={`${resources}/editing.svg`} alt="Edit" width={16} height={16} />
             </button>
@@ -123,7 +123,7 @@ const CategoryItem = memo(function CategoryItem({
         {/* Progress Bar */}
         <div>
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs text-neutral-600">Budget Usage</span>
+            <span className="text-xs text-neutral-600">{t("card.budgetUsage")}</span>
             <span className={`text-xs font-bold ${statusColor}`}>
               {percentage.toFixed(1)}%
             </span>
@@ -164,7 +164,7 @@ const CategoryItem = memo(function CategoryItem({
         {/* Warning for over/near budget */}
         {(isOverBudget || isNearLimit) && (
           <div className={`text-xs font-medium px-2 py-1 rounded ${isOverBudget ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>
-            {isOverBudget ? "⚠️ Over budget by " + formatCurrency(Math.abs(remaining), currency) : "⚠️ Approaching budget limit"}
+            {isOverBudget ? `⚠️ ${t("card.overBudgetBy", { amount: formatCurrency(Math.abs(remaining), currency) })}` : `⚠️ ${t("card.approachingLimit")}`}
           </div>
         )}
       </div>
@@ -284,8 +284,8 @@ export const CategoryBreakdown = memo(function CategoryBreakdown({
                   data={chartData}
                   xAxisKey="name"
                   series={[
-                    { dataKey: "spent", name: "Spent", color: "#10b981" },
-                    { dataKey: "remaining", name: "Remaining", color: "#e5e7eb" },
+                    { dataKey: "spent", name: t("chartLabels.spent"), color: "#10b981" },
+                    { dataKey: "remaining", name: t("chartLabels.remaining"), color: "#e5e7eb" },
                   ]}
                   height={320}
                   layout="vertical"

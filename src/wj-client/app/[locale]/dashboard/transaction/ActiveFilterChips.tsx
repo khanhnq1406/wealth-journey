@@ -153,7 +153,7 @@ function getActiveFilters(
     } else if (start) {
       value = `${t("from")} ${start}`;
     } else if (end) {
-      value = `Until ${end}`;
+      value = `${tf("until")} ${end}`;
     }
     chips.push({
       key: "dateRange",

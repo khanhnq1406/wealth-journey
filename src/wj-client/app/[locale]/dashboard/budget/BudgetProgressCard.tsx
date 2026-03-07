@@ -251,11 +251,11 @@ export const BudgetProgressCard = memo(function BudgetProgressCard({
         {daysRemaining !== undefined && (
           <div className="mt-3 pt-2 border-t border-neutral-100">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-neutral-500">Time Remaining</span>
+              <span className="text-xs text-neutral-500">{t("card.timeRemaining")}</span>
               <span
                 className={`text-xs font-semibold px-2 py-1 rounded-full ${statusBg} ${statusColor}`}
               >
-                {daysRemaining} days
+                {t("card.days", { count: daysRemaining })}
               </span>
             </div>
           </div>
@@ -295,7 +295,7 @@ export const BudgetProgressCard = memo(function BudgetProgressCard({
             <h3 className="text-lg font-bold text-neutral-900">{periodName}</h3>
             {itemCount !== undefined && itemCount > 0 && (
               <p className="text-sm text-neutral-600 mt-1">
-                {itemCount} {itemCount === 1 ? "category" : "categories"}
+                {t("card.categories", { count: itemCount })}
               </p>
             )}
           </div>
@@ -333,11 +333,11 @@ export const BudgetProgressCard = memo(function BudgetProgressCard({
           {/* Days Remaining Badge */}
           {daysRemaining !== undefined && (
             <div className="flex items-center justify-between pt-2 border-t border-neutral-100">
-              <span className="text-sm text-neutral-600">Days Remaining</span>
+              <span className="text-sm text-neutral-600">{t("card.daysRemaining")}</span>
               <span
                 className={`px-3 py-1 rounded-full text-sm font-semibold ${statusBg} ${statusColor}`}
               >
-                {daysRemaining} {daysRemaining === 1 ? "day" : "days"}
+                {t("card.days", { count: daysRemaining })}
               </span>
             </div>
           )}

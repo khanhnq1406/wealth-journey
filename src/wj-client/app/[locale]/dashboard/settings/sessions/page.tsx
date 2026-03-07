@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { BaseCard } from "@/components/BaseCard";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
@@ -21,8 +21,9 @@ interface SessionItemProps {
 }
 
 function SessionItem({ session, onRevoke, isRevoking, t }: SessionItemProps) {
+  const locale = useLocale();
   const formatDate = (timestamp: number) => {
-    return new Date(timestamp * 1000).toLocaleString();
+    return new Date(timestamp * 1000).toLocaleString(locale);
   };
 
   const getDeviceIcon = (deviceType: string) => {

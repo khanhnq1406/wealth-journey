@@ -1,7 +1,7 @@
 "use client";
 
 import React, { memo } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { BaseCard } from "@/components/BaseCard";
 import { InvestmentType } from "@/gen/protobuf/v1/investment";
 import {
@@ -65,6 +65,7 @@ export const InvestmentCard = memo(function InvestmentCard({
   showWallet = false,
 }: InvestmentCardProps) {
   const t = useTranslations("investment");
+  const locale = useLocale();
   const {
     id,
     symbol,
@@ -111,7 +112,7 @@ export const InvestmentCard = memo(function InvestmentCard({
         </div>
         <div className="ml-2 flex-shrink-0">
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-800">
-            {getInvestmentTypeLabel(type)}
+            {getInvestmentTypeLabel(type, t as (key: string) => string)}
           </span>
         </div>
       </div>
@@ -225,9 +226,7 @@ export const InvestmentCard = memo(function InvestmentCard({
                         : "bg-gray-400"
                     }`}
                   />
-                  <span className={`text-xs ${formatTimeAgo(updatedAt).colorClass}`}>
-                    {formatTimeAgo(updatedAt).text}
-                  </span>
+                  {(() => { const ta = formatTimeAgo(updatedAt, t as any, locale); return <span className={`text-xs ${ta.colorClass}`}>{ta.text}</span>; })()}
                 </>
               )}
             </div>

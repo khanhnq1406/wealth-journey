@@ -1,7 +1,7 @@
 "use client";
 
 import React, { memo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { BaseCard } from "@/components/BaseCard";
 import { InvestmentType } from "@/gen/protobuf/v1/investment";
 import { formatCurrency } from "@/utils/currency-formatter";
@@ -113,6 +113,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
   onEdit,
 }: InvestmentCardEnhancedProps) {
   const t = useTranslations("investment");
+  const locale = useLocale();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const {
@@ -233,7 +234,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
           </div>
           <div className="flex flex-col items-end gap-2">
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-800">
-              {getInvestmentTypeLabel(type)}
+              {getInvestmentTypeLabel(type, t as (key: string) => string)}
             </span>
             {!isCustom && (
               <span
@@ -289,7 +290,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
                 className={`w-2 h-2 rounded-full ${Date.now() / 1000 - updatedAt < 300 ? "bg-green-500 animate-pulse" : "bg-gray-400"}`}
               />
               <span className="text-xs text-neutral-500">
-                {formatTimeAgo(updatedAt).text}
+                {formatTimeAgo(updatedAt, t as any, locale).text}
               </span>
             </div>
 
