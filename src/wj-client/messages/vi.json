@@ -29,6 +29,10 @@
     "ok": "OK",
     "import": "Nhập",
     "export": "Xuất",
+    "exportCsv": "Xuất CSV",
+    "year": "Năm",
+    "previousPeriod": "Kỳ trước",
+    "nextPeriod": "Kỳ tiếp theo",
     "all": "Tất cả",
     "none": "Không có",
     "more": "Thêm",
@@ -400,7 +404,17 @@
     "filter": {
       "openFilters": "Mở bộ lọc",
       "clearSearch": "Xóa tìm kiếm",
-      "toggleBalanceVisibility": "Bật/tắt hiển thị số dư"
+      "toggleBalanceVisibility": "Bật/tắt hiển thị số dư",
+      "filters": "Bộ lọc",
+      "filterBy": "Lọc theo {label}",
+      "removeFilter": "Xóa bộ lọc {label}",
+      "sortBy": "Sắp xếp theo",
+      "sortTransactions": "Sắp xếp giao dịch",
+      "minAmount": "Số tiền tối thiểu",
+      "maxAmount": "Số tiền tối đa",
+      "noLimit": "Không giới hạn",
+      "selectStartDate": "Chọn ngày bắt đầu",
+      "selectEndDate": "Chọn ngày kết thúc"
     }
   },
 
@@ -485,7 +499,13 @@
       "transferSuccess": "Chuyển tiền thành công",
       "failedToTransfer": "Không thể chuyển tiền. Vui lòng thử lại"
     },
-    "unknownWallet": "Ví không xác định"
+    "unknownWallet": "Ví không xác định",
+    "hideBalance": "Ẩn số dư",
+    "showBalance": "Hiện số dư",
+    "selectWallet": "Chọn ví",
+    "deselectWallet": "Bỏ chọn ví",
+    "transferFrom": "Chuyển từ {name}",
+    "deleteWallet": "Xóa {name}"
   },
 
   "investment": {
@@ -705,7 +725,10 @@
     },
     "cashBalance": {
       "title": "Số dư tiền mặt",
-      "availableCash": "Tiền mặt khả dụng"
+      "availableCash": "Tiền mặt khả dụng",
+      "readyToInvest": "Sẵn sàng đầu tư",
+      "totalWalletValue": "Tổng giá trị ví",
+      "cashAndInvestments": "Tiền mặt + Đầu tư"
     },
     "page": {
       "title": "Danh mục đầu tư",
@@ -763,6 +786,7 @@
       "remaining": "Còn lại",
       "overBudget": "Vượt ngân sách",
       "ofBudget": "trên {amount}",
+      "budgetUsage": "Sử dụng ngân sách",
       "addItem": "Thêm mục",
       "editItem": "Sửa mục",
       "deleteItem": "Xóa mục"

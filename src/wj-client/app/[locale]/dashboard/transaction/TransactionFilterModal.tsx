@@ -415,7 +415,7 @@ export function TransactionFilterModal({
 
         {/* Filters Section - Collapsible on mobile */}
         <FilterSection
-          title="Filters"
+          title={t("filter.filters")}
           section="filters"
           expanded={isExpanded("filters")}
           onToggle={toggleSection}
@@ -448,11 +448,11 @@ export function TransactionFilterModal({
             {/* Sort Filter */}
             <FormSelect
               id="filter-sort"
-              label="Sort By"
+              label={t("filter.sortBy")}
               value={localSort}
               onChange={setLocalSort}
               options={sortOptions}
-              placeholder="Sort transactions"
+              placeholder={t("filter.sortTransactions")}
               size="sm"
               containerClassName="mb-0"
             />
@@ -469,7 +469,7 @@ export function TransactionFilterModal({
           <div className="space-y-3 sm:space-y-4">
             <FormInput
               id="amount-min"
-              label="Min Amount"
+              label={t("filter.minAmount")}
               type="number"
               inputMode="decimal"
               value={amountMin || ""}
@@ -479,12 +479,12 @@ export function TransactionFilterModal({
             />
             <FormInput
               id="amount-max"
-              label="Max Amount"
+              label={t("filter.maxAmount")}
               type="number"
               inputMode="decimal"
               value={amountMax ? amountMax : ""}
               onChange={(e) => setAmountMax(Number(e.target.value) || 0)}
-              placeholder="No limit"
+              placeholder={t("filter.noLimit")}
               size="sm"
             />
           </div>
@@ -535,7 +535,7 @@ export function TransactionFilterModal({
                   label={tCommon("from")}
                   value={customStartDate}
                   onChange={(date) => setCustomStartDate(date || undefined)}
-                  placeholder="Select start date"
+                  placeholder={t("filter.selectStartDate")}
                   size="sm"
                 />
                 <FormDatePicker
@@ -543,7 +543,7 @@ export function TransactionFilterModal({
                   label={tCommon("to")}
                   value={customEndDate}
                   onChange={(date) => setCustomEndDate(date || undefined)}
-                  placeholder="Select end date"
+                  placeholder={t("filter.selectEndDate")}
                   size="sm"
                   minDate={customStartDate}
                 />

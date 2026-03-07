@@ -134,6 +134,7 @@ export const QuickFilterChips = memo(function QuickFilterChips({
   className,
 }: QuickFilterChipsProps) {
   const t = useTranslations("transaction.quickFilters");
+  const tf = useTranslations("transaction.filter");
   const QUICK_FILTERS: QuickFilterChip[] = QUICK_FILTER_KEYS.map((qf) => ({
     type: qf.type,
     label: t(qf.labelKey),
@@ -170,7 +171,7 @@ export const QuickFilterChips = memo(function QuickFilterChips({
                 : "bg-white dark:bg-dark-surface text-gray-700 dark:text-dark-text border border-gray-300 dark:border-dark-border hover:bg-gray-50 dark:hover:bg-dark-surface-hover active:bg-gray-100 dark:active:bg-dark-surface-active",
             )}
             aria-pressed={isActive}
-            aria-label={`Filter by ${filter.label.toLowerCase()}`}
+            aria-label={tf("filterBy", { label: filter.label.toLowerCase() })}
           >
             {filter.icon || <FilterIcon type={filter.type} />}
             <span>{filter.label}</span>

@@ -84,7 +84,7 @@ export const ReportControls = memo(function ReportControls({
 
         {/* Year Selector */}
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">Year:</label>
+          <label className="text-sm font-medium">{t("year")}:</label>
           <select
             className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#008148] focus:border-transparent"
             value={selectedYear}
@@ -105,7 +105,7 @@ export const ReportControls = memo(function ReportControls({
         onClick={handleExport}
         className="w-fit px-4 py-2 text-sm"
       >
-        {t("export")} CSV
+        {t("exportCsv")}
       </Button>
     </div>
   );

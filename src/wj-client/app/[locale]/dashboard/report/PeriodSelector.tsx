@@ -1,7 +1,7 @@
 "use client";
 
 import React, { memo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { BaseCard } from "@/components/BaseCard";
 import { Button } from "@/components/Button";
 import Image from "next/image";
@@ -132,10 +132,10 @@ const PERIOD_VALUES: { value: PeriodType; labelKey: string }[] = [
 ];
 
 /**
- * Format date for display
+ * Format date for display using the given locale
  */
-function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-US", {
+function formatDate(date: Date, locale: string): string {
+  return date.toLocaleDateString(locale, {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -165,6 +165,7 @@ export const PeriodSelector = memo(function PeriodSelector({
   const t = useTranslations("report.periods");
   const tr = useTranslations("report");
   const tc = useTranslations("common");
+  const locale = useLocale();
   const [showCustomPicker, setShowCustomPicker] = useState(false);
   const [tempStartDate, setTempStartDate] = useState<string>("");
   const [tempEndDate, setTempEndDate] = useState<string>("");
@@ -262,7 +263,7 @@ export const PeriodSelector = memo(function PeriodSelector({
             <button
               onClick={() => navigatePeriod("prev")}
               className="p-1 rounded hover:bg-neutral-200 transition-colors"
-              aria-label="Previous period"
+              aria-label={tc("previousPeriod")}
             >
               <Image
                 src={`${resources}/chevron-left.svg`}
@@ -280,15 +281,15 @@ export const PeriodSelector = memo(function PeriodSelector({
                       ?.label}
               </div>
               <div className="text-xs text-neutral-500 mt-0.5">
-                {formatDate(currentRange.start)} -{" "}
-                {formatDate(currentRange.end)}
+                {formatDate(currentRange.start, locale)} -{" "}
+                {formatDate(currentRange.end, locale)}
               </div>
             </div>
 
             <button
               onClick={() => navigatePeriod("next")}
               className="p-1 rounded hover:bg-neutral-200 transition-colors"
-              aria-label="Next period"
+              aria-label={tc("nextPeriod")}
             >
               <Image
                 src={`${resources}/chevron-right.svg`}

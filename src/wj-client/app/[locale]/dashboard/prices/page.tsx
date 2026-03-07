@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useState, useMemo } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { createColumnHelper } from "@tanstack/react-table";
 import { BaseCard } from "@/components/BaseCard";
 import { Button } from "@/components/Button";
@@ -56,89 +56,93 @@ function ChangeCell({
 
 const columnHelper = createColumnHelper<PriceItem>();
 
-const tanstackColumns = [
-  columnHelper.display({
-    id: "name",
-    header: "Type",
-    cell: ({ row }) => (
-      <div>
+function buildTanstackColumns(t: (key: string) => string) {
+  return [
+    columnHelper.display({
+      id: "name",
+      header: t("table.type"),
+      cell: ({ row }) => (
+        <div>
+          <span className="font-medium text-gray-900 dark:text-dark-text">
+            {row.original.name || row.original.typeCode}
+          </span>
+          <span className="ml-1.5 text-xs text-gray-400">
+            {row.original.currency}
+          </span>
+        </div>
+      ),
+    }),
+    columnHelper.accessor("buy", {
+      header: t("table.buy"),
+      cell: ({ row }) => (
         <span className="font-medium text-gray-900 dark:text-dark-text">
-          {row.original.name || row.original.typeCode}
+          {formatPriceValue(row.original.buy, row.original.currency)}
         </span>
-        <span className="ml-1.5 text-xs text-gray-400">
-          {row.original.currency}
+      ),
+    }),
+    columnHelper.accessor("sell", {
+      header: t("table.sell"),
+      cell: ({ row }) => (
+        <span className="text-gray-500 dark:text-gray-400">
+          {formatPriceValue(row.original.sell, row.original.currency)}
         </span>
-      </div>
-    ),
-  }),
-  columnHelper.accessor("buy", {
-    header: "Buy",
-    cell: ({ row }) => (
-      <span className="font-medium text-gray-900 dark:text-dark-text">
-        {formatPriceValue(row.original.buy, row.original.currency)}
-      </span>
-    ),
-  }),
-  columnHelper.accessor("sell", {
-    header: "Sell",
-    cell: ({ row }) => (
-      <span className="text-gray-500 dark:text-gray-400">
-        {formatPriceValue(row.original.sell, row.original.currency)}
-      </span>
-    ),
-  }),
-  columnHelper.accessor("changeBuy", {
-    header: "Change",
-    cell: ({ row }) => (
-      <ChangeCell
-        value={row.original.changeBuy}
-        currency={row.original.currency}
-      />
-    ),
-  }),
-];
+      ),
+    }),
+    columnHelper.accessor("changeBuy", {
+      header: t("table.change"),
+      cell: ({ row }) => (
+        <ChangeCell
+          value={row.original.changeBuy}
+          currency={row.original.currency}
+        />
+      ),
+    }),
+  ];
+}
 
 // ─── MobileTable columns (mobile fallback) ─────────────────────────────────────
 
-const mobileColumns: MobileColumnDef<PriceItem>[] = [
-  {
-    id: "name",
-    header: "Type",
-    cell: ({ row }) => (
-      <div>
+function buildMobileColumns(t: (key: string) => string): MobileColumnDef<PriceItem>[] {
+  return [
+    {
+      id: "name",
+      header: t("table.type"),
+      cell: ({ row }) => (
+        <div>
+          <span className="font-medium text-gray-900 dark:text-dark-text">
+            {row.name || row.typeCode}
+          </span>
+          <span className="ml-1.5 text-xs text-gray-400">{row.currency}</span>
+        </div>
+      ),
+    },
+    {
+      id: "buy",
+      header: t("table.buy"),
+      cell: ({ row }) => (
         <span className="font-medium text-gray-900 dark:text-dark-text">
-          {row.name || row.typeCode}
+          {formatPriceValue(row.buy, row.currency)}
         </span>
-        <span className="ml-1.5 text-xs text-gray-400">{row.currency}</span>
-      </div>
-    ),
-  },
-  {
-    id: "buy",
-    header: "Buy",
-    cell: ({ row }) => (
-      <span className="font-medium text-gray-900 dark:text-dark-text">
-        {formatPriceValue(row.buy, row.currency)}
-      </span>
-    ),
-  },
-  {
-    id: "sell",
-    header: "Sell",
-    cell: ({ row }) => (
-      <span className="text-gray-500 dark:text-gray-400">
-        {formatPriceValue(row.sell, row.currency)}
-      </span>
-    ),
-  },
-  {
-    id: "change",
-    header: "Change",
-    cell: ({ row }) => (
-      <ChangeCell value={row.changeBuy} currency={row.currency} />
-    ),
-  },
-];
+      ),
+    },
+    {
+      id: "sell",
+      header: t("table.sell"),
+      cell: ({ row }) => (
+        <span className="text-gray-500 dark:text-gray-400">
+          {formatPriceValue(row.sell, row.currency)}
+        </span>
+      ),
+    },
+    {
+      id: "change",
+      header: t("table.change"),
+      cell: ({ row }) => (
+        <ChangeCell value={row.changeBuy} currency={row.currency} />
+      ),
+    },
+  ];
+}
 
 interface SymbolLookupTabProps {
   symbolInput: string;
@@ -245,7 +249,10 @@ function SymbolLookupTab({
 export default function PricesPage() {
   const t = useTranslations("prices");
   const tc = useTranslations("common");
+  const locale = useLocale();
   const [activeTab, setActiveTab] = useState<Tab>("gold");
+  const tanstackColumns = useMemo(() => buildTanstackColumns(t as (key: string) => string), [t]);
+  const mobileColumns = useMemo(() => buildMobileColumns(t as (key: string) => string), [t]);
   const [symbolInput, setSymbolInput] = useState("");
   const [querySymbol, setQuerySymbol] = useState("");
 
@@ -267,7 +274,7 @@ export default function PricesPage() {
   const ts = data?.timestamp;
   const lastUpdated =
     ts && !Number.isNaN(new Date(ts).getTime())
-      ? new Date(ts).toLocaleTimeString("vi-VN")
+      ? new Date(ts).toLocaleTimeString(locale)
       : null;
 
   return (

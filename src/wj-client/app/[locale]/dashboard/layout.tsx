@@ -332,7 +332,7 @@ export default function DashboardLayout({
             {/* Navigation */}
             <nav
               className="flex-1 overflow-y-auto px-3 overflow-x-hidden"
-              aria-label="Main navigation"
+              aria-label={t("mainNavigation")}
             >
               <div className="flex flex-col gap-1">
                 <NavItem
@@ -620,7 +620,7 @@ export default function DashboardLayout({
               <button
                 onClick={toggleMobileMenu}
                 className="p-2 -ml-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-dark-surface-hover transition-colors touch-target"
-                aria-label="Toggle menu"
+                aria-label={t("toggleMenu")}
                 aria-expanded={isMobileMenuOpen}
               >
                 <svg
@@ -734,7 +734,7 @@ export default function DashboardLayout({
                     <button
                       onClick={toggleMobileMenu}
                       className="p-2 -mr-2 rounded-lg hover:bg-white/10 transition-colors duration-200 touch-target"
-                      aria-label="Close menu"
+                      aria-label={t("closeMenu")}
                     >
                       <svg
                         className="w-6 h-6 text-white"
@@ -753,7 +753,7 @@ export default function DashboardLayout({
                   </div>
 
                   {/* Navigation Items */}
-                  <nav className="p-4" aria-label="Mobile navigation">
+                  <nav className="p-4" aria-label={t("mobileNavigation")}>
                     {navigationItems}
                   </nav>
 

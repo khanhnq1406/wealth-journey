@@ -303,7 +303,7 @@ export const BudgetProgressCard = memo(function BudgetProgressCard({
           {/* Progress Bar */}
           <AnimatedProgressBar
             progress={percentage}
-            label="Budget Usage"
+            label={t("card.budgetUsage")}
             showWarning={isOverBudget || isNearLimit}
           />
 

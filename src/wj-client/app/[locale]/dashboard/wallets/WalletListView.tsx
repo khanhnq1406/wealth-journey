@@ -176,7 +176,7 @@ export const WalletListView = memo(function WalletListView({
                           : "border-gray-300 dark:border-dark-border hover:border-primary-400",
                       )}
                       aria-label={
-                        isSelected ? "Deselect wallet" : "Select wallet"
+                        isSelected ? t("deselectWallet") : t("selectWallet")
                       }
                       aria-pressed={isSelected}
                     >
@@ -261,7 +261,7 @@ export const WalletListView = memo(function WalletListView({
                         variant="ghost"
                         onClick={() => handleTransfer(wallet)}
                         className="min-h-[44px] min-w-[44px] p-2 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
-                        aria-label={`Transfer from ${wallet.walletName}`}
+                        aria-label={t("transferFrom", { name: wallet.walletName })}
                       >
                         <svg
                           className="w-5 h-5 text-primary-600 dark:text-primary-400"
@@ -284,7 +284,7 @@ export const WalletListView = memo(function WalletListView({
                       type="button"
                       onClick={() => onEdit(wallet)}
                       className="min-h-[44px] min-w-[44px] p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-surface-hover transition-colors"
-                      aria-label={`Edit ${wallet.walletName}`}
+                      aria-label={tCommon("edit") + " " + wallet.walletName}
                     >
                       <svg
                         className="w-5 h-5 text-gray-600 dark:text-dark-text-secondary"
@@ -306,7 +306,7 @@ export const WalletListView = memo(function WalletListView({
                       type="button"
                       onClick={() => onDelete(wallet)}
                       className="min-h-[44px] min-w-[44px] p-2 rounded-lg hover:bg-danger-50 dark:hover:bg-danger-900/20 transition-colors"
-                      aria-label={`Delete ${wallet.walletName}`}
+                      aria-label={t("deleteWallet", { name: wallet.walletName })}
                     >
                       <svg
                         className="w-5 h-5 text-danger-600 dark:text-danger-400"

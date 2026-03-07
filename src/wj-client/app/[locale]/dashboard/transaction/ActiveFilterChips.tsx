@@ -23,6 +23,7 @@ export function ActiveFilterChips({
   onClearAll,
 }: ActiveFilterChipsProps) {
   const t = useTranslations("common");
+  const tf = useTranslations("transaction.filter");
   const activeFilters = getActiveFilters(
     filters,
     walletOptions,
@@ -44,7 +45,7 @@ export function ActiveFilterChips({
               key={filter.key}
               onClick={() => onRemoveFilter(filter.key as keyof TransactionFilters)}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-50 text-primary-700 rounded-full text-sm font-medium whitespace-nowrap hover:bg-primary-100 active:bg-primary-200 transition-colors min-h-[36px] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
-              aria-label={`Remove ${filter.label} filter`}
+              aria-label={tf("removeFilter", { label: filter.label })}
             >
               <span>{filter.label}:</span>
               <span className="font-semibold">{filter.value}</span>

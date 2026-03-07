@@ -19,7 +19,7 @@ export const TransactionFilter = ({
   return (
     <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
       {/* Filter Tabs */}
-      <div className="flex gap-2" role="tablist" aria-label="Filter transactions by type">
+      <div className="flex gap-2" role="tablist" aria-label={t("filter.filterBy", { label: t("title").toLowerCase() })}>
         <button
           onClick={() => onFilterChange("all")}
           role="tab"

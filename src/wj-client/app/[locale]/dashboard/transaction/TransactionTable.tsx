@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useMemo, useCallback, memo } from "react";
+import { useLocale } from "next-intl";
 import { TanStackTable } from "@/components/table/TanStackTable";
 import {
   VirtualizedTransactionList,
@@ -44,6 +45,8 @@ const TransactionActions = memo(function TransactionActions({
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
 }) {
+  const tc = useTranslations("common");
+
   const handleEdit = useCallback(() => {
     onEdit(transactionId);
   }, [transactionId, onEdit]);
@@ -57,26 +60,26 @@ const TransactionActions = memo(function TransactionActions({
       <button
         onClick={handleEdit}
         className="w-6 h-6 hover:opacity-70 transition-opacity"
-        aria-label="Edit transaction"
+        aria-label={tc("edit")}
       >
         <Image
           src={`${resources}/editing.svg`}
           width={24}
           height={24}
-          alt="Edit transaction"
+          alt={tc("edit")}
           className="w-full h-full object-contain"
         />
       </button>
       <button
         onClick={handleDelete}
         className="w-6 h-6 hover:opacity-70 transition-opacity"
-        aria-label="Delete transaction"
+        aria-label={tc("delete")}
       >
         <Image
           src={`${resources}/remove.svg`}
           width={24}
           height={24}
-          alt="Delete transaction"
+          alt={tc("delete")}
           className="w-full h-full object-contain"
         />
       </button>
@@ -97,35 +100,38 @@ export const TransactionTable = memo(function TransactionTable({
 }: TransactionTableProps) {
   const columnHelper = createColumnHelper<Transaction>();
   const { currency } = useCurrency();
+  const tc = useTranslations("common");
+  const tt = useTranslations("transaction");
+  const locale = useLocale();
 
   // Memoize date formatter to avoid recreating on every render
   const formatDate = useCallback((timestamp: number) => {
     const date = new Date(timestamp * 1000);
-    return date.toLocaleDateString("en-GB", {
+    return date.toLocaleDateString(locale, {
       day: "2-digit",
       month: "short",
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     });
-  }, []);
+  }, [locale]);
 
   // Memoize columns to avoid recreating on every render
   const columns = useMemo(
     () => [
       columnHelper.accessor("categoryId", {
         id: "category",
-        header: "Category",
+        header: tc("category"),
         cell: (info) => getCategoryName(info.getValue()),
       }),
       columnHelper.accessor("walletId", {
         id: "wallet",
-        header: "Wallet",
+        header: tc("wallet"),
         cell: (info) => getWalletName(info.getValue()),
       }),
       columnHelper.display({
         id: "amount",
-        header: "Amount",
+        header: tc("amount"),
         cell: (info) => {
           const row = info.row.original;
           const amountValue = row.displayAmount?.amount ?? row.amount?.amount ?? 0;
@@ -139,17 +145,17 @@ export const TransactionTable = memo(function TransactionTable({
       }),
       columnHelper.accessor("date", {
         id: "date",
-        header: "Date & Time",
+        header: tt("form.dateTime"),
         cell: (info) => formatDate(info.getValue()),
       }),
       columnHelper.accessor("note", {
         id: "note",
-        header: "Note",
+        header: tc("note"),
         cell: (info) => info.getValue() || "-",
       }),
       columnHelper.display({
         id: "actions",
-        header: "Actions",
+        header: tc("actions"),
         cell: (info) => (
           <TransactionActions
             transactionId={info.row.original.id}
@@ -159,7 +165,7 @@ export const TransactionTable = memo(function TransactionTable({
         ),
       }),
     ],
-    [columnHelper, getCategoryName, getWalletName, formatDate, onEdit, onDelete, currency],
+    [columnHelper, getCategoryName, getWalletName, formatDate, onEdit, onDelete, currency, tc, tt],
   );
 
   // Prepare display data for virtualized list
@@ -199,8 +205,8 @@ export const TransactionTable = memo(function TransactionTable({
     <TanStackTable
       data={transactions}
       columns={columns}
-      emptyMessage="No transactions found"
-      emptyDescription="Add your first transaction to get started"
+      emptyMessage={tt("noTransactionsFound")}
+      emptyDescription={tt("addFirstTransaction")}
       isLoading={isLoading}
       className={className}
     />

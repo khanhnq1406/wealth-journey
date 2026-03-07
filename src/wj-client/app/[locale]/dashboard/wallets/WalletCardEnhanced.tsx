@@ -216,7 +216,7 @@ export const WalletCardEnhanced = memo(function WalletCardEnhanced({
                 "transition-colors duration-200",
                 "focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-600",
               )}
-              aria-label={isBalanceVisible ? "Hide balance" : "Show balance"}
+              aria-label={isBalanceVisible ? t("hideBalance") : t("showBalance")}
             >
               {isBalanceVisible ? (
                 <svg

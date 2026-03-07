@@ -67,18 +67,18 @@ export const WalletCashBalanceCard = memo(function WalletCashBalanceCard({
             {formatCurrency(availableCash, availableCashCurrency)}
           </div>
           <div className="text-xs text-neutral-500 mt-1">
-            Ready to invest
+            {t("cashBalance.readyToInvest")}
           </div>
         </div>
         <div>
           <div className="text-sm text-neutral-600">
-            Total Wallet Value
+            {t("cashBalance.totalWalletValue")}
           </div>
           <div className="text-lg sm:text-xl font-semibold">
             {formatCurrency(totalValue, totalValueCurrency)}
           </div>
           <div className="text-xs text-neutral-500 mt-1">
-            Cash + Investments
+            {t("cashBalance.cashAndInvestments")}
           </div>
         </div>
       </div>

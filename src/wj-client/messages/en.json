@@ -29,6 +29,10 @@
     "ok": "OK",
     "import": "Import",
     "export": "Export",
+    "exportCsv": "Export CSV",
+    "year": "Year",
+    "previousPeriod": "Previous period",
+    "nextPeriod": "Next period",
     "all": "All",
     "none": "None",
     "more": "More",
@@ -400,7 +404,17 @@
     "filter": {
       "openFilters": "Open filters",
       "clearSearch": "Clear search",
-      "toggleBalanceVisibility": "Toggle balance visibility"
+      "toggleBalanceVisibility": "Toggle balance visibility",
+      "filters": "Filters",
+      "filterBy": "Filter by {label}",
+      "removeFilter": "Remove {label} filter",
+      "sortBy": "Sort By",
+      "sortTransactions": "Sort transactions",
+      "minAmount": "Min Amount",
+      "maxAmount": "Max Amount",
+      "noLimit": "No limit",
+      "selectStartDate": "Select start date",
+      "selectEndDate": "Select end date"
     }
   },
 
@@ -485,7 +499,13 @@
       "transferSuccess": "Funds have been transferred successfully",
       "failedToTransfer": "Failed to transfer funds. Please try again"
     },
-    "unknownWallet": "Unknown Wallet"
+    "unknownWallet": "Unknown Wallet",
+    "hideBalance": "Hide balance",
+    "showBalance": "Show balance",
+    "selectWallet": "Select wallet",
+    "deselectWallet": "Deselect wallet",
+    "transferFrom": "Transfer from {name}",
+    "deleteWallet": "Delete {name}"
   },
 
   "investment": {
@@ -705,7 +725,10 @@
     },
     "cashBalance": {
       "title": "Cash Balance",
-      "availableCash": "Available Cash"
+      "availableCash": "Available Cash",
+      "readyToInvest": "Ready to invest",
+      "totalWalletValue": "Total Wallet Value",
+      "cashAndInvestments": "Cash + Investments"
     },
     "page": {
       "title": "Investment Portfolio",
@@ -757,6 +780,7 @@
       "remaining": "Remaining",
       "overBudget": "Over Budget",
       "ofBudget": "of {amount}",
+      "budgetUsage": "Budget Usage",
       "addItem": "Add Item",
       "editItem": "Edit Item",
       "deleteItem": "Delete Item"
