@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/Button";
@@ -70,40 +71,6 @@ interface AddInvestmentFormProps {
   onSuccess?: () => void;
 }
 
-const investmentTypeOptions: SelectOption[] = [
-  { value: String(InvestmentType.INVESTMENT_TYPE_STOCK), label: "Stock" },
-  { value: String(InvestmentType.INVESTMENT_TYPE_ETF), label: "ETF" },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND),
-    label: "Mutual Fund",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY),
-    label: "Cryptocurrency",
-  },
-  { value: String(InvestmentType.INVESTMENT_TYPE_BOND), label: "Bond" },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_COMMODITY),
-    label: "Commodity",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_GOLD_VND),
-    label: "Gold (Vietnam)",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_GOLD_USD),
-    label: "Gold (World)",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_SILVER_VND),
-    label: "Silver (Vietnam)",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_SILVER_USD),
-    label: "Silver (World)",
-  },
-  { value: String(InvestmentType.INVESTMENT_TYPE_OTHER), label: "Other" },
-];
 
 export function AddInvestmentForm({
   walletId: propWalletId,
@@ -111,10 +78,25 @@ export function AddInvestmentForm({
   walletCurrency: propWalletCurrency,
   onSuccess,
 }: AddInvestmentFormProps) {
+  const t = useTranslations("investment");
   const queryClient = useQueryClient();
   const { currency: preferredCurrency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
+
+  const investmentTypeOptions = useMemo<SelectOption[]>(() => [
+    { value: String(InvestmentType.INVESTMENT_TYPE_STOCK), label: t("typeOptions.stock") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_ETF), label: t("typeOptions.etf") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND), label: t("typeOptions.mutualFund") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY), label: t("typeOptions.cryptocurrency") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_BOND), label: t("typeOptions.bond") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_COMMODITY), label: t("typeOptions.commodity") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_GOLD_VND), label: t("typeOptions.goldVietnam") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_GOLD_USD), label: t("typeOptions.goldWorld") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_SILVER_VND), label: t("typeOptions.silverVietnam") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_SILVER_USD), label: t("typeOptions.silverWorld") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_OTHER), label: t("typeOptions.other") },
+  ], [t]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [insufficientBalance, setInsufficientBalance] = useState(false);
   // Local wallet selection state (used when walletId not provided)
@@ -183,7 +165,7 @@ export function AddInvestmentForm({
 
   const createInvestmentMutation = useMutationCreateInvestment({
     onSuccess: (data) => {
-      setSuccessMessage(data.message || "Investment created successfully");
+      setSuccessMessage(data.message || t("errors.createdSuccessfully"));
       setShowSuccess(true);
       // Invalidate queries (both old and new aggregated endpoints)
       queryClient.invalidateQueries({
@@ -202,42 +184,41 @@ export function AddInvestmentForm({
     },
     onError: (error: any) => {
       // Parse error message and provide user-friendly alternatives
-      let errorMsg = error.message || "Failed to create investment";
+      let errorMsg = error.message || t("errors.failedToCreate");
 
       if (
         errorMsg.toLowerCase().includes("duplicate") ||
         errorMsg.toLowerCase().includes("already exists")
       ) {
-        errorMsg =
-          "An investment with this symbol already exists in this wallet";
+        errorMsg = t("errors.duplicateSymbol");
       } else if (errorMsg.toLowerCase().includes("currency")) {
-        errorMsg = "Invalid currency code. Please select a valid currency";
+        errorMsg = t("errors.invalidCurrency");
       } else if (
         errorMsg.toLowerCase().includes("balance") ||
         errorMsg.toLowerCase().includes("insufficient")
       ) {
-        errorMsg = "Insufficient wallet balance for this investment";
+        errorMsg = t("errors.insufficientBalance");
       } else if (errorMsg.toLowerCase().includes("symbol")) {
-        errorMsg = "Invalid symbol format. Please check and try again";
+        errorMsg = t("errors.invalidSymbol");
       } else if (errorMsg.toLowerCase().includes("quantity")) {
-        errorMsg = "Invalid quantity. Please enter a valid positive number";
+        errorMsg = t("errors.invalidQuantity");
       } else if (
         errorMsg.toLowerCase().includes("cost") ||
         errorMsg.toLowerCase().includes("price")
       ) {
-        errorMsg = "Invalid cost amount. Please enter a valid positive number";
+        errorMsg = t("errors.invalidCost");
       } else if (errorMsg.toLowerCase().includes("wallet")) {
-        errorMsg = "Invalid wallet or wallet not found";
+        errorMsg = t("errors.invalidWallet");
       } else if (
         errorMsg.toLowerCase().includes("not found") ||
         errorMsg.toLowerCase().includes("404")
       ) {
-        errorMsg = "Resource not found. Please try again";
+        errorMsg = t("errors.resourceNotFound");
       } else if (
         errorMsg.toLowerCase().includes("unauthorized") ||
         errorMsg.toLowerCase().includes("403")
       ) {
-        errorMsg = "You don't have permission to perform this action";
+        errorMsg = t("errors.unauthorized");
       }
 
       setErrorMessage(errorMsg);
@@ -580,7 +561,7 @@ export function AddInvestmentForm({
             options={walletSelectOptions}
             value={selectedWalletId ? String(selectedWalletId) : undefined}
             onChange={(value) => setSelectedWalletId(parseInt(value, 10))}
-            placeholder="Select investment wallet"
+            placeholder={t("form.selectWalletPlaceholder")}
             disabled={isSubmitting || getListWallets.isLoading}
             required
           />
@@ -598,7 +579,7 @@ export function AddInvestmentForm({
         control={control}
         label="Investment Type"
         options={investmentTypeOptions}
-        placeholder="Select investment type"
+        placeholder={t("form.selectType")}
         required
         disabled={isSubmitting}
         className="mb-4"
@@ -650,7 +631,7 @@ export function AddInvestmentForm({
               <SymbolAutocomplete
                 value={watch("symbol")}
                 onChange={handleSymbolChange}
-                placeholder="Search for stocks, ETFs, crypto (e.g., AAPL, BTC, VTI)..."
+                placeholder={t("form.searchSymbolPlaceholder")}
                 // disabled={isSubmitting}
                 className="mt-1"
               />
@@ -687,13 +668,12 @@ export function AddInvestmentForm({
                 </ErrorMessage>
               )}
               <p className="text-xs text-gray-500 mt-1 ml-1">
-                Enter a unique identifier for your custom investment
+                {t("form.customSymbolInfo")}
               </p>
               {/* Info box for custom investments */}
               <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-200">
                 <p className="text-sm text-blue-800">
-                  <strong>Note:</strong> Custom investments don&apos;t have
-                  market prices. You can set the price manually after creation.
+                  {t("form.customPriceNote")}
                 </p>
               </div>
             </>
@@ -707,7 +687,7 @@ export function AddInvestmentForm({
           name="name"
           control={control}
           label="Name"
-          placeholder="Apple Inc., Bitcoin, Vanguard Total Stock Market ETF..."
+          placeholder={t("form.investmentNamePlaceholder")}
           required
           disabled={isSubmitting}
         />
@@ -734,7 +714,7 @@ export function AddInvestmentForm({
                 // Currency is already set based on investment type, no need to override
               }
             }}
-            placeholder="Select gold type (SJC, XAU, etc.)"
+            placeholder={t("form.selectGoldTypePlaceholder")}
             disabled={isSubmitting}
             required
           />
@@ -799,7 +779,7 @@ export function AddInvestmentForm({
                 }
               }
             }}
-            placeholder="Select silver type (AG_VND, XAG, etc.)"
+            placeholder={t("form.selectSilverTypePlaceholder")}
             disabled={isSubmitting}
             required
           />

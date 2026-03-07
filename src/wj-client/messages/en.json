@@ -628,7 +628,13 @@
       "walletLabel": "Wallet",
       "selectWalletPlaceholder": "Select investment wallet",
       "create": "Create",
-      "failedToCreate": "Failed to create investment. Please try again"
+      "failedToCreate": "Failed to create investment. Please try again",
+      "searchSymbolPlaceholder": "Search for stocks, ETFs, crypto (e.g., AAPL, BTC, VTI)...",
+      "investmentNamePlaceholder": "Apple Inc., Bitcoin, Vanguard Total Stock Market ETF...",
+      "selectGoldTypePlaceholder": "Select gold type (SJC, XAU, etc.)",
+      "selectSilverTypePlaceholder": "Select silver type (AG_VND, XAG, etc.)",
+      "customSymbolInfo": "Enter a unique identifier for your custom investment",
+      "customPriceNote": "Note: Custom investments don't have market prices. You can set the price manually after creation."
     },
     "transactionTypes": {
       "buy": "Buy",
@@ -737,6 +743,19 @@
       "sortBy": "Sort by",
       "holdings": "Holdings",
       "errorLoadingPortfolio": "Error loading portfolio"
+    },
+    "errors": {
+      "createdSuccessfully": "Investment created successfully",
+      "failedToCreate": "Failed to create investment",
+      "duplicateSymbol": "An investment with this symbol already exists in this wallet",
+      "invalidCurrency": "Invalid currency code. Please select a valid currency",
+      "insufficientBalance": "Insufficient wallet balance for this investment",
+      "invalidSymbol": "Invalid symbol format. Please check and try again",
+      "invalidQuantity": "Invalid quantity. Please enter a valid positive number",
+      "invalidCost": "Invalid cost amount. Please enter a valid positive number",
+      "invalidWallet": "Invalid wallet or wallet not found",
+      "resourceNotFound": "Resource not found. Please try again",
+      "unauthorized": "You don't have permission to perform this action"
     }
   },
   "budget": {
@@ -1134,6 +1153,14 @@
       "selectCategories": "Select Categories",
       "allCategories": "All Categories",
       "exportButton": "Export"
+    }
+  },
+  "import": {
+    "steps": {
+      "upload": "Upload",
+      "selectWallet": "Select Wallet",
+      "review": "Review",
+      "complete": "Complete"
     }
   }
 }

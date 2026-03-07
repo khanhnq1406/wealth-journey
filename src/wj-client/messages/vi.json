@@ -628,7 +628,13 @@
       "walletLabel": "Ví",
       "selectWalletPlaceholder": "Chọn ví đầu tư",
       "create": "Tạo",
-      "failedToCreate": "Không thể tạo khoản đầu tư. Vui lòng thử lại"
+      "failedToCreate": "Không thể tạo khoản đầu tư. Vui lòng thử lại",
+      "searchSymbolPlaceholder": "Tìm kiếm cổ phiếu, ETF, crypto (vd: AAPL, BTC, VTI)...",
+      "investmentNamePlaceholder": "Apple Inc., Bitcoin, Vanguard Total Stock Market ETF...",
+      "selectGoldTypePlaceholder": "Chọn loại vàng (SJC, XAU, v.v.)",
+      "selectSilverTypePlaceholder": "Chọn loại bạc (AG_VND, XAG, v.v.)",
+      "customSymbolInfo": "Nhập định danh duy nhất cho khoản đầu tư tùy chỉnh của bạn",
+      "customPriceNote": "Lưu ý: Khoản đầu tư tùy chỉnh không có giá thị trường. Bạn có thể đặt giá thủ công sau khi tạo."
     },
     "transactionTypes": {
       "buy": "Mua",
@@ -737,6 +743,19 @@
       "sortBy": "Sắp xếp theo",
       "holdings": "Tài sản nắm giữ",
       "errorLoadingPortfolio": "Lỗi khi tải danh mục đầu tư"
+    },
+    "errors": {
+      "createdSuccessfully": "Tạo khoản đầu tư thành công",
+      "failedToCreate": "Không thể tạo khoản đầu tư",
+      "duplicateSymbol": "Đã có khoản đầu tư với mã này trong ví",
+      "invalidCurrency": "Mã tiền tệ không hợp lệ. Vui lòng chọn tiền tệ hợp lệ",
+      "insufficientBalance": "Số dư ví không đủ cho khoản đầu tư này",
+      "invalidSymbol": "Định dạng mã không hợp lệ. Vui lòng kiểm tra lại",
+      "invalidQuantity": "Số lượng không hợp lệ. Vui lòng nhập số dương hợp lệ",
+      "invalidCost": "Số tiền không hợp lệ. Vui lòng nhập số dương hợp lệ",
+      "invalidWallet": "Ví không hợp lệ hoặc không tìm thấy ví",
+      "resourceNotFound": "Không tìm thấy tài nguyên. Vui lòng thử lại",
+      "unauthorized": "Bạn không có quyền thực hiện hành động này"
     }
   },
   "pullToRefresh": {
@@ -1134,6 +1153,14 @@
       "selectCategories": "Chọn danh mục",
       "allCategories": "Tất cả danh mục",
       "exportButton": "Xuất"
+    }
+  },
+  "import": {
+    "steps": {
+      "upload": "Tải lên",
+      "selectWallet": "Chọn ví",
+      "review": "Xem xét",
+      "complete": "Hoàn thành"
     }
   }
 }
