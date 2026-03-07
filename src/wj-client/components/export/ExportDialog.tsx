@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
@@ -74,6 +74,8 @@ export function ExportDialog({
   defaultDateRange = "last30days",
   isExporting: isExportingProp = false,
 }: ExportDialogProps) {
+  const t = useTranslations("export.dialog");
+
   const [format, setFormat] = useState<ExportFormat>(defaultFormat);
   const [dateRange, setDateRange] = useState<DateRange>(defaultDateRange);
   const [customStartDate, setCustomStartDate] = useState<string>("");
@@ -155,12 +157,11 @@ export function ExportDialog({
     setSelectedCategories([]);
   }, []);
 
-  const getFormatInfo = (format: ExportFormat) => {
+  const getFormatInfo = (fmt: ExportFormat) => {
     const info = {
       csv: {
         name: "CSV",
-        description:
-          "Universal spreadsheet format, compatible with Excel, Google Sheets",
+        description: t("csvDescription"),
         icon: (
           <svg
             className="w-5 h-5"
@@ -179,7 +180,7 @@ export function ExportDialog({
       },
       pdf: {
         name: "PDF",
-        description: "Professional document format",
+        description: t("pdfDescription"),
         icon: (
           <svg
             className="w-5 h-5"
@@ -198,7 +199,7 @@ export function ExportDialog({
       },
       excel: {
         name: "Excel",
-        description: "Native Excel format with formatting support",
+        description: t("excelDescription"),
         icon: (
           <svg
             className="w-5 h-5"
@@ -216,16 +217,24 @@ export function ExportDialog({
         ),
       },
     };
-    return info[format];
+    return info[fmt];
   };
 
-  const dateRanges = [
-    { value: "last7days" as const, label: "Last 7 days" },
-    { value: "last30days" as const, label: "Last 30 days" },
-    { value: "last90days" as const, label: "Last 90 days" },
-    { value: "ytd" as const, label: "Year to date" },
-    { value: "all" as const, label: "All time" },
-    { value: "custom" as const, label: "Custom range" },
+  // Map DateRange values to translation keys
+  // "all" → "allTime", "custom" → "customRange", others match directly
+  const getDateRangeLabel = (value: DateRange): string => {
+    if (value === "all") return t("allTime");
+    if (value === "custom") return t("customRange");
+    return t(value as "last7days" | "last30days" | "last90days" | "ytd");
+  };
+
+  const dateRanges: Array<{ value: DateRange; label: string }> = [
+    { value: "last7days", label: t("last7days") },
+    { value: "last30days", label: t("last30days") },
+    { value: "last90days", label: t("last90days") },
+    { value: "ytd", label: t("ytd") },
+    { value: "all", label: t("allTime") },
+    { value: "custom", label: t("customRange") },
   ];
 
   return (
@@ -240,7 +249,7 @@ export function ExportDialog({
         {/* Export Format */}
         <div>
           <label className="block text-sm font-medium text-neutral-900 dark:text-dark-text mb-3">
-            Export Format
+            {t("exportFormat")}
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {(["csv", "pdf", "excel"] as ExportFormat[]).map((fmt) => {
@@ -298,7 +307,7 @@ export function ExportDialog({
         {/* Date Range */}
         <div>
           <label className="block text-sm font-medium text-neutral-900 dark:text-dark-text mb-3">
-            Date Range
+            {t("dateRange")}
           </label>
           <div className="flex flex-wrap gap-2">
             {dateRanges.map((range) => {
@@ -328,7 +337,7 @@ export function ExportDialog({
             <div className="mt-3 grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-neutral-600 dark:text-dark-text-tertiary mb-1">
-                  Start Date
+                  {t("startDate")}
                 </label>
                 <input
                   type="date"
@@ -348,7 +357,7 @@ export function ExportDialog({
               </div>
               <div>
                 <label className="block text-xs font-medium text-neutral-600 dark:text-dark-text-tertiary mb-1">
-                  End Date
+                  {t("endDate")}
                 </label>
                 <input
                   type="date"
@@ -375,9 +384,11 @@ export function ExportDialog({
           <div>
             <div className="flex items-center justify-between mb-3">
               <label className="block text-sm font-medium text-neutral-900 dark:text-dark-text">
-                Categories{" "}
-                {selectedCategories.length > 0 &&
-                  `(${selectedCategories.length} selected)`}
+                {selectedCategories.length > 0
+                  ? t("categoriesSelectedLabel", {
+                      selected: `(${selectedCategories.length} selected)`,
+                    })
+                  : t("categoriesLabel").replace(":", "")}
               </label>
               <div className="flex gap-2">
                 <button
@@ -385,14 +396,14 @@ export function ExportDialog({
                   onClick={selectAllCategories}
                   className="text-xs text-primary-600 dark:text-primary-400 hover:underline"
                 >
-                  Select All
+                  {t("selectAll")}
                 </button>
                 <button
                   type="button"
                   onClick={clearAllCategories}
                   className="text-xs text-primary-600 dark:text-primary-400 hover:underline"
                 >
-                  Clear All
+                  {t("clearAll")}
                 </button>
               </div>
             </div>
@@ -425,8 +436,10 @@ export function ExportDialog({
             </div>
             <p className="mt-1 text-xs text-neutral-500 dark:text-dark-text-tertiary">
               {selectedCategories.length === 0
-                ? "All categories will be included"
-                : `${selectedCategories.length} category(s) selected`}
+                ? t("allCategoriesIncluded")
+                : t("categoriesSelected", {
+                    count: selectedCategories.length,
+                  })}
             </p>
           </div>
         )}
@@ -474,13 +487,13 @@ export function ExportDialog({
           {/* Custom File Name */}
           <div>
             <label className="block text-sm font-medium text-neutral-900 dark:text-dark-text mb-2">
-              File Name (optional)
+              {t("fileNameOptional")}
             </label>
             <input
               type="text"
               value={fileName}
               onChange={(e) => setFileName(e.target.value)}
-              placeholder="My financial report"
+              placeholder={t("fileNamePlaceholder")}
               className={cn(
                 "w-full px-3 py-2 rounded-lg border text-sm",
                 "bg-white dark:bg-dark-surface-hover",
@@ -491,7 +504,7 @@ export function ExportDialog({
               )}
             />
             <p className="mt-1 text-xs text-neutral-500 dark:text-dark-text-tertiary">
-              Leave empty to use default name based on date range
+              {t("fileNameHint")}
             </p>
           </div>
         </div>
@@ -518,19 +531,19 @@ export function ExportDialog({
               d="M19 9l-7 7-7-7"
             />
           </svg>
-          {showPreview ? "Hide" : "Show"} preview
+          {showPreview ? t("hidePreview") : t("showPreview")}
         </button>
 
         {/* Preview */}
         {showPreview && (
           <div className="p-4 bg-neutral-100 dark:bg-dark-surface-hover rounded-lg border border-neutral-200 dark:border-dark-border">
             <h4 className="text-xs font-semibold text-neutral-500 dark:text-dark-text-tertiary uppercase tracking-wider mb-3">
-              Export Summary
+              {t("exportSummary")}
             </h4>
             <dl className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <dt className="text-neutral-600 dark:text-dark-text-tertiary">
-                  Format:
+                  {t("formatLabel")}
                 </dt>
                 <dd className="font-medium text-neutral-900 dark:text-dark-text">
                   {getFormatInfo(format).name}
@@ -538,39 +551,39 @@ export function ExportDialog({
               </div>
               <div className="flex justify-between">
                 <dt className="text-neutral-600 dark:text-dark-text-tertiary">
-                  Date Range:
+                  {t("dateRangeLabel")}
                 </dt>
                 <dd className="font-medium text-neutral-900 dark:text-dark-text">
                   {dateRanges.find((r) => r.value === dateRange)?.label ||
-                    dateRange}
+                    getDateRangeLabel(dateRange)}
                 </dd>
               </div>
               {format === "pdf" && (
                 <div className="flex justify-between">
                   <dt className="text-neutral-600 dark:text-dark-text-tertiary">
-                    Charts:
+                    {t("chartsLabel")}
                   </dt>
                   <dd className="font-medium text-neutral-900 dark:text-dark-text">
-                    {includeCharts ? "Included" : "Excluded"}
+                    {includeCharts ? t("included") : t("excluded")}
                   </dd>
                 </div>
               )}
               <div className="flex justify-between">
                 <dt className="text-neutral-600 dark:text-dark-text-tertiary">
-                  Categories:
+                  {t("categoriesLabel")}
                 </dt>
                 <dd className="font-medium text-neutral-900 dark:text-dark-text">
                   {selectedCategories.length === 0
-                    ? "All"
+                    ? t("allSelected")
                     : `${selectedCategories.length} selected`}
                 </dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-neutral-600 dark:text-dark-text-tertiary">
-                  Branding:
+                  {t("brandingLabel")}
                 </dt>
                 <dd className="font-medium text-neutral-900 dark:text-dark-text">
-                  {customBranding ? "Custom" : "Standard"}
+                  {customBranding ? t("customBranding") : t("standardBranding")}
                 </dd>
               </div>
             </dl>
@@ -585,14 +598,14 @@ export function ExportDialog({
           onClick={onClose}
           disabled={isExporting}
         >
-          Cancel
+          {t("cancel")}
         </Button>
         <Button
           type={ButtonType.PRIMARY}
           onClick={handleExport}
           loading={isExporting}
         >
-          {isExporting ? "Exporting..." : "Export"}
+          {isExporting ? t("exporting") : t("export")}
         </Button>
       </div>
     </BaseModal>
@@ -613,6 +626,7 @@ export function ExportButton({
   isExporting?: boolean;
   className?: string;
 }) {
+  const t = useTranslations("export.dialog");
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -644,7 +658,7 @@ export function ExportButton({
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
               />
             </svg>
-            Exporting...
+            {t("exporting")}
           </>
         ) : (
           <>
@@ -661,7 +675,7 @@ export function ExportButton({
                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
               />
             </svg>
-            Export
+            {t("export")}
           </>
         )}
       </Button>

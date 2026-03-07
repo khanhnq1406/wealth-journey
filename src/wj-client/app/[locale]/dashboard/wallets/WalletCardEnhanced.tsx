@@ -259,14 +259,14 @@ export const WalletCardEnhanced = memo(function WalletCardEnhanced({
           {/* Balance Display */}
           <div className="mb-4">
             <p className="text-xs sm:text-sm text-white/70 mb-1">
-              {isInvestmentWallet ? "Total Value" : tCommon("balance")}
+              {isInvestmentWallet ? t("totalValue") : tCommon("balance")}
             </p>
             <p className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
               {maskBalance(totalValue)}
             </p>
             {!isBalanceVisible && (
               <p className="text-xs text-white/50 mt-1">
-                {"Tap eye icon to reveal"}
+                {t("tapEyeReveal")}
               </p>
             )}
           </div>
@@ -281,7 +281,7 @@ export const WalletCardEnhanced = memo(function WalletCardEnhanced({
 
             {/* Account-style number (hash of ID) */}
             <div className="text-right">
-              <p className="text-xs text-white/50 mb-1">Wallet ID</p>
+              <p className="text-xs text-white/50 mb-1">{t("walletId")}</p>
               <p className="text-sm font-medium tracking-widest">
                 •••• {String(wallet.id).padStart(4, "0")}
               </p>

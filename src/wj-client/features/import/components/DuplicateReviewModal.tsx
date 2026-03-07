@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { DuplicateMatch, DuplicateActionType, DuplicateAction } from "@/gen/protobuf/v1/import";
 import { Button } from "@/components/Button";
 import { cn } from "@/lib/utils/cn";
@@ -34,6 +35,8 @@ export function DuplicateReviewModal({
   onCancel,
   currency = "VND",
 }: DuplicateReviewModalProps) {
+  const t = useTranslations("import.duplicate");
+  const locale = useLocale();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [actions, setActions] = useState<Map<number, DuplicateAction>>(new Map());
 
@@ -191,9 +194,9 @@ export function DuplicateReviewModal({
   };
 
   const getConfidenceLabel = (confidence: number) => {
-    if (confidence >= 95) return "Strong Match";
-    if (confidence >= 70) return "Likely Match";
-    return "Possible Match";
+    if (confidence >= 95) return t("strongMatch");
+    if (confidence >= 70) return t("likelyMatch");
+    return t("possibleMatch");
   };
 
   // Check if fields differ
@@ -212,7 +215,7 @@ export function DuplicateReviewModal({
         <div className="flex items-center justify-between p-6 border-b border-neutral-200 dark:border-dark-border">
           <div>
             <h2 className="text-xl font-semibold text-neutral-900 dark:text-dark-text">
-              Duplicate Review ({currentIndex + 1} of {matches.length})
+              {t("reviewTitle", { current: currentIndex + 1, total: matches.length })}
             </h2>
             <div className="flex items-center gap-2 mt-1">
               <span
@@ -221,7 +224,7 @@ export function DuplicateReviewModal({
                   getConfidenceBadgeClass(currentMatch.confidence)
                 )}
               >
-                {currentMatch.confidence}% Match
+                {t("matchPercent", { confidence: currentMatch.confidence })}
               </span>
               <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">
                 {getConfidenceLabel(currentMatch.confidence)}
@@ -261,7 +264,7 @@ export function DuplicateReviewModal({
           {/* Match Reason */}
           <div className="p-3 bg-neutral-50 dark:bg-dark-surface-hover rounded-lg">
             <p className="text-sm text-neutral-700 dark:text-dark-text-secondary">
-              <strong>Why matched:</strong> {currentMatch.matchReason}
+              <strong>{t("whyMatched")}</strong> {currentMatch.matchReason}
             </p>
           </div>
 
@@ -270,33 +273,33 @@ export function DuplicateReviewModal({
             {/* Imported Transaction */}
             <div className="p-4 bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800 rounded-lg">
               <h3 className="text-sm font-semibold mb-3 text-primary-700 dark:text-primary-300">
-                Imported Transaction
+                {t("importedTransaction")}
               </h3>
               <div className="space-y-2 text-sm">
                 <div className={cn(amountsDiffer && "bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded")}>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">Amount:</strong>
+                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("amount")}</strong>
                   <p className="text-neutral-900 dark:text-dark-text font-medium">
                     {formatCurrency(imported?.amount?.amount || 0, imported?.amount?.currency || currency)}
                   </p>
                 </div>
                 <div className={cn(datesDiffer && "bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded")}>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">Date:</strong>
-                  <p className="text-neutral-900 dark:text-dark-text">{formatDate(imported?.date)}</p>
+                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("date")}</strong>
+                  <p className="text-neutral-900 dark:text-dark-text">{formatDate(imported?.date, locale)}</p>
                 </div>
                 <div className={cn(descriptionsDiffer && "bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded")}>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">Description:</strong>
-                  <p className="text-neutral-900 dark:text-dark-text">{imported?.description || "(none)"}</p>
+                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("description")}</strong>
+                  <p className="text-neutral-900 dark:text-dark-text">{imported?.description || t("noValue")}</p>
                 </div>
                 {imported?.referenceNumber && (
                   <div>
-                    <strong className="text-neutral-700 dark:text-dark-text-secondary">Reference:</strong>
+                    <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("reference")}</strong>
                     <p className="text-neutral-900 dark:text-dark-text">{imported.referenceNumber}</p>
                   </div>
                 )}
                 <div>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">Category:</strong>
+                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("category")}</strong>
                   <p className="text-neutral-900 dark:text-dark-text">
-                    {imported?.suggestedCategoryId ? `Category ${imported.suggestedCategoryId}` : "(not set)"}
+                    {imported?.suggestedCategoryId ? t("categoryNumber", { id: imported.suggestedCategoryId }) : t("noCategory")}
                   </p>
                 </div>
               </div>
@@ -305,27 +308,27 @@ export function DuplicateReviewModal({
             {/* Existing Transaction */}
             <div className="p-4 bg-neutral-50 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border rounded-lg">
               <h3 className="text-sm font-semibold mb-3 text-neutral-900 dark:text-dark-text">
-                Existing Transaction
+                {t("existingTransaction")}
               </h3>
               <div className="space-y-2 text-sm">
                 <div className={cn(amountsDiffer && "bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded")}>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">Amount:</strong>
+                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("amount")}</strong>
                   <p className="text-neutral-900 dark:text-dark-text font-medium">
                     {formatCurrency(existing?.amount?.amount || 0, existing?.amount?.currency || currency)}
                   </p>
                 </div>
                 <div className={cn(datesDiffer && "bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded")}>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">Date:</strong>
-                  <p className="text-neutral-900 dark:text-dark-text">{formatDate(existing?.date)}</p>
+                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("date")}</strong>
+                  <p className="text-neutral-900 dark:text-dark-text">{formatDate(existing?.date, locale)}</p>
                 </div>
                 <div className={cn(descriptionsDiffer && "bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded")}>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">Description:</strong>
-                  <p className="text-neutral-900 dark:text-dark-text">{existing?.note || "(none)"}</p>
+                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("description")}</strong>
+                  <p className="text-neutral-900 dark:text-dark-text">{existing?.note || t("noValue")}</p>
                 </div>
                 <div>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">Category:</strong>
+                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("category")}</strong>
                   <p className="text-neutral-900 dark:text-dark-text">
-                    {existing?.categoryId ? `Category ${existing.categoryId}` : "(not set)"}
+                    {existing?.categoryId ? t("categoryNumber", { id: existing.categoryId }) : t("noCategory")}
                   </p>
                 </div>
               </div>
@@ -335,7 +338,7 @@ export function DuplicateReviewModal({
           {/* Keyboard Shortcuts Help */}
           <div className="p-3 bg-neutral-100 dark:bg-dark-surface-hover rounded-lg">
             <p className="text-xs text-neutral-600 dark:text-dark-text-tertiary">
-              <strong>Keyboard shortcuts:</strong> M = Merge, K = Keep Both, S = Skip, N = Not a Duplicate, ← → = Navigate, Esc = Cancel
+              {t("keyboardShortcuts")}
             </p>
           </div>
         </div>
@@ -350,8 +353,7 @@ export function DuplicateReviewModal({
               size="sm"
               fullWidth
             >
-              <span className="hidden md:inline">Merge</span>
-              <span className="md:hidden">Merge</span>
+              <span>{t("merge")}</span>
               <span className="ml-1 opacity-70">(M)</span>
             </Button>
             <Button
@@ -360,8 +362,8 @@ export function DuplicateReviewModal({
               size="sm"
               fullWidth
             >
-              <span className="hidden md:inline">Keep Both</span>
-              <span className="md:hidden">Keep</span>
+              <span className="hidden md:inline">{t("keepBoth")}</span>
+              <span className="md:hidden">{t("keep")}</span>
               <span className="ml-1 opacity-70">(K)</span>
             </Button>
             <Button
@@ -370,8 +372,8 @@ export function DuplicateReviewModal({
               size="sm"
               fullWidth
             >
-              <span className="hidden md:inline">Skip Import</span>
-              <span className="md:hidden">Skip</span>
+              <span className="hidden md:inline">{t("skipImport")}</span>
+              <span className="md:hidden">{t("skip")}</span>
               <span className="ml-1 opacity-70">(S)</span>
             </Button>
             <Button
@@ -380,8 +382,8 @@ export function DuplicateReviewModal({
               size="sm"
               fullWidth
             >
-              <span className="hidden md:inline">Not a Duplicate</span>
-              <span className="md:hidden">Not Dup</span>
+              <span className="hidden md:inline">{t("notDuplicate")}</span>
+              <span className="md:hidden">{t("notDup")}</span>
               <span className="ml-1 opacity-70">(N)</span>
             </Button>
           </div>
@@ -393,14 +395,14 @@ export function DuplicateReviewModal({
               disabled={currentIndex === 0}
               className="flex-1 px-4 py-2 text-sm bg-neutral-200 dark:bg-dark-surface-hover text-neutral-700 dark:text-dark-text rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-300 dark:hover:bg-dark-surface-active transition-colors"
             >
-              ← Previous
+              {t("previous")}
             </button>
             <button
               onClick={goToNext}
               disabled={currentIndex === matches.length - 1}
               className="flex-1 px-4 py-2 text-sm bg-neutral-200 dark:bg-dark-surface-hover text-neutral-700 dark:text-dark-text rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-300 dark:hover:bg-dark-surface-active transition-colors"
             >
-              Next →
+              {t("next")}
             </button>
           </div>
         </div>
@@ -409,9 +411,9 @@ export function DuplicateReviewModal({
   );
 }
 
-function formatDate(timestamp?: number): string {
+function formatDate(timestamp?: number, locale?: string): string {
   if (!timestamp) return "";
-  return new Date(timestamp * 1000).toLocaleDateString("vi-VN", {
+  return new Date(timestamp * 1000).toLocaleDateString(locale, {
     year: "numeric",
     month: "short",
     day: "numeric",

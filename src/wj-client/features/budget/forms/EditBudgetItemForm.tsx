@@ -17,6 +17,7 @@ import {
 import { Success } from "@/components/modals/Success";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { amountToSmallestUnit } from "@/lib/utils/units";
+import { useTranslations } from "next-intl";
 
 interface EditBudgetItemFormProps {
   budgetId: number;
@@ -35,6 +36,7 @@ export function EditBudgetItemForm({
   onSuccess,
 }: EditBudgetItemFormProps) {
   const { currency } = useCurrency();
+  const t = useTranslations("budget.form");
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [showSuccess, setShowSuccess] = useState(false);
@@ -42,14 +44,14 @@ export function EditBudgetItemForm({
   const updateBudgetItem = useMutationUpdateBudgetItem({
     onSuccess: (data) => {
       const message =
-        data?.message || "Budget item has been updated successfully";
+        data?.message || t("budgetItemUpdatedSuccess");
       setSuccessMessage(message);
       setShowSuccess(true);
       setErrorMessage("");
     },
     onError: (error: any) => {
       setErrorMessage(
-        error.message || "Failed to update budget item. Please try again",
+        error.message || t("failedToUpdateItem"),
       );
     },
   });
@@ -101,8 +103,8 @@ export function EditBudgetItemForm({
       <FormInput
         name="name"
         control={control}
-        label="Budget Item Name"
-        placeholder="e.g., Groceries"
+        label={t("budgetItemName")}
+        placeholder={t("budgetItemNamePlaceholder")}
         required
         disabled={updateBudgetItem.isPending}
       />
@@ -110,7 +112,7 @@ export function EditBudgetItemForm({
       <FormNumberInput
         name="total"
         control={control}
-        label="Allocated Amount"
+        label={t("allocatedAmount")}
         placeholder="0"
         suffix={currency}
         required
@@ -126,7 +128,7 @@ export function EditBudgetItemForm({
           loading={updateBudgetItem.isPending}
           htmlType="submit"
         >
-          Save
+          {t("save")}
         </Button>
       </div>
     </form>

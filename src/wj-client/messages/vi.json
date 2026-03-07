@@ -1239,6 +1239,113 @@
     "thisYear": "Năm nay",
     "lastYear": "Năm trước"
   },
+  "transfer": {
+    "form": {
+      "amount": "Số tiền",
+      "from": "Từ",
+      "selectSourceWallet": "Chọn ví nguồn",
+      "selectSourceFirst": "Chọn ví nguồn trước",
+      "to": "Đến",
+      "selectDestWallet": "Chọn ví đích",
+      "dateTime": "Ngày & Giờ",
+      "note": "Ghi chú",
+      "notePlaceholder": "Nhập ghi chú (tùy chọn)",
+      "transfer": "Chuyển khoản",
+      "successDefault": "Tiền đã được chuyển thành công",
+      "failedToTransfer": "Chuyển khoản thất bại. Vui lòng thử lại"
+    }
+  },
+  "investmentPrice": {
+    "form": {
+      "symbol": "Mã CK",
+      "currentPrice": "Giá hiện tại",
+      "notSet": "Chưa đặt",
+      "newPrice": "Giá mới",
+      "pricePerUnit": "Nhập giá mỗi đơn vị bằng {currency}",
+      "tip": "Bạn có thể đặt giá là 0 nếu không có giá thị trường. Điều này sẽ hiển thị số dư của bạn mà không có tính toán lãi/lỗ.",
+      "updatePrice": "Cập nhật giá",
+      "successMessage": "Đã cập nhật giá thành công!",
+      "failedToUpdate": "Cập nhật giá thất bại",
+      "invalidPrice": "Vui lòng nhập giá hợp lệ (0 hoặc lớn hơn)"
+    }
+  },
+  "changeRate": {
+    "modal": {
+      "title": "Thay đổi tỷ giá: {from} → {to}",
+      "currentRate": "Tỷ giá hiện tại:",
+      "source": "Nguồn:",
+      "transactions": "Giao dịch:",
+      "currentTotal": "Tổng hiện tại:",
+      "sourceAuto": "Tự động",
+      "sourceManual": "Ghi đè thủ công",
+      "sourceFallback": "Tỷ giá dự phòng",
+      "newRateLabel": "Tỷ giá mới (1 {from} = ? {to})",
+      "fromAutoRate": "% so với tỷ giá tự động",
+      "warningSignificant": "Cảnh báo: Tỷ giá này khác đáng kể so với tỷ giá tự động. Vui lòng xác minh.",
+      "newTotal": "Tổng mới:",
+      "invalidRate": "Vui lòng nhập tỷ giá hợp lệ lớn hơn 0",
+      "sameRate": "Tỷ giá mới giống tỷ giá hiện tại",
+      "cancel": "Hủy",
+      "applyRate": "Áp dụng tỷ giá mới",
+      "warningTitle": "Chênh lệch tỷ giá lớn",
+      "warningMessage": "Tỷ giá mới chênh lệch {percent}% so với tỷ giá tự động. Bạn có chắc muốn tiếp tục?",
+      "proceed": "Tiếp tục"
+    }
+  },
+  "currencyConversion": {
+    "section": {
+      "title": "Chuyển đổi tiền tệ ({count} giao dịch)",
+      "titlePlural": "Chuyển đổi tiền tệ ({count} giao dịch)",
+      "rate": "Tỷ giá: 1 {from} =",
+      "changeRate": "Thay đổi tỷ giá",
+      "source": "Nguồn:",
+      "date": "Ngày:",
+      "transactions": "Giao dịch:",
+      "total": "Tổng:",
+      "sourceAuto": "Tự động",
+      "sourceManual": "Ghi đè thủ công",
+      "sourceFallback": "Tỷ giá dự phòng",
+      "note": "Chuyển đổi tiền tệ được áp dụng cho tất cả giao dịch ngoại tệ. Bạn có thể ghi đè tỷ giá thủ công nếu cần."
+    }
+  },
+  "reviewStep": {
+    "title": "Xem lại nhập",
+    "fromStatement": "{count} giao dịch từ sao kê",
+    "fromStatementPlural": "{count} giao dịch từ sao kê",
+    "readyToImport": "Sẵn sàng nhập",
+    "needAttention": "Cần xem xét",
+    "back": "Quay lại",
+    "importing": "Đang nhập...",
+    "import": "Nhập {count} giao dịch",
+    "importPlural": "Nhập {count} giao dịch",
+    "importTransactions": "Nhập giao dịch",
+    "reviewInstructions": "Xem lại các giao dịch đã phân tích dưới đây. Chọn các hàng bạn muốn nhập.",
+    "reviewInstructionsDetail": "Các hàng có lỗi không thể nhập. Giao dịch trùng lặp được phát hiện tự động."
+  },
+  "transactionReview": {
+    "table": {
+      "row": "Hàng",
+      "date": "Ngày",
+      "description": "Mô tả",
+      "amount": "Số tiền",
+      "status": "Trạng thái",
+      "toggleAllRows": "Chọn/bỏ chọn tất cả hàng",
+      "toggleRow": "Chọn hàng {n}",
+      "selectAll": "Chọn tất cả",
+      "selected": "{count} đã chọn",
+      "totalRows": "Tổng hàng",
+      "valid": "Hợp lệ",
+      "errors": "Lỗi",
+      "statusError": "Lỗi",
+      "statusDuplicate": "Trùng {confidence}%",
+      "statusValid": "Hợp lệ",
+      "editDescription": "Sửa mô tả",
+      "original": "Gốc",
+      "showOriginal": "Xem mô tả gốc",
+      "save": "Lưu",
+      "cancel": "Hủy"
+    }
+  },
   "export": {
     "dialog": {
       "title": "Tùy chọn xuất",
@@ -1251,7 +1358,78 @@
       "includeCategories": "Bao gồm danh mục",
       "selectCategories": "Chọn danh mục",
       "allCategories": "Tất cả danh mục",
-      "exportButton": "Xuất"
+      "exportButton": "Xuất",
+      "exportFormat": "Định dạng xuất",
+      "dateRange": "Khoảng thời gian",
+      "last7days": "7 ngày qua",
+      "last30days": "30 ngày qua",
+      "last90days": "90 ngày qua",
+      "ytd": "Từ đầu năm",
+      "allTime": "Tất cả thời gian",
+      "customRange": "Tùy chỉnh",
+      "startDate": "Ngày bắt đầu",
+      "endDate": "Ngày kết thúc",
+      "selectAll": "Chọn tất cả",
+      "clearAll": "Xóa tất cả",
+      "allCategoriesIncluded": "Tất cả danh mục sẽ được bao gồm",
+      "categoriesSelected": "{count} danh mục đã chọn",
+      "categoriesSelectedLabel": "Danh mục {selected}",
+      "fileNameOptional": "Tên tệp (tùy chọn)",
+      "fileNameHint": "Để trống để dùng tên mặc định theo khoảng thời gian",
+      "fileNamePlaceholder": "Báo cáo tài chính của tôi",
+      "showPreview": "Hiện xem trước",
+      "hidePreview": "Ẩn xem trước",
+      "exportSummary": "Tóm tắt xuất",
+      "formatLabel": "Định dạng:",
+      "dateRangeLabel": "Khoảng thời gian:",
+      "chartsLabel": "Biểu đồ:",
+      "categoriesLabel": "Danh mục:",
+      "brandingLabel": "Thương hiệu:",
+      "included": "Bao gồm",
+      "excluded": "Loại trừ",
+      "allSelected": "Tất cả",
+      "customBranding": "Tùy chỉnh",
+      "standardBranding": "Mặc định",
+      "cancel": "Hủy",
+      "export": "Xuất",
+      "exporting": "Đang xuất...",
+      "csvDescription": "Định dạng bảng tính phổ quát, tương thích với Excel, Google Sheets",
+      "pdfDescription": "Định dạng tài liệu chuyên nghiệp",
+      "excelDescription": "Định dạng Excel gốc với hỗ trợ định dạng"
+    }
+  },
+  "share": {
+    "dialog": {
+      "title": "Chia sẻ báo cáo",
+      "shareMethod": "Phương thức chia sẻ",
+      "shareableLink": "Liên kết chia sẻ",
+      "copy": "Sao chép",
+      "copied": "Đã sao chép",
+      "emailRecipients": "Người nhận email",
+      "emailPlaceholder": "john@example.com, jane@example.com",
+      "separateEmails": "Phân cách nhiều email bằng dấu phẩy",
+      "customMessage": "Tin nhắn tùy chỉnh (tùy chọn)",
+      "messagePlaceholder": "Thêm tin nhắn cá nhân vào báo cáo...",
+      "reportFormat": "Định dạng báo cáo",
+      "summary": "Tóm tắt",
+      "detailed": "Chi tiết",
+      "includeCharts": "Bao gồm biểu đồ trong PDF",
+      "shareSocial": "Chia sẻ tóm tắt tài chính của bạn trên mạng xã hội",
+      "previewCaption": "Xem trước thẻ báo cáo chia sẻ",
+      "balance": "Số dư",
+      "income": "Thu nhập",
+      "expenses": "Chi tiêu",
+      "cancel": "Hủy",
+      "share": "Chia sẻ",
+      "sharing": "Đang chia sẻ...",
+      "methodLink": "Liên kết chia sẻ",
+      "methodLinkDesc": "Tạo liên kết để chia sẻ với bất kỳ ai",
+      "methodEmail": "Email",
+      "methodEmailDesc": "Gửi báo cáo trực tiếp đến người nhận email",
+      "methodPdf": "Tải PDF",
+      "methodPdfDesc": "Tạo tệp PDF để chia sẻ ngoại tuyến",
+      "methodSocial": "Mạng xã hội",
+      "methodSocialDesc": "Chia sẻ trên Twitter, LinkedIn hoặc Facebook"
     }
   },
   "import": {
@@ -1411,6 +1589,92 @@
     },
     "stepProgress": {
       "stepOf": "Bước {current} trên {total}"
+    },
+    "duplicateStrategy": {
+      "heading": "Phát hiện {count} giao dịch trùng lặp tiềm năng",
+      "headingPlural": "Phát hiện {count} giao dịch trùng lặp tiềm năng",
+      "subtitle": "Chọn cách xử lý các giao dịch trùng lặp",
+      "skipAll": "Bỏ qua tất cả",
+      "skipAllDesc": "Không nhập các giao dịch trùng lặp",
+      "autoMerge": "Tự động gộp",
+      "autoMergeDesc": "Cập nhật các giao dịch hiện có",
+      "reviewEach": "Xem xét từng cái",
+      "reviewEachDesc": "Xem xét thủ công từng giao dịch trùng lặp",
+      "keepAll": "Giữ tất cả",
+      "keepAllDesc": "Nhập tất cả dưới dạng giao dịch mới",
+      "keepAllWarning": "Cảnh báo: Sẽ nhập {count} bản sao tiềm năng dưới dạng giao dịch mới",
+      "keepAllWarningPlural": "Cảnh báo: Sẽ nhập {count} bản sao tiềm năng dưới dạng giao dịch mới"
+    },
+    "categoryReview": {
+      "heading": "{count} cần xem xét danh mục",
+      "subtitle": "Độ tin cậy thấp hoặc không có gợi ý danh mục",
+      "acceptAll": "Chấp nhận tất cả gợi ý",
+      "markAllUncategorized": "Đánh dấu tất cả chưa phân loại",
+      "suggested": "Gợi ý:",
+      "selectCategory": "Chọn danh mục",
+      "selectCategoryPlaceholder": "Chọn danh mục",
+      "uncategorized": "Chưa phân loại",
+      "row": "Hàng {n}"
+    },
+    "readyToImport": {
+      "heading": "{count} sẵn sàng nhập",
+      "subtitle": "Độ tin cậy cao, đã tự động phân loại",
+      "selectAll": "Chọn tất cả ({selected} trên {total})",
+      "toggleAllRows": "Bật/tắt tất cả hàng",
+      "toggleRow": "Bật/tắt hàng {n}",
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "original": "Gốc",
+      "editDescription": "Chỉnh sửa mô tả",
+      "uncategorized": "Chưa phân loại",
+      "selectCategoryPlaceholder": "Chọn danh mục"
+    },
+    "errorSummary": {
+      "validationErrorsFound": "Phát hiện lỗi xác thực",
+      "warningsFound": "Phát hiện cảnh báo",
+      "errorCount": "{count} lỗi",
+      "errorCountPlural": "{count} lỗi",
+      "warningCount": "{count} cảnh báo",
+      "warningCountPlural": "{count} cảnh báo",
+      "infoCount": "{count} tin nhắn thông tin",
+      "infoCountPlural": "{count} tin nhắn thông tin",
+      "filterAll": "Tất cả ({count})",
+      "filterErrors": "Lỗi ({count})",
+      "filterWarnings": "Cảnh báo ({count})",
+      "filterInfo": "Thông tin ({count})",
+      "row": "Hàng {n}"
     }
+  },
+  "symbolAutocomplete": {
+    "minCharsHint": "Nhập ít nhất {count} ký tự để tìm kiếm",
+    "searching": "Đang tìm kiếm...",
+    "noResults": "Không tìm thấy kết quả cho \"{query}\". Thử từ khóa khác.",
+    "failedSearch": "Tìm kiếm ký hiệu thất bại. Vui lòng thử lại."
+  },
+  "datePicker": {
+    "placeholder": "Chọn ngày",
+    "clearDate": "Xóa ngày",
+    "previousMonth": "Tháng trước",
+    "nextMonth": "Tháng sau",
+    "previousYear": "Năm trước",
+    "nextYear": "Năm sau"
+  },
+  "connectionStatus": {
+    "unsecure": "Kết nối không an toàn",
+    "secure": "Kết nối an toàn"
+  },
+  "dataFreshness": {
+    "justNow": "vừa xong",
+    "minuteAgo": "{count} phút trước",
+    "minutesAgo": "{count} phút trước",
+    "hourAgo": "{count} giờ trước",
+    "hoursAgo": "{count} giờ trước",
+    "dayAgo": "{count} ngày trước",
+    "daysAgo": "{count} ngày trước",
+    "updated": "Cập nhật {timeAgo}"
+  },
+  "sidebarToggle": {
+    "collapse": "Thu gọn thanh bên",
+    "expand": "Mở rộng thanh bên"
   }
 }

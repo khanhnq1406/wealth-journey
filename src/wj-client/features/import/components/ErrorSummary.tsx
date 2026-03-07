@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 import { ValidationError } from "@/gen/protobuf/v1/import";
 
@@ -41,6 +42,7 @@ function AlertCircleIcon({ className }: { className?: string }) {
 }
 
 export function ErrorSummary({ errors }: ErrorSummaryProps) {
+  const t = useTranslations("modals.importWizard.errorSummary");
   const [isExpanded, setIsExpanded] = useState(false);
   const [severityFilter, setSeverityFilter] = useState<SeverityFilter>("all");
 
@@ -128,7 +130,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                   : "text-yellow-900 dark:text-yellow-200",
               )}
             >
-              {errorCount > 0 ? "Validation Errors Found" : "Warnings Found"}
+              {errorCount > 0 ? t("validationErrorsFound") : t("warningsFound")}
             </h3>
             <p
               className={cn(
@@ -138,12 +140,12 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                   : "text-yellow-700 dark:text-yellow-300",
               )}
             >
-              {errorCount > 0 && `${errorCount} error${errorCount !== 1 ? "s" : ""}`}
+              {errorCount > 0 && t(errorCount !== 1 ? "errorCountPlural" : "errorCount", { count: errorCount })}
               {errorCount > 0 && warningCount > 0 && ", "}
               {warningCount > 0 &&
-                `${warningCount} warning${warningCount !== 1 ? "s" : ""}`}
+                t(warningCount !== 1 ? "warningCountPlural" : "warningCount", { count: warningCount })}
               {infoCount > 0 &&
-                `, ${infoCount} info message${infoCount !== 1 ? "s" : ""}`}
+                `, ${t(infoCount !== 1 ? "infoCountPlural" : "infoCount", { count: infoCount })}`}
             </p>
           </div>
         </div>
@@ -173,7 +175,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                     : "bg-white dark:bg-dark-surface text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600 hover:bg-neutral-100 dark:hover:bg-dark-surface-active",
                 )}
               >
-                All ({allErrors.length})
+                {t("filterAll", { count: allErrors.length })}
               </button>
               {errorCount > 0 && (
                 <button
@@ -185,7 +187,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                       : "bg-white dark:bg-dark-surface text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600 hover:bg-neutral-100 dark:hover:bg-dark-surface-active",
                   )}
                 >
-                  Errors ({errorCount})
+                  {t("filterErrors", { count: errorCount })}
                 </button>
               )}
               {warningCount > 0 && (
@@ -198,7 +200,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                       : "bg-white dark:bg-dark-surface text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600 hover:bg-neutral-100 dark:hover:bg-dark-surface-active",
                   )}
                 >
-                  Warnings ({warningCount})
+                  {t("filterWarnings", { count: warningCount })}
                 </button>
               )}
               {infoCount > 0 && (
@@ -211,7 +213,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                       : "bg-white dark:bg-dark-surface text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600 hover:bg-neutral-100 dark:hover:bg-dark-surface-active",
                   )}
                 >
-                  Info ({infoCount})
+                  {t("filterInfo", { count: infoCount })}
                 </button>
               )}
             </div>
@@ -225,7 +227,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                 className="px-4 py-3 border-b border-neutral-200 dark:border-dark-border last:border-b-0"
               >
                 <div className="font-semibold text-sm text-neutral-900 dark:text-dark-text mb-2">
-                  Row {row.rowNumber}
+                  {t("row", { n: row.rowNumber })}
                 </div>
                 <div className="space-y-2">
                   {row.errors.map((error, idx) => (

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { ParsedTransaction } from "@/gen/protobuf/v1/import";
 import { Button } from "@/components/Button";
 import { cn } from "@/lib/utils/cn";
@@ -23,6 +24,7 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
   currency = "VND",
 }: CategoryReviewSectionProps) {
   const [expanded, setExpanded] = useState(false);
+  const t = useTranslations("modals.importWizard.categoryReview");
 
   // Memoize category options to avoid recreating on every render
   const categoryOptions = useMemo<SelectOption<string>[]>(() => {
@@ -83,10 +85,10 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
           <span className="text-2xl">🏷️</span>
           <div className="text-left">
             <h3 className="font-semibold text-base text-neutral-900 dark:text-dark-text">
-              {transactions.length} Need Category Review
+              {t("heading", { count: transactions.length })}
             </h3>
             <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              Low confidence or no category suggestion
+              {t("subtitle")}
             </p>
           </div>
         </div>
@@ -114,7 +116,7 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
                 className="min-h-[44px]"
               >
                 <span className="mr-1">✓</span>
-                Accept All Suggestions
+                {t("acceptAll")}
               </Button>
               <Button
                 variant="secondary"
@@ -123,7 +125,7 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
                 fullWidth
                 className="min-h-[44px]"
               >
-                Mark All Uncategorized
+                {t("markAllUncategorized")}
               </Button>
             </div>
           </div>
@@ -151,7 +153,7 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
                     </div>
                     <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-dark-text-tertiary">
                       <span className="inline-flex px-2 py-1 rounded-full bg-neutral-200 dark:bg-neutral-700">
-                        Row {tx.rowNumber}
+                        {t("row", { n: tx.rowNumber })}
                       </span>
                       <span>•</span>
                       <span>{formatDate(tx.date)}</span>
@@ -163,7 +165,7 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
                     <div className="p-3 bg-white dark:bg-dark-surface rounded-lg border border-neutral-200 dark:border-dark-border">
                       <div className="flex items-center justify-between flex-wrap gap-2">
                         <span className="text-xs text-neutral-600 dark:text-neutral-400">
-                          Suggested:
+                          {t("suggested")}
                         </span>
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-medium text-neutral-900 dark:text-dark-text">
@@ -185,7 +187,7 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
                   {/* Category Selector */}
                   <div>
                     <label className="block text-xs font-medium text-neutral-700 dark:text-dark-text-secondary mb-1">
-                      Select Category
+                      {t("selectCategory")}
                     </label>
                     <FormSelect
                       options={categoryOptions}
@@ -197,7 +199,7 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
                           onCategoryChange(tx.rowNumber, categoryId);
                         }
                       }}
-                      placeholder="Select category"
+                      placeholder={t("selectCategoryPlaceholder")}
                       className="w-full min-h-[44px] text-base"
                       portal
                     />

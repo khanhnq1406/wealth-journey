@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 import { formatCurrencyImport } from "@/utils/currency-formatter";
 import { ParsedTransaction } from "@/gen/protobuf/v1/import";
@@ -49,6 +50,7 @@ export function TransactionReviewTable({
   currency = "VND",
   onDescriptionChange,
 }: TransactionReviewTableProps) {
+  const t = useTranslations("transactionReview.table");
   const [editingRow, setEditingRow] = useState<number | null>(null);
   const [editValue, setEditValue] = useState<string>("");
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
@@ -98,7 +100,7 @@ export function TransactionReviewTable({
     if (!transaction.isValid) {
       return (
         <span className="inline-block px-2 py-1 rounded text-xs font-semibold uppercase bg-red-600 text-white dark:bg-red-700">
-          Error
+          {t("statusError")}
         </span>
       );
     }
@@ -107,14 +109,14 @@ export function TransactionReviewTable({
     if (duplicate) {
       return (
         <span className="inline-block px-2 py-1 rounded text-xs font-semibold uppercase bg-yellow-600 text-white dark:bg-yellow-700">
-          Duplicate {duplicate.confidence}%
+          {t("statusDuplicate", { confidence: duplicate.confidence })}
         </span>
       );
     }
 
     return (
       <span className="inline-block px-2 py-1 rounded text-xs font-semibold uppercase bg-green-600 text-white dark:bg-green-700">
-        Valid
+        {t("statusValid")}
       </span>
     );
   };
@@ -144,7 +146,7 @@ export function TransactionReviewTable({
                           ? "bg-primary-600 border-primary-600 dark:bg-primary-700 dark:border-primary-700"
                           : "border-neutral-400 dark:border-neutral-500 hover:border-primary-500",
                     )}
-                    aria-label="Toggle all rows"
+                    aria-label={t("toggleAllRows")}
                   >
                     {allSelected ? (
                       <CheckIcon className="text-white" />
@@ -154,19 +156,19 @@ export function TransactionReviewTable({
                   </button>
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase">
-                  Row
+                  {t("row")}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase">
-                  Date
+                  {t("date")}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase">
-                  Description
+                  {t("description")}
                 </th>
                 <th className="px-4 py-3 text-right text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase">
-                  Amount
+                  {t("amount")}
                 </th>
                 <th className="px-4 py-3 text-center text-xs font-semibold text-neutral-700 dark:text-neutral-300 uppercase">
-                  Status
+                  {t("status")}
                 </th>
               </tr>
             </thead>
@@ -194,7 +196,7 @@ export function TransactionReviewTable({
                             : "border-neutral-400 dark:border-neutral-500 hover:border-primary-500",
                           isDisabled && "cursor-not-allowed opacity-50",
                         )}
-                        aria-label={`Toggle row ${transaction.rowNumber}`}
+                        aria-label={t("toggleRow", { n: transaction.rowNumber })}
                       >
                         {isSelected && <CheckIcon className="text-white" />}
                       </button>
@@ -225,14 +227,14 @@ export function TransactionReviewTable({
                           <button
                             onClick={() => handleSaveEdit(transaction.rowNumber)}
                             className="p-1 text-green-600 hover:text-green-700 dark:text-green-400"
-                            title="Save"
+                            title={t("save")}
                           >
                             <CheckIcon className="w-4 h-4" />
                           </button>
                           <button
                             onClick={handleCancelEdit}
                             className="p-1 text-red-600 hover:text-red-700 dark:text-red-400"
-                            title="Cancel"
+                            title={t("cancel")}
                           >
                             ✕
                           </button>
@@ -245,7 +247,7 @@ export function TransactionReviewTable({
                               <button
                                 onClick={() => handleStartEdit(transaction.rowNumber, transaction.description)}
                                 className="flex-shrink-0 text-primary-600 hover:text-primary-700 dark:text-primary-400 text-xs"
-                                title="Edit description"
+                                title={t("editDescription")}
                               >
                                 ✎
                               </button>
@@ -257,7 +259,7 @@ export function TransactionReviewTable({
                                 onClick={() => toggleExpanded(transaction.rowNumber)}
                                 className="text-xs text-neutral-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 text-left"
                               >
-                                {expandedRows.has(transaction.rowNumber) ? "▼" : "▶"} Original
+                                {expandedRows.has(transaction.rowNumber) ? "▼" : "▶"} {t("original")}
                               </button>
                             )}
                           {expandedRows.has(transaction.rowNumber) &&
@@ -318,11 +320,11 @@ export function TransactionReviewTable({
               ) : null}
             </div>
             <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              Select All
+              {t("selectAll")}
             </span>
           </button>
           <span className="text-sm text-neutral-600 dark:text-neutral-400">
-            {selectedCount} selected
+            {t("selected", { count: selectedCount })}
           </span>
         </div>
 
@@ -358,7 +360,7 @@ export function TransactionReviewTable({
                     </div>
                     <div className="text-left flex-1">
                       <div className="text-sm text-neutral-600 dark:text-neutral-400">
-                        Row {transaction.rowNumber}
+                        {t("row")} {transaction.rowNumber}
                       </div>
                       {editingRow === transaction.rowNumber ? (
                         <div className="mt-2 space-y-2" onClick={(e) => e.stopPropagation()}>
@@ -385,7 +387,7 @@ export function TransactionReviewTable({
                               }}
                               className="flex-1 px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
                             >
-                              Save
+                              {t("save")}
                             </button>
                             <button
                               onClick={(e) => {
@@ -394,7 +396,7 @@ export function TransactionReviewTable({
                               }}
                               className="flex-1 px-3 py-1 bg-neutral-300 dark:bg-neutral-700 text-neutral-900 dark:text-dark-text rounded hover:bg-neutral-400 dark:hover:bg-neutral-600"
                             >
-                              Cancel
+                              {t("cancel")}
                             </button>
                           </div>
                         </div>
@@ -411,7 +413,7 @@ export function TransactionReviewTable({
                                   handleStartEdit(transaction.rowNumber, transaction.description);
                                 }}
                                 className="flex-shrink-0 p-1 text-primary-600 hover:text-primary-700 dark:text-primary-400"
-                                title="Edit description"
+                                title={t("editDescription")}
                               >
                                 ✎
                               </button>
@@ -427,7 +429,7 @@ export function TransactionReviewTable({
                                   }}
                                   className="text-xs text-neutral-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400"
                                 >
-                                  {expandedRows.has(transaction.rowNumber) ? "▼" : "▶"} Show original description
+                                  {expandedRows.has(transaction.rowNumber) ? "▼" : "▶"} {t("showOriginal")}
                                 </button>
                                 {expandedRows.has(transaction.rowNumber) && (
                                   <div className="text-xs text-neutral-600 dark:text-neutral-400 italic bg-neutral-50 dark:bg-dark-surface-hover p-2 rounded">
@@ -476,7 +478,7 @@ export function TransactionReviewTable({
               {transactions.length}
             </div>
             <div className="text-xs text-neutral-600 dark:text-neutral-400 uppercase">
-              Total Rows
+              {t("totalRows")}
             </div>
           </div>
           <div>
@@ -484,7 +486,7 @@ export function TransactionReviewTable({
               {transactions.filter((t) => t.isValid).length}
             </div>
             <div className="text-xs text-neutral-600 dark:text-neutral-400 uppercase">
-              Valid
+              {t("valid")}
             </div>
           </div>
           <div>
@@ -492,7 +494,7 @@ export function TransactionReviewTable({
               {transactions.filter((t) => !t.isValid).length}
             </div>
             <div className="text-xs text-neutral-600 dark:text-neutral-400 uppercase">
-              Errors
+              {t("errors")}
             </div>
           </div>
           <div>

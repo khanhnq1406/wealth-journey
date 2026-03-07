@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
@@ -72,6 +73,7 @@ export function ShareDialog({
   reportUrl = "",
   summaryData,
 }: ShareDialogProps) {
+  const t = useTranslations("share.dialog");
   const [method, setMethod] = useState<ShareMethod>("link");
   const [emailRecipients, setEmailRecipients] = useState("");
   const [customMessage, setCustomMessage] = useState("");
@@ -144,8 +146,8 @@ export function ShareDialog({
   const getMethodInfo = (m: ShareMethod) => {
     const info = {
       link: {
-        name: "Shareable Link",
-        description: "Generate a link to share with anyone",
+        name: t("methodLink"),
+        description: t("methodLinkDesc"),
         icon: (
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
@@ -153,8 +155,8 @@ export function ShareDialog({
         ),
       },
       email: {
-        name: "Email",
-        description: "Send report directly to email recipients",
+        name: t("methodEmail"),
+        description: t("methodEmailDesc"),
         icon: (
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -162,8 +164,8 @@ export function ShareDialog({
         ),
       },
       pdf: {
-        name: "Download PDF",
-        description: "Generate a PDF file for offline sharing",
+        name: t("methodPdf"),
+        description: t("methodPdfDesc"),
         icon: (
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -171,8 +173,8 @@ export function ShareDialog({
         ),
       },
       social: {
-        name: "Social Media",
-        description: "Share on Twitter, LinkedIn, or Facebook",
+        name: t("methodSocial"),
+        description: t("methodSocialDesc"),
         icon: (
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
@@ -187,7 +189,7 @@ export function ShareDialog({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Share Report"
+      title={t("title")}
       maxWidth="max-w-lg"
     >
       <div className="space-y-5">
@@ -209,26 +211,26 @@ export function ShareDialog({
               <div className="grid grid-cols-3 gap-3 text-sm">
                 {summaryData.totalBalance && (
                   <div>
-                    <p className="text-primary-200 text-xs">Balance</p>
+                    <p className="text-primary-200 text-xs">{t("balance")}</p>
                     <p className="font-semibold">{summaryData.totalBalance}</p>
                   </div>
                 )}
                 {summaryData.monthlyIncome && (
                   <div>
-                    <p className="text-primary-200 text-xs">Income</p>
+                    <p className="text-primary-200 text-xs">{t("income")}</p>
                     <p className="font-semibold text-success-300">{summaryData.monthlyIncome}</p>
                   </div>
                 )}
                 {summaryData.monthlyExpenses && (
                   <div>
-                    <p className="text-primary-200 text-xs">Expenses</p>
+                    <p className="text-primary-200 text-xs">{t("expenses")}</p>
                     <p className="font-semibold text-danger-300">{summaryData.monthlyExpenses}</p>
                   </div>
                 )}
               </div>
             </div>
             <p className="text-xs text-neutral-500 dark:text-dark-text-tertiary mt-2 text-center">
-              Preview of shared report card
+              {t("previewCaption")}
             </p>
           </div>
         )}
@@ -236,7 +238,7 @@ export function ShareDialog({
         {/* Share Method Selection */}
         <div>
           <label className="block text-sm font-medium text-neutral-900 dark:text-dark-text mb-3">
-            Share Method
+            {t("shareMethod")}
           </label>
           <div className="grid grid-cols-2 gap-2">
             {(["link", "email", "pdf", "social"] as ShareMethod[]).map((m) => {
@@ -281,7 +283,7 @@ export function ShareDialog({
           <div className="space-y-3">
             <div>
               <label className="block text-sm font-medium text-neutral-900 dark:text-dark-text mb-2">
-                Shareable Link
+                {t("shareableLink")}
               </label>
               <div className="flex gap-2">
                 <input
@@ -306,14 +308,14 @@ export function ShareDialog({
                       <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
-                      Copied
+                      {t("copied")}
                     </>
                   ) : (
                     <>
                       <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                       </svg>
-                      Copy
+                      {t("copy")}
                     </>
                   )}
                 </Button>
@@ -326,13 +328,13 @@ export function ShareDialog({
           <div className="space-y-3">
             <div>
               <label className="block text-sm font-medium text-neutral-900 dark:text-dark-text mb-2">
-                Email Recipients
+                {t("emailRecipients")}
               </label>
               <input
                 type="text"
                 value={emailRecipients}
                 onChange={(e) => setEmailRecipients(e.target.value)}
-                placeholder="john@example.com, jane@example.com"
+                placeholder={t("emailPlaceholder")}
                 className={cn(
                   // IMPORTANT: Font size must be at least 16px (text-base) to prevent iOS auto-zoom
                   "w-full px-3 py-2 rounded-lg border text-base sm:text-sm",
@@ -344,17 +346,17 @@ export function ShareDialog({
                 )}
               />
               <p className="mt-1 text-xs text-neutral-500 dark:text-dark-text-tertiary">
-                Separate multiple emails with commas
+                {t("separateEmails")}
               </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-neutral-900 dark:text-dark-text mb-2">
-                Custom Message (optional)
+                {t("customMessage")}
               </label>
               <textarea
                 value={customMessage}
                 onChange={(e) => setCustomMessage(e.target.value)}
-                placeholder="Add a personal message to your report..."
+                placeholder={t("messagePlaceholder")}
                 rows={3}
                 className={cn(
                   // IMPORTANT: Font size must be at least 16px (text-base) to prevent iOS auto-zoom
@@ -374,7 +376,7 @@ export function ShareDialog({
           <div className="space-y-3">
             <div>
               <label className="block text-sm font-medium text-neutral-900 dark:text-dark-text mb-3">
-                Report Format
+                {t("reportFormat")}
               </label>
               <div className="flex gap-2">
                 <button
@@ -387,7 +389,7 @@ export function ShareDialog({
                       : "border-neutral-200 dark:border-dark-border bg-white dark:bg-dark-surface text-neutral-700 dark:text-dark-text-secondary"
                   )}
                 >
-                  Summary
+                  {t("summary")}
                 </button>
                 <button
                   type="button"
@@ -399,7 +401,7 @@ export function ShareDialog({
                       : "border-neutral-200 dark:border-dark-border bg-white dark:bg-dark-surface text-neutral-700 dark:text-dark-text-secondary"
                   )}
                 >
-                  Detailed
+                  {t("detailed")}
                 </button>
               </div>
             </div>
@@ -411,7 +413,7 @@ export function ShareDialog({
                 className="w-4 h-4 rounded border-neutral-300 dark:border-dark-border text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-600"
               />
               <span className="text-sm font-medium text-neutral-900 dark:text-dark-text">
-                Include charts in PDF
+                {t("includeCharts")}
               </span>
             </label>
           </div>
@@ -420,7 +422,7 @@ export function ShareDialog({
         {method === "social" && (
           <div className="space-y-3">
             <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
-              Share your financial summary on social media
+              {t("shareSocial")}
             </p>
             <div className="grid grid-cols-3 gap-2">
               <button
@@ -477,14 +479,14 @@ export function ShareDialog({
           onClick={onClose}
           disabled={isSharing}
         >
-          Cancel
+          {t("cancel")}
         </Button>
         <Button
           type={ButtonType.PRIMARY}
           onClick={handleShare}
           loading={isSharing}
         >
-          {isSharing ? "Sharing..." : "Share"}
+          {isSharing ? t("sharing") : t("share")}
         </Button>
       </div>
     </BaseModal>
@@ -505,6 +507,7 @@ export function ShareButton({
   reportUrl?: string;
   summaryData?: ShareDialogProps["summaryData"];
 }) {
+  const t = useTranslations("share.dialog");
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -516,7 +519,7 @@ export function ShareButton({
         <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
         </svg>
-        Share
+        {t("share")}
       </Button>
 
       <ShareDialog

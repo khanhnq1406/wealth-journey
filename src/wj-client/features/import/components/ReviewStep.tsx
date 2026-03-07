@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/Button";
 import { ErrorSummary } from "./ErrorSummary";
 import { TransactionReviewTable } from "./TransactionReviewTable";
@@ -90,6 +91,8 @@ export function ReviewStep(props: ReviewStepProps) {
   const onChangeRate = "onChangeRate" in props ? props.onChangeRate : undefined;
   const onDescriptionChange =
     "onDescriptionChange" in props ? props.onDescriptionChange : undefined;
+
+  const t = useTranslations("reviewStep");
 
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [dateRangeStart, setDateRangeStart] = useState<Date | null>(null);
@@ -448,11 +451,12 @@ export function ReviewStep(props: ReviewStepProps) {
         {/* Header Summary */}
         <div>
           <h2 className="text-xl font-bold text-neutral-900 dark:text-dark-text mb-2">
-            Review Import
+            {t("title")}
           </h2>
           <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
-            {transactionsState.length} transaction
-            {transactionsState.length !== 1 ? "s" : ""} from statement
+            {transactionsState.length !== 1
+              ? t("fromStatementPlural", { count: transactionsState.length })
+              : t("fromStatement", { count: transactionsState.length })}
           </p>
         </div>
 
@@ -544,7 +548,7 @@ export function ReviewStep(props: ReviewStepProps) {
           <div className="grid grid-cols-2 gap-4 text-center">
             <div>
               <p className="text-neutral-600 dark:text-dark-text-secondary text-sm mb-1">
-                Ready to import
+                {t("readyToImport")}
               </p>
               <p className="text-2xl font-bold text-success-600 dark:text-success-400">
                 {importableCount}
@@ -552,7 +556,7 @@ export function ReviewStep(props: ReviewStepProps) {
             </div>
             <div>
               <p className="text-neutral-600 dark:text-dark-text-secondary text-sm mb-1">
-                Need attention
+                {t("needAttention")}
               </p>
               <p className="text-2xl font-bold text-warning-600 dark:text-warning-400">
                 {blockedCount}
@@ -564,7 +568,7 @@ export function ReviewStep(props: ReviewStepProps) {
         {/* Action Buttons */}
         <div className="flex gap-3 pt-2">
           <Button variant="secondary" onClick={onBack} disabled={isLoading}>
-            Back
+            {t("back")}
           </Button>
           <Button
             variant="primary"
@@ -573,8 +577,10 @@ export function ReviewStep(props: ReviewStepProps) {
             loading={isLoading}
           >
             {isLoading
-              ? "Importing..."
-              : `Import ${importableCount} Transaction${importableCount !== 1 ? "s" : ""}`}
+              ? t("importing")
+              : importableCount !== 1
+              ? t("importPlural", { count: importableCount })
+              : t("import", { count: importableCount })}
           </Button>
         </div>
 
@@ -597,12 +603,10 @@ export function ReviewStep(props: ReviewStepProps) {
       {/* Instructions */}
       <div className="text-sm sm:text-base text-neutral-600 dark:text-dark-text-secondary">
         <p className="mb-2">
-          Review the parsed transactions below. Select the rows you want to
-          import.
+          {t("reviewInstructions")}
         </p>
         <p className="text-xs sm:text-sm text-neutral-500 dark:text-dark-text-tertiary">
-          Rows with errors cannot be imported. Duplicate transactions are
-          detected automatically.
+          {t("reviewInstructionsDetail")}
         </p>
       </div>
 
@@ -625,7 +629,7 @@ export function ReviewStep(props: ReviewStepProps) {
       {/* Action Buttons */}
       <div className="flex gap-3 pt-2">
         <Button variant="secondary" onClick={onBack} disabled={isLoading}>
-          Back
+          {t("back")}
         </Button>
         <Button
           variant="primary"
@@ -633,10 +637,11 @@ export function ReviewStep(props: ReviewStepProps) {
           disabled={selectedRows.size === 0 || isLoading}
           loading={isLoading}
         >
-          Import{" "}
           {selectedRows.size > 0
-            ? `${selectedRows.size} Transaction${selectedRows.size !== 1 ? "s" : ""}`
-            : "Transactions"}
+            ? selectedRows.size !== 1
+              ? t("importPlural", { count: selectedRows.size })
+              : t("import", { count: selectedRows.size })
+            : t("importTransactions")}
         </Button>
       </div>
     </div>

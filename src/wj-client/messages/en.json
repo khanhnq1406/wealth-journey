@@ -1239,6 +1239,113 @@
     "thisYear": "This Year",
     "lastYear": "Last Year"
   },
+  "transfer": {
+    "form": {
+      "amount": "Amount",
+      "from": "From",
+      "selectSourceWallet": "Select source wallet",
+      "selectSourceFirst": "Select source wallet first",
+      "to": "To",
+      "selectDestWallet": "Select destination wallet",
+      "dateTime": "Date & Time",
+      "note": "Note",
+      "notePlaceholder": "Enter note (optional)",
+      "transfer": "Transfer",
+      "successDefault": "Funds have been transferred successfully",
+      "failedToTransfer": "Failed to transfer funds. Please try again"
+    }
+  },
+  "investmentPrice": {
+    "form": {
+      "symbol": "Symbol",
+      "currentPrice": "Current Price",
+      "notSet": "Not set",
+      "newPrice": "New Price",
+      "pricePerUnit": "Enter price per unit in {currency}",
+      "tip": "You can set price to 0 if market price is unavailable. This will show your holdings without profit/loss calculations.",
+      "updatePrice": "Update Price",
+      "successMessage": "Price updated successfully!",
+      "failedToUpdate": "Failed to update price",
+      "invalidPrice": "Please enter a valid price (0 or greater)"
+    }
+  },
+  "changeRate": {
+    "modal": {
+      "title": "Change Rate: {from} → {to}",
+      "currentRate": "Current Rate:",
+      "source": "Source:",
+      "transactions": "Transactions:",
+      "currentTotal": "Current Total:",
+      "sourceAuto": "Automatic",
+      "sourceManual": "Manual Override",
+      "sourceFallback": "Fallback Rate",
+      "newRateLabel": "New Exchange Rate (1 {from} = ? {to})",
+      "fromAutoRate": "% from automatic rate",
+      "warningSignificant": "Warning: This rate differs significantly from the automatic rate. Please verify it is correct.",
+      "newTotal": "New Total:",
+      "invalidRate": "Please enter a valid exchange rate greater than 0",
+      "sameRate": "New rate is the same as current rate",
+      "cancel": "Cancel",
+      "applyRate": "Apply New Rate",
+      "warningTitle": "Large Rate Difference",
+      "warningMessage": "The new rate differs by {percent}% from the automatic rate. Are you sure you want to proceed?",
+      "proceed": "Proceed"
+    }
+  },
+  "currencyConversion": {
+    "section": {
+      "title": "Currency Conversions ({count} transaction)",
+      "titlePlural": "Currency Conversions ({count} transactions)",
+      "rate": "Rate: 1 {from} =",
+      "changeRate": "Change Rate",
+      "source": "Source:",
+      "date": "Date:",
+      "transactions": "Transactions:",
+      "total": "Total:",
+      "sourceAuto": "Automatic",
+      "sourceManual": "Manual Override",
+      "sourceFallback": "Fallback Rate",
+      "note": "Currency conversions are applied to all transactions in foreign currencies. You can manually override the exchange rate if needed."
+    }
+  },
+  "reviewStep": {
+    "title": "Review Import",
+    "fromStatement": "{count} transaction from statement",
+    "fromStatementPlural": "{count} transactions from statement",
+    "readyToImport": "Ready to import",
+    "needAttention": "Need attention",
+    "back": "Back",
+    "importing": "Importing...",
+    "import": "Import {count} Transaction",
+    "importPlural": "Import {count} Transactions",
+    "importTransactions": "Import Transactions",
+    "reviewInstructions": "Review the parsed transactions below. Select the rows you want to import.",
+    "reviewInstructionsDetail": "Rows with errors cannot be imported. Duplicate transactions are detected automatically."
+  },
+  "transactionReview": {
+    "table": {
+      "row": "Row",
+      "date": "Date",
+      "description": "Description",
+      "amount": "Amount",
+      "status": "Status",
+      "toggleAllRows": "Toggle all rows",
+      "toggleRow": "Toggle row {n}",
+      "selectAll": "Select All",
+      "selected": "{count} selected",
+      "totalRows": "Total Rows",
+      "valid": "Valid",
+      "errors": "Errors",
+      "statusError": "Error",
+      "statusDuplicate": "Duplicate {confidence}%",
+      "statusValid": "Valid",
+      "editDescription": "Edit description",
+      "original": "Original",
+      "showOriginal": "Show original description",
+      "save": "Save",
+      "cancel": "Cancel"
+    }
+  },
   "export": {
     "dialog": {
       "title": "Export Options",
@@ -1251,7 +1358,78 @@
       "includeCategories": "Include Categories",
       "selectCategories": "Select Categories",
       "allCategories": "All Categories",
-      "exportButton": "Export"
+      "exportButton": "Export",
+      "exportFormat": "Export Format",
+      "dateRange": "Date Range",
+      "last7days": "Last 7 days",
+      "last30days": "Last 30 days",
+      "last90days": "Last 90 days",
+      "ytd": "Year to date",
+      "allTime": "All time",
+      "customRange": "Custom range",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "selectAll": "Select All",
+      "clearAll": "Clear All",
+      "allCategoriesIncluded": "All categories will be included",
+      "categoriesSelected": "{count} category(s) selected",
+      "categoriesSelectedLabel": "Categories {selected}",
+      "fileNameOptional": "File Name (optional)",
+      "fileNameHint": "Leave empty to use default name based on date range",
+      "fileNamePlaceholder": "My financial report",
+      "showPreview": "Show preview",
+      "hidePreview": "Hide preview",
+      "exportSummary": "Export Summary",
+      "formatLabel": "Format:",
+      "dateRangeLabel": "Date Range:",
+      "chartsLabel": "Charts:",
+      "categoriesLabel": "Categories:",
+      "brandingLabel": "Branding:",
+      "included": "Included",
+      "excluded": "Excluded",
+      "allSelected": "All",
+      "customBranding": "Custom",
+      "standardBranding": "Standard",
+      "cancel": "Cancel",
+      "export": "Export",
+      "exporting": "Exporting...",
+      "csvDescription": "Universal spreadsheet format, compatible with Excel, Google Sheets",
+      "pdfDescription": "Professional document format",
+      "excelDescription": "Native Excel format with formatting support"
+    }
+  },
+  "share": {
+    "dialog": {
+      "title": "Share Report",
+      "shareMethod": "Share Method",
+      "shareableLink": "Shareable Link",
+      "copy": "Copy",
+      "copied": "Copied",
+      "emailRecipients": "Email Recipients",
+      "emailPlaceholder": "john@example.com, jane@example.com",
+      "separateEmails": "Separate multiple emails with commas",
+      "customMessage": "Custom Message (optional)",
+      "messagePlaceholder": "Add a personal message to your report...",
+      "reportFormat": "Report Format",
+      "summary": "Summary",
+      "detailed": "Detailed",
+      "includeCharts": "Include charts in PDF",
+      "shareSocial": "Share your financial summary on social media",
+      "previewCaption": "Preview of shared report card",
+      "balance": "Balance",
+      "income": "Income",
+      "expenses": "Expenses",
+      "cancel": "Cancel",
+      "share": "Share",
+      "sharing": "Sharing...",
+      "methodLink": "Shareable Link",
+      "methodLinkDesc": "Generate a link to share with anyone",
+      "methodEmail": "Email",
+      "methodEmailDesc": "Send report directly to email recipients",
+      "methodPdf": "Download PDF",
+      "methodPdfDesc": "Generate a PDF file for offline sharing",
+      "methodSocial": "Social Media",
+      "methodSocialDesc": "Share on Twitter, LinkedIn, or Facebook"
     }
   },
   "import": {
@@ -1411,6 +1589,92 @@
     },
     "stepProgress": {
       "stepOf": "Step {current} of {total}"
+    },
+    "duplicateStrategy": {
+      "heading": "{count} Potential Duplicate Detected",
+      "headingPlural": "{count} Potential Duplicates Detected",
+      "subtitle": "Choose how to handle duplicate transactions",
+      "skipAll": "Skip All",
+      "skipAllDesc": "Don't import any duplicates",
+      "autoMerge": "Auto Merge",
+      "autoMergeDesc": "Update existing transactions",
+      "reviewEach": "Review Each",
+      "reviewEachDesc": "Manually review duplicates",
+      "keepAll": "Keep All",
+      "keepAllDesc": "Import all as new transactions",
+      "keepAllWarning": "Warning: This will import all {count} potential duplicate as new transactions",
+      "keepAllWarningPlural": "Warning: This will import all {count} potential duplicates as new transactions"
+    },
+    "categoryReview": {
+      "heading": "{count} Need Category Review",
+      "subtitle": "Low confidence or no category suggestion",
+      "acceptAll": "Accept All Suggestions",
+      "markAllUncategorized": "Mark All Uncategorized",
+      "suggested": "Suggested:",
+      "selectCategory": "Select Category",
+      "selectCategoryPlaceholder": "Select category",
+      "uncategorized": "Uncategorized",
+      "row": "Row {n}"
+    },
+    "readyToImport": {
+      "heading": "{count} Ready to Import",
+      "subtitle": "High confidence, auto-categorized",
+      "selectAll": "Select All ({selected} of {total})",
+      "toggleAllRows": "Toggle all rows",
+      "toggleRow": "Toggle row {n}",
+      "save": "Save",
+      "cancel": "Cancel",
+      "original": "Original",
+      "editDescription": "Edit description",
+      "uncategorized": "Uncategorized",
+      "selectCategoryPlaceholder": "Select category"
+    },
+    "errorSummary": {
+      "validationErrorsFound": "Validation Errors Found",
+      "warningsFound": "Warnings Found",
+      "errorCount": "{count} error",
+      "errorCountPlural": "{count} errors",
+      "warningCount": "{count} warning",
+      "warningCountPlural": "{count} warnings",
+      "infoCount": "{count} info message",
+      "infoCountPlural": "{count} info messages",
+      "filterAll": "All ({count})",
+      "filterErrors": "Errors ({count})",
+      "filterWarnings": "Warnings ({count})",
+      "filterInfo": "Info ({count})",
+      "row": "Row {n}"
     }
+  },
+  "symbolAutocomplete": {
+    "minCharsHint": "Enter at least {count} characters to search",
+    "searching": "Searching...",
+    "noResults": "No results found for \"{query}\". Try a different search term.",
+    "failedSearch": "Failed to search symbols. Please try again."
+  },
+  "datePicker": {
+    "placeholder": "Select a date",
+    "clearDate": "Clear date",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "previousYear": "Previous year",
+    "nextYear": "Next year"
+  },
+  "connectionStatus": {
+    "unsecure": "Unsecure Connection",
+    "secure": "Secure Connection"
+  },
+  "dataFreshness": {
+    "justNow": "just now",
+    "minuteAgo": "{count} minute ago",
+    "minutesAgo": "{count} minutes ago",
+    "hourAgo": "{count} hour ago",
+    "hoursAgo": "{count} hours ago",
+    "dayAgo": "{count} day ago",
+    "daysAgo": "{count} days ago",
+    "updated": "Updated {timeAgo}"
+  },
+  "sidebarToggle": {
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
   }
 }

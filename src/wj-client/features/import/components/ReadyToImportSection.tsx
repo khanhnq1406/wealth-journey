@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { ParsedTransaction } from "@/gen/protobuf/v1/import";
 import { cn } from "@/lib/utils/cn";
 import { ChevronDownIcon, CheckIcon, MinusIcon } from "@/components/icons";
@@ -60,6 +61,8 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
     setExpandedOriginal(newExpanded);
   };
 
+  const t = useTranslations("modals.importWizard.readyToImport");
+
   // Memoize category options
   const categoryOptions = useMemo<SelectOption<string>[]>(() => {
     return categories.map((cat) => ({
@@ -116,10 +119,10 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
           </div>
           <div className="text-left">
             <h3 className="font-semibold text-base text-success-700 dark:text-success-300">
-              {selectedCount} Ready to Import
+              {t("heading", { count: selectedCount })}
             </h3>
             <p className="text-sm text-success-600 dark:text-success-400">
-              High confidence, auto-categorized
+              {t("subtitle")}
             </p>
           </div>
         </div>
@@ -153,7 +156,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                 )}
                 role="checkbox"
                 aria-checked={allSelected ? "true" : someSelected ? "mixed" : "false"}
-                aria-label="Toggle all rows"
+                aria-label={t("toggleAllRows")}
               >
                 {allSelected ? (
                   <CheckIcon size="sm" className="text-white" decorative />
@@ -162,7 +165,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                 ) : null}
               </div>
               <span className="text-sm font-medium text-neutral-900 dark:text-dark-text">
-                Select All ({selectedCount} of {transactions.length})
+                {t("selectAll", { selected: selectedCount, total: transactions.length })}
               </span>
             </div>
           </div>
@@ -191,7 +194,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                         ? "bg-primary-600 border-primary-600 dark:bg-primary-700 dark:border-primary-700"
                         : "border-neutral-400 dark:border-neutral-500",
                     )}
-                    aria-label={`Toggle row ${tx.rowNumber}`}
+                    aria-label={t("toggleRow", { n: tx.rowNumber })}
                   >
                     {isChecked && (
                       <CheckIcon size="sm" className="text-white" decorative />
@@ -225,7 +228,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                                 }}
                                 className="flex-1 px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
                               >
-                                Save
+                                {t("save")}
                               </button>
                               <button
                                 onClick={(e) => {
@@ -234,7 +237,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                                 }}
                                 className="flex-1 px-2 py-1 text-xs bg-neutral-300 dark:bg-neutral-700 text-neutral-900 dark:text-dark-text rounded hover:bg-neutral-400 dark:hover:bg-neutral-600"
                               >
-                                Cancel
+                                {t("cancel")}
                               </button>
                             </div>
                           </div>
@@ -251,7 +254,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                                     handleStartEdit(tx.rowNumber, tx.description);
                                   }}
                                   className="flex-shrink-0 text-primary-600 hover:text-primary-700 dark:text-primary-400 text-xs"
-                                  title="Edit description"
+                                  title={t("editDescription")}
                                 >
                                   ✎
                                 </button>
@@ -267,7 +270,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                                     }}
                                     className="text-xs text-neutral-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400"
                                   >
-                                    {expandedOriginal.has(tx.rowNumber) ? "▼" : "▶"} Original
+                                    {expandedOriginal.has(tx.rowNumber) ? "▼" : "▶"} {t("original")}
                                   </button>
                                   {expandedOriginal.has(tx.rowNumber) && (
                                     <div className="text-xs text-neutral-600 dark:text-neutral-400 italic bg-neutral-50 dark:bg-dark-surface-hover p-2 rounded mt-1">
@@ -314,7 +317,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                               onCategoryChange(tx.rowNumber, categoryId);
                             }
                           }}
-                          placeholder="Select category"
+                          placeholder={t("selectCategoryPlaceholder")}
                           className="w-full text-sm"
                           portal
                         />

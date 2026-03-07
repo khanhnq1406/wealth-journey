@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutationCreateBudgetItem } from "@/utils/generated/hooks";
@@ -30,6 +31,7 @@ export function CreateBudgetItemForm({
   budgetId,
   onSuccess,
 }: CreateBudgetItemFormProps) {
+  const t = useTranslations("budget.form");
   const { currency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
@@ -61,14 +63,14 @@ export function CreateBudgetItemForm({
         onSuccess: (data) => {
           const message =
             data?.message ||
-            `Budget item "${data?.data?.name || ""}" has been added successfully`;
+            t("budgetItemCreatedSuccess", { name: data?.data?.name || "" });
           setSuccessMessage(message);
           setShowSuccess(true);
           setErrorMessage("");
         },
         onError: (error: any) => {
           setErrorMessage(
-            error.message || "Failed to create budget item. Please try again",
+            error.message || t("failedToCreateItem"),
           );
         },
       },
@@ -91,15 +93,15 @@ export function CreateBudgetItemForm({
       <FormInput
         name="name"
         control={control}
-        label="Budget Item Name"
-        placeholder="e.g., Groceries"
+        label={t("budgetItemName")}
+        placeholder={t("budgetItemNamePlaceholder")}
         required
       />
 
       <FormNumberInput
         name="total"
         control={control}
-        label="Allocated Amount"
+        label={t("allocatedAmount")}
         placeholder="0"
         suffix={currency}
         required
@@ -114,7 +116,7 @@ export function CreateBudgetItemForm({
           loading={createBudgetItem.isPending}
           htmlType="submit"
         >
-          Add Item
+          {t("addItem")}
         </Button>
       </div>
     </form>
