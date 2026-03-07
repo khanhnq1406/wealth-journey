@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "@/lib/navigation";
 import { cn } from "@/lib/utils/cn";
 import { memo } from "react";
+import { useTranslations } from "next-intl";
 import { ZIndex } from "@/lib/utils/z-index";
 import {
   HomeIcon,
@@ -38,6 +39,7 @@ export const BottomNav = memo(function BottomNav({
   navItems,
   className,
 }: BottomNavProps) {
+  const t = useTranslations("nav");
   const pathname = usePathname();
   const router = useRouter();
 
@@ -67,7 +69,7 @@ export const BottomNav = memo(function BottomNav({
         paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)'
       }}
       role="navigation"
-      aria-label="Main navigation"
+      aria-label={t("mainNavigation")}
     >
       <div className="flex justify-around items-center min-h-[52px]">
         {navItems.map((item) => {

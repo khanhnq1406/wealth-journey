@@ -1249,7 +1249,8 @@
       "searchByHint": "tên, số tiền hoặc ngày",
       "basicWallet": "Ví cơ bản",
       "investmentWallet": "Ví đầu tư",
-      "shares": "{count} cổ phiếu"
+      "shares": "{count} cổ phiếu",
+      "clearSearch": "Xóa tìm kiếm"
     }
   },
   "validation": {

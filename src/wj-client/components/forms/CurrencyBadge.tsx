@@ -109,7 +109,7 @@ export function CurrencyBadge({
         <div
           className="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 min-w-[180px] max-h-[240px] overflow-y-auto"
           role="listbox"
-          aria-label="Select currency"
+          aria-label={t("selectCurrency")}
         >
           {SUPPORTED_CURRENCIES.map((curr) => (
             <button

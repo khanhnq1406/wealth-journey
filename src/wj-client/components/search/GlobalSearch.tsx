@@ -360,7 +360,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
             <button
               onClick={handleClear}
               className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-full hover:bg-neutral-100 dark:hover:bg-dark-surface-hover transition-colors"
-              aria-label="Clear search"
+              aria-label={t("clearSearch")}
               type="button"
             >
               <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

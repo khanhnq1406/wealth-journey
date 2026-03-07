@@ -1249,7 +1249,8 @@
       "searchByHint": "name, amount, or date",
       "basicWallet": "Basic Wallet",
       "investmentWallet": "Investment Wallet",
-      "shares": "{count} shares"
+      "shares": "{count} shares",
+      "clearSearch": "Clear search"
     }
   },
   "validation": {

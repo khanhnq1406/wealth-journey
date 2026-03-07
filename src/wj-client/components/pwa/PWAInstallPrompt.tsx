@@ -24,6 +24,7 @@ export function PWAInstallPrompt({
   showDelay = 2000,
 }: PWAInstallPromptProps) {
   const t = useTranslations("pwa.installPrompt");
+  const tCommon = useTranslations("common");
   const { isInstalled, platform, canInstall, promptInstall } = usePWAInstall();
   const isMobile = useMobile();
   const [isVisible, setIsVisible] = useState(false);
@@ -143,7 +144,7 @@ export function PWAInstallPrompt({
               <button
                 onClick={handleDismiss}
                 className="flex-shrink-0 -mt-1 -mr-1 p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                aria-label="Close"
+                aria-label={tCommon("close")}
               >
                 <svg
                   className="w-5 h-5"
