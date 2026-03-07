@@ -234,7 +234,7 @@ export function DuplicateReviewModal({
           <button
             onClick={onCancel}
             className="p-2 hover:bg-neutral-100 dark:hover:bg-dark-surface-hover rounded-lg transition-colors"
-            aria-label="Close"
+            aria-label={t("closeAriaLabel")}
           >
             <XIcon size="sm" decorative />
           </button>

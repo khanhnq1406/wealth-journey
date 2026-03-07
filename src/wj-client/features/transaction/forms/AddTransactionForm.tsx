@@ -161,14 +161,14 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
       {
         onSuccess: (data) => {
           const message =
-            data?.message || "Transaction has been added successfully";
+            data?.message || t("transactionAddedSuccess");
           setSuccessMessage(message);
           setShowSuccess(true);
           setErrorMessage("");
         },
         onError: (error: any) => {
           setErrorMessage(
-            error.message || "Failed to add transaction. Please try again",
+            error.message || t("failedToAdd"),
           );
         },
       },

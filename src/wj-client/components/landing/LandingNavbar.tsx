@@ -138,7 +138,7 @@ export default function LandingNavbar() {
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
-            aria-label="Toggle menu"
+            aria-label={t("toggleMenu")}
             aria-expanded={isMobileMenuOpen}
           >
             <motion.svg

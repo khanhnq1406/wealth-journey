@@ -74,7 +74,7 @@ export const StepProgress: FC<StepProgressProps> = ({
       <div className="hidden sm:flex sm:justify-center">
         <ol
           className="flex items-center justify-center max-w-3xl w-full"
-          aria-label="Import progress steps"
+          aria-label={t("progressAriaLabel")}
         >
           {steps.map((step, index) => {
             const isCompleted = step.number < currentStep;

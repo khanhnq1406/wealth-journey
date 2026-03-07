@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useId } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 
 export interface DatePreset {
@@ -161,6 +162,7 @@ export function FormDatePicker({
   className,
   containerClassName,
 }: FormDatePickerProps) {
+  const t = useTranslations("datePicker");
   const generatedId = useId();
   const pickerId = id || generatedId;
   const helperId = `${pickerId}-helper`;
@@ -418,7 +420,7 @@ export function FormDatePicker({
                 handleClear();
               }}
               className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-              aria-label="Clear date"
+              aria-label={t("clearDate")}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -480,7 +482,7 @@ export function FormDatePicker({
                 type="button"
                 onClick={() => navigateMonth(-1)}
                 className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
-                aria-label="Previous month"
+                aria-label={t("previousMonth")}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -490,7 +492,7 @@ export function FormDatePicker({
                 type="button"
                 onClick={() => navigateYear(-1)}
                 className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
-                aria-label="Previous year"
+                aria-label={t("previousYear")}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
@@ -510,7 +512,7 @@ export function FormDatePicker({
                 type="button"
                 onClick={() => navigateYear(1)}
                 className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
-                aria-label="Next year"
+                aria-label={t("nextYear")}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
@@ -520,7 +522,7 @@ export function FormDatePicker({
                 type="button"
                 onClick={() => navigateMonth(1)}
                 className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
-                aria-label="Next month"
+                aria-label={t("nextMonth")}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

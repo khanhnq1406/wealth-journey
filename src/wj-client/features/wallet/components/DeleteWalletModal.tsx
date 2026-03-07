@@ -150,7 +150,7 @@ export function DeleteWalletModal({
                 className="w-full border rounded p-2 text-sm"
                 disabled={isLoading}
                 required
-                aria-label="Select target wallet for transfer"
+                aria-label={t("selectTargetAriaLabel")}
               >
                 <option value="">{t("selectTargetWallet")}</option>
                 {otherWallets.map((w) => (

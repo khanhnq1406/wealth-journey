@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import { CheckIcon, XIcon, AlertTriangleIcon, InfoIcon } from "@/components/icons";
 
 /**
@@ -50,6 +51,7 @@ export function Toast({
   onClose,
   action,
 }: ToastProps) {
+  const t = useTranslations("common");
   const [visible, setVisible] = useState(true);
   const [exiting, setExiting] = useState(false);
 
@@ -109,7 +111,7 @@ export function Toast({
       <button
         onClick={handleClose}
         className="flex-shrink-0 p-1 hover:opacity-75 transition-opacity"
-        aria-label="Close"
+        aria-label={t("close")}
       >
         <XIcon size="sm" className="text-white" decorative />
       </button>

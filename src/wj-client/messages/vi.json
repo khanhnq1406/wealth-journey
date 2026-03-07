@@ -23,6 +23,7 @@
     "submit": "Gửi",
     "back": "Quay lại",
     "next": "Tiếp theo",
+    "continue": "Tiếp tục",
     "previous": "Trước đó",
     "yes": "Có",
     "no": "Không",
@@ -80,7 +81,9 @@
     "required": "bắt buộc",
     "noDataFound": "Không tìm thấy dữ liệu",
     "noDataAvailable": "Không có dữ liệu",
-    "thereIsNoDataToDisplay": "Hiện tại không có dữ liệu để hiển thị."
+    "thereIsNoDataToDisplay": "Hiện tại không có dữ liệu để hiển thị.",
+    "changeCurrency": "Thay đổi tiền tệ",
+    "selectCurrency": "Chọn tiền tệ"
   },
   "nav": {
     "home": "Trang chủ",
@@ -411,6 +414,7 @@
     "totalBalance": "Tổng số dư",
     "noTransactionsFound": "Không tìm thấy giao dịch",
     "addFirstTransaction": "Thêm giao dịch đầu tiên hoặc điều chỉnh bộ lọc",
+    "defaultLabel": "Giao dịch",
     "transactionAddedSuccess": "Giao dịch đã được thêm thành công",
     "failedToAdd": "Không thể thêm giao dịch. Vui lòng thử lại",
     "quickFilters": {
@@ -443,7 +447,11 @@
       "addTransaction": "Thêm giao dịch",
       "updateTransaction": "Cập nhật giao dịch",
       "transactionUpdatedSuccess": "Giao dịch đã được cập nhật thành công",
-      "failedToUpdate": "Không thể cập nhật giao dịch. Vui lòng thử lại"
+      "failedToUpdate": "Không thể cập nhật giao dịch. Vui lòng thử lại",
+      "transactionAddedSuccess": "Giao dịch đã được thêm thành công",
+      "failedToAdd": "Không thể thêm giao dịch. Vui lòng thử lại",
+      "createNewCategory": "Tạo danh mục mới",
+      "newCategoryPlaceholder": "Nhập tên danh mục"
     },
     "delete": {
       "title": "Xóa giao dịch",
@@ -539,7 +547,8 @@
       "notRecommended": "Không khuyến nghị.",
       "selectTargetError": "Vui lòng chọn ví đích",
       "failedToProcess": "Không thể xử lý ví. Vui lòng thử lại",
-      "confirm": "Xác nhận"
+      "confirm": "Xác nhận",
+      "selectTargetAriaLabel": "Chọn ví đích để chuyển"
     },
     "transfer": {
       "title": "Chuyển tiền",
@@ -576,6 +585,7 @@
     "sortBy": "Sắp xếp theo",
     "errorLoading": "Lỗi khi tải danh mục đầu tư",
     "errorLoadingPortfolio": "Lỗi khi tải danh mục đầu tư",
+    "priceNotSet": "Chưa cài giá",
     "selectWalletPlaceholder": "Chọn ví",
     "filterByTypePlaceholder": "Lọc theo loại",
     "sortByPlaceholder": "Sắp xếp theo",
@@ -699,7 +709,33 @@
       "selectGoldTypePlaceholder": "Chọn loại vàng (SJC, XAU, v.v.)",
       "selectSilverTypePlaceholder": "Chọn loại bạc (AG_VND, XAG, v.v.)",
       "customSymbolInfo": "Nhập định danh duy nhất cho khoản đầu tư tùy chỉnh của bạn",
-      "customPriceNote": "Lưu ý: Khoản đầu tư tùy chỉnh không có giá thị trường. Bạn có thể đặt giá thủ công sau khi tạo."
+      "customPriceNote": "Lưu ý: Khoản đầu tư tùy chỉnh không có giá thị trường. Bạn có thể đặt giá thủ công sau khi tạo.",
+      "investmentWalletLabel": "Ví đầu tư",
+      "nameLabel": "Tên",
+      "goldTypeLabel": "Loại vàng",
+      "silverTypeLabel": "Loại bạc",
+      "unitLabel": "Đơn vị",
+      "initialQuantityLabel": "Số lượng ban đầu",
+      "currencyLabel": "Tiền tệ",
+      "selectWalletError": "Vui lòng chọn ví",
+      "goldUnitCurrencyInfo": "Đơn vị: {unit} | Tiền tệ: {currency}",
+      "silverCurrencyInfo": "Tiền tệ: {currency}",
+      "loadingPrice": "Đang tải giá...",
+      "currentMarketPrice": "Giá thị trường hiện tại: {price}/{unit}",
+      "cachedPrice": "(Giá đã lưu cache)",
+      "unableToFetchPrice": "Không thể lấy giá",
+      "quantityHint": "Số cổ phiếu, đồng coin hoặc đơn vị bạn đang nắm giữ",
+      "taelUnit": "Tael (lượng)",
+      "kgUnit": "Kg",
+      "customInvestmentDescription": "Tạo khoản đầu tư cho tài sản không có trên thị trường",
+      "amountOfGold": "Khối lượng vàng theo {unit}",
+      "amountOfSilver": "Khối lượng bạc theo {unit}",
+      "taelUnitLong": "lượng",
+      "gramUnit": "grams",
+      "defaultGoldName": "Đầu tư vàng",
+      "defaultSilverName": "Đầu tư bạc",
+      "selectGoldTypeError": "Vui lòng chọn loại vàng",
+      "selectSilverTypeError": "Vui lòng chọn loại bạc"
     },
     "transactionTypes": {
       "buy": "Mua",
@@ -1475,7 +1511,8 @@
       "new": "MỚI",
       "existing": "HIỆN CÓ",
       "noCategory2": "Không có danh mục",
-      "autoMergeHigh": "Tự động gộp tất cả độ tin cậy cao ({count})"
+      "autoMergeHigh": "Tự động gộp tất cả độ tin cậy cao ({count})",
+      "closeAriaLabel": "Đóng"
     },
     "fileUpload": {
       "title": "Tải lên sao kê ngân hàng",
@@ -1492,7 +1529,10 @@
       "continue": "Tiếp tục",
       "invalidFileType": "Loại tệp không hợp lệ. Vui lòng tải lên tệp Excel (.xlsx, .xls) hoặc PDF.",
       "fileTooLarge": "Kích thước tệp vượt quá giới hạn {maxSizeMB}MB.",
-      "fileEmpty": "Tệp trống."
+      "fileEmpty": "Tệp trống.",
+      "uploadAreaAriaLabel": "Khu vực tải lên tệp. Nhấp hoặc kéo và thả để chọn tệp.",
+      "uploadInputAriaLabel": "Tải lên sao kê ngân hàng (Excel hoặc PDF)",
+      "dismissErrorAriaLabel": "Bỏ qua lỗi"
     },
     "bankTemplate": {
       "selectBankInstructions": "Chọn ngân hàng để tự động cấu hình ánh xạ cột.",
@@ -1588,7 +1628,8 @@
       "skipAll": "Bỏ qua tất cả {count}"
     },
     "stepProgress": {
-      "stepOf": "Bước {current} trên {total}"
+      "stepOf": "Bước {current} trên {total}",
+      "progressAriaLabel": "Các bước tiến trình nhập khẩu"
     },
     "duplicateStrategy": {
       "heading": "Phát hiện {count} giao dịch trùng lặp tiềm năng",
@@ -1676,5 +1717,103 @@
   "sidebarToggle": {
     "collapse": "Thu gọn thanh bên",
     "expand": "Mở rộng thanh bên"
+  },
+  "errorState": {
+    "tryAgain": "Thử lại",
+    "network": {
+      "title": "Lỗi kết nối",
+      "message": "Không thể kết nối. Vui lòng kiểm tra kết nối internet của bạn."
+    },
+    "server": {
+      "title": "Lỗi máy chủ",
+      "message": "Đã xảy ra lỗi phía máy chủ. Vui lòng thử lại sau."
+    },
+    "permission": {
+      "title": "Truy cập bị từ chối",
+      "message": "Bạn không có quyền truy cập tài nguyên này."
+    },
+    "notFound": {
+      "title": "Không tìm thấy",
+      "message": "Tài nguyên được yêu cầu không thể được tìm thấy."
+    },
+    "generic": {
+      "title": "Đã xảy ra lỗi",
+      "message": "Đã xảy ra lỗi không mong đợi. Vui lòng thử lại."
+    }
+  },
+  "emptyState": {
+    "noTransactions": {
+      "title": "Chưa có giao dịch",
+      "description": "Bắt đầu bằng cách thêm giao dịch đầu tiên để theo dõi tài chính của bạn."
+    },
+    "noWallets": {
+      "title": "Không tìm thấy ví",
+      "description": "Tạo ví để bắt đầu theo dõi số dư và giao dịch của bạn."
+    },
+    "noInvestments": {
+      "title": "Chưa có khoản đầu tư",
+      "description": "Thêm khoản đầu tư để theo dõi hiệu suất danh mục của bạn."
+    },
+    "noResults": {
+      "title": "Không tìm thấy kết quả",
+      "description": "Hãy thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm."
+    },
+    "noBudgets": {
+      "title": "Chưa đặt ngân sách",
+      "description": "Tạo ngân sách để quản lý chi tiêu theo danh mục."
+    },
+    "noCategories": {
+      "title": "Chưa có danh mục",
+      "description": "Tạo danh mục để tổ chức các giao dịch của bạn."
+    },
+    "error": {
+      "title": "Đã xảy ra lỗi",
+      "description": "Không thể tải dữ liệu. Vui lòng thử lại."
+    },
+    "networkError": {
+      "title": "Mất kết nối",
+      "description": "Vui lòng kiểm tra kết nối internet và thử lại."
+    }
+  },
+  "formWizard": {
+    "goToStep": "Đến bước {number}: {title}",
+    "stepOf": "Bước {current} trong {total}",
+    "previousStepAriaLabel": "Đến bước trước",
+    "previous": "Trước",
+    "nextStepAriaLabel": "Đến bước tiếp theo",
+    "finishAriaLabel": "Hoàn thành",
+    "processing": "Đang xử lý...",
+    "finish": "Hoàn thành",
+    "next": "Tiếp theo"
+  },
+  "transactionCard": {
+    "today": "Hôm nay",
+    "yesterday": "Hôm qua",
+    "transfer": "Chuyển tiền",
+    "editAriaLabel": "Sửa giao dịch",
+    "deleteAriaLabel": "Xóa giao dịch",
+    "viewDetailsAriaLabel": "Xem chi tiết cho {title}",
+    "status": {
+      "pending": "Đang chờ",
+      "completed": "Hoàn thành",
+      "failed": "Thất bại",
+      "cancelled": "Đã hủy"
+    }
+  },
+  "currencySelector": {
+    "selectAriaLabel": "Chọn tiền tệ",
+    "selectTitle": "Chọn Tiền Tệ",
+    "optionsAriaLabel": "Tùy chọn tiền tệ",
+    "converting": "Đang chuyển đổi tiền tệ...",
+    "confirmTitle": "Thay đổi tiền tệ?",
+    "confirmMessage": "Bạn có chắc muốn thay đổi tiền tệ hiển thị sang {currencyName}?",
+    "confirmNote": "Điều này sẽ chuyển đổi tất cả dữ liệu tài chính của bạn. Quá trình này có thể mất vài phút.",
+    "confirmButton": "Thay đổi tiền tệ",
+    "cancelButton": "Hủy"
+  },
+  "landingErrorBoundary": {
+    "title": "Đã xảy ra lỗi",
+    "description": "Chúng tôi xin lỗi vì sự bất tiện này. Vui lòng thử làm mới trang.",
+    "refreshButton": "Làm mới trang"
   }
 }

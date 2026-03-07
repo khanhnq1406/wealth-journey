@@ -169,7 +169,7 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
             ),
             currency: wallet.balance?.currency || currency,
           },
-          reason: adjustment.reason || "Balance adjustment",
+          reason: adjustment.reason || tEdit("balanceAdjustment"),
           adjustmentType,
         });
         adjustmentMade = true;

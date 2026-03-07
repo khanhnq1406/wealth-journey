@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
 import { BaseCard } from "@/components/BaseCard";
@@ -205,109 +206,133 @@ export function EmptyState({
  * Updated with design system styling and proper icons
  */
 export const EmptyStates = {
-  NoTransactions: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => (
-    <EmptyState
-      title="No transactions yet"
-      description="Start by adding your first transaction to track your finances."
-      icon={
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-        </svg>
-      }
-      {...props}
-    />
-  ),
+  NoTransactions: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => {
+    const t = useTranslations("emptyState");
+    return (
+      <EmptyState
+        title={t("noTransactions.title")}
+        description={t("noTransactions.description")}
+        icon={
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+        }
+        {...props}
+      />
+    );
+  },
 
-  NoWallets: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => (
-    <EmptyState
-      title="No wallets found"
-      description="Create a wallet to start tracking your balance and transactions."
-      icon={
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-        </svg>
-      }
-      {...props}
-    />
-  ),
+  NoWallets: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => {
+    const t = useTranslations("emptyState");
+    return (
+      <EmptyState
+        title={t("noWallets.title")}
+        description={t("noWallets.description")}
+        icon={
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          </svg>
+        }
+        {...props}
+      />
+    );
+  },
 
-  NoInvestments: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => (
-    <EmptyState
-      title="No investments yet"
-      description="Add investments to track your portfolio performance over time."
-      icon={
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-        </svg>
-      }
-      {...props}
-    />
-  ),
+  NoInvestments: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => {
+    const t = useTranslations("emptyState");
+    return (
+      <EmptyState
+        title={t("noInvestments.title")}
+        description={t("noInvestments.description")}
+        icon={
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+        }
+        {...props}
+      />
+    );
+  },
 
-  NoResults: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => (
-    <EmptyState
-      title="No results found"
-      description="Try adjusting your filters or search terms."
-      icon={
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      }
-      {...props}
-    />
-  ),
+  NoResults: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => {
+    const t = useTranslations("emptyState");
+    return (
+      <EmptyState
+        title={t("noResults.title")}
+        description={t("noResults.description")}
+        icon={
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        }
+        {...props}
+      />
+    );
+  },
 
-  NoBudgets: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => (
-    <EmptyState
-      title="No budgets set"
-      description="Create budgets to manage your spending by category."
-      icon={
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-        </svg>
-      }
-      {...props}
-    />
-  ),
+  NoBudgets: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => {
+    const t = useTranslations("emptyState");
+    return (
+      <EmptyState
+        title={t("noBudgets.title")}
+        description={t("noBudgets.description")}
+        icon={
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+        }
+        {...props}
+      />
+    );
+  },
 
-  NoCategories: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => (
-    <EmptyState
-      title="No categories yet"
-      description="Create categories to organize your transactions."
-      icon={
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-        </svg>
-      }
-      {...props}
-    />
-  ),
+  NoCategories: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => {
+    const t = useTranslations("emptyState");
+    return (
+      <EmptyState
+        title={t("noCategories.title")}
+        description={t("noCategories.description")}
+        icon={
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+          </svg>
+        }
+        {...props}
+      />
+    );
+  },
 
-  Error: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => (
-    <EmptyState
-      title="Something went wrong"
-      description="We couldn't load the data. Please try again."
-      icon={
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} className="text-danger-500">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-      }
-      {...props}
-    />
-  ),
+  Error: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => {
+    const t = useTranslations("emptyState");
+    return (
+      <EmptyState
+        title={t("error.title")}
+        description={t("error.description")}
+        icon={
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} className="text-danger-500">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        }
+        {...props}
+      />
+    );
+  },
 
-  NetworkError: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => (
-    <EmptyState
-      title="Connection lost"
-      description="Please check your internet connection and try again."
-      icon={
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
-        </svg>
-      }
-      {...props}
-    />
-  ),
+  NetworkError: (props: Omit<EmptyStateProps, "title" | "icon" | "description">) => {
+    const t = useTranslations("emptyState");
+    return (
+      <EmptyState
+        title={t("networkError.title")}
+        description={t("networkError.description")}
+        icon={
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
+          </svg>
+        }
+        {...props}
+      />
+    );
+  },
 };
 
 export default EmptyState;

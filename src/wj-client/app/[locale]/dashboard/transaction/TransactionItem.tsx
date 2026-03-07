@@ -27,6 +27,7 @@ export const TransactionItem = ({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const { currency } = useCurrency();
   const tDelete = useTranslations("transaction.delete");
+  const tTransaction = useTranslations("transaction");
   const amount = transaction.displayAmount?.amount ?? transaction.amount?.amount ?? 0;
 
   // Determine if this is income or expense based on category type
@@ -76,7 +77,7 @@ export const TransactionItem = ({
         <div className="flex-1 min-w-0">
           {/* Category Name - using note as fallback */}
           <div className="font-medium text-gray-900 truncate">
-            {transaction.note || "Transaction"}
+            {transaction.note || tTransaction("defaultLabel")}
           </div>
           {/* Date and Note */}
           <div className="text-sm text-gray-500 flex items-center gap-2">

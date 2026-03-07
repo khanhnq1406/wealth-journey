@@ -48,10 +48,12 @@ const SimplePnlChart = memo(function SimplePnlChart({
   pnl,
   pnlPercent,
   totalPnlLabel,
+  currency,
 }: {
   pnl: number;
   pnlPercent: number;
   totalPnlLabel: string;
+  currency: string;
 }) {
   const isPositive = pnl >= 0;
   const maxValue = Math.abs(pnl) || 1;
@@ -84,7 +86,7 @@ const SimplePnlChart = memo(function SimplePnlChart({
           isPositive ? "text-green-600" : "text-red-600"
         }`}
       >
-        {formatCurrency(Math.abs(pnl), "VND")}
+        {formatCurrency(Math.abs(pnl), currency)}
       </div>
     </div>
   );
@@ -184,7 +186,7 @@ export const PortfolioAnalytics = memo(function PortfolioAnalytics({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
         {/* PNL Chart */}
         <div className="sm:col-span-3">
-          <SimplePnlChart pnl={displayPnl} pnlPercent={pnlPercent} totalPnlLabel={tAnalytics("totalPnl")} />
+          <SimplePnlChart pnl={displayPnl} pnlPercent={pnlPercent} totalPnlLabel={tAnalytics("totalPnl")} currency={displayCurrency} />
         </div>
 
         {/* Additional metrics can be added here */}

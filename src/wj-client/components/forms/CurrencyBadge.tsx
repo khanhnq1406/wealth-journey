@@ -2,6 +2,7 @@
 
 import { SUPPORTED_CURRENCIES } from "@/app/constants";
 import { useState, useRef, useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 interface CurrencyBadgeProps {
   value: string;
@@ -16,6 +17,7 @@ export function CurrencyBadge({
   disabled = false,
   className = "",
 }: CurrencyBadgeProps) {
+  const t = useTranslations("common");
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -79,7 +81,7 @@ export function CurrencyBadge({
               : "bg-primary-50 text-primary-700 border-primary-200 hover:bg-primary-100 hover:border-primary-300 cursor-pointer"
           }
         `}
-        aria-label="Change currency"
+        aria-label={t("changeCurrency")}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
       >

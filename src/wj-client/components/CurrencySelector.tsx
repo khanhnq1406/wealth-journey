@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { ConfirmationDialog } from "@/components/modals/ConfirmationDialog";
 import { SUPPORTED_CURRENCIES } from "@/app/constants";
@@ -10,6 +11,7 @@ import { BottomSheet } from "@/components/BottomSheet";
 import { useMobile } from "@/hooks/useMobile";
 
 export function CurrencySelector() {
+  const t = useTranslations("currencySelector");
   const { currency, updateCurrency, isConverting } = useCurrency();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState("");
@@ -122,14 +124,14 @@ export function CurrencySelector() {
           style={{
             touchAction: "manipulation",
           }}
-          aria-label="Select currency"
+          aria-label={t("selectAriaLabel")}
           aria-expanded={isMobile ? isMobileSheetOpen : undefined}
           aria-haspopup={isMobile ? "dialog" : "menu"}
           disabled={isDisabled}
           title={
             isConverting
-              ? "Currency conversion in progress..."
-              : "Select currency"
+              ? t("converting")
+              : t("selectAriaLabel")
           }
         >
           {isConverting ? (
@@ -192,7 +194,7 @@ export function CurrencySelector() {
             )}
             style={{ zIndex: ZIndex.dropdown }}
             role="menu"
-            aria-label="Currency options"
+            aria-label={t("optionsAriaLabel")}
           >
             {SUPPORTED_CURRENCIES.map((curr, index) => (
               <button
@@ -240,7 +242,7 @@ export function CurrencySelector() {
           <BottomSheet
             isOpen={isMobileSheetOpen}
             onClose={handleMobileClose}
-            title="Select Currency"
+            title={t("selectTitle")}
           >
             <div className="py-2">
               {SUPPORTED_CURRENCIES.map((curr, index) => (
@@ -299,23 +301,19 @@ export function CurrencySelector() {
       {/* Confirmation dialog */}
       {showConfirmation && (
         <ConfirmationDialog
-          title="Change Currency?"
+          title={t("confirmTitle")}
           message={
             <div>
               <div>
-                {`Are you sure you want to change your display currency to ${
-                  SUPPORTED_CURRENCIES.find((c) => c.code === selectedCurrency)
-                    ?.name
-                }?`}
+                {t("confirmMessage", { currencyName: SUPPORTED_CURRENCIES.find((c) => c.code === selectedCurrency)?.name || selectedCurrency })}
               </div>
               <div>
-                This will convert all your financial data. This process may take
-                a few minutes.
+                {t("confirmNote")}
               </div>
             </div>
           }
-          confirmText="Change Currency"
-          cancelText="Cancel"
+          confirmText={t("confirmButton")}
+          cancelText={t("cancelButton")}
           onConfirm={handleConfirm}
           onCancel={handleCancel}
           isLoading={isLoading}

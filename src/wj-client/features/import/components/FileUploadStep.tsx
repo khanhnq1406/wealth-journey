@@ -256,7 +256,7 @@ export function FileUploadStep({
       <div
         role="button"
         tabIndex={0}
-        aria-label="Upload file area. Click or drag and drop to select a file."
+        aria-label={t("uploadAreaAriaLabel")}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
@@ -297,7 +297,7 @@ export function FileUploadStep({
           accept=".xls,.xlsx,.pdf"
           onChange={handleInputChange}
           className="hidden"
-          aria-label="Upload bank statement file (Excel or PDF)"
+          aria-label={t("uploadInputAriaLabel")}
         />
 
         {/* Upload State */}
@@ -408,7 +408,7 @@ export function FileUploadStep({
           <button
             onClick={() => setError("")}
             className="flex-shrink-0 p-1 rounded-lg text-danger-600 dark:text-danger-400 hover:bg-danger-100 dark:hover:bg-danger-900 transition-colors"
-            aria-label="Dismiss error"
+            aria-label={t("dismissErrorAriaLabel")}
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path

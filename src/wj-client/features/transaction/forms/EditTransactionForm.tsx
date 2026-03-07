@@ -177,14 +177,14 @@ export function EditTransactionForm({
       {
         onSuccess: (data) => {
           const message =
-            data?.message || "Transaction has been updated successfully";
+            data?.message || t("transactionUpdatedSuccess");
           setSuccessMessage(message);
           setShowSuccess(true);
           setErrorMessage("");
         },
         onError: (error: any) => {
           setErrorMessage(
-            error.message || "Failed to update transaction. Please try again",
+            error.message || t("failedToUpdate"),
           );
         },
       },

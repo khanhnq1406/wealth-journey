@@ -364,6 +364,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
                           currentPrice || 0,
                           nativeCurrency,
                           isCustom,
+                          t,
                         )
                       : formatPrice(
                           currentPrice || 0,

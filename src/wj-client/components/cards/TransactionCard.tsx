@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 
 export type TransactionType = "income" | "expense" | "transfer";
@@ -127,6 +128,7 @@ export function TransactionCard({
   className,
   status,
 }: TransactionCardProps) {
+  const t = useTranslations("transactionCard");
   const isIncome = type === "income";
   const isExpense = type === "expense";
   const isTransfer = type === "transfer";
@@ -139,8 +141,8 @@ export function TransactionCard({
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
 
-    if (date.toDateString() === today.toDateString()) return "Today";
-    if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
+    if (date.toDateString() === today.toDateString()) return t("today");
+    if (date.toDateString() === yesterday.toDateString()) return t("yesterday");
 
     return date.toLocaleDateString("en-US", {
       month: "short",
@@ -168,22 +170,22 @@ export function TransactionCard({
       pending: {
         bg: "bg-yellow-100 dark:bg-yellow-900/30",
         text: "text-yellow-700 dark:text-yellow-400",
-        label: "Pending",
+        label: t("status.pending"),
       },
       completed: {
         bg: "bg-green-100 dark:bg-green-900/30",
         text: "text-green-700 dark:text-green-400",
-        label: "Completed",
+        label: t("status.completed"),
       },
       failed: {
         bg: "bg-red-100 dark:bg-red-900/30",
         text: "text-red-700 dark:text-red-400",
-        label: "Failed",
+        label: t("status.failed"),
       },
       cancelled: {
         bg: "bg-gray-100 dark:bg-gray-700",
         text: "text-gray-700 dark:text-gray-400",
-        label: "Cancelled",
+        label: t("status.cancelled"),
       },
     };
 
@@ -304,7 +306,7 @@ export function TransactionCard({
               </p>
               {isTransfer && (
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Transfer
+                  {t("transfer")}
                 </p>
               )}
             </>
@@ -327,7 +329,7 @@ export function TransactionCard({
                 onEdit();
               }}
               className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
-              aria-label="Edit transaction"
+              aria-label={t("editAriaLabel")}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -342,7 +344,7 @@ export function TransactionCard({
                 onDelete();
               }}
               className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 dark:text-red-400 transition-colors"
-              aria-label="Delete transaction"
+              aria-label={t("deleteAriaLabel")}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -359,7 +361,7 @@ export function TransactionCard({
       type="button"
       className={cardClasses}
       onClick={onClick}
-      aria-label={`View details for ${title}`}
+      aria-label={t("viewDetailsAriaLabel", { title })}
     >
       {content}
     </button>

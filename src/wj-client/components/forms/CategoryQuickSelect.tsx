@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useCallback, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 
 export interface CategoryOption {
@@ -53,6 +54,7 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
   type,
   className,
 }: CategoryQuickSelectProps) {
+  const t = useTranslations("transaction.form");
   const [isCreating, setIsCreating] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
 
@@ -153,7 +155,7 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
               "min-h-[88px] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
               "bg-gray-100 dark:bg-dark-surface-hover text-gray-500 dark:text-dark-text-tertiary border-2 border-dashed border-gray-300 dark:border-dark-border hover:bg-gray-200 dark:hover:bg-dark-surface-active"
             )}
-            aria-label="Create new category"
+            aria-label={t("createNewCategory")}
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -174,7 +176,7 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
               type="text"
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
-              placeholder="Enter category name"
+              placeholder={t("newCategoryPlaceholder")}
               className="flex-1 px-3 py-2 text-sm bg-white dark:bg-dark-surface border border-gray-300 dark:border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:text-dark-text"
               autoFocus
             />

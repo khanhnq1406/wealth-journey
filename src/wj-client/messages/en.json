@@ -23,6 +23,7 @@
     "submit": "Submit",
     "back": "Back",
     "next": "Next",
+    "continue": "Continue",
     "previous": "Previous",
     "yes": "Yes",
     "no": "No",
@@ -80,7 +81,9 @@
     "required": "required",
     "noDataFound": "No data found",
     "noDataAvailable": "No data available",
-    "thereIsNoDataToDisplay": "There's no data to display at the moment."
+    "thereIsNoDataToDisplay": "There's no data to display at the moment.",
+    "changeCurrency": "Change currency",
+    "selectCurrency": "Select currency"
   },
   "nav": {
     "home": "Home",
@@ -411,6 +414,7 @@
     "totalBalance": "Total balance",
     "noTransactionsFound": "No transactions found",
     "addFirstTransaction": "Add your first transaction or adjust filters",
+    "defaultLabel": "Transaction",
     "transactionAddedSuccess": "Transaction has been added successfully",
     "failedToAdd": "Failed to add transaction. Please try again",
     "quickFilters": {
@@ -443,7 +447,11 @@
       "addTransaction": "Add Transaction",
       "updateTransaction": "Update Transaction",
       "transactionUpdatedSuccess": "Transaction has been updated successfully",
-      "failedToUpdate": "Failed to update transaction. Please try again"
+      "failedToUpdate": "Failed to update transaction. Please try again",
+      "transactionAddedSuccess": "Transaction has been added successfully",
+      "failedToAdd": "Failed to add transaction. Please try again",
+      "createNewCategory": "Create new category",
+      "newCategoryPlaceholder": "Enter category name"
     },
     "delete": {
       "title": "Delete Transaction",
@@ -539,7 +547,8 @@
       "notRecommended": "Not recommended.",
       "selectTargetError": "Please select a target wallet",
       "failedToProcess": "Failed to process wallet. Please try again",
-      "confirm": "Confirm"
+      "confirm": "Confirm",
+      "selectTargetAriaLabel": "Select target wallet for transfer"
     },
     "transfer": {
       "title": "Transfer Money",
@@ -576,6 +585,7 @@
     "sortBy": "Sort by",
     "errorLoading": "Error loading portfolio",
     "errorLoadingPortfolio": "Error loading portfolio",
+    "priceNotSet": "Price not set",
     "selectWalletPlaceholder": "Select Wallet",
     "filterByTypePlaceholder": "Filter by Type",
     "sortByPlaceholder": "Sort by",
@@ -699,7 +709,33 @@
       "selectGoldTypePlaceholder": "Select gold type (SJC, XAU, etc.)",
       "selectSilverTypePlaceholder": "Select silver type (AG_VND, XAG, etc.)",
       "customSymbolInfo": "Enter a unique identifier for your custom investment",
-      "customPriceNote": "Note: Custom investments don't have market prices. You can set the price manually after creation."
+      "customPriceNote": "Note: Custom investments don't have market prices. You can set the price manually after creation.",
+      "investmentWalletLabel": "Investment Wallet",
+      "nameLabel": "Name",
+      "goldTypeLabel": "Gold Type",
+      "silverTypeLabel": "Silver Type",
+      "unitLabel": "Unit",
+      "initialQuantityLabel": "Initial Quantity",
+      "currencyLabel": "Currency",
+      "selectWalletError": "Please select a wallet",
+      "goldUnitCurrencyInfo": "Unit: {unit} | Currency: {currency}",
+      "silverCurrencyInfo": "Currency: {currency}",
+      "loadingPrice": "Loading price...",
+      "currentMarketPrice": "Current Market Price: {price}/{unit}",
+      "cachedPrice": "(Cached price)",
+      "unableToFetchPrice": "Unable to fetch price",
+      "quantityHint": "Number of shares, coins, or units you hold",
+      "taelUnit": "Tael (lượng)",
+      "kgUnit": "Kg",
+      "customInvestmentDescription": "Create investment for assets not available in market data",
+      "amountOfGold": "Amount of gold in {unit}",
+      "amountOfSilver": "Amount of silver in {unit}",
+      "taelUnitLong": "taels (lượng)",
+      "gramUnit": "grams",
+      "defaultGoldName": "Gold Investment",
+      "defaultSilverName": "Silver Investment",
+      "selectGoldTypeError": "Please select a gold type",
+      "selectSilverTypeError": "Please select a silver type"
     },
     "transactionTypes": {
       "buy": "Buy",
@@ -1475,7 +1511,8 @@
       "new": "NEW",
       "existing": "EXISTING",
       "noCategory2": "No category",
-      "autoMergeHigh": "Auto-Merge All High Confidence ({count})"
+      "autoMergeHigh": "Auto-Merge All High Confidence ({count})",
+      "closeAriaLabel": "Close"
     },
     "fileUpload": {
       "title": "Upload Bank Statement",
@@ -1492,7 +1529,10 @@
       "continue": "Continue",
       "invalidFileType": "Invalid file type. Please upload Excel (.xlsx, .xls) or PDF file.",
       "fileTooLarge": "File size exceeds maximum {maxSizeMB}MB limit.",
-      "fileEmpty": "File is empty."
+      "fileEmpty": "File is empty.",
+      "uploadAreaAriaLabel": "Upload file area. Click or drag and drop to select a file.",
+      "uploadInputAriaLabel": "Upload bank statement file (Excel or PDF)",
+      "dismissErrorAriaLabel": "Dismiss error"
     },
     "bankTemplate": {
       "selectBankInstructions": "Select your bank to automatically configure column mapping.",
@@ -1588,7 +1628,8 @@
       "skipAll": "Skip All {count}"
     },
     "stepProgress": {
-      "stepOf": "Step {current} of {total}"
+      "stepOf": "Step {current} of {total}",
+      "progressAriaLabel": "Import progress steps"
     },
     "duplicateStrategy": {
       "heading": "{count} Potential Duplicate Detected",
@@ -1676,5 +1717,103 @@
   "sidebarToggle": {
     "collapse": "Collapse sidebar",
     "expand": "Expand sidebar"
+  },
+  "errorState": {
+    "tryAgain": "Try Again",
+    "network": {
+      "title": "Connection Error",
+      "message": "Unable to connect. Please check your internet connection."
+    },
+    "server": {
+      "title": "Server Error",
+      "message": "Something went wrong on our end. Please try again later."
+    },
+    "permission": {
+      "title": "Access Denied",
+      "message": "You don't have permission to access this resource."
+    },
+    "notFound": {
+      "title": "Not Found",
+      "message": "The requested resource could not be found."
+    },
+    "generic": {
+      "title": "Something Went Wrong",
+      "message": "An unexpected error occurred. Please try again."
+    }
+  },
+  "emptyState": {
+    "noTransactions": {
+      "title": "No transactions yet",
+      "description": "Start by adding your first transaction to track your finances."
+    },
+    "noWallets": {
+      "title": "No wallets found",
+      "description": "Create a wallet to start tracking your balance and transactions."
+    },
+    "noInvestments": {
+      "title": "No investments yet",
+      "description": "Add investments to track your portfolio performance over time."
+    },
+    "noResults": {
+      "title": "No results found",
+      "description": "Try adjusting your filters or search terms."
+    },
+    "noBudgets": {
+      "title": "No budgets set",
+      "description": "Create budgets to manage your spending by category."
+    },
+    "noCategories": {
+      "title": "No categories yet",
+      "description": "Create categories to organize your transactions."
+    },
+    "error": {
+      "title": "Something went wrong",
+      "description": "We couldn't load the data. Please try again."
+    },
+    "networkError": {
+      "title": "Connection lost",
+      "description": "Please check your internet connection and try again."
+    }
+  },
+  "formWizard": {
+    "goToStep": "Go to step {number}: {title}",
+    "stepOf": "Step {current} of {total}",
+    "previousStepAriaLabel": "Go to previous step",
+    "previous": "Previous",
+    "nextStepAriaLabel": "Go to next step",
+    "finishAriaLabel": "Finish",
+    "processing": "Processing...",
+    "finish": "Finish",
+    "next": "Next"
+  },
+  "transactionCard": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "transfer": "Transfer",
+    "editAriaLabel": "Edit transaction",
+    "deleteAriaLabel": "Delete transaction",
+    "viewDetailsAriaLabel": "View details for {title}",
+    "status": {
+      "pending": "Pending",
+      "completed": "Completed",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "currencySelector": {
+    "selectAriaLabel": "Select currency",
+    "selectTitle": "Select Currency",
+    "optionsAriaLabel": "Currency options",
+    "converting": "Currency conversion in progress...",
+    "confirmTitle": "Change Currency?",
+    "confirmMessage": "Are you sure you want to change your display currency to {currencyName}?",
+    "confirmNote": "This will convert all your financial data. This process may take a few minutes.",
+    "confirmButton": "Change Currency",
+    "cancelButton": "Cancel"
+  },
+  "landingErrorBoundary": {
+    "title": "Something went wrong",
+    "description": "We apologize for the inconvenience. Please try refreshing the page.",
+    "refreshButton": "Refresh Page"
   }
 }

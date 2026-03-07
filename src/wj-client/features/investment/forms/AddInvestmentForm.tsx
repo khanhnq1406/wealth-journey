@@ -318,7 +318,7 @@ export function AddInvestmentForm({
       setValue("currency", targetCurrency);
       // Pre-populate symbol/name to pass Zod validation (real guard is in onSubmit)
       setValue("symbol", "GOLD");
-      setValue("name", "Gold Investment");
+      setValue("name", t("form.defaultGoldName"));
     }
   }, [isGoldInvestment, investmentType, setValue]);
 
@@ -353,7 +353,7 @@ export function AddInvestmentForm({
       setValue("currency", targetCurrency);
       // Pre-populate symbol/name to pass Zod validation (real guard is in onSubmit)
       setValue("symbol", "SILVER");
-      setValue("name", "Silver Investment");
+      setValue("name", t("form.defaultSilverName"));
     }
   }, [isSilverInvestment, investmentType, setValue]);
 
@@ -439,19 +439,19 @@ export function AddInvestmentForm({
 
     // Validate wallet is selected
     if (!walletId) {
-      setErrorMessage("Please select a wallet");
+      setErrorMessage(t("form.selectWalletError"));
       return;
     }
 
     // Validate gold type is selected for gold investments
     if (isGoldInvestment && !selectedGoldType) {
-      setErrorMessage("Please select a gold type");
+      setErrorMessage(t("form.selectGoldTypeError"));
       return;
     }
 
     // Validate silver type is selected for silver investments
     if (isSilverInvestment && !selectedSilverType) {
-      setErrorMessage("Please select a silver type");
+      setErrorMessage(t("form.selectSilverTypeError"));
       return;
     }
 
@@ -557,7 +557,7 @@ export function AddInvestmentForm({
       {propWalletId === undefined && (
         <div className="mb-4">
           <BasicFormSelect
-            label="Investment Wallet"
+            label={t("form.investmentWalletLabel")}
             options={walletSelectOptions}
             value={selectedWalletId ? String(selectedWalletId) : undefined}
             onChange={(value) => setSelectedWalletId(parseInt(value, 10))}
@@ -577,7 +577,7 @@ export function AddInvestmentForm({
       <FormSelect
         name="type"
         control={control}
-        label="Investment Type"
+        label={t("form.investmentType")}
         options={investmentTypeOptions}
         placeholder={t("form.selectType")}
         required
@@ -609,10 +609,10 @@ export function AddInvestmentForm({
             />
             <div className="flex-1">
               <span className="font-medium text-gray-900">
-                Custom Investment
+                {t("form.isCustom")}
               </span>
               <p className="text-sm text-gray-500">
-                Create investment for assets not available in market data
+                {t("form.customInvestmentDescription")}
               </p>
             </div>
           </label>
@@ -686,7 +686,7 @@ export function AddInvestmentForm({
         <FormInput
           name="name"
           control={control}
-          label="Name"
+          label={t("form.nameLabel")}
           placeholder={t("form.investmentNamePlaceholder")}
           required
           disabled={isSubmitting}
@@ -697,7 +697,7 @@ export function AddInvestmentForm({
       {isGoldInvestment && (
         <div className="mb-4">
           <BasicFormSelect
-            label="Gold Type"
+            label={t("form.goldTypeLabel")}
             options={goldTypeOptions.map((opt) => ({
               value: opt.value,
               label: opt.label,
@@ -721,33 +721,33 @@ export function AddInvestmentForm({
           {selectedGoldType && (
             <div className="mt-2 space-y-1">
               <p className="text-xs text-gray-500 ml-1">
-                Unit: {selectedGoldType.unit} | Currency:{" "}
-                {selectedGoldType.currency}
+                {t("form.goldUnitCurrencyInfo", { unit: selectedGoldType.unit, currency: selectedGoldType.currency })}
               </p>
               {/* Market Price Display */}
               {goldPriceQuery.isLoading && (
-                <p className="text-xs text-gray-400 ml-1">Loading price...</p>
+                <p className="text-xs text-gray-400 ml-1">{t("form.loadingPrice")}</p>
               )}
               {goldPriceQuery.data?.data && (
                 <div className="p-2 bg-green-50 border border-green-200 rounded-md">
                   <p className="text-sm font-medium text-green-900">
-                    Current Market Price:{" "}
-                    {formatCurrency(
-                      goldPriceQuery.data.data.price,
-                      goldPriceQuery.data.data.currency,
-                    )}
-                    /{selectedGoldType.unit}
+                    {t("form.currentMarketPrice", {
+                      price: formatCurrency(
+                        goldPriceQuery.data.data.price,
+                        goldPriceQuery.data.data.currency,
+                      ),
+                      unit: selectedGoldType.unit,
+                    })}
                   </p>
                   {goldPriceQuery.data.data.isCached && (
                     <p className="text-xs text-gray-500 mt-0.5">
-                      (Cached price)
+                      {t("form.cachedPrice")}
                     </p>
                   )}
                 </div>
               )}
               {goldPriceQuery.isError && (
                 <p className="text-xs text-red-500 ml-1">
-                  Unable to fetch price
+                  {t("form.unableToFetchPrice")}
                 </p>
               )}
             </div>
@@ -759,7 +759,7 @@ export function AddInvestmentForm({
       {isSilverInvestment && (
         <div className="mb-4">
           <BasicFormSelect
-            label="Silver Type"
+            label={t("form.silverTypeLabel")}
             options={silverTypeOptions.map((opt: SilverTypeOption) => ({
               value: opt.value,
               label: opt.label,
@@ -786,32 +786,33 @@ export function AddInvestmentForm({
           {selectedSilverType && (
             <div className="mt-2 space-y-1">
               <p className="text-xs text-gray-500 ml-1">
-                Currency: {selectedSilverType.currency}
+                {t("form.silverCurrencyInfo", { currency: selectedSilverType.currency })}
               </p>
               {/* Market Price Display */}
               {silverPriceQuery.isLoading && (
-                <p className="text-xs text-gray-400 ml-1">Loading price...</p>
+                <p className="text-xs text-gray-400 ml-1">{t("form.loadingPrice")}</p>
               )}
               {silverPriceQuery.data?.data && (
                 <div className="p-2 bg-green-50 border border-green-200 rounded-md">
                   <p className="text-sm font-medium text-green-900">
-                    Current Market Price:{" "}
-                    {formatCurrency(
-                      silverPriceQuery.data.data.price,
-                      silverPriceQuery.data.data.currency,
-                    )}
-                    /{selectedSilverType.availableUnits[0] || "unit"}
+                    {t("form.currentMarketPrice", {
+                      price: formatCurrency(
+                        silverPriceQuery.data.data.price,
+                        silverPriceQuery.data.data.currency,
+                      ),
+                      unit: selectedSilverType.availableUnits[0] || "unit",
+                    })}
                   </p>
                   {silverPriceQuery.data.data.isCached && (
                     <p className="text-xs text-gray-500 mt-0.5">
-                      (Cached price)
+                      {t("form.cachedPrice")}
                     </p>
                   )}
                 </div>
               )}
               {silverPriceQuery.isError && (
                 <p className="text-xs text-red-500 ml-1">
-                  Unable to fetch price
+                  {t("form.unableToFetchPrice")}
                 </p>
               )}
             </div>
@@ -825,7 +826,7 @@ export function AddInvestmentForm({
           <>
             <div className="flex items-center gap-2 mb-1">
               <Label htmlFor="initialQuantity" required>
-                Quantity
+                {t("form.quantity")}
               </Label>
               {/* {selectedGoldType?.currency === "VND" && (
                 <Select
@@ -852,19 +853,20 @@ export function AddInvestmentForm({
               showRecommendations={false}
             />
             <p className="text-xs text-gray-500 -mt-2 ml-1">
-              Amount of gold in{" "}
-              {goldQuantityUnit === "tael"
-                ? "taels (lượng)"
-                : goldQuantityUnit === "oz"
-                  ? "oz"
-                  : "grams"}
+              {t("form.amountOfGold", {
+                unit: goldQuantityUnit === "tael"
+                  ? t("form.taelUnitLong")
+                  : goldQuantityUnit === "oz"
+                    ? "oz"
+                    : t("form.gramUnit"),
+              })}
             </p>
           </>
         ) : isSilverInvestment ? (
           <div className="flex flex-col gap-2">
             <div className="flex flex-col">
               <Label htmlFor="initialQuantity" required>
-                Quantity
+                {t("form.quantity")}
               </Label>
               <FormNumberInput
                 name="initialQuantity"
@@ -879,14 +881,15 @@ export function AddInvestmentForm({
                 showRecommendations={false}
               />
               <p className="text-xs text-gray-500 -mt-2 ml-1">
-                Amount of silver in{" "}
-                {silverQuantityUnit === "tael"
-                  ? "taels (lượng)"
-                  : silverQuantityUnit === "kg"
-                    ? "kg"
-                    : silverQuantityUnit === "oz"
-                      ? "oz"
-                      : "grams"}
+                {t("form.amountOfSilver", {
+                  unit: silverQuantityUnit === "tael"
+                    ? t("form.taelUnitLong")
+                    : silverQuantityUnit === "kg"
+                      ? t("form.kgUnit")
+                      : silverQuantityUnit === "oz"
+                        ? "oz"
+                        : t("form.gramUnit"),
+                })}
               </p>
             </div>
 
@@ -896,15 +899,15 @@ export function AddInvestmentForm({
               selectedSilverType.availableUnits.length > 1 && (
                 <div>
                   <BasicFormSelect
-                    label="Unit"
+                    label={t("form.unitLabel")}
                     options={selectedSilverType.availableUnits.map(
                       (unit: SilverUnit) => ({
                         value: unit,
                         label:
                           unit === "tael"
-                            ? "Tael (lượng)"
+                            ? t("form.taelUnit")
                             : unit === "kg"
-                              ? "Kg"
+                              ? t("form.kgUnit")
                               : unit,
                       }),
                     )}
@@ -924,7 +927,7 @@ export function AddInvestmentForm({
             <FormNumberInput
               name="initialQuantity"
               control={control}
-              label="Initial Quantity"
+              label={t("form.initialQuantityLabel")}
               placeholder={quantityConfig.placeholder}
               required
               disabled={isSubmitting}
@@ -932,7 +935,7 @@ export function AddInvestmentForm({
               step={quantityConfig.step}
             />
             <p className="text-xs text-gray-500 mt-1 -mb-3 ml-1">
-              Number of shares, coins, or units you hold
+              {t("form.quantityHint")}
             </p>
           </>
         )}
@@ -943,7 +946,7 @@ export function AddInvestmentForm({
         <FormSelect
           name="currency"
           control={control}
-          label="Currency"
+          label={t("form.currencyLabel")}
           options={[
             { value: "USD", label: "USD - US Dollar" },
             { value: "VND", label: "VND - Vietnamese Dong" },

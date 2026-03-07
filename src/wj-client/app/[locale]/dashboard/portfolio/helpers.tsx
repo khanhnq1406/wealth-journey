@@ -316,9 +316,10 @@ export function formatInvestmentPrice(
   price: number,
   currency: string,
   isCustom: boolean,
+  t?: (key: string) => string,
 ): string {
   if (isCustom && price === 0) {
-    return "Price not set";
+    return t ? t("priceNotSet") : "Price not set";
   }
 
   return formatCurrency(price, currency);
