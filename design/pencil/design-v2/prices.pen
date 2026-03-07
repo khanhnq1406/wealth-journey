@@ -1,0 +1,2212 @@
+{
+  "version": "2.8",
+  "children": [
+    {
+      "type": "frame",
+      "id": "7VttU",
+      "x": 0,
+      "y": 5492,
+      "name": "Prices - Mobile",
+      "clip": true,
+      "width": 393,
+      "fill": "$bg-primary",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "vvEG4",
+          "name": "Red Accent",
+          "width": "fill_container",
+          "height": 3,
+          "fill": "$red-primary"
+        },
+        {
+          "type": "frame",
+          "id": "OSssG",
+          "name": "Status Bar",
+          "width": "fill_container",
+          "height": 62,
+          "padding": [
+            16,
+            24,
+            0,
+            24
+          ],
+          "justifyContent": "end",
+          "children": [
+            {
+              "type": "text",
+              "id": "M42Lv",
+              "name": "sbTime",
+              "fill": "$text-primary",
+              "content": "9:41",
+              "fontFamily": "Inter",
+              "fontSize": 15,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "jeTty",
+          "name": "Header",
+          "width": "fill_container",
+          "height": 56,
+          "padding": [
+            0,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "dCDGC",
+              "name": "hLeft",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "eTuxL",
+                  "name": "hLogo",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "$red-primary",
+                  "cornerRadius": 8,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Unf0v",
+                      "name": "hLogoW",
+                      "fill": "#FFFFFF",
+                      "content": "W",
+                      "textAlign": "center",
+                      "fontFamily": "Sora",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "vDDft",
+                  "name": "hTitle",
+                  "fill": "$text-primary",
+                  "content": "WealthJourney",
+                  "fontFamily": "Sora",
+                  "fontSize": 18,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "asOrM",
+              "name": "hRight",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "vuVUU",
+                  "name": "hSearch",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "search",
+                  "iconFontFamily": "lucide",
+                  "fill": "$text-secondary"
+                },
+                {
+                  "type": "icon_font",
+                  "id": "0ZOOx",
+                  "name": "hBell",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "bell",
+                  "iconFontFamily": "lucide",
+                  "fill": "$text-secondary"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "z7X8F",
+          "name": "Title Row",
+          "width": "fill_container",
+          "padding": [
+            16,
+            20,
+            8,
+            20
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "vUmLe",
+              "name": "titleTxt",
+              "fill": "$text-primary",
+              "content": "Giá thị trường",
+              "fontFamily": "Sora",
+              "fontSize": 22,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "JspVh",
+          "name": "Tabs",
+          "width": "fill_container",
+          "padding": [
+            0,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "plbyN",
+              "name": "Tab Gold",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                10,
+                0
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "jnqCp",
+                  "name": "tab1txt",
+                  "fill": "$red-primary",
+                  "content": "Vàng",
+                  "fontFamily": "Sora",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "frame",
+                  "id": "vaOfB",
+                  "name": "tab1line",
+                  "width": "fill_container",
+                  "height": 2,
+                  "fill": "$red-primary"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "LijR2",
+              "name": "Tab Silver",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                10,
+                0
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "RVEQI",
+                  "name": "tab2txt",
+                  "fill": "$text-tertiary",
+                  "content": "Bạc",
+                  "fontFamily": "Sora",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "oyubQ",
+              "name": "Tab Lookup",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                10,
+                0
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "rM5Cx",
+                  "name": "tab3txt",
+                  "fill": "$text-tertiary",
+                  "content": "Tra cứu",
+                  "fontFamily": "Sora",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "wocBV",
+          "name": "divider",
+          "width": "fill_container",
+          "height": 1,
+          "fill": "$border-light"
+        },
+        {
+          "type": "frame",
+          "id": "EL0nZ",
+          "name": "Price Content",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            12,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "brqe9",
+              "name": "SJC 1L-10L",
+              "width": "fill_container",
+              "fill": "$bg-surface",
+              "cornerRadius": 16,
+              "stroke": {
+                "thickness": 1,
+                "fill": "$border-light"
+              },
+              "layout": "vertical",
+              "gap": 10,
+              "padding": [
+                14,
+                16
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "V7dun",
+                  "name": "p1top",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "qBcbp",
+                      "name": "p1left",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "ye8kk",
+                          "name": "p1dot",
+                          "width": 8,
+                          "height": 8,
+                          "fill": "$gold-primary",
+                          "cornerRadius": 4
+                        },
+                        {
+                          "type": "text",
+                          "id": "ARmRc",
+                          "name": "p1name",
+                          "fill": "$text-primary",
+                          "content": "SJC 1L-10L",
+                          "fontFamily": "Sora",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Mw9D9",
+                      "name": "p1badge",
+                      "fill": "$gold-light",
+                      "cornerRadius": 8,
+                      "padding": [
+                        3,
+                        8
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "BjAUS",
+                          "name": "p1badgetxt",
+                          "fill": "$gold-primary",
+                          "content": "Vàng miếng",
+                          "fontFamily": "Sora",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "QMt2T",
+                  "name": "p1bot",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "SKeZr",
+                      "name": "p1buy",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "bZwgY",
+                          "name": "p1buylbl",
+                          "fill": "$text-tertiary",
+                          "content": "Mua",
+                          "fontFamily": "Sora",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "y9H7T",
+                          "name": "p1buyval",
+                          "fill": "$text-primary",
+                          "content": "85,000",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "1u095",
+                      "name": "p1sell",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "alignItems": "end",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "4W6JZ",
+                          "name": "p1selllbl",
+                          "fill": "$text-tertiary",
+                          "content": "Bán",
+                          "fontFamily": "Sora",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Y13p9",
+                          "name": "p1sellval",
+                          "fill": "$red-primary",
+                          "content": "87,000",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "01jpl",
+              "name": "SJC Nhẫn",
+              "width": "fill_container",
+              "fill": "$bg-surface",
+              "cornerRadius": 16,
+              "stroke": {
+                "thickness": 1,
+                "fill": "$border-light"
+              },
+              "layout": "vertical",
+              "gap": 10,
+              "padding": [
+                14,
+                16
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "QiN7t",
+                  "name": "p2top",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Kx05W",
+                      "name": "p2left",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "FzBvz",
+                          "name": "p2dot",
+                          "width": 8,
+                          "height": 8,
+                          "fill": "$gold-primary",
+                          "cornerRadius": 4
+                        },
+                        {
+                          "type": "text",
+                          "id": "052fJ",
+                          "name": "p2name",
+                          "fill": "$text-primary",
+                          "content": "SJC Nhẫn 1-5 chỉ",
+                          "fontFamily": "Sora",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "HXVMy",
+                      "name": "p2badge",
+                      "fill": "$gold-light",
+                      "cornerRadius": 8,
+                      "padding": [
+                        3,
+                        8
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "mKdXS",
+                          "name": "p2badgetxt",
+                          "fill": "$gold-primary",
+                          "content": "Nhẫn",
+                          "fontFamily": "Sora",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "O1Hq6",
+                  "name": "p2bot",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "ZqjDU",
+                      "name": "p2buy",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ulov9",
+                          "name": "p2buylbl",
+                          "fill": "$text-tertiary",
+                          "content": "Mua",
+                          "fontFamily": "Sora",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "iAhtY",
+                          "name": "p2buyval",
+                          "fill": "$text-primary",
+                          "content": "74,500",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "RqgeG",
+                      "name": "p2sell",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "alignItems": "end",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "FufId",
+                          "name": "p2selllbl",
+                          "fill": "$text-tertiary",
+                          "content": "Bán",
+                          "fontFamily": "Sora",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "F1crv",
+                          "name": "p2sellval",
+                          "fill": "$red-primary",
+                          "content": "75,800",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "6yrSV",
+              "name": "XAU/USD",
+              "width": "fill_container",
+              "fill": "$bg-surface",
+              "cornerRadius": 16,
+              "stroke": {
+                "thickness": 1,
+                "fill": "$border-light"
+              },
+              "layout": "vertical",
+              "gap": 10,
+              "padding": [
+                14,
+                16
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "vRCbh",
+                  "name": "p3top",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "KVBwS",
+                      "name": "p3left",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "7c01K",
+                          "name": "p3dot",
+                          "width": 8,
+                          "height": 8,
+                          "fill": "#3B82F6",
+                          "cornerRadius": 4
+                        },
+                        {
+                          "type": "text",
+                          "id": "USXvH",
+                          "name": "p3name",
+                          "fill": "$text-primary",
+                          "content": "XAU/USD",
+                          "fontFamily": "Sora",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "jHLhp",
+                      "name": "p3badge",
+                      "fill": "#EFF6FF",
+                      "cornerRadius": 8,
+                      "padding": [
+                        3,
+                        8
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "647c3",
+                          "name": "p3badgetxt",
+                          "fill": "#3B82F6",
+                          "content": "Thế giới",
+                          "fontFamily": "Sora",
+                          "fontSize": 11,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "n9vig",
+                  "name": "p3bot",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "cWK6S",
+                      "name": "p3buy",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "mT9mA",
+                          "name": "p3buylbl",
+                          "fill": "$text-tertiary",
+                          "content": "Mua",
+                          "fontFamily": "Sora",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "xSDLK",
+                          "name": "p3buyval",
+                          "fill": "$text-primary",
+                          "content": "$2,918.50",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "EA1tU",
+                      "name": "p3sell",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "alignItems": "end",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "u2s8k",
+                          "name": "p3selllbl",
+                          "fill": "$text-tertiary",
+                          "content": "Bán",
+                          "fontFamily": "Sora",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Cn4R4",
+                          "name": "p3sellval",
+                          "fill": "#3B82F6",
+                          "content": "$2,920.00",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "7E4MT",
+              "name": "uptime",
+              "width": "fill_container",
+              "padding": [
+                4,
+                0
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "zumLZ",
+                  "name": "uptxt",
+                  "fill": "$text-tertiary",
+                  "content": "Cập nhật: 07/03/2026 10:30",
+                  "fontFamily": "Sora",
+                  "fontSize": 11,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "2v6hf",
+      "x": 8200,
+      "y": 0,
+      "name": "Prices - Desktop",
+      "clip": true,
+      "width": 1440,
+      "height": "fit_content(900)",
+      "fill": "$bg-primary",
+      "children": [
+        {
+          "type": "frame",
+          "id": "IsXO5",
+          "name": "Sidebar",
+          "width": 260,
+          "height": "fill_container",
+          "fill": "$bg-surface",
+          "stroke": {
+            "thickness": 1,
+            "fill": "$border-light"
+          },
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "XhjK0",
+              "name": "Logo",
+              "width": "fill_container",
+              "height": 68,
+              "stroke": {
+                "thickness": 1,
+                "fill": "$border-light"
+              },
+              "gap": 10,
+              "padding": [
+                0,
+                24
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "u6T0y",
+                  "name": "sLogo",
+                  "width": 32,
+                  "height": 32,
+                  "fill": "$red-primary",
+                  "cornerRadius": 8,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "hXZtI",
+                      "name": "sLogoW",
+                      "fill": "#FFFFFF",
+                      "content": "W",
+                      "textAlign": "center",
+                      "fontFamily": "Sora",
+                      "fontSize": 16,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "cZ3Xv",
+                  "name": "sLogoTxt",
+                  "fill": "$text-primary",
+                  "content": "WealthJourney",
+                  "fontFamily": "Sora",
+                  "fontSize": 18,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "8ZJc9",
+              "name": "Nav Items",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 4,
+              "padding": [
+                16,
+                12
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "edq1a",
+                  "name": "n1",
+                  "width": "fill_container",
+                  "height": 40,
+                  "cornerRadius": 10,
+                  "gap": 10,
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "JtlZR",
+                      "name": "n1i",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "home",
+                      "iconFontFamily": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ZQbUQ",
+                      "name": "n1t",
+                      "fill": "$text-secondary",
+                      "content": "Trang chủ",
+                      "fontFamily": "Sora",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Q5OzX",
+                  "name": "n2",
+                  "width": "fill_container",
+                  "height": 40,
+                  "cornerRadius": 10,
+                  "gap": 10,
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "Rinii",
+                      "name": "n2i",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "arrow-left-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "M5OdC",
+                      "name": "n2t",
+                      "fill": "$text-secondary",
+                      "content": "Giao dịch",
+                      "fontFamily": "Sora",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "wl2Ov",
+                  "name": "n3",
+                  "width": "fill_container",
+                  "height": 40,
+                  "cornerRadius": 10,
+                  "gap": 10,
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "pO2hX",
+                      "name": "n3i",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "wallet",
+                      "iconFontFamily": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "XO2Zu",
+                      "name": "n3t",
+                      "fill": "$text-secondary",
+                      "content": "Ví tiền",
+                      "fontFamily": "Sora",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ZEu0E",
+                  "name": "n4",
+                  "width": "fill_container",
+                  "height": 40,
+                  "cornerRadius": 10,
+                  "gap": 10,
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "HLPkq",
+                      "name": "n4i",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "trending-up",
+                      "iconFontFamily": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "GcfIa",
+                      "name": "n4t",
+                      "fill": "$text-secondary",
+                      "content": "Danh mục",
+                      "fontFamily": "Sora",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "lMa8Z",
+                  "name": "n5",
+                  "width": "fill_container",
+                  "height": 40,
+                  "cornerRadius": 10,
+                  "gap": 10,
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "99Gtr",
+                      "name": "n5i",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "piggy-bank",
+                      "iconFontFamily": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "eLc1t",
+                      "name": "n5t",
+                      "fill": "$text-secondary",
+                      "content": "Ngân sách",
+                      "fontFamily": "Sora",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "wuFHI",
+                  "name": "n6",
+                  "width": "fill_container",
+                  "height": 40,
+                  "cornerRadius": 10,
+                  "gap": 10,
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "YZAoW",
+                      "name": "n6i",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "bar-chart-3",
+                      "iconFontFamily": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "gp49L",
+                      "name": "n6t",
+                      "fill": "$text-secondary",
+                      "content": "Báo cáo",
+                      "fontFamily": "Sora",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "lEZqW",
+                  "name": "n7",
+                  "width": "fill_container",
+                  "height": 40,
+                  "fill": "$red-light",
+                  "cornerRadius": 10,
+                  "gap": 10,
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "nRMlD",
+                      "name": "n7i",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "line-chart",
+                      "iconFontFamily": "lucide",
+                      "fill": "$red-primary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "2oPYp",
+                      "name": "n7t",
+                      "fill": "$red-primary",
+                      "content": "Giá thị trường",
+                      "fontFamily": "Sora",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Te9YJ",
+              "name": "Sidebar Bottom",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "padding": [
+                16,
+                12
+              ],
+              "justifyContent": "end",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "L8Rbj",
+                  "name": "sLbl",
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "AIoAU",
+                      "name": "sLblTxt",
+                      "fill": "$text-tertiary",
+                      "content": "Cài đặt",
+                      "fontFamily": "Sora",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "01vul",
+                  "name": "sSet",
+                  "width": "fill_container",
+                  "height": 40,
+                  "cornerRadius": 10,
+                  "gap": 10,
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "HAzSX",
+                      "name": "sSetI",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "settings",
+                      "iconFontFamily": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "text",
+                      "id": "cPNQ9",
+                      "name": "sSetT",
+                      "fill": "$text-secondary",
+                      "content": "Cài đặt",
+                      "fontFamily": "Sora",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "6LRPm",
+                  "name": "sDivider",
+                  "width": "fill_container",
+                  "height": 1,
+                  "fill": "$border-light"
+                },
+                {
+                  "type": "frame",
+                  "id": "v24pA",
+                  "name": "sUser",
+                  "width": "fill_container",
+                  "gap": 10,
+                  "padding": [
+                    8,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "tZhz9",
+                      "name": "sAvatar",
+                      "width": 36,
+                      "height": 36,
+                      "fill": "$red-primary",
+                      "cornerRadius": 18,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "YJden",
+                          "name": "sAvatarTxt",
+                          "fill": "#FFFFFF",
+                          "content": "K",
+                          "textAlign": "center",
+                          "fontFamily": "Sora",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "V8d6S",
+                      "name": "sUserInfo",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "UKPLt",
+                          "name": "sUserName",
+                          "fill": "$text-primary",
+                          "content": "Khanh Nguyen",
+                          "fontFamily": "Sora",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "KHxp4",
+                          "name": "sUserEmail",
+                          "fill": "$text-tertiary",
+                          "content": "khanh@gmail.com",
+                          "fontFamily": "Sora",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "yKMMq",
+          "name": "Main Area",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "32iNH",
+              "name": "Top Bar",
+              "width": "fill_container",
+              "height": 68,
+              "fill": "$bg-surface",
+              "stroke": {
+                "thickness": 1,
+                "fill": "$border-light"
+              },
+              "padding": [
+                0,
+                32
+              ],
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "oVSVX",
+                  "name": "tbLeft",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "xGrzo",
+                      "name": "tbTitle",
+                      "fill": "$text-primary",
+                      "content": "Giá thị trường",
+                      "fontFamily": "Sora",
+                      "fontSize": 20,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "RzHYD",
+                      "name": "tbSub",
+                      "fill": "$text-tertiary",
+                      "content": "Theo dõi giá vàng, bạc và tra cứu mã chứng khoán",
+                      "fontFamily": "Sora",
+                      "fontSize": 13,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "EvPiz",
+                  "name": "tbRight",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "MfFQX",
+                      "name": "tbSearch",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "search",
+                      "iconFontFamily": "lucide",
+                      "fill": "$text-secondary"
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "fSe0G",
+                      "name": "tbBell",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "bell",
+                      "iconFontFamily": "lucide",
+                      "fill": "$text-secondary"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "lv8wA",
+              "name": "Dashboard Content",
+              "clip": true,
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 24,
+              "padding": [
+                28,
+                32
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "KHOZF",
+                  "name": "Tab Row",
+                  "width": "fill_container",
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "$border-light"
+                  },
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "XT3WH",
+                      "name": "Tab Gold",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": [
+                        10,
+                        24
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "M5hxr",
+                          "name": "dt1txt",
+                          "fill": "$red-primary",
+                          "content": "Vàng",
+                          "fontFamily": "Sora",
+                          "fontSize": 15,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Fxj7K",
+                          "name": "dt1line",
+                          "width": "fill_container",
+                          "height": 2,
+                          "fill": "$red-primary"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Qngjl",
+                      "name": "Tab Silver",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": [
+                        10,
+                        24
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "HADeY",
+                          "name": "dt2txt",
+                          "fill": "$text-tertiary",
+                          "content": "Bạc",
+                          "fontFamily": "Sora",
+                          "fontSize": 15,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "XBq2J",
+                      "name": "Tab Lookup",
+                      "layout": "vertical",
+                      "gap": 8,
+                      "padding": [
+                        10,
+                        24
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "8PG0X",
+                          "name": "dt3txt",
+                          "fill": "$text-tertiary",
+                          "content": "Tra cứu mã",
+                          "fontFamily": "Sora",
+                          "fontSize": 15,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "wK56J",
+                  "name": "Price Table Card",
+                  "width": "fill_container",
+                  "fill": "$bg-surface",
+                  "cornerRadius": 20,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "$border-light"
+                  },
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#0000000C",
+                    "offset": {
+                      "x": 0,
+                      "y": 2
+                    },
+                    "blur": 12
+                  },
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "6r3YR",
+                      "name": "Table Header",
+                      "width": "fill_container",
+                      "fill": "#FAFAFA",
+                      "cornerRadius": [
+                        20,
+                        20,
+                        0,
+                        0
+                      ],
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "$border-light"
+                      },
+                      "padding": [
+                        16,
+                        24
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "qmeup",
+                          "name": "th1",
+                          "fill": "$text-secondary",
+                          "content": "Loại vàng",
+                          "fontFamily": "Sora",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "HASNo",
+                          "name": "th2",
+                          "fill": "$text-secondary",
+                          "content": "Phân loại",
+                          "textAlign": "center",
+                          "fontFamily": "Sora",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "O7kEw",
+                          "name": "th3",
+                          "fill": "$text-secondary",
+                          "content": "Giá mua",
+                          "textAlign": "right",
+                          "fontFamily": "Sora",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "lCPiR",
+                          "name": "th4",
+                          "fill": "$text-secondary",
+                          "content": "Giá bán",
+                          "textAlign": "right",
+                          "fontFamily": "Sora",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "I8ZNA",
+                          "name": "th5",
+                          "fill": "$text-secondary",
+                          "content": "Thay đổi",
+                          "textAlign": "right",
+                          "fontFamily": "Sora",
+                          "fontSize": 13,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ecydP",
+                      "name": "Row SJC 1L-10L",
+                      "width": "fill_container",
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "$border-light"
+                      },
+                      "padding": [
+                        16,
+                        24
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "U93pZ",
+                          "name": "tr1left",
+                          "width": "fill_container",
+                          "gap": 10,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "aqvi6",
+                              "name": "tr1dot",
+                              "width": 10,
+                              "height": 10,
+                              "fill": "$gold-primary",
+                              "cornerRadius": 5
+                            },
+                            {
+                              "type": "text",
+                              "id": "N2WDq",
+                              "name": "tr1name",
+                              "fill": "$text-primary",
+                              "content": "SJC 1L-10L",
+                              "fontFamily": "Sora",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "9qO7i",
+                          "name": "tr1badge",
+                          "width": 140,
+                          "justifyContent": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "f4usi",
+                              "name": "tr1badgeInner",
+                              "fill": "$gold-light",
+                              "cornerRadius": 8,
+                              "padding": [
+                                3,
+                                10
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "ckVJW",
+                                  "name": "tr1badgeTxt",
+                                  "fill": "$gold-primary",
+                                  "content": "Vàng miếng",
+                                  "fontFamily": "Sora",
+                                  "fontSize": 11,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "N9eTf",
+                          "name": "tr1buy",
+                          "fill": "$text-primary",
+                          "content": "85,000,000",
+                          "textAlign": "right",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "uMk54",
+                          "name": "tr1sell",
+                          "fill": "$red-primary",
+                          "content": "87,000,000",
+                          "textAlign": "right",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "zeJPH",
+                          "name": "tr1chg",
+                          "fill": "$green-positive",
+                          "content": "+500,000",
+                          "textAlign": "right",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "9NTlY",
+                      "name": "Row SJC 5 chỉ",
+                      "width": "fill_container",
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "$border-light"
+                      },
+                      "padding": [
+                        16,
+                        24
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "wSq1z",
+                          "name": "tr2left",
+                          "width": "fill_container",
+                          "gap": 10,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "3aTV0",
+                              "name": "tr2dot",
+                              "width": 10,
+                              "height": 10,
+                              "fill": "$gold-primary",
+                              "cornerRadius": 5
+                            },
+                            {
+                              "type": "text",
+                              "id": "qVOEo",
+                              "name": "tr2name",
+                              "fill": "$text-primary",
+                              "content": "SJC 5 chỉ",
+                              "fontFamily": "Sora",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "ke0Cx",
+                          "name": "tr2badge",
+                          "width": 140,
+                          "justifyContent": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "AO23L",
+                              "name": "tr2badgeInner",
+                              "fill": "$gold-light",
+                              "cornerRadius": 8,
+                              "padding": [
+                                3,
+                                10
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "Zqy3c",
+                                  "name": "tr2badgeTxt",
+                                  "fill": "$gold-primary",
+                                  "content": "Vàng miếng",
+                                  "fontFamily": "Sora",
+                                  "fontSize": 11,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "7bbZ7",
+                          "name": "tr2buy",
+                          "fill": "$text-primary",
+                          "content": "84,800,000",
+                          "textAlign": "right",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "kEaXE",
+                          "name": "tr2sell",
+                          "fill": "$red-primary",
+                          "content": "86,500,000",
+                          "textAlign": "right",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "IKKXu",
+                          "name": "tr2chg",
+                          "fill": "$green-positive",
+                          "content": "+300,000",
+                          "textAlign": "right",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "7n2Ye",
+                      "name": "Row SJC Nhẫn",
+                      "width": "fill_container",
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "$border-light"
+                      },
+                      "padding": [
+                        16,
+                        24
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "HYADV",
+                          "name": "tr3left",
+                          "width": "fill_container",
+                          "gap": 10,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "Ynk9O",
+                              "name": "tr3dot",
+                              "width": 10,
+                              "height": 10,
+                              "fill": "$gold-primary",
+                              "cornerRadius": 5
+                            },
+                            {
+                              "type": "text",
+                              "id": "b4lwe",
+                              "name": "tr3name",
+                              "fill": "$text-primary",
+                              "content": "SJC Nhẫn 1-5 chỉ",
+                              "fontFamily": "Sora",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "bNGgv",
+                          "name": "tr3badge",
+                          "width": 140,
+                          "justifyContent": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "guION",
+                              "name": "tr3badgeInner",
+                              "fill": "$gold-light",
+                              "cornerRadius": 8,
+                              "padding": [
+                                3,
+                                10
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "193N7",
+                                  "name": "tr3badgeTxt",
+                                  "fill": "$gold-primary",
+                                  "content": "Nhẫn",
+                                  "fontFamily": "Sora",
+                                  "fontSize": 11,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "7gxpK",
+                          "name": "tr3buy",
+                          "fill": "$text-primary",
+                          "content": "74,500,000",
+                          "textAlign": "right",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "2Gy1E",
+                          "name": "tr3sell",
+                          "fill": "$red-primary",
+                          "content": "75,800,000",
+                          "textAlign": "right",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "9EaVz",
+                          "name": "tr3chg",
+                          "fill": "$red-negative",
+                          "content": "-200,000",
+                          "textAlign": "right",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "yqYol",
+                      "name": "Row XAU/USD",
+                      "width": "fill_container",
+                      "padding": [
+                        16,
+                        24
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Go5IF",
+                          "name": "tr4left",
+                          "width": "fill_container",
+                          "gap": 10,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "OOyQY",
+                              "name": "tr4dot",
+                              "width": 10,
+                              "height": 10,
+                              "fill": "#3B82F6",
+                              "cornerRadius": 5
+                            },
+                            {
+                              "type": "text",
+                              "id": "MOPox",
+                              "name": "tr4name",
+                              "fill": "$text-primary",
+                              "content": "XAU/USD",
+                              "fontFamily": "Sora",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "rLVDV",
+                          "name": "tr4badge",
+                          "width": 140,
+                          "justifyContent": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "6jkge",
+                              "name": "tr4badgeInner",
+                              "fill": "#EFF6FF",
+                              "cornerRadius": 8,
+                              "padding": [
+                                3,
+                                10
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "g1g6i",
+                                  "name": "tr4badgeTxt",
+                                  "fill": "#3B82F6",
+                                  "content": "Thế giới",
+                                  "fontFamily": "Sora",
+                                  "fontSize": 11,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "Stj6b",
+                          "name": "tr4buy",
+                          "fill": "$text-primary",
+                          "content": "$2,918.50",
+                          "textAlign": "right",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        },
+                        {
+                          "type": "text",
+                          "id": "jSQex",
+                          "name": "tr4sell",
+                          "fill": "#3B82F6",
+                          "content": "$2,920.00",
+                          "textAlign": "right",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "msadS",
+                          "name": "tr4chg",
+                          "fill": "$green-positive",
+                          "content": "+$12.30",
+                          "textAlign": "right",
+                          "fontFamily": "IBM Plex Mono",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "yd8yc",
+                  "name": "updateRow",
+                  "width": "fill_container",
+                  "justifyContent": "end",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "oeT7q",
+                      "name": "updateTxt",
+                      "fill": "$text-tertiary",
+                      "content": "Cập nhật lần cuối: 07/03/2026, 10:30 AM",
+                      "fontFamily": "Sora",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variables": {
+    "bg-primary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FAFAF8"
+        },
+        {
+          "value": "#FAF9F7"
+        }
+      ]
+    },
+    "bg-surface": {
+      "type": "color",
+      "value": "#FFFFFF"
+    },
+    "bg-surface-tint": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FFF8F0"
+        },
+        {
+          "value": "#FDF6EE"
+        }
+      ]
+    },
+    "border": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#E8E5E0"
+        },
+        {
+          "value": "#DDD8D0"
+        }
+      ]
+    },
+    "border-light": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F0EDE8"
+        },
+        {
+          "value": "#EDE8E1"
+        }
+      ]
+    },
+    "chart-gold": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#D4A017"
+        },
+        {
+          "value": "#B8860B"
+        }
+      ]
+    },
+    "chart-silver": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#6B7280"
+        },
+        {
+          "value": "#4B5563"
+        }
+      ]
+    },
+    "gold-dark": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#8B6914"
+        },
+        {
+          "value": "#92710C"
+        }
+      ]
+    },
+    "gold-light": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FDF6E3"
+        },
+        {
+          "value": "#FBF3E0"
+        }
+      ]
+    },
+    "gold-primary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#D4A017"
+        },
+        {
+          "value": "#B8860B"
+        }
+      ]
+    },
+    "green-light": {
+      "type": "color",
+      "value": "#F0FDF4"
+    },
+    "green-positive": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#16A34A"
+        },
+        {
+          "value": "#15803D"
+        }
+      ]
+    },
+    "red-light": {
+      "type": "color",
+      "value": "#FEF2F2"
+    },
+    "red-negative": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#DC2626"
+        },
+        {
+          "value": "#DC2626"
+        }
+      ]
+    },
+    "red-primary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#C41E24"
+        },
+        {
+          "value": "#B91C1C"
+        }
+      ]
+    },
+    "silver-dark": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#4B5563"
+        },
+        {
+          "value": "#374151"
+        }
+      ]
+    },
+    "silver-light": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F3F4F6"
+        },
+        {
+          "value": "#EEF0F3"
+        }
+      ]
+    },
+    "silver-primary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#9CA3AF"
+        },
+        {
+          "value": "#8B929E"
+        }
+      ]
+    },
+    "text-primary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#1A1A1A"
+        },
+        {
+          "value": "#1C1917"
+        }
+      ]
+    },
+    "text-secondary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#6B6B6B"
+        },
+        {
+          "value": "#57534E"
+        }
+      ]
+    },
+    "text-tertiary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#999999"
+        },
+        {
+          "value": "#78716C"
+        }
+      ]
+    }
+  }
+}
