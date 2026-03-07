@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
@@ -46,6 +47,7 @@ export function EditTransactionForm({
   transactionId,
   onSuccess,
 }: EditTransactionFormProps) {
+  const t = useTranslations("transaction.form");
   const { currency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
@@ -238,18 +240,18 @@ export function EditTransactionForm({
       <FormSelect
         name="walletId"
         control={control}
-        label="Wallet"
+        label={t("wallet")}
         options={walletOptions}
-        placeholder="Select wallet"
+        placeholder={t("selectWallet")}
         required
       />
 
       <FormCreatableSelect
         name="categoryId"
         control={control}
-        label="Category"
+        label={t("category")}
         options={categoryOptions}
-        placeholder="Select category..."
+        placeholder={t("selectOrCreateCategory")}
         required
         loading={categoriesLoading}
         onCreate={undefined} // Disable category creation in edit mode
@@ -258,15 +260,15 @@ export function EditTransactionForm({
       <FormDateTimePicker
         name="date"
         control={control}
-        label="Date & Time"
+        label={t("dateTime")}
         required
       />
 
       <FormTextarea
         name="note"
         control={control}
-        label="Note"
-        placeholder="Enter note (optional)"
+        label={t("note")}
+        placeholder={t("notePlaceholder")}
         maxLength={500}
         showCharacterCount
       />
