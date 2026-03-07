@@ -38,8 +38,8 @@ export default function LandingNavbar() {
 
   const navLinks = [
     { name: t("navbar.features"), href: "#features" },
-    { name: "Bank Import", href: "#bank-import" },
-    { name: "Investment Tracking", href: "#investment-tracking" },
+    { name: t("navbar.bankImport"), href: "#bank-import" },
+    { name: t("navbar.investmentTracking"), href: "#investment-tracking" },
     { name: t("navbar.howItWorks"), href: "#how-it-works" },
     // { name: "Pricing", href: "#pricing" },
   ];
@@ -80,7 +80,7 @@ export default function LandingNavbar() {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded-md"
       >
-        Skip to main content
+        {t("navbar.skipToMainContent")}
       </a>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 sm:h-16">
@@ -114,7 +114,7 @@ export default function LandingNavbar() {
                 href="/dashboard/home"
                 className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-500 transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 min-h-[44px] flex items-center"
               >
-                Dashboard
+                {t("navbar.dashboard")}
               </Link>
             ) : (
               <div className="flex items-center space-x-4">
@@ -122,7 +122,7 @@ export default function LandingNavbar() {
                   href="/auth/login"
                   className="text-gray-700 hover:text-primary-600 transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 rounded-md px-2 py-1 min-h-[44px] flex items-center"
                 >
-                  Sign In
+                  {t("navbar.signIn")}
                 </Link>
                 <Link
                   href="/auth/register"
@@ -201,7 +201,7 @@ export default function LandingNavbar() {
                       className="px-4 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-500 transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      Dashboard
+                      {t("navbar.dashboard")}
                     </Link>
                   </motion.div>
                 ) : (
@@ -219,7 +219,7 @@ export default function LandingNavbar() {
                         className="text-gray-700 hover:text-primary-600 transition-colors duration-200 font-medium px-3 py-2 focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 rounded-md min-h-[44px] flex items-center"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
-                        Sign In
+                        {t("navbar.signIn")}
                       </Link>
                     </motion.div>
                     <motion.div

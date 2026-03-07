@@ -42,6 +42,7 @@ export {
   exportReportToPDF,
   formatCurrency as formatReportCurrency,
   type ReportExportData,
+  type ReportExportTranslations,
   type ReportPDFExportOptions,
   type SummaryData as ReportSummaryData,
   type TrendData as ReportTrendData,

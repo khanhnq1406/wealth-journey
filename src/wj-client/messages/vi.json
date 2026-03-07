@@ -98,7 +98,20 @@
       "title": "Kiểm Soát Hành Trình Tài Chính Của Bạn",
       "subtitle": "Theo dõi chi tiêu, quản lý đầu tư và xây dựng tài sản với phân tích mạnh mẽ - tất cả trong một ứng dụng đẹp mắt.",
       "getStarted": "Bắt đầu miễn phí",
-      "learnMore": "Tìm hiểu thêm"
+      "learnMore": "Tìm hiểu thêm",
+      "installAsApp": "Cài đặt ứng dụng",
+      "availableOnPlatforms": "Có sẵn trên iOS & Android",
+      "noCreditCard": "Không cần thẻ tín dụng",
+      "secureOAuth": "Bảo mật với OAuth",
+      "freeForeverPlan": "Miễn phí mãi mãi",
+      "assetClasses": "Loại tài sản",
+      "inOnePlatform": "Trong một nền tảng",
+      "currencies": "Tiền tệ",
+      "multiCurrency": "Đa tiền tệ",
+      "unifiedView": "Giao diện thống nhất",
+      "allAssetsTogether": "Tất cả tài sản cùng nhau",
+      "freeForever": "Miễn phí mãi mãi",
+      "noHiddenFees": "Không phí ẩn"
     },
     "features": {
       "sectionTitle": "Mọi Thứ Bạn Cần",
@@ -126,7 +139,21 @@
       "marketData": "Dữ liệu thị trường thời gian thực",
       "marketDataDesc": "Cập nhật giá mới nhất cho cổ phiếu, tiền điện tử, vàng và nhiều hơn nữa từ Yahoo Finance.",
       "secureAuth": "Đăng nhập Google an toàn",
-      "secureAuthDesc": "Đăng nhập an toàn bằng tài khoản Google. Không cần nhớ mật khẩu."
+      "secureAuthDesc": "Đăng nhập an toàn bằng tài khoản Google. Không cần nhớ mật khẩu.",
+      "allInOnePlatform": "Mọi Thứ Bạn Cần, Tất Cả Trong Một Nền Tảng",
+      "allInOnePlatformDesc": "Từ theo dõi chi tiêu đến quản lý danh mục đa tài sản. Theo dõi cổ phiếu, ETF, quỹ tương hỗ, tiền điện tử, vàng và bạc với kế toán FIFO, dữ liệu thị trường thời gian thực và phân tích mạnh mẽ - tất cả trong một nền tảng thống nhất.",
+      "multiWalletDescLong": "Tạo không giới hạn ví CƠ BẢN và ĐẦU TƯ. Chuyển tiền liền mạch giữa các tài khoản với cập nhật số dư thời gian thực.",
+      "portfolioTrackingDescLong": "Theo dõi cổ phiếu, tiền điện tử, ETF, trái phiếu, quỹ tương hỗ và hàng hóa với dữ liệu thị trường Yahoo Finance thời gian thực.",
+      "mobileFirstDescLong": "Bố cục đáp ứng hoàn toàn, tối ưu cho di động, máy tính bảng và máy tính. Tương tác thân thiện cảm ứng với kéo để làm mới và hoạt ảnh mượt mà.",
+      "goldSilverDescLong": "Hỗ trợ chuyên biệt cho vàng SJC Việt Nam (10 loại), vàng thế giới (XAU) và bạc với chuyển đổi lượng/gram/ounce tự động.",
+      "smartTransactionsDescLong": "Phân loại thu nhập và chi tiêu với danh mục tùy chỉnh. Lọc nâng cao theo ví, khoảng ngày, số tiền và tìm kiếm văn bản.",
+      "bankImportDescLong": "Nhập hàng loạt giao dịch từ sao kê CSV, Excel hoặc PDF. Phát hiện trùng lặp thông minh, tự động phân loại và hoàn tác 24 giờ.",
+      "analyticsDescLong": "Biểu đồ đẹp mắt hiển thị lịch sử số dư, thu nhập vs chi tiêu, phân bổ ví và hiệu suất danh mục với chú thích tương tác.",
+      "reportsDescLong": "Tạo báo cáo theo kỳ với phân tích so sánh. Xuất sang CSV, PDF hoặc Excel với lọc theo danh mục cụ thể.",
+      "budgetPlanningDescLong": "Tạo ngân sách tùy chỉnh với nhiều mục. Chỉ báo tiến độ trực quan và theo dõi hoàn thành để đạt mục tiêu.",
+      "multiCurrencyDescLong": "Hỗ trợ 12+ loại tiền tệ toàn cầu (USD, VND, EUR, GBP, JPY, HKD, AUD, CAD, SGD) với chuyển đổi FX tự động.",
+      "marketDataDescLong": "Cập nhật giá trực tiếp từ Yahoo Finance API với bộ nhớ đệm 15 phút. Tìm kiếm mã tự động hoàn thành cho cổ phiếu, tiền điện tử và ETF.",
+      "secureAuthDescLong": "Đăng ký một chạm với Google OAuth. Token JWT với danh sách trắng Redis cho bảo mật tối đa. Không cần nhớ mật khẩu."
     },
     "investmentFeatures": {
       "sectionTitle": "Quản lý Đầu tư",
@@ -153,7 +180,13 @@
       "worldGold": "Vàng thế giới (XAU)",
       "taelGramOunce": "Lượng/Gram/Ounce",
       "multiCurrency": "Đa tiền tệ",
-      "livePricing": "Giá trực tiếp"
+      "livePricing": "Giá trực tiếp",
+      "allInOneTitle": "Tất cả trong một",
+      "investmentTrackingTitle": "Theo dõi đầu tư",
+      "whyJuggle": "Tại sao phải xoay xở giữa Coinbase, Robinhood, bảng tính và đại lý vàng? Theo dõi cổ phiếu, ETF, quỹ tương hỗ, tiền điện tử, vàng và bạc trong một nền tảng thống nhất với kế toán FIFO, dữ liệu thị trường thời gian thực và phân tích mạnh mẽ.",
+      "onePortfolio": "Một danh mục. Tất cả tài sản. Bức tranh toàn cảnh.",
+      "fifoAccounting": "Kế toán FIFO trên TẤT CẢ các loại tài sản - cổ phiếu, ETF, quỹ tương hỗ, tiền điện tử, vàng và bạc. Theo dõi lãi/lỗ đã/chưa thực hiện, giá vốn và tổng giá trị tài sản ròng trong một bảng điều khiển thống nhất với theo dõi lô tự động.",
+      "goldSilverSupportDescLong": "Hỗ trợ độc đáo cho kim loại quý với chuyển đổi đơn vị linh hoạt"
     },
     "bankImport": {
       "sectionTitle": "Nhập sao kê ngân hàng",
@@ -169,7 +202,32 @@
       "lightningFast": "Nhanh chóng",
       "uploadStatement": "Tải lên sao kê",
       "reviewConfirm": "Xem lại & Xác nhận",
-      "importComplete": "Nhập hoàn tất"
+      "importComplete": "Nhập hoàn tất",
+      "bulkImport": "Nhập hàng loạt",
+      "stopTyping": "Dừng gõ, Bắt đầu nhập",
+      "stopTypingDesc": "Nhập hàng trăm giao dịch trong vài phút. Tải sao kê ngân hàng dạng CSV, Excel hoặc PDF và để hệ thống thông minh xử lý phần còn lại. Không còn nhập liệu thủ công nhàm chán.",
+      "excelFormat": "Excel",
+      "excelDesc": "Tệp .xlsx, .xls",
+      "pdfFormat": "PDF",
+      "pdfDesc": "Sao kê ngân hàng",
+      "maxSize": "Tối đa {size}",
+      "smartDuplicateDesc": "Độ chính xác 99% ngăn chặn nhập trùng với khớp đa cấp (chính xác, mạnh, có thể, khả năng).",
+      "autoCategorisationDesc": "Cơ sở dữ liệu thương mại thông minh và khớp từ khóa tự động gợi ý danh mục với điểm tin cậy.",
+      "multiCurrencyDesc": "Chuyển đổi FX tự động cho 12+ loại tiền tệ với tỷ giá lịch sử từ API đáng tin cậy.",
+      "reviewEditDesc": "Chỉnh sửa trực tiếp với xác thực thời gian thực. Sửa lỗi, điều chỉnh danh mục và xử lý trùng lặp trước khi nhập.",
+      "twentyFourHourUndo": "Hoàn tác 24 giờ",
+      "twentyFourHourUndoDesc": "Nhầm lẫn? Hoàn tác bất kỳ lần nhập nào trong 24 giờ để khôi phục trạng thái trước đó hoàn toàn.",
+      "lightningFastDesc": "Nhập 500+ giao dịch trong dưới 10 phút với phân tích tối ưu và chèn hàng loạt.",
+      "uploadStatementDesc": "Kéo & thả sao kê CSV, Excel hoặc PDF. Hỗ trợ tới 10.000 giao dịch mỗi tệp.",
+      "reviewConfirmDesc": "Hệ thống thông minh tự động phân loại giao dịch, phát hiện trùng lặp và đánh dấu lỗi để bạn xem lại.",
+      "importCompleteDesc": "Giao dịch được nhập ngay lập tức. Xem tóm tắt, sửa danh mục hoặc hoàn tác trong 24 giờ nếu cần.",
+      "howBankImportWorks": "Cách nhập sao kê ngân hàng hoạt động",
+      "maxTransactions": "Giao dịch tối đa mỗi lần nhập",
+      "duplicateAccuracy": "Độ chính xác phát hiện trùng lặp",
+      "importSpeed": "Nhập 500+ giao dịch",
+      "undoWindow": "Thời gian hoàn tác có sẵn",
+      "ctaText": "Đừng quên theo dõi chi tiêu. Nhập sao kê mỗi tháng một lần và kiểm soát tài chính.",
+      "getStartedFree": "Bắt đầu miễn phí"
     },
     "howItWorks": {
       "sectionTitle": "Cách hoạt động",
@@ -182,7 +240,14 @@
       "step4Title": "Phân tích hiệu suất",
       "step4Desc": "Xem lãi/lỗ thời gian thực, phân bổ danh mục và phân tích chi tiết để đưa ra quyết định sáng suốt.",
       "step5Title": "Xuất dữ liệu",
-      "step5Desc": "Xuất dữ liệu sang CSV để phân tích sâu hơn. Giữ dữ liệu tài chính luôn di động."
+      "step5Desc": "Xuất dữ liệu sang CSV để phân tích sâu hơn. Giữ dữ liệu tài chính luôn di động.",
+      "getStartedInMinutes": "Bắt đầu trong vài phút",
+      "getStartedDesc": "Từ đăng ký đến theo dõi đầu tư chỉ trong 5 bước đơn giản.",
+      "step1TitleAlt": "Đăng ký với Google",
+      "step2TitleAlt": "Tạo ví của bạn",
+      "step3TitleAlt": "Thêm đầu tư & giao dịch",
+      "step4TitleAlt": "Theo dõi hiệu suất & thông tin",
+      "step5TitleAlt": "Xuất & Phân tích"
     },
     "comparison": {
       "sectionTitle": "Tại sao chọn WealthJourney?",
@@ -194,17 +259,33 @@
       "title": "Sẵn sàng bắt đầu hành trình tài chính?",
       "subtitle": "Cùng hàng nghìn người dùng quản lý tài chính thông minh hơn.",
       "getStartedFree": "Bắt đầu miễn phí",
-      "noCardRequired": "Không cần thẻ tín dụng"
+      "noCardRequired": "Không cần thẻ tín dụng",
+      "startJourney": "Bắt đầu hành trình tài chính tất cả trong một ngay hôm nay",
+      "joinDescription": "Theo dõi tiền mặt, thẻ, tiền điện tử, vàng và đầu tư trong một ứng dụng mạnh mẽ. Tham gia cùng hàng nghìn người dùng quản lý toàn bộ danh mục tài chính.",
+      "getStartedForFree": "Bắt đầu miễn phí",
+      "signIn": "Đăng nhập",
+      "multiWallet": "Đa ví",
+      "investments": "Đầu tư",
+      "goldCrypto": "Vàng & Tiền điện tử",
+      "analytics": "Phân tích"
     },
     "footer": {
       "copyright": "WealthJourney. Bảo lưu mọi quyền.",
       "privacyPolicy": "Chính sách bảo mật",
-      "termsOfService": "Điều khoản dịch vụ"
+      "termsOfService": "Điều khoản dịch vụ",
+      "tagline": "Người bạn đồng hành đáng tin cậy trên hành trình tài chính tự do.",
+      "builtWith": "Xây dựng với",
+      "allRightsReserved": "WealthJourney. Bảo lưu mọi quyền."
     },
     "navbar": {
       "features": "Tính năng",
       "howItWorks": "Cách hoạt động",
-      "getStarted": "Bắt đầu"
+      "getStarted": "Bắt đầu",
+      "bankImport": "Nhập sao kê",
+      "investmentTracking": "Theo dõi đầu tư",
+      "dashboard": "Bảng điều khiển",
+      "signIn": "Đăng nhập",
+      "skipToMainContent": "Chuyển đến nội dung chính"
     }
   },
 
@@ -663,6 +744,37 @@
       "startDate": "Ngày bắt đầu",
       "endDate": "Ngày kết thúc",
       "applyRange": "Áp dụng"
+    },
+    "export": {
+      "title": "Báo cáo tài chính",
+      "period": "Kỳ: {periodLabel}",
+      "summary": "Tổng quan",
+      "totalIncome": "Tổng thu nhập",
+      "totalExpenses": "Tổng chi tiêu",
+      "netSavings": "Tiết kiệm ròng",
+      "savingsRate": "Tỷ lệ tiết kiệm",
+      "topExpenseCategory": "Danh mục chi tiêu hàng đầu",
+      "monthlyBreakdown": "Chi tiết theo tháng",
+      "month": "Tháng",
+      "income": "Thu nhập",
+      "expenses": "Chi tiêu",
+      "savingsRateHeader": "Tỷ lệ tiết kiệm",
+      "notAvailable": "N/A",
+      "expenseCategoriesBreakdown": "Chi tiết danh mục chi tiêu",
+      "noExpenseData": "Không có dữ liệu chi tiêu cho kỳ này.",
+      "category": "Danh mục",
+      "amount": "Số tiền",
+      "percentage": "Tỷ lệ %",
+      "total": "Tổng",
+      "categoryComparison": "So sánh danh mục (Kỳ hiện tại vs Kỳ trước)",
+      "currentPeriod": "Kỳ hiện tại",
+      "previousPeriod": "Kỳ trước",
+      "change": "Thay đổi",
+      "changePercent": "% Thay đổi",
+      "pageNumber": "Trang {current} / {total}",
+      "generatedOn": "Tạo ngày {date}",
+      "brandFooter": "Báo cáo tài chính WealthJourney",
+      "workbookCreator": "Báo cáo tài chính WealthJourney"
     }
   },
 

@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export default function LandingFooter() {
+  const t = useTranslations("landing");
   const currentYear = new Date().getFullYear();
 
   // const footerLinks = {
@@ -35,10 +37,10 @@ export default function LandingFooter() {
               </span>
             </Link>
             <p className="text-sm mb-4">
-              Your trusted guide to financial freedom.
+              {t("footer.tagline")}
             </p>
             <div className="flex items-center space-x-4 text-sm">
-              <span>Built with</span>
+              <span>{t("footer.builtWith")}</span>
               <span className="text-white">Next.js 15</span>
               <span>+</span>
               <span className="text-white">Go 1.23</span>
@@ -98,7 +100,7 @@ export default function LandingFooter() {
         </div>
 
         <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row justify-between items-center text-sm">
-          <p>&copy; {currentYear} WealthJourney. All rights reserved.</p>
+          <p>&copy; {currentYear} WealthJourney. {t("footer.allRightsReserved")}</p>
           <div className="flex items-center space-x-6 mt-4 sm:mt-0">
             <a
               href="https://github.com/khanhnq1406/Personal_Financial_Management"

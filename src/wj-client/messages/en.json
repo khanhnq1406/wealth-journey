@@ -98,7 +98,20 @@
       "title": "Take Control of Your Financial Journey",
       "subtitle": "Track expenses, manage investments, and build wealth with powerful analytics - all in one beautiful app.",
       "getStarted": "Get Started Free",
-      "learnMore": "Learn More"
+      "learnMore": "Learn More",
+      "installAsApp": "Install as App",
+      "availableOnPlatforms": "Available on iOS & Android",
+      "noCreditCard": "No credit card required",
+      "secureOAuth": "Secure with OAuth",
+      "freeForeverPlan": "Free forever plan",
+      "assetClasses": "Asset Classes",
+      "inOnePlatform": "In One Platform",
+      "currencies": "Currencies",
+      "multiCurrency": "Multi-Currency",
+      "unifiedView": "Unified View",
+      "allAssetsTogether": "All Assets Together",
+      "freeForever": "Free Forever",
+      "noHiddenFees": "No Hidden Fees"
     },
     "features": {
       "sectionTitle": "Everything You Need",
@@ -126,7 +139,21 @@
       "marketData": "Real-Time Market Data",
       "marketDataDesc": "Get up-to-date prices for stocks, crypto, gold, and more from Yahoo Finance.",
       "secureAuth": "Secure Google OAuth",
-      "secureAuthDesc": "Sign in securely with your Google account. No passwords to remember."
+      "secureAuthDesc": "Sign in securely with your Google account. No passwords to remember.",
+      "allInOnePlatform": "Everything You Need, All-In-One Platform",
+      "allInOnePlatformDesc": "From expense tracking to multi-asset portfolio management. Track stocks, ETFs, mutual funds, crypto, gold, and silver with FIFO accounting, real-time market data, and powerful analytics - all in one unified platform.",
+      "multiWalletDescLong": "Create unlimited BASIC and INVESTMENT wallets. Transfer funds seamlessly between accounts with real-time balance updates.",
+      "portfolioTrackingDescLong": "Track stocks, crypto, ETFs, bonds, mutual funds, and commodities with real-time Yahoo Finance market data integration.",
+      "mobileFirstDescLong": "Fully responsive layout optimized for mobile, tablet, and desktop. Touch-friendly interactions with pull-to-refresh and smooth animations.",
+      "goldSilverDescLong": "Specialized support for Vietnamese SJC gold (10 varieties), world gold (XAU), and silver with automatic tael/gram/ounce conversions.",
+      "smartTransactionsDescLong": "Categorize income and expenses with custom categories. Advanced filtering by wallet, date range, amount, and text search.",
+      "bankImportDescLong": "Bulk import transactions from CSV, Excel, or PDF statements. Smart duplicate detection, auto-categorization, and 24-hour undo.",
+      "analyticsDescLong": "Beautiful charts showing balance history, income vs expenses, wallet distribution, and portfolio performance with interactive tooltips.",
+      "reportsDescLong": "Generate period-based reports with comparison analysis. Export to CSV, PDF, or Excel with category-specific filtering.",
+      "budgetPlanningDescLong": "Create custom budgets with multiple items. Visual progress indicators and completion tracking to stay on target.",
+      "multiCurrencyDescLong": "Support for 12+ global currencies (USD, VND, EUR, GBP, JPY, HKD, AUD, CAD, SGD) with automatic FX conversion.",
+      "marketDataDescLong": "Live price updates from Yahoo Finance API with 15-minute caching. Symbol search autocomplete for stocks, crypto, and ETFs.",
+      "secureAuthDescLong": "One-click sign-up with Google OAuth. JWT tokens with Redis whitelist for maximum security. No passwords to remember."
     },
     "investmentFeatures": {
       "sectionTitle": "Investment Management",
@@ -153,7 +180,13 @@
       "worldGold": "World Gold (XAU)",
       "taelGramOunce": "Tael/Gram/Ounce",
       "multiCurrency": "Multi-Currency",
-      "livePricing": "Live Pricing"
+      "livePricing": "Live Pricing",
+      "allInOneTitle": "All-In-One",
+      "investmentTrackingTitle": "Investment Tracking",
+      "whyJuggle": "Why juggle Coinbase, Robinhood, spreadsheets, and gold dealers? Track stocks, ETFs, mutual funds, crypto, gold, and silver in one unified platform with FIFO accounting, real-time market data, and powerful analytics.",
+      "onePortfolio": "One Portfolio. All Assets. Complete Picture.",
+      "fifoAccounting": "FIFO accounting across ALL asset types - stocks, ETFs, mutual funds, crypto, gold, and silver. Track realized/unrealized PNL, cost basis, and your complete net worth in one unified dashboard with automatic lot tracking.",
+      "goldSilverSupportDescLong": "Unique support for precious metals with flexible unit conversions"
     },
     "bankImport": {
       "sectionTitle": "Bank Statement Import",
@@ -169,7 +202,32 @@
       "lightningFast": "Lightning Fast",
       "uploadStatement": "Upload Statement",
       "reviewConfirm": "Review & Confirm",
-      "importComplete": "Import Complete"
+      "importComplete": "Import Complete",
+      "bulkImport": "Bulk Import",
+      "stopTyping": "Stop Typing, Start Importing",
+      "stopTypingDesc": "Import hundreds of transactions in minutes. Upload your bank statement in CSV, Excel, or PDF format and let our smart system handle the rest. No more manual entry tedium.",
+      "excelFormat": "Excel",
+      "excelDesc": ".xlsx, .xls files",
+      "pdfFormat": "PDF",
+      "pdfDesc": "Bank statements",
+      "maxSize": "Max {size}",
+      "smartDuplicateDesc": "99% accuracy prevents duplicate entries with multi-level matching (exact, strong, likely, possible).",
+      "autoCategorisationDesc": "Intelligent merchant database and keyword matching auto-suggests categories with confidence scores.",
+      "multiCurrencyDesc": "Automatic FX conversion for 12+ currencies with historical exchange rates from trusted APIs.",
+      "reviewEditDesc": "Inline editing with real-time validation. Fix errors, adjust categories, and handle duplicates before import.",
+      "twentyFourHourUndo": "24-Hour Undo",
+      "twentyFourHourUndoDesc": "Made a mistake? Undo any import within 24 hours to restore the pre-import state completely.",
+      "lightningFastDesc": "Import 500+ transactions in under 10 minutes with optimized parsing and bulk insert operations.",
+      "uploadStatementDesc": "Drag & drop your CSV, Excel, or PDF bank statement. Supports up to 10,000 transactions per file.",
+      "reviewConfirmDesc": "Smart system auto-categorizes transactions, detects duplicates, and flags errors for your review.",
+      "importCompleteDesc": "Transactions imported instantly. View summary, edit categories, or undo within 24 hours if needed.",
+      "howBankImportWorks": "How Bank Import Works",
+      "maxTransactions": "Max Transactions per Import",
+      "duplicateAccuracy": "Duplicate Detection Accuracy",
+      "importSpeed": "Import 500+ Transactions",
+      "undoWindow": "Undo Window Available",
+      "ctaText": "Stop forgetting to track expenses. Import your statement once a month and stay on top of your finances.",
+      "getStartedFree": "Get Started Free"
     },
     "howItWorks": {
       "sectionTitle": "How It Works",
@@ -182,7 +240,14 @@
       "step4Title": "Analyze Performance",
       "step4Desc": "View real-time PNL, portfolio allocation, and detailed analytics for informed decisions.",
       "step5Title": "Export Your Data",
-      "step5Desc": "Export your data to CSV for deeper analysis. Keep your financial data portable."
+      "step5Desc": "Export your data to CSV for deeper analysis. Keep your financial data portable.",
+      "getStartedInMinutes": "Get Started in Minutes",
+      "getStartedDesc": "From sign-up to tracking your investments in just 5 simple steps.",
+      "step1TitleAlt": "Sign Up with Google",
+      "step2TitleAlt": "Create Your Wallets",
+      "step3TitleAlt": "Add Investments & Transactions",
+      "step4TitleAlt": "Monitor Performance & Insights",
+      "step5TitleAlt": "Export & Analyze"
     },
     "comparison": {
       "sectionTitle": "Why WealthJourney?",
@@ -194,17 +259,33 @@
       "title": "Ready to Start Your Financial Journey?",
       "subtitle": "Join thousands of users managing their finances smarter.",
       "getStartedFree": "Get Started Free",
-      "noCardRequired": "No credit card required"
+      "noCardRequired": "No credit card required",
+      "startJourney": "Start Your All-In-One Financial Journey Today",
+      "joinDescription": "Track cash, cards, crypto, gold, and investments in one powerful app. Join thousands of users managing their complete financial portfolio.",
+      "getStartedForFree": "Get Started for Free",
+      "signIn": "Sign In",
+      "multiWallet": "Multi-Wallet",
+      "investments": "Investments",
+      "goldCrypto": "Gold & Crypto",
+      "analytics": "Analytics"
     },
     "footer": {
       "copyright": "WealthJourney. All rights reserved.",
       "privacyPolicy": "Privacy Policy",
-      "termsOfService": "Terms of Service"
+      "termsOfService": "Terms of Service",
+      "tagline": "Your trusted guide to financial freedom.",
+      "builtWith": "Built with",
+      "allRightsReserved": "WealthJourney. All rights reserved."
     },
     "navbar": {
       "features": "Features",
       "howItWorks": "How It Works",
-      "getStarted": "Get Started"
+      "getStarted": "Get Started",
+      "bankImport": "Bank Import",
+      "investmentTracking": "Investment Tracking",
+      "dashboard": "Dashboard",
+      "signIn": "Sign In",
+      "skipToMainContent": "Skip to main content"
     }
   },
 
@@ -663,6 +744,37 @@
       "startDate": "Start Date",
       "endDate": "End Date",
       "applyRange": "Apply Range"
+    },
+    "export": {
+      "title": "Financial Report",
+      "period": "Period: {periodLabel}",
+      "summary": "Summary",
+      "totalIncome": "Total Income",
+      "totalExpenses": "Total Expenses",
+      "netSavings": "Net Savings",
+      "savingsRate": "Savings Rate",
+      "topExpenseCategory": "Top Expense Category",
+      "monthlyBreakdown": "Monthly Breakdown",
+      "month": "Month",
+      "income": "Income",
+      "expenses": "Expenses",
+      "savingsRateHeader": "Savings Rate",
+      "notAvailable": "N/A",
+      "expenseCategoriesBreakdown": "Expense Categories Breakdown",
+      "noExpenseData": "No expense data available for this period.",
+      "category": "Category",
+      "amount": "Amount",
+      "percentage": "Percentage",
+      "total": "Total",
+      "categoryComparison": "Category Comparison (Current vs Previous)",
+      "currentPeriod": "Current Period",
+      "previousPeriod": "Previous Period",
+      "change": "Change",
+      "changePercent": "Change %",
+      "pageNumber": "Page {current} of {total}",
+      "generatedOn": "Generated on {date}",
+      "brandFooter": "WealthJourney Financial Report",
+      "workbookCreator": "WealthJourney Financial Reports"
     }
   },
 

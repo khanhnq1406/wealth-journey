@@ -156,10 +156,10 @@ export default function LandingHero() {
               </svg>
               <div className="text-left">
                 <div className="text-xs font-semibold text-gray-900">
-                  Install as App
+                  {t("hero.installAsApp")}
                 </div>
                 <div className="text-[10px] text-gray-600">
-                  Available on iOS & Android
+                  {t("hero.availableOnPlatforms")}
                 </div>
               </div>
             </div>
@@ -181,7 +181,7 @@ export default function LandingHero() {
                   clipRule="evenodd"
                 />
               </svg>
-              <span>No credit card required</span>
+              <span>{t("hero.noCreditCard")}</span>
             </div>
             <div className="flex items-center gap-2">
               <svg
@@ -195,7 +195,7 @@ export default function LandingHero() {
                   clipRule="evenodd"
                 />
               </svg>
-              <span>Secure with OAuth</span>
+              <span>{t("hero.secureOAuth")}</span>
             </div>
             <div className="flex items-center gap-2">
               <svg
@@ -209,7 +209,7 @@ export default function LandingHero() {
                   clipRule="evenodd"
                 />
               </svg>
-              <span>Free forever plan</span>
+              <span>{t("hero.freeForeverPlan")}</span>
             </div>
           </motion.div>
 
@@ -223,10 +223,10 @@ export default function LandingHero() {
                 6+
               </div>
               <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                Asset Classes
+                {t("hero.assetClasses")}
               </div>
               <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
-                In One Platform
+                {t("hero.inOnePlatform")}
               </div>
             </div>
             <div className="text-center">
@@ -234,10 +234,10 @@ export default function LandingHero() {
                 12+
               </div>
               <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                Currencies
+                {t("hero.currencies")}
               </div>
               <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
-                Multi-Currency
+                {t("hero.multiCurrency")}
               </div>
             </div>
             <div className="text-center">
@@ -245,10 +245,10 @@ export default function LandingHero() {
                 ∞
               </div>
               <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                Unified View
+                {t("hero.unifiedView")}
               </div>
               <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
-                All Assets Together
+                {t("hero.allAssetsTogether")}
               </div>
             </div>
             <div className="text-center">
@@ -256,10 +256,10 @@ export default function LandingHero() {
                 100%
               </div>
               <div className="text-xs sm:text-sm text-gray-600 mt-1">
-                Free Forever
+                {t("hero.freeForever")}
               </div>
               <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
-                No Hidden Fees
+                {t("hero.noHiddenFees")}
               </div>
             </div>
           </motion.div>

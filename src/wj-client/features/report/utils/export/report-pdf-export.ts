@@ -79,6 +79,46 @@ export interface ReportExportData {
   period: string;
   dateRange: { start: Date; end: Date };
   currency: string;
+  translations?: ReportExportTranslations;
+}
+
+/**
+ * Translation strings for report exports (PDF and Excel).
+ *
+ * All values are pre-resolved strings — interpolation (e.g. "Period: Jan 2026")
+ * is performed by the calling component before passing to the export function.
+ * Every property is optional; English defaults are used when omitted.
+ */
+export interface ReportExportTranslations {
+  title?: string; // "Financial Report"
+  period?: string; // Pre-resolved, e.g. "Period: This Month"
+  summary?: string; // "Summary"
+  totalIncome?: string; // "Total Income"
+  totalExpenses?: string; // "Total Expenses"
+  netSavings?: string; // "Net Savings"
+  savingsRate?: string; // "Savings Rate"
+  topExpenseCategory?: string; // "Top Expense Category"
+  monthlyBreakdown?: string; // "Monthly Breakdown"
+  month?: string; // "Month"
+  income?: string; // "Income"
+  expenses?: string; // "Expenses"
+  savingsRateHeader?: string; // "Savings Rate"
+  notAvailable?: string; // "N/A"
+  expenseCategoriesBreakdown?: string; // "Expense Categories Breakdown"
+  noExpenseData?: string; // "No expense data available for this period."
+  category?: string; // "Category"
+  amount?: string; // "Amount"
+  percentage?: string; // "Percentage"
+  total?: string; // "Total"
+  categoryComparison?: string; // "Category Comparison (Current vs Previous)"
+  currentPeriod?: string; // "Current Period"
+  previousPeriod?: string; // "Previous Period"
+  change?: string; // "Change"
+  changePercent?: string; // "Change %"
+  pageNumber?: string; // Pre-resolved, e.g. "Page 1 of 3" — set per-page at render time
+  generatedOn?: string; // Pre-resolved, e.g. "Generated on 3/6/2026"
+  brandFooter?: string; // "WealthJourney Financial Report"
+  workbookCreator?: string; // "WealthJourney Financial Reports"
 }
 
 /**
@@ -152,19 +192,21 @@ function formatDateRange(start: Date, end: Date): string {
  * @param pdf - jsPDF instance
  * @param period - Period type label
  * @param dateRange - Date range object
+ * @param translations - Optional translation strings
  * @returns Y position after header
  */
 function addHeader(
   pdf: jsPDF,
   period: string,
   dateRange: { start: Date; end: Date },
+  translations?: ReportExportTranslations,
 ): number {
   let yPosition = LAYOUT.margin;
 
   // Add title with brand green color
   pdf.setFontSize(18);
   pdf.setTextColor(...BRAND_COLORS.greenRgb);
-  pdf.text("Financial Report", LAYOUT.margin, yPosition);
+  pdf.text(translations?.title ?? "Financial Report", LAYOUT.margin, yPosition);
   yPosition += LAYOUT.lineHeight + 3;
 
   // Add period label
@@ -177,7 +219,11 @@ function addHeader(
   const periodLabel = period
     .replace(/-/g, " ")
     .replace(/\b\w/g, (l) => l.toUpperCase());
-  pdf.text(`Period: ${periodLabel}`, LAYOUT.margin, yPosition);
+  pdf.text(
+    translations?.period ?? `Period: ${periodLabel}`,
+    LAYOUT.margin,
+    yPosition,
+  );
   yPosition += LAYOUT.lineHeight;
 
   // Add date range
@@ -196,40 +242,42 @@ function addHeader(
  * @param pdf - jsPDF instance
  * @param summaryData - Summary statistics
  * @param yPosition - Starting Y position
+ * @param translations - Optional translation strings
  * @returns Y position after summary section
  */
 function addSummarySection(
   pdf: jsPDF,
   summaryData: SummaryData,
   yPosition: number,
+  translations?: ReportExportTranslations,
 ): number {
   // Section title
   pdf.setFontSize(14);
   pdf.setTextColor(...BRAND_COLORS.greenRgb);
-  pdf.text("Summary", LAYOUT.margin, yPosition);
+  pdf.text(translations?.summary ?? "Summary", LAYOUT.margin, yPosition);
   yPosition += LAYOUT.lineHeight + 2;
 
   // Define summary metrics
   const metrics = [
     {
-      label: "Total Income",
+      label: translations?.totalIncome ?? "Total Income",
       value: formatCurrency(summaryData.totalIncome, summaryData.currency),
     },
     {
-      label: "Total Expenses",
+      label: translations?.totalExpenses ?? "Total Expenses",
       value: formatCurrency(summaryData.totalExpenses, summaryData.currency),
     },
     {
-      label: "Net Savings",
+      label: translations?.netSavings ?? "Net Savings",
       value: formatCurrency(summaryData.netSavings, summaryData.currency),
     },
-    { label: "Savings Rate", value: `${summaryData.savingsRate}%` },
+    { label: translations?.savingsRate ?? "Savings Rate", value: `${summaryData.savingsRate}%` },
   ];
 
   // Add top expense category if available
   if (summaryData.topExpenseCategory) {
     metrics.push({
-      label: "Top Expense Category",
+      label: translations?.topExpenseCategory ?? "Top Expense Category",
       value: `${summaryData.topExpenseCategory.name} (${formatCurrency(summaryData.topExpenseCategory.amount, summaryData.currency)})`,
     });
   }
@@ -269,6 +317,7 @@ function addSummarySection(
  * @param trendData - Array of monthly trend data
  * @param currency - Currency code
  * @param yPosition - Starting Y position
+ * @param translations - Optional translation strings
  * @returns Y position after table
  */
 function addMonthlyBreakdownTable(
@@ -276,24 +325,32 @@ function addMonthlyBreakdownTable(
   trendData: TrendData[],
   currency: string,
   yPosition: number,
+  translations?: ReportExportTranslations,
 ): number {
   // Section title
   pdf.setFontSize(14);
   pdf.setTextColor(...BRAND_COLORS.greenRgb);
-  pdf.text("Monthly Breakdown", LAYOUT.margin, yPosition);
+  pdf.text(translations?.monthlyBreakdown ?? "Monthly Breakdown", LAYOUT.margin, yPosition);
   yPosition += LAYOUT.lineHeight + 2;
 
   // Prepare table data
   const tableHead = [
-    ["Month", "Income", "Expenses", "Net Savings", "Savings Rate"],
+    [
+      translations?.month ?? "Month",
+      translations?.income ?? "Income",
+      translations?.expenses ?? "Expenses",
+      translations?.netSavings ?? "Net Savings",
+      translations?.savingsRateHeader ?? "Savings Rate",
+    ],
   ];
 
+  const naText = translations?.notAvailable ?? "N/A";
   const tableBody = trendData.map((month) => [
     month.month,
     formatCurrency(month.income, currency),
     formatCurrency(month.expenses, currency),
     formatCurrency(month.net, currency),
-    month.savingsRate !== undefined ? `${month.savingsRate}%` : "N/A",
+    month.savingsRate !== undefined ? `${month.savingsRate}%` : naText,
   ]);
 
   // Add table using autoTable
@@ -346,6 +403,7 @@ function addMonthlyBreakdownTable(
  * @param expenseCategories - Array of expense category data
  * @param currency - Currency code
  * @param yPosition - Starting Y position
+ * @param translations - Optional translation strings
  * @returns Y position after section
  */
 function addExpenseCategoriesSection(
@@ -353,6 +411,7 @@ function addExpenseCategoriesSection(
   expenseCategories: ExpenseCategoryData[],
   currency: string,
   yPosition: number,
+  translations?: ReportExportTranslations,
 ): number {
   // Check if we need a new page
   if (yPosition > pdf.internal.pageSize.getHeight() - 60) {
@@ -363,14 +422,18 @@ function addExpenseCategoriesSection(
   // Section title
   pdf.setFontSize(14);
   pdf.setTextColor(...BRAND_COLORS.greenRgb);
-  pdf.text("Expense Categories Breakdown", LAYOUT.margin, yPosition);
+  pdf.text(
+    translations?.expenseCategoriesBreakdown ?? "Expense Categories Breakdown",
+    LAYOUT.margin,
+    yPosition,
+  );
   yPosition += LAYOUT.lineHeight + 2;
 
   if (expenseCategories.length === 0) {
     pdf.setFontSize(10);
     pdf.setTextColor(100, 100, 100);
     pdf.text(
-      "No expense data available for this period.",
+      translations?.noExpenseData ?? "No expense data available for this period.",
       LAYOUT.margin,
       yPosition,
     );
@@ -381,7 +444,13 @@ function addExpenseCategoriesSection(
   const total = expenseCategories.reduce((sum, cat) => sum + cat.value, 0);
 
   // Prepare table data
-  const tableHead = [["Category", "Amount", "Percentage"]];
+  const tableHead = [
+    [
+      translations?.category ?? "Category",
+      translations?.amount ?? "Amount",
+      translations?.percentage ?? "Percentage",
+    ],
+  ];
 
   const tableBody = expenseCategories.map((cat) => [
     cat.name,
@@ -441,6 +510,7 @@ function addExpenseCategoriesSection(
  * @param comparisonData - Array of category comparison data
  * @param currency - Currency code
  * @param yPosition - Starting Y position
+ * @param translations - Optional translation strings
  * @returns Y position after section
  */
 function addCategoryComparisonSection(
@@ -448,6 +518,7 @@ function addCategoryComparisonSection(
   comparisonData: CategoryComparisonData[],
   currency: string,
   yPosition: number,
+  translations?: ReportExportTranslations,
 ): number {
   if (!comparisonData || comparisonData.length === 0) {
     return yPosition;
@@ -463,7 +534,7 @@ function addCategoryComparisonSection(
   pdf.setFontSize(14);
   pdf.setTextColor(...BRAND_COLORS.greenRgb);
   pdf.text(
-    "Category Comparison (Current vs Previous)",
+    translations?.categoryComparison ?? "Category Comparison (Current vs Previous)",
     LAYOUT.margin,
     yPosition,
   );
@@ -471,7 +542,13 @@ function addCategoryComparisonSection(
 
   // Prepare table data
   const tableHead = [
-    ["Category", "Current Period", "Previous Period", "Change", "Change %"],
+    [
+      translations?.category ?? "Category",
+      translations?.currentPeriod ?? "Current Period",
+      translations?.previousPeriod ?? "Previous Period",
+      translations?.change ?? "Change",
+      translations?.changePercent ?? "Change %",
+    ],
   ];
 
   const tableBody = comparisonData.map((cat) => [
@@ -529,8 +606,9 @@ function addCategoryComparisonSection(
  * Add footer to each page
  *
  * @param pdf - jsPDF instance
+ * @param translations - Optional translation strings
  */
-function addFooter(pdf: jsPDF): void {
+function addFooter(pdf: jsPDF, translations?: ReportExportTranslations): void {
   const pageCount = pdf.internal.pages.length - 1;
   const pageHeight = pdf.internal.pageSize.getHeight();
 
@@ -540,7 +618,11 @@ function addFooter(pdf: jsPDF): void {
     pdf.setTextColor(150, 150, 150);
 
     // Page number
-    const pageText = `Page ${i} of ${pageCount}`;
+    const pageText = translations?.pageNumber
+      ? translations.pageNumber
+          .replace("{current}", String(i))
+          .replace("{total}", String(pageCount))
+      : `Page ${i} of ${pageCount}`;
     const pageTextWidth = pdf.getTextWidth(pageText);
     pdf.text(
       pageText,
@@ -549,11 +631,12 @@ function addFooter(pdf: jsPDF): void {
     );
 
     // Generated date
-    const generatedText = `Generated on ${new Date().toLocaleDateString()}`;
+    const generatedText =
+      translations?.generatedOn ?? `Generated on ${new Date().toLocaleDateString()}`;
     pdf.text(generatedText, LAYOUT.margin, pageHeight - 7);
 
     // Brand text
-    const brandText = "WealthJourney Financial Report";
+    const brandText = translations?.brandFooter ?? "WealthJourney Financial Report";
     const brandTextWidth = pdf.getTextWidth(brandText);
     pdf.text(
       brandText,
@@ -588,6 +671,7 @@ export function generateReportPDF(
     period,
     dateRange,
     currency,
+    translations,
   } = data;
 
   // Create new PDF document (A4 size, portrait)
@@ -598,14 +682,15 @@ export function generateReportPDF(
   });
 
   // Build PDF sections
-  let yPosition = addHeader(pdf, period, dateRange);
-  yPosition = addSummarySection(pdf, summaryData, yPosition);
-  yPosition = addMonthlyBreakdownTable(pdf, trendData, currency, yPosition);
+  let yPosition = addHeader(pdf, period, dateRange, translations);
+  yPosition = addSummarySection(pdf, summaryData, yPosition, translations);
+  yPosition = addMonthlyBreakdownTable(pdf, trendData, currency, yPosition, translations);
   yPosition = addExpenseCategoriesSection(
     pdf,
     expenseCategories,
     currency,
     yPosition,
+    translations,
   );
 
   // Add category comparison if available
@@ -615,11 +700,12 @@ export function generateReportPDF(
       categoryComparisonData,
       currency,
       yPosition,
+      translations,
     );
   }
 
   // Add footer to all pages
-  addFooter(pdf);
+  addFooter(pdf, translations);
 
   return pdf;
 }

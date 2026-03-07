@@ -1,47 +1,8 @@
 "use client";
 
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
-
-const investmentFeatures = [
-  {
-    title: "All Assets, One Platform",
-    description: "Track ALL your investments in one unified portfolio",
-    items: [
-      { icon: "📈", label: "Stocks" },
-      { icon: "🏛️", label: "ETFs" },
-      { icon: "💼", label: "Mutual Funds" },
-      { icon: "₿", label: "Cryptocurrency" },
-      { icon: "🥇", label: "Gold" },
-      { icon: "🥈", label: "Silver" },
-    ],
-  },
-  {
-    title: "Powerful Analytics",
-    description: "FIFO accounting and smart metrics across ALL your assets",
-    items: [
-      { icon: "📉", label: "FIFO Cost Basis" },
-      { icon: "📈", label: "Realized PNL" },
-      { icon: "💹", label: "Unrealized PNL" },
-      { icon: "🎯", label: "Asset Allocation" },
-      { icon: "📊", label: "Performance Tracking" },
-      { icon: "⚡", label: "Real-Time Updates" },
-    ],
-  },
-  {
-    title: "Gold & Silver Support",
-    description:
-      "Unique support for precious metals with flexible unit conversions",
-    items: [
-      { icon: "🇻🇳", label: "SJC Gold (10 Types)" },
-      { icon: "🌍", label: "World Gold (XAU)" },
-      { icon: "🥈", label: "Silver" },
-      { icon: "⚖️", label: "Tael/Gram/Ounce" },
-      { icon: "💱", label: "Multi-Currency" },
-      { icon: "🏷️", label: "Live Pricing" },
-    ],
-  },
-];
+import { useRef, useMemo } from "react";
+import { useTranslations } from "next-intl";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -63,8 +24,51 @@ const itemVariants = {
 };
 
 export default function LandingInvestmentFeatures() {
+  const t = useTranslations("landing");
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
+
+  const investmentFeatures = useMemo(
+    () => [
+      {
+        title: t("investmentFeatures.allAssets"),
+        description: t("investmentFeatures.allAssetsDesc"),
+        items: [
+          { icon: "📈", label: t("investmentFeatures.stocks") },
+          { icon: "🏛️", label: t("investmentFeatures.etfs") },
+          { icon: "💼", label: t("investmentFeatures.mutualFunds") },
+          { icon: "₿", label: t("investmentFeatures.cryptocurrency") },
+          { icon: "🥇", label: t("investmentFeatures.gold") },
+          { icon: "🥈", label: t("investmentFeatures.silver") },
+        ],
+      },
+      {
+        title: t("investmentFeatures.powerfulAnalytics"),
+        description: t("investmentFeatures.powerfulAnalyticsDesc"),
+        items: [
+          { icon: "📉", label: t("investmentFeatures.fifoCostBasis") },
+          { icon: "📈", label: t("investmentFeatures.realizedPnl") },
+          { icon: "💹", label: t("investmentFeatures.unrealizedPnl") },
+          { icon: "🎯", label: t("investmentFeatures.assetAllocation") },
+          { icon: "📊", label: t("investmentFeatures.performanceTracking") },
+          { icon: "⚡", label: t("investmentFeatures.realTimeUpdates") },
+        ],
+      },
+      {
+        title: t("investmentFeatures.goldSilverSupport"),
+        description: t("investmentFeatures.goldSilverSupportDescLong"),
+        items: [
+          { icon: "🇻🇳", label: t("investmentFeatures.sjcGold") },
+          { icon: "🌍", label: t("investmentFeatures.worldGold") },
+          { icon: "🥈", label: t("investmentFeatures.silver") },
+          { icon: "⚖️", label: t("investmentFeatures.taelGramOunce") },
+          { icon: "💱", label: t("investmentFeatures.multiCurrency") },
+          { icon: "🏷️", label: t("investmentFeatures.livePricing") },
+        ],
+      },
+    ],
+    [t],
+  );
 
   return (
     <section
@@ -80,17 +84,10 @@ export default function LandingInvestmentFeatures() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            <span className="text-primary-600">All-In-One</span> Investment
-            Tracking
+            <span className="text-primary-600">{t("investmentFeatures.allInOneTitle")}</span> {t("investmentFeatures.investmentTrackingTitle")}
           </h2>
           <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto px-4">
-            Why juggle Coinbase, Robinhood, spreadsheets, and gold dealers?
-            Track{" "}
-            <strong>
-              stocks, ETFs, mutual funds, crypto, gold, and silver
-            </strong>{" "}
-            in one unified platform with FIFO accounting, real-time market data,
-            and powerful analytics.
+            {t("investmentFeatures.whyJuggle")}
           </p>
         </motion.div>
 
@@ -139,13 +136,10 @@ export default function LandingInvestmentFeatures() {
           transition={{ duration: 0.6, delay: 0.3 }}
         >
           <h3 className="text-xl sm:text-2xl font-bold mb-3">
-            One Portfolio. All Assets. Complete Picture.
+            {t("investmentFeatures.onePortfolio")}
           </h3>
           <p className="text-sm sm:text-base text-primary-100 max-w-3xl mx-auto leading-relaxed">
-            FIFO accounting across ALL asset types - stocks, ETFs, mutual funds,
-            crypto, gold, and silver. Track realized/unrealized PNL, cost basis,
-            and your complete net worth in one unified dashboard with automatic
-            lot tracking.
+            {t("investmentFeatures.fifoAccounting")}
           </p>
         </motion.div>
       </div>
