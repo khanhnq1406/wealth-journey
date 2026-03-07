@@ -128,7 +128,7 @@ export default function PortfolioPageEnhanced() {
 
   const walletOptions = useMemo((): SelectOption[] => {
     const options: SelectOption[] = [
-      { value: "all", label: "All Investment Wallets" },
+      { value: "all", label: t("allInvestmentWallets") },
     ];
     investmentWallets.forEach((wallet) => {
       options.push({
@@ -267,15 +267,15 @@ export default function PortfolioPageEnhanced() {
   const modalTitle = useMemo(() => {
     switch (modalType) {
       case ModalType.CREATE_WALLET:
-        return "Create Investment Wallet";
+        return t("modal.createWallet");
       case ModalType.ADD_INVESTMENT:
-        return "Add Investment";
+        return t("modal.addInvestment");
       case ModalType.INVESTMENT_DETAIL:
-        return "Investment Details";
+        return t("modal.investmentDetails");
       default:
         return "";
     }
-  }, [modalType]);
+  }, [modalType, t]);
 
   const handleOpenModal = useCallback(
     (type: keyof typeof ModalType, investmentId?: number) => {
@@ -358,7 +358,7 @@ export default function PortfolioPageEnhanced() {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-danger-600 text-center">
-          <p className="text-lg font-semibold">Error loading portfolio</p>
+          <p className="text-lg font-semibold">{t("errorLoading")}</p>
           <p className="text-sm">{getListWallets.error.message}</p>
         </div>
       </div>
@@ -398,7 +398,7 @@ export default function PortfolioPageEnhanced() {
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">
-              Investment Portfolio
+              {t("page.title")}
             </h1>
 
             {/* Filter Controls */}
@@ -412,7 +412,7 @@ export default function PortfolioPageEnhanced() {
                       setSelectedWallet(value as WalletFilterValue),
                     );
                   }}
-                  placeholder="Select Wallet"
+                  placeholder={t("selectWalletPlaceholder")}
                 />
               </div>
 
@@ -423,7 +423,7 @@ export default function PortfolioPageEnhanced() {
                   onChange={(value) => {
                     startTransition(() => setTypeFilter(value));
                   }}
-                  placeholder="Filter by Type"
+                  placeholder={t("filterByTypePlaceholder")}
                 />
               </div>
 
@@ -434,7 +434,7 @@ export default function PortfolioPageEnhanced() {
                   onChange={(value) => {
                     startTransition(() => setSortBy(value));
                   }}
-                  placeholder="Sort by"
+                  placeholder={t("sortByPlaceholder")}
                 />
               </div>
             </div>
@@ -473,7 +473,7 @@ export default function PortfolioPageEnhanced() {
           <BaseCard className="p-4">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl sm:text-2xl font-bold text-neutral-800">
-                Holdings
+                {t("page.holdings")}
               </h2>
             </div>
 

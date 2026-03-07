@@ -47,9 +47,11 @@ export interface PortfolioAnalyticsProps {
 const SimplePnlChart = memo(function SimplePnlChart({
   pnl,
   pnlPercent,
+  totalPnlLabel,
 }: {
   pnl: number;
   pnlPercent: number;
+  totalPnlLabel: string;
 }) {
   const isPositive = pnl >= 0;
   const maxValue = Math.abs(pnl) || 1;
@@ -57,7 +59,7 @@ const SimplePnlChart = memo(function SimplePnlChart({
   return (
     <div className="space-y-2">
       <div className="flex justify-between text-sm">
-        <span className="text-neutral-600">Total PNL</span>
+        <span className="text-neutral-600">{totalPnlLabel}</span>
         <span
           className={`font-semibold ${
             isPositive ? "text-green-600" : "text-red-600"
@@ -144,7 +146,7 @@ export const PortfolioAnalytics = memo(function PortfolioAnalytics({
   analytics,
   userCurrency,
 }: PortfolioAnalyticsProps) {
-  const t = useTranslations("investment");
+  const tAnalytics = useTranslations("investment.analytics");
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Extract display values
@@ -167,14 +169,14 @@ export const PortfolioAnalytics = memo(function PortfolioAnalytics({
       {/* Header with collapse toggle */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg sm:text-xl font-bold text-neutral-800">
-          Portfolio Analytics
+          {tAnalytics("portfolioAnalytics")}
         </h2>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="sm:hidden text-sm text-primary-600 hover:text-primary-800 font-medium"
-          aria-label={isExpanded ? "Collapse" : "Expand"}
+          aria-label={isExpanded ? tAnalytics("showLess") : tAnalytics("showMore")}
         >
-          {isExpanded ? "Show Less" : "Show More"}
+          {isExpanded ? tAnalytics("showLess") : tAnalytics("showMore")}
         </button>
       </div>
 
@@ -182,7 +184,7 @@ export const PortfolioAnalytics = memo(function PortfolioAnalytics({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
         {/* PNL Chart */}
         <div className="sm:col-span-3">
-          <SimplePnlChart pnl={displayPnl} pnlPercent={pnlPercent} />
+          <SimplePnlChart pnl={displayPnl} pnlPercent={pnlPercent} totalPnlLabel={tAnalytics("totalPnl")} />
         </div>
 
         {/* Additional metrics can be added here */}
@@ -197,7 +199,7 @@ export const PortfolioAnalytics = memo(function PortfolioAnalytics({
         {/* Top Performers */}
         {analytics.topPerformers && analytics.topPerformers.length > 0 && (
           <PerformanceList
-            title="Top Performers"
+            title={tAnalytics("topPerformers")}
             performers={analytics.topPerformers}
             userCurrency={displayCurrency}
             isPositive={true}
@@ -207,7 +209,7 @@ export const PortfolioAnalytics = memo(function PortfolioAnalytics({
         {/* Worst Performers */}
         {analytics.worstPerformers && analytics.worstPerformers.length > 0 && (
           <PerformanceList
-            title="Worst Performers"
+            title={tAnalytics("worstPerformers")}
             performers={analytics.worstPerformers}
             userCurrency={displayCurrency}
             isPositive={false}
@@ -217,7 +219,7 @@ export const PortfolioAnalytics = memo(function PortfolioAnalytics({
         {/* Portfolio Health Indicator */}
         <div className="pt-4 border-t border-neutral-200">
           <h4 className="text-sm font-semibold text-neutral-700 mb-2">
-            Portfolio Health
+            {tAnalytics("portfolioHealth")}
           </h4>
           <div className="flex items-center gap-3">
             <div
@@ -227,12 +229,12 @@ export const PortfolioAnalytics = memo(function PortfolioAnalytics({
             />
             <span className="text-sm text-neutral-600">
               {pnlPercent >= 0
-                ? "Your portfolio is in profit"
-                : "Your portfolio is at a loss"}
+                ? tAnalytics("inProfit")
+                : tAnalytics("atLoss")}
             </span>
           </div>
           <div className="mt-2 text-xs text-neutral-500">
-            Total invested: {formatCurrency(displayCost, displayCurrency)}
+            {tAnalytics("totalInvested", { amount: formatCurrency(displayCost, displayCurrency) })}
           </div>
         </div>
       </div>
@@ -243,7 +245,7 @@ export const PortfolioAnalytics = memo(function PortfolioAnalytics({
           onClick={() => setIsExpanded(!isExpanded)}
           className="text-xs text-neutral-500 hover:text-neutral-700"
         >
-          {isExpanded ? "▲" : "▼"} {isExpanded ? "Less" : "More"} details
+          {isExpanded ? "▲" : "▼"} {isExpanded ? tAnalytics("lessDetails") : tAnalytics("moreDetails")}
         </button>
       </div>
     </BaseCard>

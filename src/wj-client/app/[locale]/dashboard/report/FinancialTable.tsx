@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useMemo, useState } from "react";
+import { useLocale } from "next-intl";
 import { useQueryGetFinancialReport } from "@/utils/generated/hooks";
 import { ChartSkeleton } from "@/components/loading/Skeleton";
 import { ExpandableTable } from "./ExpandableTable";
@@ -14,6 +15,7 @@ export const FinancialTable = memo(function FinancialTable({
   walletIds,
   selectedYear = new Date().getFullYear(),
 }: FinancialTableProps) {
+  const locale = useLocale();
   const [expandedWallets, setExpandedWallets] = useState<Set<number>>(
     new Set(),
   );
@@ -46,20 +48,11 @@ export const FinancialTable = memo(function FinancialTable({
 
   // Process data for display
   const monthlyData = useMemo(() => {
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
+    const months = Array.from({ length: 12 }, (_, i) =>
+      new Intl.DateTimeFormat(locale, { month: "short" }).format(
+        new Date(2000, i, 1),
+      ),
+    );
 
     if (!reportData?.walletData) {
       return {
@@ -118,7 +111,7 @@ export const FinancialTable = memo(function FinancialTable({
       wallets,
       totals,
     };
-  }, [reportData, expandedWallets]);
+  }, [reportData, expandedWallets, locale]);
 
   if (reportLoading) {
     return (

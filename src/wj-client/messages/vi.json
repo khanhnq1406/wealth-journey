@@ -35,6 +35,8 @@
     "less": "Ít hơn",
     "showDetails": "Hiển thị chi tiết",
     "hideDetails": "Ẩn chi tiết",
+    "collapse": "Thu gọn",
+    "expand": "Mở rộng",
     "processing": "Đang xử lý...",
     "or": "hoặc",
     "and": "và",
@@ -494,6 +496,62 @@
     "filterByType": "Lọc theo loại",
     "sortBy": "Sắp xếp theo",
     "errorLoading": "Lỗi khi tải danh mục đầu tư",
+    "errorLoadingPortfolio": "Lỗi khi tải danh mục đầu tư",
+    "selectWalletPlaceholder": "Chọn ví",
+    "filterByTypePlaceholder": "Lọc theo loại",
+    "sortByPlaceholder": "Sắp xếp theo",
+    "analytics": {
+      "portfolioAnalytics": "Phân tích danh mục",
+      "totalPnl": "Tổng lãi/lỗ",
+      "topPerformers": "Hiệu suất tốt nhất",
+      "worstPerformers": "Hiệu suất kém nhất",
+      "portfolioHealth": "Sức khỏe danh mục",
+      "inProfit": "Danh mục của bạn đang có lãi",
+      "atLoss": "Danh mục của bạn đang thua lỗ",
+      "totalInvested": "Tổng đầu tư: {amount}",
+      "showLess": "Thu gọn",
+      "showMore": "Xem thêm",
+      "lessDetails": "Ít chi tiết hơn",
+      "moreDetails": "Thêm chi tiết"
+    },
+    "summary": {
+      "totalValue": "Tổng giá trị",
+      "totalCost": "Tổng chi phí",
+      "totalPnl": "Tổng lãi/lỗ",
+      "holdings": "Số lượng nắm giữ",
+      "assetAllocation": "Phân bổ tài sản",
+      "distributionByType": "Phân phối theo loại đầu tư",
+      "totalPortfolio": "Tổng danh mục",
+      "best": "Tốt nhất:",
+      "worst": "Kém nhất:"
+    },
+    "table": {
+      "symbol": "Mã",
+      "name": "Tên",
+      "wallet": "Ví",
+      "type": "Loại",
+      "quantity": "Số lượng",
+      "avgCost": "Giá trung bình",
+      "currentPrice": "Giá hiện tại",
+      "currentValue": "Giá trị hiện tại",
+      "pnl": "Lãi/Lỗ",
+      "pnlPercent": "Lãi/Lỗ %",
+      "lastUpdated": "Cập nhật lần cuối",
+      "viewDetails": "Xem chi tiết"
+    },
+    "typeLabels": {
+      "stocks": "Cổ phiếu",
+      "crypto": "Tiền điện tử",
+      "etfs": "ETF",
+      "mutualFunds": "Quỹ tương hỗ",
+      "bonds": "Trái phiếu",
+      "commodities": "Hàng hóa",
+      "goldVietnam": "Vàng (Việt Nam)",
+      "goldWorld": "Vàng (Thế giới)",
+      "silverVietnam": "Bạc (Việt Nam)",
+      "silverWorld": "Bạc (Thế giới)",
+      "other": "Khác"
+    },
     "typeOptions": {
       "allTypes": "Tất cả loại",
       "cryptocurrency": "Tiền điện tử",
@@ -648,7 +706,21 @@
     "cashBalance": {
       "title": "Số dư tiền mặt",
       "availableCash": "Tiền mặt khả dụng"
+    },
+    "page": {
+      "title": "Danh mục đầu tư",
+      "selectWallet": "Chọn ví",
+      "filterByType": "Lọc theo loại",
+      "sortBy": "Sắp xếp theo",
+      "holdings": "Tài sản nắm giữ",
+      "errorLoadingPortfolio": "Lỗi khi tải danh mục đầu tư"
     }
+  },
+
+  "pullToRefresh": {
+    "pull": "Kéo để làm mới",
+    "release": "Thả để làm mới",
+    "updating": "Đang cập nhật giá..."
   },
 
   "budget": {
@@ -708,6 +780,13 @@
     "expenseBreakdown": "Chi tiết chi tiêu",
     "categoryComparison": "So sánh danh mục",
     "vsPreviousPeriod": "so với kỳ trước",
+    "vsLastPeriod": "so với kỳ trước",
+    "positiveCashFlow": "Dòng tiền dương",
+    "negativeCashFlow": "Dòng tiền âm",
+    "excellent": "Xuất sắc!",
+    "good": "Tốt",
+    "needsImprovement": "Cần cải thiện",
+    "ppChange": "pp thay đổi",
     "incomeVsExpensesTrend": "Xu hướng Thu nhập vs Chi tiêu",
     "monthlySummary": "Tổng kết tháng",
     "compareWithPrevious": "So sánh với kỳ trước",

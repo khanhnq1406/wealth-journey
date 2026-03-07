@@ -35,6 +35,8 @@
     "less": "Less",
     "showDetails": "Show details",
     "hideDetails": "Hide details",
+    "collapse": "Collapse",
+    "expand": "Expand",
     "processing": "Processing...",
     "or": "or",
     "and": "and",
@@ -494,6 +496,62 @@
     "filterByType": "Filter by Type",
     "sortBy": "Sort by",
     "errorLoading": "Error loading portfolio",
+    "errorLoadingPortfolio": "Error loading portfolio",
+    "selectWalletPlaceholder": "Select Wallet",
+    "filterByTypePlaceholder": "Filter by Type",
+    "sortByPlaceholder": "Sort by",
+    "analytics": {
+      "portfolioAnalytics": "Portfolio Analytics",
+      "totalPnl": "Total PNL",
+      "topPerformers": "Top Performers",
+      "worstPerformers": "Worst Performers",
+      "portfolioHealth": "Portfolio Health",
+      "inProfit": "Your portfolio is in profit",
+      "atLoss": "Your portfolio is at a loss",
+      "totalInvested": "Total invested: {amount}",
+      "showLess": "Show Less",
+      "showMore": "Show More",
+      "lessDetails": "Less details",
+      "moreDetails": "More details"
+    },
+    "summary": {
+      "totalValue": "Total Value",
+      "totalCost": "Total Cost",
+      "totalPnl": "Total PNL",
+      "holdings": "Holdings",
+      "assetAllocation": "Asset Allocation",
+      "distributionByType": "Distribution by investment type",
+      "totalPortfolio": "Total Portfolio",
+      "best": "Best:",
+      "worst": "Worst:"
+    },
+    "table": {
+      "symbol": "Symbol",
+      "name": "Name",
+      "wallet": "Wallet",
+      "type": "Type",
+      "quantity": "Quantity",
+      "avgCost": "Avg Cost",
+      "currentPrice": "Current Price",
+      "currentValue": "Current Value",
+      "pnl": "PNL",
+      "pnlPercent": "PNL %",
+      "lastUpdated": "Last Updated",
+      "viewDetails": "View Details"
+    },
+    "typeLabels": {
+      "stocks": "Stocks",
+      "crypto": "Crypto",
+      "etfs": "ETFs",
+      "mutualFunds": "Mutual Funds",
+      "bonds": "Bonds",
+      "commodities": "Commodities",
+      "goldVietnam": "Gold (Vietnam)",
+      "goldWorld": "Gold (World)",
+      "silverVietnam": "Silver (Vietnam)",
+      "silverWorld": "Silver (World)",
+      "other": "Other"
+    },
     "typeOptions": {
       "allTypes": "All Types",
       "cryptocurrency": "Cryptocurrency",
@@ -648,6 +706,14 @@
     "cashBalance": {
       "title": "Cash Balance",
       "availableCash": "Available Cash"
+    },
+    "page": {
+      "title": "Investment Portfolio",
+      "selectWallet": "Select Wallet",
+      "filterByType": "Filter by Type",
+      "sortBy": "Sort by",
+      "holdings": "Holdings",
+      "errorLoadingPortfolio": "Error loading portfolio"
     }
   },
 
@@ -697,6 +763,12 @@
     }
   },
 
+  "pullToRefresh": {
+    "pull": "Pull to refresh",
+    "release": "Release to refresh",
+    "updating": "Updating prices..."
+  },
+
   "report": {
     "title": "Financial Report",
     "failedToLoad": "Failed to Load Report",
@@ -708,6 +780,13 @@
     "expenseBreakdown": "Expense Breakdown",
     "categoryComparison": "Category Comparison",
     "vsPreviousPeriod": "vs Previous Period",
+    "vsLastPeriod": "vs last period",
+    "positiveCashFlow": "Positive cash flow",
+    "negativeCashFlow": "Negative cash flow",
+    "excellent": "Excellent!",
+    "good": "Good",
+    "needsImprovement": "Needs improvement",
+    "ppChange": "pp change",
     "incomeVsExpensesTrend": "Income vs Expenses Trend",
     "monthlySummary": "Monthly Summary",
     "compareWithPrevious": "Compare with previous period",

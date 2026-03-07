@@ -18,20 +18,20 @@ import { InvestmentType } from "@/gen/protobuf/v1/investment";
 import { PlusIcon, RefreshIcon } from "@/components/icons";
 
 /**
- * Investment type to display name mapping
+ * Investment type enum keys for translation lookup
  */
-const INVESTMENT_TYPE_LABELS: Record<number, string> = {
-  [InvestmentType.INVESTMENT_TYPE_STOCK]: "Stocks",
-  [InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY]: "Crypto",
-  [InvestmentType.INVESTMENT_TYPE_ETF]: "ETFs",
-  [InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND]: "Mutual Funds",
-  [InvestmentType.INVESTMENT_TYPE_BOND]: "Bonds",
-  [InvestmentType.INVESTMENT_TYPE_COMMODITY]: "Commodities",
-  [InvestmentType.INVESTMENT_TYPE_GOLD_VND]: "Gold (Vietnam)",
-  [InvestmentType.INVESTMENT_TYPE_GOLD_USD]: "Gold (World)",
-  [InvestmentType.INVESTMENT_TYPE_SILVER_VND]: "Silver (Vietnam)",
-  [InvestmentType.INVESTMENT_TYPE_SILVER_USD]: "Silver (World)",
-  [InvestmentType.INVESTMENT_TYPE_OTHER]: "Other",
+const INVESTMENT_TYPE_TRANSLATION_KEYS: Record<number, string> = {
+  [InvestmentType.INVESTMENT_TYPE_STOCK]: "typeLabels.stocks",
+  [InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY]: "typeLabels.crypto",
+  [InvestmentType.INVESTMENT_TYPE_ETF]: "typeLabels.etfs",
+  [InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND]: "typeLabels.mutualFunds",
+  [InvestmentType.INVESTMENT_TYPE_BOND]: "typeLabels.bonds",
+  [InvestmentType.INVESTMENT_TYPE_COMMODITY]: "typeLabels.commodities",
+  [InvestmentType.INVESTMENT_TYPE_GOLD_VND]: "typeLabels.goldVietnam",
+  [InvestmentType.INVESTMENT_TYPE_GOLD_USD]: "typeLabels.goldWorld",
+  [InvestmentType.INVESTMENT_TYPE_SILVER_VND]: "typeLabels.silverVietnam",
+  [InvestmentType.INVESTMENT_TYPE_SILVER_USD]: "typeLabels.silverWorld",
+  [InvestmentType.INVESTMENT_TYPE_OTHER]: "typeLabels.other",
 };
 
 /**
@@ -278,11 +278,14 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
     ) {
       return portfolioSummary.investmentsByType
         .filter((item) => item.totalValue !== undefined && item.totalValue > 0)
-        .map((item, index) => ({
-          name: INVESTMENT_TYPE_LABELS[item.type] || `Type ${item.type}`,
-          value: Number(item.totalValue),
-          color: ASSET_COLORS[index % ASSET_COLORS.length],
-        }));
+        .map((item, index) => {
+          const translationKey = INVESTMENT_TYPE_TRANSLATION_KEYS[item.type];
+          return {
+            name: translationKey ? t(translationKey as any) : `Type ${item.type}`,
+            value: Number(item.totalValue),
+            color: ASSET_COLORS[index % ASSET_COLORS.length],
+          };
+        });
     }
 
     // Fallback: mock data based on holdings count (for empty portfolios)
@@ -291,7 +294,7 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
       return [];
     }
 
-    const types = ["Stocks", "Crypto", "ETFs", "Gold"];
+    const types = [t("typeLabels.stocks"), t("typeLabels.crypto"), t("typeLabels.etfs"), t("typeLabels.goldVietnam")];
     const avgPerType = displayValue / Math.max(holdings, 1);
     return types.map((type, i) => ({
       name: type,
@@ -348,7 +351,7 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
       {/* Main Summary Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
-          label="Total Value"
+          label={t("summary.totalValue")}
           value={formatCurrency(animatedValue, displayCurrency)}
           color="neutral"
           sparklineData={sparklineData}
@@ -356,20 +359,20 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
         />
 
         <StatCard
-          label="Total Cost"
+          label={t("summary.totalCost")}
           value={formatCurrency(animatedCost, displayCurrency)}
           color="neutral"
         />
 
         <StatCard
-          label="Total PNL"
+          label={t("summary.totalPnl")}
           value={formatCurrency(animatedPnl, displayCurrency)}
           color={displayPnl >= 0 ? "green" : "red"}
           trend={pnlPercent}
         />
 
         <StatCard
-          label="Holdings"
+          label={t("summary.holdings")}
           value={animatedHoldings.toString()}
           color="neutral"
         />
@@ -381,10 +384,10 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
             <div>
               <h3 className="text-base sm:text-lg font-bold text-neutral-900">
-                Asset Allocation
+                {t("summary.assetAllocation")}
               </h3>
               <p className="text-xs sm:text-sm text-neutral-600 mt-0.5 sm:mt-1">
-                Distribution by investment type
+                {t("summary.distributionByType")}
               </p>
             </div>
 
@@ -393,7 +396,7 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
               {topPerformer && (
                 <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-green-100">
                   <span className="text-[10px] sm:text-xs text-green-700 font-medium truncate max-w-[80px] sm:max-w-none">
-                    Best: {topPerformer.name}
+                    {t("summary.best")} {topPerformer.name}
                   </span>
                   <span
                     className={`text-[10px] sm:text-xs font-bold flex-shrink-0 ${topPerformer.positive ? "text-green-700" : "text-red-700"}`}
@@ -405,7 +408,7 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
               {worstPerformer && (
                 <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-red-100">
                   <span className="text-[10px] sm:text-xs text-red-700 font-medium truncate max-w-[80px] sm:max-w-none">
-                    Worst: {worstPerformer.name}
+                    {t("summary.worst")} {worstPerformer.name}
                   </span>
                   <span
                     className={`text-[10px] sm:text-xs font-bold flex-shrink-0 ${worstPerformer.positive ? "text-green-700" : "text-red-700"}`}
@@ -427,7 +430,7 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
                     outerRadiusPercent={80}
                     height={260}
                     centerLabel={formatCurrency(displayValue, displayCurrency)}
-                    centerSubLabel="Total Portfolio"
+                    centerSubLabel={t("summary.totalPortfolio")}
                     showLegend={true}
                     legendPosition="right"
                   />

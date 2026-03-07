@@ -66,25 +66,26 @@ function useInvestmentColumns(
   onRowClick: (investmentId: number) => void,
   currency: string,
   showWalletColumn: boolean,
+  t: (key: string) => string,
 ): ColumnDef<InvestmentData>[] {
   return useMemo(
     () => [
       {
         accessorKey: "symbol",
-        header: "Symbol",
+        header: t("table.symbol"),
         cell: (info) => (
           <span className="font-medium">{info.getValue<string>()}</span>
         ),
       },
       {
         accessorKey: "name",
-        header: "Name",
+        header: t("table.name"),
       },
       ...(showWalletColumn
         ? [
             {
               accessorKey: "walletName" as const,
-              header: "Wallet",
+              header: t("table.wallet"),
               cell: (info: any) => (
                 <span className="text-gray-600">{info.getValue()}</span>
               ),
@@ -93,12 +94,12 @@ function useInvestmentColumns(
         : []),
       {
         accessorKey: "type",
-        header: "Type",
+        header: t("table.type"),
         cell: (info) => getInvestmentTypeLabel(info.getValue<number>() as any),
       },
       {
         accessorKey: "quantity",
-        header: "Quantity",
+        header: t("table.quantity"),
         cell: (info) => {
           const row = info.row.original;
           return formatQuantity(
@@ -110,7 +111,7 @@ function useInvestmentColumns(
       },
       {
         accessorKey: "averageCost",
-        header: "Avg Cost",
+        header: t("table.avgCost"),
         cell: (info) => {
           const row = info.row.original;
           const nativeCurrency = row.currency || "USD";
@@ -144,7 +145,7 @@ function useInvestmentColumns(
       },
       {
         accessorKey: "currentPrice",
-        header: "Current Price",
+        header: t("table.currentPrice"),
         cell: (info) => {
           const row = info.row.original;
           const nativeCurrency = row.currency || "USD";
@@ -178,7 +179,7 @@ function useInvestmentColumns(
       },
       {
         accessorKey: "currentValue",
-        header: "Current Value",
+        header: t("table.currentValue"),
         cell: (info) => {
           const row = info.row.original;
           const nativeCurrency = row.currency || "USD";
@@ -203,7 +204,7 @@ function useInvestmentColumns(
       },
       {
         accessorKey: "unrealizedPnl",
-        header: "PNL",
+        header: t("table.pnl"),
         cell: (info) => {
           const row = info.row.original;
           const nativeCurrency = row.currency || "USD";
@@ -232,7 +233,7 @@ function useInvestmentColumns(
       },
       {
         accessorKey: "unrealizedPnlPercent",
-        header: "PNL %",
+        header: t("table.pnlPercent"),
         cell: (info) => (
           <span
             className={`font-medium ${
@@ -247,7 +248,7 @@ function useInvestmentColumns(
       },
       {
         accessorKey: "updatedAt",
-        header: "Last Updated",
+        header: t("table.lastUpdated"),
         cell: (info) => {
           const timestamp = info.getValue<number>();
           const { text, colorClass } = formatTimeAgo(timestamp || 0);
@@ -263,15 +264,15 @@ function useInvestmentColumns(
             <button
               onClick={() => onRowClick(investmentId)}
               className="text-sm text-primary-600 hover:text-primary-800 hover:underline font-medium"
-              aria-label="View investment details"
+              aria-label={t("table.viewDetails")}
             >
-              View Details
+              {t("table.viewDetails")}
             </button>
           );
         },
       },
     ],
-    [onRowClick, currency, showWalletColumn],
+    [onRowClick, currency, showWalletColumn, t],
   );
 }
 
@@ -282,43 +283,44 @@ function useMobileInvestmentColumns(
   onRowClick: (investmentId: number) => void,
   currency: string,
   showWalletColumn: boolean,
+  t: (key: string) => string,
 ) {
   return useMemo(
     () => [
       {
         id: "symbol",
-        header: "Symbol",
+        header: t("table.symbol"),
         accessorFn: (row: InvestmentData) => row.symbol,
       },
       {
         id: "name",
-        header: "Name",
+        header: t("table.name"),
         accessorFn: (row: InvestmentData) => row.name,
       },
       ...(showWalletColumn
         ? [
             {
               id: "walletName",
-              header: "Wallet",
+              header: t("table.wallet"),
               accessorFn: (row: InvestmentData) => row.walletName || "",
             },
           ]
         : []),
       {
         id: "type",
-        header: "Type",
+        header: t("table.type"),
         accessorFn: (row: InvestmentData) =>
           getInvestmentTypeLabel(row.type as any),
       },
       {
         id: "quantity",
-        header: "Quantity",
+        header: t("table.quantity"),
         accessorFn: (row: InvestmentData) =>
           formatQuantity(row.quantity, row.type as any),
       },
       {
         id: "averageCost",
-        header: "Avg Cost",
+        header: t("table.avgCost"),
         accessorFn: (row: InvestmentData) =>
           formatPrice(
             row.averageCost || 0,
@@ -330,7 +332,7 @@ function useMobileInvestmentColumns(
       },
       {
         id: "currentPrice",
-        header: "Current Price",
+        header: t("table.currentPrice"),
         accessorFn: (row: InvestmentData) =>
           formatPrice(
             row.currentPrice || 0,
@@ -342,7 +344,7 @@ function useMobileInvestmentColumns(
       },
       {
         id: "currentValue",
-        header: "Current Value",
+        header: t("table.currentValue"),
         accessorFn: (row: InvestmentData) => {
           const nativeCurrency = row.currency || "USD";
           const native = formatCurrency(row.currentValue || 0, nativeCurrency);
@@ -358,7 +360,7 @@ function useMobileInvestmentColumns(
       },
       {
         id: "unrealizedPnl",
-        header: "PNL",
+        header: t("table.pnl"),
         accessorFn: (row: InvestmentData) => {
           const nativeCurrency = row.currency || "USD";
           const native = formatCurrency(row.unrealizedPnl || 0, nativeCurrency);
@@ -374,20 +376,20 @@ function useMobileInvestmentColumns(
       },
       {
         id: "unrealizedPnlPercent",
-        header: "PNL %",
+        header: t("table.pnlPercent"),
         accessorFn: (row: InvestmentData) =>
           formatPercent(row.unrealizedPnlPercent || 0),
       },
       {
         id: "updatedAt",
-        header: "Last Updated",
+        header: t("table.lastUpdated"),
         accessorFn: (row: InvestmentData) => {
           const { text, colorClass } = formatTimeAgo(row.updatedAt || 0);
           return <span className={`text-xs ${colorClass}`}>{text}</span>;
         },
       },
     ],
-    [currency, showWalletColumn],
+    [currency, showWalletColumn, t],
   );
 }
 
@@ -410,11 +412,13 @@ export const InvestmentList = memo(function InvestmentList({
     (id) => onInvestmentClick?.(id),
     userCurrency,
     showWalletColumn,
+    t as (key: string) => string,
   );
   const mobileColumns = useMobileInvestmentColumns(
     (id) => onInvestmentClick?.(id),
     userCurrency,
     showWalletColumn,
+    t as (key: string) => string,
   );
 
   if (investments.length === 0) {

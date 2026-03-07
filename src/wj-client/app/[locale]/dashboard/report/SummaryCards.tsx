@@ -293,7 +293,7 @@ export const SummaryCards = memo(function SummaryCards({ data }: SummaryCardsPro
         color="green"
         icon={<Icons.Income />}
         change={incomeChange}
-        changeLabel="vs last period"
+        changeLabel={t("vsLastPeriod")}
         showSparkline={incomeSparkline.length > 1}
         sparklineData={incomeSparkline}
       />
@@ -305,7 +305,7 @@ export const SummaryCards = memo(function SummaryCards({ data }: SummaryCardsPro
         color="red"
         icon={<Icons.Expense />}
         change={expensesChange}
-        changeLabel="vs last period"
+        changeLabel={t("vsLastPeriod")}
         showSparkline={expenseSparkline.length > 1}
         sparklineData={expenseSparkline}
       />
@@ -314,22 +314,22 @@ export const SummaryCards = memo(function SummaryCards({ data }: SummaryCardsPro
       <SummaryCard
         label={t("netSavings")}
         value={formatCurrency(animatedSavings, currency)}
-        subtitle={netSavings >= 0 ? "Positive cash flow" : "Negative cash flow"}
+        subtitle={netSavings >= 0 ? t("positiveCashFlow") : t("negativeCashFlow")}
         color={netSavings >= 0 ? "blue" : "red"}
         icon={<Icons.Savings />}
         change={savingsChange}
-        changeLabel="vs last period"
+        changeLabel={t("vsLastPeriod")}
       />
 
       {/* Savings Rate */}
       <SummaryCard
         label={t("savingsRate")}
         value={`${animatedRate.toFixed(1)}%`}
-        subtitle={savingsRate >= 20 ? "Excellent!" : savingsRate >= 10 ? "Good" : "Needs improvement"}
+        subtitle={savingsRate >= 20 ? t("excellent") : savingsRate >= 10 ? t("good") : t("needsImprovement")}
         color="neutral"
         icon={<Icons.Percent />}
         change={rateChange}
-        changeLabel="pp change"
+        changeLabel={t("ppChange")}
       />
 
       {/* Top Expense Category */}

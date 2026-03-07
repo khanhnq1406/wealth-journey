@@ -121,7 +121,7 @@ export const ExpandableTable = memo(function ExpandableTable({
                           onToggleWallet(wallet.id);
                         }}
                         className="w-4 h-4 flex items-center justify-center flex-shrink-0"
-                        aria-label={wallet.isExpanded ? "Collapse" : "Expand"}
+                        aria-label={wallet.isExpanded ? t("collapse") : t("expand")}
                       >
                         {wallet.isExpanded ? (
                           <svg

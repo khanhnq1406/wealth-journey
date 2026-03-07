@@ -1,6 +1,7 @@
 "use client";
 
 import { memo, useState, useMemo } from "react";
+import { useLocale } from "next-intl";
 import { useQueryGetMonthlyDominance } from "@/utils/generated/hooks";
 import { LineChart, ChartWrapper } from "@/components/charts";
 import { chartColors } from "@/app/constants";
@@ -17,6 +18,7 @@ export const MonthlyDominance = memo(function MonthlyDominance({
 }: MonthlyDominanceProps) {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const { currency } = useCurrency();
+  const locale = useLocale();
 
   // Fetch monthly dominance data for the selected year
   const { data: dominanceData, isLoading } = useQueryGetMonthlyDominance(
@@ -29,20 +31,11 @@ export const MonthlyDominance = memo(function MonthlyDominance({
     const walletData = dominanceData?.data ?? [];
     if (walletData.length === 0) return [];
 
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
+    const monthNames = Array.from({ length: 12 }, (_, i) =>
+      new Intl.DateTimeFormat(locale, { month: "short" }).format(
+        new Date(2000, i, 1),
+      ),
+    );
 
     // Build monthly data with each wallet's balance
     const monthlyData: Record<string, any>[] = monthNames.map((month) => ({
@@ -58,7 +51,7 @@ export const MonthlyDominance = memo(function MonthlyDominance({
     });
 
     return monthlyData;
-  }, [dominanceData]);
+  }, [dominanceData, locale]);
 
   // Get wallet list from data
   const wallets = useMemo(() => dominanceData?.data ?? [], [dominanceData]);

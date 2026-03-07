@@ -185,7 +185,7 @@ export const InvestmentCard = memo(function InvestmentCard({
 
         {/* PNL */}
         <div className="flex justify-between items-center">
-          <span className="text-sm text-neutral-600">PNL</span>
+          <span className="text-sm text-neutral-600">{t("table.pnl")}</span>
           <div className="text-right">
             <div
               className={`text-base font-semibold ${
@@ -214,7 +214,7 @@ export const InvestmentCard = memo(function InvestmentCard({
       {updatedAt && (
         <div className="mt-3 pt-2 border-t border-neutral-200">
           <div className="flex justify-between items-center">
-            <span className="text-xs text-neutral-500">Last Updated</span>
+            <span className="text-xs text-neutral-500">{t("table.lastUpdated")}</span>
             <div className="flex items-center gap-1">
               {updatedAt && (
                 <>

@@ -268,7 +268,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
           </div>
 
           <div className={`px-3 py-2 rounded-lg ${pnlBgColor}`}>
-            <div className="text-xs text-neutral-600 mb-1">Total PnL</div>
+            <div className="text-xs text-neutral-600 mb-1">{t("analytics.totalPnl")}</div>
             <div className={`text-sm font-bold ${pnlDisplay.colorClass}`}>
               {isCustom ? (
                 "N/A"
@@ -399,7 +399,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
               <div className="flex gap-2 pt-3 border-t border-neutral-100 ">
                 <QuickActionButton
                   icon={<PlusIcon />}
-                  label="More"
+                  label={t("modal.addInvestment")}
                   onClick={handleBuyMore}
                   bgColor="bg-green-100"
                   textColor="text-green-700"

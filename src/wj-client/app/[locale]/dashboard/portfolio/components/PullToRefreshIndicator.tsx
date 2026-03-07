@@ -11,6 +11,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface PullToRefreshIndicatorProps {
   isPulling: boolean;
@@ -25,6 +26,7 @@ export function PullToRefreshIndicator({
   pullDistance,
   threshold = 80,
 }: PullToRefreshIndicatorProps) {
+  const t = useTranslations("pullToRefresh");
   const [showSuccess, setShowSuccess] = useState(false);
 
   // Calculate progress percentage (0-100)
@@ -110,10 +112,10 @@ export function PullToRefreshIndicator({
           <div className="absolute top-14 left-1/2 -translate-x-1/2 whitespace-nowrap">
             <p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-white dark:bg-dark-surface px-3 py-1 rounded-full shadow-sm">
               {isRefreshing
-                ? "Updating prices..."
+                ? t("updating")
                 : progress >= 100
-                  ? "Release to refresh"
-                  : "Pull to refresh"}
+                  ? t("release")
+                  : t("pull")}
             </p>
           </div>
         )}
