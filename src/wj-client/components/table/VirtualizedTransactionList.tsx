@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { List, useDynamicRowHeight } from "react-window";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { resources } from "@/app/constants";
 import { cn } from "@/lib/utils/cn";
 import { formatCurrency } from "@/utils/currency-formatter";
@@ -74,6 +75,8 @@ const TransactionActionsButtons = memo(function TransactionActionsButtons({
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
 }) {
+  const t = useTranslations("transactionCard");
+
   const handleEdit = () => {
     onEdit(transactionId);
   };
@@ -87,26 +90,26 @@ const TransactionActionsButtons = memo(function TransactionActionsButtons({
       <button
         onClick={handleEdit}
         className="min-h-[44px] min-w-[44px] flex items-center justify-center hover:opacity-70 transition-opacity rounded hover:bg-neutral-100"
-        aria-label="Edit transaction"
+        aria-label={t("editAriaLabel")}
       >
         <Image
           src={`${resources}/editing.svg`}
           width={24}
           height={24}
-          alt="Edit transaction"
+          alt={t("editAriaLabel")}
           className="w-6 h-6 object-contain"
         />
       </button>
       <button
         onClick={handleDelete}
         className="min-h-[44px] min-w-[44px] flex items-center justify-center hover:opacity-70 transition-opacity rounded hover:bg-danger-50"
-        aria-label="Delete transaction"
+        aria-label={t("deleteAriaLabel")}
       >
         <Image
           src={`${resources}/remove.svg`}
           width={24}
           height={24}
-          alt="Delete transaction"
+          alt={t("deleteAriaLabel")}
           className="w-6 h-6 object-contain"
         />
       </button>

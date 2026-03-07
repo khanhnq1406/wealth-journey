@@ -3,6 +3,7 @@
 import React from "react";
 import { cn } from "@/lib/utils/cn";
 import { SkeletonText } from "./SkeletonText";
+import { useTranslations } from "next-intl";
 
 export interface SkeletonCardProps {
   /**
@@ -179,6 +180,7 @@ export function SkeletonCardGrid({
   className,
   cardProps,
 }: SkeletonCardGridProps) {
+  const t = useTranslations("skeleton");
   const gapClasses = {
     sm: "gap-3 sm:gap-4",
     md: "gap-4 sm:gap-6",
@@ -202,7 +204,7 @@ export function SkeletonCardGrid({
         className
       )}
       aria-busy="true"
-      aria-label="Loading content"
+      aria-label={t("loading")}
     >
       {Array.from({ length: count }).map((_, index) => (
         <SkeletonCard key={index} size={cardSize} {...cardProps} />

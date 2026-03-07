@@ -1815,5 +1815,17 @@
     "title": "Đã xảy ra lỗi",
     "description": "Chúng tôi xin lỗi vì sự bất tiện này. Vui lòng thử làm mới trang.",
     "refreshButton": "Làm mới trang"
+  },
+  "skeleton": {
+    "loading": "Đang tải..."
+  },
+  "select": {
+    "clearAriaLabel": "Xóa lựa chọn"
+  },
+  "quickActions": {
+    "sectionAriaLabel": "Thao tác nhanh"
+  },
+  "featureDiscovery": {
+    "dismissAriaLabel": "Bỏ qua gợi ý"
   }
 }

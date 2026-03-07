@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { cn } from "@/lib/utils/cn";
 import { XIcon, ChevronDownIcon, LoadingSpinnerIcon } from "@/components/icons";
+import { useTranslations } from "next-intl";
 
 /**
  * Option type for the Select component.
@@ -132,6 +133,7 @@ export function Select<T extends string = string>({
   onOpen,
   onClose,
 }: SelectProps<T>) {
+  const t = useTranslations("select");
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -401,7 +403,7 @@ export function Select<T extends string = string>({
               type="button"
               onClick={handleClear}
               className="text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-full p-0.5 transition-colors duration-200"
-              aria-label="Clear selection"
+              aria-label={t("clearAriaLabel")}
             >
               <XIcon size="sm" decorative />
             </button>

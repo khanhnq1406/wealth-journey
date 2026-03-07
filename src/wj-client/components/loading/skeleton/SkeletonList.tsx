@@ -3,6 +3,7 @@
 import React from "react";
 import { cn } from "@/lib/utils/cn";
 import { SkeletonText } from "./SkeletonText";
+import { useTranslations } from "next-intl";
 
 export interface SkeletonListItemProps {
   /**
@@ -157,6 +158,7 @@ export function SkeletonList({
   card = false,
   className,
 }: SkeletonListProps) {
+  const t = useTranslations("skeleton");
   const listContent = (
     <>
       {Array.from({ length: count }).map((_, index) => (
@@ -173,7 +175,7 @@ export function SkeletonList({
           className
         )}
         aria-busy="true"
-        aria-label="Loading list"
+        aria-label={t("loading")}
       >
         {listContent}
       </div>
@@ -184,7 +186,7 @@ export function SkeletonList({
     <div
       className={cn("divide-y divide-gray-200 dark:divide-gray-700", className)}
       aria-busy="true"
-      aria-label="Loading list"
+      aria-label={t("loading")}
     >
       {listContent}
     </div>
@@ -232,6 +234,7 @@ export function SkeletonTable({
   variant = "shimmer",
   className,
 }: SkeletonTableProps) {
+  const t = useTranslations("skeleton");
   return (
     <div
       className={cn(
@@ -239,7 +242,7 @@ export function SkeletonTable({
         className
       )}
       aria-busy="true"
-      aria-label="Loading table"
+      aria-label={t("loading")}
     >
       {/* Header */}
       {showHeader && (

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { cn } from "@/lib/utils/cn";
+import { useTranslations } from "next-intl";
 
 /**
  * SkeletonTable - Table skeleton for data tables
@@ -94,6 +95,7 @@ export function SkeletonTable({
     }
   };
 
+  const t = useTranslations("skeleton");
   const totalColumns = columns + (showActions ? 1 : 0);
   const animationClass = variant === "shimmer" ? "animate-shimmer" : "animate-pulse";
 
@@ -104,7 +106,7 @@ export function SkeletonTable({
         className
       )}
       aria-busy="true"
-      aria-label="Loading table data"
+      aria-label={t("loading")}
     >
       {/* Header */}
       {showHeader && (

@@ -1815,5 +1815,17 @@
     "title": "Something went wrong",
     "description": "We apologize for the inconvenience. Please try refreshing the page.",
     "refreshButton": "Refresh Page"
+  },
+  "skeleton": {
+    "loading": "Loading..."
+  },
+  "select": {
+    "clearAriaLabel": "Clear selection"
+  },
+  "quickActions": {
+    "sectionAriaLabel": "Quick actions"
+  },
+  "featureDiscovery": {
+    "dismissAriaLabel": "Dismiss tip"
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 
 export type SkeletonProps = {
@@ -16,6 +17,7 @@ export type SkeletonProps = {
  * <Skeleton className="h-4 w-32" />
  */
 export const Skeleton = React.memo(({ className = "", style }: SkeletonProps) => {
+  const t = useTranslations("skeleton");
   return (
     <div
       className={cn(
@@ -27,7 +29,7 @@ export const Skeleton = React.memo(({ className = "", style }: SkeletonProps) =>
       style={style}
       aria-hidden="true"
       role="status"
-      aria-label="Loading..."
+      aria-label={t("loading")}
     >
       <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/40 to-transparent" />
     </div>
@@ -66,6 +68,7 @@ export const CardSkeleton = React.memo(({
   padding = "md",
   shadow = "md"
 }: CardSkeletonProps) => {
+  const t = useTranslations("skeleton");
   const paddingClasses = {
     none: "",
     sm: "p-2 sm:p-3 lg:p-4",
@@ -90,7 +93,7 @@ export const CardSkeleton = React.memo(({
         className
       )}
       role="status"
-      aria-label="Loading card..."
+      aria-label={t("loading")}
     >
       {showHeader && (
         <div className="flex items-center justify-between">
@@ -152,13 +155,14 @@ export const TableSkeleton = React.memo(({
   columns = 3,
   showHeader = true
 }: TableSkeletonProps) => {
+  const t = useTranslations("skeleton");
   // Mobile version: card-based layout
   if (mobile) {
     return (
       <div
         className={cn("space-y-3", className)}
         role="status"
-        aria-label="Loading table..."
+        aria-label={t("loading")}
       >
         {Array.from({ length: rows }).map((_, i) => (
           <div
@@ -190,7 +194,7 @@ export const TableSkeleton = React.memo(({
     <div
       className={cn("space-y-3", className)}
       role="status"
-      aria-label="Loading table..."
+      aria-label={t("loading")}
     >
       {showHeader && (
         <div className="flex items-center gap-4 py-2 border-b border-neutral-200">
@@ -252,11 +256,12 @@ export const ListSkeleton = React.memo(({
   showAvatar = true,
   lines = 2
 }: ListSkeletonProps) => {
+  const t = useTranslations("skeleton");
   return (
     <div
       className={cn("space-y-3", className)}
       role="status"
-      aria-label="Loading list..."
+      aria-label={t("loading")}
     >
       {Array.from({ length: items }).map((_, i) => (
         <div key={i} className="flex items-center gap-3">
@@ -309,11 +314,12 @@ export const TextSkeleton = React.memo(({
   width = "full",
   height = "h-4"
 }: TextSkeletonProps) => {
+  const t = useTranslations("skeleton");
   return (
     <div
       className={cn("space-y-2", className)}
       role="status"
-      aria-label="Loading text..."
+      aria-label={t("loading")}
     >
       {Array.from({ length: lines }).map((_, i) => (
         <Skeleton
@@ -356,6 +362,7 @@ export const StatsCardSkeleton = React.memo(({
   cols = 4,
   showChange = true
 }: StatsCardSkeletonProps) => {
+  const t = useTranslations("skeleton");
   const gridCols = {
     1: "grid-cols-1",
     2: "grid-cols-1 sm:grid-cols-2",
@@ -371,7 +378,7 @@ export const StatsCardSkeleton = React.memo(({
         className
       )}
       role="status"
-      aria-label="Loading statistics..."
+      aria-label={t("loading")}
     >
       {Array.from({ length: cards }).map((_, i) => (
         <div
@@ -426,12 +433,13 @@ export const ChartSkeleton = React.memo(({
   variant = "bar",
   showLegend = true
 }: ChartSkeletonProps) => {
+  const t = useTranslations("skeleton");
   if (variant === "pie") {
     return (
       <div
         className={cn("bg-white rounded-lg shadow-card p-4 sm:p-6", className)}
         role="status"
-        aria-label="Loading chart..."
+        aria-label={t("loading")}
       >
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -460,7 +468,7 @@ export const ChartSkeleton = React.memo(({
     <div
       className={cn("bg-white rounded-lg shadow-card p-4 sm:p-6", className)}
       role="status"
-      aria-label="Loading chart..."
+      aria-label={t("loading")}
     >
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -550,11 +558,12 @@ export const FormSkeleton = React.memo(({
   showLabels = true,
   selectFields = 0
 }: FormSkeletonProps) => {
+  const t = useTranslations("skeleton");
   return (
     <div
       className={cn("space-y-4", className)}
       role="status"
-      aria-label="Loading form..."
+      aria-label={t("loading")}
     >
       {Array.from({ length: fields }).map((_, i) => (
         <div key={i} className="space-y-2">
@@ -602,11 +611,12 @@ export const PageSkeleton = React.memo(({
   showSidebar = false,
   contentCards = 2
 }: PageSkeletonProps) => {
+  const t = useTranslations("skeleton");
   return (
     <div
       className={cn("space-y-6", className)}
       role="status"
-      aria-label="Loading page..."
+      aria-label={t("loading")}
     >
       {showHeader && (
         <div className="flex items-center justify-between gap-4">
@@ -667,6 +677,7 @@ export const ButtonSkeleton = React.memo(({
   width = "full",
   showIcon = false
 }: ButtonSkeletonProps) => {
+  const t = useTranslations("skeleton");
   const sizeClasses = {
     sm: "h-11 px-4 text-sm min-h-[44px]",
     md: "h-12 px-6 text-base min-h-[48px]",
@@ -683,7 +694,7 @@ export const ButtonSkeleton = React.memo(({
         className
       )}
       role="status"
-      aria-label="Loading button..."
+      aria-label={t("loading")}
     >
       {showIcon && <Skeleton className="h-5 w-5 rounded-full" />}
       <Skeleton className="h-5 w-20" />
@@ -717,11 +728,12 @@ export const PortfolioSkeleton = React.memo(({
   showFilters = true,
   investmentRows = 5
 }: PortfolioSkeletonProps) => {
+  const t = useTranslations("skeleton");
   return (
     <div
       className={cn("flex flex-col gap-6 px-3 sm:px-4 md:px-6 py-3 sm:py-4", className)}
       role="status"
-      aria-label="Loading portfolio..."
+      aria-label={t("loading")}
     >
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
@@ -779,11 +791,12 @@ export const TransactionSkeleton = React.memo(({
   showCategory = true,
   showWallet = false
 }: TransactionSkeletonProps) => {
+  const t = useTranslations("skeleton");
   return (
     <div
       className={cn("bg-white rounded-lg shadow-card p-4 sm:p-6", className)}
       role="status"
-      aria-label="Loading transactions..."
+      aria-label={t("loading")}
     >
       <div className="space-y-4">
         {/* Header */}
@@ -849,6 +862,7 @@ export const WalletCardSkeleton = React.memo(({
   showBalance = true,
   showTransactionCount = false
 }: WalletCardSkeletonProps) => {
+  const t = useTranslations("skeleton");
   return (
     <div
       className={cn(
@@ -856,7 +870,7 @@ export const WalletCardSkeleton = React.memo(({
         className
       )}
       role="status"
-      aria-label="Loading wallets..."
+      aria-label={t("loading")}
     >
       {Array.from({ length: cards }).map((_, i) => (
         <div
@@ -903,11 +917,12 @@ export const ModalSkeleton = React.memo(({
   className = "",
   variant = "form"
 }: ModalSkeletonProps) => {
+  const t = useTranslations("skeleton");
   return (
     <div
       className={cn("bg-white rounded-lg shadow-modal p-6 space-y-4", className)}
       role="status"
-      aria-label="Loading modal..."
+      aria-label={t("loading")}
     >
       {/* Title */}
       <Skeleton className="h-7 w-48" />
@@ -1017,6 +1032,7 @@ export const AvatarSkeleton = React.memo(({
   size = "md",
   showName = false
 }: AvatarSkeletonProps) => {
+  const t = useTranslations("skeleton");
   const sizeClasses = {
     sm: "h-8 w-8",
     md: "h-12 w-12",
@@ -1028,7 +1044,7 @@ export const AvatarSkeleton = React.memo(({
     <div
       className={cn("flex items-center gap-3", className)}
       role="status"
-      aria-label="Loading user..."
+      aria-label={t("loading")}
     >
       <Skeleton className={cn("rounded-full", sizeClasses[size])} />
       {showName && (
@@ -1044,6 +1060,7 @@ AvatarSkeleton.displayName = "AvatarSkeleton";
 
 // Legacy skeletons - kept for backward compatibility
 export const WalletListSkeleton = React.memo(({ count = 3 }: { count?: number }) => {
+  const t = useTranslations("skeleton");
   return (
     <div className="px-2 py-1">
       {Array.from({ length: count }).map((_, index) => (
@@ -1061,6 +1078,7 @@ export const WalletListSkeleton = React.memo(({ count = 3 }: { count?: number })
 WalletListSkeleton.displayName = "WalletListSkeleton";
 
 export const TotalBalanceSkeleton = React.memo(() => {
+  const t = useTranslations("skeleton");
   return (
     <div className="flex flex-col items-center justify-center gap-2 py-4">
       <Skeleton className="h-8 w-48" />
@@ -1071,6 +1089,7 @@ export const TotalBalanceSkeleton = React.memo(() => {
 TotalBalanceSkeleton.displayName = "TotalBalanceSkeleton";
 
 export const UserSkeleton = React.memo(() => {
+  const t = useTranslations("skeleton");
   return <AvatarSkeleton size="lg" showName />;
 });
 UserSkeleton.displayName = "UserSkeleton";
