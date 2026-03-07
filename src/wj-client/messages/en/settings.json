@@ -1,0 +1,48 @@
+{
+  "settings": {
+    "title": "Settings",
+    "language": {
+      "title": "Language",
+      "subtitle": "Choose your preferred language for the interface",
+      "save": "Save Language",
+      "failedToUpdate": "Failed to update language"
+    },
+    "sessions": {
+      "title": "Active Sessions",
+      "description": "Manage devices that are currently logged into your account",
+      "noActiveSessions": "No active sessions",
+      "currentLabel": "Current",
+      "lastActive": "Last active: {date}",
+      "created": "Created: {date}",
+      "expires": "Expires: {date}",
+      "revokeButton": "Revoke",
+      "revokeAllOthers": "Revoke All Others",
+      "revokeAllTitle": "Revoke All Sessions",
+      "revokeAllMessage": "Are you sure you want to revoke {count} other session(s)? Those devices will need to log in again.",
+      "revokeAllConfirm": "Revoke All"
+    },
+    "importTemplates": {
+      "title": "Import Templates",
+      "description": "Manage your saved import templates for reuse",
+      "loadingTemplates": "Loading templates...",
+      "noTemplates": "No templates saved yet. Create templates while importing files by checking \"Save as template\" in the column mapping step.",
+      "tableHeaders": {
+        "templateName": "Template Name",
+        "fileFormats": "File Formats",
+        "currency": "Currency",
+        "dateFormat": "Date Format",
+        "created": "Created",
+        "actions": "Actions"
+      },
+      "deleteTitle": "Delete Template",
+      "deleteMessage": "Are you sure you want to delete the template \"{name}\"? This action cannot be undone.",
+      "deleteConfirm": "Delete"
+    }
+  },
+  "currency": {
+    "selector": {
+      "label": "Display Currency",
+      "conversionInProgress": "Converting to {currency}..."
+    }
+  }
+}

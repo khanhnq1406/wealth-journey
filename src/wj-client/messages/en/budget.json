@@ -1,0 +1,57 @@
+{
+  "budget": {
+    "title": "Budget",
+    "createBudget": "Create budget",
+    "newBudget": "New budget",
+    "noBudgetsYet": "No budgets yet",
+    "createFirstBudget": "Create your first budget to start tracking",
+    "errorLoading": "Error loading budgets",
+    "loadingBudgets": "Loading budgets...",
+    "modal": {
+      "createBudget": "Create Budget",
+      "editBudget": "Edit Budget",
+      "addBudgetItem": "Add Budget Item",
+      "editBudgetItem": "Edit Budget Item"
+    },
+    "form": {
+      "budgetName": "Budget Name",
+      "budgetNamePlaceholder": "e.g., Monthly Budget",
+      "totalAmount": "Total Amount",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "create": "Create",
+      "save": "Save",
+      "createdSuccess": "Budget \"{name}\" has been created successfully",
+      "failedToCreate": "Failed to create budget. Please try again",
+      "updatedSuccess": "Budget has been updated successfully",
+      "failedToUpdate": "Failed to update budget. Please try again",
+      "budgetItemName": "Budget Item Name",
+      "budgetItemNamePlaceholder": "e.g., Groceries",
+      "allocatedAmount": "Allocated Amount",
+      "addItem": "Add Item",
+      "budgetItemCreatedSuccess": "Budget item \"{name}\" has been added successfully",
+      "failedToCreateItem": "Failed to create budget item. Please try again",
+      "budgetItemUpdatedSuccess": "Budget item has been updated successfully",
+      "failedToUpdateItem": "Failed to update budget item. Please try again"
+    },
+    "card": {
+      "spent": "Spent",
+      "remaining": "Remaining",
+      "overBudget": "Over Budget",
+      "ofBudget": "of {amount}",
+      "budgetUsage": "Budget Usage",
+      "addItem": "Add Item",
+      "editItem": "Edit Item",
+      "deleteItem": "Delete Item",
+      "timeRemaining": "Time Remaining",
+      "daysRemaining": "Days Remaining",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "categories": "{count, plural, one {# category} other {# categories}}",
+      "transactions": "{count, plural, one {# transaction} other {# transactions}}",
+      "addExpense": "Add expense",
+      "editBudget": "Edit budget",
+      "overBudgetBy": "Over budget by {amount}",
+      "approachingLimit": "Approaching budget limit"
+    }
+  }
+}

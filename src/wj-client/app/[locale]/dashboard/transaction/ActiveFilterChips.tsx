@@ -29,6 +29,7 @@ export function ActiveFilterChips({
     walletOptions,
     categoryOptions,
     t,
+    tf,
   );
 
   if (activeFilters.length === 0) {
@@ -91,6 +92,7 @@ function getActiveFilters(
   walletOptions: { value: string; label: string }[],
   categoryOptions: { value: string; label: string }[],
   t: (key: string) => string,
+  tf: (key: string) => string,
 ): FilterChip[] {
   const chips: FilterChip[] = [];
 

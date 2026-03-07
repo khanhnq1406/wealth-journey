@@ -1,0 +1,57 @@
+{
+  "budget": {
+    "title": "Ngân sách",
+    "createBudget": "Tạo ngân sách",
+    "newBudget": "Ngân sách mới",
+    "noBudgetsYet": "Chưa có ngân sách",
+    "createFirstBudget": "Tạo ngân sách đầu tiên để bắt đầu theo dõi",
+    "errorLoading": "Lỗi khi tải ngân sách",
+    "loadingBudgets": "Đang tải ngân sách...",
+    "modal": {
+      "createBudget": "Tạo ngân sách",
+      "editBudget": "Sửa ngân sách",
+      "addBudgetItem": "Thêm mục ngân sách",
+      "editBudgetItem": "Sửa mục ngân sách"
+    },
+    "form": {
+      "budgetName": "Tên ngân sách",
+      "budgetNamePlaceholder": "VD: Ngân sách tháng",
+      "totalAmount": "Tổng số tiền",
+      "startDate": "Ngày bắt đầu",
+      "endDate": "Ngày kết thúc",
+      "create": "Tạo",
+      "save": "Lưu",
+      "createdSuccess": "Ngân sách \"{name}\" đã được tạo thành công",
+      "failedToCreate": "Không thể tạo ngân sách. Vui lòng thử lại",
+      "updatedSuccess": "Ngân sách đã được cập nhật thành công",
+      "failedToUpdate": "Không thể cập nhật ngân sách. Vui lòng thử lại",
+      "budgetItemName": "Tên mục ngân sách",
+      "budgetItemNamePlaceholder": "VD: Đi chợ",
+      "allocatedAmount": "Số tiền phân bổ",
+      "addItem": "Thêm mục",
+      "budgetItemCreatedSuccess": "Mục ngân sách \"{name}\" đã được thêm thành công",
+      "failedToCreateItem": "Không thể tạo mục ngân sách. Vui lòng thử lại",
+      "budgetItemUpdatedSuccess": "Mục ngân sách đã được cập nhật thành công",
+      "failedToUpdateItem": "Không thể cập nhật mục ngân sách. Vui lòng thử lại"
+    },
+    "card": {
+      "spent": "Đã chi",
+      "remaining": "Còn lại",
+      "overBudget": "Vượt ngân sách",
+      "ofBudget": "trên {amount}",
+      "budgetUsage": "Sử dụng ngân sách",
+      "addItem": "Thêm mục",
+      "editItem": "Sửa mục",
+      "deleteItem": "Xóa mục",
+      "timeRemaining": "Thời gian còn lại",
+      "daysRemaining": "Số ngày còn lại",
+      "days": "{count, plural, other {# ngày}}",
+      "categories": "{count, plural, other {# danh mục}}",
+      "transactions": "{count, plural, other {# giao dịch}}",
+      "addExpense": "Thêm chi tiêu",
+      "editBudget": "Chỉnh sửa ngân sách",
+      "overBudgetBy": "Vượt ngân sách {amount}",
+      "approachingLimit": "Đang tiếp cận giới hạn ngân sách"
+    }
+  }
+}
