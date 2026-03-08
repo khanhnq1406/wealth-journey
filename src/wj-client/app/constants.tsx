@@ -116,6 +116,18 @@ export const pieChartColors = [
   "#6366F1", // Indigo (final category)
 ];
 
+// V2 chart colors - Crimson & Gold palette
+export const v2ChartColors = [
+  "#B8860B", // Gold primary
+  "#B91C1C", // Red primary
+  "#15803D", // Green positive
+  "#D4A017", // Gold accent
+  "#8B929E", // Silver primary
+  "#374151", // Silver dark
+  "#92710C", // Gold dark
+  "#7F1D1D", // Red dark
+];
+
 export const ButtonType = {
   PRIMARY: "primary",
   SECONDARY: "secondary",

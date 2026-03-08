@@ -21,6 +21,12 @@ html {
   --primary-green: #008148;
   --accent-green: #22C55E;
   --teal-accent: #14B8A6;
+  /* V2 Crimson & Gold */
+  --v2-bg-primary: #FAF9F7;
+  --v2-bg-surface: #FFFFFF;
+  --v2-red-primary: #B91C1C;
+  --v2-red-dark: #7F1D1D;
+  --v2-gold-primary: #B8860B;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -429,9 +435,9 @@ body:has(.landing-scroll-container) {
   min-width: 48px;
 }
 
-/* Green focus ring for accessibility */
+/* V2 focus ring for accessibility */
 *:focus-visible {
-  outline: 2px solid #008148;
+  outline: 2px solid #B91C1C;
   outline-offset: 2px;
 }
 

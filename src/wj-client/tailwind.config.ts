@@ -133,6 +133,41 @@ export default {
           "pale-green": "#BBF7D0", // Pale green
           "spring-green": "#4ADE80", // Spring green
         },
+
+        // V2 CHART COLORS - Crimson & Gold
+        "chart-v2": {
+          gold: "#B8860B",
+          red: "#B91C1C",
+          "gold-area": "#B8860B33",
+          silver: "#4B5563",
+        },
+
+        // V2 Crimson & Gold Design System
+        v2: {
+          "bg-primary": "#FAF9F7",
+          "bg-surface": "#FFFFFF",
+          "bg-surface-tint": "#FDF6EE",
+          "bg-dark": "#1C1917",
+          "border-light": "#EDE8E1",
+          border: "#DDD8D0",
+          "text-primary": "#1C1917",
+          "text-secondary": "#57534E",
+          "text-tertiary": "#78716C",
+          "text-on-dark": "#FAF9F7",
+          "red-primary": "#B91C1C",
+          "red-dark": "#7F1D1D",
+          "red-light": "#FEF2F2",
+          "red-negative": "#DC2626",
+          "gold-primary": "#B8860B",
+          "gold-dark": "#92710C",
+          "gold-light": "#FBF3E0",
+          "gold-accent": "#D4A017",
+          "green-positive": "#15803D",
+          "green-light": "#F0FDF4",
+          "silver-primary": "#8B929E",
+          "silver-dark": "#374151",
+          "silver-light": "#EEF0F3",
+        },
       },
 
       // Typography Scale
@@ -206,6 +241,9 @@ export default {
         "dark-dropdown":
           "0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3)",
         "dark-floating": "0 8px 16px rgba(0, 0, 0, 0.4)",
+
+        // V2 shadows
+        "v2-card": "0 2px 12px rgba(0, 0, 0, 0.047)",
       },
 
       // Keep legacy dropShadow for backward compatibility
