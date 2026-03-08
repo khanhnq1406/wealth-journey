@@ -5,9 +5,9 @@
 - **Plan file:** docs/plans/2026-03-08-v2-design-migration-plan.md
 - **Spec file:** docs/specs/2026-03-08-v2-design-migration-spec.md
 - **Started:** 2026-03-08
-- **Last updated:** 2026-03-08T16:00:00
-- **Current state:** in_progress
-- **Current task:** 14
+- **Last updated:** 2026-03-08T17:00:00
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -26,8 +26,8 @@
 | 11 | Silver Price Chart Component | done | 3023983 | Created SilverPriceChart with type selector + period tabs |
 | 12 | Wallets Section Component | done | 3023983 | Created WalletsSection with wallet cards + see-all link |
 | 13 | Home Page Assembly | done | 8ad98f3 | Rewrote page.tsx with mobile vertical + desktop 4-row grid layout |
-| 14 | Update C4 Architecture Diagrams | in_progress | — | — |
-| 15 | Build Verification & Cleanup | pending | — | — |
+| 14 | Update C4 Architecture Diagrams | done | 526d1e6 | Updated C4 frontend component diagram with V2 dashboard description |
+| 15 | Build Verification & Cleanup | done | 526d1e6 | Fixed 3 TS type errors, build passes clean |
 
 ## Resume Instructions
 
