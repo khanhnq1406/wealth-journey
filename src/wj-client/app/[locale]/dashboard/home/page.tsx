@@ -48,21 +48,21 @@ export default function Home() {
   );
 
   const { data: portfolioSummary } = useQueryGetAggregatedPortfolioSummary(
-    {},
+    { walletId: 0, typeFilter: 0 },
     { staleTime: 5 * 60 * 1000 },
   );
 
   // Calculate net worth: cash (wallets) + investments (portfolio)
   const totalCash = walletsData?.wallets?.reduce(
-    (sum, w) => sum + (w.balance || 0),
+    (sum, w) => sum + (w.balance?.amount || 0),
     0,
   ) ?? 0;
-  const totalPortfolioValue = portfolioSummary?.totalValue ?? 0;
+  const totalPortfolioValue = portfolioSummary?.data?.totalValue ?? 0;
   const totalNetWorth = totalCash + totalPortfolioValue;
 
   // PNL data
-  const totalPnl = portfolioSummary?.totalPnl ?? 0;
-  const totalPnlPercent = portfolioSummary?.totalPnlPercent ?? 0;
+  const totalPnl = portfolioSummary?.data?.totalPnl ?? 0;
+  const totalPnlPercent = portfolioSummary?.data?.totalPnlPercent ?? 0;
 
   // Gold/silver prices
   const goldPrices = marketPrices?.gold ?? [];
@@ -78,7 +78,7 @@ export default function Home() {
   const wallets = (walletsData?.wallets ?? []).map((w) => ({
     id: w.id ?? 0,
     walletName: w.walletName ?? "",
-    balance: w.balance ?? 0,
+    balance: w.balance?.amount ?? 0,
     currency: w.currency ?? "VND",
     type: w.type ?? 0,
   }));
@@ -122,7 +122,7 @@ export default function Home() {
           currency={currency}
           monthPnlPercent={totalPnlPercent}
           monthPnl={totalPnl}
-          userName={user.fullname}
+          userName={user.fullname ?? undefined}
         />
 
         {/* 2. PNL Card */}
@@ -166,7 +166,7 @@ export default function Home() {
           weekPnl={totalPnl}
           monthPnlPercent={totalPnlPercent}
           monthPnl={totalPnl}
-          userName={user.fullname}
+          userName={user.fullname ?? undefined}
         />
 
         {/* Row 2: PNL Chart + Wallets */}

@@ -5,28 +5,28 @@
 - **Plan file:** docs/plans/2026-03-08-v2-design-migration-plan.md
 - **Spec file:** docs/specs/2026-03-08-v2-design-migration-spec.md
 - **Started:** 2026-03-08
-- **Last updated:** 2026-03-08
+- **Last updated:** 2026-03-08T16:00:00
 - **Current state:** in_progress
-- **Current task:** 2
+- **Current task:** 14
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
 | 1 | Color System Migration | done | 141f170 | Added V2 color tokens, chart colors, shadow, CSS vars, focus ring, theme color |
-| 2 | Typography Migration | pending | — | — |
+| 2 | Typography Migration | done | 8f739f0 | Added Sora + IBM Plex Mono fonts, fontFamily utilities, typography classes |
 | 3 | i18n Translation Keys | done | 72f63d2 | Added V2 home dashboard keys to vi/en ui.json |
-| 4 | Desktop Sidebar Redesign | pending | — | — |
-| 5 | Desktop Top Bar | pending | — | — |
-| 6 | Mobile Header & Bottom Nav Redesign | pending | — | — |
-| 7 | Net Worth & PNL Display Components | pending | — | — |
-| 8 | Gold Price Table Component | pending | — | — |
-| 9 | Gold Price Chart Component | pending | — | — |
-| 10 | Silver Price Table Component | pending | — | — |
-| 11 | Silver Price Chart Component | pending | — | — |
-| 12 | Wallets Section Component | pending | — | — |
-| 13 | Home Page Assembly | pending | — | — |
-| 14 | Update C4 Architecture Diagrams | pending | — | — |
+| 4 | Desktop Sidebar Redesign | done | 5232329 | Rewrote sidebar with V2 white bg, red W logo, lucide icons, NavItem styling |
+| 5 | Desktop Top Bar | done | 5232329 | Added greeting, date, search box, bell icon in 68px top bar |
+| 6 | Mobile Header & Bottom Nav Redesign | done | 5232329 | Red accent line, V2 mobile header, updated BottomNav colors |
+| 7 | Net Worth & PNL Display Components | done | 3023983 | Created NetWorthDisplay + PNLCard with mobile/desktop variants |
+| 8 | Gold Price Table Component | done | 3023983 | Created GoldPriceTable with gold-themed header |
+| 9 | Gold Price Chart Component | done | 3023983 | Created GoldPriceChart with type selector + period tabs |
+| 10 | Silver Price Table Component | done | 3023983 | Created SilverPriceTable with silver-themed header |
+| 11 | Silver Price Chart Component | done | 3023983 | Created SilverPriceChart with type selector + period tabs |
+| 12 | Wallets Section Component | done | 3023983 | Created WalletsSection with wallet cards + see-all link |
+| 13 | Home Page Assembly | done | 8ad98f3 | Rewrote page.tsx with mobile vertical + desktop 4-row grid layout |
+| 14 | Update C4 Architecture Diagrams | in_progress | — | — |
 | 15 | Build Verification & Cleanup | pending | — | — |
 
 ## Resume Instructions

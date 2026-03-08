@@ -9,7 +9,7 @@ C4Component
     Container_Boundary(app, "App Router (Pages)") {
         Component(landing, "Landing Page", "app/landing", "Marketing page with features, testimonials, CTA")
         Component(auth_pages, "Auth Pages", "app/auth", "Login and register with Google OAuth")
-        Component(dashboard, "Dashboard Home", "app/dashboard/home", "Balance overview, wallet list, quick actions")
+        Component(dashboard, "Dashboard Home", "app/dashboard/home", "V2 Crimson & Gold: net worth, PNL, gold/silver prices, wallets")
         Component(txn_page, "Transaction Page", "app/dashboard/transaction", "Transaction list with filters and search")
         Component(wallet_page, "Wallet Page", "app/dashboard/wallets", "Wallet grid/list with fund operations")
         Component(portfolio_page, "Portfolio Page", "app/dashboard/portfolio", "Investment portfolio with analytics")
