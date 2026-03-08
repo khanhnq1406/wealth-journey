@@ -33,7 +33,7 @@ export const NavItem = memo(function NavItem({
       <ActiveLink
         href={href}
         className={cn(
-          "flex items-center py-2.5 rounded-xl font-sora text-[14px] font-medium transition-all duration-300 ease-in-out touch-target",
+          "flex items-center py-2.5 rounded-xl font-vietnam text-[14px] font-medium transition-all duration-300 ease-in-out touch-target",
           isActive
             ? "text-v2-red-primary bg-v2-red-light"
             : "text-v2-text-secondary hover:bg-v2-bg-primary",

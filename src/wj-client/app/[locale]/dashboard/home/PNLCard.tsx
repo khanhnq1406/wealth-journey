@@ -53,7 +53,7 @@ export function PNLCard({
       {/* Header */}
       <div className="p-5 pb-4">
         <div className="flex items-center justify-between">
-          <h3 className="font-sora font-semibold text-[16px] text-v2-text-primary">
+          <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
             {t("pnlTitle")}
           </h3>
           {/* Period tabs */}
@@ -62,7 +62,7 @@ export function PNLCard({
               <button
                 key={period.key}
                 onClick={() => setSelectedPeriod(period.key)}
-                className={`px-3 py-1.5 rounded-[10px] text-[12px] font-sora font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-[10px] text-[12px] font-vietnam font-medium transition-colors ${
                   selectedPeriod === period.key
                     ? "bg-v2-red-primary text-white"
                     : "text-v2-text-secondary hover:text-v2-text-primary"
@@ -81,16 +81,16 @@ export function PNLCard({
             return (
               <div key={metric.label}>
                 <p
-                  className={`font-ibm-mono font-bold text-[16px] ${
+                  className={`font-jetbrains font-bold text-[16px] ${
                     isPositive ? "text-v2-green-positive" : "text-v2-red-negative"
                   }`}
                 >
                   {formatPercent(metric.percent)}
                 </p>
-                <p className="font-ibm-mono font-medium text-[12px] text-v2-text-secondary mt-0.5">
+                <p className="font-jetbrains font-medium text-[12px] text-v2-text-secondary mt-0.5">
                   {formatAmount(metric.value)} {currency}
                 </p>
-                <p className="font-ibm-mono font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
+                <p className="font-jetbrains font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
                   {metric.label}
                 </p>
               </div>
@@ -118,7 +118,7 @@ export function PNLCard({
                 />
               </svg>
             </div>
-            <p className="font-sora text-[13px] text-v2-text-tertiary">
+            <p className="font-vietnam text-[13px] text-v2-text-tertiary">
               {t("comingSoon")}
             </p>
           </div>

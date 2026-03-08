@@ -43,12 +43,12 @@ export function WalletsSection({ wallets }: WalletsSectionProps) {
     <div>
       {/* Section header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-sora font-semibold text-[16px] text-v2-text-primary">
+        <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
           {t("wallets")}
         </h3>
         <Link
           href={routes.wallets}
-          className="flex items-center gap-1 font-sora font-medium text-[13px] text-v2-red-primary hover:text-v2-red-dark transition-colors"
+          className="flex items-center gap-1 font-vietnam font-medium text-[13px] text-v2-red-primary hover:text-v2-red-dark transition-colors"
         >
           {t("seeAll")}
           <ChevronRight size={16} />
@@ -70,11 +70,11 @@ export function WalletsSection({ wallets }: WalletsSectionProps) {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-sora font-medium text-[14px] text-v2-text-primary truncate">
+              <p className="font-vietnam font-medium text-[14px] text-v2-text-primary truncate">
                 {wallet.walletName}
               </p>
             </div>
-            <p className="font-ibm-mono font-semibold text-[14px] text-v2-text-primary shrink-0">
+            <p className="font-jetbrains font-semibold text-[14px] text-v2-text-primary shrink-0">
               {formatBalance(wallet.balance, wallet.currency)}
             </p>
           </div>
@@ -82,7 +82,7 @@ export function WalletsSection({ wallets }: WalletsSectionProps) {
 
         {wallets.length === 0 && (
           <div className="text-center py-8">
-            <p className="font-sora text-[13px] text-v2-text-tertiary">
+            <p className="font-vietnam text-[13px] text-v2-text-tertiary">
               {t("comingSoon")}
             </p>
           </div>

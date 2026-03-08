@@ -149,7 +149,7 @@ export default function DashboardLayout({
           <ActiveLink
             key={item.href}
             href={item.href}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-sora text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target animate-stagger-fade-in"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-vietnam text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target animate-stagger-fade-in"
           >
             {item.icon}
             <span>{item.label}</span>
@@ -160,7 +160,7 @@ export default function DashboardLayout({
 
         <ActiveLink
           href="/dashboard/settings"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-sora text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-vietnam text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target"
         >
           <Settings size={20} />
           <span>{t("settings")}</span>
@@ -168,7 +168,7 @@ export default function DashboardLayout({
 
         <button
           onClick={logout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-sora text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target w-full text-left"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-vietnam text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target w-full text-left"
           aria-label={t("logout")}
         >
           <LogOut size={20} />
@@ -209,17 +209,17 @@ export default function DashboardLayout({
                   )}
                 >
                   <div className="w-[38px] h-[38px] bg-v2-red-primary rounded-[10px] flex items-center justify-center">
-                    <span className="text-white font-sora font-bold text-[18px]">
+                    <span className="text-white font-vietnam font-bold text-[18px]">
                       W
                     </span>
                   </div>
-                  <h1 className="text-v2-text-primary font-sora font-bold text-[19px]">
+                  <h1 className="text-v2-text-primary font-vietnam font-bold text-[19px]">
                     WealthJourney
                   </h1>
                 </div>
                 {!isExpanded && (
                   <div className="w-[38px] h-[38px] bg-v2-red-primary rounded-[10px] flex items-center justify-center mx-auto animate-scale-in">
-                    <span className="text-white font-sora font-bold text-[18px]">
+                    <span className="text-white font-vietnam font-bold text-[18px]">
                       W
                     </span>
                   </div>
@@ -329,7 +329,7 @@ export default function DashboardLayout({
                       className="rounded-full"
                     />
                   ) : (
-                    <span className="font-sora text-[13px] font-medium text-v2-text-secondary">
+                    <span className="font-vietnam text-[13px] font-medium text-v2-text-secondary">
                       {(user.fullname || "U").charAt(0)}
                     </span>
                   )}
@@ -345,10 +345,10 @@ export default function DashboardLayout({
                     transitionDelay: isExpanded ? "100ms" : "0ms",
                   }}
                 >
-                  <p className="font-sora text-[13px] font-medium text-v2-text-primary truncate">
+                  <p className="font-vietnam text-[13px] font-medium text-v2-text-primary truncate">
                     {user.fullname || "User"}
                   </p>
-                  <p className="font-ibm-mono text-[11px] text-v2-text-tertiary truncate">
+                  <p className="font-jetbrains text-[11px] text-v2-text-tertiary truncate">
                     {user.email || "user@example.com"}
                   </p>
                 </div>
@@ -378,11 +378,11 @@ export default function DashboardLayout({
                 {/* Logo area */}
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-v2-red-primary rounded-[8px] flex items-center justify-center">
-                    <span className="text-white font-sora font-bold text-[14px]">
+                    <span className="text-white font-vietnam font-bold text-[14px]">
                       W
                     </span>
                   </div>
-                  <span className="font-sora font-bold text-[16px] text-v2-text-primary">
+                  <span className="font-vietnam font-bold text-[16px] text-v2-text-primary">
                     WealthJourney
                   </span>
                 </div>
@@ -437,11 +437,11 @@ export default function DashboardLayout({
                   <div className="flex items-center justify-between p-4 border-b border-v2-border-light">
                     <div className="flex items-center gap-3">
                       <div className="w-[38px] h-[38px] bg-v2-red-primary rounded-[10px] flex items-center justify-center">
-                        <span className="text-white font-sora font-bold text-[18px]">
+                        <span className="text-white font-vietnam font-bold text-[18px]">
                           W
                         </span>
                       </div>
-                      <span className="text-v2-text-primary font-sora font-bold text-lg">
+                      <span className="text-v2-text-primary font-vietnam font-bold text-lg">
                         WealthJourney
                       </span>
                     </div>
@@ -472,16 +472,16 @@ export default function DashboardLayout({
                             className="rounded-full"
                           />
                         ) : (
-                          <span className="font-sora text-[13px] font-medium text-v2-text-secondary">
+                          <span className="font-vietnam text-[13px] font-medium text-v2-text-secondary">
                             {(user.fullname || "U").charAt(0)}
                           </span>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-sora text-[13px] font-medium text-v2-text-primary truncate">
+                        <p className="font-vietnam text-[13px] font-medium text-v2-text-primary truncate">
                           {user.fullname || "User"}
                         </p>
-                        <p className="font-ibm-mono text-[11px] text-v2-text-tertiary truncate">
+                        <p className="font-jetbrains text-[11px] text-v2-text-tertiary truncate">
                           {user.email || "user@example.com"}
                         </p>
                       </div>
@@ -498,19 +498,19 @@ export default function DashboardLayout({
           {/* Main Content */}
           <main
             className={cn(
-              "flex-1 overflow-y-auto transition-all duration-300 ease-in-out",
+              "flex-1 flex flex-col overflow-hidden transition-all duration-300 ease-in-out",
               isExpanded ? "sm:ml-64 lg:ml-72" : "sm:ml-20"
             )}
           >
             {/* V2 Desktop Top Bar */}
-            <header className="hidden sm:flex items-center justify-between px-8 py-4 border-b border-v2-border-light bg-white h-[68px]">
+            <header className="hidden sm:flex items-center justify-between px-8 py-4 border-b border-v2-border-light bg-white h-[68px] shrink-0">
               {/* Left: Greeting + Date */}
               <div>
-                <h2 className="font-sora font-semibold text-[18px] text-v2-text-primary">
+                <h2 className="font-vietnam font-semibold text-[18px] text-v2-text-primary">
                   {greeting}
                   {user.fullname ? `, ${user.fullname}` : ""}
                 </h2>
-                <p className="font-ibm-mono text-[12px] text-v2-text-tertiary">
+                <p className="font-jetbrains text-[12px] text-v2-text-tertiary">
                   {formattedDate}
                 </p>
               </div>
@@ -519,7 +519,7 @@ export default function DashboardLayout({
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setIsSearchOpen(true)}
-                  className="flex items-center gap-2 w-[240px] bg-v2-bg-primary border border-v2-border rounded-xl px-4 py-2 text-v2-text-tertiary text-[13px] font-sora hover:border-v2-text-tertiary transition-colors"
+                  className="flex items-center gap-2 w-[240px] bg-v2-bg-primary border border-v2-border rounded-xl px-4 py-2 text-v2-text-tertiary text-[13px] font-vietnam hover:border-v2-text-tertiary transition-colors"
                 >
                   <Search size={16} />
                   <span>{tSearch("placeholder")}</span>
@@ -533,7 +533,7 @@ export default function DashboardLayout({
               </div>
             </header>
 
-            <div className="h-full p-4 sm:p-6 lg:p-8 pb-safe-mobile sm:pb-8 overflow-y-auto transition-all duration-300 ease-in-out">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-safe-mobile sm:pb-8 transition-all duration-300 ease-in-out">
               {children}
             </div>
           </main>

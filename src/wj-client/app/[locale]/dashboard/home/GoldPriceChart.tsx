@@ -28,7 +28,7 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
       {/* Header */}
       <div className="p-5 pb-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-sora font-semibold text-[16px] text-v2-text-primary">
+          <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
             {t("goldChartTitle")}
           </h3>
           {/* Gold type selector */}
@@ -36,7 +36,7 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="font-sora text-[13px] text-v2-text-secondary bg-v2-bg-primary border border-v2-border rounded-lg px-3 py-1.5"
+              className="font-vietnam text-[13px] text-v2-text-secondary bg-v2-bg-primary border border-v2-border rounded-lg px-3 py-1.5"
             >
               {prices.map((p) => (
                 <option key={p.typeCode} value={p.typeCode}>
@@ -52,15 +52,15 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
           <div className="flex items-center gap-6 mt-3">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-v2-red-primary" />
-              <span className="font-ibm-mono text-[12px] text-v2-text-secondary">{t("buy")}</span>
-              <span className="font-ibm-mono font-semibold text-[13px] text-v2-text-primary">
+              <span className="font-jetbrains text-[12px] text-v2-text-secondary">{t("buy")}</span>
+              <span className="font-jetbrains font-semibold text-[13px] text-v2-text-primary">
                 {formatPriceValue(selectedPrice.buy, selectedPrice.currency || "VND")}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-v2-green-positive" />
-              <span className="font-ibm-mono text-[12px] text-v2-text-secondary">{t("sell")}</span>
-              <span className="font-ibm-mono font-semibold text-[13px] text-v2-text-primary">
+              <span className="font-jetbrains text-[12px] text-v2-text-secondary">{t("sell")}</span>
+              <span className="font-jetbrains font-semibold text-[13px] text-v2-text-primary">
                 {formatPriceValue(selectedPrice.sell, selectedPrice.currency || "VND")}
               </span>
             </div>
@@ -73,7 +73,7 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
             <button
               key={period.key}
               onClick={() => setSelectedPeriod(period.key)}
-              className={`px-4 py-1.5 rounded-[10px] text-[12px] font-sora font-medium transition-colors ${
+              className={`px-4 py-1.5 rounded-[10px] text-[12px] font-vietnam font-medium transition-colors ${
                 selectedPeriod === period.key
                   ? "bg-v2-red-primary text-white"
                   : "bg-v2-bg-surface-tint text-v2-text-secondary"
@@ -88,7 +88,7 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
       {/* Chart placeholder */}
       <div className="px-5 pb-5">
         <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
-          <p className="font-sora text-[13px] text-v2-text-tertiary">{t("comingSoon")}</p>
+          <p className="font-vietnam text-[13px] text-v2-text-tertiary">{t("comingSoon")}</p>
         </div>
       </div>
     </div>

@@ -172,8 +172,8 @@ export default {
 
       // V2 Font Families
       fontFamily: {
-        sora: ["var(--font-sora)", "system-ui", "sans-serif"],
-        "ibm-mono": ["var(--font-ibm-plex-mono)", "ui-monospace", "monospace"],
+        vietnam: ["var(--font-vietnam-pro)", "system-ui", "sans-serif"],
+        jetbrains: ["var(--font-jetbrains-mono)", "ui-monospace", "monospace"],
         jakarta: ["var(--font-jakarta-sans)", "system-ui", "sans-serif"],
       },
 
