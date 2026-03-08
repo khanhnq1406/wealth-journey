@@ -7,15 +7,15 @@
 - **Started:** 2026-03-08
 - **Last updated:** 2026-03-08
 - **Current state:** in_progress
-- **Current task:** 1
+- **Current task:** 2
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 1 | Color System Migration | pending | — | — |
+| 1 | Color System Migration | done | 141f170 | Added V2 color tokens, chart colors, shadow, CSS vars, focus ring, theme color |
 | 2 | Typography Migration | pending | — | — |
-| 3 | i18n Translation Keys | pending | — | — |
+| 3 | i18n Translation Keys | done | 72f63d2 | Added V2 home dashboard keys to vi/en ui.json |
 | 4 | Desktop Sidebar Redesign | pending | — | — |
 | 5 | Desktop Top Bar | pending | — | — |
 | 6 | Mobile Header & Bottom Nav Redesign | pending | — | — |
