@@ -278,7 +278,39 @@
       "investmentsLabel": "Investments: {amount}",
       "addTransaction": "+ Add Transaction",
       "transfer": "Transfer",
-      "newWallet": "New Wallet"
+      "newWallet": "New Wallet",
+      "greeting": {
+        "morning": "Good morning",
+        "afternoon": "Good afternoon",
+        "evening": "Good evening"
+      },
+      "totalNetWorthLabel": "TOTAL NET WORTH",
+      "pnlTitle": "Net worth",
+      "pnlToday": "P/L TODAY",
+      "pnl7d": "P/L 7 DAYS",
+      "pnl30d": "P/L 30 DAYS",
+      "today": "Today",
+      "7days": "7 Days",
+      "30days": "30 Days",
+      "goldPriceTitle": "Gold Prices Today",
+      "silverPriceTitle": "Silver Prices Today",
+      "goldChartTitle": "Gold Price Chart",
+      "silverChartTitle": "Silver Price Chart",
+      "wallets": "Wallets",
+      "seeAll": "See all",
+      "updated": "Updated {time}",
+      "goldType": "GOLD TYPE",
+      "silverType": "SILVER TYPE",
+      "buy": "BUY",
+      "sell": "SELL",
+      "period": {
+        "24h": "24h",
+        "week": "Week",
+        "month": "Month",
+        "year": "Year",
+        "30d": "30D"
+      },
+      "comingSoon": "Coming soon"
     },
     "quickActions": {
       "addTransaction": "Add Transaction",

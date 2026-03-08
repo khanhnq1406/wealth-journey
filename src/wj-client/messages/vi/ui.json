@@ -278,7 +278,39 @@
       "investmentsLabel": "Đầu tư: {amount}",
       "addTransaction": "+ Thêm giao dịch",
       "transfer": "Chuyển khoản",
-      "newWallet": "Ví mới"
+      "newWallet": "Ví mới",
+      "greeting": {
+        "morning": "Chào buổi sáng",
+        "afternoon": "Chào buổi chiều",
+        "evening": "Chào buổi tối"
+      },
+      "totalNetWorthLabel": "TỔNG TÀI SẢN RÒNG",
+      "pnlTitle": "Tài sản ròng",
+      "pnlToday": "L/L HÔM NAY",
+      "pnl7d": "L/L 7 NGÀY",
+      "pnl30d": "L/L 30 NGÀY",
+      "today": "Hôm nay",
+      "7days": "7 Ngày",
+      "30days": "30 Ngày",
+      "goldPriceTitle": "Giá Vàng Hôm Nay",
+      "silverPriceTitle": "Giá Bạc Hôm Nay",
+      "goldChartTitle": "Biểu Đồ Giá Vàng",
+      "silverChartTitle": "Biểu Đồ Giá Bạc",
+      "wallets": "Ví tiền",
+      "seeAll": "Xem tất cả",
+      "updated": "Cập nhật {time}",
+      "goldType": "LOẠI VÀNG",
+      "silverType": "LOẠI BẠC",
+      "buy": "MUA",
+      "sell": "BÁN",
+      "period": {
+        "24h": "24h",
+        "week": "Tuần",
+        "month": "Tháng",
+        "year": "Năm",
+        "30d": "30D"
+      },
+      "comingSoon": "Sắp ra mắt"
     },
     "quickActions": {
       "addTransaction": "Thêm giao dịch",
