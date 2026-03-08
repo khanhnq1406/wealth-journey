@@ -399,6 +399,17 @@ body:has(.landing-scroll-container) {
   letter-spacing: -0.02em;
 }
 
+/* V2 Typography Utilities */
+.v2-heading-hero { font-family: var(--font-sora); font-weight: 800; letter-spacing: -1.5px; }
+.v2-heading-lg { font-family: var(--font-sora); font-weight: 700; letter-spacing: -1px; }
+.v2-heading-md { font-family: var(--font-sora); font-weight: 600; letter-spacing: -0.5px; }
+.v2-heading-sm { font-family: var(--font-sora); font-weight: 500; letter-spacing: -0.3px; }
+.v2-body { font-family: var(--font-sora); font-weight: 400; }
+.v2-data-bold { font-family: var(--font-ibm-plex-mono); font-weight: 700; letter-spacing: 0.5px; }
+.v2-data-semibold { font-family: var(--font-ibm-plex-mono); font-weight: 600; letter-spacing: 1px; }
+.v2-data-medium { font-family: var(--font-ibm-plex-mono); font-weight: 500; letter-spacing: 0.5px; }
+.v2-data-regular { font-family: var(--font-ibm-plex-mono); font-weight: 400; letter-spacing: 0.5px; }
+
 /* Safe area bottom padding for mobile bottom navigation */
 .pb-safe-bottom {
   padding-bottom: calc(env(safe-area-inset-bottom) + 64px);
