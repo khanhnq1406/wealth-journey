@@ -16,7 +16,7 @@ interface NavItemProps {
 }
 
 /**
- * Navigation item component with icon and optional label
+ * V2 Navigation item component with Crimson & Gold design system
  * Supports both expanded (icon + label) and collapsed (icon only with tooltip) states
  */
 export const NavItem = memo(function NavItem({
@@ -33,8 +33,10 @@ export const NavItem = memo(function NavItem({
       <ActiveLink
         href={href}
         className={cn(
-          "flex items-center py-2.5 rounded-lg text-white transition-all duration-300 ease-in-out touch-target",
-          "hover:bg-white/10 hover:shadow-sm active:scale-95",
+          "flex items-center py-2.5 rounded-xl font-sora text-[14px] font-medium transition-all duration-300 ease-in-out touch-target",
+          isActive
+            ? "text-v2-red-primary bg-v2-red-light"
+            : "text-v2-text-secondary hover:bg-v2-bg-primary",
           isExpanded ? "gap-3 px-3" : "justify-center px-0 gap-0",
         )}
       >
@@ -48,7 +50,7 @@ export const NavItem = memo(function NavItem({
         </div>
         <span
           className={cn(
-            "font-medium whitespace-nowrap transition-all duration-300 ease-in-out",
+            "whitespace-nowrap transition-all duration-300 ease-in-out",
             isExpanded
               ? "opacity-100 w-auto translate-x-0"
               : "opacity-0 w-0 overflow-hidden -translate-x-2",
