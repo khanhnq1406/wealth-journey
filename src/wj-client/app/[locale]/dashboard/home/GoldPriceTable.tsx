@@ -1,0 +1,76 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+import { formatPriceValue } from "../prices/helpers";
+import type { PriceItem } from "@/gen/protobuf/v1/investment";
+
+interface GoldPriceTableProps {
+  prices: PriceItem[];
+  updatedTime?: string;
+}
+
+export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
+  const t = useTranslations("dashboard.home");
+
+  return (
+    <div className="bg-white rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
+      {/* Header */}
+      <div className="p-5 pb-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-sora font-semibold text-[16px] text-v2-text-primary">
+            {t("goldPriceTitle")}
+          </h3>
+          {updatedTime && (
+            <span className="font-ibm-mono text-[11px] text-v2-text-tertiary">
+              {t("updated", { time: updatedTime })}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-v2-gold-light">
+              <th className="text-left px-5 py-2.5 font-ibm-mono font-semibold text-[11px] tracking-[1px] text-v2-gold-dark">
+                {t("goldType")}
+              </th>
+              <th className="text-right px-5 py-2.5 font-ibm-mono font-semibold text-[11px] tracking-[1px] text-v2-gold-dark">
+                {t("buy")}
+              </th>
+              <th className="text-right px-5 py-2.5 font-ibm-mono font-semibold text-[11px] tracking-[1px] text-v2-gold-dark">
+                {t("sell")}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {prices.map((item, index) => (
+              <tr
+                key={item.typeCode || index}
+                className={index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"}
+              >
+                <td className="px-5 py-3 font-sora font-medium text-[13px] text-v2-text-primary">
+                  {item.name || item.typeCode}
+                </td>
+                <td className="px-5 py-3 text-right font-ibm-mono font-medium text-[13px] text-v2-text-primary">
+                  {formatPriceValue(item.buy, item.currency || "VND")}
+                </td>
+                <td className="px-5 py-3 text-right font-ibm-mono font-medium text-[13px] text-v2-text-primary">
+                  {formatPriceValue(item.sell, item.currency || "VND")}
+                </td>
+              </tr>
+            ))}
+            {prices.length === 0 && (
+              <tr>
+                <td colSpan={3} className="px-5 py-8 text-center font-sora text-[13px] text-v2-text-tertiary">
+                  {t("comingSoon")}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
