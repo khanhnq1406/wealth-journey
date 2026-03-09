@@ -26,4 +26,9 @@ type PortfolioHistoryRepository interface {
 
 	// CreateSnapshotIfNotDuplicate creates a snapshot only if one doesn't exist recently
 	CreateSnapshotIfNotDuplicate(ctx context.Context, history *models.PortfolioHistory) (*models.PortfolioHistory, error)
+
+	// GetPeriodStartSnapshot finds the per-wallet snapshots nearest to `from` for the user,
+	// then aggregates them into a single synthetic snapshot (summed TotalPnl and TotalValue).
+	// Returns nil, nil if no snapshots exist at or before `from`.
+	GetPeriodStartSnapshot(ctx context.Context, userID int32, from time.Time) (*models.PortfolioHistory, error)
 }

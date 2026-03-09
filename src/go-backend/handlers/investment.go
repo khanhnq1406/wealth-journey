@@ -563,8 +563,18 @@ func (h *InvestmentHandlers) GetPortfolioSummary(c *gin.Context) {
 		return
 	}
 
+	// Parse period parameter — only accept 0–4, anything else defaults to 0 (PERIOD_ALL)
+	var period investmentv1.PnlPeriod
+	periodStr := c.Query("period")
+	if periodStr != "" {
+		periodVal, err := strconv.ParseInt(periodStr, 10, 32)
+		if err == nil && periodVal >= 0 && periodVal <= 4 {
+			period = investmentv1.PnlPeriod(int32(periodVal))
+		}
+	}
+
 	// Call service
-	result, err := h.investmentService.GetPortfolioSummary(c.Request.Context(), walletID, userID)
+	result, err := h.investmentService.GetPortfolioSummary(c.Request.Context(), walletID, userID, period)
 	if err != nil {
 		handler.HandleError(c, err)
 		return
@@ -776,6 +786,20 @@ func (h *InvestmentHandlers) GetAggregatedPortfolioSummary(c *gin.Context) {
 			return
 		}
 		req.TypeFilter = investmentv1.InvestmentType(typeFilter)
+	}
+
+	// Parse period parameter — only accept 0–4, anything else defaults to 0 (PERIOD_UNSPECIFIED/ALL)
+	periodStr := c.Query("period")
+	if periodStr == "" {
+		periodStr = c.Query("pnl_period") // Fallback to snake_case
+	}
+	if periodStr != "" {
+		periodVal, err := strconv.ParseInt(periodStr, 10, 32)
+		if err != nil || periodVal < 0 || periodVal > 4 {
+			req.Period = investmentv1.PnlPeriod_PNL_PERIOD_UNSPECIFIED
+		} else {
+			req.Period = investmentv1.PnlPeriod(int32(periodVal))
+		}
 	}
 
 	// Call service

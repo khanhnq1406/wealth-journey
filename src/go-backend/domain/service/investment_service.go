@@ -23,17 +23,18 @@ import (
 
 // investmentService implements InvestmentService.
 type investmentService struct {
-	investmentRepo    repository.InvestmentRepository
-	walletRepo        repository.WalletRepository
-	txRepo            repository.InvestmentTransactionRepository
-	marketDataService MarketDataService
-	userRepo          repository.UserRepository
-	fxRateSvc         FXRateService
-	currencyCache     *cache.CurrencyCache
-	walletService     WalletService
-	mapper            *InvestmentMapper
-	goldConverter     *gold.Converter
-	silverConverter   *silver.Converter
+	investmentRepo       repository.InvestmentRepository
+	walletRepo           repository.WalletRepository
+	txRepo               repository.InvestmentTransactionRepository
+	marketDataService    MarketDataService
+	userRepo             repository.UserRepository
+	fxRateSvc            FXRateService
+	currencyCache        *cache.CurrencyCache
+	walletService        WalletService
+	portfolioHistoryRepo repository.PortfolioHistoryRepository
+	mapper               *InvestmentMapper
+	goldConverter        *gold.Converter
+	silverConverter      *silver.Converter
 }
 
 // NewInvestmentService creates a new InvestmentService.
@@ -46,19 +47,21 @@ func NewInvestmentService(
 	fxRateSvc FXRateService,
 	currencyCache *cache.CurrencyCache,
 	walletService WalletService,
+	portfolioHistoryRepo repository.PortfolioHistoryRepository,
 ) InvestmentService {
 	return &investmentService{
-		investmentRepo:    investmentRepo,
-		walletRepo:        walletRepo,
-		txRepo:            txRepo,
-		marketDataService: marketDataService,
-		userRepo:          userRepo,
-		fxRateSvc:         fxRateSvc,
-		currencyCache:     currencyCache,
-		walletService:     walletService,
-		mapper:            NewInvestmentMapper(),
-		goldConverter:     gold.NewGoldConverter(fxRateSvc),
-		silverConverter:   silver.NewSilverConverter(fxRateSvc),
+		investmentRepo:       investmentRepo,
+		walletRepo:           walletRepo,
+		txRepo:               txRepo,
+		marketDataService:    marketDataService,
+		userRepo:             userRepo,
+		fxRateSvc:            fxRateSvc,
+		currencyCache:        currencyCache,
+		walletService:        walletService,
+		portfolioHistoryRepo: portfolioHistoryRepo,
+		mapper:               NewInvestmentMapper(),
+		goldConverter:        gold.NewGoldConverter(fxRateSvc),
+		silverConverter:      silver.NewSilverConverter(fxRateSvc),
 	}
 }
 
@@ -1360,7 +1363,7 @@ func (s *investmentService) reverseDividendTransaction(ctx context.Context, inve
 
 // GetPortfolioSummary retrieves portfolio summary for a wallet.
 // For mixed-currency portfolios, all values are converted to user's preferred currency.
-func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID int32, userID int32) (*investmentv1.GetPortfolioSummaryResponse, error) {
+func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID int32, userID int32, period investmentv1.PnlPeriod) (*investmentv1.GetPortfolioSummaryResponse, error) {
 	if err := validator.ID(walletID); err != nil {
 		return nil, err
 	}
@@ -1500,6 +1503,9 @@ func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID in
 		investmentsByTypeSlice = append(investmentsByTypeSlice, typeSummary)
 	}
 
+	// Compute period-scoped PnL
+	periodPnl, periodPnlPercent, _ := s.computePeriodPnl(ctx, userID, period, totalPNL, totalPNLPercent)
+
 	// Calculate top and worst performers
 	topPerformers, worstPerformers, err := s.calculatePerformers(ctx, userID, investments, preferredCurrency)
 	if err != nil {
@@ -1513,19 +1519,22 @@ func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID in
 		Success: true,
 		Message: "Portfolio summary retrieved successfully",
 		Data: &investmentv1.PortfolioSummary{
-			TotalValue:        totalValueInPreferred,
-			TotalCost:         totalCostInPreferred,
-			TotalPnl:          totalPNL,
-			TotalPnlPercent:   totalPNLPercent,
-			RealizedPnl:       realizedPNLInPreferred,
-			UnrealizedPnl:     unrealizedPNLInPreferred,
-			TotalInvestments:  int32(len(investments)),
-			InvestmentsByType: investmentsByTypeSlice,
+			TotalValue:         totalValueInPreferred,
+			TotalCost:          totalCostInPreferred,
+			TotalPnl:           totalPNL,
+			TotalPnlPercent:    totalPNLPercent,
+			RealizedPnl:        realizedPNLInPreferred,
+			UnrealizedPnl:      unrealizedPNLInPreferred,
+			TotalInvestments:   int32(len(investments)),
+			InvestmentsByType:  investmentsByTypeSlice,
 			// Currency fields - summary is in user's preferred currency
-			Currency:        preferredCurrency,
-			DisplayCurrency: preferredCurrency,
-			TopPerformers:   topPerformers,
-			WorstPerformers: worstPerformers,
+			Currency:           preferredCurrency,
+			DisplayCurrency:    preferredCurrency,
+			TopPerformers:      topPerformers,
+			WorstPerformers:    worstPerformers,
+			PeriodPnl:          periodPnl,
+			PeriodPnlPercent:   periodPnlPercent,
+			Period:             period,
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
@@ -2001,7 +2010,7 @@ func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, u
 
 	// If specific wallet requested, delegate to existing GetPortfolioSummary
 	if req.WalletId != 0 {
-		return s.GetPortfolioSummary(ctx, req.WalletId, userID)
+		return s.GetPortfolioSummary(ctx, req.WalletId, userID, req.Period)
 	}
 
 	// Get user's preferred currency
@@ -2137,6 +2146,9 @@ func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, u
 		investmentsByTypeSlice = append(investmentsByTypeSlice, typeSummary)
 	}
 
+	// Compute period-scoped PnL
+	periodPnlAgg, periodPnlPercentAgg, _ := s.computePeriodPnl(ctx, userID, req.Period, totalPNL, totalPNLPercent)
+
 	// Calculate top and worst performers
 	topPerformers, worstPerformers, err := s.calculatePerformers(ctx, userID, investments, preferredCurrency)
 	if err != nil {
@@ -2150,19 +2162,22 @@ func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, u
 		Success: true,
 		Message: "Aggregated portfolio summary retrieved successfully",
 		Data: &investmentv1.PortfolioSummary{
-			TotalValue:        totalValueInPreferred,
-			TotalCost:         totalCostInPreferred,
-			TotalPnl:          totalPNL,
-			TotalPnlPercent:   totalPNLPercent,
-			RealizedPnl:       realizedPNLInPreferred,
-			UnrealizedPnl:     unrealizedPNLInPreferred,
-			TotalInvestments:  int32(len(investments)),
-			InvestmentsByType: investmentsByTypeSlice,
+			TotalValue:         totalValueInPreferred,
+			TotalCost:          totalCostInPreferred,
+			TotalPnl:           totalPNL,
+			TotalPnlPercent:    totalPNLPercent,
+			RealizedPnl:        realizedPNLInPreferred,
+			UnrealizedPnl:      unrealizedPNLInPreferred,
+			TotalInvestments:   int32(len(investments)),
+			InvestmentsByType:  investmentsByTypeSlice,
 			// Currency fields - summary is in user's preferred currency
-			Currency:        preferredCurrency,
-			DisplayCurrency: preferredCurrency,
-			TopPerformers:   topPerformers,
-			WorstPerformers: worstPerformers,
+			Currency:           preferredCurrency,
+			DisplayCurrency:    preferredCurrency,
+			TopPerformers:      topPerformers,
+			WorstPerformers:    worstPerformers,
+			PeriodPnl:          periodPnlAgg,
+			PeriodPnlPercent:   periodPnlPercentAgg,
+			Period:             req.Period,
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
