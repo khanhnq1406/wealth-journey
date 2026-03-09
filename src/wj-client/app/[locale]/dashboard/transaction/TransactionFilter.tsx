@@ -24,9 +24,9 @@ export const TransactionFilter = ({
           onClick={() => onFilterChange("all")}
           role="tab"
           aria-selected={filterType === "all"}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${
+          className={`px-4 py-2 rounded-lg font-medium transition-colors focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 ${
             filterType === "all"
-              ? "bg-primary-500 text-white"
+              ? "bg-v2-red-primary text-white"
               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
           }`}
         >
@@ -36,9 +36,9 @@ export const TransactionFilter = ({
           onClick={() => onFilterChange("income")}
           role="tab"
           aria-selected={filterType === "income"}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${
+          className={`px-4 py-2 rounded-lg font-medium transition-colors focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 ${
             filterType === "income"
-              ? "bg-green-500 text-white"
+              ? "bg-v2-green-positive text-white"
               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
           }`}
         >
@@ -48,7 +48,7 @@ export const TransactionFilter = ({
           onClick={() => onFilterChange("expense")}
           role="tab"
           aria-selected={filterType === "expense"}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${
+          className={`px-4 py-2 rounded-lg font-medium transition-colors focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 ${
             filterType === "expense"
               ? "bg-red-500 text-white"
               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -65,7 +65,7 @@ export const TransactionFilter = ({
           placeholder={t("searchPlaceholder")}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full px-4 py-2 pl-10 border-2 border-gray-200 rounded-lg focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus:border-primary-500"
+          className="w-full px-4 py-2 pl-10 border-2 border-gray-200 rounded-lg focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 focus:border-v2-red-primary"
         />
         <svg
           className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"

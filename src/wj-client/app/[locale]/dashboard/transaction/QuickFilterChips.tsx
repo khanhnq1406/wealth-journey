@@ -164,10 +164,10 @@ export const QuickFilterChips = memo(function QuickFilterChips({
             className={cn(
               "inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200",
               "snap-start",
-              "min-h-[44px] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
+              "min-h-[44px] focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
               // Active state
               isActive
-                ? "bg-primary-600 text-white shadow-md"
+                ? "bg-v2-red-primary text-white shadow-md"
                 : "bg-white dark:bg-dark-surface text-gray-700 dark:text-dark-text border border-gray-300 dark:border-dark-border hover:bg-gray-50 dark:hover:bg-dark-surface-hover active:bg-gray-100 dark:active:bg-dark-surface-active",
             )}
             aria-pressed={isActive}

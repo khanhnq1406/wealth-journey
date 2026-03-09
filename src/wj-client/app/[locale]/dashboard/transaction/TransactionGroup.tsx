@@ -39,7 +39,7 @@ export const TransactionGroup = ({
         </div>
         <div
           className={`font-semibold ${
-            dailyTotal >= 0 ? "text-green-600" : "text-red-600"
+            dailyTotal >= 0 ? "text-v2-green-positive" : "text-red-600"
           }`}
         >
           {dailyTotal >= 0 ? "+" : ""}

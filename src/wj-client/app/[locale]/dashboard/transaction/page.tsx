@@ -503,7 +503,7 @@ export default function TransactionPage() {
   return (
     <div className="h-full flex flex-col">
       {/* Header with Balance */}
-      <div className="flex-shrink-0 bg-primary-600 rounded-md sm:bg-transparent border-b sm:border-b-gray-300">
+      <div className="flex-shrink-0 bg-v2-red-primary rounded-md sm:bg-transparent border-b sm:border-b-gray-300">
         <div className="p-3 sm:p-4 md:px-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3 sm:mb-0">
             <h1 className="text-white sm:text-gray-900 text-2xl sm:text-3xl lg:text-4xl font-bold">
@@ -544,7 +544,7 @@ export default function TransactionPage() {
             placeholder={t("searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-neutral-50 rounded-lg px-4 py-2.5 pl-10 pr-10 text-sm drop-shadow-round focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder:text-gray-400 dark:bg-dark-surface-hover dark:text-dark-text"
+            className="w-full bg-neutral-50 rounded-lg px-4 py-2.5 pl-10 pr-10 text-sm drop-shadow-round focus:outline-none focus:ring-2 focus:ring-v2-red-primary placeholder:text-gray-400 dark:bg-dark-surface-hover dark:text-dark-text"
           />
           <svg
             className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
@@ -610,7 +610,7 @@ export default function TransactionPage() {
                 />
               </svg>
               {(selectedWallet || categoryFilter) && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-primary-600 rounded-full" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-v2-red-primary rounded-full" />
               )}
             </Button>
           </div>
@@ -749,7 +749,7 @@ export default function TransactionPage() {
                 {isLoadingMore && (
                   <div className="flex justify-center py-4">
                     <svg
-                      className="w-6 h-6 text-primary-600 animate-spin"
+                      className="w-6 h-6 text-v2-red-primary animate-spin"
                       fill="none"
                       viewBox="0 0 24 24"
                     >

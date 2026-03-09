@@ -218,13 +218,13 @@ export const TransactionCard = memo(function TransactionCard({
       <div
         className={cn(
           "absolute inset-0 rounded-lg flex items-center justify-between px-4 transition-transform duration-200",
-          "bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20",
+          "bg-gradient-to-r from-v2-red-light to-v2-red-light dark:from-v2-red-primary/20 dark:to-v2-red-primary/10",
         )}
         aria-hidden="true"
       >
         {/* Edit Action (Right swipe) */}
         <div className="flex items-center gap-2 rounded-lg">
-          <div className="w-10 h-10 flex items-center justify-center bg-primary-600 text-white rounded-full min-h-[44px] min-w-[44px]">
+          <div className="w-10 h-10 flex items-center justify-center bg-v2-red-primary text-white rounded-full min-h-[44px] min-w-[44px]">
             <svg
               className="w-5 h-5"
               fill="none"
@@ -239,7 +239,7 @@ export const TransactionCard = memo(function TransactionCard({
               />
             </svg>
           </div>
-          <span className="text-sm font-medium text-primary-700 dark:text-primary-300">
+          <span className="text-sm font-medium text-v2-red-primary dark:text-v2-red-primary/80">
             {tCommon("edit")}
           </span>
         </div>
