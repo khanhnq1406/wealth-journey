@@ -31,7 +31,6 @@ import {
   ChartNoAxesCombined,
   Calculator,
   ChartPie,
-  CircleDollarSign,
   Settings,
   Bell,
   Search,
@@ -129,11 +128,6 @@ export default function DashboardLayout({
         href: routes.portfolio,
         label: t("portfolio"),
         icon: <ChartNoAxesCombined size={20} />,
-      },
-      {
-        href: routes.prices,
-        label: t("prices"),
-        icon: <CircleDollarSign size={20} />,
       },
       {
         href: routes.report,
@@ -284,20 +278,11 @@ export default function DashboardLayout({
                   isActive={path === routes.portfolio}
                 />
                 <NavItem
-                  href={routes.prices}
-                  label={t("prices")}
-                  isExpanded={isExpanded}
-                  showTooltip={!isExpanded}
-                  animationDelay={120}
-                  icon={<CircleDollarSign size={20} />}
-                  isActive={path === routes.prices}
-                />
-                <NavItem
                   href={routes.report}
                   label={t("reports")}
                   isExpanded={isExpanded}
                   showTooltip={!isExpanded}
-                  animationDelay={150}
+                  animationDelay={120}
                   icon={<ChartPie size={20} />}
                   isActive={path === routes.report}
                 />
@@ -306,7 +291,7 @@ export default function DashboardLayout({
                   label={t("budget")}
                   isExpanded={isExpanded}
                   showTooltip={!isExpanded}
-                  animationDelay={180}
+                  animationDelay={150}
                   icon={<Calculator size={20} />}
                   isActive={path === routes.budget}
                 />
@@ -321,7 +306,7 @@ export default function DashboardLayout({
                   label={t("settings")}
                   isExpanded={isExpanded}
                   showTooltip={!isExpanded}
-                  animationDelay={210}
+                  animationDelay={180}
                   icon={<Settings size={20} />}
                   isActive={path.startsWith("/dashboard/settings")}
                 />
