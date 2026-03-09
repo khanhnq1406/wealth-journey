@@ -167,6 +167,14 @@ func RegisterRoutes(
 		if h.MarketPrices != nil {
 			investments.GET("/market-prices", h.MarketPrices.GetMarketPrices)
 		}
+		// Gold chart (must come before :id parameterized route)
+		if h.GoldChart != nil {
+			investments.GET("/gold-chart", h.GoldChart.GetGoldChart)
+		}
+		// Silver chart (must come before :id parameterized route)
+		if h.SilverChart != nil {
+			investments.GET("/silver-chart", h.SilverChart.GetSilverChart)
+		}
 		// Specific routes must come before :id parameterized route
 		// Investment transaction routes (use :id to be consistent with other routes)
 		investments.GET("/:id/transactions", h.Investment.ListTransactions)

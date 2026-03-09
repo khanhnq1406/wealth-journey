@@ -310,7 +310,17 @@
         "year": "Year",
         "30d": "30D"
       },
-      "comingSoon": "Coming soon"
+      "comingSoon": "Coming soon",
+      "domestic": "Domestic",
+      "global": "Global",
+      "price": "PRICE",
+      "loading": "Loading...",
+      "errorLoading": "Failed to load chart data",
+      "noData": "No data available",
+      "retry": "Retry",
+      "unitC": "Chỉ",
+      "unitL": "Lượng",
+      "unitKG": "KG"
     },
     "quickActions": {
       "addTransaction": "Add Transaction",

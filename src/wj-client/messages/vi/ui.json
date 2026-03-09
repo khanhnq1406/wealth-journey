@@ -310,7 +310,17 @@
         "year": "Năm",
         "30d": "30D"
       },
-      "comingSoon": "Sắp ra mắt"
+      "comingSoon": "Sắp ra mắt",
+      "domestic": "Trong nước",
+      "global": "Quốc tế",
+      "price": "GIÁ",
+      "loading": "Đang tải...",
+      "errorLoading": "Không tải được dữ liệu biểu đồ",
+      "noData": "Không có dữ liệu",
+      "retry": "Thử lại",
+      "unitC": "Chỉ",
+      "unitL": "Lượng",
+      "unitKG": "KG"
     },
     "quickActions": {
       "addTransaction": "Thêm giao dịch",
