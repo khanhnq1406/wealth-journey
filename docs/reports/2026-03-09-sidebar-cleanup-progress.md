@@ -6,8 +6,8 @@
 - **Spec file:** docs/specs/2026-03-09-sidebar-cleanup-spec.md
 - **Started:** 2026-03-09
 - **Last updated:** 2026-03-09
-- **Current state:** in_progress
-- **Current task:** 3
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -18,7 +18,7 @@
 | 3 | Remove Prices nav item | done | — | Removed from desktop + mobile, resequenced delays, removed CircleDollarSign import |
 | 4 | Remove CurrencySelector | done | — | Removed from desktop + mobile, removed import, kept CurrencyProvider |
 | 5 | Add desktop logout button | done | — | Added logout button in user section with tooltip when collapsed |
-| 6 | Verify and clean up | pending | — | — |
+| 6 | Verify and clean up | done | — | Build passes, imports clean, no issues |
 
 ## Resume Instructions
 
