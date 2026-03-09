@@ -35,6 +35,7 @@ import {
   Search,
   LogOut,
   X,
+  Menu,
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -239,67 +240,81 @@ export default function DashboardLayout({
               className="flex-1 overflow-y-auto px-3 overflow-x-hidden"
               aria-label={t("mainNavigation")}
             >
-              <div className="flex flex-col gap-1">
-                <NavItem
-                  href={routes.home}
-                  label={t("home")}
-                  isExpanded={isExpanded}
-                  showTooltip={!isExpanded}
-                  animationDelay={0}
-                  icon={<House size={20} />}
-                  isActive={path === routes.home}
-                />
-                <NavItem
-                  href={routes.transaction}
-                  label={t("transactions")}
-                  isExpanded={isExpanded}
-                  showTooltip={!isExpanded}
-                  animationDelay={30}
-                  icon={<ArrowLeftRight size={20} />}
-                  isActive={path === routes.transaction}
-                />
-                <NavItem
-                  href={routes.wallets}
-                  label={t("wallets")}
-                  isExpanded={isExpanded}
-                  showTooltip={!isExpanded}
-                  animationDelay={60}
-                  icon={<Wallet size={20} />}
-                  isActive={path === routes.wallets}
-                />
-                <NavItem
-                  href={routes.portfolio}
-                  label={t("portfolio")}
-                  isExpanded={isExpanded}
-                  showTooltip={!isExpanded}
-                  animationDelay={90}
-                  icon={<ChartNoAxesCombined size={20} />}
-                  isActive={path === routes.portfolio}
-                />
-                <NavItem
-                  href={routes.report}
-                  label={t("reports")}
-                  isExpanded={isExpanded}
-                  showTooltip={!isExpanded}
-                  animationDelay={120}
-                  icon={<ChartPie size={20} />}
-                  isActive={path === routes.report}
-                />
-                <NavItem
-                  href={routes.budget}
-                  label={t("budget")}
-                  isExpanded={isExpanded}
-                  showTooltip={!isExpanded}
-                  animationDelay={150}
-                  icon={<Calculator size={20} />}
-                  isActive={path === routes.budget}
-                />
+              <div className="flex flex-col h-full">
+                {/* Premium Card — Home + Portfolio */}
+                <div
+                  className="rounded-2xl border border-v2-border-light p-1.5 flex flex-col gap-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, #FFFFFF 0%, #FEF2F233 50%, #FEE2E240 100%)",
+                  }}
+                >
+                  <NavItem
+                    href={routes.home}
+                    label={t("home")}
+                    isExpanded={isExpanded}
+                    showTooltip={!isExpanded}
+                    animationDelay={0}
+                    icon={<House size={20} />}
+                    isActive={path === routes.home}
+                    isPremium
+                  />
+                  <NavItem
+                    href={routes.portfolio}
+                    label={t("portfolio")}
+                    isExpanded={isExpanded}
+                    showTooltip={!isExpanded}
+                    animationDelay={30}
+                    icon={<ChartNoAxesCombined size={20} />}
+                    isActive={path === routes.portfolio}
+                    isPremium
+                  />
+                </div>
 
-                {/* Spacer + Divider */}
+                {/* Standard group */}
+                <div className={cn("flex flex-col gap-0.5", isExpanded ? "mt-3" : "mt-4")}>
+                  <NavItem
+                    href={routes.transaction}
+                    label={t("transactions")}
+                    isExpanded={isExpanded}
+                    showTooltip={!isExpanded}
+                    animationDelay={60}
+                    icon={<ArrowLeftRight size={20} />}
+                    isActive={path === routes.transaction}
+                  />
+                  <NavItem
+                    href={routes.wallets}
+                    label={t("wallets")}
+                    isExpanded={isExpanded}
+                    showTooltip={!isExpanded}
+                    animationDelay={90}
+                    icon={<Wallet size={20} />}
+                    isActive={path === routes.wallets}
+                  />
+                  <NavItem
+                    href={routes.report}
+                    label={t("reports")}
+                    isExpanded={isExpanded}
+                    showTooltip={!isExpanded}
+                    animationDelay={120}
+                    icon={<ChartPie size={20} />}
+                    isActive={path === routes.report}
+                  />
+                  <NavItem
+                    href={routes.budget}
+                    label={t("budget")}
+                    isExpanded={isExpanded}
+                    showTooltip={!isExpanded}
+                    animationDelay={150}
+                    icon={<Calculator size={20} />}
+                    isActive={path === routes.budget}
+                  />
+                </div>
+
+                {/* Spacer + Divider + Settings */}
                 <div className="flex-1" />
-                <div className="my-2 border-t border-v2-border-light transition-all duration-300 ease-in-out" />
-
-                {/* Settings */}
+                <div className="border-t border-v2-border-light" />
+                <div className="h-2" />
                 <NavItem
                   href="/dashboard/settings"
                   label={t("settings")}
@@ -313,29 +328,30 @@ export default function DashboardLayout({
             </nav>
 
             {/* Sidebar Toggle */}
-            <div className="w-full flex items-center justify-center p-5">
+            <div className="px-3 pt-2 pb-0">
               <SidebarToggle isExpanded={isExpanded} onToggle={toggle} />
             </div>
 
             {/* User Section */}
-            <div className="p-4 border-t border-v2-border-light transition-all duration-300 ease-in-out">
+            <div className="px-3 pt-2 pb-3 transition-all duration-300 ease-in-out">
+              <div className="border-t border-v2-border-light mb-2" />
               <div
                 className={cn(
-                  "flex items-center py-2 transition-all duration-300 ease-in-out",
-                  isExpanded ? "gap-3 px-3" : "justify-center px-0",
+                  "flex items-center py-2 rounded-xl transition-all duration-300 ease-in-out",
+                  isExpanded ? "gap-3 px-2" : "justify-center px-0",
                 )}
               >
-                <div className="w-8 h-8 rounded-full bg-v2-bg-primary flex items-center justify-center overflow-hidden shrink-0">
+                <div className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden shrink-0 bg-v2-red-primary">
                   {user.picture ? (
                     <NextImage
                       src={user.picture}
                       alt={user.fullname || "User"}
-                      width={32}
-                      height={32}
+                      width={36}
+                      height={36}
                       className="rounded-full"
                     />
                   ) : (
-                    <span className="font-vietnam text-[13px] font-medium text-v2-text-secondary">
+                    <span className="font-vietnam text-[13px] font-medium text-white">
                       {(user.fullname || "U").charAt(0)}
                     </span>
                   )}
@@ -364,7 +380,7 @@ export default function DashboardLayout({
                 <button
                   onClick={logout}
                   className={cn(
-                    "flex items-center w-full py-2.5 rounded-xl font-vietnam text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-all duration-300 ease-in-out mt-2",
+                    "flex items-center w-full py-2.5 rounded-xl font-vietnam text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-all duration-300 ease-in-out mt-1",
                     isExpanded ? "gap-3 px-3" : "justify-center px-0",
                   )}
                   aria-label={t("logout")}
@@ -424,7 +440,7 @@ export default function DashboardLayout({
                     aria-label={t("toggleMenu")}
                     aria-expanded={isMobileMenuOpen}
                   >
-                    <Settings size={20} className="text-v2-text-secondary" />
+                    <Menu size={20} className="text-v2-text-secondary" />
                   </button>
                 </div>
               </div>
