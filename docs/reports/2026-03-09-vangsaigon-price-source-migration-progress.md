@@ -6,8 +6,8 @@
 - **Spec file:** docs/specs/2026-03-09-vangsaigon-price-source-migration-spec.md
 - **Started:** 2026-03-09T00:00:00Z
 - **Last updated:** 2026-03-09T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 1
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -15,7 +15,7 @@
 |---|-----------|--------|--------|---------|
 | 1 | Change BaseURL constant to vangsaigon.vn | done | eb43d21 | Fixed BaseURL in pkg/vang247/client.go; TestClient_FetchPrices passes |
 | 2 | Rename package vang247 → vnprice | done | cc69add | Renamed pkg/vang247→pkg/vnprice; updated imports in gold/silver services; build+tests pass |
-| 3 | Update C4 architecture diagram | in_progress | — | — |
+| 3 | Update C4 architecture diagram | done | fe837c2 | Updated c4-component-backend.md: vang.today→vangsaigon.vn, pkg/gold+pkg/silver→pkg/vnprice |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
