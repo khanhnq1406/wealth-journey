@@ -8,6 +8,7 @@ import {
   useQueryGetMarketPrices,
   useQueryGetAggregatedPortfolioSummary,
 } from "@/utils/generated/hooks";
+import { PnlPeriod } from "@/gen/protobuf/v1/investment";
 import { BaseModal } from "@/components/modals/BaseModal";
 import { CreateWalletForm } from "@/features/wallet/forms/CreateWalletForm";
 import { AddTransactionForm } from "@/features/transaction/forms/AddTransactionForm";
@@ -49,7 +50,22 @@ export default function Home() {
   );
 
   const { data: portfolioSummary } = useQueryGetAggregatedPortfolioSummary(
-    { walletId: 0, typeFilter: 0, period: 0 },
+    { walletId: 0, typeFilter: 0, period: PnlPeriod.PNL_PERIOD_ALL },
+    { staleTime: 5 * 60 * 1000 },
+  );
+
+  const { data: summary1D } = useQueryGetAggregatedPortfolioSummary(
+    { walletId: 0, typeFilter: 0, period: PnlPeriod.PNL_PERIOD_1D },
+    { staleTime: 5 * 60 * 1000 },
+  );
+
+  const { data: summary1W } = useQueryGetAggregatedPortfolioSummary(
+    { walletId: 0, typeFilter: 0, period: PnlPeriod.PNL_PERIOD_1W },
+    { staleTime: 5 * 60 * 1000 },
+  );
+
+  const { data: summary1M } = useQueryGetAggregatedPortfolioSummary(
+    { walletId: 0, typeFilter: 0, period: PnlPeriod.PNL_PERIOD_1M },
     { staleTime: 5 * 60 * 1000 },
   );
 
@@ -63,9 +79,13 @@ export default function Home() {
   const totalPortfolioValue = parseAmount(portfolioSummary?.data?.totalValue);
   const totalNetWorth = totalCash + totalPortfolioValue;
 
-  // PNL data
-  const totalPnl = parseAmount(portfolioSummary?.data?.totalPnl);
-  const totalPnlPercent = Number(portfolioSummary?.data?.totalPnlPercent ?? 0);
+  // PNL data — period-scoped values for NetWorthDisplay
+  const todayPnl = parseAmount(summary1D?.data?.periodPnl);
+  const todayPnlPercent = Number(summary1D?.data?.periodPnlPercent ?? 0);
+  const weekPnl = parseAmount(summary1W?.data?.periodPnl);
+  const weekPnlPercent = Number(summary1W?.data?.periodPnlPercent ?? 0);
+  const monthPnl = parseAmount(summary1M?.data?.periodPnl);
+  const monthPnlPercent = Number(summary1M?.data?.periodPnlPercent ?? 0);
 
   // Gold/silver prices
   const goldPrices = marketPrices?.gold ?? [];
@@ -123,8 +143,8 @@ export default function Home() {
         <NetWorthDisplay
           totalNetWorth={totalNetWorth}
           currency={currency}
-          monthPnlPercent={totalPnlPercent}
-          monthPnl={totalPnl}
+          monthPnlPercent={monthPnlPercent}
+          monthPnl={monthPnl}
           userName={user.fullname ?? undefined}
         />
 
@@ -156,12 +176,12 @@ export default function Home() {
         <NetWorthDisplay
           totalNetWorth={totalNetWorth}
           currency={currency}
-          todayPnlPercent={totalPnlPercent}
-          todayPnl={totalPnl}
-          weekPnlPercent={totalPnlPercent}
-          weekPnl={totalPnl}
-          monthPnlPercent={totalPnlPercent}
-          monthPnl={totalPnl}
+          todayPnlPercent={todayPnlPercent}
+          todayPnl={todayPnl}
+          weekPnlPercent={weekPnlPercent}
+          weekPnl={weekPnl}
+          monthPnlPercent={monthPnlPercent}
+          monthPnl={monthPnl}
           userName={user.fullname ?? undefined}
         />
 
