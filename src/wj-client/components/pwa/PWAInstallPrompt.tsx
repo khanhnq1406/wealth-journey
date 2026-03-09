@@ -104,14 +104,14 @@ export function PWAInstallPrompt({
         aria-modal="true"
         aria-labelledby="pwa-prompt-title"
       >
-        <div className="bg-white rounded-t-2xl drop-shadow-round max-w-2xl mx-auto">
+        <div className="bg-white rounded-t-2xl shadow-v2-card max-w-2xl mx-auto">
           {/* Header */}
-          <div className="px-6 pt-6 pb-4 border-b border-gray-200">
+          <div className="px-6 pt-6 pb-4 border-b border-v2-border-light">
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-4">
                 {/* App Icon */}
                 <div className="flex-shrink-0">
-                  <div className="w-14 h-14 bg-bg rounded-2xl flex items-center justify-center drop-shadow-round">
+                  <div className="w-14 h-14 bg-v2-red-primary rounded-2xl flex items-center justify-center shadow-v2-card">
                     <svg
                       className="w-8 h-8 text-white"
                       fill="none"
@@ -131,11 +131,11 @@ export function PWAInstallPrompt({
                 <div className="flex-1">
                   <h2
                     id="pwa-prompt-title"
-                    className="text-xl font-bold text-gray-900 mb-1"
+                    className="text-xl font-bold text-v2-text-primary mb-1"
                   >
                     {t("title")}
                   </h2>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-v2-text-secondary">
                     {t("description")}
                   </p>
                 </div>
@@ -143,7 +143,7 @@ export function PWAInstallPrompt({
               {/* Close Button */}
               <button
                 onClick={handleDismiss}
-                className="flex-shrink-0 -mt-1 -mr-1 p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                className="flex-shrink-0 -mt-1 -mr-1 p-2 text-v2-text-tertiary hover:text-v2-text-secondary transition-colors cursor-pointer"
                 aria-label={tCommon("close")}
               >
                 <svg
@@ -168,9 +168,9 @@ export function PWAInstallPrompt({
             {/* Benefits */}
             <div className="mb-6 grid grid-cols-3 gap-3">
               <div className="text-center">
-                <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                <div className="w-10 h-10 bg-v2-red-light rounded-full flex items-center justify-center mx-auto mb-2">
                   <svg
-                    className="w-5 h-5 text-bg"
+                    className="w-5 h-5 text-v2-red-primary"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -183,12 +183,12 @@ export function PWAInstallPrompt({
                     />
                   </svg>
                 </div>
-                <p className="text-xs font-medium text-gray-700">{t("benefits.fast")}</p>
+                <p className="text-xs font-medium text-v2-text-secondary">{t("benefits.fast")}</p>
               </div>
               <div className="text-center">
-                <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                <div className="w-10 h-10 bg-v2-red-light rounded-full flex items-center justify-center mx-auto mb-2">
                   <svg
-                    className="w-5 h-5 text-bg"
+                    className="w-5 h-5 text-v2-red-primary"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -201,12 +201,12 @@ export function PWAInstallPrompt({
                     />
                   </svg>
                 </div>
-                <p className="text-xs font-medium text-gray-700">{t("benefits.offline")}</p>
+                <p className="text-xs font-medium text-v2-text-secondary">{t("benefits.offline")}</p>
               </div>
               <div className="text-center">
-                <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                <div className="w-10 h-10 bg-v2-red-light rounded-full flex items-center justify-center mx-auto mb-2">
                   <svg
-                    className="w-5 h-5 text-bg"
+                    className="w-5 h-5 text-v2-red-primary"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -219,13 +219,13 @@ export function PWAInstallPrompt({
                     />
                   </svg>
                 </div>
-                <p className="text-xs font-medium text-gray-700">{t("benefits.homeScreenShort")}</p>
+                <p className="text-xs font-medium text-v2-text-secondary">{t("benefits.homeScreenShort")}</p>
               </div>
             </div>
 
             {/* Installation Steps */}
-            <div className="bg-fg rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">
+            <div className="bg-v2-bg-primary rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-v2-text-primary mb-4">
                 {t("howToInstall")}
               </h3>
               <InstallSteps platform={platform} onInstall={handleInstall} />
@@ -233,16 +233,16 @@ export function PWAInstallPrompt({
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 bg-fg rounded-b-2xl flex items-center justify-between gap-3">
+          <div className="px-6 py-4 bg-v2-bg-primary rounded-b-2xl flex items-center justify-between gap-3">
             <button
               onClick={handleDismissPermanently}
-              className="text-sm text-gray-500 hover:text-gray-700 transition-colors font-medium"
+              className="text-sm text-v2-text-tertiary hover:text-v2-text-secondary transition-colors font-medium cursor-pointer"
             >
               {t("dontShowAgain")}
             </button>
             <button
               onClick={handleDismiss}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-hover rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-v2-text-secondary hover:bg-v2-border-light rounded-lg transition-colors cursor-pointer"
             >
               {t("maybeLater")}
             </button>

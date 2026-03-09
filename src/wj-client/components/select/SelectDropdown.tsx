@@ -25,7 +25,7 @@ export function SelectDropdown({
         name={ariaLabel?.toLowerCase().replace(/\s+/g, "-")}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="appearance-none bg-neutral-50  rounded-lg px-4 py-2.5 pr-10 text-gray-900 text-sm font-bold drop-shadow-round cursor-pointer focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus:border-primary-600 hover:border-primary-600/80"
+        className="appearance-none bg-v2-bg-primary rounded-lg px-4 py-2.5 pr-10 text-v2-text-primary text-sm font-bold shadow-v2-card cursor-pointer focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 focus:border-v2-red-primary hover:border-v2-red-primary/80 border border-v2-border-light"
         aria-label={ariaLabel}
       >
         {placeholder && (

@@ -104,19 +104,19 @@ export function ErrorState({
 
   return (
     <div className={`flex flex-col items-center justify-center text-center p-8 ${className}`}>
-      <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4 text-red-600 dark:text-red-400">
+      <div className="w-16 h-16 rounded-full bg-v2-red-light flex items-center justify-center mb-4 text-v2-red-negative">
         {config.icon}
       </div>
 
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{config.title}</h3>
+      <h3 className="text-lg font-semibold text-v2-text-primary mb-2">{config.title}</h3>
 
-      <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mb-4">{config.message}</p>
+      <p className="text-sm text-v2-text-secondary max-w-sm mb-4">{config.message}</p>
 
       <div className="flex gap-2">
         {onRetry && (
           <button
             onClick={onRetry}
-            className="px-4 py-2 bg-bg text-white rounded-md hover:opacity-90 transition-opacity"
+            className="px-4 py-2 bg-v2-red-primary text-white rounded-md hover:opacity-90 transition-opacity cursor-pointer"
           >
             {retryLabel ?? t("tryAgain")}
           </button>
