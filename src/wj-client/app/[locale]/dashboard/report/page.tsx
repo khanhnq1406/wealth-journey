@@ -26,7 +26,12 @@ import {
   useQueryGetFinancialReport,
   useQueryGetCategoryBreakdown,
   useQueryListCategories,
+  useQueryGetAvailableYears,
 } from "@/utils/generated/hooks";
+import { Balance } from "./Balance";
+import { AccountBalance } from "./AccountBalance";
+import { Dominance } from "./Dominance";
+import { MonthlyDominance } from "./MonthlyDominance";
 import { exportFinancialReportToCSV } from "@/utils/csv-export";
 import {
   exportReportToPDF,
@@ -139,6 +144,16 @@ export default function ReportPageEnhanced() {
     { pagination: { page: 1, pageSize: 100, orderBy: "", order: "" } },
     { refetchOnMount: "always" },
   );
+
+  // Fetch available years for wallet analytics charts
+  const { data: availableYearsData } = useQueryGetAvailableYears(
+    {},
+    { refetchOnMount: "always" },
+  );
+
+  const availableYears = availableYearsData?.years?.length
+    ? availableYearsData.years
+    : [new Date().getFullYear()];
 
   // Combined loading and error states
   const isLoading = isReportLoading || isCategoryLoading;
@@ -680,6 +695,59 @@ export default function ReportPageEnhanced() {
           </div>
         </BaseCard>
       </motion.div>
+
+      {/* Wallet Analytics Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
+        <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">
+          {t("walletAnalytics")}
+        </h2>
+      </motion.div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+        >
+          <BaseCard className="p-3 sm:p-4">
+            <Balance availableYears={availableYears} />
+          </BaseCard>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.7 }}
+        >
+          <BaseCard className="p-3 sm:p-4">
+            <AccountBalance availableYears={availableYears} />
+          </BaseCard>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.8 }}
+        >
+          <BaseCard className="p-3 sm:p-4">
+            <Dominance availableYears={availableYears} />
+          </BaseCard>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.9 }}
+        >
+          <BaseCard className="p-3 sm:p-4">
+            <MonthlyDominance availableYears={availableYears} />
+          </BaseCard>
+        </motion.div>
+      </div>
     </div>
   );
 }
