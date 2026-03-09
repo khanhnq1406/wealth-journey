@@ -30,7 +30,7 @@ import {
 } from "@/utils/generated/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { WalletType } from "@/gen/protobuf/v1/wallet";
-import { InvestmentType } from "@/gen/protobuf/v1/investment";
+import { InvestmentType, PnlPeriod } from "@/gen/protobuf/v1/investment";
 import { FormSelect, SelectOption } from "@/components/forms/FormSelect";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import {
@@ -105,6 +105,7 @@ export default function PortfolioPageEnhanced() {
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
   const [showSuccessBanner, setShowSuccessBanner] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>();
+  const [summaryPeriod, setSummaryPeriod] = useState<"1d" | "1w" | "1m" | "all">("all");
 
   // Fetch data
   const getListWallets = useQueryListWallets(
@@ -153,10 +154,20 @@ export default function PortfolioPageEnhanced() {
 
   const isAllWalletsView = selectedWallet === "all";
 
+  const summaryPeriodEnum = useMemo((): PnlPeriod => {
+    switch (summaryPeriod) {
+      case "1d": return PnlPeriod.PNL_PERIOD_1D;
+      case "1w": return PnlPeriod.PNL_PERIOD_1W;
+      case "1m": return PnlPeriod.PNL_PERIOD_1M;
+      default:   return PnlPeriod.PNL_PERIOD_ALL;
+    }
+  }, [summaryPeriod]);
+
   const getPortfolioSummary = useQueryGetAggregatedPortfolioSummary(
     {
       walletId: walletIdForApi,
       typeFilter: typeFilterForApi,
+      period: summaryPeriodEnum,
     },
     {
       enabled: investmentWallets.length > 0,
@@ -450,6 +461,8 @@ export default function PortfolioPageEnhanced() {
               onRefreshPrices={handleRefreshPrices}
               onAddInvestment={() => handleOpenModal(ModalType.ADD_INVESTMENT)}
               isRefreshing={updatePricesMutation.isPending || showUpdateBanner}
+              selectedPeriod={summaryPeriod}
+              onPeriodChange={setSummaryPeriod}
             />
           ) : null}
 

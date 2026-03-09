@@ -30,12 +30,18 @@
       "totalValue": "Tổng giá trị",
       "totalCost": "Tổng chi phí",
       "totalPnl": "Tổng lãi/lỗ",
+      "periodPnl": "Lãi/lỗ theo kỳ",
       "holdings": "Số lượng nắm giữ",
       "assetAllocation": "Phân bổ tài sản",
       "distributionByType": "Phân phối theo loại đầu tư",
       "totalPortfolio": "Tổng danh mục",
       "best": "Tốt nhất:",
-      "worst": "Kém nhất:"
+      "worst": "Kém nhất:",
+      "period1D": "1N",
+      "period1W": "1T",
+      "period1M": "1Th",
+      "periodAll": "TẤT CẢ",
+      "periodLabel": "Kỳ"
     },
     "table": {
       "symbol": "Mã",

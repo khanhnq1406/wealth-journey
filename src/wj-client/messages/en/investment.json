@@ -30,12 +30,18 @@
       "totalValue": "Total Value",
       "totalCost": "Total Cost",
       "totalPnl": "Total PNL",
+      "periodPnl": "Period PNL",
       "holdings": "Holdings",
       "assetAllocation": "Asset Allocation",
       "distributionByType": "Distribution by investment type",
       "totalPortfolio": "Total Portfolio",
       "best": "Best:",
-      "worst": "Worst:"
+      "worst": "Worst:",
+      "period1D": "1D",
+      "period1W": "1W",
+      "period1M": "1M",
+      "periodAll": "ALL",
+      "periodLabel": "Period"
     },
     "table": {
       "symbol": "Symbol",

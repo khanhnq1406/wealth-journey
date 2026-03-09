@@ -5,21 +5,21 @@
 - **Plan file:** docs/plans/2026-03-09-period-pnl-plan.md
 - **Spec file:** docs/specs/2026-03-09-period-pnl-spec.md
 - **Started:** 2026-03-09T00:00:00Z
-- **Last updated:** 2026-03-09T00:00:00Z
+- **Last updated:** 2026-03-09T12:00:00Z
 - **Current state:** in_progress
-- **Current task:** 0
+- **Current task:** 6
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 0 | Update C4 and Flow Architecture Diagrams | in_progress | — | — |
-| 1 | Add PnlPeriod Enum and Fields to investment.proto | pending | — | — |
-| 2 | Backend Service — Period PnL Calculation | pending | — | — |
-| 3 | Backend Handler — Parse period query param | pending | — | — |
-| 4 | Frontend PNLCard Refactor | pending | — | — |
-| 5 | Frontend PortfolioSummaryEnhanced Period Selector | pending | — | — |
-| 6 | Smoke Test + Progress File Initialization | pending | — | — |
+| 0 | Update C4 and Flow Architecture Diagrams | done | 2c0dd54 | Updated c4-component-frontend.md and flow-investment.md with period PnL flow |
+| 1 | Add PnlPeriod Enum and Fields to investment.proto | done | 6793fac | PnlPeriod enum + periodPnl/periodPnlPercent/period fields in PortfolioSummary |
+| 2 | Backend Service — Period PnL Calculation | done | 1b6db69 | GetPeriodStartSnapshot repo method + computePeriodPnl service logic |
+| 3 | Backend Handler — Parse period query param | done | 1b6db69 | Both handlers parse ?period= with 0-4 range validation |
+| 4 | Frontend PNLCard Refactor | done | — | Self-contained PNLCard with 4 period tabs, fetches own data |
+| 5 | Frontend PortfolioSummaryEnhanced Period Selector | done | — | Period pill selector in PortfolioSummaryEnhanced; portfolio page passes period enum |
+| 6 | Smoke Test + Progress File Finalization | in_progress | — | — |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
@@ -34,8 +34,8 @@ To resume this implementation in a new session:
 
 ## Notes
 
-- investmentService struct does NOT currently have portfolioHistoryRepo — must add it
-- NewInvestmentService called in services.go line 44, must add portfolioHistoryRepo param
-- GetPortfolioSummary service signature needs period param added
-- GetAggregatedHistory exists in repo impl; need to add GetPeriodStartSnapshot
-- totalPNL computed at line 2126 in GetAggregatedPortfolioSummary, line 1489 in GetPortfolioSummary
+- Tasks 2 and 3 committed together (handler fix required for clean build)
+- Pre-existing TS errors in test files (portfolio.test.tsx, FormSelect.test.tsx, etc.) are unrelated to this feature
+- `home/page.tsx` still fetches portfolio summary for net worth calculation (totalPortfolioValue) and NetWorthDisplay PnL props — period=0 (all-time)
+- PNLCard is now self-contained: only takes `currency` prop, manages its own period state + API calls
+- PortfolioSummaryEnhanced: period pill selector only renders when `onPeriodChange` is provided

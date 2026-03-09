@@ -49,7 +49,7 @@ export default function Home() {
   );
 
   const { data: portfolioSummary } = useQueryGetAggregatedPortfolioSummary(
-    { walletId: 0, typeFilter: 0 },
+    { walletId: 0, typeFilter: 0, period: 0 },
     { staleTime: 5 * 60 * 1000 },
   );
 
@@ -129,11 +129,7 @@ export default function Home() {
         />
 
         {/* 2. PNL Card */}
-        <PNLCard
-          monthPnl={totalPnl}
-          monthPnlPercent={totalPnlPercent}
-          currency={currency}
-        />
+        <PNLCard currency={currency} />
 
         {/* 3. Gold Price Table */}
         <GoldPriceTable prices={goldPrices} updatedTime={formatUpdateTime()} />
@@ -172,15 +168,7 @@ export default function Home() {
         {/* Row 2: PNL Chart + Wallets */}
         <div className="flex gap-6">
           <div className="flex-1">
-            <PNLCard
-              todayPnl={totalPnl}
-              todayPnlPercent={totalPnlPercent}
-              weekPnl={totalPnl}
-              weekPnlPercent={totalPnlPercent}
-              monthPnl={totalPnl}
-              monthPnlPercent={totalPnlPercent}
-              currency={currency}
-            />
+            <PNLCard currency={currency} />
           </div>
           <div className="w-[340px] shrink-0">
             <div className="bg-white rounded-[20px] border border-v2-border-light shadow-v2-card p-5">

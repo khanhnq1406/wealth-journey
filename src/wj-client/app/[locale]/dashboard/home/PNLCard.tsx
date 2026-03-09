@@ -1,46 +1,62 @@
 "use client";
 
 import { LineChart } from "@/components/charts/LineChart";
-import { useQueryGetHistoricalPortfolioValues } from "@/utils/generated/hooks";
+import {
+  useQueryGetHistoricalPortfolioValues,
+  useQueryGetAggregatedPortfolioSummary,
+} from "@/utils/generated/hooks";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { PnlPeriod } from "@/gen/protobuf/v1/investment";
+import { parseAmount } from "@/utils/currency-formatter";
 
 interface PNLCardProps {
-  todayPnl?: number;
-  todayPnlPercent?: number;
-  weekPnl?: number;
-  weekPnlPercent?: number;
-  monthPnl?: number;
-  monthPnlPercent?: number;
   currency: string;
 }
 
-export function PNLCard({
-  todayPnl = 0,
-  todayPnlPercent = 0,
-  weekPnl = 0,
-  weekPnlPercent = 0,
-  monthPnl = 0,
-  monthPnlPercent = 0,
-  currency,
-}: PNLCardProps) {
-  const t = useTranslations("dashboard.home");
-  const [selectedPeriod, setSelectedPeriod] = useState<"7d" | "30d" | "90d">(
-    "30d",
-  );
+type PeriodKey = "1d" | "1w" | "1m" | "all";
 
-  const periods = [
-    { key: "7d" as const, label: t("7days") },
-    { key: "30d" as const, label: t("30days") },
+const PERIOD_TO_ENUM: Record<PeriodKey, PnlPeriod> = {
+  "1d": PnlPeriod.PNL_PERIOD_1D,
+  "1w": PnlPeriod.PNL_PERIOD_1W,
+  "1m": PnlPeriod.PNL_PERIOD_1M,
+  "all": PnlPeriod.PNL_PERIOD_ALL,
+};
+
+const PERIOD_TO_CHART_DAYS: Record<PeriodKey, number> = {
+  "1d": 1,
+  "1w": 7,
+  "1m": 30,
+  "all": 90,
+};
+
+export function PNLCard({ currency }: PNLCardProps) {
+  const t = useTranslations("dashboard.home");
+  const [selectedPeriod, setSelectedPeriod] = useState<PeriodKey>("1m");
+
+  const periods: { key: PeriodKey; label: string }[] = [
+    { key: "1d", label: t("1day") },
+    { key: "1w", label: t("1week") },
+    { key: "1m", label: t("1month") },
+    { key: "all", label: t("allTime") },
   ];
 
-  const periodDays = selectedPeriod === "7d" ? 7 : 30;
-  const periodPoints = selectedPeriod === "7d" ? 7 : 30;
+  const periodEnum = PERIOD_TO_ENUM[selectedPeriod];
+  const chartDays = PERIOD_TO_CHART_DAYS[selectedPeriod];
 
-  const { data: histData, isLoading: histLoading } = useQueryGetHistoricalPortfolioValues(
-    { walletId: 0, typeFilter: 0, days: periodDays, points: periodPoints },
-    { staleTime: 5 * 60 * 1000, refetchOnWindowFocus: false }
+  const { data: summaryData } = useQueryGetAggregatedPortfolioSummary(
+    { walletId: 0, typeFilter: 0, period: periodEnum },
+    { staleTime: 5 * 60 * 1000, refetchOnWindowFocus: false },
   );
+
+  const { data: histData, isLoading: histLoading } =
+    useQueryGetHistoricalPortfolioValues(
+      { walletId: 0, typeFilter: 0, days: chartDays, points: Math.min(chartDays, 30) },
+      { staleTime: 5 * 60 * 1000, refetchOnWindowFocus: false },
+    );
+
+  const periodPnl = parseAmount(summaryData?.data?.periodPnl);
+  const periodPnlPercent = Number(summaryData?.data?.periodPnlPercent ?? 0);
 
   const chartPoints = (histData?.data || []).map((point) => ({
     date: new Date(Number(point.timestamp) * 1000).toLocaleDateString("vi-VN", {
@@ -69,11 +85,14 @@ export function PNLCard({
     return `${sign}${value.toFixed(2)}%`;
   };
 
-  const metrics = [
-    { label: t("pnlToday"), value: Number(todayPnl), percent: Number(todayPnlPercent) },
-    { label: t("pnl7d"), value: Number(weekPnl), percent: Number(weekPnlPercent) },
-    { label: t("pnl30d"), value: Number(monthPnl), percent: Number(monthPnlPercent) },
-  ];
+  const pnlLabelKey: Record<PeriodKey, string> = {
+    "1d": "pnl1d",
+    "1w": "pnl1w",
+    "1m": "pnl1m",
+    "all": "pnlAll",
+  };
+
+  const isPositive = periodPnl >= 0;
 
   return (
     <div className="bg-white rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
@@ -101,28 +120,21 @@ export function PNLCard({
           </div>
         </div>
 
-        {/* Metrics row */}
-        <div className="flex items-center gap-6 mt-4">
-          {metrics.map((metric) => {
-            const isPositive = metric.value >= 0;
-            return (
-              <div key={metric.label}>
-                <p
-                  className={`font-jetbrains font-bold text-[16px] ${
-                    isPositive ? "text-v2-green-positive" : "text-v2-red-negative"
-                  }`}
-                >
-                  {formatPercent(metric.percent)}
-                </p>
-                <p className="font-jetbrains font-medium text-[12px] text-v2-text-secondary mt-0.5">
-                  {formatAmount(metric.value)} {currency}
-                </p>
-                <p className="font-jetbrains font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
-                  {metric.label}
-                </p>
-              </div>
-            );
-          })}
+        {/* PnL display */}
+        <div className="mt-4">
+          <p
+            className={`font-jetbrains font-bold text-[24px] ${
+              isPositive ? "text-v2-green-positive" : "text-v2-red-negative"
+            }`}
+          >
+            {formatPercent(periodPnlPercent)}
+          </p>
+          <p className="font-jetbrains font-medium text-[14px] text-v2-text-secondary mt-0.5">
+            {formatAmount(periodPnl)} {currency}
+          </p>
+          <p className="font-jetbrains font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
+            {t(pnlLabelKey[selectedPeriod] as any)}
+          </p>
         </div>
       </div>
 
@@ -135,7 +147,9 @@ export function PNLCard({
         )}
         {!histLoading && chartPoints.length === 0 && (
           <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
-            <p className="font-vietnam text-[13px] text-v2-text-tertiary">{t("comingSoon")}</p>
+            <p className="font-vietnam text-[13px] text-v2-text-tertiary">
+              {t("comingSoon")}
+            </p>
           </div>
         )}
         {!histLoading && chartPoints.length > 0 && (
