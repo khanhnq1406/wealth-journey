@@ -37,7 +37,7 @@ export function NetWorthDisplay({
   })();
 
   const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat("vi-VN").format(amount);
+    return new Intl.NumberFormat("vi-VN").format(Number(amount));
   };
 
   const formatPercent = (percent: number) => {

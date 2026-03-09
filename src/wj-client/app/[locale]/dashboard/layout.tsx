@@ -135,7 +135,11 @@ export default function DashboardLayout({
         label: t("prices"),
         icon: <CircleDollarSign size={20} />,
       },
-      { href: routes.report, label: t("reports"), icon: <ChartPie size={20} /> },
+      {
+        href: routes.report,
+        label: t("reports"),
+        icon: <ChartPie size={20} />,
+      },
       {
         href: routes.budget,
         label: t("budget"),
@@ -189,14 +193,14 @@ export default function DashboardLayout({
           <aside
             className={cn(
               "hidden sm:flex flex-col bg-white border-r border-v2-border-light min-h-screen fixed left-0 top-0 z-sidebar transition-all duration-300 ease-in-out",
-              isExpanded ? "sm:w-64 lg:w-72" : "sm:w-20"
+              isExpanded ? "sm:w-64 lg:w-72" : "sm:w-20",
             )}
           >
             {/* Logo Section */}
             <div
               className={cn(
                 "pt-6 pb-4 transition-all duration-300 ease-in-out",
-                isExpanded ? "px-6" : "px-0"
+                isExpanded ? "px-6" : "px-0",
               )}
             >
               <div className="flex items-center justify-between">
@@ -205,7 +209,7 @@ export default function DashboardLayout({
                     "flex items-center gap-3 transition-all duration-300 ease-in-out",
                     isExpanded
                       ? "opacity-100 scale-100 translate-x-0"
-                      : "opacity-0 w-0 overflow-hidden scale-95 -translate-x-2"
+                      : "opacity-0 w-0 overflow-hidden scale-95 -translate-x-2",
                   )}
                 >
                   <div className="w-[38px] h-[38px] bg-v2-red-primary rounded-[10px] flex items-center justify-center">
@@ -316,7 +320,7 @@ export default function DashboardLayout({
               <div
                 className={cn(
                   "flex items-center py-2 transition-all duration-300 ease-in-out",
-                  isExpanded ? "gap-3 px-3" : "justify-center px-0"
+                  isExpanded ? "gap-3 px-3" : "justify-center px-0",
                 )}
               >
                 <div className="w-8 h-8 rounded-full bg-v2-bg-primary flex items-center justify-center overflow-hidden shrink-0">
@@ -339,7 +343,7 @@ export default function DashboardLayout({
                     "flex-1 min-w-0 transition-all duration-300 ease-in-out",
                     isExpanded
                       ? "opacity-100 w-auto translate-x-0"
-                      : "opacity-0 w-0 overflow-hidden -translate-x-2"
+                      : "opacity-0 w-0 overflow-hidden -translate-x-2",
                   )}
                   style={{
                     transitionDelay: isExpanded ? "100ms" : "0ms",
@@ -358,7 +362,7 @@ export default function DashboardLayout({
                   "mt-3 px-3 space-y-2 transition-all duration-300 ease-in-out",
                   isExpanded
                     ? "opacity-100 max-h-20 translate-y-0"
-                    : "opacity-0 max-h-0 overflow-hidden -translate-y-2"
+                    : "opacity-0 max-h-0 overflow-hidden -translate-y-2",
                 )}
                 style={{
                   transitionDelay: isExpanded ? "150ms" : "0ms",
@@ -499,7 +503,7 @@ export default function DashboardLayout({
           <main
             className={cn(
               "flex-1 flex flex-col overflow-hidden transition-all duration-300 ease-in-out",
-              isExpanded ? "sm:ml-64 lg:ml-72" : "sm:ml-20"
+              isExpanded ? "sm:ml-64 lg:ml-72" : "sm:ml-20",
             )}
           >
             {/* V2 Desktop Top Bar */}
@@ -519,7 +523,7 @@ export default function DashboardLayout({
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setIsSearchOpen(true)}
-                  className="flex items-center gap-2 w-[240px] bg-v2-bg-primary border border-v2-border rounded-xl px-4 py-2 text-v2-text-tertiary text-[13px] font-vietnam hover:border-v2-text-tertiary transition-colors"
+                  className="flex items-center gap-2 w-fit bg-v2-bg-primary border border-v2-border rounded-xl px-4 py-2 text-v2-text-tertiary text-[13px] font-vietnam hover:border-v2-text-tertiary transition-colors"
                 >
                   <Search size={16} />
                   <span>{tSearch("placeholder")}</span>

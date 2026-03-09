@@ -33,19 +33,21 @@ export function PNLCard({
   ];
 
   const formatAmount = (amount: number) => {
-    const sign = amount >= 0 ? "+" : "";
-    return `${sign}${new Intl.NumberFormat("vi-VN").format(amount)}`;
+    const value = Number(amount);
+    const sign = value >= 0 ? "+" : "";
+    return `${sign}${new Intl.NumberFormat("vi-VN").format(value)}`;
   };
 
   const formatPercent = (percent: number) => {
-    const sign = percent >= 0 ? "+" : "";
-    return `${sign}${percent.toFixed(2)}%`;
+    const value = Number(percent);
+    const sign = value >= 0 ? "+" : "";
+    return `${sign}${value.toFixed(2)}%`;
   };
 
   const metrics = [
-    { label: t("pnlToday"), value: todayPnl, percent: todayPnlPercent },
-    { label: t("pnl7d"), value: weekPnl, percent: weekPnlPercent },
-    { label: t("pnl30d"), value: monthPnl, percent: monthPnlPercent },
+    { label: t("pnlToday"), value: Number(todayPnl), percent: Number(todayPnlPercent) },
+    { label: t("pnl7d"), value: Number(weekPnl), percent: Number(weekPnlPercent) },
+    { label: t("pnl30d"), value: Number(monthPnl), percent: Number(monthPnlPercent) },
   ];
 
   return (

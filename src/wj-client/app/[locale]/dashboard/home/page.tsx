@@ -19,6 +19,7 @@ import {
   EVENT_TransactionListTransactions,
 } from "@/utils/generated/hooks";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { parseAmount } from "@/utils/currency-formatter";
 import { NetWorthDisplay } from "./NetWorthDisplay";
 import { PNLCard } from "./PNLCard";
 import { GoldPriceTable } from "./GoldPriceTable";
@@ -53,16 +54,18 @@ export default function Home() {
   );
 
   // Calculate net worth: cash (wallets) + investments (portfolio)
-  const totalCash = walletsData?.wallets?.reduce(
-    (sum, w) => sum + (w.balance?.amount || 0),
-    0,
-  ) ?? 0;
-  const totalPortfolioValue = portfolioSummary?.data?.totalValue ?? 0;
+  // Note: protobuf int64 values arrive as strings from protojson — must parseAmount()
+  const totalCash =
+    walletsData?.wallets?.reduce(
+      (sum, w) => sum + parseAmount(w.balance?.amount),
+      0,
+    ) ?? 0;
+  const totalPortfolioValue = parseAmount(portfolioSummary?.data?.totalValue);
   const totalNetWorth = totalCash + totalPortfolioValue;
 
   // PNL data
-  const totalPnl = portfolioSummary?.data?.totalPnl ?? 0;
-  const totalPnlPercent = portfolioSummary?.data?.totalPnlPercent ?? 0;
+  const totalPnl = parseAmount(portfolioSummary?.data?.totalPnl);
+  const totalPnlPercent = Number(portfolioSummary?.data?.totalPnlPercent ?? 0);
 
   // Gold/silver prices
   const goldPrices = marketPrices?.gold ?? [];
@@ -78,7 +81,7 @@ export default function Home() {
   const wallets = (walletsData?.wallets ?? []).map((w) => ({
     id: w.id ?? 0,
     walletName: w.walletName ?? "",
-    balance: w.balance?.amount ?? 0,
+    balance: parseAmount(w.balance?.amount),
     currency: w.currency ?? "VND",
     type: w.type ?? 0,
   }));
@@ -133,10 +136,7 @@ export default function Home() {
         />
 
         {/* 3. Gold Price Table */}
-        <GoldPriceTable
-          prices={goldPrices}
-          updatedTime={formatUpdateTime()}
-        />
+        <GoldPriceTable prices={goldPrices} updatedTime={formatUpdateTime()} />
 
         {/* 4. Gold Price Chart */}
         <GoldPriceChart prices={goldPrices} />
