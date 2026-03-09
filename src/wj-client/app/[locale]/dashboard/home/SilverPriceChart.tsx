@@ -24,14 +24,19 @@ const DAYS_MAP: Record<string, number> = {
 function formatXAxis(timestamp: number, period: string): string {
   const d = new Date(timestamp * 1000);
   if (period === "24h") {
-    return d.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
   return d.toLocaleDateString("vi-VN", { month: "2-digit", day: "2-digit" });
 }
 
 export function SilverPriceChart({ prices }: SilverPriceChartProps) {
   const t = useTranslations("dashboard.home");
-  const [selectedType, setSelectedType] = useState<string>(prices[0]?.typeCode || "");
+  const [selectedType, setSelectedType] = useState<string>(
+    prices[0]?.typeCode || "",
+  );
   const [selectedPeriod, setSelectedPeriod] = useState<string>("24h");
   const [market, setMarket] = useState<"domestic" | "global">("domestic");
   const [silverUnit, setSilverUnit] = useState<"C" | "L" | "KG">("L");
@@ -49,19 +54,23 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
     { key: "KG" as const, label: t("unitKG") },
   ];
 
-  const selectedPrice = prices.find((p) => p.typeCode === selectedType) || prices[0];
+  const selectedPrice =
+    prices.find((p) => p.typeCode === selectedType) || prices[0];
   const days = DAYS_MAP[selectedPeriod] || 7;
   const isGlobal = market === "global";
-  const currency = isGlobal ? "USD" : (selectedPrice?.currency || "VND");
+  const currency = isGlobal ? "USD" : selectedPrice?.currency || "VND";
 
-  const { data, isLoading, isError, refetch } = useQueryGetSilverChart({
-    market,
-    type: isGlobal ? "" : silverUnit,
-    days,
-  }, {
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
+  const { data, isLoading, isError, refetch } = useQueryGetSilverChart(
+    {
+      market,
+      type: isGlobal ? "" : silverUnit,
+      days,
+    },
+    {
+      staleTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: false,
+    },
+  );
 
   // Build chart data
   const chartData = (data?.data || []).map((point) => ({
@@ -79,10 +88,30 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
 
   // Chart series
   const chartSeries = isGlobal
-    ? [{ dataKey: "buy", name: t("price"), color: "#8B929E", chartType: "area" as const, showDots: false }]
+    ? [
+        {
+          dataKey: "buy",
+          name: t("price"),
+          color: "#8B929E",
+          chartType: "line" as const,
+          showDots: false,
+        },
+      ]
     : [
-        { dataKey: "buy", name: t("buy"), color: "#4B5563", chartType: "area" as const, showDots: false },
-        { dataKey: "sell", name: t("sell"), color: "#16A34A", chartType: "area" as const, showDots: false },
+        {
+          dataKey: "buy",
+          name: t("buy"),
+          color: "#4B5563",
+          chartType: "line" as const,
+          showDots: false,
+        },
+        {
+          dataKey: "sell",
+          name: t("sell"),
+          color: "#16A34A",
+          chartType: "line" as const,
+          showDots: false,
+        },
       ];
 
   // Suppress unused variable warning — selectedType is kept for future type selector support
@@ -102,7 +131,9 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
               <button
                 onClick={() => setMarket("domestic")}
                 className={`px-2.5 py-1 rounded-md text-[11px] font-vietnam font-medium transition-colors ${
-                  !isGlobal ? "bg-white shadow-sm text-v2-text-primary" : "text-v2-text-secondary"
+                  !isGlobal
+                    ? "bg-white shadow-sm text-v2-text-primary"
+                    : "text-v2-text-secondary"
                 }`}
               >
                 {t("domestic")}
@@ -110,7 +141,9 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
               <button
                 onClick={() => setMarket("global")}
                 className={`px-2.5 py-1 rounded-md text-[11px] font-vietnam font-medium transition-colors ${
-                  isGlobal ? "bg-white shadow-sm text-v2-text-primary" : "text-v2-text-secondary"
+                  isGlobal
+                    ? "bg-white shadow-sm text-v2-text-primary"
+                    : "text-v2-text-secondary"
                 }`}
               >
                 {t("global")}
@@ -120,11 +153,15 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
             {!isGlobal && (
               <select
                 value={silverUnit}
-                onChange={(e) => setSilverUnit(e.target.value as "C" | "L" | "KG")}
+                onChange={(e) =>
+                  setSilverUnit(e.target.value as "C" | "L" | "KG")
+                }
                 className="font-vietnam text-[12px] text-v2-text-secondary bg-v2-bg-primary border border-v2-border rounded-lg px-2.5 py-1.5"
               >
                 {unitOptions.map((u) => (
-                  <option key={u.key} value={u.key}>{u.label}</option>
+                  <option key={u.key} value={u.key}>
+                    {u.label}
+                  </option>
                 ))}
               </select>
             )}
@@ -138,16 +175,26 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
               <>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-[#4B5563]" />
-                  <span className="font-jetbrains text-[12px] text-v2-text-secondary">{t("buy")}</span>
+                  <span className="font-jetbrains text-[12px] text-v2-text-secondary">
+                    {t("buy")}
+                  </span>
                   <span className="font-jetbrains font-semibold text-[13px] text-v2-text-primary">
-                    {formatPriceValue(selectedPrice.buy, selectedPrice.currency || "VND")}
+                    {formatPriceValue(
+                      selectedPrice.buy,
+                      selectedPrice.currency || "VND",
+                    )}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-v2-green-positive" />
-                  <span className="font-jetbrains text-[12px] text-v2-text-secondary">{t("sell")}</span>
+                  <span className="font-jetbrains text-[12px] text-v2-text-secondary">
+                    {t("sell")}
+                  </span>
                   <span className="font-jetbrains font-semibold text-[13px] text-v2-text-primary">
-                    {formatPriceValue(selectedPrice.sell, selectedPrice.currency || "VND")}
+                    {formatPriceValue(
+                      selectedPrice.sell,
+                      selectedPrice.currency || "VND",
+                    )}
                   </span>
                 </div>
               </>
@@ -155,7 +202,9 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
             {isGlobal && (
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-[#8B929E]" />
-                <span className="font-jetbrains text-[12px] text-v2-text-secondary">{t("price")}</span>
+                <span className="font-jetbrains text-[12px] text-v2-text-secondary">
+                  {t("price")}
+                </span>
                 <span className="font-jetbrains font-semibold text-[13px] text-v2-text-primary">
                   {formatPriceValue(selectedPrice.buy, "USD")}
                 </span>
@@ -188,14 +237,18 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
           <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
               <div className="w-5 h-5 border-2 border-[#4B5563] border-t-transparent rounded-full animate-spin" />
-              <p className="font-vietnam text-[12px] text-v2-text-tertiary">{t("loading")}</p>
+              <p className="font-vietnam text-[12px] text-v2-text-tertiary">
+                {t("loading")}
+              </p>
             </div>
           </div>
         )}
         {isError && (
           <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
-              <p className="font-vietnam text-[13px] text-v2-text-secondary">{t("errorLoading")}</p>
+              <p className="font-vietnam text-[13px] text-v2-text-secondary">
+                {t("errorLoading")}
+              </p>
               <button
                 onClick={() => refetch()}
                 className="px-3 py-1 text-[12px] font-vietnam text-[#4B5563] border border-[#4B5563] rounded-lg"
@@ -207,7 +260,9 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
         )}
         {!isLoading && !isError && chartData.length === 0 && (
           <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
-            <p className="font-vietnam text-[13px] text-v2-text-tertiary">{t("noData")}</p>
+            <p className="font-vietnam text-[13px] text-v2-text-tertiary">
+              {t("noData")}
+            </p>
           </div>
         )}
         {!isLoading && !isError && chartData.length > 0 && (

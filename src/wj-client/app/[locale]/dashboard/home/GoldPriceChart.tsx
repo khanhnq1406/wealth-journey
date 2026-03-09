@@ -16,7 +16,7 @@ interface GoldPriceChartProps {
 const PERIOD_MAP: Record<string, string> = {
   "24h": "24h",
   week: "15d",
-  month: "1m",
+  month: "1M",
   year: "1y",
 };
 
@@ -33,7 +33,10 @@ function toGoldCode(typeCode: string): string {
 function formatXAxis(timestamp: number, period: string): string {
   const d = new Date(timestamp * 1000);
   if (period === "24h") {
-    return d.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
   return d.toLocaleDateString("vi-VN", { month: "2-digit", day: "2-digit" });
 }
@@ -42,7 +45,9 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
   const t = useTranslations("dashboard.home");
   const [market, setMarket] = useState<"domestic" | "global">("domestic");
   const [selectedType, setSelectedType] = useState<string>(
-    prices.find((p) => p.typeCode !== "XAU")?.typeCode || prices[0]?.typeCode || "",
+    prices.find((p) => p.typeCode !== "XAU")?.typeCode ||
+      prices[0]?.typeCode ||
+      "",
   );
   const [selectedPeriod, setSelectedPeriod] = useState<string>("24h");
 
@@ -58,19 +63,24 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
   const globalPrice = prices.find((p) => p.typeCode === "XAU");
   const selectedPrice = isGlobal
     ? globalPrice || prices[0]
-    : prices.find((p) => p.typeCode === selectedType) || domesticPrices[0] || prices[0];
+    : prices.find((p) => p.typeCode === selectedType) ||
+      domesticPrices[0] ||
+      prices[0];
 
   const goldCode = isGlobal ? "" : toGoldCode(selectedType);
   const apiPeriod = PERIOD_MAP[selectedPeriod] || "24h";
 
-  const { data, isLoading, isError, refetch } = useQueryGetGoldChart({
-    market,
-    goldCode,
-    period: apiPeriod,
-  }, {
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
+  const { data, isLoading, isError, refetch } = useQueryGetGoldChart(
+    {
+      market,
+      goldCode,
+      period: apiPeriod,
+    },
+    {
+      staleTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: false,
+    },
+  );
 
   // Build chart data
   const chartData = (data?.data || []).map((point) => ({
@@ -88,10 +98,30 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
 
   // Chart series: domestic shows buy+sell, global shows single price line
   const chartSeries = isGlobal
-    ? [{ dataKey: "buy", name: t("price"), color: "#B8860B", chartType: "area" as const, showDots: false }]
+    ? [
+        {
+          dataKey: "buy",
+          name: t("price"),
+          color: "#B8860B",
+          chartType: "line" as const,
+          showDots: false,
+        },
+      ]
     : [
-        { dataKey: "buy", name: t("buy"), color: "#B91C1C", chartType: "area" as const, showDots: false },
-        { dataKey: "sell", name: t("sell"), color: "#16A34A", chartType: "area" as const, showDots: false },
+        {
+          dataKey: "buy",
+          name: t("buy"),
+          color: "#B91C1C",
+          chartType: "line" as const,
+          showDots: false,
+        },
+        {
+          dataKey: "sell",
+          name: t("sell"),
+          color: "#16A34A",
+          chartType: "line" as const,
+          showDots: false,
+        },
       ];
 
   return (
@@ -108,7 +138,9 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
               <button
                 onClick={() => setMarket("domestic")}
                 className={`px-2.5 py-1 rounded-md text-[11px] font-vietnam font-medium transition-colors ${
-                  !isGlobal ? "bg-white shadow-sm text-v2-text-primary" : "text-v2-text-secondary"
+                  !isGlobal
+                    ? "bg-white shadow-sm text-v2-text-primary"
+                    : "text-v2-text-secondary"
                 }`}
               >
                 {t("domestic")}
@@ -116,7 +148,9 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
               <button
                 onClick={() => setMarket("global")}
                 className={`px-2.5 py-1 rounded-md text-[11px] font-vietnam font-medium transition-colors ${
-                  isGlobal ? "bg-white shadow-sm text-v2-text-primary" : "text-v2-text-secondary"
+                  isGlobal
+                    ? "bg-white shadow-sm text-v2-text-primary"
+                    : "text-v2-text-secondary"
                 }`}
               >
                 {t("global")}
@@ -130,10 +164,10 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
                 className="font-vietnam text-[12px] text-v2-text-secondary bg-v2-bg-primary border border-v2-border rounded-lg px-2.5 py-1.5"
               >
                 {domesticPrices.map((p) => (
-                    <option key={p.typeCode} value={p.typeCode}>
-                      {p.name || p.typeCode}
-                    </option>
-                  ))}
+                  <option key={p.typeCode} value={p.typeCode}>
+                    {p.name || p.typeCode}
+                  </option>
+                ))}
               </select>
             )}
           </div>
@@ -146,16 +180,26 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
               <>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-v2-red-primary" />
-                  <span className="font-jetbrains text-[12px] text-v2-text-secondary">{t("buy")}</span>
+                  <span className="font-jetbrains text-[12px] text-v2-text-secondary">
+                    {t("buy")}
+                  </span>
                   <span className="font-jetbrains font-semibold text-[13px] text-v2-text-primary">
-                    {formatPriceValue(selectedPrice.buy, selectedPrice.currency || "VND")}
+                    {formatPriceValue(
+                      selectedPrice.buy,
+                      selectedPrice.currency || "VND",
+                    )}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-v2-green-positive" />
-                  <span className="font-jetbrains text-[12px] text-v2-text-secondary">{t("sell")}</span>
+                  <span className="font-jetbrains text-[12px] text-v2-text-secondary">
+                    {t("sell")}
+                  </span>
                   <span className="font-jetbrains font-semibold text-[13px] text-v2-text-primary">
-                    {formatPriceValue(selectedPrice.sell, selectedPrice.currency || "VND")}
+                    {formatPriceValue(
+                      selectedPrice.sell,
+                      selectedPrice.currency || "VND",
+                    )}
                   </span>
                 </div>
               </>
@@ -163,7 +207,9 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
             {isGlobal && (
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-[#B8860B]" />
-                <span className="font-jetbrains text-[12px] text-v2-text-secondary">{t("price")}</span>
+                <span className="font-jetbrains text-[12px] text-v2-text-secondary">
+                  {t("price")}
+                </span>
                 <span className="font-jetbrains font-semibold text-[13px] text-v2-text-primary">
                   {formatPriceValue(selectedPrice.buy, "USD")}
                 </span>
@@ -196,14 +242,18 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
           <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
               <div className="w-5 h-5 border-2 border-v2-red-primary border-t-transparent rounded-full animate-spin" />
-              <p className="font-vietnam text-[12px] text-v2-text-tertiary">{t("loading")}</p>
+              <p className="font-vietnam text-[12px] text-v2-text-tertiary">
+                {t("loading")}
+              </p>
             </div>
           </div>
         )}
         {isError && (
           <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
-              <p className="font-vietnam text-[13px] text-v2-text-secondary">{t("errorLoading")}</p>
+              <p className="font-vietnam text-[13px] text-v2-text-secondary">
+                {t("errorLoading")}
+              </p>
               <button
                 onClick={() => refetch()}
                 className="px-3 py-1 text-[12px] font-vietnam text-v2-red-primary border border-v2-red-primary rounded-lg"
@@ -215,7 +265,9 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
         )}
         {!isLoading && !isError && chartData.length === 0 && (
           <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
-            <p className="font-vietnam text-[13px] text-v2-text-tertiary">{t("noData")}</p>
+            <p className="font-vietnam text-[13px] text-v2-text-tertiary">
+              {t("noData")}
+            </p>
           </div>
         )}
         {!isLoading && !isError && chartData.length > 0 && (

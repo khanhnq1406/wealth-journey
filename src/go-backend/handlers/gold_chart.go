@@ -16,7 +16,7 @@ import (
 var (
 	validGoldMarkets = map[string]bool{"domestic": true, "global": true}
 	validGoldCodes   = map[string]bool{"SJC": true, "999": true}
-	validGoldPeriods = map[string]bool{"24h": true, "15d": true, "1m": true, "6m": true, "1y": true}
+	validGoldPeriods = map[string]bool{"24h": true, "15d": true, "1M": true, "6M": true, "1y": true}
 )
 
 // goldChartDataPoint is a single price history point

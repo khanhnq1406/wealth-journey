@@ -351,22 +351,47 @@ export const LineChart = memo(function LineChart({
             }
 
             // Render Area/Line for area/line chart types
+            if (type === "line") {
+              return (
+                <Line
+                  key={s.dataKey}
+                  dataKey={s.dataKey}
+                  name={s.name}
+                  stroke={color}
+                  strokeWidth={s.strokeWidth ?? 2}
+                  type={s.curveType ?? "monotone"}
+                  dot={
+                    s.showDots
+                      ? { r: 4, fill: color, strokeWidth: 2, stroke: "white" }
+                      : false
+                  }
+                  activeDot={{
+                    r: 5,
+                    fill: color,
+                    strokeWidth: 2,
+                    stroke: "white",
+                  }}
+                  isAnimationActive={animate}
+                  animationBegin={index * 100}
+                  animationDuration={750}
+                />
+              );
+            }
+
             return (
               <React.Fragment key={s.dataKey}>
-                {type === "area" && (
-                  <defs>
-                    <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={color} stopOpacity={0.3} />
-                      <stop offset="95%" stopColor={color} stopOpacity={0.05} />
-                    </linearGradient>
-                  </defs>
-                )}
+                <defs>
+                  <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={color} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={color} stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
                 <Area
                   dataKey={s.dataKey}
                   name={s.name}
                   stroke={color}
                   strokeWidth={s.strokeWidth ?? 2}
-                  fill={type === "area" ? `url(#${gradientId})` : "none"}
+                  fill={`url(#${gradientId})`}
                   type={s.curveType ?? "monotone"}
                   stackId={s.stackId}
                   dot={
