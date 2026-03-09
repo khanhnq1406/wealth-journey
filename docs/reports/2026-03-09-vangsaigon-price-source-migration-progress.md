@@ -13,8 +13,8 @@
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 1 | Change BaseURL constant to vangsaigon.vn | in_progress | — | — |
-| 2 | Rename package vang247 → vnprice | pending | — | — |
+| 1 | Change BaseURL constant to vangsaigon.vn | done | eb43d21 | Fixed BaseURL in pkg/vang247/client.go; TestClient_FetchPrices passes |
+| 2 | Rename package vang247 → vnprice | in_progress | — | — |
 | 3 | Update C4 architecture diagram | pending | — | — |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
