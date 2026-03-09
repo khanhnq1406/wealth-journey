@@ -115,7 +115,7 @@ export function TransactionReviewTable({
     }
 
     return (
-      <span className="inline-block px-2 py-1 rounded text-xs font-semibold uppercase bg-green-600 text-white dark:bg-green-700">
+      <span className="inline-block px-2 py-1 rounded text-xs font-semibold uppercase bg-v2-green-positive text-white dark:bg-v2-green-positive">
         {t("statusValid")}
       </span>
     );
@@ -123,7 +123,7 @@ export function TransactionReviewTable({
 
   const getAmountColor = (type: TransactionType) => {
     return type === TransactionType.TRANSACTION_TYPE_INCOME
-      ? "text-green-600 dark:text-green-400"
+      ? "text-v2-green-positive dark:text-v2-green-positive"
       : "text-red-600 dark:text-red-400";
   };
 
@@ -226,7 +226,7 @@ export function TransactionReviewTable({
                           />
                           <button
                             onClick={() => handleSaveEdit(transaction.rowNumber)}
-                            className="p-1 text-green-600 hover:text-green-700 dark:text-green-400"
+                            className="p-1 text-v2-green-positive hover:text-v2-green-positive dark:text-v2-green-positive"
                             title={t("save")}
                           >
                             <CheckIcon className="w-4 h-4" />
@@ -385,7 +385,7 @@ export function TransactionReviewTable({
                                 e.stopPropagation();
                                 handleSaveEdit(transaction.rowNumber);
                               }}
-                              className="flex-1 px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                              className="flex-1 px-3 py-1 bg-v2-green-positive text-white rounded hover:bg-v2-green-positive"
                             >
                               {t("save")}
                             </button>
@@ -482,7 +482,7 @@ export function TransactionReviewTable({
             </div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+            <div className="text-2xl font-bold text-v2-green-positive dark:text-v2-green-positive">
               {transactions.filter((t) => t.isValid).length}
             </div>
             <div className="text-xs text-neutral-600 dark:text-neutral-400 uppercase">

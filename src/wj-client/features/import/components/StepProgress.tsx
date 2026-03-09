@@ -64,7 +64,7 @@ export const StepProgress: FC<StepProgressProps> = ({
           aria-label={`${t("stepOf", { current: currentStep, total: steps.length })}: ${steps.find((s) => s.number === currentStep)?.label}`}
         >
           <div
-            className="bg-[#008148] h-2 rounded-full transition-all duration-500"
+            className="bg-v2-red-primary h-2 rounded-full transition-all duration-500"
             style={{ width: `${progressPercentage}%` }}
           />
         </div>
@@ -92,9 +92,9 @@ export const StepProgress: FC<StepProgressProps> = ({
                       transition-all duration-300
                       ${
                         isCompleted
-                          ? "bg-[#008148] border-[#008148]"
+                          ? "bg-v2-red-primary border-v2-red-primary"
                           : isCurrent
-                            ? "bg-white border-[#008148] ring-4 ring-[#008148]/10"
+                            ? "bg-white border-v2-red-primary ring-4 ring-v2-red-primary/10"
                             : "bg-white border-gray-300"
                       }
                     `}
@@ -119,7 +119,7 @@ export const StepProgress: FC<StepProgressProps> = ({
                       // Icon for current and upcoming steps
                       <div
                         className={`w-5 h-5 ${
-                          isCurrent ? "text-[#008148]" : "text-gray-400"
+                          isCurrent ? "text-v2-red-primary" : "text-gray-400"
                         }`}
                       >
                         {step.icon}
@@ -128,7 +128,7 @@ export const StepProgress: FC<StepProgressProps> = ({
                       // Fallback to step number if no icon
                       <span
                         className={`text-sm font-semibold ${
-                          isCurrent ? "text-[#008148]" : "text-gray-400"
+                          isCurrent ? "text-v2-red-primary" : "text-gray-400"
                         }`}
                       >
                         {step.number}
@@ -142,7 +142,7 @@ export const StepProgress: FC<StepProgressProps> = ({
                       mt-2 text-xs font-medium text-center whitespace-nowrap
                       ${
                         isCurrent
-                          ? "text-[#008148]"
+                          ? "text-v2-red-primary"
                           : isCompleted
                             ? "text-gray-700"
                             : "text-gray-400"
@@ -159,7 +159,7 @@ export const StepProgress: FC<StepProgressProps> = ({
                     <div
                       className={`
                         w-full h-full transition-all duration-300
-                        ${isCompleted ? "bg-[#008148]" : "bg-gray-300"}
+                        ${isCompleted ? "bg-v2-red-primary" : "bg-gray-300"}
                       `}
                     />
                   </div>
