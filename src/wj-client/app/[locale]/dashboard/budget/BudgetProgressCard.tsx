@@ -68,7 +68,7 @@ const CircularProgress = memo(function CircularProgress({
     ? "#ef4444"
     : progress > 80
       ? "#f59e0b"
-      : "#10b981";
+      : "#15803D";
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
@@ -129,7 +129,7 @@ const AnimatedProgressBar = memo(function AnimatedProgressBar({
       ? "bg-red-500"
       : progress > 80
         ? "bg-amber-500"
-        : "bg-green-500";
+        : "bg-v2-green-positive";
 
   return (
     <div className="w-full">
@@ -137,7 +137,7 @@ const AnimatedProgressBar = memo(function AnimatedProgressBar({
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm font-medium text-neutral-700">{label}</span>
           <span
-            className={`text-sm font-bold ${progress > 100 ? "text-red-600" : progress > 80 ? "text-amber-600" : "text-green-600"}`}
+            className={`text-sm font-bold ${progress > 100 ? "text-red-600" : progress > 80 ? "text-amber-600" : "text-v2-green-positive"}`}
           >
             {progress.toFixed(1)}%
           </span>
@@ -204,12 +204,12 @@ export const BudgetProgressCard = memo(function BudgetProgressCard({
     ? "text-red-600"
     : isNearLimit
       ? "text-amber-600"
-      : "text-green-600";
+      : "text-v2-green-positive";
   const statusBg = isOverBudget
     ? "bg-red-100"
     : isNearLimit
       ? "bg-amber-100"
-      : "bg-green-100";
+      : "bg-v2-green-light";
 
   if (compact) {
     return (

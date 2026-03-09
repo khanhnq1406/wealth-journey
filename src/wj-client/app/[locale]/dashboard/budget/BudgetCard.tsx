@@ -24,8 +24,8 @@ interface CircularProgressProps {
 const getProgressStrokeColor = (progressColor: string): string => {
   if (progressColor.includes("red")) return "#DC2626"; // red-600
   if (progressColor.includes("amber")) return "#D97706"; // amber-600
-  if (progressColor.includes("green")) return "#16A34A"; // green-600
-  return "#16A34A"; // default green-600
+  if (progressColor.includes("green")) return "#15803D"; // v2-green-positive
+  return "#15803D"; // default v2-green-positive
 };
 
 // Circular progress component - defined outside to prevent re-renders
@@ -145,25 +145,25 @@ export function BudgetCard({
     ? "text-red-600"
     : isNearLimit
       ? "text-amber-600"
-      : "text-green-600";
+      : "text-v2-green-positive";
 
   const statusBg = isOverBudget
     ? "bg-red-50"
     : isNearLimit
       ? "bg-amber-50"
-      : "bg-green-50";
+      : "bg-v2-green-light";
 
   const statusBorder = isOverBudget
     ? "border-red-200 ring-red-100"
     : isNearLimit
       ? "border-amber-200 ring-amber-100"
-      : "border-green-200 ring-green-100";
+      : "border-v2-border ring-green-100";
 
   const progressColor = isOverBudget
     ? "bg-red-500"
     : isNearLimit
       ? "bg-amber-500"
-      : "bg-green-500";
+      : "bg-v2-green-positive";
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -326,7 +326,7 @@ export function BudgetCard({
                       e.stopPropagation();
                       onAddBudgetItem(budget.id);
                     }}
-                    className="p-1.5 hover:bg-green-50 rounded-md transition-colors"
+                    className="p-1.5 hover:bg-v2-green-light rounded-md transition-colors"
                   />
                   <motion.div
                     animate={{ rotate: isExpanded ? 180 : 0 }}
