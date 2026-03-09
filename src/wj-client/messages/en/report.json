@@ -19,6 +19,7 @@
     "ppChange": "pp change",
     "incomeVsExpensesTrend": "Income vs Expenses Trend",
     "monthlySummary": "Monthly Summary",
+    "walletAnalytics": "Wallet Analytics",
     "compareWithPrevious": "Compare with previous period",
     "customRange": "Custom Range",
     "tableHeaders": {
