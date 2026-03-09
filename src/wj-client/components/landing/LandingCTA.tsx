@@ -44,7 +44,7 @@ export default function LandingCTA() {
         <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
           {t("cta.startJourney")}
         </h2>
-        <p className="text-lg text-green-100 mb-10 max-w-2xl mx-auto">
+        <p className="text-lg text-red-100 mb-10 max-w-2xl mx-auto">
           {t("cta.joinDescription")}
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
@@ -71,19 +71,19 @@ export default function LandingCTA() {
         >
           <div className="flex flex-col items-center">
             <div className="text-2xl mb-2">💳</div>
-            <span className="text-sm text-green-100 font-medium">{t("cta.multiWallet")}</span>
+            <span className="text-sm text-red-100 font-medium">{t("cta.multiWallet")}</span>
           </div>
           <div className="flex flex-col items-center">
             <div className="text-2xl mb-2">📈</div>
-            <span className="text-sm text-green-100 font-medium">{t("cta.investments")}</span>
+            <span className="text-sm text-red-100 font-medium">{t("cta.investments")}</span>
           </div>
           <div className="flex flex-col items-center">
             <div className="text-2xl mb-2">🪙</div>
-            <span className="text-sm text-green-100 font-medium">{t("cta.goldCrypto")}</span>
+            <span className="text-sm text-red-100 font-medium">{t("cta.goldCrypto")}</span>
           </div>
           <div className="flex flex-col items-center">
             <div className="text-2xl mb-2">📊</div>
-            <span className="text-sm text-green-100 font-medium">{t("cta.analytics")}</span>
+            <span className="text-sm text-red-100 font-medium">{t("cta.analytics")}</span>
           </div>
         </motion.div>
       </motion.div>

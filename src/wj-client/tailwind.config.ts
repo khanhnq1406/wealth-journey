@@ -20,20 +20,20 @@ export default {
         hover: "#E2E8F0", // Mapped to neutral-200
         modal: "rgba(0, 0, 0, 0.5)",
 
-        // PRIMARY - Fintech Green (growth, wealth, trust)
+        // PRIMARY - V2 Crimson (aliased to V2 red scale for migration)
         primary: {
-          50: "#F0FDF4", // Very light green tint
-          100: "#DCFCE7", // Light green background
-          200: "#BBF7D0", // Soft green surface
-          300: "#86EFAC", // Medium light green
-          400: "#4ADE80", // Bright green accent
-          500: "#22C55E", // Primary green (emerald)
-          600: "#008148", // Main brand green (fintech)
-          700: "#006638", // Darker green for hover
-          800: "#064E3B", // Deep green
-          900: "#064E3B", // Very dark green
+          50: "#FEF2F2", // V2 red-50
+          100: "#FEE2E2", // V2 red-100
+          200: "#FECACA", // V2 red-200
+          300: "#FCA5A5", // V2 red-300
+          400: "#F87171", // V2 red-400
+          500: "#B91C1C", // V2 red-primary (was: #22C55E)
+          600: "#B91C1C", // V2 red-primary (was: #008148)
+          700: "#7F1D1D", // V2 red-dark (was: #006638)
+          800: "#7F1D1D", // V2 red-dark
+          900: "#450A0A", // Very dark red
           // Dark mode variants
-          950: "#022C22", // Almost black green
+          950: "#1C0101", // Almost black red
         },
 
         // SECONDARY - Teal/Cyan (modern, tech-forward)
