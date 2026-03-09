@@ -156,17 +156,17 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
   const pnlColor = isCustom
     ? "text-gray-500"
     : isProfit
-      ? "text-green-600"
+      ? "text-v2-green-positive"
       : "text-red-600";
   const pnlBgColor = isCustom
     ? "bg-gray-50"
     : isProfit
-      ? "bg-green-50"
+      ? "bg-v2-green-light"
       : "bg-red-50";
   const pnlBadgeColor = isCustom
     ? "bg-gray-100 text-gray-800"
     : isProfit
-      ? "bg-green-100 text-green-800"
+      ? "bg-v2-green-light text-v2-green-positive"
       : "bg-red-100 text-red-800";
 
   const sparklineData = priceHistory
@@ -287,7 +287,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
           <div className="flex items-center justify-between pt-2 border-t border-neutral-100">
             <div className="flex items-center gap-1">
               <div
-                className={`w-2 h-2 rounded-full ${Date.now() / 1000 - updatedAt < 300 ? "bg-green-500 animate-pulse" : "bg-gray-400"}`}
+                className={`w-2 h-2 rounded-full ${Date.now() / 1000 - updatedAt < 300 ? "bg-v2-green-positive animate-pulse" : "bg-gray-400"}`}
               />
               <span className="text-xs text-neutral-500">
                 {formatTimeAgo(updatedAt, t as any, locale).text}
@@ -403,8 +403,8 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
                   icon={<PlusIcon />}
                   label={t("modal.addInvestment")}
                   onClick={handleBuyMore}
-                  bgColor="bg-green-100"
-                  textColor="text-green-700"
+                  bgColor="bg-v2-green-light"
+                  textColor="text-v2-green-positive"
                   className="w-full"
                 />
                 {/* <QuickActionButton

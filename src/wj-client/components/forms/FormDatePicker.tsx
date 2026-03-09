@@ -350,7 +350,7 @@ export function FormDatePicker({
     "text-neutral-900 dark:text-dark-text",
     "transition-all duration-200",
     // Focus styles - single ring (clean, modern)
-    "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+    "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:border-transparent",
     "disabled:bg-neutral-50 disabled:cursor-not-allowed dark:disabled:bg-dark-surface-hover disabled:opacity-50",
     sizeClasses[size],
     getStateClasses(),
@@ -628,10 +628,10 @@ export function FormDatePicker({
                   className={cn(
                     "aspect-square flex items-center justify-center text-sm rounded-lg transition-all duration-150",
                     "hover:bg-neutral-100 dark:hover:bg-neutral-700",
-                    "focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-inset",
+                    "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:ring-inset",
                     {
                       invisible: isEmpty,
-                      "bg-primary-600 text-white hover:bg-primary-700 dark:hover:bg-primary-700":
+                      "bg-v2-red-primary text-white hover:bg-v2-red-dark dark:hover:bg-v2-red-dark":
                         isSelected,
                       "bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400":
                         isToday && !isSelected,

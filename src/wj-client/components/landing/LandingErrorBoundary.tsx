@@ -46,7 +46,7 @@ export default class LandingErrorBoundary extends Component<Props, State> {
               </p>
               <button
                 onClick={() => window.location.reload()}
-                className="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-500 transition-colors focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
+                className="px-6 py-2 bg-v2-red-primary text-white rounded-md hover:bg-v2-red-dark transition-colors focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2"
               >
                 {this.props.strings?.refreshButton || "Refresh Page"}
               </button>

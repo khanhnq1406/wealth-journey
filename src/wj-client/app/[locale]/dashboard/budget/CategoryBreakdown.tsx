@@ -71,8 +71,8 @@ const CategoryItem = memo(function CategoryItem({
   const isOverBudget = remaining < 0;
   const isNearLimit = percentage > 80 && percentage <= 100;
 
-  const barColor = isOverBudget ? "bg-red-500" : isNearLimit ? "bg-amber-500" : color || "bg-green-500";
-  const statusColor = isOverBudget ? "text-red-600" : isNearLimit ? "text-amber-600" : "text-green-600";
+  const barColor = isOverBudget ? "bg-red-500" : isNearLimit ? "bg-amber-500" : color || "bg-v2-green-positive";
+  const statusColor = isOverBudget ? "text-red-600" : isNearLimit ? "text-amber-600" : "text-v2-green-positive";
 
   return (
     <BaseCard className="p-4 hover:shadow-md transition-shadow">
@@ -102,7 +102,7 @@ const CategoryItem = memo(function CategoryItem({
                 e.stopPropagation();
                 onAddExpense?.(id);
               }}
-              className="p-1.5 rounded-md hover:bg-green-100 text-green-600 transition-colors"
+              className="p-1.5 rounded-md hover:bg-v2-green-light text-v2-green-positive transition-colors"
               title={t("card.addExpense")}
             >
               <Image src={`${resources}/plus.svg`} alt="Add" width={16} height={16} />
@@ -284,7 +284,7 @@ export const CategoryBreakdown = memo(function CategoryBreakdown({
                   data={chartData}
                   xAxisKey="name"
                   series={[
-                    { dataKey: "spent", name: t("chartLabels.spent"), color: "#10b981" },
+                    { dataKey: "spent", name: t("chartLabels.spent"), color: "#15803D" },
                     { dataKey: "remaining", name: t("chartLabels.remaining"), color: "#e5e7eb" },
                   ]}
                   height={320}

@@ -17,13 +17,13 @@ export function InstallSteps({ platform, onInstall }: InstallStepsProps) {
     return (
       <div className="space-y-4">
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-8 h-8 bg-green-100 text-bg rounded-full flex items-center justify-center font-semibold text-sm">
+          <div className="flex-shrink-0 w-8 h-8 bg-v2-red-light text-v2-red-primary rounded-full flex items-center justify-center font-semibold text-sm">
             1
           </div>
           <div className="flex-1 pt-1">
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-v2-text-secondary">
               {t("iosTapShare")}{" "}
-              <span className="inline-flex items-center mx-1 px-1.5 py-0.5 bg-gray-100 rounded font-mono text-xs">
+              <span className="inline-flex items-center mx-1 px-1.5 py-0.5 bg-v2-bg-primary rounded font-mono text-xs">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                 </svg>
@@ -32,11 +32,11 @@ export function InstallSteps({ platform, onInstall }: InstallStepsProps) {
           </div>
         </div>
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-8 h-8 bg-green-100 text-bg rounded-full flex items-center justify-center font-semibold text-sm">
+          <div className="flex-shrink-0 w-8 h-8 bg-v2-red-light text-v2-red-primary rounded-full flex items-center justify-center font-semibold text-sm">
             2
           </div>
           <div className="flex-1 pt-1">
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-v2-text-secondary">
               {t("iosScrollDown")}{" "}
               <span className="inline-flex items-center mx-1 px-1.5 py-0.5 bg-gray-100 rounded font-medium text-xs">
                 {t("iosAddToHomeScreen")}
@@ -45,11 +45,11 @@ export function InstallSteps({ platform, onInstall }: InstallStepsProps) {
           </div>
         </div>
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-8 h-8 bg-green-100 text-bg rounded-full flex items-center justify-center font-semibold text-sm">
+          <div className="flex-shrink-0 w-8 h-8 bg-v2-red-light text-v2-red-primary rounded-full flex items-center justify-center font-semibold text-sm">
             3
           </div>
           <div className="flex-1 pt-1">
-            <p className="text-sm text-gray-700">
+            <p className="text-sm text-v2-text-secondary">
               {t("iosTapAdd")} <span className="font-medium">{t("iosAdd")}</span> {t("iosToConfirm")}
             </p>
           </div>
@@ -61,7 +61,7 @@ export function InstallSteps({ platform, onInstall }: InstallStepsProps) {
   if (platform === "android") {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-v2-text-secondary mb-4">
           {t("androidDescription")}
         </p>
         {onInstall && (
@@ -73,7 +73,7 @@ export function InstallSteps({ platform, onInstall }: InstallStepsProps) {
             {t("androidInstallButton")}
           </Button>
         )}
-        <div className="text-xs text-gray-500 text-center">
+        <div className="text-xs text-v2-text-tertiary text-center">
           {t("androidOr")}
         </div>
       </div>
@@ -81,7 +81,7 @@ export function InstallSteps({ platform, onInstall }: InstallStepsProps) {
   }
 
   return (
-    <div className="text-sm text-gray-600">
+    <div className="text-sm text-v2-text-secondary">
       <p>{t("genericInstallTitle")}</p>
       <ol className="list-decimal list-inside space-y-2 mt-3">
         <li>{t("genericStep1")}</li>

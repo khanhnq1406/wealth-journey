@@ -54,7 +54,7 @@ export const ButtonGroup = memo(function ButtonGroup() {
           <img src={`${resources}/plus.svg`} alt="" className="w-8" />
         </button>
         <button
-          className="btn-transaction fixed hover:drop-shadow-round bottom-8 right-14 bg-primary-600 rounded-full w-8"
+          className="btn-transaction fixed hover:drop-shadow-round bottom-8 right-14 bg-v2-red-primary rounded-full w-8"
           ref={transactionButtonRef}
           onClick={() => {
             store.dispatch(
@@ -65,7 +65,7 @@ export const ButtonGroup = memo(function ButtonGroup() {
           <img src={`${resources}/transaction.svg`} alt="" className="w-8" />
         </button>
         <button
-          className="btn-transfer fixed hover:drop-shadow-round bottom-14 right-6 bg-primary-600 rounded-full w-8 p-1"
+          className="btn-transfer fixed hover:drop-shadow-round bottom-14 right-6 bg-v2-red-primary rounded-full w-8 p-1"
           ref={transferButtonRef}
           onClick={() => {
             store.dispatch(

@@ -9,7 +9,7 @@ import (
 	"github.com/go-redis/redis/v8"
 
 	"wealthjourney/pkg/cache"
-	"wealthjourney/pkg/vang247"
+	"wealthjourney/pkg/vnprice"
 	"wealthjourney/pkg/yahoo"
 )
 
@@ -33,14 +33,14 @@ type CachedSilverPrice struct {
 
 // silverPriceService implements SilverPriceService
 type silverPriceService struct {
-	client *vang247.Client
+	client *vnprice.Client
 	cache  *cache.SilverPriceCache
 }
 
 // NewSilverPriceService creates a new silver price service
 func NewSilverPriceService(redisClient *redis.Client) SilverPriceService {
 	return &silverPriceService{
-		client: vang247.NewClient(10 * time.Second),
+		client: vnprice.NewClient(10 * time.Second),
 		cache:  cache.NewSilverPriceCache(redisClient),
 	}
 }

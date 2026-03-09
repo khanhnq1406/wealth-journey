@@ -76,10 +76,10 @@ export function Toast({
   if (!visible) return null;
 
   const variantStyles = {
-    success: "bg-green-500 dark:bg-green-600 text-white",
+    success: "bg-v2-green-positive text-white",
     error: "bg-red-500 dark:bg-red-600 text-white",
     warning: "bg-yellow-500 dark:bg-yellow-600 text-white",
-    info: "bg-primary-500 dark:bg-primary-600 text-white",
+    info: "bg-v2-red-primary text-white",
   };
 
   const variantIcons = {

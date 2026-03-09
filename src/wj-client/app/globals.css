@@ -15,12 +15,18 @@ html {
 :root {
   --background: #ffffff;
   --foreground: #0F172A;
-  --btn-green: #008148; /* Updated to primary fintech green */
-  --btn-green-hover: #006638; /* Darker green for hover */
+  --btn-green: #B91C1C; /* aliased to v2-red-primary */
+  --btn-green-hover: #7F1D1D; /* aliased to v2-red-dark */
   --white: #ffffff;
-  --primary-green: #008148;
-  --accent-green: #22C55E;
+  --primary-green: #B91C1C; /* aliased to v2-red-primary */
+  --accent-green: #B91C1C; /* aliased to v2-red-primary */
   --teal-accent: #14B8A6;
+  /* V2 Crimson & Gold */
+  --v2-bg-primary: #FAF9F7;
+  --v2-bg-surface: #FFFFFF;
+  --v2-red-primary: #B91C1C;
+  --v2-red-dark: #7F1D1D;
+  --v2-gold-primary: #B8860B;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -393,6 +399,17 @@ body:has(.landing-scroll-container) {
   letter-spacing: -0.02em;
 }
 
+/* V2 Typography Utilities */
+.v2-heading-hero { font-family: var(--font-vietnam-pro); font-weight: 800; letter-spacing: -1.5px; }
+.v2-heading-lg { font-family: var(--font-vietnam-pro); font-weight: 700; letter-spacing: -1px; }
+.v2-heading-md { font-family: var(--font-vietnam-pro); font-weight: 600; letter-spacing: -0.5px; }
+.v2-heading-sm { font-family: var(--font-vietnam-pro); font-weight: 500; letter-spacing: -0.3px; }
+.v2-body { font-family: var(--font-vietnam-pro); font-weight: 400; }
+.v2-data-bold { font-family: var(--font-jetbrains-mono); font-weight: 700; letter-spacing: 0.5px; }
+.v2-data-semibold { font-family: var(--font-jetbrains-mono); font-weight: 600; letter-spacing: 1px; }
+.v2-data-medium { font-family: var(--font-jetbrains-mono); font-weight: 500; letter-spacing: 0.5px; }
+.v2-data-regular { font-family: var(--font-jetbrains-mono); font-weight: 400; letter-spacing: 0.5px; }
+
 /* Safe area bottom padding for mobile bottom navigation */
 .pb-safe-bottom {
   padding-bottom: calc(env(safe-area-inset-bottom) + 64px);
@@ -429,9 +446,9 @@ body:has(.landing-scroll-container) {
   min-width: 48px;
 }
 
-/* Green focus ring for accessibility */
+/* V2 focus ring for accessibility */
 *:focus-visible {
-  outline: 2px solid #008148;
+  outline: 2px solid #B91C1C;
   outline-offset: 2px;
 }
 

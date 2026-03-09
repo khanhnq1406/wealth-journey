@@ -64,6 +64,9 @@ export interface PortfolioSummaryData {
   currency?: string;
   totalInvestments?: number;
   totalPnlPercent?: number;
+  /** Period-scoped PnL fields */
+  periodPnl?: number;
+  periodPnlPercent?: number;
   /** Historical data for sparkline (optional) */
   historicalValues?: { value: number; date: string }[];
   /** Asset allocation data (optional) */
@@ -110,6 +113,10 @@ export interface PortfolioSummaryEnhancedProps {
   isRefreshing?: boolean;
   /** Optional wallet ID for filtering historical data */
   walletId?: number;
+  /** Currently selected period (1D/1W/1M/ALL) */
+  selectedPeriod?: "1d" | "1w" | "1m" | "all";
+  /** Callback when period changes */
+  onPeriodChange?: (period: "1d" | "1w" | "1m" | "all") => void;
 }
 
 /**
@@ -137,7 +144,7 @@ const StatCard = memo(function StatCard({
   sparklineData,
 }: StatCardProps) {
   const colorClasses = {
-    green: "text-green-600",
+    green: "text-v2-green-positive",
     red: "text-red-600",
     neutral: "text-neutral-900",
   };
@@ -161,7 +168,7 @@ const StatCard = memo(function StatCard({
 
       {trend !== undefined && (
         <div
-          className={`text-xs font-medium mt-1 ${trend >= 0 ? "text-green-600" : "text-red-600"}`}
+          className={`text-xs font-medium mt-1 ${trend >= 0 ? "text-v2-green-positive" : "text-red-600"}`}
         >
           {trend >= 0 ? "+" : ""}
           {trend.toFixed(2)}%
@@ -195,9 +202,18 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
   onAddInvestment,
   isRefreshing = false,
   walletId = 0,
+  selectedPeriod = "all",
+  onPeriodChange,
 }: PortfolioSummaryEnhancedProps) {
   const t = useTranslations("investment");
   const [showAssetAllocation, setShowAssetAllocation] = useState(false);
+
+  const periodOptions: { key: "1d" | "1w" | "1m" | "all"; label: string }[] = [
+    { key: "1d", label: t("summary.period1D") },
+    { key: "1w", label: t("summary.period1W") },
+    { key: "1m", label: t("summary.period1M") },
+    { key: "all", label: t("summary.periodAll") },
+  ];
 
   // Fetch historical portfolio values for sparkline
   const { historicalData } = usePortfolioHistoricalValues({
@@ -229,6 +245,17 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
       : displayCost > 0
         ? (displayPnl / displayCost) * 100
         : 0;
+
+  // Period-scoped PnL (falls back to all-time when period === "all" or no data)
+  const displayPeriodPnl =
+    portfolioSummary.periodPnl !== undefined
+      ? portfolioSummary.periodPnl
+      : displayPnl;
+  const displayPeriodPnlPercent =
+    portfolioSummary.periodPnlPercent !== undefined
+      ? portfolioSummary.periodPnlPercent
+      : pnlPercent;
+  const showingPeriodPnl = selectedPeriod !== "all";
 
   // Animated values
   const animatedValue = useAnimatedNumber(displayValue, 1200);
@@ -348,6 +375,28 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
 
   return (
     <div className="space-y-3 sm:space-y-4">
+      {/* Period Pill Selector */}
+      {onPeriodChange && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-neutral-500">{t("summary.periodLabel")}:</span>
+          <div className="flex gap-1 bg-neutral-100 rounded-xl p-1">
+            {periodOptions.map((opt) => (
+              <button
+                key={opt.key}
+                onClick={() => onPeriodChange(opt.key)}
+                className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  selectedPeriod === opt.key
+                    ? "bg-white text-neutral-900 shadow-sm"
+                    : "text-neutral-500 hover:text-neutral-700"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Main Summary Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
@@ -365,10 +414,17 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
         />
 
         <StatCard
-          label={t("summary.totalPnl")}
-          value={formatCurrency(animatedPnl, displayCurrency)}
-          color={displayPnl >= 0 ? "green" : "red"}
-          trend={pnlPercent}
+          label={showingPeriodPnl ? t("summary.periodPnl") : t("summary.totalPnl")}
+          value={formatCurrency(
+            showingPeriodPnl ? displayPeriodPnl : animatedPnl,
+            displayCurrency,
+          )}
+          color={
+            (showingPeriodPnl ? displayPeriodPnl : displayPnl) >= 0
+              ? "green"
+              : "red"
+          }
+          trend={showingPeriodPnl ? displayPeriodPnlPercent : pnlPercent}
         />
 
         <StatCard
@@ -394,12 +450,12 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
             {/* Performers display */}
             <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2">
               {topPerformer && (
-                <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-green-100">
-                  <span className="text-[10px] sm:text-xs text-green-700 font-medium truncate max-w-[80px] sm:max-w-none">
+                <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-v2-green-light">
+                  <span className="text-[10px] sm:text-xs text-v2-green-positive font-medium truncate max-w-[80px] sm:max-w-none">
                     {t("summary.best")} {topPerformer.name}
                   </span>
                   <span
-                    className={`text-[10px] sm:text-xs font-bold flex-shrink-0 ${topPerformer.positive ? "text-green-700" : "text-red-700"}`}
+                    className={`text-[10px] sm:text-xs font-bold flex-shrink-0 ${topPerformer.positive ? "text-v2-green-positive" : "text-red-700"}`}
                   >
                     {topPerformer.value}
                   </span>
@@ -411,7 +467,7 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
                     {t("summary.worst")} {worstPerformer.name}
                   </span>
                   <span
-                    className={`text-[10px] sm:text-xs font-bold flex-shrink-0 ${worstPerformer.positive ? "text-green-700" : "text-red-700"}`}
+                    className={`text-[10px] sm:text-xs font-bold flex-shrink-0 ${worstPerformer.positive ? "text-v2-green-positive" : "text-red-700"}`}
                   >
                     {worstPerformer.value}
                   </span>

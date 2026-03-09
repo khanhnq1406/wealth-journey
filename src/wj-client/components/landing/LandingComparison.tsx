@@ -73,7 +73,7 @@ export default function LandingComparison() {
           <div className="hidden sm:block bg-white rounded-xl shadow-lg overflow-hidden">
             <table className="w-full">
               <thead>
-                <tr className="bg-primary-600 text-white">
+                <tr className="bg-v2-red-primary text-white">
                   <th className="py-4 px-6 text-left font-semibold">{t("feature")}</th>
                   <th className="py-4 px-6 text-left font-semibold">{t("wealthJourney")}</th>
                   <th className="py-4 px-6 text-left font-semibold">{t("otherApps")}</th>
@@ -84,14 +84,14 @@ export default function LandingComparison() {
                   <motion.tr
                     key={idx}
                     variants={itemVariants}
-                    className="border-b border-gray-100 hover:bg-primary-50/30 transition-colors"
+                    className="border-b border-gray-100 hover:bg-v2-red-50/30 transition-colors"
                   >
                     <td className="py-4 px-6 font-medium text-gray-900">
                       {t(`items.${item.key}.feature`)}
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-2">
-                        <span className="text-primary-600 flex-shrink-0">
+                        <span className="text-v2-red-primary flex-shrink-0">
                           {checkIcon}
                         </span>
                         <span className="text-gray-700">{t(`items.${item.key}.wj`)}</span>
@@ -117,11 +117,11 @@ export default function LandingComparison() {
                 </h3>
                 <div className="space-y-2">
                   <div className="flex items-start gap-2">
-                    <span className="text-primary-600 flex-shrink-0 mt-0.5">
+                    <span className="text-v2-red-primary flex-shrink-0 mt-0.5">
                       {checkIcon}
                     </span>
                     <div>
-                      <div className="text-xs font-semibold text-primary-600 mb-1">
+                      <div className="text-xs font-semibold text-v2-red-primary mb-1">
                         WealthJourney
                       </div>
                       <div className="text-sm text-gray-700">

@@ -596,7 +596,7 @@ export function AddInvestmentTransactionForm({
                 className={
                   walletBalance - totalCost < 0
                     ? "text-red-600"
-                    : "text-green-600"
+                    : "text-v2-green-positive"
                 }
               >
                 {formatCurrency(walletBalance - totalCost, investmentCurrency)}
@@ -643,7 +643,7 @@ export function AddInvestmentTransactionForm({
                   className={
                     walletBalanceInInvestmentCurrency - totalCost < 0
                       ? "text-red-600"
-                      : "text-green-600"
+                      : "text-v2-green-positive"
                   }
                 >
                   ≈{" "}

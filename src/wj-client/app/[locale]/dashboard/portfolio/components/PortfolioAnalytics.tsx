@@ -64,7 +64,7 @@ const SimplePnlChart = memo(function SimplePnlChart({
         <span className="text-neutral-600">{totalPnlLabel}</span>
         <span
           className={`font-semibold ${
-            isPositive ? "text-green-600" : "text-red-600"
+            isPositive ? "text-v2-green-positive" : "text-red-600"
           }`}
         >
           {pnlPercent >= 0 ? "+" : ""}
@@ -74,7 +74,7 @@ const SimplePnlChart = memo(function SimplePnlChart({
       <div className="w-full bg-neutral-200 rounded-full h-4 overflow-hidden">
         <div
           className={`h-full rounded-full transition-all duration-500 ${
-            isPositive ? "bg-green-500" : "bg-red-500"
+            isPositive ? "bg-v2-green-positive" : "bg-red-500"
           }`}
           style={{
             width: `${Math.min(Math.abs(pnlPercent), 100)}%`,
@@ -83,7 +83,7 @@ const SimplePnlChart = memo(function SimplePnlChart({
       </div>
       <div
         className={`text-right text-sm font-medium ${
-          isPositive ? "text-green-600" : "text-red-600"
+          isPositive ? "text-v2-green-positive" : "text-red-600"
         }`}
       >
         {formatCurrency(Math.abs(pnl), currency)}
@@ -123,7 +123,7 @@ const PerformanceList = memo(function PerformanceList({
             <div className="text-right">
               <div
                 className={`text-sm font-semibold ${
-                  p.pnl >= 0 ? "text-green-600" : "text-red-600"
+                  p.pnl >= 0 ? "text-v2-green-positive" : "text-red-600"
                 }`}
               >
                 {p.pnlPercent >= 0 ? "+" : ""}
@@ -226,7 +226,7 @@ export const PortfolioAnalytics = memo(function PortfolioAnalytics({
           <div className="flex items-center gap-3">
             <div
               className={`w-3 h-3 rounded-full ${
-                pnlPercent >= 0 ? "bg-green-500" : "bg-red-500"
+                pnlPercent >= 0 ? "bg-v2-green-positive" : "bg-red-500"
               }`}
             />
             <span className="text-sm text-neutral-600">

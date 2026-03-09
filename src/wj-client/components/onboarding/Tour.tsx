@@ -378,7 +378,7 @@ export function Tour({
         {showProgress && (
           <div className="h-1 bg-neutral-200 dark:bg-dark-border rounded-t-xl overflow-hidden">
             <div
-              className="h-full bg-primary-500 dark:bg-primary-600 transition-all duration-300"
+              className="h-full bg-v2-red-primary transition-all duration-300"
               style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
             />
           </div>
@@ -412,7 +412,7 @@ export function Tour({
                 step.action?.onClick();
                 handleNext();
               }}
-              className="w-full mb-4 px-4 py-2 bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-400 rounded-lg text-sm font-medium hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors"
+              className="w-full mb-4 px-4 py-2 bg-v2-red-light dark:bg-primary-950 text-v2-red-primary dark:text-primary-400 rounded-lg text-sm font-medium hover:bg-v2-red-light dark:hover:bg-primary-900 transition-colors"
             >
               {step.action.label}
             </button>

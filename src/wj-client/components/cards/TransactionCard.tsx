@@ -157,7 +157,7 @@ export function TransactionCard({
 
   // Get amount color
   const getAmountColor = () => {
-    if (isIncome) return "text-green-600 dark:text-green-400";
+    if (isIncome) return "text-v2-green-positive dark:text-v2-green-positive";
     if (isExpense) return "text-gray-900 dark:text-gray-100";
     return "text-gray-600 dark:text-gray-400";
   };
@@ -173,8 +173,8 @@ export function TransactionCard({
         label: t("status.pending"),
       },
       completed: {
-        bg: "bg-green-100 dark:bg-green-900/30",
-        text: "text-green-700 dark:text-green-400",
+        bg: "bg-v2-green-light dark:bg-v2-green-positive/30",
+        text: "text-v2-green-positive dark:text-v2-green-positive",
         label: t("status.completed"),
       },
       failed: {
@@ -204,9 +204,9 @@ export function TransactionCard({
   // Get icon background color
   const getIconBgColor = () => {
     if (color) return color;
-    if (isIncome) return "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400";
+    if (isIncome) return "bg-v2-green-light dark:bg-v2-green-positive/30 text-v2-green-positive dark:text-v2-green-positive";
     if (isExpense) return "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400";
-    return "bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400";
+    return "bg-v2-red-light dark:bg-v2-red-primary/30 text-v2-red-primary dark:text-v2-red-primary/80";
   };
 
   const cardClasses = cn(

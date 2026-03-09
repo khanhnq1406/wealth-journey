@@ -9,7 +9,7 @@ import (
 	"github.com/go-redis/redis/v8"
 
 	"wealthjourney/pkg/cache"
-	"wealthjourney/pkg/vang247"
+	"wealthjourney/pkg/vnprice"
 )
 
 // GoldPriceService handles fetching gold prices from vang247
@@ -32,14 +32,14 @@ type CachedGoldPrice struct {
 
 // goldPriceService implements GoldPriceService
 type goldPriceService struct {
-	client *vang247.Client
+	client *vnprice.Client
 	cache  *cache.GoldPriceCache
 }
 
 // NewGoldPriceService creates a new gold price service
 func NewGoldPriceService(redisClient *redis.Client) GoldPriceService {
 	return &goldPriceService{
-		client: vang247.NewClient(10 * time.Second),
+		client: vnprice.NewClient(10 * time.Second),
 		cache:  cache.NewGoldPriceCache(redisClient),
 	}
 }

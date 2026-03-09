@@ -145,7 +145,7 @@ func (s *portfolioHistoryService) sampleData(histories []*models.PortfolioHistor
 // CreateSnapshot creates a portfolio value snapshot for a specific wallet
 func (s *portfolioHistoryService) CreateSnapshot(ctx context.Context, userID, walletID int32) error {
 	// Get current portfolio summary for this wallet
-	summary, err := s.investmentSvc.GetPortfolioSummary(ctx, walletID, userID)
+	summary, err := s.investmentSvc.GetPortfolioSummary(ctx, walletID, userID, 0)
 	if err != nil {
 		return fmt.Errorf("failed to get portfolio summary: %w", err)
 	}

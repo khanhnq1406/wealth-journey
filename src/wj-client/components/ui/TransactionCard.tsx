@@ -63,7 +63,7 @@ export function TransactionCard({
   onClick,
 }: TransactionCardProps) {
   const isIncome = type === "income";
-  const amountColor = isIncome ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400";
+  const amountColor = isIncome ? "text-v2-green-positive" : "text-red-600 dark:text-red-400";
   const amountPrefix = isIncome ? "+" : "-";
 
   const formatDate = (dateInput: string | Date | undefined) => {

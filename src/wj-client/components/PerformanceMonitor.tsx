@@ -351,7 +351,7 @@ export function PerformanceMonitor({
   if (!showBadge) return null;
 
   const score = metrics.score ?? 0;
-  const scoreColor = score >= 90 ? "bg-green-500" : score >= 70 ? "bg-yellow-500" : "bg-red-500";
+  const scoreColor = score >= 90 ? "bg-v2-green-positive" : score >= 70 ? "bg-yellow-500" : "bg-red-500";
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
@@ -385,7 +385,7 @@ export function PerformanceMonitor({
             {metrics.cls !== undefined && (
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-gray-400">CLS</span>
-                <span className={getRating(metrics.cls, { good: 0.1, needsImprovement: 0.25 }) === "good" ? "text-green-600" : "text-yellow-600"}>
+                <span className={getRating(metrics.cls, { good: 0.1, needsImprovement: 0.25 }) === "good" ? "text-v2-green-positive" : "text-yellow-600"}>
                   {metrics.cls.toFixed(3)}
                 </span>
               </div>
@@ -393,7 +393,7 @@ export function PerformanceMonitor({
             {metrics.inp !== undefined && (
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-gray-400">INP</span>
-                <span className={getRating(metrics.inp, { good: 200, needsImprovement: 500 }) === "good" ? "text-green-600" : "text-yellow-600"}>
+                <span className={getRating(metrics.inp, { good: 200, needsImprovement: 500 }) === "good" ? "text-v2-green-positive" : "text-yellow-600"}>
                   {metrics.inp.toFixed(0)}ms
                 </span>
               </div>
@@ -401,7 +401,7 @@ export function PerformanceMonitor({
             {metrics.lcp !== undefined && (
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-gray-400">LCP</span>
-                <span className={getRating(metrics.lcp, { good: 2500, needsImprovement: 4000 }) === "good" ? "text-green-600" : "text-yellow-600"}>
+                <span className={getRating(metrics.lcp, { good: 2500, needsImprovement: 4000 }) === "good" ? "text-v2-green-positive" : "text-yellow-600"}>
                   {(metrics.lcp / 1000).toFixed(2)}s
                 </span>
               </div>

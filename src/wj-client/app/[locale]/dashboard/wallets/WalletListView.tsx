@@ -107,12 +107,12 @@ export const WalletListView = memo(function WalletListView({
   return (
     <div className={cn("flex flex-col", className)}>
       {/* Total Balance Summary */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl p-4 sm:p-6 mb-4 shadow-lg">
-        <p className="text-sm text-primary-100 mb-1">{tDashboard("totalNetWorth")}</p>
+      <div className="bg-gradient-to-r from-v2-red-primary to-v2-red-dark text-white rounded-xl p-4 sm:p-6 mb-4 shadow-lg">
+        <p className="text-sm text-red-100 mb-1">{tDashboard("totalNetWorth")}</p>
         <p className="text-3xl sm:text-4xl font-bold">
           {formatCurrency(totalBalance, currency)}
         </p>
-        <p className="text-xs text-primary-200 mt-2">
+        <p className="text-xs text-red-200 mt-2">
           {processedWallets.length} wallet
           {processedWallets.length !== 1 ? "s" : ""}
         </p>
@@ -159,7 +159,7 @@ export const WalletListView = memo(function WalletListView({
                   "bg-white dark:bg-dark-surface rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200",
                   "border-2",
                   isSelected
-                    ? "border-primary-500"
+                    ? "border-v2-red-primary"
                     : "border-transparent hover:border-gray-200 dark:hover:border-dark-border",
                 )}
               >
@@ -172,8 +172,8 @@ export const WalletListView = memo(function WalletListView({
                       className={cn(
                         "flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-colors",
                         isSelected
-                          ? "bg-primary-600 border-primary-600"
-                          : "border-gray-300 dark:border-dark-border hover:border-primary-400",
+                          ? "bg-v2-red-primary border-v2-red-primary"
+                          : "border-gray-300 dark:border-dark-border hover:border-v2-red-primary",
                       )}
                       aria-label={
                         isSelected ? t("deselectWallet") : t("selectWallet")
@@ -197,10 +197,10 @@ export const WalletListView = memo(function WalletListView({
                   )}
 
                   {/* Wallet Icon */}
-                  <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/30 flex items-center justify-center">
+                  <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-v2-green-light to-v2-border dark:from-v2-red-primary/20 dark:to-v2-red-dark/20 flex items-center justify-center">
                     {isInvestment ? (
                       <svg
-                        className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600 dark:text-primary-400"
+                        className="w-5 h-5 sm:w-6 sm:h-6 text-v2-red-primary dark:text-v2-red-primary"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -260,11 +260,11 @@ export const WalletListView = memo(function WalletListView({
                         type="button"
                         variant="ghost"
                         onClick={() => handleTransfer(wallet)}
-                        className="min-h-[44px] min-w-[44px] p-2 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+                        className="min-h-[44px] min-w-[44px] p-2 rounded-lg hover:bg-v2-green-light dark:hover:bg-v2-red-primary/20 transition-colors"
                         aria-label={t("transferFrom", { name: wallet.walletName })}
                       >
                         <svg
-                          className="w-5 h-5 text-primary-600 dark:text-primary-400"
+                          className="w-5 h-5 text-v2-red-primary dark:text-v2-red-primary"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"

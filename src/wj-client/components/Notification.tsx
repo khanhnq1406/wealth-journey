@@ -101,7 +101,7 @@ const Notification = memo(function Notification({ notification }: NotificationPr
               "focus:outline-none focus:ring-2 focus:ring-offset-2",
               isSuccess
                 ? "bg-accent-500 hover:bg-accent-600 text-white focus:ring-accent-500"
-                : "bg-primary-500 hover:bg-primary-600 text-white focus:ring-primary-500",
+                : "bg-v2-red-primary hover:bg-v2-red-dark text-white focus:ring-v2-red-primary",
               "active:scale-95"
             )}
           >

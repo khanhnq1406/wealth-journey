@@ -78,7 +78,7 @@ export function FloatingActionButton({ actions }: FABProps) {
                 }}
                 aria-label={action.label}
               >
-                <div className="flex-shrink-0 w-6 h-6 text-primary-600">
+                <div className="flex-shrink-0 w-6 h-6 text-v2-red-primary">
                   {action.icon}
                 </div>
                 <span className="font-medium text-neutral-900 whitespace-nowrap pr-2">
@@ -92,9 +92,9 @@ export function FloatingActionButton({ actions }: FABProps) {
         <button
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
-            "w-14 h-14 bg-primary-600 text-white rounded-full shadow-floating",
+            "w-14 h-14 bg-v2-red-primary text-white rounded-full shadow-floating",
             "flex items-center justify-center",
-            "hover:bg-primary-700 hover:shadow-xl",
+            "hover:bg-v2-red-dark hover:shadow-xl",
             "active:scale-95",
             "transition-all duration-200",
             isOpen && "rotate-45",

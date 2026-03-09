@@ -92,7 +92,7 @@ export interface ReportExcelExportOptions {
  * Brand colors for Excel styling
  */
 const BRAND_COLORS = {
-  green: { argb: "FF008148" }, // #008148
+  green: { argb: "FFB91C1C" }, // #B91C1C (V2 red-primary)
   white: { argb: "FFFFFFFF" }, // #FFFFFF
   lightGray: { argb: "FFF5F5F5" }, // #F5F5F5
   border: { argb: "FFC8C8C8" }, // #C8C8C8

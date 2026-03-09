@@ -78,7 +78,7 @@ export default function LandingNavbar() {
     >
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded-md"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-v2-red-primary focus:text-white focus:rounded-md"
       >
         {t("navbar.skipToMainContent")}
       </a>
@@ -93,7 +93,7 @@ export default function LandingNavbar() {
               height={28}
               className="sm:w-8 sm:h-8"
             />
-            <span className="text-base sm:text-lg md:text-xl font-semibold text-primary-600">
+            <span className="text-base sm:text-lg md:text-xl font-semibold text-v2-red-primary">
               WealthJourney
             </span>
           </Link>
@@ -104,7 +104,7 @@ export default function LandingNavbar() {
               <a
                 key={link.name}
                 href={link.href}
-                className="text-gray-700 hover:text-primary-600 transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 rounded-md px-2 py-1 min-h-[44px] flex items-center"
+                className="text-gray-700 hover:text-v2-red-primary transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 rounded-md px-2 py-1 min-h-[44px] flex items-center"
               >
                 {link.name}
               </a>
@@ -112,7 +112,7 @@ export default function LandingNavbar() {
             {isAuthenticated ? (
               <Link
                 href="/dashboard/home"
-                className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-500 transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 min-h-[44px] flex items-center"
+                className="px-4 py-2 bg-v2-red-primary text-white rounded-md hover:bg-v2-red-dark transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 min-h-[44px] flex items-center"
               >
                 {t("navbar.dashboard")}
               </Link>
@@ -120,13 +120,13 @@ export default function LandingNavbar() {
               <div className="flex items-center space-x-4">
                 <Link
                   href="/auth/login"
-                  className="text-gray-700 hover:text-primary-600 transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 rounded-md px-2 py-1 min-h-[44px] flex items-center"
+                  className="text-gray-700 hover:text-v2-red-primary transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 rounded-md px-2 py-1 min-h-[44px] flex items-center"
                 >
                   {t("navbar.signIn")}
                 </Link>
                 <Link
                   href="/auth/register"
-                  className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-500 transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 min-h-[44px] flex items-center"
+                  className="px-4 py-2 bg-v2-red-primary text-white rounded-md hover:bg-v2-red-dark transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 min-h-[44px] flex items-center"
                 >
                   {t("navbar.getStarted")}
                 </Link>
@@ -137,7 +137,7 @@ export default function LandingNavbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
+            className="md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2"
             aria-label={t("toggleMenu")}
             aria-expanded={isMobileMenuOpen}
           >
@@ -178,7 +178,7 @@ export default function LandingNavbar() {
                   <motion.a
                     key={link.name}
                     href={link.href}
-                    className="text-gray-700 hover:text-primary-600 transition-colors duration-200 font-medium px-3 py-2 focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 rounded-md min-h-[44px] flex items-center"
+                    className="text-gray-700 hover:text-v2-red-primary transition-colors duration-200 font-medium px-3 py-2 focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 rounded-md min-h-[44px] flex items-center"
                     onClick={() => setIsMobileMenuOpen(false)}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -198,7 +198,7 @@ export default function LandingNavbar() {
                   >
                     <Link
                       href="/dashboard/home"
-                      className="px-4 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-500 transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center"
+                      className="px-4 py-3 bg-v2-red-primary text-white rounded-md hover:bg-v2-red-dark transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {t("navbar.dashboard")}
@@ -216,7 +216,7 @@ export default function LandingNavbar() {
                     >
                       <Link
                         href="/auth/login"
-                        className="text-gray-700 hover:text-primary-600 transition-colors duration-200 font-medium px-3 py-2 focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 rounded-md min-h-[44px] flex items-center"
+                        className="text-gray-700 hover:text-v2-red-primary transition-colors duration-200 font-medium px-3 py-2 focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 rounded-md min-h-[44px] flex items-center"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {t("navbar.signIn")}
@@ -232,7 +232,7 @@ export default function LandingNavbar() {
                     >
                       <Link
                         href="/auth/register"
-                        className="px-4 py-3 bg-primary-600 text-white rounded-md hover:bg-primary-500 transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center mx-3"
+                        className="px-4 py-3 bg-v2-red-primary text-white rounded-md hover:bg-v2-red-dark transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center mx-3"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {t("navbar.getStarted")}

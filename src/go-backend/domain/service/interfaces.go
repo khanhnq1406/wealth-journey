@@ -194,7 +194,7 @@ type InvestmentService interface {
 	DeleteTransaction(ctx context.Context, transactionID int32, userID int32) (*investmentv1.DeleteInvestmentTransactionResponse, error)
 
 	// GetPortfolioSummary retrieves portfolio summary for a wallet.
-	GetPortfolioSummary(ctx context.Context, walletID int32, userID int32) (*investmentv1.GetPortfolioSummaryResponse, error)
+	GetPortfolioSummary(ctx context.Context, walletID int32, userID int32, period investmentv1.PnlPeriod) (*investmentv1.GetPortfolioSummaryResponse, error)
 
 	// UpdatePrices updates current prices for investments.
 	UpdatePrices(ctx context.Context, userID int32, req *investmentv1.UpdatePricesRequest) (*investmentv1.UpdatePricesResponse, error)

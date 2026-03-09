@@ -226,7 +226,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                                   e.stopPropagation();
                                   handleSaveEdit(tx.rowNumber);
                                 }}
-                                className="flex-1 px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                                className="flex-1 px-2 py-1 text-xs bg-v2-green-positive text-white rounded hover:bg-v2-green-positive"
                               >
                                 {t("save")}
                               </button>

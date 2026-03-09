@@ -131,8 +131,8 @@ export function VirtualList<T>({
     () => (
       <div className="flex justify-center items-center p-4">
         {loadingComponent || (
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <div className="w-4 h-4 border-2 border-bg border-t-transparent rounded-full animate-spin" />
+          <div className="flex items-center gap-2 text-sm text-v2-text-tertiary">
+            <div className="w-4 h-4 border-2 border-v2-red-primary border-t-transparent rounded-full animate-spin" />
             Loading...
           </div>
         )}
@@ -143,7 +143,7 @@ export function VirtualList<T>({
 
   const EndListComponent = useMemo(
     () => (
-      <div className="flex justify-center items-center p-4 text-sm text-gray-500">
+      <div className="flex justify-center items-center p-4 text-sm text-v2-text-tertiary">
         {endListComponent || "End of list"}
       </div>
     ),
@@ -155,9 +155,9 @@ export function VirtualList<T>({
       <div className="flex flex-col items-center justify-center p-8 text-center">
         {emptyComponent || (
           <>
-            <div className="w-16 h-16 mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 mb-4 bg-v2-bg-primary rounded-full flex items-center justify-center">
               <svg
-                className="w-8 h-8 text-gray-400"
+                className="w-8 h-8 text-v2-text-tertiary"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -170,8 +170,8 @@ export function VirtualList<T>({
                 />
               </svg>
             </div>
-            <p className="text-gray-600 font-medium">No items found</p>
-            <p className="text-gray-400 text-sm mt-1">Try adjusting your filters</p>
+            <p className="text-v2-text-secondary font-medium">No items found</p>
+            <p className="text-v2-text-tertiary text-sm mt-1">Try adjusting your filters</p>
           </>
         )}
       </div>

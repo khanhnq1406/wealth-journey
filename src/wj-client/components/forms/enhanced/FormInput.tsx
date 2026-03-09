@@ -191,9 +191,9 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
         return "border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-700 dark:focus:border-red-500 dark:focus:ring-red-500";
       }
       if (success) {
-        return "border-green-300 focus:border-green-500 focus:ring-green-500 dark:border-green-700 dark:focus:border-green-500 dark:focus:ring-green-500";
+        return "border-v2-border focus:border-v2-red-primary focus:ring-v2-red-primary dark:border-green-700 dark:focus:border-v2-red-primary dark:focus:ring-v2-red-primary";
       }
-      return "border-gray-300 focus:border-green-600 focus:ring-green-600 dark:border-gray-600 dark:focus:border-green-500 dark:focus:ring-green-500";
+      return "border-gray-300 focus:border-v2-red-primary focus:ring-v2-red-primary dark:border-gray-600 dark:focus:border-v2-red-primary dark:focus:ring-v2-red-primary";
     };
 
     const inputClasses = cn(
@@ -252,7 +252,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
               error
                 ? "text-red-600 dark:text-red-400"
                 : success
-                ? "text-green-600 dark:text-green-400"
+                ? "text-v2-green-positive dark:text-green-400"
                 : "text-gray-700 dark:text-gray-300"
             )}
           >
@@ -348,7 +348,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
               </p>
             )}
             {success && !error && (
-              <p id={successId} className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+              <p id={successId} className="text-sm text-v2-green-positive dark:text-green-400 flex items-center gap-1">
                 <svg
                   className="w-4 h-4 flex-shrink-0"
                   fill="currentColor"

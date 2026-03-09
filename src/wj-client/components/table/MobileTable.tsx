@@ -195,7 +195,7 @@ const MobileTableRow = memo(function MobileTableRow<T>({
           <div className="flex justify-end">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors duration-200 py-1 px-2 rounded hover:bg-primary-50"
+              className="text-sm font-medium text-v2-red-primary hover:text-v2-red-dark transition-colors duration-200 py-1 px-2 rounded hover:bg-v2-red-light"
               aria-expanded={isExpanded}
               aria-label={isExpanded ? collapseButtonLabel : expandButtonLabel}
             >
@@ -386,7 +386,7 @@ export const MobileTable = memo(function MobileTable<T>({
                   onStickyActionClick(data[0]);
                 }
               }}
-              className="w-full bg-primary-600 text-white py-3 px-4 rounded-lg font-medium shadow-lg hover:opacity-90 transition-opacity"
+              className="w-full bg-v2-red-primary text-white py-3 px-4 rounded-lg font-medium shadow-lg hover:opacity-90 transition-opacity"
             >
               {stickyActionLabel}
             </button>

@@ -1,22 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { BaseCard } from "@/components/BaseCard";
-import { Wallets } from "./Walllets";
-import { Balance } from "./Balance";
-import { Dominance } from "./Dominance";
-import { MonthlyDominance } from "./MonthlyDominance";
-import { AccountBalance } from "./AccountBalance";
-import { User } from "./User";
-import { TotalBalance } from "./TotalBalance";
-import { FunctionalButton } from "./FunctionalButtons";
+import { store } from "@/features/auth/store/store";
 import {
   useQueryListWallets,
-  useQueryGetAvailableYears,
-  EVENT_WalletGetBalanceHistory,
-  EVENT_WalletGetMonthlyDominance,
+  useQueryGetMarketPrices,
+  useQueryGetAggregatedPortfolioSummary,
 } from "@/utils/generated/hooks";
+import { PnlPeriod } from "@/gen/protobuf/v1/investment";
 import { BaseModal } from "@/components/modals/BaseModal";
 import { CreateWalletForm } from "@/features/wallet/forms/CreateWalletForm";
 import { AddTransactionForm } from "@/features/transaction/forms/AddTransactionForm";
@@ -27,37 +19,105 @@ import {
   EVENT_WalletGetTotalBalance,
   EVENT_TransactionListTransactions,
 } from "@/utils/generated/hooks";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { parseAmount } from "@/utils/currency-formatter";
+import { NetWorthDisplay } from "./NetWorthDisplay";
+import { PNLCard } from "./PNLCard";
+import { GoldPriceTable } from "./GoldPriceTable";
+import { GoldPriceChart } from "./GoldPriceChart";
+import { SilverPriceTable } from "./SilverPriceTable";
+import { SilverPriceChart } from "./SilverPriceChart";
+import { WalletsSection } from "./WalletsSection";
+import { BaseCard } from "@/components/BaseCard";
 
 type ModalType = "add-transaction" | "transfer-money" | "create-wallet" | null;
 
 export default function Home() {
-  const t = useTranslations("dashboard.home");
   const tModal = useTranslations("modals.titles");
   const queryClient = useQueryClient();
   const [modalType, setModalType] = useState<ModalType>(null);
-  // Mobile collapsible sections state
-  const [expandedSections, setExpandedSections] = useState({
-    analytics: false,
-    quickActions: false,
-  });
+  const user = store.getState().setAuthReducer;
+  const { currency } = useCurrency();
+  const pnlRef = useRef<HTMLDivElement>(null);
+  const [pnlHeight, setPnlHeight] = useState<number | undefined>(undefined);
 
-  const getListWallets = useQueryListWallets(
-    {
-      pagination: { page: 1, pageSize: 10, orderBy: "", order: "" },
-    },
+  useEffect(() => {
+    const el = pnlRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setPnlHeight(entry.contentRect.height);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Data fetching
+  const { data: walletsData } = useQueryListWallets(
+    { pagination: { page: 1, pageSize: 20, orderBy: "", order: "" } },
     { refetchOnMount: "always" },
   );
 
-  // Fetch available years once and pass to child components
-  const { data: availableYearsData } = useQueryGetAvailableYears(
+  const { data: marketPrices } = useQueryGetMarketPrices(
     {},
-    { refetchOnMount: "always" },
+    { staleTime: 5 * 60 * 1000 },
   );
 
-  // Use available years from API, or default to current year if no transactions
-  const availableYears = availableYearsData?.years?.length
-    ? availableYearsData.years
-    : [new Date().getFullYear()];
+  const { data: portfolioSummary } = useQueryGetAggregatedPortfolioSummary(
+    { walletId: 0, typeFilter: 0, period: PnlPeriod.PNL_PERIOD_ALL },
+    { staleTime: 5 * 60 * 1000 },
+  );
+
+  const { data: summary1D } = useQueryGetAggregatedPortfolioSummary(
+    { walletId: 0, typeFilter: 0, period: PnlPeriod.PNL_PERIOD_1D },
+    { staleTime: 5 * 60 * 1000 },
+  );
+
+  const { data: summary1W } = useQueryGetAggregatedPortfolioSummary(
+    { walletId: 0, typeFilter: 0, period: PnlPeriod.PNL_PERIOD_1W },
+    { staleTime: 5 * 60 * 1000 },
+  );
+
+  const { data: summary1M } = useQueryGetAggregatedPortfolioSummary(
+    { walletId: 0, typeFilter: 0, period: PnlPeriod.PNL_PERIOD_1M },
+    { staleTime: 5 * 60 * 1000 },
+  );
+
+  // Calculate net worth: cash (wallets) + investments (portfolio)
+  // Note: protobuf int64 values arrive as strings from protojson — must parseAmount()
+  const totalCash =
+    walletsData?.wallets?.reduce(
+      (sum, w) => sum + parseAmount(w.balance?.amount),
+      0,
+    ) ?? 0;
+  const totalPortfolioValue = parseAmount(portfolioSummary?.data?.totalValue);
+  const totalNetWorth = totalCash + totalPortfolioValue;
+
+  // PNL data — period-scoped values for NetWorthDisplay
+  const todayPnl = parseAmount(summary1D?.data?.periodPnl);
+  const todayPnlPercent = Number(summary1D?.data?.periodPnlPercent ?? 0);
+  const weekPnl = parseAmount(summary1W?.data?.periodPnl);
+  const weekPnlPercent = Number(summary1W?.data?.periodPnlPercent ?? 0);
+  const monthPnl = parseAmount(summary1M?.data?.periodPnl);
+  const monthPnlPercent = Number(summary1M?.data?.periodPnlPercent ?? 0);
+
+  // Gold/silver prices
+  const goldPrices = marketPrices?.gold ?? [];
+  const silverPrices = marketPrices?.silver ?? [];
+
+  // Format update time
+  const formatUpdateTime = () => {
+    const now = new Date();
+    return `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
+  };
+
+  // Wallets for WalletsSection
+  const wallets = (walletsData?.wallets ?? []).map((w) => ({
+    id: w.id ?? 0,
+    walletName: w.walletName ?? "",
+    balance: parseAmount(w.balance?.amount),
+    currency: w.currency ?? "VND",
+    type: w.type ?? 0,
+  }));
 
   const handleModalClose = () => setModalType(null);
 
@@ -69,8 +129,6 @@ export default function Home() {
           EVENT_WalletListWallets,
           EVENT_WalletGetTotalBalance,
           EVENT_TransactionListTransactions,
-          EVENT_WalletGetBalanceHistory,
-          EVENT_WalletGetMonthlyDominance,
         ].includes(key);
       },
     });
@@ -90,147 +148,93 @@ export default function Home() {
     }
   };
 
-  const toggleSection = (section: keyof typeof expandedSections) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
-  };
-
   return (
-    <div className="lg:grid lg:grid-cols-[70%_30%] lg:divide-x-2 lg:min-h-0 !border-l-0">
-      {/* Mobile-optimized header with Total Balance */}
-      {/* Top Section: Always visible - Most important */}
-      <div className="lg:hidden bg-gradient-to-b from-primary-50 to-neutral-50 px-3 py-4 mb-2 rounded-lg">
-        <div className="w-full max-w-md mx-auto">
-          <TotalBalance />
-        </div>
+    <div className="bg-v2-bg-primary min-h-full">
+      {/* Mobile Layout */}
+      <div className="sm:hidden px-4 py-4 pb-24 space-y-6">
+        {/* 1. Net Worth */}
+        <NetWorthDisplay
+          totalNetWorth={totalNetWorth}
+          currency={currency}
+          monthPnlPercent={monthPnlPercent}
+          monthPnl={monthPnl}
+          userName={user.fullname ?? undefined}
+        />
+
+        {/* 2. PNL Card */}
+        <PNLCard currency={currency} />
+
+        {/* 3. Gold Price Table */}
+        <GoldPriceTable prices={goldPrices} updatedTime={formatUpdateTime()} />
+
+        {/* 4. Gold Price Chart */}
+        <GoldPriceChart />
+
+        {/* 5. Silver Price Table */}
+        <SilverPriceTable
+          prices={silverPrices}
+          updatedTime={formatUpdateTime()}
+        />
+
+        {/* 6. Silver Price Chart */}
+        <SilverPriceChart />
+
+        {/* 7. Wallets */}
+        <WalletsSection wallets={wallets} />
       </div>
 
-      {/* Main content area - mobile-optimized spacing */}
-      <div className="flex justify-center px-3 py-2 lg:py-4 lg:px-4 pb-20 lg:pb-4 ">
-        <div className="w-full max-w-4xl">
-          {/* Top Section: My Wallets - always visible (highest priority) */}
-          <section className="mb-3 lg:mb-4">
-            <h2 className="text-base sm:text-lg lg:text-xl font-bold text-neutral-800 mb-2">
-              {t("myWallets")}
-            </h2>
-            <BaseCard mobileOptimized>
-              <Wallets getListWallets={getListWallets} />
-            </BaseCard>
-          </section>
+      {/* Desktop Layout */}
+      <div className="hidden sm:block px-8 py-6 space-y-6">
+        {/* Row 1: Net Worth full-width bar */}
+        <NetWorthDisplay
+          totalNetWorth={totalNetWorth}
+          currency={currency}
+          todayPnlPercent={todayPnlPercent}
+          todayPnl={todayPnl}
+          weekPnlPercent={weekPnlPercent}
+          weekPnl={weekPnl}
+          monthPnlPercent={monthPnlPercent}
+          monthPnl={monthPnl}
+          userName={user.fullname ?? undefined}
+        />
 
-          {/* Mobile Quick Actions Section - Horizontal scroll for buttons */}
-          <section className="mb-3 lg:hidden">
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              <button
-                onClick={() => setModalType("add-transaction")}
-                className="flex-shrink-0 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium shadow-sm active:shadow-md transition-shadow"
-              >
-                {t("addTransaction")}
-              </button>
-              <button
-                onClick={() => setModalType("transfer-money")}
-                className="flex-shrink-0 px-4 py-2 bg-white text-neutral-700 rounded-lg text-sm font-medium shadow-sm active:shadow-md transition-shadow border border-neutral-200"
-              >
-                {t("transfer")}
-              </button>
-              <button
-                onClick={() => setModalType("create-wallet")}
-                className="flex-shrink-0 px-4 py-2 bg-white text-neutral-700 rounded-lg text-sm font-medium shadow-sm active:shadow-md transition-shadow border border-neutral-200"
-              >
-                {t("newWallet")}
-              </button>
-            </div>
-          </section>
-
-          {/* Middle Section: Balance Trend - Always visible but compact on mobile */}
-          <section className="mb-3 lg:mb-4">
-            <h2 className="text-base sm:text-lg lg:text-xl font-bold text-neutral-800 mb-2">
-              {t("balanceTrend")}
-            </h2>
-            <BaseCard mobileOptimized>
-              <Balance availableYears={availableYears} />
-            </BaseCard>
-          </section>
-
-          {/* Bottom Section: Analytics - Collapsible on mobile, always visible on desktop */}
-          {/* <details
-            className="lg:open group mb-3 lg:mb-4"
-            open={expandedSections.analytics}
-          >
-            <summary
-              className="cursor-pointer list-none"
-              onClick={(e) => {
-                // Only toggle manually on mobile to prevent double-toggle
-                if (window.innerWidth < 1024) {
-                  e.preventDefault();
-                  toggleSection("analytics");
-                }
-              }}
-            >
-              <h2 className="text-base sm:text-lg lg:text-xl font-bold text-neutral-800 mb-2 flex items-center justify-between">
-                Analytics
-                <svg
-                  className={`w-5 h-5 lg:hidden transition-transform ${
-                    expandedSections.analytics ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </h2>
-            </summary>
-            {expandedSections.analytics || window.innerWidth >= 1024 ? ( */}
-          <div className="space-y-3 lg:space-y-4">
-            {/* Dominance */}
-            <div>
-              <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-neutral-700 mb-2">
-                {t("dominance")}
-              </h3>
-              <BaseCard mobileOptimized noMobileMargin>
-                <Dominance availableYears={availableYears} />
-              </BaseCard>
-            </div>
-
-            {/* Monthly Dominance */}
-            <div>
-              <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-neutral-700 mb-2">
-                {t("monthlyDominance")}
-              </h3>
-              <BaseCard mobileOptimized noMobileMargin>
-                <MonthlyDominance availableYears={availableYears} />
-              </BaseCard>
-            </div>
-
-            {/* Account Balance */}
-            <div>
-              <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-neutral-700 mb-2">
-                {t("accountBalance")}
-              </h3>
-              <BaseCard mobileOptimized noMobileMargin>
-                <AccountBalance availableYears={availableYears} />
-              </BaseCard>
-            </div>
+        {/* Row 2: PNL Chart + Wallets */}
+        <div className="flex gap-6 items-start">
+          {/* PNL card — measured to set wallets height */}
+          <div ref={pnlRef} className="flex-1">
+            <PNLCard currency={currency} />
           </div>
-          {/* ) : null}
-          </details> */}
+          {/* Wallets — same height as PNL, scrolls inside */}
+          <div
+            className="w-[340px] shrink-0 overflow-hidden"
+            style={pnlHeight ? { height: pnlHeight } : undefined}
+          >
+            <BaseCard
+              padding="none"
+              noMobileMargin
+              className="h-full rounded-[20px] border border-v2-border-light shadow-v2-card p-5 flex flex-col"
+            >
+              <WalletsSection wallets={wallets} />
+            </BaseCard>
+          </div>
         </div>
-      </div>
 
-      {/* Desktop sidebar - hidden on mobile */}
-      <div className="hidden lg:block px-4">
-        <div className="grid divide-y-2 sticky top-4">
-          <User />
-          <TotalBalance />
-          <FunctionalButton onOpenModal={(type) => setModalType(type)} />
+        {/* Row 3: Gold Table + Gold Chart */}
+        <div className="grid grid-cols-2 gap-6">
+          <GoldPriceTable
+            prices={goldPrices}
+            updatedTime={formatUpdateTime()}
+          />
+          <GoldPriceChart />
+        </div>
+
+        {/* Row 4: Silver Table + Silver Chart */}
+        <div className="grid grid-cols-2 gap-6">
+          <SilverPriceTable
+            prices={silverPrices}
+            updatedTime={formatUpdateTime()}
+          />
+          <SilverPriceChart />
         </div>
       </div>
 

@@ -338,7 +338,7 @@ export function FormSelect({
       return "border-red-300 hover:border-red-400 dark:border-red-700 dark:hover:border-red-600";
     }
     if (success) {
-      return "border-green-300 hover:border-green-400 dark:border-green-700 dark:hover:border-green-600";
+      return "border-v2-border hover:border-v2-border dark:border-green-700 dark:hover:border-green-600";
     }
     return "border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500";
   };
@@ -348,12 +348,12 @@ export function FormSelect({
     "rounded-lg border bg-white dark:bg-gray-800",
     "text-gray-900 dark:text-gray-100",
     "transition-all duration-200",
-    "focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent",
+    "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:border-transparent",
     "disabled:bg-gray-100 disabled:cursor-not-allowed dark:disabled:bg-gray-900",
     sizeClasses[size],
     getStateClasses(),
     {
-      "ring-2 ring-green-600 border-transparent": isFocused && !error,
+      "ring-2 ring-v2-red-primary border-transparent": isFocused && !error,
       "ring-2 ring-red-500 border-transparent": isFocused && error,
       "opacity-50 cursor-not-allowed": disabled,
     }
@@ -392,7 +392,7 @@ export function FormSelect({
             error
               ? "text-red-600 dark:text-red-400"
               : success
-              ? "text-green-600 dark:text-green-400"
+              ? "text-v2-green-positive dark:text-green-400"
               : "text-gray-700 dark:text-gray-300"
           )}
         >
@@ -467,7 +467,7 @@ export function FormSelect({
                 placeholder={searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:border-transparent"
                 autoFocus
               />
             </div>
@@ -505,7 +505,7 @@ export function FormSelect({
                           "focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700",
                           "disabled:opacity-50 disabled:cursor-not-allowed",
                           {
-                            "bg-green-50 dark:bg-green-900/20":
+                            "bg-v2-green-light dark:bg-green-900/20":
                               isSelected && !option.disabled,
                             "text-gray-400 cursor-not-allowed":
                               option.disabled,
@@ -523,7 +523,7 @@ export function FormSelect({
                               className={cn(
                                 "w-5 h-5 rounded border-2 flex items-center justify-center",
                                 isSelected
-                                  ? "bg-green-600 border-green-600"
+                                  ? "bg-v2-red-primary border-v2-red-primary"
                                   : "border-gray-300 dark:border-gray-600"
                               )}
                             >
@@ -575,7 +575,7 @@ export function FormSelect({
                       "focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700",
                       "disabled:opacity-50 disabled:cursor-not-allowed",
                       {
-                        "bg-green-50 dark:bg-green-900/20":
+                        "bg-v2-green-light dark:bg-green-900/20":
                           isSelected && !option.disabled,
                         "text-gray-400 cursor-not-allowed": option.disabled,
                       }
@@ -592,7 +592,7 @@ export function FormSelect({
                           className={cn(
                             "w-5 h-5 rounded border-2 flex items-center justify-center",
                             isSelected
-                              ? "bg-green-600 border-green-600"
+                              ? "bg-v2-red-primary border-v2-red-primary"
                               : "border-gray-300 dark:border-gray-600"
                           )}
                         >
@@ -656,7 +656,7 @@ export function FormSelect({
           {success && !error && (
             <p
               id={successId}
-              className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1"
+              className="text-sm text-v2-green-positive dark:text-green-400 flex items-center gap-1"
             >
               <svg
                 className="w-4 h-4 flex-shrink-0"

@@ -1,11 +1,25 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
-import { useQueryListWallets, useQueryListTransactions, useQueryListInvestments } from "@/utils/generated/hooks";
-import { EVENT_WalletListWallets, EVENT_TransactionListTransactions, EVENT_InvestmentListInvestments } from "@/utils/generated/hooks";
+import {
+  useQueryListWallets,
+  useQueryListTransactions,
+  useQueryListInvestments,
+} from "@/utils/generated/hooks";
+import {
+  EVENT_WalletListWallets,
+  EVENT_TransactionListTransactions,
+  EVENT_InvestmentListInvestments,
+} from "@/utils/generated/hooks";
 import { ZIndex } from "@/lib/utils/z-index";
 
 // Storage key for recent searches
@@ -13,7 +27,11 @@ const RECENT_SEARCHES_KEY = "wealthjourney-recent-searches";
 const MAX_RECENT_SEARCHES = 5;
 
 // Search result item types
-export type SearchResultType = "wallet" | "transaction" | "investment" | "category";
+export type SearchResultType =
+  | "wallet"
+  | "transaction"
+  | "investment"
+  | "category";
 
 export interface SearchResultItem {
   id: string;
@@ -112,7 +130,9 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
     if (!query.trim()) return;
 
     setRecentSearches((prev) => {
-      const filtered = prev.filter((s) => s.toLowerCase() !== query.toLowerCase());
+      const filtered = prev.filter(
+        (s) => s.toLowerCase() !== query.toLowerCase(),
+      );
       const updated = [query, ...filtered].slice(0, MAX_RECENT_SEARCHES);
 
       if (typeof window !== "undefined") {
@@ -145,7 +165,8 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
 
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [isOpen, onClose]);
 
@@ -177,12 +198,23 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           id: `wallet-${wallet.id}`,
           type: "wallet",
           title: wallet.walletName,
-          subtitle: wallet.type === 0 ? t("basicWallet") : t("investmentWallet"),
+          subtitle:
+            wallet.type === 0 ? t("basicWallet") : t("investmentWallet"),
           amount: formatCurrency(wallet.balance, wallet.currency),
           url: `/dashboard/wallets`,
           icon: (
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+              />
             </svg>
           ),
         });
@@ -191,26 +223,50 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
 
     // Search transactions
     transactionsData?.transactions?.forEach((transaction) => {
-      if (
-        transaction.note?.toLowerCase().includes(query)
-      ) {
+      if (transaction.note?.toLowerCase().includes(query)) {
         results.push({
           id: `transaction-${transaction.id}`,
           type: "transaction",
           title: transaction.note || "Transaction",
           subtitle: `Category #${transaction.categoryId}`,
-          amount: formatCurrency(transaction.displayAmount || transaction.amount, transaction.displayCurrency || transaction.currency || "VND"),
-          date: transaction.date ? new Date(transaction.date * 1000).toLocaleDateString() : undefined,
-          url: `/dashboard/transaction`,
-          icon: transaction.type === 0 ? (
-            <svg className="w-5 h-5 text-danger-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 13l-5 5m0 0l-5-5m5 5V6" />
-            </svg>
-          ) : (
-            <svg className="w-5 h-5 text-success-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 11l5-5m0 0l5 5m-5-5v12" />
-            </svg>
+          amount: formatCurrency(
+            transaction.displayAmount || transaction.amount,
+            transaction.displayCurrency || transaction.currency || "VND",
           ),
+          date: transaction.date
+            ? new Date(transaction.date * 1000).toLocaleDateString()
+            : undefined,
+          url: `/dashboard/transaction`,
+          icon:
+            transaction.type === 0 ? (
+              <svg
+                className="w-5 h-5 text-danger-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 13l-5 5m0 0l-5-5m5 5V6"
+                />
+              </svg>
+            ) : (
+              <svg
+                className="w-5 h-5 text-success-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 11l5-5m0 0l5 5m-5-5v12"
+                />
+              </svg>
+            ),
         });
       }
     });
@@ -226,11 +282,23 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           type: "investment",
           title: investment.symbol || "Investment",
           subtitle: investment.name || "",
-          amount: t("shares", { count: investment.quantity?.toLocaleString() ?? 0 }),
+          amount: t("shares", {
+            count: investment.quantity?.toLocaleString() ?? 0,
+          }),
           url: `/dashboard/portfolio`,
           icon: (
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+              />
             </svg>
           ),
         });
@@ -245,31 +313,42 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
     if (!searchQuery.trim()) return recentSearches;
 
     const query = searchQuery.toLowerCase();
-    const suggestions = recentSearches.filter((s) => s.toLowerCase().includes(query));
+    const suggestions = recentSearches.filter((s) =>
+      s.toLowerCase().includes(query),
+    );
     return suggestions.slice(0, 3);
   }, [searchQuery, recentSearches]);
 
   // Handle result click
-  const handleResultClick = useCallback((result: SearchResultItem) => {
-    saveRecentSearch(searchQuery);
-    router.push(result.url);
-    onClose();
-    setSearchQuery("");
-  }, [router, onClose, saveRecentSearch, searchQuery]);
+  const handleResultClick = useCallback(
+    (result: SearchResultItem) => {
+      saveRecentSearch(searchQuery);
+      router.push(result.url);
+      onClose();
+      setSearchQuery("");
+    },
+    [router, onClose, saveRecentSearch, searchQuery],
+  );
 
   // Handle suggestion click
-  const handleSuggestionClick = useCallback((suggestion: string) => {
-    setSearchQuery(suggestion);
-    saveRecentSearch(suggestion);
-  }, [saveRecentSearch]);
+  const handleSuggestionClick = useCallback(
+    (suggestion: string) => {
+      setSearchQuery(suggestion);
+      saveRecentSearch(suggestion);
+    },
+    [saveRecentSearch],
+  );
 
   // Handle search submit
-  const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      saveRecentSearch(searchQuery);
-    }
-  }, [saveRecentSearch, searchQuery]);
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (searchQuery.trim()) {
+        saveRecentSearch(searchQuery);
+      }
+    },
+    [saveRecentSearch, searchQuery],
+  );
 
   // Clear search
   const handleClear = useCallback(() => {
@@ -283,11 +362,17 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
       if (!isOpen) return;
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev + 1) % Math.max(1, searchResults.length));
+        setSelectedIndex(
+          (prev) => (prev + 1) % Math.max(1, searchResults.length),
+        );
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         setSelectedIndex((prev) => Math.max(-1, prev - 1));
-      } else if (e.key === "Enter" && selectedIndex >= 0 && selectedIndex < searchResults.length) {
+      } else if (
+        e.key === "Enter" &&
+        selectedIndex >= 0 &&
+        selectedIndex < searchResults.length
+      ) {
         e.preventDefault();
         handleResultClick(searchResults[selectedIndex]);
       }
@@ -304,7 +389,10 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
   const hasResults = results.length > 0 || suggestions.length > 0;
 
   return (
-    <div className="fixed inset-0 flex items-start justify-center pt-20 sm:pt-24 px-4" style={{ zIndex: ZIndex.globalSearch }}>
+    <div
+      className="fixed inset-0 flex items-start justify-center pt-20 sm:pt-24 px-4"
+      style={{ zIndex: ZIndex.globalSearch }}
+    >
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/20 backdrop-blur-sm animate-fade-in"
@@ -319,7 +407,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           "relative w-full max-w-2xl bg-white dark:bg-dark-surface rounded-xl shadow-modal dark:shadow-dark-modal",
           "border border-neutral-200 dark:border-dark-border",
           "overflow-hidden",
-          "animate-scale-in"
+          "animate-scale-in",
         )}
         style={{ zIndex: ZIndex.globalSearch + 1 }}
       >
@@ -347,10 +435,10 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t("placeholder")}
               className={cn(
-                "w-full bg-transparent border-none outline-none",
+                "w-full bg-transparent outline-none focus-visible:outline-none",
                 "text-neutral-900 dark:text-dark-text",
                 "placeholder:text-neutral-400 dark:placeholder:text-dark-text-tertiary",
-                "text-base"
+                "text-base",
               )}
               autoComplete="off"
             />
@@ -363,14 +451,26 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
               aria-label={t("clearSearch")}
               type="button"
             >
-              <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-4 h-4 text-neutral-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           )}
 
           <div className="hidden sm:flex items-center gap-1 text-xs text-neutral-400 dark:text-dark-text-tertiary">
-            <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">ESC</kbd>
+            <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">
+              ESC
+            </kbd>
             <span>{t("toClose")}</span>
           </div>
         </div>
@@ -392,44 +492,50 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
-              <p className="text-neutral-600 dark:text-dark-text-secondary font-medium">{t("noResults")}</p>
+              <p className="text-neutral-600 dark:text-dark-text-secondary font-medium">
+                {t("noResults")}
+              </p>
               <p className="text-sm text-neutral-400 dark:text-dark-text-tertiary mt-1">
                 {t("noResultsHint")}
               </p>
             </div>
           )}
 
-          {!hasResults && !searchQuery.trim() && recentSearches.length === 0 && (
-            <div className="py-12 px-4 text-center">
-              <svg
-                className="w-12 h-12 mx-auto text-neutral-300 dark:text-dark-text-tertiary mb-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
-              <p className="text-neutral-600 dark:text-dark-text-secondary font-medium">{t("startSearching")}</p>
-              <p className="text-sm text-neutral-400 dark:text-dark-text-tertiary mt-1">
-                {t("startSearchingHint")}
-              </p>
-              <div className="flex items-center justify-center gap-2 mt-4 text-xs text-neutral-400 dark:text-dark-text-tertiary">
-                <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">
-                  ↑↓
-                </kbd>
-                <span>{t("navigate")}</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">
-                  Enter
-                </kbd>
-                <span>{t("select")}</span>
+          {!hasResults &&
+            !searchQuery.trim() &&
+            recentSearches.length === 0 && (
+              <div className="py-12 px-4 text-center">
+                <svg
+                  className="w-12 h-12 mx-auto text-neutral-300 dark:text-dark-text-tertiary mb-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+                <p className="text-neutral-600 dark:text-dark-text-secondary font-medium">
+                  {t("startSearching")}
+                </p>
+                <p className="text-sm text-neutral-400 dark:text-dark-text-tertiary mt-1">
+                  {t("startSearchingHint")}
+                </p>
+                <div className="flex items-center justify-center gap-2 mt-4 text-xs text-neutral-400 dark:text-dark-text-tertiary">
+                  <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">
+                    ↑↓
+                  </kbd>
+                  <span>{t("navigate")}</span>
+                  <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">
+                    Enter
+                  </kbd>
+                  <span>{t("select")}</span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Recent Searches */}
           {!searchQuery.trim() && recentSearches.length > 0 && (
@@ -446,13 +552,26 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                       "w-full flex items-center gap-3 px-3 py-2 rounded-lg",
                       "hover:bg-neutral-100 dark:hover:bg-dark-surface-hover",
                       "transition-colors text-left",
-                      selectedIndex === index && "bg-neutral-100 dark:bg-dark-surface-hover"
+                      selectedIndex === index &&
+                        "bg-neutral-100 dark:bg-dark-surface-hover",
                     )}
                   >
-                    <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-4 h-4 text-neutral-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
-                    <span className="text-sm text-neutral-700 dark:text-dark-text">{search}</span>
+                    <span className="text-sm text-neutral-700 dark:text-dark-text">
+                      {search}
+                    </span>
                   </button>
                 ))}
                 <button
@@ -464,8 +583,18 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                   }}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-danger-600 dark:text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-950 transition-colors text-left"
                 >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
                   </svg>
                   {t("clearRecentSearches")}
                 </button>
@@ -488,15 +617,21 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                       "w-full flex items-center gap-3 px-3 py-3 rounded-lg",
                       "hover:bg-neutral-100 dark:hover:bg-dark-surface-hover",
                       "transition-colors text-left group",
-                      selectedIndex === index && "bg-neutral-100 dark:bg-dark-surface-hover"
+                      selectedIndex === index &&
+                        "bg-neutral-100 dark:bg-dark-surface-hover",
                     )}
                   >
-                    <div className={cn(
-                      "flex-shrink-0 p-2 rounded-lg",
-                      result.type === "wallet" && "bg-primary-50 dark:bg-primary-950 text-primary-600 dark:text-primary-400",
-                      result.type === "transaction" && "bg-neutral-100 dark:bg-dark-surface-hover text-neutral-600 dark:text-dark-text-secondary",
-                      result.type === "investment" && "bg-accent-50 dark:bg-accent-950 text-accent-600 dark:text-accent-400"
-                    )}>
+                    <div
+                      className={cn(
+                        "flex-shrink-0 p-2 rounded-lg",
+                        result.type === "wallet" &&
+                          "bg-primary-50 dark:bg-primary-950 text-primary-600 dark:text-primary-400",
+                        result.type === "transaction" &&
+                          "bg-neutral-100 dark:bg-dark-surface-hover text-neutral-600 dark:text-dark-text-secondary",
+                        result.type === "investment" &&
+                          "bg-accent-50 dark:bg-accent-950 text-accent-600 dark:text-accent-400",
+                      )}
+                    >
                       {result.icon}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -512,7 +647,8 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                       </div>
                       <div className="flex items-center justify-between gap-2">
                         <p className="text-xs text-neutral-500 dark:text-dark-text-tertiary truncate">
-                          {result.subtitle && highlightMatch(result.subtitle, searchQuery)}
+                          {result.subtitle &&
+                            highlightMatch(result.subtitle, searchQuery)}
                         </p>
                         {result.date && (
                           <span className="text-xs text-neutral-400 dark:text-dark-text-tertiary flex-shrink-0">
@@ -527,7 +663,12 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
                     </svg>
                   </button>
                 ))}
@@ -549,13 +690,25 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                     className={cn(
                       "w-full flex items-center gap-3 px-3 py-2 rounded-lg",
                       "hover:bg-neutral-100 dark:hover:bg-dark-surface-hover",
-                      "transition-colors text-left"
+                      "transition-colors text-left",
                     )}
                   >
-                    <svg className="w-4 h-4 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-4 h-4 text-neutral-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
-                    <span className="text-sm text-neutral-700 dark:text-dark-text">{suggestion}</span>
+                    <span className="text-sm text-neutral-700 dark:text-dark-text">
+                      {suggestion}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -593,19 +746,25 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
 function highlightMatch(text: string, query: string): React.ReactNode {
   if (!query.trim()) return text;
 
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+  const regex = new RegExp(
+    `(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+    "gi",
+  );
   const parts = text.split(regex);
 
   return (
     <>
       {parts.map((part, index) =>
         regex.test(part) ? (
-          <mark key={index} className="bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-100 rounded px-0.5">
+          <mark
+            key={index}
+            className="bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-100 rounded px-0.5"
+          >
             {part}
           </mark>
         ) : (
           part
-        )
+        ),
       )}
     </>
   );
@@ -614,7 +773,10 @@ function highlightMatch(text: string, query: string): React.ReactNode {
 /**
  * Format currency amount
  */
-function formatCurrency(money: { amount: number; currency: string } | undefined, defaultCurrency: string): string {
+function formatCurrency(
+  money: { amount: number; currency: string } | undefined,
+  defaultCurrency: string,
+): string {
   if (!money) return "";
   const { amount, currency } = money;
   const formatter = new Intl.NumberFormat("en-US", {

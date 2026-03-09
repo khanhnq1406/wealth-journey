@@ -214,7 +214,7 @@ function useInvestmentColumns(
             <div>
               <span
                 className={`font-medium ${
-                  value >= 0 ? "text-green-600" : "text-red-600"
+                  value >= 0 ? "text-v2-green-positive" : "text-red-600"
                 }`}
               >
                 {formatCurrency(value, nativeCurrency)}
@@ -239,7 +239,7 @@ function useInvestmentColumns(
           <span
             className={`font-medium ${
               ((info.getValue() as number | undefined) || 0) >= 0
-                ? "text-green-600"
+                ? "text-v2-green-positive"
                 : "text-red-600"
             }`}
           >

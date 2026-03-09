@@ -72,7 +72,7 @@ export const PortfolioSummary = memo(function PortfolioSummary({
         <div className="text-sm text-neutral-600">{t("summary.totalPnl")}</div>
         <div
           className={`text-lg sm:text-xl lg:text-2xl font-semibold mt-1 ${
-            displayPnl >= 0 ? "text-green-600" : "text-red-600"
+            displayPnl >= 0 ? "text-v2-green-positive" : "text-red-600"
           }`}
         >
           {formatCurrency(displayPnl, displayCurrency)}

@@ -93,7 +93,7 @@ export default function LandingHero() {
     <section className="relative pt-16 pb-8 sm:pt-24 sm:pb-16 md:pt-32 md:pb-24 lg:pt-40 lg:pb-32 overflow-hidden">
       {/* Background Pattern */}
       <div
-        className="absolute inset-0 bg-gradient-to-br from-primary-600/5 via-transparent to-primary-600/10"
+        className="absolute inset-0 bg-gradient-to-br from-v2-red-primary/5 via-transparent to-v2-red-primary/10"
         aria-hidden="true"
       />
 
@@ -123,13 +123,13 @@ export default function LandingHero() {
           >
             <Link
               href="/auth/register"
-              className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-primary-600 text-white rounded-md hover:bg-primary-500 transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center"
+              className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-v2-red-primary text-white rounded-md hover:bg-v2-red-dark transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center"
             >
               {t("hero.getStarted")}
             </Link>
             <a
               href="#features"
-              className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 border-2 border-primary-600 text-primary-600 rounded-md hover:bg-primary-600 hover:text-white transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center"
+              className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 border-2 border-v2-red-primary text-v2-red-primary rounded-md hover:bg-v2-red-primary hover:text-white transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center"
             >
               {t("hero.learnMore")}
             </a>
@@ -142,7 +142,7 @@ export default function LandingHero() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md border border-gray-200">
               <svg
-                className="w-5 h-5 text-bg"
+                className="w-5 h-5 text-v2-red-primary"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -171,7 +171,7 @@ export default function LandingHero() {
           >
             <div className="flex items-center gap-2">
               <svg
-                className="w-5 h-5 text-primary-600"
+                className="w-5 h-5 text-v2-red-primary"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -185,7 +185,7 @@ export default function LandingHero() {
             </div>
             <div className="flex items-center gap-2">
               <svg
-                className="w-5 h-5 text-primary-600"
+                className="w-5 h-5 text-v2-red-primary"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -199,7 +199,7 @@ export default function LandingHero() {
             </div>
             <div className="flex items-center gap-2">
               <svg
-                className="w-5 h-5 text-primary-600"
+                className="w-5 h-5 text-v2-red-primary"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -219,7 +219,7 @@ export default function LandingHero() {
             className="mt-10 sm:mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto px-4"
           >
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-primary-600">
+              <div className="text-2xl sm:text-3xl font-bold text-v2-red-primary">
                 6+
               </div>
               <div className="text-xs sm:text-sm text-gray-600 mt-1">
@@ -230,7 +230,7 @@ export default function LandingHero() {
               </div>
             </div>
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-primary-600">
+              <div className="text-2xl sm:text-3xl font-bold text-v2-red-primary">
                 12+
               </div>
               <div className="text-xs sm:text-sm text-gray-600 mt-1">
@@ -241,7 +241,7 @@ export default function LandingHero() {
               </div>
             </div>
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-primary-600">
+              <div className="text-2xl sm:text-3xl font-bold text-v2-red-primary">
                 ∞
               </div>
               <div className="text-xs sm:text-sm text-gray-600 mt-1">
@@ -252,7 +252,7 @@ export default function LandingHero() {
               </div>
             </div>
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-primary-600">
+              <div className="text-2xl sm:text-3xl font-bold text-v2-red-primary">
                 100%
               </div>
               <div className="text-xs sm:text-sm text-gray-600 mt-1">

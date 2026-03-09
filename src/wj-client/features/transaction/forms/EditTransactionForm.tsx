@@ -199,7 +199,7 @@ export function EditTransactionForm({
   if (transactionLoading) {
     return (
       <div className="flex justify-center items-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-v2-red-primary"></div>
       </div>
     );
   }
@@ -219,7 +219,7 @@ export function EditTransactionForm({
           {
             value: "income",
             label: t("income"),
-            className: "bg-green-500 text-white",
+            className: "bg-v2-green-positive text-white",
           },
           {
             value: "expense",

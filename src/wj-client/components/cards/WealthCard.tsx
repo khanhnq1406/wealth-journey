@@ -95,8 +95,8 @@ export interface WealthCardProps {
 }
 
 const gradientClasses = {
-  green: "bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700",
-  primary: "bg-gradient-to-br from-primary-500 to-primary-600 dark:from-primary-600 dark:to-primary-700",
+  green: "bg-gradient-to-br from-v2-green-positive to-v2-green-positive dark:from-v2-green-positive dark:to-v2-green-positive",
+  primary: "bg-gradient-to-br from-v2-red-primary to-v2-red-primary dark:from-v2-red-primary dark:to-v2-red-primary",
   purple: "bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700",
   orange: "bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700",
   red: "bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700",
@@ -153,7 +153,7 @@ export function WealthCard({
     isPositive
       ? isGradient
         ? "text-white"
-        : "text-green-600 dark:text-green-400"
+        : "text-v2-green-positive dark:text-v2-green-positive"
       : isGradient
       ? "text-white"
       : "text-red-600 dark:text-red-400"
@@ -334,8 +334,8 @@ export function StatCard({
   className,
 }: StatCardProps) {
   const colorClasses = {
-    green: "text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/20",
-    primary: "text-primary-600 bg-primary-50 dark:text-primary-400 dark:bg-primary-900/20",
+    green: "text-v2-green-positive bg-v2-green-light dark:text-v2-green-positive dark:bg-v2-green-positive/20",
+    primary: "text-v2-red-primary bg-v2-red-light dark:text-v2-red-primary/80 dark:bg-v2-red-primary/20",
     purple: "text-purple-600 bg-purple-50 dark:text-purple-400 dark:bg-purple-900/20",
     orange: "text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-900/20",
     red: "text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/20",
@@ -379,7 +379,7 @@ export function StatCard({
             <div className={cn(
               "inline-flex items-center gap-1 mt-2 text-sm font-medium",
               change >= 0
-                ? "text-green-600 dark:text-green-400"
+                ? "text-v2-green-positive dark:text-v2-green-positive"
                 : "text-red-600 dark:text-red-400"
             )}>
               <svg

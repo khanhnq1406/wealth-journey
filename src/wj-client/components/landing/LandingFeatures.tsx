@@ -332,7 +332,7 @@ export default function LandingFeatures() {
               whileHover={{ y: -5 }}
               className="p-6 bg-neutral-50 rounded-lg hover:shadow-lg transition-shadow duration-200"
             >
-              <div className="w-14 h-14 bg-primary-600/10 rounded-lg flex items-center justify-center text-primary-600 mb-4">
+              <div className="w-14 h-14 bg-v2-red-primary/10 rounded-lg flex items-center justify-center text-v2-red-primary mb-4">
                 {feature.icon}
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">

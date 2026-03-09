@@ -327,7 +327,7 @@ export function FormDatePicker({
       return "border-red-300 hover:border-red-400 dark:border-red-700 dark:hover:border-red-600";
     }
     if (success) {
-      return "border-green-300 hover:border-green-400 dark:border-green-700 dark:hover:border-green-600";
+      return "border-v2-border hover:border-v2-border dark:border-green-700 dark:hover:border-green-600";
     }
     return "border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500";
   };
@@ -337,7 +337,7 @@ export function FormDatePicker({
     "rounded-lg border bg-white dark:bg-gray-800",
     "text-gray-900 dark:text-gray-100",
     "transition-all duration-200",
-    "focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent",
+    "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:border-transparent",
     "disabled:bg-gray-100 disabled:cursor-not-allowed dark:disabled:bg-gray-900",
     sizeClasses[size],
     getStateClasses()
@@ -379,7 +379,7 @@ export function FormDatePicker({
             error
               ? "text-red-600 dark:text-red-400"
               : success
-              ? "text-green-600 dark:text-green-400"
+              ? "text-v2-green-positive dark:text-green-400"
               : "text-gray-700 dark:text-gray-300"
           )}
         >
@@ -562,12 +562,12 @@ export function FormDatePicker({
                   className={cn(
                     "aspect-square flex items-center justify-center text-sm rounded-lg transition-all duration-150",
                     "hover:bg-gray-100 dark:hover:bg-gray-700",
-                    "focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-inset",
+                    "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:ring-inset",
                     {
                       "invisible": isEmpty,
-                      "bg-green-600 text-white hover:bg-green-700 dark:hover:bg-green-700":
+                      "bg-v2-red-primary text-white hover:bg-v2-red-dark dark:hover:bg-v2-red-dark":
                         isSelected,
-                      "bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400":
+                      "bg-v2-green-light dark:bg-green-900/30 text-v2-green-positive dark:text-green-400":
                         isToday && !isSelected,
                       "font-semibold": isToday,
                       "text-gray-400 cursor-not-allowed": isDisabled,
@@ -611,7 +611,7 @@ export function FormDatePicker({
           {success && !error && (
             <p
               id={successId}
-              className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1"
+              className="text-sm text-v2-green-positive dark:text-green-400 flex items-center gap-1"
             >
               <svg
                 className="w-4 h-4 flex-shrink-0"

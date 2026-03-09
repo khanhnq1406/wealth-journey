@@ -21,6 +21,8 @@ type AllHandlers struct {
 	Gold         *GoldHandler
 	Silver       *SilverHandler
 	MarketPrices *MarketPricesHandler
+	GoldChart    *GoldChartHandler
+	SilverChart  *SilverChartHandler
 	Import       *ImportHandler
 }
 
@@ -56,6 +58,18 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 		)
 	}
 
+	// Create gold chart handler (requires Redis for caching)
+	var goldChartHandler *GoldChartHandler
+	if deps.RDB != nil {
+		goldChartHandler = NewGoldChartHandler(deps.RDB.GetClient())
+	}
+
+	// Create silver chart handler (requires Redis for caching)
+	var silverChartHandler *SilverChartHandler
+	if deps.RDB != nil {
+		silverChartHandler = NewSilverChartHandler(deps.RDB.GetClient())
+	}
+
 	// Create import service with categorization and currency conversion support
 	importService := service.NewImportService(
 		deps.DB,
@@ -82,6 +96,8 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 		Gold:         NewGoldHandler(),
 		Silver:       NewSilverHandler(),
 		MarketPrices: marketPricesHandler,
+		GoldChart:    goldChartHandler,
+		SilverChart:  silverChartHandler,
 		Import:       NewImportHandler(repos.Import, importService),
 	}
 }

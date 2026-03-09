@@ -71,7 +71,7 @@ export default function Login() {
       {/* Header with Logo */}
       <div className="pt-6 pb-4 px-4 sm:px-6">
         <Link href="/" className="inline-flex items-center gap-2">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary-600 rounded-xl flex items-center justify-center shadow-lg">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-v2-red-primary rounded-xl flex items-center justify-center shadow-lg">
             <svg
               className="w-6 h-6 sm:w-7 sm:h-7 text-white"
               fill="none"

@@ -1,4 +1,4 @@
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Be_Vietnam_Pro, JetBrains_Mono } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -11,6 +11,22 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   weight: ["400", "500", "600"],
   preload: true,
   adjustFontFallback: false,
+});
+
+const beVietnamPro = Be_Vietnam_Pro({
+  subsets: ["latin", "latin-ext", "vietnamese"],
+  variable: "--font-vietnam-pro",
+  weight: ["400", "500", "600", "700", "800"],
+  preload: true,
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin", "latin-ext", "vietnamese"],
+  variable: "--font-jetbrains-mono",
+  weight: ["400", "500", "600", "700"],
+  preload: true,
+  display: "swap",
 });
 
 export default async function LocaleLayout({
@@ -70,10 +86,10 @@ export default async function LocaleLayout({
         />
 
         {/* Microsoft Tiles */}
-        <meta name="msapplication-TileColor" content="#008148" />
+        <meta name="msapplication-TileColor" content="#B91C1C" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>
-      <body className={`${plusJakartaSans.variable} antialiased h-dvh`}>
+      <body className={`${plusJakartaSans.variable} ${beVietnamPro.variable} ${jetbrainsMono.variable} antialiased h-dvh`}>
         <NextIntlClientProvider messages={messages}>
           <Providers>{children}</Providers>
         </NextIntlClientProvider>

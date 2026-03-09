@@ -189,6 +189,70 @@ export function investmentTransactionTypeToJSON(object: InvestmentTransactionTyp
   }
 }
 
+/** PnlPeriod defines the time window for period-scoped PnL calculation */
+export const PnlPeriod = {
+  /** PNL_PERIOD_UNSPECIFIED - Same as ALL — returns existing all-time PnL */
+  PNL_PERIOD_UNSPECIFIED: 0,
+  PNL_PERIOD_1D: 1,
+  PNL_PERIOD_1W: 2,
+  PNL_PERIOD_1M: 3,
+  PNL_PERIOD_ALL: 4,
+  UNRECOGNIZED: -1,
+} as const;
+
+export type PnlPeriod = typeof PnlPeriod[keyof typeof PnlPeriod];
+
+export namespace PnlPeriod {
+  export type PNL_PERIOD_UNSPECIFIED = typeof PnlPeriod.PNL_PERIOD_UNSPECIFIED;
+  export type PNL_PERIOD_1D = typeof PnlPeriod.PNL_PERIOD_1D;
+  export type PNL_PERIOD_1W = typeof PnlPeriod.PNL_PERIOD_1W;
+  export type PNL_PERIOD_1M = typeof PnlPeriod.PNL_PERIOD_1M;
+  export type PNL_PERIOD_ALL = typeof PnlPeriod.PNL_PERIOD_ALL;
+  export type UNRECOGNIZED = typeof PnlPeriod.UNRECOGNIZED;
+}
+
+export function pnlPeriodFromJSON(object: any): PnlPeriod {
+  switch (object) {
+    case 0:
+    case "PNL_PERIOD_UNSPECIFIED":
+      return PnlPeriod.PNL_PERIOD_UNSPECIFIED;
+    case 1:
+    case "PNL_PERIOD_1D":
+      return PnlPeriod.PNL_PERIOD_1D;
+    case 2:
+    case "PNL_PERIOD_1W":
+      return PnlPeriod.PNL_PERIOD_1W;
+    case 3:
+    case "PNL_PERIOD_1M":
+      return PnlPeriod.PNL_PERIOD_1M;
+    case 4:
+    case "PNL_PERIOD_ALL":
+      return PnlPeriod.PNL_PERIOD_ALL;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return PnlPeriod.UNRECOGNIZED;
+  }
+}
+
+export function pnlPeriodToJSON(object: PnlPeriod): string {
+  switch (object) {
+    case PnlPeriod.PNL_PERIOD_UNSPECIFIED:
+      return "PNL_PERIOD_UNSPECIFIED";
+    case PnlPeriod.PNL_PERIOD_1D:
+      return "PNL_PERIOD_1D";
+    case PnlPeriod.PNL_PERIOD_1W:
+      return "PNL_PERIOD_1W";
+    case PnlPeriod.PNL_PERIOD_1M:
+      return "PNL_PERIOD_1M";
+    case PnlPeriod.PNL_PERIOD_ALL:
+      return "PNL_PERIOD_ALL";
+    case PnlPeriod.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 /** Investment represents an individual holding within an investment wallet */
 export interface Investment {
   id: number;
@@ -331,6 +395,12 @@ export interface PortfolioSummary {
   topPerformers: InvestmentPerformance[];
   /** Bottom 3 performing investments */
   worstPerformers: InvestmentPerformance[];
+  /** PnL for the selected period window */
+  periodPnl: number;
+  /** PnL% for the selected period window */
+  periodPnlPercent: number;
+  /** The period used for this response */
+  period: PnlPeriod;
 }
 
 export interface InvestmentByType {
@@ -500,6 +570,51 @@ export interface MarketPrice {
   displayUnit: string;
 }
 
+/** ChartDataPoint represents a single price data point for chart display */
+export interface ChartDataPoint {
+  timestamp: number;
+  buy: number;
+  sell: number;
+}
+
+/** GetGoldChartRequest for fetching gold price history */
+export interface GetGoldChartRequest {
+  market: string;
+  goldCode: string;
+  period: string;
+}
+
+/** GetGoldChartResponse with gold price history data points */
+export interface GetGoldChartResponse {
+  success: boolean;
+  message: string;
+  data: ChartDataPoint[];
+  market: string;
+  goldCode: string;
+  period: string;
+  currency: string;
+  timestamp: string;
+}
+
+/** GetSilverChartRequest for fetching silver price history */
+export interface GetSilverChartRequest {
+  market: string;
+  type: string;
+  days: number;
+}
+
+/** GetSilverChartResponse with silver price history data points */
+export interface GetSilverChartResponse {
+  success: boolean;
+  message: string;
+  data: ChartDataPoint[];
+  market: string;
+  type: string;
+  days: number;
+  currency: string;
+  timestamp: string;
+}
+
 /** Request/Response messages */
 export interface ListInvestmentsRequest {
   walletId: number;
@@ -658,6 +773,8 @@ export interface DeleteInvestmentTransactionResponse {
 
 export interface GetPortfolioSummaryRequest {
   walletId: number;
+  /** Optional — default PERIOD_ALL */
+  period: PnlPeriod;
 }
 
 export interface GetPortfolioSummaryResponse {
@@ -740,6 +857,8 @@ export interface GetAggregatedPortfolioSummaryRequest {
   walletId: number;
   /** Optional filter by investment type */
   typeFilter: InvestmentType;
+  /** Optional — default PERIOD_ALL */
+  period: PnlPeriod;
 }
 
 function createBaseInvestment(): Investment {
@@ -1636,6 +1755,9 @@ function createBasePortfolioSummary(): PortfolioSummary {
     displayCurrency: "",
     topPerformers: [],
     worstPerformers: [],
+    periodPnl: 0,
+    periodPnlPercent: 0,
+    period: 0,
   };
 }
 
@@ -1691,6 +1813,15 @@ export const PortfolioSummary: MessageFns<PortfolioSummary> = {
     }
     for (const v of message.worstPerformers) {
       InvestmentPerformance.encode(v!, writer.uint32(138).fork()).join();
+    }
+    if (message.periodPnl !== 0) {
+      writer.uint32(144).int64(message.periodPnl);
+    }
+    if (message.periodPnlPercent !== 0) {
+      writer.uint32(153).double(message.periodPnlPercent);
+    }
+    if (message.period !== 0) {
+      writer.uint32(160).int32(message.period);
     }
     return writer;
   },
@@ -1838,6 +1969,30 @@ export const PortfolioSummary: MessageFns<PortfolioSummary> = {
           message.worstPerformers.push(InvestmentPerformance.decode(reader, reader.uint32()));
           continue;
         }
+        case 18: {
+          if (tag !== 144) {
+            break;
+          }
+
+          message.periodPnl = longToNumber(reader.int64());
+          continue;
+        }
+        case 19: {
+          if (tag !== 153) {
+            break;
+          }
+
+          message.periodPnlPercent = reader.double();
+          continue;
+        }
+        case 20: {
+          if (tag !== 160) {
+            break;
+          }
+
+          message.period = reader.int32() as any;
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1874,6 +2029,9 @@ export const PortfolioSummary: MessageFns<PortfolioSummary> = {
       worstPerformers: globalThis.Array.isArray(object?.worstPerformers)
         ? object.worstPerformers.map((e: any) => InvestmentPerformance.fromJSON(e))
         : [],
+      periodPnl: isSet(object.periodPnl) ? globalThis.Number(object.periodPnl) : 0,
+      periodPnlPercent: isSet(object.periodPnlPercent) ? globalThis.Number(object.periodPnlPercent) : 0,
+      period: isSet(object.period) ? pnlPeriodFromJSON(object.period) : 0,
     };
   },
 
@@ -1930,6 +2088,15 @@ export const PortfolioSummary: MessageFns<PortfolioSummary> = {
     if (message.worstPerformers?.length) {
       obj.worstPerformers = message.worstPerformers.map((e) => InvestmentPerformance.toJSON(e));
     }
+    if (message.periodPnl !== 0) {
+      obj.periodPnl = Math.round(message.periodPnl);
+    }
+    if (message.periodPnlPercent !== 0) {
+      obj.periodPnlPercent = message.periodPnlPercent;
+    }
+    if (message.period !== 0) {
+      obj.period = pnlPeriodToJSON(message.period);
+    }
     return obj;
   },
 
@@ -1965,6 +2132,9 @@ export const PortfolioSummary: MessageFns<PortfolioSummary> = {
     message.displayCurrency = object.displayCurrency ?? "";
     message.topPerformers = object.topPerformers?.map((e) => InvestmentPerformance.fromPartial(e)) || [];
     message.worstPerformers = object.worstPerformers?.map((e) => InvestmentPerformance.fromPartial(e)) || [];
+    message.periodPnl = object.periodPnl ?? 0;
+    message.periodPnlPercent = object.periodPnlPercent ?? 0;
+    message.period = object.period ?? 0;
     return message;
   },
 };
@@ -3799,6 +3969,626 @@ export const MarketPrice: MessageFns<MarketPrice> = {
     message.timestamp = object.timestamp ?? 0;
     message.isCached = object.isCached ?? false;
     message.displayUnit = object.displayUnit ?? "";
+    return message;
+  },
+};
+
+function createBaseChartDataPoint(): ChartDataPoint {
+  return { timestamp: 0, buy: 0, sell: 0 };
+}
+
+export const ChartDataPoint: MessageFns<ChartDataPoint> = {
+  encode(message: ChartDataPoint, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.timestamp !== 0) {
+      writer.uint32(8).int64(message.timestamp);
+    }
+    if (message.buy !== 0) {
+      writer.uint32(17).double(message.buy);
+    }
+    if (message.sell !== 0) {
+      writer.uint32(25).double(message.sell);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ChartDataPoint {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChartDataPoint();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.timestamp = longToNumber(reader.int64());
+          continue;
+        }
+        case 2: {
+          if (tag !== 17) {
+            break;
+          }
+
+          message.buy = reader.double();
+          continue;
+        }
+        case 3: {
+          if (tag !== 25) {
+            break;
+          }
+
+          message.sell = reader.double();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ChartDataPoint {
+    return {
+      timestamp: isSet(object.timestamp) ? globalThis.Number(object.timestamp) : 0,
+      buy: isSet(object.buy) ? globalThis.Number(object.buy) : 0,
+      sell: isSet(object.sell) ? globalThis.Number(object.sell) : 0,
+    };
+  },
+
+  toJSON(message: ChartDataPoint): unknown {
+    const obj: any = {};
+    if (message.timestamp !== 0) {
+      obj.timestamp = Math.round(message.timestamp);
+    }
+    if (message.buy !== 0) {
+      obj.buy = message.buy;
+    }
+    if (message.sell !== 0) {
+      obj.sell = message.sell;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ChartDataPoint>): ChartDataPoint {
+    return ChartDataPoint.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChartDataPoint>): ChartDataPoint {
+    const message = createBaseChartDataPoint();
+    message.timestamp = object.timestamp ?? 0;
+    message.buy = object.buy ?? 0;
+    message.sell = object.sell ?? 0;
+    return message;
+  },
+};
+
+function createBaseGetGoldChartRequest(): GetGoldChartRequest {
+  return { market: "", goldCode: "", period: "" };
+}
+
+export const GetGoldChartRequest: MessageFns<GetGoldChartRequest> = {
+  encode(message: GetGoldChartRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.market !== "") {
+      writer.uint32(10).string(message.market);
+    }
+    if (message.goldCode !== "") {
+      writer.uint32(18).string(message.goldCode);
+    }
+    if (message.period !== "") {
+      writer.uint32(26).string(message.period);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetGoldChartRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetGoldChartRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.market = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.goldCode = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.period = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetGoldChartRequest {
+    return {
+      market: isSet(object.market) ? globalThis.String(object.market) : "",
+      goldCode: isSet(object.goldCode) ? globalThis.String(object.goldCode) : "",
+      period: isSet(object.period) ? globalThis.String(object.period) : "",
+    };
+  },
+
+  toJSON(message: GetGoldChartRequest): unknown {
+    const obj: any = {};
+    if (message.market !== "") {
+      obj.market = message.market;
+    }
+    if (message.goldCode !== "") {
+      obj.goldCode = message.goldCode;
+    }
+    if (message.period !== "") {
+      obj.period = message.period;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetGoldChartRequest>): GetGoldChartRequest {
+    return GetGoldChartRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetGoldChartRequest>): GetGoldChartRequest {
+    const message = createBaseGetGoldChartRequest();
+    message.market = object.market ?? "";
+    message.goldCode = object.goldCode ?? "";
+    message.period = object.period ?? "";
+    return message;
+  },
+};
+
+function createBaseGetGoldChartResponse(): GetGoldChartResponse {
+  return { success: false, message: "", data: [], market: "", goldCode: "", period: "", currency: "", timestamp: "" };
+}
+
+export const GetGoldChartResponse: MessageFns<GetGoldChartResponse> = {
+  encode(message: GetGoldChartResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.data) {
+      ChartDataPoint.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.market !== "") {
+      writer.uint32(34).string(message.market);
+    }
+    if (message.goldCode !== "") {
+      writer.uint32(42).string(message.goldCode);
+    }
+    if (message.period !== "") {
+      writer.uint32(50).string(message.period);
+    }
+    if (message.currency !== "") {
+      writer.uint32(58).string(message.currency);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(66).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetGoldChartResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetGoldChartResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.data.push(ChartDataPoint.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.market = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.goldCode = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.period = reader.string();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.currency = reader.string();
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetGoldChartResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      data: globalThis.Array.isArray(object?.data) ? object.data.map((e: any) => ChartDataPoint.fromJSON(e)) : [],
+      market: isSet(object.market) ? globalThis.String(object.market) : "",
+      goldCode: isSet(object.goldCode) ? globalThis.String(object.goldCode) : "",
+      period: isSet(object.period) ? globalThis.String(object.period) : "",
+      currency: isSet(object.currency) ? globalThis.String(object.currency) : "",
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetGoldChartResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.data?.length) {
+      obj.data = message.data.map((e) => ChartDataPoint.toJSON(e));
+    }
+    if (message.market !== "") {
+      obj.market = message.market;
+    }
+    if (message.goldCode !== "") {
+      obj.goldCode = message.goldCode;
+    }
+    if (message.period !== "") {
+      obj.period = message.period;
+    }
+    if (message.currency !== "") {
+      obj.currency = message.currency;
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetGoldChartResponse>): GetGoldChartResponse {
+    return GetGoldChartResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetGoldChartResponse>): GetGoldChartResponse {
+    const message = createBaseGetGoldChartResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.data = object.data?.map((e) => ChartDataPoint.fromPartial(e)) || [];
+    message.market = object.market ?? "";
+    message.goldCode = object.goldCode ?? "";
+    message.period = object.period ?? "";
+    message.currency = object.currency ?? "";
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseGetSilverChartRequest(): GetSilverChartRequest {
+  return { market: "", type: "", days: 0 };
+}
+
+export const GetSilverChartRequest: MessageFns<GetSilverChartRequest> = {
+  encode(message: GetSilverChartRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.market !== "") {
+      writer.uint32(10).string(message.market);
+    }
+    if (message.type !== "") {
+      writer.uint32(18).string(message.type);
+    }
+    if (message.days !== 0) {
+      writer.uint32(24).int32(message.days);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetSilverChartRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetSilverChartRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.market = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.type = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.days = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetSilverChartRequest {
+    return {
+      market: isSet(object.market) ? globalThis.String(object.market) : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
+      days: isSet(object.days) ? globalThis.Number(object.days) : 0,
+    };
+  },
+
+  toJSON(message: GetSilverChartRequest): unknown {
+    const obj: any = {};
+    if (message.market !== "") {
+      obj.market = message.market;
+    }
+    if (message.type !== "") {
+      obj.type = message.type;
+    }
+    if (message.days !== 0) {
+      obj.days = Math.round(message.days);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetSilverChartRequest>): GetSilverChartRequest {
+    return GetSilverChartRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetSilverChartRequest>): GetSilverChartRequest {
+    const message = createBaseGetSilverChartRequest();
+    message.market = object.market ?? "";
+    message.type = object.type ?? "";
+    message.days = object.days ?? 0;
+    return message;
+  },
+};
+
+function createBaseGetSilverChartResponse(): GetSilverChartResponse {
+  return { success: false, message: "", data: [], market: "", type: "", days: 0, currency: "", timestamp: "" };
+}
+
+export const GetSilverChartResponse: MessageFns<GetSilverChartResponse> = {
+  encode(message: GetSilverChartResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.data) {
+      ChartDataPoint.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.market !== "") {
+      writer.uint32(34).string(message.market);
+    }
+    if (message.type !== "") {
+      writer.uint32(42).string(message.type);
+    }
+    if (message.days !== 0) {
+      writer.uint32(48).int32(message.days);
+    }
+    if (message.currency !== "") {
+      writer.uint32(58).string(message.currency);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(66).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetSilverChartResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetSilverChartResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.data.push(ChartDataPoint.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.market = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.type = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.days = reader.int32();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.currency = reader.string();
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetSilverChartResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      data: globalThis.Array.isArray(object?.data) ? object.data.map((e: any) => ChartDataPoint.fromJSON(e)) : [],
+      market: isSet(object.market) ? globalThis.String(object.market) : "",
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
+      days: isSet(object.days) ? globalThis.Number(object.days) : 0,
+      currency: isSet(object.currency) ? globalThis.String(object.currency) : "",
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetSilverChartResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.data?.length) {
+      obj.data = message.data.map((e) => ChartDataPoint.toJSON(e));
+    }
+    if (message.market !== "") {
+      obj.market = message.market;
+    }
+    if (message.type !== "") {
+      obj.type = message.type;
+    }
+    if (message.days !== 0) {
+      obj.days = Math.round(message.days);
+    }
+    if (message.currency !== "") {
+      obj.currency = message.currency;
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetSilverChartResponse>): GetSilverChartResponse {
+    return GetSilverChartResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetSilverChartResponse>): GetSilverChartResponse {
+    const message = createBaseGetSilverChartResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.data = object.data?.map((e) => ChartDataPoint.fromPartial(e)) || [];
+    message.market = object.market ?? "";
+    message.type = object.type ?? "";
+    message.days = object.days ?? 0;
+    message.currency = object.currency ?? "";
+    message.timestamp = object.timestamp ?? "";
     return message;
   },
 };
@@ -5794,13 +6584,16 @@ export const DeleteInvestmentTransactionResponse: MessageFns<DeleteInvestmentTra
 };
 
 function createBaseGetPortfolioSummaryRequest(): GetPortfolioSummaryRequest {
-  return { walletId: 0 };
+  return { walletId: 0, period: 0 };
 }
 
 export const GetPortfolioSummaryRequest: MessageFns<GetPortfolioSummaryRequest> = {
   encode(message: GetPortfolioSummaryRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.walletId !== 0) {
       writer.uint32(8).int32(message.walletId);
+    }
+    if (message.period !== 0) {
+      writer.uint32(16).int32(message.period);
     }
     return writer;
   },
@@ -5820,6 +6613,14 @@ export const GetPortfolioSummaryRequest: MessageFns<GetPortfolioSummaryRequest> 
           message.walletId = reader.int32();
           continue;
         }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.period = reader.int32() as any;
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -5830,13 +6631,19 @@ export const GetPortfolioSummaryRequest: MessageFns<GetPortfolioSummaryRequest> 
   },
 
   fromJSON(object: any): GetPortfolioSummaryRequest {
-    return { walletId: isSet(object.walletId) ? globalThis.Number(object.walletId) : 0 };
+    return {
+      walletId: isSet(object.walletId) ? globalThis.Number(object.walletId) : 0,
+      period: isSet(object.period) ? pnlPeriodFromJSON(object.period) : 0,
+    };
   },
 
   toJSON(message: GetPortfolioSummaryRequest): unknown {
     const obj: any = {};
     if (message.walletId !== 0) {
       obj.walletId = Math.round(message.walletId);
+    }
+    if (message.period !== 0) {
+      obj.period = pnlPeriodToJSON(message.period);
     }
     return obj;
   },
@@ -5847,6 +6654,7 @@ export const GetPortfolioSummaryRequest: MessageFns<GetPortfolioSummaryRequest> 
   fromPartial(object: DeepPartial<GetPortfolioSummaryRequest>): GetPortfolioSummaryRequest {
     const message = createBaseGetPortfolioSummaryRequest();
     message.walletId = object.walletId ?? 0;
+    message.period = object.period ?? 0;
     return message;
   },
 };
@@ -6724,7 +7532,7 @@ export const ListUserInvestmentsResponse: MessageFns<ListUserInvestmentsResponse
 };
 
 function createBaseGetAggregatedPortfolioSummaryRequest(): GetAggregatedPortfolioSummaryRequest {
-  return { walletId: 0, typeFilter: 0 };
+  return { walletId: 0, typeFilter: 0, period: 0 };
 }
 
 export const GetAggregatedPortfolioSummaryRequest: MessageFns<GetAggregatedPortfolioSummaryRequest> = {
@@ -6734,6 +7542,9 @@ export const GetAggregatedPortfolioSummaryRequest: MessageFns<GetAggregatedPortf
     }
     if (message.typeFilter !== 0) {
       writer.uint32(16).int32(message.typeFilter);
+    }
+    if (message.period !== 0) {
+      writer.uint32(24).int32(message.period);
     }
     return writer;
   },
@@ -6761,6 +7572,14 @@ export const GetAggregatedPortfolioSummaryRequest: MessageFns<GetAggregatedPortf
           message.typeFilter = reader.int32() as any;
           continue;
         }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.period = reader.int32() as any;
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -6774,6 +7593,7 @@ export const GetAggregatedPortfolioSummaryRequest: MessageFns<GetAggregatedPortf
     return {
       walletId: isSet(object.walletId) ? globalThis.Number(object.walletId) : 0,
       typeFilter: isSet(object.typeFilter) ? investmentTypeFromJSON(object.typeFilter) : 0,
+      period: isSet(object.period) ? pnlPeriodFromJSON(object.period) : 0,
     };
   },
 
@@ -6785,6 +7605,9 @@ export const GetAggregatedPortfolioSummaryRequest: MessageFns<GetAggregatedPortf
     if (message.typeFilter !== 0) {
       obj.typeFilter = investmentTypeToJSON(message.typeFilter);
     }
+    if (message.period !== 0) {
+      obj.period = pnlPeriodToJSON(message.period);
+    }
     return obj;
   },
 
@@ -6795,6 +7618,7 @@ export const GetAggregatedPortfolioSummaryRequest: MessageFns<GetAggregatedPortf
     const message = createBaseGetAggregatedPortfolioSummaryRequest();
     message.walletId = object.walletId ?? 0;
     message.typeFilter = object.typeFilter ?? 0;
+    message.period = object.period ?? 0;
     return message;
   },
 };

@@ -48,9 +48,9 @@ export const UpdateProgressBanner = memo(function UpdateProgressBanner() {
 export const UpdateSuccessBanner = memo(function UpdateSuccessBanner() {
   const t = useTranslations("investment");
   return (
-    <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3 animate-fade-in">
+    <div className="bg-v2-green-light border border-v2-border rounded-lg p-4 flex items-center gap-3 animate-fade-in">
       <svg
-        className="h-5 w-5 text-green-600"
+        className="h-5 w-5 text-v2-green-positive"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 20 20"
         fill="currentColor"
@@ -62,10 +62,10 @@ export const UpdateSuccessBanner = memo(function UpdateSuccessBanner() {
         />
       </svg>
       <div className="flex-1">
-        <p className="text-sm font-medium text-green-900">
+        <p className="text-sm font-medium text-v2-green-positive">
           {t("updateBanner.successTitle")}
         </p>
-        <p className="text-xs text-green-700">
+        <p className="text-xs text-v2-green-positive">
           {t("updateBanner.successDescription")}
         </p>
       </div>

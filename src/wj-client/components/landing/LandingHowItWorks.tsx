@@ -90,7 +90,7 @@ export default function LandingHowItWorks() {
               variants={itemVariants}
               className="flex flex-col sm:flex-row items-start gap-6 bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
             >
-              <div className="flex-shrink-0 w-16 h-16 bg-primary-600 text-white rounded-full flex items-center justify-center text-xl font-bold shadow-lg">
+              <div className="flex-shrink-0 w-16 h-16 bg-v2-red-primary text-white rounded-full flex items-center justify-center text-xl font-bold shadow-lg">
                 {step.number}
               </div>
               <div className="flex-1 pt-1">

@@ -62,7 +62,7 @@ export const TransactionItem = ({
         {/* Category Icon */}
         <div
           className={`w-10 h-10 rounded-full flex items-center justify-center ${
-            isIncome ? "bg-green-100" : "bg-red-100"
+            isIncome ? "bg-v2-green-light" : "bg-red-100"
           }`}
         >
           <Image
@@ -99,7 +99,7 @@ export const TransactionItem = ({
         {/* Amount */}
         <div
           className={`font-semibold text-lg ${
-            isIncome ? "text-green-600" : "text-red-600"
+            isIncome ? "text-v2-green-positive" : "text-red-600"
           }`}
         >
           {isIncome ? "+" : "-"}

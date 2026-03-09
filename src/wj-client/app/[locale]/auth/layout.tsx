@@ -7,7 +7,7 @@ export default async function AuthLayout({
 }>) {
   const t = await getTranslations("auth");
   return (
-    <div className="bg-primary-600 h-screen">
+    <div className="bg-v2-red-primary h-screen">
       <div className="block sm:grid grid-cols-[40%_60%]">
         <div className="hidden sm:flex justify-center content-center flex-wrap gap-[20px]">
           <div className="flex gap-2">

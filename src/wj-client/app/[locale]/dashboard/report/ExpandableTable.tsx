@@ -179,12 +179,12 @@ export const ExpandableTable = memo(function ExpandableTable({
                     {wallet.monthlyData.map((data, index) => (
                       <td
                         key={`income-${index}`}
-                        className="text-center py-1.5 px-1 sm:py-2 sm:px-2 text-xs text-green-600 whitespace-nowrap"
+                        className="text-center py-1.5 px-1 sm:py-2 sm:px-2 text-xs text-v2-green-positive whitespace-nowrap"
                       >
                         {data.income > 0 ? formatCurrency(data.income) : "-"}
                       </td>
                     ))}
-                    <td className="text-center py-1.5 px-2 sm:py-2 sm:px-4 text-xs font-semibold text-green-600 whitespace-nowrap">
+                    <td className="text-center py-1.5 px-2 sm:py-2 sm:px-4 text-xs font-semibold text-v2-green-positive whitespace-nowrap">
                       {formatCurrency(
                         wallet.monthlyData.reduce(
                           (sum, m) => sum + m.income,

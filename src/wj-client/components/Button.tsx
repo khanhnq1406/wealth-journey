@@ -75,7 +75,7 @@ export const Button = React.memo(function Button({
   // Base classes for all buttons
   const baseClasses = cn(
     "font-semibold rounded-lg cursor-pointer",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
     "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
     "flex items-center justify-center gap-2 sm:gap-3",
     "transition-all duration-200 ease-in-out",
@@ -86,10 +86,10 @@ export const Button = React.memo(function Button({
   // Variant-specific classes (using semantic design system colors)
   const variantClasses = {
     primary: cn(
-      "bg-primary-600 text-white",
-      "hover:bg-primary-700 hover:shadow-md",
+      "bg-v2-red-primary text-white",
+      "hover:bg-v2-red-dark hover:shadow-md",
       "active:bg-primary-800",
-      "dark:bg-primary-600 dark:hover:bg-primary-700 dark:active:bg-primary-800",
+      "dark:bg-v2-red-primary dark:hover:bg-v2-red-dark dark:active:bg-primary-800",
     ),
     secondary: cn(
       "bg-white text-primary-600 border-2 border-primary-600",
@@ -178,7 +178,7 @@ export const Button = React.memo(function Button({
           "bg-transparent",
           "hover:bg-neutral-100 dark:hover:bg-dark-surface-hover",
           "rounded-full",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
           "transition-all duration-200 ease-in-out",
           "active:scale-[0.95]",
           "flex items-center justify-center",
@@ -191,7 +191,7 @@ export const Button = React.memo(function Button({
         aria-busy={loading}
       >
         {loading ? (
-          <LoadingSpinnerIcon size="md" className="text-primary-600" />
+          <LoadingSpinnerIcon size="md" className="text-v2-red-primary" />
         ) : src ? (
           <img src={src} alt="" className="w-5 h-5" />
         ) : null}

@@ -544,7 +544,7 @@ export function BaseModal({
                   isDragging && dragY > 0
                     ? dragY > swipeThreshold
                       ? "bg-danger-500 dark:bg-danger-600" // Red when close threshold reached
-                      : "bg-primary-500 dark:bg-primary-600" // Blue while dragging
+                      : "bg-v2-red-primary" // Red while dragging
                     : "bg-neutral-300 dark:bg-dark-border", // Gray at rest
                 )}
               />

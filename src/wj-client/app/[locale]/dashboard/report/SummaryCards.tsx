@@ -74,9 +74,9 @@ const SummaryCard = memo(function SummaryCard({
 }: SummaryCardProps) {
   const colorClasses = {
     green: {
-      bg: "bg-green-50",
-      text: "text-green-700",
-      icon: "bg-green-100",
+      bg: "bg-v2-green-light",
+      text: "text-v2-green-positive",
+      icon: "bg-v2-green-light",
     },
     red: {
       bg: "bg-red-50",
@@ -119,7 +119,7 @@ const SummaryCard = memo(function SummaryCard({
         )}
 
         {change !== undefined && (
-          <div className={`text-xs font-medium ${change >= 0 ? "text-green-600" : "text-red-600"}`}>
+          <div className={`text-xs font-medium ${change >= 0 ? "text-v2-green-positive" : "text-red-600"}`}>
             {change >= 0 ? "+" : ""}
             {change.toFixed(1)}%
             {changeLabel && ` ${changeLabel}`}
@@ -152,7 +152,7 @@ const Icons = {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="text-green-600"
+      className="text-v2-green-positive"
     >
       <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
       <polyline points="17 6 23 6 23 12" />

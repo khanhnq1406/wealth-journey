@@ -1,0 +1,75 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+import { formatPriceValue } from "../prices/helpers";
+import { BaseCard } from "@/components/BaseCard";
+import type { PriceItem } from "@/gen/protobuf/v1/investment";
+
+interface SilverPriceTableProps {
+  prices: PriceItem[];
+  updatedTime?: string;
+}
+
+export function SilverPriceTable({ prices, updatedTime }: SilverPriceTableProps) {
+  const t = useTranslations("dashboard.home");
+
+  return (
+    <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
+      <div className="p-5 pb-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
+            {t("silverPriceTitle")}
+          </h3>
+          {updatedTime && (
+            <span className="font-jetbrains text-[11px] text-v2-text-tertiary">
+              {t("updated", { time: updatedTime })}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-v2-silver-light">
+              <th className="text-left px-5 py-2.5 font-jetbrains font-semibold text-[11px] tracking-[1px] text-v2-silver-dark">
+                {t("silverType")}
+              </th>
+              <th className="text-right px-5 py-2.5 font-jetbrains font-semibold text-[11px] tracking-[1px] text-v2-silver-dark">
+                {t("buy")}
+              </th>
+              <th className="text-right px-5 py-2.5 font-jetbrains font-semibold text-[11px] tracking-[1px] text-v2-silver-dark">
+                {t("sell")}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {prices.map((item, index) => (
+              <tr
+                key={item.typeCode || index}
+                className={index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"}
+              >
+                <td className="px-5 py-3 font-vietnam font-medium text-[13px] text-v2-text-primary">
+                  {item.name || item.typeCode}
+                </td>
+                <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-text-primary">
+                  {formatPriceValue(item.buy, item.currency || "VND")}
+                </td>
+                <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-text-primary">
+                  {formatPriceValue(item.sell, item.currency || "VND")}
+                </td>
+              </tr>
+            ))}
+            {prices.length === 0 && (
+              <tr>
+                <td colSpan={3} className="px-5 py-8 text-center font-vietnam text-[13px] text-v2-text-tertiary">
+                  {t("comingSoon")}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </BaseCard>
+  );
+}

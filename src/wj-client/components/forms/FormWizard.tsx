@@ -80,9 +80,9 @@ export const FormWizard = memo(function FormWizard({
                     disabled={!isAccessible || !onStepChange}
                     className={cn(
                       "flex items-center justify-center w-10 h-10 rounded-full font-semibold transition-all duration-200",
-                      "focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
+                      "focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
                       isCurrent
-                        ? "bg-primary-600 text-white shadow-md"
+                        ? "bg-v2-red-primary text-white shadow-md"
                         : isCompleted
                         ? "bg-success-500 text-white"
                         : "bg-gray-200 dark:bg-dark-surface-hover text-gray-500 dark:text-dark-text-tertiary",
@@ -152,7 +152,7 @@ export const FormWizard = memo(function FormWizard({
             className={cn(
               "h-2 rounded-full transition-all duration-200",
               index === currentStepIndex
-                ? "w-8 bg-primary-600"
+                ? "w-8 bg-v2-red-primary"
                 : index < currentStepIndex
                 ? "w-2 bg-success-500"
                 : "w-2 bg-gray-300 dark:bg-dark-border"
@@ -188,7 +188,7 @@ export const FormWizard = memo(function FormWizard({
           disabled={isPreviousDisabled || isFirstStep}
           className={cn(
             "flex-1 min-h-[48px] px-4 py-3 rounded-lg font-medium transition-all duration-150",
-            "focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
+            "focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
             isFirstStep || isPreviousDisabled
               ? "bg-gray-100 dark:bg-dark-surface-hover text-gray-400 dark:text-dark-text-tertiary cursor-not-allowed"
               : "bg-white dark:bg-dark-surface text-gray-700 dark:text-dark-text border border-gray-300 dark:border-dark-border hover:bg-gray-50 dark:hover:bg-dark-surface-hover active:bg-gray-100 dark:active:bg-dark-surface-active"
@@ -205,10 +205,10 @@ export const FormWizard = memo(function FormWizard({
           disabled={isNextDisabled || (currentStep.isValid === false)}
           className={cn(
             "flex-1 min-h-[48px] px-4 py-3 rounded-lg font-medium transition-all duration-150",
-            "focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
+            "focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
             isNextDisabled || currentStep.isValid === false
               ? "bg-gray-300 dark:bg-dark-surface-hover text-gray-500 dark:text-dark-text-tertiary cursor-not-allowed"
-              : "bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 shadow-md hover:shadow-lg",
+              : "bg-v2-red-primary text-white hover:bg-v2-red-dark active:bg-v2-red-dark shadow-md hover:shadow-lg",
             isLoading && "opacity-70 cursor-wait"
           )}
           aria-label={isLastStep ? t("finishAriaLabel") : t("nextStepAriaLabel")}
