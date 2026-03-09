@@ -10,7 +10,6 @@ import { useTranslations } from "next-intl";
 import { FloatingActionButton } from "@/components/FloatingActionButton";
 import NextImage from "next/image";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
-import { CurrencySelector } from "@/components/CurrencySelector";
 import { CurrencyConversionProgress } from "@/components/CurrencyConversionProgress";
 import { BottomNav, createNavItems } from "@/components/navigation";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
@@ -360,19 +359,6 @@ export default function DashboardLayout({
                   </p>
                 </div>
               </div>
-              <div
-                className={cn(
-                  "mt-3 px-3 space-y-2 transition-all duration-300 ease-in-out",
-                  isExpanded
-                    ? "opacity-100 max-h-20 translate-y-0"
-                    : "opacity-0 max-h-0 overflow-hidden -translate-y-2",
-                )}
-                style={{
-                  transitionDelay: isExpanded ? "150ms" : "0ms",
-                }}
-              >
-                <CurrencySelector />
-              </div>
             </div>
           </aside>
 
@@ -492,9 +478,6 @@ export default function DashboardLayout({
                           {user.email || "user@example.com"}
                         </p>
                       </div>
-                    </div>
-                    <div className="mt-3">
-                      <CurrencySelector />
                     </div>
                   </div>
                 </div>
