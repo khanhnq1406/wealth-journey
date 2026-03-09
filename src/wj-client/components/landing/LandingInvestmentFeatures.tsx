@@ -73,7 +73,7 @@ export default function LandingInvestmentFeatures() {
   return (
     <section
       id="investment-tracking"
-      className="py-16 sm:py-20 bg-gradient-to-br from-primary-50 via-white to-primary-50"
+      className="py-16 sm:py-20 bg-gradient-to-br from-v2-red-50 via-white to-v2-red-50"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -84,7 +84,7 @@ export default function LandingInvestmentFeatures() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            <span className="text-primary-600">{t("investmentFeatures.allInOneTitle")}</span> {t("investmentFeatures.investmentTrackingTitle")}
+            <span className="text-v2-red-primary">{t("investmentFeatures.allInOneTitle")}</span> {t("investmentFeatures.investmentTrackingTitle")}
           </h2>
           <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto px-4">
             {t("investmentFeatures.whyJuggle")}
@@ -113,7 +113,7 @@ export default function LandingInvestmentFeatures() {
                 {feature.items.map((item, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 p-2 sm:p-3 bg-neutral-50 rounded-lg hover:bg-primary-50 transition-colors duration-200"
+                    className="flex items-center gap-2 p-2 sm:p-3 bg-neutral-50 rounded-lg hover:bg-v2-red-50 transition-colors duration-200"
                   >
                     <span className="text-lg sm:text-xl">{item.icon}</span>
                     <span className="text-xs sm:text-sm font-medium text-gray-700">
@@ -128,7 +128,7 @@ export default function LandingInvestmentFeatures() {
 
         {/* Call-out section */}
         <motion.div
-          className="mt-12 sm:mt-16 bg-primary-600 rounded-xl p-6 sm:p-8 text-center text-white"
+          className="mt-12 sm:mt-16 bg-v2-red-primary rounded-xl p-6 sm:p-8 text-center text-white"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={
             isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }
@@ -138,7 +138,7 @@ export default function LandingInvestmentFeatures() {
           <h3 className="text-xl sm:text-2xl font-bold mb-3">
             {t("investmentFeatures.onePortfolio")}
           </h3>
-          <p className="text-sm sm:text-base text-primary-100 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-v2-red-100 max-w-3xl mx-auto leading-relaxed">
             {t("investmentFeatures.fifoAccounting")}
           </p>
         </motion.div>

@@ -199,7 +199,7 @@ export default function LandingBankImport() {
   return (
     <section
       id="bank-import"
-      className="py-16 sm:py-20 bg-gradient-to-br from-primary-50 via-white to-primary-50 [scroll-margin-top:5rem]"
+      className="py-16 sm:py-20 bg-gradient-to-br from-v2-red-50 via-white to-v2-red-50 [scroll-margin-top:5rem]"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -210,7 +210,7 @@ export default function LandingBankImport() {
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center justify-center px-4 py-2 mb-4 text-sm font-medium text-primary-700 bg-primary-100 rounded-full">
+          <div className="inline-flex items-center justify-center px-4 py-2 mb-4 text-sm font-medium text-v2-red-primary bg-v2-red-100 rounded-full">
             <span className="mr-2">⚡</span>
             {t("bankImport.bulkImport")}
           </div>
@@ -241,7 +241,7 @@ export default function LandingBankImport() {
                 {format.format}
               </h3>
               <p className="text-sm text-gray-600 mb-1">{format.description}</p>
-              <p className="text-xs text-primary-600 font-medium">
+              <p className="text-xs text-v2-red-primary font-medium">
                 {t("bankImport.maxSize", { size: format.maxSize })}
               </p>
             </div>
@@ -273,7 +273,7 @@ export default function LandingBankImport() {
             ))}
           </div>
           <p className="text-center text-sm text-gray-600 mt-4">
-            Don't see your bank? Use <span className="font-semibold text-primary-600">Custom Format</span> with automatic column detection.
+            Don't see your bank? Use <span className="font-semibold text-v2-red-primary">Custom Format</span> with automatic column detection.
           </p>
         </motion.div> */}
 
@@ -290,7 +290,7 @@ export default function LandingBankImport() {
               variants={itemVariants}
               className="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300"
             >
-              <div className="w-12 h-12 bg-primary-600/10 rounded-lg flex items-center justify-center text-primary-600 mb-4">
+              <div className="w-12 h-12 bg-v2-red-primary/10 rounded-lg flex items-center justify-center text-v2-red-primary mb-4">
                 {feature.icon}
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -305,7 +305,7 @@ export default function LandingBankImport() {
 
         {/* How It Works Steps */}
         <motion.div
-          className="bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 rounded-2xl p-8 sm:p-12 text-white"
+          className="bg-gradient-to-br from-v2-red-primary via-v2-red-dark to-v2-red-dark rounded-2xl p-8 sm:p-12 text-white"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={
             isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }
@@ -322,11 +322,11 @@ export default function LandingBankImport() {
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-3xl mb-4">
                     {step.icon}
                   </div>
-                  <div className="absolute -top-2 -left-2 w-8 h-8 bg-white text-primary-600 rounded-full flex items-center justify-center font-bold text-sm">
+                  <div className="absolute -top-2 -left-2 w-8 h-8 bg-white text-v2-red-primary rounded-full flex items-center justify-center font-bold text-sm">
                     {step.number}
                   </div>
                   <h4 className="text-lg font-semibold mb-2">{step.title}</h4>
-                  <p className="text-sm text-primary-100 leading-relaxed">
+                  <p className="text-sm text-v2-red-100 leading-relaxed">
                     {step.description}
                   </p>
                 </div>
@@ -346,7 +346,7 @@ export default function LandingBankImport() {
           transition={{ duration: 0.6, delay: 0.5 }}
         >
           <div className="text-center p-6 bg-white rounded-xl shadow-md">
-            <div className="text-3xl sm:text-4xl font-extrabold text-primary-600 mb-2">
+            <div className="text-3xl sm:text-4xl font-extrabold text-v2-red-primary mb-2">
               10,000
             </div>
             <div className="text-sm text-gray-600">
@@ -354,7 +354,7 @@ export default function LandingBankImport() {
             </div>
           </div>
           <div className="text-center p-6 bg-white rounded-xl shadow-md">
-            <div className="text-3xl sm:text-4xl font-extrabold text-primary-600 mb-2">
+            <div className="text-3xl sm:text-4xl font-extrabold text-v2-red-primary mb-2">
               99%
             </div>
             <div className="text-sm text-gray-600">
@@ -362,7 +362,7 @@ export default function LandingBankImport() {
             </div>
           </div>
           <div className="text-center p-6 bg-white rounded-xl shadow-md">
-            <div className="text-3xl sm:text-4xl font-extrabold text-primary-600 mb-2">
+            <div className="text-3xl sm:text-4xl font-extrabold text-v2-red-primary mb-2">
               &lt;10min
             </div>
             <div className="text-sm text-gray-600">
@@ -370,7 +370,7 @@ export default function LandingBankImport() {
             </div>
           </div>
           <div className="text-center p-6 bg-white rounded-xl shadow-md">
-            <div className="text-3xl sm:text-4xl font-extrabold text-primary-600 mb-2">
+            <div className="text-3xl sm:text-4xl font-extrabold text-v2-red-primary mb-2">
               24hrs
             </div>
             <div className="text-sm text-gray-600">{t("bankImport.undoWindow")}</div>
@@ -389,7 +389,7 @@ export default function LandingBankImport() {
           </p>
           <a
             href="/auth/register"
-            className="inline-block px-8 py-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-200 font-semibold text-lg focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2"
+            className="inline-block px-8 py-4 bg-v2-red-primary text-white rounded-lg hover:bg-v2-red-dark transition-colors duration-200 font-semibold text-lg focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2"
           >
             {t("bankImport.getStartedFree")}
           </a>
