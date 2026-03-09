@@ -190,7 +190,7 @@ export const InvestmentCard = memo(function InvestmentCard({
           <div className="text-right">
             <div
               className={`text-base font-semibold ${
-                pnl >= 0 ? "text-green-600" : "text-red-600"
+                pnl >= 0 ? "text-v2-green-positive" : "text-red-600"
               }`}
             >
               {formatCurrency(pnl, nativeCurrency)}
@@ -202,7 +202,7 @@ export const InvestmentCard = memo(function InvestmentCard({
             </div>
             <div
               className={`text-xs font-medium ${
-                pnlPercent >= 0 ? "text-green-600" : "text-red-600"
+                pnlPercent >= 0 ? "text-v2-green-positive" : "text-red-600"
               }`}
             >
               {formatPercent(pnlPercent)}
@@ -222,7 +222,7 @@ export const InvestmentCard = memo(function InvestmentCard({
                   <span
                     className={`w-2 h-2 rounded-full ${
                       Date.now() / 1000 - updatedAt < 300
-                        ? "bg-green-500"
+                        ? "bg-v2-green-positive"
                         : "bg-gray-400"
                     }`}
                   />

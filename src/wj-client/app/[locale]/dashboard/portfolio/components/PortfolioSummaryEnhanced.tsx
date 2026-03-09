@@ -144,7 +144,7 @@ const StatCard = memo(function StatCard({
   sparklineData,
 }: StatCardProps) {
   const colorClasses = {
-    green: "text-green-600",
+    green: "text-v2-green-positive",
     red: "text-red-600",
     neutral: "text-neutral-900",
   };
@@ -168,7 +168,7 @@ const StatCard = memo(function StatCard({
 
       {trend !== undefined && (
         <div
-          className={`text-xs font-medium mt-1 ${trend >= 0 ? "text-green-600" : "text-red-600"}`}
+          className={`text-xs font-medium mt-1 ${trend >= 0 ? "text-v2-green-positive" : "text-red-600"}`}
         >
           {trend >= 0 ? "+" : ""}
           {trend.toFixed(2)}%
@@ -450,12 +450,12 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
             {/* Performers display */}
             <div className="flex flex-col sm:flex-row gap-1.5 sm:gap-2">
               {topPerformer && (
-                <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-green-100">
-                  <span className="text-[10px] sm:text-xs text-green-700 font-medium truncate max-w-[80px] sm:max-w-none">
+                <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-v2-green-light">
+                  <span className="text-[10px] sm:text-xs text-v2-green-positive font-medium truncate max-w-[80px] sm:max-w-none">
                     {t("summary.best")} {topPerformer.name}
                   </span>
                   <span
-                    className={`text-[10px] sm:text-xs font-bold flex-shrink-0 ${topPerformer.positive ? "text-green-700" : "text-red-700"}`}
+                    className={`text-[10px] sm:text-xs font-bold flex-shrink-0 ${topPerformer.positive ? "text-v2-green-positive" : "text-red-700"}`}
                   >
                     {topPerformer.value}
                   </span>
@@ -467,7 +467,7 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
                     {t("summary.worst")} {worstPerformer.name}
                   </span>
                   <span
-                    className={`text-[10px] sm:text-xs font-bold flex-shrink-0 ${worstPerformer.positive ? "text-green-700" : "text-red-700"}`}
+                    className={`text-[10px] sm:text-xs font-bold flex-shrink-0 ${worstPerformer.positive ? "text-v2-green-positive" : "text-red-700"}`}
                   >
                     {worstPerformer.value}
                   </span>

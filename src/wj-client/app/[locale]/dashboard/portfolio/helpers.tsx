@@ -139,13 +139,13 @@ export const formatTimeAgo = (
 
   if (diffMins < 1) {
     text = t ? t("timeAgo.justNow") : "Just now";
-    colorClass = "text-green-600";
+    colorClass = "text-v2-green-positive";
   } else if (diffMins < 5) {
     text = t ? t("timeAgo.minutesAgo", { count: diffMins }) : `${diffMins}m ago`;
-    colorClass = "text-green-600";
+    colorClass = "text-v2-green-positive";
   } else if (diffMins < 15) {
     text = t ? t("timeAgo.minutesAgo", { count: diffMins }) : `${diffMins}m ago`;
-    colorClass = "text-green-600";
+    colorClass = "text-v2-green-positive";
   } else if (diffMins < 60) {
     text = t ? t("timeAgo.minutesAgo", { count: diffMins }) : `${diffMins}m ago`;
     colorClass = "text-yellow-600";
@@ -342,7 +342,7 @@ export function formatUnrealizedPNL(
   }
 
   const sign = unrealizedPnl >= 0 ? "+" : "";
-  const colorClass = unrealizedPnl >= 0 ? "text-green-600" : "text-red-600";
+  const colorClass = unrealizedPnl >= 0 ? "text-v2-green-positive" : "text-red-600";
 
   return {
     text: `${sign}${formatCurrency(unrealizedPnl, currency)} (${sign}${unrealizedPnlPercent.toFixed(2)}%)`,
