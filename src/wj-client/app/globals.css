@@ -15,11 +15,11 @@ html {
 :root {
   --background: #ffffff;
   --foreground: #0F172A;
-  --btn-green: #008148; /* Updated to primary fintech green */
-  --btn-green-hover: #006638; /* Darker green for hover */
+  --btn-green: #B91C1C; /* aliased to v2-red-primary */
+  --btn-green-hover: #7F1D1D; /* aliased to v2-red-dark */
   --white: #ffffff;
-  --primary-green: #008148;
-  --accent-green: #22C55E;
+  --primary-green: #B91C1C; /* aliased to v2-red-primary */
+  --accent-green: #B91C1C; /* aliased to v2-red-primary */
   --teal-accent: #14B8A6;
   /* V2 Crimson & Gold */
   --v2-bg-primary: #FAF9F7;

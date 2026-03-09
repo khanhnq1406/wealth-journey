@@ -13,9 +13,9 @@ export default {
         // Legacy compatibility (will be phased out)
         background: "var(--background)",
         foreground: "var(--foreground)",
-        bg: "#008148", // Updated to primary fintech green
+        bg: "#B91C1C", // aliased to v2-red-primary (V2 migration)
         fg: "#F8FAFC", // Mapped to neutral-50
-        hgreen: "#006638", // Darker green for hover states
+        hgreen: "#7F1D1D", // aliased to v2-red-dark (V2 migration)
         lred: "#DC2626", // Mapped to danger-600
         hover: "#E2E8F0", // Mapped to neutral-200
         modal: "rgba(0, 0, 0, 0.5)",

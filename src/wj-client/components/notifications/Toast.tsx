@@ -256,7 +256,7 @@ export function Toast({
           "hover:bg-neutral-100 dark:hover:bg-dark-surface-hover",
           "hover:text-neutral-600 dark:hover:text-dark-text-secondary",
           "transition-colors",
-          "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
+          "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:ring-offset-2 dark:focus:ring-offset-dark-surface"
         )}
         aria-label={t("close")}
       >
@@ -275,7 +275,7 @@ export function Toast({
               variant === "success" && "bg-success-500 dark:bg-success-600",
               variant === "error" && "bg-danger-500 dark:bg-danger-600",
               variant === "warning" && "bg-warning-500 dark:bg-warning-600",
-              variant === "info" && "bg-primary-500 dark:bg-primary-600"
+              variant === "info" && "bg-v2-red-primary"
             )}
             style={{
               width: `${progress}%`,

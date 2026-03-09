@@ -284,7 +284,7 @@ export function ExportDialog({
                     {info.description}
                   </p>
                   {isSelected && (
-                    <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary-500 dark:bg-primary-600 flex items-center justify-center">
+                    <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-v2-red-primary flex items-center justify-center">
                       <svg
                         className="w-3 h-3 text-white"
                         fill="currentColor"
@@ -350,7 +350,7 @@ export function ExportDialog({
                     "border-neutral-300 dark:border-dark-border",
                     "text-neutral-900 dark:text-dark-text",
                     "transition-all duration-200",
-                    "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:border-transparent",
                     "placeholder:text-neutral-400 dark:placeholder:text-dark-text-tertiary",
                   )}
                 />
@@ -370,7 +370,7 @@ export function ExportDialog({
                     "border-neutral-300 dark:border-dark-border",
                     "text-neutral-900 dark:text-dark-text",
                     "transition-all duration-200",
-                    "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                    "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:border-transparent",
                     "placeholder:text-neutral-400 dark:placeholder:text-dark-text-tertiary",
                   )}
                 />
@@ -425,7 +425,7 @@ export function ExportDialog({
                       type="checkbox"
                       checked={isSelected}
                       onChange={() => toggleCategory(category.id)}
-                      className="w-4 h-4 rounded border-neutral-300 dark:border-dark-border text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-600"
+                      className="w-4 h-4 rounded border-neutral-300 dark:border-dark-border text-v2-red-primary dark:text-v2-red-primary focus:ring-v2-red-primary dark:focus:ring-v2-red-primary"
                     />
                     <span className="text-sm text-neutral-700 dark:text-dark-text-secondary">
                       {category.name}
@@ -453,7 +453,7 @@ export function ExportDialog({
                 type="checkbox"
                 checked={includeCharts}
                 onChange={(e) => setIncludeCharts(e.target.checked)}
-                className="w-4 h-4 rounded border-neutral-300 dark:border-dark-border text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-600"
+                className="w-4 h-4 rounded border-neutral-300 dark:border-dark-border text-v2-red-primary dark:text-v2-red-primary focus:ring-v2-red-primary dark:focus:ring-v2-red-primary"
               />
               <div className="flex-1">
                 <span className="text-sm font-medium text-neutral-900 dark:text-dark-text">
@@ -472,7 +472,7 @@ export function ExportDialog({
               type="checkbox"
               checked={customBranding}
               onChange={(e) => setCustomBranding(e.target.checked)}
-              className="w-4 h-4 rounded border-neutral-300 dark:border-dark-border text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-600"
+              className="w-4 h-4 rounded border-neutral-300 dark:border-dark-border text-v2-red-primary dark:text-v2-red-primary focus:ring-v2-red-primary dark:focus:ring-v2-red-primary"
             />
             <div className="flex-1">
               <span className="text-sm font-medium text-neutral-900 dark:text-dark-text">
@@ -499,7 +499,7 @@ export function ExportDialog({
                 "bg-white dark:bg-dark-surface-hover",
                 "border-neutral-300 dark:border-dark-border",
                 "text-neutral-900 dark:text-dark-text",
-                "focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                "focus:ring-2 focus:ring-v2-red-primary focus:border-transparent",
                 "placeholder:text-neutral-400 dark:placeholder:text-dark-text-tertiary",
               )}
             />

@@ -58,7 +58,7 @@ export function StatCard({
     lg: "text-3xl",
   };
 
-  const changeColor = change && change > 0 ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400";
+  const changeColor = change && change > 0 ? "text-v2-green-positive" : "text-red-600 dark:text-red-400";
 
   return (
     <div
