@@ -52,7 +52,7 @@ export function LanguageSelector() {
             key={lang.code}
             className={`flex items-center gap-3 p-3 rounded-md border cursor-pointer transition-colors ${
               selected === lang.code
-                ? "border-bg bg-green-50 dark:bg-green-900/20"
+                ? "border-v2-red-primary bg-v2-green-light dark:bg-v2-red-primary/20"
                 : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
             }`}
           >
@@ -62,7 +62,7 @@ export function LanguageSelector() {
               value={lang.code}
               checked={selected === lang.code}
               onChange={() => setSelected(lang.code)}
-              className="accent-bg"
+              className="accent-v2-red-primary"
             />
             <span className="font-medium">{lang.nativeLabel}</span>
           </label>

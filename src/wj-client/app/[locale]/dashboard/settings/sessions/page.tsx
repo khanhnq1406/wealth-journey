@@ -49,7 +49,7 @@ function SessionItem({ session, onRevoke, isRevoking, t }: SessionItemProps) {
               <h3 className="font-semibold">
                 {session.deviceName}
                 {session.isCurrent && (
-                  <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                  <span className="ml-2 text-xs bg-v2-green-light text-v2-green-positive px-2 py-1 rounded">
                     {t("currentLabel")}
                   </span>
                 )}

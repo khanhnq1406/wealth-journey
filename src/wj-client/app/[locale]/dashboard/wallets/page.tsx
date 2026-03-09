@@ -227,7 +227,7 @@ export default function WalletsPage() {
                 className={cn(
                   "px-4 py-2 rounded-lg text-sm font-medium transition-colors min-h-[40px]",
                   filterType === filter.value
-                    ? "bg-primary-600 text-white"
+                    ? "bg-v2-red-primary text-white"
                     : "bg-gray-100 dark:bg-dark-surface-hover text-gray-700 dark:text-dark-text hover:bg-gray-200 dark:hover:bg-dark-surface-active",
                 )}
                 aria-pressed={filterType === filter.value}

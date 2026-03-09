@@ -31,7 +31,7 @@ function ChangeCell({
   const isUp = value > 0;
   return (
     <span
-      className={`flex items-center gap-0.5 ${isUp ? "text-green-600" : "text-lred"}`}
+      className={`flex items-center gap-0.5 ${isUp ? "text-v2-green-positive" : "text-lred"}`}
     >
       <svg
         aria-hidden="true"
@@ -328,7 +328,7 @@ export default function PricesPage() {
               onClick={() => setActiveTab(tab.key)}
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === tab.key
-                  ? "border-b-2 border-primary-500 text-primary-500"
+                  ? "border-b-2 border-v2-red-primary text-v2-red-primary"
                   : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-dark-text"
               }`}
             >

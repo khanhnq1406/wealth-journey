@@ -309,7 +309,7 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
               <div className="text-sm">
                 <span className="text-gray-600">{tEdit("projectedBalance")}</span>
                 <span
-                  className={`font-medium ${projectedBalance < 0 ? "text-red-600" : "text-green-600"}`}
+                  className={`font-medium ${projectedBalance < 0 ? "text-red-600" : "text-v2-green-positive"}`}
                 >
                   {formatCurrency(projectedBalance, currency)}
                 </span>
