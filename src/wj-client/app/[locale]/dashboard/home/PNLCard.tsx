@@ -1,6 +1,7 @@
 "use client";
 
 import { LineChart } from "@/components/charts/LineChart";
+import { BaseCard } from "@/components/BaseCard";
 import {
   useQueryGetHistoricalPortfolioValues,
   useQueryGetAggregatedPortfolioSummary,
@@ -95,7 +96,7 @@ export function PNLCard({ currency }: PNLCardProps) {
   const isPositive = periodPnl >= 0;
 
   return (
-    <div className="bg-white rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
+    <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
       {/* Header */}
       <div className="p-5 pb-4">
         <div className="flex items-center justify-between">
@@ -175,6 +176,6 @@ export function PNLCard({ currency }: PNLCardProps) {
           />
         )}
       </div>
-    </div>
+    </BaseCard>
   );
 }

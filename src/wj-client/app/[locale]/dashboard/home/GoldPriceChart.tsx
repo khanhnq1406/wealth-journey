@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { formatPriceValue } from "../prices/helpers";
 import { LineChart } from "@/components/charts/LineChart";
+import { BaseCard } from "@/components/BaseCard";
+import { Select } from "@/components/select/Select";
+import type { SelectOption } from "@/components/select/Select";
 import { useQueryGetGoldChart } from "@/utils/generated/hooks";
 import { formatCurrencyCompact } from "@/utils/currency-formatter";
 import type { PriceItem } from "@/gen/protobuf/v1/investment";
@@ -125,7 +128,7 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
       ];
 
   return (
-    <div className="bg-white rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
+    <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
       {/* Header */}
       <div className="p-5 pb-3">
         <div className="flex items-center justify-between">
@@ -158,17 +161,17 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
             </div>
             {/* Gold type selector — domestic only */}
             {!isGlobal && domesticPrices.length > 0 && (
-              <select
+              <Select<string>
+                options={domesticPrices.map((p): SelectOption<string> => ({
+                  value: p.typeCode || "",
+                  label: p.name || p.typeCode || "",
+                }))}
                 value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value)}
-                className="font-vietnam text-[12px] text-v2-text-secondary bg-v2-bg-primary border border-v2-border rounded-lg px-2.5 py-1.5"
-              >
-                {domesticPrices.map((p) => (
-                  <option key={p.typeCode} value={p.typeCode}>
-                    {p.name || p.typeCode}
-                  </option>
-                ))}
-              </select>
+                onChange={setSelectedType}
+                disableInput
+                clearable={false}
+                className="w-36"
+              />
             )}
           </div>
         </div>
@@ -285,6 +288,6 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
           />
         )}
       </div>
-    </div>
+    </BaseCard>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { BaseCard } from "@/components/BaseCard";
 
 interface NetWorthDisplayProps {
   totalNetWorth: number;
@@ -110,7 +111,7 @@ export function NetWorthDisplay({
       </div>
 
       {/* Desktop version */}
-      <div className="hidden sm:flex items-center justify-between bg-white rounded-[20px] border border-v2-border-light shadow-v2-card p-6">
+      <BaseCard padding="none" className="hidden sm:flex items-center justify-between rounded-[20px] border border-v2-border-light shadow-v2-card p-6">
         <div>
           <p className="font-jetbrains font-semibold text-[11px] tracking-[2px] text-v2-text-tertiary">
             {t("totalNetWorthLabel")}
@@ -141,7 +142,7 @@ export function NetWorthDisplay({
             label={t("pnl30d")}
           />
         </div>
-      </div>
+      </BaseCard>
     </div>
   );
 }

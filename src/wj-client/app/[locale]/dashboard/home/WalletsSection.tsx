@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { ChevronRight, Wallet as WalletIcon, ChartNoAxesCombined } from "lucide-react";
 import Link from "next/link";
 import { routes } from "@/app/constants";
+import { BaseCard } from "@/components/BaseCard";
 import type { WalletType } from "@/gen/protobuf/v1/wallet";
 
 interface WalletItem {
@@ -58,9 +59,10 @@ export function WalletsSection({ wallets }: WalletsSectionProps) {
       {/* Wallet cards */}
       <div className="space-y-3">
         {wallets.map((wallet) => (
-          <div
+          <BaseCard
             key={wallet.id}
-            className="flex items-center gap-3 p-4 rounded-2xl bg-white border border-v2-border-light shadow-v2-card"
+            padding="none"
+            className="flex items-center gap-3 p-4 rounded-2xl border border-v2-border-light shadow-v2-card"
           >
             <div className="w-10 h-10 rounded-xl bg-v2-bg-primary flex items-center justify-center shrink-0">
               {isInvestment(wallet.type) ? (
@@ -77,7 +79,7 @@ export function WalletsSection({ wallets }: WalletsSectionProps) {
             <p className="font-jetbrains font-semibold text-[14px] text-v2-text-primary shrink-0">
               {formatBalance(wallet.balance, wallet.currency)}
             </p>
-          </div>
+          </BaseCard>
         ))}
 
         {wallets.length === 0 && (

@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { formatPriceValue } from "../prices/helpers";
+import { BaseCard } from "@/components/BaseCard";
 import type { PriceItem } from "@/gen/protobuf/v1/investment";
 
 interface SilverPriceTableProps {
@@ -13,7 +14,7 @@ export function SilverPriceTable({ prices, updatedTime }: SilverPriceTableProps)
   const t = useTranslations("dashboard.home");
 
   return (
-    <div className="bg-white rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
+    <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
       <div className="p-5 pb-3">
         <div className="flex items-center justify-between">
           <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
@@ -69,6 +70,6 @@ export function SilverPriceTable({ prices, updatedTime }: SilverPriceTableProps)
           </tbody>
         </table>
       </div>
-    </div>
+    </BaseCard>
   );
 }

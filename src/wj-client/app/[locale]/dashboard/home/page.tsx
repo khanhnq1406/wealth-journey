@@ -28,6 +28,7 @@ import { GoldPriceChart } from "./GoldPriceChart";
 import { SilverPriceTable } from "./SilverPriceTable";
 import { SilverPriceChart } from "./SilverPriceChart";
 import { WalletsSection } from "./WalletsSection";
+import { BaseCard } from "@/components/BaseCard";
 
 type ModalType = "add-transaction" | "transfer-money" | "create-wallet" | null;
 
@@ -191,9 +192,9 @@ export default function Home() {
             <PNLCard currency={currency} />
           </div>
           <div className="w-[340px] shrink-0">
-            <div className="bg-white rounded-[20px] border border-v2-border-light shadow-v2-card p-5">
+            <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card p-5">
               <WalletsSection wallets={wallets} />
-            </div>
+            </BaseCard>
           </div>
         </div>
 

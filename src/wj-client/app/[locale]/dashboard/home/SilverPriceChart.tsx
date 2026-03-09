@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { formatPriceValue } from "../prices/helpers";
 import { LineChart } from "@/components/charts/LineChart";
+import { BaseCard } from "@/components/BaseCard";
+import { Select } from "@/components/select/Select";
+import type { SelectOption } from "@/components/select/Select";
 import { useQueryGetSilverChart } from "@/utils/generated/hooks";
 import { formatCurrencyCompact } from "@/utils/currency-formatter";
 import type { PriceItem } from "@/gen/protobuf/v1/investment";
@@ -119,7 +122,10 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
   void currency;
 
   return (
-    <div className="bg-white rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
+    <BaseCard
+      padding="none"
+      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
+    >
       <div className="p-5 pb-3">
         <div className="flex items-center justify-between">
           <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
@@ -151,19 +157,17 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
             </div>
             {/* Unit type selector — domestic only */}
             {!isGlobal && (
-              <select
+              <Select<"C" | "L" | "KG">
+                options={unitOptions.map((u): SelectOption<"C" | "L" | "KG"> => ({
+                  value: u.key,
+                  label: u.label,
+                }))}
                 value={silverUnit}
-                onChange={(e) =>
-                  setSilverUnit(e.target.value as "C" | "L" | "KG")
-                }
-                className="font-vietnam text-[12px] text-v2-text-secondary bg-v2-bg-primary border border-v2-border rounded-lg px-2.5 py-1.5"
-              >
-                {unitOptions.map((u) => (
-                  <option key={u.key} value={u.key}>
-                    {u.label}
-                  </option>
-                ))}
-              </select>
+                onChange={setSilverUnit}
+                disableInput
+                clearable={false}
+                className="w-24"
+              />
             )}
           </div>
         </div>
@@ -280,6 +284,6 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
           />
         )}
       </div>
-    </div>
+    </BaseCard>
   );
 }
