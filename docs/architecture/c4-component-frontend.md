@@ -14,7 +14,7 @@ C4Component
         Component(wallet_page, "Wallet Page", "app/dashboard/wallets", "Wallet grid/list with fund operations")
         Component(portfolio_page, "Portfolio Page", "app/dashboard/portfolio", "Investment portfolio with analytics; period pill selector (1D/1W/1M/ALL) via PortfolioSummaryEnhanced")
         Component(budget_page, "Budget Page", "app/dashboard/budget", "Budget tracking with progress indicators")
-        Component(report_page, "Report Page", "app/dashboard/report", "Financial reports with exports")
+        Component(report_page, "Report Page", "app/dashboard/report", "Financial reports with exports; Wallet Analytics section: Balance, AccountBalance, Dominance, MonthlyDominance chart components (co-located)")
         Component(prices_page, "Prices Page", "app/dashboard/prices", "Live gold/silver/market prices")
         Component(settings, "Settings Pages", "app/dashboard/settings", "Sessions, import templates, language toggle")
     }
