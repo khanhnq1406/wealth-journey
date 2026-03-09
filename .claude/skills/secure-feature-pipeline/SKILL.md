@@ -511,7 +511,7 @@ digraph implement {
         style=filled;
         fillcolor="#ccffcc";
         "Update progress file + commit" [shape=box style=filled fillcolor="#cce5ff"];
-        "Show user summary, wait for approval" [shape=box style=filled fillcolor="#ffffcc"];
+        "Show user summary, auto-proceed" [shape=box style=filled fillcolor="#ffffcc"];
     }
 
     "More tasks?" [shape=diamond];
@@ -538,8 +538,8 @@ digraph implement {
     "Implementer fixes quality issues" -> "Dispatch code quality reviewer" [label="re-review"];
     "Quality approved?" -> "Mark task complete" [label="yes"];
     "Mark task complete" -> "Update progress file + commit";
-    "Update progress file + commit" -> "Show user summary, wait for approval";
-    "Show user summary, wait for approval" -> "More tasks?";
+    "Update progress file + commit" -> "Show user summary, auto-proceed";
+    "Show user summary, auto-proceed" -> "More tasks?";
     "More tasks?" -> "Dispatch parallel implementer agents" [label="yes"];
     "More tasks?" -> "Dispatch final cross-cutting review" [label="no"];
     "Dispatch final cross-cutting review" -> "Write implementation report";
@@ -584,13 +584,13 @@ Present a clear summary to the user:
 **Next task:** Task N+1 — [next task name]
 ```
 
-**Step 4: Wait for user approval**
-- Do NOT auto-proceed to the next task
-- Wait for the user to say "continue", "next", "go", or similar
-- If the user has feedback, address it before proceeding
-- This is the user's opportunity to course-correct
+**Step 4: Auto-proceed to next task**
+- Display the summary and immediately continue to the next task
+- Do NOT wait for user approval — keep implementation flowing continuously
+- The user can interrupt at any time if they need to course-correct
+- Only pause to ask the user if you encounter a blocker, ambiguity, or error
 
-**Why this matters:** Context compaction can happen at any time. By committing after each task and persisting progress to disk, the worst case is losing in-progress work on one task — all completed tasks are safely committed and the progress file tells the next session exactly where to resume.
+**Why this matters:** Context compaction can happen at any time. By committing after each task and persisting progress to disk, the worst case is losing in-progress work on one task — all completed tasks are safely committed and the progress file tells the next session exactly where to resume. Implementation runs continuously — the user can interrupt at any time but doesn't need to manually trigger each task.
 
 ### Parallel Execution
 
@@ -600,7 +600,7 @@ Present a clear summary to the user:
 - Use the task list (TaskCreate/TaskUpdate/TaskList) for coordination
 - Each agent reports completion; orchestrator dispatches reviews
 
-**Parallel execution and checkpoints:** When multiple independent tasks complete in the same parallel batch, commit each task individually (separate commits), then update the progress file once with all completed tasks marked `done`. Show the user a combined summary listing all completed tasks in the batch, then wait for approval before dispatching the next batch.
+**Parallel execution and checkpoints:** When multiple independent tasks complete in the same parallel batch, commit each task individually (separate commits), then update the progress file once with all completed tasks marked `done`. Show the user a combined summary listing all completed tasks in the batch, then immediately proceed to the next batch.
 
 ### Implementation Report
 
@@ -676,7 +676,7 @@ If a session is lost to context compaction or you're starting a new session to c
    - Mark tasks as `completed` per the progress file (use TaskUpdate)
    - The first `pending` task becomes your next work item
 5. **Continue from the next pending task** — follow the same implement → review → checkpoint protocol
-6. **Follow the same Commit Checkpoint Protocol** — commit after each task, show summary, wait for approval
+6. **Follow the same Commit Checkpoint Protocol** — commit after each task, show summary, auto-proceed to next task
 
 **Key rule:** The **progress file is the source of truth**, not TaskList state. TaskList is ephemeral (lives in conversation context only). If there's a conflict between the progress file and TaskList state, trust the progress file.
 
@@ -867,7 +867,7 @@ Use when ANY of these are true:
 - Implementing multi-step business logic without creating/updating runtime flow diagrams
 - Using the full fix pipeline for a one-line typo fix (use minor fix path)
 - Proceeding to the next task without committing the current task and updating the progress file
-- Proceeding to the next task without showing the user a summary and waiting for approval
+- Proceeding to the next task without showing the user a summary
 - Not initializing the progress file before starting the first task
 - Leaving the progress file out of task commits
 
