@@ -547,7 +547,7 @@ export default function ReportPageEnhanced() {
                 {
                   dataKey: "thisMonth",
                   name: t("chartLabels.thisMonth"),
-                  color: "#008148",
+                  color: "#B91C1C",
                 },
                 ...(compareWithPrevious
                   ? [
@@ -589,7 +589,7 @@ export default function ReportPageEnhanced() {
               {
                 dataKey: "income",
                 name: t("chartLabels.income"),
-                color: "#22C55E",
+                color: "#15803D",
                 showArea: true,
                 curveType: "monotone",
               },
@@ -603,7 +603,7 @@ export default function ReportPageEnhanced() {
               {
                 dataKey: "net",
                 name: t("chartLabels.netSavings"),
-                color: "#008148",
+                color: "#B91C1C",
                 showArea: false,
                 curveType: "monotone",
                 strokeWidth: 3,

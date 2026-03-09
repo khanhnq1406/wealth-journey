@@ -81,8 +81,8 @@ export const MONTH_NAMES = [
  * Green color palette for charts (matching brand colors)
  */
 export const GREEN_COLORS = [
-  "#008148", // Brand primary
-  "#22C55E", // Green 500
+  "#B91C1C", // Brand primary (V2 red)
+  "#15803D", // Green positive (V2 income)
   "#14B8A6", // Teal 500
   "#06B6D4", // Cyan 500
   "#84CC16", // Lime 500
