@@ -1,5 +1,7 @@
 "use client";
 
+import { LineChart } from "@/components/charts/LineChart";
+import { useQueryGetHistoricalPortfolioValues } from "@/utils/generated/hooks";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
@@ -31,6 +33,29 @@ export function PNLCard({
     { key: "7d" as const, label: t("7days") },
     { key: "30d" as const, label: t("30days") },
   ];
+
+  const periodDays = selectedPeriod === "7d" ? 7 : 30;
+  const periodPoints = selectedPeriod === "7d" ? 7 : 30;
+
+  const { data: histData, isLoading: histLoading } = useQueryGetHistoricalPortfolioValues(
+    { walletId: 0, typeFilter: 0, days: periodDays, points: periodPoints },
+    { staleTime: 5 * 60 * 1000, refetchOnWindowFocus: false }
+  );
+
+  const chartPoints = (histData?.data || []).map((point) => ({
+    date: new Date(Number(point.timestamp) * 1000).toLocaleDateString("vi-VN", {
+      month: "2-digit",
+      day: "2-digit",
+    }),
+    value: Number(point.totalValue) / 100,
+  }));
+
+  const firstValue = chartPoints[0]?.value ?? 0;
+  const lastValue = chartPoints[chartPoints.length - 1]?.value ?? 0;
+  const chartColor = lastValue >= firstValue ? "#16A34A" : "#DC2626";
+
+  const yFormatter = (value: number) =>
+    `${(value / 1_000_000).toLocaleString("vi-VN", { maximumFractionDigits: 1 })}M`;
 
   const formatAmount = (amount: number) => {
     const value = Number(amount);
@@ -101,30 +126,40 @@ export function PNLCard({
         </div>
       </div>
 
-      {/* Chart placeholder */}
-      <div className="px-5 pb-5">
-        <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-full bg-v2-gold-light flex items-center justify-center mx-auto mb-2">
-              <svg
-                className="w-6 h-6 text-v2-gold-primary"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"
-                />
-              </svg>
-            </div>
-            <p className="font-vietnam text-[13px] text-v2-text-tertiary">
-              {t("comingSoon")}
-            </p>
+      {/* Chart */}
+      <div className="px-2 pb-5">
+        {histLoading && (
+          <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
+            <div className="w-5 h-5 border-2 border-v2-red-primary border-t-transparent rounded-full animate-spin" />
           </div>
-        </div>
+        )}
+        {!histLoading && chartPoints.length === 0 && (
+          <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
+            <p className="font-vietnam text-[13px] text-v2-text-tertiary">{t("comingSoon")}</p>
+          </div>
+        )}
+        {!histLoading && chartPoints.length > 0 && (
+          <LineChart
+            data={chartPoints}
+            series={[
+              {
+                dataKey: "value",
+                name: "Portfolio",
+                color: chartColor,
+                chartType: "area",
+                showDots: false,
+              },
+            ]}
+            xAxisKey="date"
+            height={200}
+            showGrid={true}
+            showLegend={false}
+            showTooltip={true}
+            yAxisFormatter={yFormatter}
+            animate={true}
+            gridColor="#f3f4f6"
+          />
+        )}
       </div>
     </div>
   );
