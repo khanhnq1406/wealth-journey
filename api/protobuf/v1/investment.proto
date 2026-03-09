@@ -245,6 +245,51 @@ message MarketPrice {
   string displayUnit = 7 [json_name = "displayUnit"]; // "tael", "oz", "unit", etc.
 }
 
+// ChartDataPoint represents a single price data point for chart display
+message ChartDataPoint {
+  int64 timestamp = 1 [json_name = "timestamp"];
+  double buy = 2 [json_name = "buy"];
+  double sell = 3 [json_name = "sell"];
+}
+
+// GetGoldChartRequest for fetching gold price history
+message GetGoldChartRequest {
+  string market = 1 [json_name = "market"];
+  string goldCode = 2 [json_name = "goldCode"];
+  string period = 3 [json_name = "period"];
+}
+
+// GetGoldChartResponse with gold price history data points
+message GetGoldChartResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated ChartDataPoint data = 3 [json_name = "data"];
+  string market = 4 [json_name = "market"];
+  string goldCode = 5 [json_name = "goldCode"];
+  string period = 6 [json_name = "period"];
+  string currency = 7 [json_name = "currency"];
+  string timestamp = 8 [json_name = "timestamp"];
+}
+
+// GetSilverChartRequest for fetching silver price history
+message GetSilverChartRequest {
+  string market = 1 [json_name = "market"];
+  string type = 2 [json_name = "type"];
+  int32 days = 3 [json_name = "days"];
+}
+
+// GetSilverChartResponse with silver price history data points
+message GetSilverChartResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated ChartDataPoint data = 3 [json_name = "data"];
+  string market = 4 [json_name = "market"];
+  string type = 5 [json_name = "type"];
+  int32 days = 6 [json_name = "days"];
+  string currency = 7 [json_name = "currency"];
+  string timestamp = 8 [json_name = "timestamp"];
+}
+
 // Service definition
 service InvestmentService {
   // List all investments in a wallet
@@ -384,6 +429,20 @@ service InvestmentService {
   rpc GetMarketPrices(GetMarketPricesRequest) returns (GetMarketPricesResponse) {
     option (google.api.http) = {
       get: "/api/v1/investments/market-prices"
+    };
+  }
+
+  // GetGoldChart returns historical gold price data for chart display
+  rpc GetGoldChart(GetGoldChartRequest) returns (GetGoldChartResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/investments/gold-chart"
+    };
+  }
+
+  // GetSilverChart returns historical silver price data for chart display
+  rpc GetSilverChart(GetSilverChartRequest) returns (GetSilverChartResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/investments/silver-chart"
     };
   }
 }

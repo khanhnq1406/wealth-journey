@@ -38,6 +38,8 @@ const (
 	InvestmentService_GetHistoricalPortfolioValues_FullMethodName  = "/wealthjourney.investment.v1.InvestmentService/GetHistoricalPortfolioValues"
 	InvestmentService_GetMarketPrice_FullMethodName                = "/wealthjourney.investment.v1.InvestmentService/GetMarketPrice"
 	InvestmentService_GetMarketPrices_FullMethodName               = "/wealthjourney.investment.v1.InvestmentService/GetMarketPrices"
+	InvestmentService_GetGoldChart_FullMethodName                  = "/wealthjourney.investment.v1.InvestmentService/GetGoldChart"
+	InvestmentService_GetSilverChart_FullMethodName                = "/wealthjourney.investment.v1.InvestmentService/GetSilverChart"
 )
 
 // InvestmentServiceClient is the client API for InvestmentService service.
@@ -84,6 +86,10 @@ type InvestmentServiceClient interface {
 	GetMarketPrice(ctx context.Context, in *GetMarketPriceRequest, opts ...grpc.CallOption) (*GetMarketPriceResponse, error)
 	// GetMarketPrices returns all gold and silver prices in one call
 	GetMarketPrices(ctx context.Context, in *GetMarketPricesRequest, opts ...grpc.CallOption) (*GetMarketPricesResponse, error)
+	// GetGoldChart returns historical gold price data for chart display
+	GetGoldChart(ctx context.Context, in *GetGoldChartRequest, opts ...grpc.CallOption) (*GetGoldChartResponse, error)
+	// GetSilverChart returns historical silver price data for chart display
+	GetSilverChart(ctx context.Context, in *GetSilverChartRequest, opts ...grpc.CallOption) (*GetSilverChartResponse, error)
 }
 
 type investmentServiceClient struct {
@@ -265,6 +271,24 @@ func (c *investmentServiceClient) GetMarketPrices(ctx context.Context, in *GetMa
 	return out, nil
 }
 
+func (c *investmentServiceClient) GetGoldChart(ctx context.Context, in *GetGoldChartRequest, opts ...grpc.CallOption) (*GetGoldChartResponse, error) {
+	out := new(GetGoldChartResponse)
+	err := c.cc.Invoke(ctx, InvestmentService_GetGoldChart_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *investmentServiceClient) GetSilverChart(ctx context.Context, in *GetSilverChartRequest, opts ...grpc.CallOption) (*GetSilverChartResponse, error) {
+	out := new(GetSilverChartResponse)
+	err := c.cc.Invoke(ctx, InvestmentService_GetSilverChart_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InvestmentServiceServer is the server API for InvestmentService service.
 // All implementations must embed UnimplementedInvestmentServiceServer
 // for forward compatibility
@@ -309,6 +333,10 @@ type InvestmentServiceServer interface {
 	GetMarketPrice(context.Context, *GetMarketPriceRequest) (*GetMarketPriceResponse, error)
 	// GetMarketPrices returns all gold and silver prices in one call
 	GetMarketPrices(context.Context, *GetMarketPricesRequest) (*GetMarketPricesResponse, error)
+	// GetGoldChart returns historical gold price data for chart display
+	GetGoldChart(context.Context, *GetGoldChartRequest) (*GetGoldChartResponse, error)
+	// GetSilverChart returns historical silver price data for chart display
+	GetSilverChart(context.Context, *GetSilverChartRequest) (*GetSilverChartResponse, error)
 	mustEmbedUnimplementedInvestmentServiceServer()
 }
 
@@ -372,6 +400,12 @@ func (UnimplementedInvestmentServiceServer) GetMarketPrice(context.Context, *Get
 }
 func (UnimplementedInvestmentServiceServer) GetMarketPrices(context.Context, *GetMarketPricesRequest) (*GetMarketPricesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMarketPrices not implemented")
+}
+func (UnimplementedInvestmentServiceServer) GetGoldChart(context.Context, *GetGoldChartRequest) (*GetGoldChartResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetGoldChart not implemented")
+}
+func (UnimplementedInvestmentServiceServer) GetSilverChart(context.Context, *GetSilverChartRequest) (*GetSilverChartResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSilverChart not implemented")
 }
 func (UnimplementedInvestmentServiceServer) mustEmbedUnimplementedInvestmentServiceServer() {}
 
@@ -728,6 +762,42 @@ func _InvestmentService_GetMarketPrices_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _InvestmentService_GetGoldChart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetGoldChartRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InvestmentServiceServer).GetGoldChart(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InvestmentService_GetGoldChart_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InvestmentServiceServer).GetGoldChart(ctx, req.(*GetGoldChartRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InvestmentService_GetSilverChart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSilverChartRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InvestmentServiceServer).GetSilverChart(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InvestmentService_GetSilverChart_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InvestmentServiceServer).GetSilverChart(ctx, req.(*GetSilverChartRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // InvestmentService_ServiceDesc is the grpc.ServiceDesc for InvestmentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -810,6 +880,14 @@ var InvestmentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetMarketPrices",
 			Handler:    _InvestmentService_GetMarketPrices_Handler,
+		},
+		{
+			MethodName: "GetGoldChart",
+			Handler:    _InvestmentService_GetGoldChart_Handler,
+		},
+		{
+			MethodName: "GetSilverChart",
+			Handler:    _InvestmentService_GetSilverChart_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

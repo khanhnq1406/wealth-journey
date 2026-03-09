@@ -1990,6 +1990,406 @@ func (x *MarketPrice) GetDisplayUnit() string {
 	return ""
 }
 
+// ChartDataPoint represents a single price data point for chart display
+type ChartDataPoint struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Timestamp int64   `protobuf:"varint,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Buy       float64 `protobuf:"fixed64,2,opt,name=buy,proto3" json:"buy,omitempty"`
+	Sell      float64 `protobuf:"fixed64,3,opt,name=sell,proto3" json:"sell,omitempty"`
+}
+
+func (x *ChartDataPoint) Reset() {
+	*x = ChartDataPoint{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_protobuf_v1_investment_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ChartDataPoint) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChartDataPoint) ProtoMessage() {}
+
+func (x *ChartDataPoint) ProtoReflect() protoreflect.Message {
+	mi := &file_protobuf_v1_investment_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChartDataPoint.ProtoReflect.Descriptor instead.
+func (*ChartDataPoint) Descriptor() ([]byte, []int) {
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *ChartDataPoint) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *ChartDataPoint) GetBuy() float64 {
+	if x != nil {
+		return x.Buy
+	}
+	return 0
+}
+
+func (x *ChartDataPoint) GetSell() float64 {
+	if x != nil {
+		return x.Sell
+	}
+	return 0
+}
+
+// GetGoldChartRequest for fetching gold price history
+type GetGoldChartRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Market   string `protobuf:"bytes,1,opt,name=market,proto3" json:"market,omitempty"`
+	GoldCode string `protobuf:"bytes,2,opt,name=goldCode,proto3" json:"goldCode,omitempty"`
+	Period   string `protobuf:"bytes,3,opt,name=period,proto3" json:"period,omitempty"`
+}
+
+func (x *GetGoldChartRequest) Reset() {
+	*x = GetGoldChartRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_protobuf_v1_investment_proto_msgTypes[21]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetGoldChartRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetGoldChartRequest) ProtoMessage() {}
+
+func (x *GetGoldChartRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_protobuf_v1_investment_proto_msgTypes[21]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetGoldChartRequest.ProtoReflect.Descriptor instead.
+func (*GetGoldChartRequest) Descriptor() ([]byte, []int) {
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *GetGoldChartRequest) GetMarket() string {
+	if x != nil {
+		return x.Market
+	}
+	return ""
+}
+
+func (x *GetGoldChartRequest) GetGoldCode() string {
+	if x != nil {
+		return x.GoldCode
+	}
+	return ""
+}
+
+func (x *GetGoldChartRequest) GetPeriod() string {
+	if x != nil {
+		return x.Period
+	}
+	return ""
+}
+
+// GetGoldChartResponse with gold price history data points
+type GetGoldChartResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Success   bool              `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message   string            `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data      []*ChartDataPoint `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`
+	Market    string            `protobuf:"bytes,4,opt,name=market,proto3" json:"market,omitempty"`
+	GoldCode  string            `protobuf:"bytes,5,opt,name=goldCode,proto3" json:"goldCode,omitempty"`
+	Period    string            `protobuf:"bytes,6,opt,name=period,proto3" json:"period,omitempty"`
+	Currency  string            `protobuf:"bytes,7,opt,name=currency,proto3" json:"currency,omitempty"`
+	Timestamp string            `protobuf:"bytes,8,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+}
+
+func (x *GetGoldChartResponse) Reset() {
+	*x = GetGoldChartResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_protobuf_v1_investment_proto_msgTypes[22]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetGoldChartResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetGoldChartResponse) ProtoMessage() {}
+
+func (x *GetGoldChartResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_protobuf_v1_investment_proto_msgTypes[22]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetGoldChartResponse.ProtoReflect.Descriptor instead.
+func (*GetGoldChartResponse) Descriptor() ([]byte, []int) {
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GetGoldChartResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *GetGoldChartResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetGoldChartResponse) GetData() []*ChartDataPoint {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *GetGoldChartResponse) GetMarket() string {
+	if x != nil {
+		return x.Market
+	}
+	return ""
+}
+
+func (x *GetGoldChartResponse) GetGoldCode() string {
+	if x != nil {
+		return x.GoldCode
+	}
+	return ""
+}
+
+func (x *GetGoldChartResponse) GetPeriod() string {
+	if x != nil {
+		return x.Period
+	}
+	return ""
+}
+
+func (x *GetGoldChartResponse) GetCurrency() string {
+	if x != nil {
+		return x.Currency
+	}
+	return ""
+}
+
+func (x *GetGoldChartResponse) GetTimestamp() string {
+	if x != nil {
+		return x.Timestamp
+	}
+	return ""
+}
+
+// GetSilverChartRequest for fetching silver price history
+type GetSilverChartRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Market string `protobuf:"bytes,1,opt,name=market,proto3" json:"market,omitempty"`
+	Type   string `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
+	Days   int32  `protobuf:"varint,3,opt,name=days,proto3" json:"days,omitempty"`
+}
+
+func (x *GetSilverChartRequest) Reset() {
+	*x = GetSilverChartRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_protobuf_v1_investment_proto_msgTypes[23]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetSilverChartRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSilverChartRequest) ProtoMessage() {}
+
+func (x *GetSilverChartRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_protobuf_v1_investment_proto_msgTypes[23]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSilverChartRequest.ProtoReflect.Descriptor instead.
+func (*GetSilverChartRequest) Descriptor() ([]byte, []int) {
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *GetSilverChartRequest) GetMarket() string {
+	if x != nil {
+		return x.Market
+	}
+	return ""
+}
+
+func (x *GetSilverChartRequest) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *GetSilverChartRequest) GetDays() int32 {
+	if x != nil {
+		return x.Days
+	}
+	return 0
+}
+
+// GetSilverChartResponse with silver price history data points
+type GetSilverChartResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Success   bool              `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message   string            `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data      []*ChartDataPoint `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`
+	Market    string            `protobuf:"bytes,4,opt,name=market,proto3" json:"market,omitempty"`
+	Type      string            `protobuf:"bytes,5,opt,name=type,proto3" json:"type,omitempty"`
+	Days      int32             `protobuf:"varint,6,opt,name=days,proto3" json:"days,omitempty"`
+	Currency  string            `protobuf:"bytes,7,opt,name=currency,proto3" json:"currency,omitempty"`
+	Timestamp string            `protobuf:"bytes,8,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+}
+
+func (x *GetSilverChartResponse) Reset() {
+	*x = GetSilverChartResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_protobuf_v1_investment_proto_msgTypes[24]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetSilverChartResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSilverChartResponse) ProtoMessage() {}
+
+func (x *GetSilverChartResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_protobuf_v1_investment_proto_msgTypes[24]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSilverChartResponse.ProtoReflect.Descriptor instead.
+func (*GetSilverChartResponse) Descriptor() ([]byte, []int) {
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *GetSilverChartResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *GetSilverChartResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetSilverChartResponse) GetData() []*ChartDataPoint {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *GetSilverChartResponse) GetMarket() string {
+	if x != nil {
+		return x.Market
+	}
+	return ""
+}
+
+func (x *GetSilverChartResponse) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *GetSilverChartResponse) GetDays() int32 {
+	if x != nil {
+		return x.Days
+	}
+	return 0
+}
+
+func (x *GetSilverChartResponse) GetCurrency() string {
+	if x != nil {
+		return x.Currency
+	}
+	return ""
+}
+
+func (x *GetSilverChartResponse) GetTimestamp() string {
+	if x != nil {
+		return x.Timestamp
+	}
+	return ""
+}
+
 // Request/Response messages
 type ListInvestmentsRequest struct {
 	state         protoimpl.MessageState
@@ -2004,7 +2404,7 @@ type ListInvestmentsRequest struct {
 func (x *ListInvestmentsRequest) Reset() {
 	*x = ListInvestmentsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[20]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2017,7 +2417,7 @@ func (x *ListInvestmentsRequest) String() string {
 func (*ListInvestmentsRequest) ProtoMessage() {}
 
 func (x *ListInvestmentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[20]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2030,7 +2430,7 @@ func (x *ListInvestmentsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListInvestmentsRequest.ProtoReflect.Descriptor instead.
 func (*ListInvestmentsRequest) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{20}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *ListInvestmentsRequest) GetWalletId() int32 {
@@ -2069,7 +2469,7 @@ type ListInvestmentsResponse struct {
 func (x *ListInvestmentsResponse) Reset() {
 	*x = ListInvestmentsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[21]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2082,7 +2482,7 @@ func (x *ListInvestmentsResponse) String() string {
 func (*ListInvestmentsResponse) ProtoMessage() {}
 
 func (x *ListInvestmentsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[21]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2095,7 +2495,7 @@ func (x *ListInvestmentsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListInvestmentsResponse.ProtoReflect.Descriptor instead.
 func (*ListInvestmentsResponse) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{21}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *ListInvestmentsResponse) GetSuccess() bool {
@@ -2144,7 +2544,7 @@ type GetInvestmentRequest struct {
 func (x *GetInvestmentRequest) Reset() {
 	*x = GetInvestmentRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[22]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2157,7 +2557,7 @@ func (x *GetInvestmentRequest) String() string {
 func (*GetInvestmentRequest) ProtoMessage() {}
 
 func (x *GetInvestmentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[22]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2170,7 +2570,7 @@ func (x *GetInvestmentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetInvestmentRequest.ProtoReflect.Descriptor instead.
 func (*GetInvestmentRequest) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{22}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *GetInvestmentRequest) GetId() int32 {
@@ -2194,7 +2594,7 @@ type GetInvestmentResponse struct {
 func (x *GetInvestmentResponse) Reset() {
 	*x = GetInvestmentResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[23]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2207,7 +2607,7 @@ func (x *GetInvestmentResponse) String() string {
 func (*GetInvestmentResponse) ProtoMessage() {}
 
 func (x *GetInvestmentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[23]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2220,7 +2620,7 @@ func (x *GetInvestmentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetInvestmentResponse.ProtoReflect.Descriptor instead.
 func (*GetInvestmentResponse) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{23}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *GetInvestmentResponse) GetSuccess() bool {
@@ -2285,7 +2685,7 @@ type CreateInvestmentRequest struct {
 func (x *CreateInvestmentRequest) Reset() {
 	*x = CreateInvestmentRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[24]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2298,7 +2698,7 @@ func (x *CreateInvestmentRequest) String() string {
 func (*CreateInvestmentRequest) ProtoMessage() {}
 
 func (x *CreateInvestmentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[24]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2311,7 +2711,7 @@ func (x *CreateInvestmentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateInvestmentRequest.ProtoReflect.Descriptor instead.
 func (*CreateInvestmentRequest) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{24}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *CreateInvestmentRequest) GetWalletId() int32 {
@@ -2405,7 +2805,7 @@ type CreateInvestmentResponse struct {
 func (x *CreateInvestmentResponse) Reset() {
 	*x = CreateInvestmentResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[25]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[30]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2418,7 +2818,7 @@ func (x *CreateInvestmentResponse) String() string {
 func (*CreateInvestmentResponse) ProtoMessage() {}
 
 func (x *CreateInvestmentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[25]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[30]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2431,7 +2831,7 @@ func (x *CreateInvestmentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateInvestmentResponse.ProtoReflect.Descriptor instead.
 func (*CreateInvestmentResponse) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{25}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *CreateInvestmentResponse) GetSuccess() bool {
@@ -2475,7 +2875,7 @@ type UpdateInvestmentRequest struct {
 func (x *UpdateInvestmentRequest) Reset() {
 	*x = UpdateInvestmentRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[26]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[31]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2488,7 +2888,7 @@ func (x *UpdateInvestmentRequest) String() string {
 func (*UpdateInvestmentRequest) ProtoMessage() {}
 
 func (x *UpdateInvestmentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[26]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[31]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2501,7 +2901,7 @@ func (x *UpdateInvestmentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateInvestmentRequest.ProtoReflect.Descriptor instead.
 func (*UpdateInvestmentRequest) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{26}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *UpdateInvestmentRequest) GetId() int32 {
@@ -2539,7 +2939,7 @@ type UpdateInvestmentResponse struct {
 func (x *UpdateInvestmentResponse) Reset() {
 	*x = UpdateInvestmentResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[27]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2552,7 +2952,7 @@ func (x *UpdateInvestmentResponse) String() string {
 func (*UpdateInvestmentResponse) ProtoMessage() {}
 
 func (x *UpdateInvestmentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[27]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2565,7 +2965,7 @@ func (x *UpdateInvestmentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateInvestmentResponse.ProtoReflect.Descriptor instead.
 func (*UpdateInvestmentResponse) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{27}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *UpdateInvestmentResponse) GetSuccess() bool {
@@ -2607,7 +3007,7 @@ type DeleteInvestmentRequest struct {
 func (x *DeleteInvestmentRequest) Reset() {
 	*x = DeleteInvestmentRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[28]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[33]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2620,7 +3020,7 @@ func (x *DeleteInvestmentRequest) String() string {
 func (*DeleteInvestmentRequest) ProtoMessage() {}
 
 func (x *DeleteInvestmentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[28]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[33]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2633,7 +3033,7 @@ func (x *DeleteInvestmentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteInvestmentRequest.ProtoReflect.Descriptor instead.
 func (*DeleteInvestmentRequest) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{28}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *DeleteInvestmentRequest) GetId() int32 {
@@ -2656,7 +3056,7 @@ type DeleteInvestmentResponse struct {
 func (x *DeleteInvestmentResponse) Reset() {
 	*x = DeleteInvestmentResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[29]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[34]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2669,7 +3069,7 @@ func (x *DeleteInvestmentResponse) String() string {
 func (*DeleteInvestmentResponse) ProtoMessage() {}
 
 func (x *DeleteInvestmentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[29]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[34]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2682,7 +3082,7 @@ func (x *DeleteInvestmentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteInvestmentResponse.ProtoReflect.Descriptor instead.
 func (*DeleteInvestmentResponse) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{29}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *DeleteInvestmentResponse) GetSuccess() bool {
@@ -2723,7 +3123,7 @@ type AddTransactionRequest struct {
 func (x *AddTransactionRequest) Reset() {
 	*x = AddTransactionRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[30]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[35]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2736,7 +3136,7 @@ func (x *AddTransactionRequest) String() string {
 func (*AddTransactionRequest) ProtoMessage() {}
 
 func (x *AddTransactionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[30]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[35]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2749,7 +3149,7 @@ func (x *AddTransactionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddTransactionRequest.ProtoReflect.Descriptor instead.
 func (*AddTransactionRequest) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{30}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *AddTransactionRequest) GetInvestmentId() int32 {
@@ -2816,7 +3216,7 @@ type AddTransactionResponse struct {
 func (x *AddTransactionResponse) Reset() {
 	*x = AddTransactionResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[31]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[36]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2829,7 +3229,7 @@ func (x *AddTransactionResponse) String() string {
 func (*AddTransactionResponse) ProtoMessage() {}
 
 func (x *AddTransactionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[31]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[36]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2842,7 +3242,7 @@ func (x *AddTransactionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddTransactionResponse.ProtoReflect.Descriptor instead.
 func (*AddTransactionResponse) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{31}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *AddTransactionResponse) GetSuccess() bool {
@@ -2893,7 +3293,7 @@ type ListInvestmentTransactionsRequest struct {
 func (x *ListInvestmentTransactionsRequest) Reset() {
 	*x = ListInvestmentTransactionsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[32]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[37]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2906,7 +3306,7 @@ func (x *ListInvestmentTransactionsRequest) String() string {
 func (*ListInvestmentTransactionsRequest) ProtoMessage() {}
 
 func (x *ListInvestmentTransactionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[32]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[37]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2919,7 +3319,7 @@ func (x *ListInvestmentTransactionsRequest) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use ListInvestmentTransactionsRequest.ProtoReflect.Descriptor instead.
 func (*ListInvestmentTransactionsRequest) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{32}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *ListInvestmentTransactionsRequest) GetInvestmentId() int32 {
@@ -2958,7 +3358,7 @@ type ListInvestmentTransactionsResponse struct {
 func (x *ListInvestmentTransactionsResponse) Reset() {
 	*x = ListInvestmentTransactionsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[33]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[38]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2971,7 +3371,7 @@ func (x *ListInvestmentTransactionsResponse) String() string {
 func (*ListInvestmentTransactionsResponse) ProtoMessage() {}
 
 func (x *ListInvestmentTransactionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[33]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[38]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2984,7 +3384,7 @@ func (x *ListInvestmentTransactionsResponse) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use ListInvestmentTransactionsResponse.ProtoReflect.Descriptor instead.
 func (*ListInvestmentTransactionsResponse) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{33}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *ListInvestmentTransactionsResponse) GetSuccess() bool {
@@ -3038,7 +3438,7 @@ type EditInvestmentTransactionRequest struct {
 func (x *EditInvestmentTransactionRequest) Reset() {
 	*x = EditInvestmentTransactionRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[34]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[39]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3051,7 +3451,7 @@ func (x *EditInvestmentTransactionRequest) String() string {
 func (*EditInvestmentTransactionRequest) ProtoMessage() {}
 
 func (x *EditInvestmentTransactionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[34]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[39]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3064,7 +3464,7 @@ func (x *EditInvestmentTransactionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EditInvestmentTransactionRequest.ProtoReflect.Descriptor instead.
 func (*EditInvestmentTransactionRequest) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{34}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *EditInvestmentTransactionRequest) GetId() int32 {
@@ -3123,7 +3523,7 @@ type EditInvestmentTransactionResponse struct {
 func (x *EditInvestmentTransactionResponse) Reset() {
 	*x = EditInvestmentTransactionResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[35]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[40]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3136,7 +3536,7 @@ func (x *EditInvestmentTransactionResponse) String() string {
 func (*EditInvestmentTransactionResponse) ProtoMessage() {}
 
 func (x *EditInvestmentTransactionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[35]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[40]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3149,7 +3549,7 @@ func (x *EditInvestmentTransactionResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use EditInvestmentTransactionResponse.ProtoReflect.Descriptor instead.
 func (*EditInvestmentTransactionResponse) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{35}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *EditInvestmentTransactionResponse) GetSuccess() bool {
@@ -3191,7 +3591,7 @@ type DeleteInvestmentTransactionRequest struct {
 func (x *DeleteInvestmentTransactionRequest) Reset() {
 	*x = DeleteInvestmentTransactionRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[36]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[41]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3204,7 +3604,7 @@ func (x *DeleteInvestmentTransactionRequest) String() string {
 func (*DeleteInvestmentTransactionRequest) ProtoMessage() {}
 
 func (x *DeleteInvestmentTransactionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[36]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[41]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3217,7 +3617,7 @@ func (x *DeleteInvestmentTransactionRequest) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use DeleteInvestmentTransactionRequest.ProtoReflect.Descriptor instead.
 func (*DeleteInvestmentTransactionRequest) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{36}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *DeleteInvestmentTransactionRequest) GetId() int32 {
@@ -3240,7 +3640,7 @@ type DeleteInvestmentTransactionResponse struct {
 func (x *DeleteInvestmentTransactionResponse) Reset() {
 	*x = DeleteInvestmentTransactionResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[37]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[42]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3253,7 +3653,7 @@ func (x *DeleteInvestmentTransactionResponse) String() string {
 func (*DeleteInvestmentTransactionResponse) ProtoMessage() {}
 
 func (x *DeleteInvestmentTransactionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[37]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[42]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3266,7 +3666,7 @@ func (x *DeleteInvestmentTransactionResponse) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use DeleteInvestmentTransactionResponse.ProtoReflect.Descriptor instead.
 func (*DeleteInvestmentTransactionResponse) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{37}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *DeleteInvestmentTransactionResponse) GetSuccess() bool {
@@ -3301,7 +3701,7 @@ type GetPortfolioSummaryRequest struct {
 func (x *GetPortfolioSummaryRequest) Reset() {
 	*x = GetPortfolioSummaryRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[38]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[43]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3314,7 +3714,7 @@ func (x *GetPortfolioSummaryRequest) String() string {
 func (*GetPortfolioSummaryRequest) ProtoMessage() {}
 
 func (x *GetPortfolioSummaryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[38]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[43]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3327,7 +3727,7 @@ func (x *GetPortfolioSummaryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPortfolioSummaryRequest.ProtoReflect.Descriptor instead.
 func (*GetPortfolioSummaryRequest) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{38}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *GetPortfolioSummaryRequest) GetWalletId() int32 {
@@ -3351,7 +3751,7 @@ type GetPortfolioSummaryResponse struct {
 func (x *GetPortfolioSummaryResponse) Reset() {
 	*x = GetPortfolioSummaryResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[39]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[44]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3364,7 +3764,7 @@ func (x *GetPortfolioSummaryResponse) String() string {
 func (*GetPortfolioSummaryResponse) ProtoMessage() {}
 
 func (x *GetPortfolioSummaryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[39]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[44]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3377,7 +3777,7 @@ func (x *GetPortfolioSummaryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPortfolioSummaryResponse.ProtoReflect.Descriptor instead.
 func (*GetPortfolioSummaryResponse) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{39}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *GetPortfolioSummaryResponse) GetSuccess() bool {
@@ -3420,7 +3820,7 @@ type UpdatePricesRequest struct {
 func (x *UpdatePricesRequest) Reset() {
 	*x = UpdatePricesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[40]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[45]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3433,7 +3833,7 @@ func (x *UpdatePricesRequest) String() string {
 func (*UpdatePricesRequest) ProtoMessage() {}
 
 func (x *UpdatePricesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[40]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[45]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3446,7 +3846,7 @@ func (x *UpdatePricesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdatePricesRequest.ProtoReflect.Descriptor instead.
 func (*UpdatePricesRequest) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{40}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *UpdatePricesRequest) GetInvestmentIds() []int32 {
@@ -3477,7 +3877,7 @@ type UpdatePricesResponse struct {
 func (x *UpdatePricesResponse) Reset() {
 	*x = UpdatePricesResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[41]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[46]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3490,7 +3890,7 @@ func (x *UpdatePricesResponse) String() string {
 func (*UpdatePricesResponse) ProtoMessage() {}
 
 func (x *UpdatePricesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[41]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[46]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3503,7 +3903,7 @@ func (x *UpdatePricesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdatePricesResponse.ProtoReflect.Descriptor instead.
 func (*UpdatePricesResponse) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{41}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *UpdatePricesResponse) GetSuccess() bool {
@@ -3547,7 +3947,7 @@ type SearchSymbolsRequest struct {
 func (x *SearchSymbolsRequest) Reset() {
 	*x = SearchSymbolsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[42]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[47]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3560,7 +3960,7 @@ func (x *SearchSymbolsRequest) String() string {
 func (*SearchSymbolsRequest) ProtoMessage() {}
 
 func (x *SearchSymbolsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[42]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[47]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3573,7 +3973,7 @@ func (x *SearchSymbolsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchSymbolsRequest.ProtoReflect.Descriptor instead.
 func (*SearchSymbolsRequest) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{42}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *SearchSymbolsRequest) GetQuery() string {
@@ -3607,7 +4007,7 @@ type SearchResult struct {
 func (x *SearchResult) Reset() {
 	*x = SearchResult{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[43]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[48]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3620,7 +4020,7 @@ func (x *SearchResult) String() string {
 func (*SearchResult) ProtoMessage() {}
 
 func (x *SearchResult) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[43]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[48]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3633,7 +4033,7 @@ func (x *SearchResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchResult.ProtoReflect.Descriptor instead.
 func (*SearchResult) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{43}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *SearchResult) GetSymbol() string {
@@ -3693,7 +4093,7 @@ type SearchSymbolsResponse struct {
 func (x *SearchSymbolsResponse) Reset() {
 	*x = SearchSymbolsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[44]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[49]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3706,7 +4106,7 @@ func (x *SearchSymbolsResponse) String() string {
 func (*SearchSymbolsResponse) ProtoMessage() {}
 
 func (x *SearchSymbolsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[44]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[49]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3719,7 +4119,7 @@ func (x *SearchSymbolsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchSymbolsResponse.ProtoReflect.Descriptor instead.
 func (*SearchSymbolsResponse) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{44}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *SearchSymbolsResponse) GetSuccess() bool {
@@ -3764,7 +4164,7 @@ type ListUserInvestmentsRequest struct {
 func (x *ListUserInvestmentsRequest) Reset() {
 	*x = ListUserInvestmentsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[45]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[50]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3777,7 +4177,7 @@ func (x *ListUserInvestmentsRequest) String() string {
 func (*ListUserInvestmentsRequest) ProtoMessage() {}
 
 func (x *ListUserInvestmentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[45]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[50]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3790,7 +4190,7 @@ func (x *ListUserInvestmentsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUserInvestmentsRequest.ProtoReflect.Descriptor instead.
 func (*ListUserInvestmentsRequest) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{45}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *ListUserInvestmentsRequest) GetPagination() *PaginationParams {
@@ -3831,7 +4231,7 @@ type ListUserInvestmentsResponse struct {
 func (x *ListUserInvestmentsResponse) Reset() {
 	*x = ListUserInvestmentsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[46]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[51]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3844,7 +4244,7 @@ func (x *ListUserInvestmentsResponse) String() string {
 func (*ListUserInvestmentsResponse) ProtoMessage() {}
 
 func (x *ListUserInvestmentsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[46]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[51]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3857,7 +4257,7 @@ func (x *ListUserInvestmentsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListUserInvestmentsResponse.ProtoReflect.Descriptor instead.
 func (*ListUserInvestmentsResponse) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{46}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *ListUserInvestmentsResponse) GetSuccess() bool {
@@ -3915,7 +4315,7 @@ type GetAggregatedPortfolioSummaryRequest struct {
 func (x *GetAggregatedPortfolioSummaryRequest) Reset() {
 	*x = GetAggregatedPortfolioSummaryRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_protobuf_v1_investment_proto_msgTypes[47]
+		mi := &file_protobuf_v1_investment_proto_msgTypes[52]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3928,7 +4328,7 @@ func (x *GetAggregatedPortfolioSummaryRequest) String() string {
 func (*GetAggregatedPortfolioSummaryRequest) ProtoMessage() {}
 
 func (x *GetAggregatedPortfolioSummaryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_protobuf_v1_investment_proto_msgTypes[47]
+	mi := &file_protobuf_v1_investment_proto_msgTypes[52]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3941,7 +4341,7 @@ func (x *GetAggregatedPortfolioSummaryRequest) ProtoReflect() protoreflect.Messa
 
 // Deprecated: Use GetAggregatedPortfolioSummaryRequest.ProtoReflect.Descriptor instead.
 func (*GetAggregatedPortfolioSummaryRequest) Descriptor() ([]byte, []int) {
-	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{47}
+	return file_protobuf_v1_investment_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *GetAggregatedPortfolioSummaryRequest) GetWalletId() int32 {
@@ -4323,7 +4723,58 @@ var file_protobuf_v1_investment_proto_rawDesc = []byte{
 	0x1a, 0x0a, 0x08, 0x69, 0x73, 0x43, 0x61, 0x63, 0x68, 0x65, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28,
 	0x08, 0x52, 0x08, 0x69, 0x73, 0x43, 0x61, 0x63, 0x68, 0x65, 0x64, 0x12, 0x20, 0x0a, 0x0b, 0x64,
 	0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x55, 0x6e, 0x69, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x0b, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x55, 0x6e, 0x69, 0x74, 0x22, 0xcc, 0x01,
+	0x52, 0x0b, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x55, 0x6e, 0x69, 0x74, 0x22, 0x54, 0x0a,
+	0x0e, 0x43, 0x68, 0x61, 0x72, 0x74, 0x44, 0x61, 0x74, 0x61, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x12,
+	0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x03, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x12, 0x10, 0x0a,
+	0x03, 0x62, 0x75, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x01, 0x52, 0x03, 0x62, 0x75, 0x79, 0x12,
+	0x12, 0x0a, 0x04, 0x73, 0x65, 0x6c, 0x6c, 0x18, 0x03, 0x20, 0x01, 0x28, 0x01, 0x52, 0x04, 0x73,
+	0x65, 0x6c, 0x6c, 0x22, 0x61, 0x0a, 0x13, 0x47, 0x65, 0x74, 0x47, 0x6f, 0x6c, 0x64, 0x43, 0x68,
+	0x61, 0x72, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x6d, 0x61,
+	0x72, 0x6b, 0x65, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x6d, 0x61, 0x72, 0x6b,
+	0x65, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x67, 0x6f, 0x6c, 0x64, 0x43, 0x6f, 0x64, 0x65, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x67, 0x6f, 0x6c, 0x64, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x16,
+	0x0a, 0x06, 0x70, 0x65, 0x72, 0x69, 0x6f, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06,
+	0x70, 0x65, 0x72, 0x69, 0x6f, 0x64, 0x22, 0x91, 0x02, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x47, 0x6f,
+	0x6c, 0x64, 0x43, 0x68, 0x61, 0x72, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x18, 0x0a, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08,
+	0x52, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73,
+	0x73, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73,
+	0x61, 0x67, 0x65, 0x12, 0x3f, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x03, 0x20, 0x03, 0x28,
+	0x0b, 0x32, 0x2b, 0x2e, 0x77, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x6a, 0x6f, 0x75, 0x72, 0x6e, 0x65,
+	0x79, 0x2e, 0x69, 0x6e, 0x76, 0x65, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x76, 0x31, 0x2e,
+	0x43, 0x68, 0x61, 0x72, 0x74, 0x44, 0x61, 0x74, 0x61, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x52, 0x04,
+	0x64, 0x61, 0x74, 0x61, 0x12, 0x16, 0x0a, 0x06, 0x6d, 0x61, 0x72, 0x6b, 0x65, 0x74, 0x18, 0x04,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x6d, 0x61, 0x72, 0x6b, 0x65, 0x74, 0x12, 0x1a, 0x0a, 0x08,
+	0x67, 0x6f, 0x6c, 0x64, 0x43, 0x6f, 0x64, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
+	0x67, 0x6f, 0x6c, 0x64, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x70, 0x65, 0x72, 0x69,
+	0x6f, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x70, 0x65, 0x72, 0x69, 0x6f, 0x64,
+	0x12, 0x1a, 0x0a, 0x08, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x18, 0x07, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x08, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x12, 0x1c, 0x0a, 0x09,
+	0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x22, 0x57, 0x0a, 0x15, 0x47, 0x65,
+	0x74, 0x53, 0x69, 0x6c, 0x76, 0x65, 0x72, 0x43, 0x68, 0x61, 0x72, 0x74, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x6d, 0x61, 0x72, 0x6b, 0x65, 0x74, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x6d, 0x61, 0x72, 0x6b, 0x65, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x74,
+	0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12,
+	0x12, 0x0a, 0x04, 0x64, 0x61, 0x79, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x64,
+	0x61, 0x79, 0x73, 0x22, 0x87, 0x02, 0x0a, 0x16, 0x47, 0x65, 0x74, 0x53, 0x69, 0x6c, 0x76, 0x65,
+	0x72, 0x43, 0x68, 0x61, 0x72, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18,
+	0x0a, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52,
+	0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73,
+	0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61,
+	0x67, 0x65, 0x12, 0x3f, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b,
+	0x32, 0x2b, 0x2e, 0x77, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x6a, 0x6f, 0x75, 0x72, 0x6e, 0x65, 0x79,
+	0x2e, 0x69, 0x6e, 0x76, 0x65, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x76, 0x31, 0x2e, 0x43,
+	0x68, 0x61, 0x72, 0x74, 0x44, 0x61, 0x74, 0x61, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x52, 0x04, 0x64,
+	0x61, 0x74, 0x61, 0x12, 0x16, 0x0a, 0x06, 0x6d, 0x61, 0x72, 0x6b, 0x65, 0x74, 0x18, 0x04, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x6d, 0x61, 0x72, 0x6b, 0x65, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x74,
+	0x79, 0x70, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12,
+	0x12, 0x0a, 0x04, 0x64, 0x61, 0x79, 0x73, 0x18, 0x06, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x64,
+	0x61, 0x79, 0x73, 0x12, 0x1a, 0x0a, 0x08, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x18,
+	0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x12,
+	0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x08, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x22, 0xcc, 0x01,
 	0x0a, 0x16, 0x4c, 0x69, 0x73, 0x74, 0x49, 0x6e, 0x76, 0x65, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74,
 	0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x77, 0x61, 0x6c, 0x6c,
 	0x65, 0x74, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x08, 0x77, 0x61, 0x6c, 0x6c,
@@ -4667,7 +5118,7 @@ var file_protobuf_v1_investment_proto_rawDesc = []byte{
 	0x50, 0x45, 0x5f, 0x44, 0x49, 0x56, 0x49, 0x44, 0x45, 0x4e, 0x44, 0x10, 0x03, 0x12, 0x25, 0x0a,
 	0x21, 0x49, 0x4e, 0x56, 0x45, 0x53, 0x54, 0x4d, 0x45, 0x4e, 0x54, 0x5f, 0x54, 0x52, 0x41, 0x4e,
 	0x53, 0x41, 0x43, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x53, 0x50, 0x4c,
-	0x49, 0x54, 0x10, 0x04, 0x32, 0xf7, 0x1a, 0x0a, 0x11, 0x49, 0x6e, 0x76, 0x65, 0x73, 0x74, 0x6d,
+	0x49, 0x54, 0x10, 0x04, 0x32, 0xbb, 0x1d, 0x0a, 0x11, 0x49, 0x6e, 0x76, 0x65, 0x73, 0x74, 0x6d,
 	0x65, 0x6e, 0x74, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0xac, 0x01, 0x0a, 0x0f, 0x4c,
 	0x69, 0x73, 0x74, 0x49, 0x6e, 0x76, 0x65, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x33,
 	0x2e, 0x77, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x6a, 0x6f, 0x75, 0x72, 0x6e, 0x65, 0x79, 0x2e, 0x69,
@@ -4882,9 +5333,29 @@ var file_protobuf_v1_investment_proto_rawDesc = []byte{
 	0x61, 0x72, 0x6b, 0x65, 0x74, 0x50, 0x72, 0x69, 0x63, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
 	0x6e, 0x73, 0x65, 0x22, 0x29, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x23, 0x12, 0x21, 0x2f, 0x61, 0x70,
 	0x69, 0x2f, 0x76, 0x31, 0x2f, 0x69, 0x6e, 0x76, 0x65, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x73,
-	0x2f, 0x6d, 0x61, 0x72, 0x6b, 0x65, 0x74, 0x2d, 0x70, 0x72, 0x69, 0x63, 0x65, 0x73, 0x42, 0x0d,
-	0x5a, 0x0b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x2f, 0x6d, 0x61, 0x72, 0x6b, 0x65, 0x74, 0x2d, 0x70, 0x72, 0x69, 0x63, 0x65, 0x73, 0x12, 0x9b,
+	0x01, 0x0a, 0x0c, 0x47, 0x65, 0x74, 0x47, 0x6f, 0x6c, 0x64, 0x43, 0x68, 0x61, 0x72, 0x74, 0x12,
+	0x30, 0x2e, 0x77, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x6a, 0x6f, 0x75, 0x72, 0x6e, 0x65, 0x79, 0x2e,
+	0x69, 0x6e, 0x76, 0x65, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65,
+	0x74, 0x47, 0x6f, 0x6c, 0x64, 0x43, 0x68, 0x61, 0x72, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x31, 0x2e, 0x77, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x6a, 0x6f, 0x75, 0x72, 0x6e, 0x65,
+	0x79, 0x2e, 0x69, 0x6e, 0x76, 0x65, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x76, 0x31, 0x2e,
+	0x47, 0x65, 0x74, 0x47, 0x6f, 0x6c, 0x64, 0x43, 0x68, 0x61, 0x72, 0x74, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x26, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x20, 0x12, 0x1e, 0x2f, 0x61,
+	0x70, 0x69, 0x2f, 0x76, 0x31, 0x2f, 0x69, 0x6e, 0x76, 0x65, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74,
+	0x73, 0x2f, 0x67, 0x6f, 0x6c, 0x64, 0x2d, 0x63, 0x68, 0x61, 0x72, 0x74, 0x12, 0xa3, 0x01, 0x0a,
+	0x0e, 0x47, 0x65, 0x74, 0x53, 0x69, 0x6c, 0x76, 0x65, 0x72, 0x43, 0x68, 0x61, 0x72, 0x74, 0x12,
+	0x32, 0x2e, 0x77, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x6a, 0x6f, 0x75, 0x72, 0x6e, 0x65, 0x79, 0x2e,
+	0x69, 0x6e, 0x76, 0x65, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65,
+	0x74, 0x53, 0x69, 0x6c, 0x76, 0x65, 0x72, 0x43, 0x68, 0x61, 0x72, 0x74, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x33, 0x2e, 0x77, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x6a, 0x6f, 0x75, 0x72,
+	0x6e, 0x65, 0x79, 0x2e, 0x69, 0x6e, 0x76, 0x65, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x76,
+	0x31, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x69, 0x6c, 0x76, 0x65, 0x72, 0x43, 0x68, 0x61, 0x72, 0x74,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x28, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x22,
+	0x12, 0x20, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x2f, 0x69, 0x6e, 0x76, 0x65, 0x73, 0x74,
+	0x6d, 0x65, 0x6e, 0x74, 0x73, 0x2f, 0x73, 0x69, 0x6c, 0x76, 0x65, 0x72, 0x2d, 0x63, 0x68, 0x61,
+	0x72, 0x74, 0x42, 0x0d, 0x5a, 0x0b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x76,
+	0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -4900,7 +5371,7 @@ func file_protobuf_v1_investment_proto_rawDescGZIP() []byte {
 }
 
 var file_protobuf_v1_investment_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_protobuf_v1_investment_proto_msgTypes = make([]protoimpl.MessageInfo, 48)
+var file_protobuf_v1_investment_proto_msgTypes = make([]protoimpl.MessageInfo, 53)
 var file_protobuf_v1_investment_proto_goTypes = []interface{}{
 	(InvestmentType)(0),                          // 0: wealthjourney.investment.v1.InvestmentType
 	(InvestmentTransactionType)(0),               // 1: wealthjourney.investment.v1.InvestmentTransactionType
@@ -4924,62 +5395,67 @@ var file_protobuf_v1_investment_proto_goTypes = []interface{}{
 	(*GetMarketPricesRequest)(nil),               // 19: wealthjourney.investment.v1.GetMarketPricesRequest
 	(*GetMarketPricesResponse)(nil),              // 20: wealthjourney.investment.v1.GetMarketPricesResponse
 	(*MarketPrice)(nil),                          // 21: wealthjourney.investment.v1.MarketPrice
-	(*ListInvestmentsRequest)(nil),               // 22: wealthjourney.investment.v1.ListInvestmentsRequest
-	(*ListInvestmentsResponse)(nil),              // 23: wealthjourney.investment.v1.ListInvestmentsResponse
-	(*GetInvestmentRequest)(nil),                 // 24: wealthjourney.investment.v1.GetInvestmentRequest
-	(*GetInvestmentResponse)(nil),                // 25: wealthjourney.investment.v1.GetInvestmentResponse
-	(*CreateInvestmentRequest)(nil),              // 26: wealthjourney.investment.v1.CreateInvestmentRequest
-	(*CreateInvestmentResponse)(nil),             // 27: wealthjourney.investment.v1.CreateInvestmentResponse
-	(*UpdateInvestmentRequest)(nil),              // 28: wealthjourney.investment.v1.UpdateInvestmentRequest
-	(*UpdateInvestmentResponse)(nil),             // 29: wealthjourney.investment.v1.UpdateInvestmentResponse
-	(*DeleteInvestmentRequest)(nil),              // 30: wealthjourney.investment.v1.DeleteInvestmentRequest
-	(*DeleteInvestmentResponse)(nil),             // 31: wealthjourney.investment.v1.DeleteInvestmentResponse
-	(*AddTransactionRequest)(nil),                // 32: wealthjourney.investment.v1.AddTransactionRequest
-	(*AddTransactionResponse)(nil),               // 33: wealthjourney.investment.v1.AddTransactionResponse
-	(*ListInvestmentTransactionsRequest)(nil),    // 34: wealthjourney.investment.v1.ListInvestmentTransactionsRequest
-	(*ListInvestmentTransactionsResponse)(nil),   // 35: wealthjourney.investment.v1.ListInvestmentTransactionsResponse
-	(*EditInvestmentTransactionRequest)(nil),     // 36: wealthjourney.investment.v1.EditInvestmentTransactionRequest
-	(*EditInvestmentTransactionResponse)(nil),    // 37: wealthjourney.investment.v1.EditInvestmentTransactionResponse
-	(*DeleteInvestmentTransactionRequest)(nil),   // 38: wealthjourney.investment.v1.DeleteInvestmentTransactionRequest
-	(*DeleteInvestmentTransactionResponse)(nil),  // 39: wealthjourney.investment.v1.DeleteInvestmentTransactionResponse
-	(*GetPortfolioSummaryRequest)(nil),           // 40: wealthjourney.investment.v1.GetPortfolioSummaryRequest
-	(*GetPortfolioSummaryResponse)(nil),          // 41: wealthjourney.investment.v1.GetPortfolioSummaryResponse
-	(*UpdatePricesRequest)(nil),                  // 42: wealthjourney.investment.v1.UpdatePricesRequest
-	(*UpdatePricesResponse)(nil),                 // 43: wealthjourney.investment.v1.UpdatePricesResponse
-	(*SearchSymbolsRequest)(nil),                 // 44: wealthjourney.investment.v1.SearchSymbolsRequest
-	(*SearchResult)(nil),                         // 45: wealthjourney.investment.v1.SearchResult
-	(*SearchSymbolsResponse)(nil),                // 46: wealthjourney.investment.v1.SearchSymbolsResponse
-	(*ListUserInvestmentsRequest)(nil),           // 47: wealthjourney.investment.v1.ListUserInvestmentsRequest
-	(*ListUserInvestmentsResponse)(nil),          // 48: wealthjourney.investment.v1.ListUserInvestmentsResponse
-	(*GetAggregatedPortfolioSummaryRequest)(nil), // 49: wealthjourney.investment.v1.GetAggregatedPortfolioSummaryRequest
-	(*Money)(nil),                                // 50: wealthjourney.common.v1.Money
-	(*PaginationParams)(nil),                     // 51: wealthjourney.common.v1.PaginationParams
-	(*PaginationResult)(nil),                     // 52: wealthjourney.common.v1.PaginationResult
+	(*ChartDataPoint)(nil),                       // 22: wealthjourney.investment.v1.ChartDataPoint
+	(*GetGoldChartRequest)(nil),                  // 23: wealthjourney.investment.v1.GetGoldChartRequest
+	(*GetGoldChartResponse)(nil),                 // 24: wealthjourney.investment.v1.GetGoldChartResponse
+	(*GetSilverChartRequest)(nil),                // 25: wealthjourney.investment.v1.GetSilverChartRequest
+	(*GetSilverChartResponse)(nil),               // 26: wealthjourney.investment.v1.GetSilverChartResponse
+	(*ListInvestmentsRequest)(nil),               // 27: wealthjourney.investment.v1.ListInvestmentsRequest
+	(*ListInvestmentsResponse)(nil),              // 28: wealthjourney.investment.v1.ListInvestmentsResponse
+	(*GetInvestmentRequest)(nil),                 // 29: wealthjourney.investment.v1.GetInvestmentRequest
+	(*GetInvestmentResponse)(nil),                // 30: wealthjourney.investment.v1.GetInvestmentResponse
+	(*CreateInvestmentRequest)(nil),              // 31: wealthjourney.investment.v1.CreateInvestmentRequest
+	(*CreateInvestmentResponse)(nil),             // 32: wealthjourney.investment.v1.CreateInvestmentResponse
+	(*UpdateInvestmentRequest)(nil),              // 33: wealthjourney.investment.v1.UpdateInvestmentRequest
+	(*UpdateInvestmentResponse)(nil),             // 34: wealthjourney.investment.v1.UpdateInvestmentResponse
+	(*DeleteInvestmentRequest)(nil),              // 35: wealthjourney.investment.v1.DeleteInvestmentRequest
+	(*DeleteInvestmentResponse)(nil),             // 36: wealthjourney.investment.v1.DeleteInvestmentResponse
+	(*AddTransactionRequest)(nil),                // 37: wealthjourney.investment.v1.AddTransactionRequest
+	(*AddTransactionResponse)(nil),               // 38: wealthjourney.investment.v1.AddTransactionResponse
+	(*ListInvestmentTransactionsRequest)(nil),    // 39: wealthjourney.investment.v1.ListInvestmentTransactionsRequest
+	(*ListInvestmentTransactionsResponse)(nil),   // 40: wealthjourney.investment.v1.ListInvestmentTransactionsResponse
+	(*EditInvestmentTransactionRequest)(nil),     // 41: wealthjourney.investment.v1.EditInvestmentTransactionRequest
+	(*EditInvestmentTransactionResponse)(nil),    // 42: wealthjourney.investment.v1.EditInvestmentTransactionResponse
+	(*DeleteInvestmentTransactionRequest)(nil),   // 43: wealthjourney.investment.v1.DeleteInvestmentTransactionRequest
+	(*DeleteInvestmentTransactionResponse)(nil),  // 44: wealthjourney.investment.v1.DeleteInvestmentTransactionResponse
+	(*GetPortfolioSummaryRequest)(nil),           // 45: wealthjourney.investment.v1.GetPortfolioSummaryRequest
+	(*GetPortfolioSummaryResponse)(nil),          // 46: wealthjourney.investment.v1.GetPortfolioSummaryResponse
+	(*UpdatePricesRequest)(nil),                  // 47: wealthjourney.investment.v1.UpdatePricesRequest
+	(*UpdatePricesResponse)(nil),                 // 48: wealthjourney.investment.v1.UpdatePricesResponse
+	(*SearchSymbolsRequest)(nil),                 // 49: wealthjourney.investment.v1.SearchSymbolsRequest
+	(*SearchResult)(nil),                         // 50: wealthjourney.investment.v1.SearchResult
+	(*SearchSymbolsResponse)(nil),                // 51: wealthjourney.investment.v1.SearchSymbolsResponse
+	(*ListUserInvestmentsRequest)(nil),           // 52: wealthjourney.investment.v1.ListUserInvestmentsRequest
+	(*ListUserInvestmentsResponse)(nil),          // 53: wealthjourney.investment.v1.ListUserInvestmentsResponse
+	(*GetAggregatedPortfolioSummaryRequest)(nil), // 54: wealthjourney.investment.v1.GetAggregatedPortfolioSummaryRequest
+	(*Money)(nil),                                // 55: wealthjourney.common.v1.Money
+	(*PaginationParams)(nil),                     // 56: wealthjourney.common.v1.PaginationParams
+	(*PaginationResult)(nil),                     // 57: wealthjourney.common.v1.PaginationResult
 }
 var file_protobuf_v1_investment_proto_depIdxs = []int32{
 	0,  // 0: wealthjourney.investment.v1.Investment.type:type_name -> wealthjourney.investment.v1.InvestmentType
-	50, // 1: wealthjourney.investment.v1.Investment.displayTotalCost:type_name -> wealthjourney.common.v1.Money
-	50, // 2: wealthjourney.investment.v1.Investment.displayCurrentValue:type_name -> wealthjourney.common.v1.Money
-	50, // 3: wealthjourney.investment.v1.Investment.displayUnrealizedPnl:type_name -> wealthjourney.common.v1.Money
-	50, // 4: wealthjourney.investment.v1.Investment.displayRealizedPnl:type_name -> wealthjourney.common.v1.Money
-	50, // 5: wealthjourney.investment.v1.Investment.displayCurrentPrice:type_name -> wealthjourney.common.v1.Money
-	50, // 6: wealthjourney.investment.v1.Investment.displayAverageCost:type_name -> wealthjourney.common.v1.Money
+	55, // 1: wealthjourney.investment.v1.Investment.displayTotalCost:type_name -> wealthjourney.common.v1.Money
+	55, // 2: wealthjourney.investment.v1.Investment.displayCurrentValue:type_name -> wealthjourney.common.v1.Money
+	55, // 3: wealthjourney.investment.v1.Investment.displayUnrealizedPnl:type_name -> wealthjourney.common.v1.Money
+	55, // 4: wealthjourney.investment.v1.Investment.displayRealizedPnl:type_name -> wealthjourney.common.v1.Money
+	55, // 5: wealthjourney.investment.v1.Investment.displayCurrentPrice:type_name -> wealthjourney.common.v1.Money
+	55, // 6: wealthjourney.investment.v1.Investment.displayAverageCost:type_name -> wealthjourney.common.v1.Money
 	1,  // 7: wealthjourney.investment.v1.InvestmentTransaction.type:type_name -> wealthjourney.investment.v1.InvestmentTransactionType
-	50, // 8: wealthjourney.investment.v1.InvestmentTransaction.displayPrice:type_name -> wealthjourney.common.v1.Money
-	50, // 9: wealthjourney.investment.v1.InvestmentTransaction.displayCost:type_name -> wealthjourney.common.v1.Money
-	50, // 10: wealthjourney.investment.v1.InvestmentTransaction.displayFees:type_name -> wealthjourney.common.v1.Money
+	55, // 8: wealthjourney.investment.v1.InvestmentTransaction.displayPrice:type_name -> wealthjourney.common.v1.Money
+	55, // 9: wealthjourney.investment.v1.InvestmentTransaction.displayCost:type_name -> wealthjourney.common.v1.Money
+	55, // 10: wealthjourney.investment.v1.InvestmentTransaction.displayFees:type_name -> wealthjourney.common.v1.Money
 	5,  // 11: wealthjourney.investment.v1.PortfolioSummary.investmentsByType:type_name -> wealthjourney.investment.v1.InvestmentByType
-	50, // 12: wealthjourney.investment.v1.PortfolioSummary.displayTotalValue:type_name -> wealthjourney.common.v1.Money
-	50, // 13: wealthjourney.investment.v1.PortfolioSummary.displayTotalCost:type_name -> wealthjourney.common.v1.Money
-	50, // 14: wealthjourney.investment.v1.PortfolioSummary.displayTotalPnl:type_name -> wealthjourney.common.v1.Money
-	50, // 15: wealthjourney.investment.v1.PortfolioSummary.displayRealizedPnl:type_name -> wealthjourney.common.v1.Money
-	50, // 16: wealthjourney.investment.v1.PortfolioSummary.displayUnrealizedPnl:type_name -> wealthjourney.common.v1.Money
+	55, // 12: wealthjourney.investment.v1.PortfolioSummary.displayTotalValue:type_name -> wealthjourney.common.v1.Money
+	55, // 13: wealthjourney.investment.v1.PortfolioSummary.displayTotalCost:type_name -> wealthjourney.common.v1.Money
+	55, // 14: wealthjourney.investment.v1.PortfolioSummary.displayTotalPnl:type_name -> wealthjourney.common.v1.Money
+	55, // 15: wealthjourney.investment.v1.PortfolioSummary.displayRealizedPnl:type_name -> wealthjourney.common.v1.Money
+	55, // 16: wealthjourney.investment.v1.PortfolioSummary.displayUnrealizedPnl:type_name -> wealthjourney.common.v1.Money
 	6,  // 17: wealthjourney.investment.v1.PortfolioSummary.topPerformers:type_name -> wealthjourney.investment.v1.InvestmentPerformance
 	6,  // 18: wealthjourney.investment.v1.PortfolioSummary.worstPerformers:type_name -> wealthjourney.investment.v1.InvestmentPerformance
 	0,  // 19: wealthjourney.investment.v1.InvestmentByType.type:type_name -> wealthjourney.investment.v1.InvestmentType
 	0,  // 20: wealthjourney.investment.v1.InvestmentPerformance.type:type_name -> wealthjourney.investment.v1.InvestmentType
-	50, // 21: wealthjourney.investment.v1.InvestmentPerformance.displayUnrealizedPnl:type_name -> wealthjourney.common.v1.Money
-	50, // 22: wealthjourney.investment.v1.HistoricalPortfolioValue.displayTotalValue:type_name -> wealthjourney.common.v1.Money
+	55, // 21: wealthjourney.investment.v1.InvestmentPerformance.displayUnrealizedPnl:type_name -> wealthjourney.common.v1.Money
+	55, // 22: wealthjourney.investment.v1.HistoricalPortfolioValue.displayTotalValue:type_name -> wealthjourney.common.v1.Money
 	0,  // 23: wealthjourney.investment.v1.GetHistoricalPortfolioValuesRequest.typeFilter:type_name -> wealthjourney.investment.v1.InvestmentType
 	7,  // 24: wealthjourney.investment.v1.GetHistoricalPortfolioValuesResponse.data:type_name -> wealthjourney.investment.v1.HistoricalPortfolioValue
 	10, // 25: wealthjourney.investment.v1.GetGoldTypeCodesResponse.data:type_name -> wealthjourney.investment.v1.GoldTypeCode
@@ -4988,73 +5464,79 @@ var file_protobuf_v1_investment_proto_depIdxs = []int32{
 	21, // 28: wealthjourney.investment.v1.GetMarketPriceResponse.data:type_name -> wealthjourney.investment.v1.MarketPrice
 	18, // 29: wealthjourney.investment.v1.GetMarketPricesResponse.gold:type_name -> wealthjourney.investment.v1.PriceItem
 	18, // 30: wealthjourney.investment.v1.GetMarketPricesResponse.silver:type_name -> wealthjourney.investment.v1.PriceItem
-	51, // 31: wealthjourney.investment.v1.ListInvestmentsRequest.pagination:type_name -> wealthjourney.common.v1.PaginationParams
-	0,  // 32: wealthjourney.investment.v1.ListInvestmentsRequest.typeFilter:type_name -> wealthjourney.investment.v1.InvestmentType
-	2,  // 33: wealthjourney.investment.v1.ListInvestmentsResponse.data:type_name -> wealthjourney.investment.v1.Investment
-	52, // 34: wealthjourney.investment.v1.ListInvestmentsResponse.pagination:type_name -> wealthjourney.common.v1.PaginationResult
-	2,  // 35: wealthjourney.investment.v1.GetInvestmentResponse.data:type_name -> wealthjourney.investment.v1.Investment
-	0,  // 36: wealthjourney.investment.v1.CreateInvestmentRequest.type:type_name -> wealthjourney.investment.v1.InvestmentType
-	2,  // 37: wealthjourney.investment.v1.CreateInvestmentResponse.data:type_name -> wealthjourney.investment.v1.Investment
-	2,  // 38: wealthjourney.investment.v1.UpdateInvestmentResponse.data:type_name -> wealthjourney.investment.v1.Investment
-	1,  // 39: wealthjourney.investment.v1.AddTransactionRequest.type:type_name -> wealthjourney.investment.v1.InvestmentTransactionType
-	3,  // 40: wealthjourney.investment.v1.AddTransactionResponse.data:type_name -> wealthjourney.investment.v1.InvestmentTransaction
-	2,  // 41: wealthjourney.investment.v1.AddTransactionResponse.updatedInvestment:type_name -> wealthjourney.investment.v1.Investment
-	51, // 42: wealthjourney.investment.v1.ListInvestmentTransactionsRequest.pagination:type_name -> wealthjourney.common.v1.PaginationParams
-	1,  // 43: wealthjourney.investment.v1.ListInvestmentTransactionsRequest.typeFilter:type_name -> wealthjourney.investment.v1.InvestmentTransactionType
-	3,  // 44: wealthjourney.investment.v1.ListInvestmentTransactionsResponse.data:type_name -> wealthjourney.investment.v1.InvestmentTransaction
-	52, // 45: wealthjourney.investment.v1.ListInvestmentTransactionsResponse.pagination:type_name -> wealthjourney.common.v1.PaginationResult
-	3,  // 46: wealthjourney.investment.v1.EditInvestmentTransactionResponse.data:type_name -> wealthjourney.investment.v1.InvestmentTransaction
-	4,  // 47: wealthjourney.investment.v1.GetPortfolioSummaryResponse.data:type_name -> wealthjourney.investment.v1.PortfolioSummary
-	2,  // 48: wealthjourney.investment.v1.UpdatePricesResponse.updatedInvestments:type_name -> wealthjourney.investment.v1.Investment
-	45, // 49: wealthjourney.investment.v1.SearchSymbolsResponse.data:type_name -> wealthjourney.investment.v1.SearchResult
-	51, // 50: wealthjourney.investment.v1.ListUserInvestmentsRequest.pagination:type_name -> wealthjourney.common.v1.PaginationParams
-	0,  // 51: wealthjourney.investment.v1.ListUserInvestmentsRequest.typeFilter:type_name -> wealthjourney.investment.v1.InvestmentType
-	2,  // 52: wealthjourney.investment.v1.ListUserInvestmentsResponse.investments:type_name -> wealthjourney.investment.v1.Investment
-	52, // 53: wealthjourney.investment.v1.ListUserInvestmentsResponse.pagination:type_name -> wealthjourney.common.v1.PaginationResult
-	0,  // 54: wealthjourney.investment.v1.GetAggregatedPortfolioSummaryRequest.typeFilter:type_name -> wealthjourney.investment.v1.InvestmentType
-	22, // 55: wealthjourney.investment.v1.InvestmentService.ListInvestments:input_type -> wealthjourney.investment.v1.ListInvestmentsRequest
-	24, // 56: wealthjourney.investment.v1.InvestmentService.GetInvestment:input_type -> wealthjourney.investment.v1.GetInvestmentRequest
-	26, // 57: wealthjourney.investment.v1.InvestmentService.CreateInvestment:input_type -> wealthjourney.investment.v1.CreateInvestmentRequest
-	28, // 58: wealthjourney.investment.v1.InvestmentService.UpdateInvestment:input_type -> wealthjourney.investment.v1.UpdateInvestmentRequest
-	30, // 59: wealthjourney.investment.v1.InvestmentService.DeleteInvestment:input_type -> wealthjourney.investment.v1.DeleteInvestmentRequest
-	32, // 60: wealthjourney.investment.v1.InvestmentService.AddInvestmentTransaction:input_type -> wealthjourney.investment.v1.AddTransactionRequest
-	34, // 61: wealthjourney.investment.v1.InvestmentService.ListInvestmentTransactions:input_type -> wealthjourney.investment.v1.ListInvestmentTransactionsRequest
-	36, // 62: wealthjourney.investment.v1.InvestmentService.EditInvestmentTransaction:input_type -> wealthjourney.investment.v1.EditInvestmentTransactionRequest
-	38, // 63: wealthjourney.investment.v1.InvestmentService.DeleteInvestmentTransaction:input_type -> wealthjourney.investment.v1.DeleteInvestmentTransactionRequest
-	40, // 64: wealthjourney.investment.v1.InvestmentService.GetPortfolioSummary:input_type -> wealthjourney.investment.v1.GetPortfolioSummaryRequest
-	42, // 65: wealthjourney.investment.v1.InvestmentService.UpdatePrices:input_type -> wealthjourney.investment.v1.UpdatePricesRequest
-	44, // 66: wealthjourney.investment.v1.InvestmentService.SearchSymbols:input_type -> wealthjourney.investment.v1.SearchSymbolsRequest
-	47, // 67: wealthjourney.investment.v1.InvestmentService.ListUserInvestments:input_type -> wealthjourney.investment.v1.ListUserInvestmentsRequest
-	49, // 68: wealthjourney.investment.v1.InvestmentService.GetAggregatedPortfolioSummary:input_type -> wealthjourney.investment.v1.GetAggregatedPortfolioSummaryRequest
-	11, // 69: wealthjourney.investment.v1.InvestmentService.GetGoldTypeCodes:input_type -> wealthjourney.investment.v1.GetGoldTypeCodesRequest
-	14, // 70: wealthjourney.investment.v1.InvestmentService.GetSilverTypeCodes:input_type -> wealthjourney.investment.v1.GetSilverTypeCodesRequest
-	8,  // 71: wealthjourney.investment.v1.InvestmentService.GetHistoricalPortfolioValues:input_type -> wealthjourney.investment.v1.GetHistoricalPortfolioValuesRequest
-	16, // 72: wealthjourney.investment.v1.InvestmentService.GetMarketPrice:input_type -> wealthjourney.investment.v1.GetMarketPriceRequest
-	19, // 73: wealthjourney.investment.v1.InvestmentService.GetMarketPrices:input_type -> wealthjourney.investment.v1.GetMarketPricesRequest
-	23, // 74: wealthjourney.investment.v1.InvestmentService.ListInvestments:output_type -> wealthjourney.investment.v1.ListInvestmentsResponse
-	25, // 75: wealthjourney.investment.v1.InvestmentService.GetInvestment:output_type -> wealthjourney.investment.v1.GetInvestmentResponse
-	27, // 76: wealthjourney.investment.v1.InvestmentService.CreateInvestment:output_type -> wealthjourney.investment.v1.CreateInvestmentResponse
-	29, // 77: wealthjourney.investment.v1.InvestmentService.UpdateInvestment:output_type -> wealthjourney.investment.v1.UpdateInvestmentResponse
-	31, // 78: wealthjourney.investment.v1.InvestmentService.DeleteInvestment:output_type -> wealthjourney.investment.v1.DeleteInvestmentResponse
-	33, // 79: wealthjourney.investment.v1.InvestmentService.AddInvestmentTransaction:output_type -> wealthjourney.investment.v1.AddTransactionResponse
-	35, // 80: wealthjourney.investment.v1.InvestmentService.ListInvestmentTransactions:output_type -> wealthjourney.investment.v1.ListInvestmentTransactionsResponse
-	37, // 81: wealthjourney.investment.v1.InvestmentService.EditInvestmentTransaction:output_type -> wealthjourney.investment.v1.EditInvestmentTransactionResponse
-	39, // 82: wealthjourney.investment.v1.InvestmentService.DeleteInvestmentTransaction:output_type -> wealthjourney.investment.v1.DeleteInvestmentTransactionResponse
-	41, // 83: wealthjourney.investment.v1.InvestmentService.GetPortfolioSummary:output_type -> wealthjourney.investment.v1.GetPortfolioSummaryResponse
-	43, // 84: wealthjourney.investment.v1.InvestmentService.UpdatePrices:output_type -> wealthjourney.investment.v1.UpdatePricesResponse
-	46, // 85: wealthjourney.investment.v1.InvestmentService.SearchSymbols:output_type -> wealthjourney.investment.v1.SearchSymbolsResponse
-	48, // 86: wealthjourney.investment.v1.InvestmentService.ListUserInvestments:output_type -> wealthjourney.investment.v1.ListUserInvestmentsResponse
-	41, // 87: wealthjourney.investment.v1.InvestmentService.GetAggregatedPortfolioSummary:output_type -> wealthjourney.investment.v1.GetPortfolioSummaryResponse
-	12, // 88: wealthjourney.investment.v1.InvestmentService.GetGoldTypeCodes:output_type -> wealthjourney.investment.v1.GetGoldTypeCodesResponse
-	15, // 89: wealthjourney.investment.v1.InvestmentService.GetSilverTypeCodes:output_type -> wealthjourney.investment.v1.GetSilverTypeCodesResponse
-	9,  // 90: wealthjourney.investment.v1.InvestmentService.GetHistoricalPortfolioValues:output_type -> wealthjourney.investment.v1.GetHistoricalPortfolioValuesResponse
-	17, // 91: wealthjourney.investment.v1.InvestmentService.GetMarketPrice:output_type -> wealthjourney.investment.v1.GetMarketPriceResponse
-	20, // 92: wealthjourney.investment.v1.InvestmentService.GetMarketPrices:output_type -> wealthjourney.investment.v1.GetMarketPricesResponse
-	74, // [74:93] is the sub-list for method output_type
-	55, // [55:74] is the sub-list for method input_type
-	55, // [55:55] is the sub-list for extension type_name
-	55, // [55:55] is the sub-list for extension extendee
-	0,  // [0:55] is the sub-list for field type_name
+	22, // 31: wealthjourney.investment.v1.GetGoldChartResponse.data:type_name -> wealthjourney.investment.v1.ChartDataPoint
+	22, // 32: wealthjourney.investment.v1.GetSilverChartResponse.data:type_name -> wealthjourney.investment.v1.ChartDataPoint
+	56, // 33: wealthjourney.investment.v1.ListInvestmentsRequest.pagination:type_name -> wealthjourney.common.v1.PaginationParams
+	0,  // 34: wealthjourney.investment.v1.ListInvestmentsRequest.typeFilter:type_name -> wealthjourney.investment.v1.InvestmentType
+	2,  // 35: wealthjourney.investment.v1.ListInvestmentsResponse.data:type_name -> wealthjourney.investment.v1.Investment
+	57, // 36: wealthjourney.investment.v1.ListInvestmentsResponse.pagination:type_name -> wealthjourney.common.v1.PaginationResult
+	2,  // 37: wealthjourney.investment.v1.GetInvestmentResponse.data:type_name -> wealthjourney.investment.v1.Investment
+	0,  // 38: wealthjourney.investment.v1.CreateInvestmentRequest.type:type_name -> wealthjourney.investment.v1.InvestmentType
+	2,  // 39: wealthjourney.investment.v1.CreateInvestmentResponse.data:type_name -> wealthjourney.investment.v1.Investment
+	2,  // 40: wealthjourney.investment.v1.UpdateInvestmentResponse.data:type_name -> wealthjourney.investment.v1.Investment
+	1,  // 41: wealthjourney.investment.v1.AddTransactionRequest.type:type_name -> wealthjourney.investment.v1.InvestmentTransactionType
+	3,  // 42: wealthjourney.investment.v1.AddTransactionResponse.data:type_name -> wealthjourney.investment.v1.InvestmentTransaction
+	2,  // 43: wealthjourney.investment.v1.AddTransactionResponse.updatedInvestment:type_name -> wealthjourney.investment.v1.Investment
+	56, // 44: wealthjourney.investment.v1.ListInvestmentTransactionsRequest.pagination:type_name -> wealthjourney.common.v1.PaginationParams
+	1,  // 45: wealthjourney.investment.v1.ListInvestmentTransactionsRequest.typeFilter:type_name -> wealthjourney.investment.v1.InvestmentTransactionType
+	3,  // 46: wealthjourney.investment.v1.ListInvestmentTransactionsResponse.data:type_name -> wealthjourney.investment.v1.InvestmentTransaction
+	57, // 47: wealthjourney.investment.v1.ListInvestmentTransactionsResponse.pagination:type_name -> wealthjourney.common.v1.PaginationResult
+	3,  // 48: wealthjourney.investment.v1.EditInvestmentTransactionResponse.data:type_name -> wealthjourney.investment.v1.InvestmentTransaction
+	4,  // 49: wealthjourney.investment.v1.GetPortfolioSummaryResponse.data:type_name -> wealthjourney.investment.v1.PortfolioSummary
+	2,  // 50: wealthjourney.investment.v1.UpdatePricesResponse.updatedInvestments:type_name -> wealthjourney.investment.v1.Investment
+	50, // 51: wealthjourney.investment.v1.SearchSymbolsResponse.data:type_name -> wealthjourney.investment.v1.SearchResult
+	56, // 52: wealthjourney.investment.v1.ListUserInvestmentsRequest.pagination:type_name -> wealthjourney.common.v1.PaginationParams
+	0,  // 53: wealthjourney.investment.v1.ListUserInvestmentsRequest.typeFilter:type_name -> wealthjourney.investment.v1.InvestmentType
+	2,  // 54: wealthjourney.investment.v1.ListUserInvestmentsResponse.investments:type_name -> wealthjourney.investment.v1.Investment
+	57, // 55: wealthjourney.investment.v1.ListUserInvestmentsResponse.pagination:type_name -> wealthjourney.common.v1.PaginationResult
+	0,  // 56: wealthjourney.investment.v1.GetAggregatedPortfolioSummaryRequest.typeFilter:type_name -> wealthjourney.investment.v1.InvestmentType
+	27, // 57: wealthjourney.investment.v1.InvestmentService.ListInvestments:input_type -> wealthjourney.investment.v1.ListInvestmentsRequest
+	29, // 58: wealthjourney.investment.v1.InvestmentService.GetInvestment:input_type -> wealthjourney.investment.v1.GetInvestmentRequest
+	31, // 59: wealthjourney.investment.v1.InvestmentService.CreateInvestment:input_type -> wealthjourney.investment.v1.CreateInvestmentRequest
+	33, // 60: wealthjourney.investment.v1.InvestmentService.UpdateInvestment:input_type -> wealthjourney.investment.v1.UpdateInvestmentRequest
+	35, // 61: wealthjourney.investment.v1.InvestmentService.DeleteInvestment:input_type -> wealthjourney.investment.v1.DeleteInvestmentRequest
+	37, // 62: wealthjourney.investment.v1.InvestmentService.AddInvestmentTransaction:input_type -> wealthjourney.investment.v1.AddTransactionRequest
+	39, // 63: wealthjourney.investment.v1.InvestmentService.ListInvestmentTransactions:input_type -> wealthjourney.investment.v1.ListInvestmentTransactionsRequest
+	41, // 64: wealthjourney.investment.v1.InvestmentService.EditInvestmentTransaction:input_type -> wealthjourney.investment.v1.EditInvestmentTransactionRequest
+	43, // 65: wealthjourney.investment.v1.InvestmentService.DeleteInvestmentTransaction:input_type -> wealthjourney.investment.v1.DeleteInvestmentTransactionRequest
+	45, // 66: wealthjourney.investment.v1.InvestmentService.GetPortfolioSummary:input_type -> wealthjourney.investment.v1.GetPortfolioSummaryRequest
+	47, // 67: wealthjourney.investment.v1.InvestmentService.UpdatePrices:input_type -> wealthjourney.investment.v1.UpdatePricesRequest
+	49, // 68: wealthjourney.investment.v1.InvestmentService.SearchSymbols:input_type -> wealthjourney.investment.v1.SearchSymbolsRequest
+	52, // 69: wealthjourney.investment.v1.InvestmentService.ListUserInvestments:input_type -> wealthjourney.investment.v1.ListUserInvestmentsRequest
+	54, // 70: wealthjourney.investment.v1.InvestmentService.GetAggregatedPortfolioSummary:input_type -> wealthjourney.investment.v1.GetAggregatedPortfolioSummaryRequest
+	11, // 71: wealthjourney.investment.v1.InvestmentService.GetGoldTypeCodes:input_type -> wealthjourney.investment.v1.GetGoldTypeCodesRequest
+	14, // 72: wealthjourney.investment.v1.InvestmentService.GetSilverTypeCodes:input_type -> wealthjourney.investment.v1.GetSilverTypeCodesRequest
+	8,  // 73: wealthjourney.investment.v1.InvestmentService.GetHistoricalPortfolioValues:input_type -> wealthjourney.investment.v1.GetHistoricalPortfolioValuesRequest
+	16, // 74: wealthjourney.investment.v1.InvestmentService.GetMarketPrice:input_type -> wealthjourney.investment.v1.GetMarketPriceRequest
+	19, // 75: wealthjourney.investment.v1.InvestmentService.GetMarketPrices:input_type -> wealthjourney.investment.v1.GetMarketPricesRequest
+	23, // 76: wealthjourney.investment.v1.InvestmentService.GetGoldChart:input_type -> wealthjourney.investment.v1.GetGoldChartRequest
+	25, // 77: wealthjourney.investment.v1.InvestmentService.GetSilverChart:input_type -> wealthjourney.investment.v1.GetSilverChartRequest
+	28, // 78: wealthjourney.investment.v1.InvestmentService.ListInvestments:output_type -> wealthjourney.investment.v1.ListInvestmentsResponse
+	30, // 79: wealthjourney.investment.v1.InvestmentService.GetInvestment:output_type -> wealthjourney.investment.v1.GetInvestmentResponse
+	32, // 80: wealthjourney.investment.v1.InvestmentService.CreateInvestment:output_type -> wealthjourney.investment.v1.CreateInvestmentResponse
+	34, // 81: wealthjourney.investment.v1.InvestmentService.UpdateInvestment:output_type -> wealthjourney.investment.v1.UpdateInvestmentResponse
+	36, // 82: wealthjourney.investment.v1.InvestmentService.DeleteInvestment:output_type -> wealthjourney.investment.v1.DeleteInvestmentResponse
+	38, // 83: wealthjourney.investment.v1.InvestmentService.AddInvestmentTransaction:output_type -> wealthjourney.investment.v1.AddTransactionResponse
+	40, // 84: wealthjourney.investment.v1.InvestmentService.ListInvestmentTransactions:output_type -> wealthjourney.investment.v1.ListInvestmentTransactionsResponse
+	42, // 85: wealthjourney.investment.v1.InvestmentService.EditInvestmentTransaction:output_type -> wealthjourney.investment.v1.EditInvestmentTransactionResponse
+	44, // 86: wealthjourney.investment.v1.InvestmentService.DeleteInvestmentTransaction:output_type -> wealthjourney.investment.v1.DeleteInvestmentTransactionResponse
+	46, // 87: wealthjourney.investment.v1.InvestmentService.GetPortfolioSummary:output_type -> wealthjourney.investment.v1.GetPortfolioSummaryResponse
+	48, // 88: wealthjourney.investment.v1.InvestmentService.UpdatePrices:output_type -> wealthjourney.investment.v1.UpdatePricesResponse
+	51, // 89: wealthjourney.investment.v1.InvestmentService.SearchSymbols:output_type -> wealthjourney.investment.v1.SearchSymbolsResponse
+	53, // 90: wealthjourney.investment.v1.InvestmentService.ListUserInvestments:output_type -> wealthjourney.investment.v1.ListUserInvestmentsResponse
+	46, // 91: wealthjourney.investment.v1.InvestmentService.GetAggregatedPortfolioSummary:output_type -> wealthjourney.investment.v1.GetPortfolioSummaryResponse
+	12, // 92: wealthjourney.investment.v1.InvestmentService.GetGoldTypeCodes:output_type -> wealthjourney.investment.v1.GetGoldTypeCodesResponse
+	15, // 93: wealthjourney.investment.v1.InvestmentService.GetSilverTypeCodes:output_type -> wealthjourney.investment.v1.GetSilverTypeCodesResponse
+	9,  // 94: wealthjourney.investment.v1.InvestmentService.GetHistoricalPortfolioValues:output_type -> wealthjourney.investment.v1.GetHistoricalPortfolioValuesResponse
+	17, // 95: wealthjourney.investment.v1.InvestmentService.GetMarketPrice:output_type -> wealthjourney.investment.v1.GetMarketPriceResponse
+	20, // 96: wealthjourney.investment.v1.InvestmentService.GetMarketPrices:output_type -> wealthjourney.investment.v1.GetMarketPricesResponse
+	24, // 97: wealthjourney.investment.v1.InvestmentService.GetGoldChart:output_type -> wealthjourney.investment.v1.GetGoldChartResponse
+	26, // 98: wealthjourney.investment.v1.InvestmentService.GetSilverChart:output_type -> wealthjourney.investment.v1.GetSilverChartResponse
+	78, // [78:99] is the sub-list for method output_type
+	57, // [57:78] is the sub-list for method input_type
+	57, // [57:57] is the sub-list for extension type_name
+	57, // [57:57] is the sub-list for extension extendee
+	0,  // [0:57] is the sub-list for field type_name
 }
 
 func init() { file_protobuf_v1_investment_proto_init() }
@@ -5305,7 +5787,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListInvestmentsRequest); i {
+			switch v := v.(*ChartDataPoint); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5317,7 +5799,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListInvestmentsResponse); i {
+			switch v := v.(*GetGoldChartRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5329,7 +5811,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetInvestmentRequest); i {
+			switch v := v.(*GetGoldChartResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5341,7 +5823,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetInvestmentResponse); i {
+			switch v := v.(*GetSilverChartRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5353,7 +5835,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateInvestmentRequest); i {
+			switch v := v.(*GetSilverChartResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5365,7 +5847,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateInvestmentResponse); i {
+			switch v := v.(*ListInvestmentsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5377,7 +5859,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateInvestmentRequest); i {
+			switch v := v.(*ListInvestmentsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5389,7 +5871,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdateInvestmentResponse); i {
+			switch v := v.(*GetInvestmentRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5401,7 +5883,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteInvestmentRequest); i {
+			switch v := v.(*GetInvestmentResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5413,7 +5895,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteInvestmentResponse); i {
+			switch v := v.(*CreateInvestmentRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5425,7 +5907,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AddTransactionRequest); i {
+			switch v := v.(*CreateInvestmentResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5437,7 +5919,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AddTransactionResponse); i {
+			switch v := v.(*UpdateInvestmentRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5449,7 +5931,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListInvestmentTransactionsRequest); i {
+			switch v := v.(*UpdateInvestmentResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5461,7 +5943,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListInvestmentTransactionsResponse); i {
+			switch v := v.(*DeleteInvestmentRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5473,7 +5955,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EditInvestmentTransactionRequest); i {
+			switch v := v.(*DeleteInvestmentResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5485,7 +5967,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EditInvestmentTransactionResponse); i {
+			switch v := v.(*AddTransactionRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5497,7 +5979,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteInvestmentTransactionRequest); i {
+			switch v := v.(*AddTransactionResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5509,7 +5991,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteInvestmentTransactionResponse); i {
+			switch v := v.(*ListInvestmentTransactionsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5521,7 +6003,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetPortfolioSummaryRequest); i {
+			switch v := v.(*ListInvestmentTransactionsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5533,7 +6015,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetPortfolioSummaryResponse); i {
+			switch v := v.(*EditInvestmentTransactionRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5545,7 +6027,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdatePricesRequest); i {
+			switch v := v.(*EditInvestmentTransactionResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5557,7 +6039,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UpdatePricesResponse); i {
+			switch v := v.(*DeleteInvestmentTransactionRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5569,7 +6051,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SearchSymbolsRequest); i {
+			switch v := v.(*DeleteInvestmentTransactionResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5581,7 +6063,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SearchResult); i {
+			switch v := v.(*GetPortfolioSummaryRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5593,7 +6075,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SearchSymbolsResponse); i {
+			switch v := v.(*GetPortfolioSummaryResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5605,7 +6087,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListUserInvestmentsRequest); i {
+			switch v := v.(*UpdatePricesRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5617,7 +6099,7 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[46].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListUserInvestmentsResponse); i {
+			switch v := v.(*UpdatePricesResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -5629,6 +6111,66 @@ func file_protobuf_v1_investment_proto_init() {
 			}
 		}
 		file_protobuf_v1_investment_proto_msgTypes[47].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SearchSymbolsRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_protobuf_v1_investment_proto_msgTypes[48].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SearchResult); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_protobuf_v1_investment_proto_msgTypes[49].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SearchSymbolsResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_protobuf_v1_investment_proto_msgTypes[50].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListUserInvestmentsRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_protobuf_v1_investment_proto_msgTypes[51].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListUserInvestmentsResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_protobuf_v1_investment_proto_msgTypes[52].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetAggregatedPortfolioSummaryRequest); i {
 			case 0:
 				return &v.state
@@ -5647,7 +6189,7 @@ func file_protobuf_v1_investment_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_protobuf_v1_investment_proto_rawDesc,
 			NumEnums:      2,
-			NumMessages:   48,
+			NumMessages:   53,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
