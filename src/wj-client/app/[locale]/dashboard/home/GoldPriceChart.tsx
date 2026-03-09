@@ -9,11 +9,6 @@ import { Select } from "@/components/select/Select";
 import type { SelectOption } from "@/components/select/Select";
 import { useQueryGetGoldChart } from "@/utils/generated/hooks";
 import { formatCurrencyCompact } from "@/utils/currency-formatter";
-import type { PriceItem } from "@/gen/protobuf/v1/investment";
-
-interface GoldPriceChartProps {
-  prices: PriceItem[];
-}
 
 // Map period tab keys to API period strings
 const PERIOD_MAP: Record<string, string> = {
@@ -23,14 +18,11 @@ const PERIOD_MAP: Record<string, string> = {
   year: "1y",
 };
 
-// Map gold type codes to goldCode API param
-function toGoldCode(typeCode: string): string {
-  if (!typeCode) return "SJC";
-  if (typeCode.startsWith("999")) return "999";
-  // XAU and global types — signals global market
-  if (typeCode === "XAU") return "XAU";
-  return "SJC";
-}
+// The two goldCode values supported by the API
+const GOLD_CODE_OPTIONS: SelectOption<string>[] = [
+  { value: "SJC", label: "SJC" },
+  { value: "999", label: "999" },
+];
 
 // Format timestamp for X-axis display
 function formatXAxis(timestamp: number, period: string): string {
@@ -44,14 +36,10 @@ function formatXAxis(timestamp: number, period: string): string {
   return d.toLocaleDateString("vi-VN", { month: "2-digit", day: "2-digit" });
 }
 
-export function GoldPriceChart({ prices }: GoldPriceChartProps) {
+export function GoldPriceChart() {
   const t = useTranslations("dashboard.home");
   const [market, setMarket] = useState<"domestic" | "global">("domestic");
-  const [selectedType, setSelectedType] = useState<string>(
-    prices.find((p) => p.typeCode !== "XAU")?.typeCode ||
-      prices[0]?.typeCode ||
-      "",
-  );
+  const [goldCode, setGoldCode] = useState<string>("SJC");
   const [selectedPeriod, setSelectedPeriod] = useState<string>("24h");
 
   const periods = [
@@ -62,21 +50,12 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
   ];
 
   const isGlobal = market === "global";
-  const domesticPrices = prices.filter((p) => p.typeCode !== "XAU");
-  const globalPrice = prices.find((p) => p.typeCode === "XAU");
-  const selectedPrice = isGlobal
-    ? globalPrice || prices[0]
-    : prices.find((p) => p.typeCode === selectedType) ||
-      domesticPrices[0] ||
-      prices[0];
-
-  const goldCode = isGlobal ? "" : toGoldCode(selectedType);
   const apiPeriod = PERIOD_MAP[selectedPeriod] || "24h";
 
   const { data, isLoading, isError, refetch } = useQueryGetGoldChart(
     {
       market,
-      goldCode,
+      goldCode: isGlobal ? "" : goldCode,
       period: apiPeriod,
     },
     {
@@ -86,11 +65,15 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
   );
 
   // Build chart data
-  const chartData = (data?.data || []).map((point) => ({
+  const chartPoints = data?.data || [];
+  const chartData = chartPoints.map((point) => ({
     time: formatXAxis(point.timestamp, selectedPeriod),
     buy: point.buy,
     sell: point.sell,
   }));
+
+  // Latest data point — drives the current prices row
+  const latestPoint = chartPoints[chartPoints.length - 1];
 
   // Y-axis formatter — chart values are raw major-unit prices (not smallest unit),
   // so multiply USD by 100 to match formatCurrencyCompact's cents expectation.
@@ -128,7 +111,10 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
       ];
 
   return (
-    <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
+    <BaseCard
+      padding="none"
+      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
+    >
       {/* Header */}
       <div className="p-5 pb-3">
         <div className="flex items-center justify-between">
@@ -159,25 +145,23 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
                 {t("global")}
               </button>
             </div>
-            {/* Gold type selector — domestic only */}
-            {!isGlobal && domesticPrices.length > 0 && (
+            {/* Gold type selector — domestic only (SJC or 999) */}
+            {!isGlobal && (
               <Select<string>
-                options={domesticPrices.map((p): SelectOption<string> => ({
-                  value: p.typeCode || "",
-                  label: p.name || p.typeCode || "",
-                }))}
-                value={selectedType}
-                onChange={setSelectedType}
+                options={GOLD_CODE_OPTIONS}
+                value={goldCode}
+                onChange={setGoldCode}
                 disableInput
+                disableFilter
                 clearable={false}
-                className="w-36"
+                className="w-24"
               />
             )}
           </div>
         </div>
 
-        {/* Current prices row */}
-        {selectedPrice && (
+        {/* Current prices row — latest data point from chart */}
+        {latestPoint && (
           <div className="flex items-center gap-6 mt-3">
             {!isGlobal && (
               <>
@@ -187,10 +171,7 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
                     {t("buy")}
                   </span>
                   <span className="font-jetbrains font-semibold text-[13px] text-v2-text-primary">
-                    {formatPriceValue(
-                      selectedPrice.buy,
-                      selectedPrice.currency || "VND",
-                    )}
+                    {formatPriceValue(latestPoint.buy, "VND")}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -199,10 +180,7 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
                     {t("sell")}
                   </span>
                   <span className="font-jetbrains font-semibold text-[13px] text-v2-text-primary">
-                    {formatPriceValue(
-                      selectedPrice.sell,
-                      selectedPrice.currency || "VND",
-                    )}
+                    {formatPriceValue(latestPoint.sell, "VND")}
                   </span>
                 </div>
               </>
@@ -214,7 +192,7 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
                   {t("price")}
                 </span>
                 <span className="font-jetbrains font-semibold text-[13px] text-v2-text-primary">
-                  {formatPriceValue(selectedPrice.buy, "USD")}
+                  {formatPriceValue(latestPoint.buy, "USD")}
                 </span>
               </div>
             )}
@@ -278,7 +256,7 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
             data={chartData}
             series={chartSeries}
             xAxisKey="time"
-            height={200}
+            height={400}
             showGrid={true}
             showLegend={false}
             showTooltip={true}

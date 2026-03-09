@@ -168,7 +168,7 @@ export default function Home() {
         <GoldPriceTable prices={goldPrices} updatedTime={formatUpdateTime()} />
 
         {/* 4. Gold Price Chart */}
-        <GoldPriceChart prices={goldPrices} />
+        <GoldPriceChart />
 
         {/* 5. Silver Price Table */}
         <SilverPriceTable
@@ -177,7 +177,7 @@ export default function Home() {
         />
 
         {/* 6. Silver Price Chart */}
-        <SilverPriceChart prices={silverPrices} />
+        <SilverPriceChart />
 
         {/* 7. Wallets */}
         <WalletsSection wallets={wallets} />
@@ -225,7 +225,7 @@ export default function Home() {
             prices={goldPrices}
             updatedTime={formatUpdateTime()}
           />
-          <GoldPriceChart prices={goldPrices} />
+          <GoldPriceChart />
         </div>
 
         {/* Row 4: Silver Table + Silver Chart */}
@@ -234,7 +234,7 @@ export default function Home() {
             prices={silverPrices}
             updatedTime={formatUpdateTime()}
           />
-          <SilverPriceChart prices={silverPrices} />
+          <SilverPriceChart />
         </div>
       </div>
 

@@ -9,11 +9,6 @@ import { Select } from "@/components/select/Select";
 import type { SelectOption } from "@/components/select/Select";
 import { useQueryGetSilverChart } from "@/utils/generated/hooks";
 import { formatCurrencyCompact } from "@/utils/currency-formatter";
-import type { PriceItem } from "@/gen/protobuf/v1/investment";
-
-interface SilverPriceChartProps {
-  prices: PriceItem[];
-}
 
 // Map period tab keys to days for API
 const DAYS_MAP: Record<string, number> = {
@@ -35,11 +30,8 @@ function formatXAxis(timestamp: number, period: string): string {
   return d.toLocaleDateString("vi-VN", { month: "2-digit", day: "2-digit" });
 }
 
-export function SilverPriceChart({ prices }: SilverPriceChartProps) {
+export function SilverPriceChart() {
   const t = useTranslations("dashboard.home");
-  const [selectedType, setSelectedType] = useState<string>(
-    prices[0]?.typeCode || "",
-  );
   const [selectedPeriod, setSelectedPeriod] = useState<string>("24h");
   const [market, setMarket] = useState<"domestic" | "global">("domestic");
   const [silverUnit, setSilverUnit] = useState<"C" | "L" | "KG">("L");
@@ -57,11 +49,8 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
     { key: "KG" as const, label: t("unitKG") },
   ];
 
-  const selectedPrice =
-    prices.find((p) => p.typeCode === selectedType) || prices[0];
   const days = DAYS_MAP[selectedPeriod] || 7;
   const isGlobal = market === "global";
-  const currency = isGlobal ? "USD" : selectedPrice?.currency || "VND";
 
   const { data, isLoading, isError, refetch } = useQueryGetSilverChart(
     {
@@ -76,11 +65,15 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
   );
 
   // Build chart data
-  const chartData = (data?.data || []).map((point) => ({
+  const chartPoints = data?.data || [];
+  const chartData = chartPoints.map((point) => ({
     time: formatXAxis(point.timestamp, selectedPeriod),
     buy: point.buy,
     sell: point.sell,
   }));
+
+  // Latest data point — drives the current prices row
+  const latestPoint = chartPoints[chartPoints.length - 1];
 
   // Y-axis formatter — chart values are raw major-unit prices (not smallest unit),
   // so multiply USD by 100 to match formatCurrencyCompact's cents expectation.
@@ -116,10 +109,6 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
           showDots: false,
         },
       ];
-
-  // Suppress unused variable warning — selectedType is kept for future type selector support
-  void selectedType;
-  void currency;
 
   return (
     <BaseCard
@@ -165,6 +154,7 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
                 value={silverUnit}
                 onChange={setSilverUnit}
                 disableInput
+                disableFilter
                 clearable={false}
                 className="w-24"
               />
@@ -172,8 +162,8 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
           </div>
         </div>
 
-        {/* Current prices row */}
-        {selectedPrice && (
+        {/* Current prices row — latest data point from chart */}
+        {latestPoint && (
           <div className="flex items-center gap-6 mt-3">
             {!isGlobal && (
               <>
@@ -183,10 +173,7 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
                     {t("buy")}
                   </span>
                   <span className="font-jetbrains font-semibold text-[13px] text-v2-text-primary">
-                    {formatPriceValue(
-                      selectedPrice.buy,
-                      selectedPrice.currency || "VND",
-                    )}
+                    {formatPriceValue(latestPoint.buy, "VND")}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -195,10 +182,7 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
                     {t("sell")}
                   </span>
                   <span className="font-jetbrains font-semibold text-[13px] text-v2-text-primary">
-                    {formatPriceValue(
-                      selectedPrice.sell,
-                      selectedPrice.currency || "VND",
-                    )}
+                    {formatPriceValue(latestPoint.sell, "VND")}
                   </span>
                 </div>
               </>
@@ -210,7 +194,7 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
                   {t("price")}
                 </span>
                 <span className="font-jetbrains font-semibold text-[13px] text-v2-text-primary">
-                  {formatPriceValue(selectedPrice.buy, "USD")}
+                  {formatPriceValue(latestPoint.buy, "USD")}
                 </span>
               </div>
             )}
