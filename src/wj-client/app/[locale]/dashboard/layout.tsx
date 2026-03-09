@@ -304,7 +304,12 @@ export default function DashboardLayout({
                 </div>
 
                 {/* Standard group */}
-                <div className={cn("flex flex-col gap-0.5", isExpanded ? "mt-3" : "mt-4")}>
+                <div
+                  className={cn(
+                    "flex flex-col gap-0.5",
+                    isExpanded ? "mt-3" : "mt-4",
+                  )}
+                >
                   <NavItem
                     href={routes.transaction}
                     label={t("transactions")}
@@ -360,7 +365,7 @@ export default function DashboardLayout({
             </nav>
 
             {/* Sidebar Toggle */}
-            <div className="px-3 pt-2 pb-0">
+            <div className="px-3 pt-2 pb-0 flex justify-center">
               <SidebarToggle isExpanded={isExpanded} onToggle={toggle} />
             </div>
 

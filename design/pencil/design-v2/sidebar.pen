@@ -1,0 +1,2135 @@
+{
+  "version": "2.8",
+  "children": [
+    {
+      "type": "frame",
+      "id": "7nLwV",
+      "x": 0,
+      "y": 0,
+      "name": "Expanded Sidebar",
+      "width": 1440,
+      "height": 900,
+      "fill": "#FAF9F7",
+      "children": [
+        {
+          "type": "frame",
+          "id": "1GLDZ",
+          "name": "Sidebar",
+          "width": 280,
+          "height": "fill_container",
+          "fill": "#FFFFFF",
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "right": 1
+            },
+            "fill": "#EDE8E1"
+          },
+          "layout": "vertical",
+          "padding": [
+            24,
+            20
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "1Wy2L",
+              "name": "Logo Section",
+              "width": "fill_container",
+              "gap": 10,
+              "padding": [
+                0,
+                4
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "b3Z1e",
+                  "name": "Logo Icon",
+                  "width": 36,
+                  "height": 36,
+                  "fill": "#B91C1C",
+                  "cornerRadius": 10,
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "2iDfG",
+                      "name": "logoW",
+                      "fill": "#FFFFFF",
+                      "content": "W",
+                      "fontFamily": "Be Vietnam Pro",
+                      "fontSize": 18,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "text",
+                  "id": "T51Iw",
+                  "name": "logoText",
+                  "fill": "#1C1917",
+                  "content": "WealthJourney",
+                  "fontFamily": "Be Vietnam Pro",
+                  "fontSize": 19,
+                  "fontWeight": "700"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "P4FzW",
+              "name": "Spacer",
+              "width": "fill_container",
+              "height": 24
+            },
+            {
+              "type": "frame",
+              "id": "28rIu",
+              "name": "Premium Card",
+              "width": "fill_container",
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 180,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#FFFFFF",
+                    "position": 0
+                  },
+                  {
+                    "color": "#FEF2F233",
+                    "position": 0.5
+                  },
+                  {
+                    "color": "#FEE2E240",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 16,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "#EDE8E1"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#0000000A",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 8
+              },
+              "layout": "vertical",
+              "gap": 2,
+              "padding": 6,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "9zKDY",
+                  "name": "Nav Home Active",
+                  "width": "fill_container",
+                  "fill": "#FEF2F2",
+                  "cornerRadius": 10,
+                  "gap": 12,
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "NIcxZ",
+                      "name": "homeIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "house",
+                      "iconFontFamily": "lucide",
+                      "fill": "#B91C1C"
+                    },
+                    {
+                      "type": "text",
+                      "id": "3SFZy",
+                      "name": "homeLabel",
+                      "fill": "#B91C1C",
+                      "content": "Home",
+                      "fontFamily": "Be Vietnam Pro",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "5Fj6P",
+                  "name": "Nav Portfolio",
+                  "width": "fill_container",
+                  "cornerRadius": 10,
+                  "gap": 12,
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "7rRFV",
+                      "name": "portIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "chart-no-axes-combined",
+                      "iconFontFamily": "lucide",
+                      "fill": "#57534E"
+                    },
+                    {
+                      "type": "text",
+                      "id": "ZJTra",
+                      "name": "portLabel",
+                      "fill": "#57534E",
+                      "content": "Portfolio",
+                      "fontFamily": "Be Vietnam Pro",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Myy66",
+              "name": "Gap",
+              "width": "fill_container",
+              "height": 12
+            },
+            {
+              "type": "frame",
+              "id": "f3NJl",
+              "name": "Standard Section",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 2,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "GlzV8",
+                  "name": "Nav Transactions",
+                  "width": "fill_container",
+                  "cornerRadius": 10,
+                  "gap": 12,
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "0tX3R",
+                      "name": "txnIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "arrow-left-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "#57534E"
+                    },
+                    {
+                      "type": "text",
+                      "id": "A693b",
+                      "name": "txnLabel",
+                      "fill": "#57534E",
+                      "content": "Transactions",
+                      "fontFamily": "Be Vietnam Pro",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "OMlXO",
+                  "name": "Nav Wallets",
+                  "width": "fill_container",
+                  "cornerRadius": 10,
+                  "gap": 12,
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "FHWM6",
+                      "name": "walIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "wallet",
+                      "iconFontFamily": "lucide",
+                      "fill": "#57534E"
+                    },
+                    {
+                      "type": "text",
+                      "id": "szVPp",
+                      "name": "walLabel",
+                      "fill": "#57534E",
+                      "content": "Wallets",
+                      "fontFamily": "Be Vietnam Pro",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "nq3KG",
+                  "name": "Nav Reports",
+                  "width": "fill_container",
+                  "cornerRadius": 10,
+                  "gap": 12,
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "uabwD",
+                      "name": "repIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "chart-pie",
+                      "iconFontFamily": "lucide",
+                      "fill": "#57534E"
+                    },
+                    {
+                      "type": "text",
+                      "id": "zsUmt",
+                      "name": "repLabel",
+                      "fill": "#57534E",
+                      "content": "Reports",
+                      "fontFamily": "Be Vietnam Pro",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "0SREz",
+                  "name": "Nav Budget",
+                  "width": "fill_container",
+                  "cornerRadius": 10,
+                  "gap": 12,
+                  "padding": [
+                    10,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "QYdog",
+                      "name": "budIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "calculator",
+                      "iconFontFamily": "lucide",
+                      "fill": "#57534E"
+                    },
+                    {
+                      "type": "text",
+                      "id": "cDJgG",
+                      "name": "budLabel",
+                      "fill": "#57534E",
+                      "content": "Budget",
+                      "fontFamily": "Be Vietnam Pro",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "9QmFU",
+              "name": "Flex Spacer",
+              "width": "fill_container",
+              "height": "fill_container"
+            },
+            {
+              "type": "frame",
+              "id": "bmjjy",
+              "name": "Divider",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "#EDE8E1"
+            },
+            {
+              "type": "frame",
+              "id": "olqem",
+              "name": "Gap2",
+              "width": "fill_container",
+              "height": 8
+            },
+            {
+              "type": "frame",
+              "id": "o8utN",
+              "name": "Nav Settings",
+              "width": "fill_container",
+              "cornerRadius": 10,
+              "gap": 12,
+              "padding": [
+                10,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "eM0kf",
+                  "name": "settIcon",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "settings",
+                  "iconFontFamily": "lucide",
+                  "fill": "#78716C"
+                },
+                {
+                  "type": "text",
+                  "id": "WJUvj",
+                  "name": "settLabel",
+                  "fill": "#78716C",
+                  "content": "Settings",
+                  "fontFamily": "Be Vietnam Pro",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "QaqRS",
+              "name": "Sidebar Toggle",
+              "width": "fill_container",
+              "cornerRadius": 10,
+              "gap": 12,
+              "padding": [
+                10,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "jUQgu",
+                  "name": "toggleIcon",
+                  "width": 20,
+                  "height": 20,
+                  "iconFontName": "panel-left-close",
+                  "iconFontFamily": "lucide",
+                  "fill": "#78716C"
+                },
+                {
+                  "type": "text",
+                  "id": "RgwMY",
+                  "name": "toggleLabel",
+                  "fill": "#78716C",
+                  "content": "Collapse",
+                  "fontFamily": "Be Vietnam Pro",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Ev6PY",
+              "name": "Gap3",
+              "width": "fill_container",
+              "height": 8
+            },
+            {
+              "type": "frame",
+              "id": "GaVZq",
+              "name": "Divider2",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "#EDE8E1"
+            },
+            {
+              "type": "frame",
+              "id": "AZSpP",
+              "name": "Gap4",
+              "width": "fill_container",
+              "height": 8
+            },
+            {
+              "type": "frame",
+              "id": "GDa5J",
+              "name": "User Section",
+              "width": "fill_container",
+              "cornerRadius": 10,
+              "gap": 12,
+              "padding": 8,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "eLi9X",
+                  "name": "Avatar",
+                  "width": 36,
+                  "height": 36,
+                  "fill": "#B91C1C",
+                  "cornerRadius": 18,
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "gbXc6",
+                      "name": "avatarLetter",
+                      "fill": "#FFFFFF",
+                      "content": "K",
+                      "fontFamily": "Be Vietnam Pro",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "c3uUN",
+                  "name": "User Info",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "wzV2P",
+                      "name": "userName",
+                      "fill": "#1C1917",
+                      "content": "Khanh Nguyen",
+                      "fontFamily": "Be Vietnam Pro",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "vW1JJ",
+                      "name": "userEmail",
+                      "fill": "#78716C",
+                      "content": "khanh@email.com",
+                      "fontFamily": "JetBrains Mono",
+                      "fontSize": 11
+                    }
+                  ]
+                },
+                {
+                  "type": "icon_font",
+                  "id": "Xjjjd",
+                  "name": "moreIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "ellipsis-vertical",
+                  "iconFontFamily": "lucide",
+                  "fill": "#78716C"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "R5Isl",
+          "name": "Content Area",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "#FAF9F7",
+          "layout": "vertical",
+          "padding": 40,
+          "children": [
+            {
+              "type": "text",
+              "id": "VChdq",
+              "name": "contentTitle",
+              "fill": "#78716C",
+              "content": "Dashboard Content Area",
+              "fontFamily": "Be Vietnam Pro",
+              "fontSize": 18,
+              "fontWeight": "600"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "2QMcy",
+      "x": 1540,
+      "y": 0,
+      "name": "Collapsed Sidebar",
+      "width": 600,
+      "height": 900,
+      "fill": "#FAF9F7",
+      "children": [
+        {
+          "type": "group",
+          "id": "tKhTk",
+          "children": [
+            {
+              "type": "frame",
+              "id": "fnqRX",
+              "x": 80,
+              "y": 0,
+              "name": "Content Area",
+              "width": "fill_container(520)",
+              "height": "fill_container(900)",
+              "fill": "#FAF9F7",
+              "layout": "vertical",
+              "padding": 40,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "3Yqd9",
+                  "name": "collTitle",
+                  "fill": "#78716C",
+                  "content": "Content",
+                  "fontFamily": "Be Vietnam Pro",
+                  "fontSize": 18,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "XhYtm",
+              "x": 0,
+              "y": 0,
+              "name": "Collapsed Sidebar",
+              "width": 80,
+              "height": "fill_container(900)",
+              "fill": "#FFFFFF",
+              "stroke": {
+                "align": "inside",
+                "thickness": {
+                  "right": 1
+                },
+                "fill": "#EDE8E1"
+              },
+              "layout": "vertical",
+              "padding": [
+                24,
+                0
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "gMAlo",
+                  "name": "Logo Icon",
+                  "width": 40,
+                  "height": 40,
+                  "fill": "#B91C1C",
+                  "cornerRadius": 12,
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "nRHge",
+                      "name": "cLogoW",
+                      "fill": "#FFFFFF",
+                      "content": "W",
+                      "fontFamily": "Be Vietnam Pro",
+                      "fontSize": 20,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "FlVhZ",
+                  "name": "Spacer",
+                  "width": 40,
+                  "height": 24
+                },
+                {
+                  "type": "frame",
+                  "id": "lzpUw",
+                  "name": "Home Icon Wrap",
+                  "width": 44,
+                  "height": 44,
+                  "fill": "#FEF2F2",
+                  "cornerRadius": 12,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1.5,
+                    "fill": "#FECACA"
+                  },
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "wd8c6",
+                      "name": "cHomeIcon",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "house",
+                      "iconFontFamily": "lucide",
+                      "fill": "#B91C1C"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "5u8Qv",
+                  "name": "Gap",
+                  "width": 40,
+                  "height": 4
+                },
+                {
+                  "type": "frame",
+                  "id": "QNPjw",
+                  "name": "Portfolio Icon Wrap",
+                  "width": 44,
+                  "height": 44,
+                  "fill": "#FEF2F210",
+                  "cornerRadius": 12,
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "oH9zh",
+                      "name": "cPortIcon",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "chart-no-axes-combined",
+                      "iconFontFamily": "lucide",
+                      "fill": "#57534E"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "4EQsj",
+                  "name": "Gap2",
+                  "width": 40,
+                  "height": 16
+                },
+                {
+                  "type": "frame",
+                  "id": "SyHYs",
+                  "name": "Txn Icon Wrap",
+                  "width": 44,
+                  "height": 44,
+                  "cornerRadius": 12,
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "YRSeh",
+                      "name": "cTxnIcon",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "arrow-left-right",
+                      "iconFontFamily": "lucide",
+                      "fill": "#78716C"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "DUAZz",
+                  "name": "Gap3",
+                  "width": 40,
+                  "height": 4
+                },
+                {
+                  "type": "frame",
+                  "id": "vdLHv",
+                  "name": "Wallet Icon Wrap",
+                  "width": 44,
+                  "height": 44,
+                  "cornerRadius": 12,
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "Tn8kB",
+                      "name": "cWalIcon",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "wallet",
+                      "iconFontFamily": "lucide",
+                      "fill": "#78716C"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "lpF9w",
+                  "name": "Gap4",
+                  "width": 40,
+                  "height": 4
+                },
+                {
+                  "type": "frame",
+                  "id": "7k5wD",
+                  "name": "Report Icon Wrap",
+                  "width": 44,
+                  "height": 44,
+                  "cornerRadius": 12,
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "Ze9Yh",
+                      "name": "cRepIcon",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "chart-pie",
+                      "iconFontFamily": "lucide",
+                      "fill": "#78716C"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "0bHZb",
+                  "name": "Gap5",
+                  "width": 40,
+                  "height": 4
+                },
+                {
+                  "type": "frame",
+                  "id": "V2faq",
+                  "name": "Budget Icon Wrap",
+                  "width": 44,
+                  "height": 44,
+                  "cornerRadius": 12,
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "jEM5N",
+                      "name": "cBudIcon",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "calculator",
+                      "iconFontFamily": "lucide",
+                      "fill": "#78716C"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "6Ci5j",
+                  "name": "Flex Spacer",
+                  "width": 40,
+                  "height": "fill_container"
+                },
+                {
+                  "type": "frame",
+                  "id": "mR3Yi",
+                  "name": "Divider",
+                  "width": 44,
+                  "height": 1,
+                  "fill": "#EDE8E1"
+                },
+                {
+                  "type": "frame",
+                  "id": "N1czM",
+                  "name": "Gap6",
+                  "width": 40,
+                  "height": 8
+                },
+                {
+                  "type": "frame",
+                  "id": "4OoIs",
+                  "name": "Settings Icon Wrap",
+                  "width": 44,
+                  "height": 44,
+                  "cornerRadius": 12,
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "vyzhY",
+                      "name": "cSettIcon",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "settings",
+                      "iconFontFamily": "lucide",
+                      "fill": "#78716C"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "bEh2r",
+                  "name": "Gap7",
+                  "width": 40,
+                  "height": 4
+                },
+                {
+                  "type": "frame",
+                  "id": "40xFC",
+                  "name": "Toggle Icon Wrap",
+                  "width": 44,
+                  "height": 44,
+                  "cornerRadius": 12,
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "yE1RT",
+                      "name": "cTogIcon",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "panel-left-open",
+                      "iconFontFamily": "lucide",
+                      "fill": "#78716C"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "WgHK4",
+                  "name": "Gap8",
+                  "width": 40,
+                  "height": 8
+                },
+                {
+                  "type": "frame",
+                  "id": "T8bh7",
+                  "name": "Divider2",
+                  "width": 44,
+                  "height": 1,
+                  "fill": "#EDE8E1"
+                },
+                {
+                  "type": "frame",
+                  "id": "dcfEs",
+                  "name": "Gap9",
+                  "width": 40,
+                  "height": 8
+                },
+                {
+                  "type": "frame",
+                  "id": "DWH8A",
+                  "name": "Avatar",
+                  "width": 36,
+                  "height": 36,
+                  "fill": "#B91C1C",
+                  "cornerRadius": 18,
+                  "layout": "vertical",
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "IKVr5",
+                      "name": "cAvatarK",
+                      "fill": "#FFFFFF",
+                      "content": "K",
+                      "fontFamily": "Be Vietnam Pro",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "FxCIv",
+      "x": 2240,
+      "y": 0,
+      "name": "Mobile Bottom Nav",
+      "width": 390,
+      "height": 844,
+      "fill": "#FAF9F7",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "9w4pm",
+          "name": "Content Area",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "#FAF9F7",
+          "layout": "vertical",
+          "padding": 24,
+          "children": [
+            {
+              "type": "text",
+              "id": "za9Fj",
+              "name": "mContentLabel",
+              "fill": "#78716C",
+              "content": "App Content",
+              "fontFamily": "Be Vietnam Pro",
+              "fontSize": 16,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "cON8B",
+          "name": "Bottom Nav Bar",
+          "width": "fill_container",
+          "height": 72,
+          "fill": "#FFFFFF",
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "top": 1
+            },
+            "fill": "#EDE8E1"
+          },
+          "padding": [
+            8,
+            0,
+            16,
+            0
+          ],
+          "justifyContent": "space_around",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "jTtjB",
+              "name": "Nav Home",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 4,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "uvuP7",
+                  "name": "navHomeIcon",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "house",
+                  "iconFontFamily": "lucide",
+                  "fill": "#B91C1C"
+                },
+                {
+                  "type": "text",
+                  "id": "lTWI0",
+                  "name": "navHomeLabel",
+                  "fill": "#B91C1C",
+                  "content": "Home",
+                  "fontFamily": "Be Vietnam Pro",
+                  "fontSize": 10,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "ellipse",
+                  "id": "e3fN9",
+                  "name": "navHomeDot",
+                  "fill": "#B91C1C",
+                  "width": 5,
+                  "height": 5
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "2FJ4u",
+              "name": "Nav Txn",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 4,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Cr0DO",
+                  "name": "navTxnIcon",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "arrow-left-right",
+                  "iconFontFamily": "lucide",
+                  "fill": "#78716C"
+                },
+                {
+                  "type": "text",
+                  "id": "CPkOv",
+                  "name": "navTxnLabel",
+                  "fill": "#78716C",
+                  "content": "Txns",
+                  "fontFamily": "Be Vietnam Pro",
+                  "fontSize": 10,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "kCdfU",
+              "name": "Nav Wallets",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 4,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "N1hhm",
+                  "name": "navWalIcon",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "wallet",
+                  "iconFontFamily": "lucide",
+                  "fill": "#78716C"
+                },
+                {
+                  "type": "text",
+                  "id": "CiVr8",
+                  "name": "navWalLabel",
+                  "fill": "#78716C",
+                  "content": "Wallets",
+                  "fontFamily": "Be Vietnam Pro",
+                  "fontSize": 10,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "6HEGk",
+              "name": "Nav Portfolio",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 4,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "yOmTT",
+                  "name": "navPortIcon",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "chart-no-axes-combined",
+                  "iconFontFamily": "lucide",
+                  "fill": "#B91C1C"
+                },
+                {
+                  "type": "text",
+                  "id": "g2bkj",
+                  "name": "navPortLabel",
+                  "fill": "#B91C1C",
+                  "content": "Portfolio",
+                  "fontFamily": "Be Vietnam Pro",
+                  "fontSize": 10,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "ellipse",
+                  "id": "mXwBx",
+                  "name": "navPortDot",
+                  "fill": "#B91C1C",
+                  "width": 5,
+                  "height": 5
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "fqYoA",
+              "name": "Nav Reports",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 4,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "csG8a",
+                  "name": "navRepIcon",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "chart-pie",
+                  "iconFontFamily": "lucide",
+                  "fill": "#78716C"
+                },
+                {
+                  "type": "text",
+                  "id": "Y5rr3",
+                  "name": "navRepLabel",
+                  "fill": "#78716C",
+                  "content": "Reports",
+                  "fontFamily": "Be Vietnam Pro",
+                  "fontSize": 10,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "ShfyA",
+              "name": "Nav Budget",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 4,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "o1DmD",
+                  "name": "navBudIcon",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "calculator",
+                  "iconFontFamily": "lucide",
+                  "fill": "#78716C"
+                },
+                {
+                  "type": "text",
+                  "id": "hExos",
+                  "name": "navBudLabel",
+                  "fill": "#78716C",
+                  "content": "Budget",
+                  "fontFamily": "Be Vietnam Pro",
+                  "fontSize": 10,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "AmD5R",
+      "x": 0,
+      "y": -40,
+      "name": "label1",
+      "fill": "#1C1917",
+      "content": "Screen 1: Expanded Sidebar (280px)",
+      "fontFamily": "Be Vietnam Pro",
+      "fontSize": 16,
+      "fontWeight": "700"
+    },
+    {
+      "type": "text",
+      "id": "f2EnD",
+      "x": 1540,
+      "y": -40,
+      "name": "label2",
+      "fill": "#1C1917",
+      "content": "Screen 2: Collapsed Sidebar (80px)",
+      "fontFamily": "Be Vietnam Pro",
+      "fontSize": 16,
+      "fontWeight": "700"
+    },
+    {
+      "type": "text",
+      "id": "sMqKR",
+      "x": 2240,
+      "y": -40,
+      "name": "label3",
+      "fill": "#1C1917",
+      "content": "Screen 3: Mobile Bottom Nav",
+      "fontFamily": "Be Vietnam Pro",
+      "fontSize": 16,
+      "fontWeight": "700"
+    },
+    {
+      "type": "frame",
+      "id": "DjPVb",
+      "x": -180,
+      "y": 95,
+      "name": "Annotation Premium",
+      "gap": 8,
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "Zs8Ci",
+          "name": "ann1Line",
+          "width": 40,
+          "height": 2,
+          "fill": "#B91C1C"
+        },
+        {
+          "type": "text",
+          "id": "cNt9v",
+          "name": "ann1Text",
+          "fill": "#B91C1C",
+          "content": "Premium Tier",
+          "fontFamily": "Be Vietnam Pro",
+          "fontSize": 12,
+          "fontWeight": "600"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "vx6MU",
+      "x": -180,
+      "y": 225,
+      "name": "Annotation Standard",
+      "gap": 8,
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "cA4E3",
+          "name": "ann2Line",
+          "width": 40,
+          "height": 2,
+          "fill": "#78716C"
+        },
+        {
+          "type": "text",
+          "id": "kpVo4",
+          "name": "ann2Text",
+          "fill": "#78716C",
+          "content": "Standard Tier",
+          "fontFamily": "Be Vietnam Pro",
+          "fontSize": 12,
+          "fontWeight": "600"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "AuDNd",
+      "x": 0,
+      "y": 960,
+      "name": "Color Legend",
+      "gap": 32,
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "vona7",
+          "name": "c1",
+          "gap": 8,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "RyYE7",
+              "name": "c1s",
+              "width": 16,
+              "height": 16,
+              "fill": "#B91C1C",
+              "cornerRadius": 4
+            },
+            {
+              "type": "text",
+              "id": "yPaXK",
+              "name": "c1t",
+              "fill": "#57534E",
+              "content": "Red Primary #B91C1C",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "FP9KK",
+          "name": "c2",
+          "gap": 8,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "ZEbK1",
+              "name": "c2s",
+              "width": 16,
+              "height": 16,
+              "fill": "#FEF2F2",
+              "cornerRadius": 4,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "#DDD8D0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "LUnQw",
+              "name": "c2t",
+              "fill": "#57534E",
+              "content": "Red Light #FEF2F2",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "sSsM8",
+          "name": "c3",
+          "gap": 8,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "uRRqd",
+              "name": "c3s",
+              "width": 16,
+              "height": 16,
+              "fill": "#1C1917",
+              "cornerRadius": 4
+            },
+            {
+              "type": "text",
+              "id": "2vdbY",
+              "name": "c3t",
+              "fill": "#57534E",
+              "content": "Text Primary #1C1917",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "nDMp5",
+          "name": "c4",
+          "gap": 8,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "PjD7K",
+              "name": "c4s",
+              "width": 16,
+              "height": 16,
+              "fill": "#57534E",
+              "cornerRadius": 4
+            },
+            {
+              "type": "text",
+              "id": "rmpGn",
+              "name": "c4t",
+              "fill": "#57534E",
+              "content": "Text Secondary #57534E",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "R1SYw",
+          "name": "c5",
+          "gap": 8,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "prd7i",
+              "name": "c5s",
+              "width": 16,
+              "height": 16,
+              "fill": "#EDE8E1",
+              "cornerRadius": 4,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "#DDD8D0"
+              }
+            },
+            {
+              "type": "text",
+              "id": "dJmqU",
+              "name": "c5t",
+              "fill": "#57534E",
+              "content": "Border #EDE8E1",
+              "fontFamily": "JetBrains Mono",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "nqhLV",
+      "x": 2730,
+      "y": 0,
+      "name": "Mobile Menu",
+      "clip": true,
+      "width": 390,
+      "height": 844,
+      "fill": "#00000080",
+      "children": [
+        {
+          "type": "frame",
+          "id": "a65wQ",
+          "name": "Backdrop",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "#00000066",
+          "children": [
+            {
+              "type": "frame",
+              "id": "DUJvI",
+              "name": "Menu Panel",
+              "width": 300,
+              "height": "fill_container",
+              "fill": "#FFFFFF",
+              "layout": "vertical",
+              "padding": [
+                0,
+                0,
+                32,
+                0
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "BxFRw",
+                  "name": "Header",
+                  "width": "fill_container",
+                  "padding": [
+                    20,
+                    20,
+                    16,
+                    20
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "0lbTe",
+                      "name": "Logo Row",
+                      "gap": 10,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "zEPay",
+                          "name": "Logo Icon",
+                          "width": 32,
+                          "height": 32,
+                          "fill": "#B91C1C",
+                          "cornerRadius": 9,
+                          "layout": "vertical",
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "j7yhI",
+                              "name": "logoW",
+                              "fill": "#FFFFFF",
+                              "content": "W",
+                              "fontFamily": "Be Vietnam Pro",
+                              "fontSize": 16,
+                              "fontWeight": "700"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "GVtE5",
+                          "name": "logoText",
+                          "fill": "#1C1917",
+                          "content": "WealthJourney",
+                          "fontFamily": "Be Vietnam Pro",
+                          "fontSize": 17,
+                          "fontWeight": "700"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "Hg4kH",
+                      "name": "Close Button",
+                      "width": 36,
+                      "height": 36,
+                      "fill": "#F5F4F2",
+                      "cornerRadius": 18,
+                      "layout": "vertical",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "tDiZe",
+                          "name": "closeIcon",
+                          "width": 18,
+                          "height": 18,
+                          "iconFontName": "x",
+                          "iconFontFamily": "lucide",
+                          "fill": "#57534E"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "S6O7Y",
+                  "name": "Divider",
+                  "width": "fill_container",
+                  "height": 1,
+                  "fill": "#EDE8E1"
+                },
+                {
+                  "type": "frame",
+                  "id": "M2X7v",
+                  "name": "Nav Section",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "padding": [
+                    16,
+                    12,
+                    0,
+                    12
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "I6RpQ",
+                      "name": "Premium Card",
+                      "width": "fill_container",
+                      "fill": {
+                        "type": "gradient",
+                        "gradientType": "linear",
+                        "enabled": true,
+                        "rotation": 180,
+                        "size": {
+                          "height": 1
+                        },
+                        "colors": [
+                          {
+                            "color": "#FFFFFF",
+                            "position": 0
+                          },
+                          {
+                            "color": "#FEF2F233",
+                            "position": 0.5
+                          },
+                          {
+                            "color": "#FEE2E240",
+                            "position": 1
+                          }
+                        ]
+                      },
+                      "cornerRadius": 14,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 1,
+                        "fill": "#EDE8E1"
+                      },
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#0000000A",
+                        "offset": {
+                          "x": 0,
+                          "y": 2
+                        },
+                        "blur": 8
+                      },
+                      "layout": "vertical",
+                      "gap": 2,
+                      "padding": 6,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "fEb2Q",
+                          "name": "Nav Home Active",
+                          "width": "fill_container",
+                          "fill": "#FEF2F2",
+                          "cornerRadius": 10,
+                          "gap": 14,
+                          "padding": [
+                            12,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon_font",
+                              "id": "7f4IO",
+                              "name": "homeIcon",
+                              "width": 22,
+                              "height": 22,
+                              "iconFontName": "house",
+                              "iconFontFamily": "lucide",
+                              "fill": "#B91C1C"
+                            },
+                            {
+                              "type": "text",
+                              "id": "uMWp4",
+                              "name": "homeLabel",
+                              "fill": "#B91C1C",
+                              "content": "Home",
+                              "fontFamily": "Be Vietnam Pro",
+                              "fontSize": 15,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "5Usjl",
+                          "name": "Nav Portfolio",
+                          "width": "fill_container",
+                          "cornerRadius": 10,
+                          "gap": 14,
+                          "padding": [
+                            12,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon_font",
+                              "id": "M0Qpw",
+                              "name": "portIcon",
+                              "width": 22,
+                              "height": 22,
+                              "iconFontName": "chart-no-axes-combined",
+                              "iconFontFamily": "lucide",
+                              "fill": "#57534E"
+                            },
+                            {
+                              "type": "text",
+                              "id": "tjtPO",
+                              "name": "portLabel",
+                              "fill": "#57534E",
+                              "content": "Portfolio",
+                              "fontFamily": "Be Vietnam Pro",
+                              "fontSize": 15,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "DOod5",
+                      "name": "Gap",
+                      "width": "fill_container",
+                      "height": 8
+                    },
+                    {
+                      "type": "frame",
+                      "id": "1L2lw",
+                      "name": "Nav Transactions",
+                      "width": "fill_container",
+                      "cornerRadius": 10,
+                      "gap": 14,
+                      "padding": [
+                        12,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "vw8q5",
+                          "name": "txnIcon",
+                          "width": 22,
+                          "height": 22,
+                          "iconFontName": "arrow-left-right",
+                          "iconFontFamily": "lucide",
+                          "fill": "#57534E"
+                        },
+                        {
+                          "type": "text",
+                          "id": "7O3HQ",
+                          "name": "txnLabel",
+                          "fill": "#57534E",
+                          "content": "Transactions",
+                          "fontFamily": "Be Vietnam Pro",
+                          "fontSize": 15,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "UDU6q",
+                      "name": "Nav Wallets",
+                      "width": "fill_container",
+                      "cornerRadius": 10,
+                      "gap": 14,
+                      "padding": [
+                        12,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "w8OwO",
+                          "name": "walIcon",
+                          "width": 22,
+                          "height": 22,
+                          "iconFontName": "wallet",
+                          "iconFontFamily": "lucide",
+                          "fill": "#57534E"
+                        },
+                        {
+                          "type": "text",
+                          "id": "84t0o",
+                          "name": "walLabel",
+                          "fill": "#57534E",
+                          "content": "Wallets",
+                          "fontFamily": "Be Vietnam Pro",
+                          "fontSize": 15,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "k0VBx",
+                      "name": "Nav Reports",
+                      "width": "fill_container",
+                      "cornerRadius": 10,
+                      "gap": 14,
+                      "padding": [
+                        12,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "vlIGG",
+                          "name": "repIcon",
+                          "width": 22,
+                          "height": 22,
+                          "iconFontName": "chart-pie",
+                          "iconFontFamily": "lucide",
+                          "fill": "#57534E"
+                        },
+                        {
+                          "type": "text",
+                          "id": "8EvnB",
+                          "name": "repLabel",
+                          "fill": "#57534E",
+                          "content": "Reports",
+                          "fontFamily": "Be Vietnam Pro",
+                          "fontSize": 15,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "w0O6E",
+                      "name": "Nav Budget",
+                      "width": "fill_container",
+                      "cornerRadius": 10,
+                      "gap": 14,
+                      "padding": [
+                        12,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "n4R7v",
+                          "name": "budIcon",
+                          "width": 22,
+                          "height": 22,
+                          "iconFontName": "calculator",
+                          "iconFontFamily": "lucide",
+                          "fill": "#57534E"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Xwzcn",
+                          "name": "budLabel",
+                          "fill": "#57534E",
+                          "content": "Budget",
+                          "fontFamily": "Be Vietnam Pro",
+                          "fontSize": 15,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "CCoCp",
+                  "name": "Flex Spacer",
+                  "width": "fill_container",
+                  "height": "fill_container"
+                },
+                {
+                  "type": "frame",
+                  "id": "bckQl",
+                  "name": "Divider Bottom",
+                  "width": "fill_container",
+                  "height": 1,
+                  "fill": "#EDE8E1"
+                },
+                {
+                  "type": "frame",
+                  "id": "88Z4z",
+                  "name": "Bottom Section",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "padding": [
+                    12,
+                    12,
+                    0,
+                    12
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "kPcVS",
+                      "name": "Nav Settings",
+                      "width": "fill_container",
+                      "cornerRadius": 10,
+                      "gap": 14,
+                      "padding": [
+                        12,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "BzhBq",
+                          "name": "settIcon",
+                          "width": 22,
+                          "height": 22,
+                          "iconFontName": "settings",
+                          "iconFontFamily": "lucide",
+                          "fill": "#78716C"
+                        },
+                        {
+                          "type": "text",
+                          "id": "RIfkO",
+                          "name": "settLabel",
+                          "fill": "#78716C",
+                          "content": "Settings",
+                          "fontFamily": "Be Vietnam Pro",
+                          "fontSize": 15,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "SfDIK",
+                      "name": "Logout",
+                      "width": "fill_container",
+                      "cornerRadius": 10,
+                      "gap": 14,
+                      "padding": [
+                        12,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "4ZPBt",
+                          "name": "logoutIcon",
+                          "width": 22,
+                          "height": 22,
+                          "iconFontName": "log-out",
+                          "iconFontFamily": "lucide",
+                          "fill": "#78716c"
+                        },
+                        {
+                          "type": "text",
+                          "id": "m9aXT",
+                          "name": "logoutLabel",
+                          "fill": "#78716c",
+                          "content": "Log Out",
+                          "fontFamily": "Be Vietnam Pro",
+                          "fontSize": 15,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "vYNx5",
+                  "name": "Divider User",
+                  "width": "fill_container",
+                  "height": 1,
+                  "fill": "#EDE8E1"
+                },
+                {
+                  "type": "frame",
+                  "id": "NUWlZ",
+                  "name": "User Section",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "padding": [
+                    16,
+                    16,
+                    0,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "wfb92",
+                      "name": "Avatar",
+                      "width": 44,
+                      "height": 44,
+                      "fill": "#B91C1C",
+                      "cornerRadius": 22,
+                      "layout": "vertical",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "UdyST",
+                          "name": "avatarLetter",
+                          "fill": "#FFFFFF",
+                          "content": "K",
+                          "fontFamily": "Be Vietnam Pro",
+                          "fontSize": 18,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "yweoA",
+                      "name": "User Info",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 3,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "wvbY5",
+                          "name": "userName",
+                          "fill": "#1C1917",
+                          "content": "Khanh Nguyen",
+                          "fontFamily": "Be Vietnam Pro",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        },
+                        {
+                          "type": "text",
+                          "id": "5WfuF",
+                          "name": "userEmail",
+                          "fill": "#78716C",
+                          "content": "khanh@email.com",
+                          "fontFamily": "JetBrains Mono",
+                          "fontSize": 11,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "KIMXX",
+                      "name": "More Btn",
+                      "width": 32,
+                      "height": 32,
+                      "fill": "#F5F4F2",
+                      "cornerRadius": 16,
+                      "layout": "vertical",
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon_font",
+                          "id": "AKOd9",
+                          "name": "moreIcon",
+                          "width": 16,
+                          "height": 16,
+                          "iconFontName": "ellipsis-vertical",
+                          "iconFontFamily": "lucide",
+                          "fill": "#57534E"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "iZ7AF",
+      "x": 2730,
+      "y": -40,
+      "name": "label4",
+      "fill": "#1C1917",
+      "content": "Screen 4: Mobile Slide-out Menu",
+      "fontFamily": "Be Vietnam Pro",
+      "fontSize": 16,
+      "fontWeight": "700"
+    }
+  ]
+}
