@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { formatPriceValue } from "../prices/helpers";
 import { LineChart } from "@/components/charts/LineChart";
 import { useQueryGetSilverChart } from "@/utils/generated/hooks";
+import { formatCurrencyCompact } from "@/utils/currency-formatter";
 import type { PriceItem } from "@/gen/protobuf/v1/investment";
 
 interface SilverPriceChartProps {
@@ -69,11 +70,12 @@ export function SilverPriceChart({ prices }: SilverPriceChartProps) {
     sell: point.sell,
   }));
 
-  // Y-axis formatter
+  // Y-axis formatter — chart values are raw major-unit prices (not smallest unit),
+  // so multiply USD by 100 to match formatCurrencyCompact's cents expectation.
   const yFormatter = (value: number) =>
     isGlobal
-      ? `$${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`
-      : `₫${(value / 1000).toLocaleString("vi-VN", { maximumFractionDigits: 0 })}K`;
+      ? formatCurrencyCompact(value * 100, "USD")
+      : formatCurrencyCompact(value, "VND");
 
   // Chart series
   const chartSeries = isGlobal

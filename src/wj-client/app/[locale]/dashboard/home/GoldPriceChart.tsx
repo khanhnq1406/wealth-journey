@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { formatPriceValue } from "../prices/helpers";
 import { LineChart } from "@/components/charts/LineChart";
 import { useQueryGetGoldChart } from "@/utils/generated/hooks";
+import { formatCurrencyCompact } from "@/utils/currency-formatter";
 import type { PriceItem } from "@/gen/protobuf/v1/investment";
 
 interface GoldPriceChartProps {
@@ -39,7 +40,10 @@ function formatXAxis(timestamp: number, period: string): string {
 
 export function GoldPriceChart({ prices }: GoldPriceChartProps) {
   const t = useTranslations("dashboard.home");
-  const [selectedType, setSelectedType] = useState<string>(prices[0]?.typeCode || "");
+  const [market, setMarket] = useState<"domestic" | "global">("domestic");
+  const [selectedType, setSelectedType] = useState<string>(
+    prices.find((p) => p.typeCode !== "XAU")?.typeCode || prices[0]?.typeCode || "",
+  );
   const [selectedPeriod, setSelectedPeriod] = useState<string>("24h");
 
   const periods = [
@@ -49,11 +53,13 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
     { key: "year", label: t("period.year") },
   ];
 
-  const selectedPrice = prices.find((p) => p.typeCode === selectedType) || prices[0];
+  const isGlobal = market === "global";
+  const domesticPrices = prices.filter((p) => p.typeCode !== "XAU");
+  const globalPrice = prices.find((p) => p.typeCode === "XAU");
+  const selectedPrice = isGlobal
+    ? globalPrice || prices[0]
+    : prices.find((p) => p.typeCode === selectedType) || domesticPrices[0] || prices[0];
 
-  // Determine market based on selected type
-  const isGlobal = selectedType === "XAU";
-  const market = isGlobal ? "global" : "domestic";
   const goldCode = isGlobal ? "" : toGoldCode(selectedType);
   const apiPeriod = PERIOD_MAP[selectedPeriod] || "24h";
 
@@ -73,11 +79,12 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
     sell: point.sell,
   }));
 
-  // Y-axis formatter
+  // Y-axis formatter — chart values are raw major-unit prices (not smallest unit),
+  // so multiply USD by 100 to match formatCurrencyCompact's cents expectation.
   const yFormatter = (value: number) =>
     isGlobal
-      ? `$${value.toLocaleString("en-US", { maximumFractionDigits: 0 })}`
-      : `₫${(value / 1000).toLocaleString("vi-VN", { maximumFractionDigits: 0 })}K`;
+      ? formatCurrencyCompact(value * 100, "USD")
+      : formatCurrencyCompact(value, "VND");
 
   // Chart series: domestic shows buy+sell, global shows single price line
   const chartSeries = isGlobal
@@ -96,37 +103,33 @@ export function GoldPriceChart({ prices }: GoldPriceChartProps) {
             {t("goldChartTitle")}
           </h3>
           <div className="flex items-center gap-2">
-            {/* Market toggle: only show if XAU type is in prices */}
-            {prices.some((p) => p.typeCode === "XAU") && (
-              <div className="flex bg-v2-bg-primary rounded-lg p-0.5">
-                <button
-                  onClick={() => setSelectedType(prices.find((p) => p.typeCode !== "XAU")?.typeCode || "")}
-                  className={`px-2.5 py-1 rounded-md text-[11px] font-vietnam font-medium transition-colors ${
-                    !isGlobal ? "bg-white shadow-sm text-v2-text-primary" : "text-v2-text-secondary"
-                  }`}
-                >
-                  {t("domestic")}
-                </button>
-                <button
-                  onClick={() => setSelectedType("XAU")}
-                  className={`px-2.5 py-1 rounded-md text-[11px] font-vietnam font-medium transition-colors ${
-                    isGlobal ? "bg-white shadow-sm text-v2-text-primary" : "text-v2-text-secondary"
-                  }`}
-                >
-                  {t("global")}
-                </button>
-              </div>
-            )}
+            {/* Market toggle — always visible */}
+            <div className="flex bg-v2-bg-primary rounded-lg p-0.5">
+              <button
+                onClick={() => setMarket("domestic")}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-vietnam font-medium transition-colors ${
+                  !isGlobal ? "bg-white shadow-sm text-v2-text-primary" : "text-v2-text-secondary"
+                }`}
+              >
+                {t("domestic")}
+              </button>
+              <button
+                onClick={() => setMarket("global")}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-vietnam font-medium transition-colors ${
+                  isGlobal ? "bg-white shadow-sm text-v2-text-primary" : "text-v2-text-secondary"
+                }`}
+              >
+                {t("global")}
+              </button>
+            </div>
             {/* Gold type selector — domestic only */}
-            {!isGlobal && prices.filter((p) => p.typeCode !== "XAU").length > 0 && (
+            {!isGlobal && domesticPrices.length > 0 && (
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
                 className="font-vietnam text-[12px] text-v2-text-secondary bg-v2-bg-primary border border-v2-border rounded-lg px-2.5 py-1.5"
               >
-                {prices
-                  .filter((p) => p.typeCode !== "XAU")
-                  .map((p) => (
+                {domesticPrices.map((p) => (
                     <option key={p.typeCode} value={p.typeCode}>
                       {p.name || p.typeCode}
                     </option>
