@@ -7,14 +7,14 @@
 - **Started:** 2026-03-09
 - **Last updated:** 2026-03-09
 - **Current state:** in_progress
-- **Current task:** 1
+- **Current task:** 3
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 1 | Fix ActiveLink pathname comparison | pending | — | — |
-| 2 | Pass isActive prop to NavItems + mobile active styling | pending | — | — |
+| 1 | Fix ActiveLink pathname comparison | done | 1a9c088 | Changed usePathname import to next-intl version |
+| 2 | Pass isActive prop to NavItems + mobile active styling | done | — | Added isActive to all desktop NavItems + mobile active styling |
 | 3 | Remove Prices nav item | pending | — | — |
 | 4 | Remove CurrencySelector | pending | — | — |
 | 5 | Add desktop logout button | pending | — | — |

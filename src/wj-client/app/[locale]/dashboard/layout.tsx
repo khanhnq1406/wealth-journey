@@ -153,7 +153,12 @@ export default function DashboardLayout({
           <ActiveLink
             key={item.href}
             href={item.href}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-vietnam text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target animate-stagger-fade-in"
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-xl font-vietnam text-[14px] font-medium transition-colors duration-200 touch-target animate-stagger-fade-in",
+              path === item.href
+                ? "text-v2-red-primary bg-v2-red-light"
+                : "text-v2-text-secondary hover:bg-v2-bg-primary",
+            )}
           >
             {item.icon}
             <span>{item.label}</span>
@@ -164,7 +169,12 @@ export default function DashboardLayout({
 
         <ActiveLink
           href="/dashboard/settings"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-vietnam text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target"
+          className={cn(
+            "flex items-center gap-3 px-3 py-2.5 rounded-xl font-vietnam text-[14px] font-medium transition-colors duration-200 touch-target",
+            path.startsWith("/dashboard/settings")
+              ? "text-v2-red-primary bg-v2-red-light"
+              : "text-v2-text-secondary hover:bg-v2-bg-primary",
+          )}
         >
           <Settings size={20} />
           <span>{t("settings")}</span>
@@ -180,7 +190,7 @@ export default function DashboardLayout({
         </button>
       </div>
     );
-  }, [handleNavClick, t]);
+  }, [handleNavClick, t, path]);
 
   return (
     <AuthCheck>
@@ -244,6 +254,7 @@ export default function DashboardLayout({
                   showTooltip={!isExpanded}
                   animationDelay={0}
                   icon={<House size={20} />}
+                  isActive={path === routes.home}
                 />
                 <NavItem
                   href={routes.transaction}
@@ -252,6 +263,7 @@ export default function DashboardLayout({
                   showTooltip={!isExpanded}
                   animationDelay={30}
                   icon={<ArrowLeftRight size={20} />}
+                  isActive={path === routes.transaction}
                 />
                 <NavItem
                   href={routes.wallets}
@@ -260,6 +272,7 @@ export default function DashboardLayout({
                   showTooltip={!isExpanded}
                   animationDelay={60}
                   icon={<Wallet size={20} />}
+                  isActive={path === routes.wallets}
                 />
                 <NavItem
                   href={routes.portfolio}
@@ -268,6 +281,7 @@ export default function DashboardLayout({
                   showTooltip={!isExpanded}
                   animationDelay={90}
                   icon={<ChartNoAxesCombined size={20} />}
+                  isActive={path === routes.portfolio}
                 />
                 <NavItem
                   href={routes.prices}
@@ -276,6 +290,7 @@ export default function DashboardLayout({
                   showTooltip={!isExpanded}
                   animationDelay={120}
                   icon={<CircleDollarSign size={20} />}
+                  isActive={path === routes.prices}
                 />
                 <NavItem
                   href={routes.report}
@@ -284,6 +299,7 @@ export default function DashboardLayout({
                   showTooltip={!isExpanded}
                   animationDelay={150}
                   icon={<ChartPie size={20} />}
+                  isActive={path === routes.report}
                 />
                 <NavItem
                   href={routes.budget}
@@ -292,6 +308,7 @@ export default function DashboardLayout({
                   showTooltip={!isExpanded}
                   animationDelay={180}
                   icon={<Calculator size={20} />}
+                  isActive={path === routes.budget}
                 />
 
                 {/* Spacer + Divider */}
@@ -306,6 +323,7 @@ export default function DashboardLayout({
                   showTooltip={!isExpanded}
                   animationDelay={210}
                   icon={<Settings size={20} />}
+                  isActive={path.startsWith("/dashboard/settings")}
                 />
               </div>
             </nav>
