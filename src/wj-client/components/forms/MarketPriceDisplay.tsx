@@ -65,11 +65,11 @@ export function MarketPriceDisplay({
   );
 
   return (
-    <div className={`p-3 bg-green-50 rounded-md border border-green-200 ${className}`}>
+    <div className={`p-3 bg-v2-green-light rounded-md border border-v2-border ${className}`}>
       <div className="flex items-center justify-between">
         <div>
           <div className="text-xs text-gray-500 mb-1">Current Market Price</div>
-          <div className="text-lg font-semibold text-green-700">
+          <div className="text-lg font-semibold text-v2-green-positive">
             {formattedPrice}
           </div>
         </div>
@@ -99,7 +99,7 @@ function formatTimeAgo(timestamp: number): { text: string; colorClass: string } 
 
   if (ageInMinutes < 15) {
     text = "Just now";
-    colorClass = "text-green-600";
+    colorClass = "text-v2-green-positive";
   } else if (ageInMinutes < 60) {
     text = `${Math.floor(ageInMinutes)} min ago`;
     colorClass = "text-yellow-600";

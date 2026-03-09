@@ -103,7 +103,7 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
     const colors = [
       "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
       "bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400",
-      "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400",
+      "bg-v2-green-light text-v2-green-positive dark:bg-green-900/30 dark:text-green-400",
       "bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400",
       "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400",
       "bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400",
@@ -129,9 +129,9 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
               onClick={() => handleCategorySelect(category.id)}
               className={cn(
                 "flex flex-col items-center gap-1 p-3 rounded-lg transition-all duration-150",
-                "min-h-[88px] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
+                "min-h-[88px] focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
                 isSelected
-                  ? "bg-primary-600 text-white shadow-md scale-105"
+                  ? "bg-v2-red-primary text-white shadow-md scale-105"
                   : "bg-white dark:bg-dark-surface text-gray-700 dark:text-dark-text border border-gray-200 dark:border-dark-border hover:bg-gray-50 dark:hover:bg-dark-surface-hover active:scale-95"
               )}
               aria-label={`Select ${category.name}`}
@@ -152,7 +152,7 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
             onClick={() => setIsCreating(true)}
             className={cn(
               "flex flex-col items-center justify-center gap-1 p-3 rounded-lg transition-all duration-150",
-              "min-h-[88px] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
+              "min-h-[88px] focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
               "bg-gray-100 dark:bg-dark-surface-hover text-gray-500 dark:text-dark-text-tertiary border-2 border-dashed border-gray-300 dark:border-dark-border hover:bg-gray-200 dark:hover:bg-dark-surface-active"
             )}
             aria-label={t("createNewCategory")}
@@ -177,14 +177,14 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               placeholder={t("newCategoryPlaceholder")}
-              className="flex-1 px-3 py-2 text-sm bg-white dark:bg-dark-surface border border-gray-300 dark:border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:text-dark-text"
+              className="flex-1 px-3 py-2 text-sm bg-white dark:bg-dark-surface border border-gray-300 dark:border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-v2-red-primary dark:text-dark-text"
               autoFocus
             />
             <button
               type="button"
               onClick={handleCreateCategory}
               disabled={!newCategoryName.trim()}
-              className="px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
+              className="px-4 py-2 bg-v2-red-primary text-white rounded-lg font-medium hover:bg-v2-red-dark disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
             >
               Add
             </button>

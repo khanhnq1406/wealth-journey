@@ -396,7 +396,7 @@ export function FormSelect({
     getStateClasses(),
     {
       // Apply ring only when focused
-      "ring-2 ring-primary-500 border-transparent":
+      "ring-2 ring-v2-red-primary border-transparent":
         isFocused && !error && !success,
       "ring-2 ring-danger-500 border-transparent": isFocused && error,
       "ring-2 ring-success-500 border-transparent": isFocused && success,
@@ -461,7 +461,7 @@ export function FormSelect({
               placeholder={searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-md border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-dark-surface text-neutral-900 dark:text-dark-text placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+              className="w-full px-3 py-2 text-sm rounded-md border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-dark-surface text-neutral-900 dark:text-dark-text placeholder:text-neutral-400 dark:placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:border-transparent transition-all duration-200"
               autoFocus
             />
           </div>
@@ -517,7 +517,7 @@ export function FormSelect({
                             className={cn(
                               "w-5 h-5 rounded border-2 flex items-center justify-center",
                               isSelected
-                                ? "bg-primary-600 border-primary-600"
+                                ? "bg-v2-red-primary border-v2-red-primary"
                                 : "border-neutral-300 dark:border-neutral-600",
                             )}
                           >
@@ -587,7 +587,7 @@ export function FormSelect({
                         className={cn(
                           "w-5 h-5 rounded border-2 flex items-center justify-center",
                           isSelected
-                            ? "bg-primary-600 border-primary-600"
+                            ? "bg-v2-red-primary border-v2-red-primary"
                             : "border-neutral-300 dark:border-neutral-600",
                         )}
                       >

@@ -111,7 +111,7 @@ export function FormField({
     error
       ? "text-red-600 dark:text-red-400"
       : success
-      ? "text-green-600 dark:text-green-400"
+      ? "text-v2-green-positive dark:text-green-400"
       : "text-gray-700 dark:text-gray-300",
     labelClassName
   );
@@ -157,7 +157,7 @@ export function FormField({
             {success && !error && (
               <p
                 id={successId}
-                className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1"
+                className="text-sm text-v2-green-positive dark:text-green-400 flex items-center gap-1"
               >
                 <svg
                   className="w-4 h-4 flex-shrink-0"

@@ -77,7 +77,7 @@ export const AmountKeypad = memo(function AmountKeypad({
             className={cn(
               "min-h-[56px] rounded-lg font-semibold text-xl transition-all duration-150",
               "active:scale-95 active:shadow-inner",
-              "focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
+              "focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
               // Number keys
               key !== "⌫"
                 ? "bg-white dark:bg-dark-surface text-gray-900 dark:text-dark-text shadow-sm hover:shadow-md border border-gray-200 dark:border-dark-border"
@@ -100,9 +100,9 @@ export const AmountKeypad = memo(function AmountKeypad({
           className={cn(
             "w-full min-h-[52px] rounded-lg font-semibold text-lg transition-all duration-150",
             "active:scale-95 active:shadow-inner",
-            "focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
+            "focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
             value && parseFloat(value) > 0
-              ? "bg-primary-600 text-white hover:bg-primary-700 shadow-md hover:shadow-lg"
+              ? "bg-v2-red-primary text-white hover:bg-v2-red-dark shadow-md hover:shadow-lg"
               : "bg-gray-200 dark:bg-dark-surface-hover text-gray-400 dark:text-dark-text-tertiary cursor-not-allowed"
           )}
           aria-label={t("continue")}
