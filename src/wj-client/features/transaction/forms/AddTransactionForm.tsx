@@ -195,7 +195,7 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
           {
             value: "income",
             label: t("income"),
-            className: "bg-green-500 text-white",
+            className: "bg-v2-green-positive text-white",
           },
           {
             value: "expense",

@@ -605,7 +605,7 @@ export function AddInvestmentForm({
                   setSelectedCurrency("USD");
                 }
               }}
-              className="w-4 h-4 text-bg border-gray-300 rounded focus:ring-bg"
+              className="w-4 h-4 text-v2-red-primary border-gray-300 rounded focus:ring-v2-red-primary"
             />
             <div className="flex-1">
               <span className="font-medium text-gray-900">
@@ -728,8 +728,8 @@ export function AddInvestmentForm({
                 <p className="text-xs text-gray-400 ml-1">{t("form.loadingPrice")}</p>
               )}
               {goldPriceQuery.data?.data && (
-                <div className="p-2 bg-green-50 border border-green-200 rounded-md">
-                  <p className="text-sm font-medium text-green-900">
+                <div className="p-2 bg-v2-green-light border border-v2-border rounded-md">
+                  <p className="text-sm font-medium text-v2-green-positive">
                     {t("form.currentMarketPrice", {
                       price: formatCurrency(
                         goldPriceQuery.data.data.price,
@@ -793,8 +793,8 @@ export function AddInvestmentForm({
                 <p className="text-xs text-gray-400 ml-1">{t("form.loadingPrice")}</p>
               )}
               {silverPriceQuery.data?.data && (
-                <div className="p-2 bg-green-50 border border-green-200 rounded-md">
-                  <p className="text-sm font-medium text-green-900">
+                <div className="p-2 bg-v2-green-light border border-v2-border rounded-md">
+                  <p className="text-sm font-medium text-v2-green-positive">
                     {t("form.currentMarketPrice", {
                       price: formatCurrency(
                         silverPriceQuery.data.data.price,
@@ -1032,7 +1032,7 @@ export function AddInvestmentForm({
               className={
                 walletBalance - initialCostInSmallestUnit < 0
                   ? "text-red-600"
-                  : "text-green-600"
+                  : "text-v2-green-positive"
               }
             >
               {formatCurrency(
@@ -1094,7 +1094,7 @@ export function AddInvestmentForm({
                     initialCostInSmallestUnit <
                   0
                     ? "text-red-600"
-                    : "text-green-600"
+                    : "text-v2-green-positive"
                 }
               >
                 ≈{" "}
