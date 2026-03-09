@@ -11,7 +11,7 @@ import (
 
 const (
 	DefaultTimeout = 10 * time.Second
-	BaseURL        = "https://services.vang247.vn/ws-prices/api/v1/c_prices"
+	BaseURL        = "https://vangsaigon.vn/ws-prices/api/v1/c_prices"
 )
 
 type Client struct {
