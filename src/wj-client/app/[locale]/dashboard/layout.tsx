@@ -116,72 +116,104 @@ export default function DashboardLayout({
 
   // Mobile navigation items for slide-out menu
   const navigationItems = useMemo(() => {
-    const items = [
-      { href: routes.home, label: t("home"), icon: <House size={20} /> },
+    const standardItems = [
       {
         href: routes.transaction,
         label: t("transactions"),
-        icon: <ArrowLeftRight size={20} />,
+        icon: <ArrowLeftRight size={22} />,
       },
-      { href: routes.wallets, label: t("wallets"), icon: <Wallet size={20} /> },
-      {
-        href: routes.portfolio,
-        label: t("portfolio"),
-        icon: <ChartNoAxesCombined size={20} />,
-      },
+      { href: routes.wallets, label: t("wallets"), icon: <Wallet size={22} /> },
       {
         href: routes.report,
         label: t("reports"),
-        icon: <ChartPie size={20} />,
+        icon: <ChartPie size={22} />,
       },
       {
         href: routes.budget,
         label: t("budget"),
-        icon: <Calculator size={20} />,
+        icon: <Calculator size={22} />,
       },
     ];
 
     return (
-      <div className="flex flex-col gap-1 px-3">
-        {items.map((item) => (
+      <div className="flex flex-col gap-3 px-3">
+        {/* Premium Card — Home + Portfolio */}
+        <div
+          className="rounded-2xl border border-v2-border-light p-1.5 flex flex-col gap-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+          style={{
+            background:
+              "linear-gradient(180deg, #FFFFFF 0%, #FEF2F233 50%, #FEE2E240 100%)",
+          }}
+        >
           <ActiveLink
-            key={item.href}
-            href={item.href}
+            href={routes.home}
             className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-xl font-vietnam text-[14px] font-medium transition-colors duration-200 touch-target animate-stagger-fade-in",
-              path === item.href
-                ? "text-v2-red-primary bg-v2-red-light"
-                : "text-v2-text-secondary hover:bg-v2-bg-primary",
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target animate-stagger-fade-in",
+              path === routes.home
+                ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
             )}
           >
-            {item.icon}
-            <span>{item.label}</span>
+            <House size={22} />
+            <span>{t("home")}</span>
           </ActiveLink>
-        ))}
+          <ActiveLink
+            href={routes.portfolio}
+            className={cn(
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+              path === routes.portfolio
+                ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
+            )}
+          >
+            <ChartNoAxesCombined size={22} />
+            <span>{t("portfolio")}</span>
+          </ActiveLink>
+        </div>
 
-        <div className="my-2 border-t border-v2-border-light" />
+        {/* Standard group */}
+        <div className="flex flex-col gap-0.5">
+          {standardItems.map((item) => (
+            <ActiveLink
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+                path === item.href
+                  ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                  : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
+              )}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </ActiveLink>
+          ))}
+        </div>
 
-        <ActiveLink
-          href="/dashboard/settings"
-          className={cn(
-            "flex items-center gap-3 px-3 py-2.5 rounded-xl font-vietnam text-[14px] font-medium transition-colors duration-200 touch-target",
-            path.startsWith("/dashboard/settings")
-              ? "text-v2-red-primary bg-v2-red-light"
-              : "text-v2-text-secondary hover:bg-v2-bg-primary",
-          )}
-        >
-          <Settings size={20} />
-          <span>{t("settings")}</span>
-        </ActiveLink>
-
-        <button
-          onClick={logout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl font-vietnam text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target w-full text-left"
-          aria-label={t("logout")}
-        >
-          <LogOut size={20} />
-          <span>{t("logout")}</span>
-        </button>
+        {/* Divider + Settings + Logout */}
+        <div>
+          <div className="border-t border-v2-border-light mb-1" />
+          <ActiveLink
+            href="/dashboard/settings"
+            className={cn(
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+              path.startsWith("/dashboard/settings")
+                ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
+            )}
+          >
+            <Settings size={22} />
+            <span>{t("settings")}</span>
+          </ActiveLink>
+          <button
+            onClick={logout}
+            className="flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target w-full text-left"
+            aria-label={t("logout")}
+          >
+            <LogOut size={22} />
+            <span>{t("logout")}</span>
+          </button>
+        </div>
       </div>
     );
   }, [handleNavClick, t, path]);
