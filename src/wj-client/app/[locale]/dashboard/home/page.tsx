@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { store } from "@/features/auth/store/store";
 import {
@@ -38,6 +38,18 @@ export default function Home() {
   const [modalType, setModalType] = useState<ModalType>(null);
   const user = store.getState().setAuthReducer;
   const { currency } = useCurrency();
+  const pnlRef = useRef<HTMLDivElement>(null);
+  const [pnlHeight, setPnlHeight] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    const el = pnlRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setPnlHeight(entry.contentRect.height);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // Data fetching
   const { data: walletsData } = useQueryListWallets(
@@ -187,12 +199,21 @@ export default function Home() {
         />
 
         {/* Row 2: PNL Chart + Wallets */}
-        <div className="flex gap-6">
-          <div className="flex-1">
+        <div className="flex gap-6 items-start">
+          {/* PNL card — measured to set wallets height */}
+          <div ref={pnlRef} className="flex-1">
             <PNLCard currency={currency} />
           </div>
-          <div className="w-[340px] shrink-0">
-            <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card p-5">
+          {/* Wallets — same height as PNL, scrolls inside */}
+          <div
+            className="w-[340px] shrink-0 overflow-hidden"
+            style={pnlHeight ? { height: pnlHeight } : undefined}
+          >
+            <BaseCard
+              padding="none"
+              noMobileMargin
+              className="h-full rounded-[20px] border border-v2-border-light shadow-v2-card p-5 flex flex-col"
+            >
               <WalletsSection wallets={wallets} />
             </BaseCard>
           </div>

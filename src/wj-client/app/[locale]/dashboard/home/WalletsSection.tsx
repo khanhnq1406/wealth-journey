@@ -41,9 +41,9 @@ export function WalletsSection({ wallets }: WalletsSectionProps) {
   const isInvestment = (type: WalletType) => type === 1;
 
   return (
-    <div>
+    <div className="flex flex-col h-full">
       {/* Section header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 shrink-0">
         <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
           {t("wallets")}
         </h3>
@@ -57,7 +57,7 @@ export function WalletsSection({ wallets }: WalletsSectionProps) {
       </div>
 
       {/* Wallet cards */}
-      <div className="space-y-3">
+      <div className="space-y-3 overflow-y-auto flex-1 min-h-0">
         {wallets.map((wallet) => (
           <BaseCard
             key={wallet.id}

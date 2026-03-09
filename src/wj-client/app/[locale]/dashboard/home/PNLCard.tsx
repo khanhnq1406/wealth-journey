@@ -96,7 +96,7 @@ export function PNLCard({ currency }: PNLCardProps) {
   const isPositive = periodPnl >= 0;
 
   return (
-    <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
+    <BaseCard padding="none" noMobileMargin className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
       {/* Header */}
       <div className="p-5 pb-4">
         <div className="flex items-center justify-between">
