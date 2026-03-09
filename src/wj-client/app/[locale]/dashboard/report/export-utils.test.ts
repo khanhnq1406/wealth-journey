@@ -37,8 +37,8 @@ describe("prepareReportExportData", () => {
     ];
 
     const mockExpenseCategories: ExpenseCategoryData[] = [
-      { name: "Food", value: 30000, color: "#008148", percentage: 40 },
-      { name: "Transport", value: 20000, color: "#22C55E", percentage: 26.7 },
+      { name: "Food", value: 30000, color: "#B91C1C", percentage: 40 },
+      { name: "Transport", value: 20000, color: "#15803D", percentage: 26.7 },
       { name: "Entertainment", value: 15000, color: "#14B8A6", percentage: 20 },
     ];
 

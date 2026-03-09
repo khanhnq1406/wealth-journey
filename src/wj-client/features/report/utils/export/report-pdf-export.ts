@@ -133,8 +133,8 @@ export interface ReportPDFExportOptions {
  * Brand colors for PDF styling
  */
 const BRAND_COLORS = {
-  green: { r: 0, g: 129, b: 72 }, // #008148
-  greenRgb: [0, 129, 72] as [number, number, number],
+  green: { r: 185, g: 28, b: 28 }, // #B91C1C (V2 red-primary)
+  greenRgb: [185, 28, 28] as [number, number, number],
   text: { r: 51, g: 51, b: 51 }, // #333333
   lightGray: { r: 245, g: 245, b: 245 }, // #F5F5F5
   border: { r: 200, g: 200, b: 200 }, // #C8C8C8

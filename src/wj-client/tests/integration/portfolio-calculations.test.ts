@@ -80,9 +80,9 @@ test.describe('Portfolio Calculations', () => {
     const pnlText = await pnlValue.textContent();
     expect(pnlText).toMatch(/[\+\-]?[\$¥£€₹][\d,]+\.?\d*/);
 
-    // Check color coding - positive PNL should be green, negative should be red
+    // Check color coding - positive PNL should be green (V2), negative should be red (V2)
     const className = await pnlValue.getAttribute('class');
-    expect(className).toMatch(/text-(green|red)-600/);
+    expect(className).toMatch(/text-v2-green-positive|text-(red)-[0-9]+/);
   });
 
   test('should display holdings table with correct columns', async ({ page }) => {
@@ -156,8 +156,8 @@ test.describe('Portfolio Calculations', () => {
       const cell = pnlCells.nth(i);
       const className = await cell.getAttribute('class');
 
-      // Should have text-green-600 or text-red-600 class
-      expect(className).toMatch(/text-(green|red)-600/);
+      // Should have text-v2-green-positive or text-red-* class (V2 color system)
+      expect(className).toMatch(/text-v2-green-positive|text-(red)-[0-9]+/);
     }
   });
 
