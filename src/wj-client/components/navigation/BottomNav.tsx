@@ -84,10 +84,10 @@ export const BottomNav = memo(function BottomNav({
                 "flex flex-col items-center justify-center",
                 "min-h-[48px] w-full max-w-[16.66%]", // 16.66% width for 6 items
                 "transition-all duration-200 ease-out",
-                "text-neutral-600",
+                "text-v2-text-tertiary",
                 isActive
                   ? "text-v2-red-primary"
-                  : "hover:text-neutral-800 active:text-v2-red-dark",
+                  : "hover:text-v2-text-secondary active:text-v2-red-dark",
                 isActive && "font-medium"
               )}
               aria-current={isActive ? "page" : undefined}
