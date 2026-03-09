@@ -17,7 +17,7 @@
 | 2 | Pass isActive prop to NavItems + mobile active styling | done | — | Added isActive to all desktop NavItems + mobile active styling |
 | 3 | Remove Prices nav item | done | — | Removed from desktop + mobile, resequenced delays, removed CircleDollarSign import |
 | 4 | Remove CurrencySelector | done | — | Removed from desktop + mobile, removed import, kept CurrencyProvider |
-| 5 | Add desktop logout button | pending | — | — |
+| 5 | Add desktop logout button | done | — | Added logout button in user section with tooltip when collapsed |
 | 6 | Verify and clean up | pending | — | — |
 
 ## Resume Instructions

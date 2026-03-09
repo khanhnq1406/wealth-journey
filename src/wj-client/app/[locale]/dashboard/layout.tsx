@@ -359,6 +359,29 @@ export default function DashboardLayout({
                   </p>
                 </div>
               </div>
+              {/* Logout Button */}
+              <NavTooltip content={t("logout")} disabled={isExpanded}>
+                <button
+                  onClick={logout}
+                  className={cn(
+                    "flex items-center w-full py-2.5 rounded-xl font-vietnam text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-all duration-300 ease-in-out mt-2",
+                    isExpanded ? "gap-3 px-3" : "justify-center px-0",
+                  )}
+                  aria-label={t("logout")}
+                >
+                  <LogOut size={20} className="shrink-0" />
+                  <span
+                    className={cn(
+                      "whitespace-nowrap transition-all duration-300 ease-in-out",
+                      isExpanded
+                        ? "opacity-100 w-auto translate-x-0"
+                        : "opacity-0 w-0 overflow-hidden -translate-x-2",
+                    )}
+                  >
+                    {t("logout")}
+                  </span>
+                </button>
+              </NavTooltip>
             </div>
           </aside>
 
