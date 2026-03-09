@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils/cn";
 import { memo } from "react";
 import { useTranslations } from "next-intl";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 interface SidebarToggleProps {
   isExpanded: boolean;
@@ -11,7 +12,7 @@ interface SidebarToggleProps {
 
 /**
  * Toggle button for collapsing/expanding the sidebar
- * Uses chevron icons to indicate direction
+ * Uses PanelLeftClose/PanelLeftOpen lucide icons to indicate direction
  */
 export const SidebarToggle = memo(function SidebarToggle({
   isExpanded,
@@ -22,29 +23,18 @@ export const SidebarToggle = memo(function SidebarToggle({
     <button
       onClick={onToggle}
       className={cn(
-        "hidden sm:flex items-center justify-center h-8 rounded-lg bg-v2-bg-primary hover:bg-v2-border-light hover:scale-105 active:scale-95 transition-all touch-target duration-300 ease-in-out",
-        isExpanded ? "w-full" : "w-8",
+        "hidden sm:flex items-center justify-center h-11 rounded-xl bg-v2-bg-primary hover:bg-v2-border-light active:scale-95 transition-all touch-target duration-300 ease-in-out",
+        isExpanded ? "w-full" : "w-11",
       )}
       aria-label={isExpanded ? t("collapse") : t("expand")}
       aria-expanded={isExpanded}
       title={isExpanded ? t("collapse") : t("expand")}
     >
-      <svg
-        className="w-5 h-5 text-v2-text-secondary transition-transform duration-300 ease-in-out"
-        style={{
-          transform: isExpanded ? "rotate(0deg)" : "rotate(180deg)",
-        }}
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
-        />
-      </svg>
+      {isExpanded ? (
+        <PanelLeftClose className="w-5 h-5 text-v2-text-tertiary" />
+      ) : (
+        <PanelLeftOpen className="w-5 h-5 text-v2-text-tertiary" />
+      )}
     </button>
   );
 });
