@@ -420,6 +420,8 @@ func local_request_InvestmentService_DeleteInvestmentTransaction_0(ctx context.C
 	return msg, metadata, err
 }
 
+var filter_InvestmentService_GetPortfolioSummary_0 = &utilities.DoubleArray{Encoding: map[string]int{"walletId": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+
 func request_InvestmentService_GetPortfolioSummary_0(ctx context.Context, marshaler runtime.Marshaler, client InvestmentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq GetPortfolioSummaryRequest
@@ -436,6 +438,12 @@ func request_InvestmentService_GetPortfolioSummary_0(ctx context.Context, marsha
 	protoReq.WalletId, err = runtime.Int32(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "walletId", err)
+	}
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_InvestmentService_GetPortfolioSummary_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := client.GetPortfolioSummary(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
@@ -454,6 +462,12 @@ func local_request_InvestmentService_GetPortfolioSummary_0(ctx context.Context, 
 	protoReq.WalletId, err = runtime.Int32(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "walletId", err)
+	}
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_InvestmentService_GetPortfolioSummary_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	msg, err := server.GetPortfolioSummary(ctx, &protoReq)
 	return msg, metadata, err

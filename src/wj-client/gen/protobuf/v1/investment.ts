@@ -189,6 +189,70 @@ export function investmentTransactionTypeToJSON(object: InvestmentTransactionTyp
   }
 }
 
+/** PnlPeriod defines the time window for period-scoped PnL calculation */
+export const PnlPeriod = {
+  /** PNL_PERIOD_UNSPECIFIED - Same as ALL — returns existing all-time PnL */
+  PNL_PERIOD_UNSPECIFIED: 0,
+  PNL_PERIOD_1D: 1,
+  PNL_PERIOD_1W: 2,
+  PNL_PERIOD_1M: 3,
+  PNL_PERIOD_ALL: 4,
+  UNRECOGNIZED: -1,
+} as const;
+
+export type PnlPeriod = typeof PnlPeriod[keyof typeof PnlPeriod];
+
+export namespace PnlPeriod {
+  export type PNL_PERIOD_UNSPECIFIED = typeof PnlPeriod.PNL_PERIOD_UNSPECIFIED;
+  export type PNL_PERIOD_1D = typeof PnlPeriod.PNL_PERIOD_1D;
+  export type PNL_PERIOD_1W = typeof PnlPeriod.PNL_PERIOD_1W;
+  export type PNL_PERIOD_1M = typeof PnlPeriod.PNL_PERIOD_1M;
+  export type PNL_PERIOD_ALL = typeof PnlPeriod.PNL_PERIOD_ALL;
+  export type UNRECOGNIZED = typeof PnlPeriod.UNRECOGNIZED;
+}
+
+export function pnlPeriodFromJSON(object: any): PnlPeriod {
+  switch (object) {
+    case 0:
+    case "PNL_PERIOD_UNSPECIFIED":
+      return PnlPeriod.PNL_PERIOD_UNSPECIFIED;
+    case 1:
+    case "PNL_PERIOD_1D":
+      return PnlPeriod.PNL_PERIOD_1D;
+    case 2:
+    case "PNL_PERIOD_1W":
+      return PnlPeriod.PNL_PERIOD_1W;
+    case 3:
+    case "PNL_PERIOD_1M":
+      return PnlPeriod.PNL_PERIOD_1M;
+    case 4:
+    case "PNL_PERIOD_ALL":
+      return PnlPeriod.PNL_PERIOD_ALL;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return PnlPeriod.UNRECOGNIZED;
+  }
+}
+
+export function pnlPeriodToJSON(object: PnlPeriod): string {
+  switch (object) {
+    case PnlPeriod.PNL_PERIOD_UNSPECIFIED:
+      return "PNL_PERIOD_UNSPECIFIED";
+    case PnlPeriod.PNL_PERIOD_1D:
+      return "PNL_PERIOD_1D";
+    case PnlPeriod.PNL_PERIOD_1W:
+      return "PNL_PERIOD_1W";
+    case PnlPeriod.PNL_PERIOD_1M:
+      return "PNL_PERIOD_1M";
+    case PnlPeriod.PNL_PERIOD_ALL:
+      return "PNL_PERIOD_ALL";
+    case PnlPeriod.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 /** Investment represents an individual holding within an investment wallet */
 export interface Investment {
   id: number;
@@ -331,6 +395,12 @@ export interface PortfolioSummary {
   topPerformers: InvestmentPerformance[];
   /** Bottom 3 performing investments */
   worstPerformers: InvestmentPerformance[];
+  /** PnL for the selected period window */
+  periodPnl: number;
+  /** PnL% for the selected period window */
+  periodPnlPercent: number;
+  /** The period used for this response */
+  period: PnlPeriod;
 }
 
 export interface InvestmentByType {
@@ -703,6 +773,8 @@ export interface DeleteInvestmentTransactionResponse {
 
 export interface GetPortfolioSummaryRequest {
   walletId: number;
+  /** Optional — default PERIOD_ALL */
+  period: PnlPeriod;
 }
 
 export interface GetPortfolioSummaryResponse {
@@ -785,6 +857,8 @@ export interface GetAggregatedPortfolioSummaryRequest {
   walletId: number;
   /** Optional filter by investment type */
   typeFilter: InvestmentType;
+  /** Optional — default PERIOD_ALL */
+  period: PnlPeriod;
 }
 
 function createBaseInvestment(): Investment {
@@ -1681,6 +1755,9 @@ function createBasePortfolioSummary(): PortfolioSummary {
     displayCurrency: "",
     topPerformers: [],
     worstPerformers: [],
+    periodPnl: 0,
+    periodPnlPercent: 0,
+    period: 0,
   };
 }
 
@@ -1736,6 +1813,15 @@ export const PortfolioSummary: MessageFns<PortfolioSummary> = {
     }
     for (const v of message.worstPerformers) {
       InvestmentPerformance.encode(v!, writer.uint32(138).fork()).join();
+    }
+    if (message.periodPnl !== 0) {
+      writer.uint32(144).int64(message.periodPnl);
+    }
+    if (message.periodPnlPercent !== 0) {
+      writer.uint32(153).double(message.periodPnlPercent);
+    }
+    if (message.period !== 0) {
+      writer.uint32(160).int32(message.period);
     }
     return writer;
   },
@@ -1883,6 +1969,30 @@ export const PortfolioSummary: MessageFns<PortfolioSummary> = {
           message.worstPerformers.push(InvestmentPerformance.decode(reader, reader.uint32()));
           continue;
         }
+        case 18: {
+          if (tag !== 144) {
+            break;
+          }
+
+          message.periodPnl = longToNumber(reader.int64());
+          continue;
+        }
+        case 19: {
+          if (tag !== 153) {
+            break;
+          }
+
+          message.periodPnlPercent = reader.double();
+          continue;
+        }
+        case 20: {
+          if (tag !== 160) {
+            break;
+          }
+
+          message.period = reader.int32() as any;
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1919,6 +2029,9 @@ export const PortfolioSummary: MessageFns<PortfolioSummary> = {
       worstPerformers: globalThis.Array.isArray(object?.worstPerformers)
         ? object.worstPerformers.map((e: any) => InvestmentPerformance.fromJSON(e))
         : [],
+      periodPnl: isSet(object.periodPnl) ? globalThis.Number(object.periodPnl) : 0,
+      periodPnlPercent: isSet(object.periodPnlPercent) ? globalThis.Number(object.periodPnlPercent) : 0,
+      period: isSet(object.period) ? pnlPeriodFromJSON(object.period) : 0,
     };
   },
 
@@ -1975,6 +2088,15 @@ export const PortfolioSummary: MessageFns<PortfolioSummary> = {
     if (message.worstPerformers?.length) {
       obj.worstPerformers = message.worstPerformers.map((e) => InvestmentPerformance.toJSON(e));
     }
+    if (message.periodPnl !== 0) {
+      obj.periodPnl = Math.round(message.periodPnl);
+    }
+    if (message.periodPnlPercent !== 0) {
+      obj.periodPnlPercent = message.periodPnlPercent;
+    }
+    if (message.period !== 0) {
+      obj.period = pnlPeriodToJSON(message.period);
+    }
     return obj;
   },
 
@@ -2010,6 +2132,9 @@ export const PortfolioSummary: MessageFns<PortfolioSummary> = {
     message.displayCurrency = object.displayCurrency ?? "";
     message.topPerformers = object.topPerformers?.map((e) => InvestmentPerformance.fromPartial(e)) || [];
     message.worstPerformers = object.worstPerformers?.map((e) => InvestmentPerformance.fromPartial(e)) || [];
+    message.periodPnl = object.periodPnl ?? 0;
+    message.periodPnlPercent = object.periodPnlPercent ?? 0;
+    message.period = object.period ?? 0;
     return message;
   },
 };
@@ -6459,13 +6584,16 @@ export const DeleteInvestmentTransactionResponse: MessageFns<DeleteInvestmentTra
 };
 
 function createBaseGetPortfolioSummaryRequest(): GetPortfolioSummaryRequest {
-  return { walletId: 0 };
+  return { walletId: 0, period: 0 };
 }
 
 export const GetPortfolioSummaryRequest: MessageFns<GetPortfolioSummaryRequest> = {
   encode(message: GetPortfolioSummaryRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.walletId !== 0) {
       writer.uint32(8).int32(message.walletId);
+    }
+    if (message.period !== 0) {
+      writer.uint32(16).int32(message.period);
     }
     return writer;
   },
@@ -6485,6 +6613,14 @@ export const GetPortfolioSummaryRequest: MessageFns<GetPortfolioSummaryRequest> 
           message.walletId = reader.int32();
           continue;
         }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.period = reader.int32() as any;
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -6495,13 +6631,19 @@ export const GetPortfolioSummaryRequest: MessageFns<GetPortfolioSummaryRequest> 
   },
 
   fromJSON(object: any): GetPortfolioSummaryRequest {
-    return { walletId: isSet(object.walletId) ? globalThis.Number(object.walletId) : 0 };
+    return {
+      walletId: isSet(object.walletId) ? globalThis.Number(object.walletId) : 0,
+      period: isSet(object.period) ? pnlPeriodFromJSON(object.period) : 0,
+    };
   },
 
   toJSON(message: GetPortfolioSummaryRequest): unknown {
     const obj: any = {};
     if (message.walletId !== 0) {
       obj.walletId = Math.round(message.walletId);
+    }
+    if (message.period !== 0) {
+      obj.period = pnlPeriodToJSON(message.period);
     }
     return obj;
   },
@@ -6512,6 +6654,7 @@ export const GetPortfolioSummaryRequest: MessageFns<GetPortfolioSummaryRequest> 
   fromPartial(object: DeepPartial<GetPortfolioSummaryRequest>): GetPortfolioSummaryRequest {
     const message = createBaseGetPortfolioSummaryRequest();
     message.walletId = object.walletId ?? 0;
+    message.period = object.period ?? 0;
     return message;
   },
 };
@@ -7389,7 +7532,7 @@ export const ListUserInvestmentsResponse: MessageFns<ListUserInvestmentsResponse
 };
 
 function createBaseGetAggregatedPortfolioSummaryRequest(): GetAggregatedPortfolioSummaryRequest {
-  return { walletId: 0, typeFilter: 0 };
+  return { walletId: 0, typeFilter: 0, period: 0 };
 }
 
 export const GetAggregatedPortfolioSummaryRequest: MessageFns<GetAggregatedPortfolioSummaryRequest> = {
@@ -7399,6 +7542,9 @@ export const GetAggregatedPortfolioSummaryRequest: MessageFns<GetAggregatedPortf
     }
     if (message.typeFilter !== 0) {
       writer.uint32(16).int32(message.typeFilter);
+    }
+    if (message.period !== 0) {
+      writer.uint32(24).int32(message.period);
     }
     return writer;
   },
@@ -7426,6 +7572,14 @@ export const GetAggregatedPortfolioSummaryRequest: MessageFns<GetAggregatedPortf
           message.typeFilter = reader.int32() as any;
           continue;
         }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.period = reader.int32() as any;
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -7439,6 +7593,7 @@ export const GetAggregatedPortfolioSummaryRequest: MessageFns<GetAggregatedPortf
     return {
       walletId: isSet(object.walletId) ? globalThis.Number(object.walletId) : 0,
       typeFilter: isSet(object.typeFilter) ? investmentTypeFromJSON(object.typeFilter) : 0,
+      period: isSet(object.period) ? pnlPeriodFromJSON(object.period) : 0,
     };
   },
 
@@ -7450,6 +7605,9 @@ export const GetAggregatedPortfolioSummaryRequest: MessageFns<GetAggregatedPortf
     if (message.typeFilter !== 0) {
       obj.typeFilter = investmentTypeToJSON(message.typeFilter);
     }
+    if (message.period !== 0) {
+      obj.period = pnlPeriodToJSON(message.period);
+    }
     return obj;
   },
 
@@ -7460,6 +7618,7 @@ export const GetAggregatedPortfolioSummaryRequest: MessageFns<GetAggregatedPortf
     const message = createBaseGetAggregatedPortfolioSummaryRequest();
     message.walletId = object.walletId ?? 0;
     message.typeFilter = object.typeFilter ?? 0;
+    message.period = object.period ?? 0;
     return message;
   },
 };
