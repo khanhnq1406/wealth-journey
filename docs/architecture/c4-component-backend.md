@@ -58,7 +58,7 @@ C4Component
 
     Container_Boundary(external, "External Integrations — TRUST BOUNDARY: Untrusted external responses") {
         Component(yahoo_client, "Yahoo Finance Client", "pkg/yahoo", "Market price quotes, symbol search, rate throttling")
-        Component(vang_client, "vang.today Client", "pkg/gold + pkg/silver", "Vietnamese gold/silver price fetching")
+        Component(vang_client, "vangsaigon.vn Client", "pkg/vnprice", "Vietnamese gold/silver price fetching via vangsaigon.vn REST API")
         Component(google_client, "Google OAuth Verifier", "domain/auth", "ID token verification via Google APIs")
         Component(supabase_client, "Supabase Storage Client", "pkg/storage", "File upload/download for bank statements")
         Component(mihong_client, "mihong.vn API", "direct HTTP", "Gold price history for domestic/global market")
@@ -136,7 +136,7 @@ C4Component
 | **Auth Middleware → Handlers** | After authentication | User ID set in context (from JWT, never from request params). Request is authenticated but input not yet validated. |
 | **Handlers → Service Layer** | Handler calls service method | Handler validates/parses request body. Service layer performs business validation + ownership checks. After service validation, data is considered trusted. |
 | **Service Layer → Repository** | Service calls repository | Data is validated and authorized. Repository only handles persistence logic (no business rules). |
-| **Service → External APIs** | Outbound to Yahoo/vang.today/Google | Responses are UNTRUSTED. Must validate types, ranges, handle timeouts. Cache with TTL for resilience. |
+| **Service → External APIs** | Outbound to Yahoo/vangsaigon.vn/Google | Responses are UNTRUSTED. Must validate types, ranges, handle timeouts. Cache with TTL for resilience. |
 | **External APIs → Service** | Inbound price/token data | All external data validated before storing. Numeric ranges checked. Graceful fallback to stale cache on failure. |
 | **Handler → External APIs (chart)** | Outbound to mihong.vn/giabac.vn/Yahoo Finance | Chart handlers call external APIs directly (no service layer). Responses are UNTRUSTED. Query params validated via allowlist. Stale cache used as fallback on failure. |
 
@@ -185,7 +185,7 @@ User → SPA → REST API → Auth MW → SilverChartHandler → Redis (cache hi
 Scheduler (every 15min) → User Repository (list all users)
                         → Investment Repository (list user investments)
                         → Market Data Service → Yahoo Finance (stocks/ETFs/crypto)
-                                              → vang.today (gold/silver)
+                                              → vangsaigon.vn (gold/silver)
                                               → Redis (update price cache)
                                               → Market Data Repository (persist to DB)
 ```
