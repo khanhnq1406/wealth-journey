@@ -511,3 +511,86 @@ sequenceDiagram
 | `investmentsByType` | Grouped value + count per type | Preferred |
 | `topPerformers` | Best 5 by unrealized PNL % | Preferred |
 | `worstPerformers` | Worst 5 by unrealized PNL % | Preferred |
+
+---
+
+## 7. Gold/Silver Chart Data Flow
+
+**Trigger:** User opens the Gold or Silver price chart on the Market Prices page
+**Endpoints:** `GET /api/v1/investments/gold-chart`, `GET /api/v1/investments/silver-chart`
+**Source:** `handlers/gold.go`, `handlers/silver.go`
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant H as GoldChartHandler<br/>/ SilverChartHandler
+    participant Redis
+    participant Ext as ExternalAPI<br/>(mihong.vn / giabac.vn<br/>/ Yahoo Finance)
+
+    Note over Browser,Ext: Happy Path — Cache Hit
+
+    Browser->>H: GET /api/v1/investments/gold-chart<br/>?market=domestic&goldCode=SJC&period=24h
+    H->>H: Validate query params<br/>(allowlist: market, goldCode, period)
+    H->>Redis: GET gold_chart:domestic:SJC:24h
+    Redis-->>H: Cached JSON payload
+    H-->>Browser: 200 OK — cached data
+
+    Note over Browser,Ext: Happy Path — Cache Miss
+
+    Browser->>H: GET /api/v1/investments/gold-chart<br/>?market=domestic&goldCode=SJC&period=24h
+    H->>H: Validate query params<br/>(allowlist check)
+    H->>Redis: GET gold_chart:domestic:SJC:24h
+    Redis-->>H: (nil) — key not found
+    H->>Ext: Fetch price history (10s timeout)
+    Ext-->>H: Raw price array<br/>{timestamp: "DD/MM/YYYY HH:mm", buy, sell}[]
+    H->>H: Parse timestamps<br/>DD/MM/YYYY HH:mm → Unix epoch
+    H->>H: Normalize to ChartDataPoint[]<br/>{time: int64, buy: int64, sell: int64}
+    alt market=global AND period=24h
+        H->>H: Downsample to ≤100 points<br/>(evenly spaced by index)
+    end
+    H->>Redis: SET gold_chart:domestic:SJC:24h<br/>TTL: 5 min (24h period) / 15 min (longer periods)
+    H->>Redis: SET gold_chart:domestic:SJC:24h:stale<br/>TTL: 6× primary TTL (stale fallback)
+    H-->>Browser: 200 OK — fresh data
+
+    Note over Browser,Ext: Error Path — External API Failure
+
+    Browser->>H: GET /api/v1/investments/gold-chart<br/>?market=domestic&goldCode=SJC&period=24h
+    H->>H: Validate query params
+    H->>Redis: GET gold_chart:domestic:SJC:24h
+    Redis-->>H: (nil) — key not found
+    H->>Ext: Fetch price history (10s timeout)
+    Ext-->>H: Timeout / 5xx error
+    H->>Redis: GET gold_chart:domestic:SJC:24h:stale
+    alt Stale cache hit
+        Redis-->>H: Stale JSON payload
+        H-->>Browser: 200 OK — stale data
+    else No stale cache
+        Redis-->>H: (nil)
+        H-->>Browser: 503 Service Unavailable<br/>"Failed to fetch chart data"
+    end
+```
+
+### Key Invariants
+
+| Rule | Detail |
+|------|--------|
+| Cache key format | `gold_chart:{market}:{goldCode}:{period}` / `silver_chart:{market}:{silverCode}:{period}` |
+| TTL — 24h period | 5 minutes (primary), 30 minutes (stale fallback) |
+| TTL — longer periods (7d, 30d, 90d) | 15 minutes (primary), 90 minutes (stale fallback) |
+| Stale TTL multiplier | Always 6× the primary TTL |
+| Downsampling rule | Applied only when `market=global` AND `period=24h`; reduces array to ≤100 evenly spaced points |
+| Size limit | Response payload must not exceed 100 data points after normalization/downsampling |
+| Timestamp parsing | Input format `DD/MM/YYYY HH:mm` (local time, Asia/Ho_Chi_Minh); stored as Unix seconds |
+| Monetary values | `buy` and `sell` stored in smallest currency unit (VND ×1, USD ×100) — consistent with investment storage |
+| Param allowlist | `market`: `domestic` or `global`; `goldCode`/`silverCode`: registered type codes only; `period`: `24h`, `7d`, `30d`, `90d` |
+
+### Error Paths
+
+| Condition | Response | Fallback |
+|-----------|----------|----------|
+| Invalid `market`, `goldCode`/`silverCode`, or `period` param | 400 Bad Request | None |
+| External API timeout (>10s) | Check stale cache | Stale data if available |
+| External API 5xx | Check stale cache | Stale data if available |
+| Stale cache also missing | 503 Service Unavailable | None |
+| Timestamp parse failure on individual point | Skip point, continue | Partial dataset returned |
+| Redis write failure (SET) | Log warning, continue | Fresh data still returned to client; next request will refetch |

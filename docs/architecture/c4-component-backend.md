@@ -24,6 +24,8 @@ C4Component
         Component(invest_h, "Investment Handlers", "CRUD + Txn + Prices", "Investment holdings, transactions, market data")
         Component(import_h, "Import Handlers", "Upload + Parse + Execute", "Bank statement import wizard endpoints")
         Component(price_h, "Market Price Handlers", "Gold + Silver + Market", "Gold/silver type codes and combined market prices")
+        Component(gold_chart_h, "Gold Chart Handler", "handlers/gold_chart.go", "Proxies gold price history from mihong.vn with Redis caching")
+        Component(silver_chart_h, "Silver Chart Handler", "handlers/silver_chart.go", "Proxies silver price history from giabac.vn and Yahoo Finance SI=F with Redis caching")
     }
 
     Container_Boundary(services, "Service Layer — TRUST BOUNDARY: Data considered validated after this point") {
@@ -59,6 +61,8 @@ C4Component
         Component(vang_client, "vang.today Client", "pkg/gold + pkg/silver", "Vietnamese gold/silver price fetching")
         Component(google_client, "Google OAuth Verifier", "domain/auth", "ID token verification via Google APIs")
         Component(supabase_client, "Supabase Storage Client", "pkg/storage", "File upload/download for bank statements")
+        Component(mihong_client, "mihong.vn API", "direct HTTP", "Gold price history for domestic/global market")
+        Component(giabac_client, "giabac.vn API", "direct HTTP", "Domestic silver price history")
     }
 
     Container_Boundary(infra, "Infrastructure") {
@@ -77,6 +81,8 @@ C4Component
     Rel(gin, invest_h, "Routes /investments/*")
     Rel(gin, import_h, "Routes /import/*")
     Rel(gin, price_h, "Routes /investments/market-prices")
+    Rel(gin, gold_chart_h, "Routes /investments/gold-chart")
+    Rel(gin, silver_chart_h, "Routes /investments/silver-chart")
 
     Rel(auth_h, auth_svc, "Delegates auth logic")
     Rel(user_h, user_svc, "Delegates user ops")
@@ -89,6 +95,8 @@ C4Component
     Rel(invest_h, portfolio_svc, "Historical values")
     Rel(import_h, import_svc, "Delegates import ops")
     Rel(price_h, market_svc, "Combined gold/silver prices")
+    Rel(gold_chart_h, redis, "Read/write price history cache")
+    Rel(silver_chart_h, redis, "Read/write price history cache")
 
     Rel(wallet_svc, wallet_repo, "Persists wallets")
     Rel(wallet_svc, fx_svc, "Currency conversion")
@@ -115,6 +123,9 @@ C4Component
     Rel(fx_svc, redis, "Rate cache")
     Rel(auth_svc, google_client, "Verify ID tokens")
     Rel(import_svc, supabase_client, "File operations")
+    Rel(gold_chart_h, mihong_client, "Fetches domestic/global gold price history")
+    Rel(silver_chart_h, giabac_client, "Fetches domestic silver price history")
+    Rel(silver_chart_h, yahoo_client, "Fetches global SI=F silver futures history")
 ```
 
 ## Trust Boundaries Within Backend
@@ -127,6 +138,7 @@ C4Component
 | **Service Layer → Repository** | Service calls repository | Data is validated and authorized. Repository only handles persistence logic (no business rules). |
 | **Service → External APIs** | Outbound to Yahoo/vang.today/Google | Responses are UNTRUSTED. Must validate types, ranges, handle timeouts. Cache with TTL for resilience. |
 | **External APIs → Service** | Inbound price/token data | All external data validated before storing. Numeric ranges checked. Graceful fallback to stale cache on failure. |
+| **Handler → External APIs (chart)** | Outbound to mihong.vn/giabac.vn/Yahoo Finance | Chart handlers call external APIs directly (no service layer). Responses are UNTRUSTED. Query params validated via allowlist. Stale cache used as fallback on failure. |
 
 **Security invariants:**
 - User ID ALWAYS comes from JWT context, never from request parameters
@@ -152,6 +164,20 @@ User → SPA → REST API → Auth MW → Investment Handler → Investment Serv
                                                       → Investment Lot Repository (create FIFO lot)
                                                       → Market Data Service (fetch current price)
                                    ← Investment details ←
+```
+
+### Gold/Silver Chart Data Flow
+```
+User → SPA → REST API → Auth MW → GoldChartHandler  → Redis (cache hit? serve immediately)
+                                                      → mihong.vn (cache miss: fetch history)
+                                                      → Redis (write fresh cache + stale fallback)
+                                  ← chart data points ←
+
+User → SPA → REST API → Auth MW → SilverChartHandler → Redis (cache hit? serve immediately)
+                                  [domestic]           → giabac.vn (fetch history)
+                                  [global]             → Yahoo Finance SI=F (fetch history)
+                                                       → Redis (write fresh cache + stale fallback)
+                                  ← chart data points ←
 ```
 
 ### Background Price Update Flow
