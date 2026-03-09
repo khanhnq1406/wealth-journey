@@ -345,7 +345,7 @@ export default function DashboardLayout({
                     "flex-1 min-w-0 transition-all duration-300 ease-in-out",
                     isExpanded
                       ? "opacity-100 w-auto translate-x-0"
-                      : "opacity-0 w-0 overflow-hidden -translate-x-2",
+                      : "opacity-0 w-0 overflow-hidden -translate-x-2 hidden",
                   )}
                   style={{
                     transitionDelay: isExpanded ? "100ms" : "0ms",
