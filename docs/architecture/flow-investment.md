@@ -514,7 +514,58 @@ sequenceDiagram
 
 ---
 
-## 7. Gold/Silver Chart Data Flow
+## 7. Period PnL Calculation
+
+**Trigger:** User selects a period tab (1D/1W/1M/ALL) on PNLCard or PortfolioSummaryEnhanced
+**Endpoint:** `GET /api/v1/portfolio-summary/aggregated?period=2` (aggregated) or `GET /api/v1/wallets/:walletId/portfolio-summary?period=2` (per wallet)
+**Source:** `domain/service/investment_service.go` — `computePeriodPnl()`, `domain/repository/portfolio_history_repository_impl.go` — `GetPeriodStartSnapshot()`
+
+```mermaid
+sequenceDiagram
+    participant FE as Frontend (PNLCard)
+    participant H as InvestmentHandler
+    participant S as InvestmentService
+    participant PHR as PortfolioHistoryRepo
+    participant DB as PostgreSQL
+
+    FE->>H: GET /api/v1/portfolio-summary/aggregated?period=2 (1W)
+    H->>S: GetAggregatedPortfolioSummary(ctx, userID, req{period=1W})
+    S->>S: computeCurrentTotalPnl() (existing logic)
+    S->>PHR: GetPeriodStartSnapshot(ctx, userID, from=now-7d)
+    PHR->>DB: SELECT DISTINCT ON (wallet_id) ...<br/>FROM portfolio_history<br/>WHERE user_id=? AND timestamp <= ? AND deleted_at IS NULL<br/>ORDER BY wallet_id, timestamp DESC
+    DB-->>PHR: per-wallet snapshots nearest to period start (or empty)
+    PHR-->>S: aggregated synthetic snapshot (or nil)
+    alt snapshot found
+        S->>S: periodPnl = currentTotalPnl - snapshot.TotalPnl
+        S->>S: periodPnlPercent = periodPnl / snapshot.TotalValue * 100 (if TotalValue > 0)
+    else no snapshot (new user or period > history)
+        S->>S: periodPnl = totalPnl (fallback to all-time)
+        S->>S: periodPnlPercent = totalPnlPercent
+    end
+    S-->>H: GetPortfolioSummaryResponse{..., periodPnl, periodPnlPercent, period}
+    H-->>FE: 200 OK {data: {totalPnl, periodPnl, periodPnlPercent, period, ...}}
+```
+
+### Key Invariants
+
+- `periodPnl` is always in `int64` (no float intermediaries for the snapshot delta)
+- Fallback to all-time when no snapshot exists for the period (new user or sparse history)
+- `DISTINCT ON (wallet_id)` ensures one snapshot per wallet, reducing multi-wallet users to their per-wallet period baseline
+- Snapshots are aggregated in memory: sum `TotalPnl` and `TotalValue` across all wallets
+- `PNL_PERIOD_ALL` (value=4) and `PNL_PERIOD_UNSPECIFIED` (value=0) both skip the snapshot query and mirror all-time PnL
+
+### Error Paths
+
+| Condition | Response | Rollback |
+|-----------|----------|----------|
+| `period` out of range (< 0 or > 4) | Default to `PERIOD_UNSPECIFIED` (all-time), no error | N/A |
+| `portfolio_history` query fails | Non-fatal: log warning, fall back to all-time PnL | N/A |
+| `snapshotTotalValue = 0` | `periodPnlPercent = 0` (no division) | N/A |
+| No snapshots in DB for period | `periodPnl = totalPnl` (all-time fallback) | N/A |
+
+---
+
+## 8. Gold/Silver Chart Data Flow
 
 **Trigger:** User opens the Gold or Silver price chart on the Market Prices page
 **Endpoints:** `GET /api/v1/investments/gold-chart`, `GET /api/v1/investments/silver-chart`

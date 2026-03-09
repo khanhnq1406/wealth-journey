@@ -9,10 +9,10 @@ C4Component
     Container_Boundary(app, "App Router (Pages)") {
         Component(landing, "Landing Page", "app/landing", "Marketing page with features, testimonials, CTA")
         Component(auth_pages, "Auth Pages", "app/auth", "Login and register with Google OAuth")
-        Component(dashboard, "Dashboard Home", "app/dashboard/home", "V2 Crimson & Gold: net worth, PNL, gold/silver price charts (live), wallets")
+        Component(dashboard, "Dashboard Home", "app/dashboard/home", "V2 Crimson & Gold: net worth, PNL card (self-contained with 1D/1W/1M/ALL period tabs), gold/silver price charts (live), wallets")
         Component(txn_page, "Transaction Page", "app/dashboard/transaction", "Transaction list with filters and search")
         Component(wallet_page, "Wallet Page", "app/dashboard/wallets", "Wallet grid/list with fund operations")
-        Component(portfolio_page, "Portfolio Page", "app/dashboard/portfolio", "Investment portfolio with analytics")
+        Component(portfolio_page, "Portfolio Page", "app/dashboard/portfolio", "Investment portfolio with analytics; period pill selector (1D/1W/1M/ALL) via PortfolioSummaryEnhanced")
         Component(budget_page, "Budget Page", "app/dashboard/budget", "Budget tracking with progress indicators")
         Component(report_page, "Report Page", "app/dashboard/report", "Financial reports with exports")
         Component(prices_page, "Prices Page", "app/dashboard/prices", "Live gold/silver/market prices")
@@ -64,7 +64,7 @@ C4Component
 
     Rel(dashboard, wallet_feat, "Renders wallet list")
     Rel(dashboard, txn_feat, "Renders recent transactions")
-    Rel(dashboard, gen_hooks, "GoldPriceChart: useQueryGetGoldChart, SilverPriceChart: useQueryGetSilverChart, PNLCard: useQueryGetHistoricalPortfolioValues")
+    Rel(dashboard, gen_hooks, "GoldPriceChart: useQueryGetGoldChart, SilverPriceChart: useQueryGetSilverChart, PNLCard: useQueryGetAggregatedPortfolioSummary(period) + useQueryGetHistoricalPortfolioValues")
     Rel(txn_page, txn_feat, "Renders transaction management")
     Rel(wallet_page, wallet_feat, "Renders wallet management")
     Rel(portfolio_page, invest_feat, "Renders portfolio")
