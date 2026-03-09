@@ -5,19 +5,19 @@
 - **Plan file:** docs/plans/2026-03-09-sidebar-v2-plan.md
 - **Spec file:** docs/specs/2026-03-09-sidebar-v2-spec.md
 - **Started:** 2026-03-09T00:00:00Z
-- **Last updated:** 2026-03-09T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 1
+- **Last updated:** 2026-03-09T01:00:00Z
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 1 | Update NavItem — isPremium prop + 44×44 collapsed container | pending | — | — |
-| 2 | Update SidebarToggle — PanelLeft icons, h-11, rounded-xl | pending | — | — |
-| 3 | Update layout.tsx — desktop sidebar Premium Card restructure | pending | — | — |
-| 4 | Update layout.tsx — mobile slide-out Premium Card grouping | pending | — | — |
-| 5 | Update BottomNav — inactive color to v2-text-tertiary | pending | — | — |
+| 1 | Update NavItem — isPremium prop + 44×44 collapsed container | done | 8830b19 | Added isPremium prop, 44×44 collapsed container with Premium active/inactive styling, font-semibold active |
+| 2 | Update SidebarToggle — PanelLeft icons, h-11, rounded-xl | done | 6d8ac6d | Replaced double-chevron SVG with PanelLeftClose/PanelLeftOpen, h-11, rounded-xl, text-v2-text-tertiary |
+| 3 | Update layout.tsx — desktop sidebar Premium Card restructure | done | 4a9d873 | Wrapped Home+Portfolio in gradient Premium Card, Standard group below, restructured bottom (Settings → Toggle → divider → User) |
+| 4 | Update layout.tsx — mobile slide-out Premium Card grouping | done | a09f796 | Mobile slide-out: Premium Card (Home+Portfolio), Standard group, font 15px, icon 22px, py-3 px-3.5 |
+| 5 | Update BottomNav — inactive color to v2-text-tertiary | done | 765f3f3 | Changed text-neutral-600 → text-v2-text-tertiary, hover:text-neutral-800 → hover:text-v2-text-secondary |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
