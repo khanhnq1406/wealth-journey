@@ -1,0 +1,395 @@
+syntax = "proto3";
+
+package wealthjourney.community.v1;
+
+import "protobuf/v1/common.proto";
+import "google/api/annotations.proto";
+
+option go_package = "protobuf/v1";
+
+// PostItem represents a community post in the feed
+message PostItem {
+  int32 id = 1 [json_name = "id"];
+  int32 userId = 2 [json_name = "userId"];
+  string userName = 3 [json_name = "userName"];
+  string userPicture = 4 [json_name = "userPicture"];
+  string content = 5 [json_name = "content"];
+  string imageUrl = 6 [json_name = "imageUrl"];
+  string topicTag = 7 [json_name = "topicTag"];
+  int32 likeCount = 8 [json_name = "likeCount"];
+  int32 commentCount = 9 [json_name = "commentCount"];
+  bool isLiked = 10 [json_name = "isLiked"];
+  bool isOwnPost = 11 [json_name = "isOwnPost"];
+  int64 createdAt = 12 [json_name = "createdAt"];
+  int64 updatedAt = 13 [json_name = "updatedAt"];
+}
+
+// CommentItem represents a comment on a post
+message CommentItem {
+  int32 id = 1 [json_name = "id"];
+  int32 postId = 2 [json_name = "postId"];
+  int32 userId = 3 [json_name = "userId"];
+  string userName = 4 [json_name = "userName"];
+  string userPicture = 5 [json_name = "userPicture"];
+  string content = 6 [json_name = "content"];
+  bool isOwnComment = 7 [json_name = "isOwnComment"];
+  int64 createdAt = 8 [json_name = "createdAt"];
+}
+
+// CommunityProfile represents a user's community profile
+message CommunityProfile {
+  int32 userId = 1 [json_name = "userId"];
+  string userName = 2 [json_name = "userName"];
+  string userPicture = 3 [json_name = "userPicture"];
+  string bio = 4 [json_name = "bio"];
+  int32 postCount = 5 [json_name = "postCount"];
+  int32 followerCount = 6 [json_name = "followerCount"];
+  int32 followingCount = 7 [json_name = "followingCount"];
+  bool isFollowing = 8 [json_name = "isFollowing"];
+  bool isOwnProfile = 9 [json_name = "isOwnProfile"];
+}
+
+// --- Request/Response Messages ---
+
+// CreatePost
+message CreatePostRequest {
+  string content = 1 [json_name = "content"];
+  string imageUrl = 2 [json_name = "imageUrl"];
+  string topicTag = 3 [json_name = "topicTag"];
+}
+
+message CreatePostResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  PostItem data = 3 [json_name = "data"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+// UpdatePost
+message UpdatePostRequest {
+  int32 postId = 1 [json_name = "postId"];
+  string content = 2 [json_name = "content"];
+  string imageUrl = 3 [json_name = "imageUrl"];
+  string topicTag = 4 [json_name = "topicTag"];
+}
+
+message UpdatePostResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  PostItem data = 3 [json_name = "data"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+// DeletePost
+message DeletePostRequest {
+  int32 postId = 1 [json_name = "postId"];
+}
+
+message DeletePostResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+// GetPost
+message GetPostRequest {
+  int32 postId = 1 [json_name = "postId"];
+}
+
+message GetPostResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  PostItem data = 3 [json_name = "data"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+// GetFeed
+message GetFeedRequest {
+  wealthjourney.common.v1.PaginationParams pagination = 1 [json_name = "pagination"];
+  string topicFilter = 2 [json_name = "topicFilter"];
+}
+
+message GetFeedResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated PostItem posts = 3 [json_name = "posts"];
+  wealthjourney.common.v1.PaginationResult pagination = 4 [json_name = "pagination"];
+  string timestamp = 5 [json_name = "timestamp"];
+}
+
+// GetUserPosts
+message GetUserPostsRequest {
+  int32 userId = 1 [json_name = "userId"];
+  wealthjourney.common.v1.PaginationParams pagination = 2 [json_name = "pagination"];
+}
+
+message GetUserPostsResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated PostItem posts = 3 [json_name = "posts"];
+  wealthjourney.common.v1.PaginationResult pagination = 4 [json_name = "pagination"];
+  string timestamp = 5 [json_name = "timestamp"];
+}
+
+// LikePost
+message LikePostRequest {
+  int32 postId = 1 [json_name = "postId"];
+}
+
+message LikePostResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+// UnlikePost
+message UnlikePostRequest {
+  int32 postId = 1 [json_name = "postId"];
+}
+
+message UnlikePostResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+// CreateComment
+message CreateCommentRequest {
+  int32 postId = 1 [json_name = "postId"];
+  string content = 2 [json_name = "content"];
+}
+
+message CreateCommentResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  CommentItem data = 3 [json_name = "data"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+// DeleteComment
+message DeleteCommentRequest {
+  int32 commentId = 1 [json_name = "commentId"];
+}
+
+message DeleteCommentResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+// GetComments
+message GetCommentsRequest {
+  int32 postId = 1 [json_name = "postId"];
+  wealthjourney.common.v1.PaginationParams pagination = 2 [json_name = "pagination"];
+}
+
+message GetCommentsResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated CommentItem comments = 3 [json_name = "comments"];
+  wealthjourney.common.v1.PaginationResult pagination = 4 [json_name = "pagination"];
+  string timestamp = 5 [json_name = "timestamp"];
+}
+
+// FollowUser
+message FollowUserRequest {
+  int32 userId = 1 [json_name = "userId"];
+}
+
+message FollowUserResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+// UnfollowUser
+message UnfollowUserRequest {
+  int32 userId = 1 [json_name = "userId"];
+}
+
+message UnfollowUserResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+// GetCommunityProfile
+message GetCommunityProfileRequest {
+  int32 userId = 1 [json_name = "userId"];
+}
+
+message GetCommunityProfileResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  CommunityProfile data = 3 [json_name = "data"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+// UpdateBio
+message UpdateBioRequest {
+  string bio = 1 [json_name = "bio"];
+}
+
+message UpdateBioResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+// ReportContent
+message ReportContentRequest {
+  string targetType = 1 [json_name = "targetType"];
+  int32 targetId = 2 [json_name = "targetId"];
+  string reason = 3 [json_name = "reason"];
+  string details = 4 [json_name = "details"];
+}
+
+message ReportContentResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+// GetUploadURL
+message GetUploadURLRequest {
+  string fileName = 1 [json_name = "fileName"];
+  string contentType = 2 [json_name = "contentType"];
+}
+
+message GetUploadURLResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string uploadUrl = 3 [json_name = "uploadUrl"];
+  string publicUrl = 4 [json_name = "publicUrl"];
+  string timestamp = 5 [json_name = "timestamp"];
+}
+
+// Service definition
+service CommunityService {
+  // Create a new post
+  rpc CreatePost(CreatePostRequest) returns (CreatePostResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/community/posts"
+      body: "*"
+    };
+  }
+
+  // Update an existing post
+  rpc UpdatePost(UpdatePostRequest) returns (UpdatePostResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/community/posts/{postId}"
+      body: "*"
+    };
+  }
+
+  // Delete a post
+  rpc DeletePost(DeletePostRequest) returns (DeletePostResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/community/posts/{postId}"
+    };
+  }
+
+  // Get a single post
+  rpc GetPost(GetPostRequest) returns (GetPostResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/community/posts/{postId}"
+    };
+  }
+
+  // Get the user's feed (posts from followed users + own posts)
+  rpc GetFeed(GetFeedRequest) returns (GetFeedResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/community/feed"
+    };
+  }
+
+  // Get posts by a specific user
+  rpc GetUserPosts(GetUserPostsRequest) returns (GetUserPostsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/community/users/{userId}/posts"
+    };
+  }
+
+  // Like a post
+  rpc LikePost(LikePostRequest) returns (LikePostResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/community/posts/{postId}/like"
+      body: "*"
+    };
+  }
+
+  // Unlike a post
+  rpc UnlikePost(UnlikePostRequest) returns (UnlikePostResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/community/posts/{postId}/like"
+    };
+  }
+
+  // Create a comment on a post
+  rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/community/posts/{postId}/comments"
+      body: "*"
+    };
+  }
+
+  // Delete a comment
+  rpc DeleteComment(DeleteCommentRequest) returns (DeleteCommentResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/community/comments/{commentId}"
+    };
+  }
+
+  // Get comments for a post
+  rpc GetComments(GetCommentsRequest) returns (GetCommentsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/community/posts/{postId}/comments"
+    };
+  }
+
+  // Follow a user
+  rpc FollowUser(FollowUserRequest) returns (FollowUserResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/community/users/{userId}/follow"
+      body: "*"
+    };
+  }
+
+  // Unfollow a user
+  rpc UnfollowUser(UnfollowUserRequest) returns (UnfollowUserResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/community/users/{userId}/follow"
+    };
+  }
+
+  // Get a user's community profile
+  rpc GetCommunityProfile(GetCommunityProfileRequest) returns (GetCommunityProfileResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/community/users/{userId}/profile"
+    };
+  }
+
+  // Update own bio
+  rpc UpdateBio(UpdateBioRequest) returns (UpdateBioResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/community/profile/bio"
+      body: "*"
+    };
+  }
+
+  // Report content (post or comment)
+  rpc ReportContent(ReportContentRequest) returns (ReportContentResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/community/report"
+      body: "*"
+    };
+  }
+
+  // Get a signed upload URL for post images
+  rpc GetUploadURL(GetUploadURLRequest) returns (GetUploadURLResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/community/upload-url"
+      body: "*"
+    };
+  }
+}
