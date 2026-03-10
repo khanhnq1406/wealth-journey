@@ -302,3 +302,48 @@ type FXRateRepository interface {
 	// GetLatestRates retrieves the latest rates for a given from currency.
 	GetLatestRates(ctx context.Context, fromCurrency string) ([]*models.FXRate, error)
 }
+
+// PostRepository defines the interface for community post data operations.
+type PostRepository interface {
+	Create(ctx context.Context, post *models.Post) error
+	GetByID(ctx context.Context, id int32) (*models.Post, error)
+	Update(ctx context.Context, post *models.Post) error
+	SoftDelete(ctx context.Context, id int32) error
+	GetFeed(ctx context.Context, userIDs []int32, topicFilter string, opts ListOptions) ([]*models.Post, int, error)
+	GetByUserID(ctx context.Context, userID int32, opts ListOptions) ([]*models.Post, int, error)
+	IncrementLikeCount(ctx context.Context, postID int32, delta int32) error
+	IncrementCommentCount(ctx context.Context, postID int32, delta int32) error
+	CountByUserID(ctx context.Context, userID int32) (int32, error)
+}
+
+// CommentRepository defines the interface for community comment data operations.
+type CommentRepository interface {
+	Create(ctx context.Context, comment *models.Comment) error
+	GetByID(ctx context.Context, id int32) (*models.Comment, error)
+	SoftDelete(ctx context.Context, id int32) error
+	GetByPostID(ctx context.Context, postID int32, opts ListOptions) ([]*models.Comment, int, error)
+}
+
+// LikeRepository defines the interface for post like data operations.
+type LikeRepository interface {
+	Create(ctx context.Context, like *models.PostLike) error
+	Delete(ctx context.Context, userID, postID int32) error
+	Exists(ctx context.Context, userID, postID int32) (bool, error)
+	GetLikedPostIDs(ctx context.Context, userID int32, postIDs []int32) ([]int32, error)
+}
+
+// FollowRepository defines the interface for user follow data operations.
+type FollowRepository interface {
+	Create(ctx context.Context, follow *models.UserFollow) error
+	Delete(ctx context.Context, followerID, followingID int32) error
+	Exists(ctx context.Context, followerID, followingID int32) (bool, error)
+	GetFollowingIDs(ctx context.Context, userID int32) ([]int32, error)
+	GetFollowerCount(ctx context.Context, userID int32) (int32, error)
+	GetFollowingCount(ctx context.Context, userID int32) (int32, error)
+}
+
+// ReportRepository defines the interface for content report data operations.
+type ReportRepository interface {
+	Create(ctx context.Context, report *models.ContentReport) error
+	ExistsByUser(ctx context.Context, userID int32, targetType string, targetID int32) (bool, error)
+}
