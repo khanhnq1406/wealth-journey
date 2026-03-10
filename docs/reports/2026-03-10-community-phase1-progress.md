@@ -5,9 +5,9 @@
 - **Plan file:** docs/plans/2026-03-10-community-phase1-plan.md
 - **Spec file:** docs/specs/2026-03-09-community-phase1-spec.md
 - **Started:** 2026-03-10T00:00:00Z
-- **Last updated:** 2026-03-10T15:00:00Z
+- **Last updated:** 2026-03-10T15:30:00Z
 - **Current state:** in_progress
-- **Current task:** 15
+- **Current task:** 16
 
 ## Task Progress
 
@@ -27,8 +27,8 @@
 | 11 | Frontend: PostCard Component | done | d3d96c7 | PostCard, PostHeader, PostBody, PostActions, Avatar, TopicTag |
 | 12 | Frontend: CreatePostBox & Form | done | 826f2d4 | CreatePostBox, CreatePostForm, EditPostForm, Zod schemas |
 | 13 | Frontend: Like, Comment, Follow | done | d54e8b6 | useLike, useFollow hooks, FollowButton, CommentBubble, CommentSection |
-| 14 | Frontend: Profile Card & Nav | done | — | ProfileCard, CommunityNav, FeedEmpty, SuggestedUsersPlaceholder |
-| 15 | Frontend: Mobile Layout | pending | — | — |
+| 14 | Frontend: Profile Card & Nav | done | 9caf6fa | ProfileCard, CommunityNav, FeedEmpty, SuggestedUsersPlaceholder |
+| 15 | Frontend: Mobile Layout | done | — | MobileSubNav, responsive verified for all components |
 | 16 | Create Runtime Flow Diagrams | pending | — | — |
 | 17 | Integration Testing & Cleanup | pending | — | — |
 

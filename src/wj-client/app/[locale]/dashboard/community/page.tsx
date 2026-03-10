@@ -6,13 +6,19 @@ import { CommunityFeed } from "@/features/community/components/CommunityFeed";
 import { CommunityLeftSidebar } from "@/features/community/components/CommunityLeftSidebar";
 import { CommunityRightSidebar } from "@/features/community/components/CommunityRightSidebar";
 import { CreatePostBox } from "@/features/community/components/CreatePostBox";
+import { MobileSubNav } from "@/features/community/components/MobileSubNav";
 
 export default function CommunityPage() {
   const [topicFilter, setTopicFilter] = useState("");
 
   return (
     <div className="flex flex-col h-full -m-4 sm:-m-6 lg:-m-8">
-      {/* Mobile tab bar - shown below sm */}
+      {/* Mobile sub-navigation - shown below sm */}
+      <div className="sm:hidden">
+        <MobileSubNav />
+      </div>
+
+      {/* Mobile topic filter - shown below sm */}
       <CommunityTabBar
         className="sm:hidden"
         activeFilter={topicFilter}
