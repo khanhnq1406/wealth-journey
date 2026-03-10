@@ -26,6 +26,7 @@ C4Component
         Component(price_h, "Market Price Handlers", "Gold + Silver + Market", "Gold/silver type codes and combined market prices")
         Component(gold_chart_h, "Gold Chart Handler", "handlers/gold_chart.go", "Proxies gold price history from mihong.vn with Redis caching")
         Component(silver_chart_h, "Silver Chart Handler", "handlers/silver_chart.go", "Proxies silver price history from giabac.vn and Yahoo Finance SI=F with Redis caching")
+        Component(community_h, "Community Handlers", "Posts + Comments + Likes + Follows + Reports", "Social feed, post CRUD, commenting, liking, user following, content moderation")
     }
 
     Container_Boundary(services, "Service Layer — TRUST BOUNDARY: Data considered validated after this point") {
@@ -40,6 +41,7 @@ C4Component
         Component(fx_svc, "FX Rate Service", "domain/service", "Currency conversion rates, cross-currency calculations")
         Component(import_svc, "Import Service", "domain/service", "File parsing, field mapping, duplicate detection, batch execution")
         Component(portfolio_svc, "Portfolio History Service", "domain/service", "Historical portfolio value snapshots for charts")
+        Component(community_svc, "Community Service", "domain/service", "Social interactions: posts, comments, likes, follows, content reports")
     }
 
     Container_Boundary(repos, "Repository Layer (Data Access)") {
@@ -54,6 +56,11 @@ C4Component
         Component(fx_repo, "FX Rate Repository", "GORM", "Exchange rate history")
         Component(import_repo, "Import Repository", "GORM", "Import batches, templates, merchant rules")
         Component(portfolio_repo, "Portfolio History Repository", "GORM", "Historical portfolio value records")
+        Component(post_repo, "Post Repository", "GORM", "Community posts with content and topic tags")
+        Component(comment_repo, "Comment Repository", "GORM", "Post comments")
+        Component(like_repo, "Like Repository", "GORM", "Post likes with unique constraints")
+        Component(follow_repo, "Follow Repository", "GORM", "User follow relationships")
+        Component(report_repo, "Report Repository", "GORM", "Content reports for moderation")
     }
 
     Container_Boundary(external, "External Integrations — TRUST BOUNDARY: Untrusted external responses") {
@@ -83,6 +90,7 @@ C4Component
     Rel(gin, price_h, "Routes /investments/market-prices")
     Rel(gin, gold_chart_h, "Routes /investments/gold-chart")
     Rel(gin, silver_chart_h, "Routes /investments/silver-chart")
+    Rel(gin, community_h, "Routes /community/*")
 
     Rel(auth_h, auth_svc, "Delegates auth logic")
     Rel(user_h, user_svc, "Delegates user ops")
@@ -95,6 +103,7 @@ C4Component
     Rel(invest_h, portfolio_svc, "Historical values")
     Rel(import_h, import_svc, "Delegates import ops")
     Rel(price_h, market_svc, "Combined gold/silver prices")
+    Rel(community_h, community_svc, "Delegates social interactions")
     Rel(gold_chart_h, redis, "Read/write price history cache")
     Rel(silver_chart_h, redis, "Read/write price history cache")
 
@@ -114,10 +123,20 @@ C4Component
     Rel(import_svc, txn_repo, "Creates transactions")
     Rel(portfolio_svc, portfolio_repo, "Persists snapshots")
     Rel(portfolio_svc, invest_svc, "Current portfolio value")
+    Rel(community_svc, post_repo, "Persists posts")
+    Rel(community_svc, comment_repo, "Persists comments")
+    Rel(community_svc, like_repo, "Persists likes")
+    Rel(community_svc, follow_repo, "Persists follows")
+    Rel(community_svc, report_repo, "Persists reports")
 
     Rel(user_repo, postgres, "SQL")
     Rel(wallet_repo, postgres, "SQL")
     Rel(txn_repo, postgres, "SQL")
+    Rel(post_repo, postgres, "SQL")
+    Rel(comment_repo, postgres, "SQL")
+    Rel(like_repo, postgres, "SQL")
+    Rel(follow_repo, postgres, "SQL")
+    Rel(report_repo, postgres, "SQL")
     Rel(auth_svc, redis, "JWT whitelist")
     Rel(market_svc, redis, "Price cache")
     Rel(fx_svc, redis, "Rate cache")

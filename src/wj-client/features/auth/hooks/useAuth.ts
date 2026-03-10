@@ -53,9 +53,13 @@ const clearStoredToken = (): void => {
 const extractAuthFromResponse = (
   response: any
 ): { user: User | null; token: string | null } => {
-  // Adjust based on your actual API response structure
   const token = response?.accessToken || response?.token || getStoredToken();
-  const user = response?.user || response?.userId ? response : null;
+  // VerifyAuth returns User directly (has `id`), Login returns LoginData (has `accessToken`)
+  // Detect User object by checking for `id` field (number > 0)
+  const user: User | null =
+    response?.id && typeof response.id === "number"
+      ? (response as User)
+      : null;
   return { user, token };
 };
 

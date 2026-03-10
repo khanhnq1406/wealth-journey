@@ -18,6 +18,7 @@ type User struct {
 	PreferredCurrency   string         `gorm:"size:3;not null;default:'VND';index" json:"preferredCurrency"`
 	ConversionInProgress bool          `gorm:"default:false;index" json:"conversionInProgress"`
 	PreferredLanguage    string         `gorm:"size:5;not null;default:'vi'" json:"preferredLanguage"`
+	Bio                  string         `gorm:"size:200" json:"bio"`
 }
 
 // TableName specifies the table name for User model

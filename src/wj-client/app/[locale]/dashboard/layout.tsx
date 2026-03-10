@@ -36,6 +36,7 @@ import {
   LogOut,
   X,
   Menu,
+  Users,
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -137,7 +138,7 @@ export default function DashboardLayout({
 
     return (
       <div className="flex flex-col gap-3 px-3">
-        {/* Premium Card — Home + Portfolio */}
+        {/* Premium Card — Home + Portfolio + Community */}
         <div
           className="rounded-2xl border border-v2-border-light p-1.5 flex flex-col gap-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
           style={{
@@ -168,6 +169,18 @@ export default function DashboardLayout({
           >
             <ChartNoAxesCombined size={22} />
             <span>{t("portfolio")}</span>
+          </ActiveLink>
+          <ActiveLink
+            href={routes.community}
+            className={cn(
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+              path === routes.community
+                ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
+            )}
+          >
+            <Users size={22} />
+            <span>{t("community")}</span>
           </ActiveLink>
         </div>
 
@@ -273,7 +286,7 @@ export default function DashboardLayout({
               aria-label={t("mainNavigation")}
             >
               <div className="flex flex-col h-full">
-                {/* Premium Card — Home + Portfolio */}
+                {/* Premium Card — Home + Portfolio + Community */}
                 <div
                   className="rounded-2xl border border-v2-border-light p-1.5 flex flex-col gap-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
                   style={{
@@ -301,6 +314,16 @@ export default function DashboardLayout({
                     isActive={path === routes.portfolio}
                     isPremium
                   />
+                  <NavItem
+                    href={routes.community}
+                    label={t("community")}
+                    isExpanded={isExpanded}
+                    showTooltip={!isExpanded}
+                    animationDelay={60}
+                    icon={<Users size={20} />}
+                    isActive={path === routes.community}
+                    isPremium
+                  />
                 </div>
 
                 {/* Standard group */}
@@ -315,7 +338,7 @@ export default function DashboardLayout({
                     label={t("transactions")}
                     isExpanded={isExpanded}
                     showTooltip={!isExpanded}
-                    animationDelay={60}
+                    animationDelay={90}
                     icon={<ArrowLeftRight size={20} />}
                     isActive={path === routes.transaction}
                   />
@@ -324,7 +347,7 @@ export default function DashboardLayout({
                     label={t("wallets")}
                     isExpanded={isExpanded}
                     showTooltip={!isExpanded}
-                    animationDelay={90}
+                    animationDelay={120}
                     icon={<Wallet size={20} />}
                     isActive={path === routes.wallets}
                   />
@@ -333,7 +356,7 @@ export default function DashboardLayout({
                     label={t("reports")}
                     isExpanded={isExpanded}
                     showTooltip={!isExpanded}
-                    animationDelay={120}
+                    animationDelay={150}
                     icon={<ChartPie size={20} />}
                     isActive={path === routes.report}
                   />
@@ -342,7 +365,7 @@ export default function DashboardLayout({
                     label={t("budget")}
                     isExpanded={isExpanded}
                     showTooltip={!isExpanded}
-                    animationDelay={150}
+                    animationDelay={180}
                     icon={<Calculator size={20} />}
                     isActive={path === routes.budget}
                   />
@@ -357,7 +380,7 @@ export default function DashboardLayout({
                   label={t("settings")}
                   isExpanded={isExpanded}
                   showTooltip={!isExpanded}
-                  animationDelay={180}
+                  animationDelay={210}
                   icon={<Settings size={20} />}
                   isActive={path.startsWith("/dashboard/settings")}
                 />

@@ -82,6 +82,18 @@ tasks:
     cmds:
       - go run cmd/migrate-i18n-language/main.go
 
+  backend:migrate-community:
+    desc: "Create community tables (post, comment, post_like, user_follow, content_report) and add bio to user"
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - go run cmd/migrate-community/main.go
+
+  backend:migrate-drop-topic:
+    desc: "Drop topic_tag column from post table (topic feature removed)"
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - go run cmd/migrate-drop-topic/main.go
+
   # Frontend tasks
   frontend:dev:
     desc: "Start frontend in development mode"

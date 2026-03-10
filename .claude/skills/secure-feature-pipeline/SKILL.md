@@ -801,7 +801,16 @@ Use when ALL of these are true:
 1. **Parse the issue** — Understand exactly what's wrong
 2. **Implement the fix** — With a test (TDD still applies)
 3. **Dispatch security reviewer** — Quick check that the fix doesn't introduce vulnerabilities
-4. **Done** — No need for full brainstorm/plan cycle
+4. **Append to original implementation report** — Add a "Fix History" entry to `docs/reports/YYYY-MM-DD-<feature>-report.md`:
+
+```markdown
+## Fix History
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| YYYY-MM-DD | [description of what was fixed] | Minor | [commit hash] |
+```
+
+5. **Done** — No need for full brainstorm/plan cycle or a separate report file
 
 ### Major Fix Path (Full Pipeline)
 
@@ -819,6 +828,7 @@ Use when ANY of these are true:
    - The requirement is: "Fix these specific issues: [list]"
    - Context: reference the original spec, plan, and report
 3. **Follow the full pipeline** — brainstorm → plan → implement → review
+   - The implement step naturally produces `docs/reports/YYYY-MM-DD-<fix>-report.md`
 4. **The fix spec should be focused** — Only address the identified issues, don't scope-creep
 
 ### Fix Spec Template (for Major Fix Path)

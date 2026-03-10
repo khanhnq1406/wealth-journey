@@ -16,6 +16,7 @@ C4Component
         Component(budget_page, "Budget Page", "app/dashboard/budget", "Budget tracking with progress indicators")
         Component(report_page, "Report Page", "app/dashboard/report", "Financial reports with exports; Wallet Analytics section: Balance, AccountBalance, Dominance, MonthlyDominance chart components (co-located)")
         Component(prices_page, "Prices Page", "app/dashboard/prices", "Live gold/silver/market prices")
+        Component(community_page, "Community Page", "app/dashboard/community", "Social feed with posts, comments, likes, user profiles")
         Component(settings, "Settings Pages", "app/dashboard/settings", "Sessions, import templates, language toggle")
     }
 
@@ -28,6 +29,7 @@ C4Component
         Component(import_feat, "Import Feature", "features/import", "Import wizard steps, template management, file upload")
         Component(prices_feat, "Market Prices Feature", "features/market-prices", "Price display tables, symbol lookup")
         Component(report_feat, "Report Feature", "features/report", "Financial tables, period selectors, CSV/PDF export")
+        Component(community_feat, "Community Feature", "features/community", "Posts, comments, likes, follows, profiles, topic tags")
     }
 
     Container_Boundary(shared, "Shared Layer") {
@@ -73,6 +75,7 @@ C4Component
     Rel(prices_page, prices_feat, "Renders price tables")
     Rel(auth_pages, auth_feat, "Renders auth forms")
     Rel(settings, import_feat, "Renders import templates")
+    Rel(community_page, community_feat, "Renders social feed and profiles")
 
     Rel(wallet_feat, forms, "Uses form components")
     Rel(wallet_feat, modals, "Uses modal components")
@@ -83,12 +86,15 @@ C4Component
     Rel(import_feat, forms, "Uses form components")
     Rel(report_feat, tables, "Uses table components")
     Rel(report_feat, charts, "Uses chart components")
+    Rel(community_feat, modals, "Uses BaseModal for create/edit post")
+    Rel(community_feat, loading, "Uses LoadingSpinner")
 
     Rel(wallet_feat, gen_hooks, "useQueryListWallets, useMutationCreateWallet, etc.")
     Rel(txn_feat, gen_hooks, "useQueryListTransactions, useMutationCreateTransaction, etc.")
     Rel(invest_feat, gen_hooks, "useQueryListInvestments, useMutationCreateInvestment, etc.")
     Rel(budget_feat, gen_hooks, "useQueryListBudgets, useMutationCreateBudget, etc.")
     Rel(import_feat, gen_hooks, "useMutationUploadFile, useMutationParseFile, etc.")
+    Rel(community_feat, gen_hooks, "useQueryGetFeed, useMutationCreatePost, useMutationLikePost, useMutationFollowUser, etc.")
 
     Rel(gen_hooks, gen_api, "Wraps API calls")
     Rel(gen_api, gen_types, "Uses request/response types")

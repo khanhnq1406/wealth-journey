@@ -7,11 +7,8 @@ import { useTranslations } from "next-intl";
 import { ZIndex } from "@/lib/utils/z-index";
 import {
   HomeIcon,
-  TransactionIcon,
-  WalletIcon,
   PortfolioIcon,
-  ReportsIcon,
-  BudgetIcon,
+  CommunityIcon,
 } from "@/components/icons";
 
 export interface NavItem {
@@ -82,7 +79,7 @@ export const BottomNav = memo(function BottomNav({
               onClick={(e) => handleClick(e, item.href)}
               className={cn(
                 "flex flex-col items-center justify-center",
-                "min-h-[48px] w-full max-w-[16.66%]", // 16.66% width for 6 items
+                "min-h-[48px] w-full max-w-[33.33%]", // 33.33% width for 3 items
                 "transition-all duration-200 ease-out",
                 "text-v2-text-tertiary",
                 isActive
@@ -143,40 +140,22 @@ export const createNavItems = (
 ): NavItem[] => {
   return [
     {
-      href: routes.home,
-      label: t ? t('home') : "Home",
-      ariaLabel: t ? t('home') : "Go to home dashboard",
-      icon: <HomeIcon size="md" decorative />,
-    },
-    {
-      href: routes.transaction,
-      label: t ? t('transactions') : "Transactions",
-      ariaLabel: t ? t('transactions') : "Go to transactions",
-      icon: <TransactionIcon size="md" decorative />,
-    },
-    {
-      href: routes.wallets,
-      label: t ? t('wallets') : "Wallets",
-      ariaLabel: t ? t('wallets') : "Go to wallets",
-      icon: <WalletIcon size="md" decorative />,
-    },
-    {
       href: routes.portfolio,
       label: t ? t('portfolio') : "Portfolio",
       ariaLabel: t ? t('portfolio') : "Go to investment portfolio",
       icon: <PortfolioIcon size="md" decorative />,
     },
     {
-      href: routes.report,
-      label: t ? t('reports') : "Reports",
-      ariaLabel: t ? t('reports') : "Go to reports",
-      icon: <ReportsIcon size="md" decorative />,
+      href: routes.home,
+      label: t ? t('home') : "Home",
+      ariaLabel: t ? t('home') : "Go to home dashboard",
+      icon: <HomeIcon size="md" decorative />,
     },
     {
-      href: routes.budget,
-      label: t ? t('budget') : "Budget",
-      ariaLabel: t ? t('budget') : "Go to budget",
-      icon: <BudgetIcon size="md" decorative />,
+      href: routes.community,
+      label: t ? t('community') : "Community",
+      ariaLabel: t ? t('community') : "Go to community",
+      icon: <CommunityIcon size="md" decorative />,
     },
   ];
 };

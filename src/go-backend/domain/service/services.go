@@ -19,6 +19,7 @@ type Services struct {
 	PortfolioHistory   PortfolioHistoryService
 	MarketData         MarketDataService
 	Import             ImportService
+	Community          CommunityService
 }
 
 // NewServices creates all service instances with proper dependency ordering.
@@ -44,6 +45,9 @@ func NewServices(repos *Repositories, redisClient *redis.Client) *Services {
 	investmentSvc := NewInvestmentService(repos.Investment, repos.Wallet, repos.InvestmentTransaction, marketDataSvc, repos.User, fxRateSvc, currencyCache, walletSvc, repos.PortfolioHistory)
 	portfolioHistorySvc := NewPortfolioHistoryService(repos.PortfolioHistory, investmentSvc, repos.User, fxRateSvc)
 
+	// Phase 1 (cont.): CommunityService — no service dependencies
+	communitySvc := NewCommunityService(repos.Post, repos.Comment, repos.Like, repos.Follow, repos.Report, repos.User)
+
 	return &Services{
 		Wallet:           walletSvc,
 		User:             userSvc,
@@ -55,6 +59,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client) *Services {
 		PortfolioHistory: portfolioHistorySvc,
 		MarketData:       marketDataSvc,
 		Import:           nil, // Created separately with job queue
+		Community:        communitySvc,
 	}
 }
 
@@ -76,6 +81,11 @@ type Repositories struct {
 	MerchantRule          repository.MerchantRuleRepository
 	Keyword               repository.KeywordRepository
 	UserMapping           repository.UserMappingRepository
+	Post                  repository.PostRepository
+	Comment               repository.CommentRepository
+	Like                  repository.LikeRepository
+	Follow                repository.FollowRepository
+	Report                repository.ReportRepository
 }
 
 // NewRepositories creates all repository instances.
