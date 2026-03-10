@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutationCreatePost } from "@/utils/generated/hooks";
+import { useMutationCreatePost, EVENT_CommunityGetFeed } from "@/utils/generated/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { createPostSchema, type CreatePostFormData } from "../utils/community.schema";
 import { TOPIC_TAGS } from "../utils/topic-tags";
@@ -41,7 +41,7 @@ export function CreatePostForm({ currentUser, onSuccess }: CreatePostFormProps) 
 
   const createPostMutation = useMutationCreatePost({
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["GetFeed"] });
+      queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetFeed] });
       onSuccess?.();
     },
     onError: (error: any) => {

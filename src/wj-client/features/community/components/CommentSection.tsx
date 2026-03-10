@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useQueryGetComments, useMutationCreateComment } from "@/utils/generated/hooks";
+import { useQueryGetComments, useMutationCreateComment, EVENT_CommunityGetComments, EVENT_CommunityGetFeed } from "@/utils/generated/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { CommentBubble } from "./CommentBubble";
 import { Avatar } from "./Avatar";
@@ -26,8 +26,8 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
   const createCommentMutation = useMutationCreateComment({
     onSuccess: () => {
       setCommentText("");
-      queryClient.invalidateQueries({ queryKey: ["GetComments"] });
-      queryClient.invalidateQueries({ queryKey: ["GetFeed"] });
+      queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetComments] });
+      queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetFeed] });
     },
   });
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useQueryGetFeed } from "@/utils/generated/hooks";
+import { useQueryGetFeed, EVENT_CommunityGetFeed } from "@/utils/generated/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
 import { PostCard } from "./PostCard";
@@ -26,7 +26,7 @@ export function CommunityFeed({ topicFilter, currentUser }: CommunityFeedProps) 
   );
 
   const handlePostUpdated = () => {
-    queryClient.invalidateQueries({ queryKey: ["GetFeed"] });
+    queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetFeed] });
   };
 
   if (isLoading) {
