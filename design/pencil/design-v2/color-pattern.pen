@@ -31,7 +31,7 @@
               "name": "bgLabel",
               "fill": "#78716C",
               "content": "BACKGROUNDS",
-              "fontFamily": "IBM Plex Mono",
+              "fontFamily": "JetBrains Mono",
               "fontSize": 11,
               "fontWeight": "600",
               "letterSpacing": 2
@@ -70,7 +70,7 @@
                       "name": "sw1name",
                       "fill": "#1C1917",
                       "content": "bg-primary",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 11,
                       "fontWeight": "600"
                     },
@@ -80,7 +80,7 @@
                       "name": "sw1hex",
                       "fill": "#78716C",
                       "content": "#FAF9F7",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -113,7 +113,7 @@
                       "name": "sw2name",
                       "fill": "#1C1917",
                       "content": "bg-surface",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 11,
                       "fontWeight": "600"
                     },
@@ -123,7 +123,7 @@
                       "name": "sw2hex",
                       "fill": "#78716C",
                       "content": "#FFFFFF",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -156,7 +156,7 @@
                       "name": "sw3name",
                       "fill": "#1C1917",
                       "content": "bg-surface-tint",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 11,
                       "fontWeight": "600"
                     },
@@ -166,7 +166,7 @@
                       "name": "sw3hex",
                       "fill": "#78716C",
                       "content": "#FDF6EE",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -195,7 +195,7 @@
                       "name": "sw4name",
                       "fill": "#1C1917",
                       "content": "bg-dark",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 11,
                       "fontWeight": "600"
                     },
@@ -205,7 +205,7 @@
                       "name": "sw4hex",
                       "fill": "#78716C",
                       "content": "#1C1917",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -236,7 +236,7 @@
                   "name": "borderLbl",
                   "fill": "#78716C",
                   "content": "BORDERS",
-                  "fontFamily": "IBM Plex Mono",
+                  "fontFamily": "JetBrains Mono",
                   "fontSize": 11,
                   "fontWeight": "600",
                   "letterSpacing": 2
@@ -271,7 +271,7 @@
                           "name": "b1name",
                           "fill": "#1C1917",
                           "content": "border-light",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 11,
                           "fontWeight": "600"
                         },
@@ -281,7 +281,7 @@
                           "name": "b1hex",
                           "fill": "#78716C",
                           "content": "#EDE8E1",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 10,
                           "fontWeight": "normal"
                         }
@@ -310,7 +310,7 @@
                           "name": "b2name",
                           "fill": "#1C1917",
                           "content": "border",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 11,
                           "fontWeight": "600"
                         },
@@ -320,7 +320,7 @@
                           "name": "b2hex",
                           "fill": "#78716C",
                           "content": "#DDD8D0",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 10,
                           "fontWeight": "normal"
                         }
@@ -344,7 +344,7 @@
                   "name": "textLbl",
                   "fill": "#78716C",
                   "content": "TEXT COLORS",
-                  "fontFamily": "IBM Plex Mono",
+                  "fontFamily": "JetBrains Mono",
                   "fontSize": 11,
                   "fontWeight": "600",
                   "letterSpacing": 2
@@ -379,7 +379,7 @@
                           "name": "t1name",
                           "fill": "#1C1917",
                           "content": "text-primary",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 11,
                           "fontWeight": "600"
                         },
@@ -389,7 +389,7 @@
                           "name": "t1hex",
                           "fill": "#78716C",
                           "content": "#1C1917",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 10,
                           "fontWeight": "normal"
                         }
@@ -418,7 +418,7 @@
                           "name": "t2name",
                           "fill": "#1C1917",
                           "content": "text-secondary",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 11,
                           "fontWeight": "600"
                         },
@@ -428,7 +428,7 @@
                           "name": "t2hex",
                           "fill": "#78716C",
                           "content": "#57534E",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 10,
                           "fontWeight": "normal"
                         }
@@ -457,7 +457,7 @@
                           "name": "t3name",
                           "fill": "#1C1917",
                           "content": "text-tertiary",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 11,
                           "fontWeight": "600"
                         },
@@ -467,7 +467,7 @@
                           "name": "t3hex",
                           "fill": "#78716C",
                           "content": "#78716C",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 10,
                           "fontWeight": "normal"
                         }
@@ -500,7 +500,7 @@
                           "name": "t4name",
                           "fill": "#1C1917",
                           "content": "text-on-dark",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 11,
                           "fontWeight": "600"
                         },
@@ -510,7 +510,7 @@
                           "name": "t4hex",
                           "fill": "#78716C",
                           "content": "#FAF9F7",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 10,
                           "fontWeight": "normal"
                         }
@@ -536,7 +536,7 @@
               "name": "redLbl",
               "fill": "#78716C",
               "content": "BRAND — RED (Fortune & Power)",
-              "fontFamily": "IBM Plex Mono",
+              "fontFamily": "JetBrains Mono",
               "fontSize": 11,
               "fontWeight": "600",
               "letterSpacing": 2
@@ -571,7 +571,7 @@
                       "name": "r1name",
                       "fill": "#1C1917",
                       "content": "red-primary",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 11,
                       "fontWeight": "600"
                     },
@@ -581,7 +581,7 @@
                       "name": "r1hex",
                       "fill": "#78716C",
                       "content": "#B91C1C",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -610,7 +610,7 @@
                       "name": "r2name",
                       "fill": "#1C1917",
                       "content": "red-dark",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 11,
                       "fontWeight": "600"
                     },
@@ -620,7 +620,7 @@
                       "name": "r2hex",
                       "fill": "#78716C",
                       "content": "#7F1D1D",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -653,7 +653,7 @@
                       "name": "r3name",
                       "fill": "#1C1917",
                       "content": "red-light",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 11,
                       "fontWeight": "600"
                     },
@@ -663,7 +663,7 @@
                       "name": "r3hex",
                       "fill": "#78716C",
                       "content": "#FEF2F2",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -692,7 +692,7 @@
                       "name": "r4name",
                       "fill": "#1C1917",
                       "content": "red-negative",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 11,
                       "fontWeight": "600"
                     },
@@ -702,7 +702,7 @@
                       "name": "r4hex",
                       "fill": "#78716C",
                       "content": "#DC2626",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -749,7 +749,7 @@
                       "name": "r5name",
                       "fill": "#1C1917",
                       "content": "red gradient",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 11,
                       "fontWeight": "600"
                     },
@@ -759,7 +759,7 @@
                       "name": "r5hex",
                       "fill": "#78716C",
                       "content": "#B91C1C → #991B1B",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -783,7 +783,7 @@
               "name": "goldLbl",
               "fill": "#78716C",
               "content": "BRAND — GOLD (Wealth & Trust)",
-              "fontFamily": "IBM Plex Mono",
+              "fontFamily": "JetBrains Mono",
               "fontSize": 11,
               "fontWeight": "600",
               "letterSpacing": 2
@@ -818,7 +818,7 @@
                       "name": "g1name",
                       "fill": "#1C1917",
                       "content": "gold-primary",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 11,
                       "fontWeight": "600"
                     },
@@ -828,7 +828,7 @@
                       "name": "g1hex",
                       "fill": "#78716C",
                       "content": "#B8860B",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -857,7 +857,7 @@
                       "name": "g2name",
                       "fill": "#1C1917",
                       "content": "gold-dark",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 11,
                       "fontWeight": "600"
                     },
@@ -867,7 +867,7 @@
                       "name": "g2hex",
                       "fill": "#78716C",
                       "content": "#92710C",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -896,7 +896,7 @@
                       "name": "g3name",
                       "fill": "#1C1917",
                       "content": "gold-accent",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 11,
                       "fontWeight": "600"
                     },
@@ -906,7 +906,7 @@
                       "name": "g3hex",
                       "fill": "#78716C",
                       "content": "#D4A017",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -939,7 +939,7 @@
                       "name": "g4name",
                       "fill": "#1C1917",
                       "content": "gold-light",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 11,
                       "fontWeight": "600"
                     },
@@ -949,7 +949,7 @@
                       "name": "g4hex",
                       "fill": "#78716C",
                       "content": "#FBF3E0",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -980,7 +980,7 @@
                   "name": "semLbl",
                   "fill": "#78716C",
                   "content": "SEMANTIC",
-                  "fontFamily": "IBM Plex Mono",
+                  "fontFamily": "JetBrains Mono",
                   "fontSize": 11,
                   "fontWeight": "600",
                   "letterSpacing": 2
@@ -1015,7 +1015,7 @@
                           "name": "s1name",
                           "fill": "#1C1917",
                           "content": "green-positive",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 11,
                           "fontWeight": "600"
                         },
@@ -1025,7 +1025,7 @@
                           "name": "s1hex",
                           "fill": "#78716C",
                           "content": "#15803D",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 10,
                           "fontWeight": "normal"
                         }
@@ -1058,7 +1058,7 @@
                           "name": "s2name",
                           "fill": "#1C1917",
                           "content": "green-light",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 11,
                           "fontWeight": "600"
                         },
@@ -1068,7 +1068,7 @@
                           "name": "s2hex",
                           "fill": "#78716C",
                           "content": "#F0FDF4",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 10,
                           "fontWeight": "normal"
                         }
@@ -1092,7 +1092,7 @@
                   "name": "chartLbl",
                   "fill": "#78716C",
                   "content": "CHART COLORS",
-                  "fontFamily": "IBM Plex Mono",
+                  "fontFamily": "JetBrains Mono",
                   "fontSize": 11,
                   "fontWeight": "600",
                   "letterSpacing": 2
@@ -1127,7 +1127,7 @@
                           "name": "c1name",
                           "fill": "#1C1917",
                           "content": "chart-gold",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 11,
                           "fontWeight": "600"
                         },
@@ -1137,7 +1137,7 @@
                           "name": "c1hex",
                           "fill": "#78716C",
                           "content": "#B8860B",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 10,
                           "fontWeight": "normal"
                         }
@@ -1166,7 +1166,7 @@
                           "name": "c2name",
                           "fill": "#1C1917",
                           "content": "chart-red",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 11,
                           "fontWeight": "600"
                         },
@@ -1176,7 +1176,7 @@
                           "name": "c2hex",
                           "fill": "#78716C",
                           "content": "#B91C1C",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 10,
                           "fontWeight": "normal"
                         }
@@ -1209,7 +1209,7 @@
                           "name": "c3name",
                           "fill": "#1C1917",
                           "content": "chart-gold-area",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 11,
                           "fontWeight": "600"
                         },
@@ -1219,7 +1219,7 @@
                           "name": "c3hex",
                           "fill": "#78716C",
                           "content": "#B8860B33 (20%)",
-                          "fontFamily": "IBM Plex Mono",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 10,
                           "fontWeight": "normal"
                         }
@@ -1253,7 +1253,7 @@
               "name": "typoLbl",
               "fill": "#78716C",
               "content": "TYPOGRAPHY",
-              "fontFamily": "IBM Plex Mono",
+              "fontFamily": "JetBrains Mono",
               "fontSize": 11,
               "fontWeight": "600",
               "letterSpacing": 2
@@ -1278,8 +1278,8 @@
                       "id": "11SIw",
                       "name": "soraTitle",
                       "fill": "#1C1917",
-                      "content": "Sora",
-                      "fontFamily": "Sora",
+                      "content": "Be Vietnam Pro",
+                      "fontFamily": "Be Vietnam Pro",
                       "fontSize": 24,
                       "fontWeight": "700",
                       "letterSpacing": -0.5
@@ -1290,7 +1290,7 @@
                       "name": "soraDesc",
                       "fill": "#78716C",
                       "content": "Headings, labels, navigation, amounts",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     },
@@ -1307,8 +1307,8 @@
                           "id": "6RaQf",
                           "name": "s800",
                           "fill": "#1C1917",
-                          "content": "Sora 800 — Net Worth Hero",
-                          "fontFamily": "Sora",
+                          "content": "Vietnam Pro 800 — Net Worth Hero",
+                          "fontFamily": "Be Vietnam Pro",
                           "fontSize": 18,
                           "fontWeight": "800"
                         },
@@ -1317,8 +1317,8 @@
                           "id": "hug9i",
                           "name": "s700",
                           "fill": "#1C1917",
-                          "content": "Sora 700 — Brand / Logo",
-                          "fontFamily": "Sora",
+                          "content": "Vietnam Pro 700 — Brand / Logo",
+                          "fontFamily": "Be Vietnam Pro",
                           "fontSize": 18,
                           "fontWeight": "700"
                         },
@@ -1327,8 +1327,8 @@
                           "id": "S2886",
                           "name": "s600",
                           "fill": "#1C1917",
-                          "content": "Sora 600 — Section Titles",
-                          "fontFamily": "Sora",
+                          "content": "Vietnam Pro 600 — Section Titles",
+                          "fontFamily": "Be Vietnam Pro",
                           "fontSize": 18,
                           "fontWeight": "600"
                         },
@@ -1337,8 +1337,8 @@
                           "id": "xBCCz",
                           "name": "s500",
                           "fill": "#1C1917",
-                          "content": "Sora 500 — Card Labels",
-                          "fontFamily": "Sora",
+                          "content": "Vietnam Pro 500 — Card Labels",
+                          "fontFamily": "Be Vietnam Pro",
                           "fontSize": 18,
                           "fontWeight": "500"
                         },
@@ -1347,8 +1347,8 @@
                           "id": "WJpgg",
                           "name": "s400",
                           "fill": "#57534E",
-                          "content": "Sora 400 — Body Text",
-                          "fontFamily": "Sora",
+                          "content": "Vietnam Pro 400 — Body Text",
+                          "fontFamily": "Be Vietnam Pro",
                           "fontSize": 18,
                           "fontWeight": "normal"
                         }
@@ -1369,8 +1369,8 @@
                       "id": "I2CSv",
                       "name": "monoTitle",
                       "fill": "#1C1917",
-                      "content": "IBM Plex Mono",
-                      "fontFamily": "IBM Plex Mono",
+                      "content": "JetBrains Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 24,
                       "fontWeight": "700"
                     },
@@ -1380,7 +1380,7 @@
                       "name": "monoDesc",
                       "fill": "#78716C",
                       "content": "Data values, timestamps, metrics, badges",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     },
@@ -1397,8 +1397,8 @@
                           "id": "QmOFZ",
                           "name": "m700",
                           "fill": "#15803D",
-                          "content": "Plex Mono 700 — PNL Values",
-                          "fontFamily": "IBM Plex Mono",
+                          "content": "JetBrains 700 — PNL Values",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 18,
                           "fontWeight": "700"
                         },
@@ -1407,8 +1407,8 @@
                           "id": "cvqy5",
                           "name": "m600",
                           "fill": "#1C1917",
-                          "content": "Plex Mono 600 — Amounts, Labels",
-                          "fontFamily": "IBM Plex Mono",
+                          "content": "JetBrains 600 — Amounts, Labels",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 18,
                           "fontWeight": "600"
                         },
@@ -1417,8 +1417,8 @@
                           "id": "HAac5",
                           "name": "m500",
                           "fill": "#1C1917",
-                          "content": "Plex Mono 500 — Table Data",
-                          "fontFamily": "IBM Plex Mono",
+                          "content": "JetBrains 500 — Table Data",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 18,
                           "fontWeight": "500"
                         },
@@ -1427,8 +1427,8 @@
                           "id": "f56q4",
                           "name": "m400",
                           "fill": "#78716C",
-                          "content": "Plex Mono 400 — Timestamps, Hints",
-                          "fontFamily": "IBM Plex Mono",
+                          "content": "JetBrains 400 — Timestamps, Hints",
+                          "fontFamily": "JetBrains Mono",
                           "fontSize": 18,
                           "fontWeight": "normal"
                         }
@@ -1462,7 +1462,7 @@
               "name": "usageLbl",
               "fill": "#78716C",
               "content": "USAGE GUIDE",
-              "fontFamily": "IBM Plex Mono",
+              "fontFamily": "JetBrains Mono",
               "fontSize": 11,
               "fontWeight": "600",
               "letterSpacing": 2
@@ -1495,7 +1495,7 @@
                       "name": "u1t",
                       "fill": "$red-primary",
                       "content": "Red — Use Sparingly",
-                      "fontFamily": "Sora",
+                      "fontFamily": "Be Vietnam Pro",
                       "fontSize": 14,
                       "fontWeight": "600"
                     },
@@ -1508,7 +1508,7 @@
                       "width": 226,
                       "height": 36,
                       "content": "Active nav states, CTAs, logo mark, accent lines. Never as large area fills.",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -1535,7 +1535,7 @@
                       "name": "u2t",
                       "fill": "$gold-primary",
                       "content": "Gold — Data & Delight",
-                      "fontFamily": "Sora",
+                      "fontFamily": "Be Vietnam Pro",
                       "fontSize": 14,
                       "fontWeight": "600"
                     },
@@ -1548,7 +1548,7 @@
                       "width": 212,
                       "height": 36,
                       "content": "Charts, price tags, table headers, icon backgrounds. The warm cultural anchor.",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -1575,7 +1575,7 @@
                       "name": "u3t",
                       "fill": "$green-positive",
                       "content": "Green / Red — Financial",
-                      "fontFamily": "Sora",
+                      "fontFamily": "Be Vietnam Pro",
                       "fontSize": 14,
                       "fontWeight": "600"
                     },
@@ -1588,7 +1588,7 @@
                       "width": 216,
                       "height": 36,
                       "content": "Gains vs losses only. green-positive for profit, red-negative for loss. Standard convention.",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
@@ -1615,7 +1615,7 @@
                       "name": "u4t",
                       "fill": "#1C1917",
                       "content": "Neutrals — The Canvas",
-                      "fontFamily": "Sora",
+                      "fontFamily": "Be Vietnam Pro",
                       "fontSize": 14,
                       "fontWeight": "600"
                     },
@@ -1628,7 +1628,7 @@
                       "width": 221,
                       "height": 36,
                       "content": "Warm ivory backgrounds, stone-toned text. Let content breathe, colors accent.",
-                      "fontFamily": "IBM Plex Mono",
+                      "fontFamily": "JetBrains Mono",
                       "fontSize": 10,
                       "fontWeight": "normal"
                     }
