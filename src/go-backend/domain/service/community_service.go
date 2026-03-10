@@ -187,7 +187,7 @@ func (s *communityService) GetFeed(ctx context.Context, userID int32, req *v1.Ge
 	// Parse pagination
 	opts := s.parsePagination(req.Pagination)
 
-	posts, total, err := s.postRepo.GetFeed(ctx, userIDs, opts)
+	posts, total, err := s.postRepo.GetFeed(ctx, userIDs, opts, req.Hashtag)
 	if err != nil {
 		return nil, err
 	}
