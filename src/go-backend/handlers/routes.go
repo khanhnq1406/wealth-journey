@@ -257,6 +257,23 @@ func RegisterRoutes(
 
 		// Upload
 		community.POST("/upload-url", h.Community.GetUploadURL)
+
+		// Phase 2: Share / Repost
+		community.POST("/posts/:post_id/share", h.Community.SharePost)
+
+		// Phase 2: Notifications
+		community.GET("/notifications", h.Community.GetNotifications)
+		community.GET("/notifications/unread-count", h.Community.GetUnreadNotificationCount)
+		community.PUT("/notifications/read", h.Community.MarkNotificationsRead)
+
+		// Phase 2: Saved Posts
+		community.POST("/posts/:post_id/save", h.Community.SavePost)
+		community.DELETE("/posts/:post_id/save", h.Community.UnsavePost)
+		community.GET("/saved-posts", h.Community.GetSavedPosts)
+
+		// Phase 2: Discovery
+		community.GET("/suggested-users", h.Community.GetSuggestedUsers)
+		community.GET("/trending-topics", h.Community.GetTrendingTopics)
 	}
 
 	// Import routes (protected)
