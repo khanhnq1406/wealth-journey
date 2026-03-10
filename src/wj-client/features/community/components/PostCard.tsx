@@ -41,6 +41,7 @@ export function PostCard({
         topicTag={post.topicTag}
         createdAt={post.createdAt ?? 0}
         isOwnPost={isOwnPost}
+        isFollowing={post.isFollowing ?? false}
         onMenuClick={onMenuClick ? () => onMenuClick(postId) : undefined}
       />
 

@@ -208,6 +208,8 @@ Implemented a finance-focused community social feed for WealthJourney. The commu
 | Date | Fix | Severity | Files Changed |
 |------|-----|----------|---------------|
 | 2026-03-10 | Add spinner loading state to comment submit button (replaces Send icon with Loader2 while `isPending`; dims button color during load) | Minor | `CommentSection.tsx` |
+| 2026-03-10 | Fix empty feed for new users: when user follows nobody, fall back to global feed (all posts) instead of filtering to own posts only | Minor | `community_service.go`, `post_repository.go` |
+| 2026-03-10 | Fix Follow button resetting to "Follow" on page refresh: add `isFollowing` field to `PostItem` proto, batch-check follow status in `GetFeed`/`GetUserPosts`/`GetPost`, pass down through `PostCard` → `PostHeader` → `FollowButton` | Minor | `community.proto`, `interfaces.go`, `follow_repository.go`, `community_service.go`, `PostCard.tsx` |
 
 ## Known Issues / Technical Debt
 

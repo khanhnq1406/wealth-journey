@@ -22,6 +22,7 @@ message PostItem {
   bool isOwnPost = 11 [json_name = "isOwnPost"];
   int64 createdAt = 12 [json_name = "createdAt"];
   int64 updatedAt = 13 [json_name = "updatedAt"];
+  bool isFollowing = 14 [json_name = "isFollowing"];
 }
 
 // CommentItem represents a comment on a post

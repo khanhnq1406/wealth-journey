@@ -58,6 +58,20 @@ func (r *followRepository) GetFollowingIDs(ctx context.Context, userID int32) ([
 	return ids, nil
 }
 
+func (r *followRepository) GetFollowedAuthorIDs(ctx context.Context, followerID int32, authorIDs []int32) ([]int32, error) {
+	if len(authorIDs) == 0 {
+		return nil, nil
+	}
+	var ids []int32
+	err := r.db.DB.WithContext(ctx).Model(&models.UserFollow{}).
+		Where("follower_id = ? AND following_id IN ?", followerID, authorIDs).
+		Pluck("following_id", &ids).Error
+	if err != nil {
+		return nil, r.handleDBError(err, "follow", "get followed author IDs")
+	}
+	return ids, nil
+}
+
 func (r *followRepository) GetFollowerCount(ctx context.Context, userID int32) (int32, error) {
 	var count int64
 	err := r.db.DB.WithContext(ctx).Model(&models.UserFollow{}).

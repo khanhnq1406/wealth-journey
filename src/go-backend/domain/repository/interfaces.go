@@ -338,6 +338,8 @@ type FollowRepository interface {
 	Delete(ctx context.Context, followerID, followingID int32) error
 	Exists(ctx context.Context, followerID, followingID int32) (bool, error)
 	GetFollowingIDs(ctx context.Context, userID int32) ([]int32, error)
+	// GetFollowedAuthorIDs returns the subset of authorIDs that followerID is following.
+	GetFollowedAuthorIDs(ctx context.Context, followerID int32, authorIDs []int32) ([]int32, error)
 	GetFollowerCount(ctx context.Context, userID int32) (int32, error)
 	GetFollowingCount(ctx context.Context, userID int32) (int32, error)
 }

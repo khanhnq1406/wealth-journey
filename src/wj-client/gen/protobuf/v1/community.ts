@@ -25,6 +25,7 @@ export interface PostItem {
   isOwnPost: boolean;
   createdAt: number;
   updatedAt: number;
+  isFollowing: boolean;
 }
 
 /** CommentItem represents a comment on a post */
@@ -280,6 +281,7 @@ function createBasePostItem(): PostItem {
     isOwnPost: false,
     createdAt: 0,
     updatedAt: 0,
+    isFollowing: false,
   };
 }
 
@@ -323,6 +325,9 @@ export const PostItem: MessageFns<PostItem> = {
     }
     if (message.updatedAt !== 0) {
       writer.uint32(104).int64(message.updatedAt);
+    }
+    if (message.isFollowing !== false) {
+      writer.uint32(112).bool(message.isFollowing);
     }
     return writer;
   },
@@ -438,6 +443,14 @@ export const PostItem: MessageFns<PostItem> = {
           message.updatedAt = longToNumber(reader.int64());
           continue;
         }
+        case 14: {
+          if (tag !== 112) {
+            break;
+          }
+
+          message.isFollowing = reader.bool();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -462,6 +475,7 @@ export const PostItem: MessageFns<PostItem> = {
       isOwnPost: isSet(object.isOwnPost) ? globalThis.Boolean(object.isOwnPost) : false,
       createdAt: isSet(object.createdAt) ? globalThis.Number(object.createdAt) : 0,
       updatedAt: isSet(object.updatedAt) ? globalThis.Number(object.updatedAt) : 0,
+      isFollowing: isSet(object.isFollowing) ? globalThis.Boolean(object.isFollowing) : false,
     };
   },
 
@@ -506,6 +520,9 @@ export const PostItem: MessageFns<PostItem> = {
     if (message.updatedAt !== 0) {
       obj.updatedAt = Math.round(message.updatedAt);
     }
+    if (message.isFollowing !== false) {
+      obj.isFollowing = message.isFollowing;
+    }
     return obj;
   },
 
@@ -527,6 +544,7 @@ export const PostItem: MessageFns<PostItem> = {
     message.isOwnPost = object.isOwnPost ?? false;
     message.createdAt = object.createdAt ?? 0;
     message.updatedAt = object.updatedAt ?? 0;
+    message.isFollowing = object.isFollowing ?? false;
     return message;
   },
 };
