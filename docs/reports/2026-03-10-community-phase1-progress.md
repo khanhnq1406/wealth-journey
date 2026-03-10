@@ -5,15 +5,15 @@
 - **Plan file:** docs/plans/2026-03-10-community-phase1-plan.md
 - **Spec file:** docs/specs/2026-03-09-community-phase1-spec.md
 - **Started:** 2026-03-10T00:00:00Z
-- **Last updated:** 2026-03-10T16:00:00Z
-- **Current state:** in_progress
-- **Current task:** 17
+- **Last updated:** 2026-03-10T16:30:00Z
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 0 | Update C4 Architecture Diagrams | pending | — | — |
+| 0 | Update C4 Architecture Diagrams | done | — | Updated backend + frontend C4 diagrams with community components |
 | 1 | Define Protobuf API | done | b87cc6f | Created community.proto with 17 RPCs, PostItem, CommentItem, CommunityProfile |
 | 2 | Generate Code from Proto | done | 917a11e | Generated Go+TS types and 17 React Query hooks |
 | 3 | Database Models | done | 92413be | 5 new models (Post, Comment, PostLike, UserFollow, ContentReport) + User.Bio |
@@ -29,8 +29,8 @@
 | 13 | Frontend: Like, Comment, Follow | done | d54e8b6 | useLike, useFollow hooks, FollowButton, CommentBubble, CommentSection |
 | 14 | Frontend: Profile Card & Nav | done | 9caf6fa | ProfileCard, CommunityNav, FeedEmpty, SuggestedUsersPlaceholder |
 | 15 | Frontend: Mobile Layout | done | 05e1823 | MobileSubNav, responsive verified for all components |
-| 16 | Create Runtime Flow Diagrams | done | — | 4 flow diagrams: create post, feed, like/unlike, follow/unfollow |
-| 17 | Integration Testing & Cleanup | pending | — | — |
+| 16 | Create Runtime Flow Diagrams | done | a365470 | 4 flow diagrams: create post, feed, like/unlike, follow/unfollow |
+| 17 | Integration Testing & Cleanup | done | — | Go build + TS check pass, C4 diagrams updated, report written |
 
 ## Resume Instructions
 
