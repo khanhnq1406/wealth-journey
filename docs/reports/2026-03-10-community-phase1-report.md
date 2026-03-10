@@ -211,6 +211,7 @@ Implemented a finance-focused community social feed for WealthJourney. The commu
 | 2026-03-10 | Fix empty feed for new users: when user follows nobody, fall back to global feed (all posts) instead of filtering to own posts only | Minor | `community_service.go`, `post_repository.go` |
 | 2026-03-10 | Fix Follow button resetting to "Follow" on page refresh: add `isFollowing` field to `PostItem` proto, batch-check follow status in `GetFeed`/`GetUserPosts`/`GetPost`, pass down through `PostCard` → `PostHeader` → `FollowButton` | Minor | `community.proto`, `interfaces.go`, `follow_repository.go`, `community_service.go`, `PostCard.tsx` |
 | 2026-03-10 | Remove topic tag feature: delete `topic-tags.ts`, `TopicTag.tsx`, `CommunityTabBar.tsx`; remove `topicTag`/`topicFilter` fields from proto, model, service, repo, handler, forms, and components; add `cmd/migrate-drop-topic` to drop DB column | Minor | 22 files (proto, 5 backend, 3 deleted frontend, 7 modified frontend, generated code) |
+| 2026-03-10 | Fix comment section hidden under bottom nav on mobile: `-m-4` in community page negated the scroll container's `pb-safe-mobile` bottom padding, causing the last post's comment section to be clipped by the fixed bottom nav. Changed to `-mx-4 -mt-4` (negate only horizontal + top margins) so bottom safe-area padding is preserved. | Minor | `app/[locale]/dashboard/community/page.tsx` |
 
 ## Known Issues / Technical Debt
 

@@ -26,14 +26,14 @@ export default function CommunityPage() {
   };
 
   return (
-    <div className="flex flex-col h-full -m-4 sm:-m-6 lg:-m-8">
+    <div className="flex flex-col sm:h-full -mx-4 -mt-4 sm:-mx-6 sm:-mt-6 lg:-mx-8 lg:-mt-8">
       {/* Mobile sub-navigation - shown below sm */}
       <div className="sm:hidden">
         <MobileSubNav />
       </div>
 
       {/* Desktop body - 3 column */}
-      <div className="flex gap-6 p-4 sm:px-8 sm:py-6 flex-1 min-h-0">
+      <div className="flex gap-6 p-4 sm:px-8 sm:py-6 sm:flex-1 sm:min-h-0">
         {/* Left sidebar - hidden on mobile */}
         <CommunityLeftSidebar className="hidden sm:flex w-[280px] shrink-0" currentUser={currentUser} />
 
