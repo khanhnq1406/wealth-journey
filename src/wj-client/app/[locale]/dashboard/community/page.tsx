@@ -5,6 +5,7 @@ import { CommunityTabBar } from "@/features/community/components/CommunityTabBar
 import { CommunityFeed } from "@/features/community/components/CommunityFeed";
 import { CommunityLeftSidebar } from "@/features/community/components/CommunityLeftSidebar";
 import { CommunityRightSidebar } from "@/features/community/components/CommunityRightSidebar";
+import { CreatePostBox } from "@/features/community/components/CreatePostBox";
 
 export default function CommunityPage() {
   const [topicFilter, setTopicFilter] = useState("");
@@ -31,6 +32,9 @@ export default function CommunityPage() {
             activeFilter={topicFilter}
             onFilterChange={setTopicFilter}
           />
+
+          {/* Create post box */}
+          <CreatePostBox />
 
           {/* Feed list */}
           <CommunityFeed topicFilter={topicFilter} />
