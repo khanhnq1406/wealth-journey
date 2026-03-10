@@ -5,9 +5,9 @@
 - **Plan file:** docs/plans/2026-03-10-community-phase1-plan.md
 - **Spec file:** docs/specs/2026-03-09-community-phase1-spec.md
 - **Started:** 2026-03-10T00:00:00Z
-- **Last updated:** 2026-03-10T12:00:00Z
+- **Last updated:** 2026-03-10T14:30:00Z
 - **Current state:** in_progress
-- **Current task:** 13
+- **Current task:** 14
 
 ## Task Progress
 
@@ -25,8 +25,8 @@
 | 9 | Frontend: Constants & Route | done | e811358 | Route, nav restructure, CommunityIcon, i18n |
 | 10 | Frontend: Community Page Shell | done | 8b08247 | Page shell, feed, sidebars, tab bar, utils |
 | 11 | Frontend: PostCard Component | done | d3d96c7 | PostCard, PostHeader, PostBody, PostActions, Avatar, TopicTag |
-| 12 | Frontend: CreatePostBox & Form | in_progress | — | — |
-| 13 | Frontend: Like, Comment, Follow | pending | — | — |
+| 12 | Frontend: CreatePostBox & Form | done | 826f2d4 | CreatePostBox, CreatePostForm, EditPostForm, Zod schemas |
+| 13 | Frontend: Like, Comment, Follow | done | — | useLike, useFollow hooks, FollowButton, CommentBubble, CommentSection |
 | 14 | Frontend: Profile Card & Nav | pending | — | — |
 | 15 | Frontend: Mobile Layout | pending | — | — |
 | 16 | Create Runtime Flow Diagrams | pending | — | — |
