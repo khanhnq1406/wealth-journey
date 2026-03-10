@@ -9,9 +9,11 @@ import { FeedEmpty } from "./FeedEmpty";
 
 interface CommunityFeedProps {
   currentUser: { id: number; name: string; picture: string };
+  hashtag?: string;
+  onHashtagClick?: (tag: string) => void;
 }
 
-export function CommunityFeed({ currentUser }: CommunityFeedProps) {
+export function CommunityFeed({ currentUser, hashtag, onHashtagClick }: CommunityFeedProps) {
   const [page, setPage] = useState(1);
   const pageSize = 20;
   const queryClient = useQueryClient();
@@ -19,6 +21,7 @@ export function CommunityFeed({ currentUser }: CommunityFeedProps) {
   const { data, isLoading, error } = useQueryGetFeed(
     {
       pagination: { page, pageSize, orderBy: "", order: "" },
+      hashtag: hashtag ?? "",
     },
     { refetchOnMount: "always" }
   );
@@ -53,12 +56,25 @@ export function CommunityFeed({ currentUser }: CommunityFeedProps) {
 
   return (
     <div className="flex flex-col gap-4">
+      {hashtag && (
+        <div className="flex items-center gap-2 px-4 sm:px-0">
+          <span className="font-vietnam text-sm text-v2-text-secondary">Lọc theo:</span>
+          <button
+            onClick={() => onHashtagClick?.("")}
+            className="flex items-center gap-1 px-3 py-1 rounded-full bg-v2-bg-primary border border-v2-border-light font-vietnam text-sm text-bg hover:bg-green-50 transition-colors"
+          >
+            #{hashtag}
+            <span className="text-v2-text-tertiary ml-1">×</span>
+          </button>
+        </div>
+      )}
       {posts.map((post) => (
         <PostCard
           key={post.id}
           post={post}
           currentUser={currentUser}
           onPostUpdated={handlePostUpdated}
+          onHashtagClick={onHashtagClick}
         />
       ))}
 
