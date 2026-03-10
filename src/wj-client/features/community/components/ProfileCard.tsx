@@ -1,21 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useQueryGetCommunityProfile, useMutationUpdateBio } from "@/utils/generated/hooks";
+import { useQueryGetCommunityProfile, useMutationUpdateBio, EVENT_CommunityGetCommunityProfile } from "@/utils/generated/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
-import { store } from "@/features/auth/store/store";
 import { Pencil, Check, X } from "lucide-react";
-import { cn } from "@/lib/utils/cn";
 
-export function ProfileCard() {
-  const user = store.getState().setAuthReducer;
-  const userId = user?.id ?? 0;
+interface ProfileCardProps {
+  currentUser: { id: number; name: string; picture: string };
+}
+
+export function ProfileCard({ currentUser }: ProfileCardProps) {
   const queryClient = useQueryClient();
 
   const { data } = useQueryGetCommunityProfile(
-    { userId },
-    { enabled: userId > 0, refetchOnMount: "always" }
+    { userId: currentUser.id },
+    { enabled: currentUser.id > 0, refetchOnMount: "always" }
   );
 
   const profile = data?.data;
@@ -26,7 +26,7 @@ export function ProfileCard() {
   const updateBioMutation = useMutationUpdateBio({
     onSuccess: () => {
       setIsEditingBio(false);
-      queryClient.invalidateQueries({ queryKey: ["GetCommunityProfile"] });
+      queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetCommunityProfile] });
     },
   });
 
@@ -59,8 +59,8 @@ export function ProfileCard() {
         {/* Avatar overlapping banner */}
         <div className="-mt-9 mb-2">
           <Avatar
-            name={profile?.userName || user?.fullname || "User"}
-            imageUrl={profile?.userPicture || user?.picture}
+            name={profile?.userName || currentUser.name}
+            imageUrl={profile?.userPicture || currentUser.picture}
             size="lg"
             className="!w-[72px] !h-[72px] !text-xl ring-[3px] ring-white"
           />
@@ -68,7 +68,7 @@ export function ProfileCard() {
 
         {/* Name */}
         <p className="font-vietnam text-lg font-bold text-v2-text-primary">
-          {profile?.userName || user?.fullname || "User"}
+          {profile?.userName || currentUser.name}
         </p>
 
         {/* Bio */}

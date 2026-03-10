@@ -1,15 +1,32 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { CommunityTabBar } from "@/features/community/components/CommunityTabBar";
 import { CommunityFeed } from "@/features/community/components/CommunityFeed";
 import { CommunityLeftSidebar } from "@/features/community/components/CommunityLeftSidebar";
 import { CommunityRightSidebar } from "@/features/community/components/CommunityRightSidebar";
 import { CreatePostBox } from "@/features/community/components/CreatePostBox";
 import { MobileSubNav } from "@/features/community/components/MobileSubNav";
+import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
 
 export default function CommunityPage() {
   const [topicFilter, setTopicFilter] = useState("");
+  const { user, isLoading: authLoading } = useAuth();
+
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  const currentUser = {
+    id: user?.id ?? 0,
+    name: user?.name ?? "User",
+    picture: user?.picture ?? "",
+  };
 
   return (
     <div className="flex flex-col h-full -m-4 sm:-m-6 lg:-m-8">
@@ -28,7 +45,7 @@ export default function CommunityPage() {
       {/* Desktop body - 3 column */}
       <div className="flex gap-6 p-4 sm:px-8 sm:py-6 flex-1 min-h-0">
         {/* Left sidebar - hidden on mobile */}
-        <CommunityLeftSidebar className="hidden sm:flex w-[280px] shrink-0" />
+        <CommunityLeftSidebar className="hidden sm:flex w-[280px] shrink-0" currentUser={currentUser} />
 
         {/* Center feed - fill width */}
         <div className="flex-1 min-w-0 flex flex-col gap-4">
@@ -40,10 +57,10 @@ export default function CommunityPage() {
           />
 
           {/* Create post box */}
-          <CreatePostBox />
+          <CreatePostBox currentUser={currentUser} />
 
           {/* Feed list */}
-          <CommunityFeed topicFilter={topicFilter} />
+          <CommunityFeed topicFilter={topicFilter} currentUser={currentUser} />
         </div>
 
         {/* Right sidebar - hidden on mobile and tablet */}

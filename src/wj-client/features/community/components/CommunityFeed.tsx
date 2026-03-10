@@ -2,37 +2,31 @@
 
 import { useState } from "react";
 import { useQueryGetFeed } from "@/utils/generated/hooks";
+import { useQueryClient } from "@tanstack/react-query";
 import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
 import { PostCard } from "./PostCard";
 import { FeedEmpty } from "./FeedEmpty";
-import { store } from "@/features/auth/store/store";
 
 interface CommunityFeedProps {
   topicFilter: string;
+  currentUser: { id: number; name: string; picture: string };
 }
 
-export function CommunityFeed({ topicFilter }: CommunityFeedProps) {
+export function CommunityFeed({ topicFilter, currentUser }: CommunityFeedProps) {
   const [page, setPage] = useState(1);
-  const [expandedComments, setExpandedComments] = useState<number | null>(null);
   const pageSize = 20;
-  const user = store.getState().setAuthReducer;
-  const currentUserId = user?.id ?? 0;
+  const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQueryGetFeed(
     {
       topicFilter,
-      page,
-      pageSize,
+      pagination: { page, pageSize, orderBy: "", order: "" },
     },
     { refetchOnMount: "always" }
   );
 
-  const handleLikeToggle = (postId: number, _isLiked: boolean) => {
-    // Will be implemented in Task 13 with useLike hook
-  };
-
-  const handleCommentClick = (postId: number) => {
-    setExpandedComments(expandedComments === postId ? null : postId);
+  const handlePostUpdated = () => {
+    queryClient.invalidateQueries({ queryKey: ["GetFeed"] });
   };
 
   if (isLoading) {
@@ -63,15 +57,14 @@ export function CommunityFeed({ topicFilter }: CommunityFeedProps) {
     <div className="flex flex-col gap-4">
       {posts.map((post) => (
         <PostCard
-          key={post.postId}
+          key={post.id}
           post={post}
-          currentUserId={currentUserId}
-          onLikeToggle={handleLikeToggle}
-          onCommentClick={handleCommentClick}
+          currentUser={currentUser}
+          onPostUpdated={handlePostUpdated}
         />
       ))}
 
-      {data?.hasMore && (
+      {data?.pagination && data.pagination.page < data.pagination.totalPages && (
         <button
           onClick={() => setPage((p) => p + 1)}
           className="py-3 text-center font-vietnam text-sm font-medium text-v2-red-primary hover:text-v2-red-dark transition-colors"

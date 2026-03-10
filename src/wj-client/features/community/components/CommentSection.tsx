@@ -5,22 +5,21 @@ import { useQueryGetComments, useMutationCreateComment } from "@/utils/generated
 import { useQueryClient } from "@tanstack/react-query";
 import { CommentBubble } from "./CommentBubble";
 import { Avatar } from "./Avatar";
-import { store } from "@/features/auth/store/store";
 import { Send } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 interface CommentSectionProps {
   postId: number;
+  currentUser: { id: number; name: string; picture: string };
 }
 
-export function CommentSection({ postId }: CommentSectionProps) {
+export function CommentSection({ postId, currentUser }: CommentSectionProps) {
   const [commentText, setCommentText] = useState("");
   const [page, setPage] = useState(1);
-  const user = store.getState().setAuthReducer;
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQueryGetComments(
-    { postId, page, pageSize: 5 },
+    { postId, pagination: { page, pageSize: 5, orderBy: "", order: "" } },
     { refetchOnMount: "always" }
   );
 
@@ -48,6 +47,8 @@ export function CommentSection({ postId }: CommentSectionProps) {
   };
 
   const comments = data?.comments ?? [];
+  const pagination = data?.pagination;
+  const hasMore = pagination ? pagination.page < pagination.totalPages : false;
 
   return (
     <div className="mt-3 pt-3 border-t border-[#EDE8E1]">
@@ -60,14 +61,14 @@ export function CommentSection({ postId }: CommentSectionProps) {
         )}
         {comments.map((comment) => (
           <CommentBubble
-            key={comment.commentId}
-            authorName={comment.authorName ?? ""}
-            authorPicture={comment.authorPicture}
+            key={comment.id}
+            authorName={comment.userName ?? ""}
+            authorPicture={comment.userPicture}
             content={comment.content ?? ""}
             createdAt={comment.createdAt ?? 0}
           />
         ))}
-        {data?.hasMore && (
+        {hasMore && (
           <button
             onClick={() => setPage((p) => p + 1)}
             className="text-xs font-vietnam font-medium text-v2-red-primary hover:text-v2-red-dark transition-colors py-1"
@@ -80,8 +81,8 @@ export function CommentSection({ postId }: CommentSectionProps) {
       {/* Add comment input */}
       <div className="flex items-center gap-2">
         <Avatar
-          name={user?.fullname || "User"}
-          imageUrl={user?.picture}
+          name={currentUser.name}
+          imageUrl={currentUser.picture}
           size="sm"
         />
         <div className="flex-1 flex items-center gap-2 bg-[#FAF9F7] rounded-full px-3 py-1.5">

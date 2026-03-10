@@ -2,24 +2,29 @@
 
 import { Avatar } from "./Avatar";
 import { TopicTag } from "./TopicTag";
+import { FollowButton } from "./FollowButton";
 import { formatRelativeTime } from "../utils/time-format";
 import { MoreHorizontal } from "lucide-react";
 
 interface PostHeaderProps {
+  authorId: number;
   authorName: string;
   authorPicture?: string;
   topicTag?: string;
   createdAt: number;
   isOwnPost: boolean;
+  isFollowing?: boolean;
   onMenuClick?: () => void;
 }
 
 export function PostHeader({
+  authorId,
   authorName,
   authorPicture,
   topicTag,
   createdAt,
   isOwnPost,
+  isFollowing = false,
   onMenuClick,
 }: PostHeaderProps) {
   return (
@@ -27,9 +32,18 @@ export function PostHeader({
       <div className="flex items-center gap-3 min-w-0">
         <Avatar name={authorName} imageUrl={authorPicture} size="md" />
         <div className="min-w-0">
-          <p className="font-vietnam text-sm font-semibold text-v2-text-primary truncate">
-            {authorName}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="font-vietnam text-sm font-semibold text-v2-text-primary truncate">
+              {authorName}
+            </p>
+            {!isOwnPost && (
+              <FollowButton
+                targetUserId={authorId}
+                initialIsFollowing={isFollowing}
+                className="!px-2.5 !py-0.5 !text-[11px]"
+              />
+            )}
+          </div>
           <div className="flex items-center gap-1.5 text-v2-text-tertiary">
             <span className="font-jetbrains text-xs">
               {formatRelativeTime(createdAt)}

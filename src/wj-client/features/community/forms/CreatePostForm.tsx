@@ -8,17 +8,17 @@ import { useQueryClient } from "@tanstack/react-query";
 import { createPostSchema, type CreatePostFormData } from "../utils/community.schema";
 import { TOPIC_TAGS } from "../utils/topic-tags";
 import { Avatar } from "../components/Avatar";
-import { store } from "@/features/auth/store/store";
 import { cn } from "@/lib/utils/cn";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, X } from "lucide-react";
 
 interface CreatePostFormProps {
+  currentUser: { id: number; name: string; picture: string };
   onSuccess?: () => void;
 }
 
-export function CreatePostForm({ onSuccess }: CreatePostFormProps) {
+export function CreatePostForm({ currentUser, onSuccess }: CreatePostFormProps) {
   const [errorMessage, setErrorMessage] = useState<string>();
-  const user = store.getState().setAuthReducer;
+  const [showImageInput, setShowImageInput] = useState(false);
   const queryClient = useQueryClient();
 
   const {
@@ -54,7 +54,7 @@ export function CreatePostForm({ onSuccess }: CreatePostFormProps) {
     createPostMutation.mutate({
       content: data.content,
       topicTag: data.topicTag,
-      imageUrl: data.imageUrl || undefined,
+      imageUrl: data.imageUrl || "",
     });
   };
 
@@ -66,13 +66,13 @@ export function CreatePostForm({ onSuccess }: CreatePostFormProps) {
       {/* User info */}
       <div className="flex items-center gap-3">
         <Avatar
-          name={user?.fullname || "User"}
-          imageUrl={user?.picture}
+          name={currentUser.name}
+          imageUrl={currentUser.picture}
           size="lg"
         />
         <div>
           <p className="font-vietnam text-sm font-semibold text-v2-text-primary">
-            {user?.fullname || "User"}
+            {currentUser.name}
           </p>
         </div>
       </div>
@@ -122,6 +122,36 @@ export function CreatePostForm({ onSuccess }: CreatePostFormProps) {
         </div>
       </div>
 
+      {/* Image URL input */}
+      {showImageInput && (
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <p className="font-vietnam text-xs font-medium text-v2-text-tertiary">
+              URL ảnh
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setShowImageInput(false);
+                setValue("imageUrl", "");
+              }}
+              className="p-0.5 rounded-full text-v2-text-tertiary hover:bg-gray-100 transition-colors"
+            >
+              <X size={14} />
+            </button>
+          </div>
+          <input
+            {...register("imageUrl")}
+            type="url"
+            placeholder="https://example.com/image.jpg"
+            className="w-full border border-v2-border-light rounded-xl px-3 py-2 font-vietnam text-sm text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none focus:border-v2-red-primary transition-colors"
+          />
+          {errors.imageUrl && (
+            <p className="mt-1 text-xs text-red-500 font-vietnam">{errors.imageUrl.message}</p>
+          )}
+        </div>
+      )}
+
       {/* Error message */}
       {errorMessage && (
         <div className="p-3 rounded-lg bg-red-50 border border-red-200">
@@ -134,9 +164,15 @@ export function CreatePostForm({ onSuccess }: CreatePostFormProps) {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-v2-text-secondary hover:bg-v2-bg-primary transition-colors font-vietnam text-sm"
+            onClick={() => setShowImageInput(!showImageInput)}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors font-vietnam text-sm",
+              showImageInput
+                ? "text-v2-red-primary bg-v2-red-light"
+                : "text-v2-text-secondary hover:bg-v2-bg-primary"
+            )}
           >
-            <ImageIcon size={18} className="text-v2-text-tertiary" />
+            <ImageIcon size={18} className={showImageInput ? "text-v2-red-primary" : "text-v2-text-tertiary"} />
             <span>Ảnh</span>
           </button>
         </div>

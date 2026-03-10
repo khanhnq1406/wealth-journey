@@ -86,6 +86,76 @@ Implemented a finance-focused community social feed for WealthJourney. The commu
 - **Runtime Flow Diagrams** (`flow-community.md`): 4 sequence diagrams (create post, feed generation, like/unlike, follow/unfollow)
 - **Architecture README**: Updated dynamic behavior diagrams table
 
+## Bugfix: Community Frontend Hotfix (2026-03-10)
+
+### Issues Reported
+
+| # | Issue | Root Cause | Severity |
+|---|-------|------------|----------|
+| 1 | Like/comment buttons do nothing | `CommunityFeed.handleLikeToggle` was a stub; `CommentSection` never rendered; proto field name mismatches (`post.postId`→`post.id`, `post.authorId`→`post.userId`, etc.) | Critical |
+| 2 | Image post button does nothing | `CreatePostForm` had no image URL input field — the image button just opened the form without image support | Medium |
+| 3 | Bio doesn't save after editing | `ProfileCard` used Redux store `setAuthReducer` which has no `id` field → `userId = 0` → profile query returned nothing | Critical |
+| 4 | Avatar doesn't show Google image | Same root cause as #3: Redux store's `picture` field was not reliably populated; `useAuth` hook provides correct `user.picture` | Medium |
+| 5 | Can't click follow button on posts | `FollowButton` component existed but was never integrated into `PostHeader` | Medium |
+
+### Root Cause Analysis
+
+**Primary root cause:** Components used `store.getState().setAuthReducer` (Redux legacy store) which lacks `id` field. The `AuthPayload` interface only has `{ isAuthenticated, email, fullname, picture, preferredCurrency }` — no `id`. This caused `userId = 0` across all community components, making all API calls fail silently.
+
+**Secondary root cause:** Proto field name mismatches. Components referenced `post.postId`, `post.authorId`, `post.authorName`, `post.authorPicture`, `comment.commentId`, `comment.authorName` — but the generated TypeScript interfaces use `post.id`, `post.userId`, `post.userName`, `post.userPicture`, `comment.id`, `comment.userName`. All these fields resolved to `undefined`.
+
+**Tertiary root cause:** Incomplete wiring. `useLike` hook was created (Task 13) but never integrated into `CommunityFeed`/`PostCard`. `CommentSection` had toggle state but no render. `FollowButton` existed but was not placed in `PostHeader`.
+
+### Fix Approach
+
+**Classification:** Minor fix path — all changes in frontend components only, no new business logic, no security-relevant changes, no API/proto changes.
+
+**Strategy:** Replace Redux store access with `useAuth` hook at page level, pass `currentUser` prop down the component tree. Fix all proto field name references. Wire existing hooks (`useLike`, `useFollow`) into the component hierarchy.
+
+### Fix Tasks Completed
+
+| # | Task | Status | Files Changed |
+|---|------|--------|---------------|
+| F-1 | Replace Redux store with useAuth hook | Done | 7 modified |
+| F-2 | Wire useLike hook into PostCard | Done | 2 modified |
+| F-3 | Render CommentSection on toggle | Done | 2 modified |
+| F-4 | Add image URL input to CreatePostForm | Done | 1 modified |
+| F-5 | Add FollowButton to PostHeader | Done | 1 modified |
+| F-6 | Fix proto field name mismatches | Done | 4 modified |
+| F-7 | Fix pagination request format | Done | 2 modified |
+
+### Files Changed (Hotfix)
+
+| File | Changes |
+|------|---------|
+| `src/wj-client/app/[locale]/dashboard/community/page.tsx` | Use `useAuth` hook; create `currentUser` object with `id`, `name`, `picture`; pass to children; add auth loading state |
+| `src/wj-client/features/community/components/CommunityFeed.tsx` | Accept `currentUser` prop; remove Redux dep; fix `post.id` key; fix pagination format `{ pagination: { page, pageSize } }` |
+| `src/wj-client/features/community/components/PostCard.tsx` | Integrate `useLike` hook; render `CommentSection` on toggle; fix all proto field names (`id`, `userId`, `userName`, `userPicture`, `isOwnPost`) |
+| `src/wj-client/features/community/components/PostHeader.tsx` | Add `FollowButton` for non-own posts; accept `authorId`, `isFollowing` props |
+| `src/wj-client/features/community/components/CommentSection.tsx` | Accept `currentUser` prop; remove Redux dep; fix comment field names (`comment.id`, `comment.userName`, `comment.userPicture`); fix pagination format |
+| `src/wj-client/features/community/components/ProfileCard.tsx` | Accept `currentUser` prop; remove Redux dep; use correct query invalidation key `EVENT_CommunityGetCommunityProfile` |
+| `src/wj-client/features/community/components/CreatePostBox.tsx` | Accept `currentUser` prop; remove Redux dep |
+| `src/wj-client/features/community/components/CommunityLeftSidebar.tsx` | Pass `currentUser` to `ProfileCard` |
+| `src/wj-client/features/community/forms/CreatePostForm.tsx` | Accept `currentUser` prop; remove Redux dep; add toggleable image URL input field with `showImageInput` state |
+| `src/wj-client/features/community/forms/EditPostForm.tsx` | Fix `post.postId` → `post.id`; fix `imageUrl` type (`undefined` → `""`) |
+
+### Verification Results (Hotfix)
+
+| Check | Result |
+|-------|--------|
+| `go build ./domain/... ./handlers/... ./internal/... ./pkg/...` | Pass |
+| `npx tsc --noEmit` (community files) | Pass (0 community errors) |
+
+### Security Review (Hotfix)
+
+| Concern | Assessment |
+|---------|-----------|
+| Auth data source | Improved: `useAuth` hook uses JWT-verified user data from `verifyAuth` API call, more reliable than Redux store snapshot |
+| User ID integrity | Fixed: `currentUser.id` now comes from server-verified auth response, not client-side Redux state |
+| No new endpoints | Confirmed: all changes are frontend-only prop/wiring fixes |
+| No new data exposure | Confirmed: same data flows, corrected field references |
+| XSS prevention | Unchanged: image URL input uses standard `<input type="url">`, rendered via React auto-escaping |
+
 ## Known Issues / Technical Debt
 
 1. **No server-side image upload**: Phase 1 uses image URLs directly; Phase 2 should add Supabase storage upload
@@ -193,7 +263,11 @@ Implemented a finance-focused community social feed for WealthJourney. The commu
 4. Navigate to `/dashboard/community`
 5. **Empty state**: See "Chưa có bài viết nào" empty feed message
 6. **Create post**: Click "Chia sẻ kiến thức tài chính..." → fill form → submit
-7. **Like post**: Click heart icon → heart fills red, count increments
-8. **Comment**: Click comment icon → expand comment section → type → send
-9. **Profile card**: Left sidebar shows user profile with stats and bio editing
-10. **Mobile**: Resize to <800px → see full-width cards, mobile sub-nav, topic filter bar
+7. **Create post with image**: In create post form, click "Ảnh" → paste image URL → submit
+8. **Like post**: Click heart icon → heart fills red, count increments; click again → unlike
+9. **Comment**: Click comment icon → expand comment section → type → send → comment appears
+10. **Follow**: On other users' posts, click "Theo dõi" button next to author name → toggles to "Đang theo dõi"
+11. **Profile card**: Left sidebar shows user profile with Google avatar, stats, and bio editing
+12. **Edit bio**: Click pencil icon → edit text → click checkmark → bio saves and refreshes
+13. **Avatar**: Verify Google profile picture shows in profile card, post creation box, and comment input
+14. **Mobile**: Resize to <800px → see full-width cards, mobile sub-nav, topic filter bar

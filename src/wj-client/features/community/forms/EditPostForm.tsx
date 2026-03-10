@@ -50,10 +50,10 @@ export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
   const onSubmit = (data: EditPostFormData) => {
     setErrorMessage(undefined);
     updatePostMutation.mutate({
-      postId: post.postId ?? 0,
+      postId: post.id ?? 0,
       content: data.content,
       topicTag: data.topicTag,
-      imageUrl: data.imageUrl || undefined,
+      imageUrl: data.imageUrl || "",
     });
   };
 

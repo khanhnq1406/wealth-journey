@@ -4,24 +4,23 @@ import { useState } from "react";
 import { Avatar } from "./Avatar";
 import { BaseModal } from "@/components/modals/BaseModal";
 import { CreatePostForm } from "../forms/CreatePostForm";
-import { store } from "@/features/auth/store/store";
 import { ImageIcon } from "lucide-react";
 
 interface CreatePostBoxProps {
+  currentUser: { id: number; name: string; picture: string };
   onPostCreated?: () => void;
 }
 
-export function CreatePostBox({ onPostCreated }: CreatePostBoxProps) {
+export function CreatePostBox({ currentUser, onPostCreated }: CreatePostBoxProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const user = store.getState().setAuthReducer;
 
   return (
     <>
       <div className="bg-white sm:rounded-2xl border-b sm:border border-v2-border-light p-4">
         <div className="flex items-center gap-3">
           <Avatar
-            name={user?.fullname || "User"}
-            imageUrl={user?.picture}
+            name={currentUser.name}
+            imageUrl={currentUser.picture}
             size="md"
           />
           <button
@@ -49,6 +48,7 @@ export function CreatePostBox({ onPostCreated }: CreatePostBoxProps) {
         title="Tạo bài viết"
       >
         <CreatePostForm
+          currentUser={currentUser}
           onSuccess={() => {
             setIsModalOpen(false);
             onPostCreated?.();
