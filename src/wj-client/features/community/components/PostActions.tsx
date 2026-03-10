@@ -1,20 +1,28 @@
 "use client";
 
-import { Heart, MessageCircle } from "lucide-react";
+import { Heart, MessageCircle, Share2, Bookmark } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 interface PostActionsProps {
   isLiked: boolean;
   onLikeToggle: () => void;
   onCommentClick: () => void;
+  onShareClick?: () => void;
+  onSaveToggle?: () => void;
+  isSaved?: boolean;
   isLikeLoading?: boolean;
+  isSaveLoading?: boolean;
 }
 
 export function PostActions({
   isLiked,
   onLikeToggle,
   onCommentClick,
+  onShareClick,
+  onSaveToggle,
+  isSaved,
   isLikeLoading,
+  isSaveLoading,
 }: PostActionsProps) {
   return (
     <div className="flex items-center gap-1 mt-2 pt-2 border-t border-[#EDE8E1]">
@@ -22,7 +30,7 @@ export function PostActions({
         onClick={onLikeToggle}
         disabled={isLikeLoading}
         className={cn(
-          "flex items-center gap-1.5 px-4 py-2 rounded-lg transition-colors flex-1 justify-center",
+          "flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors flex-1 justify-center",
           "font-vietnam text-sm font-medium",
           isLiked
             ? "text-[#DC2626] hover:bg-red-50"
@@ -37,17 +45,48 @@ export function PostActions({
             isLiked ? "fill-[#DC2626] scale-110" : "fill-none"
           )}
         />
-        <span>{isLiked ? "Đã thích" : "Thích"}</span>
+        <span className="hidden sm:inline">{isLiked ? "Đã thích" : "Thích"}</span>
       </button>
 
       <button
         onClick={onCommentClick}
-        className="flex items-center gap-1.5 px-4 py-2 rounded-lg transition-colors font-vietnam text-sm font-medium text-v2-text-secondary hover:bg-v2-bg-primary flex-1 justify-center"
+        className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-vietnam text-sm font-medium text-v2-text-secondary hover:bg-v2-bg-primary flex-1 justify-center"
         aria-label="Comment"
       >
         <MessageCircle size={18} />
-        <span>Bình luận</span>
+        <span className="hidden sm:inline">Bình luận</span>
       </button>
+
+      {onShareClick && (
+        <button
+          onClick={onShareClick}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-vietnam text-sm font-medium text-v2-text-secondary hover:bg-v2-bg-primary flex-1 justify-center"
+          aria-label="Share"
+        >
+          <Share2 size={18} />
+          <span className="hidden sm:inline">Chia sẻ</span>
+        </button>
+      )}
+
+      {onSaveToggle && (
+        <button
+          onClick={onSaveToggle}
+          disabled={isSaveLoading}
+          className={cn(
+            "flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-vietnam text-sm font-medium flex-1 justify-center",
+            isSaved
+              ? "text-bg hover:bg-green-50"
+              : "text-v2-text-secondary hover:bg-v2-bg-primary"
+          )}
+          aria-label={isSaved ? "Unsave" : "Save"}
+        >
+          <Bookmark
+            size={18}
+            className={cn(isSaved ? "fill-bg" : "fill-none")}
+          />
+          <span className="hidden sm:inline">{isSaved ? "Đã lưu" : "Lưu"}</span>
+        </button>
+      )}
     </div>
   );
 }
