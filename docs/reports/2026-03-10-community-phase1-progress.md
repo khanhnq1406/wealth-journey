@@ -5,22 +5,22 @@
 - **Plan file:** docs/plans/2026-03-10-community-phase1-plan.md
 - **Spec file:** docs/specs/2026-03-09-community-phase1-spec.md
 - **Started:** 2026-03-10T00:00:00Z
-- **Last updated:** 2026-03-10T00:00:00Z
+- **Last updated:** 2026-03-10T12:00:00Z
 - **Current state:** in_progress
-- **Current task:** 1
+- **Current task:** 8
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
 | 0 | Update C4 Architecture Diagrams | pending | — | — |
-| 1 | Define Protobuf API | pending | — | — |
-| 2 | Generate Code from Proto | pending | — | — |
-| 3 | Database Models | pending | — | — |
-| 4 | Database Migration | pending | — | — |
-| 5 | Repositories | pending | — | — |
-| 6 | Community Service | pending | — | — |
-| 7 | Community Handlers | pending | — | — |
+| 1 | Define Protobuf API | done | b87cc6f | Created community.proto with 17 RPCs, PostItem, CommentItem, CommunityProfile |
+| 2 | Generate Code from Proto | done | 917a11e | Generated Go+TS types and 17 React Query hooks |
+| 3 | Database Models | done | 92413be | 5 new models (Post, Comment, PostLike, UserFollow, ContentReport) + User.Bio |
+| 4 | Database Migration | done | 9faf62a | Migration script + Taskfile task for community tables |
+| 5 | Repositories | done | 43deb1b | 5 repository interfaces and implementations |
+| 6 | Community Service | done | 612f0f1 | Full CommunityService with 17 methods |
+| 7 | Community Handlers | in_progress | — | Handler file created, committing now |
 | 8 | Wire DI & Routes | pending | — | — |
 | 9 | Frontend: Constants & Route | pending | — | — |
 | 10 | Frontend: Community Page Shell | pending | — | — |
@@ -44,3 +44,5 @@ To resume this implementation in a new session:
 ## Notes
 
 - Starting fresh implementation on feat/community-phase-1 branch
+- Pre-existing build errors in cmd/migrate-import and cmd/test-json — not related to our changes
+- Build verification uses: `go build ./domain/... ./handlers/... ./internal/... ./pkg/...`
