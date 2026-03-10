@@ -587,7 +587,7 @@ func (h *CommunityHandler) SavePost(c *gin.Context) {
 		return
 	}
 
-	handler.NoContent(c)
+	handler.Success(c, gin.H{"success": true})
 }
 
 // UnsavePost removes a post from the user's saved collection.
@@ -609,7 +609,7 @@ func (h *CommunityHandler) UnsavePost(c *gin.Context) {
 		return
 	}
 
-	handler.NoContent(c)
+	handler.Success(c, gin.H{"success": true})
 }
 
 // GetSavedPosts retrieves the user's saved posts.
