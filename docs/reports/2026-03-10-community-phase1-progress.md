@@ -20,8 +20,8 @@
 | 4 | Database Migration | done | 9faf62a | Migration script + Taskfile task for community tables |
 | 5 | Repositories | done | 43deb1b | 5 repository interfaces and implementations |
 | 6 | Community Service | done | 612f0f1 | Full CommunityService with 17 methods |
-| 7 | Community Handlers | in_progress | — | Handler file created, committing now |
-| 8 | Wire DI & Routes | pending | — | — |
+| 7 | Community Handlers | done | 6822db6 | 17 REST handler methods for all community endpoints |
+| 8 | Wire DI & Routes | in_progress | — | — |
 | 9 | Frontend: Constants & Route | pending | — | — |
 | 10 | Frontend: Community Page Shell | pending | — | — |
 | 11 | Frontend: PostCard Component | pending | — | — |

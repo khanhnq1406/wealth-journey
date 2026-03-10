@@ -218,6 +218,47 @@ func RegisterRoutes(
 		portfolio.GET("/historical-values", h.Investment.GetHistoricalPortfolioValues)
 	}
 
+	// Community routes (protected)
+	community := v1.Group("/community")
+	community.Use(AuthMiddleware(authSrv))
+	if rateLimiter != nil {
+		community.Use(appmiddleware.RateLimitByUser(rateLimiter))
+	}
+	{
+		// Feed
+		community.GET("/feed", h.Community.GetFeed)
+
+		// Posts — specific routes first
+		community.POST("/posts", h.Community.CreatePost)
+		community.GET("/posts/:post_id", h.Community.GetPost)
+		community.PUT("/posts/:post_id", h.Community.UpdatePost)
+		community.DELETE("/posts/:post_id", h.Community.DeletePost)
+
+		// Likes
+		community.POST("/posts/:post_id/like", h.Community.LikePost)
+		community.DELETE("/posts/:post_id/like", h.Community.UnlikePost)
+
+		// Comments
+		community.POST("/posts/:post_id/comments", h.Community.CreateComment)
+		community.GET("/posts/:post_id/comments", h.Community.GetComments)
+		community.DELETE("/comments/:comment_id", h.Community.DeleteComment)
+
+		// Users — specific routes first
+		community.GET("/users/:user_id/posts", h.Community.GetUserPosts)
+		community.GET("/users/:user_id/profile", h.Community.GetProfile)
+		community.POST("/users/:user_id/follow", h.Community.FollowUser)
+		community.DELETE("/users/:user_id/follow", h.Community.UnfollowUser)
+
+		// Profile
+		community.PUT("/profile/bio", h.Community.UpdateBio)
+
+		// Report
+		community.POST("/report", h.Community.ReportContent)
+
+		// Upload
+		community.POST("/upload-url", h.Community.GetUploadURL)
+	}
+
 	// Import routes (protected)
 	imports := v1.Group("/import")
 	if rateLimiter != nil {

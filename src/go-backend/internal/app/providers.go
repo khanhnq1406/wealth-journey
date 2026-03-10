@@ -84,6 +84,11 @@ func ProvideRepositories(db *database.Database) *service.Repositories {
 		MerchantRule:          repository.NewMerchantRuleRepository(db),
 		Keyword:               repository.NewKeywordRepository(db),
 		UserMapping:           repository.NewUserMappingRepository(db),
+		Post:                  repository.NewPostRepository(db),
+		Comment:               repository.NewCommentRepository(db),
+		Like:                  repository.NewLikeRepository(db),
+		Follow:                repository.NewFollowRepository(db),
+		Report:                repository.NewReportRepository(db),
 	}
 }
 
