@@ -5,9 +5,9 @@
 - **Plan file:** docs/plans/2026-03-10-community-phase1-plan.md
 - **Spec file:** docs/specs/2026-03-09-community-phase1-spec.md
 - **Started:** 2026-03-10T00:00:00Z
-- **Last updated:** 2026-03-10T15:30:00Z
+- **Last updated:** 2026-03-10T16:00:00Z
 - **Current state:** in_progress
-- **Current task:** 16
+- **Current task:** 17
 
 ## Task Progress
 
@@ -28,8 +28,8 @@
 | 12 | Frontend: CreatePostBox & Form | done | 826f2d4 | CreatePostBox, CreatePostForm, EditPostForm, Zod schemas |
 | 13 | Frontend: Like, Comment, Follow | done | d54e8b6 | useLike, useFollow hooks, FollowButton, CommentBubble, CommentSection |
 | 14 | Frontend: Profile Card & Nav | done | 9caf6fa | ProfileCard, CommunityNav, FeedEmpty, SuggestedUsersPlaceholder |
-| 15 | Frontend: Mobile Layout | done | — | MobileSubNav, responsive verified for all components |
-| 16 | Create Runtime Flow Diagrams | pending | — | — |
+| 15 | Frontend: Mobile Layout | done | 05e1823 | MobileSubNav, responsive verified for all components |
+| 16 | Create Runtime Flow Diagrams | done | — | 4 flow diagrams: create post, feed, like/unlike, follow/unfollow |
 | 17 | Integration Testing & Cleanup | pending | — | — |
 
 ## Resume Instructions
