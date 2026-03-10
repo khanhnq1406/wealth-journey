@@ -269,7 +269,7 @@ func RegisterRoutes(
 		// Phase 2: Saved Posts
 		community.POST("/posts/:post_id/save", h.Community.SavePost)
 		community.DELETE("/posts/:post_id/save", h.Community.UnsavePost)
-		community.GET("/saved-posts", h.Community.GetSavedPosts)
+		community.GET("/saved", h.Community.GetSavedPosts)
 
 		// Phase 2: Discovery
 		community.GET("/suggested-users", h.Community.GetSuggestedUsers)

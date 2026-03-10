@@ -1599,9 +1599,9 @@ cd src/wj-client && npm run build
 - [x] Check notification bell shows unread count
 - [x] Open notification panel → verify list renders with action text
 - [x] Click "Đọc tất cả" → verify all marked as read, badge clears
-- [ ] Click notification → navigates to correct post/profile
-- [ ] Bookmark a post → verify bookmark icon filled
-- [ ] Go to "Đã lưu" tab → verify saved post appears
+- [x] Click notification → navigates to correct post/profile
+- [x] Bookmark a post → verify bookmark icon filled
+- [x] Go to "Đã lưu" tab → verify saved post appears
 - [ ] Unbookmark → verify post removed from saved view
 - [ ] Check right sidebar → suggested users render with follow buttons
 - [ ] Dismiss a suggested user → removed from current session
