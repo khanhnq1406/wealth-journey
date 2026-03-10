@@ -1,21 +1,27 @@
 "use client";
 
-import { Newspaper, Users, User, Bell, Menu } from "lucide-react";
+import { Newspaper, Bookmark, User, Bell } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+
+type MobileNavView = "feed" | "saved" | "profile" | "notifications";
 
 type MobileNavTab = {
   label: string;
   icon: React.ReactNode;
-  active?: boolean;
-  disabled?: boolean;
+  view: MobileNavView;
 };
 
-export function MobileSubNav() {
+interface MobileSubNavProps {
+  activeView?: MobileNavView;
+  onViewChange?: (view: MobileNavView) => void;
+}
+
+export function MobileSubNav({ activeView = "feed", onViewChange }: MobileSubNavProps) {
   const tabs: MobileNavTab[] = [
-    { label: "Bảng tin", icon: <Newspaper size={18} />, active: true },
-    { label: "Nhóm", icon: <Users size={18} />, disabled: true },
-    { label: "Hồ sơ", icon: <User size={18} /> },
-    { label: "Thông báo", icon: <Bell size={18} />, disabled: true },
+    { label: "Bảng tin", icon: <Newspaper size={18} />, view: "feed" },
+    { label: "Đã lưu", icon: <Bookmark size={18} />, view: "saved" },
+    { label: "Hồ sơ", icon: <User size={18} />, view: "profile" },
+    { label: "Thông báo", icon: <Bell size={18} />, view: "notifications" },
   ];
 
   return (
@@ -24,13 +30,12 @@ export function MobileSubNav() {
         {tabs.map((tab) => (
           <button
             key={tab.label}
-            disabled={tab.disabled}
+            onClick={() => onViewChange?.(tab.view)}
             className={cn(
               "flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg transition-colors min-w-[56px]",
-              tab.active
+              activeView === tab.view
                 ? "text-v2-red-primary"
-                : "text-v2-text-tertiary",
-              tab.disabled && "opacity-40 cursor-not-allowed"
+                : "text-v2-text-tertiary hover:text-v2-text-secondary"
             )}
           >
             {tab.icon}
