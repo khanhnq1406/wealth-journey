@@ -88,6 +88,12 @@ tasks:
     cmds:
       - go run cmd/migrate-community/main.go
 
+  backend:migrate-drop-topic:
+    desc: "Drop topic_tag column from post table (topic feature removed)"
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - go run cmd/migrate-drop-topic/main.go
+
   # Frontend tasks
   frontend:dev:
     desc: "Start frontend in development mode"

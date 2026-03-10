@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutationCreatePost, EVENT_CommunityGetFeed } from "@/utils/generated/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { createPostSchema, type CreatePostFormData } from "../utils/community.schema";
-import { TOPIC_TAGS } from "../utils/topic-tags";
 import { Avatar } from "../components/Avatar";
 import { cn } from "@/lib/utils/cn";
 import { ImageIcon, X } from "lucide-react";
@@ -31,13 +30,11 @@ export function CreatePostForm({ currentUser, onSuccess }: CreatePostFormProps) 
     resolver: zodResolver(createPostSchema),
     defaultValues: {
       content: "",
-      topicTag: "",
       imageUrl: "",
     },
   });
 
   const content = watch("content");
-  const selectedTopic = watch("topicTag");
 
   const createPostMutation = useMutationCreatePost({
     onSuccess: () => {
@@ -53,7 +50,6 @@ export function CreatePostForm({ currentUser, onSuccess }: CreatePostFormProps) 
     setErrorMessage(undefined);
     createPostMutation.mutate({
       content: data.content,
-      topicTag: data.topicTag,
       imageUrl: data.imageUrl || "",
     });
   };
@@ -75,33 +71,6 @@ export function CreatePostForm({ currentUser, onSuccess }: CreatePostFormProps) 
             {currentUser.name}
           </p>
         </div>
-      </div>
-
-      {/* Topic tags */}
-      <div>
-        <p className="font-vietnam text-xs font-medium text-v2-text-tertiary mb-2">
-          Chủ đề
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {TOPIC_TAGS.map((tag) => (
-            <button
-              key={tag.value}
-              type="button"
-              onClick={() => setValue("topicTag", tag.value)}
-              className={cn(
-                "px-3 py-1.5 rounded-full text-[12px] font-vietnam font-medium transition-colors border",
-                selectedTopic === tag.value
-                  ? "bg-v2-red-primary text-white border-v2-red-primary"
-                  : "border-v2-border-light text-v2-text-secondary hover:bg-v2-bg-primary"
-              )}
-            >
-              {tag.label}
-            </button>
-          ))}
-        </div>
-        {errors.topicTag && (
-          <p className="mt-1 text-xs text-red-500 font-vietnam">{errors.topicTag.message}</p>
-        )}
       </div>
 
       {/* Content textarea */}

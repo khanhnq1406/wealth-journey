@@ -309,7 +309,7 @@ type PostRepository interface {
 	GetByID(ctx context.Context, id int32) (*models.Post, error)
 	Update(ctx context.Context, post *models.Post) error
 	SoftDelete(ctx context.Context, id int32) error
-	GetFeed(ctx context.Context, userIDs []int32, topicFilter string, opts ListOptions) ([]*models.Post, int, error)
+	GetFeed(ctx context.Context, userIDs []int32, opts ListOptions) ([]*models.Post, int, error)
 	GetByUserID(ctx context.Context, userID int32, opts ListOptions) ([]*models.Post, int, error)
 	IncrementLikeCount(ctx context.Context, postID int32, delta int32) error
 	IncrementCommentCount(ctx context.Context, postID int32, delta int32) error

@@ -131,9 +131,7 @@ func (h *CommunityHandler) GetFeed(c *gin.Context) {
 		return
 	}
 
-	req := &v1.GetFeedRequest{
-		TopicFilter: c.Query("topicFilter"),
-	}
+	req := &v1.GetFeedRequest{}
 
 	// Parse pagination from query params
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))

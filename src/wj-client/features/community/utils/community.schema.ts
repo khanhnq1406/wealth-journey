@@ -2,7 +2,6 @@ import { z } from "zod";
 
 export const createPostSchema = z.object({
   content: z.string().min(1, "Content is required").max(2000, "Maximum 2000 characters"),
-  topicTag: z.string().min(1, "Please select a topic"),
   imageUrl: z.string().url().optional().or(z.literal("")),
 });
 
@@ -10,7 +9,6 @@ export type CreatePostFormData = z.infer<typeof createPostSchema>;
 
 export const editPostSchema = z.object({
   content: z.string().min(1, "Content is required").max(2000, "Maximum 2000 characters"),
-  topicTag: z.string().min(1, "Please select a topic"),
   imageUrl: z.string().url().optional().or(z.literal("")),
 });
 

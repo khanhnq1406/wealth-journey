@@ -1,7 +1,6 @@
 "use client";
 
 import { Avatar } from "./Avatar";
-import { TopicTag } from "./TopicTag";
 import { FollowButton } from "./FollowButton";
 import { formatRelativeTime } from "../utils/time-format";
 import { MoreHorizontal } from "lucide-react";
@@ -10,7 +9,6 @@ interface PostHeaderProps {
   authorId: number;
   authorName: string;
   authorPicture?: string;
-  topicTag?: string;
   createdAt: number;
   isOwnPost: boolean;
   isFollowing?: boolean;
@@ -21,7 +19,6 @@ export function PostHeader({
   authorId,
   authorName,
   authorPicture,
-  topicTag,
   createdAt,
   isOwnPost,
   isFollowing = false,
@@ -48,12 +45,6 @@ export function PostHeader({
             <span className="font-jetbrains text-xs">
               {formatRelativeTime(createdAt)}
             </span>
-            {topicTag && (
-              <>
-                <span className="text-xs">·</span>
-                <TopicTag value={topicTag} />
-              </>
-            )}
           </div>
         </div>
       </div>

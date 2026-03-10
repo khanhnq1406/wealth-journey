@@ -38,7 +38,6 @@ export function PostCard({
         authorId={post.userId ?? 0}
         authorName={post.userName ?? ""}
         authorPicture={post.userPicture}
-        topicTag={post.topicTag}
         createdAt={post.createdAt ?? 0}
         isOwnPost={isOwnPost}
         isFollowing={post.isFollowing ?? false}

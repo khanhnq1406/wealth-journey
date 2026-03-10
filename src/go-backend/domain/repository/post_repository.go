@@ -41,7 +41,7 @@ func (r *postRepository) SoftDelete(ctx context.Context, id int32) error {
 	return r.executeDelete(ctx, &models.Post{}, id, "post")
 }
 
-func (r *postRepository) GetFeed(ctx context.Context, userIDs []int32, topicFilter string, opts ListOptions) ([]*models.Post, int, error) {
+func (r *postRepository) GetFeed(ctx context.Context, userIDs []int32, opts ListOptions) ([]*models.Post, int, error) {
 	var posts []*models.Post
 	var total int64
 
@@ -50,10 +50,6 @@ func (r *postRepository) GetFeed(ctx context.Context, userIDs []int32, topicFilt
 	// nil/empty userIDs means global feed (no follow filter)
 	if len(userIDs) > 0 {
 		query = query.Where("user_id IN ?", userIDs)
-	}
-
-	if topicFilter != "" {
-		query = query.Where("topic_tag = ?", topicFilter)
 	}
 
 	if err := query.Count(&total).Error; err != nil {

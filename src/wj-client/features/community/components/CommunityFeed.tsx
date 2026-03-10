@@ -8,18 +8,16 @@ import { PostCard } from "./PostCard";
 import { FeedEmpty } from "./FeedEmpty";
 
 interface CommunityFeedProps {
-  topicFilter: string;
   currentUser: { id: number; name: string; picture: string };
 }
 
-export function CommunityFeed({ topicFilter, currentUser }: CommunityFeedProps) {
+export function CommunityFeed({ currentUser }: CommunityFeedProps) {
   const [page, setPage] = useState(1);
   const pageSize = 20;
   const queryClient = useQueryClient();
 
   const { data, isLoading, error } = useQueryGetFeed(
     {
-      topicFilter,
       pagination: { page, pageSize, orderBy: "", order: "" },
     },
     { refetchOnMount: "always" }

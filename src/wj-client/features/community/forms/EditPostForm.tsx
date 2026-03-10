@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutationUpdatePost } from "@/utils/generated/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { editPostSchema, type EditPostFormData } from "../utils/community.schema";
-import { TOPIC_TAGS } from "../utils/topic-tags";
 import { cn } from "@/lib/utils/cn";
 import type { PostItem } from "@/gen/protobuf/v1/community";
 
@@ -23,19 +22,16 @@ export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
     register,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors },
   } = useForm<EditPostFormData>({
     resolver: zodResolver(editPostSchema),
     defaultValues: {
       content: post.content ?? "",
-      topicTag: post.topicTag ?? "",
       imageUrl: post.imageUrl ?? "",
     },
   });
 
   const content = watch("content");
-  const selectedTopic = watch("topicTag");
 
   const updatePostMutation = useMutationUpdatePost({
     onSuccess: () => {
@@ -52,40 +48,12 @@ export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
     updatePostMutation.mutate({
       postId: post.id ?? 0,
       content: data.content,
-      topicTag: data.topicTag,
       imageUrl: data.imageUrl || "",
     });
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      {/* Topic tags */}
-      <div>
-        <p className="font-vietnam text-xs font-medium text-v2-text-tertiary mb-2">
-          Chủ đề
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {TOPIC_TAGS.map((tag) => (
-            <button
-              key={tag.value}
-              type="button"
-              onClick={() => setValue("topicTag", tag.value)}
-              className={cn(
-                "px-3 py-1.5 rounded-full text-[12px] font-vietnam font-medium transition-colors border",
-                selectedTopic === tag.value
-                  ? "bg-v2-red-primary text-white border-v2-red-primary"
-                  : "border-v2-border-light text-v2-text-secondary hover:bg-v2-bg-primary"
-              )}
-            >
-              {tag.label}
-            </button>
-          ))}
-        </div>
-        {errors.topicTag && (
-          <p className="mt-1 text-xs text-red-500 font-vietnam">{errors.topicTag.message}</p>
-        )}
-      </div>
-
       {/* Content textarea */}
       <div>
         <textarea

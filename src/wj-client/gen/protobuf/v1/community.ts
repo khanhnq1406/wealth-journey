@@ -18,7 +18,6 @@ export interface PostItem {
   userPicture: string;
   content: string;
   imageUrl: string;
-  topicTag: string;
   likeCount: number;
   commentCount: number;
   isLiked: boolean;
@@ -57,7 +56,6 @@ export interface CommunityProfile {
 export interface CreatePostRequest {
   content: string;
   imageUrl: string;
-  topicTag: string;
 }
 
 export interface CreatePostResponse {
@@ -72,7 +70,6 @@ export interface UpdatePostRequest {
   postId: number;
   content: string;
   imageUrl: string;
-  topicTag: string;
 }
 
 export interface UpdatePostResponse {
@@ -108,7 +105,6 @@ export interface GetPostResponse {
 /** GetFeed */
 export interface GetFeedRequest {
   pagination: PaginationParams | undefined;
-  topicFilter: string;
 }
 
 export interface GetFeedResponse {
@@ -274,7 +270,6 @@ function createBasePostItem(): PostItem {
     userPicture: "",
     content: "",
     imageUrl: "",
-    topicTag: "",
     likeCount: 0,
     commentCount: 0,
     isLiked: false,
@@ -304,9 +299,6 @@ export const PostItem: MessageFns<PostItem> = {
     }
     if (message.imageUrl !== "") {
       writer.uint32(50).string(message.imageUrl);
-    }
-    if (message.topicTag !== "") {
-      writer.uint32(58).string(message.topicTag);
     }
     if (message.likeCount !== 0) {
       writer.uint32(64).int32(message.likeCount);
@@ -387,14 +379,6 @@ export const PostItem: MessageFns<PostItem> = {
           message.imageUrl = reader.string();
           continue;
         }
-        case 7: {
-          if (tag !== 58) {
-            break;
-          }
-
-          message.topicTag = reader.string();
-          continue;
-        }
         case 8: {
           if (tag !== 64) {
             break;
@@ -468,7 +452,6 @@ export const PostItem: MessageFns<PostItem> = {
       userPicture: isSet(object.userPicture) ? globalThis.String(object.userPicture) : "",
       content: isSet(object.content) ? globalThis.String(object.content) : "",
       imageUrl: isSet(object.imageUrl) ? globalThis.String(object.imageUrl) : "",
-      topicTag: isSet(object.topicTag) ? globalThis.String(object.topicTag) : "",
       likeCount: isSet(object.likeCount) ? globalThis.Number(object.likeCount) : 0,
       commentCount: isSet(object.commentCount) ? globalThis.Number(object.commentCount) : 0,
       isLiked: isSet(object.isLiked) ? globalThis.Boolean(object.isLiked) : false,
@@ -498,9 +481,6 @@ export const PostItem: MessageFns<PostItem> = {
     }
     if (message.imageUrl !== "") {
       obj.imageUrl = message.imageUrl;
-    }
-    if (message.topicTag !== "") {
-      obj.topicTag = message.topicTag;
     }
     if (message.likeCount !== 0) {
       obj.likeCount = Math.round(message.likeCount);
@@ -537,7 +517,6 @@ export const PostItem: MessageFns<PostItem> = {
     message.userPicture = object.userPicture ?? "";
     message.content = object.content ?? "";
     message.imageUrl = object.imageUrl ?? "";
-    message.topicTag = object.topicTag ?? "";
     message.likeCount = object.likeCount ?? 0;
     message.commentCount = object.commentCount ?? 0;
     message.isLiked = object.isLiked ?? false;
@@ -920,7 +899,7 @@ export const CommunityProfile: MessageFns<CommunityProfile> = {
 };
 
 function createBaseCreatePostRequest(): CreatePostRequest {
-  return { content: "", imageUrl: "", topicTag: "" };
+  return { content: "", imageUrl: "" };
 }
 
 export const CreatePostRequest: MessageFns<CreatePostRequest> = {
@@ -930,9 +909,6 @@ export const CreatePostRequest: MessageFns<CreatePostRequest> = {
     }
     if (message.imageUrl !== "") {
       writer.uint32(18).string(message.imageUrl);
-    }
-    if (message.topicTag !== "") {
-      writer.uint32(26).string(message.topicTag);
     }
     return writer;
   },
@@ -960,14 +936,6 @@ export const CreatePostRequest: MessageFns<CreatePostRequest> = {
           message.imageUrl = reader.string();
           continue;
         }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
-
-          message.topicTag = reader.string();
-          continue;
-        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -981,7 +949,6 @@ export const CreatePostRequest: MessageFns<CreatePostRequest> = {
     return {
       content: isSet(object.content) ? globalThis.String(object.content) : "",
       imageUrl: isSet(object.imageUrl) ? globalThis.String(object.imageUrl) : "",
-      topicTag: isSet(object.topicTag) ? globalThis.String(object.topicTag) : "",
     };
   },
 
@@ -993,9 +960,6 @@ export const CreatePostRequest: MessageFns<CreatePostRequest> = {
     if (message.imageUrl !== "") {
       obj.imageUrl = message.imageUrl;
     }
-    if (message.topicTag !== "") {
-      obj.topicTag = message.topicTag;
-    }
     return obj;
   },
 
@@ -1006,7 +970,6 @@ export const CreatePostRequest: MessageFns<CreatePostRequest> = {
     const message = createBaseCreatePostRequest();
     message.content = object.content ?? "";
     message.imageUrl = object.imageUrl ?? "";
-    message.topicTag = object.topicTag ?? "";
     return message;
   },
 };
@@ -1120,7 +1083,7 @@ export const CreatePostResponse: MessageFns<CreatePostResponse> = {
 };
 
 function createBaseUpdatePostRequest(): UpdatePostRequest {
-  return { postId: 0, content: "", imageUrl: "", topicTag: "" };
+  return { postId: 0, content: "", imageUrl: "" };
 }
 
 export const UpdatePostRequest: MessageFns<UpdatePostRequest> = {
@@ -1133,9 +1096,6 @@ export const UpdatePostRequest: MessageFns<UpdatePostRequest> = {
     }
     if (message.imageUrl !== "") {
       writer.uint32(26).string(message.imageUrl);
-    }
-    if (message.topicTag !== "") {
-      writer.uint32(34).string(message.topicTag);
     }
     return writer;
   },
@@ -1171,14 +1131,6 @@ export const UpdatePostRequest: MessageFns<UpdatePostRequest> = {
           message.imageUrl = reader.string();
           continue;
         }
-        case 4: {
-          if (tag !== 34) {
-            break;
-          }
-
-          message.topicTag = reader.string();
-          continue;
-        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1193,7 +1145,6 @@ export const UpdatePostRequest: MessageFns<UpdatePostRequest> = {
       postId: isSet(object.postId) ? globalThis.Number(object.postId) : 0,
       content: isSet(object.content) ? globalThis.String(object.content) : "",
       imageUrl: isSet(object.imageUrl) ? globalThis.String(object.imageUrl) : "",
-      topicTag: isSet(object.topicTag) ? globalThis.String(object.topicTag) : "",
     };
   },
 
@@ -1208,9 +1159,6 @@ export const UpdatePostRequest: MessageFns<UpdatePostRequest> = {
     if (message.imageUrl !== "") {
       obj.imageUrl = message.imageUrl;
     }
-    if (message.topicTag !== "") {
-      obj.topicTag = message.topicTag;
-    }
     return obj;
   },
 
@@ -1222,7 +1170,6 @@ export const UpdatePostRequest: MessageFns<UpdatePostRequest> = {
     message.postId = object.postId ?? 0;
     message.content = object.content ?? "";
     message.imageUrl = object.imageUrl ?? "";
-    message.topicTag = object.topicTag ?? "";
     return message;
   },
 };
@@ -1652,16 +1599,13 @@ export const GetPostResponse: MessageFns<GetPostResponse> = {
 };
 
 function createBaseGetFeedRequest(): GetFeedRequest {
-  return { pagination: undefined, topicFilter: "" };
+  return { pagination: undefined };
 }
 
 export const GetFeedRequest: MessageFns<GetFeedRequest> = {
   encode(message: GetFeedRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.pagination !== undefined) {
       PaginationParams.encode(message.pagination, writer.uint32(10).fork()).join();
-    }
-    if (message.topicFilter !== "") {
-      writer.uint32(18).string(message.topicFilter);
     }
     return writer;
   },
@@ -1681,14 +1625,6 @@ export const GetFeedRequest: MessageFns<GetFeedRequest> = {
           message.pagination = PaginationParams.decode(reader, reader.uint32());
           continue;
         }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
-
-          message.topicFilter = reader.string();
-          continue;
-        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1699,19 +1635,13 @@ export const GetFeedRequest: MessageFns<GetFeedRequest> = {
   },
 
   fromJSON(object: any): GetFeedRequest {
-    return {
-      pagination: isSet(object.pagination) ? PaginationParams.fromJSON(object.pagination) : undefined,
-      topicFilter: isSet(object.topicFilter) ? globalThis.String(object.topicFilter) : "",
-    };
+    return { pagination: isSet(object.pagination) ? PaginationParams.fromJSON(object.pagination) : undefined };
   },
 
   toJSON(message: GetFeedRequest): unknown {
     const obj: any = {};
     if (message.pagination !== undefined) {
       obj.pagination = PaginationParams.toJSON(message.pagination);
-    }
-    if (message.topicFilter !== "") {
-      obj.topicFilter = message.topicFilter;
     }
     return obj;
   },
@@ -1724,7 +1654,6 @@ export const GetFeedRequest: MessageFns<GetFeedRequest> = {
     message.pagination = (object.pagination !== undefined && object.pagination !== null)
       ? PaginationParams.fromPartial(object.pagination)
       : undefined;
-    message.topicFilter = object.topicFilter ?? "";
     return message;
   },
 };

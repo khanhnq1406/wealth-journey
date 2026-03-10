@@ -15,7 +15,6 @@ message PostItem {
   string userPicture = 4 [json_name = "userPicture"];
   string content = 5 [json_name = "content"];
   string imageUrl = 6 [json_name = "imageUrl"];
-  string topicTag = 7 [json_name = "topicTag"];
   int32 likeCount = 8 [json_name = "likeCount"];
   int32 commentCount = 9 [json_name = "commentCount"];
   bool isLiked = 10 [json_name = "isLiked"];
@@ -56,7 +55,6 @@ message CommunityProfile {
 message CreatePostRequest {
   string content = 1 [json_name = "content"];
   string imageUrl = 2 [json_name = "imageUrl"];
-  string topicTag = 3 [json_name = "topicTag"];
 }
 
 message CreatePostResponse {
@@ -71,7 +69,6 @@ message UpdatePostRequest {
   int32 postId = 1 [json_name = "postId"];
   string content = 2 [json_name = "content"];
   string imageUrl = 3 [json_name = "imageUrl"];
-  string topicTag = 4 [json_name = "topicTag"];
 }
 
 message UpdatePostResponse {
@@ -107,7 +104,6 @@ message GetPostResponse {
 // GetFeed
 message GetFeedRequest {
   wealthjourney.common.v1.PaginationParams pagination = 1 [json_name = "pagination"];
-  string topicFilter = 2 [json_name = "topicFilter"];
 }
 
 message GetFeedResponse {

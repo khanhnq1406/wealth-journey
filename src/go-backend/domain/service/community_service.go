@@ -12,18 +12,6 @@ import (
 	v1 "wealthjourney/protobuf/v1"
 )
 
-// AllowedTopicTags defines the valid topic tags for community posts
-var AllowedTopicTags = map[string]bool{
-	"Chứng khoán VN":  true,
-	"Giao dịch Crypto": true,
-	"Vàng & Bạc":      true,
-	"Ngân sách":       true,
-	"Tiết kiệm":       true,
-	"Bất động sản":    true,
-	"Bảo hiểm":        true,
-	"Tổng hợp":        true,
-}
-
 // AllowedReportReasons defines the valid reasons for reporting content
 var AllowedReportReasons = map[string]bool{
 	"spam":        true,
@@ -71,11 +59,6 @@ func (s *communityService) CreatePost(ctx context.Context, userID int32, req *v1
 		return nil, err
 	}
 
-	// Validate topic tag
-	if !AllowedTopicTags[req.TopicTag] {
-		return nil, apperrors.NewValidationError("invalid topic tag")
-	}
-
 	// Validate image URL if provided
 	if req.ImageUrl != "" {
 		if err := validator.URL(req.ImageUrl); err != nil {
@@ -93,7 +76,6 @@ func (s *communityService) CreatePost(ctx context.Context, userID int32, req *v1
 		UserID:   userID,
 		Content:  content,
 		ImageURL: req.ImageUrl,
-		TopicTag: req.TopicTag,
 	}
 
 	if err := s.postRepo.Create(ctx, post); err != nil {
@@ -128,11 +110,6 @@ func (s *communityService) UpdatePost(ctx context.Context, userID int32, req *v1
 		return nil, err
 	}
 
-	// Validate topic tag
-	if !AllowedTopicTags[req.TopicTag] {
-		return nil, apperrors.NewValidationError("invalid topic tag")
-	}
-
 	if req.ImageUrl != "" {
 		if err := validator.URL(req.ImageUrl); err != nil {
 			return nil, err
@@ -140,7 +117,6 @@ func (s *communityService) UpdatePost(ctx context.Context, userID int32, req *v1
 	}
 
 	post.Content = content
-	post.TopicTag = req.TopicTag
 	post.ImageURL = req.ImageUrl
 
 	if err := s.postRepo.Update(ctx, post); err != nil {
@@ -211,7 +187,7 @@ func (s *communityService) GetFeed(ctx context.Context, userID int32, req *v1.Ge
 	// Parse pagination
 	opts := s.parsePagination(req.Pagination)
 
-	posts, total, err := s.postRepo.GetFeed(ctx, userIDs, req.TopicFilter, opts)
+	posts, total, err := s.postRepo.GetFeed(ctx, userIDs, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -618,7 +594,6 @@ func (s *communityService) postToProto(post *models.Post, user *models.User, isL
 		UserId:       post.UserID,
 		Content:      post.Content,
 		ImageUrl:     post.ImageURL,
-		TopicTag:     post.TopicTag,
 		LikeCount:    post.LikeCount,
 		CommentCount: post.CommentCount,
 		IsLiked:      isLiked,

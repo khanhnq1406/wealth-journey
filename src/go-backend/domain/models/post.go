@@ -12,7 +12,6 @@ type Post struct {
 	UserID       int32          `gorm:"not null;index:idx_post_user_id" json:"userId"`
 	Content      string         `gorm:"type:text;not null" json:"content"`
 	ImageURL     string         `gorm:"size:500" json:"imageUrl"`
-	TopicTag     string         `gorm:"size:50;not null" json:"topicTag"`
 	LikeCount    int32          `gorm:"default:0" json:"likeCount"`
 	CommentCount int32          `gorm:"default:0" json:"commentCount"`
 	CreatedAt    time.Time      `gorm:"index:idx_post_created_at" json:"createdAt"`
