@@ -156,6 +156,53 @@ Implemented a finance-focused community social feed for WealthJourney. The commu
 | No new data exposure | Confirmed: same data flows, corrected field references |
 | XSS prevention | Unchanged: image URL input uses standard `<input type="url">`, rendered via React auto-escaping |
 
+## Hotfix 2: Community Avatar, Cache Invalidation & Tailwind (2026-03-10)
+
+### Issues Reported
+
+| # | Issue | Root Cause | Severity |
+|---|-------|------------|----------|
+| 1 | ProfileCard shows "User" name and no avatar | `extractAuthFromResponse` checks `response?.userId` but User proto has `id` — operator precedence causes `user` to always be `null` | Critical |
+| 2 | Avatar not shown in PostCard | Cascading from #1: `currentUser.picture` is `""` | Critical |
+| 3 | Avatar/username not shown in CreatePostBox | Cascading from #1 | Critical |
+| 4 | Feed doesn't reload after creating post | Query key mismatch: `["GetFeed"]` vs `["api.community.getFeed", ...]` | Medium |
+| 5 | Comments don't reload after posting | Query key mismatch: `["GetComments"]` vs `["api.community.getComments", ...]` | Medium |
+| 6 | Bio doesn't save (visually) | Cascading from #1: `currentUser.id` is 0 → profile query disabled | Critical |
+| 7 | Banner in ProfileCard is white | Tailwind `content` config missing `./features/**/*` — feature-only CSS classes purged | Medium |
+| 8 | Avatar not shown in CommentSection | Cascading from #1 | Critical |
+
+### Root Cause Analysis
+
+**Primary:** `extractAuthFromResponse` (useAuth.ts:58) had JS operator precedence bug: `response?.user || response?.userId ? response : null` parses as `(response?.user || response?.userId) ? response : null`. The User proto has `id` not `userId`, so `user` was always `null`.
+
+**Secondary:** Hardcoded query key strings `["GetFeed"]`/`["GetComments"]` didn't match auto-generated `EVENT_Community*` constants used by React Query hooks.
+
+**Tertiary:** Tailwind `content` config missed `./features/**/*`, purging all CSS classes unique to feature files.
+
+### Fix Tasks Completed
+
+| # | Task | Files Changed |
+|---|------|---------------|
+| F2-1 | Fix `extractAuthFromResponse` to detect User by `id` field | `useAuth.ts` |
+| F2-2 | Fix query keys in CreatePostForm and CommunityFeed | `CreatePostForm.tsx`, `CommunityFeed.tsx` |
+| F2-3 | Fix query keys in CommentSection | `CommentSection.tsx` |
+| F2-4 | Add `./features/**/*` to Tailwind content config | `tailwind.config.ts` |
+
+### Verification Results (Hotfix 2)
+
+| Check | Result |
+|-------|--------|
+| `npx tsc --noEmit` (community + auth files) | Pass (0 errors) |
+
+### Security Review (Hotfix 2)
+
+| Concern | Assessment |
+|---------|-----------|
+| Auth data integrity | Fixed: correctly identifies User objects by server-verified `id` field |
+| Query invalidation | Fixed: uses correct EVENT constants for cache consistency |
+| No new endpoints | Confirmed: frontend-only fixes |
+| No new data exposure | Confirmed: same data flows, corrected extraction logic |
+
 ## Known Issues / Technical Debt
 
 1. **No server-side image upload**: Phase 1 uses image URLs directly; Phase 2 should add Supabase storage upload
