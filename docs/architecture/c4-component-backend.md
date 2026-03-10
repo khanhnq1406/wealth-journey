@@ -41,7 +41,7 @@ C4Component
         Component(fx_svc, "FX Rate Service", "domain/service", "Currency conversion rates, cross-currency calculations")
         Component(import_svc, "Import Service", "domain/service", "File parsing, field mapping, duplicate detection, batch execution")
         Component(portfolio_svc, "Portfolio History Service", "domain/service", "Historical portfolio value snapshots for charts")
-        Component(community_svc, "Community Service", "domain/service", "Social interactions: posts, comments, likes, follows, content reports")
+        Component(community_svc, "Community Service", "domain/service", "Social interactions: posts, comments, likes, follows, content reports; Phase 2: SharePost, GetNotifications, GetUnreadNotificationCount, MarkNotificationsRead, SavePost, UnsavePost, GetSavedPosts, GetSuggestedUsers, GetTrendingTopics")
     }
 
     Container_Boundary(repos, "Repository Layer (Data Access)") {
@@ -56,11 +56,14 @@ C4Component
         Component(fx_repo, "FX Rate Repository", "GORM", "Exchange rate history")
         Component(import_repo, "Import Repository", "GORM", "Import batches, templates, merchant rules")
         Component(portfolio_repo, "Portfolio History Repository", "GORM", "Historical portfolio value records")
-        Component(post_repo, "Post Repository", "GORM", "Community posts with content and topic tags")
+        Component(post_repo, "Post Repository", "GORM", "Community posts with content and topic tags; GetByIDs batch fetch, IncrementShareCount, hashtag filter on GetFeed")
         Component(comment_repo, "Comment Repository", "GORM", "Post comments")
         Component(like_repo, "Like Repository", "GORM", "Post likes with unique constraints")
-        Component(follow_repo, "Follow Repository", "GORM", "User follow relationships")
+        Component(follow_repo, "Follow Repository", "GORM", "User follow relationships; GetFriendsOfFriends, GetTopUsersByFollowers")
         Component(report_repo, "Report Repository", "GORM", "Content reports for moderation")
+        Component(notification_repo, "Notification Repository", "GORM", "CRUD for user notifications (like, comment, follow, share events)")
+        Component(saved_post_repo, "Saved Post Repository", "GORM", "Save/unsave posts per user with unique constraints")
+        Component(hashtag_repo, "Hashtag Repository", "GORM", "Hashtag extraction index and trending hashtag aggregations")
     }
 
     Container_Boundary(external, "External Integrations — TRUST BOUNDARY: Untrusted external responses") {
@@ -128,6 +131,9 @@ C4Component
     Rel(community_svc, like_repo, "Persists likes")
     Rel(community_svc, follow_repo, "Persists follows")
     Rel(community_svc, report_repo, "Persists reports")
+    Rel(community_svc, notification_repo, "Persists notifications")
+    Rel(community_svc, saved_post_repo, "Persists saved posts")
+    Rel(community_svc, hashtag_repo, "Persists and queries hashtags")
 
     Rel(user_repo, postgres, "SQL")
     Rel(wallet_repo, postgres, "SQL")
@@ -137,6 +143,9 @@ C4Component
     Rel(like_repo, postgres, "SQL")
     Rel(follow_repo, postgres, "SQL")
     Rel(report_repo, postgres, "SQL")
+    Rel(notification_repo, postgres, "SQL")
+    Rel(saved_post_repo, postgres, "SQL")
+    Rel(hashtag_repo, postgres, "SQL")
     Rel(auth_svc, redis, "JWT whitelist")
     Rel(market_svc, redis, "Price cache")
     Rel(fx_svc, redis, "Rate cache")

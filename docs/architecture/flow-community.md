@@ -1,6 +1,6 @@
 # Community Domain — Runtime Flows
 
-Community social feed flows covering post creation, feed generation, like/unlike toggling, and follow/unfollow operations. All operations require JWT authentication and enforce content ownership rules.
+Community social feed flows covering post creation, feed generation, like/unlike toggling, follow/unfollow operations, and Phase 2 social features (share post, notifications, saved posts). All operations require JWT authentication and enforce content ownership rules.
 
 ## Table of Contents
 
@@ -8,6 +8,7 @@ Community social feed flows covering post creation, feed generation, like/unlike
 - [Feed Generation](#2-feed-generation)
 - [Like / Unlike Post](#3-like--unlike-post)
 - [Follow / Unfollow User](#4-follow--unfollow-user)
+- [Share Post](#5-share-post)
 
 ---
 
@@ -250,3 +251,72 @@ sequenceDiagram
 | Already following (on follow) | 409 Conflict | Frontend rollback |
 | Not following (on unfollow) | 404 Not Found | Frontend rollback |
 | Target user not found | 404 Not Found | Frontend rollback |
+
+---
+
+## 5. Share Post
+
+**Trigger:** User clicks "Share" on a post, writes an optional comment in `SharePostModal`, and submits
+**Endpoint:** `POST /api/v1/community/posts/:post_id/share`
+**Source:** `domain/service/community_service.go`, `handlers/community.go`
+
+```mermaid
+sequenceDiagram
+    participant SPA as Next.js SPA
+    participant H as CommunityHandler
+    participant CS as CommunityService
+    participant PR as PostRepository
+    participant NR as NotificationRepository
+
+    SPA->>H: POST /api/v1/community/posts/:post_id/share<br/>{comment?}
+    H->>H: GetUserID from JWT
+    H->>H: Parse post_id from URL
+    H->>CS: SharePost(sharerID, originalPostID, comment)
+
+    activate CS
+    CS->>PR: GetByID(originalPostID)
+    alt Post not found
+        PR-->>CS: nil
+        CS-->>H: 404 Not Found
+        H-->>SPA: {success: false, message: "Post not found"}
+    end
+    PR-->>CS: originalPost
+
+    CS->>CS: Build new Post{userID: sharerID, sharedPostID: originalPostID,<br/>content: comment, topicTag: originalPost.topicTag}
+
+    CS->>PR: Create(sharedPost)
+    alt DB error
+        PR-->>CS: Error
+        CS-->>H: 500 Internal Error
+        H-->>SPA: {success: false, message: "..."}
+    end
+    PR-->>CS: Created sharedPost
+
+    CS->>PR: IncrementShareCount(originalPostID)
+    PR-->>CS: Updated
+
+    CS->>NR: Create(Notification{recipientID: originalPost.userID,<br/>actorID: sharerID, type: "share", postID: originalPostID})
+    NR-->>CS: Created
+    deactivate CS
+
+    CS-->>H: sharedPost with embed
+    H-->>SPA: {success: true, data: PostItem}
+```
+
+**Key Invariants:**
+- A share creates a new Post record referencing the original via `sharedPostID`
+- The original post's `shareCount` is incremented atomically
+- A notification is dispatched to the original post's author (skipped if sharer == author)
+- The optional `comment` field is the sharer's own caption (may be empty)
+- The original post is embedded in the feed response as `SharedPostEmbed` for display
+- Shared posts carry the original's `topicTag` so they appear in the same topic filter
+
+**Error Paths:**
+
+| Condition | Response | Rollback |
+|-----------|----------|----------|
+| Missing/invalid JWT | 401 Unauthorized | None |
+| Original post not found | 404 Not Found | None |
+| Comment exceeds 2000 chars | 400 Validation Error | None |
+| DB write failure (new post) | 500 Internal Error | None |
+| DB failure (share count increment) | 500 Internal Error | New post is rolled back |
