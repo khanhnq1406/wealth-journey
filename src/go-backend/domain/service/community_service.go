@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"regexp"
 	"strings"
 	"time"
 
@@ -22,12 +23,15 @@ var AllowedReportReasons = map[string]bool{
 }
 
 type communityService struct {
-	postRepo    repository.PostRepository
-	commentRepo repository.CommentRepository
-	likeRepo    repository.LikeRepository
-	followRepo  repository.FollowRepository
-	reportRepo  repository.ReportRepository
-	userRepo    repository.UserRepository
+	postRepo         repository.PostRepository
+	commentRepo      repository.CommentRepository
+	likeRepo         repository.LikeRepository
+	followRepo       repository.FollowRepository
+	reportRepo       repository.ReportRepository
+	userRepo         repository.UserRepository
+	notificationRepo repository.NotificationRepository
+	savedPostRepo    repository.SavedPostRepository
+	hashtagRepo      repository.HashtagRepository
 }
 
 // NewCommunityService creates a new community service
@@ -38,14 +42,20 @@ func NewCommunityService(
 	followRepo repository.FollowRepository,
 	reportRepo repository.ReportRepository,
 	userRepo repository.UserRepository,
+	notificationRepo repository.NotificationRepository,
+	savedPostRepo repository.SavedPostRepository,
+	hashtagRepo repository.HashtagRepository,
 ) CommunityService {
 	return &communityService{
-		postRepo:    postRepo,
-		commentRepo: commentRepo,
-		likeRepo:    likeRepo,
-		followRepo:  followRepo,
-		reportRepo:  reportRepo,
-		userRepo:    userRepo,
+		postRepo:         postRepo,
+		commentRepo:      commentRepo,
+		likeRepo:         likeRepo,
+		followRepo:       followRepo,
+		reportRepo:       reportRepo,
+		userRepo:         userRepo,
+		notificationRepo: notificationRepo,
+		savedPostRepo:    savedPostRepo,
+		hashtagRepo:      hashtagRepo,
 	}
 }
 
@@ -81,6 +91,9 @@ func (s *communityService) CreatePost(ctx context.Context, userID int32, req *v1
 	if err := s.postRepo.Create(ctx, post); err != nil {
 		return nil, err
 	}
+
+	// Extract and store hashtags (Phase 2)
+	s.extractAndStoreHashtags(ctx, post.ID, content, post.CreatedAt)
 
 	return &v1.CreatePostResponse{
 		Success: true,
@@ -123,6 +136,10 @@ func (s *communityService) UpdatePost(ctx context.Context, userID int32, req *v1
 		return nil, err
 	}
 
+	// Update hashtags (Phase 2): delete old, re-extract
+	s.hashtagRepo.DeleteByPostID(ctx, post.ID)
+	s.extractAndStoreHashtags(ctx, post.ID, content, post.CreatedAt)
+
 	return &v1.UpdatePostResponse{
 		Success: true,
 		Message: "Post updated successfully",
@@ -141,7 +158,13 @@ func (s *communityService) DeletePost(ctx context.Context, userID int32, postID 
 		return apperrors.NewForbiddenError("you can only delete your own posts")
 	}
 
-	return s.postRepo.SoftDelete(ctx, postID)
+	if err := s.postRepo.SoftDelete(ctx, postID); err != nil {
+		return err
+	}
+
+	// Clean up hashtags (Phase 2)
+	s.hashtagRepo.DeleteByPostID(ctx, postID)
+	return nil
 }
 
 func (s *communityService) GetPost(ctx context.Context, userID int32, postID int32) (*v1.GetPostResponse, error) {
@@ -320,7 +343,15 @@ func (s *communityService) LikePost(ctx context.Context, userID int32, postID in
 		return err
 	}
 
-	return s.postRepo.IncrementLikeCount(ctx, postID, 1)
+	if err := s.postRepo.IncrementLikeCount(ctx, postID, 1); err != nil {
+		return err
+	}
+
+	// Create notification for post owner (Phase 2)
+	if post, err := s.postRepo.GetByID(ctx, postID); err == nil {
+		s.createNotification(ctx, post.UserID, userID, "like", &postID)
+	}
+	return nil
 }
 
 func (s *communityService) UnlikePost(ctx context.Context, userID int32, postID int32) error {
@@ -364,6 +395,11 @@ func (s *communityService) CreateComment(ctx context.Context, userID int32, req 
 	// Increment comment count
 	if err := s.postRepo.IncrementCommentCount(ctx, req.PostId, 1); err != nil {
 		return nil, err
+	}
+
+	// Create notification for post owner (Phase 2)
+	if post, err := s.postRepo.GetByID(ctx, req.PostId); err == nil {
+		s.createNotification(ctx, post.UserID, userID, "comment", &req.PostId)
 	}
 
 	return &v1.CreateCommentResponse{
@@ -447,7 +483,13 @@ func (s *communityService) FollowUser(ctx context.Context, followerID int32, fol
 		FollowerID:  followerID,
 		FollowingID: followingID,
 	}
-	return s.followRepo.Create(ctx, follow)
+	if err := s.followRepo.Create(ctx, follow); err != nil {
+		return err
+	}
+
+	// Create notification for the followed user (Phase 2)
+	s.createNotification(ctx, followingID, followerID, "follow", nil)
+	return nil
 }
 
 func (s *communityService) UnfollowUser(ctx context.Context, followerID int32, followingID int32) error {
@@ -596,9 +638,11 @@ func (s *communityService) postToProto(post *models.Post, user *models.User, isL
 		ImageUrl:     post.ImageURL,
 		LikeCount:    post.LikeCount,
 		CommentCount: post.CommentCount,
+		ShareCount:   post.ShareCount,
 		IsLiked:      isLiked,
 		IsOwnPost:    isOwnPost,
 		IsFollowing:  isFollowing,
+		IsShared:     post.SharedPostID != nil,
 		CreatedAt:    post.CreatedAt.Unix(),
 		UpdatedAt:    post.UpdatedAt.Unix(),
 	}
@@ -653,4 +697,378 @@ func (s *communityService) getPageParams(params *v1.PaginationParams) (int32, in
 		}
 	}
 	return page, pageSize
+}
+
+// --- Phase 2: Social Features ---
+
+// hashtagRegex matches hashtags in post content (supports Vietnamese diacritics).
+var hashtagRegex = regexp.MustCompile(`#([a-zA-Z0-9_\x{00C0}-\x{024F}]+)`)
+
+func extractHashtags(content string) []string {
+	matches := hashtagRegex.FindAllStringSubmatch(content, -1)
+	seen := make(map[string]bool)
+	var hashtags []string
+	for _, match := range matches {
+		tag := strings.ToLower(match[1])
+		if !seen[tag] && len(tag) <= 100 {
+			seen[tag] = true
+			hashtags = append(hashtags, tag)
+			if len(hashtags) >= 10 {
+				break
+			}
+		}
+	}
+	return hashtags
+}
+
+func (s *communityService) extractAndStoreHashtags(ctx context.Context, postID int32, content string, createdAt time.Time) {
+	hashtags := extractHashtags(content)
+	if len(hashtags) > 0 {
+		s.hashtagRepo.CreateBatch(ctx, postID, hashtags, createdAt)
+	}
+}
+
+func (s *communityService) createNotification(ctx context.Context, userID, actorID int32, notifType string, postID *int32) {
+	if userID == actorID {
+		return // No self-notifications
+	}
+	s.notificationRepo.Create(ctx, &models.Notification{
+		UserID:  userID,
+		ActorID: actorID,
+		Type:    notifType,
+		PostID:  postID,
+	})
+}
+
+func (s *communityService) SharePost(ctx context.Context, userID int32, req *v1.SharePostRequest) (*v1.SharePostResponse, error) {
+	// Validate content (0-2000 chars, HTML stripped)
+	content, err := validator.SanitizeStringField(req.Content, 2000)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get original post
+	originalPost, err := s.postRepo.GetByID(ctx, req.PostId)
+	if err != nil || originalPost == nil {
+		return nil, apperrors.NewNotFoundError("post")
+	}
+
+	// Cannot share own post
+	if originalPost.UserID == userID {
+		return nil, apperrors.NewValidationError("cannot share your own post")
+	}
+
+	// Resolve to root original (prevent recursive embedding)
+	rootPostID := originalPost.ID
+	if originalPost.SharedPostID != nil {
+		rootPostID = *originalPost.SharedPostID
+	}
+
+	// Create shared post
+	post := &models.Post{
+		UserID:       userID,
+		Content:      content,
+		SharedPostID: &rootPostID,
+	}
+	if err := s.postRepo.Create(ctx, post); err != nil {
+		return nil, err
+	}
+
+	// Increment share count on original
+	s.postRepo.IncrementShareCount(ctx, rootPostID, 1)
+
+	// Fetch root post for notification
+	rootPost, _ := s.postRepo.GetByID(ctx, rootPostID)
+	if rootPost != nil {
+		s.createNotification(ctx, rootPost.UserID, userID, "share", &rootPostID)
+	}
+
+	// Extract hashtags from commentary
+	s.extractAndStoreHashtags(ctx, post.ID, content, post.CreatedAt)
+
+	// Build response
+	user, _ := s.userRepo.GetByID(ctx, userID)
+	protoPost := s.postToProto(post, user, false, true, false)
+
+	if rootPost != nil {
+		rootUser := rootPost.User
+		if rootUser == nil {
+			rootUser, _ = s.userRepo.GetByID(ctx, rootPost.UserID)
+		}
+		protoPost.SharedPost = s.postToProto(rootPost, rootUser, false, false, false)
+		protoPost.IsShared = true
+	}
+
+	return &v1.SharePostResponse{
+		Success:   true,
+		Message:   "Post shared successfully",
+		Data:      protoPost,
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+func (s *communityService) GetNotifications(ctx context.Context, userID int32, req *v1.GetNotificationsRequest) (*v1.GetNotificationsResponse, error) {
+	opts := s.parsePagination(req.Pagination)
+	if opts.Limit > 50 {
+		opts.Limit = 50
+	}
+
+	notifications, total, err := s.notificationRepo.GetByUserID(ctx, userID, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	// Batch-fetch referenced posts for preview
+	postIDSet := make(map[int32]bool)
+	for _, n := range notifications {
+		if n.PostID != nil {
+			postIDSet[*n.PostID] = true
+		}
+	}
+	postIDs := make([]int32, 0, len(postIDSet))
+	for id := range postIDSet {
+		postIDs = append(postIDs, id)
+	}
+	postMap := make(map[int32]*models.Post)
+	if len(postIDs) > 0 {
+		if posts, err := s.postRepo.GetByIDs(ctx, postIDs); err == nil {
+			for _, p := range posts {
+				postMap[p.ID] = p
+			}
+		}
+	}
+
+	items := make([]*v1.NotificationItem, len(notifications))
+	for i, n := range notifications {
+		item := &v1.NotificationItem{
+			Id:        n.ID,
+			Type:      n.Type,
+			ActorId:   n.ActorID,
+			IsRead:    n.IsRead,
+			CreatedAt: n.CreatedAt.Unix(),
+		}
+		if n.Actor != nil {
+			item.ActorName = n.Actor.Name
+			item.ActorPicture = n.Actor.Picture
+		}
+		if n.PostID != nil {
+			item.PostId = *n.PostID
+			if post, ok := postMap[*n.PostID]; ok {
+				preview := post.Content
+				if len(preview) > 100 {
+					preview = preview[:100]
+				}
+				item.PostPreview = preview
+			}
+		}
+		items[i] = item
+	}
+
+	page, pageSize := s.getPageParams(req.Pagination)
+	totalPages := int32(0)
+	if pageSize > 0 {
+		totalPages = (int32(total) + pageSize - 1) / pageSize
+	}
+
+	return &v1.GetNotificationsResponse{
+		Success:       true,
+		Message:       "Notifications retrieved successfully",
+		Notifications: items,
+		Pagination: &v1.PaginationResult{
+			Page:       page,
+			PageSize:   pageSize,
+			TotalCount: int32(total),
+			TotalPages: totalPages,
+		},
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+func (s *communityService) GetUnreadNotificationCount(ctx context.Context, userID int32) (*v1.GetUnreadNotificationCountResponse, error) {
+	count, err := s.notificationRepo.GetUnreadCount(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.GetUnreadNotificationCountResponse{
+		Success:   true,
+		Message:   "Unread count retrieved",
+		Count:     count,
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+func (s *communityService) MarkNotificationsRead(ctx context.Context, userID int32) error {
+	return s.notificationRepo.MarkAllRead(ctx, userID)
+}
+
+func (s *communityService) SavePost(ctx context.Context, userID int32, postID int32) error {
+	// Validate post exists
+	if _, err := s.postRepo.GetByID(ctx, postID); err != nil {
+		return apperrors.NewNotFoundError("post")
+	}
+
+	savedPost := &models.SavedPost{
+		UserID: userID,
+		PostID: postID,
+	}
+	return s.savedPostRepo.Create(ctx, savedPost)
+}
+
+func (s *communityService) UnsavePost(ctx context.Context, userID int32, postID int32) error {
+	// Idempotent: return success even if not found
+	return s.savedPostRepo.Delete(ctx, userID, postID)
+}
+
+func (s *communityService) GetSavedPosts(ctx context.Context, userID int32, req *v1.GetSavedPostsRequest) (*v1.GetSavedPostsResponse, error) {
+	opts := s.parsePagination(req.Pagination)
+
+	savedPosts, total, err := s.savedPostRepo.GetByUserID(ctx, userID, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	// Collect post IDs for batch enrichment
+	posts := make([]*models.Post, 0, len(savedPosts))
+	for _, sp := range savedPosts {
+		if sp.Post != nil {
+			posts = append(posts, sp.Post)
+		}
+	}
+
+	postIDs := make([]int32, len(posts))
+	for i, p := range posts {
+		postIDs[i] = p.ID
+	}
+
+	likedIDs, _ := s.likeRepo.GetLikedPostIDs(ctx, userID, postIDs)
+	likedSet := make(map[int32]bool)
+	for _, id := range likedIDs {
+		likedSet[id] = true
+	}
+
+	protoPosts := make([]*v1.PostItem, len(posts))
+	for i, post := range posts {
+		protoPost := s.postToProto(post, post.User, likedSet[post.ID], post.UserID == userID, false)
+		protoPost.IsSaved = true
+		protoPosts[i] = protoPost
+	}
+
+	page, pageSize := s.getPageParams(req.Pagination)
+	totalPages := int32(0)
+	if pageSize > 0 {
+		totalPages = (int32(total) + pageSize - 1) / pageSize
+	}
+
+	return &v1.GetSavedPostsResponse{
+		Success: true,
+		Message: "Saved posts retrieved successfully",
+		Posts:   protoPosts,
+		Pagination: &v1.PaginationResult{
+			Page:       page,
+			PageSize:   pageSize,
+			TotalCount: int32(total),
+			TotalPages: totalPages,
+		},
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+func (s *communityService) GetSuggestedUsers(ctx context.Context, userID int32) (*v1.GetSuggestedUsersResponse, error) {
+	// Get user's following IDs (to exclude)
+	followingIDs, err := s.followRepo.GetFollowingIDs(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	excludeIDs := append(followingIDs, userID)
+
+	// Get friends-of-friends (up to 5)
+	fofs, err := s.followRepo.GetFriendsOfFriends(ctx, userID, excludeIDs, 5)
+	if err != nil {
+		return nil, err
+	}
+
+	// Build result user IDs and mutual count map
+	suggestedIDs := make([]int32, 0, 5)
+	mutualCounts := make(map[int32]int32)
+	for _, fof := range fofs {
+		suggestedIDs = append(suggestedIDs, fof.UserID)
+		mutualCounts[fof.UserID] = fof.MutualCount
+	}
+
+	// Fill remaining with top users by follower count
+	if len(suggestedIDs) < 5 {
+		needed := 5 - len(suggestedIDs)
+		// Exclude already suggested
+		newExclude := append(excludeIDs, suggestedIDs...)
+		topUsers, err := s.followRepo.GetTopUsersByFollowers(ctx, newExclude, needed)
+		if err == nil {
+			for _, tu := range topUsers {
+				suggestedIDs = append(suggestedIDs, tu.UserID)
+			}
+		}
+	}
+
+	if len(suggestedIDs) == 0 {
+		return &v1.GetSuggestedUsersResponse{
+			Success:   true,
+			Message:   "No suggestions available",
+			Users:     []*v1.SuggestedUserItem{},
+			Timestamp: time.Now().Format(time.RFC3339),
+		}, nil
+	}
+
+	// Fetch user details
+	users := make([]*v1.SuggestedUserItem, 0, len(suggestedIDs))
+	for _, uid := range suggestedIDs {
+		user, err := s.userRepo.GetByID(ctx, uid)
+		if err != nil || user == nil {
+			continue
+		}
+		followerCount, _ := s.followRepo.GetFollowerCount(ctx, uid)
+
+		bio := user.Bio
+		if len(bio) > 60 {
+			bio = bio[:60]
+		}
+
+		users = append(users, &v1.SuggestedUserItem{
+			UserId:           uid,
+			UserName:         user.Name,
+			UserPicture:      user.Picture,
+			BioSnippet:       bio,
+			MutualFollowCount: mutualCounts[uid],
+			FollowerCount:    followerCount,
+		})
+	}
+
+	return &v1.GetSuggestedUsersResponse{
+		Success:   true,
+		Message:   "Suggested users retrieved successfully",
+		Users:     users,
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+func (s *communityService) GetTrendingTopics(ctx context.Context) (*v1.GetTrendingTopicsResponse, error) {
+	since := time.Now().Add(-24 * time.Hour)
+	trending, err := s.hashtagRepo.GetTrending(ctx, since, 10)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]*v1.TrendingTopicItem, len(trending))
+	for i, t := range trending {
+		items[i] = &v1.TrendingTopicItem{
+			Hashtag:   t.Hashtag,
+			PostCount: t.PostCount,
+		}
+	}
+
+	return &v1.GetTrendingTopicsResponse{
+		Success:   true,
+		Message:   "Trending topics retrieved successfully",
+		Topics:    items,
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
 }
