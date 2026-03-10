@@ -348,6 +348,9 @@ type FollowRepository interface {
 	GetFriendsOfFriends(ctx context.Context, userID int32, excludeIDs []int32, limit int) ([]FriendOfFriend, error)
 	// GetTopUsersByFollowers returns users with most followers excluding specified IDs.
 	GetTopUsersByFollowers(ctx context.Context, excludeIDs []int32, limit int) ([]UserFollowerCount, error)
+	// GetRecentUsers returns recently-registered users excluding specified IDs.
+	// Used as a cold-start fallback when there is no social graph data yet.
+	GetRecentUsers(ctx context.Context, excludeIDs []int32, limit int) ([]int32, error)
 }
 
 // ReportRepository defines the interface for content report data operations.

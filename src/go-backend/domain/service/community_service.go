@@ -1035,6 +1035,16 @@ func (s *communityService) GetSuggestedUsers(ctx context.Context, userID int32) 
 		}
 	}
 
+	// Cold-start fallback: if still no suggestions (empty social graph), show recently-joined users
+	if len(suggestedIDs) < 5 {
+		needed := 5 - len(suggestedIDs)
+		newExclude := append(excludeIDs, suggestedIDs...)
+		recentIDs, err := s.followRepo.GetRecentUsers(ctx, newExclude, needed)
+		if err == nil {
+			suggestedIDs = append(suggestedIDs, recentIDs...)
+		}
+	}
+
 	if len(suggestedIDs) == 0 {
 		return &v1.GetSuggestedUsersResponse{
 			Success:   true,

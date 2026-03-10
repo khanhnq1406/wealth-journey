@@ -145,3 +145,16 @@ func (r *followRepository) GetTopUsersByFollowers(ctx context.Context, excludeID
 	}
 	return results, nil
 }
+
+func (r *followRepository) GetRecentUsers(ctx context.Context, excludeIDs []int32, limit int) ([]int32, error) {
+	var ids []int32
+	query := r.db.DB.WithContext(ctx).Model(&models.User{})
+	if len(excludeIDs) > 0 {
+		query = query.Where("id NOT IN ?", excludeIDs)
+	}
+	err := query.Order("created_at DESC").Limit(limit).Pluck("id", &ids).Error
+	if err != nil {
+		return nil, r.handleDBError(err, "user", "get recent users")
+	}
+	return ids, nil
+}
