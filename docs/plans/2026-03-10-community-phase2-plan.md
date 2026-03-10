@@ -1549,7 +1549,7 @@ cd src/wj-client && npm run build
 
 **Step 4: Manual testing checklist**
 
-- [ ] Create a post with hashtags → verify hashtags extracted and stored
+- [x] Create a post with hashtags → verify hashtags extracted and stored
 - [ ] Share another user's post with commentary → verify shared post renders correctly
 - [ ] Share a shared post → verify it references the original (no recursive nesting)
 - [ ] Like/comment/follow → verify notification created for target user

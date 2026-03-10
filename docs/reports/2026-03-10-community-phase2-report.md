@@ -170,6 +170,12 @@ All 5 functional requirement groups from the spec were implemented:
 | 4 | `FollowButton` `compact` prop doesn't exist | Component only accepts `className` | Replaced `compact` with `className="text-xs px-3 py-1 flex-shrink-0"` |
 | 5 | `Button` `buttonType` prop doesn't exist for HTML type | Submit type uses `htmlType` prop | Fixed `SharePostForm` to use `htmlType="submit"` |
 
+## Fix History
+
+| Date | Fix | Severity | File | Commit |
+|------|-----|----------|------|--------|
+| 2026-03-10 | Backend route `/trending-topics` → `/trending` to match proto HTTP option and generated frontend client | Minor | `src/go-backend/handlers/routes.go:276` | — |
+
 ## Known Issues / Technical Debt
 
 - **`GetSuggestedUsers`** uses a simple SQL query (users not followed + ordered by follower count). A more sophisticated recommendation algorithm (mutual follows, shared interests) is out of scope for Phase 2.

@@ -273,7 +273,7 @@ func RegisterRoutes(
 
 		// Phase 2: Discovery
 		community.GET("/suggested-users", h.Community.GetSuggestedUsers)
-		community.GET("/trending-topics", h.Community.GetTrendingTopics)
+		community.GET("/trending", h.Community.GetTrendingTopics)
 	}
 
 	// Import routes (protected)
