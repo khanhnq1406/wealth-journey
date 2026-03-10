@@ -14,6 +14,8 @@ type Post struct {
 	ImageURL     string         `gorm:"size:500" json:"imageUrl"`
 	LikeCount    int32          `gorm:"default:0" json:"likeCount"`
 	CommentCount int32          `gorm:"default:0" json:"commentCount"`
+	SharedPostID *int32         `gorm:"index:idx_post_shared" json:"sharedPostId,omitempty"`
+	ShareCount   int32          `gorm:"type:int;default:0;not null" json:"shareCount"`
 	CreatedAt    time.Time      `gorm:"index:idx_post_created_at" json:"createdAt"`
 	UpdatedAt    time.Time      `json:"updatedAt"`
 	DeletedAt    gorm.DeletedAt `gorm:"index:idx_post_deleted_at" json:"-"`
