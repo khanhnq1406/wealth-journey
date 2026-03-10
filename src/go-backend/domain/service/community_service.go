@@ -650,6 +650,9 @@ func (s *communityService) postToProto(post *models.Post, user *models.User, isL
 		item.UserName = user.Name
 		item.UserPicture = user.Picture
 	}
+	if post.SharedPost != nil {
+		item.SharedPost = s.postToProto(post.SharedPost, post.SharedPost.User, false, false, false)
+	}
 	return item
 }
 

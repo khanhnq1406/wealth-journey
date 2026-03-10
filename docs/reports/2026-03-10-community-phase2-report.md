@@ -175,6 +175,7 @@ All 5 functional requirement groups from the spec were implemented:
 | Date | Fix | Severity | File | Commit |
 |------|-----|----------|------|--------|
 | 2026-03-10 | Backend route `/trending-topics` → `/trending` to match proto HTTP option and generated frontend client | Minor | `src/go-backend/handlers/routes.go:276` | — |
+| 2026-03-10 | SharedPostEmbed not rendered when viewing feed: (1) added `SharedPost *Post` GORM relationship to Post model, (2) added `Preload("SharedPost").Preload("SharedPost.User")` to `GetFeed` and `GetByUserID`, (3) populated `item.SharedPost` in `postToProto` when relationship is loaded | Minor | `domain/models/post.go`, `domain/repository/post_repository.go`, `domain/service/community_service.go` | — |
 
 ## Known Issues / Technical Debt
 

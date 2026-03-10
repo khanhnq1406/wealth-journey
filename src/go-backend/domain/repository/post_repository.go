@@ -72,7 +72,7 @@ func (r *postRepository) GetFeed(ctx context.Context, userIDs []int32, opts List
 		return nil, 0, r.handleDBError(err, "post", "count feed posts")
 	}
 
-	query = query.Preload("User").Order("created_at DESC")
+	query = query.Preload("User").Preload("SharedPost").Preload("SharedPost.User").Order("created_at DESC")
 	query = r.applyPagination(query, opts)
 
 	if err := query.Find(&posts).Error; err != nil {
@@ -95,7 +95,7 @@ func (r *postRepository) GetByUserID(ctx context.Context, userID int32, opts Lis
 
 	query = r.db.DB.WithContext(ctx).
 		Where("user_id = ?", userID).
-		Preload("User").
+		Preload("User").Preload("SharedPost").Preload("SharedPost.User").
 		Order("created_at DESC")
 	query = r.applyPagination(query, opts)
 

@@ -28,41 +28,42 @@
 
 ## Task Overview
 
-| # | Task | Layer | Dependencies |
-|---|------|-------|-------------|
-| 1 | Extend Protobuf API | API | None |
-| 2 | Generate Code from Proto | Build | Task 1 |
-| 3 | Database Models (Notification, SavedPost, PostHashtag) + Post model changes | Backend | Task 2 |
-| 4 | Database Migration | Backend | Task 3 |
-| 5 | New Repositories (Notification, SavedPost, Hashtag) | Backend | Task 3 |
-| 6 | Extend PostRepository (shared posts, batch isSaved) | Backend | Task 3 |
-| 7 | Extend CommunityService — Share/Repost | Backend | Tasks 5, 6 |
-| 8 | Extend CommunityService — Notifications | Backend | Task 5 |
-| 9 | Extend CommunityService — Saved Posts | Backend | Task 5 |
-| 10 | Extend CommunityService — Suggested Users | Backend | Task 5 |
-| 11 | Extend CommunityService — Trending Topics (Hashtags) | Backend | Task 5 |
-| 12 | Extend CommunityService — Hashtag extraction in CreatePost/UpdatePost | Backend | Task 11 |
-| 13 | New Handler Methods + Routes | Backend | Tasks 7-12 |
-| 14 | Wire DI (builder, services, providers) | Backend | Task 13 |
-| 15 | Frontend: Schemas, Hooks (useSavedPost, useNotifications) | Frontend | Task 2 |
-| 16 | Frontend: SharePostModal + SharedPostEmbed | Frontend | Task 15 |
-| 17 | Frontend: PostCard/PostActions/PostBody/PostEngagement updates | Frontend | Task 16 |
-| 18 | Frontend: NotificationBell + NotificationPanel + NotificationItem | Frontend | Task 15 |
-| 19 | Frontend: SavedPostsView + CommunityNav/MobileSubNav updates | Frontend | Task 15 |
-| 20 | Frontend: SuggestedUsers + SuggestedUserCard | Frontend | Task 15 |
-| 21 | Frontend: TrendingTopics + HashtagLink + Feed hashtag filter | Frontend | Task 15 |
-| 22 | Frontend: Wire notifications into dashboard layout | Frontend | Task 18 |
-| 23 | Frontend: CommunityRightSidebar + page.tsx updates | Frontend | Tasks 20, 21 |
-| 24 | Frontend: Mobile layout (horizontal scroll suggested users, trending chips) | Frontend | Task 23 |
-| 25 | Update C4 Architecture Diagrams | Docs | Task 14 |
-| 26 | Update Runtime Flow Diagrams | Docs | Task 14 |
-| 27 | Integration Testing & Cleanup | All | All above |
+| #   | Task                                                                        | Layer    | Dependencies |
+| --- | --------------------------------------------------------------------------- | -------- | ------------ |
+| 1   | Extend Protobuf API                                                         | API      | None         |
+| 2   | Generate Code from Proto                                                    | Build    | Task 1       |
+| 3   | Database Models (Notification, SavedPost, PostHashtag) + Post model changes | Backend  | Task 2       |
+| 4   | Database Migration                                                          | Backend  | Task 3       |
+| 5   | New Repositories (Notification, SavedPost, Hashtag)                         | Backend  | Task 3       |
+| 6   | Extend PostRepository (shared posts, batch isSaved)                         | Backend  | Task 3       |
+| 7   | Extend CommunityService — Share/Repost                                      | Backend  | Tasks 5, 6   |
+| 8   | Extend CommunityService — Notifications                                     | Backend  | Task 5       |
+| 9   | Extend CommunityService — Saved Posts                                       | Backend  | Task 5       |
+| 10  | Extend CommunityService — Suggested Users                                   | Backend  | Task 5       |
+| 11  | Extend CommunityService — Trending Topics (Hashtags)                        | Backend  | Task 5       |
+| 12  | Extend CommunityService — Hashtag extraction in CreatePost/UpdatePost       | Backend  | Task 11      |
+| 13  | New Handler Methods + Routes                                                | Backend  | Tasks 7-12   |
+| 14  | Wire DI (builder, services, providers)                                      | Backend  | Task 13      |
+| 15  | Frontend: Schemas, Hooks (useSavedPost, useNotifications)                   | Frontend | Task 2       |
+| 16  | Frontend: SharePostModal + SharedPostEmbed                                  | Frontend | Task 15      |
+| 17  | Frontend: PostCard/PostActions/PostBody/PostEngagement updates              | Frontend | Task 16      |
+| 18  | Frontend: NotificationBell + NotificationPanel + NotificationItem           | Frontend | Task 15      |
+| 19  | Frontend: SavedPostsView + CommunityNav/MobileSubNav updates                | Frontend | Task 15      |
+| 20  | Frontend: SuggestedUsers + SuggestedUserCard                                | Frontend | Task 15      |
+| 21  | Frontend: TrendingTopics + HashtagLink + Feed hashtag filter                | Frontend | Task 15      |
+| 22  | Frontend: Wire notifications into dashboard layout                          | Frontend | Task 18      |
+| 23  | Frontend: CommunityRightSidebar + page.tsx updates                          | Frontend | Tasks 20, 21 |
+| 24  | Frontend: Mobile layout (horizontal scroll suggested users, trending chips) | Frontend | Task 23      |
+| 25  | Update C4 Architecture Diagrams                                             | Docs     | Task 14      |
+| 26  | Update Runtime Flow Diagrams                                                | Docs     | Task 14      |
+| 27  | Integration Testing & Cleanup                                               | All      | All above    |
 
 ---
 
 ### Task 1: Extend Protobuf API — `api/protobuf/v1/community.proto`
 
 **Files:**
+
 - Modify: `api/protobuf/v1/community.proto`
 
 **Security notes:** All new RPCs require authenticated user. User ID from JWT, never from request body.
@@ -90,6 +91,7 @@ string hashtag = 2 [json_name = "hashtag"];
 **Step 3: Add new messages**
 
 Add all new messages from spec section "New Messages":
+
 - `SharePostRequest`, `SharePostResponse`
 - `NotificationItem`, `GetNotificationsRequest`, `GetNotificationsResponse`
 - `GetUnreadNotificationCountRequest`, `GetUnreadNotificationCountResponse`
@@ -102,6 +104,7 @@ Add all new messages from spec section "New Messages":
 **Step 4: Add new RPCs to CommunityService**
 
 Add 9 new RPCs with HTTP annotations:
+
 - `SharePost` — POST `/api/v1/community/posts/{postId}/share`
 - `GetNotifications` — GET `/api/v1/community/notifications`
 - `GetUnreadNotificationCount` — GET `/api/v1/community/notifications/unread-count`
@@ -125,6 +128,7 @@ task proto:all
 ### Task 2: Generate Code from Proto
 
 **Files:**
+
 - Generated: `src/go-backend/protobuf/v1/community*.go`
 - Generated: `src/wj-client/gen/protobuf/v1/community*.ts`
 - Generated: `src/wj-client/utils/generated/hooks.ts`
@@ -154,6 +158,7 @@ cd src/wj-client && npx tsc --noEmit
 ### Task 3: Database Models (Notification, SavedPost, PostHashtag) + Post Model Changes
 
 **Files:**
+
 - Create: `src/go-backend/domain/models/notification.go`
 - Create: `src/go-backend/domain/models/saved_post.go`
 - Create: `src/go-backend/domain/models/post_hashtag.go`
@@ -250,6 +255,7 @@ cd src/go-backend && go build ./...
 ### Task 4: Database Migration
 
 **Files:**
+
 - Modify: `src/go-backend/cmd/migrate-community/main.go`
 
 **Step 1: Add Phase 2 migration function**
@@ -307,6 +313,7 @@ Add call to `migrateCommunityPhase2(db)` after existing Phase 1 migration in mai
 ### Task 5: New Repositories (Notification, SavedPost, Hashtag)
 
 **Files:**
+
 - Create: `src/go-backend/domain/repository/notification_repository.go`
 - Create: `src/go-backend/domain/repository/saved_post_repository.go`
 - Create: `src/go-backend/domain/repository/hashtag_repository.go`
@@ -327,6 +334,7 @@ type NotificationRepository interface {
 ```
 
 Implementation:
+
 - `GetByUserID`: Preload `Actor`, order by `created_at DESC`, with pagination
 - `GetUnreadCount`: `WHERE user_id = ? AND is_read = false`, count
 - `MarkAllRead`: `UPDATE notification SET is_read = true WHERE user_id = ? AND is_read = false`
@@ -345,6 +353,7 @@ type SavedPostRepository interface {
 ```
 
 Implementation:
+
 - `Create`: Insert with ON CONFLICT DO NOTHING (idempotent)
 - `Delete`: Soft delete by user_id + post_id
 - `GetSavedPostIDs`: Batch query like `GetLikedPostIDs` pattern for N+1 prevention
@@ -368,6 +377,7 @@ type TrendingHashtag struct {
 ```
 
 Implementation:
+
 - `CreateBatch`: Batch insert with ON CONFLICT DO NOTHING
 - `GetTrending`: `SELECT hashtag, COUNT(*) as post_count FROM post_hashtag WHERE created_at > ? GROUP BY hashtag ORDER BY post_count DESC LIMIT ?`
 - `GetPostIDsByHashtag`: `SELECT post_id FROM post_hashtag WHERE hashtag = ? ORDER BY created_at DESC` with pagination
@@ -385,6 +395,7 @@ cd src/go-backend && go build ./...
 ### Task 6: Extend PostRepository (Shared Posts, Batch isSaved)
 
 **Files:**
+
 - Modify: `src/go-backend/domain/repository/post_repository.go`
 
 **Step 1: Add IncrementShareCount method**
@@ -440,6 +451,7 @@ Add `IncrementShareCount`, `GetByIDs` to the interface. Update `GetFeed` signatu
 ### Task 7: Extend CommunityService — Share/Repost
 
 **Files:**
+
 - Modify: `src/go-backend/domain/service/community_service.go`
 - Modify: `src/go-backend/domain/service/interfaces.go`
 
@@ -543,6 +555,7 @@ func (s *communityService) postToProto(post *models.Post, user *models.User, isL
 **Step 4: Update GetFeed to embed shared posts and isSaved**
 
 In the feed enrichment loop, after batch-loading isLiked and isFollowing:
+
 1. Collect all `SharedPostID` values from feed posts
 2. Batch-fetch shared posts via `GetByIDs`
 3. Attach `sharedPost` to each feed item that has one
@@ -556,6 +569,7 @@ In the feed enrichment loop, after batch-loading isLiked and isFollowing:
 ### Task 8: Extend CommunityService — Notifications
 
 **Files:**
+
 - Modify: `src/go-backend/domain/service/community_service.go`
 - Modify: `src/go-backend/domain/service/interfaces.go`
 
@@ -588,6 +602,7 @@ MarkNotificationsRead(ctx context.Context, userID int32) error
 **Step 5: Add notification creation as side-effects**
 
 Add `createNotification` helper. Wire into existing methods:
+
 - `LikePost`: Create notification type "like" (skip if liking own post)
 - `CreateComment`: Create notification type "comment" (skip if commenting on own post)
 - `FollowUser`: Create notification type "follow"
@@ -614,6 +629,7 @@ func (s *communityService) createNotification(ctx context.Context, userID, actor
 ### Task 9: Extend CommunityService — Saved Posts
 
 **Files:**
+
 - Modify: `src/go-backend/domain/service/community_service.go`
 - Modify: `src/go-backend/domain/service/interfaces.go`
 
@@ -652,6 +668,7 @@ GetSavedPosts(ctx context.Context, userID int32, req *v1.GetSavedPostsRequest) (
 ### Task 10: Extend CommunityService — Suggested Users
 
 **Files:**
+
 - Modify: `src/go-backend/domain/service/community_service.go`
 - Modify: `src/go-backend/domain/service/interfaces.go`
 - Modify: `src/go-backend/domain/repository/follow_repository.go` (add new query)
@@ -717,6 +734,7 @@ LIMIT ?
 ### Task 11: Extend CommunityService — Trending Topics (Hashtags)
 
 **Files:**
+
 - Modify: `src/go-backend/domain/service/community_service.go`
 - Modify: `src/go-backend/domain/service/interfaces.go`
 
@@ -760,6 +778,7 @@ func (s *communityService) GetTrendingTopics(ctx context.Context) (*v1.GetTrendi
 ### Task 12: Extend CommunityService — Hashtag Extraction in CreatePost/UpdatePost
 
 **Files:**
+
 - Modify: `src/go-backend/domain/service/community_service.go`
 
 **Security notes:** Hashtag extraction is server-side only. Frontend does NOT send hashtags. Regex validated. Max 10 hashtags per post.
@@ -805,6 +824,7 @@ After `s.postRepo.Create(ctx, post)` succeeds, call `s.extractAndStoreHashtags(c
 **Step 4: Wire into UpdatePost**
 
 After content update succeeds:
+
 1. `s.hashtagRepo.DeleteByPostID(ctx, post.ID)` — remove old hashtags
 2. `s.extractAndStoreHashtags(ctx, post.ID, content, post.CreatedAt)` — re-extract
 
@@ -828,6 +848,7 @@ Load hashtags for post (or accept them as parameter from batch-loaded data in fe
 ### Task 13: New Handler Methods + Routes
 
 **Files:**
+
 - Modify: `src/go-backend/handlers/community.go`
 - Modify: `src/go-backend/handlers/routes.go`
 
@@ -859,6 +880,7 @@ func (h *CommunityHandler) GetTrendingTopics(c *gin.Context) { ... }
 ```
 
 Each follows the standard pattern:
+
 1. Extract userID from JWT
 2. Parse path params / query params / body
 3. Call service method
@@ -908,6 +930,7 @@ func (h *CommunityHandler) GetFeed(c *gin.Context) {
 ### Task 14: Wire DI (Builder, Services, Providers)
 
 **Files:**
+
 - Modify: `src/go-backend/handlers/builder.go` (no changes needed — CommunityHandler already wired)
 - Modify: `src/go-backend/domain/service/services.go` (add new repos to CommunityService constructor)
 - Modify: `src/go-backend/internal/app/providers.go` (add new repo instantiation)
@@ -966,6 +989,7 @@ type communityService struct {
 ### Task 15: Frontend: Schemas, Hooks (useSavedPost, useNotifications)
 
 **Files:**
+
 - Modify: `src/wj-client/features/community/utils/community.schema.ts`
 - Create: `src/wj-client/features/community/hooks/useSavedPost.ts`
 - Create: `src/wj-client/features/community/hooks/useNotifications.ts`
@@ -975,7 +999,11 @@ type communityService struct {
 
 ```typescript
 export const sharePostSchema = z.object({
-  content: z.string().max(2000, "Maximum 2000 characters").optional().or(z.literal("")),
+  content: z
+    .string()
+    .max(2000, "Maximum 2000 characters")
+    .optional()
+    .or(z.literal("")),
 });
 
 export type SharePostFormData = z.infer<typeof sharePostSchema>;
@@ -1013,7 +1041,7 @@ export function useSavedPost(postId: number, initialIsSaved: boolean) {
 export function useNotifications() {
   const { data: unreadData } = useQueryGetUnreadNotificationCount(
     {},
-    { refetchInterval: 30000 } // Poll every 30 seconds
+    { refetchInterval: 30000 }, // Poll every 30 seconds
   );
 
   const unreadCount = unreadData?.count ?? 0;
@@ -1043,6 +1071,7 @@ export function parseContentWithHashtags(content: string): ContentSegment[] {
 ### Task 16: Frontend: SharePostModal + SharedPostEmbed
 
 **Files:**
+
 - Create: `src/wj-client/features/community/components/SharePostModal.tsx`
 - Create: `src/wj-client/features/community/components/SharedPostEmbed.tsx`
 - Create: `src/wj-client/features/community/forms/SharePostForm.tsx`
@@ -1100,6 +1129,7 @@ Wraps `BaseModal` with `SharePostForm` inside. Title: "Chia sẻ bài viết".
 ### Task 17: Frontend: PostCard/PostActions/PostBody/PostEngagement Updates
 
 **Files:**
+
 - Modify: `src/wj-client/features/community/components/PostCard.tsx`
 - Modify: `src/wj-client/features/community/components/PostActions.tsx`
 - Modify: `src/wj-client/features/community/components/PostBody.tsx`
@@ -1108,6 +1138,7 @@ Wraps `BaseModal` with `SharePostForm` inside. Title: "Chia sẻ bài viết".
 **Step 1: Update PostActions — add Share and Bookmark buttons**
 
 Add two new buttons:
+
 - **Share button** (ArrowUpRight or Forward icon): triggers share modal. Hidden for own posts.
 - **Bookmark button** (Bookmark icon): toggles save/unsave via `useSavedPost` hook. Filled when saved.
 
@@ -1147,6 +1178,7 @@ Use `parseContentWithHashtags` utility to split content into segments. Render ha
 ### Task 18: Frontend: NotificationBell + NotificationPanel + NotificationItem
 
 **Files:**
+
 - Create: `src/wj-client/components/notifications/NotificationBell.tsx`
 - Create: `src/wj-client/components/notifications/NotificationPanel.tsx`
 - Create: `src/wj-client/components/notifications/NotificationItem.tsx`
@@ -1189,6 +1221,7 @@ interface NotificationItemProps {
 Renders: actor avatar, action text (Vietnamese), relative time, read/unread indicator (blue dot for unread).
 
 Action text mapping:
+
 - `like`: "đã thích bài viết của bạn"
 - `comment`: "đã bình luận bài viết của bạn"
 - `follow`: "đã theo dõi bạn"
@@ -1200,6 +1233,7 @@ Desktop: dropdown (320px wide, max-h 480px, z-20, positioned below bell).
 Mobile: full-screen overlay.
 
 Features:
+
 - "Thông báo" header + "Đọc tất cả" button
 - Scrollable list of NotificationItem
 - Empty state: "Chưa có thông báo nào"
@@ -1214,6 +1248,7 @@ Features:
 ### Task 19: Frontend: SavedPostsView + CommunityNav/MobileSubNav Updates
 
 **Files:**
+
 - Create: `src/wj-client/features/community/components/SavedPostsView.tsx`
 - Modify: `src/wj-client/features/community/components/CommunityNav.tsx`
 - Modify: `src/wj-client/features/community/components/MobileSubNav.tsx`
@@ -1251,6 +1286,7 @@ interface SavedPostsViewProps {
 ### Task 20: Frontend: SuggestedUsers + SuggestedUserCard
 
 **Files:**
+
 - Create: `src/wj-client/features/community/components/SuggestedUsers.tsx`
 - Create: `src/wj-client/features/community/components/SuggestedUserCard.tsx`
 - Delete or replace: `src/wj-client/features/community/components/SuggestedUsersPlaceholder.tsx`
@@ -1288,6 +1324,7 @@ interface SuggestedUsersProps {
 ### Task 21: Frontend: TrendingTopics + HashtagLink + Feed Hashtag Filter
 
 **Files:**
+
 - Create: `src/wj-client/features/community/components/TrendingTopics.tsx`
 - Create: `src/wj-client/features/community/components/HashtagLink.tsx`
 - Modify: `src/wj-client/features/community/components/CommunityFeed.tsx`
@@ -1342,6 +1379,7 @@ interface TrendingTopicsProps {
 ### Task 22: Frontend: Wire Notifications into Dashboard Layout
 
 **Files:**
+
 - Modify: `src/wj-client/app/[locale]/dashboard/layout.tsx`
 
 **Step 1: Import NotificationBell and NotificationPanel**
@@ -1380,6 +1418,7 @@ Add bell with badge to mobile header section.
 ### Task 23: Frontend: CommunityRightSidebar + Page.tsx Updates
 
 **Files:**
+
 - Modify: `src/wj-client/features/community/components/CommunityRightSidebar.tsx`
 - Modify: `src/wj-client/app/[locale]/dashboard/community/page.tsx`
 
@@ -1421,6 +1460,7 @@ export function CommunityRightSidebar({ className, onHashtagClick }: CommunityRi
 ### Task 24: Frontend: Mobile Layout (Horizontal Scroll Suggested Users, Trending Chips)
 
 **Files:**
+
 - Modify: `src/wj-client/app/[locale]/dashboard/community/page.tsx`
 
 **Step 1: Add mobile suggested users section**
@@ -1456,6 +1496,7 @@ Both components use `overflow-x-auto snap-x snap-mandatory` with `scroll-snap-al
 ### Task 25: Update C4 Architecture Diagrams
 
 **Files:**
+
 - Modify: `docs/architecture/c4-component-backend.md`
 - Modify: `docs/architecture/c4-component-frontend.md`
 
@@ -1479,6 +1520,7 @@ Both components use `overflow-x-auto snap-x snap-mandatory` with `scroll-snap-al
 ### Task 26: Update Runtime Flow Diagrams
 
 **Files:**
+
 - Modify: `docs/architecture/flow-community.md`
 
 **Step 1: Add Share Post sequence diagram**
@@ -1527,6 +1569,7 @@ Add notification creation side-effects.
 ### Task 27: Integration Testing & Cleanup
 
 **Files:**
+
 - All modified files across the feature
 
 **Step 1: Run full backend build**
@@ -1550,7 +1593,7 @@ cd src/wj-client && npm run build
 **Step 4: Manual testing checklist**
 
 - [x] Create a post with hashtags → verify hashtags extracted and stored
-- [ ] Share another user's post with commentary → verify shared post renders correctly
+- [x] Share another user's post with commentary → verify shared post renders correctly
 - [ ] Share a shared post → verify it references the original (no recursive nesting)
 - [ ] Like/comment/follow → verify notification created for target user
 - [ ] Check notification bell shows unread count

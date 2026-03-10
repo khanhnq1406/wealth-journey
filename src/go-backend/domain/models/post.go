@@ -20,6 +20,7 @@ type Post struct {
 	UpdatedAt    time.Time      `json:"updatedAt"`
 	DeletedAt    gorm.DeletedAt `gorm:"index:idx_post_deleted_at" json:"-"`
 	User         *User          `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	SharedPost   *Post          `gorm:"foreignKey:SharedPostID" json:"sharedPost,omitempty"`
 }
 
 // TableName specifies the table name for Post model
