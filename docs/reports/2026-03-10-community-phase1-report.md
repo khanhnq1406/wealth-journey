@@ -210,6 +210,7 @@ Implemented a finance-focused community social feed for WealthJourney. The commu
 | 2026-03-10 | Add spinner loading state to comment submit button (replaces Send icon with Loader2 while `isPending`; dims button color during load) | Minor | `CommentSection.tsx` |
 | 2026-03-10 | Fix empty feed for new users: when user follows nobody, fall back to global feed (all posts) instead of filtering to own posts only | Minor | `community_service.go`, `post_repository.go` |
 | 2026-03-10 | Fix Follow button resetting to "Follow" on page refresh: add `isFollowing` field to `PostItem` proto, batch-check follow status in `GetFeed`/`GetUserPosts`/`GetPost`, pass down through `PostCard` → `PostHeader` → `FollowButton` | Minor | `community.proto`, `interfaces.go`, `follow_repository.go`, `community_service.go`, `PostCard.tsx` |
+| 2026-03-10 | Remove topic tag feature: delete `topic-tags.ts`, `TopicTag.tsx`, `CommunityTabBar.tsx`; remove `topicTag`/`topicFilter` fields from proto, model, service, repo, handler, forms, and components; add `cmd/migrate-drop-topic` to drop DB column | Minor | 22 files (proto, 5 backend, 3 deleted frontend, 7 modified frontend, generated code) |
 
 ## Known Issues / Technical Debt
 
