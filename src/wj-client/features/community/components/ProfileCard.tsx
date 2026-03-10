@@ -62,6 +62,7 @@ export function ProfileCard({ currentUser }: ProfileCardProps) {
             name={profile?.userName || currentUser.name}
             imageUrl={profile?.userPicture || currentUser.picture}
             size="lg"
+            priority
             className="!w-[72px] !h-[72px] !text-xl ring-[3px] ring-white"
           />
         </div>
