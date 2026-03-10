@@ -1602,17 +1602,17 @@ cd src/wj-client && npm run build
 - [x] Click notification → navigates to correct post/profile
 - [x] Bookmark a post → verify bookmark icon filled
 - [x] Go to "Đã lưu" tab → verify saved post appears
-- [ ] Unbookmark → verify post removed from saved view
-- [ ] Check right sidebar → suggested users render with follow buttons
+- [x] Unbookmark → verify post removed from saved view
+- [x] Check right sidebar → suggested users render with follow buttons
 - [ ] Dismiss a suggested user → removed from current session
-- [ ] Check trending topics → top 10 hashtags render with counts
-- [ ] Click trending hashtag → feed filters to that hashtag
-- [ ] Click hashtag in post body → same filter behavior
-- [ ] Clear hashtag filter → returns to full feed
+- [x] Check trending topics → top 10 hashtags render with counts
+- [x] Click trending hashtag → feed filters to that hashtag
+- [x] Click hashtag in post body → same filter behavior
+- [x] Clear hashtag filter → returns to full feed
 - [ ] Mobile: horizontal scroll suggested users + trending chips
-- [ ] Mobile: notification tab in sub-nav works
-- [ ] Desktop: notification dropdown positions correctly below bell
-- [ ] Desktop: saved tab in left nav works
+- [x] Mobile: notification tab in sub-nav works
+- [x] Desktop: notification dropdown positions correctly below bell
+- [x] Desktop: saved tab in left nav works
 
 **Step 5: Fix any issues found**
 

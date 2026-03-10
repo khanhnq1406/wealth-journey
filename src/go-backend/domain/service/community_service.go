@@ -98,7 +98,7 @@ func (s *communityService) CreatePost(ctx context.Context, userID int32, req *v1
 	return &v1.CreatePostResponse{
 		Success: true,
 		Message: "Post created successfully",
-		Data:    s.postToProto(post, user, false, true, false),
+		Data:    s.postToProto(post, user, false, true, false, false),
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
 }
@@ -143,7 +143,7 @@ func (s *communityService) UpdatePost(ctx context.Context, userID int32, req *v1
 	return &v1.UpdatePostResponse{
 		Success: true,
 		Message: "Post updated successfully",
-		Data:    s.postToProto(post, post.User, false, true, false),
+		Data:    s.postToProto(post, post.User, false, true, false, false),
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
 }
@@ -185,10 +185,14 @@ func (s *communityService) GetPost(ctx context.Context, userID int32, postID int
 		return nil, err
 	}
 
+	// Check if user saved this post
+	savedIDs, _ := s.savedPostRepo.GetSavedPostIDs(ctx, userID, []int32{postID})
+	isSaved := len(savedIDs) > 0
+
 	return &v1.GetPostResponse{
 		Success: true,
 		Message: "Post retrieved successfully",
-		Data:    s.postToProto(post, post.User, isLiked, post.UserID == userID, isFollowing),
+		Data:    s.postToProto(post, post.User, isLiked, post.UserID == userID, isFollowing, isSaved),
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
 }
@@ -241,10 +245,20 @@ func (s *communityService) GetFeed(ctx context.Context, userID int32, req *v1.Ge
 		followedSet[id] = true
 	}
 
+	// Batch check saved status
+	savedIDs, err := s.savedPostRepo.GetSavedPostIDs(ctx, userID, postIDs)
+	if err != nil {
+		return nil, err
+	}
+	savedSet := make(map[int32]bool, len(savedIDs))
+	for _, id := range savedIDs {
+		savedSet[id] = true
+	}
+
 	// Convert to proto
 	protoPosts := make([]*v1.PostItem, len(posts))
 	for i, post := range posts {
-		protoPosts[i] = s.postToProto(post, post.User, likedSet[post.ID], post.UserID == userID, followedSet[post.UserID])
+		protoPosts[i] = s.postToProto(post, post.User, likedSet[post.ID], post.UserID == userID, followedSet[post.UserID], savedSet[post.ID])
 	}
 
 	page, pageSize := s.getPageParams(req.Pagination)
@@ -295,9 +309,19 @@ func (s *communityService) GetUserPosts(ctx context.Context, userID int32, targe
 		return nil, err
 	}
 
+	// Batch check saved status
+	savedIDs, err := s.savedPostRepo.GetSavedPostIDs(ctx, userID, postIDs)
+	if err != nil {
+		return nil, err
+	}
+	savedSet := make(map[int32]bool, len(savedIDs))
+	for _, id := range savedIDs {
+		savedSet[id] = true
+	}
+
 	protoPosts := make([]*v1.PostItem, len(posts))
 	for i, post := range posts {
-		protoPosts[i] = s.postToProto(post, post.User, likedSet[post.ID], post.UserID == userID, isFollowingTarget)
+		protoPosts[i] = s.postToProto(post, post.User, likedSet[post.ID], post.UserID == userID, isFollowingTarget, savedSet[post.ID])
 	}
 
 	page, pageSize := s.getPageParams(req.Pagination)
@@ -630,7 +654,7 @@ func (s *communityService) GetUploadURL(ctx context.Context, userID int32, req *
 
 // --- Helpers ---
 
-func (s *communityService) postToProto(post *models.Post, user *models.User, isLiked, isOwnPost, isFollowing bool) *v1.PostItem {
+func (s *communityService) postToProto(post *models.Post, user *models.User, isLiked, isOwnPost, isFollowing, isSaved bool) *v1.PostItem {
 	item := &v1.PostItem{
 		Id:           post.ID,
 		UserId:       post.UserID,
@@ -642,6 +666,7 @@ func (s *communityService) postToProto(post *models.Post, user *models.User, isL
 		IsLiked:      isLiked,
 		IsOwnPost:    isOwnPost,
 		IsFollowing:  isFollowing,
+		IsSaved:      isSaved,
 		IsShared:     post.SharedPostID != nil,
 		CreatedAt:    post.CreatedAt.Unix(),
 		UpdatedAt:    post.UpdatedAt.Unix(),
@@ -651,7 +676,7 @@ func (s *communityService) postToProto(post *models.Post, user *models.User, isL
 		item.UserPicture = user.Picture
 	}
 	if post.SharedPost != nil {
-		item.SharedPost = s.postToProto(post.SharedPost, post.SharedPost.User, false, false, false)
+		item.SharedPost = s.postToProto(post.SharedPost, post.SharedPost.User, false, false, false, false)
 	}
 	return item
 }
@@ -791,14 +816,14 @@ func (s *communityService) SharePost(ctx context.Context, userID int32, req *v1.
 
 	// Build response
 	user, _ := s.userRepo.GetByID(ctx, userID)
-	protoPost := s.postToProto(post, user, false, true, false)
+	protoPost := s.postToProto(post, user, false, true, false, false)
 
 	if rootPost != nil {
 		rootUser := rootPost.User
 		if rootUser == nil {
 			rootUser, _ = s.userRepo.GetByID(ctx, rootPost.UserID)
 		}
-		protoPost.SharedPost = s.postToProto(rootPost, rootUser, false, false, false)
+		protoPost.SharedPost = s.postToProto(rootPost, rootUser, false, false, false, false)
 		protoPost.IsShared = true
 	}
 
@@ -951,9 +976,7 @@ func (s *communityService) GetSavedPosts(ctx context.Context, userID int32, req 
 
 	protoPosts := make([]*v1.PostItem, len(posts))
 	for i, post := range posts {
-		protoPost := s.postToProto(post, post.User, likedSet[post.ID], post.UserID == userID, false)
-		protoPost.IsSaved = true
-		protoPosts[i] = protoPost
+		protoPosts[i] = s.postToProto(post, post.User, likedSet[post.ID], post.UserID == userID, false, true)
 	}
 
 	page, pageSize := s.getPageParams(req.Pagination)

@@ -1,13 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { useMutationSavePost, useMutationUnsavePost } from "@/utils/generated/hooks";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  useMutationSavePost,
+  useMutationUnsavePost,
+  EVENT_CommunityGetFeed,
+  EVENT_CommunityGetSavedPosts,
+} from "@/utils/generated/hooks";
 
 export function useSavedPost(postId: number, initialIsSaved: boolean) {
   const [isSaved, setIsSaved] = useState(initialIsSaved);
+  const queryClient = useQueryClient();
 
   const saveMutation = useMutationSavePost();
   const unsaveMutation = useMutationUnsavePost();
+
+  const invalidateFeed = () => {
+    queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetFeed] });
+    queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetSavedPosts] });
+  };
 
   const toggle = () => {
     if (isSaved) {
@@ -15,6 +27,7 @@ export function useSavedPost(postId: number, initialIsSaved: boolean) {
       unsaveMutation.mutate(
         { postId },
         {
+          onSuccess: invalidateFeed,
           onError: () => {
             setIsSaved(true);
           },
@@ -25,6 +38,7 @@ export function useSavedPost(postId: number, initialIsSaved: boolean) {
       saveMutation.mutate(
         { postId },
         {
+          onSuccess: invalidateFeed,
           onError: () => {
             setIsSaved(false);
           },
