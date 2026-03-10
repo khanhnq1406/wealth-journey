@@ -28,6 +28,7 @@ export {
   PortfolioIcon,
   ReportsIcon,
   BudgetIcon,
+  CommunityIcon,
 } from "./navigation";
 
 // Action Icons

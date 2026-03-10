@@ -7,7 +7,7 @@
 - **Started:** 2026-03-10T00:00:00Z
 - **Last updated:** 2026-03-10T12:00:00Z
 - **Current state:** in_progress
-- **Current task:** 8
+- **Current task:** 10
 
 ## Task Progress
 
@@ -21,8 +21,8 @@
 | 5 | Repositories | done | 43deb1b | 5 repository interfaces and implementations |
 | 6 | Community Service | done | 612f0f1 | Full CommunityService with 17 methods |
 | 7 | Community Handlers | done | 6822db6 | 17 REST handler methods for all community endpoints |
-| 8 | Wire DI & Routes | in_progress | — | — |
-| 9 | Frontend: Constants & Route | pending | — | — |
+| 8 | Wire DI & Routes | done | 9484a7a | Wired builder, routes, providers for community |
+| 9 | Frontend: Constants & Route | in_progress | — | — |
 | 10 | Frontend: Community Page Shell | pending | — | — |
 | 11 | Frontend: PostCard Component | pending | — | — |
 | 12 | Frontend: CreatePostBox & Form | pending | — | — |

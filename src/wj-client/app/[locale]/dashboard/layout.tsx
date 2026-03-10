@@ -36,6 +36,7 @@ import {
   LogOut,
   X,
   Menu,
+  Users,
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -132,6 +133,11 @@ export default function DashboardLayout({
         href: routes.budget,
         label: t("budget"),
         icon: <Calculator size={22} />,
+      },
+      {
+        href: routes.community,
+        label: t("community"),
+        icon: <Users size={22} />,
       },
     ];
 
@@ -346,6 +352,15 @@ export default function DashboardLayout({
                     icon={<Calculator size={20} />}
                     isActive={path === routes.budget}
                   />
+                  <NavItem
+                    href={routes.community}
+                    label={t("community")}
+                    isExpanded={isExpanded}
+                    showTooltip={!isExpanded}
+                    animationDelay={180}
+                    icon={<Users size={20} />}
+                    isActive={path === routes.community}
+                  />
                 </div>
 
                 {/* Spacer + Divider + Settings */}
@@ -357,7 +372,7 @@ export default function DashboardLayout({
                   label={t("settings")}
                   isExpanded={isExpanded}
                   showTooltip={!isExpanded}
-                  animationDelay={180}
+                  animationDelay={210}
                   icon={<Settings size={20} />}
                   isActive={path.startsWith("/dashboard/settings")}
                 />

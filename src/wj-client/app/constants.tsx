@@ -84,6 +84,7 @@ export const routes = {
   wallets: `/dashboard/wallets`,
   portfolio: `/dashboard/portfolio`,
   prices: `/dashboard/prices`,
+  community: `/dashboard/community`,
 };
 
 export const resources = "/resources/icons/";
@@ -149,6 +150,9 @@ export const ModalType = {
   EDIT_BUDGET_ITEM: "Edit Budget Item",
   ADD_INVESTMENT: "Add Investment",
   INVESTMENT_DETAIL: "Investment Details",
+  CREATE_POST: "Create Post",
+  EDIT_POST: "Edit Post",
+  REPORT_CONTENT: "Report Content",
 };
 
 export const SUPPORTED_CURRENCIES = [
