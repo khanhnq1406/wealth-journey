@@ -562,7 +562,10 @@ func (h *CommunityHandler) MarkNotificationsRead(c *gin.Context) {
 		return
 	}
 
-	handler.NoContent(c)
+	handler.Success(c, gin.H{
+		"success": true,
+		"message": "Notifications marked as read",
+	})
 }
 
 // SavePost saves a post to the user's saved collection.

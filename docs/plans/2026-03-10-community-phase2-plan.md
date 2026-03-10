@@ -1598,7 +1598,7 @@ cd src/wj-client && npm run build
 - [x] Like/comment/follow → verify notification created for target user
 - [x] Check notification bell shows unread count
 - [x] Open notification panel → verify list renders with action text
-- [ ] Click "Đọc tất cả" → verify all marked as read, badge clears
+- [x] Click "Đọc tất cả" → verify all marked as read, badge clears
 - [ ] Click notification → navigates to correct post/profile
 - [ ] Bookmark a post → verify bookmark icon filled
 - [ ] Go to "Đã lưu" tab → verify saved post appears
