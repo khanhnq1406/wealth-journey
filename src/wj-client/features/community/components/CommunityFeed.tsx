@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQueryGetFeed } from "@/utils/generated/hooks";
 import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
 import { PostCard } from "./PostCard";
+import { FeedEmpty } from "./FeedEmpty";
 import { store } from "@/features/auth/store/store";
 
 interface CommunityFeedProps {
@@ -55,16 +56,7 @@ export function CommunityFeed({ topicFilter }: CommunityFeedProps) {
   const posts = data?.posts ?? [];
 
   if (posts.length === 0) {
-    return (
-      <div className="bg-white rounded-2xl border border-v2-border-light p-8 text-center">
-        <p className="font-vietnam text-lg font-semibold text-v2-text-primary mb-1">
-          No posts yet
-        </p>
-        <p className="font-vietnam text-sm text-v2-text-tertiary">
-          Be the first to share something with the community!
-        </p>
-      </div>
-    );
+    return <FeedEmpty />;
   }
 
   return (
