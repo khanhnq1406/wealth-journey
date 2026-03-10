@@ -103,7 +103,7 @@ func (s *communityService) CreatePost(ctx context.Context, userID int32, req *v1
 	return &v1.CreatePostResponse{
 		Success: true,
 		Message: "Post created successfully",
-		Data:    s.postToProto(post, user, false, true),
+		Data:    s.postToProto(post, user, false, true, false),
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
 }
@@ -150,7 +150,7 @@ func (s *communityService) UpdatePost(ctx context.Context, userID int32, req *v1
 	return &v1.UpdatePostResponse{
 		Success: true,
 		Message: "Post updated successfully",
-		Data:    s.postToProto(post, post.User, false, true),
+		Data:    s.postToProto(post, post.User, false, true, false),
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
 }
@@ -180,10 +180,16 @@ func (s *communityService) GetPost(ctx context.Context, userID int32, postID int
 		return nil, err
 	}
 
+	// Check if user follows the post author
+	isFollowing, err := s.followRepo.Exists(ctx, userID, post.UserID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &v1.GetPostResponse{
 		Success: true,
 		Message: "Post retrieved successfully",
-		Data:    s.postToProto(post, post.User, isLiked, post.UserID == userID),
+		Data:    s.postToProto(post, post.User, isLiked, post.UserID == userID, isFollowing),
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
 }
@@ -195,8 +201,12 @@ func (s *communityService) GetFeed(ctx context.Context, userID int32, req *v1.Ge
 		return nil, err
 	}
 
-	// Include own user ID for own posts in feed
-	userIDs := append(followingIDs, userID)
+	// If the user follows nobody, show all posts (global feed for discovery).
+	// Otherwise, show posts from followed users + own posts.
+	var userIDs []int32
+	if len(followingIDs) > 0 {
+		userIDs = append(followingIDs, userID)
+	}
 
 	// Parse pagination
 	opts := s.parsePagination(req.Pagination)
@@ -208,8 +218,10 @@ func (s *communityService) GetFeed(ctx context.Context, userID int32, req *v1.Ge
 
 	// Batch check liked status
 	postIDs := make([]int32, len(posts))
+	authorIDs := make([]int32, len(posts))
 	for i, p := range posts {
 		postIDs[i] = p.ID
+		authorIDs[i] = p.UserID
 	}
 	likedIDs, err := s.likeRepo.GetLikedPostIDs(ctx, userID, postIDs)
 	if err != nil {
@@ -220,10 +232,20 @@ func (s *communityService) GetFeed(ctx context.Context, userID int32, req *v1.Ge
 		likedSet[id] = true
 	}
 
+	// Batch check follow status for post authors
+	followedIDs, err := s.followRepo.GetFollowedAuthorIDs(ctx, userID, authorIDs)
+	if err != nil {
+		return nil, err
+	}
+	followedSet := make(map[int32]bool, len(followedIDs))
+	for _, id := range followedIDs {
+		followedSet[id] = true
+	}
+
 	// Convert to proto
 	protoPosts := make([]*v1.PostItem, len(posts))
 	for i, post := range posts {
-		protoPosts[i] = s.postToProto(post, post.User, likedSet[post.ID], post.UserID == userID)
+		protoPosts[i] = s.postToProto(post, post.User, likedSet[post.ID], post.UserID == userID, followedSet[post.UserID])
 	}
 
 	page, pageSize := s.getPageParams(req.Pagination)
@@ -268,9 +290,15 @@ func (s *communityService) GetUserPosts(ctx context.Context, userID int32, targe
 		likedSet[id] = true
 	}
 
+	// Check if the current user follows the target user (all posts share the same author)
+	isFollowingTarget, err := s.followRepo.Exists(ctx, userID, targetUserID)
+	if err != nil {
+		return nil, err
+	}
+
 	protoPosts := make([]*v1.PostItem, len(posts))
 	for i, post := range posts {
-		protoPosts[i] = s.postToProto(post, post.User, likedSet[post.ID], post.UserID == userID)
+		protoPosts[i] = s.postToProto(post, post.User, likedSet[post.ID], post.UserID == userID, isFollowingTarget)
 	}
 
 	page, pageSize := s.getPageParams(req.Pagination)
@@ -584,7 +612,7 @@ func (s *communityService) GetUploadURL(ctx context.Context, userID int32, req *
 
 // --- Helpers ---
 
-func (s *communityService) postToProto(post *models.Post, user *models.User, isLiked, isOwnPost bool) *v1.PostItem {
+func (s *communityService) postToProto(post *models.Post, user *models.User, isLiked, isOwnPost, isFollowing bool) *v1.PostItem {
 	item := &v1.PostItem{
 		Id:           post.ID,
 		UserId:       post.UserID,
@@ -595,6 +623,7 @@ func (s *communityService) postToProto(post *models.Post, user *models.User, isL
 		CommentCount: post.CommentCount,
 		IsLiked:      isLiked,
 		IsOwnPost:    isOwnPost,
+		IsFollowing:  isFollowing,
 		CreatedAt:    post.CreatedAt.Unix(),
 		UpdatedAt:    post.UpdatedAt.Unix(),
 	}

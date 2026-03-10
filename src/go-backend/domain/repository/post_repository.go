@@ -45,8 +45,12 @@ func (r *postRepository) GetFeed(ctx context.Context, userIDs []int32, topicFilt
 	var posts []*models.Post
 	var total int64
 
-	query := r.db.DB.WithContext(ctx).Model(&models.Post{}).
-		Where("user_id IN ?", userIDs)
+	query := r.db.DB.WithContext(ctx).Model(&models.Post{})
+
+	// nil/empty userIDs means global feed (no follow filter)
+	if len(userIDs) > 0 {
+		query = query.Where("user_id IN ?", userIDs)
+	}
 
 	if topicFilter != "" {
 		query = query.Where("topic_tag = ?", topicFilter)
