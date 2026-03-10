@@ -1,12 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import { useQueryGetSuggestedUsers } from "@/utils/generated/hooks";
 import { SuggestedUserCard } from "./SuggestedUserCard";
 import { Users } from "lucide-react";
 
 export function SuggestedUsers() {
   const { data, isLoading } = useQueryGetSuggestedUsers({}, { refetchOnMount: "always" });
-  const users = data?.users ?? [];
+  const [dismissedIds, setDismissedIds] = useState<Set<number>>(new Set());
+
+  const users = (data?.users ?? []).filter((u) => !dismissedIds.has(u.userId)).slice(0, 5);
+
+  const handleDismiss = (userId: number) => {
+    setDismissedIds((prev) => new Set(prev).add(userId));
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-v2-border-light p-4">
@@ -27,8 +34,8 @@ export function SuggestedUsers() {
         </p>
       ) : (
         <div className="divide-y divide-v2-border-light/50">
-          {users.slice(0, 5).map((user) => (
-            <SuggestedUserCard key={user.userId} user={user} />
+          {users.map((user) => (
+            <SuggestedUserCard key={user.userId} user={user} onDismiss={handleDismiss} />
           ))}
         </div>
       )}

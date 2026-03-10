@@ -1604,7 +1604,7 @@ cd src/wj-client && npm run build
 - [x] Go to "Đã lưu" tab → verify saved post appears
 - [x] Unbookmark → verify post removed from saved view
 - [x] Check right sidebar → suggested users render with follow buttons
-- [ ] Dismiss a suggested user → removed from current session
+- [x] Dismiss a suggested user → removed from current session
 - [x] Check trending topics → top 10 hashtags render with counts
 - [x] Click trending hashtag → feed filters to that hashtag
 - [x] Click hashtag in post body → same filter behavior
