@@ -1594,10 +1594,10 @@ cd src/wj-client && npm run build
 
 - [x] Create a post with hashtags → verify hashtags extracted and stored
 - [x] Share another user's post with commentary → verify shared post renders correctly
-- [ ] Share a shared post → verify it references the original (no recursive nesting)
-- [ ] Like/comment/follow → verify notification created for target user
-- [ ] Check notification bell shows unread count
-- [ ] Open notification panel → verify list renders with action text
+- [x] Share a shared post → verify it references the original (no recursive nesting)
+- [x] Like/comment/follow → verify notification created for target user
+- [x] Check notification bell shows unread count
+- [x] Open notification panel → verify list renders with action text
 - [ ] Click "Đọc tất cả" → verify all marked as read, badge clears
 - [ ] Click notification → navigates to correct post/profile
 - [ ] Bookmark a post → verify bookmark icon filled

@@ -2,14 +2,26 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Bell } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils/cn";
 import { useNotificationCount } from "@/features/community/hooks/useNotifications";
+import { EVENT_CommunityGetUnreadNotificationCount } from "@/utils/generated/hooks";
 import { NotificationPanel } from "./NotificationPanel";
 
 export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
   const { count } = useNotificationCount();
+
+  // Invalidate unread count when panel opens so badge syncs with panel list
+  useEffect(() => {
+    if (isOpen) {
+      queryClient.invalidateQueries({
+        queryKey: [EVENT_CommunityGetUnreadNotificationCount],
+      });
+    }
+  }, [isOpen, queryClient]);
 
   // Close on outside click
   useEffect(() => {

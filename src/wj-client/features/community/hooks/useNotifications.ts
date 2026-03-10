@@ -9,7 +9,10 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 
 export function useNotificationCount() {
-  const { data, isLoading } = useQueryGetUnreadNotificationCount({});
+  const { data, isLoading } = useQueryGetUnreadNotificationCount(
+    {},
+    { refetchInterval: 30_000, refetchOnMount: "always" },
+  );
 
   return {
     count: data?.count ?? 0,

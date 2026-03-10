@@ -176,6 +176,7 @@ All 5 functional requirement groups from the spec were implemented:
 |------|-----|----------|------|--------|
 | 2026-03-10 | Backend route `/trending-topics` → `/trending` to match proto HTTP option and generated frontend client | Minor | `src/go-backend/handlers/routes.go:276` | — |
 | 2026-03-10 | SharedPostEmbed not rendered when viewing feed: (1) added `SharedPost *Post` GORM relationship to Post model, (2) added `Preload("SharedPost").Preload("SharedPost.User")` to `GetFeed` and `GetByUserID`, (3) populated `item.SharedPost` in `postToProto` when relationship is loaded | Minor | `domain/models/post.go`, `domain/repository/post_repository.go`, `domain/service/community_service.go` | — |
+| 2026-03-10 | NotificationBell badge only updated after page refresh: (1) added `refetchInterval: 30_000` and `refetchOnMount: "always"` to `useQueryGetUnreadNotificationCount` in `useNotificationCount`, (2) added `useEffect` in `NotificationBell` to invalidate the unread count cache whenever the panel opens so badge syncs with the freshly fetched list | Minor | `features/community/hooks/useNotifications.ts`, `components/notifications/NotificationBell.tsx` | — |
 
 ## Known Issues / Technical Debt
 
