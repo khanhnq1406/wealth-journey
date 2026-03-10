@@ -233,3 +233,24 @@ type PortfolioHistoryService interface {
 	// CreateAggregatedSnapshot creates snapshots for all investment wallets.
 	CreateAggregatedSnapshot(ctx context.Context, userID int32) error
 }
+
+// CommunityService defines the interface for community business logic.
+type CommunityService interface {
+	CreatePost(ctx context.Context, userID int32, req *v1.CreatePostRequest) (*v1.CreatePostResponse, error)
+	UpdatePost(ctx context.Context, userID int32, req *v1.UpdatePostRequest) (*v1.UpdatePostResponse, error)
+	DeletePost(ctx context.Context, userID int32, postID int32) error
+	GetPost(ctx context.Context, userID int32, postID int32) (*v1.GetPostResponse, error)
+	GetFeed(ctx context.Context, userID int32, req *v1.GetFeedRequest) (*v1.GetFeedResponse, error)
+	GetUserPosts(ctx context.Context, userID int32, targetUserID int32, req *v1.GetUserPostsRequest) (*v1.GetUserPostsResponse, error)
+	LikePost(ctx context.Context, userID int32, postID int32) error
+	UnlikePost(ctx context.Context, userID int32, postID int32) error
+	CreateComment(ctx context.Context, userID int32, req *v1.CreateCommentRequest) (*v1.CreateCommentResponse, error)
+	DeleteComment(ctx context.Context, userID int32, commentID int32) error
+	GetComments(ctx context.Context, userID int32, postID int32, req *v1.GetCommentsRequest) (*v1.GetCommentsResponse, error)
+	FollowUser(ctx context.Context, followerID int32, followingID int32) error
+	UnfollowUser(ctx context.Context, followerID int32, followingID int32) error
+	GetProfile(ctx context.Context, userID int32, targetUserID int32) (*v1.GetCommunityProfileResponse, error)
+	UpdateBio(ctx context.Context, userID int32, bio string) error
+	ReportContent(ctx context.Context, userID int32, req *v1.ReportContentRequest) error
+	GetUploadURL(ctx context.Context, userID int32, req *v1.GetUploadURLRequest) (*v1.GetUploadURLResponse, error)
+}
