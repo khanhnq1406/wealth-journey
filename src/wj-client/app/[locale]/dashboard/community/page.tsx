@@ -8,6 +8,8 @@ import { CommunityRightSidebar } from "@/features/community/components/Community
 import { CreatePostBox } from "@/features/community/components/CreatePostBox";
 import { MobileSubNav } from "@/features/community/components/MobileSubNav";
 import { SavedPostsView } from "@/features/community/components/SavedPostsView";
+import { SuggestedUsers } from "@/features/community/components/SuggestedUsers";
+import { TrendingTopics } from "@/features/community/components/TrendingTopics";
 import { NotificationPanel } from "@/components/notifications/NotificationPanel";
 import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
 
@@ -59,6 +61,11 @@ export default function CommunityPage() {
           hashtag={hashtagFilter}
           onHashtagClick={handleHashtagClick}
         />
+        {/* Suggested users + trending topics — mobile only (desktop uses right sidebar) */}
+        <div className="flex flex-col gap-4 lg:hidden">
+          <SuggestedUsers />
+          <TrendingTopics onHashtagClick={handleHashtagClick} />
+        </div>
       </>
     );
   };

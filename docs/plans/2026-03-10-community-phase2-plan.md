@@ -1609,7 +1609,7 @@ cd src/wj-client && npm run build
 - [x] Click trending hashtag → feed filters to that hashtag
 - [x] Click hashtag in post body → same filter behavior
 - [x] Clear hashtag filter → returns to full feed
-- [ ] Mobile: horizontal scroll suggested users + trending chips
+- [x] Mobile: horizontal scroll suggested users + trending chips
 - [x] Mobile: notification tab in sub-nav works
 - [x] Desktop: notification dropdown positions correctly below bell
 - [x] Desktop: saved tab in left nav works
