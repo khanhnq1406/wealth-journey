@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useQueryGetFeed } from "@/utils/generated/hooks";
 import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
+import { PostCard } from "./PostCard";
+import { store } from "@/features/auth/store/store";
 
 interface CommunityFeedProps {
   topicFilter: string;
@@ -10,7 +12,10 @@ interface CommunityFeedProps {
 
 export function CommunityFeed({ topicFilter }: CommunityFeedProps) {
   const [page, setPage] = useState(1);
+  const [expandedComments, setExpandedComments] = useState<number | null>(null);
   const pageSize = 20;
+  const user = store.getState().setAuthReducer;
+  const currentUserId = user?.id ?? 0;
 
   const { data, isLoading, error } = useQueryGetFeed(
     {
@@ -20,6 +25,14 @@ export function CommunityFeed({ topicFilter }: CommunityFeedProps) {
     },
     { refetchOnMount: "always" }
   );
+
+  const handleLikeToggle = (postId: number, _isLiked: boolean) => {
+    // Will be implemented in Task 13 with useLike hook
+  };
+
+  const handleCommentClick = (postId: number) => {
+    setExpandedComments(expandedComments === postId ? null : postId);
+  };
 
   if (isLoading) {
     return (
@@ -57,53 +70,15 @@ export function CommunityFeed({ topicFilter }: CommunityFeedProps) {
   return (
     <div className="flex flex-col gap-4">
       {posts.map((post) => (
-        <div
+        <PostCard
           key={post.postId}
-          className="bg-white rounded-2xl sm:rounded-2xl border border-v2-border-light p-4"
-        >
-          {/* PostCard placeholder — will be filled in Task 11 */}
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-v2-gold-primary to-v2-gold-accent flex items-center justify-center">
-              <span className="text-white font-vietnam font-semibold text-xs">
-                {(post.authorName || "U").charAt(0)}
-              </span>
-            </div>
-            <div>
-              <p className="font-vietnam text-sm font-semibold text-v2-text-primary">
-                {post.authorName}
-              </p>
-              {post.topicTag && (
-                <span className="font-vietnam text-xs text-v2-text-tertiary">
-                  {post.topicTag}
-                </span>
-              )}
-            </div>
-          </div>
-          <p className="font-vietnam text-sm text-v2-text-primary whitespace-pre-wrap break-words">
-            {post.content}
-          </p>
-          {post.imageUrl && (
-            <div className="mt-3 rounded-xl overflow-hidden">
-              <img
-                src={post.imageUrl}
-                alt=""
-                className="w-full h-[220px] object-cover"
-                loading="lazy"
-              />
-            </div>
-          )}
-          <div className="flex items-center gap-4 mt-3 pt-3 border-t border-v2-border-light">
-            <span className="font-vietnam text-xs text-v2-text-tertiary">
-              {post.likeCount ?? 0} likes
-            </span>
-            <span className="font-vietnam text-xs text-v2-text-tertiary">
-              {post.commentCount ?? 0} comments
-            </span>
-          </div>
-        </div>
+          post={post}
+          currentUserId={currentUserId}
+          onLikeToggle={handleLikeToggle}
+          onCommentClick={handleCommentClick}
+        />
       ))}
 
-      {/* Load more */}
       {data?.hasMore && (
         <button
           onClick={() => setPage((p) => p + 1)}

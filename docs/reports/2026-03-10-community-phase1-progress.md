@@ -7,7 +7,7 @@
 - **Started:** 2026-03-10T00:00:00Z
 - **Last updated:** 2026-03-10T12:00:00Z
 - **Current state:** in_progress
-- **Current task:** 11
+- **Current task:** 12
 
 ## Task Progress
 
@@ -23,8 +23,8 @@
 | 7 | Community Handlers | done | 6822db6 | 17 REST handler methods for all community endpoints |
 | 8 | Wire DI & Routes | done | 9484a7a | Wired builder, routes, providers for community |
 | 9 | Frontend: Constants & Route | done | e811358 | Route, nav restructure, CommunityIcon, i18n |
-| 10 | Frontend: Community Page Shell | in_progress | — | — |
-| 11 | Frontend: PostCard Component | pending | — | — |
+| 10 | Frontend: Community Page Shell | done | 8b08247 | Page shell, feed, sidebars, tab bar, utils |
+| 11 | Frontend: PostCard Component | in_progress | — | — |
 | 12 | Frontend: CreatePostBox & Form | pending | — | — |
 | 13 | Frontend: Like, Comment, Follow | pending | — | — |
 | 14 | Frontend: Profile Card & Nav | pending | — | — |
