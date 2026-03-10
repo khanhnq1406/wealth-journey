@@ -5,7 +5,7 @@ import { useQueryGetComments, useMutationCreateComment, EVENT_CommunityGetCommen
 import { useQueryClient } from "@tanstack/react-query";
 import { CommentBubble } from "./CommentBubble";
 import { Avatar } from "./Avatar";
-import { Send } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 interface CommentSectionProps {
@@ -100,13 +100,17 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
             disabled={!commentText.trim() || createCommentMutation.isPending}
             className={cn(
               "p-1 rounded-full transition-colors",
-              commentText.trim()
+              commentText.trim() && !createCommentMutation.isPending
                 ? "text-v2-red-primary hover:bg-v2-red-light"
                 : "text-v2-text-tertiary"
             )}
             aria-label="Send comment"
           >
-            <Send size={16} />
+            {createCommentMutation.isPending ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Send size={16} />
+            )}
           </button>
         </div>
       </div>

@@ -203,6 +203,12 @@ Implemented a finance-focused community social feed for WealthJourney. The commu
 | No new endpoints | Confirmed: frontend-only fixes |
 | No new data exposure | Confirmed: same data flows, corrected extraction logic |
 
+## Fix History
+
+| Date | Fix | Severity | Files Changed |
+|------|-----|----------|---------------|
+| 2026-03-10 | Add spinner loading state to comment submit button (replaces Send icon with Loader2 while `isPending`; dims button color during load) | Minor | `CommentSection.tsx` |
+
 ## Known Issues / Technical Debt
 
 1. **No server-side image upload**: Phase 1 uses image URLs directly; Phase 2 should add Supabase storage upload
