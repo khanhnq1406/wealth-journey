@@ -33,3 +33,9 @@ export const reportContentSchema = z.object({
 });
 
 export type ReportContentFormData = z.infer<typeof reportContentSchema>;
+
+export const sharePostSchema = z.object({
+  comment: z.string().max(2000, "Maximum 2000 characters").optional().or(z.literal("")),
+});
+
+export type SharePostFormData = z.infer<typeof sharePostSchema>;
