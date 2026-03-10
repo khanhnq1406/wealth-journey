@@ -54,3 +54,30 @@ export function useMarkAllRead() {
     isLoading: mutation.isPending,
   };
 }
+
+// Optimistically marks a single notification as read in the cache without
+// an extra API call. Call this when the user clicks a notification so the
+// UI reflects the "read" state immediately even before the next refetch.
+export function useMarkOneReadOptimistic() {
+  const queryClient = useQueryClient();
+
+  return (notificationId: number) => {
+    queryClient.setQueriesData<GetNotificationsResponse>(
+      { queryKey: [EVENT_CommunityGetNotifications] },
+      (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          notifications: old.notifications?.map((n) =>
+            n.id === notificationId ? { ...n, isRead: true } : n
+          ) ?? [],
+        };
+      },
+    );
+    // Decrement the badge count by 1 (floor at 0).
+    queryClient.setQueriesData<GetUnreadNotificationCountResponse>(
+      { queryKey: [EVENT_CommunityGetUnreadNotificationCount] },
+      (old) => (old ? { ...old, count: Math.max(0, (old.count ?? 1) - 1) } : old),
+    );
+  };
+}

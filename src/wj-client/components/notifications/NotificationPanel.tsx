@@ -1,26 +1,43 @@
 "use client";
 
-import { useQueryGetNotifications, EVENT_CommunityGetNotifications } from "@/utils/generated/hooks";
-import { useMarkAllRead } from "@/features/community/hooks/useNotifications";
+import { useQueryGetNotifications, useMutationMarkNotificationsRead } from "@/utils/generated/hooks";
+import {
+  useMarkAllRead,
+  useMarkOneReadOptimistic,
+} from "@/features/community/hooks/useNotifications";
 import { NotificationItem } from "./NotificationItem";
 import type { NotificationItem as NotificationItemType } from "@/gen/protobuf/v1/community";
+import { useRouter } from "@/lib/navigation";
+import { routes } from "@/app/constants";
 
 interface NotificationPanelProps {
   onClose?: () => void;
 }
 
 export function NotificationPanel({ onClose }: NotificationPanelProps) {
+  const router = useRouter();
   const { data, isLoading } = useQueryGetNotifications(
     { pagination: { page: 1, pageSize: 20, orderBy: "", order: "" } },
     { refetchOnMount: "always" }
   );
 
   const { markAllRead, isLoading: isMarkingRead } = useMarkAllRead();
+  const markOneRead = useMarkOneReadOptimistic();
+  const markReadMutation = useMutationMarkNotificationsRead();
 
   const notifications = data?.notifications ?? [];
 
-  const handleNotificationClick = (_notif: NotificationItemType) => {
+  const handleNotificationClick = (notif: NotificationItemType) => {
+    // Mark this notification as read in the cache immediately.
+    if (!notif.isRead) {
+      markOneRead(notif.id);
+      // Fire-and-forget the API call to persist on the server.
+      markReadMutation.mutate({});
+    }
+    // Navigate to the community page. Close the panel first so it doesn't
+    // stay open while the navigation animation plays.
     onClose?.();
+    router.push(routes.community as Parameters<typeof router.push>[0]);
   };
 
   return (
