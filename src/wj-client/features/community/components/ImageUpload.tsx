@@ -65,7 +65,7 @@ export function ImageUpload({
   const hasFixedHeight = /\bh-\d/.test(className);
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative overflow-hidden ${className}`}>
       {preview ? (
         <div className={`relative overflow-hidden rounded-lg ${hasFixedHeight ? "h-full" : ""}`}>
           <img
@@ -96,7 +96,9 @@ export function ImageUpload({
         </div>
       ) : (
         <div
-          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+          className={`border-2 border-dashed rounded-lg text-center cursor-pointer transition-colors flex flex-col items-center justify-center ${
+            hasFixedHeight ? "h-full p-3" : "p-6"
+          } ${
             isDragging
               ? "border-bg bg-green-50"
               : "border-gray-300 hover:border-bg hover:bg-gray-50"

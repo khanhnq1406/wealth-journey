@@ -74,7 +74,7 @@ export function ProfileView({
             <button
               type="button"
               onClick={() => setShowEditModal(true)}
-              className="absolute bottom-2 right-2 z-10 bg-black/40 text-white text-xs px-2 py-1 rounded-md hover:bg-black/60"
+              className="absolute bottom-2 right-2 z-20 bg-black/40 text-white text-xs px-2 py-1 rounded-md hover:bg-black/60"
             >
               Edit cover
             </button>
