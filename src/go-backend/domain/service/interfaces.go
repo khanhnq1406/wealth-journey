@@ -263,4 +263,6 @@ type CommunityService interface {
 	GetSavedPosts(ctx context.Context, userID int32, req *v1.GetSavedPostsRequest) (*v1.GetSavedPostsResponse, error)
 	GetSuggestedUsers(ctx context.Context, userID int32) (*v1.GetSuggestedUsersResponse, error)
 	GetTrendingTopics(ctx context.Context) (*v1.GetTrendingTopicsResponse, error)
+	GetFollowing(ctx context.Context, userID int32, targetUserID int32, req *v1.GetFollowingRequest) (*v1.GetFollowingResponse, error)
+	GetFollowers(ctx context.Context, userID int32, targetUserID int32, req *v1.GetFollowersRequest) (*v1.GetFollowersResponse, error)
 }

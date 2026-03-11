@@ -1086,6 +1086,136 @@ func (s *communityService) GetSuggestedUsers(ctx context.Context, userID int32) 
 	}, nil
 }
 
+func (s *communityService) GetFollowing(ctx context.Context, userID int32, targetUserID int32, req *v1.GetFollowingRequest) (*v1.GetFollowingResponse, error) {
+	opts := s.parsePagination(req.Pagination)
+
+	follows, total, err := s.followRepo.GetFollowing(ctx, targetUserID, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	// Collect user IDs to batch check follow status
+	userIDs := make([]int32, 0, len(follows))
+	for _, f := range follows {
+		if f.Following != nil {
+			userIDs = append(userIDs, f.Following.ID)
+		}
+	}
+
+	// Batch check which of these users the requesting user follows
+	followedIDs, err := s.followRepo.GetFollowedAuthorIDs(ctx, userID, userIDs)
+	if err != nil {
+		return nil, err
+	}
+	followedSet := make(map[int32]bool, len(followedIDs))
+	for _, id := range followedIDs {
+		followedSet[id] = true
+	}
+
+	items := make([]*v1.FollowUserItem, 0, len(follows))
+	for _, f := range follows {
+		if f.Following == nil {
+			continue
+		}
+		u := f.Following
+		bio := u.Bio
+		if len(bio) > 60 {
+			bio = bio[:60]
+		}
+		items = append(items, &v1.FollowUserItem{
+			UserId:      u.ID,
+			UserName:    u.Name,
+			UserPicture: u.Picture,
+			BioSnippet:  bio,
+			IsFollowing: followedSet[u.ID],
+		})
+	}
+
+	page, pageSize := s.getPageParams(req.Pagination)
+	totalPages := int32(0)
+	if pageSize > 0 {
+		totalPages = (int32(total) + pageSize - 1) / pageSize
+	}
+
+	return &v1.GetFollowingResponse{
+		Success: true,
+		Message: "Following list retrieved successfully",
+		Users:   items,
+		Pagination: &v1.PaginationResult{
+			Page:       page,
+			PageSize:   pageSize,
+			TotalCount: int32(total),
+			TotalPages: totalPages,
+		},
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+func (s *communityService) GetFollowers(ctx context.Context, userID int32, targetUserID int32, req *v1.GetFollowersRequest) (*v1.GetFollowersResponse, error) {
+	opts := s.parsePagination(req.Pagination)
+
+	follows, total, err := s.followRepo.GetFollowers(ctx, targetUserID, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	// Collect user IDs to batch check follow status
+	userIDs := make([]int32, 0, len(follows))
+	for _, f := range follows {
+		if f.Follower != nil {
+			userIDs = append(userIDs, f.Follower.ID)
+		}
+	}
+
+	// Batch check which of these users the requesting user follows
+	followedIDs, err := s.followRepo.GetFollowedAuthorIDs(ctx, userID, userIDs)
+	if err != nil {
+		return nil, err
+	}
+	followedSet := make(map[int32]bool, len(followedIDs))
+	for _, id := range followedIDs {
+		followedSet[id] = true
+	}
+
+	items := make([]*v1.FollowUserItem, 0, len(follows))
+	for _, f := range follows {
+		if f.Follower == nil {
+			continue
+		}
+		u := f.Follower
+		bio := u.Bio
+		if len(bio) > 60 {
+			bio = bio[:60]
+		}
+		items = append(items, &v1.FollowUserItem{
+			UserId:      u.ID,
+			UserName:    u.Name,
+			UserPicture: u.Picture,
+			BioSnippet:  bio,
+			IsFollowing: followedSet[u.ID],
+		})
+	}
+
+	page, pageSize := s.getPageParams(req.Pagination)
+	totalPages := int32(0)
+	if pageSize > 0 {
+		totalPages = (int32(total) + pageSize - 1) / pageSize
+	}
+
+	return &v1.GetFollowersResponse{
+		Success: true,
+		Message: "Followers list retrieved successfully",
+		Users:   items,
+		Pagination: &v1.PaginationResult{
+			Page:       page,
+			PageSize:   pageSize,
+			TotalCount: int32(total),
+			TotalPages: totalPages,
+		},
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
 func (s *communityService) GetTrendingTopics(ctx context.Context) (*v1.GetTrendingTopicsResponse, error) {
 	since := time.Now().Add(-24 * time.Hour)
 	trending, err := s.hashtagRepo.GetTrending(ctx, since, 10)
