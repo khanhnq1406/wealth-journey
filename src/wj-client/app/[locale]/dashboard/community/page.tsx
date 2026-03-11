@@ -10,6 +10,8 @@ import { MobileSubNav } from "@/features/community/components/MobileSubNav";
 import { SavedPostsView } from "@/features/community/components/SavedPostsView";
 import { SuggestedUsers } from "@/features/community/components/SuggestedUsers";
 import { TrendingTopics } from "@/features/community/components/TrendingTopics";
+import { ProfileView } from "@/features/community/components/ProfileView";
+import { FollowingView } from "@/features/community/components/FollowingView";
 import { NotificationPanel } from "@/components/notifications/NotificationPanel";
 import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
 
@@ -21,11 +23,33 @@ export default function CommunityPage() {
   const [activeView, setActiveView] = useState<CommunityView>("feed");
   const [mobileView, setMobileView] = useState<MobileView>("feed");
   const [hashtagFilter, setHashtagFilter] = useState<string>("");
+  const [profileUserId, setProfileUserId] = useState<number | null>(null);
+  const [followingTab, setFollowingTab] = useState<"following" | "followers">("following");
 
   const handleHashtagClick = (tag: string) => {
     setHashtagFilter(tag);
     setActiveView("feed");
     setMobileView("feed");
+  };
+
+  const handleUserClick = (userId: number) => {
+    setProfileUserId(userId);
+    setActiveView("profile");
+    setMobileView("profile");
+  };
+
+  const handleViewChange = (view: CommunityView) => {
+    if (view === "profile") {
+      setProfileUserId(null); // Reset to own profile when clicking sidebar nav
+    }
+    setActiveView(view);
+  };
+
+  const handleMobileViewChange = (view: MobileView) => {
+    if (view === "profile") {
+      setProfileUserId(null); // Reset to own profile when clicking mobile nav
+    }
+    setMobileView(view);
   };
 
   if (authLoading) {
@@ -53,6 +77,35 @@ export default function CommunityPage() {
         </div>
       );
     }
+    if (view === "profile") {
+      const targetId = profileUserId ?? currentUser.id;
+      return (
+        <ProfileView
+          targetUserId={targetId}
+          currentUser={currentUser}
+          onBack={profileUserId ? () => {
+            setProfileUserId(null);
+            setActiveView("feed");
+            setMobileView("feed");
+          } : undefined}
+          onUserClick={handleUserClick}
+          onHashtagClick={handleHashtagClick}
+          onFollowingClick={(tab) => {
+            setFollowingTab(tab);
+            setActiveView("following");
+          }}
+        />
+      );
+    }
+    if (view === "following") {
+      return (
+        <FollowingView
+          currentUser={currentUser}
+          onUserClick={handleUserClick}
+          initialTab={followingTab}
+        />
+      );
+    }
     return (
       <>
         <CreatePostBox currentUser={currentUser} />
@@ -76,7 +129,7 @@ export default function CommunityPage() {
       <div className="sm:hidden">
         <MobileSubNav
           activeView={mobileView}
-          onViewChange={setMobileView}
+          onViewChange={handleMobileViewChange}
         />
       </div>
 
@@ -87,7 +140,7 @@ export default function CommunityPage() {
           className="hidden sm:flex w-[280px] shrink-0"
           currentUser={currentUser}
           activeView={activeView}
-          onViewChange={setActiveView}
+          onViewChange={handleViewChange}
         />
 
         {/* Center feed - fill width */}
