@@ -42,6 +42,10 @@ export interface CommentItem {
   content: string;
   isOwnComment: boolean;
   createdAt: number;
+  parentCommentId: number;
+  replyCount: number;
+  updatedAt: number;
+  isEdited: boolean;
 }
 
 /** CommunityProfile represents a user's community profile */
@@ -55,6 +59,9 @@ export interface CommunityProfile {
   followingCount: number;
   isFollowing: boolean;
   isOwnProfile: boolean;
+  coverPhotoUrl: string;
+  location: string;
+  website: string;
 }
 
 /** CreatePost */
@@ -161,6 +168,7 @@ export interface UnlikePostResponse {
 export interface CreateCommentRequest {
   postId: number;
   content: string;
+  parentCommentId: number;
 }
 
 export interface CreateCommentResponse {
@@ -229,17 +237,6 @@ export interface GetCommunityProfileResponse {
   timestamp: string;
 }
 
-/** UpdateBio */
-export interface UpdateBioRequest {
-  bio: string;
-}
-
-export interface UpdateBioResponse {
-  success: boolean;
-  message: string;
-  timestamp: string;
-}
-
 /** ReportContent */
 export interface ReportContentRequest {
   targetType: string;
@@ -251,20 +248,6 @@ export interface ReportContentRequest {
 export interface ReportContentResponse {
   success: boolean;
   message: string;
-  timestamp: string;
-}
-
-/** GetUploadURL */
-export interface GetUploadURLRequest {
-  fileName: string;
-  contentType: string;
-}
-
-export interface GetUploadURLResponse {
-  success: boolean;
-  message: string;
-  uploadUrl: string;
-  publicUrl: string;
   timestamp: string;
 }
 
@@ -428,6 +411,75 @@ export interface GetTrendingTopicsResponse {
   success: boolean;
   message: string;
   topics: TrendingTopicItem[];
+  timestamp: string;
+}
+
+/** UpdateComment */
+export interface UpdateCommentRequest {
+  commentId: number;
+  content: string;
+}
+
+export interface UpdateCommentResponse {
+  success: boolean;
+  message: string;
+  data: CommentItem | undefined;
+  timestamp: string;
+}
+
+/** GetReplies */
+export interface GetRepliesRequest {
+  commentId: number;
+  pagination: PaginationParams | undefined;
+}
+
+export interface GetRepliesResponse {
+  success: boolean;
+  message: string;
+  replies: CommentItem[];
+  pagination: PaginationResult | undefined;
+  timestamp: string;
+}
+
+/** GetLikedPosts */
+export interface GetLikedPostsRequest {
+  userId: number;
+  pagination: PaginationParams | undefined;
+}
+
+export interface GetLikedPostsResponse {
+  success: boolean;
+  message: string;
+  posts: PostItem[];
+  pagination: PaginationResult | undefined;
+  timestamp: string;
+}
+
+/** UpdateProfile */
+export interface UpdateProfileRequest {
+  bio: string;
+  location: string;
+  website: string;
+  picture: string;
+  coverPhotoUrl: string;
+}
+
+export interface UpdateProfileResponse {
+  success: boolean;
+  message: string;
+  data: CommunityProfile | undefined;
+  timestamp: string;
+}
+
+/** UploadImage */
+export interface UploadImageRequest {
+  purpose: string;
+}
+
+export interface UploadImageResponse {
+  success: boolean;
+  message: string;
+  imageUrl: string;
   timestamp: string;
 }
 
@@ -785,7 +837,20 @@ export const PostItem: MessageFns<PostItem> = {
 };
 
 function createBaseCommentItem(): CommentItem {
-  return { id: 0, postId: 0, userId: 0, userName: "", userPicture: "", content: "", isOwnComment: false, createdAt: 0 };
+  return {
+    id: 0,
+    postId: 0,
+    userId: 0,
+    userName: "",
+    userPicture: "",
+    content: "",
+    isOwnComment: false,
+    createdAt: 0,
+    parentCommentId: 0,
+    replyCount: 0,
+    updatedAt: 0,
+    isEdited: false,
+  };
 }
 
 export const CommentItem: MessageFns<CommentItem> = {
@@ -813,6 +878,18 @@ export const CommentItem: MessageFns<CommentItem> = {
     }
     if (message.createdAt !== 0) {
       writer.uint32(64).int64(message.createdAt);
+    }
+    if (message.parentCommentId !== 0) {
+      writer.uint32(72).int32(message.parentCommentId);
+    }
+    if (message.replyCount !== 0) {
+      writer.uint32(80).int32(message.replyCount);
+    }
+    if (message.updatedAt !== 0) {
+      writer.uint32(88).int64(message.updatedAt);
+    }
+    if (message.isEdited !== false) {
+      writer.uint32(96).bool(message.isEdited);
     }
     return writer;
   },
@@ -888,6 +965,38 @@ export const CommentItem: MessageFns<CommentItem> = {
           message.createdAt = longToNumber(reader.int64());
           continue;
         }
+        case 9: {
+          if (tag !== 72) {
+            break;
+          }
+
+          message.parentCommentId = reader.int32();
+          continue;
+        }
+        case 10: {
+          if (tag !== 80) {
+            break;
+          }
+
+          message.replyCount = reader.int32();
+          continue;
+        }
+        case 11: {
+          if (tag !== 88) {
+            break;
+          }
+
+          message.updatedAt = longToNumber(reader.int64());
+          continue;
+        }
+        case 12: {
+          if (tag !== 96) {
+            break;
+          }
+
+          message.isEdited = reader.bool();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -907,6 +1016,10 @@ export const CommentItem: MessageFns<CommentItem> = {
       content: isSet(object.content) ? globalThis.String(object.content) : "",
       isOwnComment: isSet(object.isOwnComment) ? globalThis.Boolean(object.isOwnComment) : false,
       createdAt: isSet(object.createdAt) ? globalThis.Number(object.createdAt) : 0,
+      parentCommentId: isSet(object.parentCommentId) ? globalThis.Number(object.parentCommentId) : 0,
+      replyCount: isSet(object.replyCount) ? globalThis.Number(object.replyCount) : 0,
+      updatedAt: isSet(object.updatedAt) ? globalThis.Number(object.updatedAt) : 0,
+      isEdited: isSet(object.isEdited) ? globalThis.Boolean(object.isEdited) : false,
     };
   },
 
@@ -936,6 +1049,18 @@ export const CommentItem: MessageFns<CommentItem> = {
     if (message.createdAt !== 0) {
       obj.createdAt = Math.round(message.createdAt);
     }
+    if (message.parentCommentId !== 0) {
+      obj.parentCommentId = Math.round(message.parentCommentId);
+    }
+    if (message.replyCount !== 0) {
+      obj.replyCount = Math.round(message.replyCount);
+    }
+    if (message.updatedAt !== 0) {
+      obj.updatedAt = Math.round(message.updatedAt);
+    }
+    if (message.isEdited !== false) {
+      obj.isEdited = message.isEdited;
+    }
     return obj;
   },
 
@@ -952,6 +1077,10 @@ export const CommentItem: MessageFns<CommentItem> = {
     message.content = object.content ?? "";
     message.isOwnComment = object.isOwnComment ?? false;
     message.createdAt = object.createdAt ?? 0;
+    message.parentCommentId = object.parentCommentId ?? 0;
+    message.replyCount = object.replyCount ?? 0;
+    message.updatedAt = object.updatedAt ?? 0;
+    message.isEdited = object.isEdited ?? false;
     return message;
   },
 };
@@ -967,6 +1096,9 @@ function createBaseCommunityProfile(): CommunityProfile {
     followingCount: 0,
     isFollowing: false,
     isOwnProfile: false,
+    coverPhotoUrl: "",
+    location: "",
+    website: "",
   };
 }
 
@@ -998,6 +1130,15 @@ export const CommunityProfile: MessageFns<CommunityProfile> = {
     }
     if (message.isOwnProfile !== false) {
       writer.uint32(72).bool(message.isOwnProfile);
+    }
+    if (message.coverPhotoUrl !== "") {
+      writer.uint32(82).string(message.coverPhotoUrl);
+    }
+    if (message.location !== "") {
+      writer.uint32(90).string(message.location);
+    }
+    if (message.website !== "") {
+      writer.uint32(98).string(message.website);
     }
     return writer;
   },
@@ -1081,6 +1222,30 @@ export const CommunityProfile: MessageFns<CommunityProfile> = {
           message.isOwnProfile = reader.bool();
           continue;
         }
+        case 10: {
+          if (tag !== 82) {
+            break;
+          }
+
+          message.coverPhotoUrl = reader.string();
+          continue;
+        }
+        case 11: {
+          if (tag !== 90) {
+            break;
+          }
+
+          message.location = reader.string();
+          continue;
+        }
+        case 12: {
+          if (tag !== 98) {
+            break;
+          }
+
+          message.website = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1101,6 +1266,9 @@ export const CommunityProfile: MessageFns<CommunityProfile> = {
       followingCount: isSet(object.followingCount) ? globalThis.Number(object.followingCount) : 0,
       isFollowing: isSet(object.isFollowing) ? globalThis.Boolean(object.isFollowing) : false,
       isOwnProfile: isSet(object.isOwnProfile) ? globalThis.Boolean(object.isOwnProfile) : false,
+      coverPhotoUrl: isSet(object.coverPhotoUrl) ? globalThis.String(object.coverPhotoUrl) : "",
+      location: isSet(object.location) ? globalThis.String(object.location) : "",
+      website: isSet(object.website) ? globalThis.String(object.website) : "",
     };
   },
 
@@ -1133,6 +1301,15 @@ export const CommunityProfile: MessageFns<CommunityProfile> = {
     if (message.isOwnProfile !== false) {
       obj.isOwnProfile = message.isOwnProfile;
     }
+    if (message.coverPhotoUrl !== "") {
+      obj.coverPhotoUrl = message.coverPhotoUrl;
+    }
+    if (message.location !== "") {
+      obj.location = message.location;
+    }
+    if (message.website !== "") {
+      obj.website = message.website;
+    }
     return obj;
   },
 
@@ -1150,6 +1327,9 @@ export const CommunityProfile: MessageFns<CommunityProfile> = {
     message.followingCount = object.followingCount ?? 0;
     message.isFollowing = object.isFollowing ?? false;
     message.isOwnProfile = object.isOwnProfile ?? false;
+    message.coverPhotoUrl = object.coverPhotoUrl ?? "";
+    message.location = object.location ?? "";
+    message.website = object.website ?? "";
     return message;
   },
 };
@@ -2563,7 +2743,7 @@ export const UnlikePostResponse: MessageFns<UnlikePostResponse> = {
 };
 
 function createBaseCreateCommentRequest(): CreateCommentRequest {
-  return { postId: 0, content: "" };
+  return { postId: 0, content: "", parentCommentId: 0 };
 }
 
 export const CreateCommentRequest: MessageFns<CreateCommentRequest> = {
@@ -2573,6 +2753,9 @@ export const CreateCommentRequest: MessageFns<CreateCommentRequest> = {
     }
     if (message.content !== "") {
       writer.uint32(18).string(message.content);
+    }
+    if (message.parentCommentId !== 0) {
+      writer.uint32(24).int32(message.parentCommentId);
     }
     return writer;
   },
@@ -2600,6 +2783,14 @@ export const CreateCommentRequest: MessageFns<CreateCommentRequest> = {
           message.content = reader.string();
           continue;
         }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.parentCommentId = reader.int32();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2613,6 +2804,7 @@ export const CreateCommentRequest: MessageFns<CreateCommentRequest> = {
     return {
       postId: isSet(object.postId) ? globalThis.Number(object.postId) : 0,
       content: isSet(object.content) ? globalThis.String(object.content) : "",
+      parentCommentId: isSet(object.parentCommentId) ? globalThis.Number(object.parentCommentId) : 0,
     };
   },
 
@@ -2624,6 +2816,9 @@ export const CreateCommentRequest: MessageFns<CreateCommentRequest> = {
     if (message.content !== "") {
       obj.content = message.content;
     }
+    if (message.parentCommentId !== 0) {
+      obj.parentCommentId = Math.round(message.parentCommentId);
+    }
     return obj;
   },
 
@@ -2634,6 +2829,7 @@ export const CreateCommentRequest: MessageFns<CreateCommentRequest> = {
     const message = createBaseCreateCommentRequest();
     message.postId = object.postId ?? 0;
     message.content = object.content ?? "";
+    message.parentCommentId = object.parentCommentId ?? 0;
     return message;
   },
 };
@@ -3572,156 +3768,6 @@ export const GetCommunityProfileResponse: MessageFns<GetCommunityProfileResponse
   },
 };
 
-function createBaseUpdateBioRequest(): UpdateBioRequest {
-  return { bio: "" };
-}
-
-export const UpdateBioRequest: MessageFns<UpdateBioRequest> = {
-  encode(message: UpdateBioRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.bio !== "") {
-      writer.uint32(10).string(message.bio);
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): UpdateBioRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseUpdateBioRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
-
-          message.bio = reader.string();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): UpdateBioRequest {
-    return { bio: isSet(object.bio) ? globalThis.String(object.bio) : "" };
-  },
-
-  toJSON(message: UpdateBioRequest): unknown {
-    const obj: any = {};
-    if (message.bio !== "") {
-      obj.bio = message.bio;
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<UpdateBioRequest>): UpdateBioRequest {
-    return UpdateBioRequest.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<UpdateBioRequest>): UpdateBioRequest {
-    const message = createBaseUpdateBioRequest();
-    message.bio = object.bio ?? "";
-    return message;
-  },
-};
-
-function createBaseUpdateBioResponse(): UpdateBioResponse {
-  return { success: false, message: "", timestamp: "" };
-}
-
-export const UpdateBioResponse: MessageFns<UpdateBioResponse> = {
-  encode(message: UpdateBioResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.success !== false) {
-      writer.uint32(8).bool(message.success);
-    }
-    if (message.message !== "") {
-      writer.uint32(18).string(message.message);
-    }
-    if (message.timestamp !== "") {
-      writer.uint32(26).string(message.timestamp);
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): UpdateBioResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseUpdateBioResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 8) {
-            break;
-          }
-
-          message.success = reader.bool();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
-
-          message.message = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
-
-          message.timestamp = reader.string();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): UpdateBioResponse {
-    return {
-      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-      message: isSet(object.message) ? globalThis.String(object.message) : "",
-      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
-    };
-  },
-
-  toJSON(message: UpdateBioResponse): unknown {
-    const obj: any = {};
-    if (message.success !== false) {
-      obj.success = message.success;
-    }
-    if (message.message !== "") {
-      obj.message = message.message;
-    }
-    if (message.timestamp !== "") {
-      obj.timestamp = message.timestamp;
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<UpdateBioResponse>): UpdateBioResponse {
-    return UpdateBioResponse.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<UpdateBioResponse>): UpdateBioResponse {
-    const message = createBaseUpdateBioResponse();
-    message.success = object.success ?? false;
-    message.message = object.message ?? "";
-    message.timestamp = object.timestamp ?? "";
-    return message;
-  },
-};
-
 function createBaseReportContentRequest(): ReportContentRequest {
   return { targetType: "", targetId: 0, reason: "", details: "" };
 }
@@ -3917,206 +3963,6 @@ export const ReportContentResponse: MessageFns<ReportContentResponse> = {
     const message = createBaseReportContentResponse();
     message.success = object.success ?? false;
     message.message = object.message ?? "";
-    message.timestamp = object.timestamp ?? "";
-    return message;
-  },
-};
-
-function createBaseGetUploadURLRequest(): GetUploadURLRequest {
-  return { fileName: "", contentType: "" };
-}
-
-export const GetUploadURLRequest: MessageFns<GetUploadURLRequest> = {
-  encode(message: GetUploadURLRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.fileName !== "") {
-      writer.uint32(10).string(message.fileName);
-    }
-    if (message.contentType !== "") {
-      writer.uint32(18).string(message.contentType);
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): GetUploadURLRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetUploadURLRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
-
-          message.fileName = reader.string();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
-
-          message.contentType = reader.string();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): GetUploadURLRequest {
-    return {
-      fileName: isSet(object.fileName) ? globalThis.String(object.fileName) : "",
-      contentType: isSet(object.contentType) ? globalThis.String(object.contentType) : "",
-    };
-  },
-
-  toJSON(message: GetUploadURLRequest): unknown {
-    const obj: any = {};
-    if (message.fileName !== "") {
-      obj.fileName = message.fileName;
-    }
-    if (message.contentType !== "") {
-      obj.contentType = message.contentType;
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<GetUploadURLRequest>): GetUploadURLRequest {
-    return GetUploadURLRequest.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<GetUploadURLRequest>): GetUploadURLRequest {
-    const message = createBaseGetUploadURLRequest();
-    message.fileName = object.fileName ?? "";
-    message.contentType = object.contentType ?? "";
-    return message;
-  },
-};
-
-function createBaseGetUploadURLResponse(): GetUploadURLResponse {
-  return { success: false, message: "", uploadUrl: "", publicUrl: "", timestamp: "" };
-}
-
-export const GetUploadURLResponse: MessageFns<GetUploadURLResponse> = {
-  encode(message: GetUploadURLResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.success !== false) {
-      writer.uint32(8).bool(message.success);
-    }
-    if (message.message !== "") {
-      writer.uint32(18).string(message.message);
-    }
-    if (message.uploadUrl !== "") {
-      writer.uint32(26).string(message.uploadUrl);
-    }
-    if (message.publicUrl !== "") {
-      writer.uint32(34).string(message.publicUrl);
-    }
-    if (message.timestamp !== "") {
-      writer.uint32(42).string(message.timestamp);
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): GetUploadURLResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetUploadURLResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 8) {
-            break;
-          }
-
-          message.success = reader.bool();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
-
-          message.message = reader.string();
-          continue;
-        }
-        case 3: {
-          if (tag !== 26) {
-            break;
-          }
-
-          message.uploadUrl = reader.string();
-          continue;
-        }
-        case 4: {
-          if (tag !== 34) {
-            break;
-          }
-
-          message.publicUrl = reader.string();
-          continue;
-        }
-        case 5: {
-          if (tag !== 42) {
-            break;
-          }
-
-          message.timestamp = reader.string();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): GetUploadURLResponse {
-    return {
-      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
-      message: isSet(object.message) ? globalThis.String(object.message) : "",
-      uploadUrl: isSet(object.uploadUrl) ? globalThis.String(object.uploadUrl) : "",
-      publicUrl: isSet(object.publicUrl) ? globalThis.String(object.publicUrl) : "",
-      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
-    };
-  },
-
-  toJSON(message: GetUploadURLResponse): unknown {
-    const obj: any = {};
-    if (message.success !== false) {
-      obj.success = message.success;
-    }
-    if (message.message !== "") {
-      obj.message = message.message;
-    }
-    if (message.uploadUrl !== "") {
-      obj.uploadUrl = message.uploadUrl;
-    }
-    if (message.publicUrl !== "") {
-      obj.publicUrl = message.publicUrl;
-    }
-    if (message.timestamp !== "") {
-      obj.timestamp = message.timestamp;
-    }
-    return obj;
-  },
-
-  create(base?: DeepPartial<GetUploadURLResponse>): GetUploadURLResponse {
-    return GetUploadURLResponse.fromPartial(base ?? {});
-  },
-  fromPartial(object: DeepPartial<GetUploadURLResponse>): GetUploadURLResponse {
-    const message = createBaseGetUploadURLResponse();
-    message.success = object.success ?? false;
-    message.message = object.message ?? "";
-    message.uploadUrl = object.uploadUrl ?? "";
-    message.publicUrl = object.publicUrl ?? "";
     message.timestamp = object.timestamp ?? "";
     return message;
   },
@@ -6511,6 +6357,1000 @@ export const GetTrendingTopicsResponse: MessageFns<GetTrendingTopicsResponse> = 
     message.success = object.success ?? false;
     message.message = object.message ?? "";
     message.topics = object.topics?.map((e) => TrendingTopicItem.fromPartial(e)) || [];
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseUpdateCommentRequest(): UpdateCommentRequest {
+  return { commentId: 0, content: "" };
+}
+
+export const UpdateCommentRequest: MessageFns<UpdateCommentRequest> = {
+  encode(message: UpdateCommentRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.commentId !== 0) {
+      writer.uint32(8).int32(message.commentId);
+    }
+    if (message.content !== "") {
+      writer.uint32(18).string(message.content);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateCommentRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateCommentRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.commentId = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.content = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateCommentRequest {
+    return {
+      commentId: isSet(object.commentId) ? globalThis.Number(object.commentId) : 0,
+      content: isSet(object.content) ? globalThis.String(object.content) : "",
+    };
+  },
+
+  toJSON(message: UpdateCommentRequest): unknown {
+    const obj: any = {};
+    if (message.commentId !== 0) {
+      obj.commentId = Math.round(message.commentId);
+    }
+    if (message.content !== "") {
+      obj.content = message.content;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UpdateCommentRequest>): UpdateCommentRequest {
+    return UpdateCommentRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateCommentRequest>): UpdateCommentRequest {
+    const message = createBaseUpdateCommentRequest();
+    message.commentId = object.commentId ?? 0;
+    message.content = object.content ?? "";
+    return message;
+  },
+};
+
+function createBaseUpdateCommentResponse(): UpdateCommentResponse {
+  return { success: false, message: "", data: undefined, timestamp: "" };
+}
+
+export const UpdateCommentResponse: MessageFns<UpdateCommentResponse> = {
+  encode(message: UpdateCommentResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.data !== undefined) {
+      CommentItem.encode(message.data, writer.uint32(26).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateCommentResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateCommentResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.data = CommentItem.decode(reader, reader.uint32());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateCommentResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      data: isSet(object.data) ? CommentItem.fromJSON(object.data) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: UpdateCommentResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.data !== undefined) {
+      obj.data = CommentItem.toJSON(message.data);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UpdateCommentResponse>): UpdateCommentResponse {
+    return UpdateCommentResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateCommentResponse>): UpdateCommentResponse {
+    const message = createBaseUpdateCommentResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.data = (object.data !== undefined && object.data !== null)
+      ? CommentItem.fromPartial(object.data)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseGetRepliesRequest(): GetRepliesRequest {
+  return { commentId: 0, pagination: undefined };
+}
+
+export const GetRepliesRequest: MessageFns<GetRepliesRequest> = {
+  encode(message: GetRepliesRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.commentId !== 0) {
+      writer.uint32(8).int32(message.commentId);
+    }
+    if (message.pagination !== undefined) {
+      PaginationParams.encode(message.pagination, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetRepliesRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetRepliesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.commentId = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.pagination = PaginationParams.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetRepliesRequest {
+    return {
+      commentId: isSet(object.commentId) ? globalThis.Number(object.commentId) : 0,
+      pagination: isSet(object.pagination) ? PaginationParams.fromJSON(object.pagination) : undefined,
+    };
+  },
+
+  toJSON(message: GetRepliesRequest): unknown {
+    const obj: any = {};
+    if (message.commentId !== 0) {
+      obj.commentId = Math.round(message.commentId);
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationParams.toJSON(message.pagination);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetRepliesRequest>): GetRepliesRequest {
+    return GetRepliesRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetRepliesRequest>): GetRepliesRequest {
+    const message = createBaseGetRepliesRequest();
+    message.commentId = object.commentId ?? 0;
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationParams.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseGetRepliesResponse(): GetRepliesResponse {
+  return { success: false, message: "", replies: [], pagination: undefined, timestamp: "" };
+}
+
+export const GetRepliesResponse: MessageFns<GetRepliesResponse> = {
+  encode(message: GetRepliesResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.replies) {
+      CommentItem.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.pagination !== undefined) {
+      PaginationResult.encode(message.pagination, writer.uint32(34).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(42).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetRepliesResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetRepliesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.replies.push(CommentItem.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.pagination = PaginationResult.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetRepliesResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      replies: globalThis.Array.isArray(object?.replies) ? object.replies.map((e: any) => CommentItem.fromJSON(e)) : [],
+      pagination: isSet(object.pagination) ? PaginationResult.fromJSON(object.pagination) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetRepliesResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.replies?.length) {
+      obj.replies = message.replies.map((e) => CommentItem.toJSON(e));
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationResult.toJSON(message.pagination);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetRepliesResponse>): GetRepliesResponse {
+    return GetRepliesResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetRepliesResponse>): GetRepliesResponse {
+    const message = createBaseGetRepliesResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.replies = object.replies?.map((e) => CommentItem.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationResult.fromPartial(object.pagination)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseGetLikedPostsRequest(): GetLikedPostsRequest {
+  return { userId: 0, pagination: undefined };
+}
+
+export const GetLikedPostsRequest: MessageFns<GetLikedPostsRequest> = {
+  encode(message: GetLikedPostsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userId !== 0) {
+      writer.uint32(8).int32(message.userId);
+    }
+    if (message.pagination !== undefined) {
+      PaginationParams.encode(message.pagination, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetLikedPostsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetLikedPostsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.userId = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.pagination = PaginationParams.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetLikedPostsRequest {
+    return {
+      userId: isSet(object.userId) ? globalThis.Number(object.userId) : 0,
+      pagination: isSet(object.pagination) ? PaginationParams.fromJSON(object.pagination) : undefined,
+    };
+  },
+
+  toJSON(message: GetLikedPostsRequest): unknown {
+    const obj: any = {};
+    if (message.userId !== 0) {
+      obj.userId = Math.round(message.userId);
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationParams.toJSON(message.pagination);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetLikedPostsRequest>): GetLikedPostsRequest {
+    return GetLikedPostsRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetLikedPostsRequest>): GetLikedPostsRequest {
+    const message = createBaseGetLikedPostsRequest();
+    message.userId = object.userId ?? 0;
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationParams.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseGetLikedPostsResponse(): GetLikedPostsResponse {
+  return { success: false, message: "", posts: [], pagination: undefined, timestamp: "" };
+}
+
+export const GetLikedPostsResponse: MessageFns<GetLikedPostsResponse> = {
+  encode(message: GetLikedPostsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.posts) {
+      PostItem.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.pagination !== undefined) {
+      PaginationResult.encode(message.pagination, writer.uint32(34).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(42).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetLikedPostsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetLikedPostsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.posts.push(PostItem.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.pagination = PaginationResult.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetLikedPostsResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      posts: globalThis.Array.isArray(object?.posts) ? object.posts.map((e: any) => PostItem.fromJSON(e)) : [],
+      pagination: isSet(object.pagination) ? PaginationResult.fromJSON(object.pagination) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetLikedPostsResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.posts?.length) {
+      obj.posts = message.posts.map((e) => PostItem.toJSON(e));
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationResult.toJSON(message.pagination);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetLikedPostsResponse>): GetLikedPostsResponse {
+    return GetLikedPostsResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetLikedPostsResponse>): GetLikedPostsResponse {
+    const message = createBaseGetLikedPostsResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.posts = object.posts?.map((e) => PostItem.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationResult.fromPartial(object.pagination)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseUpdateProfileRequest(): UpdateProfileRequest {
+  return { bio: "", location: "", website: "", picture: "", coverPhotoUrl: "" };
+}
+
+export const UpdateProfileRequest: MessageFns<UpdateProfileRequest> = {
+  encode(message: UpdateProfileRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.bio !== "") {
+      writer.uint32(10).string(message.bio);
+    }
+    if (message.location !== "") {
+      writer.uint32(18).string(message.location);
+    }
+    if (message.website !== "") {
+      writer.uint32(26).string(message.website);
+    }
+    if (message.picture !== "") {
+      writer.uint32(34).string(message.picture);
+    }
+    if (message.coverPhotoUrl !== "") {
+      writer.uint32(42).string(message.coverPhotoUrl);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateProfileRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateProfileRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.bio = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.location = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.website = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.picture = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.coverPhotoUrl = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateProfileRequest {
+    return {
+      bio: isSet(object.bio) ? globalThis.String(object.bio) : "",
+      location: isSet(object.location) ? globalThis.String(object.location) : "",
+      website: isSet(object.website) ? globalThis.String(object.website) : "",
+      picture: isSet(object.picture) ? globalThis.String(object.picture) : "",
+      coverPhotoUrl: isSet(object.coverPhotoUrl) ? globalThis.String(object.coverPhotoUrl) : "",
+    };
+  },
+
+  toJSON(message: UpdateProfileRequest): unknown {
+    const obj: any = {};
+    if (message.bio !== "") {
+      obj.bio = message.bio;
+    }
+    if (message.location !== "") {
+      obj.location = message.location;
+    }
+    if (message.website !== "") {
+      obj.website = message.website;
+    }
+    if (message.picture !== "") {
+      obj.picture = message.picture;
+    }
+    if (message.coverPhotoUrl !== "") {
+      obj.coverPhotoUrl = message.coverPhotoUrl;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UpdateProfileRequest>): UpdateProfileRequest {
+    return UpdateProfileRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateProfileRequest>): UpdateProfileRequest {
+    const message = createBaseUpdateProfileRequest();
+    message.bio = object.bio ?? "";
+    message.location = object.location ?? "";
+    message.website = object.website ?? "";
+    message.picture = object.picture ?? "";
+    message.coverPhotoUrl = object.coverPhotoUrl ?? "";
+    return message;
+  },
+};
+
+function createBaseUpdateProfileResponse(): UpdateProfileResponse {
+  return { success: false, message: "", data: undefined, timestamp: "" };
+}
+
+export const UpdateProfileResponse: MessageFns<UpdateProfileResponse> = {
+  encode(message: UpdateProfileResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.data !== undefined) {
+      CommunityProfile.encode(message.data, writer.uint32(26).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateProfileResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateProfileResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.data = CommunityProfile.decode(reader, reader.uint32());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateProfileResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      data: isSet(object.data) ? CommunityProfile.fromJSON(object.data) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: UpdateProfileResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.data !== undefined) {
+      obj.data = CommunityProfile.toJSON(message.data);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UpdateProfileResponse>): UpdateProfileResponse {
+    return UpdateProfileResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateProfileResponse>): UpdateProfileResponse {
+    const message = createBaseUpdateProfileResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.data = (object.data !== undefined && object.data !== null)
+      ? CommunityProfile.fromPartial(object.data)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseUploadImageRequest(): UploadImageRequest {
+  return { purpose: "" };
+}
+
+export const UploadImageRequest: MessageFns<UploadImageRequest> = {
+  encode(message: UploadImageRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.purpose !== "") {
+      writer.uint32(10).string(message.purpose);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UploadImageRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUploadImageRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.purpose = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UploadImageRequest {
+    return { purpose: isSet(object.purpose) ? globalThis.String(object.purpose) : "" };
+  },
+
+  toJSON(message: UploadImageRequest): unknown {
+    const obj: any = {};
+    if (message.purpose !== "") {
+      obj.purpose = message.purpose;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UploadImageRequest>): UploadImageRequest {
+    return UploadImageRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UploadImageRequest>): UploadImageRequest {
+    const message = createBaseUploadImageRequest();
+    message.purpose = object.purpose ?? "";
+    return message;
+  },
+};
+
+function createBaseUploadImageResponse(): UploadImageResponse {
+  return { success: false, message: "", imageUrl: "", timestamp: "" };
+}
+
+export const UploadImageResponse: MessageFns<UploadImageResponse> = {
+  encode(message: UploadImageResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.imageUrl !== "") {
+      writer.uint32(26).string(message.imageUrl);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UploadImageResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUploadImageResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.imageUrl = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UploadImageResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      imageUrl: isSet(object.imageUrl) ? globalThis.String(object.imageUrl) : "",
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: UploadImageResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.imageUrl !== "") {
+      obj.imageUrl = message.imageUrl;
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UploadImageResponse>): UploadImageResponse {
+    return UploadImageResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UploadImageResponse>): UploadImageResponse {
+    const message = createBaseUploadImageResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.imageUrl = object.imageUrl ?? "";
     message.timestamp = object.timestamp ?? "";
     return message;
   },
