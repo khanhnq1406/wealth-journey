@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useQueryGetReplies, useMutationDeleteComment, EVENT_CommunityGetReplies } from "@/utils/generated/hooks";
+import { useQueryGetReplies, useMutationDeleteComment, EVENT_CommunityGetReplies, EVENT_CommunityGetComments } from "@/utils/generated/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { ReplyBubble } from "./ReplyBubble";
 
@@ -10,9 +10,10 @@ interface ReplyListProps {
   replyCount: number;
   postId: number;
   currentUserId: number;
+  onReplyDeleted?: () => void;
 }
 
-export function ReplyList({ commentId, replyCount, postId: _postId, currentUserId }: ReplyListProps) {
+export function ReplyList({ commentId, replyCount, postId: _postId, currentUserId, onReplyDeleted }: ReplyListProps) {
   const [expanded, setExpanded] = useState(false);
   const [page, setPage] = useState(1);
   const pageSize = 5;
@@ -32,6 +33,8 @@ export function ReplyList({ commentId, replyCount, postId: _postId, currentUserI
   const deleteCommentMutation = useMutationDeleteComment({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetReplies, { commentId }] });
+      queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetComments] });
+      onReplyDeleted?.();
     },
   });
 

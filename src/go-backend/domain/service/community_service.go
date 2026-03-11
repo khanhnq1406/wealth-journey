@@ -485,13 +485,12 @@ func (s *communityService) DeleteComment(ctx context.Context, userID int32, comm
 		return err
 	}
 
-	// If this is a reply, decrement parent's reply count
+	// If this is a reply, decrement parent's reply count only.
+	// Replies never increment post.comment_count, so don't decrement it here.
 	if comment.ParentCommentID != nil {
 		_ = s.commentRepo.IncrementReplyCount(ctx, *comment.ParentCommentID, -1)
-		// Also decrement post comment count by 1 for the reply itself
-		_ = s.postRepo.IncrementCommentCount(ctx, comment.PostID, -1)
 	} else {
-		// Root comment — decrement post comment count by 1 (replies deleted by DB cascade/soft-delete)
+		// Root comment — decrement post comment count by 1
 		_ = s.postRepo.IncrementCommentCount(ctx, comment.PostID, -1)
 	}
 
