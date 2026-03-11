@@ -6,8 +6,8 @@
 - **Spec file:** `docs/specs/2026-03-11-landing-page-redesign-spec.md`
 - **Started:** 2026-03-11T00:00:00+07:00
 - **Last updated:** 2026-03-11T00:00:00+07:00
-- **Current state:** in_progress
-- **Current task:** 0
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -23,7 +23,7 @@
 | 7 | Create LandingSilverPriceChart | done | 5c13e76 | Disabled silver chart shell, 200px, axes-only SVG + login button |
 | 8 | Rewrite Landing Page | done | cb14ffd | Replaced marketing sections with price teaser layout, mobile-first |
 | 9 | Update SEO Meta Tags | done | cb14ffd | Updated title, description, keywords to gold/silver price focus + Vietnamese keywords |
-| 10 | Update C4 Architecture Diagrams | pending | — | — |
+| 10 | Update C4 Architecture Diagrams | done | d0bf1d8 | Added PublicHandler to backend C4; updated landing page + market-prices feature in frontend C4 |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
