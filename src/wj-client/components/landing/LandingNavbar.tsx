@@ -36,14 +36,6 @@ export default function LandingNavbar() {
     setIsAuthenticated(authState ?? false);
   }, []);
 
-  const navLinks = [
-    { name: t("navbar.features"), href: "#features" },
-    { name: t("navbar.bankImport"), href: "#bank-import" },
-    { name: t("navbar.investmentTracking"), href: "#investment-tracking" },
-    { name: t("navbar.howItWorks"), href: "#how-it-works" },
-    // { name: "Pricing", href: "#pricing" },
-  ];
-
   // Mobile menu animation variants
   const mobileMenuVariants = {
     closed: {
@@ -100,15 +92,6 @@ export default function LandingNavbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="text-gray-700 hover:text-v2-red-primary transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 rounded-md px-2 py-1 min-h-[44px] flex items-center"
-              >
-                {link.name}
-              </a>
-            ))}
             {isAuthenticated ? (
               <Link
                 href="/dashboard/home"
@@ -138,7 +121,7 @@ export default function LandingNavbar() {
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2"
-            aria-label={t("toggleMenu")}
+            aria-label={t("navbar.toggleMenu")}
             aria-expanded={isMobileMenuOpen}
           >
             <motion.svg
@@ -174,26 +157,13 @@ export default function LandingNavbar() {
           >
             <div className="py-4 sm:py-6">
               <div className="flex flex-col space-y-3 sm:space-y-4">
-                {navLinks.map((link, index) => (
-                  <motion.a
-                    key={link.name}
-                    href={link.href}
-                    className="text-gray-700 hover:text-v2-red-primary transition-colors duration-200 font-medium px-3 py-2 focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 rounded-md min-h-[44px] flex items-center"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.2, delay: index * 0.05 }}
-                  >
-                    {link.name}
-                  </motion.a>
-                ))}
                 {isAuthenticated ? (
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{
                       duration: 0.2,
-                      delay: navLinks.length * 0.05,
+                      delay: 0,
                     }}
                   >
                     <Link
@@ -211,7 +181,7 @@ export default function LandingNavbar() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{
                         duration: 0.2,
-                        delay: navLinks.length * 0.05,
+                        delay: 0,
                       }}
                     >
                       <Link
@@ -227,7 +197,7 @@ export default function LandingNavbar() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{
                         duration: 0.2,
-                        delay: (navLinks.length + 1) * 0.05,
+                        delay: 0.05,
                       }}
                     >
                       <Link

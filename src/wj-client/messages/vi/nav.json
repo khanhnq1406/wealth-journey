@@ -268,7 +268,8 @@
       "investmentTracking": "Theo dõi đầu tư",
       "dashboard": "Bảng điều khiển",
       "signIn": "Đăng nhập",
-      "skipToMainContent": "Chuyển đến nội dung chính"
+      "skipToMainContent": "Chuyển đến nội dung chính",
+      "toggleMenu": "Bật/tắt menu"
     },
     "priceTeaser": {
       "goldTableTitle": "Giá Vàng",
@@ -277,8 +278,7 @@
       "silverType": "LOẠI BẠC",
       "buy": "MUA",
       "sell": "BÁN",
-      "loginPrompt": "Vui lòng {loginLink} để xem giá",
-      "loginLink": "đăng nhập",
+      "loginPrompt": "Vui lòng <loginLink>đăng nhập</loginLink> để xem giá",
       "goldChartTitle": "Biểu Đồ Giá Vàng",
       "silverChartTitle": "Biểu Đồ Giá Bạc",
       "chartLoginPrompt": "Đăng nhập để xem biểu đồ",

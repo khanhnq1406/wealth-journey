@@ -100,6 +100,14 @@ task frontend:dev
 
 None. The implementation matches all acceptance criteria from the spec.
 
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-11 | `LandingNavbar` used `t("toggleMenu")` which looked for `landing.toggleMenu` (missing). Added `toggleMenu` key to `landing.navbar` in both `en/nav.json` and `vi/nav.json`, and updated the component to use `t("navbar.toggleMenu")`. | Minor | — |
+| 2026-03-11 | Removed all marketing anchor nav links (Features, Bank Import, Investment Tracking, How It Works) from `LandingNavbar`. Desktop and mobile menus now show only Login/Register buttons (or Dashboard link when authenticated). | Minor | — |
+| 2026-03-11 | `LandingGoldPriceTable` and `LandingSilverPriceTable` used `t.rich("loginPrompt", { loginLink: fn })` but the i18n messages used `{loginLink}` (variable substitution), not `<loginLink>…</loginLink>` (rich-text tag syntax). `t.rich()` returned the render function itself as the interpolated value, causing "Functions are not valid as a React child". Fixed by changing both locale files (`en/nav.json`, `vi/nav.json`) to use `<loginLink>…</loginLink>` tag syntax, dropping the now-redundant `loginLink` string key. Components unchanged. | Minor | — |
+
 ## Commits
 
 | Commit | Description |

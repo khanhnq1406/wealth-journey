@@ -268,7 +268,8 @@
       "investmentTracking": "Investment Tracking",
       "dashboard": "Dashboard",
       "signIn": "Sign In",
-      "skipToMainContent": "Skip to main content"
+      "skipToMainContent": "Skip to main content",
+      "toggleMenu": "Toggle menu"
     },
     "priceTeaser": {
       "goldTableTitle": "Gold Prices",
@@ -277,8 +278,7 @@
       "silverType": "SILVER TYPE",
       "buy": "BUY",
       "sell": "SELL",
-      "loginPrompt": "Please {loginLink} to view prices",
-      "loginLink": "sign in",
+      "loginPrompt": "Please <loginLink>sign in</loginLink> to view prices",
       "goldChartTitle": "Gold Price Chart",
       "silverChartTitle": "Silver Price Chart",
       "chartLoginPrompt": "Sign in to view chart",
