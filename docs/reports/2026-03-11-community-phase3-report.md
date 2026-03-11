@@ -183,4 +183,4 @@ All 5 feature areas from the spec implemented: image upload, edit comments, repl
 | Date       | Fix                                                                               | Severity | Commit  |
 | ---------- | --------------------------------------------------------------------------------- | -------- | ------- |
 | 2026-03-11 | Replace 📷 emoji with `<Camera>` lucide-react icon in `ImageUpload.tsx` drop zone | Minor    | 3c0de6f |
-| 2026-03-11 | Fix reply showing `(edited)` on creation — change `IsEdited` condition from `UpdatedAt != nil` to `UpdatedAt > CreatedAt` in `commentToProto` | Minor    | pending |
+| 2026-03-11 | Fix reply showing `(edited)` on creation — change `IsEdited` condition from `UpdatedAt != nil` to `UpdatedAt > CreatedAt` in `commentToProto` | Minor    | 098ffe0 |
