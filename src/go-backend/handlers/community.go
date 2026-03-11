@@ -664,3 +664,71 @@ func (h *CommunityHandler) GetTrendingTopics(c *gin.Context) {
 
 	handler.Success(c, result)
 }
+
+// GetFollowing returns paginated list of users that a user follows.
+func (h *CommunityHandler) GetFollowing(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	targetUserID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		handler.BadRequest(c, err)
+		return
+	}
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
+
+	req := &v1.GetFollowingRequest{
+		UserId: int32(targetUserID),
+		Pagination: &v1.PaginationParams{
+			Page:     int32(page),
+			PageSize: int32(pageSize),
+		},
+	}
+
+	result, err := h.communityService.GetFollowing(c.Request.Context(), userID, int32(targetUserID), req)
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, result)
+}
+
+// GetFollowers returns paginated list of users who follow a user.
+func (h *CommunityHandler) GetFollowers(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	targetUserID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		handler.BadRequest(c, err)
+		return
+	}
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
+
+	req := &v1.GetFollowersRequest{
+		UserId: int32(targetUserID),
+		Pagination: &v1.PaginationParams{
+			Page:     int32(page),
+			PageSize: int32(pageSize),
+		},
+	}
+
+	result, err := h.communityService.GetFollowers(c.Request.Context(), userID, int32(targetUserID), req)
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, result)
+}

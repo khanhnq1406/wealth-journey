@@ -248,6 +248,8 @@ func RegisterRoutes(
 		community.GET("/users/:user_id/profile", h.Community.GetProfile)
 		community.POST("/users/:user_id/follow", h.Community.FollowUser)
 		community.DELETE("/users/:user_id/follow", h.Community.UnfollowUser)
+		community.GET("/users/:user_id/following", h.Community.GetFollowing)
+		community.GET("/users/:user_id/followers", h.Community.GetFollowers)
 
 		// Profile
 		community.PUT("/profile/bio", h.Community.UpdateBio)
