@@ -19,6 +19,9 @@ type User struct {
 	ConversionInProgress bool          `gorm:"default:false;index" json:"conversionInProgress"`
 	PreferredLanguage    string         `gorm:"size:5;not null;default:'vi'" json:"preferredLanguage"`
 	Bio                  string         `gorm:"size:200" json:"bio"`
+	CoverPhotoURL string `gorm:"size:500" json:"coverPhotoUrl"`
+	Location      string `gorm:"size:100" json:"location"`
+	Website       string `gorm:"size:200" json:"website"`
 }
 
 // TableName specifies the table name for User model
