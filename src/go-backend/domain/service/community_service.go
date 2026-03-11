@@ -1457,14 +1457,22 @@ func (s *communityService) UpdateProfile(ctx context.Context, userID int32, req 
 		user.Website = website
 	}
 
-	// Update picture if provided
+	// Update picture if provided (max 2048 chars for signed URLs)
 	if req.Picture != "" {
-		user.Picture = req.Picture
+		picture, err := validator.SanitizeStringField(req.Picture, 2048)
+		if err != nil {
+			return nil, err
+		}
+		user.Picture = picture
 	}
 
-	// Update cover photo if provided
+	// Update cover photo if provided (max 2048 chars for signed URLs)
 	if req.CoverPhotoUrl != "" {
-		user.CoverPhotoURL = req.CoverPhotoUrl
+		coverPhoto, err := validator.SanitizeStringField(req.CoverPhotoUrl, 2048)
+		if err != nil {
+			return nil, err
+		}
+		user.CoverPhotoURL = coverPhoto
 	}
 
 	if err := s.userRepo.Update(ctx, user); err != nil {

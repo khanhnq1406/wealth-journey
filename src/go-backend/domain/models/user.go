@@ -11,7 +11,7 @@ type User struct {
 	ID                  int32          `gorm:"primaryKey;autoIncrement" json:"id"`
 	Email               string         `gorm:"uniqueIndex;size:100;not null" json:"email"`
 	Name                string         `gorm:"size:100" json:"name"`
-	Picture             string         `gorm:"size:255" json:"picture"`
+	Picture             string         `gorm:"size:2048" json:"picture"`
 	CreatedAt           time.Time      `json:"createdAt"`
 	UpdatedAt           time.Time      `json:"updatedAt"`
 	DeletedAt           gorm.DeletedAt `gorm:"index" json:"-"`
@@ -19,7 +19,7 @@ type User struct {
 	ConversionInProgress bool          `gorm:"default:false;index" json:"conversionInProgress"`
 	PreferredLanguage    string         `gorm:"size:5;not null;default:'vi'" json:"preferredLanguage"`
 	Bio                  string         `gorm:"size:200" json:"bio"`
-	CoverPhotoURL string `gorm:"size:500" json:"coverPhotoUrl"`
+	CoverPhotoURL string `gorm:"size:2048" json:"coverPhotoUrl"`
 	Location      string `gorm:"size:100" json:"location"`
 	Website       string `gorm:"size:200" json:"website"`
 }

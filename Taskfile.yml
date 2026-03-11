@@ -100,6 +100,12 @@ tasks:
     cmds:
       - go run cmd/migrate-community-phase3/main.go
 
+  backend:migrate-profile-url-size:
+    desc: Expand picture and cover_photo_url columns to VARCHAR(2048)
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-profile-url-size/main.go
+
   # Frontend tasks
   frontend:dev:
     desc: "Start frontend in development mode"
