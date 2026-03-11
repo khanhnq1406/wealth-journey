@@ -41,7 +41,7 @@ C4Component
         Component(fx_svc, "FX Rate Service", "domain/service", "Currency conversion rates, cross-currency calculations")
         Component(import_svc, "Import Service", "domain/service", "File parsing, field mapping, duplicate detection, batch execution")
         Component(portfolio_svc, "Portfolio History Service", "domain/service", "Historical portfolio value snapshots for charts")
-        Component(community_svc, "Community Service", "domain/service", "Social interactions: posts, comments, likes, follows, content reports; Phase 2: SharePost, GetNotifications, GetUnreadNotificationCount, MarkNotificationsRead, SavePost, UnsavePost, GetSavedPosts, GetSuggestedUsers, GetTrendingTopics")
+        Component(community_svc, "Community Service", "domain/service", "Social interactions: posts, comments, likes, follows, content reports; Phase 2: SharePost, GetNotifications, GetUnreadNotificationCount, MarkNotificationsRead, SavePost, UnsavePost, GetSavedPosts, GetSuggestedUsers, GetTrendingTopics, GetFollowing, GetFollowers")
     }
 
     Container_Boundary(repos, "Repository Layer (Data Access)") {
@@ -59,7 +59,7 @@ C4Component
         Component(post_repo, "Post Repository", "GORM", "Community posts with content and topic tags; GetByIDs batch fetch, IncrementShareCount, hashtag filter on GetFeed")
         Component(comment_repo, "Comment Repository", "GORM", "Post comments")
         Component(like_repo, "Like Repository", "GORM", "Post likes with unique constraints")
-        Component(follow_repo, "Follow Repository", "GORM", "User follow relationships; GetFriendsOfFriends, GetTopUsersByFollowers")
+        Component(follow_repo, "Follow Repository", "GORM", "User follow relationships; GetFriendsOfFriends, GetTopUsersByFollowers, GetFollowing, GetFollowers (paginated with Preload)")
         Component(report_repo, "Report Repository", "GORM", "Content reports for moderation")
         Component(notification_repo, "Notification Repository", "GORM", "CRUD for user notifications (like, comment, follow, share events)")
         Component(saved_post_repo, "Saved Post Repository", "GORM", "Save/unsave posts per user with unique constraints")
