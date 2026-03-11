@@ -268,7 +268,30 @@
       "investmentTracking": "Theo dõi đầu tư",
       "dashboard": "Bảng điều khiển",
       "signIn": "Đăng nhập",
-      "skipToMainContent": "Chuyển đến nội dung chính"
+      "skipToMainContent": "Chuyển đến nội dung chính",
+      "toggleMenu": "Bật/tắt menu"
+    },
+    "priceTeaser": {
+      "goldTableTitle": "Giá Vàng",
+      "silverTableTitle": "Giá Bạc",
+      "goldType": "LOẠI VÀNG",
+      "silverType": "LOẠI BẠC",
+      "buy": "MUA",
+      "sell": "BÁN",
+      "loginPrompt": "Vui lòng <loginLink>đăng nhập</loginLink> để xem giá",
+      "goldChartTitle": "Biểu Đồ Giá Vàng",
+      "silverChartTitle": "Biểu Đồ Giá Bạc",
+      "chartLoginPrompt": "Đăng nhập để xem biểu đồ",
+      "domesticMarket": "Trong nước",
+      "globalMarket": "Thế giới",
+      "period24h": "24h",
+      "periodWeek": "Tuần",
+      "periodMonth": "Tháng",
+      "periodYear": "Năm",
+      "loadingTypes": "Đang tải dữ liệu...",
+      "errorLoadingTypes": "Không thể tải dữ liệu thị trường",
+      "retry": "Thử lại",
+      "noData": "Không có dữ liệu"
     }
   },
   "sidebarToggle": {

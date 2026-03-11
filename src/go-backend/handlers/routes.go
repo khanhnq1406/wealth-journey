@@ -17,6 +17,15 @@ func RegisterRoutes(
 	rateLimiter *appmiddleware.RateLimiter,
 	importRateLimiter interface{}, // Can be *ImportRateLimiter or *RedisImportRateLimiter
 ) {
+	// Public routes (no auth required)
+	publicGroup := v1.Group("/public")
+	if rateLimiter != nil {
+		publicGroup.Use(appmiddleware.RateLimitByIP(rateLimiter))
+	}
+	{
+		publicGroup.GET("/market-types", h.Public.GetPublicMarketTypes)
+	}
+
 	// Auth routes (higher rate limit allowed for auth)
 	authGroup := v1.Group("/auth")
 	if rateLimiter != nil {

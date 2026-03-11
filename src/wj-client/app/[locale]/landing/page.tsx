@@ -1,35 +1,66 @@
 "use client";
 
-import LandingHero from "@/components/landing/LandingHero";
-import LandingFeatures from "@/components/landing/LandingFeatures";
-import LandingBankImport from "@/components/landing/LandingBankImport";
-import LandingInvestmentFeatures from "@/components/landing/LandingInvestmentFeatures";
-import LandingComparison from "@/components/landing/LandingComparison";
-import { LandingTestimonials } from "@/components/landing/LandingTestimonials";
-import LandingHowItWorks from "@/components/landing/LandingHowItWorks";
-import LandingCTA from "@/components/landing/LandingCTA";
 import LandingNavbar from "@/components/landing/LandingNavbar";
-import LandingFooter from "@/components/landing/LandingFooter";
 import LandingErrorBoundary from "@/components/landing/LandingErrorBoundary";
-import { PWAInstallPrompt } from "@/components/pwa";
+import { LandingGoldPriceTable } from "@/components/landing/LandingGoldPriceTable";
+import { LandingGoldPriceChart } from "@/components/landing/LandingGoldPriceChart";
+import { LandingSilverPriceTable } from "@/components/landing/LandingSilverPriceTable";
+import { LandingSilverPriceChart } from "@/components/landing/LandingSilverPriceChart";
+import { usePublicMarketTypes } from "@/features/market-prices/hooks/usePublicMarketTypes";
+import { useTranslations } from "next-intl";
 
 export default function LandingPage() {
+  const { data, isLoading, isError, refetch } = usePublicMarketTypes();
+  const t = useTranslations("landing.priceTeaser");
+
+  const goldTypes = data?.gold ?? [];
+  const silverTypes = data?.silver ?? [];
+
   return (
     <LandingErrorBoundary>
       <div className="landing-scroll-container min-h-screen bg-neutral-50">
         <LandingNavbar />
         <main id="main-content" className="pt-14 sm:pt-16">
-          <LandingHero />
-          <LandingFeatures />
-          <LandingInvestmentFeatures />
-          <LandingBankImport />
-          <LandingComparison />
-          {/* <LandingTestimonials /> */}
-          <LandingHowItWorks />
-          <LandingCTA />
+          {/* Error state */}
+          {isError && (
+            <div className="px-4 sm:px-8 py-8 text-center">
+              <p className="font-vietnam text-v2-text-secondary mb-3">
+                {t("errorLoadingTypes")}
+              </p>
+              <button
+                onClick={() => refetch()}
+                className="px-4 py-2 bg-v2-red-primary text-white rounded-lg font-vietnam text-[13px] hover:bg-v2-red-dark transition-colors"
+              >
+                {t("retry")}
+              </button>
+            </div>
+          )}
+
+          {/* Mobile Layout */}
+          <div className="sm:hidden px-4 py-4 pb-24 space-y-6">
+            <LandingGoldPriceTable types={goldTypes} isLoading={isLoading} />
+            <LandingGoldPriceChart />
+            <LandingSilverPriceTable types={silverTypes} isLoading={isLoading} />
+            <LandingSilverPriceChart />
+          </div>
+
+          {/* Desktop Layout */}
+          <div className="hidden sm:block px-8 py-6 space-y-6">
+            {/* Row 1: Gold Table + Gold Chart */}
+            <div className="grid grid-cols-2 gap-6">
+              <LandingGoldPriceTable types={goldTypes} isLoading={isLoading} />
+              <LandingGoldPriceChart />
+            </div>
+            {/* Row 2: Silver Table + Silver Chart */}
+            <div className="grid grid-cols-2 gap-6">
+              <LandingSilverPriceTable
+                types={silverTypes}
+                isLoading={isLoading}
+              />
+              <LandingSilverPriceChart />
+            </div>
+          </div>
         </main>
-        <LandingFooter />
-        <PWAInstallPrompt showDelay={3000} />
       </div>
     </LandingErrorBoundary>
   );

@@ -1,0 +1,45 @@
+# Landing Page Redesign — Implementation Progress
+
+## Metadata
+- **Feature:** Landing Page Redesign (Gold/Silver Price Teaser)
+- **Plan file:** `docs/plans/2026-03-11-landing-page-redesign-plan.md`
+- **Spec file:** `docs/specs/2026-03-11-landing-page-redesign-spec.md`
+- **Started:** 2026-03-11T00:00:00+07:00
+- **Last updated:** 2026-03-11T00:00:00+07:00
+- **Current state:** completed
+- **Current task:** done
+
+## Task Progress
+
+| # | Task Name | Status | Commit | Summary |
+|---|-----------|--------|--------|---------|
+| 0 | Add Proto Messages & Generate Code | done | 9924685 | Added MarketTypeItem, GetPublicMarketTypesRequest/Response, GetPublicMarketTypes RPC |
+| 1 | Create Public Backend Handler | done | 0b27c84 | Created PublicHandler, wired in AllHandlers, registered /api/v1/public/market-types route |
+| 2 | Add i18n Translation Keys | done | 05f9a0b | Added priceTeaser keys to EN and VI nav.json |
+| 3 | Create usePublicMarketTypes Hook | done | 05f9a0b | Created React Query hook with no auth headers |
+| 4 | Create LandingGoldPriceTable | done | 5c13e76 | Gold type table with login links, v2-gold color theme |
+| 5 | Create LandingSilverPriceTable | done | 5c13e76 | Silver type table with login links, v2-silver color theme |
+| 6 | Create LandingGoldPriceChart | done | 5c13e76 | Disabled gold chart shell, 400px, axes-only SVG + login button |
+| 7 | Create LandingSilverPriceChart | done | 5c13e76 | Disabled silver chart shell, 200px, axes-only SVG + login button |
+| 8 | Rewrite Landing Page | done | cb14ffd | Replaced marketing sections with price teaser layout, mobile-first |
+| 9 | Update SEO Meta Tags | done | cb14ffd | Updated title, description, keywords to gold/silver price focus + Vietnamese keywords |
+| 10 | Update C4 Architecture Diagrams | done | d0bf1d8 | Added PublicHandler to backend C4; updated landing page + market-prices feature in frontend C4 |
+
+**Status values:** `pending` | `in_progress` | `done` | `skipped`
+
+## Resume Instructions
+
+To resume this implementation in a new session:
+1. Read this progress file
+2. Read the plan file referenced above
+3. Check `git log --oneline -10` to verify last commit matches the last `done` task
+4. Check `git status` for any uncommitted work
+5. Continue from the next `pending` task using the same checkpoint protocol
+
+## Notes
+
+- Gold package: `src/go-backend/pkg/gold/types.go` — GoldTypes slice with 18 entries (Code, Name, Currency fields)
+- Silver package: `src/go-backend/pkg/silver/types.go` — SilverTypes slice with 11 entries (Code, Name, Currency fields)
+- Landing page at: `src/wj-client/app/[locale]/landing/page.tsx`
+- v2 color tokens: v2-gold-light, v2-gold-dark, v2-silver-light, v2-silver-dark, v2-red-primary all in tailwind.config.ts
+- market-prices feature hooks dir: `src/wj-client/features/market-prices/hooks/` (empty, needs to be created)
