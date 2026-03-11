@@ -457,6 +457,13 @@ service InvestmentService {
       get: "/api/v1/investments/silver-chart"
     };
   }
+
+  // GetPublicMarketTypes returns gold/silver type names without prices (no auth required)
+  rpc GetPublicMarketTypes(GetPublicMarketTypesRequest) returns (GetPublicMarketTypesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/public/market-types"
+    };
+  }
 }
 
 // Request/Response messages
@@ -671,4 +678,23 @@ message GetAggregatedPortfolioSummaryRequest {
   int32 walletId = 1 [json_name = "walletId"];  // Optional: 0 or omitted = aggregate all investment wallets
   InvestmentType typeFilter = 2 [json_name = "typeFilter"];  // Optional filter by investment type
   PnlPeriod period = 3 [json_name = "period"];  // Optional — default PERIOD_ALL
+}
+
+// MarketTypeItem represents a single gold or silver type (public, no prices)
+message MarketTypeItem {
+  string code = 1 [json_name = "code"];
+  string name = 2 [json_name = "name"];
+  string currency = 3 [json_name = "currency"];
+}
+
+// GetPublicMarketTypesRequest is empty (no auth, no params)
+message GetPublicMarketTypesRequest {}
+
+// GetPublicMarketTypesResponse returns gold/silver type names without prices
+message GetPublicMarketTypesResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated MarketTypeItem gold = 3 [json_name = "gold"];
+  repeated MarketTypeItem silver = 4 [json_name = "silver"];
+  string timestamp = 5 [json_name = "timestamp"];
 }

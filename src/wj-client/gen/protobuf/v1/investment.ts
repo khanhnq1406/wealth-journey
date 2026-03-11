@@ -861,6 +861,26 @@ export interface GetAggregatedPortfolioSummaryRequest {
   period: PnlPeriod;
 }
 
+/** MarketTypeItem represents a single gold or silver type (public, no prices) */
+export interface MarketTypeItem {
+  code: string;
+  name: string;
+  currency: string;
+}
+
+/** GetPublicMarketTypesRequest is empty (no auth, no params) */
+export interface GetPublicMarketTypesRequest {
+}
+
+/** GetPublicMarketTypesResponse returns gold/silver type names without prices */
+export interface GetPublicMarketTypesResponse {
+  success: boolean;
+  message: string;
+  gold: MarketTypeItem[];
+  silver: MarketTypeItem[];
+  timestamp: string;
+}
+
 function createBaseInvestment(): Investment {
   return {
     id: 0,
@@ -7619,6 +7639,265 @@ export const GetAggregatedPortfolioSummaryRequest: MessageFns<GetAggregatedPortf
     message.walletId = object.walletId ?? 0;
     message.typeFilter = object.typeFilter ?? 0;
     message.period = object.period ?? 0;
+    return message;
+  },
+};
+
+function createBaseMarketTypeItem(): MarketTypeItem {
+  return { code: "", name: "", currency: "" };
+}
+
+export const MarketTypeItem: MessageFns<MarketTypeItem> = {
+  encode(message: MarketTypeItem, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.code !== "") {
+      writer.uint32(10).string(message.code);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.currency !== "") {
+      writer.uint32(26).string(message.currency);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): MarketTypeItem {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMarketTypeItem();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.code = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.currency = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MarketTypeItem {
+    return {
+      code: isSet(object.code) ? globalThis.String(object.code) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      currency: isSet(object.currency) ? globalThis.String(object.currency) : "",
+    };
+  },
+
+  toJSON(message: MarketTypeItem): unknown {
+    const obj: any = {};
+    if (message.code !== "") {
+      obj.code = message.code;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.currency !== "") {
+      obj.currency = message.currency;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<MarketTypeItem>): MarketTypeItem {
+    return MarketTypeItem.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<MarketTypeItem>): MarketTypeItem {
+    const message = createBaseMarketTypeItem();
+    message.code = object.code ?? "";
+    message.name = object.name ?? "";
+    message.currency = object.currency ?? "";
+    return message;
+  },
+};
+
+function createBaseGetPublicMarketTypesRequest(): GetPublicMarketTypesRequest {
+  return {};
+}
+
+export const GetPublicMarketTypesRequest: MessageFns<GetPublicMarketTypesRequest> = {
+  encode(_: GetPublicMarketTypesRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetPublicMarketTypesRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetPublicMarketTypesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): GetPublicMarketTypesRequest {
+    return {};
+  },
+
+  toJSON(_: GetPublicMarketTypesRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetPublicMarketTypesRequest>): GetPublicMarketTypesRequest {
+    return GetPublicMarketTypesRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<GetPublicMarketTypesRequest>): GetPublicMarketTypesRequest {
+    const message = createBaseGetPublicMarketTypesRequest();
+    return message;
+  },
+};
+
+function createBaseGetPublicMarketTypesResponse(): GetPublicMarketTypesResponse {
+  return { success: false, message: "", gold: [], silver: [], timestamp: "" };
+}
+
+export const GetPublicMarketTypesResponse: MessageFns<GetPublicMarketTypesResponse> = {
+  encode(message: GetPublicMarketTypesResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.gold) {
+      MarketTypeItem.encode(v!, writer.uint32(26).fork()).join();
+    }
+    for (const v of message.silver) {
+      MarketTypeItem.encode(v!, writer.uint32(34).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(42).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetPublicMarketTypesResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetPublicMarketTypesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.gold.push(MarketTypeItem.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.silver.push(MarketTypeItem.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetPublicMarketTypesResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      gold: globalThis.Array.isArray(object?.gold) ? object.gold.map((e: any) => MarketTypeItem.fromJSON(e)) : [],
+      silver: globalThis.Array.isArray(object?.silver) ? object.silver.map((e: any) => MarketTypeItem.fromJSON(e)) : [],
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetPublicMarketTypesResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.gold?.length) {
+      obj.gold = message.gold.map((e) => MarketTypeItem.toJSON(e));
+    }
+    if (message.silver?.length) {
+      obj.silver = message.silver.map((e) => MarketTypeItem.toJSON(e));
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetPublicMarketTypesResponse>): GetPublicMarketTypesResponse {
+    return GetPublicMarketTypesResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetPublicMarketTypesResponse>): GetPublicMarketTypesResponse {
+    const message = createBaseGetPublicMarketTypesResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.gold = object.gold?.map((e) => MarketTypeItem.fromPartial(e)) || [];
+    message.silver = object.silver?.map((e) => MarketTypeItem.fromPartial(e)) || [];
+    message.timestamp = object.timestamp ?? "";
     return message;
   },
 };

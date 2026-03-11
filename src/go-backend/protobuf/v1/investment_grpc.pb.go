@@ -40,6 +40,7 @@ const (
 	InvestmentService_GetMarketPrices_FullMethodName               = "/wealthjourney.investment.v1.InvestmentService/GetMarketPrices"
 	InvestmentService_GetGoldChart_FullMethodName                  = "/wealthjourney.investment.v1.InvestmentService/GetGoldChart"
 	InvestmentService_GetSilverChart_FullMethodName                = "/wealthjourney.investment.v1.InvestmentService/GetSilverChart"
+	InvestmentService_GetPublicMarketTypes_FullMethodName          = "/wealthjourney.investment.v1.InvestmentService/GetPublicMarketTypes"
 )
 
 // InvestmentServiceClient is the client API for InvestmentService service.
@@ -90,6 +91,8 @@ type InvestmentServiceClient interface {
 	GetGoldChart(ctx context.Context, in *GetGoldChartRequest, opts ...grpc.CallOption) (*GetGoldChartResponse, error)
 	// GetSilverChart returns historical silver price data for chart display
 	GetSilverChart(ctx context.Context, in *GetSilverChartRequest, opts ...grpc.CallOption) (*GetSilverChartResponse, error)
+	// GetPublicMarketTypes returns gold/silver type names without prices (no auth required)
+	GetPublicMarketTypes(ctx context.Context, in *GetPublicMarketTypesRequest, opts ...grpc.CallOption) (*GetPublicMarketTypesResponse, error)
 }
 
 type investmentServiceClient struct {
@@ -289,6 +292,15 @@ func (c *investmentServiceClient) GetSilverChart(ctx context.Context, in *GetSil
 	return out, nil
 }
 
+func (c *investmentServiceClient) GetPublicMarketTypes(ctx context.Context, in *GetPublicMarketTypesRequest, opts ...grpc.CallOption) (*GetPublicMarketTypesResponse, error) {
+	out := new(GetPublicMarketTypesResponse)
+	err := c.cc.Invoke(ctx, InvestmentService_GetPublicMarketTypes_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InvestmentServiceServer is the server API for InvestmentService service.
 // All implementations must embed UnimplementedInvestmentServiceServer
 // for forward compatibility
@@ -337,6 +349,8 @@ type InvestmentServiceServer interface {
 	GetGoldChart(context.Context, *GetGoldChartRequest) (*GetGoldChartResponse, error)
 	// GetSilverChart returns historical silver price data for chart display
 	GetSilverChart(context.Context, *GetSilverChartRequest) (*GetSilverChartResponse, error)
+	// GetPublicMarketTypes returns gold/silver type names without prices (no auth required)
+	GetPublicMarketTypes(context.Context, *GetPublicMarketTypesRequest) (*GetPublicMarketTypesResponse, error)
 	mustEmbedUnimplementedInvestmentServiceServer()
 }
 
@@ -406,6 +420,9 @@ func (UnimplementedInvestmentServiceServer) GetGoldChart(context.Context, *GetGo
 }
 func (UnimplementedInvestmentServiceServer) GetSilverChart(context.Context, *GetSilverChartRequest) (*GetSilverChartResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSilverChart not implemented")
+}
+func (UnimplementedInvestmentServiceServer) GetPublicMarketTypes(context.Context, *GetPublicMarketTypesRequest) (*GetPublicMarketTypesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPublicMarketTypes not implemented")
 }
 func (UnimplementedInvestmentServiceServer) mustEmbedUnimplementedInvestmentServiceServer() {}
 
@@ -798,6 +815,24 @@ func _InvestmentService_GetSilverChart_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _InvestmentService_GetPublicMarketTypes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPublicMarketTypesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InvestmentServiceServer).GetPublicMarketTypes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InvestmentService_GetPublicMarketTypes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InvestmentServiceServer).GetPublicMarketTypes(ctx, req.(*GetPublicMarketTypesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // InvestmentService_ServiceDesc is the grpc.ServiceDesc for InvestmentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -888,6 +923,10 @@ var InvestmentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSilverChart",
 			Handler:    _InvestmentService_GetSilverChart_Handler,
+		},
+		{
+			MethodName: "GetPublicMarketTypes",
+			Handler:    _InvestmentService_GetPublicMarketTypes_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
