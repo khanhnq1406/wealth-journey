@@ -15,8 +15,8 @@
 |---|-----------|--------|--------|---------|
 | 0 | Add Proto Messages & Generate Code | done | 9924685 | Added MarketTypeItem, GetPublicMarketTypesRequest/Response, GetPublicMarketTypes RPC |
 | 1 | Create Public Backend Handler | done | 0b27c84 | Created PublicHandler, wired in AllHandlers, registered /api/v1/public/market-types route |
-| 2 | Add i18n Translation Keys | pending | — | — |
-| 3 | Create usePublicMarketTypes Hook | pending | — | — |
+| 2 | Add i18n Translation Keys | done | 05f9a0b | Added priceTeaser keys to EN and VI nav.json |
+| 3 | Create usePublicMarketTypes Hook | done | 05f9a0b | Created React Query hook with no auth headers |
 | 4 | Create LandingGoldPriceTable | pending | — | — |
 | 5 | Create LandingSilverPriceTable | pending | — | — |
 | 6 | Create LandingGoldPriceChart | pending | — | — |
