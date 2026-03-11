@@ -27,6 +27,7 @@ C4Component
         Component(gold_chart_h, "Gold Chart Handler", "handlers/gold_chart.go", "Proxies gold price history from mihong.vn with Redis caching")
         Component(silver_chart_h, "Silver Chart Handler", "handlers/silver_chart.go", "Proxies silver price history from giabac.vn and Yahoo Finance SI=F with Redis caching")
         Component(community_h, "Community Handlers", "Posts + Comments + Likes + Follows + Reports", "Social feed, post CRUD, commenting, liking, user following, content moderation")
+        Component(public_h, "Public Handlers", "handlers/public.go", "No-auth endpoint returning gold/silver type names from in-memory registries. IP-rate-limited only.")
     }
 
     Container_Boundary(services, "Service Layer — TRUST BOUNDARY: Data considered validated after this point") {

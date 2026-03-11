@@ -7,7 +7,7 @@ C4Component
     title WealthJourney Frontend - Component Diagram
 
     Container_Boundary(app, "App Router (Pages)") {
-        Component(landing, "Landing Page", "app/landing", "Marketing page with features, testimonials, CTA")
+        Component(landing, "Landing Page", "app/landing", "Price teaser page: gold/silver type tables with login links and disabled chart shells. Fetches from public /api/v1/public/market-types endpoint (no auth).")
         Component(auth_pages, "Auth Pages", "app/auth", "Login and register with Google OAuth")
         Component(dashboard, "Dashboard Home", "app/dashboard/home", "V2 Crimson & Gold: net worth, PNL card (self-contained with 1D/1W/1M/ALL period tabs), gold/silver price charts (live), wallets")
         Component(txn_page, "Transaction Page", "app/dashboard/transaction", "Transaction list with filters and search")
@@ -27,7 +27,7 @@ C4Component
         Component(budget_feat, "Budget Feature", "features/budget", "Budget forms, progress cards, category breakdown")
         Component(invest_feat, "Investment Feature", "features/investment", "Investment forms, detail modal, portfolio analytics, gold/silver calculators")
         Component(import_feat, "Import Feature", "features/import", "Import wizard steps, template management, file upload")
-        Component(prices_feat, "Market Prices Feature", "features/market-prices", "Price display tables, symbol lookup")
+        Component(prices_feat, "Market Prices Feature", "features/market-prices", "Price display tables, symbol lookup; hooks/usePublicMarketTypes.ts — public no-auth hook for landing page type names")
         Component(report_feat, "Report Feature", "features/report", "Financial tables, period selectors, CSV/PDF export")
         Component(community_feat, "Community Feature", "features/community", "Posts, comments, likes, follows, profiles, topic tags; Phase 2 components: SharePostModal, SharedPostEmbed, HashtagLink, SavedPostsView, SuggestedUserCard, SuggestedUsers, TrendingTopics, ProfileView, FollowingView, UserListItem; updated: PostCard (share+save actions, onUserClick), PostBody (hashtag rendering, shared post embed), PostActions (Share/Save buttons), PostEngagement (shareCount), PostHeader (clickable avatar+name via onUserClick), CommunityFeed (onUserClick prop); hooks: useSavedPost, useNotifications (useNotificationCount, useMarkAllRead); utils: hashtag.ts (extractHashtags, tokenizeContent)")
     }
@@ -106,6 +106,7 @@ C4Component
     Rel(intl_mw, dashboard, "Resolves locale, provides translations")
     Rel(intl_mw, intl_catalogs, "Loads per-locale strings")
     Rel(settings, intl_mw, "Language toggle updates locale cookie")
+    Rel(landing, prices_feat, "usePublicMarketTypes hook — fetches gold/silver type names (no auth)")
 ```
 
 ## Feature Module Structure

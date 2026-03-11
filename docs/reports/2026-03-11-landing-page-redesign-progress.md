@@ -21,8 +21,8 @@
 | 5 | Create LandingSilverPriceTable | done | 5c13e76 | Silver type table with login links, v2-silver color theme |
 | 6 | Create LandingGoldPriceChart | done | 5c13e76 | Disabled gold chart shell, 400px, axes-only SVG + login button |
 | 7 | Create LandingSilverPriceChart | done | 5c13e76 | Disabled silver chart shell, 200px, axes-only SVG + login button |
-| 8 | Rewrite Landing Page | pending | — | — |
-| 9 | Update SEO Meta Tags | pending | — | — |
+| 8 | Rewrite Landing Page | done | cb14ffd | Replaced marketing sections with price teaser layout, mobile-first |
+| 9 | Update SEO Meta Tags | done | cb14ffd | Updated title, description, keywords to gold/silver price focus + Vietnamese keywords |
 | 10 | Update C4 Architecture Diagrams | pending | — | — |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
