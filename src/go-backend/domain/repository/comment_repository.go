@@ -31,6 +31,10 @@ func (r *commentRepository) GetByID(ctx context.Context, id int32) (*models.Comm
 	return &comment, nil
 }
 
+func (r *commentRepository) Update(ctx context.Context, comment *models.Comment) error {
+	return r.db.DB.WithContext(ctx).Save(comment).Error
+}
+
 func (r *commentRepository) SoftDelete(ctx context.Context, id int32) error {
 	return r.executeDelete(ctx, &models.Comment{}, id, "comment")
 }
