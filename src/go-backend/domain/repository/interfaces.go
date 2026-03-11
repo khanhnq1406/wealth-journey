@@ -351,6 +351,10 @@ type FollowRepository interface {
 	// GetRecentUsers returns recently-registered users excluding specified IDs.
 	// Used as a cold-start fallback when there is no social graph data yet.
 	GetRecentUsers(ctx context.Context, excludeIDs []int32, limit int) ([]int32, error)
+	// GetFollowing returns paginated list of users that userID follows, with preloaded User data.
+	GetFollowing(ctx context.Context, userID int32, opts ListOptions) ([]*models.UserFollow, int, error)
+	// GetFollowers returns paginated list of users who follow userID, with preloaded User data.
+	GetFollowers(ctx context.Context, userID int32, opts ListOptions) ([]*models.UserFollow, int, error)
 }
 
 // ReportRepository defines the interface for content report data operations.

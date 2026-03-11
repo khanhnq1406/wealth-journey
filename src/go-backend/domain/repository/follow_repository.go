@@ -146,6 +146,50 @@ func (r *followRepository) GetTopUsersByFollowers(ctx context.Context, excludeID
 	return results, nil
 }
 
+func (r *followRepository) GetFollowing(ctx context.Context, userID int32, opts ListOptions) ([]*models.UserFollow, int, error) {
+	var follows []*models.UserFollow
+	var total int64
+
+	base := r.db.DB.WithContext(ctx).Model(&models.UserFollow{}).Where("follower_id = ?", userID)
+	if err := base.Count(&total).Error; err != nil {
+		return nil, 0, r.handleDBError(err, "follow", "count following")
+	}
+
+	err := r.db.DB.WithContext(ctx).
+		Where("follower_id = ?", userID).
+		Preload("Following").
+		Order("created_at DESC").
+		Offset(opts.Offset).
+		Limit(opts.Limit).
+		Find(&follows).Error
+	if err != nil {
+		return nil, 0, r.handleDBError(err, "follow", "get following")
+	}
+	return follows, int(total), nil
+}
+
+func (r *followRepository) GetFollowers(ctx context.Context, userID int32, opts ListOptions) ([]*models.UserFollow, int, error) {
+	var follows []*models.UserFollow
+	var total int64
+
+	base := r.db.DB.WithContext(ctx).Model(&models.UserFollow{}).Where("following_id = ?", userID)
+	if err := base.Count(&total).Error; err != nil {
+		return nil, 0, r.handleDBError(err, "follow", "count followers")
+	}
+
+	err := r.db.DB.WithContext(ctx).
+		Where("following_id = ?", userID).
+		Preload("Follower").
+		Order("created_at DESC").
+		Offset(opts.Offset).
+		Limit(opts.Limit).
+		Find(&follows).Error
+	if err != nil {
+		return nil, 0, r.handleDBError(err, "follow", "get followers")
+	}
+	return follows, int(total), nil
+}
+
 func (r *followRepository) GetRecentUsers(ctx context.Context, excludeIDs []int32, limit int) ([]int32, error) {
 	var ids []int32
 	query := r.db.DB.WithContext(ctx).Model(&models.User{})
