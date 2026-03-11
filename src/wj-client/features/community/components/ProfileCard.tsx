@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useQueryGetCommunityProfile, useMutationUpdateBio, EVENT_CommunityGetCommunityProfile } from "@/utils/generated/hooks";
+import { useQueryGetCommunityProfile, useMutationUpdateProfile, EVENT_CommunityGetCommunityProfile } from "@/utils/generated/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "./Avatar";
 import { Pencil, Check, X } from "lucide-react";
@@ -23,7 +23,7 @@ export function ProfileCard({ currentUser }: ProfileCardProps) {
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [bioText, setBioText] = useState("");
 
-  const updateBioMutation = useMutationUpdateBio({
+  const updateProfileMutation = useMutationUpdateProfile({
     onSuccess: () => {
       setIsEditingBio(false);
       queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetCommunityProfile] });
@@ -36,7 +36,13 @@ export function ProfileCard({ currentUser }: ProfileCardProps) {
   };
 
   const handleSaveBio = () => {
-    updateBioMutation.mutate({ bio: bioText.trim() });
+    updateProfileMutation.mutate({
+      bio: bioText.trim(),
+      location: profile?.location || "",
+      website: profile?.website || "",
+      picture: profile?.userPicture || "",
+      coverPhotoUrl: profile?.coverPhotoUrl || "",
+    });
   };
 
   const handleCancelBio = () => {
@@ -51,8 +57,19 @@ export function ProfileCard({ currentUser }: ProfileCardProps) {
 
   return (
     <div className="bg-white rounded-2xl border border-v2-border-light overflow-hidden">
-      {/* Banner */}
-      <div className="h-20 bg-gradient-to-r from-[#B91C1C] to-[#DC2626]" />
+      {/* Cover photo mini banner */}
+      <div
+        className="w-full h-16 rounded-t-xl"
+        style={
+          profile?.coverPhotoUrl
+            ? {
+                backgroundImage: `url(${profile.coverPhotoUrl})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
+            : { background: "linear-gradient(to right, #B91C1C, #DC2626)" }
+        }
+      />
 
       {/* Profile info */}
       <div className="px-4 pb-4">
@@ -96,7 +113,7 @@ export function ProfileCard({ currentUser }: ProfileCardProps) {
                 </button>
                 <button
                   onClick={handleSaveBio}
-                  disabled={updateBioMutation.isPending}
+                  disabled={updateProfileMutation.isPending}
                   className="p-1 rounded-full text-v2-red-primary hover:bg-v2-red-light transition-colors"
                 >
                   <Check size={14} />
