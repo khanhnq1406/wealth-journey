@@ -655,22 +655,6 @@ func (s *communityService) GetProfile(ctx context.Context, userID int32, targetU
 	}, nil
 }
 
-func (s *communityService) UpdateBio(ctx context.Context, userID int32, bio string) error {
-	// Sanitize bio
-	bio, err := validator.SanitizeStringField(bio, 200)
-	if err != nil {
-		return err
-	}
-
-	user, err := s.userRepo.GetByID(ctx, userID)
-	if err != nil {
-		return err
-	}
-
-	user.Bio = strings.TrimSpace(bio)
-	return s.userRepo.Update(ctx, user)
-}
-
 func (s *communityService) ReportContent(ctx context.Context, userID int32, req *v1.ReportContentRequest) error {
 	// Validate target type
 	targetType := strings.ToLower(req.TargetType)

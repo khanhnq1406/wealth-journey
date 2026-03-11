@@ -253,7 +253,6 @@ type CommunityService interface {
 	FollowUser(ctx context.Context, followerID int32, followingID int32) error
 	UnfollowUser(ctx context.Context, followerID int32, followingID int32) error
 	GetProfile(ctx context.Context, userID int32, targetUserID int32) (*v1.GetCommunityProfileResponse, error)
-	UpdateBio(ctx context.Context, userID int32, bio string) error
 	ReportContent(ctx context.Context, userID int32, req *v1.ReportContentRequest) error
 	// Phase 2: Social Features
 	SharePost(ctx context.Context, userID int32, req *v1.SharePostRequest) (*v1.SharePostResponse, error)

@@ -445,34 +445,6 @@ func (h *CommunityHandler) GetProfile(c *gin.Context) {
 	handler.Success(c, result)
 }
 
-// UpdateBio updates the user's bio.
-func (h *CommunityHandler) UpdateBio(c *gin.Context) {
-	userID, ok := handler.GetUserID(c)
-	if !ok {
-		handler.Unauthorized(c, "User not authenticated")
-		return
-	}
-
-	var req struct {
-		Bio string `json:"bio"`
-	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		handler.BadRequest(c, err)
-		return
-	}
-
-	if err := h.communityService.UpdateBio(c.Request.Context(), userID, req.Bio); err != nil {
-		handler.HandleError(c, err)
-		return
-	}
-
-	handler.Success(c, gin.H{
-		"success":   true,
-		"message":   "Bio updated successfully",
-		"timestamp": time.Now().Format(time.RFC3339),
-	})
-}
-
 // ReportContent reports a post or comment.
 func (h *CommunityHandler) ReportContent(c *gin.Context) {
 	userID, ok := handler.GetUserID(c)

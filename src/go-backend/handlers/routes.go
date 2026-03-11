@@ -270,7 +270,6 @@ func RegisterRoutes(
 		community.GET("/users/:user_id/liked-posts", h.Community.GetLikedPosts)
 
 		// Profile
-		community.PUT("/profile/bio", h.Community.UpdateBio)
 		community.PUT("/profile", h.Community.UpdateProfile)
 
 		// Report
