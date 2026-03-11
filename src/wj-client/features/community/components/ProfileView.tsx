@@ -90,7 +90,7 @@ export function ProfileView({
         {/* Profile info */}
         <div className="px-4 pb-4">
           {/* Avatar overlapping banner */}
-          <div className="-mt-10 mb-2 flex items-end justify-between">
+          <div className="-mt-10 mb-2 flex items-end justify-between relative z-10">
             <Avatar
               name={profile?.userName || currentUser.name}
               imageUrl={profile?.userPicture || currentUser.picture}
