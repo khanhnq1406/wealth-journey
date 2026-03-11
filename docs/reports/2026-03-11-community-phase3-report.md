@@ -169,3 +169,9 @@ All 5 feature areas from the spec implemented: image upload, edit comments, repl
 1. Open app in two browser windows (two users)
 2. User B likes/comments on User A's post
 3. Verify User A receives notification without page refresh (bell count updates)
+
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-11 | Replace 📷 emoji with `<Camera>` lucide-react icon in `ImageUpload.tsx` drop zone | Minor | — |

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback } from "react";
+import { Camera } from "lucide-react";
 import { useImageUpload } from "../hooks/useImageUpload";
 
 type Purpose = "post" | "avatar" | "cover";
@@ -107,7 +108,7 @@ export function ImageUpload({
           onClick={() => fileInputRef.current?.click()}
         >
           <div className="text-gray-400 text-sm">
-            <div className="text-2xl mb-1">📷</div>
+            <Camera className="mx-auto mb-1 text-gray-400" size={24} />
             <div>{label}</div>
             <div className="text-xs mt-1 text-gray-300">
               JPEG, PNG, WebP, GIF · max 5MB
