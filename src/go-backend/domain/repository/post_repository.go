@@ -41,7 +41,19 @@ func (r *postRepository) SoftDelete(ctx context.Context, id int32) error {
 	return r.executeDelete(ctx, &models.Post{}, id, "post")
 }
 
-func (r *postRepository) GetFeed(ctx context.Context, userIDs []int32, opts ListOptions) ([]*models.Post, int, error) {
+func (r *postRepository) GetByIDs(ctx context.Context, ids []int32) ([]*models.Post, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	var posts []*models.Post
+	err := r.db.DB.WithContext(ctx).Preload("User").Where("id IN ?", ids).Find(&posts).Error
+	if err != nil {
+		return nil, r.handleDBError(err, "post", "get posts by IDs")
+	}
+	return posts, nil
+}
+
+func (r *postRepository) GetFeed(ctx context.Context, userIDs []int32, opts ListOptions, hashtag string) ([]*models.Post, int, error) {
 	var posts []*models.Post
 	var total int64
 
@@ -52,11 +64,15 @@ func (r *postRepository) GetFeed(ctx context.Context, userIDs []int32, opts List
 		query = query.Where("user_id IN ?", userIDs)
 	}
 
+	if hashtag != "" {
+		query = query.Where("id IN (SELECT post_id FROM post_hashtag WHERE hashtag = ?)", hashtag)
+	}
+
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, r.handleDBError(err, "post", "count feed posts")
 	}
 
-	query = query.Preload("User").Order("created_at DESC")
+	query = query.Preload("User").Preload("SharedPost").Preload("SharedPost.User").Order("created_at DESC")
 	query = r.applyPagination(query, opts)
 
 	if err := query.Find(&posts).Error; err != nil {
@@ -79,7 +95,7 @@ func (r *postRepository) GetByUserID(ctx context.Context, userID int32, opts Lis
 
 	query = r.db.DB.WithContext(ctx).
 		Where("user_id = ?", userID).
-		Preload("User").
+		Preload("User").Preload("SharedPost").Preload("SharedPost.User").
 		Order("created_at DESC")
 	query = r.applyPagination(query, opts)
 
@@ -88,6 +104,17 @@ func (r *postRepository) GetByUserID(ctx context.Context, userID int32, opts Lis
 	}
 
 	return posts, int(total), nil
+}
+
+func (r *postRepository) IncrementShareCount(ctx context.Context, postID int32, delta int32) error {
+	result := r.db.DB.WithContext(ctx).
+		Model(&models.Post{}).
+		Where("id = ?", postID).
+		Update("share_count", gorm.Expr("share_count + ?", delta))
+	if result.Error != nil {
+		return r.handleDBError(result.Error, "post", "update share count")
+	}
+	return nil
 }
 
 func (r *postRepository) IncrementLikeCount(ctx context.Context, postID int32, delta int32) error {

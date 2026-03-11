@@ -307,12 +307,14 @@ type FXRateRepository interface {
 type PostRepository interface {
 	Create(ctx context.Context, post *models.Post) error
 	GetByID(ctx context.Context, id int32) (*models.Post, error)
+	GetByIDs(ctx context.Context, ids []int32) ([]*models.Post, error)
 	Update(ctx context.Context, post *models.Post) error
 	SoftDelete(ctx context.Context, id int32) error
-	GetFeed(ctx context.Context, userIDs []int32, opts ListOptions) ([]*models.Post, int, error)
+	GetFeed(ctx context.Context, userIDs []int32, opts ListOptions, hashtag string) ([]*models.Post, int, error)
 	GetByUserID(ctx context.Context, userID int32, opts ListOptions) ([]*models.Post, int, error)
 	IncrementLikeCount(ctx context.Context, postID int32, delta int32) error
 	IncrementCommentCount(ctx context.Context, postID int32, delta int32) error
+	IncrementShareCount(ctx context.Context, postID int32, delta int32) error
 	CountByUserID(ctx context.Context, userID int32) (int32, error)
 }
 
@@ -342,10 +344,48 @@ type FollowRepository interface {
 	GetFollowedAuthorIDs(ctx context.Context, followerID int32, authorIDs []int32) ([]int32, error)
 	GetFollowerCount(ctx context.Context, userID int32) (int32, error)
 	GetFollowingCount(ctx context.Context, userID int32) (int32, error)
+	// GetFriendsOfFriends returns users followed by people I follow, ordered by mutual count.
+	GetFriendsOfFriends(ctx context.Context, userID int32, excludeIDs []int32, limit int) ([]FriendOfFriend, error)
+	// GetTopUsersByFollowers returns users with most followers excluding specified IDs.
+	GetTopUsersByFollowers(ctx context.Context, excludeIDs []int32, limit int) ([]UserFollowerCount, error)
+	// GetRecentUsers returns recently-registered users excluding specified IDs.
+	// Used as a cold-start fallback when there is no social graph data yet.
+	GetRecentUsers(ctx context.Context, excludeIDs []int32, limit int) ([]int32, error)
+	// GetFollowing returns paginated list of users that userID follows, with preloaded User data.
+	GetFollowing(ctx context.Context, userID int32, opts ListOptions) ([]*models.UserFollow, int, error)
+	// GetFollowers returns paginated list of users who follow userID, with preloaded User data.
+	GetFollowers(ctx context.Context, userID int32, opts ListOptions) ([]*models.UserFollow, int, error)
 }
 
 // ReportRepository defines the interface for content report data operations.
 type ReportRepository interface {
 	Create(ctx context.Context, report *models.ContentReport) error
 	ExistsByUser(ctx context.Context, userID int32, targetType string, targetID int32) (bool, error)
+}
+
+// NotificationRepository defines the interface for notification data operations.
+type NotificationRepository interface {
+	Create(ctx context.Context, notification *models.Notification) error
+	GetByUserID(ctx context.Context, userID int32, opts ListOptions) ([]*models.Notification, int, error)
+	GetUnreadCount(ctx context.Context, userID int32) (int32, error)
+	MarkAllRead(ctx context.Context, userID int32) error
+	MarkRead(ctx context.Context, id int32, userID int32) error
+}
+
+// SavedPostRepository defines the interface for saved post data operations.
+type SavedPostRepository interface {
+	Create(ctx context.Context, savedPost *models.SavedPost) error
+	Delete(ctx context.Context, userID, postID int32) error
+	Exists(ctx context.Context, userID, postID int32) (bool, error)
+	GetByUserID(ctx context.Context, userID int32, opts ListOptions) ([]*models.SavedPost, int, error)
+	GetSavedPostIDs(ctx context.Context, userID int32, postIDs []int32) ([]int32, error)
+}
+
+// HashtagRepository defines the interface for hashtag data operations.
+type HashtagRepository interface {
+	CreateBatch(ctx context.Context, postID int32, hashtags []string, createdAt time.Time) error
+	DeleteByPostID(ctx context.Context, postID int32) error
+	GetByPostID(ctx context.Context, postID int32) ([]string, error)
+	GetTrending(ctx context.Context, since time.Time, limit int) ([]TrendingHashtag, error)
+	GetPostIDsByHashtag(ctx context.Context, hashtag string, opts ListOptions) ([]int32, int, error)
 }

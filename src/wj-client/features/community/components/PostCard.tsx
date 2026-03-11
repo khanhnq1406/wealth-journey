@@ -6,7 +6,9 @@ import { PostBody } from "./PostBody";
 import { PostEngagement } from "./PostEngagement";
 import { PostActions } from "./PostActions";
 import { CommentSection } from "./CommentSection";
+import { SharePostModal } from "./SharePostModal";
 import { useLike } from "../hooks/useLike";
+import { useSavedPost } from "../hooks/useSavedPost";
 import type { PostItem } from "@/gen/protobuf/v1/community";
 
 interface PostCardProps {
@@ -14,6 +16,8 @@ interface PostCardProps {
   currentUser: { id: number; name: string; picture: string };
   onPostUpdated?: () => void;
   onMenuClick?: (postId: number) => void;
+  onHashtagClick?: (tag: string) => void;
+  onUserClick?: (userId: number) => void;
 }
 
 export function PostCard({
@@ -21,8 +25,11 @@ export function PostCard({
   currentUser,
   onPostUpdated,
   onMenuClick,
+  onHashtagClick,
+  onUserClick,
 }: PostCardProps) {
   const [showComments, setShowComments] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const isOwnPost = post.isOwnPost || post.userId === currentUser.id;
   const postId = post.id ?? 0;
 
@@ -30,6 +37,11 @@ export function PostCard({
     postId,
     post.isLiked ?? false,
     post.likeCount ?? 0
+  );
+
+  const { isSaved, toggle: toggleSave, isLoading: isSaveLoading } = useSavedPost(
+    postId,
+    post.isSaved ?? false
   );
 
   return (
@@ -42,16 +54,20 @@ export function PostCard({
         isOwnPost={isOwnPost}
         isFollowing={post.isFollowing ?? false}
         onMenuClick={onMenuClick ? () => onMenuClick(postId) : undefined}
+        onUserClick={onUserClick}
       />
 
       <PostBody
         content={post.content ?? ""}
         imageUrl={post.imageUrl}
+        sharedPost={post.sharedPost ?? undefined}
+        onHashtagClick={onHashtagClick}
       />
 
       <PostEngagement
         likeCount={likeCount}
         commentCount={post.commentCount ?? 0}
+        shareCount={post.shareCount ?? 0}
         onCommentsClick={() => setShowComments(!showComments)}
       />
 
@@ -59,7 +75,11 @@ export function PostCard({
         isLiked={isLiked}
         onLikeToggle={toggleLike}
         onCommentClick={() => setShowComments(!showComments)}
+        onShareClick={() => setShowShareModal(true)}
+        onSaveToggle={toggleSave}
+        isSaved={isSaved}
         isLikeLoading={isLikeLoading}
+        isSaveLoading={isSaveLoading}
       />
 
       {showComments && (
@@ -68,6 +88,12 @@ export function PostCard({
           currentUser={currentUser}
         />
       )}
+
+      <SharePostModal
+        post={showShareModal ? post : null}
+        onClose={() => setShowShareModal(false)}
+        onSuccess={onPostUpdated}
+      />
     </article>
   );
 }

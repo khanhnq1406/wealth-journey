@@ -46,7 +46,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client) *Services {
 	portfolioHistorySvc := NewPortfolioHistoryService(repos.PortfolioHistory, investmentSvc, repos.User, fxRateSvc)
 
 	// Phase 1 (cont.): CommunityService — no service dependencies
-	communitySvc := NewCommunityService(repos.Post, repos.Comment, repos.Like, repos.Follow, repos.Report, repos.User)
+	communitySvc := NewCommunityService(repos.Post, repos.Comment, repos.Like, repos.Follow, repos.Report, repos.User, repos.Notification, repos.SavedPost, repos.Hashtag)
 
 	return &Services{
 		Wallet:           walletSvc,
@@ -86,6 +86,9 @@ type Repositories struct {
 	Like                  repository.LikeRepository
 	Follow                repository.FollowRepository
 	Report                repository.ReportRepository
+	Notification          repository.NotificationRepository
+	SavedPost             repository.SavedPostRepository
+	Hashtag               repository.HashtagRepository
 }
 
 // NewRepositories creates all repository instances.

@@ -253,4 +253,16 @@ type CommunityService interface {
 	UpdateBio(ctx context.Context, userID int32, bio string) error
 	ReportContent(ctx context.Context, userID int32, req *v1.ReportContentRequest) error
 	GetUploadURL(ctx context.Context, userID int32, req *v1.GetUploadURLRequest) (*v1.GetUploadURLResponse, error)
+	// Phase 2: Social Features
+	SharePost(ctx context.Context, userID int32, req *v1.SharePostRequest) (*v1.SharePostResponse, error)
+	GetNotifications(ctx context.Context, userID int32, req *v1.GetNotificationsRequest) (*v1.GetNotificationsResponse, error)
+	GetUnreadNotificationCount(ctx context.Context, userID int32) (*v1.GetUnreadNotificationCountResponse, error)
+	MarkNotificationsRead(ctx context.Context, userID int32) error
+	SavePost(ctx context.Context, userID int32, postID int32) error
+	UnsavePost(ctx context.Context, userID int32, postID int32) error
+	GetSavedPosts(ctx context.Context, userID int32, req *v1.GetSavedPostsRequest) (*v1.GetSavedPostsResponse, error)
+	GetSuggestedUsers(ctx context.Context, userID int32) (*v1.GetSuggestedUsersResponse, error)
+	GetTrendingTopics(ctx context.Context) (*v1.GetTrendingTopicsResponse, error)
+	GetFollowing(ctx context.Context, userID int32, targetUserID int32, req *v1.GetFollowingRequest) (*v1.GetFollowingResponse, error)
+	GetFollowers(ctx context.Context, userID int32, targetUserID int32, req *v1.GetFollowersRequest) (*v1.GetFollowersResponse, error)
 }

@@ -11,7 +11,7 @@ The Community module adds a finance-focused social feed to WealthJourney, simila
 | Phase | Name | Scope | Status | Spec | Plan | Report |
 |-------|------|-------|--------|------|------|--------|
 | **1** | **MVP** | Feed, Posts (text+image), Like, Comment, Follow, Basic Profile, Report | `completed` | `docs/specs/2026-03-09-community-phase1-spec.md` | `docs/plans/2026-03-10-community-phase1-plan.md` | `docs/reports/2026-03-10-community-phase1-report.md` |
-| 2 | Social | Share, Notifications, Saved posts, Suggested users, Trending topics | `planned` | — | — | — |
+| **2** | **Social** | Share, Notifications, Saved posts, Suggested users, Trending topics | `completed` | `docs/specs/2026-03-09-community-phase2-spec.md` | `docs/plans/2026-03-10-community-phase2-plan.md` | `docs/reports/2026-03-10-community-phase2-report.md` |
 | 3 | Advanced | Groups, Advanced profile, Polls, Admin moderation dashboard | `planned` | — | — | — |
 
 ## Phase 1 (MVP) Details
@@ -27,7 +27,7 @@ The Community module adds a finance-focused social feed to WealthJourney, simila
 
 ### Architecture
 - **Backend:** `community.proto` → CommunityHandler → CommunityService → 4 repositories (Post, Comment, Like, Follow)
-- **Frontend:** `features/community/` module with 18 components, 2 forms, 2 hooks, 2 utils
+- **Frontend:** `features/community/` module with 11 components, 2 forms, 2 hooks, 2 utils (Phase 2 added more — see Phase 2 details)
 - **Database:** 4 new tables (post, comment, post_like, user_follow) + bio field on user table
 - **Storage:** GetUploadURL endpoint implemented; Supabase bucket integration deferred
 
@@ -86,13 +86,75 @@ The Community module adds a finance-focused social feed to WealthJourney, simila
 - Reply threads
 - Admin moderation dashboard
 
-## Phase 2 (Social) Planned Scope
+## Phase 2 (Social) Details
 
-- **Share/Repost:** Share posts to own feed with optional commentary
-- **Notifications:** Real-time notifications for likes, comments, follows, mentions
-- **Saved Posts:** Bookmark posts for later reading
-- **Suggested Users:** Algorithm-based user suggestions (based on followed topics, mutual follows)
-- **Trending Topics:** Aggregate popular topic tags into trending section on right sidebar
+### Key Decisions Made
+- **Notifications:** Pull-based polling (every 30s); real-time WebSocket/SSE deferred to Phase 3
+- **Share model:** Creates a new post with `shared_post_id` FK pointing to original; `SharedPostEmbed` renders the original inside
+- **Hashtag extraction:** Regex `#(\p{L}|\p{N})+` (Unicode, supports Vietnamese diacritics); stored in `post_hashtag` table on create/share
+- **Suggested users algorithm:** Three-tier fallback — friends-of-friends → top by followers → recently joined (cold-start)
+- **Saved posts toggle:** Unique constraint on `(user_id, post_id)` in `saved_post` table; optimistic UI toggle
+- **Notification components:** Placed in `components/notifications/` (shared layer) rather than `features/community/` for potential reuse
+
+### Architecture
+- **Backend:** 9 new RPCs in `community.proto`; 3 new repositories (Notification, SavedPost, Hashtag); CommunityService extended with 10 new methods; 9 new routes
+- **Frontend:** `features/community/` extended with 11 new components, 1 new form, 2 new hooks, 1 new util; 3 new shared notification components in `components/notifications/`
+- **Database:** 3 new tables (`notification`, `saved_post`, `post_hashtag`) + 2 columns on `post` (`shared_post_id`, `share_count`)
+
+### Phase 2 Implementation Progress
+
+| # | Task | Status | Commit | Summary |
+|---|------|--------|--------|---------|
+| 1 | Extend community.proto (9 new RPCs) | `done` | `870355a` | Share, Notifications (3), Saved Posts (3), SuggestedUsers, TrendingTopics |
+| 2 | Phase 2 models + migration | `done` | `17b287e` | notification, saved_post, post_hashtag tables; shared_post_id + share_count on post |
+| 3 | Phase 2 repositories | `done` | `b607f1f` | NotificationRepository, SavedPostRepository, HashtagRepository; extend PostRepo + FollowRepo |
+| 4 | Extend CommunityService (10 methods) | `done` | `962200a` | SharePost, GetNotifications, GetUnreadCount, MarkRead, SavePost, UnsavePost, GetSaved, GetSuggestedUsers, GetTrendingTopics + helpers |
+| 5 | Phase 2 handlers + routes + DI | `done` | `12e4e2c` | 9 new routes under `/api/v1/community/*`; DI wired in providers.go and builder.go |
+| 6 | Frontend schemas, hooks, hashtag utils | `done` | `fb91325` | community.schema.ts, useSavedPost, useNotifications, hashtag.ts |
+| 7 | SharePost modal + PostCard Phase 2 | `done` | `11b3b13` | SharePostModal, SharedPostEmbed, SharePostForm; PostActions updated |
+| 8 | Notification components | `done` | `a14e377` | NotificationBell, NotificationPanel, NotificationItem (shared layer) |
+| 9 | SavedPostsView, SuggestedUsers, TrendingTopics | `done` | `5eb9503` | SuggestedUserCard, SuggestedUsersPlaceholder, HashtagLink, TrendingTopics |
+| 10 | Wire Phase 2 into layout + community page | `done` | `12bfe42` | CommunityNav, MobileSubNav, CommunityRightSidebar updated; NotificationBell in dashboard header |
+| 11 | C4 diagrams + Phase 2 report | `done` | `69e1261` | Architecture docs updated for Phase 2 |
+| 12 | Fix: bookmark icon not persisting | `done` | `d5d6b11` | isSaved hydrated from feed query on reload |
+| 13 | Fix: saved posts route 404 | `done` | `dd23263` | Route corrected to `/saved` |
+| 14 | Fix: SavePost/UnsavePost returning 204 | `done` | `d6d27d4` | Handlers return 200 JSON |
+| 15 | Fix: notification click not navigating | `done` | `dc2ef3d` | Click navigates + optimistic single-item mark-read |
+| 16 | Fix: mark-all-read not updating UI | `done` | `cde3634` | Query invalidation added after mutation |
+| 17 | Fix: NotificationBell badge stale | `done` | `409efbf` | Badge refetches on panel open via invalidateQueries |
+| 18 | Fix: SharedPostEmbed missing from feed | `done` | `28fddbe` | Backend Preload("SharedPost") added to feed query |
+| 19 | Fix: trending topics route mismatch | `done` | `d2cfa46` | Route corrected to match proto HTTP option `/trending` |
+| 20 | Fix: SuggestedUserCard dismiss button | `done` | `d7c5c95` | X dismiss button removes card client-side |
+| 21 | Fix: SuggestedUsers + TrendingTopics mobile | `done` | `bae09c8` | Widgets shown below feed on mobile (lg:hidden wrapper) |
+| 22 | Fix: cold-start suggested users | `done` | `06bd49a` | GetRecentUsers fallback for new accounts with no follows |
+| 23 | Fix: avatar 429 errors (Google CDN) | `done` | `b0378b6` | Avatar uses Next.js Image instead of raw img tag |
+
+### Phase 2 Scope Delivered
+
+**Delivered in Phase 2:**
+- Share/repost posts with optional commentary (shares appear in feed with embedded original)
+- In-app notifications for likes, comments, follows, shares (pull-based, 30s polling)
+- Unread badge on NotificationBell in dashboard header
+- Mark all notifications read
+- Save/bookmark posts (optimistic toggle, bookmark persists on reload)
+- Saved Posts view (paginated, accessible from sidebar and mobile nav)
+- Suggested Users widget (friends-of-friends → top followers → recent; dismiss per card)
+- Trending hashtags widget (top 10 by post count, clickable to filter feed)
+- Hashtag extraction in posts and shares (stored in `post_hashtag` table)
+- Hashtag feed filtering (click trending topic or inline hashtag to filter)
+- Share count displayed on PostEngagement
+
+**Explicitly deferred to Phase 3+:**
+- Real-time notifications (WebSocket/SSE)
+- Single-item notification mark-as-read API
+- Share count decrement on share deletion
+- Edit comments
+- Reply threads (threaded comments)
+- Groups
+- Advanced profile
+- Polls
+- Admin moderation dashboard
+- Image upload via Supabase Storage (endpoint exists, no UI integration)
 
 ## Phase 3 (Advanced) Planned Scope
 
@@ -104,4 +166,4 @@ The Community module adds a finance-focused social feed to WealthJourney, simila
 ## Notes
 
 - Created: 2026-03-09
-- Last updated: 2026-03-10
+- Last updated: 2026-03-10 (Phase 2 completed)

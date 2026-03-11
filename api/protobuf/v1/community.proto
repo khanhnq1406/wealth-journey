@@ -22,6 +22,11 @@ message PostItem {
   int64 createdAt = 12 [json_name = "createdAt"];
   int64 updatedAt = 13 [json_name = "updatedAt"];
   bool isFollowing = 14 [json_name = "isFollowing"];
+  int32 shareCount = 15 [json_name = "shareCount"];
+  PostItem sharedPost = 16 [json_name = "sharedPost"];
+  bool isShared = 17 [json_name = "isShared"];
+  bool isSaved = 18 [json_name = "isSaved"];
+  repeated string hashtags = 19 [json_name = "hashtags"];
 }
 
 // CommentItem represents a comment on a post
@@ -104,6 +109,7 @@ message GetPostResponse {
 // GetFeed
 message GetFeedRequest {
   wealthjourney.common.v1.PaginationParams pagination = 1 [json_name = "pagination"];
+  string hashtag = 2 [json_name = "hashtag"];
 }
 
 message GetFeedResponse {
@@ -261,6 +267,167 @@ message GetUploadURLResponse {
   string timestamp = 5 [json_name = "timestamp"];
 }
 
+// --- Phase 2: Social Features ---
+
+// SharePost
+message SharePostRequest {
+  int32 postId = 1 [json_name = "postId"];
+  string content = 2 [json_name = "content"];
+}
+
+message SharePostResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  PostItem data = 3 [json_name = "data"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+// Notification
+message NotificationItem {
+  int32 id = 1 [json_name = "id"];
+  string type = 2 [json_name = "type"];
+  int32 actorId = 3 [json_name = "actorId"];
+  string actorName = 4 [json_name = "actorName"];
+  string actorPicture = 5 [json_name = "actorPicture"];
+  int32 postId = 6 [json_name = "postId"];
+  string postPreview = 7 [json_name = "postPreview"];
+  bool isRead = 8 [json_name = "isRead"];
+  int64 createdAt = 9 [json_name = "createdAt"];
+}
+
+message GetNotificationsRequest {
+  wealthjourney.common.v1.PaginationParams pagination = 1 [json_name = "pagination"];
+}
+
+message GetNotificationsResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated NotificationItem notifications = 3 [json_name = "notifications"];
+  wealthjourney.common.v1.PaginationResult pagination = 4 [json_name = "pagination"];
+  string timestamp = 5 [json_name = "timestamp"];
+}
+
+message GetUnreadNotificationCountRequest {}
+
+message GetUnreadNotificationCountResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  int32 count = 3 [json_name = "count"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+message MarkNotificationsReadRequest {}
+
+message MarkNotificationsReadResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+// SavedPost
+message SavePostRequest {
+  int32 postId = 1 [json_name = "postId"];
+}
+
+message SavePostResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+message UnsavePostRequest {
+  int32 postId = 1 [json_name = "postId"];
+}
+
+message UnsavePostResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+message GetSavedPostsRequest {
+  wealthjourney.common.v1.PaginationParams pagination = 1 [json_name = "pagination"];
+}
+
+message GetSavedPostsResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated PostItem posts = 3 [json_name = "posts"];
+  wealthjourney.common.v1.PaginationResult pagination = 4 [json_name = "pagination"];
+  string timestamp = 5 [json_name = "timestamp"];
+}
+
+// SuggestedUsers
+message SuggestedUserItem {
+  int32 userId = 1 [json_name = "userId"];
+  string userName = 2 [json_name = "userName"];
+  string userPicture = 3 [json_name = "userPicture"];
+  string bioSnippet = 4 [json_name = "bioSnippet"];
+  int32 mutualFollowCount = 5 [json_name = "mutualFollowCount"];
+  int32 followerCount = 6 [json_name = "followerCount"];
+}
+
+message GetSuggestedUsersRequest {}
+
+message GetSuggestedUsersResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated SuggestedUserItem users = 3 [json_name = "users"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+// FollowUserItem represents a user in a following/followers list
+message FollowUserItem {
+  int32 userId = 1 [json_name = "userId"];
+  string userName = 2 [json_name = "userName"];
+  string userPicture = 3 [json_name = "userPicture"];
+  string bioSnippet = 4 [json_name = "bioSnippet"];
+  bool isFollowing = 5 [json_name = "isFollowing"];
+}
+
+// GetFollowing — list users that a user follows
+message GetFollowingRequest {
+  int32 userId = 1 [json_name = "userId"];
+  wealthjourney.common.v1.PaginationParams pagination = 2 [json_name = "pagination"];
+}
+
+message GetFollowingResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated FollowUserItem users = 3 [json_name = "users"];
+  wealthjourney.common.v1.PaginationResult pagination = 4 [json_name = "pagination"];
+  string timestamp = 5 [json_name = "timestamp"];
+}
+
+// GetFollowers — list users who follow a user
+message GetFollowersRequest {
+  int32 userId = 1 [json_name = "userId"];
+  wealthjourney.common.v1.PaginationParams pagination = 2 [json_name = "pagination"];
+}
+
+message GetFollowersResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated FollowUserItem users = 3 [json_name = "users"];
+  wealthjourney.common.v1.PaginationResult pagination = 4 [json_name = "pagination"];
+  string timestamp = 5 [json_name = "timestamp"];
+}
+
+// TrendingTopics
+message TrendingTopicItem {
+  string hashtag = 1 [json_name = "hashtag"];
+  int32 postCount = 2 [json_name = "postCount"];
+}
+
+message GetTrendingTopicsRequest {}
+
+message GetTrendingTopicsResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated TrendingTopicItem topics = 3 [json_name = "topics"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
 // Service definition
 service CommunityService {
   // Create a new post
@@ -387,6 +554,88 @@ service CommunityService {
     option (google.api.http) = {
       post: "/api/v1/community/upload-url"
       body: "*"
+    };
+  }
+
+  // --- Phase 2: Social Features ---
+
+  // Share/repost a post with optional commentary
+  rpc SharePost(SharePostRequest) returns (SharePostResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/community/posts/{postId}/share"
+      body: "*"
+    };
+  }
+
+  // Get notifications for current user
+  rpc GetNotifications(GetNotificationsRequest) returns (GetNotificationsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/community/notifications"
+    };
+  }
+
+  // Get unread notification count
+  rpc GetUnreadNotificationCount(GetUnreadNotificationCountRequest) returns (GetUnreadNotificationCountResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/community/notifications/unread-count"
+    };
+  }
+
+  // Mark all notifications as read
+  rpc MarkNotificationsRead(MarkNotificationsReadRequest) returns (MarkNotificationsReadResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/community/notifications/read"
+      body: "*"
+    };
+  }
+
+  // Save/bookmark a post
+  rpc SavePost(SavePostRequest) returns (SavePostResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/community/posts/{postId}/save"
+      body: "*"
+    };
+  }
+
+  // Unsave/unbookmark a post
+  rpc UnsavePost(UnsavePostRequest) returns (UnsavePostResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/community/posts/{postId}/save"
+    };
+  }
+
+  // Get saved posts for current user
+  rpc GetSavedPosts(GetSavedPostsRequest) returns (GetSavedPostsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/community/saved"
+    };
+  }
+
+  // Get suggested users to follow
+  rpc GetSuggestedUsers(GetSuggestedUsersRequest) returns (GetSuggestedUsersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/community/suggested-users"
+    };
+  }
+
+  // Get trending topics/hashtags
+  rpc GetTrendingTopics(GetTrendingTopicsRequest) returns (GetTrendingTopicsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/community/trending"
+    };
+  }
+
+  // Get users that a user follows (paginated)
+  rpc GetFollowing(GetFollowingRequest) returns (GetFollowingResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/community/users/{userId}/following"
+    };
+  }
+
+  // Get users who follow a user (paginated)
+  rpc GetFollowers(GetFollowersRequest) returns (GetFollowersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/community/users/{userId}/followers"
     };
   }
 }

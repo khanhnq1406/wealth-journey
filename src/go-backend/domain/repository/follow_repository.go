@@ -91,3 +91,114 @@ func (r *followRepository) GetFollowingCount(ctx context.Context, userID int32) 
 	}
 	return int32(count), nil
 }
+
+func (r *followRepository) GetFriendsOfFriends(ctx context.Context, userID int32, excludeIDs []int32, limit int) ([]FriendOfFriend, error) {
+	var results []FriendOfFriend
+
+	// Build exclusion list (must include self)
+	excluded := append(excludeIDs, userID)
+
+	err := r.db.DB.WithContext(ctx).Raw(`
+		SELECT uf2.following_id as user_id, COUNT(*) as mutual_count
+		FROM user_follow uf1
+		JOIN user_follow uf2 ON uf1.following_id = uf2.follower_id
+		WHERE uf1.follower_id = ?
+		  AND uf2.following_id != ?
+		  AND uf2.following_id NOT IN (?)
+		GROUP BY uf2.following_id
+		ORDER BY mutual_count DESC
+		LIMIT ?
+	`, userID, userID, excluded, limit).Scan(&results).Error
+
+	if err != nil {
+		return nil, r.handleDBError(err, "follow", "get friends of friends")
+	}
+	return results, nil
+}
+
+func (r *followRepository) GetTopUsersByFollowers(ctx context.Context, excludeIDs []int32, limit int) ([]UserFollowerCount, error) {
+	var results []UserFollowerCount
+
+	query := r.db.DB.WithContext(ctx).Raw(`
+		SELECT uf.following_id as user_id, COUNT(*) as follower_count
+		FROM user_follow uf
+		WHERE uf.following_id NOT IN (?)
+		  AND EXISTS (SELECT 1 FROM post p WHERE p.user_id = uf.following_id AND p.deleted_at IS NULL)
+		GROUP BY uf.following_id
+		ORDER BY follower_count DESC
+		LIMIT ?
+	`, excludeIDs, limit)
+
+	if len(excludeIDs) == 0 {
+		query = r.db.DB.WithContext(ctx).Raw(`
+			SELECT uf.following_id as user_id, COUNT(*) as follower_count
+			FROM user_follow uf
+			WHERE EXISTS (SELECT 1 FROM post p WHERE p.user_id = uf.following_id AND p.deleted_at IS NULL)
+			GROUP BY uf.following_id
+			ORDER BY follower_count DESC
+			LIMIT ?
+		`, limit)
+	}
+
+	if err := query.Scan(&results).Error; err != nil {
+		return nil, r.handleDBError(err, "follow", "get top users by followers")
+	}
+	return results, nil
+}
+
+func (r *followRepository) GetFollowing(ctx context.Context, userID int32, opts ListOptions) ([]*models.UserFollow, int, error) {
+	var follows []*models.UserFollow
+	var total int64
+
+	base := r.db.DB.WithContext(ctx).Model(&models.UserFollow{}).Where("follower_id = ?", userID)
+	if err := base.Count(&total).Error; err != nil {
+		return nil, 0, r.handleDBError(err, "follow", "count following")
+	}
+
+	err := r.db.DB.WithContext(ctx).
+		Where("follower_id = ?", userID).
+		Preload("Following").
+		Order("created_at DESC").
+		Offset(opts.Offset).
+		Limit(opts.Limit).
+		Find(&follows).Error
+	if err != nil {
+		return nil, 0, r.handleDBError(err, "follow", "get following")
+	}
+	return follows, int(total), nil
+}
+
+func (r *followRepository) GetFollowers(ctx context.Context, userID int32, opts ListOptions) ([]*models.UserFollow, int, error) {
+	var follows []*models.UserFollow
+	var total int64
+
+	base := r.db.DB.WithContext(ctx).Model(&models.UserFollow{}).Where("following_id = ?", userID)
+	if err := base.Count(&total).Error; err != nil {
+		return nil, 0, r.handleDBError(err, "follow", "count followers")
+	}
+
+	err := r.db.DB.WithContext(ctx).
+		Where("following_id = ?", userID).
+		Preload("Follower").
+		Order("created_at DESC").
+		Offset(opts.Offset).
+		Limit(opts.Limit).
+		Find(&follows).Error
+	if err != nil {
+		return nil, 0, r.handleDBError(err, "follow", "get followers")
+	}
+	return follows, int(total), nil
+}
+
+func (r *followRepository) GetRecentUsers(ctx context.Context, excludeIDs []int32, limit int) ([]int32, error) {
+	var ids []int32
+	query := r.db.DB.WithContext(ctx).Model(&models.User{})
+	if len(excludeIDs) > 0 {
+		query = query.Where("id NOT IN ?", excludeIDs)
+	}
+	err := query.Order("created_at DESC").Limit(limit).Pluck("id", &ids).Error
+	if err != nil {
+		return nil, r.handleDBError(err, "user", "get recent users")
+	}
+	return ids, nil
+}

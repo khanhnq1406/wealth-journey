@@ -89,6 +89,9 @@ func ProvideRepositories(db *database.Database) *service.Repositories {
 		Like:                  repository.NewLikeRepository(db),
 		Follow:                repository.NewFollowRepository(db),
 		Report:                repository.NewReportRepository(db),
+		Notification:          repository.NewNotificationRepository(db),
+		SavedPost:             repository.NewSavedPostRepository(db),
+		Hashtag:               repository.NewHashtagRepository(db),
 	}
 }
 

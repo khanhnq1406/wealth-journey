@@ -25,6 +25,11 @@ export interface PostItem {
   createdAt: number;
   updatedAt: number;
   isFollowing: boolean;
+  shareCount: number;
+  sharedPost: PostItem | undefined;
+  isShared: boolean;
+  isSaved: boolean;
+  hashtags: string[];
 }
 
 /** CommentItem represents a comment on a post */
@@ -105,6 +110,7 @@ export interface GetPostResponse {
 /** GetFeed */
 export interface GetFeedRequest {
   pagination: PaginationParams | undefined;
+  hashtag: string;
 }
 
 export interface GetFeedResponse {
@@ -262,6 +268,169 @@ export interface GetUploadURLResponse {
   timestamp: string;
 }
 
+/** SharePost */
+export interface SharePostRequest {
+  postId: number;
+  content: string;
+}
+
+export interface SharePostResponse {
+  success: boolean;
+  message: string;
+  data: PostItem | undefined;
+  timestamp: string;
+}
+
+/** Notification */
+export interface NotificationItem {
+  id: number;
+  type: string;
+  actorId: number;
+  actorName: string;
+  actorPicture: string;
+  postId: number;
+  postPreview: string;
+  isRead: boolean;
+  createdAt: number;
+}
+
+export interface GetNotificationsRequest {
+  pagination: PaginationParams | undefined;
+}
+
+export interface GetNotificationsResponse {
+  success: boolean;
+  message: string;
+  notifications: NotificationItem[];
+  pagination: PaginationResult | undefined;
+  timestamp: string;
+}
+
+export interface GetUnreadNotificationCountRequest {
+}
+
+export interface GetUnreadNotificationCountResponse {
+  success: boolean;
+  message: string;
+  count: number;
+  timestamp: string;
+}
+
+export interface MarkNotificationsReadRequest {
+}
+
+export interface MarkNotificationsReadResponse {
+  success: boolean;
+  message: string;
+  timestamp: string;
+}
+
+/** SavedPost */
+export interface SavePostRequest {
+  postId: number;
+}
+
+export interface SavePostResponse {
+  success: boolean;
+  message: string;
+  timestamp: string;
+}
+
+export interface UnsavePostRequest {
+  postId: number;
+}
+
+export interface UnsavePostResponse {
+  success: boolean;
+  message: string;
+  timestamp: string;
+}
+
+export interface GetSavedPostsRequest {
+  pagination: PaginationParams | undefined;
+}
+
+export interface GetSavedPostsResponse {
+  success: boolean;
+  message: string;
+  posts: PostItem[];
+  pagination: PaginationResult | undefined;
+  timestamp: string;
+}
+
+/** SuggestedUsers */
+export interface SuggestedUserItem {
+  userId: number;
+  userName: string;
+  userPicture: string;
+  bioSnippet: string;
+  mutualFollowCount: number;
+  followerCount: number;
+}
+
+export interface GetSuggestedUsersRequest {
+}
+
+export interface GetSuggestedUsersResponse {
+  success: boolean;
+  message: string;
+  users: SuggestedUserItem[];
+  timestamp: string;
+}
+
+/** FollowUserItem represents a user in a following/followers list */
+export interface FollowUserItem {
+  userId: number;
+  userName: string;
+  userPicture: string;
+  bioSnippet: string;
+  isFollowing: boolean;
+}
+
+/** GetFollowing — list users that a user follows */
+export interface GetFollowingRequest {
+  userId: number;
+  pagination: PaginationParams | undefined;
+}
+
+export interface GetFollowingResponse {
+  success: boolean;
+  message: string;
+  users: FollowUserItem[];
+  pagination: PaginationResult | undefined;
+  timestamp: string;
+}
+
+/** GetFollowers — list users who follow a user */
+export interface GetFollowersRequest {
+  userId: number;
+  pagination: PaginationParams | undefined;
+}
+
+export interface GetFollowersResponse {
+  success: boolean;
+  message: string;
+  users: FollowUserItem[];
+  pagination: PaginationResult | undefined;
+  timestamp: string;
+}
+
+/** TrendingTopics */
+export interface TrendingTopicItem {
+  hashtag: string;
+  postCount: number;
+}
+
+export interface GetTrendingTopicsRequest {
+}
+
+export interface GetTrendingTopicsResponse {
+  success: boolean;
+  message: string;
+  topics: TrendingTopicItem[];
+  timestamp: string;
+}
+
 function createBasePostItem(): PostItem {
   return {
     id: 0,
@@ -277,6 +446,11 @@ function createBasePostItem(): PostItem {
     createdAt: 0,
     updatedAt: 0,
     isFollowing: false,
+    shareCount: 0,
+    sharedPost: undefined,
+    isShared: false,
+    isSaved: false,
+    hashtags: [],
   };
 }
 
@@ -320,6 +494,21 @@ export const PostItem: MessageFns<PostItem> = {
     }
     if (message.isFollowing !== false) {
       writer.uint32(112).bool(message.isFollowing);
+    }
+    if (message.shareCount !== 0) {
+      writer.uint32(120).int32(message.shareCount);
+    }
+    if (message.sharedPost !== undefined) {
+      PostItem.encode(message.sharedPost, writer.uint32(130).fork()).join();
+    }
+    if (message.isShared !== false) {
+      writer.uint32(136).bool(message.isShared);
+    }
+    if (message.isSaved !== false) {
+      writer.uint32(144).bool(message.isSaved);
+    }
+    for (const v of message.hashtags) {
+      writer.uint32(154).string(v!);
     }
     return writer;
   },
@@ -435,6 +624,46 @@ export const PostItem: MessageFns<PostItem> = {
           message.isFollowing = reader.bool();
           continue;
         }
+        case 15: {
+          if (tag !== 120) {
+            break;
+          }
+
+          message.shareCount = reader.int32();
+          continue;
+        }
+        case 16: {
+          if (tag !== 130) {
+            break;
+          }
+
+          message.sharedPost = PostItem.decode(reader, reader.uint32());
+          continue;
+        }
+        case 17: {
+          if (tag !== 136) {
+            break;
+          }
+
+          message.isShared = reader.bool();
+          continue;
+        }
+        case 18: {
+          if (tag !== 144) {
+            break;
+          }
+
+          message.isSaved = reader.bool();
+          continue;
+        }
+        case 19: {
+          if (tag !== 154) {
+            break;
+          }
+
+          message.hashtags.push(reader.string());
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -459,6 +688,11 @@ export const PostItem: MessageFns<PostItem> = {
       createdAt: isSet(object.createdAt) ? globalThis.Number(object.createdAt) : 0,
       updatedAt: isSet(object.updatedAt) ? globalThis.Number(object.updatedAt) : 0,
       isFollowing: isSet(object.isFollowing) ? globalThis.Boolean(object.isFollowing) : false,
+      shareCount: isSet(object.shareCount) ? globalThis.Number(object.shareCount) : 0,
+      sharedPost: isSet(object.sharedPost) ? PostItem.fromJSON(object.sharedPost) : undefined,
+      isShared: isSet(object.isShared) ? globalThis.Boolean(object.isShared) : false,
+      isSaved: isSet(object.isSaved) ? globalThis.Boolean(object.isSaved) : false,
+      hashtags: globalThis.Array.isArray(object?.hashtags) ? object.hashtags.map((e: any) => globalThis.String(e)) : [],
     };
   },
 
@@ -503,6 +737,21 @@ export const PostItem: MessageFns<PostItem> = {
     if (message.isFollowing !== false) {
       obj.isFollowing = message.isFollowing;
     }
+    if (message.shareCount !== 0) {
+      obj.shareCount = Math.round(message.shareCount);
+    }
+    if (message.sharedPost !== undefined) {
+      obj.sharedPost = PostItem.toJSON(message.sharedPost);
+    }
+    if (message.isShared !== false) {
+      obj.isShared = message.isShared;
+    }
+    if (message.isSaved !== false) {
+      obj.isSaved = message.isSaved;
+    }
+    if (message.hashtags?.length) {
+      obj.hashtags = message.hashtags;
+    }
     return obj;
   },
 
@@ -524,6 +773,13 @@ export const PostItem: MessageFns<PostItem> = {
     message.createdAt = object.createdAt ?? 0;
     message.updatedAt = object.updatedAt ?? 0;
     message.isFollowing = object.isFollowing ?? false;
+    message.shareCount = object.shareCount ?? 0;
+    message.sharedPost = (object.sharedPost !== undefined && object.sharedPost !== null)
+      ? PostItem.fromPartial(object.sharedPost)
+      : undefined;
+    message.isShared = object.isShared ?? false;
+    message.isSaved = object.isSaved ?? false;
+    message.hashtags = object.hashtags?.map((e) => e) || [];
     return message;
   },
 };
@@ -1599,13 +1855,16 @@ export const GetPostResponse: MessageFns<GetPostResponse> = {
 };
 
 function createBaseGetFeedRequest(): GetFeedRequest {
-  return { pagination: undefined };
+  return { pagination: undefined, hashtag: "" };
 }
 
 export const GetFeedRequest: MessageFns<GetFeedRequest> = {
   encode(message: GetFeedRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.pagination !== undefined) {
       PaginationParams.encode(message.pagination, writer.uint32(10).fork()).join();
+    }
+    if (message.hashtag !== "") {
+      writer.uint32(18).string(message.hashtag);
     }
     return writer;
   },
@@ -1625,6 +1884,14 @@ export const GetFeedRequest: MessageFns<GetFeedRequest> = {
           message.pagination = PaginationParams.decode(reader, reader.uint32());
           continue;
         }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.hashtag = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1635,13 +1902,19 @@ export const GetFeedRequest: MessageFns<GetFeedRequest> = {
   },
 
   fromJSON(object: any): GetFeedRequest {
-    return { pagination: isSet(object.pagination) ? PaginationParams.fromJSON(object.pagination) : undefined };
+    return {
+      pagination: isSet(object.pagination) ? PaginationParams.fromJSON(object.pagination) : undefined,
+      hashtag: isSet(object.hashtag) ? globalThis.String(object.hashtag) : "",
+    };
   },
 
   toJSON(message: GetFeedRequest): unknown {
     const obj: any = {};
     if (message.pagination !== undefined) {
       obj.pagination = PaginationParams.toJSON(message.pagination);
+    }
+    if (message.hashtag !== "") {
+      obj.hashtag = message.hashtag;
     }
     return obj;
   },
@@ -1654,6 +1927,7 @@ export const GetFeedRequest: MessageFns<GetFeedRequest> = {
     message.pagination = (object.pagination !== undefined && object.pagination !== null)
       ? PaginationParams.fromPartial(object.pagination)
       : undefined;
+    message.hashtag = object.hashtag ?? "";
     return message;
   },
 };
@@ -3843,6 +4117,2400 @@ export const GetUploadURLResponse: MessageFns<GetUploadURLResponse> = {
     message.message = object.message ?? "";
     message.uploadUrl = object.uploadUrl ?? "";
     message.publicUrl = object.publicUrl ?? "";
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseSharePostRequest(): SharePostRequest {
+  return { postId: 0, content: "" };
+}
+
+export const SharePostRequest: MessageFns<SharePostRequest> = {
+  encode(message: SharePostRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.postId !== 0) {
+      writer.uint32(8).int32(message.postId);
+    }
+    if (message.content !== "") {
+      writer.uint32(18).string(message.content);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): SharePostRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSharePostRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.postId = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.content = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SharePostRequest {
+    return {
+      postId: isSet(object.postId) ? globalThis.Number(object.postId) : 0,
+      content: isSet(object.content) ? globalThis.String(object.content) : "",
+    };
+  },
+
+  toJSON(message: SharePostRequest): unknown {
+    const obj: any = {};
+    if (message.postId !== 0) {
+      obj.postId = Math.round(message.postId);
+    }
+    if (message.content !== "") {
+      obj.content = message.content;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<SharePostRequest>): SharePostRequest {
+    return SharePostRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SharePostRequest>): SharePostRequest {
+    const message = createBaseSharePostRequest();
+    message.postId = object.postId ?? 0;
+    message.content = object.content ?? "";
+    return message;
+  },
+};
+
+function createBaseSharePostResponse(): SharePostResponse {
+  return { success: false, message: "", data: undefined, timestamp: "" };
+}
+
+export const SharePostResponse: MessageFns<SharePostResponse> = {
+  encode(message: SharePostResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.data !== undefined) {
+      PostItem.encode(message.data, writer.uint32(26).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): SharePostResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSharePostResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.data = PostItem.decode(reader, reader.uint32());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SharePostResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      data: isSet(object.data) ? PostItem.fromJSON(object.data) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: SharePostResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.data !== undefined) {
+      obj.data = PostItem.toJSON(message.data);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<SharePostResponse>): SharePostResponse {
+    return SharePostResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SharePostResponse>): SharePostResponse {
+    const message = createBaseSharePostResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.data = (object.data !== undefined && object.data !== null) ? PostItem.fromPartial(object.data) : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseNotificationItem(): NotificationItem {
+  return {
+    id: 0,
+    type: "",
+    actorId: 0,
+    actorName: "",
+    actorPicture: "",
+    postId: 0,
+    postPreview: "",
+    isRead: false,
+    createdAt: 0,
+  };
+}
+
+export const NotificationItem: MessageFns<NotificationItem> = {
+  encode(message: NotificationItem, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== 0) {
+      writer.uint32(8).int32(message.id);
+    }
+    if (message.type !== "") {
+      writer.uint32(18).string(message.type);
+    }
+    if (message.actorId !== 0) {
+      writer.uint32(24).int32(message.actorId);
+    }
+    if (message.actorName !== "") {
+      writer.uint32(34).string(message.actorName);
+    }
+    if (message.actorPicture !== "") {
+      writer.uint32(42).string(message.actorPicture);
+    }
+    if (message.postId !== 0) {
+      writer.uint32(48).int32(message.postId);
+    }
+    if (message.postPreview !== "") {
+      writer.uint32(58).string(message.postPreview);
+    }
+    if (message.isRead !== false) {
+      writer.uint32(64).bool(message.isRead);
+    }
+    if (message.createdAt !== 0) {
+      writer.uint32(72).int64(message.createdAt);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): NotificationItem {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseNotificationItem();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.id = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.type = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.actorId = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.actorName = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.actorPicture = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.postId = reader.int32();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.postPreview = reader.string();
+          continue;
+        }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
+
+          message.isRead = reader.bool();
+          continue;
+        }
+        case 9: {
+          if (tag !== 72) {
+            break;
+          }
+
+          message.createdAt = longToNumber(reader.int64());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): NotificationItem {
+    return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      type: isSet(object.type) ? globalThis.String(object.type) : "",
+      actorId: isSet(object.actorId) ? globalThis.Number(object.actorId) : 0,
+      actorName: isSet(object.actorName) ? globalThis.String(object.actorName) : "",
+      actorPicture: isSet(object.actorPicture) ? globalThis.String(object.actorPicture) : "",
+      postId: isSet(object.postId) ? globalThis.Number(object.postId) : 0,
+      postPreview: isSet(object.postPreview) ? globalThis.String(object.postPreview) : "",
+      isRead: isSet(object.isRead) ? globalThis.Boolean(object.isRead) : false,
+      createdAt: isSet(object.createdAt) ? globalThis.Number(object.createdAt) : 0,
+    };
+  },
+
+  toJSON(message: NotificationItem): unknown {
+    const obj: any = {};
+    if (message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    if (message.type !== "") {
+      obj.type = message.type;
+    }
+    if (message.actorId !== 0) {
+      obj.actorId = Math.round(message.actorId);
+    }
+    if (message.actorName !== "") {
+      obj.actorName = message.actorName;
+    }
+    if (message.actorPicture !== "") {
+      obj.actorPicture = message.actorPicture;
+    }
+    if (message.postId !== 0) {
+      obj.postId = Math.round(message.postId);
+    }
+    if (message.postPreview !== "") {
+      obj.postPreview = message.postPreview;
+    }
+    if (message.isRead !== false) {
+      obj.isRead = message.isRead;
+    }
+    if (message.createdAt !== 0) {
+      obj.createdAt = Math.round(message.createdAt);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<NotificationItem>): NotificationItem {
+    return NotificationItem.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<NotificationItem>): NotificationItem {
+    const message = createBaseNotificationItem();
+    message.id = object.id ?? 0;
+    message.type = object.type ?? "";
+    message.actorId = object.actorId ?? 0;
+    message.actorName = object.actorName ?? "";
+    message.actorPicture = object.actorPicture ?? "";
+    message.postId = object.postId ?? 0;
+    message.postPreview = object.postPreview ?? "";
+    message.isRead = object.isRead ?? false;
+    message.createdAt = object.createdAt ?? 0;
+    return message;
+  },
+};
+
+function createBaseGetNotificationsRequest(): GetNotificationsRequest {
+  return { pagination: undefined };
+}
+
+export const GetNotificationsRequest: MessageFns<GetNotificationsRequest> = {
+  encode(message: GetNotificationsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PaginationParams.encode(message.pagination, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetNotificationsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetNotificationsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.pagination = PaginationParams.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetNotificationsRequest {
+    return { pagination: isSet(object.pagination) ? PaginationParams.fromJSON(object.pagination) : undefined };
+  },
+
+  toJSON(message: GetNotificationsRequest): unknown {
+    const obj: any = {};
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationParams.toJSON(message.pagination);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetNotificationsRequest>): GetNotificationsRequest {
+    return GetNotificationsRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetNotificationsRequest>): GetNotificationsRequest {
+    const message = createBaseGetNotificationsRequest();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationParams.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseGetNotificationsResponse(): GetNotificationsResponse {
+  return { success: false, message: "", notifications: [], pagination: undefined, timestamp: "" };
+}
+
+export const GetNotificationsResponse: MessageFns<GetNotificationsResponse> = {
+  encode(message: GetNotificationsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.notifications) {
+      NotificationItem.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.pagination !== undefined) {
+      PaginationResult.encode(message.pagination, writer.uint32(34).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(42).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetNotificationsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetNotificationsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.notifications.push(NotificationItem.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.pagination = PaginationResult.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetNotificationsResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      notifications: globalThis.Array.isArray(object?.notifications)
+        ? object.notifications.map((e: any) => NotificationItem.fromJSON(e))
+        : [],
+      pagination: isSet(object.pagination) ? PaginationResult.fromJSON(object.pagination) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetNotificationsResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.notifications?.length) {
+      obj.notifications = message.notifications.map((e) => NotificationItem.toJSON(e));
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationResult.toJSON(message.pagination);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetNotificationsResponse>): GetNotificationsResponse {
+    return GetNotificationsResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetNotificationsResponse>): GetNotificationsResponse {
+    const message = createBaseGetNotificationsResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.notifications = object.notifications?.map((e) => NotificationItem.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationResult.fromPartial(object.pagination)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseGetUnreadNotificationCountRequest(): GetUnreadNotificationCountRequest {
+  return {};
+}
+
+export const GetUnreadNotificationCountRequest: MessageFns<GetUnreadNotificationCountRequest> = {
+  encode(_: GetUnreadNotificationCountRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetUnreadNotificationCountRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetUnreadNotificationCountRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): GetUnreadNotificationCountRequest {
+    return {};
+  },
+
+  toJSON(_: GetUnreadNotificationCountRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetUnreadNotificationCountRequest>): GetUnreadNotificationCountRequest {
+    return GetUnreadNotificationCountRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<GetUnreadNotificationCountRequest>): GetUnreadNotificationCountRequest {
+    const message = createBaseGetUnreadNotificationCountRequest();
+    return message;
+  },
+};
+
+function createBaseGetUnreadNotificationCountResponse(): GetUnreadNotificationCountResponse {
+  return { success: false, message: "", count: 0, timestamp: "" };
+}
+
+export const GetUnreadNotificationCountResponse: MessageFns<GetUnreadNotificationCountResponse> = {
+  encode(message: GetUnreadNotificationCountResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.count !== 0) {
+      writer.uint32(24).int32(message.count);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetUnreadNotificationCountResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetUnreadNotificationCountResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.count = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetUnreadNotificationCountResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      count: isSet(object.count) ? globalThis.Number(object.count) : 0,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetUnreadNotificationCountResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.count !== 0) {
+      obj.count = Math.round(message.count);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetUnreadNotificationCountResponse>): GetUnreadNotificationCountResponse {
+    return GetUnreadNotificationCountResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetUnreadNotificationCountResponse>): GetUnreadNotificationCountResponse {
+    const message = createBaseGetUnreadNotificationCountResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.count = object.count ?? 0;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseMarkNotificationsReadRequest(): MarkNotificationsReadRequest {
+  return {};
+}
+
+export const MarkNotificationsReadRequest: MessageFns<MarkNotificationsReadRequest> = {
+  encode(_: MarkNotificationsReadRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): MarkNotificationsReadRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMarkNotificationsReadRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): MarkNotificationsReadRequest {
+    return {};
+  },
+
+  toJSON(_: MarkNotificationsReadRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<MarkNotificationsReadRequest>): MarkNotificationsReadRequest {
+    return MarkNotificationsReadRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<MarkNotificationsReadRequest>): MarkNotificationsReadRequest {
+    const message = createBaseMarkNotificationsReadRequest();
+    return message;
+  },
+};
+
+function createBaseMarkNotificationsReadResponse(): MarkNotificationsReadResponse {
+  return { success: false, message: "", timestamp: "" };
+}
+
+export const MarkNotificationsReadResponse: MessageFns<MarkNotificationsReadResponse> = {
+  encode(message: MarkNotificationsReadResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(26).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): MarkNotificationsReadResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMarkNotificationsReadResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): MarkNotificationsReadResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: MarkNotificationsReadResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<MarkNotificationsReadResponse>): MarkNotificationsReadResponse {
+    return MarkNotificationsReadResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<MarkNotificationsReadResponse>): MarkNotificationsReadResponse {
+    const message = createBaseMarkNotificationsReadResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseSavePostRequest(): SavePostRequest {
+  return { postId: 0 };
+}
+
+export const SavePostRequest: MessageFns<SavePostRequest> = {
+  encode(message: SavePostRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.postId !== 0) {
+      writer.uint32(8).int32(message.postId);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): SavePostRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSavePostRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.postId = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SavePostRequest {
+    return { postId: isSet(object.postId) ? globalThis.Number(object.postId) : 0 };
+  },
+
+  toJSON(message: SavePostRequest): unknown {
+    const obj: any = {};
+    if (message.postId !== 0) {
+      obj.postId = Math.round(message.postId);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<SavePostRequest>): SavePostRequest {
+    return SavePostRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SavePostRequest>): SavePostRequest {
+    const message = createBaseSavePostRequest();
+    message.postId = object.postId ?? 0;
+    return message;
+  },
+};
+
+function createBaseSavePostResponse(): SavePostResponse {
+  return { success: false, message: "", timestamp: "" };
+}
+
+export const SavePostResponse: MessageFns<SavePostResponse> = {
+  encode(message: SavePostResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(26).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): SavePostResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSavePostResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SavePostResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: SavePostResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<SavePostResponse>): SavePostResponse {
+    return SavePostResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SavePostResponse>): SavePostResponse {
+    const message = createBaseSavePostResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseUnsavePostRequest(): UnsavePostRequest {
+  return { postId: 0 };
+}
+
+export const UnsavePostRequest: MessageFns<UnsavePostRequest> = {
+  encode(message: UnsavePostRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.postId !== 0) {
+      writer.uint32(8).int32(message.postId);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UnsavePostRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUnsavePostRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.postId = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UnsavePostRequest {
+    return { postId: isSet(object.postId) ? globalThis.Number(object.postId) : 0 };
+  },
+
+  toJSON(message: UnsavePostRequest): unknown {
+    const obj: any = {};
+    if (message.postId !== 0) {
+      obj.postId = Math.round(message.postId);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UnsavePostRequest>): UnsavePostRequest {
+    return UnsavePostRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UnsavePostRequest>): UnsavePostRequest {
+    const message = createBaseUnsavePostRequest();
+    message.postId = object.postId ?? 0;
+    return message;
+  },
+};
+
+function createBaseUnsavePostResponse(): UnsavePostResponse {
+  return { success: false, message: "", timestamp: "" };
+}
+
+export const UnsavePostResponse: MessageFns<UnsavePostResponse> = {
+  encode(message: UnsavePostResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(26).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UnsavePostResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUnsavePostResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UnsavePostResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: UnsavePostResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UnsavePostResponse>): UnsavePostResponse {
+    return UnsavePostResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UnsavePostResponse>): UnsavePostResponse {
+    const message = createBaseUnsavePostResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseGetSavedPostsRequest(): GetSavedPostsRequest {
+  return { pagination: undefined };
+}
+
+export const GetSavedPostsRequest: MessageFns<GetSavedPostsRequest> = {
+  encode(message: GetSavedPostsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PaginationParams.encode(message.pagination, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetSavedPostsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetSavedPostsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.pagination = PaginationParams.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetSavedPostsRequest {
+    return { pagination: isSet(object.pagination) ? PaginationParams.fromJSON(object.pagination) : undefined };
+  },
+
+  toJSON(message: GetSavedPostsRequest): unknown {
+    const obj: any = {};
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationParams.toJSON(message.pagination);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetSavedPostsRequest>): GetSavedPostsRequest {
+    return GetSavedPostsRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetSavedPostsRequest>): GetSavedPostsRequest {
+    const message = createBaseGetSavedPostsRequest();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationParams.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseGetSavedPostsResponse(): GetSavedPostsResponse {
+  return { success: false, message: "", posts: [], pagination: undefined, timestamp: "" };
+}
+
+export const GetSavedPostsResponse: MessageFns<GetSavedPostsResponse> = {
+  encode(message: GetSavedPostsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.posts) {
+      PostItem.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.pagination !== undefined) {
+      PaginationResult.encode(message.pagination, writer.uint32(34).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(42).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetSavedPostsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetSavedPostsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.posts.push(PostItem.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.pagination = PaginationResult.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetSavedPostsResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      posts: globalThis.Array.isArray(object?.posts) ? object.posts.map((e: any) => PostItem.fromJSON(e)) : [],
+      pagination: isSet(object.pagination) ? PaginationResult.fromJSON(object.pagination) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetSavedPostsResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.posts?.length) {
+      obj.posts = message.posts.map((e) => PostItem.toJSON(e));
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationResult.toJSON(message.pagination);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetSavedPostsResponse>): GetSavedPostsResponse {
+    return GetSavedPostsResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetSavedPostsResponse>): GetSavedPostsResponse {
+    const message = createBaseGetSavedPostsResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.posts = object.posts?.map((e) => PostItem.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationResult.fromPartial(object.pagination)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseSuggestedUserItem(): SuggestedUserItem {
+  return { userId: 0, userName: "", userPicture: "", bioSnippet: "", mutualFollowCount: 0, followerCount: 0 };
+}
+
+export const SuggestedUserItem: MessageFns<SuggestedUserItem> = {
+  encode(message: SuggestedUserItem, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userId !== 0) {
+      writer.uint32(8).int32(message.userId);
+    }
+    if (message.userName !== "") {
+      writer.uint32(18).string(message.userName);
+    }
+    if (message.userPicture !== "") {
+      writer.uint32(26).string(message.userPicture);
+    }
+    if (message.bioSnippet !== "") {
+      writer.uint32(34).string(message.bioSnippet);
+    }
+    if (message.mutualFollowCount !== 0) {
+      writer.uint32(40).int32(message.mutualFollowCount);
+    }
+    if (message.followerCount !== 0) {
+      writer.uint32(48).int32(message.followerCount);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): SuggestedUserItem {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSuggestedUserItem();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.userId = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.userName = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.userPicture = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.bioSnippet = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.mutualFollowCount = reader.int32();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.followerCount = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SuggestedUserItem {
+    return {
+      userId: isSet(object.userId) ? globalThis.Number(object.userId) : 0,
+      userName: isSet(object.userName) ? globalThis.String(object.userName) : "",
+      userPicture: isSet(object.userPicture) ? globalThis.String(object.userPicture) : "",
+      bioSnippet: isSet(object.bioSnippet) ? globalThis.String(object.bioSnippet) : "",
+      mutualFollowCount: isSet(object.mutualFollowCount) ? globalThis.Number(object.mutualFollowCount) : 0,
+      followerCount: isSet(object.followerCount) ? globalThis.Number(object.followerCount) : 0,
+    };
+  },
+
+  toJSON(message: SuggestedUserItem): unknown {
+    const obj: any = {};
+    if (message.userId !== 0) {
+      obj.userId = Math.round(message.userId);
+    }
+    if (message.userName !== "") {
+      obj.userName = message.userName;
+    }
+    if (message.userPicture !== "") {
+      obj.userPicture = message.userPicture;
+    }
+    if (message.bioSnippet !== "") {
+      obj.bioSnippet = message.bioSnippet;
+    }
+    if (message.mutualFollowCount !== 0) {
+      obj.mutualFollowCount = Math.round(message.mutualFollowCount);
+    }
+    if (message.followerCount !== 0) {
+      obj.followerCount = Math.round(message.followerCount);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<SuggestedUserItem>): SuggestedUserItem {
+    return SuggestedUserItem.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SuggestedUserItem>): SuggestedUserItem {
+    const message = createBaseSuggestedUserItem();
+    message.userId = object.userId ?? 0;
+    message.userName = object.userName ?? "";
+    message.userPicture = object.userPicture ?? "";
+    message.bioSnippet = object.bioSnippet ?? "";
+    message.mutualFollowCount = object.mutualFollowCount ?? 0;
+    message.followerCount = object.followerCount ?? 0;
+    return message;
+  },
+};
+
+function createBaseGetSuggestedUsersRequest(): GetSuggestedUsersRequest {
+  return {};
+}
+
+export const GetSuggestedUsersRequest: MessageFns<GetSuggestedUsersRequest> = {
+  encode(_: GetSuggestedUsersRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetSuggestedUsersRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetSuggestedUsersRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): GetSuggestedUsersRequest {
+    return {};
+  },
+
+  toJSON(_: GetSuggestedUsersRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetSuggestedUsersRequest>): GetSuggestedUsersRequest {
+    return GetSuggestedUsersRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<GetSuggestedUsersRequest>): GetSuggestedUsersRequest {
+    const message = createBaseGetSuggestedUsersRequest();
+    return message;
+  },
+};
+
+function createBaseGetSuggestedUsersResponse(): GetSuggestedUsersResponse {
+  return { success: false, message: "", users: [], timestamp: "" };
+}
+
+export const GetSuggestedUsersResponse: MessageFns<GetSuggestedUsersResponse> = {
+  encode(message: GetSuggestedUsersResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.users) {
+      SuggestedUserItem.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetSuggestedUsersResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetSuggestedUsersResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.users.push(SuggestedUserItem.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetSuggestedUsersResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      users: globalThis.Array.isArray(object?.users) ? object.users.map((e: any) => SuggestedUserItem.fromJSON(e)) : [],
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetSuggestedUsersResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.users?.length) {
+      obj.users = message.users.map((e) => SuggestedUserItem.toJSON(e));
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetSuggestedUsersResponse>): GetSuggestedUsersResponse {
+    return GetSuggestedUsersResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetSuggestedUsersResponse>): GetSuggestedUsersResponse {
+    const message = createBaseGetSuggestedUsersResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.users = object.users?.map((e) => SuggestedUserItem.fromPartial(e)) || [];
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseFollowUserItem(): FollowUserItem {
+  return { userId: 0, userName: "", userPicture: "", bioSnippet: "", isFollowing: false };
+}
+
+export const FollowUserItem: MessageFns<FollowUserItem> = {
+  encode(message: FollowUserItem, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userId !== 0) {
+      writer.uint32(8).int32(message.userId);
+    }
+    if (message.userName !== "") {
+      writer.uint32(18).string(message.userName);
+    }
+    if (message.userPicture !== "") {
+      writer.uint32(26).string(message.userPicture);
+    }
+    if (message.bioSnippet !== "") {
+      writer.uint32(34).string(message.bioSnippet);
+    }
+    if (message.isFollowing !== false) {
+      writer.uint32(40).bool(message.isFollowing);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): FollowUserItem {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFollowUserItem();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.userId = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.userName = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.userPicture = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.bioSnippet = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.isFollowing = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): FollowUserItem {
+    return {
+      userId: isSet(object.userId) ? globalThis.Number(object.userId) : 0,
+      userName: isSet(object.userName) ? globalThis.String(object.userName) : "",
+      userPicture: isSet(object.userPicture) ? globalThis.String(object.userPicture) : "",
+      bioSnippet: isSet(object.bioSnippet) ? globalThis.String(object.bioSnippet) : "",
+      isFollowing: isSet(object.isFollowing) ? globalThis.Boolean(object.isFollowing) : false,
+    };
+  },
+
+  toJSON(message: FollowUserItem): unknown {
+    const obj: any = {};
+    if (message.userId !== 0) {
+      obj.userId = Math.round(message.userId);
+    }
+    if (message.userName !== "") {
+      obj.userName = message.userName;
+    }
+    if (message.userPicture !== "") {
+      obj.userPicture = message.userPicture;
+    }
+    if (message.bioSnippet !== "") {
+      obj.bioSnippet = message.bioSnippet;
+    }
+    if (message.isFollowing !== false) {
+      obj.isFollowing = message.isFollowing;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<FollowUserItem>): FollowUserItem {
+    return FollowUserItem.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<FollowUserItem>): FollowUserItem {
+    const message = createBaseFollowUserItem();
+    message.userId = object.userId ?? 0;
+    message.userName = object.userName ?? "";
+    message.userPicture = object.userPicture ?? "";
+    message.bioSnippet = object.bioSnippet ?? "";
+    message.isFollowing = object.isFollowing ?? false;
+    return message;
+  },
+};
+
+function createBaseGetFollowingRequest(): GetFollowingRequest {
+  return { userId: 0, pagination: undefined };
+}
+
+export const GetFollowingRequest: MessageFns<GetFollowingRequest> = {
+  encode(message: GetFollowingRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userId !== 0) {
+      writer.uint32(8).int32(message.userId);
+    }
+    if (message.pagination !== undefined) {
+      PaginationParams.encode(message.pagination, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetFollowingRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetFollowingRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.userId = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.pagination = PaginationParams.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetFollowingRequest {
+    return {
+      userId: isSet(object.userId) ? globalThis.Number(object.userId) : 0,
+      pagination: isSet(object.pagination) ? PaginationParams.fromJSON(object.pagination) : undefined,
+    };
+  },
+
+  toJSON(message: GetFollowingRequest): unknown {
+    const obj: any = {};
+    if (message.userId !== 0) {
+      obj.userId = Math.round(message.userId);
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationParams.toJSON(message.pagination);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetFollowingRequest>): GetFollowingRequest {
+    return GetFollowingRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetFollowingRequest>): GetFollowingRequest {
+    const message = createBaseGetFollowingRequest();
+    message.userId = object.userId ?? 0;
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationParams.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseGetFollowingResponse(): GetFollowingResponse {
+  return { success: false, message: "", users: [], pagination: undefined, timestamp: "" };
+}
+
+export const GetFollowingResponse: MessageFns<GetFollowingResponse> = {
+  encode(message: GetFollowingResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.users) {
+      FollowUserItem.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.pagination !== undefined) {
+      PaginationResult.encode(message.pagination, writer.uint32(34).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(42).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetFollowingResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetFollowingResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.users.push(FollowUserItem.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.pagination = PaginationResult.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetFollowingResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      users: globalThis.Array.isArray(object?.users) ? object.users.map((e: any) => FollowUserItem.fromJSON(e)) : [],
+      pagination: isSet(object.pagination) ? PaginationResult.fromJSON(object.pagination) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetFollowingResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.users?.length) {
+      obj.users = message.users.map((e) => FollowUserItem.toJSON(e));
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationResult.toJSON(message.pagination);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetFollowingResponse>): GetFollowingResponse {
+    return GetFollowingResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetFollowingResponse>): GetFollowingResponse {
+    const message = createBaseGetFollowingResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.users = object.users?.map((e) => FollowUserItem.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationResult.fromPartial(object.pagination)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseGetFollowersRequest(): GetFollowersRequest {
+  return { userId: 0, pagination: undefined };
+}
+
+export const GetFollowersRequest: MessageFns<GetFollowersRequest> = {
+  encode(message: GetFollowersRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userId !== 0) {
+      writer.uint32(8).int32(message.userId);
+    }
+    if (message.pagination !== undefined) {
+      PaginationParams.encode(message.pagination, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetFollowersRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetFollowersRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.userId = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.pagination = PaginationParams.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetFollowersRequest {
+    return {
+      userId: isSet(object.userId) ? globalThis.Number(object.userId) : 0,
+      pagination: isSet(object.pagination) ? PaginationParams.fromJSON(object.pagination) : undefined,
+    };
+  },
+
+  toJSON(message: GetFollowersRequest): unknown {
+    const obj: any = {};
+    if (message.userId !== 0) {
+      obj.userId = Math.round(message.userId);
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationParams.toJSON(message.pagination);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetFollowersRequest>): GetFollowersRequest {
+    return GetFollowersRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetFollowersRequest>): GetFollowersRequest {
+    const message = createBaseGetFollowersRequest();
+    message.userId = object.userId ?? 0;
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationParams.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseGetFollowersResponse(): GetFollowersResponse {
+  return { success: false, message: "", users: [], pagination: undefined, timestamp: "" };
+}
+
+export const GetFollowersResponse: MessageFns<GetFollowersResponse> = {
+  encode(message: GetFollowersResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.users) {
+      FollowUserItem.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.pagination !== undefined) {
+      PaginationResult.encode(message.pagination, writer.uint32(34).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(42).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetFollowersResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetFollowersResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.users.push(FollowUserItem.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.pagination = PaginationResult.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetFollowersResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      users: globalThis.Array.isArray(object?.users) ? object.users.map((e: any) => FollowUserItem.fromJSON(e)) : [],
+      pagination: isSet(object.pagination) ? PaginationResult.fromJSON(object.pagination) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetFollowersResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.users?.length) {
+      obj.users = message.users.map((e) => FollowUserItem.toJSON(e));
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationResult.toJSON(message.pagination);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetFollowersResponse>): GetFollowersResponse {
+    return GetFollowersResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetFollowersResponse>): GetFollowersResponse {
+    const message = createBaseGetFollowersResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.users = object.users?.map((e) => FollowUserItem.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationResult.fromPartial(object.pagination)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseTrendingTopicItem(): TrendingTopicItem {
+  return { hashtag: "", postCount: 0 };
+}
+
+export const TrendingTopicItem: MessageFns<TrendingTopicItem> = {
+  encode(message: TrendingTopicItem, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.hashtag !== "") {
+      writer.uint32(10).string(message.hashtag);
+    }
+    if (message.postCount !== 0) {
+      writer.uint32(16).int32(message.postCount);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): TrendingTopicItem {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseTrendingTopicItem();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.hashtag = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.postCount = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): TrendingTopicItem {
+    return {
+      hashtag: isSet(object.hashtag) ? globalThis.String(object.hashtag) : "",
+      postCount: isSet(object.postCount) ? globalThis.Number(object.postCount) : 0,
+    };
+  },
+
+  toJSON(message: TrendingTopicItem): unknown {
+    const obj: any = {};
+    if (message.hashtag !== "") {
+      obj.hashtag = message.hashtag;
+    }
+    if (message.postCount !== 0) {
+      obj.postCount = Math.round(message.postCount);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<TrendingTopicItem>): TrendingTopicItem {
+    return TrendingTopicItem.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<TrendingTopicItem>): TrendingTopicItem {
+    const message = createBaseTrendingTopicItem();
+    message.hashtag = object.hashtag ?? "";
+    message.postCount = object.postCount ?? 0;
+    return message;
+  },
+};
+
+function createBaseGetTrendingTopicsRequest(): GetTrendingTopicsRequest {
+  return {};
+}
+
+export const GetTrendingTopicsRequest: MessageFns<GetTrendingTopicsRequest> = {
+  encode(_: GetTrendingTopicsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetTrendingTopicsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetTrendingTopicsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): GetTrendingTopicsRequest {
+    return {};
+  },
+
+  toJSON(_: GetTrendingTopicsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetTrendingTopicsRequest>): GetTrendingTopicsRequest {
+    return GetTrendingTopicsRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<GetTrendingTopicsRequest>): GetTrendingTopicsRequest {
+    const message = createBaseGetTrendingTopicsRequest();
+    return message;
+  },
+};
+
+function createBaseGetTrendingTopicsResponse(): GetTrendingTopicsResponse {
+  return { success: false, message: "", topics: [], timestamp: "" };
+}
+
+export const GetTrendingTopicsResponse: MessageFns<GetTrendingTopicsResponse> = {
+  encode(message: GetTrendingTopicsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.topics) {
+      TrendingTopicItem.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetTrendingTopicsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetTrendingTopicsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.topics.push(TrendingTopicItem.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetTrendingTopicsResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      topics: globalThis.Array.isArray(object?.topics)
+        ? object.topics.map((e: any) => TrendingTopicItem.fromJSON(e))
+        : [],
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetTrendingTopicsResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.topics?.length) {
+      obj.topics = message.topics.map((e) => TrendingTopicItem.toJSON(e));
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetTrendingTopicsResponse>): GetTrendingTopicsResponse {
+    return GetTrendingTopicsResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetTrendingTopicsResponse>): GetTrendingTopicsResponse {
+    const message = createBaseGetTrendingTopicsResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.topics = object.topics?.map((e) => TrendingTopicItem.fromPartial(e)) || [];
     message.timestamp = object.timestamp ?? "";
     return message;
   },

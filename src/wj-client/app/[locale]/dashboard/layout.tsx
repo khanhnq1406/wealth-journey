@@ -18,6 +18,7 @@ import { BaseModal } from "@/components/modals/BaseModal";
 import { AddTransactionForm } from "@/features/transaction/forms/AddTransactionForm";
 import { TransferMoneyForm } from "@/features/wallet/forms/TransferMoneyForm";
 import { useSidebarState } from "@/hooks/useSidebarState";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { SidebarToggle } from "@/components/navigation/SidebarToggle";
 import { NavItem } from "@/components/navigation/NavItem";
 import { NavTooltip } from "@/components/navigation/NavTooltip";
@@ -488,12 +489,7 @@ export default function DashboardLayout({
                   >
                     <Search size={20} className="text-v2-text-secondary" />
                   </button>
-                  <button
-                    className="p-2 rounded-lg hover:bg-white/60 transition-colors touch-target"
-                    aria-label="Notifications"
-                  >
-                    <Bell size={20} className="text-v2-text-secondary" />
-                  </button>
+                  <NotificationBell />
                   <button
                     onClick={toggleMobileMenu}
                     className="p-2 rounded-lg hover:bg-white/60 transition-colors touch-target"
@@ -613,12 +609,7 @@ export default function DashboardLayout({
                   <Search size={16} />
                   <span>{tSearch("placeholder")}</span>
                 </button>
-                <button
-                  className="p-2 rounded-lg hover:bg-v2-bg-primary transition-colors"
-                  aria-label="Notifications"
-                >
-                  <Bell size={20} className="text-v2-text-secondary" />
-                </button>
+                <NotificationBell />
               </div>
             </header>
 

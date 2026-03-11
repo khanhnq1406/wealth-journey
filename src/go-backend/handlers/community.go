@@ -140,6 +140,7 @@ func (h *CommunityHandler) GetFeed(c *gin.Context) {
 		Page:     int32(page),
 		PageSize: int32(pageSize),
 	}
+	req.Hashtag = c.Query("hashtag")
 
 	result, err := h.communityService.GetFeed(c.Request.Context(), userID, req)
 	if err != nil {
@@ -468,6 +469,262 @@ func (h *CommunityHandler) GetUploadURL(c *gin.Context) {
 	}
 
 	result, err := h.communityService.GetUploadURL(c.Request.Context(), userID, &req)
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, result)
+}
+
+// SharePost shares/reposts a post.
+func (h *CommunityHandler) SharePost(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	postID, err := strconv.Atoi(c.Param("post_id"))
+	if err != nil {
+		handler.BadRequest(c, err)
+		return
+	}
+
+	var req v1.SharePostRequest
+	if err := handler.BindAndValidate(c, &req); err != nil {
+		handler.BadRequest(c, err)
+		return
+	}
+	req.PostId = int32(postID)
+
+	result, err := h.communityService.SharePost(c.Request.Context(), userID, &req)
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Created(c, result)
+}
+
+// GetNotifications retrieves notifications for the authenticated user.
+func (h *CommunityHandler) GetNotifications(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	req := &v1.GetNotificationsRequest{}
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
+	req.Pagination = &v1.PaginationParams{
+		Page:     int32(page),
+		PageSize: int32(pageSize),
+	}
+
+	result, err := h.communityService.GetNotifications(c.Request.Context(), userID, req)
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, result)
+}
+
+// GetUnreadNotificationCount returns the count of unread notifications.
+func (h *CommunityHandler) GetUnreadNotificationCount(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	result, err := h.communityService.GetUnreadNotificationCount(c.Request.Context(), userID)
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, result)
+}
+
+// MarkNotificationsRead marks all notifications as read.
+func (h *CommunityHandler) MarkNotificationsRead(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	if err := h.communityService.MarkNotificationsRead(c.Request.Context(), userID); err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, gin.H{
+		"success": true,
+		"message": "Notifications marked as read",
+	})
+}
+
+// SavePost saves a post to the user's saved collection.
+func (h *CommunityHandler) SavePost(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	postID, err := strconv.Atoi(c.Param("post_id"))
+	if err != nil {
+		handler.BadRequest(c, err)
+		return
+	}
+
+	if err := h.communityService.SavePost(c.Request.Context(), userID, int32(postID)); err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, gin.H{"success": true})
+}
+
+// UnsavePost removes a post from the user's saved collection.
+func (h *CommunityHandler) UnsavePost(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	postID, err := strconv.Atoi(c.Param("post_id"))
+	if err != nil {
+		handler.BadRequest(c, err)
+		return
+	}
+
+	if err := h.communityService.UnsavePost(c.Request.Context(), userID, int32(postID)); err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, gin.H{"success": true})
+}
+
+// GetSavedPosts retrieves the user's saved posts.
+func (h *CommunityHandler) GetSavedPosts(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	req := &v1.GetSavedPostsRequest{}
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
+	req.Pagination = &v1.PaginationParams{
+		Page:     int32(page),
+		PageSize: int32(pageSize),
+	}
+
+	result, err := h.communityService.GetSavedPosts(c.Request.Context(), userID, req)
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, result)
+}
+
+// GetSuggestedUsers returns a list of suggested users to follow.
+func (h *CommunityHandler) GetSuggestedUsers(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	result, err := h.communityService.GetSuggestedUsers(c.Request.Context(), userID)
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, result)
+}
+
+// GetTrendingTopics returns trending hashtags.
+func (h *CommunityHandler) GetTrendingTopics(c *gin.Context) {
+	result, err := h.communityService.GetTrendingTopics(c.Request.Context())
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, result)
+}
+
+// GetFollowing returns paginated list of users that a user follows.
+func (h *CommunityHandler) GetFollowing(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	targetUserID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		handler.BadRequest(c, err)
+		return
+	}
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
+
+	req := &v1.GetFollowingRequest{
+		UserId: int32(targetUserID),
+		Pagination: &v1.PaginationParams{
+			Page:     int32(page),
+			PageSize: int32(pageSize),
+		},
+	}
+
+	result, err := h.communityService.GetFollowing(c.Request.Context(), userID, int32(targetUserID), req)
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, result)
+}
+
+// GetFollowers returns paginated list of users who follow a user.
+func (h *CommunityHandler) GetFollowers(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	targetUserID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		handler.BadRequest(c, err)
+		return
+	}
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
+
+	req := &v1.GetFollowersRequest{
+		UserId: int32(targetUserID),
+		Pagination: &v1.PaginationParams{
+			Page:     int32(page),
+			PageSize: int32(pageSize),
+		},
+	}
+
+	result, err := h.communityService.GetFollowers(c.Request.Context(), userID, int32(targetUserID), req)
 	if err != nil {
 		handler.HandleError(c, err)
 		return

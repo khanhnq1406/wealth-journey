@@ -29,7 +29,7 @@ C4Component
         Component(import_feat, "Import Feature", "features/import", "Import wizard steps, template management, file upload")
         Component(prices_feat, "Market Prices Feature", "features/market-prices", "Price display tables, symbol lookup")
         Component(report_feat, "Report Feature", "features/report", "Financial tables, period selectors, CSV/PDF export")
-        Component(community_feat, "Community Feature", "features/community", "Posts, comments, likes, follows, profiles, topic tags")
+        Component(community_feat, "Community Feature", "features/community", "Posts, comments, likes, follows, profiles, topic tags; Phase 2 components: SharePostModal, SharedPostEmbed, HashtagLink, SavedPostsView, SuggestedUserCard, SuggestedUsers, TrendingTopics, ProfileView, FollowingView, UserListItem; updated: PostCard (share+save actions, onUserClick), PostBody (hashtag rendering, shared post embed), PostActions (Share/Save buttons), PostEngagement (shareCount), PostHeader (clickable avatar+name via onUserClick), CommunityFeed (onUserClick prop); hooks: useSavedPost, useNotifications (useNotificationCount, useMarkAllRead); utils: hashtag.ts (extractHashtags, tokenizeContent)")
     }
 
     Container_Boundary(shared, "Shared Layer") {
@@ -41,6 +41,7 @@ C4Component
         Component(tables, "Table Components", "shared/components/table", "MobileTable, TanStackTable, VirtualizedList")
         Component(loading, "Loading Components", "shared/components/loading", "LoadingSpinner, FullPageLoading, Skeleton variants")
         Component(feedback, "Feedback Components", "shared/components/feedback", "EmptyState, ErrorState, Toast, Notification")
+        Component(notifications, "Notification Components", "shared/components/notifications", "NotificationBell, NotificationPanel, NotificationItem — shared bell+panel widget used in dashboard layout")
         Component(icons, "Icon System", "shared/components/icons", "SVG icon library: actions, finance, navigation, ui")
         Component(hooks, "Shared Hooks", "shared/hooks", "useMobile, useDebounce, useInfiniteScroll, useExchangeRate")
         Component(contexts, "React Contexts", "shared/contexts", "CurrencyContext, NotificationContext")
@@ -86,15 +87,16 @@ C4Component
     Rel(import_feat, forms, "Uses form components")
     Rel(report_feat, tables, "Uses table components")
     Rel(report_feat, charts, "Uses chart components")
-    Rel(community_feat, modals, "Uses BaseModal for create/edit post")
+    Rel(community_feat, modals, "Uses BaseModal for create/edit post and SharePostModal")
     Rel(community_feat, loading, "Uses LoadingSpinner")
+    Rel(community_feat, notifications, "Feeds notification data to NotificationBell/NotificationPanel")
 
     Rel(wallet_feat, gen_hooks, "useQueryListWallets, useMutationCreateWallet, etc.")
     Rel(txn_feat, gen_hooks, "useQueryListTransactions, useMutationCreateTransaction, etc.")
     Rel(invest_feat, gen_hooks, "useQueryListInvestments, useMutationCreateInvestment, etc.")
     Rel(budget_feat, gen_hooks, "useQueryListBudgets, useMutationCreateBudget, etc.")
     Rel(import_feat, gen_hooks, "useMutationUploadFile, useMutationParseFile, etc.")
-    Rel(community_feat, gen_hooks, "useQueryGetFeed, useMutationCreatePost, useMutationLikePost, useMutationFollowUser, etc.")
+    Rel(community_feat, gen_hooks, "useQueryGetFeed, useMutationCreatePost, useMutationLikePost, useMutationFollowUser; Phase 2: useMutationSharePost, useQueryGetNotifications, useQueryGetUnreadNotificationCount, useMutationMarkNotificationsRead, useMutationSavePost, useMutationUnsavePost, useQueryGetSavedPosts, useQueryGetSuggestedUsers, useQueryGetTrendingTopics, useQueryGetFollowing, useQueryGetFollowers, useQueryGetCommunityProfile, useQueryGetUserPosts, useMutationUpdateBio")
 
     Rel(gen_hooks, gen_api, "Wraps API calls")
     Rel(gen_api, gen_types, "Uses request/response types")
