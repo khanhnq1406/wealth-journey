@@ -17,6 +17,7 @@ interface PostCardProps {
   onPostUpdated?: () => void;
   onMenuClick?: (postId: number) => void;
   onHashtagClick?: (tag: string) => void;
+  onUserClick?: (userId: number) => void;
 }
 
 export function PostCard({
@@ -25,6 +26,7 @@ export function PostCard({
   onPostUpdated,
   onMenuClick,
   onHashtagClick,
+  onUserClick,
 }: PostCardProps) {
   const [showComments, setShowComments] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -52,6 +54,7 @@ export function PostCard({
         isOwnPost={isOwnPost}
         isFollowing={post.isFollowing ?? false}
         onMenuClick={onMenuClick ? () => onMenuClick(postId) : undefined}
+        onUserClick={onUserClick}
       />
 
       <PostBody

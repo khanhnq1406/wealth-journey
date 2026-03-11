@@ -11,9 +11,10 @@ interface CommunityFeedProps {
   currentUser: { id: number; name: string; picture: string };
   hashtag?: string;
   onHashtagClick?: (tag: string) => void;
+  onUserClick?: (userId: number) => void;
 }
 
-export function CommunityFeed({ currentUser, hashtag, onHashtagClick }: CommunityFeedProps) {
+export function CommunityFeed({ currentUser, hashtag, onHashtagClick, onUserClick }: CommunityFeedProps) {
   const [page, setPage] = useState(1);
   const pageSize = 20;
   const queryClient = useQueryClient();
@@ -75,6 +76,7 @@ export function CommunityFeed({ currentUser, hashtag, onHashtagClick }: Communit
           currentUser={currentUser}
           onPostUpdated={handlePostUpdated}
           onHashtagClick={onHashtagClick}
+          onUserClick={onUserClick}
         />
       ))}
 

@@ -113,6 +113,7 @@ export default function CommunityPage() {
           currentUser={currentUser}
           hashtag={hashtagFilter}
           onHashtagClick={handleHashtagClick}
+          onUserClick={handleUserClick}
         />
         {/* Suggested users + trending topics — mobile only (desktop uses right sidebar) */}
         <div className="flex flex-col gap-4 lg:hidden">
