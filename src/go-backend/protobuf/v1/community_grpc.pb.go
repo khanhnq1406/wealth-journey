@@ -45,6 +45,8 @@ const (
 	CommunityService_GetSavedPosts_FullMethodName              = "/wealthjourney.community.v1.CommunityService/GetSavedPosts"
 	CommunityService_GetSuggestedUsers_FullMethodName          = "/wealthjourney.community.v1.CommunityService/GetSuggestedUsers"
 	CommunityService_GetTrendingTopics_FullMethodName          = "/wealthjourney.community.v1.CommunityService/GetTrendingTopics"
+	CommunityService_GetFollowing_FullMethodName               = "/wealthjourney.community.v1.CommunityService/GetFollowing"
+	CommunityService_GetFollowers_FullMethodName               = "/wealthjourney.community.v1.CommunityService/GetFollowers"
 )
 
 // CommunityServiceClient is the client API for CommunityService service.
@@ -103,6 +105,10 @@ type CommunityServiceClient interface {
 	GetSuggestedUsers(ctx context.Context, in *GetSuggestedUsersRequest, opts ...grpc.CallOption) (*GetSuggestedUsersResponse, error)
 	// Get trending topics/hashtags
 	GetTrendingTopics(ctx context.Context, in *GetTrendingTopicsRequest, opts ...grpc.CallOption) (*GetTrendingTopicsResponse, error)
+	// Get users that a user follows (paginated)
+	GetFollowing(ctx context.Context, in *GetFollowingRequest, opts ...grpc.CallOption) (*GetFollowingResponse, error)
+	// Get users who follow a user (paginated)
+	GetFollowers(ctx context.Context, in *GetFollowersRequest, opts ...grpc.CallOption) (*GetFollowersResponse, error)
 }
 
 type communityServiceClient struct {
@@ -347,6 +353,24 @@ func (c *communityServiceClient) GetTrendingTopics(ctx context.Context, in *GetT
 	return out, nil
 }
 
+func (c *communityServiceClient) GetFollowing(ctx context.Context, in *GetFollowingRequest, opts ...grpc.CallOption) (*GetFollowingResponse, error) {
+	out := new(GetFollowingResponse)
+	err := c.cc.Invoke(ctx, CommunityService_GetFollowing_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *communityServiceClient) GetFollowers(ctx context.Context, in *GetFollowersRequest, opts ...grpc.CallOption) (*GetFollowersResponse, error) {
+	out := new(GetFollowersResponse)
+	err := c.cc.Invoke(ctx, CommunityService_GetFollowers_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CommunityServiceServer is the server API for CommunityService service.
 // All implementations must embed UnimplementedCommunityServiceServer
 // for forward compatibility
@@ -403,6 +427,10 @@ type CommunityServiceServer interface {
 	GetSuggestedUsers(context.Context, *GetSuggestedUsersRequest) (*GetSuggestedUsersResponse, error)
 	// Get trending topics/hashtags
 	GetTrendingTopics(context.Context, *GetTrendingTopicsRequest) (*GetTrendingTopicsResponse, error)
+	// Get users that a user follows (paginated)
+	GetFollowing(context.Context, *GetFollowingRequest) (*GetFollowingResponse, error)
+	// Get users who follow a user (paginated)
+	GetFollowers(context.Context, *GetFollowersRequest) (*GetFollowersResponse, error)
 	mustEmbedUnimplementedCommunityServiceServer()
 }
 
@@ -487,6 +515,12 @@ func (UnimplementedCommunityServiceServer) GetSuggestedUsers(context.Context, *G
 }
 func (UnimplementedCommunityServiceServer) GetTrendingTopics(context.Context, *GetTrendingTopicsRequest) (*GetTrendingTopicsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTrendingTopics not implemented")
+}
+func (UnimplementedCommunityServiceServer) GetFollowing(context.Context, *GetFollowingRequest) (*GetFollowingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFollowing not implemented")
+}
+func (UnimplementedCommunityServiceServer) GetFollowers(context.Context, *GetFollowersRequest) (*GetFollowersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFollowers not implemented")
 }
 func (UnimplementedCommunityServiceServer) mustEmbedUnimplementedCommunityServiceServer() {}
 
@@ -969,6 +1003,42 @@ func _CommunityService_GetTrendingTopics_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CommunityService_GetFollowing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFollowingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunityServiceServer).GetFollowing(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommunityService_GetFollowing_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunityServiceServer).GetFollowing(ctx, req.(*GetFollowingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommunityService_GetFollowers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFollowersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunityServiceServer).GetFollowers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommunityService_GetFollowers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunityServiceServer).GetFollowers(ctx, req.(*GetFollowersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CommunityService_ServiceDesc is the grpc.ServiceDesc for CommunityService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1079,6 +1149,14 @@ var CommunityService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTrendingTopics",
 			Handler:    _CommunityService_GetTrendingTopics_Handler,
+		},
+		{
+			MethodName: "GetFollowing",
+			Handler:    _CommunityService_GetFollowing_Handler,
+		},
+		{
+			MethodName: "GetFollowers",
+			Handler:    _CommunityService_GetFollowers_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

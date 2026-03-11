@@ -376,6 +376,43 @@ message GetSuggestedUsersResponse {
   string timestamp = 4 [json_name = "timestamp"];
 }
 
+// FollowUserItem represents a user in a following/followers list
+message FollowUserItem {
+  int32 userId = 1 [json_name = "userId"];
+  string userName = 2 [json_name = "userName"];
+  string userPicture = 3 [json_name = "userPicture"];
+  string bioSnippet = 4 [json_name = "bioSnippet"];
+  bool isFollowing = 5 [json_name = "isFollowing"];
+}
+
+// GetFollowing — list users that a user follows
+message GetFollowingRequest {
+  int32 userId = 1 [json_name = "userId"];
+  wealthjourney.common.v1.PaginationParams pagination = 2 [json_name = "pagination"];
+}
+
+message GetFollowingResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated FollowUserItem users = 3 [json_name = "users"];
+  wealthjourney.common.v1.PaginationResult pagination = 4 [json_name = "pagination"];
+  string timestamp = 5 [json_name = "timestamp"];
+}
+
+// GetFollowers — list users who follow a user
+message GetFollowersRequest {
+  int32 userId = 1 [json_name = "userId"];
+  wealthjourney.common.v1.PaginationParams pagination = 2 [json_name = "pagination"];
+}
+
+message GetFollowersResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated FollowUserItem users = 3 [json_name = "users"];
+  wealthjourney.common.v1.PaginationResult pagination = 4 [json_name = "pagination"];
+  string timestamp = 5 [json_name = "timestamp"];
+}
+
 // TrendingTopics
 message TrendingTopicItem {
   string hashtag = 1 [json_name = "hashtag"];
@@ -585,6 +622,20 @@ service CommunityService {
   rpc GetTrendingTopics(GetTrendingTopicsRequest) returns (GetTrendingTopicsResponse) {
     option (google.api.http) = {
       get: "/api/v1/community/trending"
+    };
+  }
+
+  // Get users that a user follows (paginated)
+  rpc GetFollowing(GetFollowingRequest) returns (GetFollowingResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/community/users/{userId}/following"
+    };
+  }
+
+  // Get users who follow a user (paginated)
+  rpc GetFollowers(GetFollowersRequest) returns (GetFollowersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/community/users/{userId}/followers"
     };
   }
 }

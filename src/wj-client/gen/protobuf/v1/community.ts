@@ -378,6 +378,43 @@ export interface GetSuggestedUsersResponse {
   timestamp: string;
 }
 
+/** FollowUserItem represents a user in a following/followers list */
+export interface FollowUserItem {
+  userId: number;
+  userName: string;
+  userPicture: string;
+  bioSnippet: string;
+  isFollowing: boolean;
+}
+
+/** GetFollowing — list users that a user follows */
+export interface GetFollowingRequest {
+  userId: number;
+  pagination: PaginationParams | undefined;
+}
+
+export interface GetFollowingResponse {
+  success: boolean;
+  message: string;
+  users: FollowUserItem[];
+  pagination: PaginationResult | undefined;
+  timestamp: string;
+}
+
+/** GetFollowers — list users who follow a user */
+export interface GetFollowersRequest {
+  userId: number;
+  pagination: PaginationParams | undefined;
+}
+
+export interface GetFollowersResponse {
+  success: boolean;
+  message: string;
+  users: FollowUserItem[];
+  pagination: PaginationResult | undefined;
+  timestamp: string;
+}
+
 /** TrendingTopics */
 export interface TrendingTopicItem {
   hashtag: string;
@@ -5713,6 +5750,538 @@ export const GetSuggestedUsersResponse: MessageFns<GetSuggestedUsersResponse> = 
     message.success = object.success ?? false;
     message.message = object.message ?? "";
     message.users = object.users?.map((e) => SuggestedUserItem.fromPartial(e)) || [];
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseFollowUserItem(): FollowUserItem {
+  return { userId: 0, userName: "", userPicture: "", bioSnippet: "", isFollowing: false };
+}
+
+export const FollowUserItem: MessageFns<FollowUserItem> = {
+  encode(message: FollowUserItem, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userId !== 0) {
+      writer.uint32(8).int32(message.userId);
+    }
+    if (message.userName !== "") {
+      writer.uint32(18).string(message.userName);
+    }
+    if (message.userPicture !== "") {
+      writer.uint32(26).string(message.userPicture);
+    }
+    if (message.bioSnippet !== "") {
+      writer.uint32(34).string(message.bioSnippet);
+    }
+    if (message.isFollowing !== false) {
+      writer.uint32(40).bool(message.isFollowing);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): FollowUserItem {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseFollowUserItem();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.userId = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.userName = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.userPicture = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.bioSnippet = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.isFollowing = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): FollowUserItem {
+    return {
+      userId: isSet(object.userId) ? globalThis.Number(object.userId) : 0,
+      userName: isSet(object.userName) ? globalThis.String(object.userName) : "",
+      userPicture: isSet(object.userPicture) ? globalThis.String(object.userPicture) : "",
+      bioSnippet: isSet(object.bioSnippet) ? globalThis.String(object.bioSnippet) : "",
+      isFollowing: isSet(object.isFollowing) ? globalThis.Boolean(object.isFollowing) : false,
+    };
+  },
+
+  toJSON(message: FollowUserItem): unknown {
+    const obj: any = {};
+    if (message.userId !== 0) {
+      obj.userId = Math.round(message.userId);
+    }
+    if (message.userName !== "") {
+      obj.userName = message.userName;
+    }
+    if (message.userPicture !== "") {
+      obj.userPicture = message.userPicture;
+    }
+    if (message.bioSnippet !== "") {
+      obj.bioSnippet = message.bioSnippet;
+    }
+    if (message.isFollowing !== false) {
+      obj.isFollowing = message.isFollowing;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<FollowUserItem>): FollowUserItem {
+    return FollowUserItem.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<FollowUserItem>): FollowUserItem {
+    const message = createBaseFollowUserItem();
+    message.userId = object.userId ?? 0;
+    message.userName = object.userName ?? "";
+    message.userPicture = object.userPicture ?? "";
+    message.bioSnippet = object.bioSnippet ?? "";
+    message.isFollowing = object.isFollowing ?? false;
+    return message;
+  },
+};
+
+function createBaseGetFollowingRequest(): GetFollowingRequest {
+  return { userId: 0, pagination: undefined };
+}
+
+export const GetFollowingRequest: MessageFns<GetFollowingRequest> = {
+  encode(message: GetFollowingRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userId !== 0) {
+      writer.uint32(8).int32(message.userId);
+    }
+    if (message.pagination !== undefined) {
+      PaginationParams.encode(message.pagination, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetFollowingRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetFollowingRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.userId = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.pagination = PaginationParams.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetFollowingRequest {
+    return {
+      userId: isSet(object.userId) ? globalThis.Number(object.userId) : 0,
+      pagination: isSet(object.pagination) ? PaginationParams.fromJSON(object.pagination) : undefined,
+    };
+  },
+
+  toJSON(message: GetFollowingRequest): unknown {
+    const obj: any = {};
+    if (message.userId !== 0) {
+      obj.userId = Math.round(message.userId);
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationParams.toJSON(message.pagination);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetFollowingRequest>): GetFollowingRequest {
+    return GetFollowingRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetFollowingRequest>): GetFollowingRequest {
+    const message = createBaseGetFollowingRequest();
+    message.userId = object.userId ?? 0;
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationParams.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseGetFollowingResponse(): GetFollowingResponse {
+  return { success: false, message: "", users: [], pagination: undefined, timestamp: "" };
+}
+
+export const GetFollowingResponse: MessageFns<GetFollowingResponse> = {
+  encode(message: GetFollowingResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.users) {
+      FollowUserItem.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.pagination !== undefined) {
+      PaginationResult.encode(message.pagination, writer.uint32(34).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(42).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetFollowingResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetFollowingResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.users.push(FollowUserItem.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.pagination = PaginationResult.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetFollowingResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      users: globalThis.Array.isArray(object?.users) ? object.users.map((e: any) => FollowUserItem.fromJSON(e)) : [],
+      pagination: isSet(object.pagination) ? PaginationResult.fromJSON(object.pagination) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetFollowingResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.users?.length) {
+      obj.users = message.users.map((e) => FollowUserItem.toJSON(e));
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationResult.toJSON(message.pagination);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetFollowingResponse>): GetFollowingResponse {
+    return GetFollowingResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetFollowingResponse>): GetFollowingResponse {
+    const message = createBaseGetFollowingResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.users = object.users?.map((e) => FollowUserItem.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationResult.fromPartial(object.pagination)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseGetFollowersRequest(): GetFollowersRequest {
+  return { userId: 0, pagination: undefined };
+}
+
+export const GetFollowersRequest: MessageFns<GetFollowersRequest> = {
+  encode(message: GetFollowersRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userId !== 0) {
+      writer.uint32(8).int32(message.userId);
+    }
+    if (message.pagination !== undefined) {
+      PaginationParams.encode(message.pagination, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetFollowersRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetFollowersRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.userId = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.pagination = PaginationParams.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetFollowersRequest {
+    return {
+      userId: isSet(object.userId) ? globalThis.Number(object.userId) : 0,
+      pagination: isSet(object.pagination) ? PaginationParams.fromJSON(object.pagination) : undefined,
+    };
+  },
+
+  toJSON(message: GetFollowersRequest): unknown {
+    const obj: any = {};
+    if (message.userId !== 0) {
+      obj.userId = Math.round(message.userId);
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationParams.toJSON(message.pagination);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetFollowersRequest>): GetFollowersRequest {
+    return GetFollowersRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetFollowersRequest>): GetFollowersRequest {
+    const message = createBaseGetFollowersRequest();
+    message.userId = object.userId ?? 0;
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationParams.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseGetFollowersResponse(): GetFollowersResponse {
+  return { success: false, message: "", users: [], pagination: undefined, timestamp: "" };
+}
+
+export const GetFollowersResponse: MessageFns<GetFollowersResponse> = {
+  encode(message: GetFollowersResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.users) {
+      FollowUserItem.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.pagination !== undefined) {
+      PaginationResult.encode(message.pagination, writer.uint32(34).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(42).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetFollowersResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetFollowersResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.users.push(FollowUserItem.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.pagination = PaginationResult.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetFollowersResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      users: globalThis.Array.isArray(object?.users) ? object.users.map((e: any) => FollowUserItem.fromJSON(e)) : [],
+      pagination: isSet(object.pagination) ? PaginationResult.fromJSON(object.pagination) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetFollowersResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.users?.length) {
+      obj.users = message.users.map((e) => FollowUserItem.toJSON(e));
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationResult.toJSON(message.pagination);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetFollowersResponse>): GetFollowersResponse {
+    return GetFollowersResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetFollowersResponse>): GetFollowersResponse {
+    const message = createBaseGetFollowersResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.users = object.users?.map((e) => FollowUserItem.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationResult.fromPartial(object.pagination)
+      : undefined;
     message.timestamp = object.timestamp ?? "";
     return message;
   },
