@@ -12,9 +12,11 @@ import { cn } from "@/lib/utils/cn";
 interface CommentSectionProps {
   postId: number;
   currentUser: { id: number; name: string; picture: string };
+  onCommentAdded?: () => void;
+  onCommentDeleted?: () => void;
 }
 
-export function CommentSection({ postId, currentUser }: CommentSectionProps) {
+export function CommentSection({ postId, currentUser, onCommentAdded, onCommentDeleted }: CommentSectionProps) {
   const [commentText, setCommentText] = useState("");
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
@@ -29,12 +31,15 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
       setCommentText("");
       queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetComments] });
       queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetFeed] });
+      onCommentAdded?.();
     },
   });
 
   const deleteCommentMutation = useMutationDeleteComment({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetComments] });
+      queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetFeed] });
+      onCommentDeleted?.();
     },
   });
 

@@ -39,7 +39,7 @@ export function ReplyList({ commentId, replyCount, postId: _postId, currentUserI
     (replyId: number) => {
       deleteCommentMutation.mutate({ commentId: replyId });
     },
-    [deleteCommentMutation]
+    [deleteCommentMutation],
   );
 
   if (replyCount === 0) return null;
@@ -56,7 +56,9 @@ export function ReplyList({ commentId, replyCount, postId: _postId, currentUserI
       {expanded && (
         <div>
           {isLoading && (
-            <div className="ml-8 mt-2 text-xs text-gray-400">Loading replies...</div>
+            <div className="ml-8 mt-2 text-xs text-gray-400">
+              Loading replies...
+            </div>
           )}
           {data?.replies?.map((reply) => (
             <ReplyBubble
