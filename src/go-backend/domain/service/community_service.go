@@ -806,7 +806,7 @@ func (s *communityService) commentToProto(comment *models.Comment, user *models.
 		IsOwnComment: isOwnComment,
 		CreatedAt:    comment.CreatedAt.Unix(),
 		ReplyCount:   comment.ReplyCount,
-		IsEdited:     comment.UpdatedAt != nil,
+		IsEdited:     comment.UpdatedAt != nil && comment.UpdatedAt.Unix() > comment.CreatedAt.Unix(),
 	}
 	if comment.ParentCommentID != nil {
 		item.ParentCommentId = *comment.ParentCommentID
