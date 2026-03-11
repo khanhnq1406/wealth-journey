@@ -28,6 +28,7 @@ export default function CommunityPage() {
 
   const handleHashtagClick = (tag: string) => {
     setHashtagFilter(tag);
+    setProfileUserId(null);
     setActiveView("feed");
     setMobileView("feed");
   };
@@ -41,6 +42,9 @@ export default function CommunityPage() {
   const handleViewChange = (view: CommunityView) => {
     if (view === "profile") {
       setProfileUserId(null); // Reset to own profile when clicking sidebar nav
+    }
+    if (view === "feed") {
+      setProfileUserId(null); // Clear other user context when going back to feed
     }
     setActiveView(view);
   };
@@ -101,8 +105,10 @@ export default function CommunityPage() {
       return (
         <FollowingView
           currentUser={currentUser}
+          targetUserId={profileUserId ?? undefined}
           onUserClick={handleUserClick}
           initialTab={followingTab}
+          onBack={profileUserId ? () => setActiveView("profile") : undefined}
         />
       );
     }

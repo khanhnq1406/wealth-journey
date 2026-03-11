@@ -3,25 +3,28 @@
 import { useState } from "react";
 import { useQueryGetFollowing, useQueryGetFollowers } from "@/utils/generated/hooks";
 import { UserListItem } from "./UserListItem";
-import { Users } from "lucide-react";
+import { Users, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 interface FollowingViewProps {
   currentUser: { id: number; name: string; picture: string };
+  targetUserId?: number;
   onUserClick?: (userId: number) => void;
   initialTab?: "following" | "followers";
+  onBack?: () => void;
 }
 
-export function FollowingView({ currentUser, onUserClick, initialTab = "following" }: FollowingViewProps) {
+export function FollowingView({ currentUser, targetUserId, onUserClick, initialTab = "following", onBack }: FollowingViewProps) {
   const [activeTab, setActiveTab] = useState<"following" | "followers">(initialTab);
+  const profileId = targetUserId ?? currentUser.id;
 
   const { data: followingData, isLoading: followingLoading } = useQueryGetFollowing(
-    { userId: currentUser.id, pagination: { page: 1, pageSize: 50, orderBy: "", order: "" } },
+    { userId: profileId, pagination: { page: 1, pageSize: 50, orderBy: "", order: "" } },
     { enabled: activeTab === "following", refetchOnMount: "always" }
   );
 
   const { data: followersData, isLoading: followersLoading } = useQueryGetFollowers(
-    { userId: currentUser.id, pagination: { page: 1, pageSize: 50, orderBy: "", order: "" } },
+    { userId: profileId, pagination: { page: 1, pageSize: 50, orderBy: "", order: "" } },
     { enabled: activeTab === "followers", refetchOnMount: "always" }
   );
 
@@ -37,6 +40,19 @@ export function FollowingView({ currentUser, onUserClick, initialTab = "followin
 
   return (
     <div className="bg-white sm:rounded-2xl border-b sm:border border-v2-border-light overflow-hidden">
+      {/* Back button — only when viewing another user's following/followers */}
+      {onBack && (
+        <div className="px-4 pt-3 pb-1">
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex items-center gap-1.5 text-sm text-v2-text-secondary hover:text-v2-text-primary transition-colors"
+          >
+            <ArrowLeft size={16} />
+            <span className="font-vietnam">Quay lại</span>
+          </button>
+        </div>
+      )}
       {/* Tabs */}
       <div className="flex border-b border-[#EDE8E1]">
         {tabs.map((tab) => (
