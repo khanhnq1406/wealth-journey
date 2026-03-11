@@ -5,31 +5,31 @@
 - **Plan file:** `docs/plans/2026-03-11-community-phase3-plan.md`
 - **Spec file:** `docs/specs/2026-03-11-community-phase3-spec.md`
 - **Started:** 2026-03-11T00:00:00Z
-- **Last updated:** 2026-03-11T00:00:00Z
+- **Last updated:** 2026-03-11T10:00:00Z
 - **Current state:** in_progress
-- **Current task:** 0
+- **Current task:** 14
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 0 | Update C4 Architecture Diagrams | pending | — | — |
-| 1 | Database Migration — Add Phase 3 Columns | pending | — | — |
-| 2 | Proto — Phase 3 Message Types & RPCs | pending | — | — |
-| 3 | Backend — Image Upload Service | pending | — | — |
-| 4 | Backend — Edit Comment (UpdateComment) | pending | — | — |
-| 5 | Backend — Reply Threads | pending | — | — |
-| 6 | Backend — Advanced Profile (UpdateProfile + GetLikedPosts) | pending | — | — |
-| 7 | Backend — Real-Time Notifications (SSE + Redis Pub/Sub) | pending | — | — |
-| 8 | Frontend — Proto Regeneration & API Hooks | pending | — | — |
-| 9 | Frontend — Image Upload Hook & Component | pending | — | — |
-| 10 | Frontend — Edit Comment UI | pending | — | — |
-| 11 | Frontend — Reply Thread UI | pending | — | — |
-| 12 | Frontend — Advanced Profile (Cover Photo, Extended Fields, Tabs) | pending | — | — |
-| 13 | Frontend — Real-Time Notification Stream (SSE) | pending | — | — |
+| 0 | Update C4 Architecture Diagrams | done | f2332b0 | Updated c4-component-backend and c4-component-frontend for Phase 3 |
+| 1 | Database Migration — Add Phase 3 Columns | done | 681a772 | Added cover_photo_url/location/website to user; parent_comment_id/reply_count/updated_at to comment |
+| 2 | Proto — Phase 3 Message Types & RPCs | done | cdc0ff2 | Added UpdateComment, GetReplies, UpdateProfile, GetLikedPosts, UploadImage RPCs; removed deprecated UpdateBio/GetUploadURL |
+| 3 | Backend — Image Upload Service | done | 28124fe | pkg/imaging with magic bytes validation, resize, EXIF strip; UploadImage handler |
+| 4 | Backend — Edit Comment (UpdateComment) | done | 55aab01 | UpdateComment with ownership check; IncrementReplyCount; Update in repo |
+| 5 | Backend — Reply Threads | done | ac08c66 | GetReplies; CreateComment with parent enforcement; DeleteComment cascades |
+| 6 | Backend — Advanced Profile (UpdateProfile + GetLikedPosts) | done | 8bb6cdb | UpdateProfile validates bio/location/website; GetLikedPosts paginated |
+| 7 | Backend — Real-Time Notifications (SSE + Redis Pub/Sub) | done | b171c76 | StreamNotifications SSE endpoint; Redis Publish/Subscribe; 30s heartbeat |
+| 8 | Frontend — Proto Regeneration & API Hooks | done | ac08c66 | Generated TS types + hooks for all Phase 3 RPCs |
+| 9 | Frontend — Image Upload Hook & Component | done | ac08c66 | useImageUpload with XHR progress; ImageUpload drag-drop component |
+| 10 | Frontend — Edit Comment UI | done | ac08c66 | EditCommentForm inline; CommentBubble with 3-dot menu + (edited) label |
+| 11 | Frontend — Reply Thread UI | done | ac08c66 | ReplyInput, ReplyBubble, ReplyList with lazy load; CommentSection updated |
+| 12 | Frontend — Advanced Profile (Cover Photo, Extended Fields, Tabs) | done | ac08c66 | ProfileTabs (Posts/Likes/Shared); ProfileEditModal; ProfileView cover photo |
+| 13 | Frontend — Real-Time Notification Stream (SSE) | done | ac08c66 | useNotificationStream with exponential backoff; cache update on event |
 | 14 | Create/Update Runtime Flow Diagrams | pending | — | — |
 | 15 | Backend Cleanup & Integration Verification | pending | — | — |
-| 16 | Frontend Build Verification | pending | — | — |
+| 16 | Frontend Build Verification | done | bd5d015 | Fixed ProfileCard (useMutationUpdateProfile) + CommentSection (parentCommentId: 0); build passes |
 | 17 | Write Implementation Report | pending | — | — |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
