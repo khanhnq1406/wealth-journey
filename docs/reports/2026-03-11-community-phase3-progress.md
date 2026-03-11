@@ -5,7 +5,7 @@
 - **Plan file:** `docs/plans/2026-03-11-community-phase3-plan.md`
 - **Spec file:** `docs/specs/2026-03-11-community-phase3-spec.md`
 - **Started:** 2026-03-11T00:00:00Z
-- **Last updated:** 2026-03-11T10:00:00Z
+- **Last updated:** 2026-03-11T12:00:00Z
 - **Current state:** completed
 - **Current task:** done
 
@@ -21,16 +21,16 @@
 | 5 | Backend — Reply Threads | done | ac08c66 | GetReplies; CreateComment with parent enforcement; DeleteComment cascades |
 | 6 | Backend — Advanced Profile (UpdateProfile + GetLikedPosts) | done | 8bb6cdb | UpdateProfile validates bio/location/website; GetLikedPosts paginated |
 | 7 | Backend — Real-Time Notifications (SSE + Redis Pub/Sub) | done | b171c76 | StreamNotifications SSE endpoint; Redis Publish/Subscribe; 30s heartbeat |
-| 8 | Frontend — Proto Regeneration & API Hooks | done | ac08c66 | Generated TS types + hooks for all Phase 3 RPCs |
-| 9 | Frontend — Image Upload Hook & Component | done | ac08c66 | useImageUpload with XHR progress; ImageUpload drag-drop component |
-| 10 | Frontend — Edit Comment UI | done | ac08c66 | EditCommentForm inline; CommentBubble with 3-dot menu + (edited) label |
-| 11 | Frontend — Reply Thread UI | done | ac08c66 | ReplyInput, ReplyBubble, ReplyList with lazy load; CommentSection updated |
-| 12 | Frontend — Advanced Profile (Cover Photo, Extended Fields, Tabs) | done | ac08c66 | ProfileTabs (Posts/Likes/Shared); ProfileEditModal; ProfileView cover photo |
-| 13 | Frontend — Real-Time Notification Stream (SSE) | done | ac08c66 | useNotificationStream with exponential backoff; cache update on event |
-| 14 | Create/Update Runtime Flow Diagrams | pending | — | — |
-| 15 | Backend Cleanup & Integration Verification | pending | — | — |
+| 8 | Frontend — Proto Regeneration & API Hooks | done | 9737437 | Generated TS types + hooks for all Phase 3 RPCs |
+| 9 | Frontend — Image Upload Hook & Component | done | 9737437 | useImageUpload with XHR progress; ImageUpload drag-drop component |
+| 10 | Frontend — Edit Comment UI | done | 9737437 | EditCommentForm inline; CommentBubble with 3-dot menu + (edited) label |
+| 11 | Frontend — Reply Thread UI | done | 9737437 | ReplyInput, ReplyBubble, ReplyList with lazy load; CommentSection updated |
+| 12 | Frontend — Advanced Profile (Cover Photo, Extended Fields, Tabs) | done | 9737437 | ProfileTabs (Posts/Likes/Shared); ProfileEditModal; ProfileView cover photo |
+| 13 | Frontend — Real-Time Notification Stream (SSE) | done | 9737437 | useNotificationStream with exponential backoff; cache update on event |
+| 14 | Create/Update Runtime Flow Diagrams | done | 8b0a7ff | Added flows 8-12 to flow-community.md; updated README diagram table |
+| 15 | Backend Cleanup & Integration Verification | done | 0bcde8f | Removed UpdateBio from interfaces, service, handler, routes; core packages compile |
 | 16 | Frontend Build Verification | done | bd5d015 | Fixed ProfileCard (useMutationUpdateProfile) + CommentSection (parentCommentId: 0); build passes |
-| 17 | Write Implementation Report | done | — | docs/reports/2026-03-11-community-phase3-report.md created |
+| 17 | Write Implementation Report | done | a2378f3 | docs/reports/2026-03-11-community-phase3-report.md created |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
