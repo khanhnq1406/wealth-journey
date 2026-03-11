@@ -227,6 +227,12 @@ func RegisterRoutes(
 		portfolio.GET("/historical-values", h.Investment.GetHistoricalPortfolioValues)
 	}
 
+	// Community SSE route — no rate limiter (long-lived connection), token auth via query param
+	communitySSE := v1.Group("/community")
+	{
+		communitySSE.GET("/notifications/stream", h.Community.StreamNotifications)
+	}
+
 	// Community routes (protected)
 	community := v1.Group("/community")
 	community.Use(AuthMiddleware(authSrv))
@@ -251,6 +257,7 @@ func RegisterRoutes(
 		community.POST("/posts/:post_id/comments", h.Community.CreateComment)
 		community.GET("/posts/:post_id/comments", h.Community.GetComments)
 		community.DELETE("/comments/:comment_id", h.Community.DeleteComment)
+		community.PUT("/comments/:comment_id", h.Community.UpdateComment)
 
 		// Users — specific routes first
 		community.GET("/users/:user_id/posts", h.Community.GetUserPosts)
@@ -259,15 +266,17 @@ func RegisterRoutes(
 		community.DELETE("/users/:user_id/follow", h.Community.UnfollowUser)
 		community.GET("/users/:user_id/following", h.Community.GetFollowing)
 		community.GET("/users/:user_id/followers", h.Community.GetFollowers)
+		community.GET("/users/:user_id/liked-posts", h.Community.GetLikedPosts)
 
 		// Profile
 		community.PUT("/profile/bio", h.Community.UpdateBio)
+		community.PUT("/profile", h.Community.UpdateProfile)
 
 		// Report
 		community.POST("/report", h.Community.ReportContent)
 
 		// Upload
-		community.POST("/upload-url", h.Community.GetUploadURL)
+		community.POST("/upload", h.Community.UploadImage)
 
 		// Phase 2: Share / Repost
 		community.POST("/posts/:post_id/share", h.Community.SharePost)

@@ -104,8 +104,8 @@ func ProvideUnderlyingRedis(rdb *redis.RedisClient) *redisv8.Client {
 }
 
 // ProvideServices creates all service instances.
-func ProvideServices(repos *service.Repositories, redisClient *redisv8.Client) *service.Services {
-	return service.NewServices(repos, redisClient)
+func ProvideServices(repos *service.Repositories, redisClient *redisv8.Client, storageProvider storage.StorageProvider, rdb *redis.RedisClient) *service.Services {
+	return service.NewServices(repos, redisClient, storageProvider, rdb)
 }
 
 // ProvideImportSystem sets up the import service and worker pool.
