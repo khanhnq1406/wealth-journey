@@ -6,8 +6,8 @@
 - **Spec file:** `docs/specs/2026-03-11-community-profile-following-spec.md`
 - **Started:** 2026-03-11
 - **Last updated:** 2026-03-11
-- **Current state:** in_progress
-- **Current task:** 11
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -22,8 +22,8 @@
 | 7 | Create ProfileView Component | done | 549d339 | Profile header + bio edit + stats + user posts list |
 | 8 | Wire Views into Community Page | done | 78ee712 | Added profileUserId/followingTab state, extended renderCenterContent |
 | 9 | Add User Click Navigation | done | a0a1926 | Threaded onUserClick through PostHeader → PostCard → CommunityFeed → page |
-| 10 | Update Architecture Diagrams | in_progress | — | Updating C4 backend/frontend + flow diagrams |
-| 11 | Build Verification and Report | pending | — | — |
+| 10 | Update Architecture Diagrams | done | b80df59 | Updated C4 backend/frontend + added flow diagrams |
+| 11 | Build Verification and Report | done | — | Go build + TS check pass, report written |
 
 ## Resume Instructions
 
