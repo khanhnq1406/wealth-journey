@@ -17,10 +17,10 @@
 | 1 | Create Public Backend Handler | done | 0b27c84 | Created PublicHandler, wired in AllHandlers, registered /api/v1/public/market-types route |
 | 2 | Add i18n Translation Keys | done | 05f9a0b | Added priceTeaser keys to EN and VI nav.json |
 | 3 | Create usePublicMarketTypes Hook | done | 05f9a0b | Created React Query hook with no auth headers |
-| 4 | Create LandingGoldPriceTable | pending | — | — |
-| 5 | Create LandingSilverPriceTable | pending | — | — |
-| 6 | Create LandingGoldPriceChart | pending | — | — |
-| 7 | Create LandingSilverPriceChart | pending | — | — |
+| 4 | Create LandingGoldPriceTable | done | 5c13e76 | Gold type table with login links, v2-gold color theme |
+| 5 | Create LandingSilverPriceTable | done | 5c13e76 | Silver type table with login links, v2-silver color theme |
+| 6 | Create LandingGoldPriceChart | done | 5c13e76 | Disabled gold chart shell, 400px, axes-only SVG + login button |
+| 7 | Create LandingSilverPriceChart | done | 5c13e76 | Disabled silver chart shell, 200px, axes-only SVG + login button |
 | 8 | Rewrite Landing Page | pending | — | — |
 | 9 | Update SEO Meta Tags | pending | — | — |
 | 10 | Update C4 Architecture Diagrams | pending | — | — |
