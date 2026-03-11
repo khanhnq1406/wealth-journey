@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQueryGetCommunityProfile } from "@/utils/generated/hooks";
 import { Avatar } from "./Avatar";
 import { FollowButton } from "./FollowButton";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MapPin, Link2 } from "lucide-react";
 import { ProfileTabs } from "./ProfileTabs";
 import { ProfileEditModal } from "./ProfileEditModal";
 
@@ -72,8 +72,9 @@ export function ProfileView({
           )}
           {isOwnProfile && (
             <button
+              type="button"
               onClick={() => setShowEditModal(true)}
-              className="absolute bottom-2 right-2 bg-black/40 text-white text-xs px-2 py-1 rounded-md hover:bg-black/60"
+              className="absolute bottom-2 right-2 z-10 bg-black/40 text-white text-xs px-2 py-1 rounded-md hover:bg-black/60"
             >
               Edit cover
             </button>
@@ -122,7 +123,7 @@ export function ProfileView({
           {/* Location */}
           {profile?.location && (
             <div className="flex items-center gap-1 text-sm text-gray-500 mt-1">
-              <span>📍</span>
+              <MapPin size={13} className="shrink-0" />
               <span>{profile.location}</span>
             </div>
           )}
@@ -135,7 +136,7 @@ export function ProfileView({
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-sm text-bg hover:underline mt-1"
             >
-              <span>🔗</span>
+              <Link2 size={13} className="shrink-0" />
               <span>{profile.website}</span>
             </a>
           )}

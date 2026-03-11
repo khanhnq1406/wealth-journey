@@ -91,6 +91,7 @@ export function ProfileEditModal({ profile, onClose }: ProfileEditModalProps) {
               onRemove={() => setAvatarUrl("")}
               currentImageUrl={avatarUrl || undefined}
               label="Upload profile photo"
+              className="h-24"
             />
           </div>
 

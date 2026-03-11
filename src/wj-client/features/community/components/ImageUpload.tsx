@@ -62,14 +62,16 @@ export function ImageUpload({
     onRemove?.();
   };
 
+  const hasFixedHeight = /\bh-\d/.test(className);
+
   return (
     <div className={`relative ${className}`}>
       {preview ? (
-        <div className="relative">
+        <div className={`relative overflow-hidden rounded-lg ${hasFixedHeight ? "h-full" : ""}`}>
           <img
             src={preview}
             alt="Preview"
-            className="w-full rounded-lg object-cover max-h-64"
+            className={`w-full object-cover ${hasFixedHeight ? "h-full" : "max-h-64"}`}
           />
           {!uploading && (
             <button
