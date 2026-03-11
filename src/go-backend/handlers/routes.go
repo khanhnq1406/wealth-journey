@@ -258,6 +258,7 @@ func RegisterRoutes(
 		community.GET("/posts/:post_id/comments", h.Community.GetComments)
 		community.DELETE("/comments/:comment_id", h.Community.DeleteComment)
 		community.PUT("/comments/:comment_id", h.Community.UpdateComment)
+		community.GET("/comments/:comment_id/replies", h.Community.GetReplies)
 
 		// Users — specific routes first
 		community.GET("/users/:user_id/posts", h.Community.GetUserPosts)

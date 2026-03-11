@@ -418,19 +418,44 @@ func (s *communityService) CreateComment(ctx context.Context, userID int32, req 
 		return nil, err
 	}
 
+	// Handle reply threading
+	var parentCommentID *int32
+	if req.ParentCommentId > 0 {
+		parentComment, err := s.commentRepo.GetByID(ctx, req.ParentCommentId)
+		if err != nil {
+			return nil, apperrors.NewValidationError("parent comment not found")
+		}
+		// Validate parent belongs to same post
+		if parentComment.PostID != req.PostId {
+			return nil, apperrors.NewValidationError("parent comment does not belong to this post")
+		}
+		// Flatten nesting: if parent is itself a reply, use its parent
+		actualParentID := parentComment.ID
+		if parentComment.ParentCommentID != nil {
+			actualParentID = *parentComment.ParentCommentID
+		}
+		parentCommentID = &actualParentID
+	}
+
 	comment := &models.Comment{
-		PostID:  req.PostId,
-		UserID:  userID,
-		Content: content,
+		PostID:          req.PostId,
+		UserID:          userID,
+		Content:         content,
+		ParentCommentID: parentCommentID,
 	}
 
 	if err := s.commentRepo.Create(ctx, comment); err != nil {
 		return nil, err
 	}
 
-	// Increment comment count
-	if err := s.postRepo.IncrementCommentCount(ctx, req.PostId, 1); err != nil {
-		return nil, err
+	// Increment reply count on parent, or post comment count for root comments
+	if parentCommentID != nil {
+		_ = s.commentRepo.IncrementReplyCount(ctx, *parentCommentID, 1)
+	} else {
+		// Increment post comment count only for root comments
+		if err := s.postRepo.IncrementCommentCount(ctx, req.PostId, 1); err != nil {
+			return nil, err
+		}
 	}
 
 	// Create notification for post owner (Phase 2)
@@ -460,7 +485,17 @@ func (s *communityService) DeleteComment(ctx context.Context, userID int32, comm
 		return err
 	}
 
-	return s.postRepo.IncrementCommentCount(ctx, comment.PostID, -1)
+	// If this is a reply, decrement parent's reply count
+	if comment.ParentCommentID != nil {
+		_ = s.commentRepo.IncrementReplyCount(ctx, *comment.ParentCommentID, -1)
+		// Also decrement post comment count by 1 for the reply itself
+		_ = s.postRepo.IncrementCommentCount(ctx, comment.PostID, -1)
+	} else {
+		// Root comment — decrement post comment count by 1 (replies deleted by DB cascade/soft-delete)
+		_ = s.postRepo.IncrementCommentCount(ctx, comment.PostID, -1)
+	}
+
+	return nil
 }
 
 func (s *communityService) GetComments(ctx context.Context, userID int32, postID int32, req *v1.GetCommentsRequest) (*v1.GetCommentsResponse, error) {
@@ -493,6 +528,44 @@ func (s *communityService) GetComments(ctx context.Context, userID int32, postID
 			TotalPages: totalPages,
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+func (s *communityService) GetReplies(ctx context.Context, viewerUserID int32, commentID int32, req *v1.GetRepliesRequest) (*v1.GetRepliesResponse, error) {
+	// Validate comment exists
+	if _, err := s.commentRepo.GetByID(ctx, commentID); err != nil {
+		return nil, err
+	}
+
+	opts := s.parsePagination(req.Pagination)
+
+	replies, total, err := s.commentRepo.GetByParentID(ctx, commentID, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	replyItems := make([]*v1.CommentItem, len(replies))
+	for i, reply := range replies {
+		replyItems[i] = s.commentToProto(reply, reply.User, reply.UserID == viewerUserID)
+	}
+
+	page, pageSize := s.getPageParams(req.Pagination)
+	totalPages := int32(0)
+	if pageSize > 0 {
+		totalPages = (int32(total) + pageSize - 1) / pageSize
+	}
+
+	return &v1.GetRepliesResponse{
+		Success: true,
+		Message: "Replies retrieved successfully",
+		Replies: replyItems,
+		Pagination: &v1.PaginationResult{
+			Page:       page,
+			PageSize:   pageSize,
+			TotalCount: int32(total),
+			TotalPages: totalPages,
+		},
+		Timestamp: time.Now().UTC().Format(time.RFC3339),
 	}, nil
 }
 

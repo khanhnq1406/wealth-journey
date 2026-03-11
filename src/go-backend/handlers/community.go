@@ -857,6 +857,41 @@ func (h *CommunityHandler) GetLikedPosts(c *gin.Context) {
 	handler.Success(c, result)
 }
 
+// GetReplies handles GET /api/v1/community/comments/:comment_id/replies
+func (h *CommunityHandler) GetReplies(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	commentIDStr := c.Param("comment_id")
+	commentID, err := strconv.ParseInt(commentIDStr, 10, 32)
+	if err != nil {
+		handler.HandleError(c, apperrors.NewValidationError("invalid comment ID"))
+		return
+	}
+
+	page, _ := strconv.ParseInt(c.DefaultQuery("page", "1"), 10, 32)
+	pageSize, _ := strconv.ParseInt(c.DefaultQuery("pageSize", "5"), 10, 32)
+
+	req := &v1.GetRepliesRequest{
+		CommentId: int32(commentID),
+		Pagination: &v1.PaginationParams{
+			Page:     int32(page),
+			PageSize: int32(pageSize),
+		},
+	}
+
+	resp, err := h.communityService.GetReplies(c.Request.Context(), userID, int32(commentID), req)
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, resp)
+}
+
 // StreamNotifications handles GET /api/v1/community/notifications/stream (SSE).
 // The EventSource API cannot send custom headers, so the JWT is passed as a
 // ?token= query parameter instead of the Authorization header.

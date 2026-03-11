@@ -272,4 +272,7 @@ type CommunityService interface {
 	// Phase 3: Advanced Profile
 	UpdateProfile(ctx context.Context, userID int32, req *v1.UpdateProfileRequest) (*v1.UpdateProfileResponse, error)
 	GetLikedPosts(ctx context.Context, viewerUserID int32, targetUserID int32, req *v1.GetLikedPostsRequest) (*v1.GetLikedPostsResponse, error)
+	// Phase 3: Reply Threads
+	// GetReplies returns paginated replies for a comment.
+	GetReplies(ctx context.Context, viewerUserID int32, commentID int32, req *v1.GetRepliesRequest) (*v1.GetRepliesResponse, error)
 }

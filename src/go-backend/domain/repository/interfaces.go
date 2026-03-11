@@ -326,6 +326,10 @@ type CommentRepository interface {
 	Update(ctx context.Context, comment *models.Comment) error
 	SoftDelete(ctx context.Context, id int32) error
 	GetByPostID(ctx context.Context, postID int32, opts ListOptions) ([]*models.Comment, int, error)
+	// GetByParentID returns replies for a parent comment (paginated).
+	GetByParentID(ctx context.Context, parentID int32, opts ListOptions) ([]*models.Comment, int, error)
+	// IncrementReplyCount atomically increments (positive) or decrements (negative) the reply_count.
+	IncrementReplyCount(ctx context.Context, commentID int32, delta int32) error
 }
 
 // LikeRepository defines the interface for post like data operations.

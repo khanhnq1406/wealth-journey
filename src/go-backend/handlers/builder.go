@@ -101,7 +101,7 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 		GoldChart:    goldChartHandler,
 		SilverChart:  silverChartHandler,
 		Import:       NewImportHandler(repos.Import, importService),
-		Community:    NewCommunityHandler(services.Community),
+		Community:    NewCommunityHandler(services.Community, deps.RDB, deps.AuthSrv),
 		Public:       NewPublicHandler(),
 	}
 }
