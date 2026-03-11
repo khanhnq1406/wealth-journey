@@ -13,7 +13,7 @@
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 0 | Add Proto Messages & Generate Code | pending | — | — |
+| 0 | Add Proto Messages & Generate Code | done | 9924685 | Added MarketTypeItem, GetPublicMarketTypesRequest/Response, GetPublicMarketTypes RPC |
 | 1 | Create Public Backend Handler | pending | — | — |
 | 2 | Add i18n Translation Keys | pending | — | — |
 | 3 | Create usePublicMarketTypes Hook | pending | — | — |
