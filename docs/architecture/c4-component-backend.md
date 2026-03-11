@@ -26,7 +26,7 @@ C4Component
         Component(price_h, "Market Price Handlers", "Gold + Silver + Market", "Gold/silver type codes and combined market prices")
         Component(gold_chart_h, "Gold Chart Handler", "handlers/gold_chart.go", "Proxies gold price history from mihong.vn with Redis caching")
         Component(silver_chart_h, "Silver Chart Handler", "handlers/silver_chart.go", "Proxies silver price history from giabac.vn and Yahoo Finance SI=F with Redis caching")
-        Component(community_h, "Community Handlers", "Posts + Comments + Likes + Follows + Reports", "Social feed, post CRUD, commenting, liking, user following, content moderation")
+        Component(community_h, "Community Handlers", "Posts + Comments + Likes + Follows + Reports", "Social feed, post CRUD, commenting, liking, user following, content moderation; Phase 3: UploadImage, UpdateComment, GetReplies, GetLikedPosts, UpdateProfile, StreamNotifications")
         Component(public_h, "Public Handlers", "handlers/public.go", "No-auth endpoint returning gold/silver type names from in-memory registries. IP-rate-limited only.")
     }
 
@@ -42,7 +42,7 @@ C4Component
         Component(fx_svc, "FX Rate Service", "domain/service", "Currency conversion rates, cross-currency calculations")
         Component(import_svc, "Import Service", "domain/service", "File parsing, field mapping, duplicate detection, batch execution")
         Component(portfolio_svc, "Portfolio History Service", "domain/service", "Historical portfolio value snapshots for charts")
-        Component(community_svc, "Community Service", "domain/service", "Social interactions: posts, comments, likes, follows, content reports; Phase 2: SharePost, GetNotifications, GetUnreadNotificationCount, MarkNotificationsRead, SavePost, UnsavePost, GetSavedPosts, GetSuggestedUsers, GetTrendingTopics, GetFollowing, GetFollowers")
+        Component(community_svc, "Community Service", "domain/service", "Social interactions: posts, comments, likes, follows, content reports; Phase 2: SharePost, GetNotifications, GetUnreadNotificationCount, MarkNotificationsRead, SavePost, UnsavePost, GetSavedPosts, GetSuggestedUsers, GetTrendingTopics, GetFollowing, GetFollowers; Phase 3: UploadImage, UpdateComment, GetReplies, GetLikedPosts, UpdateProfile, StreamNotifications")
     }
 
     Container_Boundary(repos, "Repository Layer (Data Access)") {
@@ -71,7 +71,8 @@ C4Component
         Component(yahoo_client, "Yahoo Finance Client", "pkg/yahoo", "Market price quotes, symbol search, rate throttling")
         Component(vang_client, "vangsaigon.vn Client", "pkg/vnprice", "Vietnamese gold/silver price fetching via vangsaigon.vn REST API")
         Component(google_client, "Google OAuth Verifier", "domain/auth", "ID token verification via Google APIs")
-        Component(supabase_client, "Supabase Storage Client", "pkg/storage", "File upload/download for bank statements")
+        Component(supabase_client, "Supabase Storage Client", "pkg/storage", "File upload/download for bank statements and community image uploads")
+        Component(imaging_pkg, "Imaging Package", "pkg/imaging", "Image processing: resize, compress, format conversion for community post/profile images")
         Component(mihong_client, "mihong.vn API", "direct HTTP", "Gold price history for domestic/global market")
         Component(giabac_client, "giabac.vn API", "direct HTTP", "Domestic silver price history")
     }
@@ -79,6 +80,7 @@ C4Component
     Container_Boundary(infra, "Infrastructure") {
         ComponentDb(postgres, "PostgreSQL 16", "Supabase", "All domain tables")
         ComponentDb(redis, "Redis 7", "Cache/Queue", "Sessions, prices, queues")
+        Component(redis_pubsub, "Redis Pub/Sub", "Redis channels", "Real-time notification fanout for StreamNotifications SSE endpoint; community_notifications channel")
     }
 
     Rel(gin, auth_mw, "Applies to protected routes")
@@ -108,6 +110,7 @@ C4Component
     Rel(import_h, import_svc, "Delegates import ops")
     Rel(price_h, market_svc, "Combined gold/silver prices")
     Rel(community_h, community_svc, "Delegates social interactions")
+    Rel(community_h, redis_pubsub, "Subscribes for SSE StreamNotifications")
     Rel(gold_chart_h, redis, "Read/write price history cache")
     Rel(silver_chart_h, redis, "Read/write price history cache")
 
@@ -127,6 +130,9 @@ C4Component
     Rel(import_svc, txn_repo, "Creates transactions")
     Rel(portfolio_svc, portfolio_repo, "Persists snapshots")
     Rel(portfolio_svc, invest_svc, "Current portfolio value")
+    Rel(community_svc, redis_pubsub, "Publishes notification events")
+    Rel(community_svc, supabase_client, "Stores community images")
+    Rel(community_svc, imaging_pkg, "Processes images before upload")
     Rel(community_svc, post_repo, "Persists posts")
     Rel(community_svc, comment_repo, "Persists comments")
     Rel(community_svc, like_repo, "Persists likes")

@@ -289,3 +289,17 @@ func (r *RedisClient) Close() error {
 func (r *RedisClient) GetClient() *redis.Client {
 	return r.client
 }
+
+// Publish publishes a message to a Redis channel.
+func (r *RedisClient) Publish(channel string, message interface{}) error {
+	data, err := json.Marshal(message)
+	if err != nil {
+		return fmt.Errorf("failed to marshal message: %w", err)
+	}
+	return r.client.Publish(r.ctx, channel, data).Err()
+}
+
+// Subscribe returns a PubSub subscription for the given channel.
+func (r *RedisClient) Subscribe(channel string) *redis.PubSub {
+	return r.client.Subscribe(r.ctx, channel)
+}

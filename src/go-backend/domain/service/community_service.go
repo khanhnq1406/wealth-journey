@@ -1,7 +1,10 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"crypto/rand"
+	"fmt"
 	"regexp"
 	"strings"
 	"time"
@@ -9,6 +12,9 @@ import (
 	"wealthjourney/domain/models"
 	"wealthjourney/domain/repository"
 	apperrors "wealthjourney/pkg/errors"
+	"wealthjourney/pkg/imaging"
+	pkgredis "wealthjourney/pkg/redis"
+	"wealthjourney/pkg/storage"
 	"wealthjourney/pkg/validator"
 	v1 "wealthjourney/protobuf/v1"
 )
@@ -32,6 +38,8 @@ type communityService struct {
 	notificationRepo repository.NotificationRepository
 	savedPostRepo    repository.SavedPostRepository
 	hashtagRepo      repository.HashtagRepository
+	storageProvider  storage.StorageProvider
+	redisClient      *pkgredis.RedisClient
 }
 
 // NewCommunityService creates a new community service
@@ -45,6 +53,8 @@ func NewCommunityService(
 	notificationRepo repository.NotificationRepository,
 	savedPostRepo repository.SavedPostRepository,
 	hashtagRepo repository.HashtagRepository,
+	storageProvider storage.StorageProvider,
+	redisClient *pkgredis.RedisClient,
 ) CommunityService {
 	return &communityService{
 		postRepo:         postRepo,
@@ -56,6 +66,8 @@ func NewCommunityService(
 		notificationRepo: notificationRepo,
 		savedPostRepo:    savedPostRepo,
 		hashtagRepo:      hashtagRepo,
+		storageProvider:  storageProvider,
+		redisClient:      redisClient,
 	}
 }
 
@@ -406,19 +418,44 @@ func (s *communityService) CreateComment(ctx context.Context, userID int32, req 
 		return nil, err
 	}
 
+	// Handle reply threading
+	var parentCommentID *int32
+	if req.ParentCommentId > 0 {
+		parentComment, err := s.commentRepo.GetByID(ctx, req.ParentCommentId)
+		if err != nil {
+			return nil, apperrors.NewValidationError("parent comment not found")
+		}
+		// Validate parent belongs to same post
+		if parentComment.PostID != req.PostId {
+			return nil, apperrors.NewValidationError("parent comment does not belong to this post")
+		}
+		// Flatten nesting: if parent is itself a reply, use its parent
+		actualParentID := parentComment.ID
+		if parentComment.ParentCommentID != nil {
+			actualParentID = *parentComment.ParentCommentID
+		}
+		parentCommentID = &actualParentID
+	}
+
 	comment := &models.Comment{
-		PostID:  req.PostId,
-		UserID:  userID,
-		Content: content,
+		PostID:          req.PostId,
+		UserID:          userID,
+		Content:         content,
+		ParentCommentID: parentCommentID,
 	}
 
 	if err := s.commentRepo.Create(ctx, comment); err != nil {
 		return nil, err
 	}
 
-	// Increment comment count
-	if err := s.postRepo.IncrementCommentCount(ctx, req.PostId, 1); err != nil {
-		return nil, err
+	// Increment reply count on parent, or post comment count for root comments
+	if parentCommentID != nil {
+		_ = s.commentRepo.IncrementReplyCount(ctx, *parentCommentID, 1)
+	} else {
+		// Increment post comment count only for root comments
+		if err := s.postRepo.IncrementCommentCount(ctx, req.PostId, 1); err != nil {
+			return nil, err
+		}
 	}
 
 	// Create notification for post owner (Phase 2)
@@ -448,7 +485,16 @@ func (s *communityService) DeleteComment(ctx context.Context, userID int32, comm
 		return err
 	}
 
-	return s.postRepo.IncrementCommentCount(ctx, comment.PostID, -1)
+	// If this is a reply, decrement parent's reply count only.
+	// Replies never increment post.comment_count, so don't decrement it here.
+	if comment.ParentCommentID != nil {
+		_ = s.commentRepo.IncrementReplyCount(ctx, *comment.ParentCommentID, -1)
+	} else {
+		// Root comment — decrement post comment count by 1
+		_ = s.postRepo.IncrementCommentCount(ctx, comment.PostID, -1)
+	}
+
+	return nil
 }
 
 func (s *communityService) GetComments(ctx context.Context, userID int32, postID int32, req *v1.GetCommentsRequest) (*v1.GetCommentsResponse, error) {
@@ -481,6 +527,44 @@ func (s *communityService) GetComments(ctx context.Context, userID int32, postID
 			TotalPages: totalPages,
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+func (s *communityService) GetReplies(ctx context.Context, viewerUserID int32, commentID int32, req *v1.GetRepliesRequest) (*v1.GetRepliesResponse, error) {
+	// Validate comment exists
+	if _, err := s.commentRepo.GetByID(ctx, commentID); err != nil {
+		return nil, err
+	}
+
+	opts := s.parsePagination(req.Pagination)
+
+	replies, total, err := s.commentRepo.GetByParentID(ctx, commentID, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	replyItems := make([]*v1.CommentItem, len(replies))
+	for i, reply := range replies {
+		replyItems[i] = s.commentToProto(reply, reply.User, reply.UserID == viewerUserID)
+	}
+
+	page, pageSize := s.getPageParams(req.Pagination)
+	totalPages := int32(0)
+	if pageSize > 0 {
+		totalPages = (int32(total) + pageSize - 1) / pageSize
+	}
+
+	return &v1.GetRepliesResponse{
+		Success: true,
+		Message: "Replies retrieved successfully",
+		Replies: replyItems,
+		Pagination: &v1.PaginationResult{
+			Page:       page,
+			PageSize:   pageSize,
+			TotalCount: int32(total),
+			TotalPages: totalPages,
+		},
+		Timestamp: time.Now().UTC().Format(time.RFC3339),
 	}, nil
 }
 
@@ -562,25 +646,12 @@ func (s *communityService) GetProfile(ctx context.Context, userID int32, targetU
 			FollowingCount: followingCount,
 			IsFollowing:    isFollowing,
 			IsOwnProfile:   userID == targetUserID,
+			CoverPhotoUrl:  user.CoverPhotoURL,
+			Location:       user.Location,
+			Website:        user.Website,
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
-}
-
-func (s *communityService) UpdateBio(ctx context.Context, userID int32, bio string) error {
-	// Sanitize bio
-	bio, err := validator.SanitizeStringField(bio, 200)
-	if err != nil {
-		return err
-	}
-
-	user, err := s.userRepo.GetByID(ctx, userID)
-	if err != nil {
-		return err
-	}
-
-	user.Bio = strings.TrimSpace(bio)
-	return s.userRepo.Update(ctx, user)
 }
 
 func (s *communityService) ReportContent(ctx context.Context, userID int32, req *v1.ReportContentRequest) error {
@@ -640,16 +711,60 @@ func (s *communityService) ReportContent(ctx context.Context, userID int32, req 
 	return s.reportRepo.Create(ctx, report)
 }
 
-func (s *communityService) GetUploadURL(ctx context.Context, userID int32, req *v1.GetUploadURLRequest) (*v1.GetUploadURLResponse, error) {
-	// TODO: Implement Supabase Storage signed URL generation
-	// For now, return a placeholder response
-	return &v1.GetUploadURLResponse{
-		Success:   true,
-		Message:   "Upload URL generated",
-		UploadUrl: "",
-		PublicUrl: "",
-		Timestamp: time.Now().Format(time.RFC3339),
-	}, nil
+func (s *communityService) UploadImage(ctx context.Context, userID int32, fileData []byte, purpose string, filename string) (string, error) {
+	// Validate purpose whitelist
+	validPurposes := map[string]bool{"post": true, "avatar": true, "cover": true}
+	if !validPurposes[purpose] {
+		return "", apperrors.NewValidationError("invalid purpose: must be 'post', 'avatar', or 'cover'")
+	}
+
+	// Validate magic bytes
+	mimeType, err := imaging.ValidateMagicBytes(fileData)
+	if err != nil {
+		return "", apperrors.NewValidationError("invalid image: " + err.Error())
+	}
+
+	// Validate size (5MB max)
+	if len(fileData) > 5*1024*1024 {
+		return "", apperrors.NewValidationError("image too large: maximum size is 5MB")
+	}
+
+	// Determine max width by purpose
+	maxWidth := map[string]int{
+		"avatar": 400,
+		"cover":  1920,
+		"post":   2048,
+	}[purpose]
+
+	// Resize and strip EXIF
+	processed, err := imaging.ResizeImage(fileData, mimeType, maxWidth)
+	if err != nil {
+		return "", apperrors.NewValidationError("failed to process image: " + err.Error())
+	}
+
+	// Check storage provider is available
+	if s.storageProvider == nil {
+		return "", fmt.Errorf("storage provider not configured")
+	}
+
+	// Generate storage key: community/{purpose}/{userId}/{uuid}.{ext}
+	ext := imaging.MimeTypeToExtension(mimeType)
+	key := fmt.Sprintf("community/%s/%d/%s.%s", purpose, userID, generateUUID(), ext)
+
+	// Upload via storage provider
+	result, err := s.storageProvider.Upload(ctx, bytes.NewReader(processed), key, mimeType)
+	if err != nil {
+		return "", fmt.Errorf("failed to upload image: %w", err)
+	}
+
+	return result.URL, nil
+}
+
+// generateUUID generates a simple UUID v4.
+func generateUUID() string {
+	b := make([]byte, 16)
+	_, _ = rand.Read(b)
+	return fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 }
 
 // --- Helpers ---
@@ -689,12 +804,57 @@ func (s *communityService) commentToProto(comment *models.Comment, user *models.
 		Content:      comment.Content,
 		IsOwnComment: isOwnComment,
 		CreatedAt:    comment.CreatedAt.Unix(),
+		ReplyCount:   comment.ReplyCount,
+		IsEdited:     comment.UpdatedAt != nil && comment.UpdatedAt.Unix() > comment.CreatedAt.Unix(),
+	}
+	if comment.ParentCommentID != nil {
+		item.ParentCommentId = *comment.ParentCommentID
+	}
+	if comment.UpdatedAt != nil {
+		item.UpdatedAt = comment.UpdatedAt.Unix()
 	}
 	if user != nil {
 		item.UserName = user.Name
 		item.UserPicture = user.Picture
 	}
 	return item
+}
+
+func (s *communityService) UpdateComment(ctx context.Context, userID int32, req *v1.UpdateCommentRequest) (*v1.UpdateCommentResponse, error) {
+	comment, err := s.commentRepo.GetByID(ctx, req.CommentId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Authorization: only comment owner can edit
+	if comment.UserID != userID {
+		return nil, apperrors.NewForbiddenError("you can only edit your own comments")
+	}
+
+	// Validate content
+	content, err := validator.SanitizeStringField(req.Content, 500)
+	if err != nil {
+		return nil, err
+	}
+	if err := validator.Length("content", content, 1, 500); err != nil {
+		return nil, err
+	}
+
+	// Update comment
+	now := time.Now().UTC()
+	comment.Content = content
+	comment.UpdatedAt = &now
+
+	if err := s.commentRepo.Update(ctx, comment); err != nil {
+		return nil, err
+	}
+
+	return &v1.UpdateCommentResponse{
+		Success:   true,
+		Message:   "Comment updated successfully",
+		Data:      s.commentToProto(comment, comment.User, true),
+		Timestamp: time.Now().UTC().Format(time.RFC3339),
+	}, nil
 }
 
 func (s *communityService) parsePagination(params *v1.PaginationParams) repository.ListOptions {
@@ -766,6 +926,20 @@ func (s *communityService) createNotification(ctx context.Context, userID, actor
 		Type:    notifType,
 		PostID:  postID,
 	})
+
+	// Publish real-time notification to Redis Pub/Sub if client is available
+	if s.redisClient != nil {
+		notificationPayload := map[string]interface{}{
+			"type":    notifType,
+			"actorId": actorID,
+			"userId":  userID,
+		}
+		if postID != nil {
+			notificationPayload["postId"] = *postID
+		}
+		channel := fmt.Sprintf("user:%d:notifications", userID)
+		_ = s.redisClient.Publish(channel, notificationPayload)
+	}
 }
 
 func (s *communityService) SharePost(ctx context.Context, userID int32, req *v1.SharePostRequest) (*v1.SharePostResponse, error) {
@@ -1235,6 +1409,141 @@ func (s *communityService) GetTrendingTopics(ctx context.Context) (*v1.GetTrendi
 		Success:   true,
 		Message:   "Trending topics retrieved successfully",
 		Topics:    items,
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+// isValidURL validates that a string is a valid HTTP/HTTPS URL.
+var validURLPattern = regexp.MustCompile(`^https?://[^\s/$.?#].[^\s]*$`)
+
+func isValidURL(u string) bool {
+	return validURLPattern.MatchString(u)
+}
+
+// UpdateProfile updates the authenticated user's profile fields.
+func (s *communityService) UpdateProfile(ctx context.Context, userID int32, req *v1.UpdateProfileRequest) (*v1.UpdateProfileResponse, error) {
+	user, err := s.userRepo.GetByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Validate and sanitize bio (0-200 chars)
+	if req.Bio != "" {
+		bio, err := validator.SanitizeStringField(req.Bio, 200)
+		if err != nil {
+			return nil, err
+		}
+		user.Bio = bio
+	}
+
+	// Validate and sanitize location (0-100 chars)
+	if req.Location != "" {
+		location, err := validator.SanitizeStringField(req.Location, 100)
+		if err != nil {
+			return nil, err
+		}
+		user.Location = location
+	}
+
+	// Validate and sanitize website (0-200 chars, URL pattern)
+	if req.Website != "" {
+		website, err := validator.SanitizeStringField(req.Website, 200)
+		if err != nil {
+			return nil, err
+		}
+		if !isValidURL(website) {
+			return nil, apperrors.NewValidationError("website must be a valid URL (http:// or https://)")
+		}
+		user.Website = website
+	}
+
+	// Update picture if provided (max 2048 chars for signed URLs)
+	if req.Picture != "" {
+		picture, err := validator.SanitizeStringField(req.Picture, 2048)
+		if err != nil {
+			return nil, err
+		}
+		user.Picture = picture
+	}
+
+	// Update cover photo if provided (max 2048 chars for signed URLs)
+	if req.CoverPhotoUrl != "" {
+		coverPhoto, err := validator.SanitizeStringField(req.CoverPhotoUrl, 2048)
+		if err != nil {
+			return nil, err
+		}
+		user.CoverPhotoURL = coverPhoto
+	}
+
+	if err := s.userRepo.Update(ctx, user); err != nil {
+		return nil, err
+	}
+
+	profile, err := s.GetProfile(ctx, userID, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.UpdateProfileResponse{
+		Success:   true,
+		Message:   "Profile updated successfully",
+		Data:      profile.Data,
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+// GetLikedPosts returns a paginated list of posts liked by a target user.
+func (s *communityService) GetLikedPosts(ctx context.Context, viewerUserID int32, targetUserID int32, req *v1.GetLikedPostsRequest) (*v1.GetLikedPostsResponse, error) {
+	opts := s.parsePagination(req.Pagination)
+
+	postIDs, total, err := s.likeRepo.GetLikedPostsByUser(ctx, targetUserID, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	// Batch-fetch liked status for the viewer
+	viewerLikedIDs, err := s.likeRepo.GetLikedPostIDs(ctx, viewerUserID, postIDs)
+	if err != nil {
+		return nil, err
+	}
+	viewerLikedSet := make(map[int32]bool, len(viewerLikedIDs))
+	for _, id := range viewerLikedIDs {
+		viewerLikedSet[id] = true
+	}
+
+	// Batch-fetch saved status for the viewer
+	savedIDs, _ := s.savedPostRepo.GetSavedPostIDs(ctx, viewerUserID, postIDs)
+	savedSet := make(map[int32]bool, len(savedIDs))
+	for _, id := range savedIDs {
+		savedSet[id] = true
+	}
+
+	var posts []*v1.PostItem
+	for _, postID := range postIDs {
+		post, err := s.postRepo.GetByID(ctx, postID)
+		if err != nil {
+			continue // skip posts that may have been deleted
+		}
+		isOwnPost := post.UserID == viewerUserID
+		posts = append(posts, s.postToProto(post, post.User, viewerLikedSet[postID], isOwnPost, false, savedSet[postID]))
+	}
+
+	page, pageSize := s.getPageParams(req.Pagination)
+	totalPages := int32(0)
+	if pageSize > 0 {
+		totalPages = (int32(total) + pageSize - 1) / pageSize
+	}
+
+	return &v1.GetLikedPostsResponse{
+		Success: true,
+		Message: "Liked posts retrieved successfully",
+		Posts:   posts,
+		Pagination: &v1.PaginationResult{
+			Page:       page,
+			PageSize:   pageSize,
+			TotalCount: int32(total),
+			TotalPages: totalPages,
+		},
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
 }

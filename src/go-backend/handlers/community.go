@@ -1,24 +1,36 @@
 package handlers
 
 import (
+	"fmt"
+	"io"
+	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 
+	"wealthjourney/domain/auth"
 	"wealthjourney/domain/service"
+	apperrors "wealthjourney/pkg/errors"
 	"wealthjourney/pkg/handler"
+	pkgredis "wealthjourney/pkg/redis"
 	v1 "wealthjourney/protobuf/v1"
 )
 
 // CommunityHandler handles community-related HTTP requests.
 type CommunityHandler struct {
 	communityService service.CommunityService
+	redisClient      *pkgredis.RedisClient
+	authSrv          *auth.Server
 }
 
 // NewCommunityHandler creates a new CommunityHandler instance.
-func NewCommunityHandler(communityService service.CommunityService) *CommunityHandler {
-	return &CommunityHandler{communityService: communityService}
+func NewCommunityHandler(communityService service.CommunityService, rdb *pkgredis.RedisClient, authSrv *auth.Server) *CommunityHandler {
+	return &CommunityHandler{
+		communityService: communityService,
+		redisClient:      rdb,
+		authSrv:          authSrv,
+	}
 }
 
 // CreatePost creates a new community post.
@@ -293,6 +305,37 @@ func (h *CommunityHandler) DeleteComment(c *gin.Context) {
 	})
 }
 
+// UpdateComment handles PUT /api/v1/community/comments/:comment_id
+func (h *CommunityHandler) UpdateComment(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	commentIDStr := c.Param("comment_id")
+	commentID, err := strconv.ParseInt(commentIDStr, 10, 32)
+	if err != nil {
+		handler.HandleError(c, apperrors.NewValidationError("invalid comment ID"))
+		return
+	}
+
+	var req v1.UpdateCommentRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		handler.HandleError(c, apperrors.NewValidationError(err.Error()))
+		return
+	}
+	req.CommentId = int32(commentID)
+
+	resp, err := h.communityService.UpdateComment(c.Request.Context(), userID, &req)
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, resp)
+}
+
 // GetComments retrieves comments for a post.
 func (h *CommunityHandler) GetComments(c *gin.Context) {
 	userID, ok := handler.GetUserID(c)
@@ -402,32 +445,6 @@ func (h *CommunityHandler) GetProfile(c *gin.Context) {
 	handler.Success(c, result)
 }
 
-// UpdateBio updates the user's bio.
-func (h *CommunityHandler) UpdateBio(c *gin.Context) {
-	userID, ok := handler.GetUserID(c)
-	if !ok {
-		handler.Unauthorized(c, "User not authenticated")
-		return
-	}
-
-	var req v1.UpdateBioRequest
-	if err := handler.BindAndValidate(c, &req); err != nil {
-		handler.BadRequest(c, err)
-		return
-	}
-
-	if err := h.communityService.UpdateBio(c.Request.Context(), userID, req.Bio); err != nil {
-		handler.HandleError(c, err)
-		return
-	}
-
-	handler.Success(c, gin.H{
-		"success":   true,
-		"message":   "Bio updated successfully",
-		"timestamp": time.Now().Format(time.RFC3339),
-	})
-}
-
 // ReportContent reports a post or comment.
 func (h *CommunityHandler) ReportContent(c *gin.Context) {
 	userID, ok := handler.GetUserID(c)
@@ -454,27 +471,49 @@ func (h *CommunityHandler) ReportContent(c *gin.Context) {
 	})
 }
 
-// GetUploadURL generates a signed upload URL for post images.
-func (h *CommunityHandler) GetUploadURL(c *gin.Context) {
+// UploadImage handles POST /api/v1/community/upload
+// Accepts multipart form with "file" field and optional "purpose" field.
+func (h *CommunityHandler) UploadImage(c *gin.Context) {
 	userID, ok := handler.GetUserID(c)
 	if !ok {
 		handler.Unauthorized(c, "User not authenticated")
 		return
 	}
 
-	var req v1.GetUploadURLRequest
-	if err := handler.BindAndValidate(c, &req); err != nil {
-		handler.BadRequest(c, err)
+	// Enforce 5MB limit on the request body
+	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 5<<20)
+
+	file, fileHeader, err := c.Request.FormFile("file")
+	if err != nil {
+		handler.HandleError(c, apperrors.NewValidationError("missing file field"))
+		return
+	}
+	defer file.Close()
+
+	// Read file bytes
+	fileData := make([]byte, fileHeader.Size)
+	if _, err := file.Read(fileData); err != nil {
+		handler.HandleError(c, apperrors.NewValidationError("failed to read file"))
 		return
 	}
 
-	result, err := h.communityService.GetUploadURL(c.Request.Context(), userID, &req)
+	purpose := c.PostForm("purpose")
+	if purpose == "" {
+		purpose = "post"
+	}
+
+	imageURL, err := h.communityService.UploadImage(c.Request.Context(), userID, fileData, purpose, fileHeader.Filename)
 	if err != nil {
 		handler.HandleError(c, err)
 		return
 	}
 
-	handler.Success(c, result)
+	handler.Success(c, gin.H{
+		"success":   true,
+		"message":   "Image uploaded successfully",
+		"imageUrl":  imageURL,
+		"timestamp": time.Now().UTC().Format(time.RFC3339),
+	})
 }
 
 // SharePost shares/reposts a post.
@@ -731,4 +770,159 @@ func (h *CommunityHandler) GetFollowers(c *gin.Context) {
 	}
 
 	handler.Success(c, result)
+}
+
+// UpdateProfile updates the authenticated user's community profile fields.
+func (h *CommunityHandler) UpdateProfile(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	var req v1.UpdateProfileRequest
+	if err := handler.BindAndValidate(c, &req); err != nil {
+		handler.BadRequest(c, err)
+		return
+	}
+
+	result, err := h.communityService.UpdateProfile(c.Request.Context(), userID, &req)
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, result)
+}
+
+// GetLikedPosts retrieves posts liked by a specific user.
+func (h *CommunityHandler) GetLikedPosts(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	targetUserID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		handler.HandleError(c, apperrors.NewValidationError("invalid user ID"))
+		return
+	}
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
+
+	req := &v1.GetLikedPostsRequest{
+		UserId: int32(targetUserID),
+		Pagination: &v1.PaginationParams{
+			Page:     int32(page),
+			PageSize: int32(pageSize),
+		},
+	}
+
+	result, err := h.communityService.GetLikedPosts(c.Request.Context(), userID, int32(targetUserID), req)
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, result)
+}
+
+// GetReplies handles GET /api/v1/community/comments/:comment_id/replies
+func (h *CommunityHandler) GetReplies(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.Unauthorized(c, "User not authenticated")
+		return
+	}
+
+	commentIDStr := c.Param("comment_id")
+	commentID, err := strconv.ParseInt(commentIDStr, 10, 32)
+	if err != nil {
+		handler.HandleError(c, apperrors.NewValidationError("invalid comment ID"))
+		return
+	}
+
+	page, _ := strconv.ParseInt(c.DefaultQuery("page", "1"), 10, 32)
+	pageSize, _ := strconv.ParseInt(c.DefaultQuery("pageSize", "5"), 10, 32)
+
+	req := &v1.GetRepliesRequest{
+		CommentId: int32(commentID),
+		Pagination: &v1.PaginationParams{
+			Page:     int32(page),
+			PageSize: int32(pageSize),
+		},
+	}
+
+	resp, err := h.communityService.GetReplies(c.Request.Context(), userID, int32(commentID), req)
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, resp)
+}
+
+// StreamNotifications handles GET /api/v1/community/notifications/stream (SSE).
+// The EventSource API cannot send custom headers, so the JWT is passed as a
+// ?token= query parameter instead of the Authorization header.
+func (h *CommunityHandler) StreamNotifications(c *gin.Context) {
+	// Validate token from query parameter (EventSource API limitation)
+	token := c.Query("token")
+	if token == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "missing token"})
+		return
+	}
+
+	if h.authSrv == nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "auth service unavailable"})
+		return
+	}
+
+	// Parse and validate the JWT to extract the user ID
+	claims, err := h.authSrv.ParseToken(token)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		return
+	}
+	userID := claims.UserID
+
+	if h.redisClient == nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "streaming not available"})
+		return
+	}
+
+	// Set SSE response headers
+	c.Header("Content-Type", "text/event-stream")
+	c.Header("Cache-Control", "no-cache")
+	c.Header("Connection", "keep-alive")
+	c.Header("X-Accel-Buffering", "no")
+
+	// Subscribe to the user's personal notification channel
+	channel := fmt.Sprintf("user:%d:notifications", userID)
+	pubsub := h.redisClient.Subscribe(channel)
+	defer pubsub.Close()
+
+	// Keep-alive ticker sends a comment every 30 s to prevent proxy timeouts
+	ctx := c.Request.Context()
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
+
+	c.Stream(func(w io.Writer) bool {
+		select {
+		case msg, ok := <-pubsub.Channel():
+			if !ok {
+				return false
+			}
+			fmt.Fprintf(w, "event: notification\ndata: %s\n\n", msg.Payload)
+			return true
+		case <-ticker.C:
+			// SSE comment (keep-alive ping)
+			fmt.Fprintf(w, ":ping\n\n")
+			return true
+		case <-ctx.Done():
+			return false
+		}
+	})
 }

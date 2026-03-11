@@ -33,9 +33,7 @@ const (
 	CommunityService_FollowUser_FullMethodName                 = "/wealthjourney.community.v1.CommunityService/FollowUser"
 	CommunityService_UnfollowUser_FullMethodName               = "/wealthjourney.community.v1.CommunityService/UnfollowUser"
 	CommunityService_GetCommunityProfile_FullMethodName        = "/wealthjourney.community.v1.CommunityService/GetCommunityProfile"
-	CommunityService_UpdateBio_FullMethodName                  = "/wealthjourney.community.v1.CommunityService/UpdateBio"
 	CommunityService_ReportContent_FullMethodName              = "/wealthjourney.community.v1.CommunityService/ReportContent"
-	CommunityService_GetUploadURL_FullMethodName               = "/wealthjourney.community.v1.CommunityService/GetUploadURL"
 	CommunityService_SharePost_FullMethodName                  = "/wealthjourney.community.v1.CommunityService/SharePost"
 	CommunityService_GetNotifications_FullMethodName           = "/wealthjourney.community.v1.CommunityService/GetNotifications"
 	CommunityService_GetUnreadNotificationCount_FullMethodName = "/wealthjourney.community.v1.CommunityService/GetUnreadNotificationCount"
@@ -47,6 +45,11 @@ const (
 	CommunityService_GetTrendingTopics_FullMethodName          = "/wealthjourney.community.v1.CommunityService/GetTrendingTopics"
 	CommunityService_GetFollowing_FullMethodName               = "/wealthjourney.community.v1.CommunityService/GetFollowing"
 	CommunityService_GetFollowers_FullMethodName               = "/wealthjourney.community.v1.CommunityService/GetFollowers"
+	CommunityService_UpdateComment_FullMethodName              = "/wealthjourney.community.v1.CommunityService/UpdateComment"
+	CommunityService_GetReplies_FullMethodName                 = "/wealthjourney.community.v1.CommunityService/GetReplies"
+	CommunityService_GetLikedPosts_FullMethodName              = "/wealthjourney.community.v1.CommunityService/GetLikedPosts"
+	CommunityService_UpdateProfile_FullMethodName              = "/wealthjourney.community.v1.CommunityService/UpdateProfile"
+	CommunityService_UploadImage_FullMethodName                = "/wealthjourney.community.v1.CommunityService/UploadImage"
 )
 
 // CommunityServiceClient is the client API for CommunityService service.
@@ -81,12 +84,8 @@ type CommunityServiceClient interface {
 	UnfollowUser(ctx context.Context, in *UnfollowUserRequest, opts ...grpc.CallOption) (*UnfollowUserResponse, error)
 	// Get a user's community profile
 	GetCommunityProfile(ctx context.Context, in *GetCommunityProfileRequest, opts ...grpc.CallOption) (*GetCommunityProfileResponse, error)
-	// Update own bio
-	UpdateBio(ctx context.Context, in *UpdateBioRequest, opts ...grpc.CallOption) (*UpdateBioResponse, error)
 	// Report content (post or comment)
 	ReportContent(ctx context.Context, in *ReportContentRequest, opts ...grpc.CallOption) (*ReportContentResponse, error)
-	// Get a signed upload URL for post images
-	GetUploadURL(ctx context.Context, in *GetUploadURLRequest, opts ...grpc.CallOption) (*GetUploadURLResponse, error)
 	// Share/repost a post with optional commentary
 	SharePost(ctx context.Context, in *SharePostRequest, opts ...grpc.CallOption) (*SharePostResponse, error)
 	// Get notifications for current user
@@ -109,6 +108,16 @@ type CommunityServiceClient interface {
 	GetFollowing(ctx context.Context, in *GetFollowingRequest, opts ...grpc.CallOption) (*GetFollowingResponse, error)
 	// Get users who follow a user (paginated)
 	GetFollowers(ctx context.Context, in *GetFollowersRequest, opts ...grpc.CallOption) (*GetFollowersResponse, error)
+	// Update an existing comment
+	UpdateComment(ctx context.Context, in *UpdateCommentRequest, opts ...grpc.CallOption) (*UpdateCommentResponse, error)
+	// Get replies for a comment
+	GetReplies(ctx context.Context, in *GetRepliesRequest, opts ...grpc.CallOption) (*GetRepliesResponse, error)
+	// Get posts liked by a user
+	GetLikedPosts(ctx context.Context, in *GetLikedPostsRequest, opts ...grpc.CallOption) (*GetLikedPostsResponse, error)
+	// Update the current user's community profile
+	UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*UpdateProfileResponse, error)
+	// Upload an image for use in posts or profile
+	UploadImage(ctx context.Context, in *UploadImageRequest, opts ...grpc.CallOption) (*UploadImageResponse, error)
 }
 
 type communityServiceClient struct {
@@ -245,27 +254,9 @@ func (c *communityServiceClient) GetCommunityProfile(ctx context.Context, in *Ge
 	return out, nil
 }
 
-func (c *communityServiceClient) UpdateBio(ctx context.Context, in *UpdateBioRequest, opts ...grpc.CallOption) (*UpdateBioResponse, error) {
-	out := new(UpdateBioResponse)
-	err := c.cc.Invoke(ctx, CommunityService_UpdateBio_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *communityServiceClient) ReportContent(ctx context.Context, in *ReportContentRequest, opts ...grpc.CallOption) (*ReportContentResponse, error) {
 	out := new(ReportContentResponse)
 	err := c.cc.Invoke(ctx, CommunityService_ReportContent_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *communityServiceClient) GetUploadURL(ctx context.Context, in *GetUploadURLRequest, opts ...grpc.CallOption) (*GetUploadURLResponse, error) {
-	out := new(GetUploadURLResponse)
-	err := c.cc.Invoke(ctx, CommunityService_GetUploadURL_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -371,6 +362,51 @@ func (c *communityServiceClient) GetFollowers(ctx context.Context, in *GetFollow
 	return out, nil
 }
 
+func (c *communityServiceClient) UpdateComment(ctx context.Context, in *UpdateCommentRequest, opts ...grpc.CallOption) (*UpdateCommentResponse, error) {
+	out := new(UpdateCommentResponse)
+	err := c.cc.Invoke(ctx, CommunityService_UpdateComment_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *communityServiceClient) GetReplies(ctx context.Context, in *GetRepliesRequest, opts ...grpc.CallOption) (*GetRepliesResponse, error) {
+	out := new(GetRepliesResponse)
+	err := c.cc.Invoke(ctx, CommunityService_GetReplies_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *communityServiceClient) GetLikedPosts(ctx context.Context, in *GetLikedPostsRequest, opts ...grpc.CallOption) (*GetLikedPostsResponse, error) {
+	out := new(GetLikedPostsResponse)
+	err := c.cc.Invoke(ctx, CommunityService_GetLikedPosts_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *communityServiceClient) UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*UpdateProfileResponse, error) {
+	out := new(UpdateProfileResponse)
+	err := c.cc.Invoke(ctx, CommunityService_UpdateProfile_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *communityServiceClient) UploadImage(ctx context.Context, in *UploadImageRequest, opts ...grpc.CallOption) (*UploadImageResponse, error) {
+	out := new(UploadImageResponse)
+	err := c.cc.Invoke(ctx, CommunityService_UploadImage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CommunityServiceServer is the server API for CommunityService service.
 // All implementations must embed UnimplementedCommunityServiceServer
 // for forward compatibility
@@ -403,12 +439,8 @@ type CommunityServiceServer interface {
 	UnfollowUser(context.Context, *UnfollowUserRequest) (*UnfollowUserResponse, error)
 	// Get a user's community profile
 	GetCommunityProfile(context.Context, *GetCommunityProfileRequest) (*GetCommunityProfileResponse, error)
-	// Update own bio
-	UpdateBio(context.Context, *UpdateBioRequest) (*UpdateBioResponse, error)
 	// Report content (post or comment)
 	ReportContent(context.Context, *ReportContentRequest) (*ReportContentResponse, error)
-	// Get a signed upload URL for post images
-	GetUploadURL(context.Context, *GetUploadURLRequest) (*GetUploadURLResponse, error)
 	// Share/repost a post with optional commentary
 	SharePost(context.Context, *SharePostRequest) (*SharePostResponse, error)
 	// Get notifications for current user
@@ -431,6 +463,16 @@ type CommunityServiceServer interface {
 	GetFollowing(context.Context, *GetFollowingRequest) (*GetFollowingResponse, error)
 	// Get users who follow a user (paginated)
 	GetFollowers(context.Context, *GetFollowersRequest) (*GetFollowersResponse, error)
+	// Update an existing comment
+	UpdateComment(context.Context, *UpdateCommentRequest) (*UpdateCommentResponse, error)
+	// Get replies for a comment
+	GetReplies(context.Context, *GetRepliesRequest) (*GetRepliesResponse, error)
+	// Get posts liked by a user
+	GetLikedPosts(context.Context, *GetLikedPostsRequest) (*GetLikedPostsResponse, error)
+	// Update the current user's community profile
+	UpdateProfile(context.Context, *UpdateProfileRequest) (*UpdateProfileResponse, error)
+	// Upload an image for use in posts or profile
+	UploadImage(context.Context, *UploadImageRequest) (*UploadImageResponse, error)
 	mustEmbedUnimplementedCommunityServiceServer()
 }
 
@@ -480,14 +522,8 @@ func (UnimplementedCommunityServiceServer) UnfollowUser(context.Context, *Unfoll
 func (UnimplementedCommunityServiceServer) GetCommunityProfile(context.Context, *GetCommunityProfileRequest) (*GetCommunityProfileResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCommunityProfile not implemented")
 }
-func (UnimplementedCommunityServiceServer) UpdateBio(context.Context, *UpdateBioRequest) (*UpdateBioResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateBio not implemented")
-}
 func (UnimplementedCommunityServiceServer) ReportContent(context.Context, *ReportContentRequest) (*ReportContentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReportContent not implemented")
-}
-func (UnimplementedCommunityServiceServer) GetUploadURL(context.Context, *GetUploadURLRequest) (*GetUploadURLResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUploadURL not implemented")
 }
 func (UnimplementedCommunityServiceServer) SharePost(context.Context, *SharePostRequest) (*SharePostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SharePost not implemented")
@@ -521,6 +557,21 @@ func (UnimplementedCommunityServiceServer) GetFollowing(context.Context, *GetFol
 }
 func (UnimplementedCommunityServiceServer) GetFollowers(context.Context, *GetFollowersRequest) (*GetFollowersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFollowers not implemented")
+}
+func (UnimplementedCommunityServiceServer) UpdateComment(context.Context, *UpdateCommentRequest) (*UpdateCommentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateComment not implemented")
+}
+func (UnimplementedCommunityServiceServer) GetReplies(context.Context, *GetRepliesRequest) (*GetRepliesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetReplies not implemented")
+}
+func (UnimplementedCommunityServiceServer) GetLikedPosts(context.Context, *GetLikedPostsRequest) (*GetLikedPostsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetLikedPosts not implemented")
+}
+func (UnimplementedCommunityServiceServer) UpdateProfile(context.Context, *UpdateProfileRequest) (*UpdateProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateProfile not implemented")
+}
+func (UnimplementedCommunityServiceServer) UploadImage(context.Context, *UploadImageRequest) (*UploadImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UploadImage not implemented")
 }
 func (UnimplementedCommunityServiceServer) mustEmbedUnimplementedCommunityServiceServer() {}
 
@@ -787,24 +838,6 @@ func _CommunityService_GetCommunityProfile_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CommunityService_UpdateBio_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateBioRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CommunityServiceServer).UpdateBio(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CommunityService_UpdateBio_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CommunityServiceServer).UpdateBio(ctx, req.(*UpdateBioRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _CommunityService_ReportContent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ReportContentRequest)
 	if err := dec(in); err != nil {
@@ -819,24 +852,6 @@ func _CommunityService_ReportContent_Handler(srv interface{}, ctx context.Contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CommunityServiceServer).ReportContent(ctx, req.(*ReportContentRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _CommunityService_GetUploadURL_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUploadURLRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CommunityServiceServer).GetUploadURL(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CommunityService_GetUploadURL_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CommunityServiceServer).GetUploadURL(ctx, req.(*GetUploadURLRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1039,6 +1054,96 @@ func _CommunityService_GetFollowers_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CommunityService_UpdateComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCommentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunityServiceServer).UpdateComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommunityService_UpdateComment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunityServiceServer).UpdateComment(ctx, req.(*UpdateCommentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommunityService_GetReplies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRepliesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunityServiceServer).GetReplies(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommunityService_GetReplies_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunityServiceServer).GetReplies(ctx, req.(*GetRepliesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommunityService_GetLikedPosts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLikedPostsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunityServiceServer).GetLikedPosts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommunityService_GetLikedPosts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunityServiceServer).GetLikedPosts(ctx, req.(*GetLikedPostsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommunityService_UpdateProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunityServiceServer).UpdateProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommunityService_UpdateProfile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunityServiceServer).UpdateProfile(ctx, req.(*UpdateProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommunityService_UploadImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UploadImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunityServiceServer).UploadImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommunityService_UploadImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunityServiceServer).UploadImage(ctx, req.(*UploadImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CommunityService_ServiceDesc is the grpc.ServiceDesc for CommunityService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1103,16 +1208,8 @@ var CommunityService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CommunityService_GetCommunityProfile_Handler,
 		},
 		{
-			MethodName: "UpdateBio",
-			Handler:    _CommunityService_UpdateBio_Handler,
-		},
-		{
 			MethodName: "ReportContent",
 			Handler:    _CommunityService_ReportContent_Handler,
-		},
-		{
-			MethodName: "GetUploadURL",
-			Handler:    _CommunityService_GetUploadURL_Handler,
 		},
 		{
 			MethodName: "SharePost",
@@ -1157,6 +1254,26 @@ var CommunityService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFollowers",
 			Handler:    _CommunityService_GetFollowers_Handler,
+		},
+		{
+			MethodName: "UpdateComment",
+			Handler:    _CommunityService_UpdateComment_Handler,
+		},
+		{
+			MethodName: "GetReplies",
+			Handler:    _CommunityService_GetReplies_Handler,
+		},
+		{
+			MethodName: "GetLikedPosts",
+			Handler:    _CommunityService_GetLikedPosts_Handler,
+		},
+		{
+			MethodName: "UpdateProfile",
+			Handler:    _CommunityService_UpdateProfile_Handler,
+		},
+		{
+			MethodName: "UploadImage",
+			Handler:    _CommunityService_UploadImage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

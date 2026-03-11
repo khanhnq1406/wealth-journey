@@ -5,6 +5,8 @@ import (
 
 	"wealthjourney/domain/repository"
 	"wealthjourney/pkg/cache"
+	pkgredis "wealthjourney/pkg/redis"
+	"wealthjourney/pkg/storage"
 )
 
 // Services holds all service instances.
@@ -24,7 +26,7 @@ type Services struct {
 
 // NewServices creates all service instances with proper dependency ordering.
 // No Set* hacks — all dependencies are passed via constructors.
-func NewServices(repos *Repositories, redisClient *redis.Client) *Services {
+func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider storage.StorageProvider, rdb *pkgredis.RedisClient) *Services {
 	// Phase 1: Services with no service dependencies
 	categorySvc := NewCategoryService(repos.Category)
 	fxRateSvc := NewFXRateService(repos.FXRate, redisClient)
@@ -45,8 +47,8 @@ func NewServices(repos *Repositories, redisClient *redis.Client) *Services {
 	investmentSvc := NewInvestmentService(repos.Investment, repos.Wallet, repos.InvestmentTransaction, marketDataSvc, repos.User, fxRateSvc, currencyCache, walletSvc, repos.PortfolioHistory)
 	portfolioHistorySvc := NewPortfolioHistoryService(repos.PortfolioHistory, investmentSvc, repos.User, fxRateSvc)
 
-	// Phase 1 (cont.): CommunityService — no service dependencies
-	communitySvc := NewCommunityService(repos.Post, repos.Comment, repos.Like, repos.Follow, repos.Report, repos.User, repos.Notification, repos.SavedPost, repos.Hashtag)
+	// Phase 1 (cont.): CommunityService — depends on storage provider for image uploads
+	communitySvc := NewCommunityService(repos.Post, repos.Comment, repos.Like, repos.Follow, repos.Report, repos.User, repos.Notification, repos.SavedPost, repos.Hashtag, storageProvider, rdb)
 
 	return &Services{
 		Wallet:           walletSvc,

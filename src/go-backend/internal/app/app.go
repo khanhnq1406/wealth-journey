@@ -46,11 +46,11 @@ func Run() {
 	defer dbCleanup()
 
 	rdb := ProvideRedis(cfg)
-	_ = ProvideStorage(cfg) // side-effect: initializes fileupload default service
+	storageProvider := ProvideStorage(cfg) // initializes fileupload default service
 
 	repos := ProvideRepositories(db)
 	redisClient := ProvideUnderlyingRedis(rdb)
-	services := ProvideServices(repos, redisClient)
+	services := ProvideServices(repos, redisClient, storageProvider, rdb)
 
 	// Import system (must be after services for FXRate dependency)
 	workerPool := ProvideImportSystem(db, repos, services, rdb)

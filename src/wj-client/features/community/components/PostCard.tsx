@@ -30,6 +30,7 @@ export function PostCard({
 }: PostCardProps) {
   const [showComments, setShowComments] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [commentCount, setCommentCount] = useState(post.commentCount ?? 0);
   const isOwnPost = post.isOwnPost || post.userId === currentUser.id;
   const postId = post.id ?? 0;
 
@@ -66,7 +67,7 @@ export function PostCard({
 
       <PostEngagement
         likeCount={likeCount}
-        commentCount={post.commentCount ?? 0}
+        commentCount={commentCount}
         shareCount={post.shareCount ?? 0}
         onCommentsClick={() => setShowComments(!showComments)}
       />
@@ -86,6 +87,8 @@ export function PostCard({
         <CommentSection
           postId={postId}
           currentUser={currentUser}
+          onCommentAdded={() => setCommentCount((c) => c + 1)}
+          onCommentDeleted={() => setCommentCount((c) => Math.max(0, c - 1))}
         />
       )}
 

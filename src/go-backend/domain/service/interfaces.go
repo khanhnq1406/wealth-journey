@@ -245,14 +245,15 @@ type CommunityService interface {
 	LikePost(ctx context.Context, userID int32, postID int32) error
 	UnlikePost(ctx context.Context, userID int32, postID int32) error
 	CreateComment(ctx context.Context, userID int32, req *v1.CreateCommentRequest) (*v1.CreateCommentResponse, error)
+	// UpdateComment edits the content of an existing comment.
+	// Returns 403 if the caller does not own the comment.
+	UpdateComment(ctx context.Context, userID int32, req *v1.UpdateCommentRequest) (*v1.UpdateCommentResponse, error)
 	DeleteComment(ctx context.Context, userID int32, commentID int32) error
 	GetComments(ctx context.Context, userID int32, postID int32, req *v1.GetCommentsRequest) (*v1.GetCommentsResponse, error)
 	FollowUser(ctx context.Context, followerID int32, followingID int32) error
 	UnfollowUser(ctx context.Context, followerID int32, followingID int32) error
 	GetProfile(ctx context.Context, userID int32, targetUserID int32) (*v1.GetCommunityProfileResponse, error)
-	UpdateBio(ctx context.Context, userID int32, bio string) error
 	ReportContent(ctx context.Context, userID int32, req *v1.ReportContentRequest) error
-	GetUploadURL(ctx context.Context, userID int32, req *v1.GetUploadURLRequest) (*v1.GetUploadURLResponse, error)
 	// Phase 2: Social Features
 	SharePost(ctx context.Context, userID int32, req *v1.SharePostRequest) (*v1.SharePostResponse, error)
 	GetNotifications(ctx context.Context, userID int32, req *v1.GetNotificationsRequest) (*v1.GetNotificationsResponse, error)
@@ -265,4 +266,12 @@ type CommunityService interface {
 	GetTrendingTopics(ctx context.Context) (*v1.GetTrendingTopicsResponse, error)
 	GetFollowing(ctx context.Context, userID int32, targetUserID int32, req *v1.GetFollowingRequest) (*v1.GetFollowingResponse, error)
 	GetFollowers(ctx context.Context, userID int32, targetUserID int32, req *v1.GetFollowersRequest) (*v1.GetFollowersResponse, error)
+	// UploadImage uploads an image to storage and returns the public URL.
+	UploadImage(ctx context.Context, userID int32, fileData []byte, purpose string, filename string) (string, error)
+	// Phase 3: Advanced Profile
+	UpdateProfile(ctx context.Context, userID int32, req *v1.UpdateProfileRequest) (*v1.UpdateProfileResponse, error)
+	GetLikedPosts(ctx context.Context, viewerUserID int32, targetUserID int32, req *v1.GetLikedPostsRequest) (*v1.GetLikedPostsResponse, error)
+	// Phase 3: Reply Threads
+	// GetReplies returns paginated replies for a comment.
+	GetReplies(ctx context.Context, viewerUserID int32, commentID int32, req *v1.GetRepliesRequest) (*v1.GetRepliesResponse, error)
 }

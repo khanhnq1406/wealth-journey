@@ -1,6 +1,6 @@
 # Community Domain — Runtime Flows
 
-Community social feed flows covering post creation, feed generation, like/unlike toggling, follow/unfollow operations, and Phase 2 social features (share post, notifications, saved posts). All operations require JWT authentication and enforce content ownership rules.
+Community social feed flows covering post creation, feed generation, like/unlike toggling, follow/unfollow operations, Phase 2 social features (share post, notifications, saved posts), and Phase 3 advanced features (image upload, edit comment, reply threads, SSE notification stream, reply list). All operations require JWT authentication and enforce content ownership rules.
 
 ## Table of Contents
 
@@ -11,6 +11,11 @@ Community social feed flows covering post creation, feed generation, like/unlike
 - [Share Post](#5-share-post)
 - [View User Profile](#6-view-user-profile)
 - [Get Following / Followers List](#7-get-following--followers-list)
+- [Image Upload](#8-image-upload)
+- [Edit Comment](#9-edit-comment)
+- [Reply Thread (Create Reply)](#10-reply-thread-create-reply)
+- [SSE Notification Stream](#11-sse-notification-stream)
+- [Get Reply List](#12-get-reply-list)
 
 ---
 
@@ -456,3 +461,441 @@ sequenceDiagram
 | Target user not found | 404 Not Found | None |
 | Invalid page/pageSize | 400 Validation Error | None |
 | DB read failure | 500 Internal Error | None |
+
+---
+
+## 8. Image Upload
+
+**Trigger:** User selects an image file in a post editor, profile edit modal, or cover photo picker
+**Endpoint:** `POST /api/v1/community/upload` (multipart/form-data)
+**Source:** `handlers/community.go` `UploadImage`, `domain/service/community_service.go` `UploadImage`, `pkg/imaging/imaging.go`
+
+```mermaid
+sequenceDiagram
+    participant SPA as Next.js SPA
+    participant H as CommunityHandler
+    participant CS as CommunityService
+    participant IMG as imaging.go
+    participant Storage as Supabase Storage
+
+    SPA->>SPA: Client validation:<br/>MIME type check (JPEG/PNG/WebP/GIF)<br/>File size check (≤ 5 MB)
+
+    alt Client-side validation fails
+        SPA->>SPA: Show error — do not send request
+    end
+
+    SPA->>H: POST /api/v1/community/upload<br/>multipart/form-data {file, purpose}
+    Note over H: MaxBytesReader enforces 5 MB body limit
+
+    H->>H: GetUserID from JWT
+    H->>H: Parse multipart form<br/>Read file bytes + purpose field
+
+    alt Body exceeds 5 MB
+        H-->>SPA: 400 Bad Request — file too large
+    end
+
+    H->>CS: UploadImage(userID, fileData, purpose, filename)
+
+    activate CS
+    CS->>CS: Validate purpose whitelist<br/>("post" | "avatar" | "cover")
+
+    alt Invalid purpose
+        CS-->>H: 400 Bad Request
+        H-->>SPA: {success: false, message: "invalid purpose"}
+    end
+
+    CS->>IMG: ValidateMagicBytes(fileData)
+    Note over IMG: Checks JPEG (FF D8 FF), PNG (89 50 4E 47),<br/>GIF (47 49 46), WebP (52 49 46 46 + WEBP at offset 8)
+
+    alt Magic bytes do not match any allowed type
+        IMG-->>CS: error — unsupported file type
+        CS-->>H: 400 Bad Request
+        H-->>SPA: {success: false, message: "invalid file type"}
+    end
+
+    IMG-->>CS: detectedMIME
+
+    CS->>CS: Determine maxWidth by purpose:<br/>avatar=400, cover=1920, post=2048
+
+    CS->>IMG: ResizeImage(fileData, maxWidth)
+    Note over IMG: Resize if wider than maxWidth<br/>Strip EXIF metadata (GPS, personal data)<br/>Maintain aspect ratio
+
+    IMG-->>CS: processedData []byte
+
+    CS->>CS: Generate storage key:<br/>community/{purpose}/{userID}/{uuid}.{ext}
+
+    CS->>Storage: Upload(key, processedData, mimeType)
+
+    alt Storage failure
+        Storage-->>CS: Error
+        CS-->>H: 500 Internal Error
+        H-->>SPA: {success: false, message: "upload failed"}
+    end
+
+    Storage-->>CS: Public URL
+    deactivate CS
+
+    CS-->>H: imageUrl string
+    H-->>SPA: {success: true, imageUrl: "https://..."}
+
+    SPA->>SPA: Store returned URL, attach to post/profile form
+```
+
+### Key Invariants
+
+- Magic bytes validation is server-side (not relying on Content-Type header from client) — prevents polyglot file attacks
+- EXIF metadata is stripped from all images before storage (prevents GPS/personal data leakage)
+- Storage keys use UUID-based filenames — no user input appears in the storage path
+- File size limit is enforced both at Go `MaxBytesReader` level (hard cut) and as a client-side UX guard (soft pre-check)
+- Rate limit: max 10 uploads per user per minute
+- The `purpose` field determines the resize threshold; it is validated against a fixed whitelist
+
+### Error Paths
+
+| Condition | HTTP Status | Details |
+|-----------|-------------|---------|
+| Missing/invalid JWT | 401 Unauthorized | Auth middleware rejects before handler |
+| Body exceeds 5 MB | 400 Bad Request | Go `MaxBytesReader` truncates and returns error |
+| Client sends non-image file | 400 Bad Request | Magic bytes check fails; Content-Type is untrusted |
+| Invalid purpose value | 400 Bad Request | Only "post", "avatar", "cover" are accepted |
+| Image processing/resize failure | 500 Internal Error | Imaging library error |
+| Supabase Storage unavailable | 500 Internal Error | No partial state; image is never referenced |
+
+---
+
+## 9. Edit Comment
+
+**Trigger:** User clicks the edit option on their own comment and submits the updated text inline
+**Endpoint:** `PUT /api/v1/community/comments/{commentId}`
+**Source:** `handlers/community.go` `UpdateComment`, `domain/service/community_service.go` `UpdateComment`
+
+```mermaid
+sequenceDiagram
+    participant SPA as Next.js SPA
+    participant H as CommunityHandler
+    participant CS as CommunityService
+    participant CR as CommentRepository
+
+    SPA->>H: PUT /api/v1/community/comments/{commentId}<br/>{content: "updated text"}
+    H->>H: GetUserID from JWT
+    H->>H: Parse commentId from URL path
+    H->>H: Bind request body
+
+    H->>CS: UpdateComment(userID, req{commentId, content})
+
+    activate CS
+    CS->>CR: GetByID(commentId)
+
+    alt Comment not found
+        CR-->>CS: nil
+        CS-->>H: 404 Not Found
+        H-->>SPA: {success: false, message: "comment not found"}
+    end
+
+    CR-->>CS: comment
+
+    CS->>CS: Ownership check:<br/>comment.UserID != userID?
+
+    alt Not the comment owner
+        CS-->>H: 403 Forbidden
+        H-->>SPA: {success: false, message: "not authorized to edit this comment"}
+    end
+
+    CS->>CS: Validate content length (1-500 chars)
+
+    alt Content empty or too long
+        CS-->>H: 400 Bad Request
+        H-->>SPA: {success: false, message: "content must be 1-500 characters"}
+    end
+
+    CS->>CS: SanitizeStringField(content)
+    CS->>CS: Set comment.Content = sanitized content
+    CS->>CS: Set comment.UpdatedAt = &now
+
+    CS->>CR: Update(comment)
+
+    alt DB error
+        CR-->>CS: Error
+        CS-->>H: 500 Internal Error
+        H-->>SPA: {success: false, message: "..."}
+    end
+
+    CR-->>CS: Updated comment
+    deactivate CS
+
+    CS-->>H: CommentItem{..., updatedAt, isEdited: true}
+    H-->>SPA: {success: true, data: CommentItem}
+
+    SPA->>SPA: Replace comment text in UI<br/>Show "(edited)" label next to timestamp
+```
+
+### Key Invariants
+
+- Ownership is enforced in the service layer using the JWT-derived `userID` (not a request body field)
+- `UpdatedAt` is always set to server time on successful edit — clients cannot supply a custom timestamp
+- `isEdited` is derived at read time: `updatedAt != nil` indicates the comment has been edited
+- Content is sanitized via the same `SanitizeStringField` function used at creation (XSS prevention)
+- The comment's `PostID`, `ParentCommentID`, and `UserID` are immutable — only `Content` and `UpdatedAt` change
+
+### Error Paths
+
+| Condition | HTTP Status | Details |
+|-----------|-------------|---------|
+| Missing/invalid JWT | 401 Unauthorized | Auth middleware rejects before handler |
+| Comment not found | 404 Not Found | `commentRepo.GetByID` returns nil |
+| Requester is not the comment owner | 403 Forbidden | `comment.UserID != userID` check in service |
+| Content is empty | 400 Bad Request | Minimum length 1 character |
+| Content exceeds 500 characters | 400 Bad Request | Maximum length 500 characters |
+| DB save failure | 500 Internal Error | No partial state; original comment is unchanged |
+
+---
+
+## 10. Reply Thread (Create Reply)
+
+**Trigger:** User clicks "Reply" on a root comment, types a reply, and submits
+**Endpoint:** `POST /api/v1/community/posts/{postId}/comments` with `parentCommentId > 0` in body
+**Source:** `handlers/community.go` `CreateComment`, `domain/service/community_service.go` `CreateComment`
+
+```mermaid
+sequenceDiagram
+    participant SPA as Next.js SPA
+    participant H as CommunityHandler
+    participant CS as CommunityService
+    participant CR as CommentRepository
+    participant PR as PostRepository
+    participant NR as NotificationRepository
+    participant Redis
+
+    SPA->>H: POST /api/v1/community/posts/{postId}/comments<br/>{content, parentCommentId: <id>}
+    H->>H: GetUserID from JWT
+    H->>H: Parse postId from URL path
+    H->>H: Bind request body
+
+    H->>CS: CreateComment(userID, postId, req{content, parentCommentId})
+
+    activate CS
+    CS->>CS: Validate content (1-500 chars)
+
+    CS->>CR: GetByID(parentCommentId)
+
+    alt Parent comment not found
+        CR-->>CS: nil
+        CS-->>H: 404 Not Found
+        H-->>SPA: {success: false, message: "parent comment not found"}
+    end
+
+    CR-->>CS: parentComment
+
+    CS->>CS: Validate parentComment.PostID == postId
+    Note over CS: Cross-post reply prevention (T-8)
+
+    alt Parent belongs to different post
+        CS-->>H: 400 Bad Request
+        H-->>SPA: {success: false, message: "parent comment belongs to a different post"}
+    end
+
+    CS->>CS: Flatten nesting:<br/>if parentComment.ParentCommentID != nil,<br/>use parentComment.ParentCommentID as actualParentID<br/>(prevents nesting deeper than 1 level)
+
+    CS->>CS: SanitizeStringField(content)
+    CS->>CR: Create(Comment{userID, postId, content, parentCommentID: actualParentID})
+
+    alt DB create error
+        CR-->>CS: Error
+        CS-->>H: 500 Internal Error
+        H-->>SPA: {success: false, message: "..."}
+    end
+
+    CR-->>CS: newReply
+
+    CS->>CR: IncrementReplyCount(actualParentID, +1)
+    Note over CS,CR: Atomic increment on parent comment's reply_count
+
+    CS->>PR: IncrementCommentCount(postId, +1)
+    Note over CS,PR: Replies count toward the post's total comment_count
+
+    opt Notify parent comment author (if not self-reply)
+        CS->>NR: Create(Notification{<br/>recipientID: parentComment.UserID,<br/>actorID: userID,<br/>type: "reply",<br/>postID: postId,<br/>commentID: newReply.ID})
+        NR-->>CS: Created
+
+        CS->>Redis: Publish("user:{parentComment.UserID}:notifications", notificationItem)
+        Note over CS,Redis: Real-time delivery to notification SSE stream
+    end
+
+    deactivate CS
+
+    CS-->>H: CommentItem{..., parentCommentId, replyCount: 0}
+    H-->>SPA: {success: true, data: CommentItem}
+
+    SPA->>SPA: Append reply under parent comment<br/>Increment replyCount badge on parent
+```
+
+### Key Invariants
+
+- Nesting is enforced to exactly 1 level: if the targeted parent is itself a reply, the new reply is re-parented to the grandparent (the original root comment)
+- Cross-post reply prevention: the parent comment's `PostID` must match the URL `postId` parameter
+- Both `IncrementReplyCount` (on the parent comment) and `IncrementCommentCount` (on the post) are executed — replies count toward total post comment count
+- Notifications are published to Redis synchronously after DB write; Redis failure does not fail the request (best-effort)
+- `GetComments` (root comment listing) excludes replies (`WHERE parent_comment_id IS NULL`) so they only appear when the reply list is explicitly loaded
+
+### Error Paths
+
+| Condition | HTTP Status | Details |
+|-----------|-------------|---------|
+| Missing/invalid JWT | 401 Unauthorized | Auth middleware rejects before handler |
+| Parent comment not found | 404 Not Found | `commentRepo.GetByID` returns nil |
+| Parent comment belongs to a different post | 400 Bad Request | Cross-post reply prevention check |
+| Content empty or exceeds 500 chars | 400 Bad Request | Validation before DB write |
+| DB create failure | 500 Internal Error | No reply is created; counts are not incremented |
+| `IncrementReplyCount` failure | 500 Internal Error | Reply is rolled back conceptually (inconsistency risk) |
+
+---
+
+## 11. SSE Notification Stream
+
+**Trigger:** Frontend mounts the notification bell component (community layout or dashboard layout)
+**Endpoint:** `GET /api/v1/community/notifications/stream?token=<jwt>`
+**Source:** `handlers/community.go` `StreamNotifications`
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant SPA as Next.js SPA
+    participant H as CommunityHandler
+    participant Auth as AuthService
+    participant Redis
+
+    Note over SPA,H: EventSource API cannot send Authorization header —<br/>JWT is passed as ?token= query parameter instead
+
+    SPA->>Browser: new EventSource("/api/v1/community/notifications/stream?token=<jwt>")
+    Browser->>H: GET /api/v1/community/notifications/stream?token=<jwt>
+    Note over H: SSE route is registered OUTSIDE rate-limit middleware<br/>(long-lived connection)
+
+    H->>H: Extract token from ?token= query param
+    Note over H: Do NOT log the token value in access logs (T-5)
+
+    H->>Auth: ValidateJWT(token)
+
+    alt Invalid or expired JWT
+        Auth-->>H: Error
+        H-->>Browser: 401 Unauthorized (closes EventSource)
+        SPA->>SPA: Fallback to 30s polling
+    end
+
+    Auth-->>H: claims{userID, sessionID}
+
+    H->>Redis: Subscribe("user:{userID}:notifications")
+    Note over H,Redis: Channel is derived from authenticated userID only —<br/>never from user-supplied input (T-6)
+
+    H->>Browser: HTTP 200 OK<br/>Content-Type: text/event-stream<br/>Cache-Control: no-cache<br/>Connection: keep-alive
+
+    loop Stream is open
+
+        alt Notification published by another service action
+            Redis-->>H: PubSub message (NotificationItem JSON)
+            H-->>Browser: event: notification\ndata: {json}\n\n
+            Browser-->>SPA: EventSource "notification" event
+            SPA->>SPA: Parse JSON, update React Query cache:<br/>- Increment unread count<br/>- Prepend to notification list
+        end
+
+        alt 30-second heartbeat tick
+            H-->>Browser: :ping\n\n
+            Note over H,Browser: Keeps TCP connection alive through proxies
+        end
+
+        alt Client disconnects (tab close, navigation, network)
+            Browser->>H: c.Request.Context().Done()
+            H->>Redis: Unsubscribe("user:{userID}:notifications")
+            H->>H: Goroutine cleanup
+            Note over H: T-4: Goroutine leak prevention via context cancellation
+        end
+
+    end
+```
+
+### Key Invariants
+
+- Authentication uses `?token=` query parameter because the `EventSource` browser API does not support custom headers
+- The token value must not appear in server access logs to prevent token leakage in log aggregation systems
+- The Redis channel is always `user:{authenticatedUserID}:notifications` — constructed from the validated JWT, never from a request parameter
+- Goroutine lifetime is bounded by `c.Request.Context().Done()` — no goroutine leak on client disconnect
+- Heartbeat pings every 30 seconds prevent proxy/load-balancer timeout disconnections
+- Rate limit: maximum 1 SSE connection per user at a time (subsequent connections return 429)
+- Frontend maintains 30-second polling as a fallback if SSE fails to connect or is unavailable
+
+### Error Paths
+
+| Condition | HTTP Status | Details |
+|-----------|-------------|---------|
+| Missing or empty `?token=` param | 401 Unauthorized | JWT extraction fails before handler logic |
+| Invalid, expired, or tampered JWT | 401 Unauthorized | `ValidateJWT` returns error; EventSource closes |
+| Redis connection failure at subscribe time | 500 Internal Error | Stream cannot be established; client falls back to polling |
+| Redis connection drops mid-stream | Stream terminates | `PubSub.Receive` returns error; handler cleans up and returns |
+| User already has 1 active SSE connection | 429 Too Many Requests | Rate limiter enforces max 1 SSE per user |
+| Client disconnects normally | — | Context cancellation triggers cleanup; no error logged |
+
+---
+
+## 12. Get Reply List
+
+**Trigger:** User clicks "View N replies" under a root comment to expand the reply thread
+**Endpoint:** `GET /api/v1/community/comments/{commentId}/replies?page=1&pageSize=5`
+**Source:** `handlers/community.go` `GetReplies`, `domain/service/community_service.go` `GetReplies`
+
+```mermaid
+sequenceDiagram
+    participant SPA as Next.js SPA
+    participant H as CommunityHandler
+    participant CS as CommunityService
+    participant CR as CommentRepository
+
+    SPA->>H: GET /api/v1/community/comments/{commentId}/replies<br/>?page=1&pageSize=5
+    H->>H: GetUserID from JWT
+    H->>H: Parse commentId from URL path
+    H->>H: Parse page, pageSize from query params
+
+    H->>CS: GetReplies(userID, commentId, req{pagination})
+
+    activate CS
+    CS->>CR: GetByID(commentId)
+
+    alt Comment not found
+        CR-->>CS: nil
+        CS-->>H: 404 Not Found
+        H-->>SPA: {success: false, message: "comment not found"}
+    end
+
+    CR-->>CS: rootComment
+    Note over CS: Confirm rootComment.ParentCommentID IS NULL<br/>(only root comments have a reply list)
+
+    CS->>CR: GetByParentID(commentId, ListOptions{offset, limit})
+    Note over CR: SELECT * FROM comment<br/>WHERE parent_comment_id = ?<br/>ORDER BY created_at ASC<br/>LIMIT ? OFFSET ?
+
+    CR-->>CS: []Comment, totalCount
+
+    CS->>CS: Map each Comment → CommentItem{<br/>..., parentCommentId, isEdited, updatedAt,<br/>isOwner: comment.UserID == userID}
+
+    deactivate CS
+
+    CS-->>H: GetRepliesResponse{replies, pagination{total, page, pageSize}}
+    H-->>SPA: {success: true, replies: [...], pagination: {...}}
+
+    SPA->>SPA: Render replies with indentation (ml-8)<br/>Show "Load more" if hasMore
+```
+
+### Key Invariants
+
+- Only root comments (those with `parent_comment_id IS NULL`) have a reply list; requesting replies for a reply returns an empty list (the reply has no children)
+- Replies are ordered by `created_at ASC` (chronological, oldest first) — matches conversation reading order
+- `isOwner` is resolved per-reply using the JWT `userID` so the frontend can show edit/delete controls
+- `isEdited` is derived from `updatedAt != nil`
+- Page size defaults to 5; larger values are accepted up to a configured cap to prevent abuse
+- The total count returned enables the frontend to show a "N of M replies loaded" indicator
+
+### Error Paths
+
+| Condition | HTTP Status | Details |
+|-----------|-------------|---------|
+| Missing/invalid JWT | 401 Unauthorized | Auth middleware rejects before handler |
+| Comment not found | 404 Not Found | `commentRepo.GetByID` returns nil |
+| Invalid page or pageSize | 400 Bad Request | Negative or non-integer values |
+| DB read failure | 500 Internal Error | No partial data returned |

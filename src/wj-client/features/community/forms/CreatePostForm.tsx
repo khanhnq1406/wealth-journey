@@ -7,8 +7,9 @@ import { useMutationCreatePost, EVENT_CommunityGetFeed } from "@/utils/generated
 import { useQueryClient } from "@tanstack/react-query";
 import { createPostSchema, type CreatePostFormData } from "../utils/community.schema";
 import { Avatar } from "../components/Avatar";
+import { ImageUpload } from "../components/ImageUpload";
 import { cn } from "@/lib/utils/cn";
-import { ImageIcon, X } from "lucide-react";
+import { ImageIcon } from "lucide-react";
 
 interface CreatePostFormProps {
   currentUser: { id: number; name: string; picture: string };
@@ -91,34 +92,15 @@ export function CreatePostForm({ currentUser, onSuccess }: CreatePostFormProps) 
         </div>
       </div>
 
-      {/* Image URL input */}
+      {/* Image upload */}
       {showImageInput && (
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <p className="font-vietnam text-xs font-medium text-v2-text-tertiary">
-              URL ảnh
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setShowImageInput(false);
-                setValue("imageUrl", "");
-              }}
-              className="p-0.5 rounded-full text-v2-text-tertiary hover:bg-gray-100 transition-colors"
-            >
-              <X size={14} />
-            </button>
-          </div>
-          <input
-            {...register("imageUrl")}
-            type="url"
-            placeholder="https://example.com/image.jpg"
-            className="w-full border border-v2-border-light rounded-xl px-3 py-2 font-vietnam text-sm text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none focus:border-v2-red-primary transition-colors"
-          />
-          {errors.imageUrl && (
-            <p className="mt-1 text-xs text-red-500 font-vietnam">{errors.imageUrl.message}</p>
-          )}
-        </div>
+        <ImageUpload
+          purpose="post"
+          onUpload={(url) => setValue("imageUrl", url)}
+          onRemove={() => setValue("imageUrl", "")}
+          currentImageUrl={watch("imageUrl")}
+          label="Thêm ảnh"
+        />
       )}
 
       {/* Error message */}

@@ -322,8 +322,14 @@ type PostRepository interface {
 type CommentRepository interface {
 	Create(ctx context.Context, comment *models.Comment) error
 	GetByID(ctx context.Context, id int32) (*models.Comment, error)
+	// Update updates a comment (content and metadata).
+	Update(ctx context.Context, comment *models.Comment) error
 	SoftDelete(ctx context.Context, id int32) error
 	GetByPostID(ctx context.Context, postID int32, opts ListOptions) ([]*models.Comment, int, error)
+	// GetByParentID returns replies for a parent comment (paginated).
+	GetByParentID(ctx context.Context, parentID int32, opts ListOptions) ([]*models.Comment, int, error)
+	// IncrementReplyCount atomically increments (positive) or decrements (negative) the reply_count.
+	IncrementReplyCount(ctx context.Context, commentID int32, delta int32) error
 }
 
 // LikeRepository defines the interface for post like data operations.
@@ -332,6 +338,8 @@ type LikeRepository interface {
 	Delete(ctx context.Context, userID, postID int32) error
 	Exists(ctx context.Context, userID, postID int32) (bool, error)
 	GetLikedPostIDs(ctx context.Context, userID int32, postIDs []int32) ([]int32, error)
+	// GetLikedPostsByUser returns IDs of posts liked by a user (paginated, ordered by creation time DESC).
+	GetLikedPostsByUser(ctx context.Context, userID int32, opts ListOptions) ([]int32, int, error)
 }
 
 // FollowRepository defines the interface for user follow data operations.

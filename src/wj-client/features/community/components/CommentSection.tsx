@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useQueryGetComments, useMutationCreateComment, EVENT_CommunityGetComments, EVENT_CommunityGetFeed } from "@/utils/generated/hooks";
+import { useQueryGetComments, useMutationCreateComment, useMutationDeleteComment, EVENT_CommunityGetComments, EVENT_CommunityGetFeed } from "@/utils/generated/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { CommentBubble } from "./CommentBubble";
+import { ReplyList } from "./ReplyList";
 import { Avatar } from "./Avatar";
 import { Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
@@ -11,9 +12,11 @@ import { cn } from "@/lib/utils/cn";
 interface CommentSectionProps {
   postId: number;
   currentUser: { id: number; name: string; picture: string };
+  onCommentAdded?: () => void;
+  onCommentDeleted?: () => void;
 }
 
-export function CommentSection({ postId, currentUser }: CommentSectionProps) {
+export function CommentSection({ postId, currentUser, onCommentAdded, onCommentDeleted }: CommentSectionProps) {
   const [commentText, setCommentText] = useState("");
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
@@ -28,14 +31,28 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
       setCommentText("");
       queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetComments] });
       queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetFeed] });
+      onCommentAdded?.();
     },
   });
+
+  const deleteCommentMutation = useMutationDeleteComment({
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetComments] });
+      queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetFeed] });
+      onCommentDeleted?.();
+    },
+  });
+
+  const handleDeleteComment = (commentId: number) => {
+    deleteCommentMutation.mutate({ commentId });
+  };
 
   const handleSubmit = () => {
     if (!commentText.trim()) return;
     createCommentMutation.mutate({
       postId,
       content: commentText.trim(),
+      parentCommentId: 0,
     });
   };
 
@@ -60,13 +77,30 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
           </p>
         )}
         {comments.map((comment) => (
-          <CommentBubble
-            key={comment.id}
-            authorName={comment.userName ?? ""}
-            authorPicture={comment.userPicture}
-            content={comment.content ?? ""}
-            createdAt={comment.createdAt ?? 0}
-          />
+          <div key={comment.id}>
+            <CommentBubble
+              commentId={comment.id}
+              authorName={comment.userName ?? ""}
+              authorPicture={comment.userPicture}
+              content={comment.content ?? ""}
+              createdAt={comment.createdAt ?? 0}
+              isOwnComment={comment.userId === currentUser.id}
+              isEdited={comment.isEdited}
+              postId={postId}
+              currentUser={currentUser}
+              isReply={false}
+              onDelete={handleDeleteComment}
+              onReplyAdded={() => {
+                queryClient.invalidateQueries({ queryKey: [EVENT_CommunityGetComments] });
+              }}
+            />
+            <ReplyList
+              commentId={comment.id}
+              replyCount={comment.replyCount ?? 0}
+              postId={postId}
+              currentUserId={currentUser.id}
+            />
+          </div>
         ))}
         {hasMore && (
           <button

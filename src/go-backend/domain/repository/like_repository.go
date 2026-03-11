@@ -61,3 +61,32 @@ func (r *likeRepository) GetLikedPostIDs(ctx context.Context, userID int32, post
 	}
 	return likedIDs, nil
 }
+
+func (r *likeRepository) GetLikedPostsByUser(ctx context.Context, userID int32, opts ListOptions) ([]int32, int, error) {
+	var total int64
+
+	query := r.db.DB.WithContext(ctx).
+		Model(&models.PostLike{}).
+		Where("user_id = ?", userID)
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, r.handleDBError(err, "like", "count liked posts")
+	}
+
+	var likes []*models.PostLike
+	query = r.db.DB.WithContext(ctx).
+		Where("user_id = ?", userID).
+		Order("created_at DESC")
+	query = r.applyPagination(query, opts)
+
+	if err := query.Find(&likes).Error; err != nil {
+		return nil, 0, r.handleDBError(err, "like", "get liked posts")
+	}
+
+	likedPostIDs := make([]int32, 0, len(likes))
+	for _, like := range likes {
+		likedPostIDs = append(likedPostIDs, like.PostID)
+	}
+
+	return likedPostIDs, int(total), nil
+}
