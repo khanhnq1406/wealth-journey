@@ -174,4 +174,4 @@ All 5 feature areas from the spec implemented: image upload, edit comments, repl
 
 | Date | Fix | Severity | Commit |
 |------|-----|----------|--------|
-| 2026-03-11 | Replace 📷 emoji with `<Camera>` lucide-react icon in `ImageUpload.tsx` drop zone | Minor | — |
+| 2026-03-11 | Replace 📷 emoji with `<Camera>` lucide-react icon in `ImageUpload.tsx` drop zone | Minor | 3c0de6f |
