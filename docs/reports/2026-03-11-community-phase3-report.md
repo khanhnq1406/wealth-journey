@@ -184,3 +184,4 @@ All 5 feature areas from the spec implemented: image upload, edit comments, repl
 | ---------- | --------------------------------------------------------------------------------- | -------- | ------- |
 | 2026-03-11 | Replace 📷 emoji with `<Camera>` lucide-react icon in `ImageUpload.tsx` drop zone | Minor    | 3c0de6f |
 | 2026-03-11 | Fix reply showing `(edited)` on creation — change `IsEdited` condition from `UpdatedAt != nil` to `UpdatedAt > CreatedAt` in `commentToProto` | Minor    | 098ffe0 |
+| 2026-03-11 | Fix comment count not updating in `PostEngagement` — add local `commentCount` state in `PostCard` with optimistic `+1`/`-1` callbacks; also fix delete not invalidating feed cache in `CommentSection` | Minor    | — |
