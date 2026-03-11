@@ -14,7 +14,7 @@
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
 | 0 | Add Proto Messages & Generate Code | done | 9924685 | Added MarketTypeItem, GetPublicMarketTypesRequest/Response, GetPublicMarketTypes RPC |
-| 1 | Create Public Backend Handler | pending | — | — |
+| 1 | Create Public Backend Handler | done | 0b27c84 | Created PublicHandler, wired in AllHandlers, registered /api/v1/public/market-types route |
 | 2 | Add i18n Translation Keys | pending | — | — |
 | 3 | Create usePublicMarketTypes Hook | pending | — | — |
 | 4 | Create LandingGoldPriceTable | pending | — | — |

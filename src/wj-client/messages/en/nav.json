@@ -269,6 +269,29 @@
       "dashboard": "Dashboard",
       "signIn": "Sign In",
       "skipToMainContent": "Skip to main content"
+    },
+    "priceTeaser": {
+      "goldTableTitle": "Gold Prices",
+      "silverTableTitle": "Silver Prices",
+      "goldType": "GOLD TYPE",
+      "silverType": "SILVER TYPE",
+      "buy": "BUY",
+      "sell": "SELL",
+      "loginPrompt": "Please {loginLink} to view prices",
+      "loginLink": "sign in",
+      "goldChartTitle": "Gold Price Chart",
+      "silverChartTitle": "Silver Price Chart",
+      "chartLoginPrompt": "Sign in to view chart",
+      "domesticMarket": "Domestic",
+      "globalMarket": "Global",
+      "period24h": "24h",
+      "periodWeek": "Week",
+      "periodMonth": "Month",
+      "periodYear": "Year",
+      "loadingTypes": "Loading market types...",
+      "errorLoadingTypes": "Could not load market data",
+      "retry": "Retry",
+      "noData": "No data available"
     }
   },
   "sidebarToggle": {
