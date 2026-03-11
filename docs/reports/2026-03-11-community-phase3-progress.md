@@ -6,8 +6,8 @@
 - **Spec file:** `docs/specs/2026-03-11-community-phase3-spec.md`
 - **Started:** 2026-03-11T00:00:00Z
 - **Last updated:** 2026-03-11T10:00:00Z
-- **Current state:** in_progress
-- **Current task:** 14
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -30,7 +30,7 @@
 | 14 | Create/Update Runtime Flow Diagrams | pending | — | — |
 | 15 | Backend Cleanup & Integration Verification | pending | — | — |
 | 16 | Frontend Build Verification | done | bd5d015 | Fixed ProfileCard (useMutationUpdateProfile) + CommentSection (parentCommentId: 0); build passes |
-| 17 | Write Implementation Report | pending | — | — |
+| 17 | Write Implementation Report | done | — | docs/reports/2026-03-11-community-phase3-report.md created |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
