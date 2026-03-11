@@ -81,3 +81,12 @@ export function useMarkOneReadOptimistic() {
     );
   };
 }
+
+import { useNotificationStream } from "./useNotificationStream";
+
+// Mount SSE stream alongside existing polling
+// Call this hook in the community layout where notifications are consumed
+export function useNotificationsWithStream() {
+  useNotificationStream(); // SSE real-time updates
+  return useNotificationCount(); // existing 30s polling as fallback
+}

@@ -39,3 +39,17 @@ export const sharePostSchema = z.object({
 });
 
 export type SharePostFormData = z.infer<typeof sharePostSchema>;
+
+export const editCommentSchema = z.object({
+  content: z.string().min(1, "Comment cannot be empty").max(500, "Comment must be 500 characters or less"),
+});
+
+export type EditCommentFormData = z.infer<typeof editCommentSchema>;
+
+export const editProfileSchema = z.object({
+  bio: z.string().max(200, "Bio must be 200 characters or less").optional(),
+  location: z.string().max(100, "Location must be 100 characters or less").optional(),
+  website: z.string().max(200).url("Must be a valid URL").optional().or(z.literal("")),
+});
+
+export type EditProfileFormData = z.infer<typeof editProfileSchema>;

@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutationUpdatePost } from "@/utils/generated/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { editPostSchema, type EditPostFormData } from "../utils/community.schema";
+import { ImageUpload } from "../components/ImageUpload";
 import { cn } from "@/lib/utils/cn";
 import type { PostItem } from "@/gen/protobuf/v1/community";
 
@@ -22,6 +23,7 @@ export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<EditPostFormData>({
     resolver: zodResolver(editPostSchema),
@@ -70,6 +72,15 @@ export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
           </p>
         </div>
       </div>
+
+      {/* Image upload */}
+      <ImageUpload
+        purpose="post"
+        onUpload={(url) => setValue("imageUrl", url)}
+        onRemove={() => setValue("imageUrl", "")}
+        currentImageUrl={watch("imageUrl")}
+        label="Thêm ảnh"
+      />
 
       {/* Error message */}
       {errorMessage && (
