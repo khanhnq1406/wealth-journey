@@ -24,9 +24,18 @@ const customJestConfig = {
     url: 'http://localhost:3000',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(?:.pnpm/node_modules/(?:(?:@mswjs|msw)/)|exceljs|jszip|pako|saxes|fast-crc32c|ip-address)/)',
+    'node_modules/(?!(?:.pnpm/node_modules/(?:(?:@mswjs|msw)/)|exceljs|jszip|pako|saxes|fast-crc32c|ip-address|next-intl|use-intl)/)',
   ],
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-module.exports = createJestConfig(customJestConfig)
+module.exports = async () => {
+  const nextJestConfig = await createJestConfig(customJestConfig)()
+  return {
+    ...nextJestConfig,
+    transformIgnorePatterns: [
+      // Explicitly transform ESM-only packages
+      'node_modules/(?!(?:.pnpm/node_modules/(?:(?:@mswjs|msw)/)|exceljs|jszip|pako|saxes|fast-crc32c|ip-address|next-intl|use-intl|@formatjs)/)',
+    ],
+  }
+}

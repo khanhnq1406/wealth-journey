@@ -131,7 +131,7 @@ describe('Gold Calculator - Total Cost Calculation', () => {
     const input: GoldCalculationInput = {
       quantity: 1,
       quantityUnit: 'oz',
-      pricePerUnit: 270000, // $2700 per ounce (in cents)
+      pricePerUnit: 2700, // $2700 per ounce (in dollars, will be converted to cents)
       priceCurrency: 'USD',
       priceUnit: 'oz',
       investmentType: 9, // GOLD_USD
@@ -161,9 +161,9 @@ describe('Gold Calculator - Total Cost Calculation', () => {
     const result = calculateGoldFromUserInput(input);
 
     // Total cost in VND: 170,000,000 VND
-    // Total cost in USD: 170,000,000 × 0.00004 = $6,800
+    // Total cost in USD: 170,000,000 × 0.00004 = $6,800 = 680,000 cents
     expect(result.totalCostNative).toBe(170000000);
-    expect(result.totalCostWallet).toBeCloseTo(6800, 0);
+    expect(result.totalCostWallet).toBeCloseTo(680000, 0);
   });
 });
 
@@ -264,7 +264,7 @@ describe('Gold Calculator - Integration Tests', () => {
     const result = calculateGoldFromUserInput(input);
 
     // Verify calculations
-    expect(result.storedQuantity).toBe(93750); // 2.5 × 37.5g × 10000 = 937,500
+    expect(result.storedQuantity).toBe(937500); // 2.5 × 37.5g × 10000 = 937,500
     expect(result.totalCostNative).toBe(215000000); // ~215M VND
     expect(result.displayInfo.quantity).toBe(2.5);
   });
@@ -292,7 +292,7 @@ describe('Gold Calculator - Integration Tests', () => {
     const input: GoldCalculationInput = {
       quantity: 0.5,
       quantityUnit: 'oz',
-      pricePerUnit: 275000, // $2750 per ounce
+      pricePerUnit: 2750, // $2750 per ounce (in dollars)
       priceCurrency: 'USD',
       priceUnit: 'oz',
       investmentType: 9,
@@ -302,9 +302,10 @@ describe('Gold Calculator - Integration Tests', () => {
 
     const result = calculateGoldFromUserInput(input);
 
-    // Total in USD: $2750 × 0.5 = $1375
+    // Total in USD: $2750 × 0.5 = $1375 = 137500 cents
     // Total in VND: $1375 × 25,000 = 34,375,000 VND
     expect(result.totalCostNative).toBe(137500); // $1375 in cents
-    expect(result.totalCostWallet).toBeCloseTo(34375000000, 6); // 34.4B VND
+    expect(result.totalCostWallet).toBeCloseTo(34375000, 0); // 34.375M VND
   });
 });
+

@@ -98,6 +98,15 @@ export class Row {
     }
     return this._cells.get(key)!;
   }
+
+  eachCell(callback: (cell: Cell, colNumber: number) => void): void {
+    // Iterate through column keys and call callback for each cell
+    const keys = Object.keys(this.values);
+    keys.forEach((key, index) => {
+      const cell = this.getCell(key);
+      callback(cell, index + 1);
+    });
+  }
 }
 
 export class Cell {

@@ -1,6 +1,13 @@
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { usePWAInstall } from "../usePWAInstall";
 
+// Helper to flush microtasks
+const flushMicrotasks = async () => {
+  await act(async () => {
+    await new Promise((resolve) => queueMicrotask(resolve));
+  });
+};
+
 describe("usePWAInstall", () => {
   let beforeInstallPromptEvent: any;
 
@@ -41,13 +48,16 @@ describe("usePWAInstall", () => {
   });
 
   describe("PWA Installation Detection", () => {
-    it("should detect when app is not installed", () => {
+    it("should detect when app is not installed", async () => {
       const { result } = renderHook(() => usePWAInstall());
+
+      // Wait for microtask state updates to complete
+      await flushMicrotasks();
 
       expect(result.current.isInstalled).toBe(false);
     });
 
-    it("should detect iOS standalone mode", () => {
+    it("should detect iOS standalone mode", async () => {
       // Mock iOS standalone mode
       Object.defineProperty(window.navigator, "standalone", {
         writable: true,
@@ -57,10 +67,13 @@ describe("usePWAInstall", () => {
 
       const { result } = renderHook(() => usePWAInstall());
 
+      // Wait for microtask state updates to complete
+      await flushMicrotasks();
+
       expect(result.current.isInstalled).toBe(true);
     });
 
-    it("should detect Android display-mode: standalone", () => {
+    it("should detect Android display-mode: standalone", async () => {
       // Mock Android display-mode
       Object.defineProperty(window, "matchMedia", {
         writable: true,
@@ -78,12 +91,15 @@ describe("usePWAInstall", () => {
 
       const { result } = renderHook(() => usePWAInstall());
 
+      // Wait for microtask state updates to complete
+      await flushMicrotasks();
+
       expect(result.current.isInstalled).toBe(true);
     });
   });
 
   describe("Platform Detection", () => {
-    it("should detect iOS devices", () => {
+    it("should detect iOS devices", async () => {
       Object.defineProperty(window.navigator, "userAgent", {
         writable: true,
         configurable: true,
@@ -93,10 +109,13 @@ describe("usePWAInstall", () => {
 
       const { result } = renderHook(() => usePWAInstall());
 
+      // Wait for microtask state updates to complete
+      await flushMicrotasks();
+
       expect(result.current.platform).toBe("ios");
     });
 
-    it("should detect Android devices", () => {
+    it("should detect Android devices", async () => {
       Object.defineProperty(window.navigator, "userAgent", {
         writable: true,
         configurable: true,
@@ -105,10 +124,13 @@ describe("usePWAInstall", () => {
 
       const { result } = renderHook(() => usePWAInstall());
 
+      // Wait for microtask state updates to complete
+      await flushMicrotasks();
+
       expect(result.current.platform).toBe("android");
     });
 
-    it("should return 'other' for non-mobile devices", () => {
+    it("should return 'other' for non-mobile devices", async () => {
       Object.defineProperty(window.navigator, "userAgent", {
         writable: true,
         configurable: true,
@@ -117,6 +139,9 @@ describe("usePWAInstall", () => {
 
       const { result } = renderHook(() => usePWAInstall());
 
+      // Wait for microtask state updates to complete
+      await flushMicrotasks();
+
       expect(result.current.platform).toBe("other");
     });
   });
@@ -124,6 +149,9 @@ describe("usePWAInstall", () => {
   describe("Install Prompt Handling", () => {
     it("should capture beforeinstallprompt event", async () => {
       const { result } = renderHook(() => usePWAInstall());
+
+      // Wait for initial microtasks
+      await flushMicrotasks();
 
       // Simulate beforeinstallprompt event
       const mockEvent = {
@@ -145,6 +173,9 @@ describe("usePWAInstall", () => {
 
     it("should trigger install prompt when available", async () => {
       const { result } = renderHook(() => usePWAInstall());
+
+      // Wait for initial microtasks
+      await flushMicrotasks();
 
       // Mock prompt
       const mockPrompt = jest.fn().mockResolvedValue(undefined);
@@ -179,6 +210,9 @@ describe("usePWAInstall", () => {
     it("should not trigger install prompt when not available", async () => {
       const { result } = renderHook(() => usePWAInstall());
 
+      // Wait for initial microtasks
+      await flushMicrotasks();
+
       expect(result.current.canInstall).toBe(false);
 
       await act(async () => {
@@ -193,6 +227,9 @@ describe("usePWAInstall", () => {
   describe("App Installed Event", () => {
     it("should detect when app is installed via appinstalled event", async () => {
       const { result } = renderHook(() => usePWAInstall());
+
+      // Wait for initial microtasks
+      await flushMicrotasks();
 
       expect(result.current.isInstalled).toBe(false);
 
