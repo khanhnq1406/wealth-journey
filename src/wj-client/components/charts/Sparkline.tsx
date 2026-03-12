@@ -1,7 +1,7 @@
 "use client";
 
 import { parseAmount } from "@/utils/currency-formatter";
-import React, { memo, useState, useEffect, useRef } from "react";
+import React, { memo, useId, useState, useEffect, useRef } from "react";
 
 /**
  * Data point for sparkline chart
@@ -52,6 +52,7 @@ export const Sparkline = memo(function Sparkline({
 }: SparklineProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(300);
+  const uniqueId = useId();
 
   // Measure container width on mount and resize
   useEffect(() => {
@@ -136,7 +137,7 @@ export const Sparkline = memo(function Sparkline({
     ? `${pathData} L ${points[points.length - 1].x} ${height - padding} L ${padding} ${height - padding} Z`
     : "";
 
-  const gradientId = `sparkline-gradient-${Math.random().toString(36).slice(2, 11)}`;
+  const gradientId = `sparkline-gradient-${uniqueId.replace(/:/g, '-')}`;
 
   return (
     <div
