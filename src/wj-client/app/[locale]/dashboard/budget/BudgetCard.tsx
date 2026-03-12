@@ -81,6 +81,39 @@ function CircularProgress({
   );
 }
 
+// Stat card component - defined outside to prevent re-renders
+interface StatCardProps {
+  label: string;
+  value: string;
+  highlight?: boolean;
+  statusBorder?: string;
+  statusColor?: string;
+}
+
+function StatCard({
+  label,
+  value,
+  highlight = false,
+  statusBorder = "",
+  statusColor = "",
+}: StatCardProps) {
+  return (
+    <div
+      className={`flex-1 px-3 py-2.5 rounded-xl border ring-1 ${
+        highlight ? statusBorder : "border-gray-200 bg-gray-50 ring-transparent"
+      } transition-all duration-200`}
+    >
+      <div className="text-xs text-gray-500 mb-1">{label}</div>
+      <div
+        className={`text-sm font-semibold truncate ${highlight ? statusColor : "text-gray-900"}`}
+        title={value}
+      >
+        {value}
+      </div>
+    </div>
+  );
+}
+
 interface BudgetCardProps {
   budget: Budget;
   onRefresh: () => void;
@@ -180,31 +213,6 @@ export function BudgetCard({
     setShowDeleteDialog(false);
   };
 
-  // Stat card component
-  const StatCard = ({
-    label,
-    value,
-    highlight = false,
-  }: {
-    label: string;
-    value: string;
-    highlight?: boolean;
-  }) => (
-    <div
-      className={`flex-1 px-3 py-2.5 rounded-xl border ring-1 ${
-        highlight ? statusBorder : "border-gray-200 bg-gray-50 ring-transparent"
-      } transition-all duration-200`}
-    >
-      <div className="text-xs text-gray-500 mb-1">{label}</div>
-      <div
-        className={`text-sm font-semibold truncate ${highlight ? statusColor : "text-gray-900"}`}
-        title={value}
-      >
-        {value}
-      </div>
-    </div>
-  );
-
   return (
     <>
       <motion.div
@@ -266,15 +274,21 @@ export function BudgetCard({
                 <StatCard
                   label={tCommon("balance")}
                   value={formatCurrency(totalBudget, currency)}
+                  statusBorder={statusBorder}
+                  statusColor={statusColor}
                 />
                 <StatCard
                   label={t("card.spent")}
                   value={formatCurrency(totalSpent, currency)}
+                  statusBorder={statusBorder}
+                  statusColor={statusColor}
                 />
                 <StatCard
                   label={t("card.remaining")}
                   value={`${isOverBudget ? "-" : ""}${formatCurrency(Math.abs(remaining), currency)}`}
                   highlight
+                  statusBorder={statusBorder}
+                  statusColor={statusColor}
                 />
               </div>
             </div>

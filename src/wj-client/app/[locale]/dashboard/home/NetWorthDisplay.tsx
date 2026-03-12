@@ -16,6 +16,42 @@ interface NetWorthDisplayProps {
   userName?: string;
 }
 
+// PnL Value component - defined outside to prevent re-renders
+interface PnlValueProps {
+  percent: number;
+  amount: number;
+  label: string;
+  currency: string;
+}
+
+function PnlValue({ percent, amount, label, currency }: PnlValueProps) {
+  const isPositive = percent >= 0;
+  const formatAmount = (value: number) => {
+    return new Intl.NumberFormat("vi-VN").format(Number(value));
+  };
+
+  const formatPercent = (value: number) => {
+    const sign = value >= 0 ? "+" : "";
+    return `${sign}${value.toFixed(2)}%`;
+  };
+
+  return (
+    <div className="text-center">
+      <p
+        className={`font-jetbrains font-bold text-[14px] ${isPositive ? "text-v2-green-positive" : "text-v2-red-negative"}`}
+      >
+        {formatPercent(percent)}
+      </p>
+      <p className="font-jetbrains font-medium text-[12px] text-v2-text-secondary">
+        {formatAmount(amount)} {currency}
+      </p>
+      <p className="font-jetbrains font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
+        {label}
+      </p>
+    </div>
+  );
+}
+
 export function NetWorthDisplay({
   totalNetWorth,
   currency,
@@ -44,33 +80,6 @@ export function NetWorthDisplay({
   const formatPercent = (percent: number) => {
     const sign = percent >= 0 ? "+" : "";
     return `${sign}${percent.toFixed(2)}%`;
-  };
-
-  const PnlValue = ({
-    percent,
-    amount,
-    label,
-  }: {
-    percent: number;
-    amount: number;
-    label: string;
-  }) => {
-    const isPositive = percent >= 0;
-    return (
-      <div className="text-center">
-        <p
-          className={`font-jetbrains font-bold text-[14px] ${isPositive ? "text-v2-green-positive" : "text-v2-red-negative"}`}
-        >
-          {formatPercent(percent)}
-        </p>
-        <p className="font-jetbrains font-medium text-[12px] text-v2-text-secondary">
-          {formatAmount(amount)} {currency}
-        </p>
-        <p className="font-jetbrains font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
-          {label}
-        </p>
-      </div>
-    );
   };
 
   return (
@@ -130,16 +139,19 @@ export function NetWorthDisplay({
             percent={todayPnlPercent}
             amount={todayPnl}
             label={t("pnlToday")}
+            currency={currency}
           />
           <PnlValue
             percent={weekPnlPercent}
             amount={weekPnl}
             label={t("pnl7d")}
+            currency={currency}
           />
           <PnlValue
             percent={monthPnlPercent}
             amount={monthPnl}
             label={t("pnl30d")}
+            currency={currency}
           />
         </div>
       </BaseCard>

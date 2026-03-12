@@ -1,0 +1,4 @@
+## Backend Lint Errors
+Job: lint | Run: 22989832947
+
+golangci-lint failed. Check the 'Run golangci-lint' step logs above for details.

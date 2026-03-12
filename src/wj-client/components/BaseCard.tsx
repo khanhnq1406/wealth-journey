@@ -88,26 +88,6 @@ export const BaseCard = memo(function BaseCard({
     collapsibleOnMobile ? isCollapsed : true
   );
 
-  // Chevron icon component
-  const ChevronIcon = () => (
-    <svg
-      className={cn(
-        "w-5 h-5 transition-transform duration-200 flex-shrink-0",
-        shouldCollapse ? "-rotate-90" : "rotate-0"
-      )}
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M19 9l-7 7-7-7"
-      />
-    </svg>
-  );
-
   return (
     <div
       className={cn(
@@ -167,7 +147,22 @@ export const BaseCard = memo(function BaseCard({
                 collapsibleOnMobile && "md:hidden"
               )}
             >
-              <ChevronIcon />
+              <svg
+                className={cn(
+                  "w-5 h-5 transition-transform duration-200 flex-shrink-0",
+                  shouldCollapse ? "-rotate-90" : "rotate-0"
+                )}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
             </button>
           </div>
 
