@@ -130,3 +130,4 @@ After merging to `main`:
 | 2026-03-12 | Fixed React Compiler variable ordering: Moved handler declarations (handleNext, handlePrevious, handleSkip, handleComplete) before useEffect usage in Tour.tsx; Moved handleClose before useEffect in Toast.tsx | Minor | 635c32e |
 | 2026-03-12 | Fixed Storybook preview: Renamed `preview.ts` to `preview.tsx` to support JSX syntax | Minor | 635c32e |
 | 2026-03-12 | Fixed unescaped entities: Changed quotes to `&quot;` and apostrophes to `&apos;` in test-recommendations, FeatureDiscovery, SearchResults | Minor | 635c32e |
+| 2026-03-12 | Additional React Compiler fixes: ConnectionStatus, PullToRefresh, ui/Toast, CurrencyContext, NotificationContext, SymbolAutocomplete, ReviewStep | Minor | 1b76b16 |

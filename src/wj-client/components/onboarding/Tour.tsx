@@ -302,6 +302,43 @@ export function Tour({
   // Center overlay for welcome/completion steps
   const isCenterStep = !step.target || step.placement === "center";
 
+  // Calculate tooltip position using useMemo to avoid accessing refs during render
+  const tooltipStyle = useMemo(() => {
+    if (isCenterStep || !targetElement) return undefined;
+
+    const rect = targetElement.getBoundingClientRect();
+    const tooltipHeight = 200; // Default height, will adjust after mount
+    const tooltipWidth = 400; // Default width
+
+    switch (step.placement) {
+      case "top":
+        return {
+          top: `${tooltipPosition.top - tooltipHeight - 16}px`,
+          left: `${tooltipPosition.left + rect.width / 2 - tooltipWidth / 2}px`,
+        };
+      case "bottom":
+        return {
+          top: `${tooltipPosition.top + rect.height + 16}px`,
+          left: `${tooltipPosition.left + rect.width / 2 - tooltipWidth / 2}px`,
+        };
+      case "left":
+        return {
+          top: `${tooltipPosition.top + rect.height / 2 - tooltipHeight / 2}px`,
+          left: `${tooltipPosition.left - tooltipWidth - 16}px`,
+        };
+      case "right":
+        return {
+          top: `${tooltipPosition.top + rect.height / 2 - tooltipHeight / 2}px`,
+          left: `${tooltipPosition.left + rect.width + 16}px`,
+        };
+      default:
+        return {
+          top: `${tooltipPosition.top + rect.height + 16}px`,
+          left: `${Math.max(16, Math.min(tooltipPosition.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - 16))}px`,
+        };
+    }
+  }, [isCenterStep, targetElement, step.placement, tooltipPosition]);
+
   return createPortal(
     <div className="fixed inset-0 z-[60] pointer-events-none">
       {/* Backdrop */}
@@ -339,41 +376,8 @@ export function Tour({
           isCenterStep
             ? "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-scale-in"
             : "animate-fade-in",
-          !isCenterStep && targetElement && (() => {
-            const rect = targetElement.getBoundingClientRect();
-            const tooltipHeight = containerRef.current?.offsetHeight || 200;
-            const tooltipWidth = containerRef.current?.offsetWidth || 400;
-
-            switch (step.placement) {
-              case "top":
-                return {
-                  top: `${tooltipPosition.top - tooltipHeight - 16}px`,
-                  left: `${tooltipPosition.left + rect.width / 2 - tooltipWidth / 2}px`,
-                };
-              case "bottom":
-                return {
-                  top: `${tooltipPosition.top + rect.height + 16}px`,
-                  left: `${tooltipPosition.left + rect.width / 2 - tooltipWidth / 2}px`,
-                };
-              case "left":
-                return {
-                  top: `${tooltipPosition.top + rect.height / 2 - tooltipHeight / 2}px`,
-                  left: `${tooltipPosition.left - tooltipWidth - 16}px`,
-                };
-              case "right":
-                return {
-                  top: `${tooltipPosition.top + rect.height / 2 - tooltipHeight / 2}px`,
-                  left: `${tooltipPosition.left + rect.width + 16}px`,
-                };
-              default:
-                return {
-                  top: `${tooltipPosition.top + rect.height + 16}px`,
-                  left: `${Math.max(16, Math.min(tooltipPosition.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - 16))}px`,
-                };
-            }
-          })()
         )}
-        style={!isCenterStep && targetElement ? undefined : undefined}
+        style={tooltipStyle}
       >
         {/* Progress Bar */}
         {showProgress && (

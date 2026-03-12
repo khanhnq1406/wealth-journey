@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { ReviewStep } from "./ReviewStep";
 import { ColumnMapping } from "./ColumnMappingStep";
 import { ParsedTransaction, DuplicateHandlingStrategy, ImportSummary, DuplicateMatch, CurrencyConversion, CurrencyInfo, DuplicateAction } from "@/gen/protobuf/v1/import";
@@ -140,22 +140,8 @@ export function ReviewStepWrapper({
     },
   });
 
-  // Parse the file when component mounts using backend API
-  useEffect(() => {
-    parseFileViaBackend();
-  }, [fileId, columnMapping, bankTemplateId]);
-
-  // Detect duplicates when transactions are loaded
-  useEffect(() => {
-    if (transactions.length > 0 && walletId) {
-      detectDuplicatesMutation.mutate({
-        transactions,
-        walletId,
-      });
-    }
-  }, [transactions, walletId]);
-
-  const parseFileViaBackend = () => {
+  // Define parseFileViaBackend before useEffect to avoid variable ordering issue
+  const parseFileViaBackend = React.useCallback(() => {
     // Build custom mapping if provided (for CSV files)
     let customMapping = undefined;
     if (columnMapping) {
@@ -180,7 +166,22 @@ export function ReviewStepWrapper({
       sheetName: "",
       useOcr: false,
     });
-  };
+  }, [columnMapping, fileId, bankTemplateId, parseStatementMutation]);
+
+  // Parse the file when component mounts using backend API
+  useEffect(() => {
+    parseFileViaBackend();
+  }, [parseFileViaBackend]);
+
+  // Detect duplicates when transactions are loaded
+  useEffect(() => {
+    if (transactions.length > 0 && walletId) {
+      detectDuplicatesMutation.mutate({
+        transactions,
+        walletId,
+      });
+    }
+  }, [transactions, walletId]);
 
   const handleImport = (
     selectedRowNumbers: number[],
