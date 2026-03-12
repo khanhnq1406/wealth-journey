@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { formatPriceValue } from "../prices/helpers";
 import { BaseCard } from "@/components/BaseCard";
 import type { PriceItem } from "@/gen/protobuf/v1/investment";
+import { filterGoldPrices } from "@/features/market-prices/constants/gold-filter";
 
 interface GoldPriceTableProps {
   prices: PriceItem[];
@@ -12,6 +13,9 @@ interface GoldPriceTableProps {
 
 export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
   const t = useTranslations("dashboard.home");
+
+  // Filter and reorder to show only 9 configured gold types
+  const filteredPrices = filterGoldPrices(prices);
 
   return (
     <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
@@ -46,13 +50,13 @@ export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
             </tr>
           </thead>
           <tbody>
-            {prices.map((item, index) => (
+            {filteredPrices.map((item, index) => (
               <tr
                 key={item.typeCode || index}
                 className={index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"}
               >
                 <td className="px-5 py-3 font-vietnam font-medium text-[13px] text-v2-text-primary">
-                  {item.name || item.typeCode}
+                  {item.displayName}
                 </td>
                 <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-text-primary">
                   {formatPriceValue(item.buy, item.currency || "VND")}
@@ -62,7 +66,7 @@ export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
                 </td>
               </tr>
             ))}
-            {prices.length === 0 && (
+            {filteredPrices.length === 0 && (
               <tr>
                 <td colSpan={3} className="px-5 py-8 text-center font-vietnam text-[13px] text-v2-text-tertiary">
                   {t("comingSoon")}
