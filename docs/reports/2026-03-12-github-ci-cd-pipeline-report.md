@@ -131,3 +131,6 @@ After merging to `main`:
 | 2026-03-12 | Fixed Storybook preview: Renamed `preview.ts` to `preview.tsx` to support JSX syntax | Minor | 635c32e |
 | 2026-03-12 | Fixed unescaped entities: Changed quotes to `&quot;` and apostrophes to `&apos;` in test-recommendations, FeatureDiscovery, SearchResults | Minor | 635c32e |
 | 2026-03-12 | Additional React Compiler fixes: ConnectionStatus, PullToRefresh, ui/Toast, CurrencyContext, NotificationContext, SymbolAutocomplete, ReviewStep | Minor | 1b76b16 |
+| 2026-03-12 | Fix Cannot access refs during render: Tour.tsx (moved tooltip position calculation to useMemo) | Minor | 03b07e4 |
+| 2026-03-12 | Fix Cannot access variable before it is declared: useNotificationStream.ts (use connectRef), ReviewStepWrapper.tsx (move parseFileViaBackend before useEffect) | Minor | 03b07e4 |
+| 2026-03-12 | Fix missing `useMemo` import in Tour.tsx causing TypeScript error | Minor | — |
