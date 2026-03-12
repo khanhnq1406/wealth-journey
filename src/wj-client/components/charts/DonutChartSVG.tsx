@@ -116,9 +116,19 @@ export const DonutChartSVG = memo(function DonutChartSVG({
   const radius = (size / 2) * (outerRadiusPercent / 100);
   const innerRadius = (size / 2) * (innerRadiusPercent / 100);
 
-  // Generate pie slices
-  let currentAngle = -90; // Start from top
-  const slices = coloredData.map((item, index) => {
+  // Generate pie slices using reduce to avoid variable mutation during render
+  const slices = coloredData.reduce<
+    Array<{
+      path: string;
+      color: string;
+      name: string;
+      value: number;
+      percentage: number;
+      labelX: number;
+      labelY: number;
+    }>
+  >((acc, item) => {
+    const currentAngle = -90 + acc.reduce((sum, _, i) => sum + (coloredData[i].value / total) * 360, 0);
     const percentage = total > 0 ? item.value / total : 0;
     const angle = percentage * 360;
 
@@ -174,8 +184,6 @@ export const DonutChartSVG = memo(function DonutChartSVG({
       ].join(" ");
     }
 
-    currentAngle = endAngle;
-
     // Calculate label position (mid-angle of slice)
     const midAngle = (startAngle + endAngle) / 2;
     const midRad = (midAngle * Math.PI) / 180;
@@ -185,7 +193,7 @@ export const DonutChartSVG = memo(function DonutChartSVG({
     const labelX = centerX + labelRadius * Math.cos(midRad);
     const labelY = centerY + labelRadius * Math.sin(midRad);
 
-    return {
+    acc.push({
       path,
       color: item.color,
       name: item.name,
@@ -193,8 +201,9 @@ export const DonutChartSVG = memo(function DonutChartSVG({
       percentage,
       labelX,
       labelY,
-    };
-  });
+    });
+    return acc;
+  }, []);
 
   return (
     <div className={`${className} w-full`}>
