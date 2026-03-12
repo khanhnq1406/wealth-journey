@@ -370,9 +370,9 @@ describe("downloadExcel", () => {
 
     const createElementSpy = jest.spyOn(document, "createElement").mockReturnValue(mockLink);
 
-    // Track calls to these methods
-    const appendChildSpy = jest.spyOn(document.body, "appendChild").mockImplementation(() => mockLink);
-    const removeChildSpy = jest.spyOn(document.body, "removeChild").mockImplementation(() => mockLink);
+    // Track calls to these methods - use explicit any to avoid deep type instantiation
+    const appendChildSpy = jest.spyOn(document.body, "appendChild" as any).mockReturnValue(mockLink);
+    const removeChildSpy = jest.spyOn(document.body, "removeChild" as any).mockReturnValue(mockLink);
 
     // Create a mock workbook with xlsx.writeBuffer
     const mockWorkbook = {
