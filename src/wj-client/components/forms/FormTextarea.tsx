@@ -1,7 +1,7 @@
 "use client";
 
 import { useController, UseControllerProps } from "react-hook-form";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Label } from "./Label";
 import { ErrorMessage } from "./ErrorMessage";
 import { cn } from "@/lib/utils/cn";
@@ -46,17 +46,21 @@ export const FormTextarea = ({
   // Extract field properties without ref
   const { ref: fieldRef, onChange: fieldOnChange, onBlur: fieldOnBlur, name: fieldName, value: fieldValue } = field;
 
+  // Store field ref in a mutable object to avoid modifying the original ref
+  const fieldRefValue = useRef<HTMLTextAreaElement | null>(null);
+
   // Merge refs to support both the field.ref from useController and our internal ref
-  const setRef = (ref: HTMLTextAreaElement | null) => {
+  const setRef = useCallback((ref: HTMLTextAreaElement | null) => {
     // Set the field ref (from react-hook-form)
     if (typeof fieldRef === "function") {
       fieldRef(ref);
     } else if (fieldRef) {
-      (fieldRef as React.MutableRefObject<HTMLTextAreaElement | null>).current = ref;
+      // Store in our wrapper instead of modifying the original ref
+      fieldRefValue.current = ref;
     }
     // Set our internal ref
     internalRef.current = ref;
-  };
+  }, [fieldRef]);
 
   const currentLength = String(fieldValue || "").length;
   const isNearLimit = maxLength && currentLength > maxLength * 0.9;
