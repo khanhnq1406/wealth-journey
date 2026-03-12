@@ -5,6 +5,11 @@
       "source": "softaworks/agent-toolkit",
       "sourceType": "github",
       "computedHash": "f35f57420c35f2e8413e1e22934ca3950cae8286499f6fbe978cff604c35cfcd"
+    },
+    "ci-cd-best-practices": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "16c5f5bafd768c74bbf75b69b2d73c7fe2f2915ce57774ae4c6d7b285fd5d357"
     }
   }
 }
