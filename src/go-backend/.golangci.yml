@@ -1,3 +1,5 @@
+version: "2"
+
 run:
   timeout: 5m
 
@@ -7,29 +9,28 @@ linters:
     - govet
     - errcheck
     - staticcheck
-
-linters-settings:
-  depguard:
-    rules:
-      domain-no-infrastructure:
-        deny:
-          - pkg: "gorm.io/*"
-            desc: "Domain layer must not import GORM directly; use repository interfaces"
-          - pkg: "github.com/go-redis/*"
-            desc: "Domain layer must not import Redis directly; use service interfaces"
-          - pkg: "github.com/gin-gonic/*"
-            desc: "Domain layer must not import Gin; HTTP belongs in handlers/"
-        files:
-          - "!**/domain/**"
-        # Only apply to domain/ packages
-      domain-services:
-        deny:
-          - pkg: "gorm.io/*"
-            desc: "Service layer must not import GORM directly; use repository interfaces"
-          - pkg: "github.com/go-redis/redis/v8/internal/*"
-            desc: "Service layer must not import Redis internals"
-        files:
-          - "**/domain/service/**"
+  settings:
+    depguard:
+      rules:
+        domain-no-infrastructure:
+          deny:
+            - pkg: "gorm.io/*"
+              desc: "Domain layer must not import GORM directly; use repository interfaces"
+            - pkg: "github.com/go-redis/*"
+              desc: "Domain layer must not import Redis directly; use service interfaces"
+            - pkg: "github.com/gin-gonic/*"
+              desc: "Domain layer must not import Gin; HTTP belongs in handlers/"
+          files:
+            - "!**/domain/**"
+          # Only apply to domain/ packages
+        domain-services:
+          deny:
+            - pkg: "gorm.io/*"
+              desc: "Service layer must not import GORM directly; use repository interfaces"
+            - pkg: "github.com/go-redis/redis/v8/internal/*"
+              desc: "Service layer must not import Redis internals"
+          files:
+            - "**/domain/service/**"
 
 issues:
   exclude-dirs:
