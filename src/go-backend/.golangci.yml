@@ -2,11 +2,12 @@ version: "2"
 
 run:
   timeout: 5m
-  exclude-dirs:
-    - protobuf
-    - vendor
 
 linters:
+  exclusions:
+    paths:
+      - protobuf
+      - vendor
   enable:
     - depguard
     - govet
@@ -34,4 +35,3 @@ linters:
               desc: "Service layer must not import Redis internals"
           files:
             - "**/domain/service/**"
-
