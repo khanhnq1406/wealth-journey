@@ -15,8 +15,99 @@ import (
 	v1 "wealthjourney/protobuf/v1"
 )
 
-// TestExecuteImport_ReviewEachStrategy tests the REVIEW_EACH duplicate handling strategy
-func TestExecuteImport_ReviewEachStrategy(t *testing.T) {
+// TestExecuteImport_ReviewEachStrategy_MERGE tests MERGE action for duplicate handling
+func TestExecuteImport_ReviewEachStrategy_MERGE(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+	db, cleanup := setupTestDB(t)
+	defer cleanup()
+
+	// Setup repositories and services
+	userRepo, walletRepo, categoryRepo, transactionRepo, importRepo := setupRepositories(db)
+	importService := setupImportService(importRepo, transactionRepo, walletRepo, categoryRepo, db)
+
+	// Create test user, wallet, and category
+	user, wallet, category := setupTestUserWalletCategory(t, ctx, userRepo, walletRepo, categoryRepo)
+
+	// Create an existing transaction (potential duplicate)
+	// Note: Description must have >80% similarity with parsed transaction for duplicate detection
+	existingDate := time.Now().AddDate(0, 0, -1)
+	existingTx := &models.Transaction{
+		WalletID:   wallet.ID,
+		Amount:     -500000, // 500K VND expense (negative)
+		Date:       existingDate,
+		CategoryID: &category.ID,
+		Note:       "STARBUCKS COFFEE", // Exact match for duplicate detection
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+	}
+	err := transactionRepo.Create(ctx, existingTx)
+	require.NoError(t, err)
+
+	// Prepare imported transactions with one duplicate
+	parsedTransactions := []*v1.ParsedTransaction{
+		{
+			RowNumber:   1,
+			Date:        existingDate.Unix(),
+			Description: "STARBUCKS COFFEE", // Exact match for duplicate detection (>80% similarity required)
+			Amount: &v1.Money{
+				Amount:   -500000,
+				Currency: "VND",
+			},
+			Type:                v1.TransactionType_TRANSACTION_TYPE_EXPENSE,
+			SuggestedCategoryId: category.ID,
+			IsValid:             true,
+		},
+		{
+			RowNumber:   2,
+			Date:        time.Now().Unix(),
+			Description: "New Restaurant",
+			Amount: &v1.Money{
+				Amount:   -300000,
+				Currency: "VND",
+			},
+			Type:                v1.TransactionType_TRANSACTION_TYPE_EXPENSE,
+			SuggestedCategoryId: category.ID,
+			IsValid:             true,
+		},
+	}
+
+	// User chooses to MERGE the duplicate
+	duplicateActions := []*v1.DuplicateAction{
+		{
+			ImportedRowNumber:     1,
+			ExistingTransactionId: existingTx.ID,
+			Action:                v1.DuplicateActionType_DUPLICATE_ACTION_MERGE,
+		},
+	}
+
+	req := &v1.ExecuteImportRequest{
+		FileId:           "test-file-review-merge",
+		WalletId:         wallet.ID,
+		Transactions:     parsedTransactions,
+		Strategy:         v1.DuplicateHandlingStrategy_DUPLICATE_STRATEGY_REVIEW_EACH,
+		DuplicateActions: duplicateActions,
+	}
+
+	resp, err := importService.ExecuteImport(ctx, user.ID, req)
+	require.NoError(t, err)
+	require.True(t, resp.Success)
+
+	// Should import 1 new transaction and merge 1
+	assert.Equal(t, int32(1), resp.Summary.TotalImported)
+	assert.Equal(t, int32(1), resp.Summary.DuplicatesMerged)
+
+	// Verify existing transaction was updated
+	updatedTx, err := transactionRepo.GetByID(ctx, existingTx.ID)
+	require.NoError(t, err)
+	assert.Equal(t, "STARBUCKS COFFEE", updatedTx.Note)
+}
+
+// TestExecuteImport_ReviewEachStrategy_KEEP_BOTH tests KEEP_BOTH action for duplicate handling
+func TestExecuteImport_ReviewEachStrategy_KEEP_BOTH(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test")
 	}
@@ -36,10 +127,10 @@ func TestExecuteImport_ReviewEachStrategy(t *testing.T) {
 	existingDate := time.Now().AddDate(0, 0, -1)
 	existingTx := &models.Transaction{
 		WalletID:   wallet.ID,
-		Amount:     -500000, // 500K VND expense (negative)
+		Amount:     -500000,
 		Date:       existingDate,
 		CategoryID: &category.ID,
-		Note:       "Coffee at Starbucks",
+		Note:       "STARBUCKS COFFEE",
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
@@ -74,117 +165,199 @@ func TestExecuteImport_ReviewEachStrategy(t *testing.T) {
 		},
 	}
 
-	t.Run("MERGE action updates existing transaction", func(t *testing.T) {
-		// User chooses to MERGE the duplicate
-		duplicateActions := []*v1.DuplicateAction{
-			{
-				ImportedRowNumber:      1,
-				ExistingTransactionId:  existingTx.ID,
-				Action:                 v1.DuplicateActionType_DUPLICATE_ACTION_MERGE,
+	// User chooses to KEEP_BOTH
+	duplicateActions := []*v1.DuplicateAction{
+		{
+			ImportedRowNumber:     1,
+			ExistingTransactionId: existingTx.ID,
+			Action:                v1.DuplicateActionType_DUPLICATE_ACTION_KEEP_BOTH,
+		},
+	}
+
+	req := &v1.ExecuteImportRequest{
+		FileId:           "test-file-review-keep-both",
+		WalletId:         wallet.ID,
+		Transactions:     parsedTransactions,
+		Strategy:         v1.DuplicateHandlingStrategy_DUPLICATE_STRATEGY_REVIEW_EACH,
+		DuplicateActions: duplicateActions,
+	}
+
+	resp, err := importService.ExecuteImport(ctx, user.ID, req)
+	require.NoError(t, err)
+	require.True(t, resp.Success)
+
+	// Should import 2 new transactions
+	assert.Equal(t, int32(2), resp.Summary.TotalImported)
+	assert.Equal(t, int32(0), resp.Summary.DuplicatesMerged)
+}
+
+// TestExecuteImport_ReviewEachStrategy_SKIP tests SKIP action for duplicate handling
+func TestExecuteImport_ReviewEachStrategy_SKIP(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+	db, cleanup := setupTestDB(t)
+	defer cleanup()
+
+	// Setup repositories and services
+	userRepo, walletRepo, categoryRepo, transactionRepo, importRepo := setupRepositories(db)
+	importService := setupImportService(importRepo, transactionRepo, walletRepo, categoryRepo, db)
+
+	// Create test user, wallet, and category
+	user, wallet, category := setupTestUserWalletCategory(t, ctx, userRepo, walletRepo, categoryRepo)
+
+	// Create an existing transaction (potential duplicate)
+	existingDate := time.Now().AddDate(0, 0, -1)
+	existingTx := &models.Transaction{
+		WalletID:   wallet.ID,
+		Amount:     -500000,
+		Date:       existingDate,
+		CategoryID: &category.ID,
+		Note:       "STARBUCKS COFFEE",
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+	}
+	err := transactionRepo.Create(ctx, existingTx)
+	require.NoError(t, err)
+
+	// Prepare imported transactions with one duplicate
+	parsedTransactions := []*v1.ParsedTransaction{
+		{
+			RowNumber:   1,
+			Date:        existingDate.Unix(),
+			Description: "STARBUCKS COFFEE",
+			Amount: &v1.Money{
+				Amount:   -500000,
+				Currency: "VND",
 			},
-		}
-
-		req := &v1.ExecuteImportRequest{
-			FileId:           "test-file-review-merge",
-			WalletId:         wallet.ID,
-			Transactions:     parsedTransactions,
-			Strategy:         v1.DuplicateHandlingStrategy_DUPLICATE_STRATEGY_REVIEW_EACH,
-			DuplicateActions: duplicateActions,
-		}
-
-		resp, err := importService.ExecuteImport(ctx, user.ID, req)
-		require.NoError(t, err)
-		require.True(t, resp.Success)
-
-		// Should import 1 new transaction and merge 1
-		assert.Equal(t, int32(1), resp.Summary.TotalImported)
-		assert.Equal(t, int32(1), resp.Summary.DuplicatesMerged)
-
-		// Verify existing transaction was updated
-		updatedTx, err := transactionRepo.GetByID(ctx, existingTx.ID)
-		require.NoError(t, err)
-		assert.Equal(t, "STARBUCKS COFFEE", updatedTx.Note)
-	})
-
-	t.Run("KEEP_BOTH action imports as new transaction", func(t *testing.T) {
-		// User chooses to KEEP_BOTH
-		duplicateActions := []*v1.DuplicateAction{
-			{
-				ImportedRowNumber:      1,
-				ExistingTransactionId:  existingTx.ID,
-				Action:                 v1.DuplicateActionType_DUPLICATE_ACTION_KEEP_BOTH,
+			Type:                v1.TransactionType_TRANSACTION_TYPE_EXPENSE,
+			SuggestedCategoryId: category.ID,
+			IsValid:             true,
+		},
+		{
+			RowNumber:   2,
+			Date:        time.Now().Unix(),
+			Description: "New Restaurant",
+			Amount: &v1.Money{
+				Amount:   -300000,
+				Currency: "VND",
 			},
-		}
+			Type:                v1.TransactionType_TRANSACTION_TYPE_EXPENSE,
+			SuggestedCategoryId: category.ID,
+			IsValid:             true,
+		},
+	}
 
-		req := &v1.ExecuteImportRequest{
-			FileId:           "test-file-review-keep-both",
-			WalletId:         wallet.ID,
-			Transactions:     parsedTransactions,
-			Strategy:         v1.DuplicateHandlingStrategy_DUPLICATE_STRATEGY_REVIEW_EACH,
-			DuplicateActions: duplicateActions,
-		}
+	// User chooses to SKIP
+	duplicateActions := []*v1.DuplicateAction{
+		{
+			ImportedRowNumber:     1,
+			ExistingTransactionId: existingTx.ID,
+			Action:                v1.DuplicateActionType_DUPLICATE_ACTION_SKIP,
+		},
+	}
 
-		resp, err := importService.ExecuteImport(ctx, user.ID, req)
-		require.NoError(t, err)
-		require.True(t, resp.Success)
+	req := &v1.ExecuteImportRequest{
+		FileId:           "test-file-review-skip",
+		WalletId:         wallet.ID,
+		Transactions:     parsedTransactions,
+		Strategy:         v1.DuplicateHandlingStrategy_DUPLICATE_STRATEGY_REVIEW_EACH,
+		DuplicateActions: duplicateActions,
+	}
 
-		// Should import 2 new transactions
-		assert.Equal(t, int32(2), resp.Summary.TotalImported)
-		assert.Equal(t, int32(0), resp.Summary.DuplicatesMerged)
-	})
+	resp, err := importService.ExecuteImport(ctx, user.ID, req)
+	require.NoError(t, err)
+	require.True(t, resp.Success)
 
-	t.Run("SKIP action excludes transaction", func(t *testing.T) {
-		// User chooses to SKIP
-		duplicateActions := []*v1.DuplicateAction{
-			{
-				ImportedRowNumber:      1,
-				ExistingTransactionId:  existingTx.ID,
-				Action:                 v1.DuplicateActionType_DUPLICATE_ACTION_SKIP,
+	// Should import 1 new transaction and skip 1
+	assert.Equal(t, int32(1), resp.Summary.TotalImported)
+	assert.Equal(t, int32(1), resp.Summary.DuplicatesSkipped)
+}
+
+// TestExecuteImport_ReviewEachStrategy_NOT_DUPLICATE tests NOT_DUPLICATE action for duplicate handling
+func TestExecuteImport_ReviewEachStrategy_NOT_DUPLICATE(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test")
+	}
+
+	ctx := context.Background()
+	db, cleanup := setupTestDB(t)
+	defer cleanup()
+
+	// Setup repositories and services
+	userRepo, walletRepo, categoryRepo, transactionRepo, importRepo := setupRepositories(db)
+	importService := setupImportService(importRepo, transactionRepo, walletRepo, categoryRepo, db)
+
+	// Create test user, wallet, and category
+	user, wallet, category := setupTestUserWalletCategory(t, ctx, userRepo, walletRepo, categoryRepo)
+
+	// Create an existing transaction (potential duplicate)
+	existingDate := time.Now().AddDate(0, 0, -1)
+	existingTx := &models.Transaction{
+		WalletID:   wallet.ID,
+		Amount:     -500000,
+		Date:       existingDate,
+		CategoryID: &category.ID,
+		Note:       "STARBUCKS COFFEE",
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+	}
+	err := transactionRepo.Create(ctx, existingTx)
+	require.NoError(t, err)
+
+	// Prepare imported transactions with one duplicate
+	parsedTransactions := []*v1.ParsedTransaction{
+		{
+			RowNumber:   1,
+			Date:        existingDate.Unix(),
+			Description: "STARBUCKS COFFEE",
+			Amount: &v1.Money{
+				Amount:   -500000,
+				Currency: "VND",
 			},
-		}
-
-		req := &v1.ExecuteImportRequest{
-			FileId:           "test-file-review-skip",
-			WalletId:         wallet.ID,
-			Transactions:     parsedTransactions,
-			Strategy:         v1.DuplicateHandlingStrategy_DUPLICATE_STRATEGY_REVIEW_EACH,
-			DuplicateActions: duplicateActions,
-		}
-
-		resp, err := importService.ExecuteImport(ctx, user.ID, req)
-		require.NoError(t, err)
-		require.True(t, resp.Success)
-
-		// Should import 1 new transaction and skip 1
-		assert.Equal(t, int32(1), resp.Summary.TotalImported)
-		assert.Equal(t, int32(1), resp.Summary.DuplicatesSkipped)
-	})
-
-	t.Run("NOT_DUPLICATE action imports as new transaction", func(t *testing.T) {
-		// User marks as false positive
-		duplicateActions := []*v1.DuplicateAction{
-			{
-				ImportedRowNumber:      1,
-				ExistingTransactionId:  existingTx.ID,
-				Action:                 v1.DuplicateActionType_DUPLICATE_ACTION_NOT_DUPLICATE,
+			Type:                v1.TransactionType_TRANSACTION_TYPE_EXPENSE,
+			SuggestedCategoryId: category.ID,
+			IsValid:             true,
+		},
+		{
+			RowNumber:   2,
+			Date:        time.Now().Unix(),
+			Description: "New Restaurant",
+			Amount: &v1.Money{
+				Amount:   -300000,
+				Currency: "VND",
 			},
-		}
+			Type:                v1.TransactionType_TRANSACTION_TYPE_EXPENSE,
+			SuggestedCategoryId: category.ID,
+			IsValid:             true,
+		},
+	}
 
-		req := &v1.ExecuteImportRequest{
-			FileId:           "test-file-review-not-dup",
-			WalletId:         wallet.ID,
-			Transactions:     parsedTransactions,
-			Strategy:         v1.DuplicateHandlingStrategy_DUPLICATE_STRATEGY_REVIEW_EACH,
-			DuplicateActions: duplicateActions,
-		}
+	// User marks as false positive
+	duplicateActions := []*v1.DuplicateAction{
+		{
+			ImportedRowNumber:     1,
+			ExistingTransactionId: existingTx.ID,
+			Action:                v1.DuplicateActionType_DUPLICATE_ACTION_NOT_DUPLICATE,
+		},
+	}
 
-		resp, err := importService.ExecuteImport(ctx, user.ID, req)
-		require.NoError(t, err)
-		require.True(t, resp.Success)
+	req := &v1.ExecuteImportRequest{
+		FileId:           "test-file-review-not-dup",
+		WalletId:         wallet.ID,
+		Transactions:     parsedTransactions,
+		Strategy:         v1.DuplicateHandlingStrategy_DUPLICATE_STRATEGY_REVIEW_EACH,
+		DuplicateActions: duplicateActions,
+	}
 
-		// Should import 2 new transactions
-		assert.Equal(t, int32(2), resp.Summary.TotalImported)
-	})
+	resp, err := importService.ExecuteImport(ctx, user.ID, req)
+	require.NoError(t, err)
+	require.True(t, resp.Success)
+
+	// Should import 2 new transactions
+	assert.Equal(t, int32(2), resp.Summary.TotalImported)
 }
 
 // TestExecuteImport_KeepAllStrategy tests the KEEP_ALL duplicate handling strategy
@@ -211,7 +384,7 @@ func TestExecuteImport_KeepAllStrategy(t *testing.T) {
 		Amount:     -500000, // Expense (negative)
 		Date:       existingDate,
 		CategoryID: &category.ID,
-		Note:       "Coffee",
+		Note:       "STARBUCKS COFFEE",
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
@@ -223,7 +396,7 @@ func TestExecuteImport_KeepAllStrategy(t *testing.T) {
 		Amount:     -300000, // Expense (negative)
 		Date:       existingDate,
 		CategoryID: &category.ID,
-		Note:       "Lunch",
+		Note:       "RESTAURANT LUNCH",
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
@@ -258,34 +431,32 @@ func TestExecuteImport_KeepAllStrategy(t *testing.T) {
 		},
 	}
 
-	t.Run("KEEP_ALL imports all transactions including duplicates", func(t *testing.T) {
-		req := &v1.ExecuteImportRequest{
-			FileId:       "test-file-keep-all",
-			WalletId:     wallet.ID,
-			Transactions: parsedTransactions,
-			Strategy:     v1.DuplicateHandlingStrategy_DUPLICATE_STRATEGY_KEEP_ALL,
-		}
+	req := &v1.ExecuteImportRequest{
+		FileId:       "test-file-keep-all",
+		WalletId:     wallet.ID,
+		Transactions: parsedTransactions,
+		Strategy:     v1.DuplicateHandlingStrategy_DUPLICATE_STRATEGY_KEEP_ALL,
+	}
 
-		resp, err := importService.ExecuteImport(ctx, user.ID, req)
-		require.NoError(t, err)
-		require.True(t, resp.Success)
+	resp, err := importService.ExecuteImport(ctx, user.ID, req)
+	require.NoError(t, err)
+	require.True(t, resp.Success)
 
-		// Should import all 2 transactions
-		assert.Equal(t, int32(2), resp.Summary.TotalImported)
-		assert.Equal(t, int32(0), resp.Summary.DuplicatesSkipped)
-		assert.Equal(t, int32(0), resp.Summary.DuplicatesMerged)
+	// Should import all 2 transactions
+	assert.Equal(t, int32(2), resp.Summary.TotalImported)
+	assert.Equal(t, int32(0), resp.Summary.DuplicatesSkipped)
+	assert.Equal(t, int32(0), resp.Summary.DuplicatesMerged)
 
-		// Verify transactions were created
-		filter := repository.TransactionFilter{
-			WalletID: &wallet.ID,
-		}
-		allTxs, _, err := transactionRepo.List(ctx, user.ID, filter, repository.ListOptions{
-			Limit:  100,
-			Offset: 0,
-		})
-		require.NoError(t, err)
-		assert.GreaterOrEqual(t, len(allTxs), 4) // 2 existing + 2 new
+	// Verify transactions were created
+	filter := repository.TransactionFilter{
+		WalletID: &wallet.ID,
+	}
+	allTxs, _, err := transactionRepo.List(ctx, user.ID, filter, repository.ListOptions{
+		Limit:  100,
+		Offset: 0,
 	})
+	require.NoError(t, err)
+	assert.GreaterOrEqual(t, len(allTxs), 4) // 2 existing + 2 new
 }
 
 // TestExecuteImport_RejectsZeroAmount tests that zero-amount transactions are rejected
@@ -377,11 +548,27 @@ func TestExecuteImport_RejectsZeroAmount(t *testing.T) {
 		}
 
 		// Verify expense and income totals don't include zero-amount transaction
-		assert.Equal(t, int64(100000), resp.Summary.TotalExpenses, "Total expenses should be 100,000 VND")
-		assert.Equal(t, int64(50000), resp.Summary.TotalIncome, "Total income should be 50,000 VND")
+		// Amounts are divided by 10000 in import_service.go before storage
+		// -100000 / 10000 = -10 (expense), 50000 / 10000 = 5 (income)
+		assert.Equal(t, int64(10), resp.Summary.TotalExpenses, "Total expenses should be 10 VND")
+		assert.Equal(t, int64(5), resp.Summary.TotalIncome, "Total income should be 5 VND")
 	})
 
 	t.Run("All zero-amount transactions results in no imports", func(t *testing.T) {
+		// Create a new wallet for this sub-test to ensure isolation
+		wallet2 := &models.Wallet{
+			UserID:     user.ID,
+			WalletName: "Test Wallet 2",
+			Balance:    1000000,
+			Currency:   "VND",
+			Status:     1,
+			Type:       int32(v1.WalletType_BASIC),
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		}
+		err := walletRepo.Create(ctx, wallet2)
+		require.NoError(t, err)
+
 		// Prepare only zero-amount transactions
 		parsedTransactions := []*v1.ParsedTransaction{
 			{
@@ -412,7 +599,7 @@ func TestExecuteImport_RejectsZeroAmount(t *testing.T) {
 
 		req := &v1.ExecuteImportRequest{
 			FileId:       "test-file-all-zero",
-			WalletId:     wallet.ID,
+			WalletId:     wallet2.ID,
 			Transactions: parsedTransactions,
 			Strategy:     v1.DuplicateHandlingStrategy_DUPLICATE_STRATEGY_KEEP_ALL,
 		}

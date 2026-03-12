@@ -564,8 +564,13 @@ func setupTestRedis(t *testing.T) *redis.Client {
 		DB:   15, // Use separate DB for tests
 	})
 
-	// Clear test database
+	// Check if Redis is available
 	ctx := context.Background()
+	if err := client.Ping(ctx).Err(); err != nil {
+		t.Skip("Redis not available, skipping test")
+	}
+
+	// Clear test database
 	client.FlushDB(ctx)
 
 	return client
