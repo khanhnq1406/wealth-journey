@@ -1,0 +1,41 @@
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+const nextConfig = require("eslint-config-next");
+
+export default [
+  ...nextConfig,
+  {
+    rules: {
+      "jsx-a11y/no-img-element": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "no-restricted-imports": [
+        "warn",
+        {
+          patterns: [
+            {
+              group: ["@/redux/*"],
+              message: "Redux store moved to @/features/auth/store/. Update your import."
+            },
+            {
+              group: ["@/components/modals/forms/*"],
+              message: "Form components moved to @/features/*/forms/. Import from the appropriate feature module."
+            },
+            {
+              group: ["@/components/import/*"],
+              message: "Import components moved to @/features/import/components/. Update your import."
+            },
+            {
+              group: ["@/lib/validation/investment*", "@/lib/validation/wallet*", "@/lib/validation/budget*", "@/lib/validation/transaction*", "@/lib/validation/transfer*"],
+              message: "Validation schemas moved to @/features/*/utils/. Import from the appropriate feature module."
+            },
+            {
+              group: ["@/utils/export/*"],
+              message: "Export utilities moved to @/features/report/utils/export/. Update your import."
+            }
+          ]
+        }
+      ]
+    }
+  }
+];
