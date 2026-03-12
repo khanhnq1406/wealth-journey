@@ -123,9 +123,11 @@ export function TransactionFilterModal({
   // Ref to track the debounced search value without causing re-renders
   const debouncedSearchRef = useRef(localSearch);
   const typingTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  // Track render count
+  // Track render count - use useEffect to avoid accessing ref during render
   const renderCountRef = useRef(0);
-  renderCountRef.current += 1;
+  useEffect(() => {
+    renderCountRef.current += 1;
+  });
 
   // Custom debounce implementation that doesn't cause re-renders
   useEffect(() => {
