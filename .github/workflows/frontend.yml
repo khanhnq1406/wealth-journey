@@ -33,7 +33,7 @@ jobs:
         id: lint
         run: |
           mkdir -p /tmp/ci-errors
-          npx next lint 2>&1 | tee /tmp/ci-errors/lint-output.txt
+          npm run lint 2>&1 | tee /tmp/ci-errors/lint-output.txt
           exit ${PIPESTATUS[0]}
 
       - name: Type check

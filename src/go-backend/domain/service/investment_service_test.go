@@ -518,6 +518,7 @@ func TestInvestmentService_CreateInvestment_Success(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -547,24 +548,9 @@ func TestInvestmentService_CreateInvestment_Success(t *testing.T) {
 		},
 	)
 	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
-	// For populateInvestmentCache
-	mockInvestmentRepo.On("GetByID", ctx, mock.AnythingOfType("int32")).Return(
-		&models.Investment{
-			ID:          1,
-			WalletID:    walletID,
-			Symbol:      "AAPL",
-			Name:        "Apple Inc.",
-			Type:        int32(investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK),
-			Quantity:    10000,
-			AverageCost: 1500000,
-			TotalCost:   15000000000,
-			Currency:    "USD",
-		},
-		nil,
-	)
-	mockUserRepo.On("GetByID", ctx, userID).Return(&models.User{ID: userID, PreferredCurrency: "USD"}, nil)
 	mockTxRepo.On("CreateLot", ctx, mock.AnythingOfType("*models.InvestmentLot")).Return(nil)
 	mockTxRepo.On("Update", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
+	mockUserRepo.On("GetByID", ctx, userID).Return(&models.User{ID: userID, PreferredCurrency: "USD"}, nil)
 
 	// Execute
 	response, err := service.CreateInvestment(ctx, userID, req)
@@ -598,6 +584,7 @@ func TestInvestmentService_CreateInvestment_WalletNotFound(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -645,6 +632,7 @@ func TestInvestmentService_CreateInvestment_WrongWalletType(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -694,6 +682,7 @@ func TestInvestmentService_CreateInvestment_DuplicateSymbol(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -746,6 +735,7 @@ func TestInvestmentService_AddTransaction_BuyCreatesLot(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -766,12 +756,16 @@ func TestInvestmentService_AddTransaction_BuyCreatesLot(t *testing.T) {
 	}
 
 	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
+	mockWalletRepo.On("GetByID", ctx, walletID).Return(wallet, nil)
+	mockWalletRepo.On("UpdateBalance", ctx, walletID, mock.AnythingOfType("int64")).Return(wallet, nil)
 	mockInvestmentRepo.On("GetByIDForUser", ctx, investmentID, userID).Return(investment, nil)
+	mockInvestmentRepo.On("GetByID", ctx, investmentID).Return(investment, nil)
 	mockTxRepo.On("GetOpenLots", ctx, investmentID).Return([]*models.InvestmentLot{}, nil)
 	mockTxRepo.On("CreateLot", ctx, mock.AnythingOfType("*models.InvestmentLot")).Return(nil)
 	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
 	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*investmentv1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
 	mockInvestmentRepo.On("Update", ctx, mock.AnythingOfType("*models.Investment")).Return(nil)
+	mockUserRepo.On("GetByID", ctx, userID).Return(&models.User{ID: userID, PreferredCurrency: "USD"}, nil)
 
 	// Execute
 	response, err := service.AddTransaction(ctx, userID, req)
@@ -805,6 +799,7 @@ func TestInvestmentService_AddTransaction_SellConsumesOldestLot(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -845,7 +840,10 @@ func TestInvestmentService_AddTransaction_SellConsumesOldestLot(t *testing.T) {
 	}
 
 	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
+	mockWalletRepo.On("GetByID", ctx, walletID).Return(wallet, nil)
+	mockWalletRepo.On("UpdateBalance", ctx, walletID, mock.AnythingOfType("int64")).Return(wallet, nil)
 	mockInvestmentRepo.On("GetByIDForUser", ctx, investmentID, userID).Return(investment, nil)
+	mockInvestmentRepo.On("GetByID", ctx, investmentID).Return(investment, nil)
 	mockTxRepo.On("GetOpenLots", ctx, investmentID).Return([]*models.InvestmentLot{lot1, lot2}, nil)
 	mockTxRepo.On("UpdateLot", ctx, mock.MatchedBy(func(lot *models.InvestmentLot) bool {
 		return lot.ID == 1 && lot.RemainingQuantity == 3000 // 10000 - 7000
@@ -856,6 +854,7 @@ func TestInvestmentService_AddTransaction_SellConsumesOldestLot(t *testing.T) {
 		return inv.Quantity == 13000 && // 20000 - 7000
 		 inv.RealizedPNL > 0 // Should have realized PNL
 	})).Return(nil)
+	mockUserRepo.On("GetByID", ctx, userID).Return(&models.User{ID: userID, PreferredCurrency: "USD"}, nil)
 
 	// Execute
 	response, err := service.AddTransaction(ctx, userID, req)
@@ -889,6 +888,7 @@ func TestInvestmentService_AddTransaction_SellConsumesMultipleLots(t *testing.T)
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -929,13 +929,17 @@ func TestInvestmentService_AddTransaction_SellConsumesMultipleLots(t *testing.T)
 	}
 
 	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
+	mockWalletRepo.On("GetByID", ctx, walletID).Return(wallet, nil)
+	mockWalletRepo.On("UpdateBalance", ctx, walletID, mock.AnythingOfType("int64")).Return(wallet, nil)
 	mockInvestmentRepo.On("GetByIDForUser", ctx, investmentID, userID).Return(investment, nil)
+	mockInvestmentRepo.On("GetByID", ctx, investmentID).Return(investment, nil)
 	mockTxRepo.On("GetOpenLots", ctx, investmentID).Return([]*models.InvestmentLot{lot1, lot2}, nil)
 	// Both lots should be updated
 	mockTxRepo.On("UpdateLot", ctx, mock.AnythingOfType("*models.InvestmentLot")).Return(nil).Times(2)
 	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
 	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*investmentv1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
 	mockInvestmentRepo.On("Update", ctx, mock.AnythingOfType("*models.Investment")).Return(nil)
+	mockUserRepo.On("GetByID", ctx, userID).Return(&models.User{ID: userID, PreferredCurrency: "USD"}, nil)
 
 	// Execute
 	response, err := service.AddTransaction(ctx, userID, req)
@@ -969,6 +973,7 @@ func TestInvestmentService_AddTransaction_SellExceedsQuantity(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -1023,6 +1028,7 @@ func TestInvestmentService_GetPortfolioSummary_Success(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -1030,46 +1036,73 @@ func TestInvestmentService_GetPortfolioSummary_Success(t *testing.T) {
 	walletID := int32(1)
 	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
 
-	summary := &repository.PortfolioSummary{
-		TotalValue:        100000000000, // $10,000
-		TotalCost:         80000000000,  // $8,000
-		TotalPNL:          20000000000,  // $2,000
-		TotalPNLPercent:   25.0,
-		RealizedPNL:       5000000000,   // $500
-		UnrealizedPNL:     15000000000,  // $1,500
-		TotalInvestments:  5,
-		InvestmentsByType: map[investmentv1.InvestmentType]*repository.TypeSummary{
-			investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK: {
-				TotalValue: 70000000000,
-				Count:      3,
-			},
-			investmentv1.InvestmentType_INVESTMENT_TYPE_CRYPTOCURRENCY: {
-				TotalValue: 30000000000,
-				Count:      2,
-			},
-		},
+	// GetPortfolioSummary aggregates from investments in-memory.
+	// Create 5 investments (3 STOCK, 2 CRYPTO) with known values in USD (matches preferred currency).
+	stockInvestment := func(id int32, currentValue, totalCost, realizedPNL, unrealizedPNL int64) *models.Investment {
+		return &models.Investment{
+			ID:            id,
+			WalletID:      walletID,
+			Symbol:        "TEST",
+			Type:          int32(investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK),
+			Currency:      "USD",
+			CurrentValue:  currentValue,
+			TotalCost:     totalCost,
+			RealizedPNL:   realizedPNL,
+			UnrealizedPNL: unrealizedPNL,
+			UpdatedAt:     time.Now(), // fresh — no auto-refresh triggered
+		}
+	}
+	cryptoInvestment := func(id int32, currentValue, totalCost, realizedPNL, unrealizedPNL int64) *models.Investment {
+		return &models.Investment{
+			ID:            id,
+			WalletID:      walletID,
+			Symbol:        "BTC",
+			Type:          int32(investmentv1.InvestmentType_INVESTMENT_TYPE_CRYPTOCURRENCY),
+			Currency:      "USD",
+			CurrentValue:  currentValue,
+			TotalCost:     totalCost,
+			RealizedPNL:   realizedPNL,
+			UnrealizedPNL: unrealizedPNL,
+			UpdatedAt:     time.Now(),
+		}
 	}
 
+	investments := []*models.Investment{
+		stockInvestment(1, 30000000000, 25000000000, 1000000000, 4000000000),  // stock 1
+		stockInvestment(2, 25000000000, 20000000000, 2000000000, 5000000000),  // stock 2
+		stockInvestment(3, 15000000000, 12000000000, 500000000, 2500000000),   // stock 3
+		cryptoInvestment(4, 20000000000, 15000000000, 1000000000, 4000000000), // crypto 1
+		cryptoInvestment(5, 10000000000, 8000000000, 500000000, 2000000000),   // crypto 2
+	}
+	// Expected totals (all USD == preferred currency, no FX conversion):
+	// TotalValue  = 30+25+15+20+10 billion = 100 billion
+	// TotalCost   = 25+20+12+15+8 billion  = 80 billion
+	// RealizedPNL = 1+2+0.5+1+0.5 billion  = 5 billion
+	// UnrealizedPNL = 4+5+2.5+4+2 billion  = 17.5 billion
+	// TotalPNL    = 5 + 17.5 = 22.5 billion
+	// TotalInvestments = 5
+
+	// GetPortfolioSummary calls userRepo.GetByID first to get preferred currency
+	mockUserRepo.On("GetByID", ctx, userID).Return(&models.User{ID: userID, PreferredCurrency: "USD"}, nil)
 	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
-	// GetPortfolioSummary now calls ListByWalletID to check if prices need refresh
-	// Return empty investments to avoid auto-refresh
+	// ListByWalletID returns investments (fresh timestamps → no auto-refresh triggered)
 	mockInvestmentRepo.On("ListByWalletID", ctx, walletID, mock.MatchedBy(func(opts repository.ListOptions) bool {
 		return opts.Limit == 1000
-	}), investmentv1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED).Return([]*models.Investment{}, 0, nil).Maybe()
-	mockInvestmentRepo.On("GetPortfolioSummary", ctx, walletID).Return(summary, nil)
+	}), investmentv1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED).Return(investments, len(investments), nil)
 
 	// Execute
-	response, err := service.GetPortfolioSummary(ctx, walletID, userID)
+	response, err := service.GetPortfolioSummary(ctx, walletID, userID, investmentv1.PnlPeriod_PNL_PERIOD_UNSPECIFIED)
 
 	// Assert
 	assert.NoError(t, err)
 	assert.NotNil(t, response)
 	assert.True(t, response.Success)
 	assert.Equal(t, int64(100000000000), response.Data.TotalValue)
-	assert.Equal(t, int64(20000000000), response.Data.TotalPnl)
+	assert.Equal(t, int64(22500000000), response.Data.TotalPnl)
 	assert.Equal(t, int32(5), response.Data.TotalInvestments)
 	assert.Len(t, response.Data.InvestmentsByType, 2)
 
+	mockUserRepo.AssertExpectations(t)
 	mockWalletRepo.AssertExpectations(t)
 	mockInvestmentRepo.AssertExpectations(t)
 }
@@ -1093,6 +1126,7 @@ func TestInvestmentService_UpdatePrices_Success(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -1109,34 +1143,27 @@ func TestInvestmentService_UpdatePrices_Success(t *testing.T) {
 		{ID: 1, UserID: userID, Type: int32(walletv1.WalletType_INVESTMENT)},
 	}, 1, nil)
 	mockInvestmentRepo.On("ListByWalletID", ctx, int32(1), mock.Anything, investmentv1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED).Return([]*models.Investment{investment1, investment2}, 2, nil)
-	mockMarketDataService.On("UpdatePricesForInvestments", ctx, mock.Anything, false).Return(map[int32]int64{
-		1: 16000, // AAPL @ $160 (in cents)
+	// UpdatePrices runs async in a goroutine with its own timeout context — use mock.Anything + Maybe()
+	mockMarketDataService.On("UpdatePricesForInvestments", mock.Anything, mock.Anything, false).Return(map[int32]int64{
+		1: 16000,   // AAPL @ $160 (in cents)
 		2: 5100000, // BTC @ $51,000 (in cents)
-	}, nil)
-	mockInvestmentRepo.On("UpdatePrices", ctx, mock.Anything).Return(nil)
-	// GetByID is called to fetch the updated investments with recalculated values
-	updatedInv1 := createTestInvestment(1, 1, "AAPL", 10000, 1500000, 15000000000)
-	updatedInv1.CurrentPrice = 16000
-	updatedInv1.CurrentValue = 16000 // (10000/10000) * 16000 = 16000 cents = $160
-	updatedInv1.UnrealizedPNL = 16000 - 15000000000 // This will be negative, but that's what recalculate produces
-	updatedInv2 := createTestInvestment(2, 1, "BTC", 100000000, 50000000000, 5000000000000000)
-	updatedInv2.CurrentPrice = 5100000
-	updatedInv2.CurrentValue = 5100000 // (100000000/100000000) * 5100000 = 5100000 cents = $51,000
-	updatedInv2.UnrealizedPNL = 5100000 - 5000000000000000
-	mockInvestmentRepo.On("GetByID", ctx, int32(1)).Return(updatedInv1, nil)
-	mockInvestmentRepo.On("GetByID", ctx, int32(2)).Return(updatedInv2, nil)
+	}, nil).Maybe()
+	mockInvestmentRepo.On("UpdatePrices", mock.Anything, mock.Anything).Return(nil).Maybe()
+	// Goroutine also calls GetByID per investment for cache invalidation
+	mockInvestmentRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int32")).Return(investment1, nil).Maybe()
 
 	// Execute
 	response, err := service.UpdatePrices(ctx, userID, req)
 
-	// Assert
+	// Assert — UpdatePrices returns immediately with empty list (async background update)
 	assert.NoError(t, err)
 	assert.NotNil(t, response)
 	assert.True(t, response.Success)
-	assert.Len(t, response.UpdatedInvestments, 2)
+	assert.Empty(t, response.UpdatedInvestments)
 
+	// Only assert expectations on mocks that run synchronously
+	mockWalletRepo.AssertExpectations(t)
 	mockInvestmentRepo.AssertExpectations(t)
-	mockMarketDataService.AssertExpectations(t)
 }
 
 // Test UpdatePrices - Custom investments should be skipped
@@ -1161,6 +1188,7 @@ func TestInvestmentService_UpdatePrices_SkipsCustomInvestments(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	// Create test wallets
@@ -1177,6 +1205,13 @@ func TestInvestmentService_UpdatePrices_SkipsCustomInvestments(t *testing.T) {
 		InvestmentIds: []int32{}, // Empty = update all
 		ForceRefresh:  false,
 	}
+
+	// Async goroutine will call these — register with Maybe() so they don't panic
+	mockMarketDataService.On("UpdatePricesForInvestments", mock.Anything, mock.Anything, false).
+		Return(map[int32]int64{1: 16000}, nil).Maybe()
+	mockInvestmentRepo.On("UpdatePrices", mock.Anything, mock.Anything).Return(nil).Maybe()
+	// Goroutine also calls GetByID per updated investment for cache invalidation
+	mockInvestmentRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int32")).Return(marketInv, nil).Maybe()
 
 	// Execute
 	response, err := service.UpdatePrices(ctx, userID, req)
@@ -1211,6 +1246,7 @@ func TestInvestmentService_DeleteInvestment_RefundsWalletBalance(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -1267,6 +1303,7 @@ func TestInvestmentService_DeleteInvestment_RefundsWithCurrencyConversion(t *tes
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()

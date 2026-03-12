@@ -252,7 +252,7 @@ func TestInvestment_TypeAwareRecalculation(t *testing.T) {
 		{
 			name:           "Other type - default divisor",
 			investmentType: v1.InvestmentType_INVESTMENT_TYPE_OTHER,
-			quantity:       100,          // 1 unit in 2 decimals
+			quantity:       10000,        // 1 unit in 4 decimals
 			totalCost:      10000,        // $100.00 in cents
 			currentPrice:   12000,        // $120.00 in cents
 			expectedValue:  12000,        // $120.00 in cents
@@ -506,12 +506,12 @@ func TestInvestmentRecalculate_CorrectedTests(t *testing.T) {
 			expectedPNLPct: 12.5,  // (50 / 400) * 100 = 12.5%
 		},
 		{
-			name:           "Other type - default divisor (2 decimals)",
+			name:           "Other type - default divisor (4 decimals)",
 			investmentType: v1.InvestmentType_INVESTMENT_TYPE_OTHER,
-			quantity:       100,   // 1 unit (2 decimals)
+			quantity:       10000, // 1 unit (4 decimals)
 			totalCost:      10000, // $100.00 in cents
 			currentPrice:   12000, // $120.00 in cents
-			// Calculation: (100 / 100) * 12000 = 12000 cents = $120
+			// Calculation: (10000 / 10000) * 12000 = 12000 cents = $120
 			expectedValue:  12000, // $120 in cents
 			expectedPNL:    2000,  // $120 - $100 = $20 profit
 			expectedPNLPct: 20.0,  // (20 / 100) * 100 = 20%

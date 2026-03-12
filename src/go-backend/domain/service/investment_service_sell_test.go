@@ -68,6 +68,7 @@ func TestSellTransaction_CostBasisPreserved(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -183,6 +184,7 @@ func TestSellTransaction_SellAllShares(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -284,6 +286,7 @@ func TestSellTransaction_MultipleBuysThenSell(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -399,6 +402,7 @@ func TestSellTransaction_InsufficientQuantity(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -463,6 +467,7 @@ func TestSellTransaction_NoOpenLots(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -529,6 +534,7 @@ func TestSellTransaction_FIFOMultipleLots(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()

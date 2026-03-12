@@ -2,6 +2,7 @@ package fx
 
 import (
 	"fmt"
+	"math"
 	"strings"
 )
 
@@ -84,6 +85,9 @@ func GetSupportedCurrencies() []string {
 
 // ValidateRate checks if an FX rate is within a reasonable range
 func ValidateRate(fromCurrency, toCurrency string, rate float64) error {
+	if math.IsNaN(rate) {
+		return fmt.Errorf("FX rate must be a valid number, got: NaN")
+	}
 	if rate <= 0 {
 		return fmt.Errorf("FX rate must be positive, got: %f", rate)
 	}
