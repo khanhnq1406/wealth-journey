@@ -140,7 +140,7 @@ export function Tour({
     try {
       const completed = localStorage.getItem(TOUR_COMPLETION_KEY);
       if (completed === "true") {
-        setIsCompleted(true);
+        queueMicrotask(() => setIsCompleted(true));
         return;
       }
 
@@ -148,8 +148,10 @@ export function Tour({
       if (savedStep && autoStart) {
         const stepIndex = parseInt(savedStep, 10);
         if (stepIndex < steps.length) {
-          setCurrentStep(stepIndex);
-          setIsActive(true);
+          queueMicrotask(() => {
+            setCurrentStep(stepIndex);
+            setIsActive(true);
+          });
         }
       }
     } catch (e) {
@@ -177,23 +179,25 @@ export function Tour({
 
     if (step.target) {
       const element = document.querySelector(step.target);
-      setTargetElement(element);
+      queueMicrotask(() => setTargetElement(element));
 
       if (element) {
         const rect = element.getBoundingClientRect();
         const scrollY = window.scrollY || window.pageYOffset;
         const scrollX = window.scrollX || window.pageXOffset;
 
-        setTooltipPosition({
-          top: rect.top + scrollY,
-          left: rect.left + scrollX,
-        });
+        queueMicrotask(() =>
+          setTooltipPosition({
+            top: rect.top + scrollY,
+            left: rect.left + scrollX,
+          }),
+        );
 
         // Scroll element into view if needed
         element.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     } else {
-      setTargetElement(null);
+      queueMicrotask(() => setTargetElement(null));
     }
   }, [isActive, currentStep, steps]);
 
@@ -292,18 +296,13 @@ export function Tour({
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === steps.length - 1;
 
-  if (!isActive || !step) return null;
-
-  // Portal target
-  const portalTarget = typeof document !== "undefined" ? document.body : null;
-
-  if (!portalTarget) return null;
-
-  // Center overlay for welcome/completion steps
-  const isCenterStep = !step.target || step.placement === "center";
+  // Center overlay for welcome/completion steps - computed before early returns for useMemo
+  const isCenterStep = !step?.target || step?.placement === "center";
 
   // Calculate tooltip position using useMemo to avoid accessing refs during render
+  // Must be called before any early returns to follow React Hooks rules
   const tooltipStyle = useMemo(() => {
+    if (!isActive || !step) return undefined;
     if (isCenterStep || !targetElement) return undefined;
 
     const rect = targetElement.getBoundingClientRect();
@@ -337,7 +336,14 @@ export function Tour({
           left: `${Math.max(16, Math.min(tooltipPosition.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - 16))}px`,
         };
     }
-  }, [isCenterStep, targetElement, step.placement, tooltipPosition]);
+  }, [isActive, step, isCenterStep, targetElement, tooltipPosition]);
+
+  if (!isActive || !step) return null;
+
+  // Portal target
+  const portalTarget = typeof document !== "undefined" ? document.body : null;
+
+  if (!portalTarget) return null;
 
   return createPortal(
     <div className="fixed inset-0 z-[60] pointer-events-none">

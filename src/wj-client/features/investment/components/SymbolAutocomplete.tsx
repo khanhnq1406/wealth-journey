@@ -128,7 +128,7 @@ export function SymbolAutocomplete({
         </div>
       ),
     }));
-  }, [searchQuery.data?.data]);
+  }, [searchQuery.data]);
 
   // Update display value when value changes externally (but not during typing)
   useEffect(() => {
@@ -217,9 +217,10 @@ export function SymbolAutocomplete({
       // Default dropdown with options
       return <div className={props.className}>{props.children}</div>;
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      inputValue.length,
-      debouncedQuery.length,
+      inputValue,
+      debouncedQuery,
       searchQuery.isLoading,
       options.length,
       searchError,

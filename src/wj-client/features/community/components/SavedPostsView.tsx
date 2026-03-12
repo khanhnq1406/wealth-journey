@@ -31,7 +31,7 @@ export function SavedPostsView({ currentUser, onHashtagClick }: SavedPostsViewPr
         <Bookmark size={40} className="text-v2-text-tertiary" />
         <p className="font-vietnam text-sm text-v2-text-tertiary">Chưa có bài viết đã lưu</p>
         <p className="font-vietnam text-xs text-v2-text-tertiary text-center max-w-xs">
-          Lưu bài viết để xem lại sau bằng cách nhấn nút "Lưu" ở mỗi bài viết.
+          Lưu bài viết để xem lại sau bằng cách nhấn nút &quot;Lưu&quot; ở mỗi bài viết.
         </p>
       </div>
     );

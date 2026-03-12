@@ -164,13 +164,13 @@ export const TransactionCard = memo(function TransactionCard({
     if (transaction?.id) {
       onEdit(transaction.id);
     }
-  }, [transaction?.id, onEdit]);
+  }, [transaction, onEdit]);
 
   const handleDelete = useCallback(() => {
     if (transaction?.id) {
       onDelete(transaction.id);
     }
-  }, [transaction?.id, onDelete]);
+  }, [transaction, onDelete]);
 
   const handleTouchEnd = useCallback(() => {
     if (!isDragging) return;

@@ -138,3 +138,12 @@ After merging to `main`:
 | 2026-03-12 | Fixed 41 golangci-lint errors: errcheck (34) - unchecked error returns in defer Close(), repository calls, fmt.Fprintf; staticcheck (7) - duplicate protobuf imports, capitalized error strings | Minor | 2452558 |
 | 2026-03-12 | Fixed remaining 11 golangci-lint errcheck errors: unchecked error returns in defer db.Close(), redisClient.Close(), resp.Body.Close(), os.Remove(), client.Close() across 8 files | Minor | — |
 | 2026-03-12 | Fixed additional 20 golangci-lint errcheck errors: more unchecked error returns in defer db.Close(), redisClient.Close() across cmd/* and service/*_test.go files | Minor | — |
+| 2026-03-12 | Fixed React Compiler memoization errors: report/page.tsx (added t to deps), TransactionCard.tsx (use transaction instead of transaction?.id), CategoryQuickSelect.tsx (added getDefaultColor/getDefaultIcon to deps) | Minor | — |
+| 2026-03-12 | Fixed setState in effect errors: Tour.tsx (wrapped setIsCompleted, setCurrentStep, setIsActive, setTargetElement, setTooltipPosition in queueMicrotask) | Minor | — |
+| 2026-03-12 | Fixed conditional useMemo in Tour.tsx: Moved isCenterStep and tooltipStyle useMemo before early returns to follow React Hooks rules | Minor | — |
+| 2026-03-12 | Fixed ref access during render: useNotificationStream.ts (moved connectRef.current assignment into useEffect) | Minor | — |
+| 2026-03-12 | Fixed unescaped entities: SavedPostsView.tsx (changed quotes to &quot;) | Minor | — |
+| 2026-03-12 | Fixed useCallback missing deps: FileUploadStep.tsx (added validateFile), DeleteWalletModal.tsx (added t) | Minor | — |
+| 2026-03-12 | Fixed setState in effect: ReviewStepWrapper.tsx (wrapped parseFileViaBackend in queueMicrotask) | Minor | — |
+| 2026-03-12 | Fixed useMemo dependency mismatches: InvestmentDetailModal.tsx (added getTransactionTypeLabel and changed to investment object), SymbolAutocomplete.tsx (fixed searchQuery.data and debouncedQuery deps) | Minor | — |
+| 2026-03-12 | Fixed useMemo dependency mismatch: GlobalSearch.tsx (added t to deps) | Minor | — |

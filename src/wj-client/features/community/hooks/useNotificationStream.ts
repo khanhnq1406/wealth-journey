@@ -113,7 +113,9 @@ export function useNotificationStream() {
   }, [getToken, handleNotification]);
 
   // Store connect in ref to avoid circular dependency
-  connectRef.current = connect;
+  useEffect(() => {
+    connectRef.current = connect;
+  });
 
   useEffect(() => {
     mountedRef.current = true;

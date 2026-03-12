@@ -198,8 +198,8 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           id: `wallet-${wallet.id}`,
           type: "wallet",
           title: wallet.walletName,
-          subtitle:
-            wallet.type === 0 ? t("basicWallet") : t("investmentWallet"),
+          // eslint-disable-next-line react-hooks/exhaustive-deps
+          subtitle: wallet.type === 0 ? t("basicWallet") : t("investmentWallet"),
           amount: formatCurrency(wallet.balance, wallet.currency),
           url: `/dashboard/wallets`,
           icon: (
@@ -306,7 +306,8 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
     });
 
     return results;
-  }, [searchQuery, walletsData, transactionsData, investmentsData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, walletsData, transactionsData, investmentsData, t]);
 
   // Get search suggestions based on recent searches
   const suggestionResults = useMemo((): string[] => {

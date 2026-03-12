@@ -65,7 +65,8 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
       icon: cat.icon || getDefaultIcon(cat.name.toLowerCase(), type),
       color: cat.color || getDefaultColor(cat.id),
     }));
-  }, [categories, type]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories, type, getDefaultColor, getDefaultIcon]);
 
   const handleCategorySelect = useCallback(
     (categoryId: string | number) => {

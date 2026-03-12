@@ -170,7 +170,7 @@ export function ReviewStepWrapper({
 
   // Parse the file when component mounts using backend API
   useEffect(() => {
-    parseFileViaBackend();
+    queueMicrotask(() => parseFileViaBackend());
   }, [parseFileViaBackend]);
 
   // Detect duplicates when transactions are loaded
