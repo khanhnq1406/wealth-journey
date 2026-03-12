@@ -102,6 +102,19 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 		SilverChart:  silverChartHandler,
 		Import:       NewImportHandler(repos.Import, importService),
 		Community:    NewCommunityHandler(services.Community, deps.RDB, deps.AuthSrv),
-		Public:       NewPublicHandler(),
+		Public: NewPublicHandler(
+			func() service.GoldPriceService {
+				if deps.RDB != nil {
+					return service.NewGoldPriceService(deps.RDB.GetClient())
+				}
+				return nil
+			}(),
+			func() service.SilverPriceService {
+				if deps.RDB != nil {
+					return service.NewSilverPriceService(deps.RDB.GetClient())
+				}
+				return nil
+			}(),
+		),
 	}
 }

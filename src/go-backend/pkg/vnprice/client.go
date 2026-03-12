@@ -102,6 +102,26 @@ func (c *Client) FetchPrices(ctx context.Context) (*PricesResponse, error) {
 		})
 	}
 
+	for _, entry := range apiResp.VSGGoldTable {
+		if entry.Name == "" {
+			continue
+		}
+		region := entry.Saigon
+		if region.Buy == 0 || region.Sell == 0 {
+			region = entry.Hanoi
+		}
+		goldPrices = append(goldPrices, GoldPrice{
+			Name:       entry.Name,
+			Buy:        region.Buy,
+			Sell:       region.Sell,
+			BuyChange:  region.BuyChange,
+			SellChange: region.SellChange,
+			Currency:   "VND",
+			Digit:      entry.Digit,
+			UpdateAt:   entry.UpdateAt,
+		})
+	}
+
 	silverPrices := make([]SilverPrice, 0)
 	for _, entry := range apiResp.SilverPrice {
 		if entry.Name == "" {
