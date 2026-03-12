@@ -7,6 +7,7 @@ import { LandingGoldPriceChart } from "@/components/landing/LandingGoldPriceChar
 import { LandingSilverPriceTable } from "@/components/landing/LandingSilverPriceTable";
 import { LandingSilverPriceChart } from "@/components/landing/LandingSilverPriceChart";
 import { usePublicMarketTypes } from "@/features/market-prices/hooks/usePublicMarketTypes";
+import { formatUpdateTimestamp } from "@/features/market-prices/utils/format-update-time";
 import { useTranslations } from "next-intl";
 
 export default function LandingPage() {
@@ -15,6 +16,14 @@ export default function LandingPage() {
 
   const goldTypes = data?.gold ?? [];
   const silverTypes = data?.silver ?? [];
+
+  // Update timestamps from API
+  const goldUpdatedTime = data?.goldUpdatedAt
+    ? formatUpdateTimestamp(data.goldUpdatedAt)
+    : undefined;
+  const silverUpdatedTime = data?.silverUpdatedAt
+    ? formatUpdateTimestamp(data.silverUpdatedAt)
+    : undefined;
 
   return (
     <LandingErrorBoundary>
@@ -38,9 +47,9 @@ export default function LandingPage() {
 
           {/* Mobile Layout */}
           <div className="sm:hidden px-4 py-4 pb-24 space-y-6">
-            <LandingGoldPriceTable types={goldTypes} isLoading={isLoading} />
+            <LandingGoldPriceTable types={goldTypes} isLoading={isLoading} updatedTime={goldUpdatedTime} />
             <LandingGoldPriceChart />
-            <LandingSilverPriceTable types={silverTypes} isLoading={isLoading} />
+            <LandingSilverPriceTable types={silverTypes} isLoading={isLoading} updatedTime={silverUpdatedTime} />
             <LandingSilverPriceChart />
           </div>
 
@@ -48,7 +57,7 @@ export default function LandingPage() {
           <div className="hidden sm:block px-8 py-6 space-y-6">
             {/* Row 1: Gold Table + Gold Chart */}
             <div className="grid grid-cols-2 gap-6">
-              <LandingGoldPriceTable types={goldTypes} isLoading={isLoading} />
+              <LandingGoldPriceTable types={goldTypes} isLoading={isLoading} updatedTime={goldUpdatedTime} />
               <LandingGoldPriceChart />
             </div>
             {/* Row 2: Silver Table + Silver Chart */}
@@ -56,6 +65,7 @@ export default function LandingPage() {
               <LandingSilverPriceTable
                 types={silverTypes}
                 isLoading={isLoading}
+                updatedTime={silverUpdatedTime}
               />
               <LandingSilverPriceChart />
             </div>
