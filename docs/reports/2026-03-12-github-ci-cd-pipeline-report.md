@@ -62,7 +62,9 @@ All four workflow files match the spec exactly. Branch protection documentation 
 
 ## Known Issues / Technical Debt
 
-None. The first PR adding these workflows will not have status checks enforced (checks must be registered in GitHub Settings after the first CI run on `main`). This is documented in `docs/guides/branch-protection-setup.md`.
+1. **`collect-errors.yml` not visible on feature branches** — The `workflow_run` trigger is a GitHub restriction: workflows using `workflow_run` are only registered and executed when they exist on the **default branch** (`main`). While this branch is open as a PR, `collect-errors.yml` will not appear in the Actions sidebar and will not run. This is expected behavior — it will activate automatically after the PR is merged to `main`.
+
+2. **First PR status checks not enforced** — The first PR adding these workflows will not have status checks enforced (checks must be registered in GitHub Settings after the first CI run on `main`). This is documented in `docs/guides/branch-protection-setup.md`.
 
 ## Files Changed
 
@@ -108,3 +110,4 @@ After merging to `main`:
 | 2026-03-12 | npm ci: regenerated `package-lock.json` to resolve `@swc/helpers@0.5.15` not satisfying `>=0.5.17` required by `next@16.1.4` | Minor | ec15294 |
 | 2026-03-12 | Added error capture to all three workflows (`backend.yml`, `frontend.yml`, `security.yml`): each failing step now captures output via `tee`, writes to `$GITHUB_STEP_SUMMARY` (inline in Actions UI), and uploads `errors.txt` as a downloadable artifact (7-day retention) | Minor | — |
 | 2026-03-12 | Added `collect-errors.yml` workflow: triggers on `workflow_run` completion for Backend CI / Frontend CI / Security; downloads all `*-errors` artifacts from failed runs on the same commit, merges into a single `all-ci-errors` artifact (`all-errors.txt`) and writes to job summary — one file to copy for all workflow errors | Minor | — |
+| 2026-03-12 | Documented `workflow_run` default-branch restriction: `collect-errors.yml` does not appear in GitHub Actions on feature branches because GitHub only executes `workflow_run` workflows on the default branch (`main`). Added explanatory comment to YAML and updated Known Issues section. | Minor | — |

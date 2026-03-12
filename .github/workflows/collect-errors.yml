@@ -1,5 +1,8 @@
 name: Collect CI Errors
 
+# NOTE: workflow_run triggers are only active on the default branch (main).
+# This workflow will NOT appear in GitHub Actions while it is on a feature branch.
+# It will register and start running automatically after this branch is merged to main.
 on:
   workflow_run:
     workflows:
