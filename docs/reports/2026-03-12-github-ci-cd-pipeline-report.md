@@ -93,3 +93,12 @@ After merging to `main`:
 1. Verify all three workflows run successfully in the Actions tab
 2. Configure branch protection rules per `docs/guides/branch-protection-setup.md`
 3. Dependabot will create its first batch of PRs within one week (Monday schedule)
+
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-12 | Fixed `Enabled` → `IsActive` in `cmd/migrate-import/main.go` (lines 95, 131) — field name mismatch with `models.BankTemplate` | Minor | — |
+| 2026-03-12 | Rewrote `cmd/test-json/main.go` to use `datatypes.JSON` directly instead of undefined `models.JSONArray/ColumnMapping/AmountFormat/DetectionRules/TypeRules` types | Minor | — |
+| 2026-03-12 | Added `//go:build ignore` to `tests/test-files/*.go` to prevent duplicate `main` declaration errors during `govulncheck ./...` | Minor | — |
+| 2026-03-12 | Upgraded Storybook from v8 to v10 (`storybook`, `@storybook/nextjs`, `@storybook/react`, `@storybook/addon-links`, `@storybook/addon-themes` → `^10.2.17`); removed deprecated `addon-essentials`, `addon-interactions`, `testing-library` packages not available in v10 | Minor | — |

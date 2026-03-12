@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"gorm.io/datatypes"
 	"wealthjourney/domain/models"
 	"wealthjourney/pkg/config"
 	"wealthjourney/pkg/database"
@@ -32,29 +33,29 @@ func main() {
 		Name:          "Test Template",
 		BankCode:      "TEST",
 		StatementType: "credit",
-		FileFormats:   models.JSONArray{"csv"},
-		ColumnMapping: models.ColumnMapping{
-			Date:        []string{"Date"},
-			Amount:      []string{"Amount"},
-			Description: []string{"Description"},
-		},
+		FileFormats:   datatypes.JSON([]byte(`["csv"]`)),
+		ColumnMapping: datatypes.JSON([]byte(`{
+			"date": ["Date"],
+			"amount": ["Amount"],
+			"description": ["Description"]
+		}`)),
 		DateFormat: "DD/MM/YYYY",
-		AmountFormat: models.AmountFormat{
-			DecimalSeparator:   ".",
-			ThousandsSeparator: ",",
-			CurrencySymbol:     "$",
-		},
+		AmountFormat: datatypes.JSON([]byte(`{
+			"decimalSeparator": ".",
+			"thousandsSeparator": ",",
+			"currencySymbol": "$"
+		}`)),
 		Currency: "USD",
-		DetectionRules: models.DetectionRules{
-			ExpectedHeaders: []string{"Date", "Amount"},
-			FooterKeywords:  []string{"Total"},
-			HeaderRow:       0,
-			DataStartRow:    1,
-		},
-		TypeRules: models.TypeRules{
-			IncomeKeywords:  []string{"credit", "deposit"},
-			ExpenseKeywords: []string{"payment", "debit"},
-		},
+		DetectionRules: datatypes.JSON([]byte(`{
+			"expectedHeaders": ["Date", "Amount"],
+			"footerKeywords": ["Total"],
+			"headerRow": 0,
+			"dataStartRow": 1
+		}`)),
+		TypeRules: datatypes.JSON([]byte(`{
+			"incomeKeywords": ["credit", "deposit"],
+			"expenseKeywords": ["payment", "debit"]
+		}`)),
 		Region:   "US",
 		IsActive: true,
 	}
