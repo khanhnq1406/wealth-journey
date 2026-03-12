@@ -30,13 +30,62 @@ jobs:
         run: npm ci
 
       - name: Run linter
-        run: npx next lint
+        id: lint
+        run: |
+          mkdir -p /tmp/ci-errors
+          npx next lint 2>&1 | tee /tmp/ci-errors/lint-output.txt
+          exit ${PIPESTATUS[0]}
 
       - name: Type check
-        run: npx tsc --noEmit
+        id: typecheck
+        run: |
+          npx tsc --noEmit 2>&1 | tee /tmp/ci-errors/typecheck-output.txt
+          exit ${PIPESTATUS[0]}
 
       - name: Run unit tests
-        run: npx jest --ci --coverage
+        id: jest
+        run: |
+          npx jest --ci --coverage 2>&1 | tee /tmp/ci-errors/jest-output.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Capture frontend errors
+        if: failure()
+        run: |
+          {
+            echo "## Frontend Lint & Test Errors"
+            echo "Job: ${{ github.job }} | Run: ${{ github.run_id }}"
+            echo ""
+            if [ -s /tmp/ci-errors/lint-output.txt ]; then
+              echo "### ESLint errors:"
+              cat /tmp/ci-errors/lint-output.txt
+              echo ""
+            fi
+            if [ -s /tmp/ci-errors/typecheck-output.txt ]; then
+              echo "### TypeScript errors:"
+              cat /tmp/ci-errors/typecheck-output.txt
+              echo ""
+            fi
+            if [ -s /tmp/ci-errors/jest-output.txt ]; then
+              echo "### Jest test failures:"
+              grep -E "^(FAIL|●|✕|×)" /tmp/ci-errors/jest-output.txt || cat /tmp/ci-errors/jest-output.txt
+            fi
+          } > /tmp/ci-errors/errors.txt
+
+      - name: Write frontend errors to job summary
+        if: failure()
+        run: |
+          echo "## ❌ Frontend Lint & Tests Failed" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/ci-errors/errors.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload frontend error artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-lint-test-errors
+          path: /tmp/ci-errors/errors.txt
+          retention-days: 7
 
   build:
     name: Build
@@ -57,7 +106,35 @@ jobs:
         run: npm ci
 
       - name: Build Next.js
-        run: npm run build
+        id: nextjs-build
+        run: |
+          mkdir -p /tmp/ci-errors
+          npm run build 2>&1 | tee /tmp/ci-errors/build-output.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Capture build errors
+        if: failure()
+        run: |
+          echo "## Frontend Build Errors" > /tmp/ci-errors/errors.txt
+          echo "Job: ${{ github.job }} | Run: ${{ github.run_id }}" >> /tmp/ci-errors/errors.txt
+          echo "" >> /tmp/ci-errors/errors.txt
+          cat /tmp/ci-errors/build-output.txt >> /tmp/ci-errors/errors.txt
+
+      - name: Write build errors to job summary
+        if: failure()
+        run: |
+          echo "## ❌ Frontend Build Failed" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          grep -E "^(Error|Failed|error TS)" /tmp/ci-errors/build-output.txt | head -50 || cat /tmp/ci-errors/build-output.txt | tail -50 >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload build error artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-errors
+          path: /tmp/ci-errors/errors.txt
+          retention-days: 7
 
   e2e:
     name: E2E Tests

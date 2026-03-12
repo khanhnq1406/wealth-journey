@@ -106,3 +106,4 @@ After merging to `main`:
 | 2026-03-12 | govulncheck: upgraded Go 1.24.1→1.25.8 and `jwt/v5` v5.2.0→v5.2.2; updated `go-version` in `backend.yml` and `security.yml` to `1.25` (resolves GO-2026-4601, GO-2026-4602, GO-2026-4603, GO-2025-3553) | Minor | ec15294 |
 | 2026-03-12 | ExampleClient: renamed to `exampleClientUsage` (unexported, not a testable example) to stop real Yahoo Finance API calls during `go test` | Minor | ec15294 |
 | 2026-03-12 | npm ci: regenerated `package-lock.json` to resolve `@swc/helpers@0.5.15` not satisfying `>=0.5.17` required by `next@16.1.4` | Minor | ec15294 |
+| 2026-03-12 | Added error capture to all three workflows (`backend.yml`, `frontend.yml`, `security.yml`): each failing step now captures output via `tee`, writes to `$GITHUB_STEP_SUMMARY` (inline in Actions UI), and uploads `errors.txt` as a downloadable artifact (7-day retention) | Minor | — |
