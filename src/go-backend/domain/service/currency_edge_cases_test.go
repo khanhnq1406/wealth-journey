@@ -462,9 +462,10 @@ func TestCurrencyCache_EdgeCases(t *testing.T) {
 
 	currencyCache := cache.NewCurrencyCache(redisClient)
 
-	t.Run("GetNonExistent_ReturnsError", func(t *testing.T) {
-		_, err := currencyCache.GetConvertedValue(ctx, 999, "wallet", 999, "USD")
-		assert.Error(t, err, "Should return error for non-existent key")
+	t.Run("GetNonExistent_ReturnsZero", func(t *testing.T) {
+		val, err := currencyCache.GetConvertedValue(ctx, 999, "wallet", 999, "USD")
+		assert.NoError(t, err, "Cache miss should not return error")
+		assert.Equal(t, int64(0), val, "Non-existent key should return zero value")
 	})
 
 	t.Run("SetThenGet_Consistency", func(t *testing.T) {
@@ -504,8 +505,9 @@ func TestCurrencyCache_EdgeCases(t *testing.T) {
 
 		// Verify all keys are deleted
 		for i := 0; i < 10; i++ {
-			_, err := currencyCache.GetConvertedValue(ctx, 1, "wallet", int32(i), "USD")
-			assert.Error(t, err, "Cache should be deleted for wallet %d", i)
+			val, err := currencyCache.GetConvertedValue(ctx, 1, "wallet", int32(i), "USD")
+			assert.NoError(t, err, "Cache miss should not return error for wallet %d", i)
+			assert.Equal(t, int64(0), val, "Deleted key should return zero value for wallet %d", i)
 		}
 	})
 

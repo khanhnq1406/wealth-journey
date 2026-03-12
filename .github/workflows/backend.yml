@@ -97,6 +97,7 @@ jobs:
       DB_USER: testuser
       DB_PASSWORD: testpass
       DB_NAME: wealthjourney_test
+      DB_SSL_MODE: disable
       REDIS_URL: localhost:6379
       REDIS_PASSWORD: ""
       JWT_SECRET: ci-test-secret-not-real

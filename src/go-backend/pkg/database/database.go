@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"sync"
 	"time"
 
@@ -21,12 +22,20 @@ type Database struct {
 
 // New creates a new database connection with connection pooling
 func New(cfg *config.Config) (*Database, error) {
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=require",
+	// Allow SSL mode to be configured via environment variable
+	// Default to 'require' for production safety, but allow 'disable' for CI/testing
+	sslMode := os.Getenv("DB_SSL_MODE")
+	if sslMode == "" {
+		sslMode = "require"
+	}
+
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		cfg.Database.Host,
 		cfg.Database.Port,
 		cfg.Database.User,
 		cfg.Database.Password,
 		cfg.Database.Name,
+		sslMode,
 	)
 
 	db, err := gorm.Open(postgres.New(postgres.Config{
