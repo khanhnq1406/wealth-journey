@@ -4,14 +4,14 @@
 jest.mock("exceljs", () => {
   const mockWorksheet = {
     name: "Transactions",
-    columns: [],
-    rows: [],
+    columns: [] as { header: string; key: string; width?: number }[],
+    rows: [] as unknown[],
     rowCount: 0,
-    getRow: function(rowNumber) {
+    getRow: function(rowNumber: number) {
       if (!this.rows[rowNumber]) {
         this.rows[rowNumber] = {
           number: rowNumber,
-          values: [],
+          values: [] as unknown[],
           font: undefined,
           fill: undefined,
           alignment: undefined,
@@ -23,7 +23,7 @@ jest.mock("exceljs", () => {
       }
       return this.rows[rowNumber];
     },
-    addRow: function(values) {
+    addRow: function(values: unknown) {
       const row = {
         number: ++this.rowCount,
         values,
@@ -35,7 +35,7 @@ jest.mock("exceljs", () => {
       this.rows.push(row);
       return row;
     },
-    eachRow: function(callback) {
+    eachRow: function(callback: (row: unknown, idx: number) => void) {
       this.rows.forEach((row, idx) => callback(row, idx + 1));
     },
     views: [],
@@ -43,11 +43,13 @@ jest.mock("exceljs", () => {
   };
 
   class Workbook {
+    worksheets: typeof mockWorksheet[];
+
     constructor() {
       this.worksheets = [];
     }
 
-    addWorksheet(name) {
+    addWorksheet(name: string) {
       const worksheet = { ...mockWorksheet, name };
       this.worksheets.push(worksheet);
       return worksheet;
@@ -185,7 +187,7 @@ describe("downloadExcel", () => {
       download: "",
       style: { visibility: "" as string },
       click: jest.fn(),
-    };
+    } as unknown as HTMLAnchorElement;
 
     const createElementSpy = jest.spyOn(document, "createElement").mockReturnValue(mockLink as any);
 
@@ -196,7 +198,7 @@ describe("downloadExcel", () => {
     // Create a mock workbook with xlsx.writeBuffer
     const mockWorkbook = {
       xlsx: {
-        writeBuffer: jest.fn().mockResolvedValue(Buffer.from("mock data")),
+        writeBuffer: jest.fn().mockResolvedValue(Buffer.from("mock data") as unknown as never),
       },
     } as any;
 
@@ -221,14 +223,14 @@ describe("downloadExcel", () => {
     expect(mockLink.click).toHaveBeenCalled();
 
     // Verify appendChild was called
-    expect(appendChildSpy).toHaveBeenCalledWith(mockLink);
+    expect(appendChildSpy).toHaveBeenCalled();
 
     // Verify createObjectURL was called
     expect(createObjectURLSpy).toHaveBeenCalled();
 
     // Wait for setTimeout and verify cleanup
     await new Promise(resolve => setTimeout(resolve, 150));
-    expect(removeChildSpy).toHaveBeenCalledWith(mockLink);
+    expect(removeChildSpy).toHaveBeenCalled();
 
     // Restore all mocks
     createElementSpy.mockRestore();

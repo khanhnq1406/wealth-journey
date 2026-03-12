@@ -767,8 +767,8 @@ describe("downloadCSV", () => {
       setAttribute: jest.fn(),
       click: jest.fn(),
       style: { visibility: "" as string },
-    };
-    jest.spyOn(document, "createElement").mockReturnValue(mockLink as any);
+    } as unknown as HTMLAnchorElement;
+    jest.spyOn(document, "createElement").mockReturnValue(mockLink);
 
     downloadCSV("test,content", "test.csv");
 
@@ -794,8 +794,8 @@ describe("downloadCSV", () => {
       setAttribute: jest.fn(),
       click: jest.fn(),
       style: { visibility: "" as string },
-    };
-    jest.spyOn(document, "createElement").mockReturnValue(mockLink as any);
+    } as unknown as HTMLAnchorElement;
+    jest.spyOn(document, "createElement").mockReturnValue(mockLink);
 
     const csvContent = "Header1,Header2\nValue1,Value2";
     downloadCSV(csvContent, "test.csv");
