@@ -134,3 +134,4 @@ After merging to `main`:
 | 2026-03-12 | Fix Cannot access refs during render: Tour.tsx (moved tooltip position calculation to useMemo) | Minor | 03b07e4 |
 | 2026-03-12 | Fix Cannot access variable before it is declared: useNotificationStream.ts (use connectRef), ReviewStepWrapper.tsx (move parseFileViaBackend before useEffect) | Minor | 03b07e4 |
 | 2026-03-12 | Fix missing `useMemo` import in Tour.tsx causing TypeScript error | Minor | — |
+| 2026-03-12 | Fix golangci-lint errors: errcheck (50), ineffassign (3), staticcheck (16), unused (28) — see commit 71990fd for details | Minor | 71990fd |
