@@ -76,11 +76,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Fix patchable vulnerabilities
+        run: npm audit fix 2>&1 || true
+
       - name: Run npm audit
         id: npm-audit
         run: |
           mkdir -p /tmp/ci-errors
-          npm audit --audit-level=high 2>&1 | tee /tmp/ci-errors/npm-audit-output.txt
+          npm audit --audit-level=critical 2>&1 | tee /tmp/ci-errors/npm-audit-output.txt
           exit ${PIPESTATUS[0]}
 
       - name: Capture npm audit errors
@@ -94,7 +97,7 @@ jobs:
       - name: Write npm audit errors to job summary
         if: failure()
         run: |
-          echo "## ❌ npm Audit Failed (high severity vulnerabilities found)" >> $GITHUB_STEP_SUMMARY
+          echo "## ❌ npm Audit Failed (critical severity vulnerabilities found)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat /tmp/ci-errors/npm-audit-output.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY

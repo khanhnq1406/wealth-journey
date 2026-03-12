@@ -2,6 +2,9 @@ version: "2"
 
 run:
   timeout: 5m
+  exclude-dirs:
+    - protobuf
+    - vendor
 
 linters:
   enable:
@@ -32,7 +35,3 @@ linters:
           files:
             - "**/domain/service/**"
 
-issues:
-  exclude-dirs:
-    - protobuf
-    - vendor
