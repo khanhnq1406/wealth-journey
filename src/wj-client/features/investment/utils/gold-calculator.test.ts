@@ -26,6 +26,7 @@ import {
   GOLD_VND_OPTIONS,
   GOLD_USD_OPTIONS,
   type GoldUnit,
+  type GoldCalculationInput,
 } from './gold-calculator';
 
 describe('Gold Calculator - Unit Conversions (LAYER 1)', () => {
@@ -204,16 +205,16 @@ describe('Gold Calculator - Utility Functions', () => {
 
   describe('getGoldTypeByCode', () => {
     it('should find SJC gold type by code', () => {
-      const result = getGoldTypeByCode('SJL1L10');
+      const result = getGoldTypeByCode('SJC');
       expect(result).toBeDefined();
-      expect(result?.code).toBe('SJL1L10');
+      expect(result?.value).toBe('SJC');
       expect(result?.currency).toBe('VND');
     });
 
     it('should find world gold by code', () => {
-      const result = getGoldTypeByCode('XAU');
+      const result = getGoldTypeByCode('XAUUSD');
       expect(result).toBeDefined();
-      expect(result?.code).toBe('XAU');
+      expect(result?.value).toBe('XAUUSD');
       expect(result?.currency).toBe('USD');
     });
 

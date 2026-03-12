@@ -43,6 +43,7 @@ describe("CategoryReviewSection", () => {
       exchangeRate: 0,
       exchangeRateSource: "",
       exchangeRateDate: 0 as any,
+      originalDescription: "Coffee Shop",
     },
     {
       rowNumber: 2,
@@ -59,6 +60,7 @@ describe("CategoryReviewSection", () => {
       exchangeRate: 0,
       exchangeRateSource: "",
       exchangeRateDate: 0 as any,
+      originalDescription: "Grab ride",
     },
     {
       rowNumber: 3,
@@ -75,6 +77,7 @@ describe("CategoryReviewSection", () => {
       exchangeRate: 0,
       exchangeRateSource: "",
       exchangeRateDate: 0 as any,
+      originalDescription: "Unknown transaction",
     },
   ];
 

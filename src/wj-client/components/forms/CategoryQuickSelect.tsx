@@ -58,31 +58,7 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
   const [isCreating, setIsCreating] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
 
-  // Filter categories by type and add default icons
-  const displayCategories = useMemo(() => {
-    return categories.map((cat) => ({
-      ...cat,
-      icon: cat.icon || getDefaultIcon(cat.name.toLowerCase(), type),
-      color: cat.color || getDefaultColor(cat.id),
-    }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [categories, type, getDefaultColor, getDefaultIcon]);
-
-  const handleCategorySelect = useCallback(
-    (categoryId: string | number) => {
-      onChange(categoryId);
-    },
-    [onChange]
-  );
-
-  const handleCreateCategory = useCallback(() => {
-    if (newCategoryName.trim() && onCreateCategory) {
-      onCreateCategory(newCategoryName.trim());
-      setNewCategoryName("");
-      setIsCreating(false);
-    }
-  }, [newCategoryName, onCreateCategory]);
-
+  // Define helper functions BEFORE they are used in useMemo
   const getDefaultIcon = useCallback((name: string, catType: string): string => {
     // Try exact match first
     if (DEFAULT_ICONS[name]) {
@@ -115,6 +91,30 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
     const index = Math.abs(Number(id)) % colors.length;
     return colors[index];
   }, []);
+
+  // Filter categories by type and add default icons
+  const displayCategories = useMemo(() => {
+    return categories.map((cat) => ({
+      ...cat,
+      icon: cat.icon || getDefaultIcon(cat.name.toLowerCase(), type),
+      color: cat.color || getDefaultColor(cat.id),
+    }));
+  }, [categories, type, getDefaultColor, getDefaultIcon]);
+
+  const handleCategorySelect = useCallback(
+    (categoryId: string | number) => {
+      onChange(categoryId);
+    },
+    [onChange]
+  );
+
+  const handleCreateCategory = useCallback(() => {
+    if (newCategoryName.trim() && onCreateCategory) {
+      onCreateCategory(newCategoryName.trim());
+      setNewCategoryName("");
+      setIsCreating(false);
+    }
+  }, [newCategoryName, onCreateCategory]);
 
   return (
     <div className={cn("space-y-3", className)}>

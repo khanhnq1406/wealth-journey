@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { FormSelect } from "./FormSelect";
+import { RHFFormSelect as FormSelect } from "./RHFFormSelect";
 import { useForm } from "react-hook-form";
 
 /**
@@ -30,9 +30,9 @@ describe("FormSelect - Integration", () => {
             label="Select Fruit"
             placeholder="Select a fruit"
             options={[
-              { value: 1, label: "Apple" },
-              { value: 2, label: "Banana" },
-              { value: 3, label: "Cherry" },
+              { value: "1", label: "Apple" },
+              { value: "2", label: "Banana" },
+              { value: "3", label: "Cherry" },
             ]}
           />
           <button type="submit">Submit</button>
@@ -65,10 +65,10 @@ describe("FormSelect - Integration", () => {
     const submitButton = screen.getByText("Submit");
     fireEvent.click(submitButton);
 
-    // The form should have the selected value (number value)
+    // The form should have the selected value (string value)
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(
-        { fruit: 2 },
+        { fruit: "2" },
         expect.any(Object),
       );
     });
@@ -90,9 +90,9 @@ describe("FormSelect - Integration", () => {
             label="Select Wallet"
             placeholder="Choose a wallet"
             options={[
-              { value: 101, label: "Wallet A" },
-              { value: 102, label: "Wallet B" },
-              { value: 103, label: "Wallet C" },
+              { value: "101", label: "Wallet A" },
+              { value: "102", label: "Wallet B" },
+              { value: "103", label: "Wallet C" },
             ]}
           />
           <button type="submit">Submit</button>
@@ -125,10 +125,10 @@ describe("FormSelect - Integration", () => {
     const submitButton = screen.getByText("Submit");
     fireEvent.click(submitButton);
 
-    // FormSelect should convert string back to number
+    // FormSelect keeps string values
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(
-        { walletId: 102 },
+        { walletId: "102" },
         expect.any(Object),
       );
     });
@@ -263,11 +263,11 @@ describe("FormSelect - Integration", () => {
             control={control}
             label="Select Category"
             placeholder="Pick a category"
-            disableFilter={true}
+            searchable={false}
             options={[
-              { value: 1, label: "Food" },
-              { value: 2, label: "Transport" },
-              { value: 3, label: "Entertainment" },
+              { value: "1", label: "Food" },
+              { value: "2", label: "Transport" },
+              { value: "3", label: "Entertainment" },
             ]}
           />
           <button type="submit">Submit</button>
@@ -303,7 +303,7 @@ describe("FormSelect - Integration", () => {
 
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledWith(
-        { category: 1 },
+        { category: "1" },
         expect.any(Object),
       );
     });

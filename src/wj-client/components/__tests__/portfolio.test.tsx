@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
-import PortfolioPage from "../../app/dashboard/portfolio/page.old";
+import PortfolioPage from "../../app/[locale]/dashboard/portfolio/page";
 import {
   useQueryListInvestments,
   useQueryGetPortfolioSummary,

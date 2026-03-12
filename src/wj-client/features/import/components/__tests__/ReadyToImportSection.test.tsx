@@ -19,6 +19,7 @@ describe("ReadyToImportSection", () => {
       exchangeRate: 0,
       exchangeRateSource: "",
       exchangeRateDate: 0 as any,
+      originalDescription: "Coffee Shop",
     },
     {
       rowNumber: 2,
@@ -35,6 +36,7 @@ describe("ReadyToImportSection", () => {
       exchangeRate: 0,
       exchangeRateSource: "",
       exchangeRateDate: 0 as any,
+      originalDescription: "Salary",
     },
   ];
 
@@ -43,7 +45,7 @@ describe("ReadyToImportSection", () => {
     { id: 2, name: "Salary", type: 1 },
   ];
 
-  const mockOnSkip = jest.fn();
+  const mockOnToggleExclude = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -54,7 +56,8 @@ describe("ReadyToImportSection", () => {
       <ReadyToImportSection
         transactions={[]}
         categories={mockCategories}
-        onSkip={mockOnSkip}
+        excludedRows={new Set()}
+        onToggleExclude={mockOnToggleExclude}
       />
     );
     expect(container.firstChild).toBeNull();
@@ -65,7 +68,8 @@ describe("ReadyToImportSection", () => {
       <ReadyToImportSection
         transactions={mockTransactions}
         categories={mockCategories}
-        onSkip={mockOnSkip}
+        excludedRows={new Set()}
+        onToggleExclude={mockOnToggleExclude}
       />
     );
     expect(screen.getByText(/2 Ready to Import/i)).toBeInTheDocument();
@@ -77,7 +81,8 @@ describe("ReadyToImportSection", () => {
       <ReadyToImportSection
         transactions={mockTransactions}
         categories={mockCategories}
-        onSkip={mockOnSkip}
+        excludedRows={new Set()}
+        onToggleExclude={mockOnToggleExclude}
       />
     );
 
@@ -90,7 +95,8 @@ describe("ReadyToImportSection", () => {
       <ReadyToImportSection
         transactions={mockTransactions}
         categories={mockCategories}
-        onSkip={mockOnSkip}
+        excludedRows={new Set()}
+        onToggleExclude={mockOnToggleExclude}
       />
     );
 
@@ -114,7 +120,8 @@ describe("ReadyToImportSection", () => {
       <ReadyToImportSection
         transactions={mockTransactions}
         categories={mockCategories}
-        onSkip={mockOnSkip}
+        excludedRows={new Set()}
+        onToggleExclude={mockOnToggleExclude}
       />
     );
 
@@ -134,27 +141,29 @@ describe("ReadyToImportSection", () => {
       <ReadyToImportSection
         transactions={txWithoutCategory}
         categories={mockCategories}
-        onSkip={mockOnSkip}
+        excludedRows={new Set()}
+        onToggleExclude={mockOnToggleExclude}
       />
     );
 
     expect(screen.getByText("Uncategorized")).toBeInTheDocument();
   });
 
-  it("calls onSkip when skip button is clicked", () => {
+  it("calls onToggleExclude when exclude button is clicked", () => {
     render(
       <ReadyToImportSection
         transactions={mockTransactions}
         categories={mockCategories}
-        onSkip={mockOnSkip}
+        excludedRows={new Set()}
+        onToggleExclude={mockOnToggleExclude}
       />
     );
 
-    const skipButtons = screen.getAllByText("Skip");
-    fireEvent.click(skipButtons[0]);
+    const excludeButtons = screen.getAllByRole("button", { name: /Exclude/i });
+    fireEvent.click(excludeButtons[0]);
 
-    expect(mockOnSkip).toHaveBeenCalledWith(1);
-    expect(mockOnSkip).toHaveBeenCalledTimes(1);
+    expect(mockOnToggleExclude).toHaveBeenCalledWith(1);
+    expect(mockOnToggleExclude).toHaveBeenCalledTimes(1);
   });
 
   it("displays amounts with correct formatting", () => {
@@ -162,7 +171,8 @@ describe("ReadyToImportSection", () => {
       <ReadyToImportSection
         transactions={mockTransactions}
         categories={mockCategories}
-        onSkip={mockOnSkip}
+        excludedRows={new Set()}
+        onToggleExclude={mockOnToggleExclude}
       />
     );
 
@@ -176,7 +186,8 @@ describe("ReadyToImportSection", () => {
       <ReadyToImportSection
         transactions={mockTransactions}
         categories={mockCategories}
-        onSkip={mockOnSkip}
+        excludedRows={new Set()}
+        onToggleExclude={mockOnToggleExclude}
         currency="USD"
       />
     );
@@ -190,7 +201,8 @@ describe("ReadyToImportSection", () => {
       <ReadyToImportSection
         transactions={[mockTransactions[0]]}
         categories={mockCategories}
-        onSkip={mockOnSkip}
+        excludedRows={new Set()}
+        onToggleExclude={mockOnToggleExclude}
       />
     );
 
@@ -202,7 +214,8 @@ describe("ReadyToImportSection", () => {
       <ReadyToImportSection
         transactions={mockTransactions}
         categories={mockCategories}
-        onSkip={mockOnSkip}
+        excludedRows={new Set()}
+        onToggleExclude={mockOnToggleExclude}
       />
     );
 
