@@ -18,8 +18,8 @@ export function LandingSilverPriceChart() {
   const unitLabels = ["C", "L", "KG"] as const;
 
   return (
-    <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
-      <div className="p-5">
+    <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden h-full">
+      <div className="p-5 h-full flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
@@ -70,8 +70,8 @@ export function LandingSilverPriceChart() {
           ))}
         </div>
 
-        {/* Chart area — axes only + login prompt (200px height matching dashboard) */}
-        <div className="relative" style={{ height: 200 }}>
+        {/* Chart area — axes only + login prompt */}
+        <div className="relative flex-1 min-h-[200px] sm:min-h-[120px]">
           {/* SVG axes */}
           <svg
             className="absolute inset-0 w-full h-full"
@@ -80,34 +80,37 @@ export function LandingSilverPriceChart() {
             {/* Y axis */}
             <line
               x1="40"
-              y1="10"
+              y1="3%"
               x2="40"
-              y2="175"
+              y2="95%"
               stroke="#e5e7eb"
               strokeWidth="1"
             />
             {/* X axis */}
             <line
               x1="40"
-              y1="175"
+              y1="95%"
               x2="100%"
-              y2="175"
+              y2="95%"
               stroke="#e5e7eb"
               strokeWidth="1"
             />
             {/* Grid lines (horizontal) */}
-            {[0, 1, 2].map((i) => (
-              <line
-                key={i}
-                x1="40"
-                y1={10 + i * 55}
-                x2="100%"
-                y2={10 + i * 55}
-                stroke="#f3f4f6"
-                strokeWidth="1"
-                strokeDasharray="3 3"
-              />
-            ))}
+            {[0, 1, 2].map((i) => {
+              const y = `${3 + i * 31}%`;
+              return (
+                <line
+                  key={i}
+                  x1="40"
+                  y1={y}
+                  x2="100%"
+                  y2={y}
+                  stroke="#f3f4f6"
+                  strokeWidth="1"
+                  strokeDasharray="3 3"
+                />
+              );
+            })}
           </svg>
 
           {/* Login overlay */}

@@ -5,8 +5,6 @@ import { useTranslations } from "next-intl";
 import { formatPriceValue } from "../prices/helpers";
 import { LineChart } from "@/components/charts/LineChart";
 import { BaseCard } from "@/components/BaseCard";
-import { Select } from "@/components/select/Select";
-import type { SelectOption } from "@/components/select/Select";
 import { useQueryGetGoldChart } from "@/utils/generated/hooks";
 import { formatCurrencyCompact } from "@/utils/currency-formatter";
 
@@ -17,12 +15,6 @@ const PERIOD_MAP: Record<string, string> = {
   month: "1M",
   year: "1y",
 };
-
-// The two goldCode values supported by the API
-const GOLD_CODE_OPTIONS: SelectOption<string>[] = [
-  { value: "SJC", label: "SJC" },
-  { value: "999", label: "999" },
-];
 
 // Format timestamp for X-axis display
 function formatXAxis(timestamp: number, period: string): string {
@@ -145,17 +137,26 @@ export function GoldPriceChart() {
                 {t("global")}
               </button>
             </div>
-            {/* Gold type selector — domestic only (SJC or 999) */}
+            {/* Gold type toggle — domestic only (SJC or 999) */}
             {!isGlobal && (
-              <Select<string>
-                options={GOLD_CODE_OPTIONS}
-                value={goldCode}
-                onChange={setGoldCode}
-                disableInput
-                disableFilter
-                clearable={false}
-                className="w-24"
-              />
+              <div className="flex bg-v2-bg-primary rounded-lg p-0.5">
+                {[
+                  { value: "SJC", label: "SJC" },
+                  { value: "999", label: "999" },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setGoldCode(opt.value)}
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-vietnam font-medium transition-colors ${
+                      goldCode === opt.value
+                        ? "bg-white shadow-sm text-v2-text-primary"
+                        : "text-v2-text-secondary"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         </div>
@@ -220,7 +221,7 @@ export function GoldPriceChart() {
       {/* Chart area */}
       <div className="px-2 pb-5">
         {isLoading && (
-          <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
+          <div className="h-[320px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
               <div className="w-5 h-5 border-2 border-v2-red-primary border-t-transparent rounded-full animate-spin" />
               <p className="font-vietnam text-[12px] text-v2-text-tertiary">
@@ -230,7 +231,7 @@ export function GoldPriceChart() {
           </div>
         )}
         {isError && (
-          <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
+          <div className="h-[320px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
               <p className="font-vietnam text-[13px] text-v2-text-secondary">
                 {t("errorLoading")}
@@ -245,7 +246,7 @@ export function GoldPriceChart() {
           </div>
         )}
         {!isLoading && !isError && chartData.length === 0 && (
-          <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
+          <div className="h-[320px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
             <p className="font-vietnam text-[13px] text-v2-text-tertiary">
               {t("noData")}
             </p>
@@ -256,7 +257,7 @@ export function GoldPriceChart() {
             data={chartData}
             series={chartSeries}
             xAxisKey="time"
-            height={400}
+            height={320}
             showGrid={true}
             showLegend={false}
             showTooltip={true}

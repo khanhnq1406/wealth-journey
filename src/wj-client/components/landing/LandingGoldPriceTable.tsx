@@ -4,22 +4,36 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { BaseCard } from "@/components/BaseCard";
 import type { MarketTypeItem } from "@/features/market-prices/hooks/usePublicMarketTypes";
+import { GOLD_TABLE_FILTER } from "@/features/market-prices/constants/gold-filter";
 
 interface LandingGoldPriceTableProps {
   types: MarketTypeItem[];
   isLoading?: boolean;
+  updatedTime?: string;
 }
 
 export function LandingGoldPriceTable({
   types,
   isLoading,
+  updatedTime,
 }: LandingGoldPriceTableProps) {
   const t = useTranslations("landing.priceTeaser");
 
+  // Filter and reorder to show only 9 configured gold types
+  const filteredTypes = GOLD_TABLE_FILTER.map((filter) => {
+    const match = types.find(
+      (item) => item.code === filter.apiName || item.name === filter.apiName,
+    );
+    return match ? { ...match, displayName: filter.displayName } : null;
+  }).filter(Boolean) as (MarketTypeItem & { displayName: string })[];
+
   if (isLoading) {
     return (
-      <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
-        <div className="p-5 pb-3">
+      <BaseCard
+        padding="none"
+        className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
+      >
+        <div className="px-5 py-3">
           <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
             {t("goldTableTitle")}
           </h3>
@@ -32,12 +46,22 @@ export function LandingGoldPriceTable({
   }
 
   return (
-    <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
+    <BaseCard
+      padding="none"
+      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
+    >
       {/* Header */}
-      <div className="p-5 pb-3">
-        <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
-          {t("goldTableTitle")}
-        </h3>
+      <div className="px-5 py-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
+            {t("goldTableTitle")}
+          </h3>
+          {updatedTime && (
+            <span className="font-jetbrains text-[11px] text-v2-text-tertiary">
+              {t("updatedTime", { time: updatedTime })}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Table */}
@@ -57,7 +81,7 @@ export function LandingGoldPriceTable({
             </tr>
           </thead>
           <tbody>
-            {types.map((item, index) => (
+            {filteredTypes.map((item, index) => (
               <tr
                 key={item.code}
                 className={
@@ -65,7 +89,7 @@ export function LandingGoldPriceTable({
                 }
               >
                 <td className="px-5 py-3 font-vietnam font-medium text-[13px] text-v2-text-primary">
-                  {item.name || item.code}
+                  {item.displayName}
                 </td>
                 <td className="px-5 py-3 text-right font-vietnam text-[12px] text-v2-text-secondary">
                   {t.rich("loginPrompt", {
@@ -93,7 +117,7 @@ export function LandingGoldPriceTable({
                 </td>
               </tr>
             ))}
-            {types.length === 0 && (
+            {filteredTypes.length === 0 && (
               <tr>
                 <td
                   colSpan={3}

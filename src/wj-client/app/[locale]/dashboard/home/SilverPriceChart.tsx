@@ -5,8 +5,6 @@ import { useTranslations } from "next-intl";
 import { formatPriceValue } from "../prices/helpers";
 import { LineChart } from "@/components/charts/LineChart";
 import { BaseCard } from "@/components/BaseCard";
-import { Select } from "@/components/select/Select";
-import type { SelectOption } from "@/components/select/Select";
 import { useQueryGetSilverChart } from "@/utils/generated/hooks";
 import { formatCurrencyCompact } from "@/utils/currency-formatter";
 
@@ -144,20 +142,23 @@ export function SilverPriceChart() {
                 {t("global")}
               </button>
             </div>
-            {/* Unit type selector — domestic only */}
+            {/* Unit type toggle — domestic only */}
             {!isGlobal && (
-              <Select<"C" | "L" | "KG">
-                options={unitOptions.map((u): SelectOption<"C" | "L" | "KG"> => ({
-                  value: u.key,
-                  label: u.label,
-                }))}
-                value={silverUnit}
-                onChange={setSilverUnit}
-                disableInput
-                disableFilter
-                clearable={false}
-                className="w-24"
-              />
+              <div className="flex bg-v2-bg-primary rounded-lg p-0.5">
+                {unitOptions.map((opt) => (
+                  <button
+                    key={opt.key}
+                    onClick={() => setSilverUnit(opt.key)}
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-vietnam font-medium transition-colors ${
+                      silverUnit === opt.key
+                        ? "bg-white shadow-sm text-v2-text-primary"
+                        : "text-v2-text-secondary"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         </div>
@@ -222,7 +223,7 @@ export function SilverPriceChart() {
       {/* Chart area */}
       <div className="px-2 pb-5">
         {isLoading && (
-          <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
+          <div className="h-[400px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
               <div className="w-5 h-5 border-2 border-[#4B5563] border-t-transparent rounded-full animate-spin" />
               <p className="font-vietnam text-[12px] text-v2-text-tertiary">
@@ -232,7 +233,7 @@ export function SilverPriceChart() {
           </div>
         )}
         {isError && (
-          <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
+          <div className="h-[400px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
               <p className="font-vietnam text-[13px] text-v2-text-secondary">
                 {t("errorLoading")}
@@ -247,7 +248,7 @@ export function SilverPriceChart() {
           </div>
         )}
         {!isLoading && !isError && chartData.length === 0 && (
-          <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
+          <div className="h-[400px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
             <p className="font-vietnam text-[13px] text-v2-text-tertiary">
               {t("noData")}
             </p>
@@ -258,7 +259,7 @@ export function SilverPriceChart() {
             data={chartData}
             series={chartSeries}
             xAxisKey="time"
-            height={200}
+            height={400}
             showGrid={true}
             showLegend={false}
             showTooltip={true}

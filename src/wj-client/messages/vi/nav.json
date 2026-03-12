@@ -291,7 +291,8 @@
       "loadingTypes": "Đang tải dữ liệu...",
       "errorLoadingTypes": "Không thể tải dữ liệu thị trường",
       "retry": "Thử lại",
-      "noData": "Không có dữ liệu"
+      "noData": "Không có dữ liệu",
+      "updatedTime": "Cập nhật {time}"
     }
   },
   "sidebarToggle": {

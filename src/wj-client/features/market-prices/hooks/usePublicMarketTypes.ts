@@ -13,6 +13,8 @@ export interface PublicMarketTypesResponse {
   message: string;
   gold: MarketTypeItem[];
   silver: MarketTypeItem[];
+  goldUpdatedAt: number;
+  silverUpdatedAt: number;
   timestamp: string;
 }
 

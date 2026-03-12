@@ -21,6 +21,10 @@ import {
 } from "@/utils/generated/hooks";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { parseAmount } from "@/utils/currency-formatter";
+import {
+  formatUpdateTimestamp,
+  getLatestTimestamp,
+} from "@/features/market-prices/utils/format-update-time";
 import { NetWorthDisplay } from "./NetWorthDisplay";
 import { PNLCard } from "./PNLCard";
 import { GoldPriceTable } from "./GoldPriceTable";
@@ -104,11 +108,11 @@ export default function Home() {
   const goldPrices = marketPrices?.gold ?? [];
   const silverPrices = marketPrices?.silver ?? [];
 
-  // Format update time
-  const formatUpdateTime = () => {
-    const now = new Date();
-    return `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
-  };
+  // Update timestamps from API data
+  const goldUpdatedTime = formatUpdateTimestamp(getLatestTimestamp(goldPrices));
+  const silverUpdatedTime = formatUpdateTimestamp(
+    getLatestTimestamp(silverPrices),
+  );
 
   // Wallets for WalletsSection
   const wallets = (walletsData?.wallets ?? []).map((w) => ({
@@ -165,7 +169,7 @@ export default function Home() {
         <PNLCard currency={currency} />
 
         {/* 3. Gold Price Table */}
-        <GoldPriceTable prices={goldPrices} updatedTime={formatUpdateTime()} />
+        <GoldPriceTable prices={goldPrices} updatedTime={goldUpdatedTime} />
 
         {/* 4. Gold Price Chart */}
         <GoldPriceChart />
@@ -173,7 +177,7 @@ export default function Home() {
         {/* 5. Silver Price Table */}
         <SilverPriceTable
           prices={silverPrices}
-          updatedTime={formatUpdateTime()}
+          updatedTime={silverUpdatedTime}
         />
 
         {/* 6. Silver Price Chart */}
@@ -223,7 +227,7 @@ export default function Home() {
         <div className="grid grid-cols-2 gap-6">
           <GoldPriceTable
             prices={goldPrices}
-            updatedTime={formatUpdateTime()}
+            updatedTime={goldUpdatedTime}
           />
           <GoldPriceChart />
         </div>
@@ -232,7 +236,7 @@ export default function Home() {
         <div className="grid grid-cols-2 gap-6">
           <SilverPriceTable
             prices={silverPrices}
-            updatedTime={formatUpdateTime()}
+            updatedTime={silverUpdatedTime}
           />
           <SilverPriceChart />
         </div>
