@@ -123,3 +123,10 @@ cd src/wj-client && npx next build
 
 - Pre-existing build errors in `tests/test-files/` and `cmd/migrate-import/` are unrelated to this feature
 - If `vsg_gold_table` API array stops returning "Vàng nhẫn SJC" or "PNJ HCM", the table gracefully degrades to 7 rows
+
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-12 | Add "Vàng nhẫn SJC" and "PNJ HCM" to gold types registry so landing page shows same 9 types as home page | Minor | pending |
+| 2026-03-12 | Make landing chart heights match adjacent table heights (removed hardcoded 400px/200px, use flex-1 to fill grid row) | Minor | pending |

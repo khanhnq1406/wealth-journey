@@ -56,12 +56,12 @@ export default function LandingPage() {
           {/* Desktop Layout */}
           <div className="hidden sm:block px-8 py-6 space-y-6">
             {/* Row 1: Gold Table + Gold Chart */}
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-6 [&>*]:!mb-0">
               <LandingGoldPriceTable types={goldTypes} isLoading={isLoading} updatedTime={goldUpdatedTime} />
               <LandingGoldPriceChart />
             </div>
             {/* Row 2: Silver Table + Silver Chart */}
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-6 [&>*]:!mb-0">
               <LandingSilverPriceTable
                 types={silverTypes}
                 isLoading={isLoading}
