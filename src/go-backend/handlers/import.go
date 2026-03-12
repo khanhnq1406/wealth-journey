@@ -372,7 +372,7 @@ func (h *ImportHandler) ParseFile(c *gin.Context) {
 		// Use Excel parser with auto-detection (ignore template mapping for Excel files)
 		// Excel files have too much variation in layout to use fixed column mappings
 		excelParser := parser.NewExcelParser(fileURL, nil)
-		defer excelParser.Close() // Clean up: close the Excel file
+		defer func() { _ = excelParser.Close() }() // Clean up: close the Excel file
 
 		// Set specific sheet if provided
 		if req.SheetName != "" {

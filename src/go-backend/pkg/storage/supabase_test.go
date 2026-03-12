@@ -29,7 +29,10 @@ func TestSupabaseStorage_Upload(t *testing.T) {
 
 		// Return success response
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"Key": "uploads/test.csv"}`))
+		_, err := w.Write([]byte(`{"Key": "uploads/test.csv"}`))
+		if err != nil {
+			t.Errorf("Failed to write response: %v", err)
+		}
 	}))
 	defer mockServer.Close()
 

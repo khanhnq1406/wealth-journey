@@ -313,7 +313,7 @@ func fetchGlobalSilverData(ctx context.Context, days int) ([]silverChartDataPoin
 	}
 
 	if chartResp.Chart.Error != nil {
-		return nil, fmt.Errorf("Yahoo Finance API error: %s", chartResp.Chart.Error.Description)
+		return nil, fmt.Errorf("yahoo Finance API error: %s", chartResp.Chart.Error.Description)
 	}
 
 	if len(chartResp.Chart.Result) == 0 {

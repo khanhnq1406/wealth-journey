@@ -58,7 +58,7 @@ func BenchmarkCurrencyConversion_BatchConversion(b *testing.B) {
 // BenchmarkCurrencyConversion_WithRateCache benchmarks conversion with cached rates
 func BenchmarkCurrencyConversion_WithRateCache(b *testing.B) {
 	redisClient := setupBenchmarkRedis(b)
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 
 	fxCache := cache.NewFXRateCache(redisClient)
 	ctx := context.Background()
@@ -165,7 +165,7 @@ func BenchmarkTransactionConversion_List(b *testing.B) {
 // BenchmarkCurrencyCache_Set benchmarks cache write operations
 func BenchmarkCurrencyCache_Set(b *testing.B) {
 	redisClient := setupBenchmarkRedis(b)
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 
 	currencyCache := cache.NewCurrencyCache(redisClient)
 	ctx := context.Background()
@@ -179,7 +179,7 @@ func BenchmarkCurrencyCache_Set(b *testing.B) {
 // BenchmarkCurrencyCache_Get benchmarks cache read operations
 func BenchmarkCurrencyCache_Get(b *testing.B) {
 	redisClient := setupBenchmarkRedis(b)
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 
 	currencyCache := cache.NewCurrencyCache(redisClient)
 	ctx := context.Background()

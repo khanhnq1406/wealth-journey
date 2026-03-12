@@ -57,7 +57,7 @@ func (s *SupabaseStorage) Upload(ctx context.Context, file io.Reader, key string
 	if err != nil {
 		return nil, fmt.Errorf("failed to upload file: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// Check response status
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
@@ -94,7 +94,7 @@ func (s *SupabaseStorage) Delete(ctx context.Context, key string) error {
 	if err != nil {
 		return fmt.Errorf("failed to delete file: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// 404 is acceptable (file already deleted or never existed)
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent && resp.StatusCode != http.StatusNotFound {

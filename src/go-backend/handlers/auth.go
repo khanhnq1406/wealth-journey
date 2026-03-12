@@ -77,7 +77,10 @@ func (h *AuthHandlers) Logout(c *gin.Context) {
 		var req struct {
 			Token string `json:"token"`
 		}
-		c.ShouldBindJSON(&req)
+		if err := c.ShouldBindJSON(&req); err != nil {
+			handler.HandleError(c, apperrors.NewValidationError("invalid request body"))
+			return
+		}
 		token = req.Token
 	} else {
 		// Use ExtractBearerToken for header tokens

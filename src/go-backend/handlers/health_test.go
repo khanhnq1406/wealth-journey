@@ -39,7 +39,10 @@ func TestHealthHandler_Success(t *testing.T) {
 	}
 
 	var body map[string]interface{}
-	json.Unmarshal(resp.Body.Bytes(), &body)
+	err := json.Unmarshal(resp.Body.Bytes(), &body)
+	if err != nil {
+		t.Fatalf("Failed to unmarshal response body: %v", err)
+	}
 
 	if body["status"] != "healthy" {
 		t.Errorf("Expected status 'healthy', got '%v'", body["status"])
@@ -72,7 +75,10 @@ func TestHealthHandler_DatabaseDown(t *testing.T) {
 	}
 
 	var body map[string]interface{}
-	json.Unmarshal(resp.Body.Bytes(), &body)
+	err := json.Unmarshal(resp.Body.Bytes(), &body)
+	if err != nil {
+		t.Fatalf("Failed to unmarshal response body: %v", err)
+	}
 
 	if body["status"] != "unhealthy" {
 		t.Errorf("Expected status 'unhealthy', got '%v'", body["status"])
@@ -115,7 +121,10 @@ func TestHealthHandler_HEADMethod(t *testing.T) {
 	// Note: Gin automatically converts HEAD to GET and returns the body
 	// This is acceptable for health check purposes
 	var body map[string]interface{}
-	json.Unmarshal(resp.Body.Bytes(), &body)
+	err := json.Unmarshal(resp.Body.Bytes(), &body)
+	if err != nil {
+		t.Fatalf("Failed to unmarshal response body: %v", err)
+	}
 
 	if body["status"] != "healthy" {
 		t.Errorf("Expected status 'healthy', got '%v'", body["status"])

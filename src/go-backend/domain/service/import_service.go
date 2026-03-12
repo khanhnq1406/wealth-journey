@@ -1151,7 +1151,7 @@ func (s *importService) ListExcelSheets(ctx context.Context, userID int32, fileI
 
 	// Create Excel parser
 	excelParser := parser.NewExcelParser(filePath, nil)
-	defer excelParser.Close()
+	defer func() { _ = excelParser.Close() }()
 
 	// List all visible sheets
 	sheets, err := excelParser.ListSheets()

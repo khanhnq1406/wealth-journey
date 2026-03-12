@@ -616,7 +616,7 @@ func TestInvestmentRecalculate_CorrectedEdgeCases(t *testing.T) {
 			}
 
 			// Trigger recalculation
-			inv.BeforeUpdate(nil)
+			_ = inv.BeforeUpdate(nil)
 
 			if inv.CurrentValue != tt.expectedValue {
 				t.Errorf("Expected current value %d, got %d", tt.expectedValue, inv.CurrentValue)

@@ -81,7 +81,7 @@ func UploadFile(file multipart.File, header *multipart.FileHeader) (*UploadResul
 
 	// Copy uploaded file to destination
 	if _, err := io.Copy(destFile, file); err != nil {
-		os.Remove(destPath) // Clean up on error
+		_ = os.Remove(destPath) // Clean up on error
 		return nil, fmt.Errorf("failed to save file: %w", err)
 	}
 

@@ -11,8 +11,7 @@ import (
 	"wealthjourney/pkg/types"
 	"wealthjourney/pkg/yahoo"
 
-	investmentv1 "wealthjourney/protobuf/v1"
-	walletv1 "wealthjourney/protobuf/v1"
+	v1 "wealthjourney/protobuf/v1"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -127,12 +126,12 @@ func (m *MockInvestmentRepository) GetByWalletAndSymbol(ctx context.Context, wal
 	return args.Get(0).(*models.Investment), args.Error(1)
 }
 
-func (m *MockInvestmentRepository) ListByUserID(ctx context.Context, userID int32, opts repository.ListOptions, typeFilter investmentv1.InvestmentType) ([]*models.Investment, int, error) {
+func (m *MockInvestmentRepository) ListByUserID(ctx context.Context, userID int32, opts repository.ListOptions, typeFilter v1.InvestmentType) ([]*models.Investment, int, error) {
 	args := m.Called(ctx, userID, opts, typeFilter)
 	return args.Get(0).([]*models.Investment), args.Get(1).(int), args.Error(2)
 }
 
-func (m *MockInvestmentRepository) ListByWalletID(ctx context.Context, walletID int32, opts repository.ListOptions, typeFilter investmentv1.InvestmentType) ([]*models.Investment, int, error) {
+func (m *MockInvestmentRepository) ListByWalletID(ctx context.Context, walletID int32, opts repository.ListOptions, typeFilter v1.InvestmentType) ([]*models.Investment, int, error) {
 	args := m.Called(ctx, walletID, opts, typeFilter)
 	return args.Get(0).([]*models.Investment), args.Get(1).(int), args.Error(2)
 }
@@ -160,7 +159,7 @@ func (m *MockInvestmentRepository) GetPortfolioSummary(ctx context.Context, wall
 	return args.Get(0).(*repository.PortfolioSummary), args.Error(1)
 }
 
-func (m *MockInvestmentRepository) GetAggregatedPortfolioSummary(ctx context.Context, userID int32, typeFilter investmentv1.InvestmentType) (*repository.PortfolioSummary, error) {
+func (m *MockInvestmentRepository) GetAggregatedPortfolioSummary(ctx context.Context, userID int32, typeFilter v1.InvestmentType) (*repository.PortfolioSummary, error) {
 	args := m.Called(ctx, userID, typeFilter)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -206,7 +205,7 @@ func (m *MockInvestmentTransactionRepository) GetByIDForUser(ctx context.Context
 	return args.Get(0).(*models.InvestmentTransaction), args.Error(1)
 }
 
-func (m *MockInvestmentTransactionRepository) ListByInvestmentID(ctx context.Context, investmentID int32, typeFilter *investmentv1.InvestmentTransactionType, opts repository.ListOptions) ([]*models.InvestmentTransaction, int, error) {
+func (m *MockInvestmentTransactionRepository) ListByInvestmentID(ctx context.Context, investmentID int32, typeFilter *v1.InvestmentTransactionType, opts repository.ListOptions) ([]*models.InvestmentTransaction, int, error) {
 	args := m.Called(ctx, investmentID, typeFilter, opts)
 	return args.Get(0).([]*models.InvestmentTransaction), args.Get(1).(int), args.Error(2)
 }
@@ -266,7 +265,7 @@ type MockMarketDataService struct {
 	mock.Mock
 }
 
-func (m *MockMarketDataService) GetPrice(ctx context.Context, symbol, currency string, investmentType investmentv1.InvestmentType, maxAge time.Duration) (*models.MarketData, error) {
+func (m *MockMarketDataService) GetPrice(ctx context.Context, symbol, currency string, investmentType v1.InvestmentType, maxAge time.Duration) (*models.MarketData, error) {
 	args := m.Called(ctx, symbol, currency, investmentType, maxAge)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -377,104 +376,104 @@ type MockWalletService struct {
 	mock.Mock
 }
 
-func (m *MockWalletService) CreateWallet(ctx context.Context, userID int32, req *walletv1.CreateWalletRequest) (*walletv1.CreateWalletResponse, error) {
+func (m *MockWalletService) CreateWallet(ctx context.Context, userID int32, req *v1.CreateWalletRequest) (*v1.CreateWalletResponse, error) {
 	args := m.Called(ctx, userID, req)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*walletv1.CreateWalletResponse), args.Error(1)
+	return args.Get(0).(*v1.CreateWalletResponse), args.Error(1)
 }
 
-func (m *MockWalletService) GetWallet(ctx context.Context, walletID, requestingUserID int32) (*walletv1.GetWalletResponse, error) {
+func (m *MockWalletService) GetWallet(ctx context.Context, walletID, requestingUserID int32) (*v1.GetWalletResponse, error) {
 	args := m.Called(ctx, walletID, requestingUserID)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*walletv1.GetWalletResponse), args.Error(1)
+	return args.Get(0).(*v1.GetWalletResponse), args.Error(1)
 }
 
-func (m *MockWalletService) ListWallets(ctx context.Context, userID int32, params types.PaginationParams) (*walletv1.ListWalletsResponse, error) {
+func (m *MockWalletService) ListWallets(ctx context.Context, userID int32, params types.PaginationParams) (*v1.ListWalletsResponse, error) {
 	args := m.Called(ctx, userID, params)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*walletv1.ListWalletsResponse), args.Error(1)
+	return args.Get(0).(*v1.ListWalletsResponse), args.Error(1)
 }
 
-func (m *MockWalletService) UpdateWallet(ctx context.Context, walletID, userID int32, req *walletv1.UpdateWalletRequest) (*walletv1.UpdateWalletResponse, error) {
+func (m *MockWalletService) UpdateWallet(ctx context.Context, walletID, userID int32, req *v1.UpdateWalletRequest) (*v1.UpdateWalletResponse, error) {
 	args := m.Called(ctx, walletID, userID, req)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*walletv1.UpdateWalletResponse), args.Error(1)
+	return args.Get(0).(*v1.UpdateWalletResponse), args.Error(1)
 }
 
-func (m *MockWalletService) DeleteWallet(ctx context.Context, walletID, userID int32, req *walletv1.DeleteWalletRequest) (*walletv1.DeleteWalletResponse, error) {
+func (m *MockWalletService) DeleteWallet(ctx context.Context, walletID, userID int32, req *v1.DeleteWalletRequest) (*v1.DeleteWalletResponse, error) {
 	args := m.Called(ctx, walletID, userID, req)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*walletv1.DeleteWalletResponse), args.Error(1)
+	return args.Get(0).(*v1.DeleteWalletResponse), args.Error(1)
 }
 
-func (m *MockWalletService) AddFunds(ctx context.Context, walletID, userID int32, req *walletv1.AddFundsRequest) (*walletv1.AddFundsResponse, error) {
+func (m *MockWalletService) AddFunds(ctx context.Context, walletID, userID int32, req *v1.AddFundsRequest) (*v1.AddFundsResponse, error) {
 	args := m.Called(ctx, walletID, userID, req)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*walletv1.AddFundsResponse), args.Error(1)
+	return args.Get(0).(*v1.AddFundsResponse), args.Error(1)
 }
 
-func (m *MockWalletService) WithdrawFunds(ctx context.Context, walletID, userID int32, req *walletv1.WithdrawFundsRequest) (*walletv1.WithdrawFundsResponse, error) {
+func (m *MockWalletService) WithdrawFunds(ctx context.Context, walletID, userID int32, req *v1.WithdrawFundsRequest) (*v1.WithdrawFundsResponse, error) {
 	args := m.Called(ctx, walletID, userID, req)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*walletv1.WithdrawFundsResponse), args.Error(1)
+	return args.Get(0).(*v1.WithdrawFundsResponse), args.Error(1)
 }
 
-func (m *MockWalletService) TransferFunds(ctx context.Context, userID int32, req *walletv1.TransferFundsRequest) (*walletv1.TransferFundsResponse, error) {
+func (m *MockWalletService) TransferFunds(ctx context.Context, userID int32, req *v1.TransferFundsRequest) (*v1.TransferFundsResponse, error) {
 	args := m.Called(ctx, userID, req)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*walletv1.TransferFundsResponse), args.Error(1)
+	return args.Get(0).(*v1.TransferFundsResponse), args.Error(1)
 }
 
-func (m *MockWalletService) AdjustBalance(ctx context.Context, walletID, userID int32, req *walletv1.AdjustBalanceRequest) (*walletv1.AdjustBalanceResponse, error) {
+func (m *MockWalletService) AdjustBalance(ctx context.Context, walletID, userID int32, req *v1.AdjustBalanceRequest) (*v1.AdjustBalanceResponse, error) {
 	args := m.Called(ctx, walletID, userID, req)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*walletv1.AdjustBalanceResponse), args.Error(1)
+	return args.Get(0).(*v1.AdjustBalanceResponse), args.Error(1)
 }
 
-func (m *MockWalletService) GetTotalBalance(ctx context.Context, userID int32) (*walletv1.GetTotalBalanceResponse, error) {
+func (m *MockWalletService) GetTotalBalance(ctx context.Context, userID int32) (*v1.GetTotalBalanceResponse, error) {
 	args := m.Called(ctx, userID)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*walletv1.GetTotalBalanceResponse), args.Error(1)
+	return args.Get(0).(*v1.GetTotalBalanceResponse), args.Error(1)
 }
 
-func (m *MockWalletService) GetBalanceHistory(ctx context.Context, userID int32, req *walletv1.GetBalanceHistoryRequest) (*walletv1.GetBalanceHistoryResponse, error) {
+func (m *MockWalletService) GetBalanceHistory(ctx context.Context, userID int32, req *v1.GetBalanceHistoryRequest) (*v1.GetBalanceHistoryResponse, error) {
 	args := m.Called(ctx, userID, req)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*walletv1.GetBalanceHistoryResponse), args.Error(1)
+	return args.Get(0).(*v1.GetBalanceHistoryResponse), args.Error(1)
 }
 
-func (m *MockWalletService) GetMonthlyDominance(ctx context.Context, userID int32, req *walletv1.GetMonthlyDominanceRequest) (*walletv1.GetMonthlyDominanceResponse, error) {
+func (m *MockWalletService) GetMonthlyDominance(ctx context.Context, userID int32, req *v1.GetMonthlyDominanceRequest) (*v1.GetMonthlyDominanceResponse, error) {
 	args := m.Called(ctx, userID, req)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*walletv1.GetMonthlyDominanceResponse), args.Error(1)
+	return args.Get(0).(*v1.GetMonthlyDominanceResponse), args.Error(1)
 }
 
 // Test helper functions
-func createTestWallet(id int32, userID int32, walletType walletv1.WalletType) *models.Wallet {
+func createTestWallet(id int32, userID int32, walletType v1.WalletType) *models.Wallet {
 	return &models.Wallet{
 		ID:       id,
 		UserID:   userID,
@@ -491,7 +490,7 @@ func createTestInvestment(id int32, walletID int32, symbol string, quantity, ave
 		WalletID:    walletID,
 		Symbol:      symbol,
 		Name:        symbol + " Inc.",
-		Type:        int32(investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK),
+		Type:        int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
 		Quantity:    quantity,
 		AverageCost: averageCost,
 		TotalCost:   totalCost,
@@ -524,14 +523,14 @@ func TestInvestmentService_CreateInvestment_Success(t *testing.T) {
 	ctx := context.Background()
 	userID := int32(1)
 	walletID := int32(1)
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
 	wallet.Balance = 20000000000 // $200,000 in cents - enough for the investment
 
-	req := &investmentv1.CreateInvestmentRequest{
+	req := &v1.CreateInvestmentRequest{
 		WalletId:        walletID,
 		Symbol:          "AAPL",
 		Name:            "Apple Inc.",
-		Type:            investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK,
+		Type:            v1.InvestmentType_INVESTMENT_TYPE_STOCK,
 		InitialQuantity: 10000, // 1 share (4 decimal places)
 		InitialCost:     15000000000, // Total cost (150.00 * 10000)
 		Currency:        "USD",
@@ -591,11 +590,11 @@ func TestInvestmentService_CreateInvestment_WalletNotFound(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(999)
 
-	req := &investmentv1.CreateInvestmentRequest{
+	req := &v1.CreateInvestmentRequest{
 		WalletId:        walletID,
 		Symbol:          "AAPL",
 		Name:            "Apple Inc.",
-		Type:            investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK,
+		Type:            v1.InvestmentType_INVESTMENT_TYPE_STOCK,
 		InitialQuantity: 10000,
 		InitialCost:     15000000000,
 		Currency:        "USD",
@@ -638,13 +637,13 @@ func TestInvestmentService_CreateInvestment_WrongWalletType(t *testing.T) {
 	ctx := context.Background()
 	userID := int32(1)
 	walletID := int32(1)
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_BASIC) // Wrong type
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC) // Wrong type
 
-	req := &investmentv1.CreateInvestmentRequest{
+	req := &v1.CreateInvestmentRequest{
 		WalletId:        walletID,
 		Symbol:          "AAPL",
 		Name:            "Apple Inc.",
-		Type:            investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK,
+		Type:            v1.InvestmentType_INVESTMENT_TYPE_STOCK,
 		InitialQuantity: 10000,
 		InitialCost:     15000000000,
 		Currency:        "USD",
@@ -688,14 +687,14 @@ func TestInvestmentService_CreateInvestment_DuplicateSymbol(t *testing.T) {
 	ctx := context.Background()
 	userID := int32(1)
 	walletID := int32(1)
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
 	existingInvestment := createTestInvestment(1, walletID, "AAPL", 10000, 1500000, 15000000000)
 
-	req := &investmentv1.CreateInvestmentRequest{
+	req := &v1.CreateInvestmentRequest{
 		WalletId:        walletID,
 		Symbol:          "AAPL",
 		Name:            "Apple Inc.",
-		Type:            investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK,
+		Type:            v1.InvestmentType_INVESTMENT_TYPE_STOCK,
 		InitialQuantity: 10000,
 		InitialCost:     15000000000,
 		Currency:        "USD",
@@ -742,12 +741,12 @@ func TestInvestmentService_AddTransaction_BuyCreatesLot(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
 	investment := createTestInvestment(investmentID, walletID, "AAPL", 0, 0, 0)
 
-	req := &investmentv1.AddTransactionRequest{
+	req := &v1.AddTransactionRequest{
 		InvestmentId: investmentID,
-		Type:         investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY,
+		Type:         v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY,
 		Quantity:     10000, // 1 share
 		Price:        1500000, // $150.00
 		Fees:         100, // $1.00 fee
@@ -763,7 +762,7 @@ func TestInvestmentService_AddTransaction_BuyCreatesLot(t *testing.T) {
 	mockTxRepo.On("GetOpenLots", ctx, investmentID).Return([]*models.InvestmentLot{}, nil)
 	mockTxRepo.On("CreateLot", ctx, mock.AnythingOfType("*models.InvestmentLot")).Return(nil)
 	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
-	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*investmentv1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
+	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*v1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
 	mockInvestmentRepo.On("Update", ctx, mock.AnythingOfType("*models.Investment")).Return(nil)
 	mockUserRepo.On("GetByID", ctx, userID).Return(&models.User{ID: userID, PreferredCurrency: "USD"}, nil)
 
@@ -806,7 +805,7 @@ func TestInvestmentService_AddTransaction_SellConsumesOldestLot(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
 	investment := createTestInvestment(investmentID, walletID, "AAPL", 20000, 1500000, 30000000000)
 
 	// Create two lots - oldest should be consumed first
@@ -829,9 +828,9 @@ func TestInvestmentService_AddTransaction_SellConsumesOldestLot(t *testing.T) {
 		PurchasedAt:       time.Now(),
 	}
 
-	req := &investmentv1.AddTransactionRequest{
+	req := &v1.AddTransactionRequest{
 		InvestmentId: investmentID,
-		Type:         investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
+		Type:         v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
 		Quantity:     7000, // Sell 0.7 shares
 		Price:        1700000, // $170.00
 		Fees:         100,
@@ -849,7 +848,7 @@ func TestInvestmentService_AddTransaction_SellConsumesOldestLot(t *testing.T) {
 		return lot.ID == 1 && lot.RemainingQuantity == 3000 // 10000 - 7000
 	})).Return(nil)
 	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
-	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*investmentv1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
+	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*v1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
 	mockInvestmentRepo.On("Update", ctx, mock.MatchedBy(func(inv *models.Investment) bool {
 		return inv.Quantity == 13000 && // 20000 - 7000
 		 inv.RealizedPNL > 0 // Should have realized PNL
@@ -895,7 +894,7 @@ func TestInvestmentService_AddTransaction_SellConsumesMultipleLots(t *testing.T)
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
 	investment := createTestInvestment(investmentID, walletID, "AAPL", 20000, 1500000, 30000000000)
 
 	// Create two lots with small quantities
@@ -918,9 +917,9 @@ func TestInvestmentService_AddTransaction_SellConsumesMultipleLots(t *testing.T)
 		PurchasedAt:       time.Now(),
 	}
 
-	req := &investmentv1.AddTransactionRequest{
+	req := &v1.AddTransactionRequest{
 		InvestmentId: investmentID,
-		Type:         investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
+		Type:         v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
 		Quantity:     5000, // Should consume all of lot1 (3000) and 2000 from lot2
 		Price:        1700000,
 		Fees:         100,
@@ -937,7 +936,7 @@ func TestInvestmentService_AddTransaction_SellConsumesMultipleLots(t *testing.T)
 	// Both lots should be updated
 	mockTxRepo.On("UpdateLot", ctx, mock.AnythingOfType("*models.InvestmentLot")).Return(nil).Times(2)
 	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
-	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*investmentv1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
+	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*v1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
 	mockInvestmentRepo.On("Update", ctx, mock.AnythingOfType("*models.Investment")).Return(nil)
 	mockUserRepo.On("GetByID", ctx, userID).Return(&models.User{ID: userID, PreferredCurrency: "USD"}, nil)
 
@@ -980,12 +979,12 @@ func TestInvestmentService_AddTransaction_SellExceedsQuantity(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
 	investment := createTestInvestment(investmentID, walletID, "AAPL", 5000, 1500000, 7500000000)
 
-	req := &investmentv1.AddTransactionRequest{
+	req := &v1.AddTransactionRequest{
 		InvestmentId: investmentID,
-		Type:         investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
+		Type:         v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
 		Quantity:     10000, // Trying to sell more than owned
 		Price:        1700000,
 		Fees:         100,
@@ -1034,7 +1033,7 @@ func TestInvestmentService_GetPortfolioSummary_Success(t *testing.T) {
 	ctx := context.Background()
 	userID := int32(1)
 	walletID := int32(1)
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
 
 	// GetPortfolioSummary aggregates from investments in-memory.
 	// Create 5 investments (3 STOCK, 2 CRYPTO) with known values in USD (matches preferred currency).
@@ -1043,7 +1042,7 @@ func TestInvestmentService_GetPortfolioSummary_Success(t *testing.T) {
 			ID:            id,
 			WalletID:      walletID,
 			Symbol:        "TEST",
-			Type:          int32(investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK),
+			Type:          int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
 			Currency:      "USD",
 			CurrentValue:  currentValue,
 			TotalCost:     totalCost,
@@ -1057,7 +1056,7 @@ func TestInvestmentService_GetPortfolioSummary_Success(t *testing.T) {
 			ID:            id,
 			WalletID:      walletID,
 			Symbol:        "BTC",
-			Type:          int32(investmentv1.InvestmentType_INVESTMENT_TYPE_CRYPTOCURRENCY),
+			Type:          int32(v1.InvestmentType_INVESTMENT_TYPE_CRYPTOCURRENCY),
 			Currency:      "USD",
 			CurrentValue:  currentValue,
 			TotalCost:     totalCost,
@@ -1088,10 +1087,10 @@ func TestInvestmentService_GetPortfolioSummary_Success(t *testing.T) {
 	// ListByWalletID returns investments (fresh timestamps → no auto-refresh triggered)
 	mockInvestmentRepo.On("ListByWalletID", ctx, walletID, mock.MatchedBy(func(opts repository.ListOptions) bool {
 		return opts.Limit == 1000
-	}), investmentv1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED).Return(investments, len(investments), nil)
+	}), v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED).Return(investments, len(investments), nil)
 
 	// Execute
-	response, err := service.GetPortfolioSummary(ctx, walletID, userID, investmentv1.PnlPeriod_PNL_PERIOD_UNSPECIFIED)
+	response, err := service.GetPortfolioSummary(ctx, walletID, userID, v1.PnlPeriod_PNL_PERIOD_UNSPECIFIED)
 
 	// Assert
 	assert.NoError(t, err)
@@ -1134,15 +1133,15 @@ func TestInvestmentService_UpdatePrices_Success(t *testing.T) {
 	investment1 := createTestInvestment(1, 1, "AAPL", 10000, 1500000, 15000000000)
 	investment2 := createTestInvestment(2, 1, "BTC", 100000000, 50000000000, 5000000000000000)
 
-	req := &investmentv1.UpdatePricesRequest{
+	req := &v1.UpdatePricesRequest{
 		InvestmentIds: []int32{1, 2},
 		ForceRefresh:   false,
 	}
 
 	mockWalletRepo.On("ListByUserID", ctx, userID, mock.Anything).Return([]*models.Wallet{
-		{ID: 1, UserID: userID, Type: int32(walletv1.WalletType_INVESTMENT)},
+		{ID: 1, UserID: userID, Type: int32(v1.WalletType_INVESTMENT)},
 	}, 1, nil)
-	mockInvestmentRepo.On("ListByWalletID", ctx, int32(1), mock.Anything, investmentv1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED).Return([]*models.Investment{investment1, investment2}, 2, nil)
+	mockInvestmentRepo.On("ListByWalletID", ctx, int32(1), mock.Anything, v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED).Return([]*models.Investment{investment1, investment2}, 2, nil)
 	// UpdatePrices runs async in a goroutine with its own timeout context — use mock.Anything + Maybe()
 	mockMarketDataService.On("UpdatePricesForInvestments", mock.Anything, mock.Anything, false).Return(map[int32]int64{
 		1: 16000,   // AAPL @ $160 (in cents)
@@ -1192,16 +1191,16 @@ func TestInvestmentService_UpdatePrices_SkipsCustomInvestments(t *testing.T) {
 	).(*investmentService)
 
 	// Create test wallets
-	wallet1 := &models.Wallet{ID: 1, UserID: userID, Type: int32(walletv1.WalletType_INVESTMENT), Currency: "USD"}
+	wallet1 := &models.Wallet{ID: 1, UserID: userID, Type: int32(v1.WalletType_INVESTMENT), Currency: "USD"}
 	mockWalletRepo.On("ListByUserID", ctx, userID, mock.Anything).Return([]*models.Wallet{wallet1}, 1, nil)
 
 	// Create mixed investments (1 market-based, 1 custom)
-	marketInv := &models.Investment{ID: 1, WalletID: 1, Symbol: "AAPL", Currency: "USD", Type: int32(investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK), IsCustom: false}
-	customInv := &models.Investment{ID: 2, WalletID: 1, Symbol: "MY-CUSTOM", Currency: "USD", Type: int32(investmentv1.InvestmentType_INVESTMENT_TYPE_OTHER), IsCustom: true}
-	mockInvestmentRepo.On("ListByWalletID", ctx, int32(1), mock.Anything, investmentv1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED).
+	marketInv := &models.Investment{ID: 1, WalletID: 1, Symbol: "AAPL", Currency: "USD", Type: int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK), IsCustom: false}
+	customInv := &models.Investment{ID: 2, WalletID: 1, Symbol: "MY-CUSTOM", Currency: "USD", Type: int32(v1.InvestmentType_INVESTMENT_TYPE_OTHER), IsCustom: true}
+	mockInvestmentRepo.On("ListByWalletID", ctx, int32(1), mock.Anything, v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED).
 		Return([]*models.Investment{marketInv, customInv}, 2, nil)
 
-	req := &investmentv1.UpdatePricesRequest{
+	req := &v1.UpdatePricesRequest{
 		InvestmentIds: []int32{}, // Empty = update all
 		ForceRefresh:  false,
 	}
@@ -1255,7 +1254,7 @@ func TestInvestmentService_DeleteInvestment_RefundsWalletBalance(t *testing.T) {
 	investmentID := int32(1)
 
 	// Create test wallet and investment with same currency (no conversion needed)
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
 	wallet.Currency = "USD"
 	wallet.Balance = 5000000000 // $50,000 in cents
 
@@ -1312,7 +1311,7 @@ func TestInvestmentService_DeleteInvestment_RefundsWithCurrencyConversion(t *tes
 	investmentID := int32(1)
 
 	// Create test wallet in VND and investment in USD
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
 	wallet.Currency = "VND"
 	wallet.Balance = 500000000 // 5M VND
 

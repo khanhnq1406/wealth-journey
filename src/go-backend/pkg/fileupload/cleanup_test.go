@@ -87,7 +87,7 @@ func TestListFiles_NonExistentDirectory(t *testing.T) {
 func TestDeleteFile(t *testing.T) {
 	// Create a temporary file
 	tempFile := filepath.Join(os.TempDir(), "test-delete-"+time.Now().Format("20060102150405")+".txt")
-	defer os.Remove(tempFile) // cleanup in case test fails
+	defer func() { _ = os.Remove(tempFile) }() // cleanup in case test fails
 
 	if err := os.WriteFile(tempFile, []byte("test data"), 0644); err != nil {
 		t.Fatalf("Failed to create test file: %v", err)

@@ -13,7 +13,6 @@ import (
 	"wealthjourney/pkg/cache"
 	"wealthjourney/pkg/types"
 	"wealthjourney/pkg/validator"
-	protobufv1 "wealthjourney/protobuf/v1"
 	v1 "wealthjourney/protobuf/v1"
 )
 
@@ -68,7 +67,7 @@ func NewUserService(
 }
 
 // GetUser retrieves a user by ID.
-func (s *userService) GetUser(ctx context.Context, userID int32) (*protobufv1.GetUserResponse, error) {
+func (s *userService) GetUser(ctx context.Context, userID int32) (*v1.GetUserResponse, error) {
 	if err := validator.ID(userID); err != nil {
 		return nil, err
 	}
@@ -78,7 +77,7 @@ func (s *userService) GetUser(ctx context.Context, userID int32) (*protobufv1.Ge
 		return nil, err
 	}
 
-	return &protobufv1.GetUserResponse{
+	return &v1.GetUserResponse{
 		Success:   true,
 		Message:   "User retrieved successfully",
 		Data:      s.mapper.ModelToProto(user),
@@ -87,7 +86,7 @@ func (s *userService) GetUser(ctx context.Context, userID int32) (*protobufv1.Ge
 }
 
 // GetUserByEmail retrieves a user by email.
-func (s *userService) GetUserByEmail(ctx context.Context, email string) (*protobufv1.GetUserByEmailResponse, error) {
+func (s *userService) GetUserByEmail(ctx context.Context, email string) (*v1.GetUserByEmailResponse, error) {
 	if err := validator.Email(email); err != nil {
 		return nil, err
 	}
@@ -97,7 +96,7 @@ func (s *userService) GetUserByEmail(ctx context.Context, email string) (*protob
 		return nil, err
 	}
 
-	return &protobufv1.GetUserByEmailResponse{
+	return &v1.GetUserByEmailResponse{
 		Success:   true,
 		Message:   "User retrieved successfully",
 		Data:      s.mapper.ModelToProto(user),
@@ -106,7 +105,7 @@ func (s *userService) GetUserByEmail(ctx context.Context, email string) (*protob
 }
 
 // ListUsers retrieves all users with pagination.
-func (s *userService) ListUsers(ctx context.Context, params types.PaginationParams) (*protobufv1.ListUsersResponse, error) {
+func (s *userService) ListUsers(ctx context.Context, params types.PaginationParams) (*v1.ListUsersResponse, error) {
 	params = params.Validate()
 
 	opts := repository.ListOptions{
@@ -123,7 +122,7 @@ func (s *userService) ListUsers(ctx context.Context, params types.PaginationPara
 
 	pagination := types.NewPaginationResult(params.Page, params.PageSize, total)
 
-	return &protobufv1.ListUsersResponse{
+	return &v1.ListUsersResponse{
 		Success:    true,
 		Message:    "Users retrieved successfully",
 		Users:      s.mapper.ModelSliceToProto(users),
@@ -133,7 +132,7 @@ func (s *userService) ListUsers(ctx context.Context, params types.PaginationPara
 }
 
 // CreateUser creates a new user.
-func (s *userService) CreateUser(ctx context.Context, email, name, picture string) (*protobufv1.CreateUserResponse, error) {
+func (s *userService) CreateUser(ctx context.Context, email, name, picture string) (*v1.CreateUserResponse, error) {
 	// Validate inputs
 	if err := validator.Email(email); err != nil {
 		return nil, err
@@ -173,7 +172,7 @@ func (s *userService) CreateUser(ctx context.Context, email, name, picture strin
 		}
 	}
 
-	return &protobufv1.CreateUserResponse{
+	return &v1.CreateUserResponse{
 		Success:   true,
 		Message:   "User created successfully",
 		Data:      s.mapper.ModelToProto(user),
@@ -182,7 +181,7 @@ func (s *userService) CreateUser(ctx context.Context, email, name, picture strin
 }
 
 // UpdateUser updates a user's information.
-func (s *userService) UpdateUser(ctx context.Context, userID int32, email, name, picture string) (*protobufv1.UpdateUserResponse, error) {
+func (s *userService) UpdateUser(ctx context.Context, userID int32, email, name, picture string) (*v1.UpdateUserResponse, error) {
 	if err := validator.ID(userID); err != nil {
 		return nil, err
 	}
@@ -226,7 +225,7 @@ func (s *userService) UpdateUser(ctx context.Context, userID int32, email, name,
 		return nil, err
 	}
 
-	return &protobufv1.UpdateUserResponse{
+	return &v1.UpdateUserResponse{
 		Success:   true,
 		Message:   "User updated successfully",
 		Data:      s.mapper.ModelToProto(user),
@@ -235,7 +234,7 @@ func (s *userService) UpdateUser(ctx context.Context, userID int32, email, name,
 }
 
 // DeleteUser deletes a user.
-func (s *userService) DeleteUser(ctx context.Context, userID int32) (*protobufv1.DeleteUserResponse, error) {
+func (s *userService) DeleteUser(ctx context.Context, userID int32) (*v1.DeleteUserResponse, error) {
 	if err := validator.ID(userID); err != nil {
 		return nil, err
 	}
@@ -244,7 +243,7 @@ func (s *userService) DeleteUser(ctx context.Context, userID int32) (*protobufv1
 		return nil, err
 	}
 
-	return &protobufv1.DeleteUserResponse{
+	return &v1.DeleteUserResponse{
 		Success:   true,
 		Message:   "User deleted successfully",
 		Timestamp: time.Now().Format(time.RFC3339),
@@ -261,7 +260,7 @@ func (s *userService) ExistsByEmail(ctx context.Context, email string) (bool, er
 
 // UpdateUserPreferences updates a user's preferences, including currency.
 // If currency is changed, it triggers a background job to convert all monetary values.
-func (s *userService) UpdateUserPreferences(ctx context.Context, userID int32, preferredCurrency string) (*protobufv1.UpdateUserResponse, error) {
+func (s *userService) UpdateUserPreferences(ctx context.Context, userID int32, preferredCurrency string) (*v1.UpdateUserResponse, error) {
 	if err := validator.ID(userID); err != nil {
 		return nil, err
 	}
@@ -280,7 +279,7 @@ func (s *userService) UpdateUserPreferences(ctx context.Context, userID int32, p
 	// Check if currency is actually changing
 	oldCurrency := user.PreferredCurrency
 	if oldCurrency == preferredCurrency || preferredCurrency == "" {
-		return &protobufv1.UpdateUserResponse{
+		return &v1.UpdateUserResponse{
 			Success:   true,
 			Message:   "No currency change needed",
 			Data:      s.mapper.ModelToProto(user),
@@ -315,7 +314,7 @@ func (s *userService) UpdateUserPreferences(ctx context.Context, userID int32, p
 	// For now, we'll run it in a goroutine with proper error handling
 	go s.convertUserCurrency(context.Background(), userID, oldCurrency, preferredCurrency)
 
-	return &protobufv1.UpdateUserResponse{
+	return &v1.UpdateUserResponse{
 		Success:   true,
 		Message:   fmt.Sprintf("Currency conversion from %s to %s has started. You will be notified when complete.", oldCurrency, preferredCurrency),
 		Data:      s.mapper.ModelToProto(user),
@@ -649,7 +648,7 @@ func (s *userService) UpdatePreferences(ctx context.Context, userID int32, req *
 	}
 
 	// Handle currency update (existing logic via UpdateUserPreferences)
-	var updateResp *protobufv1.UpdateUserResponse
+	var updateResp *v1.UpdateUserResponse
 	var err error
 
 	if preferredCurrency != "" {
@@ -663,7 +662,7 @@ func (s *userService) UpdatePreferences(ctx context.Context, userID int32, req *
 		if err != nil {
 			return nil, err
 		}
-		updateResp = &protobufv1.UpdateUserResponse{
+		updateResp = &v1.UpdateUserResponse{
 			Success:   true,
 			Message:   "Preferences updated",
 			Data:      s.mapper.ModelToProto(user),

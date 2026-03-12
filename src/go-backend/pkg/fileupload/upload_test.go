@@ -100,7 +100,7 @@ func TestValidateFileSize(t *testing.T) {
 func TestUploadFile(t *testing.T) {
 	// Create test upload directory
 	testUploadDir := "/tmp/wealthjourney-uploads-test"
-	defer os.RemoveAll(testUploadDir)
+	defer func() { _ = os.RemoveAll(testUploadDir) }()
 
 	tests := []struct {
 		name        string
@@ -184,7 +184,7 @@ func TestUploadFile(t *testing.T) {
 			}
 
 			// Clean up
-			os.Remove(result.FilePath)
+			_ = os.Remove(result.FilePath)
 		})
 	}
 }
@@ -408,7 +408,7 @@ func TestCleanupFile(t *testing.T) {
 	if err := os.MkdirAll(testDir, 0755); err != nil {
 		t.Fatalf("Failed to create test directory: %v", err)
 	}
-	defer os.RemoveAll(testDir)
+	defer func() { _ = os.RemoveAll(testDir) }()
 
 	// Create test files with same ID but different extensions
 	fileID := "test-file-id"
