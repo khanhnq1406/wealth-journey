@@ -35,7 +35,7 @@ export function PWAInstallPrompt({
     try {
       const dismissed = localStorage.getItem(PWA_PROMPT_DISMISSED_KEY);
       if (dismissed === "true") {
-        setIsDismissed(true);
+        queueMicrotask(() => setIsDismissed(true));
         console.log('[PWA] Prompt permanently dismissed by user');
         return;
       }

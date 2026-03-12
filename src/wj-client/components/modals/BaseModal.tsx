@@ -103,7 +103,7 @@ export function BaseModal({
       // Small delay to trigger animation after mount
       requestAnimationFrame(() => setIsAnimating(true));
     } else {
-      setIsAnimating(false);
+      queueMicrotask(() => setIsAnimating(false));
     }
   }, [isOpen]);
 

@@ -88,10 +88,12 @@ export const FormNumberInput = ({
   // Initialize display value from form value
   useEffect(() => {
     if (value === null || value === undefined || value === "") {
-      setDisplayValue("");
+      queueMicrotask(() => setDisplayValue(""));
     } else {
-      setDisplayValue(
-        useThousandSeparator ? formatNumberWithCommas(value) : String(value)
+      queueMicrotask(() =>
+        setDisplayValue(
+          useThousandSeparator ? formatNumberWithCommas(value) : String(value)
+        )
       );
     }
   }, [value, useThousandSeparator]);
@@ -103,12 +105,16 @@ export const FormNumberInput = ({
         displayValue,
         recommendationMultipliers
       );
-      setRecommendations(recs);
-      // Always show if recommendations exist (no focus dependency)
-      setShowSuggestions(recs.length > 0);
+      queueMicrotask(() => {
+        setRecommendations(recs);
+        // Always show if recommendations exist (no focus dependency)
+        setShowSuggestions(recs.length > 0);
+      });
     } else {
-      setShowSuggestions(false);
-      setRecommendations([]);
+      queueMicrotask(() => {
+        setShowSuggestions(false);
+        setRecommendations([]);
+      });
     }
   }, [
     displayValue,

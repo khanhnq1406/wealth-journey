@@ -273,7 +273,7 @@ function useInvestmentColumns(
         },
       },
     ],
-    [onRowClick, currency, showWalletColumn, t],
+    [onRowClick, currency, showWalletColumn, t, locale],
   );
 }
 

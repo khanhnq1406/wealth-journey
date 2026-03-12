@@ -501,16 +501,13 @@ export const ChartSkeleton = React.memo(({
         ) : (
           // Bar chart
           <div className={cn("flex items-end justify-between gap-2", height)}>
-            {Array.from({ length: bars }).map((_, i) => {
-              const randomHeight = Math.floor(Math.random() * 60) + 30;
-              return (
-                <Skeleton
-                  key={i}
-                  className="flex-1 rounded-t"
-                  style={{ height: `${randomHeight}%` }}
-                />
-              );
-            })}
+            {Array.from({ length: bars }).map((_, i) => (
+              <Skeleton
+                key={i}
+                className="flex-1 rounded-t"
+                style={{ height: `${((i * 17) % 60) + 30}%` }}
+              />
+            ))}
           </div>
         )}
 

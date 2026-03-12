@@ -151,11 +151,11 @@ export function Select<T extends string = string>({
     }
 
     if (selectedOption) {
-      setInputValue(selectedOption.label);
+      queueMicrotask(() => setInputValue(selectedOption.label));
     } else if (value === "" || value === undefined) {
-      setInputValue("");
+      queueMicrotask(() => setInputValue(""));
     } else if (displayValue) {
-      setInputValue(displayValue);
+      queueMicrotask(() => setInputValue(displayValue));
     }
   }, [value, selectedOption, displayValue, isFocused]);
 

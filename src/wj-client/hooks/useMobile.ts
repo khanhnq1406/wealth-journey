@@ -15,7 +15,7 @@ export function useMobile(): boolean {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    queueMicrotask(() => setIsMounted(true));
 
     let timeoutId: NodeJS.Timeout;
 
@@ -27,7 +27,7 @@ export function useMobile(): boolean {
     };
 
     // Initial check
-    setIsMobile(window.innerWidth < 800);
+    queueMicrotask(() => setIsMobile(window.innerWidth < 800));
 
     // Listen for resize events
     window.addEventListener("resize", handleResize);

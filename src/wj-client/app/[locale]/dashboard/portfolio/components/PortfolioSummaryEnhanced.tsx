@@ -332,6 +332,7 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
     portfolioSummary.assetAllocation,
     portfolioSummary.investmentsByType,
     portfolioSummary.totalInvestments,
+    t,
   ]);
 
   // Get best performer from API data

@@ -46,7 +46,7 @@ export function PullToRefreshIndicator({
   // Trigger success animation when refresh completes
   useEffect(() => {
     if (isRefreshing) {
-      setShowSuccess(false);
+      queueMicrotask(() => setShowSuccess(false));
     }
   }, [isRefreshing]);
 

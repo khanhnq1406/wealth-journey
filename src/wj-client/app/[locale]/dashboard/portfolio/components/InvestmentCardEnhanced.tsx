@@ -143,11 +143,14 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
   const nativeCurrency = currency || "USD";
   const displayCcy = displayCurrency || userCurrency;
 
-  // Compute if data is recent (within 5 minutes) - memoized to avoid impure Date.now() during render
+  // Use state to capture Date.now() once on mount to avoid impure function during render
+  const [now] = useState(() => Date.now());
+
+  // Compute if data is recent (within 5 minutes)
   const isRecent = useMemo(() => {
     if (!updatedAt) return false;
-    return Date.now() / 1000 - updatedAt < 300;
-  }, [updatedAt]);
+    return now / 1000 - updatedAt < 300;
+  }, [now, updatedAt]);
   const pnl = unrealizedPnl || 0;
   const pnlPercent = unrealizedPnlPercent || 0;
 

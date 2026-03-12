@@ -208,45 +208,19 @@ export function Tour({
     }
   }, [isActive, isCompleted, currentStep]);
 
-  // Keyboard navigation
-  useEffect(() => {
-    if (!keyboardNavigation || !isActive) return;
+  // Define handlers before keyboard navigation effect
+  const handleComplete = useCallback(() => {
+    setIsActive(false);
+    setIsCompleted(true);
+    onComplete?.();
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight" || e.key === "Enter") {
-        e.preventDefault();
-        handleNext();
-      } else if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        handlePrevious();
-      } else if (e.key === "Escape") {
-        e.preventDefault();
-        handleSkip();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isActive, currentStep]);
-
-  // Handle window resize
-  useEffect(() => {
-    if (!isActive || !targetElement) return;
-
-    const handleResize = () => {
-      const rect = targetElement.getBoundingClientRect();
-      const scrollY = window.scrollY || window.pageYOffset;
-      const scrollX = window.scrollX || window.pageXOffset;
-
-      setTooltipPosition({
-        top: rect.top + scrollY,
-        left: rect.left + scrollX,
-      });
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [isActive, targetElement]);
+    try {
+      localStorage.setItem(TOUR_COMPLETION_KEY, "true");
+      localStorage.removeItem(TOUR_STEP_KEY);
+    } catch (e) {
+      console.error("Failed to save tour completion:", e);
+    }
+  }, [onComplete]);
 
   const handleNext = useCallback(() => {
     if (currentStep < steps.length - 1) {
@@ -254,7 +228,7 @@ export function Tour({
     } else {
       handleComplete();
     }
-  }, [currentStep, steps.length]);
+  }, [currentStep, steps.length, handleComplete]);
 
   const handlePrevious = useCallback(() => {
     if (currentStep > 0) {
@@ -274,18 +248,45 @@ export function Tour({
     }
   }, [onSkip]);
 
-  const handleComplete = useCallback(() => {
-    setIsActive(false);
-    setIsCompleted(true);
-    onComplete?.();
+  // Keyboard navigation
+  useEffect(() => {
+    if (!keyboardNavigation || !isActive) return;
 
-    try {
-      localStorage.setItem(TOUR_COMPLETION_KEY, "true");
-      localStorage.removeItem(TOUR_STEP_KEY);
-    } catch (e) {
-      console.error("Failed to save tour completion:", e);
-    }
-  }, [onComplete]);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight" || e.key === "Enter") {
+        e.preventDefault();
+        handleNext();
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        handlePrevious();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        handleSkip();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isActive, keyboardNavigation, handleNext, handlePrevious, handleSkip]);
+
+  // Handle window resize
+  useEffect(() => {
+    if (!isActive || !targetElement) return;
+
+    const handleResize = () => {
+      const rect = targetElement.getBoundingClientRect();
+      const scrollY = window.scrollY || window.pageYOffset;
+      const scrollX = window.scrollX || window.pageXOffset;
+
+      setTooltipPosition({
+        top: rect.top + scrollY,
+        left: rect.left + scrollX,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [isActive, targetElement]);
 
   const step = steps[currentStep];
   const isFirstStep = currentStep === 0;
@@ -489,11 +490,11 @@ export function useTour() {
 
     try {
       const completed = localStorage.getItem(TOUR_COMPLETION_KEY);
-      setIsCompleted(completed === "true");
+      queueMicrotask(() => setIsCompleted(completed === "true"));
 
       const savedStep = localStorage.getItem(TOUR_STEP_KEY);
       if (savedStep) {
-        setCurrentStep(parseInt(savedStep, 10));
+        queueMicrotask(() => setCurrentStep(parseInt(savedStep, 10)));
       }
     } catch (e) {
       console.error("Failed to load tour state:", e);

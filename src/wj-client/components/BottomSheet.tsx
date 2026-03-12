@@ -63,8 +63,10 @@ export function BottomSheet({
   // Reset drag state when sheet opens/closes
   useEffect(() => {
     if (!isOpen) {
-      setDragOffset(0);
-      setIsDragging(false);
+      queueMicrotask(() => {
+        setDragOffset(0);
+        setIsDragging(false);
+      });
       touchStartRef.current = null;
     }
   }, [isOpen]);

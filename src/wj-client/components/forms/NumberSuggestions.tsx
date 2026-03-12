@@ -49,7 +49,7 @@ export function NumberSuggestions({
 
   // Reset focus when recommendations change
   useEffect(() => {
-    setFocusedIndex(-1);
+    queueMicrotask(() => setFocusedIndex(-1));
     chipRefs.current = chipRefs.current.slice(0, recommendations.length);
   }, [recommendations]);
 

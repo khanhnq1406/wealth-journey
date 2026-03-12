@@ -70,10 +70,24 @@ export function Toast({
   const { resolvedTheme } = useTheme();
   const [progress, setProgress] = useState(100);
   const [isPaused, setIsPaused] = useState(false);
-  const startTimeRef = useRef<number>(Date.now());
+  // Use lazy initialization to avoid Date.now() during render
+  const startTimeRef = useRef<number>(0);
   const remainingTimeRef = useRef<number>(duration);
   const timerRef = useRef<number | null>(null);
   const animationFrameRef = useRef<number | null>(null);
+
+  // Initialize startTime in effect to avoid impure function during render
+  useEffect(() => {
+    startTimeRef.current = Date.now();
+  }, []);
+
+  // Define handleClose before it's used in other effects
+  const handleClose = useCallback(() => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+    onClose?.();
+  }, [onClose]);
 
   // Auto-dismiss timer
   useEffect(() => {
@@ -102,7 +116,7 @@ export function Toast({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [duration, isPaused, isClosing]);
+  }, [duration, isPaused, isClosing, handleClose]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -115,13 +129,6 @@ export function Toast({
       }
     };
   }, []);
-
-  const handleClose = useCallback(() => {
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-    onClose?.();
-  }, [onClose]);
 
   const handleMouseEnter = useCallback(() => {
     if (duration > 0) {

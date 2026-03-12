@@ -124,12 +124,12 @@ export function FeatureDiscovery({
     try {
       const dismissed = localStorage.getItem(DISMISSED_FEATURES_KEY);
       if (dismissed) {
-        setDismissedFeatures(new Set(JSON.parse(dismissed)));
+        queueMicrotask(() => setDismissedFeatures(new Set(JSON.parse(dismissed))));
       }
 
       const viewed = localStorage.getItem(VIEWED_FEATURES_KEY);
       if (viewed) {
-        setViewedFeatures(new Set(JSON.parse(viewed)));
+        queueMicrotask(() => setViewedFeatures(new Set(JSON.parse(viewed))));
       }
     } catch (e) {
       console.error("Failed to load feature discovery state:", e);
@@ -459,7 +459,7 @@ export function WhatsNewPanel({
     try {
       const stored = localStorage.getItem(DISMISSED_FEATURES_KEY);
       if (stored) {
-        setDismissed(new Set(JSON.parse(stored)));
+        queueMicrotask(() => setDismissed(new Set(JSON.parse(stored))));
       }
     } catch (e) {
       console.error("Failed to load dismissed features:", e);
@@ -486,7 +486,7 @@ export function WhatsNewPanel({
         <svg className="w-12 h-12 mx-auto text-neutral-300 dark:text-dark-text-tertiary mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <p className="text-neutral-600 dark:text-dark-text-secondary">You're all caught up!</p>
+        <p className="text-neutral-600 dark:text-dark-text-secondary">You&apos;re all caught up!</p>
         <p className="text-sm text-neutral-400 dark:text-dark-text-tertiary">Check back later for new features and updates.</p>
       </div>
     );

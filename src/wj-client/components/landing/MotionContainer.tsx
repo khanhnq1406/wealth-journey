@@ -17,7 +17,7 @@ export default function MotionContainer({
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setShouldReduceMotion(mediaQuery.matches);
+    queueMicrotask(() => setShouldReduceMotion(mediaQuery.matches));
 
     const handleChange = () => setShouldReduceMotion(mediaQuery.matches);
     mediaQuery.addEventListener("change", handleChange);

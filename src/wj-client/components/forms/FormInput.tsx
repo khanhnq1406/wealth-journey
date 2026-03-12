@@ -151,7 +151,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
     // Update hasValue when value prop changes
     useEffect(() => {
       if (value !== undefined) {
-        setHasValue(String(value).length > 0);
+        queueMicrotask(() => setHasValue(String(value).length > 0));
       }
     }, [value]);
 

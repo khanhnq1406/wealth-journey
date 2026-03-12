@@ -79,16 +79,16 @@ export function usePWAInstall(): PWAInstallState {
 
     // Set initial platform
     const detectedPlatform = detectPlatform();
-    setPlatform(detectedPlatform);
+    queueMicrotask(() => setPlatform(detectedPlatform));
 
     // Set initial installation status
     const installed = checkInstalled();
-    setIsInstalled(installed);
+    queueMicrotask(() => setIsInstalled(installed));
 
     // For iOS, set canInstall to true if not already installed
     // (iOS doesn't fire beforeinstallprompt, so we need to enable it manually)
     if (detectedPlatform === "ios" && !installed) {
-      setCanInstall(true);
+      queueMicrotask(() => setCanInstall(true));
     }
 
     // Listen for beforeinstallprompt event (Android)

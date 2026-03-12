@@ -29,7 +29,7 @@ export default function TestRecommendationsPage() {
           Number Recommendations Test
         </h1>
         <p className="text-gray-600 mb-8">
-          Type a number to see recommendations (e.g., "12", "1", "123")
+          Type a number to see recommendations (e.g., &quot;12&quot;, &quot;1&quot;, &quot;123&quot;)
         </p>
 
         <div className="bg-white rounded-lg shadow p-6">
@@ -74,37 +74,37 @@ export default function TestRecommendationsPage() {
           <h2 className="text-xl font-bold mb-4">Test Cases</h2>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between border-b pb-2">
-              <span className="font-mono">Input: "12"</span>
+              <span className="font-mono">Input: &quot;12&quot;</span>
               <span className="text-gray-600">
                 → 12,000 | 120K | 1.2M | 12M | 120M | 1.2B
               </span>
             </div>
             <div className="flex justify-between border-b pb-2">
-              <span className="font-mono">Input: "1"</span>
+              <span className="font-mono">Input: &quot;1&quot;</span>
               <span className="text-gray-600">
                 → 1,000 | 10,000 | 100K | 1M | 10M | 100M
               </span>
             </div>
             <div className="flex justify-between border-b pb-2">
-              <span className="font-mono">Input: "123"</span>
+              <span className="font-mono">Input: &quot;123&quot;</span>
               <span className="text-gray-600">
                 → 123,000 | 1.2M | 12.3M | 123M | 1.2B
               </span>
             </div>
             <div className="flex justify-between border-b pb-2">
-              <span className="font-mono">Input: "12.5"</span>
+              <span className="font-mono">Input: &quot;12.5&quot;</span>
               <span className="text-gray-600">
                 → (no recommendations - decimal)
               </span>
             </div>
             <div className="flex justify-between border-b pb-2">
-              <span className="font-mono">Input: "0"</span>
+              <span className="font-mono">Input: &quot;0&quot;</span>
               <span className="text-gray-600">
                 → (no recommendations - zero)
               </span>
             </div>
             <div className="flex justify-between pb-2">
-              <span className="font-mono">Input: "-12"</span>
+              <span className="font-mono">Input: &quot;-12&quot;</span>
               <span className="text-gray-600">
                 → -12,000 | -120K | -1.2M | -12M | -120M | -1.2B
               </span>

@@ -117,7 +117,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
       try {
         const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
         if (stored) {
-          setRecentSearches(JSON.parse(stored));
+          queueMicrotask(() => setRecentSearches(JSON.parse(stored)));
         }
       } catch (e) {
         console.error("Failed to load recent searches:", e);
@@ -151,7 +151,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
   useEffect(() => {
     if (isOpen) {
       inputRef.current?.focus();
-      setSelectedIndex(-1);
+      queueMicrotask(() => setSelectedIndex(-1));
     }
   }, [isOpen]);
 

@@ -45,7 +45,7 @@ export const AuthCheck = ({ children }: { children: React.ReactNode }) => {
     const storedToken = localStorage.getItem(LOCAL_STORAGE_TOKEN_NAME);
 
     if (storedToken) {
-      setShouldFetch(true);
+      queueMicrotask(() => setShouldFetch(true));
     } else {
       router.push(routes.login);
     }
@@ -54,7 +54,7 @@ export const AuthCheck = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const storedToken = localStorage.getItem(LOCAL_STORAGE_TOKEN_NAME);
     if (storedToken && authResponse?.data) {
-      setToken(storedToken);
+      queueMicrotask(() => setToken(storedToken));
       const lang = authResponse.data.preferredLanguage || "vi";
       store.dispatch(
         setAuth({

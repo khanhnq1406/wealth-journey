@@ -179,16 +179,18 @@ export function TransactionFilterModal({
   // Reset local state when modal opens
   useEffect(() => {
     if (isOpen) {
-      setLocalWallet(currentFilters.walletId);
-      setLocalCategory(currentFilters.categoryFilter);
-      setLocalSort(`${currentFilters.sortField}-${currentFilters.sortOrder}`);
-      setLocalSearch(currentFilters.searchQuery);
-      setAmountMin(currentFilters.amountRange?.min || 0);
-      setAmountMax(currentFilters.amountRange?.max || 0);
-      setCustomStartDate(parseDate(currentFilters.dateRange?.start));
-      setCustomEndDate(parseDate(currentFilters.dateRange?.end));
-      // Reset expanded sections on mobile
-      setExpandedSections(new Set(["search", "filters"]));
+      queueMicrotask(() => {
+        setLocalWallet(currentFilters.walletId);
+        setLocalCategory(currentFilters.categoryFilter);
+        setLocalSort(`${currentFilters.sortField}-${currentFilters.sortOrder}`);
+        setLocalSearch(currentFilters.searchQuery);
+        setAmountMin(currentFilters.amountRange?.min || 0);
+        setAmountMax(currentFilters.amountRange?.max || 0);
+        setCustomStartDate(parseDate(currentFilters.dateRange?.start));
+        setCustomEndDate(parseDate(currentFilters.dateRange?.end));
+        // Reset expanded sections on mobile
+        setExpandedSections(new Set(["search", "filters"]));
+      });
     }
   }, [isOpen, currentFilters]);
 

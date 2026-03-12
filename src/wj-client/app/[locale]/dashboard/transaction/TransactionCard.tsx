@@ -44,6 +44,52 @@ function GroupHeader({ groupLabel, className }: { groupLabel: string; className?
   );
 }
 
+// Transaction icon component - extracted to avoid creating during render
+function TransactionIcon({ isExpense }: { isExpense: boolean }) {
+  const Icon = isExpense ? (
+    <svg
+      className="w-5 h-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M20 12H4"
+      />
+    </svg>
+  ) : (
+    <svg
+      className="w-5 h-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 4v16m8-8H4"
+      />
+    </svg>
+  );
+
+  return (
+    <div
+      className={cn(
+        "flex items-center justify-center w-10 h-10 rounded-full",
+        isExpense
+          ? "bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400"
+          : "bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-400",
+      )}
+    >
+      {Icon}
+    </div>
+  );
+}
+
 export const TransactionCard = memo(function TransactionCard({
   transaction,
   categoryName,
@@ -143,52 +189,6 @@ export const TransactionCard = memo(function TransactionCard({
     // Reset offset
     setSwipeOffset(0);
   }, [isDragging, swipeOffset, handleEdit, handleDelete]);
-
-  // Get icon based on transaction type
-  const TransactionIcon = useCallback(() => {
-    const Icon = isExpense ? (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M20 12H4"
-        />
-      </svg>
-    ) : (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 4v16m8-8H4"
-        />
-      </svg>
-    );
-
-    return (
-      <div
-        className={cn(
-          "flex items-center justify-center w-10 h-10 rounded-full",
-          isExpense
-            ? "bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400"
-            : "bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-400",
-        )}
-      >
-        {Icon}
-      </div>
-    );
-  }, [isExpense]);
 
   // Reset swipe when clicking outside
   useEffect(() => {
@@ -296,7 +296,7 @@ export const TransactionCard = memo(function TransactionCard({
       >
         <div className="flex items-center gap-3 p-3 sm:p-4">
           {/* Transaction Icon */}
-          <TransactionIcon />
+          <TransactionIcon isExpense={isExpense} />
 
           {/* Transaction Details */}
           <div className="flex-1 min-w-0">
