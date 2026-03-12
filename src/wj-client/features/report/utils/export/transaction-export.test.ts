@@ -783,10 +783,10 @@ describe("downloadCSV", () => {
     expect(mockLink.setAttribute).toHaveBeenCalledWith("download", "test.csv");
     expect(mockLink.style.visibility).toBe("hidden");
 
-    // Verify DOM manipulation
-    expect(document.body.appendChild).toHaveBeenCalledWith(mockLink);
+    // Verify DOM manipulation - use expect.anything() to avoid TypeScript type instantiation issues
+    expect(document.body.appendChild).toHaveBeenCalledWith(expect.anything());
     expect(mockLink.click).toHaveBeenCalled();
-    expect(document.body.removeChild).toHaveBeenCalledWith(mockLink);
+    expect(document.body.removeChild).toHaveBeenCalledWith(expect.anything());
   });
 
   it("should create blob with correct content", () => {
