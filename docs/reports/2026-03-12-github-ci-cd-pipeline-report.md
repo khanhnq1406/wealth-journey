@@ -102,3 +102,7 @@ After merging to `main`:
 | 2026-03-12 | Rewrote `cmd/test-json/main.go` to use `datatypes.JSON` directly instead of undefined `models.JSONArray/ColumnMapping/AmountFormat/DetectionRules/TypeRules` types | Minor | — |
 | 2026-03-12 | Added `//go:build ignore` to `tests/test-files/*.go` to prevent duplicate `main` declaration errors during `govulncheck ./...` | Minor | — |
 | 2026-03-12 | Upgraded Storybook from v8 to v10 (`storybook`, `@storybook/nextjs`, `@storybook/react`, `@storybook/addon-links`, `@storybook/addon-themes` → `^10.2.17`); removed deprecated `addon-essentials`, `addon-interactions`, `testing-library` packages not available in v10 | Minor | — |
+| 2026-03-12 | golangci-lint: added `version: "2"` and migrated `linters-settings` → `linters.settings` for golangci-lint v2 config format | Minor | ec15294 |
+| 2026-03-12 | govulncheck: upgraded Go 1.24.1→1.25.8 and `jwt/v5` v5.2.0→v5.2.2; updated `go-version` in `backend.yml` and `security.yml` to `1.25` (resolves GO-2026-4601, GO-2026-4602, GO-2026-4603, GO-2025-3553) | Minor | ec15294 |
+| 2026-03-12 | ExampleClient: renamed to `exampleClientUsage` (unexported, not a testable example) to stop real Yahoo Finance API calls during `go test` | Minor | ec15294 |
+| 2026-03-12 | npm ci: regenerated `package-lock.json` to resolve `@swc/helpers@0.5.15` not satisfying `>=0.5.17` required by `next@16.1.4` | Minor | ec15294 |
