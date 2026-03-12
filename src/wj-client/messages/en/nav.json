@@ -291,7 +291,8 @@
       "loadingTypes": "Loading market types...",
       "errorLoadingTypes": "Could not load market data",
       "retry": "Retry",
-      "noData": "No data available"
+      "noData": "No data available",
+      "updatedTime": "Updated {time}"
     }
   },
   "sidebarToggle": {
