@@ -7,15 +7,15 @@ import (
 
 func TestLoadConfig_SupabaseStorage(t *testing.T) {
 	// Set environment variables for test
-	os.Setenv("JWT_SECRET", "test-secret-key-12345")
-	os.Setenv("SUPABASE_URL", "https://test.supabase.co")
-	os.Setenv("SUPABASE_API_KEY", "test-api-key")
-	os.Setenv("SUPABASE_BUCKET", "test-bucket")
+	_ = os.Setenv("JWT_SECRET", "test-secret-key-12345")
+	_ = os.Setenv("SUPABASE_URL", "https://test.supabase.co")
+	_ = os.Setenv("SUPABASE_API_KEY", "test-api-key")
+	_ = os.Setenv("SUPABASE_BUCKET", "test-bucket")
 	defer func() {
-		os.Unsetenv("JWT_SECRET")
-		os.Unsetenv("SUPABASE_URL")
-		os.Unsetenv("SUPABASE_API_KEY")
-		os.Unsetenv("SUPABASE_BUCKET")
+		_ = os.Unsetenv("JWT_SECRET")
+		_ = os.Unsetenv("SUPABASE_URL")
+		_ = os.Unsetenv("SUPABASE_API_KEY")
+		_ = os.Unsetenv("SUPABASE_BUCKET")
 	}()
 
 	// This will fail until we add Storage config

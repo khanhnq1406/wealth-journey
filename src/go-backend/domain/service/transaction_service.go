@@ -910,6 +910,7 @@ func deriveTransactionType(category *models.Category) v1.TransactionType {
 
 // Currency conversion helper methods
 
+//nolint:unused
 // convertTransactionAmount converts a transaction's amount to the user's preferred currency
 // Uses cache for fast lookups and populates cache on misses
 func (s *transactionService) convertTransactionAmount(ctx context.Context, userID int32, transaction *models.Transaction, walletCurrency string) (int64, error) {

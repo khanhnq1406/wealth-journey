@@ -281,7 +281,7 @@ func TestInvestment_TypeAwareRecalculation(t *testing.T) {
 			}
 
 			// Trigger recalculation via BeforeUpdate (simulating GORM hook)
-			inv.BeforeUpdate(nil)
+			_ = inv.BeforeUpdate(nil)
 
 			if inv.CurrentValue != tt.expectedValue {
 				t.Errorf("Expected current value %d, got %d", tt.expectedValue, inv.CurrentValue)
@@ -363,7 +363,7 @@ func TestInvestment_ZeroValueEdgeCases(t *testing.T) {
 			}
 
 			// Trigger recalculation
-			inv.BeforeUpdate(nil)
+			_ = inv.BeforeUpdate(nil)
 
 			if inv.CurrentValue != tt.expectedValue {
 				t.Errorf("Expected current value %d, got %d", tt.expectedValue, inv.CurrentValue)
@@ -528,7 +528,7 @@ func TestInvestmentRecalculate_CorrectedTests(t *testing.T) {
 			}
 
 			// Trigger recalculation via BeforeCreate (simulating GORM hook)
-			inv.BeforeCreate(nil)
+			_ = inv.BeforeCreate(nil)
 
 			if inv.CurrentValue != tt.expectedValue {
 				t.Errorf("Expected current value %d (%.2f), got %d (%.2f)",

@@ -66,7 +66,7 @@ func TestThrottlerWait_BasicRateLimiting(t *testing.T) {
 	}
 
 	// Second call should wait approximately 500ms
-	err = throttler.Wait(ctx)
+	_ = throttler.Wait(ctx)
 	elapsed := time.Since(start)
 
 	// Allow some tolerance for timing precision
@@ -338,7 +338,7 @@ func BenchmarkThrottlerWait_WithWait(b *testing.B) {
 	ctx := context.Background()
 
 	// Make first call to establish lastCallTime
-	throttler.Wait(ctx)
+	_ = throttler.Wait(ctx)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
@@ -349,6 +349,7 @@ func BenchmarkThrottlerWait_WithWait(b *testing.B) {
 	}
 }
 
+//nolint:unused
 // Helper function to measure time with nanosecond precision
 func measureNanos(fn func()) time.Duration {
 	start := time.Now()

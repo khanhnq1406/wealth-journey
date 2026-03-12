@@ -523,16 +523,7 @@ func TestQuoteDataValidation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Custom validation logic
-			hasError := false
-			if tt.quote.Symbol == "" {
-				hasError = true
-			}
-			if tt.quote.Price < 0 {
-				hasError = true
-			}
-			if tt.quote.Volume24h < 0 {
-				hasError = true
-			}
+			hasError := tt.quote.Symbol == "" || tt.quote.Price < 0 || tt.quote.Volume24h < 0
 
 			if hasError != tt.wantErr {
 				t.Errorf("Validation error mismatch: got %v, want %v", hasError, tt.wantErr)

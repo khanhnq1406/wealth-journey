@@ -262,8 +262,8 @@ func (s *importService) updateTransactionFromParsed(ctx context.Context, existin
 func (s *importService) ExecuteImport(ctx context.Context, userID int32, req *v1.ExecuteImportRequest) (*v1.ExecuteImportResponse, error) {
 	// Track import duration
 	startTime := time.Now()
-	var fileType string = "unknown"
-	var importSuccess bool = false
+	var fileType = "unknown"
+	var importSuccess = false
 
 	defer func() {
 		duration := time.Since(startTime).Seconds()

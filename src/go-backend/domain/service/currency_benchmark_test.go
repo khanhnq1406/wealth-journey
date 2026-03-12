@@ -228,7 +228,6 @@ func BenchmarkFXRateCache_ParallelGet(b *testing.B) {
 
 // BenchmarkBatchFXRateRetrieval benchmarks parallel FX rate fetching
 func BenchmarkBatchFXRateRetrieval(b *testing.B) {
-	ctx := context.Background()
 	redisClient := setupBenchmarkRedis(b)
 	defer redisClient.Close()
 
@@ -251,7 +250,7 @@ func BenchmarkBatchFXRateRetrieval(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = fxRateSvc.BatchGetRates(ctx, pairs)
+		_, _ = fxRateSvc.BatchGetRates(context.Background(), pairs)
 	}
 }
 

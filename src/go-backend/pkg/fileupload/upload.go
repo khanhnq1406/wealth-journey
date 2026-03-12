@@ -77,7 +77,7 @@ func UploadFile(file multipart.File, header *multipart.FileHeader) (*UploadResul
 	if err != nil {
 		return nil, fmt.Errorf("failed to create destination file: %w", err)
 	}
-	defer destFile.Close()
+	defer func() { _ = destFile.Close() }()
 
 	// Copy uploaded file to destination
 	if _, err := io.Copy(destFile, file); err != nil {

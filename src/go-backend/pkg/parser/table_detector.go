@@ -209,9 +209,7 @@ func (td *TableDetector) alignCellsToColumns(rows [][]TextElement, columnBoundar
 		cells := make([]string, len(columnBoundaries))
 		cellBounds := make([]float64, len(columnBoundaries))
 
-		for i := range columnBoundaries {
-			cellBounds[i] = columnBoundaries[i]
-		}
+		copy(cellBounds, columnBoundaries)
 
 		for _, elem := range row {
 			// Find closest column boundary

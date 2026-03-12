@@ -298,7 +298,7 @@ func fetchGlobalSilverData(ctx context.Context, days int) ([]silverChartDataPoin
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Yahoo Finance returned status %d", resp.StatusCode)
+		return nil, fmt.Errorf("yahoo Finance returned status %d", resp.StatusCode)
 	}
 
 	limitedReader := io.LimitReader(resp.Body, 1<<20)

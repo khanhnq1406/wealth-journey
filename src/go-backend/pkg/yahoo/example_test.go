@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+//nolint:unused
 // exampleClientUsage demonstrates how to use the Yahoo Finance client.
 // This is intentionally not an Example* function to avoid making real
 // network calls during go test runs.

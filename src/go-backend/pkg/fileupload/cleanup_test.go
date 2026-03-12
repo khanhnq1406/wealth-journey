@@ -10,7 +10,7 @@ import (
 func TestListFiles(t *testing.T) {
 	// Create a temporary upload directory
 	tempDir := filepath.Join(os.TempDir(), "test-upload-"+time.Now().Format("20060102150405"))
-	defer os.RemoveAll(tempDir)
+	defer func() { _ = os.RemoveAll(tempDir) }()
 
 	// Create some test files
 	testFiles := []string{
@@ -58,7 +58,7 @@ func TestListFiles(t *testing.T) {
 func TestListFiles_EmptyDirectory(t *testing.T) {
 	// Create a temporary empty directory
 	tempDir := filepath.Join(os.TempDir(), "test-empty-"+time.Now().Format("20060102150405"))
-	defer os.RemoveAll(tempDir)
+	defer func() { _ = os.RemoveAll(tempDir) }()
 
 	if err := os.MkdirAll(tempDir, 0755); err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
@@ -115,7 +115,7 @@ func TestDeleteFile_NonExistent(t *testing.T) {
 func TestFileCleanup_Integration(t *testing.T) {
 	// Create a temporary upload directory
 	tempDir := filepath.Join(os.TempDir(), "test-cleanup-"+time.Now().Format("20060102150405"))
-	defer os.RemoveAll(tempDir)
+	defer func() { _ = os.RemoveAll(tempDir) }()
 
 	if err := os.MkdirAll(tempDir, 0755); err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
@@ -183,7 +183,7 @@ func TestFileCleanup_Integration(t *testing.T) {
 func TestFileCleanup_ContinuesOnError(t *testing.T) {
 	// Create a temporary upload directory
 	tempDir := filepath.Join(os.TempDir(), "test-error-"+time.Now().Format("20060102150405"))
-	defer os.RemoveAll(tempDir)
+	defer func() { _ = os.RemoveAll(tempDir) }()
 
 	if err := os.MkdirAll(tempDir, 0755); err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)

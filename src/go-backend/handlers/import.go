@@ -450,9 +450,10 @@ func (h *ImportHandler) ParseFile(c *gin.Context) {
 				Severity: ve.Severity,
 			})
 
-			if ve.Severity == "error" {
+			switch ve.Severity {
+			case "error":
 				errorRows++
-			} else if ve.Severity == "warning" {
+			case "warning":
 				warningRows++
 			}
 		}

@@ -210,7 +210,7 @@ func (p *ExcelParser) Parse() ([]*ParsedRow, error) {
 	}
 
 	if len(rows) == 0 {
-		return nil, fmt.Errorf("Excel file is empty")
+		return nil, fmt.Errorf("excel file is empty")
 	}
 
 	var parsedRows []*ParsedRow
@@ -368,6 +368,7 @@ func (p *ExcelParser) isCellRed(sheetName string, cellRef string) bool {
 	return false
 }
 
+//nolint:unused
 // getCellValueWithFormula gets the calculated value of a cell (evaluating formulas)
 func (p *ExcelParser) getCellValueWithFormula(sheetName string, cellRef string) (string, error) {
 	if p.file == nil {
@@ -806,12 +807,14 @@ func (p *ExcelParser) parseDate(dateStr string, preferredFormat string) (time.Ti
 	return dateParser.Parse(dateStr)
 }
 
+//nolint:unused
 // parseAmount is deprecated - use AmountParser instead
 func (p *ExcelParser) parseAmount(amountStr string) (int64, error) {
 	amountParser := NewAmountParserWithAutoDetect()
 	return amountParser.Parse(amountStr)
 }
 
+//nolint:unused
 // detectType is deprecated - use TypeDetector instead
 func (p *ExcelParser) detectType(typeStr string, amount int64) string {
 	detector := NewTypeDetector()

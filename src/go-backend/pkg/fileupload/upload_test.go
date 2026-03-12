@@ -391,12 +391,12 @@ func TestUploadFileFromBytes_SizeMismatch(t *testing.T) {
 				if err != nil {
 					// Clean up created file if any
 					if err == nil {
-						CleanupFile(tt.fileName)
+						_ = CleanupFile(tt.fileName)
 					}
 					t.Errorf("Expected no error for %s, got: %v", tt.name, err)
 				}
 				// Clean up on success
-				CleanupFile(tt.fileName)
+				_ = CleanupFile(tt.fileName)
 			}
 		})
 	}

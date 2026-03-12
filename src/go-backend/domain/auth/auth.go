@@ -221,6 +221,7 @@ func (s *Server) generateLoginResponse(ctx context.Context, user models.User, de
 	}, nil
 }
 
+//nolint:unused
 // extractDeviceInfo extracts device information from context (from request headers)
 func extractDeviceInfo(ctx context.Context) *redis.SessionData {
 	// This is a placeholder - in real implementation, extract from HTTP headers
@@ -257,7 +258,7 @@ func (s *Server) LoginWithDeviceInfo(ctx context.Context, googleToken string, de
 	var user models.User
 	result := s.db.DB.Where("email = ?", email).First(&user)
 	if result.Error == gorm.ErrRecordNotFound {
-		return nil, fmt.Errorf("User not found. Please register first")
+		return nil, fmt.Errorf("user not found. Please register first")
 	} else if result.Error != nil {
 		return nil, fmt.Errorf("database error: %w", result.Error)
 	}

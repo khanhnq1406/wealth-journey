@@ -12,7 +12,7 @@ import (
 func TestFetchFileContent_URL(t *testing.T) {
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("test file content"))
+		_, _ = w.Write([]byte("test file content"))
 	}))
 	defer mockServer.Close()
 
@@ -29,8 +29,8 @@ func TestFetchFileContent_URL(t *testing.T) {
 func TestFetchFileContent_LocalPath(t *testing.T) {
 	// Create temporary file
 	tmpFile := "/tmp/test-fetch.txt"
-	os.WriteFile(tmpFile, []byte("local file"), 0644)
-	defer os.Remove(tmpFile)
+	_ = os.WriteFile(tmpFile, []byte("local file"), 0644)
+	defer func() { _ = os.Remove(tmpFile) }()
 
 	data, err := FetchFileContent(context.Background(), tmpFile)
 	if err != nil {
@@ -64,7 +64,7 @@ func TestFetchFileContent_NonExistentFile(t *testing.T) {
 func TestFetchFileReader_URL(t *testing.T) {
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("test reader content"))
+		_, _ = w.Write([]byte("test reader content"))
 	}))
 	defer mockServer.Close()
 
@@ -72,7 +72,7 @@ func TestFetchFileReader_URL(t *testing.T) {
 	if err != nil {
 		t.Fatalf("FetchFileReader failed: %v", err)
 	}
-	defer reader.Close()
+	defer func() { _ = reader.Close() }()
 
 	data, err := io.ReadAll(reader)
 	if err != nil {
@@ -87,14 +87,14 @@ func TestFetchFileReader_URL(t *testing.T) {
 func TestFetchFileReader_LocalPath(t *testing.T) {
 	// Create temporary file
 	tmpFile := "/tmp/test-fetch-reader.txt"
-	os.WriteFile(tmpFile, []byte("local reader"), 0644)
-	defer os.Remove(tmpFile)
+	_ = os.WriteFile(tmpFile, []byte("local reader"), 0644)
+	defer func() { _ = os.Remove(tmpFile) }()
 
 	reader, err := FetchFileReader(context.Background(), tmpFile)
 	if err != nil {
 		t.Fatalf("FetchFileReader failed: %v", err)
 	}
-	defer reader.Close()
+	defer func() { _ = reader.Close() }()
 
 	data, err := io.ReadAll(reader)
 	if err != nil {
@@ -110,7 +110,7 @@ func TestOpenCSVReader_URL(t *testing.T) {
 	csvContent := "Date,Amount,Description\n2024-01-01,100,Test\n2024-01-02,200,Test2"
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(csvContent))
+		_, _ = w.Write([]byte(csvContent))
 	}))
 	defer mockServer.Close()
 
@@ -118,7 +118,7 @@ func TestOpenCSVReader_URL(t *testing.T) {
 	if err != nil {
 		t.Fatalf("OpenCSVReader failed: %v", err)
 	}
-	defer closer.Close()
+	defer func() { _ = closer.Close() }()
 
 	records, err := csvReader.ReadAll()
 	if err != nil {
@@ -137,14 +137,14 @@ func TestOpenCSVReader_URL(t *testing.T) {
 func TestOpenCSVReader_LocalPath(t *testing.T) {
 	csvContent := "Date,Amount,Description\n2024-01-01,100,Test"
 	tmpFile := "/tmp/test-csv-reader.csv"
-	os.WriteFile(tmpFile, []byte(csvContent), 0644)
-	defer os.Remove(tmpFile)
+	_ = os.WriteFile(tmpFile, []byte(csvContent), 0644)
+	defer func() { _ = os.Remove(tmpFile) }()
 
 	csvReader, closer, err := OpenCSVReader(context.Background(), tmpFile)
 	if err != nil {
 		t.Fatalf("OpenCSVReader failed: %v", err)
 	}
-	defer closer.Close()
+	defer func() { _ = closer.Close() }()
 
 	records, err := csvReader.ReadAll()
 	if err != nil {
@@ -160,7 +160,7 @@ func TestFetchFileReaderWithSize_URL(t *testing.T) {
 	content := "test content for size check"
 	mockServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(content))
+		_, _ = w.Write([]byte(content))
 	}))
 	defer mockServer.Close()
 
@@ -168,7 +168,7 @@ func TestFetchFileReaderWithSize_URL(t *testing.T) {
 	if err != nil {
 		t.Fatalf("FetchFileReaderWithSize failed: %v", err)
 	}
-	defer reader.Close()
+	defer func() { _ = reader.Close() }()
 
 	if reader.Size() != int64(len(content)) {
 		t.Errorf("Expected size %d, got %d", len(content), reader.Size())
@@ -187,14 +187,14 @@ func TestFetchFileReaderWithSize_URL(t *testing.T) {
 func TestFetchFileReaderWithSize_LocalPath(t *testing.T) {
 	content := "local file with size"
 	tmpFile := "/tmp/test-size-reader.txt"
-	os.WriteFile(tmpFile, []byte(content), 0644)
-	defer os.Remove(tmpFile)
+	_ = os.WriteFile(tmpFile, []byte(content), 0644)
+	defer func() { _ = os.Remove(tmpFile) }()
 
 	reader, err := FetchFileReaderWithSize(context.Background(), tmpFile)
 	if err != nil {
 		t.Fatalf("FetchFileReaderWithSize failed: %v", err)
 	}
-	defer reader.Close()
+	defer func() { _ = reader.Close() }()
 
 	if reader.Size() != int64(len(content)) {
 		t.Errorf("Expected size %d, got %d", len(content), reader.Size())

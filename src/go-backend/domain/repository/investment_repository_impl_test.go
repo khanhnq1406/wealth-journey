@@ -39,7 +39,7 @@ func TestNewInvestmentRepository(t *testing.T) {
 	db, _, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)
@@ -52,7 +52,7 @@ func TestInvestmentRepository_Create(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)
@@ -85,7 +85,7 @@ func TestInvestmentRepository_Create_Error(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)
@@ -117,7 +117,7 @@ func TestInvestmentRepository_GetByID(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)
@@ -153,7 +153,7 @@ func TestInvestmentRepository_GetByID_NotFound(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)
@@ -176,7 +176,7 @@ func TestInvestmentRepository_GetByWalletAndSymbol(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)
@@ -211,7 +211,7 @@ func TestInvestmentRepository_GetByWalletAndSymbol_NotFound(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)
@@ -232,7 +232,7 @@ func TestInvestmentRepository_ListByWalletID(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)
@@ -270,7 +270,7 @@ func TestInvestmentRepository_Update(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)
@@ -304,7 +304,7 @@ func TestInvestmentRepository_Delete(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)
@@ -326,7 +326,7 @@ func TestInvestmentRepository_Delete_NotFound(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)
@@ -350,7 +350,7 @@ func TestInvestmentRepository_UpdatePrices(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)
@@ -403,7 +403,7 @@ func TestInvestmentRepository_GetPortfolioSummary(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)
@@ -443,7 +443,7 @@ func TestInvestmentRepository_GetPortfolioSummary_Empty(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)
@@ -484,7 +484,7 @@ func TestInvestmentRepository_ListByUserID(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)
@@ -530,7 +530,7 @@ func TestInvestmentRepository_ListByUserID_NoWallets(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
-		sqlDB.Close()
+		_ = sqlDB.Close()
 	}()
 
 	repo := NewInvestmentRepository(database)

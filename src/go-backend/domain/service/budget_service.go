@@ -523,6 +523,7 @@ func validateBudgetItemName(name string) error {
 	return nil
 }
 
+//nolint:unused
 // validateNonNegativeAmount validates that an amount is non-negative.
 func validateNonNegativeAmount(amount int64) error {
 	if amount < 0 {
@@ -544,6 +545,7 @@ func validateMoneyAmount(money *budgetv1.Money) error {
 
 // Currency conversion helper methods
 
+//nolint:unused
 // convertBudgetTotal converts a budget's total to the user's preferred currency
 // Uses cache for fast lookups and populates cache on misses
 func (s *budgetService) convertBudgetTotal(ctx context.Context, userID int32, budget *models.Budget) (int64, error) {
@@ -580,6 +582,7 @@ func (s *budgetService) convertBudgetTotal(ctx context.Context, userID int32, bu
 	return convertedTotal, nil
 }
 
+//nolint:unused
 // convertBudgetItemTotal converts a budget item's total to the user's preferred currency
 func (s *budgetService) convertBudgetItemTotal(ctx context.Context, userID int32, budgetItem *models.BudgetItem, budgetCurrency string) (int64, error) {
 	// Get user's preferred currency

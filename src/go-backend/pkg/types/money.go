@@ -203,7 +203,6 @@ func (m Money) Validate() error {
 // MarshalJSON implements json.Marshaler for Money.
 // It marshals as a string to maintain precision in JSON.
 func (m Money) MarshalJSON() ([]byte, error) {
-	type Alias Money
 	return json.Marshal(&struct {
 		Amount   int64  `json:"amount"`
 		Currency string `json:"currency"`
@@ -215,7 +214,6 @@ func (m Money) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements json.Unmarshaler for Money.
 func (m *Money) UnmarshalJSON(data []byte) error {
-	type Alias Money
 	aux := &struct {
 		Amount   int64  `json:"amount"`
 		Currency string `json:"currency"`
