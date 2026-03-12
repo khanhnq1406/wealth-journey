@@ -24,7 +24,7 @@ export function LandingSilverPriceTable({
         padding="none"
         className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
       >
-        <div className="p-5 pb-3">
+        <div className="px-5 py-3">
           <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
             {t("silverTableTitle")}
           </h3>
@@ -39,7 +39,7 @@ export function LandingSilverPriceTable({
   return (
     <BaseCard className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden !p-0">
       {/* Header */}
-      <div className="p-5 pb-3">
+      <div className="px-5 py-3">
         <div className="flex items-center justify-between">
           <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
             {t("silverTableTitle")}

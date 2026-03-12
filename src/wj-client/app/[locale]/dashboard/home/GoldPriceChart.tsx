@@ -221,7 +221,7 @@ export function GoldPriceChart() {
       {/* Chart area */}
       <div className="px-2 pb-5">
         {isLoading && (
-          <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
+          <div className="h-[320px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
               <div className="w-5 h-5 border-2 border-v2-red-primary border-t-transparent rounded-full animate-spin" />
               <p className="font-vietnam text-[12px] text-v2-text-tertiary">
@@ -231,7 +231,7 @@ export function GoldPriceChart() {
           </div>
         )}
         {isError && (
-          <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
+          <div className="h-[320px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
               <p className="font-vietnam text-[13px] text-v2-text-secondary">
                 {t("errorLoading")}
@@ -246,7 +246,7 @@ export function GoldPriceChart() {
           </div>
         )}
         {!isLoading && !isError && chartData.length === 0 && (
-          <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
+          <div className="h-[320px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
             <p className="font-vietnam text-[13px] text-v2-text-tertiary">
               {t("noData")}
             </p>
@@ -257,7 +257,7 @@ export function GoldPriceChart() {
             data={chartData}
             series={chartSeries}
             xAxisKey="time"
-            height={400}
+            height={320}
             showGrid={true}
             showLegend={false}
             showTooltip={true}

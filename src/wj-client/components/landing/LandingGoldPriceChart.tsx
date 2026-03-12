@@ -15,7 +15,10 @@ export function LandingGoldPriceChart() {
   ] as const;
 
   return (
-    <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
+    <BaseCard
+      padding="none"
+      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
+    >
       <div className="p-5">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">

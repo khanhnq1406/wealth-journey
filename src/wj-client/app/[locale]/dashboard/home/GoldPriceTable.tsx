@@ -18,9 +18,12 @@ export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
   const filteredPrices = filterGoldPrices(prices);
 
   return (
-    <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
+    <BaseCard
+      padding="none"
+      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
+    >
       {/* Header */}
-      <div className="p-5 pb-3">
+      <div className="px-5 py-3 ">
         <div className="flex items-center justify-between">
           <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
             {t("goldPriceTitle")}
@@ -53,7 +56,9 @@ export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
             {filteredPrices.map((item, index) => (
               <tr
                 key={item.typeCode || index}
-                className={index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"}
+                className={
+                  index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"
+                }
               >
                 <td className="px-5 py-3 font-vietnam font-medium text-[13px] text-v2-text-primary">
                   {item.displayName}
@@ -68,7 +73,10 @@ export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
             ))}
             {filteredPrices.length === 0 && (
               <tr>
-                <td colSpan={3} className="px-5 py-8 text-center font-vietnam text-[13px] text-v2-text-tertiary">
+                <td
+                  colSpan={3}
+                  className="px-5 py-8 text-center font-vietnam text-[13px] text-v2-text-tertiary"
+                >
                   {t("comingSoon")}
                 </td>
               </tr>

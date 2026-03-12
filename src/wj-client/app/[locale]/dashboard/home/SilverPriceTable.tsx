@@ -10,12 +10,18 @@ interface SilverPriceTableProps {
   updatedTime?: string;
 }
 
-export function SilverPriceTable({ prices, updatedTime }: SilverPriceTableProps) {
+export function SilverPriceTable({
+  prices,
+  updatedTime,
+}: SilverPriceTableProps) {
   const t = useTranslations("dashboard.home");
 
   return (
-    <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
-      <div className="p-5 pb-3">
+    <BaseCard
+      padding="none"
+      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
+    >
+      <div className="px-5 py-3">
         <div className="flex items-center justify-between">
           <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
             {t("silverPriceTitle")}
@@ -47,7 +53,9 @@ export function SilverPriceTable({ prices, updatedTime }: SilverPriceTableProps)
             {prices.map((item, index) => (
               <tr
                 key={item.typeCode || index}
-                className={index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"}
+                className={
+                  index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"
+                }
               >
                 <td className="px-5 py-3 font-vietnam font-medium text-[13px] text-v2-text-primary">
                   {item.name || item.typeCode}
@@ -62,7 +70,10 @@ export function SilverPriceTable({ prices, updatedTime }: SilverPriceTableProps)
             ))}
             {prices.length === 0 && (
               <tr>
-                <td colSpan={3} className="px-5 py-8 text-center font-vietnam text-[13px] text-v2-text-tertiary">
+                <td
+                  colSpan={3}
+                  className="px-5 py-8 text-center font-vietnam text-[13px] text-v2-text-tertiary"
+                >
                   {t("comingSoon")}
                 </td>
               </tr>

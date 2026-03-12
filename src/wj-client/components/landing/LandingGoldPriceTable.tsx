@@ -29,8 +29,11 @@ export function LandingGoldPriceTable({
 
   if (isLoading) {
     return (
-      <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
-        <div className="p-5 pb-3">
+      <BaseCard
+        padding="none"
+        className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
+      >
+        <div className="px-5 py-3">
           <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
             {t("goldTableTitle")}
           </h3>
@@ -43,9 +46,12 @@ export function LandingGoldPriceTable({
   }
 
   return (
-    <BaseCard padding="none" className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
+    <BaseCard
+      padding="none"
+      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
+    >
       {/* Header */}
-      <div className="p-5 pb-3">
+      <div className="px-5 py-3">
         <div className="flex items-center justify-between">
           <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
             {t("goldTableTitle")}
