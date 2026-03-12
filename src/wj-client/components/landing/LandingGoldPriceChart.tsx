@@ -34,8 +34,15 @@ export function LandingGoldPriceChart() {
               {t("globalMarket")}
             </button>
           </div>
-          {/* Gold code selector placeholder */}
-          <div className="w-24 h-7 bg-v2-bg-surface-tint rounded-md" />
+          {/* Gold code toggle placeholder */}
+          <div className="flex items-center bg-v2-bg-surface-tint rounded-lg p-0.5">
+            <button className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-white shadow-sm text-v2-text-primary">
+              SJC
+            </button>
+            <button className="px-2.5 py-1 rounded-md text-[11px] font-medium text-v2-text-secondary">
+              999
+            </button>
+          </div>
         </div>
 
         {/* Period tabs — disabled */}
