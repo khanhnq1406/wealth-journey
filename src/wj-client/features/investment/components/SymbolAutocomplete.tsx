@@ -93,8 +93,10 @@ export function SymbolAutocomplete({
   // Handle search query errors
   useEffect(() => {
     if (searchQuery.error) {
-      setSearchError(
-        (searchQuery.error as any)?.message || t("failedSearch"),
+      queueMicrotask(() =>
+        setSearchError(
+          (searchQuery.error as any)?.message || t("failedSearch"),
+        ),
       );
     }
   }, [searchQuery.error]);
@@ -131,7 +133,7 @@ export function SymbolAutocomplete({
   // Update display value when value changes externally (but not during typing)
   useEffect(() => {
     if (value && value !== inputValue) {
-      setInputValue(value);
+      queueMicrotask(() => setInputValue(value));
     }
   }, [value]);
 

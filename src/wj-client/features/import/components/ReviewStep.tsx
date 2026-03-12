@@ -116,40 +116,42 @@ export function ReviewStep(props: ReviewStepProps) {
   useEffect(() => {
     if (transactionsState.length === 0) {
       // Initial load - just set the transactions
-      setTransactionsState(transactions);
+      queueMicrotask(() => setTransactionsState(transactions));
     } else {
       // Merge updates from parent with local state
-      setTransactionsState((prev) => {
-        // Create a map of current local state by row number
-        const localStateMap = new Map(prev.map((tx) => [tx.rowNumber, tx]));
+      queueMicrotask(() =>
+        setTransactionsState((prev) => {
+          // Create a map of current local state by row number
+          const localStateMap = new Map(prev.map((tx) => [tx.rowNumber, tx]));
 
-        // Merge parent updates with local changes
-        const merged = transactions.map((parentTx) => {
-          const localTx = localStateMap.get(parentTx.rowNumber);
-          if (localTx) {
-            // Take parent updates but preserve local category changes
-            // Only override category if it was changed locally (different from parent)
-            const hasLocalCategoryChange =
-              localTx.suggestedCategoryId !== parentTx.suggestedCategoryId ||
-              localTx.categoryConfidence !== parentTx.categoryConfidence;
+          // Merge parent updates with local changes
+          const merged = transactions.map((parentTx) => {
+            const localTx = localStateMap.get(parentTx.rowNumber);
+            if (localTx) {
+              // Take parent updates but preserve local category changes
+              // Only override category if it was changed locally (different from parent)
+              const hasLocalCategoryChange =
+                localTx.suggestedCategoryId !== parentTx.suggestedCategoryId ||
+                localTx.categoryConfidence !== parentTx.categoryConfidence;
 
-            if (hasLocalCategoryChange) {
-              // User made local category changes - preserve them
-              return {
-                ...parentTx,
-                suggestedCategoryId: localTx.suggestedCategoryId,
-                categoryConfidence: localTx.categoryConfidence,
-              };
-            } else {
-              // No local changes - just use parent data
-              return parentTx;
+              if (hasLocalCategoryChange) {
+                // User made local category changes - preserve them
+                return {
+                  ...parentTx,
+                  suggestedCategoryId: localTx.suggestedCategoryId,
+                  categoryConfidence: localTx.categoryConfidence,
+                };
+              } else {
+                // No local changes - just use parent data
+                return parentTx;
+              }
             }
-          }
-          return parentTx;
-        });
+            return parentTx;
+          });
 
-        return merged;
-      });
+          return merged;
+        })
+      );
     }
   }, [transactions]);
 
@@ -163,7 +165,7 @@ export function ReviewStep(props: ReviewStepProps) {
       .filter((t) => t.isValid && !duplicateRowNumbers.has(t.rowNumber))
       .map((t) => t.rowNumber);
 
-    setSelectedRows(new Set(validNonDuplicateRows));
+    queueMicrotask(() => setSelectedRows(new Set(validNonDuplicateRows)));
   }, [transactionsState, duplicateMatches]);
 
   // Filter transactions by date range

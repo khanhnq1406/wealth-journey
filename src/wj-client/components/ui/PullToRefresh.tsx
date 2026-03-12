@@ -87,7 +87,7 @@ export const PullToRefresh = memo(function PullToRefresh({
   // Reset pull distance when refresh completes
   useEffect(() => {
     if (!isRefreshing && pullDistance > 0) {
-      setPullDistance(0);
+      queueMicrotask(() => setPullDistance(0));
     }
   }, [isRefreshing, pullDistance]);
 

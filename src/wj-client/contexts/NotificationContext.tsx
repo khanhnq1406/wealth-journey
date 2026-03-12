@@ -46,7 +46,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   // Handle hydration
   useEffect(() => {
-    setIsClient(true);
+    queueMicrotask(() => setIsClient(true));
   }, []);
 
   const dismiss = useCallback((id: string) => {
