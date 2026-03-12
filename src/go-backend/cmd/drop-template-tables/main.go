@@ -22,7 +22,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	// Drop tables
 	if err := db.DB.Exec("DROP TABLE IF EXISTS user_template CASCADE").Error; err != nil {

@@ -23,7 +23,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	// Run Phase 1 migration
 	if err := migrateCommunity(db.DB); err != nil {

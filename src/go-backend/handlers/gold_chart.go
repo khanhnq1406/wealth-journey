@@ -159,7 +159,7 @@ func fetchGoldChartData(ctx context.Context, market, goldCode, period string) ([
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch from mihong.vn: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("mihong.vn returned status %d", resp.StatusCode)

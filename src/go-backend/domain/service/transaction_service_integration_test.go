@@ -23,7 +23,7 @@ func TestTransactionService_CurrencyConversion(t *testing.T) {
 	defer cleanup()
 
 	redisClient := setupTestRedis(t)
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 
 	// Create repositories
 	userRepo := setupUserRepository(db)
@@ -311,7 +311,7 @@ func TestTransactionService_MultiCurrencyEdgeCases(t *testing.T) {
 	defer cleanup()
 
 	redisClient := setupTestRedis(t)
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 
 	// Create repositories and services
 	userRepo := setupUserRepository(db)

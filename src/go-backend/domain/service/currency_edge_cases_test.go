@@ -458,7 +458,7 @@ func TestCurrencyCache_EdgeCases(t *testing.T) {
 
 	ctx := context.Background()
 	redisClient := setupTestRedis(t)
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 
 	currencyCache := cache.NewCurrencyCache(redisClient)
 

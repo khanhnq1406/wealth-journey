@@ -33,7 +33,7 @@ func ProvideDatabase(cfg *config.Config) (*database.Database, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	cleanup := func() { db.Close() }
+	cleanup := func() { _ = db.Close() }
 	return db, cleanup, nil
 }
 

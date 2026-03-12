@@ -26,7 +26,7 @@ func TestWalletService_CurrencyConversion(t *testing.T) {
 
 	// Create Redis client for caching
 	redisClient := setupTestRedis(t)
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 
 	// Create repositories
 	userRepo := setupUserRepository(db)
@@ -300,7 +300,7 @@ func TestWalletService_CurrencyConversionErrors(t *testing.T) {
 	defer cleanup()
 
 	redisClient := setupTestRedis(t)
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 
 	// Create repositories and services
 	userRepo := setupUserRepository(db)

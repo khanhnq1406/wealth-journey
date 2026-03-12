@@ -524,7 +524,7 @@ func setupTestDB(t *testing.T) (db *database.Database, cleanup func()) {
 	require.NoError(t, err)
 
 	cleanup = func() {
-		db.Close()
+		_ = db.Close()
 	}
 	return
 }

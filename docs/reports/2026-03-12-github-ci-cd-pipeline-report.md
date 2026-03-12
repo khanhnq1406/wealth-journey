@@ -136,3 +136,5 @@ After merging to `main`:
 | 2026-03-12 | Fix missing `useMemo` import in Tour.tsx causing TypeScript error | Minor | — |
 | 2026-03-12 | Fix golangci-lint errors: errcheck (50), ineffassign (3), staticcheck (16), unused (28) — see commit 71990fd for details | Minor | 71990fd |
 | 2026-03-12 | Fixed 41 golangci-lint errors: errcheck (34) - unchecked error returns in defer Close(), repository calls, fmt.Fprintf; staticcheck (7) - duplicate protobuf imports, capitalized error strings | Minor | 2452558 |
+| 2026-03-12 | Fixed remaining 11 golangci-lint errcheck errors: unchecked error returns in defer db.Close(), redisClient.Close(), resp.Body.Close(), os.Remove(), client.Close() across 8 files | Minor | — |
+| 2026-03-12 | Fixed additional 20 golangci-lint errcheck errors: more unchecked error returns in defer db.Close(), redisClient.Close() across cmd/* and service/*_test.go files | Minor | — |

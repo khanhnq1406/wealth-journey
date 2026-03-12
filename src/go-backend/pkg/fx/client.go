@@ -61,7 +61,7 @@ func (c *Client) GetLatestRates(ctx context.Context, baseCurrency string) (*APIR
 			lastErr = err
 			continue
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != http.StatusOK {
 			body, _ := io.ReadAll(resp.Body)

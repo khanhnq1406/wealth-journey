@@ -439,7 +439,7 @@ func TestCleanupFile(t *testing.T) {
 
 	// Manually clean up test files since CleanupFile uses different directory
 	for _, file := range testFiles {
-		os.Remove(file)
+		_ = os.Remove(file)
 	}
 }
 

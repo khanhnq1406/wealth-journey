@@ -229,7 +229,7 @@ func TestCleanupExpiredJobs_MixedStatuses(t *testing.T) {
 	}
 
 	client := setupTestRedis(t)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	queue := NewRedisImportQueue(client)
 	ctx := context.Background()
