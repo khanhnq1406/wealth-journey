@@ -6,15 +6,15 @@
 - **Spec file:** docs/specs/2026-03-13-landing-footer-spec.md
 - **Started:** 2026-03-13
 - **Last updated:** 2026-03-13
-- **Current state:** in_progress
-- **Current task:** 1
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 1 | Replace LandingFooter with congdongvang.com branding | in_progress | — | — |
-| 2 | Import LandingFooter into landing page | pending | — | — |
+| 1 | Replace LandingFooter with congdongvang.com branding | done | a6a75a4 | Replaced entire footer with centered congdongvang.com branding |
+| 2 | Import LandingFooter into landing page | done | — | Added footer import and render, reduced mobile bottom padding |
 
 ## Resume Instructions
 

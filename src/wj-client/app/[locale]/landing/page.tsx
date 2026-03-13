@@ -6,6 +6,7 @@ import { LandingGoldPriceTable } from "@/components/landing/LandingGoldPriceTabl
 import { LandingGoldPriceChart } from "@/components/landing/LandingGoldPriceChart";
 import { LandingSilverPriceTable } from "@/components/landing/LandingSilverPriceTable";
 import { LandingSilverPriceChart } from "@/components/landing/LandingSilverPriceChart";
+import LandingFooter from "@/components/landing/LandingFooter";
 import { usePublicMarketTypes } from "@/features/market-prices/hooks/usePublicMarketTypes";
 import { formatUpdateTimestamp } from "@/features/market-prices/utils/format-update-time";
 import { useTranslations } from "next-intl";
@@ -46,7 +47,7 @@ export default function LandingPage() {
           )}
 
           {/* Mobile Layout */}
-          <div className="sm:hidden px-4 py-4 pb-24 space-y-6">
+          <div className="sm:hidden px-4 py-4 pb-8 space-y-6">
             <LandingGoldPriceTable types={goldTypes} isLoading={isLoading} updatedTime={goldUpdatedTime} />
             <LandingGoldPriceChart />
             <LandingSilverPriceTable types={silverTypes} isLoading={isLoading} updatedTime={silverUpdatedTime} />
@@ -71,6 +72,7 @@ export default function LandingPage() {
             </div>
           </div>
         </main>
+        <LandingFooter />
       </div>
     </LandingErrorBoundary>
   );
