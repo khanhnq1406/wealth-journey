@@ -48,10 +48,10 @@ func ProvideRedis(cfg *config.Config) *redis.RedisClient {
 	return client
 }
 
-// ProvideStorage initializes the file storage provider.
+// ProvideStorage initializes the private file storage provider (financial documents).
 func ProvideStorage(cfg *config.Config) storage.StorageProvider {
 	if cfg.Storage.Provider == "supabase" {
-		log.Println("Initializing Supabase storage...")
+		log.Println("Initializing Supabase storage (private documents bucket)...")
 		provider := storage.NewSupabaseStorage(
 			cfg.Storage.SupabaseURL,
 			cfg.Storage.SupabaseAPIKey,
@@ -62,6 +62,21 @@ func ProvideStorage(cfg *config.Config) storage.StorageProvider {
 		return provider
 	}
 	log.Printf("Warning: Unknown storage provider '%s', file uploads disabled", cfg.Storage.Provider)
+	return nil
+}
+
+// ProvideCommunityStorage initializes the public storage provider for community images.
+func ProvideCommunityStorage(cfg *config.Config) storage.StorageProvider {
+	if cfg.Storage.Provider == "supabase" {
+		log.Println("Initializing Supabase community storage (public bucket)...")
+		provider := storage.NewSupabasePublicStorage(
+			cfg.Storage.SupabaseURL,
+			cfg.Storage.SupabaseAPIKey,
+			cfg.Storage.SupabaseCommunityBucket,
+		)
+		log.Printf("Supabase community storage initialized (bucket: %s)", cfg.Storage.SupabaseCommunityBucket)
+		return provider
+	}
 	return nil
 }
 
@@ -104,8 +119,8 @@ func ProvideUnderlyingRedis(rdb *redis.RedisClient) *redisv8.Client {
 }
 
 // ProvideServices creates all service instances.
-func ProvideServices(repos *service.Repositories, redisClient *redisv8.Client, storageProvider storage.StorageProvider, rdb *redis.RedisClient) *service.Services {
-	return service.NewServices(repos, redisClient, storageProvider, rdb)
+func ProvideServices(repos *service.Repositories, redisClient *redisv8.Client, storageProvider storage.StorageProvider, communityStorage storage.StorageProvider, rdb *redis.RedisClient) *service.Services {
+	return service.NewServices(repos, redisClient, storageProvider, communityStorage, rdb)
 }
 
 // ProvideImportSystem sets up the import service and worker pool.

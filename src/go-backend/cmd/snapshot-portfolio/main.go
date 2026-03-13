@@ -57,7 +57,7 @@ func main() {
 	}
 
 	// Initialize services (no storage provider needed for this CLI tool)
-	services := service.NewServices(repos, underlyingRedisClient, nil, redisClient)
+	services := service.NewServices(repos, underlyingRedisClient, nil, nil, redisClient)
 
 	// Run portfolio snapshot job
 	ctx := context.Background()

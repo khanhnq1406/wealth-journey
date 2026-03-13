@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { ReviewStep } from "./ReviewStep";
 import { ColumnMapping } from "./ColumnMappingStep";
 import { ParsedTransaction, DuplicateHandlingStrategy, ImportSummary, DuplicateMatch, CurrencyConversion, CurrencyInfo, DuplicateAction } from "@/gen/protobuf/v1/import";
@@ -52,6 +52,9 @@ export function ReviewStepWrapper({
     { pagination: { page: 1, pageSize: 1000, orderBy: "", order: "" } },
     { staleTime: 5 * 60 * 1000 } // Cache for 5 minutes
   );
+
+  // Stable ref to the parse mutate function — prevents useCallback re-creation on mutation state changes
+  const parseMutateRef = useRef<typeof parseStatementMutation.mutate | null>(null);
 
   // Parse statement mutation (backend API)
   const parseStatementMutation = useMutationParseStatement({
@@ -140,9 +143,12 @@ export function ReviewStepWrapper({
     },
   });
 
+  // Keep the ref up to date with the latest mutate function
+  parseMutateRef.current = parseStatementMutation.mutate;
+
   // Define parseFileViaBackend before useEffect to avoid variable ordering issue
   const parseFileViaBackend = React.useCallback(() => {
-    // Build custom mapping if provided (for CSV files)
+    // Build custom mapping if provided
     let customMapping = undefined;
     if (columnMapping) {
       customMapping = {
@@ -158,30 +164,30 @@ export function ReviewStepWrapper({
       setCurrency(columnMapping.currency || "VND");
     }
 
-    // Call backend parse API
-    parseStatementMutation.mutate({
+    // Call backend parse API via ref — avoids re-creating this callback when mutation state changes
+    parseMutateRef.current?.({
       fileId,
       bankTemplateId: bankTemplateId || "",
       customMapping,
       sheetName: "",
       useOcr: false,
     });
-  }, [columnMapping, fileId, bankTemplateId, parseStatementMutation]);
+  }, [columnMapping, fileId, bankTemplateId]); // parseStatementMutation intentionally excluded
 
-  // Parse the file when component mounts using backend API
+  // Parse the file once on mount (fileId/walletId are stable for the lifetime of this component)
   useEffect(() => {
     queueMicrotask(() => parseFileViaBackend());
-  }, [parseFileViaBackend]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Detect duplicates when transactions are loaded
+  // Detect duplicates when transactions are first loaded (run once per transactions set)
+  const detectMutateRef = useRef(detectDuplicatesMutation.mutate);
+  detectMutateRef.current = detectDuplicatesMutation.mutate;
+
   useEffect(() => {
     if (transactions.length > 0 && walletId) {
-      detectDuplicatesMutation.mutate({
-        transactions,
-        walletId,
-      });
+      detectMutateRef.current({ transactions, walletId });
     }
-  }, [transactions, walletId]);
+  }, [transactions, walletId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleImport = (
     selectedRowNumbers: number[],

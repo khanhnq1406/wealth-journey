@@ -13,7 +13,6 @@ import (
 )
 
 const (
-	MaxCSVSize   = 10 * 1024 * 1024 // 10MB
 	MaxExcelSize = 10 * 1024 * 1024 // 10MB
 	MaxPDFSize   = 20 * 1024 * 1024 // 20MB
 	UploadDir    = "/tmp/wealthjourney-uploads"
@@ -31,7 +30,6 @@ func InitializeDefaultService(storageProvider storage.StorageProvider) {
 type FileType string
 
 const (
-	FileTypeCSV   FileType = "csv"
 	FileTypeExcel FileType = "excel"
 	FileTypePDF   FileType = "pdf"
 )
@@ -145,7 +143,7 @@ func CleanupFile(fileID string) error {
 	// Use new service if initialized
 	if defaultService != nil {
 		// Try common extensions
-		for _, ext := range []string{".csv", ".xlsx", ".xls", ".pdf"} {
+		for _, ext := range []string{".xlsx", ".xls", ".pdf"} {
 			_ = defaultService.Cleanup(context.Background(), fileID, ext)
 		}
 		return nil
@@ -222,7 +220,7 @@ func GetFileURL(ctx context.Context, fileID string) (string, string, error) {
 	fmt.Printf("[DEBUG] GetFileURL: defaultService is nil: %v\n", defaultService == nil)
 
 	// Try common extensions
-	for _, ext := range []string{".csv", ".xlsx", ".xls", ".pdf"} {
+	for _, ext := range []string{".xlsx", ".xls", ".pdf"} {
 		if defaultService != nil {
 			// Use storage provider to get URL
 			storageKey := fmt.Sprintf("uploads/%s%s", fileID, ext)

@@ -30,14 +30,14 @@ func TestValidateFileType(t *testing.T) {
 		expected    FileType
 		expectError bool
 	}{
-		{"statement.csv", FileTypeCSV, false},
+		{"statement.csv", "", true}, // CSV no longer supported
 		{"statement.xlsx", FileTypeExcel, false},
 		{"statement.xls", FileTypeExcel, false},
 		{"statement.pdf", FileTypePDF, false},
 		{"statement.txt", "", true},
 		{"statement.doc", "", true},
 		{"statement", "", true},
-		{"statement.CSV", FileTypeCSV, false}, // Case insensitive
+		{"statement.CSV", "", true}, // CSV no longer supported
 		{"statement.XLSX", FileTypeExcel, false},
 	}
 
@@ -67,10 +67,6 @@ func TestValidateFileSize(t *testing.T) {
 		fileType    FileType
 		expectError bool
 	}{
-		{"CSV valid size", 5 * 1024 * 1024, FileTypeCSV, false},
-		{"CSV at max size", MaxCSVSize, FileTypeCSV, false},
-		{"CSV too large", 11 * 1024 * 1024, FileTypeCSV, true},
-		{"CSV empty", 0, FileTypeCSV, true},
 		{"Excel valid size", 8 * 1024 * 1024, FileTypeExcel, false},
 		{"Excel at max size", MaxExcelSize, FileTypeExcel, false},
 		{"Excel too large", 11 * 1024 * 1024, FileTypeExcel, true},
@@ -109,10 +105,10 @@ func TestUploadFile(t *testing.T) {
 		shouldError bool
 	}{
 		{
-			name:        "valid CSV upload",
+			name:        "CSV upload rejected",
 			filename:    "test.csv",
 			content:     "date,amount,description\n2024-01-01,100,Test",
-			shouldError: false,
+			shouldError: true,
 		},
 		{
 			name:        "valid Excel upload",
@@ -192,7 +188,7 @@ func TestUploadFile(t *testing.T) {
 func TestUploadFile_EmptyFile(t *testing.T) {
 	mockFile := newMockFile("")
 	header := &multipart.FileHeader{
-		Filename: "empty.csv",
+		Filename: "empty.xlsx",
 		Size:     0,
 	}
 
@@ -200,16 +196,13 @@ func TestUploadFile_EmptyFile(t *testing.T) {
 	if err == nil {
 		t.Error("Expected error for empty file, got none")
 	}
-	if !strings.Contains(err.Error(), "empty") {
-		t.Errorf("Expected empty file error, got: %v", err)
-	}
 }
 
 func TestUploadFile_OversizedFile(t *testing.T) {
 	mockFile := newMockFile("test")
 	header := &multipart.FileHeader{
-		Filename: "large.csv",
-		Size:     MaxCSVSize + 1,
+		Filename: "large.xlsx",
+		Size:     MaxExcelSize + 1,
 	}
 
 	_, err := UploadFile(mockFile, header)
@@ -286,19 +279,12 @@ func TestValidateFileSizeMatch(t *testing.T) {
 
 func TestValidateFileSize_UserFriendlyMessages(t *testing.T) {
 	tests := []struct {
-		name              string
-		size              int64
-		fileType          FileType
-		expectedContains  []string
-		expectError       bool
+		name             string
+		size             int64
+		fileType         FileType
+		expectedContains []string
+		expectError      bool
 	}{
-		{
-			name:             "CSV oversized shows MB limit",
-			size:             11 * 1024 * 1024,
-			fileType:         FileTypeCSV,
-			expectedContains: []string{"file too large", "10MB", "csv"},
-			expectError:      true,
-		},
 		{
 			name:             "Excel oversized shows MB limit",
 			size:             11 * 1024 * 1024,
@@ -314,9 +300,9 @@ func TestValidateFileSize_UserFriendlyMessages(t *testing.T) {
 			expectError:      true,
 		},
 		{
-			name:        "valid CSV size",
+			name:        "valid Excel size",
 			size:        5 * 1024 * 1024,
-			fileType:    FileTypeCSV,
+			fileType:    FileTypeExcel,
 			expectError: false,
 		},
 	}
@@ -356,14 +342,14 @@ func TestUploadFileFromBytes_SizeMismatch(t *testing.T) {
 		{
 			name:         "matching size",
 			fileData:     []byte("test data"),
-			fileName:     "test.csv",
+			fileName:     "test.xlsx",
 			declaredSize: 9,
 			expectError:  false,
 		},
 		{
 			name:         "size mismatch - declared larger",
 			fileData:     []byte("test data"),
-			fileName:     "test.csv",
+			fileName:     "test.xlsx",
 			declaredSize: 100,
 			expectError:  true,
 			errorMsg:     "size mismatch",
@@ -371,7 +357,7 @@ func TestUploadFileFromBytes_SizeMismatch(t *testing.T) {
 		{
 			name:         "size mismatch - declared smaller",
 			fileData:     []byte("test data"),
-			fileName:     "test.csv",
+			fileName:     "test.xlsx",
 			declaredSize: 5,
 			expectError:  true,
 			errorMsg:     "size mismatch",
@@ -413,7 +399,7 @@ func TestCleanupFile(t *testing.T) {
 	// Create test files with same ID but different extensions
 	fileID := "test-file-id"
 	testFiles := []string{
-		filepath.Join(testDir, fileID+".csv"),
+		filepath.Join(testDir, fileID+".pdf"),
 		filepath.Join(testDir, fileID+".xlsx"),
 	}
 

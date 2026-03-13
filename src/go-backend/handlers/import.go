@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -254,73 +253,9 @@ func (h *ImportHandler) ParseFile(c *gin.Context) {
 
 	fmt.Printf("[DEBUG] ParseFile: Got fileURL=%s, fileExt=%s\n", fileURL, fileExt)
 
-	// Get bank template or custom mapping
-	var columnMapping *parser.ColumnMapping
-
-	if req.BankTemplateId != "" {
-		// Load bank template from repository
-		template, err := h.importRepo.GetBankTemplateByID(c.Request.Context(), req.BankTemplateId)
-		if err != nil {
-			handler.BadRequest(c, apperrors.NewValidationError(fmt.Sprintf("invalid bank template: %s", req.BankTemplateId)))
-			return
-		}
-
-		// Parse column mapping from JSON
-		var mapping struct {
-			DateColumn        int `json:"dateColumn"`
-			AmountColumn      int `json:"amountColumn"`
-			DescriptionColumn int `json:"descriptionColumn"`
-			TypeColumn        int `json:"typeColumn"`
-			CategoryColumn    int `json:"categoryColumn"`
-			ReferenceColumn   int `json:"referenceColumn"`
-		}
-
-		if err := json.Unmarshal(template.ColumnMapping, &mapping); err != nil {
-			handler.BadRequest(c, apperrors.NewValidationError(fmt.Sprintf("invalid column mapping in template: %v", err)))
-			return
-		}
-
-		// Convert template to column mapping
-		columnMapping = &parser.ColumnMapping{
-			DateColumn:        mapping.DateColumn,
-			AmountColumn:      mapping.AmountColumn,
-			DebitColumn:       -1, // Will be auto-detected if needed
-			CreditColumn:      -1, // Will be auto-detected if needed
-			DescriptionColumn: mapping.DescriptionColumn,
-			TypeColumn:        mapping.TypeColumn - 1,    // -1 if not present (0 index becomes -1)
-			CategoryColumn:    mapping.CategoryColumn - 1,
-			ReferenceColumn:   mapping.ReferenceColumn - 1,
-			DateFormat:        template.DateFormat,
-			Currency:          template.Currency,
-		}
-	} else if req.CustomMapping != nil {
-		// Use custom mapping (convert string column names to indices if needed)
-		// For now, assume custom mapping provides numeric indices as strings
-		dateCol, _ := strconv.Atoi(req.CustomMapping.DateColumn)
-		amountCol, _ := strconv.Atoi(req.CustomMapping.AmountColumn)
-		descCol, _ := strconv.Atoi(req.CustomMapping.DescriptionColumn)
-		typeCol, _ := strconv.Atoi(req.CustomMapping.TypeColumn)
-		catCol, _ := strconv.Atoi(req.CustomMapping.CategoryColumn)
-		refCol, _ := strconv.Atoi(req.CustomMapping.ReferenceColumn)
-
-		columnMapping = &parser.ColumnMapping{
-			DateColumn:        dateCol,
-			AmountColumn:      amountCol,
-			DebitColumn:       -1, // Will be auto-detected if needed
-			CreditColumn:      -1, // Will be auto-detected if needed
-			DescriptionColumn: descCol,
-			TypeColumn:        typeCol - 1,    // -1 if not present
-			CategoryColumn:    catCol - 1,
-			ReferenceColumn:   refCol - 1,
-			DateFormat:        req.CustomMapping.DateFormat,
-			Currency:          req.CustomMapping.Currency,
-		}
-	}
-
-	// Validate column mapping requirement based on file type
-	// CSV files require explicit mapping, but PDF/Excel can use auto-detection
-	if columnMapping == nil && fileExt != ".pdf" && fileExt != ".xlsx" && fileExt != ".xls" {
-		handler.BadRequest(c, apperrors.NewValidationError("column mapping is required for CSV files. Please select a bank template or provide custom mapping"))
+	// Validate file type — only Excel and PDF are supported
+	if fileExt != ".pdf" && fileExt != ".xlsx" && fileExt != ".xls" {
+		handler.BadRequest(c, apperrors.NewValidationError(fmt.Sprintf("unsupported file type: %s. Supported: Excel (.xlsx, .xls), PDF", fileExt)))
 		return
 	}
 
@@ -333,14 +268,14 @@ func (h *ImportHandler) ParseFile(c *gin.Context) {
 
 	// Track parsing duration
 	parseStart := time.Now()
-	fileTypeStr := "csv"
+	var fileTypeStr string
+	var columnMapping *parser.ColumnMapping
 
 	switch fileExt {
 	case ".pdf":
 		fileTypeStr = "pdf"
-		// PDF parser supports auto-detection when columnMapping is nil
-		// It will attempt to detect columns from header row and extract currency
-		pdfParser := parser.NewPDFParser(fileURL, columnMapping)
+		// PDF parser supports auto-detection — detects columns from header row and extracts currency
+		pdfParser := parser.NewPDFParser(fileURL, nil)
 		parsedRows, err = pdfParser.Parse()
 		if err != nil {
 			metrics.ImportAttempts.WithLabelValues("error", fileTypeStr).Inc()
@@ -363,14 +298,10 @@ func (h *ImportHandler) ParseFile(c *gin.Context) {
 			handler.BadRequest(c, apperrors.WrapWithUserMessage(err))
 			return
 		}
-		// Get the detected mapping (includes extracted currency from file metadata)
-		if columnMapping == nil {
-			columnMapping = pdfParser.GetDetectedMapping()
-		}
+		columnMapping = pdfParser.GetDetectedMapping()
 	case ".xlsx", ".xls":
 		fileTypeStr = "excel"
-		// Use Excel parser with auto-detection (ignore template mapping for Excel files)
-		// Excel files have too much variation in layout to use fixed column mappings
+		// Excel parser uses auto-detection
 		excelParser := parser.NewExcelParser(fileURL, nil)
 		defer func() { _ = excelParser.Close() }() // Clean up: close the Excel file
 
@@ -401,33 +332,7 @@ func (h *ImportHandler) ParseFile(c *gin.Context) {
 			handler.BadRequest(c, apperrors.WrapWithUserMessage(err))
 			return
 		}
-		// Get the detected mapping (includes extracted currency from file metadata)
 		columnMapping = excelParser.GetDetectedMapping()
-	default:
-		// Use CSV parser (default for .csv and any other text format)
-		csvParser := parser.NewCSVParser(fileURL, columnMapping)
-		parsedRows, err = csvParser.Parse()
-		if err != nil {
-			metrics.ImportAttempts.WithLabelValues("error", fileTypeStr).Inc()
-			logger.LogImportError(c.Request.Context(), userID, "parse:csv", err, logger.ImportErrorMetadata(
-				req.FileId, fileTypeStr, 0, 0,
-			))
-
-			// Audit log: Failed parse
-			logger.LogImportAudit(c.Request.Context(), logger.NewParseAuditLog(
-				userID,
-				req.FileId,
-				fileTypeStr,
-				ipAddress,
-				userAgent,
-				0,
-				false,
-				err.Error(),
-			))
-
-			handler.BadRequest(c, apperrors.WrapWithUserMessage(err))
-			return
-		}
 	}
 
 	// Record parsing duration
