@@ -168,6 +168,10 @@ export default {
           "silver-primary": "#8B929E",
           "silver-dark": "#374151",
           "silver-light": "#EEF0F3",
+          "currency-primary": "#1E40AF",
+          "currency-dark": "#1E3A8A",
+          "currency-light": "#EFF6FF",
+          "currency-accent": "#3B82F6",
         },
       },
 

@@ -237,13 +237,14 @@ message PriceItem {
 // GetMarketPricesRequest for fetching all gold and silver prices
 message GetMarketPricesRequest {}
 
-// GetMarketPricesResponse returns all gold and silver prices
+// GetMarketPricesResponse returns all gold, silver, and currency prices
 message GetMarketPricesResponse {
   bool success = 1 [json_name = "success"];
   string message = 2 [json_name = "message"];
   repeated PriceItem gold = 3 [json_name = "gold"];
   repeated PriceItem silver = 4 [json_name = "silver"];
   string timestamp = 5 [json_name = "timestamp"];
+  repeated PriceItem currency = 6 [json_name = "currency"];
 }
 
 // MarketPrice - Price data with freshness info
@@ -690,11 +691,12 @@ message MarketTypeItem {
 // GetPublicMarketTypesRequest is empty (no auth, no params)
 message GetPublicMarketTypesRequest {}
 
-// GetPublicMarketTypesResponse returns gold/silver type names without prices
+// GetPublicMarketTypesResponse returns gold/silver/currency type names without prices
 message GetPublicMarketTypesResponse {
   bool success = 1 [json_name = "success"];
   string message = 2 [json_name = "message"];
   repeated MarketTypeItem gold = 3 [json_name = "gold"];
   repeated MarketTypeItem silver = 4 [json_name = "silver"];
   string timestamp = 5 [json_name = "timestamp"];
+  repeated MarketTypeItem currency = 6 [json_name = "currency"];
 }
