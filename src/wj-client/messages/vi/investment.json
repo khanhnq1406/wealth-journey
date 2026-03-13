@@ -294,6 +294,7 @@
     "tabs": {
       "gold": "Vàng",
       "silver": "Bạc",
+      "currency": "Ngoại Tệ",
       "symbolLookup": "Tra cứu mã"
     },
     "table": {
@@ -318,6 +319,11 @@
       "emptyMessage": "Không có giá bạc",
       "emptyDescription": "Không thể lấy giá bạc từ nhà cung cấp.",
       "failedToLoad": "Không thể tải giá bạc. Hãy thử làm mới."
+    },
+    "currency": {
+      "emptyMessage": "Không có giá ngoại tệ",
+      "emptyDescription": "Không thể lấy giá ngoại tệ từ nhà cung cấp.",
+      "failedToLoad": "Không thể tải giá ngoại tệ. Hãy thử làm mới."
     }
   },
   "investmentPrice": {

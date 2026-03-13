@@ -16,7 +16,7 @@ import {
 import { InvestmentType } from "@/gen/protobuf/v1/investment";
 import { formatPriceValue, formatChangeValue, PriceItem } from "./helpers";
 
-type Tab = "gold" | "silver" | "symbol";
+type Tab = "gold" | "silver" | "currency" | "symbol";
 
 // Tab labels are provided via translations below
 
@@ -260,6 +260,7 @@ export default function PricesPage() {
   const TABS: { key: Tab; label: string }[] = [
     { key: "gold", label: t("tabs.gold") },
     { key: "silver", label: t("tabs.silver") },
+    { key: "currency", label: t("tabs.currency") },
     { key: "symbol", label: t("tabs.symbolLookup") },
   ];
 
@@ -402,6 +403,41 @@ export default function PricesPage() {
                   getKey={(item) => item.typeCode}
                   emptyMessage={t("silver.emptyMessage")}
                   emptyDescription={t("silver.emptyDescription")}
+                  expandable
+                />
+              </div>
+            </>
+          )}
+
+          {activeTab === "currency" && (
+            <>
+              {isError && (
+                <p className="text-lred text-sm text-center py-4">
+                  {t("currency.failedToLoad")}
+                </p>
+              )}
+              {/* Desktop: TanStack Table */}
+              <div className="hidden md:block">
+                <TanStackTable<PriceItem>
+                  data={data?.currency ?? []}
+                  columns={tanstackColumns}
+                  isLoading={isLoading}
+                  loadingRowCount={6}
+                  emptyMessage={t("currency.emptyMessage")}
+                  emptyDescription={t("currency.emptyDescription")}
+                  enableMobileExpansion={false}
+                />
+              </div>
+              {/* Mobile: card-based list */}
+              <div className="md:hidden">
+                <MobileTable<PriceItem>
+                  data={data?.currency ?? []}
+                  columns={mobileColumns}
+                  isLoading={isLoading}
+                  loadingRowCount={6}
+                  getKey={(item) => item.typeCode}
+                  emptyMessage={t("currency.emptyMessage")}
+                  emptyDescription={t("currency.emptyDescription")}
                   expandable
                 />
               </div>

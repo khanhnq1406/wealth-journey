@@ -294,6 +294,7 @@
     "tabs": {
       "gold": "Gold",
       "silver": "Silver",
+      "currency": "Currency",
       "symbolLookup": "Symbol Lookup"
     },
     "table": {
@@ -318,6 +319,11 @@
       "emptyMessage": "No silver prices available",
       "emptyDescription": "Could not fetch silver prices from the price provider.",
       "failedToLoad": "Failed to load silver prices. Try refreshing."
+    },
+    "currency": {
+      "emptyMessage": "No currency prices available",
+      "emptyDescription": "Could not fetch currency prices from the price provider.",
+      "failedToLoad": "Failed to load currency prices. Try refreshing."
     }
   },
   "investmentPrice": {

@@ -6,6 +6,7 @@ import { LandingGoldPriceTable } from "@/components/landing/LandingGoldPriceTabl
 import { LandingGoldPriceChart } from "@/components/landing/LandingGoldPriceChart";
 import { LandingSilverPriceTable } from "@/components/landing/LandingSilverPriceTable";
 import { LandingSilverPriceChart } from "@/components/landing/LandingSilverPriceChart";
+import { LandingCurrencyPriceTable } from "@/components/landing/LandingCurrencyPriceTable";
 import LandingFooter from "@/components/landing/LandingFooter";
 import { usePublicMarketTypes } from "@/features/market-prices/hooks/usePublicMarketTypes";
 import { formatUpdateTimestamp } from "@/features/market-prices/utils/format-update-time";
@@ -17,6 +18,7 @@ export default function LandingPage() {
 
   const goldTypes = data?.gold ?? [];
   const silverTypes = data?.silver ?? [];
+  const currencyTypes = data?.currency ?? [];
 
   // Update timestamps from API
   const goldUpdatedTime = data?.goldUpdatedAt
@@ -24,6 +26,9 @@ export default function LandingPage() {
     : undefined;
   const silverUpdatedTime = data?.silverUpdatedAt
     ? formatUpdateTimestamp(data.silverUpdatedAt)
+    : undefined;
+  const currencyUpdatedTime = data?.currencyUpdatedAt
+    ? formatUpdateTimestamp(data.currencyUpdatedAt)
     : undefined;
 
   return (
@@ -52,6 +57,7 @@ export default function LandingPage() {
             <LandingGoldPriceChart />
             <LandingSilverPriceTable types={silverTypes} isLoading={isLoading} updatedTime={silverUpdatedTime} />
             <LandingSilverPriceChart />
+            <LandingCurrencyPriceTable types={currencyTypes} isLoading={isLoading} updatedTime={currencyUpdatedTime} />
           </div>
 
           {/* Desktop Layout */}
@@ -69,6 +75,11 @@ export default function LandingPage() {
                 updatedTime={silverUpdatedTime}
               />
               <LandingSilverPriceChart />
+            </div>
+            {/* Row 3: Currency Table */}
+            <div className="grid grid-cols-2 gap-6 [&>*]:!mb-0">
+              <LandingCurrencyPriceTable types={currencyTypes} isLoading={isLoading} updatedTime={currencyUpdatedTime} />
+              <div />
             </div>
           </div>
         </main>
