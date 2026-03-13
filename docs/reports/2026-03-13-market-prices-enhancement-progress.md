@@ -5,9 +5,9 @@
 - **Plan file:** docs/plans/2026-03-13-market-prices-enhancement-plan.md
 - **Spec file:** docs/specs/2026-03-13-market-prices-enhancement-spec.md
 - **Started:** 2026-03-13T00:00:00+07:00
-- **Last updated:** 2026-03-13T12:00:00+07:00
-- **Current state:** in_progress
-- **Current task:** 11
+- **Last updated:** 2026-03-13T13:00:00+07:00
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -23,7 +23,7 @@
 | 8 | Frontend — Restyle gold/silver table headers | done | e7d1404 | Bold headers with commodity-specific color themes |
 | 9 | Frontend — Create CurrencyPriceTable + LandingCurrencyPriceTable | done | e7d1404 | Blue-themed currency tables with i18n translations |
 | 10 | Frontend — Update dashboard home + landing + prices pages | done | — | Added currency tables to all pages, new "Ngoại Tệ" tab in prices |
-| 11 | Update C4 + flow diagrams | pending | — | — |
+| 11 | Update C4 + flow diagrams | done | — | Updated backend/frontend C4, added market prices aggregation flow |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 

@@ -8,6 +8,7 @@ Infrastructure-level flows that are referenced by multiple domain flows. Read th
 - [Frontend API Call Lifecycle](#2-frontend-api-call-lifecycle)
 - [Background Scheduler Jobs](#3-background-scheduler-jobs)
 - [Currency Conversion Logic](#4-currency-conversion-logic)
+- [Market Prices Aggregation Flow](#5-market-prices-aggregation-flow)
 
 ---
 
@@ -238,3 +239,90 @@ flowchart TD
 | 4200 (cents) | USD (×100) | 25,850 | VND (×1) | (4200/100) × 25850 × 1 | 1,085,700 VND |
 | 1,000,000 VND | VND (×1) | 0.0000387 | USD (×100) | (1000000/1) × 0.0000387 × 100 | 3,870 cents ($38.70) |
 | 10,000 JPY | JPY (×1) | 172.5 | VND (×1) | (10000/1) × 172.5 × 1 | 1,725,000 VND |
+
+---
+
+## 5. Market Prices Aggregation Flow
+
+**Trigger:** `GET /api/v1/investments/market-prices` (authenticated) or `GET /api/v1/public/market-types` (public)
+**Source:** `handlers/market_prices.go`, `handlers/public.go`
+
+```mermaid
+sequenceDiagram
+    participant C as Frontend
+    participant H as MarketPricesHandler
+    participant G as GoldPriceService
+    participant S as SilverPriceService
+    participant CR as CurrencyPriceService
+    participant PQ as Phú Quý Client
+    participant AN as Ancarat Client
+    participant DJ as DOJI Client
+    participant V as vangsaigon.vn
+    participant R as Redis
+
+    C->>H: GET /market-prices
+
+    par Gold prices
+        H->>G: FetchAllPrices(ctx)
+        G->>R: Check cache
+        alt Cache hit
+            R-->>G: Cached gold prices
+        else Cache miss
+            G->>V: Fetch gold prices
+            V-->>G: Gold price data
+            G->>R: Cache async (15min TTL)
+        end
+        G-->>H: []*CachedGoldPrice
+    and Silver prices (multi-source)
+        H->>S: FetchAllPrices(ctx)
+        par Phú Quý
+            S->>PQ: FetchPrices(ctx)
+            PQ-->>S: 4 silver prices (HTML)
+        and Ancarat
+            S->>AN: FetchPrices(ctx)
+            AN-->>S: 4 silver prices (JSON)
+        and DOJI
+            S->>DJ: FetchPrices(ctx)
+            DJ-->>S: 2 silver prices (text)
+        end
+        Note over S: Merge into 12 ordered rows:<br/>4 Phú Quý + 4 Ancarat + 2 SBJ (static) + 2 DOJI
+        S->>R: Cache each price async
+        S-->>H: []*CachedSilverPrice
+    and Currency prices
+        H->>CR: FetchAllPrices(ctx)
+        CR->>R: Check cache
+        alt Cache hit
+            R-->>CR: Cached currency prices
+        else Cache miss
+            CR->>V: Fetch currency prices
+            V-->>CR: Currency nationwide data
+            CR->>R: Cache async (15min TTL)
+        end
+        CR-->>H: []*CachedCurrencyPrice
+    end
+
+    alt All three failed
+        H-->>C: 503 Service Unavailable
+    else Partial or full success
+        Note over H: Empty slice for failed categories<br/>(never null)
+        H-->>C: 200 {gold, silver, currency, timestamp}
+    end
+```
+
+### Key Invariants
+
+- Gold, silver, and currency are fetched in parallel via `sync.WaitGroup` — one failure does not block others
+- Silver aggregates from 4 sources (Phú Quý, Ancarat, DOJI, SBJ); SBJ entries are static (prices = 0, displayed as "—")
+- Currency prices come from vangsaigon's `currencyNationWide` field — raw VND values (no ×1000 multiplier)
+- 503 is returned only if ALL THREE categories fail; partial success returns empty slices for failed categories
+- All prices are cached in Redis with 15-minute TTL; cache writes are non-blocking goroutines
+
+### Error Paths
+
+| Condition | Response | Fallback |
+|-----------|----------|----------|
+| One category fails (e.g., silver) | 200 with empty `silver: []` | Other categories still returned |
+| All three categories fail | 503 Service Unavailable | No fallback |
+| Individual silver source fails (e.g., Phú Quý down) | Rows from that source omitted | Other sources still included |
+| Redis cache write fails | Logged warning | Next request re-fetches from source |
+| vangsaigon.vn timeout | Gold/currency return empty | Stale cache if available |
