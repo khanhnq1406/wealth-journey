@@ -91,6 +91,8 @@ type Repositories struct {
 	Notification          repository.NotificationRepository
 	SavedPost             repository.SavedPostRepository
 	Hashtag               repository.HashtagRepository
+	GoldVote              repository.GoldVoteRepository
+	GoldVoteComment       repository.GoldVoteCommentRepository
 }
 
 // NewRepositories creates all repository instances.
