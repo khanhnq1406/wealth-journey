@@ -7,9 +7,9 @@ C4Component
     title WealthJourney Frontend - Component Diagram
 
     Container_Boundary(app, "App Router (Pages)") {
-        Component(landing, "Landing Page", "app/landing", "Price teaser page: gold/silver/currency type tables with login links and disabled chart shells. Fetches from public /api/v1/public/market-types endpoint (no auth).")
+        Component(landing, "Landing Page", "app/landing", "Price teaser page: gold/silver/currency type tables with login links. Live TradingView gold/silver charts (no login required). Fetches from public /api/v1/public/market-types endpoint (no auth).")
         Component(auth_pages, "Auth Pages", "app/auth", "Login and register with Google OAuth")
-        Component(dashboard, "Dashboard Home", "app/dashboard/home", "V2 Crimson & Gold: net worth, PNL card (self-contained with 1D/1W/1M/ALL period tabs), gold/silver price charts (live), currency price table, wallets")
+        Component(dashboard, "Dashboard Home", "app/dashboard/home", "V2 Crimson & Gold: net worth, PNL card (self-contained with 1D/1W/1M/ALL period tabs), gold/silver TradingView charts (XAUUSD, XAGUSD), currency price table, wallets")
         Component(txn_page, "Transaction Page", "app/dashboard/transaction", "Transaction list with filters and search")
         Component(wallet_page, "Wallet Page", "app/dashboard/wallets", "Wallet grid/list with fund operations")
         Component(portfolio_page, "Portfolio Page", "app/dashboard/portfolio", "Investment portfolio with analytics; period pill selector (1D/1W/1M/ALL) via PortfolioSummaryEnhanced")
@@ -37,7 +37,7 @@ C4Component
         Component(forms, "Form Components", "shared/components/forms", "FormInput, FormSelect, FormNumberInput, DatePicker, Textarea")
         Component(modals, "Modal Components", "shared/components/modals", "BaseModal, BottomSheet, ConfirmationDialog, Success")
         Component(selects, "Select Components", "shared/components/select", "Select, CreatableSelect, MultiSelect, CurrencySelector")
-        Component(charts, "Chart Components", "shared/components/charts", "BarChart, LineChart, DonutChart, Sparkline")
+        Component(charts, "Chart Components", "shared/components/charts", "BarChart, LineChart, DonutChart, Sparkline, TradingViewChart (embeds TradingView Advanced Chart widget for XAUUSD/XAGUSD)")
         Component(tables, "Table Components", "shared/components/table", "MobileTable, TanStackTable, VirtualizedList")
         Component(loading, "Loading Components", "shared/components/loading", "LoadingSpinner, FullPageLoading, Skeleton variants")
         Component(feedback, "Feedback Components", "shared/components/feedback", "EmptyState, ErrorState, Toast, Notification")
@@ -67,7 +67,8 @@ C4Component
 
     Rel(dashboard, wallet_feat, "Renders wallet list")
     Rel(dashboard, txn_feat, "Renders recent transactions")
-    Rel(dashboard, gen_hooks, "GoldPriceChart: useQueryGetGoldChart, SilverPriceChart: useQueryGetSilverChart, PNLCard: useQueryGetAggregatedPortfolioSummary(period) + useQueryGetHistoricalPortfolioValues")
+    Rel(dashboard, gen_hooks, "PNLCard: useQueryGetAggregatedPortfolioSummary(period) + useQueryGetHistoricalPortfolioValues")
+    Rel(dashboard, charts, "GoldPriceChart & SilverPriceChart use TradingViewChart (TVC:GOLD, TVC:SILVER)")
     Rel(txn_page, txn_feat, "Renders transaction management")
     Rel(wallet_page, wallet_feat, "Renders wallet management")
     Rel(portfolio_page, invest_feat, "Renders portfolio")
