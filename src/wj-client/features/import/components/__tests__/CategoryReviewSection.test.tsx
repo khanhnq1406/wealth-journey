@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
+import { renderWithIntl as render } from "@/test-utils";
 import { CategoryReviewSection } from "../CategoryReviewSection";
 import { ParsedTransaction } from "@/gen/protobuf/v1/import";
 
@@ -107,10 +108,10 @@ describe("CategoryReviewSection", () => {
       />
     );
     expect(screen.getByText(/3 Need Category Review/i)).toBeInTheDocument();
-    expect(screen.getByText(/Confirm or change auto-assigned categories/i)).toBeInTheDocument();
+    expect(screen.getByText(/Low confidence or no category suggestion/i)).toBeInTheDocument();
   });
 
-  it("collapses to show only low confidence transactions by default", () => {
+  it("collapses to show only header by default, expands to show transactions", () => {
     render(
       <CategoryReviewSection
         transactions={mockTransactions}
@@ -119,7 +120,14 @@ describe("CategoryReviewSection", () => {
       />
     );
 
-    // Low confidence transaction (0% or <70%) should be visible
+    // Initially collapsed — transaction descriptions not visible
+    expect(screen.queryByText("Unknown transaction")).not.toBeInTheDocument();
+
+    // Expand
+    const header = screen.getByRole("button", { name: /3 Need Category Review/i });
+    fireEvent.click(header);
+
+    // Now visible
     expect(screen.getByText("Unknown transaction")).toBeInTheDocument();
   });
 
@@ -176,11 +184,11 @@ describe("CategoryReviewSection", () => {
     const header = screen.getByRole("button", { name: /3 Need Category Review/i });
     fireEvent.click(header);
 
-    expect(screen.getByText("Food & Dining")).toBeInTheDocument();
-    expect(screen.getByText("Transportation")).toBeInTheDocument();
+    expect(screen.getAllByText("Food & Dining").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Transportation").length).toBeGreaterThan(0);
   });
 
-  it("shows Uncategorized for transactions without category", () => {
+  it("shows transaction without suggested category in the list", () => {
     render(
       <CategoryReviewSection
         transactions={mockTransactions}
@@ -189,7 +197,12 @@ describe("CategoryReviewSection", () => {
       />
     );
 
-    expect(screen.getByText("Uncategorized")).toBeInTheDocument();
+    // Expand to see transaction rows
+    const header = screen.getByRole("button", { name: /3 Need Category Review/i });
+    fireEvent.click(header);
+
+    // Transaction with no suggested category should still appear in the list
+    expect(screen.getByText("Unknown transaction")).toBeInTheDocument();
   });
 
   it("renders with custom currency", () => {

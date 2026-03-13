@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
+import { renderWithIntl as render } from "@/test-utils";
 import { DuplicateSection } from "../DuplicateSection";
 import { DuplicateMatch } from "@/gen/protobuf/v1/import";
 
@@ -121,8 +122,8 @@ describe("DuplicateSection", () => {
       />
     );
 
-    // Should show row number
-    expect(screen.getByText(/Row 10/i)).toBeInTheDocument();
+    // Should show match progress (Match 1 of 2)
+    expect(screen.getByText(/Match 1 of 2/i)).toBeInTheDocument();
 
     // Should show confidence
     expect(screen.getByText(/95.5%/i)).toBeInTheDocument();
@@ -136,19 +137,19 @@ describe("DuplicateSection", () => {
       />
     );
 
-    // Initially expanded
-    expect(screen.getByText(/Row 10/i)).toBeInTheDocument();
+    // Initially expanded (shows match progress)
+    expect(screen.getByText(/Match 1 of 2/i)).toBeInTheDocument();
 
     // Click to collapse
     const header = screen.getByRole("button", { name: /2 Potential Duplicates/i });
     fireEvent.click(header);
 
     // Should be hidden
-    expect(screen.queryByText(/Row 10/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Match 1 of 2/i)).not.toBeInTheDocument();
 
     // Click to expand again
     fireEvent.click(header);
-    expect(screen.getByText(/Row 10/i)).toBeInTheDocument();
+    expect(screen.getByText(/Match 1 of 2/i)).toBeInTheDocument();
   });
 
   it("displays match reason", () => {
@@ -213,15 +214,15 @@ describe("DuplicateSection", () => {
     );
 
     // First duplicate
-    expect(screen.getByText(/Row 10/i)).toBeInTheDocument();
+    expect(screen.getByText(/Match 1 of 2/i)).toBeInTheDocument();
 
     // Click merge
     const mergeButton = screen.getByText("Merge");
     fireEvent.click(mergeButton);
 
     // Should move to second duplicate
-    expect(screen.getByText(/Row 15/i)).toBeInTheDocument();
-    expect(screen.getByText(/75.0%/i)).toBeInTheDocument();
+    expect(screen.getByText(/Match 2 of 2/i)).toBeInTheDocument();
+    expect(screen.getByText(/75%/i)).toBeInTheDocument();
   });
 
   it("shows high confidence badge for confidence >= 90", () => {
@@ -249,7 +250,7 @@ describe("DuplicateSection", () => {
     const mergeButton = screen.getByText("Merge");
     fireEvent.click(mergeButton);
 
-    const badge = screen.getByText(/75.0%/i);
+    const badge = screen.getByText(/75%/i);
     expect(badge.className).toContain("warning"); // Medium confidence uses warning color
   });
 

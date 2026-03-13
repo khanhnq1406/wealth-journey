@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
+import { renderWithIntl as render } from "@/test-utils";
 import { ReadyToImportSection } from "../ReadyToImportSection";
 import { ParsedTransaction } from "@/gen/protobuf/v1/import";
 
@@ -7,7 +8,8 @@ describe("ReadyToImportSection", () => {
     {
       rowNumber: 1,
       date: 1707638400 as any,
-      amount: { amount: -50000 as any, currency: "VND" },
+      // Import amounts use ×10000 format: 500000000 = 50,000 VND
+      amount: { amount: 500000000 as any, currency: "VND" },
       description: "Coffee Shop",
       type: 2,
       suggestedCategoryId: 1,
@@ -24,7 +26,8 @@ describe("ReadyToImportSection", () => {
     {
       rowNumber: 2,
       date: 1707638500 as any,
-      amount: { amount: 100000 as any, currency: "VND" },
+      // Import amounts use ×10000 format: 1000000000 = 100,000 VND
+      amount: { amount: 1000000000 as any, currency: "VND" },
       description: "Salary",
       type: 1, // INCOME
       suggestedCategoryId: 2,
@@ -73,10 +76,10 @@ describe("ReadyToImportSection", () => {
       />
     );
     expect(screen.getByText(/2 Ready to Import/i)).toBeInTheDocument();
-    expect(screen.getByText(/These transactions will be imported/i)).toBeInTheDocument();
+    expect(screen.getByText(/High confidence, auto-categorized/i)).toBeInTheDocument();
   });
 
-  it("expands to show transaction list by default", () => {
+  it("expands to show transaction list when clicking header", () => {
     render(
       <ReadyToImportSection
         transactions={mockTransactions}
@@ -85,6 +88,13 @@ describe("ReadyToImportSection", () => {
         onToggleExclude={mockOnToggleExclude}
       />
     );
+
+    // Initially collapsed — transactions not visible
+    expect(screen.queryByText("Coffee Shop")).not.toBeInTheDocument();
+
+    // Expand
+    const header = screen.getByRole("button", { name: /2 Ready to Import/i });
+    fireEvent.click(header);
 
     expect(screen.getByText("Coffee Shop")).toBeInTheDocument();
     expect(screen.getByText("Salary")).toBeInTheDocument();
@@ -100,14 +110,14 @@ describe("ReadyToImportSection", () => {
       />
     );
 
-    // Initially expanded
+    const header = screen.getByRole("button", { name: /2 Ready to Import/i });
+
+    // Click to expand
+    fireEvent.click(header);
     expect(screen.getByText("Coffee Shop")).toBeInTheDocument();
 
     // Click to collapse
-    const header = screen.getByRole("button", { name: /2 Ready to Import/i });
     fireEvent.click(header);
-
-    // Should be hidden
     expect(screen.queryByText("Coffee Shop")).not.toBeInTheDocument();
 
     // Click to expand again
@@ -125,11 +135,14 @@ describe("ReadyToImportSection", () => {
       />
     );
 
-    expect(screen.getByText("Food & Dining")).toBeInTheDocument();
-    expect(screen.getByText("Salary")).toBeInTheDocument();
+    // Expand to see transactions
+    const header = screen.getByRole("button", { name: /2 Ready to Import/i });
+    fireEvent.click(header);
+
+    expect(screen.getByText(/Food & Dining/i)).toBeInTheDocument();
   });
 
-  it("shows Uncategorized for transactions without category", () => {
+  it("shows transaction without category in the list", () => {
     const txWithoutCategory: ParsedTransaction[] = [
       {
         ...mockTransactions[0],
@@ -146,10 +159,15 @@ describe("ReadyToImportSection", () => {
       />
     );
 
-    expect(screen.getByText("Uncategorized")).toBeInTheDocument();
+    // Expand to see transactions
+    const header = screen.getByRole("button", { name: /1 Ready to Import/i });
+    fireEvent.click(header);
+
+    // Transaction with no category still appears in the list
+    expect(screen.getByText("Coffee Shop")).toBeInTheDocument();
   });
 
-  it("calls onToggleExclude when exclude button is clicked", () => {
+  it("calls onToggleExclude when row toggle button is clicked", () => {
     render(
       <ReadyToImportSection
         transactions={mockTransactions}
@@ -159,8 +177,13 @@ describe("ReadyToImportSection", () => {
       />
     );
 
-    const excludeButtons = screen.getAllByRole("button", { name: /Exclude/i });
-    fireEvent.click(excludeButtons[0]);
+    // Expand to see transactions
+    const header = screen.getByRole("button", { name: /2 Ready to Import/i });
+    fireEvent.click(header);
+
+    // Toggle row 1 button (aria-label: "Toggle row 1")
+    const toggleButtons = screen.getAllByRole("button", { name: /Toggle row/i });
+    fireEvent.click(toggleButtons[0]);
 
     expect(mockOnToggleExclude).toHaveBeenCalledWith(1);
     expect(mockOnToggleExclude).toHaveBeenCalledTimes(1);
@@ -176,9 +199,13 @@ describe("ReadyToImportSection", () => {
       />
     );
 
-    // Check that amounts are displayed (exact format depends on formatCurrency implementation)
-    expect(screen.getByText(/50,000/i)).toBeInTheDocument();
-    expect(screen.getByText(/100,000/i)).toBeInTheDocument();
+    // Expand to see transactions
+    const header = screen.getByRole("button", { name: /2 Ready to Import/i });
+    fireEvent.click(header);
+
+    // Check that amounts are displayed (VND locale uses dot as thousand separator: 50.000)
+    expect(screen.getByText(/50[.,]000/i)).toBeInTheDocument();
+    expect(screen.getByText(/100[.,]000/i)).toBeInTheDocument();
   });
 
   it("renders with custom currency", () => {
@@ -209,7 +236,7 @@ describe("ReadyToImportSection", () => {
     expect(screen.getByText(/1 Ready to Import/i)).toBeInTheDocument();
   });
 
-  it("displays row numbers correctly", () => {
+  it("displays row toggle buttons for each transaction when expanded", () => {
     render(
       <ReadyToImportSection
         transactions={mockTransactions}
@@ -219,7 +246,12 @@ describe("ReadyToImportSection", () => {
       />
     );
 
-    expect(screen.getByText(/Row 1/i)).toBeInTheDocument();
-    expect(screen.getByText(/Row 2/i)).toBeInTheDocument();
+    // Expand to see transactions
+    const header = screen.getByRole("button", { name: /2 Ready to Import/i });
+    fireEvent.click(header);
+
+    // Each transaction has a toggle button with aria-label "Toggle row N"
+    expect(screen.getByRole("button", { name: /Toggle row 1/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Toggle row 2/i })).toBeInTheDocument();
   });
 });

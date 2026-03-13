@@ -61,7 +61,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
     setExpandedOriginal(newExpanded);
   };
 
-  const t = useTranslations("modals.importWizard.readyToImport");
+  const t = useTranslations("import.readyToImport");
 
   // Memoize category options
   const categoryOptions = useMemo<SelectOption<string>[]>(() => {

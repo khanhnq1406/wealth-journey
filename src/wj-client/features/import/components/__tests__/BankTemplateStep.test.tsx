@@ -1,16 +1,22 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
+import { renderWithIntl as render } from "@/test-utils";
 import { BankTemplateStep } from "../BankTemplateStep";
 
-// Mock the query hook
+// Mock the query hooks
 jest.mock("@/utils/generated/hooks", () => ({
   useQueryListBankTemplates: jest.fn(() => ({
     data: {
       success: true,
       templates: [
-        { id: "vcb-csv", name: "Vietcombank CSV", bankCode: "VCB" },
-        { id: "tcb-csv", name: "Techcombank CSV", bankCode: "TCB" },
+        { id: "vcb-csv", name: "Vietcombank CSV", bankCode: "VCB", statementType: "CSV", fileFormats: ["csv"] },
+        { id: "tcb-csv", name: "Techcombank CSV", bankCode: "TCB", statementType: "CSV", fileFormats: ["csv"] },
       ],
     },
+    isLoading: false,
+    error: null,
+  })),
+  useQueryListUserTemplates: jest.fn(() => ({
+    data: { success: true, templates: [] },
     isLoading: false,
     error: null,
   })),
@@ -34,8 +40,8 @@ describe("BankTemplateStep", () => {
       />
     );
 
-    // Should render the component
-    expect(screen.getByText(/Select Bank Template/i)).toBeInTheDocument();
+    // Should render the component with bank templates heading
+    expect(screen.getByText(/Bank Templates/i)).toBeInTheDocument();
   });
 
   it("displays bank template options when loaded", () => {

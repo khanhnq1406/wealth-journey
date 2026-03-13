@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { renderWithIntl as render } from '@/test-utils';
 import { PWAInstallPrompt } from '../PWAInstallPrompt';
 
 // Mock hooks
