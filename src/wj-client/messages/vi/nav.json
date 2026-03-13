@@ -283,6 +283,8 @@
       "loginPrompt": "Vui lòng <loginLink>đăng nhập</loginLink> để xem giá",
       "goldChartTitle": "Biểu Đồ Giá Vàng",
       "silverChartTitle": "Biểu Đồ Giá Bạc",
+      "dollarIndexChartTitle": "Chỉ Số Dollar (DXY)",
+      "chartUnavailable": "Biểu đồ tạm thời không khả dụng",
       "chartLoginPrompt": "Đăng nhập để xem biểu đồ",
       "domesticMarket": "Trong nước",
       "globalMarket": "Thế giới",

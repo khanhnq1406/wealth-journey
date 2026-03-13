@@ -283,6 +283,8 @@
       "loginPrompt": "Please <loginLink>sign in</loginLink> to view prices",
       "goldChartTitle": "Gold Price Chart",
       "silverChartTitle": "Silver Price Chart",
+      "dollarIndexChartTitle": "Dollar Index (DXY)",
+      "chartUnavailable": "Chart temporarily unavailable",
       "chartLoginPrompt": "Sign in to view chart",
       "domesticMarket": "Domestic",
       "globalMarket": "Global",

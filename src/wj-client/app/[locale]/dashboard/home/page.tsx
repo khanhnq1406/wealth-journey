@@ -32,6 +32,7 @@ import { GoldPriceChart } from "./GoldPriceChart";
 import { SilverPriceTable } from "./SilverPriceTable";
 import { SilverPriceChart } from "./SilverPriceChart";
 import { CurrencyPriceTable } from "./CurrencyPriceTable";
+import { DollarIndexChart } from "./DollarIndexChart";
 import { WalletsSection } from "./WalletsSection";
 import { BaseCard } from "@/components/BaseCard";
 
@@ -191,7 +192,10 @@ export default function Home() {
         {/* 7. Currency Price Table */}
         <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} />
 
-        {/* 8. Wallets */}
+        {/* 8. Dollar Index Chart */}
+        <DollarIndexChart />
+
+        {/* 9. Wallets */}
         <WalletsSection wallets={wallets} />
       </div>
 
@@ -249,10 +253,10 @@ export default function Home() {
           <SilverPriceChart />
         </div>
 
-        {/* Row 5: Currency Table */}
+        {/* Row 5: Currency Table + Dollar Index Chart */}
         <div className="grid grid-cols-2 gap-6">
           <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} />
-          <div />
+          <DollarIndexChart />
         </div>
       </div>
 

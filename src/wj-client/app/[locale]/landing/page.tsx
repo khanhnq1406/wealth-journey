@@ -7,6 +7,7 @@ import { LandingGoldPriceChart } from "@/components/landing/LandingGoldPriceChar
 import { LandingSilverPriceTable } from "@/components/landing/LandingSilverPriceTable";
 import { LandingSilverPriceChart } from "@/components/landing/LandingSilverPriceChart";
 import { LandingCurrencyPriceTable } from "@/components/landing/LandingCurrencyPriceTable";
+import { LandingDollarIndexChart } from "@/components/landing/LandingDollarIndexChart";
 import LandingFooter from "@/components/landing/LandingFooter";
 import { usePublicMarketTypes } from "@/features/market-prices/hooks/usePublicMarketTypes";
 import { formatUpdateTimestamp } from "@/features/market-prices/utils/format-update-time";
@@ -58,6 +59,7 @@ export default function LandingPage() {
             <LandingSilverPriceTable types={silverTypes} isLoading={isLoading} updatedTime={silverUpdatedTime} />
             <LandingSilverPriceChart />
             <LandingCurrencyPriceTable types={currencyTypes} isLoading={isLoading} updatedTime={currencyUpdatedTime} />
+            <LandingDollarIndexChart />
           </div>
 
           {/* Desktop Layout */}
@@ -76,10 +78,10 @@ export default function LandingPage() {
               />
               <LandingSilverPriceChart />
             </div>
-            {/* Row 3: Currency Table */}
+            {/* Row 3: Currency Table + Dollar Index Chart */}
             <div className="grid grid-cols-2 gap-6 [&>*]:!mb-0">
               <LandingCurrencyPriceTable types={currencyTypes} isLoading={isLoading} updatedTime={currencyUpdatedTime} />
-              <div />
+              <LandingDollarIndexChart />
             </div>
           </div>
         </main>
