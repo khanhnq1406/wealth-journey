@@ -20,7 +20,7 @@ jobs:
       run:
         working-directory: src/go-backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-go@v5
         with:
@@ -108,7 +108,7 @@ jobs:
       UPLOAD_DIR: /tmp/wealthjourney-uploads
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-go@v5
         with:
@@ -157,7 +157,7 @@ jobs:
       run:
         working-directory: src/go-backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-go@v5
         with:
