@@ -143,8 +143,10 @@ export function ReviewStepWrapper({
     },
   });
 
-  // Keep the ref up to date with the latest mutate function
-  parseMutateRef.current = parseStatementMutation.mutate;
+  // Keep the ref up to date with the latest mutate function (in effect to avoid render-time ref mutation)
+  useEffect(() => {
+    parseMutateRef.current = parseStatementMutation.mutate;
+  });
 
   // Define parseFileViaBackend before useEffect to avoid variable ordering issue
   const parseFileViaBackend = React.useCallback(() => {
@@ -181,7 +183,9 @@ export function ReviewStepWrapper({
 
   // Detect duplicates when transactions are first loaded (run once per transactions set)
   const detectMutateRef = useRef(detectDuplicatesMutation.mutate);
-  detectMutateRef.current = detectDuplicatesMutation.mutate;
+  useEffect(() => {
+    detectMutateRef.current = detectDuplicatesMutation.mutate;
+  });
 
   useEffect(() => {
     if (transactions.length > 0 && walletId) {
