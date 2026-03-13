@@ -36,7 +36,7 @@ Personal_Financial_Management/
 │       └── import.proto               # Bank statement import
 │
 ├── src/
-│   ├── go-backend/                    # Go backend (Vercel deployment)
+│   ├── go-backend/                    # Go backend (Railway deployment)
 │   │   ├── internal/                  # Application bootstrap (ADR-001, ADR-002)
 │   │   │   ├── app/                   # App lifecycle & DI providers
 │   │   │   │   ├── app.go            # Application init & graceful shutdown
@@ -1442,8 +1442,8 @@ npm test
 
 **Backend:**
 
-- Vercel deployment (see [go-backend/vercel.go](src/go-backend/vercel.go))
-- Environment variables configured in Vercel dashboard
+- Railway deployment
+- Environment variables configured in Railway dashboard
 
 **Frontend:**
 

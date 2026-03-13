@@ -168,7 +168,7 @@ Protocol Buffer-first API design with C4-modeled architecture. Full diagrams, tr
 | **API Layer**        | Protocol Buffers, Buf, ts-proto                       |
 | **Auth**             | Google OAuth, JWT with Redis whitelist                |
 | **Background Jobs**  | Go scheduler (price updates, portfolio snapshots, cleanup) |
-| **Deployment**       | Vercel (frontend & backend)                           |
+| **Deployment**       | Vercel (frontend), Railway (backend)                  |
 | **External APIs**    | Yahoo Finance (market data), vang.today (gold prices) |
 
 ## 🚀 Quick Start
@@ -340,7 +340,7 @@ WealthJourney uses **Protocol Buffers as the single source of truth** for all AP
 - ✅ No manual DTOs or API client code
 - ✅ Dual protocol support (REST + gRPC)
 - ✅ Auto-generated TypeScript hooks for React Query
-- ✅ Vercel serverless compatible
+- ✅ Railway & Vercel compatible
 
 ### How It Works
 
@@ -447,7 +447,7 @@ task backend:migrate-sessions
 # See all: task --list | grep migrate
 
 # Deployment
-task deploy:backend          # Deploy to Vercel
+task deploy:backend          # Deploy backend to Railway
 task deploy:backend:preview  # Preview deployment
 ```
 
@@ -559,23 +559,12 @@ sequenceDiagram
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
+### Production Setup
 
-**Backend:**
+**Backend → Railway:**
 
-```bash
-cd src/go-backend
-vercel
-```
+Deploy the Go backend to Railway. Configure the following environment variables in the Railway dashboard:
 
-**Frontend:**
-
-```bash
-cd src/wj-client
-vercel
-```
-
-**Environment Variables (Vercel Dashboard):**
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `DB_HOST` | ✅ | PostgreSQL host (Supabase recommended) |
@@ -583,8 +572,15 @@ vercel
 | `JWT_SECRET` | ✅ | Minimum 32 characters |
 | `GOOGLE_CLIENT_ID` | ✅ | OAuth client ID |
 | `GOOGLE_CLIENT_SECRET` | ✅ | OAuth client secret |
-| `NEXT_PUBLIC_API_URL` | ✅ | Backend URL (frontend only) |
 | `YAHOO_FINANCE_ENABLED` | ❌ | Enable market data (default: true) |
+
+**Frontend → Vercel:**
+
+Deploy the Next.js frontend to Vercel from the `src/wj-client` directory.
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_API_URL` | ✅ | Backend Railway URL |
 
 ### Docker
 
@@ -862,7 +858,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [vang.today](https://vang.today) - Vietnamese gold prices
 - [Supabase](https://supabase.com/) - PostgreSQL hosting
 - [Upstash](https://upstash.com/) - Redis hosting
-- [Vercel](https://vercel.com/) - Deployment platform
+- [Vercel](https://vercel.com/) - Frontend deployment platform
+- [Railway](https://railway.app/) - Backend deployment platform
 
 ## 📞 Support
 

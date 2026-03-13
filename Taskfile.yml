@@ -15,7 +15,7 @@ tasks:
 
   # Backend tasks
   backend:dev:
-    desc: "Start backend in development mode (with Vercel dev)"
+    desc: "Start backend in development mode"
     dir: "{{.BACKEND_DIR}}"
     cmds:
       - make dev
@@ -225,13 +225,13 @@ tasks:
 
   # Deployment tasks
   deploy:backend:
-    desc: "Deploy backend to production (Vercel)"
+    desc: "Deploy backend to production (Railway)"
     dir: "{{.BACKEND_DIR}}"
     cmds:
       - make deploy
 
   deploy:backend:preview:
-    desc: "Deploy backend to preview environment (Vercel)"
+    desc: "Deploy backend to preview environment (Railway)"
     dir: "{{.BACKEND_DIR}}"
     cmds:
       - make deploy-preview
