@@ -552,8 +552,8 @@ func TestExecuteImport_RejectsZeroAmount(t *testing.T) {
 		// Verify expense and income totals don't include zero-amount transaction
 		// Amounts are divided by 10000 in import_service.go before storage
 		// -100000 / 10000 = -10 (expense), 50000 / 10000 = 5 (income)
-		assert.Equal(t, int64(10), resp.Summary.TotalExpenses, "Total expenses should be 10 VND")
-		assert.Equal(t, int64(5), resp.Summary.TotalIncome, "Total income should be 5 VND")
+		assert.Equal(t, int64(10), resp.Summary.TotalExpenses.Amount, "Total expenses should be 10 VND")
+		assert.Equal(t, int64(5), resp.Summary.TotalIncome.Amount, "Total income should be 5 VND")
 	})
 
 	t.Run("All zero-amount transactions results in no imports", func(t *testing.T) {
@@ -612,8 +612,8 @@ func TestExecuteImport_RejectsZeroAmount(t *testing.T) {
 
 		// Should import 0 transactions
 		assert.Equal(t, int32(0), resp.Summary.TotalImported, "Should import 0 transactions")
-		assert.Equal(t, int64(0), resp.Summary.TotalExpenses, "Total expenses should be 0")
-		assert.Equal(t, int64(0), resp.Summary.TotalIncome, "Total income should be 0")
+		assert.Equal(t, int64(0), resp.Summary.TotalExpenses.Amount, "Total expenses should be 0")
+		assert.Equal(t, int64(0), resp.Summary.TotalIncome.Amount, "Total income should be 0")
 	})
 }
 
