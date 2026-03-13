@@ -11,26 +11,24 @@ export function LandingGoldPriceChart() {
   return (
     <BaseCard
       padding="none"
-      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden h-full"
+      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
     >
-      <div className="p-5 h-full flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
-            {t("goldChartTitle")}
-          </h3>
-        </div>
+      {/* Header */}
+      <div className="px-5 pt-5 pb-2">
+        <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
+          {t("goldChartTitle")}
+        </h3>
+      </div>
 
-        {/* TradingView Chart — fully interactive, no login wall */}
-        <div className="flex-1 min-h-[300px]">
-          <TradingViewChart
-            symbol="TVC:GOLD"
-            height={500}
-            locale={locale}
-            theme="light"
-            allowSymbolChange={false}
-          />
-        </div>
+      {/* TradingView Chart — fully interactive, no login wall */}
+      <div className="px-2 pb-2">
+        <TradingViewChart
+          symbol="TVC:GOLD"
+          height={430}
+          locale={locale}
+          theme="light"
+          allowSymbolChange={false}
+        />
       </div>
     </BaseCard>
   );
