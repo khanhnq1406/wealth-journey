@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+package wealthjourney.v1;
+
+option go_package = "wealthjourney/protobuf/v1;v1";
+
+import "google/api/annotations.proto";
+
+enum VoteDirection {
+    VOTE_DIRECTION_UNSPECIFIED = 0;
+    VOTE_DIRECTION_BULLISH = 1;
+    VOTE_DIRECTION_BEARISH = 2;
+}
+
+message GetGoldSentimentRequest {}
+
+message GetGoldSentimentResponse {
+    int32 bullish_count = 1 [json_name = "bullishCount"];
+    int32 bearish_count = 2 [json_name = "bearishCount"];
+    int32 total_votes = 3 [json_name = "totalVotes"];
+    double bullish_percentage = 4 [json_name = "bullishPercentage"];
+    double bearish_percentage = 5 [json_name = "bearishPercentage"];
+    string vote_date = 6 [json_name = "voteDate"];
+    VoteDirection user_vote = 7 [json_name = "userVote"];
+}
+
+message GetGoldSentimentCommentsRequest {
+    int32 page = 1 [json_name = "page"];
+    int32 page_size = 2 [json_name = "pageSize"];
+}
+
+message GoldSentimentCommentItem {
+    int32 id = 1 [json_name = "id"];
+    int32 user_id = 2 [json_name = "userId"];
+    string user_name = 3 [json_name = "userName"];
+    string user_picture = 4 [json_name = "userPicture"];
+    string content = 5 [json_name = "content"];
+    int64 created_at = 6 [json_name = "createdAt"];
+    bool is_own_comment = 7 [json_name = "isOwnComment"];
+    VoteDirection user_vote_direction = 8 [json_name = "userVoteDirection"];
+}
+
+message GetGoldSentimentCommentsResponse {
+    repeated GoldSentimentCommentItem comments = 1 [json_name = "comments"];
+    int32 total_count = 2 [json_name = "totalCount"];
+    int32 page = 3 [json_name = "page"];
+    int32 page_size = 4 [json_name = "pageSize"];
+}
+
+message CastGoldVoteRequest {
+    VoteDirection direction = 1 [json_name = "direction"];
+}
+
+message CastGoldVoteResponse {
+    VoteDirection direction = 1 [json_name = "direction"];
+    int32 bullish_count = 2 [json_name = "bullishCount"];
+    int32 bearish_count = 3 [json_name = "bearishCount"];
+    int32 total_votes = 4 [json_name = "totalVotes"];
+    double bullish_percentage = 5 [json_name = "bullishPercentage"];
+    double bearish_percentage = 6 [json_name = "bearishPercentage"];
+}
+
+message PostGoldSentimentCommentRequest {
+    string content = 1 [json_name = "content"];
+}
+
+message PostGoldSentimentCommentResponse {
+    GoldSentimentCommentItem comment = 1 [json_name = "comment"];
+}
+
+message DeleteGoldSentimentCommentRequest {
+    int32 comment_id = 1 [json_name = "commentId"];
+}
+
+message DeleteGoldSentimentCommentResponse {}
+
+service GoldSentimentService {
+    rpc GetGoldSentiment(GetGoldSentimentRequest) returns (GetGoldSentimentResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/public/gold-sentiment"
+        };
+    }
+
+    rpc GetGoldSentimentComments(GetGoldSentimentCommentsRequest) returns (GetGoldSentimentCommentsResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/public/gold-sentiment/comments"
+        };
+    }
+
+    rpc CastGoldVote(CastGoldVoteRequest) returns (CastGoldVoteResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/gold-sentiment/vote"
+            body: "*"
+        };
+    }
+
+    rpc PostGoldSentimentComment(PostGoldSentimentCommentRequest) returns (PostGoldSentimentCommentResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/gold-sentiment/comments"
+            body: "*"
+        };
+    }
+
+    rpc DeleteGoldSentimentComment(DeleteGoldSentimentCommentRequest) returns (DeleteGoldSentimentCommentResponse) {
+        option (google.api.http) = {
+            delete: "/api/v1/gold-sentiment/comments/{comment_id}"
+        };
+    }
+}
