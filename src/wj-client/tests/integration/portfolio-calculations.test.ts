@@ -98,7 +98,7 @@ test.describe('Portfolio Calculations', () => {
 
   test('should display monetary values in correct format', async ({ page }) => {
     // Wait for page to settle — either shows content or empty state
-    await page.waitForSelector('text=Total Value, text=No Investment Wallets', { timeout: 10000 });
+    await page.waitForFunction(() => document.body.innerText.includes('Total Value') || document.body.innerText.includes('No Investment Wallets'), { timeout: 10000 });
     // Skip if no investment wallets
     const emptyWallets = await page.locator('text=No Investment Wallets').count();
     if (emptyWallets > 0) {
@@ -124,7 +124,7 @@ test.describe('Portfolio Calculations', () => {
 
   test('should display PNL with correct color coding', async ({ page }) => {
     // Wait for page to settle — either shows content or empty state
-    await page.waitForSelector('text=Total PNL, text=No Investment Wallets', { timeout: 10000 });
+    await page.waitForFunction(() => document.body.innerText.includes('Total PNL') || document.body.innerText.includes('No Investment Wallets'), { timeout: 10000 });
     // Skip if no investment wallets
     const emptyWallets = await page.locator('text=No Investment Wallets').count();
     if (emptyWallets > 0) {
@@ -151,7 +151,7 @@ test.describe('Portfolio Calculations', () => {
 
   test('should display holdings table with correct columns', async ({ page }) => {
     // Wait for page to settle — either shows content or empty state
-    await page.waitForSelector('text=Holdings, text=No Investment Wallets', { timeout: 10000 });
+    await page.waitForFunction(() => document.body.innerText.includes('Holdings') || document.body.innerText.includes('No Investment Wallets'), { timeout: 10000 });
     // Skip if no investment wallets
     const emptyWallets = await page.locator('text=No Investment Wallets').count();
     if (emptyWallets > 0) {
@@ -176,7 +176,7 @@ test.describe('Portfolio Calculations', () => {
 
   test('should display investment rows with formatted values', async ({ page }) => {
     // Wait for page to settle — either shows content or empty state
-    await page.waitForSelector('text=Holdings, text=No Investment Wallets', { timeout: 10000 });
+    await page.waitForFunction(() => document.body.innerText.includes('Holdings') || document.body.innerText.includes('No Investment Wallets'), { timeout: 10000 });
     // Skip if no investment wallets
     const emptyWallets1 = await page.locator('text=No Investment Wallets').count();
     if (emptyWallets1 > 0) {
@@ -219,7 +219,7 @@ test.describe('Portfolio Calculations', () => {
 
   test('should color code PNL values correctly in table', async ({ page }) => {
     // Wait for page to settle — either shows content or empty state
-    await page.waitForSelector('text=Holdings, text=No Investment Wallets', { timeout: 10000 });
+    await page.waitForFunction(() => document.body.innerText.includes('Holdings') || document.body.innerText.includes('No Investment Wallets'), { timeout: 10000 });
     // Skip if no investment wallets
     const emptyWallets2 = await page.locator('text=No Investment Wallets').count();
     if (emptyWallets2 > 0) {
@@ -273,7 +273,7 @@ test.describe('Portfolio Calculations', () => {
 
   test('should allow wallet selection when multiple wallets exist', async ({ page }) => {
     // Wait for page to settle — either shows content or empty state
-    await page.waitForSelector('text=Investment Portfolio, text=No Investment Wallets', { timeout: 10000 });
+    await page.waitForFunction(() => document.body.innerText.includes('Investment Portfolio') || document.body.innerText.includes('No Investment Wallets'), { timeout: 10000 });
     // Skip if no investment wallets
     const emptyWallets3 = await page.locator('text=No Investment Wallets').count();
     if (emptyWallets3 > 0) {
@@ -306,7 +306,7 @@ test.describe('Portfolio Calculations', () => {
 
   test('should have responsive layout', async ({ page }) => {
     // Wait for page to settle — either shows content or empty state
-    await page.waitForSelector('text=Investment Portfolio, text=No Investment Wallets', { timeout: 10000 });
+    await page.waitForFunction(() => document.body.innerText.includes('Investment Portfolio') || document.body.innerText.includes('No Investment Wallets'), { timeout: 10000 });
     // Skip if no investment wallets (page shows empty state without main portfolio content)
     const emptyWallets4 = await page.locator('text=No Investment Wallets').count();
     if (emptyWallets4 > 0) {
@@ -362,7 +362,7 @@ test.describe('Portfolio Calculations', () => {
 
   test('should calculate PNL correctly across all investments', async ({ page }) => {
     // Wait for page to settle — either shows content or empty state
-    await page.waitForSelector('text=Holdings, text=No Investment Wallets', { timeout: 10000 });
+    await page.waitForFunction(() => document.body.innerText.includes('Holdings') || document.body.innerText.includes('No Investment Wallets'), { timeout: 10000 });
     // Skip if no investment wallets
     const emptyWallets5 = await page.locator('text=No Investment Wallets').count();
     if (emptyWallets5 > 0) {
