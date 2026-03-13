@@ -305,6 +305,7 @@
       "currencyPriceTitle": "Currency Prices Today",
       "goldChartTitle": "Gold Price Chart",
       "silverChartTitle": "Silver Price Chart",
+      "chartUnavailable": "Chart temporarily unavailable",
       "wallets": "Wallets",
       "seeAll": "See all",
       "updated": "Updated {time}",

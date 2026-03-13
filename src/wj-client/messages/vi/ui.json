@@ -305,6 +305,7 @@
       "currencyPriceTitle": "Giá Ngoại Tệ Hôm Nay",
       "goldChartTitle": "Biểu Đồ Giá Vàng",
       "silverChartTitle": "Biểu Đồ Giá Bạc",
+      "chartUnavailable": "Biểu đồ tạm thời không khả dụng",
       "wallets": "Ví tiền",
       "seeAll": "Xem tất cả",
       "updated": "Cập nhật {time}",
