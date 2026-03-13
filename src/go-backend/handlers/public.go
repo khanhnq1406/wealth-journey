@@ -29,102 +29,126 @@ func NewPublicHandler(goldSvc service.GoldPriceService, silverSvc service.Silver
 	}
 }
 
-// GetPublicMarketTypes returns gold/silver/currency type names without prices
+// GetPublicMarketTypes returns gold/silver/currency type names without prices.
+// Derives type lists from live price services so the landing page shows the
+// same items as the authenticated dashboard. Falls back to static registries
+// when a service is unavailable.
 // GET /api/v1/public/market-types
 func (h *PublicHandler) GetPublicMarketTypes(c *gin.Context) {
-	// Build gold types (code, name, currency only — no prices)
-	goldTypes := make([]gin.H, len(gold.GoldTypes))
-	for i, gt := range gold.GoldTypes {
-		goldTypes[i] = gin.H{
-			"code":     gt.Code,
-			"name":     gt.Name,
-			"currency": gt.Currency,
-		}
-	}
+	ctx := c.Request.Context()
 
-	// Build silver types (code, name, currency only — no prices)
-	silverTypes := make([]gin.H, len(silver.SilverTypes))
-	for i, st := range silver.SilverTypes {
-		silverTypes[i] = gin.H{
-			"code":     st.Code,
-			"name":     st.Name,
-			"currency": st.Currency,
-		}
-	}
+	var (
+		goldTypes, silverTypes, currencyTypes []gin.H
+		goldUpdatedAt, silverUpdatedAt, currencyUpdatedAt int64
+		wg sync.WaitGroup
+		mu sync.Mutex
+	)
 
-	// Build currency types from static list (no API call needed)
-	currencyTypes := make([]gin.H, len(currency.CurrencyTypes))
-	for i, ct := range currency.CurrencyTypes {
-		currencyTypes[i] = gin.H{
-			"code":     ct.Code,
-			"name":     ct.Name,
-			"currency": ct.Currency,
-		}
-	}
-
-	// Fetch latest update timestamps (best-effort, don't fail if unavailable)
-	var goldUpdatedAt, silverUpdatedAt, currencyUpdatedAt int64
-	var wg sync.WaitGroup
 	wg.Add(3)
 
+	// Gold: derive from live prices, fallback to static registry
 	go func() {
 		defer wg.Done()
-		if h.goldSvc == nil {
-			return
-		}
-		prices, err := h.goldSvc.FetchAllPrices(c.Request.Context())
-		if err != nil || len(prices) == 0 {
-			return
-		}
-		var latest time.Time
-		for _, p := range prices {
-			if p.UpdateTime.After(latest) {
-				latest = p.UpdateTime
+		if h.goldSvc != nil {
+			prices, err := h.goldSvc.FetchAllPrices(ctx)
+			if err == nil && len(prices) > 0 {
+				mu.Lock()
+				goldTypes = make([]gin.H, len(prices))
+				for i, p := range prices {
+					goldTypes[i] = gin.H{
+						"code":     p.TypeCode,
+						"name":     p.Name,
+						"currency": p.Currency,
+					}
+					if p.UpdateTime.Unix() > goldUpdatedAt {
+						goldUpdatedAt = p.UpdateTime.Unix()
+					}
+				}
+				mu.Unlock()
+				return
 			}
 		}
-		if !latest.IsZero() {
-			goldUpdatedAt = latest.Unix()
+		// Fallback to static registry
+		mu.Lock()
+		goldTypes = make([]gin.H, len(gold.GoldTypes))
+		for i, gt := range gold.GoldTypes {
+			goldTypes[i] = gin.H{
+				"code":     gt.Code,
+				"name":     gt.Name,
+				"currency": gt.Currency,
+			}
 		}
+		mu.Unlock()
 	}()
 
+	// Silver: derive from live prices, fallback to static registry
 	go func() {
 		defer wg.Done()
-		if h.silverSvc == nil {
-			return
-		}
-		prices, err := h.silverSvc.FetchAllPrices(c.Request.Context())
-		if err != nil || len(prices) == 0 {
-			return
-		}
-		var latest time.Time
-		for _, p := range prices {
-			if p.UpdateTime.After(latest) {
-				latest = p.UpdateTime
+		if h.silverSvc != nil {
+			prices, err := h.silverSvc.FetchAllPrices(ctx)
+			if err == nil && len(prices) > 0 {
+				mu.Lock()
+				silverTypes = make([]gin.H, len(prices))
+				for i, p := range prices {
+					silverTypes[i] = gin.H{
+						"code":     p.TypeCode,
+						"name":     p.Name,
+						"currency": p.Currency,
+					}
+					if p.UpdateTime.Unix() > silverUpdatedAt {
+						silverUpdatedAt = p.UpdateTime.Unix()
+					}
+				}
+				mu.Unlock()
+				return
 			}
 		}
-		if !latest.IsZero() {
-			silverUpdatedAt = latest.Unix()
+		// Fallback to static registry
+		mu.Lock()
+		silverTypes = make([]gin.H, len(silver.SilverTypes))
+		for i, st := range silver.SilverTypes {
+			silverTypes[i] = gin.H{
+				"code":     st.Code,
+				"name":     st.Name,
+				"currency": st.Currency,
+			}
 		}
+		mu.Unlock()
 	}()
 
+	// Currency: derive from live prices, fallback to static registry
 	go func() {
 		defer wg.Done()
-		if h.currencySvc == nil {
-			return
-		}
-		prices, err := h.currencySvc.FetchAllPrices(c.Request.Context())
-		if err != nil || len(prices) == 0 {
-			return
-		}
-		var latest time.Time
-		for _, p := range prices {
-			if p.UpdateTime.After(latest) {
-				latest = p.UpdateTime
+		if h.currencySvc != nil {
+			prices, err := h.currencySvc.FetchAllPrices(ctx)
+			if err == nil && len(prices) > 0 {
+				mu.Lock()
+				currencyTypes = make([]gin.H, len(prices))
+				for i, p := range prices {
+					currencyTypes[i] = gin.H{
+						"code":     p.TypeCode,
+						"name":     p.Name,
+						"currency": p.Currency,
+					}
+					if p.UpdateTime.Unix() > currencyUpdatedAt {
+						currencyUpdatedAt = p.UpdateTime.Unix()
+					}
+				}
+				mu.Unlock()
+				return
 			}
 		}
-		if !latest.IsZero() {
-			currencyUpdatedAt = latest.Unix()
+		// Fallback to static registry
+		mu.Lock()
+		currencyTypes = make([]gin.H, len(currency.CurrencyTypes))
+		for i, ct := range currency.CurrencyTypes {
+			currencyTypes[i] = gin.H{
+				"code":     ct.Code,
+				"name":     ct.Name,
+				"currency": ct.Currency,
+			}
 		}
+		mu.Unlock()
 	}()
 
 	wg.Wait()

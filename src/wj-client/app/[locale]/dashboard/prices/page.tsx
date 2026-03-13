@@ -56,14 +56,22 @@ function ChangeCell({
 
 const columnHelper = createColumnHelper<PriceItem>();
 
-function buildTanstackColumns(t: (key: string) => string) {
+const TAB_TYPE_COLOR: Record<Tab, string> = {
+  gold: "text-v2-gold-dark",
+  silver: "text-v2-silver-dark",
+  currency: "text-v2-currency-dark",
+  symbol: "text-gray-900 dark:text-dark-text",
+};
+
+function buildTanstackColumns(t: (key: string) => string, tab: Tab) {
+  const typeColor = TAB_TYPE_COLOR[tab];
   return [
     columnHelper.display({
       id: "name",
       header: t("table.type"),
       cell: ({ row }) => (
         <div>
-          <span className="font-medium text-gray-900 dark:text-dark-text">
+          <span className={`font-medium ${typeColor}`}>
             {row.original.name || row.original.typeCode}
           </span>
           <span className="ml-1.5 text-xs text-gray-400">
@@ -102,14 +110,15 @@ function buildTanstackColumns(t: (key: string) => string) {
 
 // ─── MobileTable columns (mobile fallback) ─────────────────────────────────────
 
-function buildMobileColumns(t: (key: string) => string): MobileColumnDef<PriceItem>[] {
+function buildMobileColumns(t: (key: string) => string, tab: Tab): MobileColumnDef<PriceItem>[] {
+  const typeColor = TAB_TYPE_COLOR[tab];
   return [
     {
       id: "name",
       header: t("table.type"),
       cell: ({ row }) => (
         <div>
-          <span className="font-medium text-gray-900 dark:text-dark-text">
+          <span className={`font-medium ${typeColor}`}>
             {row.name || row.typeCode}
           </span>
           <span className="ml-1.5 text-xs text-gray-400">{row.currency}</span>
@@ -252,8 +261,8 @@ export default function PricesPage() {
   const tc = useTranslations("common");
   const locale = useLocale();
   const [activeTab, setActiveTab] = useState<Tab>("gold");
-  const tanstackColumns = useMemo(() => buildTanstackColumns(t as (key: string) => string), [t]);
-  const mobileColumns = useMemo(() => buildMobileColumns(t as (key: string) => string), [t]);
+  const tanstackColumns = useMemo(() => buildTanstackColumns(t as (key: string) => string, activeTab), [t, activeTab]);
+  const mobileColumns = useMemo(() => buildMobileColumns(t as (key: string) => string, activeTab), [t, activeTab]);
   const [symbolInput, setSymbolInput] = useState("");
   const [querySymbol, setQuerySymbol] = useState("");
 

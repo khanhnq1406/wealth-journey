@@ -76,7 +76,7 @@ export function LandingSilverPriceTable({
                   index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"
                 }
               >
-                <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-text-primary">
+                <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-silver-dark">
                   {item.name || item.code}
                 </td>
                 <td className="px-5 py-3 text-right font-vietnam text-[12px] text-v2-text-secondary">

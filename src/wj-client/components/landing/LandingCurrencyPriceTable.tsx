@@ -60,13 +60,13 @@ export function LandingCurrencyPriceTable({
         <table className="w-full">
           <thead>
             <tr className="bg-v2-currency-light">
-              <th className="text-left px-5 py-2.5 font-jetbrains font-semibold text-[11px] tracking-[1px] text-v2-currency-dark">
+              <th className="text-left px-5 py-3.5 font-vietnam font-bold text-[14px] tracking-normal text-v2-currency-dark">
                 {t("currencyType")}
               </th>
-              <th className="text-right px-5 py-2.5 font-jetbrains font-semibold text-[11px] tracking-[1px] text-v2-currency-dark">
+              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-currency-dark">
                 {t("buy")}
               </th>
-              <th className="text-right px-5 py-2.5 font-jetbrains font-semibold text-[11px] tracking-[1px] text-v2-currency-dark">
+              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-currency-dark">
                 {t("sell")}
               </th>
             </tr>
@@ -79,7 +79,7 @@ export function LandingCurrencyPriceTable({
                   index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"
                 }
               >
-                <td className="px-5 py-3 font-vietnam font-medium text-[13px] text-v2-text-primary">
+                <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-currency-dark">
                   {item.name || item.code}
                 </td>
                 <td className="px-5 py-3 text-right font-vietnam text-[12px] text-v2-text-secondary">

@@ -136,6 +136,14 @@ Created new test file: `tests/e2e/view-prices-flow.spec.ts` (commit: c2b36a1)
    - Navigate to `/dashboard/home` → scroll to see currency table
    - Navigate to landing page → verify currency section after silver
 
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-13 | TypeCode column text color now matches commodity-specific header color (gold amber, silver gray, currency blue) across all 7 price table components | Minor | pending |
+| 2026-03-13 | LandingCurrencyPriceTable thead/tbody font weight, size, and padding now matches homepage CurrencyPriceTable (font-bold 14px for type col, font-bold 13px uppercase for buy/sell, py-3.5 padding) | Minor | pending |
+| 2026-03-13 | Public endpoint now derives gold/silver/currency type lists from live price services instead of static registries, ensuring landing page shows the same items as the authenticated home page. Falls back to static lists when services are unavailable. | Minor | pending |
+
 ## Known Issues / Technical Debt
 
 - Silver SBJ entries are static (Buy/Sell = 0) — displayed as "—" on frontend. Real SBJ API integration deferred.
