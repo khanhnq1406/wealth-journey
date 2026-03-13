@@ -22,6 +22,7 @@ type Services struct {
 	MarketData         MarketDataService
 	Import             ImportService
 	Community          CommunityService
+	GoldSentiment      GoldSentimentService
 }
 
 // NewServices creates all service instances with proper dependency ordering.
@@ -47,6 +48,9 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	investmentSvc := NewInvestmentService(repos.Investment, repos.Wallet, repos.InvestmentTransaction, marketDataSvc, repos.User, fxRateSvc, currencyCache, walletSvc, repos.PortfolioHistory)
 	portfolioHistorySvc := NewPortfolioHistoryService(repos.PortfolioHistory, investmentSvc, repos.User, fxRateSvc)
 
+	// Phase 1 (cont.): GoldSentimentService — depends on vote/comment repos and Redis
+	goldSentimentSvc := NewGoldSentimentService(repos.GoldVote, repos.GoldVoteComment, repos.User, redisClient)
+
 	// Phase 1 (cont.): CommunityService — depends on storage provider for image uploads
 	communitySvc := NewCommunityService(repos.Post, repos.Comment, repos.Like, repos.Follow, repos.Report, repos.User, repos.Notification, repos.SavedPost, repos.Hashtag, communityStorage, rdb)
 
@@ -62,6 +66,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		MarketData:       marketDataSvc,
 		Import:           nil, // Created separately with job queue
 		Community:        communitySvc,
+		GoldSentiment:    goldSentimentSvc,
 	}
 }
 
