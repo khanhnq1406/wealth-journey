@@ -79,3 +79,4 @@ Replaced all 4 Recharts-based gold/silver price charts (2 dashboard, 2 landing) 
 | Date | Fix | Severity | Commit |
 |------|-----|----------|--------|
 | 2026-03-13 | Fix chart layout (widget div height 100%), add loading spinner, remove copyright text | Minor | — |
+| 2026-03-13 | Add Dollar Index (DXY) TradingView chart beside currency price table on dashboard + landing | Minor | — |
