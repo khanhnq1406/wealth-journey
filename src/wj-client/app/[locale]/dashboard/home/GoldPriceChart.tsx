@@ -24,7 +24,7 @@ export function GoldPriceChart() {
       <div className="px-2 pb-2">
         <TradingViewChart
           symbol="TVC:GOLD"
-          height={400}
+          height={500}
           locale={locale}
           theme="light"
         />

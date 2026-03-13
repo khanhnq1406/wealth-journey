@@ -1,6 +1,14 @@
 "use client";
 
-import { useEffect, useRef, memo } from "react";
+import { useEffect, useRef, useState, memo } from "react";
+
+declare global {
+  interface Window {
+    TradingView?: {
+      widget: new (config: Record<string, unknown>) => unknown;
+    };
+  }
+}
 
 interface TradingViewChartProps {
   symbol: string;
@@ -12,6 +20,27 @@ interface TradingViewChartProps {
   className?: string;
 }
 
+let tvScriptPromise: Promise<void> | null = null;
+
+function loadTradingViewScript(): Promise<void> {
+  if (tvScriptPromise) return tvScriptPromise;
+  if (window.TradingView) return Promise.resolve();
+
+  tvScriptPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://s3.tradingview.com/tv.js";
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => {
+      tvScriptPromise = null;
+      reject(new Error("Failed to load TradingView"));
+    };
+    document.head.appendChild(script);
+  });
+
+  return tvScriptPromise;
+}
+
 function TradingViewChartInner({
   symbol,
   height = 400,
@@ -21,66 +50,86 @@ function TradingViewChartInner({
   allowSymbolChange = false,
   className,
 }: TradingViewChartProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const widgetRef = useRef<HTMLDivElement>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   const tvLocale = locale === "vi" ? "vi_VN" : "en";
 
   useEffect(() => {
-    const container = containerRef.current;
+    let cancelled = false;
+    const container = widgetRef.current;
     if (!container) return;
 
-    container.innerHTML = "";
+    setIsLoading(true);
+    setHasError(false);
 
-    const widgetDiv = document.createElement("div");
-    widgetDiv.className = "tradingview-widget-container__widget";
-    widgetDiv.style.height = "calc(100% - 32px)";
-    widgetDiv.style.width = "100%";
-    container.appendChild(widgetDiv);
+    // Generate unique container id for the widget
+    const containerId = `tv-widget-${symbol.replace(/[^a-zA-Z0-9]/g, "-")}-${Date.now()}`;
+    container.id = containerId;
 
-    const copyrightDiv = document.createElement("div");
-    copyrightDiv.className = "tradingview-widget-copyright";
-    copyrightDiv.innerHTML = `<a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a>`;
-    container.appendChild(copyrightDiv);
+    loadTradingViewScript()
+      .then(() => {
+        if (cancelled || !window.TradingView) return;
 
-    const script = document.createElement("script");
-    script.src =
-      "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
-    script.type = "text/javascript";
-    script.async = true;
-    script.innerHTML = JSON.stringify({
-      autosize: true,
-      symbol,
-      interval,
-      timezone: "Asia/Ho_Chi_Minh",
-      theme,
-      style: "1",
-      locale: tvLocale,
-      allow_symbol_change: allowSymbolChange,
-      hide_top_toolbar: false,
-      hide_side_toolbar: true,
-      hide_volume: false,
-      save_image: false,
-      calendar: false,
-      support_host: "https://www.tradingview.com",
-    });
+        new window.TradingView.widget({
+          container_id: containerId,
+          autosize: true,
+          symbol,
+          interval,
+          timezone: "Asia/Ho_Chi_Minh",
+          theme: theme === "dark" ? "dark" : "light",
+          style: "1",
+          locale: tvLocale,
+          toolbar_bg: "#f1f3f6",
+          enable_publishing: false,
+          allow_symbol_change: allowSymbolChange,
+          hide_side_toolbar: true,
+          save_image: false,
+          calendar: false,
+          studies: [],
+        });
 
-    container.appendChild(script);
+        // Wait for iframe to render
+        setTimeout(() => {
+          if (!cancelled) setIsLoading(false);
+        }, 1500);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setHasError(true);
+          setIsLoading(false);
+        }
+      });
 
     return () => {
-      if (container) {
-        container.innerHTML = "";
-      }
+      cancelled = true;
+      if (container) container.innerHTML = "";
     };
   }, [symbol, theme, tvLocale, interval, allowSymbolChange]);
 
   return (
     <div
-      ref={containerRef}
-      className={className}
+      className={`relative ${className ?? ""}`}
       style={{ height, width: "100%" }}
-      role="img"
-      aria-label={`TradingView chart for ${symbol}`}
-    />
+    >
+      <div
+        ref={widgetRef}
+        style={{ height: "100%", width: "100%" }}
+        role="img"
+        aria-label={`TradingView chart for ${symbol}`}
+      />
+      {isLoading && !hasError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-bg" />
+        </div>
+      )}
+      {hasError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">
+          <p className="text-sm text-gray-500">Chart unavailable</p>
+        </div>
+      )}
+    </div>
   );
 }
 

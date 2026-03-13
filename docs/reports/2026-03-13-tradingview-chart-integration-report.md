@@ -73,3 +73,9 @@ Replaced all 4 Recharts-based gold/silver price charts (2 dashboard, 2 landing) 
 
 - CSP headers may need `s3.tradingview.com` and `*.tradingview.com` whitelisted if Content Security Policy is configured
 - The `useQueryGetGoldChart` and `useQueryGetSilverChart` hooks are no longer used by the home page charts — they remain available for other consumers (e.g., prices page) but could be cleaned up if no longer needed elsewhere
+
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-13 | Fix chart layout (widget div height 100%), add loading spinner, remove copyright text | Minor | — |

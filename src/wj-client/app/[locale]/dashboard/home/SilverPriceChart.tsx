@@ -24,7 +24,7 @@ export function SilverPriceChart() {
       <div className="px-2 pb-2">
         <TradingViewChart
           symbol="TVC:SILVER"
-          height={400}
+          height={500}
           locale={locale}
           theme="light"
         />

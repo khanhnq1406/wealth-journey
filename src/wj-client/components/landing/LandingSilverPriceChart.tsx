@@ -25,7 +25,7 @@ export function LandingSilverPriceChart() {
         <div className="flex-1 min-h-[300px]">
           <TradingViewChart
             symbol="TVC:SILVER"
-            height={350}
+            height={500}
             locale={locale}
             theme="light"
             allowSymbolChange={false}
