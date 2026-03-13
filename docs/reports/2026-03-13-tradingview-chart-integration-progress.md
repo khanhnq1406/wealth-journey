@@ -6,35 +6,18 @@
 - **Spec file:** docs/specs/2026-03-13-tradingview-chart-integration-spec.md
 - **Started:** 2026-03-13
 - **Last updated:** 2026-03-13
-- **Current state:** in_progress
-- **Current task:** 1
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 1 | Create TradingViewChart shared component | pending | — | — |
-| 2 | Add i18n translation keys | pending | — | — |
-| 3 | Replace dashboard gold chart | pending | — | — |
-| 4 | Replace dashboard silver chart | pending | — | — |
-| 5 | Replace landing gold chart | pending | — | — |
-| 6 | Replace landing silver chart | pending | — | — |
-| 7 | Update C4 frontend architecture diagram | pending | — | — |
-| 8 | Final verification and build check | pending | — | — |
-
-## Resume Instructions
-
-To resume this implementation in a new session:
-1. Read this progress file
-2. Read the plan file referenced above
-3. Check `git log --oneline -10` to verify last commit matches the last `done` task
-4. Check `git status` for any uncommitted work
-5. Continue from the next `pending` task using the same checkpoint protocol
-
-## Notes
-
-- Tasks 1 and 2 are independent, can run in parallel
-- Tasks 3-6 depend on Task 1, are independent of each other
-- Task 7 depends on Tasks 3-6
-- Task 8 depends on all tasks
-- No backend changes, no protobuf changes, no new npm dependencies
+| 1 | Create TradingViewChart shared component | done | 4495ee7 | Created reusable TradingViewChart.tsx with symbol/theme/locale/interval props |
+| 2 | Add i18n translation keys | done | ce31a89 | Added chartUnavailable key to en/vi ui.json and nav.json |
+| 3 | Replace dashboard gold chart | done | abd76da | Replaced Recharts GoldPriceChart with TradingView TVC:GOLD (-253 lines) |
+| 4 | Replace dashboard silver chart | done | 3203aa2 | Replaced Recharts SilverPriceChart with TradingView TVC:SILVER (-256 lines) |
+| 5 | Replace landing gold chart | done | 172fa01 | Replaced mock SVG + login overlay with live TradingView TVC:GOLD (-99 lines) |
+| 6 | Replace landing silver chart | done | 6448bd9 | Replaced mock SVG + login overlay with live TradingView TVC:SILVER (-109 lines) |
+| 7 | Update C4 frontend architecture diagram | done | d58ebbe | Updated C4 diagram: added TradingViewChart, updated page descriptions |
+| 8 | Final verification and build check | done | — | TypeScript + Next.js build pass clean |
