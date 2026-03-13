@@ -302,6 +302,7 @@
       "allTime": "TẤT CẢ",
       "goldPriceTitle": "Giá Vàng Hôm Nay",
       "silverPriceTitle": "Giá Bạc Hôm Nay",
+      "currencyPriceTitle": "Giá Ngoại Tệ Hôm Nay",
       "goldChartTitle": "Biểu Đồ Giá Vàng",
       "silverChartTitle": "Biểu Đồ Giá Bạc",
       "wallets": "Ví tiền",
@@ -309,6 +310,7 @@
       "updated": "Cập nhật {time}",
       "goldType": "LOẠI VÀNG",
       "silverType": "LOẠI BẠC",
+      "currencyType": "LOẠI NGOẠI TỆ",
       "buy": "MUA",
       "sell": "BÁN",
       "period": {

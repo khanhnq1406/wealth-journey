@@ -274,8 +274,10 @@
     "priceTeaser": {
       "goldTableTitle": "Gold Prices",
       "silverTableTitle": "Silver Prices",
+      "currencyTableTitle": "Currency Prices",
       "goldType": "GOLD TYPE",
       "silverType": "SILVER TYPE",
+      "currencyType": "CURRENCY TYPE",
       "buy": "BUY",
       "sell": "SELL",
       "loginPrompt": "Please <loginLink>sign in</loginLink> to view prices",

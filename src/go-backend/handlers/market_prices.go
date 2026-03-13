@@ -11,34 +11,38 @@ import (
 	investmentv1 "wealthjourney/protobuf/v1"
 )
 
-// MarketPricesHandler handles the combined gold + silver prices endpoint
+// MarketPricesHandler handles the combined gold + silver + currency prices endpoint
 type MarketPricesHandler struct {
-	goldSvc   service.GoldPriceService
-	silverSvc service.SilverPriceService
+	goldSvc     service.GoldPriceService
+	silverSvc   service.SilverPriceService
+	currencySvc service.CurrencyPriceService
 }
 
 // NewMarketPricesHandler creates a new market prices handler
-func NewMarketPricesHandler(goldSvc service.GoldPriceService, silverSvc service.SilverPriceService) *MarketPricesHandler {
+func NewMarketPricesHandler(goldSvc service.GoldPriceService, silverSvc service.SilverPriceService, currencySvc service.CurrencyPriceService) *MarketPricesHandler {
 	return &MarketPricesHandler{
-		goldSvc:   goldSvc,
-		silverSvc: silverSvc,
+		goldSvc:     goldSvc,
+		silverSvc:   silverSvc,
+		currencySvc: currencySvc,
 	}
 }
 
-// GetMarketPrices returns all gold and silver prices in one call.
+// GetMarketPrices returns all gold, silver, and currency prices in one call.
 // GET /api/v1/investments/market-prices
 func (h *MarketPricesHandler) GetMarketPrices(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	var (
-		goldItems   []*investmentv1.PriceItem
-		silverItems []*investmentv1.PriceItem
-		goldErr     error
-		silverErr   error
-		wg          sync.WaitGroup
+		goldItems     []*investmentv1.PriceItem
+		silverItems   []*investmentv1.PriceItem
+		currencyItems []*investmentv1.PriceItem
+		goldErr       error
+		silverErr     error
+		currencyErr   error
+		wg            sync.WaitGroup
 	)
 
-	wg.Add(2)
+	wg.Add(3)
 
 	go func() {
 		defer wg.Done()
@@ -84,10 +88,32 @@ func (h *MarketPricesHandler) GetMarketPrices(c *gin.Context) {
 		}
 	}()
 
+	go func() {
+		defer wg.Done()
+		prices, err := h.currencySvc.FetchAllPrices(ctx)
+		if err != nil {
+			currencyErr = err
+			return
+		}
+		currencyItems = make([]*investmentv1.PriceItem, len(prices))
+		for i, p := range prices {
+			currencyItems[i] = &investmentv1.PriceItem{
+				TypeCode:   p.TypeCode,
+				Buy:        p.Buy,
+				Sell:       p.Sell,
+				ChangeBuy:  p.ChangeBuy,
+				ChangeSell: p.ChangeSell,
+				Currency:   p.Currency,
+				UpdatedAt:  p.UpdateTime.Unix(),
+				Name:       p.Name,
+			}
+		}
+	}()
+
 	wg.Wait()
 
-	// Both failed — return error
-	if goldErr != nil && silverErr != nil {
+	// All three failed — return error
+	if goldErr != nil && silverErr != nil && currencyErr != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{
 			"success": false,
 			"message": "Failed to fetch prices",
@@ -95,12 +121,15 @@ func (h *MarketPricesHandler) GetMarketPrices(c *gin.Context) {
 		return
 	}
 
-	// Partial success: return empty slice (never null) for failed one
+	// Partial success: return empty slice (never null) for failed ones
 	if goldItems == nil {
 		goldItems = []*investmentv1.PriceItem{}
 	}
 	if silverItems == nil {
 		silverItems = []*investmentv1.PriceItem{}
+	}
+	if currencyItems == nil {
+		currencyItems = []*investmentv1.PriceItem{}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -108,6 +137,7 @@ func (h *MarketPricesHandler) GetMarketPrices(c *gin.Context) {
 		"message":   "Market prices retrieved successfully",
 		"gold":      goldItems,
 		"silver":    silverItems,
+		"currency":  currencyItems,
 		"timestamp": time.Now().Format(time.RFC3339),
 	})
 }

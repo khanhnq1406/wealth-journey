@@ -16,7 +16,7 @@ import {
 import { InvestmentType } from "@/gen/protobuf/v1/investment";
 import { formatPriceValue, formatChangeValue, PriceItem } from "./helpers";
 
-type Tab = "gold" | "silver" | "symbol";
+type Tab = "gold" | "silver" | "currency" | "symbol";
 
 // Tab labels are provided via translations below
 
@@ -56,14 +56,22 @@ function ChangeCell({
 
 const columnHelper = createColumnHelper<PriceItem>();
 
-function buildTanstackColumns(t: (key: string) => string) {
+const TAB_TYPE_COLOR: Record<Tab, string> = {
+  gold: "text-v2-gold-dark",
+  silver: "text-v2-silver-dark",
+  currency: "text-v2-currency-dark",
+  symbol: "text-gray-900 dark:text-dark-text",
+};
+
+function buildTanstackColumns(t: (key: string) => string, tab: Tab) {
+  const typeColor = TAB_TYPE_COLOR[tab];
   return [
     columnHelper.display({
       id: "name",
       header: t("table.type"),
       cell: ({ row }) => (
         <div>
-          <span className="font-medium text-gray-900 dark:text-dark-text">
+          <span className={`font-medium ${typeColor}`}>
             {row.original.name || row.original.typeCode}
           </span>
           <span className="ml-1.5 text-xs text-gray-400">
@@ -102,14 +110,15 @@ function buildTanstackColumns(t: (key: string) => string) {
 
 // ─── MobileTable columns (mobile fallback) ─────────────────────────────────────
 
-function buildMobileColumns(t: (key: string) => string): MobileColumnDef<PriceItem>[] {
+function buildMobileColumns(t: (key: string) => string, tab: Tab): MobileColumnDef<PriceItem>[] {
+  const typeColor = TAB_TYPE_COLOR[tab];
   return [
     {
       id: "name",
       header: t("table.type"),
       cell: ({ row }) => (
         <div>
-          <span className="font-medium text-gray-900 dark:text-dark-text">
+          <span className={`font-medium ${typeColor}`}>
             {row.name || row.typeCode}
           </span>
           <span className="ml-1.5 text-xs text-gray-400">{row.currency}</span>
@@ -252,14 +261,15 @@ export default function PricesPage() {
   const tc = useTranslations("common");
   const locale = useLocale();
   const [activeTab, setActiveTab] = useState<Tab>("gold");
-  const tanstackColumns = useMemo(() => buildTanstackColumns(t as (key: string) => string), [t]);
-  const mobileColumns = useMemo(() => buildMobileColumns(t as (key: string) => string), [t]);
+  const tanstackColumns = useMemo(() => buildTanstackColumns(t as (key: string) => string, activeTab), [t, activeTab]);
+  const mobileColumns = useMemo(() => buildMobileColumns(t as (key: string) => string, activeTab), [t, activeTab]);
   const [symbolInput, setSymbolInput] = useState("");
   const [querySymbol, setQuerySymbol] = useState("");
 
   const TABS: { key: Tab; label: string }[] = [
     { key: "gold", label: t("tabs.gold") },
     { key: "silver", label: t("tabs.silver") },
+    { key: "currency", label: t("tabs.currency") },
     { key: "symbol", label: t("tabs.symbolLookup") },
   ];
 
@@ -402,6 +412,41 @@ export default function PricesPage() {
                   getKey={(item) => item.typeCode}
                   emptyMessage={t("silver.emptyMessage")}
                   emptyDescription={t("silver.emptyDescription")}
+                  expandable
+                />
+              </div>
+            </>
+          )}
+
+          {activeTab === "currency" && (
+            <>
+              {isError && (
+                <p className="text-lred text-sm text-center py-4">
+                  {t("currency.failedToLoad")}
+                </p>
+              )}
+              {/* Desktop: TanStack Table */}
+              <div className="hidden md:block">
+                <TanStackTable<PriceItem>
+                  data={data?.currency ?? []}
+                  columns={tanstackColumns}
+                  isLoading={isLoading}
+                  loadingRowCount={6}
+                  emptyMessage={t("currency.emptyMessage")}
+                  emptyDescription={t("currency.emptyDescription")}
+                  enableMobileExpansion={false}
+                />
+              </div>
+              {/* Mobile: card-based list */}
+              <div className="md:hidden">
+                <MobileTable<PriceItem>
+                  data={data?.currency ?? []}
+                  columns={mobileColumns}
+                  isLoading={isLoading}
+                  loadingRowCount={6}
+                  getKey={(item) => item.typeCode}
+                  emptyMessage={t("currency.emptyMessage")}
+                  emptyDescription={t("currency.emptyDescription")}
                   expandable
                 />
               </div>

@@ -545,13 +545,14 @@ export interface PriceItem {
 export interface GetMarketPricesRequest {
 }
 
-/** GetMarketPricesResponse returns all gold and silver prices */
+/** GetMarketPricesResponse returns all gold, silver, and currency prices */
 export interface GetMarketPricesResponse {
   success: boolean;
   message: string;
   gold: PriceItem[];
   silver: PriceItem[];
   timestamp: string;
+  currency: PriceItem[];
 }
 
 /** MarketPrice - Price data with freshness info */
@@ -872,13 +873,14 @@ export interface MarketTypeItem {
 export interface GetPublicMarketTypesRequest {
 }
 
-/** GetPublicMarketTypesResponse returns gold/silver type names without prices */
+/** GetPublicMarketTypesResponse returns gold/silver/currency type names without prices */
 export interface GetPublicMarketTypesResponse {
   success: boolean;
   message: string;
   gold: MarketTypeItem[];
   silver: MarketTypeItem[];
   timestamp: string;
+  currency: MarketTypeItem[];
 }
 
 function createBaseInvestment(): Investment {
@@ -3714,7 +3716,7 @@ export const GetMarketPricesRequest: MessageFns<GetMarketPricesRequest> = {
 };
 
 function createBaseGetMarketPricesResponse(): GetMarketPricesResponse {
-  return { success: false, message: "", gold: [], silver: [], timestamp: "" };
+  return { success: false, message: "", gold: [], silver: [], timestamp: "", currency: [] };
 }
 
 export const GetMarketPricesResponse: MessageFns<GetMarketPricesResponse> = {
@@ -3733,6 +3735,9 @@ export const GetMarketPricesResponse: MessageFns<GetMarketPricesResponse> = {
     }
     if (message.timestamp !== "") {
       writer.uint32(42).string(message.timestamp);
+    }
+    for (const v of message.currency) {
+      PriceItem.encode(v!, writer.uint32(50).fork()).join();
     }
     return writer;
   },
@@ -3784,6 +3789,14 @@ export const GetMarketPricesResponse: MessageFns<GetMarketPricesResponse> = {
           message.timestamp = reader.string();
           continue;
         }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.currency.push(PriceItem.decode(reader, reader.uint32()));
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3800,6 +3813,9 @@ export const GetMarketPricesResponse: MessageFns<GetMarketPricesResponse> = {
       gold: globalThis.Array.isArray(object?.gold) ? object.gold.map((e: any) => PriceItem.fromJSON(e)) : [],
       silver: globalThis.Array.isArray(object?.silver) ? object.silver.map((e: any) => PriceItem.fromJSON(e)) : [],
       timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+      currency: globalThis.Array.isArray(object?.currency)
+        ? object.currency.map((e: any) => PriceItem.fromJSON(e))
+        : [],
     };
   },
 
@@ -3820,6 +3836,9 @@ export const GetMarketPricesResponse: MessageFns<GetMarketPricesResponse> = {
     if (message.timestamp !== "") {
       obj.timestamp = message.timestamp;
     }
+    if (message.currency?.length) {
+      obj.currency = message.currency.map((e) => PriceItem.toJSON(e));
+    }
     return obj;
   },
 
@@ -3833,6 +3852,7 @@ export const GetMarketPricesResponse: MessageFns<GetMarketPricesResponse> = {
     message.gold = object.gold?.map((e) => PriceItem.fromPartial(e)) || [];
     message.silver = object.silver?.map((e) => PriceItem.fromPartial(e)) || [];
     message.timestamp = object.timestamp ?? "";
+    message.currency = object.currency?.map((e) => PriceItem.fromPartial(e)) || [];
     return message;
   },
 };
@@ -7779,7 +7799,7 @@ export const GetPublicMarketTypesRequest: MessageFns<GetPublicMarketTypesRequest
 };
 
 function createBaseGetPublicMarketTypesResponse(): GetPublicMarketTypesResponse {
-  return { success: false, message: "", gold: [], silver: [], timestamp: "" };
+  return { success: false, message: "", gold: [], silver: [], timestamp: "", currency: [] };
 }
 
 export const GetPublicMarketTypesResponse: MessageFns<GetPublicMarketTypesResponse> = {
@@ -7798,6 +7818,9 @@ export const GetPublicMarketTypesResponse: MessageFns<GetPublicMarketTypesRespon
     }
     if (message.timestamp !== "") {
       writer.uint32(42).string(message.timestamp);
+    }
+    for (const v of message.currency) {
+      MarketTypeItem.encode(v!, writer.uint32(50).fork()).join();
     }
     return writer;
   },
@@ -7849,6 +7872,14 @@ export const GetPublicMarketTypesResponse: MessageFns<GetPublicMarketTypesRespon
           message.timestamp = reader.string();
           continue;
         }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.currency.push(MarketTypeItem.decode(reader, reader.uint32()));
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -7865,6 +7896,9 @@ export const GetPublicMarketTypesResponse: MessageFns<GetPublicMarketTypesRespon
       gold: globalThis.Array.isArray(object?.gold) ? object.gold.map((e: any) => MarketTypeItem.fromJSON(e)) : [],
       silver: globalThis.Array.isArray(object?.silver) ? object.silver.map((e: any) => MarketTypeItem.fromJSON(e)) : [],
       timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+      currency: globalThis.Array.isArray(object?.currency)
+        ? object.currency.map((e: any) => MarketTypeItem.fromJSON(e))
+        : [],
     };
   },
 
@@ -7885,6 +7919,9 @@ export const GetPublicMarketTypesResponse: MessageFns<GetPublicMarketTypesRespon
     if (message.timestamp !== "") {
       obj.timestamp = message.timestamp;
     }
+    if (message.currency?.length) {
+      obj.currency = message.currency.map((e) => MarketTypeItem.toJSON(e));
+    }
     return obj;
   },
 
@@ -7898,6 +7935,7 @@ export const GetPublicMarketTypesResponse: MessageFns<GetPublicMarketTypesRespon
     message.gold = object.gold?.map((e) => MarketTypeItem.fromPartial(e)) || [];
     message.silver = object.silver?.map((e) => MarketTypeItem.fromPartial(e)) || [];
     message.timestamp = object.timestamp ?? "";
+    message.currency = object.currency?.map((e) => MarketTypeItem.fromPartial(e)) || [];
     return message;
   },
 };

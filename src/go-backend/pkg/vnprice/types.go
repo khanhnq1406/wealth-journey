@@ -59,8 +59,21 @@ type SilverPrice struct {
 	UpdateAt   time.Time
 }
 
+// CurrencyPrice represents a processed foreign currency price (internal format)
+type CurrencyPrice struct {
+	Code       string // Original API name (e.g., "USD", "USD Internalbank")
+	Name       string // Display name (e.g., "USD Tự Do", "USD Vietcombank")
+	Buy        float64
+	Sell       float64
+	BuyChange  float64
+	SellChange float64
+	Currency   string // Always "VND"
+	UpdateAt   time.Time
+}
+
 // PricesResponse represents the processed prices
 type PricesResponse struct {
-	GoldPrices   []GoldPrice
-	SilverPrices []SilverPrice
+	GoldPrices     []GoldPrice
+	SilverPrices   []SilverPrice
+	CurrencyPrices []CurrencyPrice
 }

@@ -57,6 +57,7 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 		marketPricesHandler = NewMarketPricesHandler(
 			service.NewGoldPriceService(deps.RDB.GetClient()),
 			service.NewSilverPriceService(deps.RDB.GetClient()),
+			service.NewCurrencyPriceService(deps.RDB.GetClient()),
 		)
 	}
 
@@ -112,6 +113,12 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 			func() service.SilverPriceService {
 				if deps.RDB != nil {
 					return service.NewSilverPriceService(deps.RDB.GetClient())
+				}
+				return nil
+			}(),
+			func() service.CurrencyPriceService {
+				if deps.RDB != nil {
+					return service.NewCurrencyPriceService(deps.RDB.GetClient())
 				}
 				return nil
 			}(),

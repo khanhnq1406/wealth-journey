@@ -41,13 +41,13 @@ export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
         <table className="w-full">
           <thead>
             <tr className="bg-v2-gold-light">
-              <th className="text-left px-5 py-2.5 font-jetbrains font-semibold text-[11px] tracking-[1px] text-v2-gold-dark">
+              <th className="text-left px-5 py-3.5 font-vietnam font-bold text-[14px] tracking-normal text-v2-gold-dark">
                 {t("goldType")}
               </th>
-              <th className="text-right px-5 py-2.5 font-jetbrains font-semibold text-[11px] tracking-[1px] text-v2-gold-dark">
+              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-gold-dark">
                 {t("buy")}
               </th>
-              <th className="text-right px-5 py-2.5 font-jetbrains font-semibold text-[11px] tracking-[1px] text-v2-gold-dark">
+              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-gold-dark">
                 {t("sell")}
               </th>
             </tr>
@@ -60,7 +60,7 @@ export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
                   index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"
                 }
               >
-                <td className="px-5 py-3 font-vietnam font-medium text-[13px] text-v2-text-primary">
+                <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-gold-dark">
                   {item.displayName}
                 </td>
                 <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-text-primary">

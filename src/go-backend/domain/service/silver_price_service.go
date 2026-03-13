@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 
 	"wealthjourney/pkg/cache"
+	"wealthjourney/pkg/silverprice"
 	"wealthjourney/pkg/vnprice"
 	"wealthjourney/pkg/yahoo"
 )
@@ -33,15 +35,21 @@ type CachedSilverPrice struct {
 
 // silverPriceService implements SilverPriceService
 type silverPriceService struct {
-	client *vnprice.Client
-	cache  *cache.SilverPriceCache
+	client        *vnprice.Client
+	cache         *cache.SilverPriceCache
+	phuquyClient  *silverprice.PhuQuyClient
+	ancaratClient *silverprice.AncaratClient
+	dojiClient    *silverprice.DOJIClient
 }
 
 // NewSilverPriceService creates a new silver price service
 func NewSilverPriceService(redisClient *redis.Client) SilverPriceService {
 	return &silverPriceService{
-		client: vnprice.NewClient(10 * time.Second),
-		cache:  cache.NewSilverPriceCache(redisClient),
+		client:        vnprice.NewClient(10 * time.Second),
+		cache:         cache.NewSilverPriceCache(redisClient),
+		phuquyClient:  silverprice.NewPhuQuyClient(),
+		ancaratClient: silverprice.NewAncaratClient(),
+		dojiClient:    silverprice.NewDOJIClient(),
 	}
 }
 
@@ -176,38 +184,128 @@ func (s *silverPriceService) fetchUSDSilverPrice(ctx context.Context) (*CachedSi
 	return price, nil
 }
 
-// FetchAllPrices fetches all silver prices
+// FetchAllPrices fetches silver prices from multiple sources in parallel:
+// Phú Quý, Ancarat, DOJI, and SBJ (static entries).
 func (s *silverPriceService) FetchAllPrices(ctx context.Context) ([]*CachedSilverPrice, error) {
-	pricesResp, err := s.client.FetchPrices(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("fetch prices from vang247 API: %w", err)
+	var (
+		phuquyPrices  []silverprice.ExternalSilverPrice
+		ancaratPrices []silverprice.ExternalSilverPrice
+		dojiPrices    []silverprice.ExternalSilverPrice
+		mu            sync.Mutex
+		wg            sync.WaitGroup
+	)
+
+	// Fetch from all sources in parallel
+	wg.Add(3)
+
+	go func() {
+		defer wg.Done()
+		prices, err := s.phuquyClient.FetchPrices(ctx)
+		if err != nil {
+			log.Printf("Warning: failed to fetch Phú Quý silver prices: %v", err)
+			return
+		}
+		mu.Lock()
+		phuquyPrices = prices
+		mu.Unlock()
+	}()
+
+	go func() {
+		defer wg.Done()
+		prices, err := s.ancaratClient.FetchPrices(ctx)
+		if err != nil {
+			log.Printf("Warning: failed to fetch Ancarat silver prices: %v", err)
+			return
+		}
+		mu.Lock()
+		ancaratPrices = prices
+		mu.Unlock()
+	}()
+
+	go func() {
+		defer wg.Done()
+		prices, err := s.dojiClient.FetchPrices(ctx)
+		if err != nil {
+			log.Printf("Warning: failed to fetch DOJI silver prices: %v", err)
+			return
+		}
+		mu.Lock()
+		dojiPrices = prices
+		mu.Unlock()
+	}()
+
+	wg.Wait()
+
+	// Build ordered result (12 rows as per spec)
+	// Order: Phú Quý (4), Ancarat (4), SBJ (2), DOJI (2)
+	orderedNames := []struct {
+		name   string
+		source string
+	}{
+		{"Phú Quý thỏi 1L", "phuquy"},
+		{"Phú Quý thỏi 5L,10L", "phuquy"},
+		{"Phú Quý 999 - 1Kg", "phuquy"},
+		{"Bạc Mỹ nghệ Phú Quý", "phuquy"},
+		{"Ancarat Ngân Long 1L", "ancarat"},
+		{"Ancarat Ngân Long 5L", "ancarat"},
+		{"Ancarat Ngân Long 1kg", "ancarat"},
+		{"Ancarat thỏi 999 - 1kg", "ancarat"},
+		{"SBJ 1L,10L,50L", "sbj"},
+		{"SBJ 1kg", "sbj"},
+		{"DOJI 99.9 1L", "doji"},
+		{"DOJI 99.9 5L", "doji"},
 	}
 
-	prices := make([]*CachedSilverPrice, 0, len(pricesResp.SilverPrices)+1)
+	// Build lookup maps by name
+	allExternal := make(map[string]silverprice.ExternalSilverPrice)
+	for _, p := range phuquyPrices {
+		allExternal[p.Name] = p
+	}
+	for _, p := range ancaratPrices {
+		allExternal[p.Name] = p
+	}
+	for _, p := range dojiPrices {
+		allExternal[p.Name] = p
+	}
 
-	for _, apiPrice := range pricesResp.SilverPrices {
-		// Skip XAGUSD from vang247 (will fetch from Yahoo)
-		if apiPrice.Name == "XAGUSD" {
+	prices := make([]*CachedSilverPrice, 0, len(orderedNames))
+	now := time.Now()
+
+	for _, entry := range orderedNames {
+		if entry.source == "sbj" {
+			// SBJ: static entries with zero prices (displayed as "--" on frontend)
+			prices = append(prices, &CachedSilverPrice{
+				TypeCode:   toTypeCode(entry.name),
+				Name:       entry.name,
+				Buy:        0,
+				Sell:       0,
+				ChangeBuy:  0,
+				ChangeSell: 0,
+				Currency:   "VND",
+				UpdateTime: now,
+			})
 			continue
 		}
 
-		buy := int64(apiPrice.Buy * 1000)
-		sell := int64(apiPrice.Sell * 1000)
-		changeBuy := int64(apiPrice.BuyChange * 1000)
-		changeSell := int64(apiPrice.SellChange * 1000)
+		ext, ok := allExternal[entry.name]
+		if !ok {
+			// Source failed or type not found — skip
+			continue
+		}
 
 		price := &CachedSilverPrice{
-			TypeCode:   apiPrice.Name,
-			Name:       apiPrice.Name,
-			Buy:        buy,
-			Sell:       sell,
-			ChangeBuy:  changeBuy,
-			ChangeSell: changeSell,
-			Currency:   apiPrice.Currency,
-			UpdateTime: apiPrice.UpdateAt,
+			TypeCode:   toTypeCode(entry.name),
+			Name:       ext.Name,
+			Buy:        ext.Buy,
+			Sell:       ext.Sell,
+			ChangeBuy:  0,
+			ChangeSell: 0,
+			Currency:   "VND",
+			UpdateTime: now,
 		}
 		prices = append(prices, price)
 
+		// Cache each price (non-blocking)
 		go func(p *CachedSilverPrice) {
 			cachedPrice := &cache.CachedSilverPrice{
 				TypeCode:   p.TypeCode,
@@ -225,13 +323,23 @@ func (s *silverPriceService) FetchAllPrices(ctx context.Context) ([]*CachedSilve
 		}(price)
 	}
 
-	// Also fetch XAGUSD from Yahoo Finance
-	xagPrice, err := s.fetchUSDSilverPrice(ctx)
-	if err == nil {
-		prices = append(prices, xagPrice)
-	} else {
-		log.Printf("Warning: failed to fetch XAGUSD price: %v", err)
-	}
-
 	return prices, nil
+}
+
+// toTypeCode converts a display name to a type code (replace spaces with underscores, uppercase)
+func toTypeCode(name string) string {
+	code := ""
+	for _, c := range name {
+		switch {
+		case c == ' ' || c == ',':
+			code += "_"
+		case c == '-' || c == '.':
+			code += string(c)
+		case c >= 'a' && c <= 'z':
+			code += string(c - 32)
+		case c >= 'A' && c <= 'Z' || c >= '0' && c <= '9':
+			code += string(c)
+		}
+	}
+	return code
 }

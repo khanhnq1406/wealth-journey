@@ -31,6 +31,7 @@ import { GoldPriceTable } from "./GoldPriceTable";
 import { GoldPriceChart } from "./GoldPriceChart";
 import { SilverPriceTable } from "./SilverPriceTable";
 import { SilverPriceChart } from "./SilverPriceChart";
+import { CurrencyPriceTable } from "./CurrencyPriceTable";
 import { WalletsSection } from "./WalletsSection";
 import { BaseCard } from "@/components/BaseCard";
 
@@ -104,14 +105,18 @@ export default function Home() {
   const monthPnl = parseAmount(summary1M?.data?.periodPnl);
   const monthPnlPercent = Number(summary1M?.data?.periodPnlPercent ?? 0);
 
-  // Gold/silver prices
+  // Gold/silver/currency prices
   const goldPrices = marketPrices?.gold ?? [];
   const silverPrices = marketPrices?.silver ?? [];
+  const currencyPrices = marketPrices?.currency ?? [];
 
   // Update timestamps from API data
   const goldUpdatedTime = formatUpdateTimestamp(getLatestTimestamp(goldPrices));
   const silverUpdatedTime = formatUpdateTimestamp(
     getLatestTimestamp(silverPrices),
+  );
+  const currencyUpdatedTime = formatUpdateTimestamp(
+    getLatestTimestamp(currencyPrices),
   );
 
   // Wallets for WalletsSection
@@ -183,7 +188,10 @@ export default function Home() {
         {/* 6. Silver Price Chart */}
         <SilverPriceChart />
 
-        {/* 7. Wallets */}
+        {/* 7. Currency Price Table */}
+        <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} />
+
+        {/* 8. Wallets */}
         <WalletsSection wallets={wallets} />
       </div>
 
@@ -239,6 +247,12 @@ export default function Home() {
             updatedTime={silverUpdatedTime}
           />
           <SilverPriceChart />
+        </div>
+
+        {/* Row 5: Currency Table */}
+        <div className="grid grid-cols-2 gap-6">
+          <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} />
+          <div />
         </div>
       </div>
 

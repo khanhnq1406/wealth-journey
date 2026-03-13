@@ -5,15 +5,15 @@ import { formatPriceValue } from "../prices/helpers";
 import { BaseCard } from "@/components/BaseCard";
 import type { PriceItem } from "@/gen/protobuf/v1/investment";
 
-interface SilverPriceTableProps {
+interface CurrencyPriceTableProps {
   prices: PriceItem[];
   updatedTime?: string;
 }
 
-export function SilverPriceTable({
+export function CurrencyPriceTable({
   prices,
   updatedTime,
-}: SilverPriceTableProps) {
+}: CurrencyPriceTableProps) {
   const t = useTranslations("dashboard.home");
 
   return (
@@ -21,10 +21,11 @@ export function SilverPriceTable({
       padding="none"
       className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
     >
+      {/* Header */}
       <div className="px-5 py-3">
         <div className="flex items-center justify-between">
           <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
-            {t("silverPriceTitle")}
+            {t("currencyPriceTitle")}
           </h3>
           {updatedTime && (
             <span className="font-jetbrains text-[11px] text-v2-text-tertiary">
@@ -34,17 +35,18 @@ export function SilverPriceTable({
         </div>
       </div>
 
+      {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-v2-silver-light">
-              <th className="text-left px-5 py-3.5 font-vietnam font-bold text-[14px] tracking-normal text-v2-silver-dark">
-                {t("silverType")}
+            <tr className="bg-v2-currency-light">
+              <th className="text-left px-5 py-3.5 font-vietnam font-bold text-[14px] tracking-normal text-v2-currency-dark">
+                {t("currencyType")}
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-silver-dark">
+              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-currency-dark">
                 {t("buy")}
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-silver-dark">
+              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-currency-dark">
                 {t("sell")}
               </th>
             </tr>
@@ -57,14 +59,14 @@ export function SilverPriceTable({
                   index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"
                 }
               >
-                <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-silver-dark">
+                <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-currency-dark">
                   {item.name || item.typeCode}
                 </td>
                 <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-text-primary">
-                  {formatPriceValue(item.buy, item.currency || "VND")}
+                  {formatPriceValue(item.buy, "VND")}
                 </td>
                 <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-text-primary">
-                  {formatPriceValue(item.sell, item.currency || "VND")}
+                  {formatPriceValue(item.sell, "VND")}
                 </td>
               </tr>
             ))}

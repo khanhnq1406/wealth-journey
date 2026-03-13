@@ -302,6 +302,7 @@
       "allTime": "ALL",
       "goldPriceTitle": "Gold Prices Today",
       "silverPriceTitle": "Silver Prices Today",
+      "currencyPriceTitle": "Currency Prices Today",
       "goldChartTitle": "Gold Price Chart",
       "silverChartTitle": "Silver Price Chart",
       "wallets": "Wallets",
@@ -309,6 +310,7 @@
       "updated": "Updated {time}",
       "goldType": "GOLD TYPE",
       "silverType": "SILVER TYPE",
+      "currencyType": "CURRENCY TYPE",
       "buy": "BUY",
       "sell": "SELL",
       "period": {

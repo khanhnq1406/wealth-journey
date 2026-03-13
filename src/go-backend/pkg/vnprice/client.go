@@ -150,9 +150,44 @@ func (c *Client) FetchPrices(ctx context.Context) (*PricesResponse, error) {
 		})
 	}
 
+	currencyPrices := make([]CurrencyPrice, 0)
+	for _, entry := range apiResp.CurrencyNationWide {
+		if entry.Name == "" {
+			continue
+		}
+		region := entry.Saigon
+		if region.Buy == 0 && region.Sell == 0 {
+			region = entry.Hanoi
+		}
+		if region.Buy == 0 && region.Sell == 0 {
+			continue
+		}
+
+		// Map display names
+		displayName := entry.Name
+		switch entry.Name {
+		case "USD":
+			displayName = "USD Tự Do"
+		case "USD Internalbank":
+			displayName = "USD Vietcombank"
+		}
+
+		currencyPrices = append(currencyPrices, CurrencyPrice{
+			Code:       entry.Name,
+			Name:       displayName,
+			Buy:        region.Buy,
+			Sell:       region.Sell,
+			BuyChange:  region.BuyChange,
+			SellChange: region.SellChange,
+			Currency:   "VND",
+			UpdateAt:   entry.UpdateAt,
+		})
+	}
+
 	return &PricesResponse{
-		GoldPrices:   goldPrices,
-		SilverPrices: silverPrices,
+		GoldPrices:     goldPrices,
+		SilverPrices:   silverPrices,
+		CurrencyPrices: currencyPrices,
 	}, nil
 }
 
