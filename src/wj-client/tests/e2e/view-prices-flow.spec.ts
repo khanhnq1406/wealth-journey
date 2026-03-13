@@ -114,7 +114,7 @@ test.describe("View Market Prices Flow", () => {
     await page.waitForLoadState("networkidle");
 
     // Page title should be visible
-    const heading = page.locator("h1");
+    const heading = page.getByRole("heading", { name: "Market Prices" });
     await expect(heading).toBeVisible();
 
     // Tabs should be visible
@@ -202,11 +202,8 @@ test.describe("View Market Prices Flow", () => {
     await page.waitForLoadState("networkidle");
 
     // On gold tab, refresh button should be visible
-    const refreshBtn = page
-      .locator("button")
-      .filter({ hasText: /refresh|Làm mới/i });
-    const refreshCount = await refreshBtn.count();
-    expect(refreshCount).toBeGreaterThan(0);
+    const refreshBtn = page.getByRole("button", { name: /refresh|Làm mới/i });
+    await expect(refreshBtn).toBeVisible();
 
     // Switch to symbol tab
     const symbolTab = page
@@ -217,10 +214,7 @@ test.describe("View Market Prices Flow", () => {
     await page.waitForTimeout(300);
 
     // Refresh button should be hidden on symbol tab
-    const refreshAfter = page
-      .locator("button")
-      .filter({ hasText: /refresh|Làm mới/i });
-    await expect(refreshAfter).toHaveCount(0);
+    await expect(refreshBtn).toBeHidden();
   });
 });
 
@@ -270,20 +264,14 @@ test.describe("View Market Prices Flow - Mobile", () => {
     await page.goto("/dashboard/prices");
     await page.waitForLoadState("networkidle");
 
-    // All tabs should be visible (may need horizontal scroll)
-    const tabs = page.locator("button");
-    const tabTexts = await tabs.allTextContents();
-    const hasCurrencyTab = tabTexts.some(
-      (t) =>
-        t.toLowerCase().includes("currency") || t.includes("Ngoại Tệ"),
-    );
-    expect(hasCurrencyTab).toBeTruthy();
-
-    // Switch to currency tab on mobile
+    // Currency tab should be visible (may need horizontal scroll)
     const currencyTab = page
       .locator("button")
       .filter({ hasText: /currency|Ngoại Tệ/i })
       .first();
+    await expect(currencyTab).toBeVisible();
+
+    // Switch to currency tab on mobile
     await currencyTab.click();
     await page.waitForTimeout(500);
 

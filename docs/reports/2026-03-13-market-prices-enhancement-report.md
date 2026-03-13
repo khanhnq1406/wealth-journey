@@ -143,6 +143,7 @@ Created new test file: `tests/e2e/view-prices-flow.spec.ts` (commit: c2b36a1)
 | 2026-03-13 | TypeCode column text color now matches commodity-specific header color (gold amber, silver gray, currency blue) across all 7 price table components | Minor | pending |
 | 2026-03-13 | LandingCurrencyPriceTable thead/tbody font weight, size, and padding now matches homepage CurrencyPriceTable (font-bold 14px for type col, font-bold 13px uppercase for buy/sell, py-3.5 padding) | Minor | pending |
 | 2026-03-13 | Public endpoint now derives gold/silver/currency type lists from live price services instead of static registries, ensuring landing page shows the same items as the authenticated home page. Falls back to static lists when services are unavailable. | Minor | pending |
+| 2026-03-13 | E2E test `should display prices page with gold tab by default` used ambiguous `page.locator("h1")` which matched 2 elements (sidebar logo + page title), causing strict mode violation. Fixed to use `getByRole("heading", { name: "Market Prices" })` | Minor | pending |
 
 ## Known Issues / Technical Debt
 
