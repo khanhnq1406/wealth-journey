@@ -54,10 +54,30 @@ function TradingViewChartInner({
 }: TradingViewChartProps) {
   const widgetRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<ChartStatus>("loading");
+  const [isVisible, setIsVisible] = useState(false);
 
   const tvLocale = locale === "vi" ? "vi_VN" : "en";
 
+  // Detect when the container is actually visible (not inside display:none)
   useEffect(() => {
+    const container = widgetRef.current;
+    if (!container) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  // Only initialize TradingView widget when visible
+  useEffect(() => {
+    if (!isVisible) return;
+
     let cancelled = false;
     const container = widgetRef.current;
     if (!container) return;
@@ -103,8 +123,9 @@ function TradingViewChartInner({
     return () => {
       cancelled = true;
       if (container) container.innerHTML = "";
+      setStatus("loading");
     };
-  }, [symbol, theme, tvLocale, interval, allowSymbolChange]);
+  }, [isVisible, symbol, theme, tvLocale, interval, allowSymbolChange]);
 
   return (
     <div

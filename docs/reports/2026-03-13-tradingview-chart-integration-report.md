@@ -82,3 +82,4 @@ Replaced all 4 Recharts-based gold/silver price charts (2 dashboard, 2 landing) 
 | 2026-03-13 | Add Dollar Index (DXY) TradingView chart beside currency price table on dashboard + landing | Minor | — |
 | 2026-03-13 | Fix landing page charts not rendering — replaced flex-1/h-full layout with static height matching dashboard pattern | Minor | — |
 | 2026-03-13 | Fix CI lint error: refactor TradingViewChart to avoid synchronous setState inside useEffect — consolidated isLoading/hasError into single `status` state, moved setState into async `.then()` callback | Minor | — |
+| 2026-03-13 | Fix charts rendering empty on desktop when both mobile/desktop layouts mount simultaneously — added IntersectionObserver to defer widget init until container is visible, preventing 0x0-dimension initialization from `display:none` parents | Minor | — |
