@@ -41,6 +41,8 @@ function loadTradingViewScript(): Promise<void> {
   return tvScriptPromise;
 }
 
+type ChartStatus = "loading" | "ready" | "error";
+
 function TradingViewChartInner({
   symbol,
   height = 400,
@@ -51,8 +53,7 @@ function TradingViewChartInner({
   className,
 }: TradingViewChartProps) {
   const widgetRef = useRef<HTMLDivElement>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
+  const [status, setStatus] = useState<ChartStatus>("loading");
 
   const tvLocale = locale === "vi" ? "vi_VN" : "en";
 
@@ -61,9 +62,6 @@ function TradingViewChartInner({
     const container = widgetRef.current;
     if (!container) return;
 
-    setIsLoading(true);
-    setHasError(false);
-
     // Generate unique container id for the widget
     const containerId = `tv-widget-${symbol.replace(/[^a-zA-Z0-9]/g, "-")}-${Date.now()}`;
     container.id = containerId;
@@ -71,6 +69,9 @@ function TradingViewChartInner({
     loadTradingViewScript()
       .then(() => {
         if (cancelled || !window.TradingView) return;
+
+        // Reset to loading at the start of widget creation
+        setStatus("loading");
 
         new window.TradingView.widget({
           container_id: containerId,
@@ -92,14 +93,11 @@ function TradingViewChartInner({
 
         // Wait for iframe to render
         setTimeout(() => {
-          if (!cancelled) setIsLoading(false);
+          if (!cancelled) setStatus("ready");
         }, 1500);
       })
       .catch(() => {
-        if (!cancelled) {
-          setHasError(true);
-          setIsLoading(false);
-        }
+        if (!cancelled) setStatus("error");
       });
 
     return () => {
@@ -119,12 +117,12 @@ function TradingViewChartInner({
         role="img"
         aria-label={`TradingView chart for ${symbol}`}
       />
-      {isLoading && !hasError && (
+      {status === "loading" && (
         <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-bg" />
         </div>
       )}
-      {hasError && (
+      {status === "error" && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">
           <p className="text-sm text-gray-500">Chart unavailable</p>
         </div>
