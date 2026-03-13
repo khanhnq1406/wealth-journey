@@ -5,8 +5,11 @@ import (
 	"fmt"
 )
 
-// Example usage of the Yahoo Finance client
-func ExampleClient() {
+//nolint:unused
+// exampleClientUsage demonstrates how to use the Yahoo Finance client.
+// This is intentionally not an Example* function to avoid making real
+// network calls during go test runs.
+func exampleClientUsage() {
 	// Create a new client for a stock symbol
 	client := NewClient("AAPL")
 	// Fetch current quote data
@@ -21,7 +24,4 @@ func ExampleClient() {
 	fmt.Printf("Symbol: %s\n", quote.Symbol)
 	fmt.Printf("Price: $%d.%02d\n", quote.Price/100, quote.Price%100)
 	fmt.Printf("Volume (24h): %d\n", quote.Volume24h)
-
-	//output:
-	//ok
 }

@@ -10,7 +10,6 @@ import (
 
 // Allowed MIME types for uploads
 var allowedMIMETypes = map[string][]string{
-	".csv":  {"text/csv", "text/plain", "application/csv"},
 	".xlsx": {"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/zip", "application/octet-stream"},
 	".xls":  {"application/vnd.ms-excel", "application/octet-stream"},
 	".pdf":  {"application/pdf"},
@@ -51,11 +50,6 @@ func ValidateMIMEType(fileContent []byte, fileName string) error {
 		if detectedMIME == expectedMIME {
 			return nil
 		}
-	}
-
-	// Special case: CSV files might be detected as text/plain
-	if ext == ".csv" && (detectedMIME == "text/plain" || detectedMIME == "text/csv") {
-		return nil
 	}
 
 	return fmt.Errorf("file type mismatch: file has extension %s but content type is %s (expected: %v)",

@@ -24,7 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	log.Println("Starting import tables migration...")
 
@@ -92,7 +92,7 @@ func seedBankTemplates(db *gorm.DB) error {
 				"income_keywords": ["Refund", "Credit", "Deposit", "Cashback"]
 			}`)),
 
-			Enabled: true,
+			IsActive: true,
 		},
 		{
 			ID:            "tcb-credit-card",
@@ -128,7 +128,7 @@ func seedBankTemplates(db *gorm.DB) error {
 				"income_keywords": ["Refund", "Credit"]
 			}`)),
 
-			Enabled: true,
+			IsActive: true,
 		},
 	}
 

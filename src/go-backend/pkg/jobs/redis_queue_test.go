@@ -39,7 +39,7 @@ func TestCleanupExpiredJobs_Integration(t *testing.T) {
 	}
 
 	client := setupTestRedis(t)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	queue := NewRedisImportQueue(client)
 	ctx := context.Background()
@@ -154,7 +154,7 @@ func TestCleanupExpiredJobs_EmptyQueue(t *testing.T) {
 	}
 
 	client := setupTestRedis(t)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	queue := NewRedisImportQueue(client)
 	ctx := context.Background()
@@ -174,7 +174,7 @@ func TestCleanupExpiredJobs_OnlyActiveJobs(t *testing.T) {
 	}
 
 	client := setupTestRedis(t)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	queue := NewRedisImportQueue(client)
 	ctx := context.Background()
@@ -229,7 +229,7 @@ func TestCleanupExpiredJobs_MixedStatuses(t *testing.T) {
 	}
 
 	client := setupTestRedis(t)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	queue := NewRedisImportQueue(client)
 	ctx := context.Background()

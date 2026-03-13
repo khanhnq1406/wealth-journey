@@ -412,6 +412,7 @@ export default function ReportPageEnhanced() {
         );
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       summaryData,
       trendData,
@@ -423,6 +424,7 @@ export default function ReportPageEnhanced() {
       reportData,
       reportYear,
       currency,
+      t,
     ],
   );
 

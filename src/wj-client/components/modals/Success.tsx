@@ -20,7 +20,7 @@ export const Success: React.FC<SuccessProps> = ({ message: propMessage, onDone }
     if (!propMessage) {
       const stored = sessionStorage.getItem("successMessage");
       if (stored) {
-        setMessage(stored);
+        queueMicrotask(() => setMessage(stored));
         sessionStorage.removeItem("successMessage");
       }
     }

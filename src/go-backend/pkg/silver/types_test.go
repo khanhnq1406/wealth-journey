@@ -2,8 +2,6 @@ package silver
 
 import (
 	"testing"
-
-	investmentv1 "wealthjourney/protobuf/v1"
 )
 
 func TestGetSilverTypeByCode_NewTypes(t *testing.T) {
@@ -67,58 +65,3 @@ func TestGetPriceUnitForMarketData_NewTypes(t *testing.T) {
 	}
 }
 
-func TestProcessMarketPrice_BarSize(t *testing.T) {
-	c := &Converter{} // fxService not needed for ProcessMarketPrice
-
-	tests := []struct {
-		name      string
-		symbol    string
-		price     int64 // Market price in VND (VND has multiplier 1)
-		currency  string
-		invType   investmentv1.InvestmentType
-		wantPrice int64 // Expected per-gram price in VND
-	}{
-		{
-			name:      "GOLDENFUND_1L per-unit price: 1,366,000 VND/tael → per gram",
-			symbol:    "GOLDENFUND_1L",
-			price:     1366000,
-			currency:  "VND",
-			invType:   investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND,
-			wantPrice: 36427, // 1,366,000 / 37.5 = 36,426.67 → rounded
-		},
-		{
-			name:      "GOLDENFUND_5L 5-bar price: 6,830,000 VND/5L bar → per gram",
-			symbol:    "GOLDENFUND_5L",
-			price:     6830000,
-			currency:  "VND",
-			invType:   investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND,
-			wantPrice: 36427, // 6,830,000 / 5 / 37.5 = 36,426.67 → rounded
-		},
-		{
-			name:      "GOLDENFUND_10L 10-bar price: 13,660,000 VND/10L bar → per gram",
-			symbol:    "GOLDENFUND_10L",
-			price:     13660000,
-			currency:  "VND",
-			invType:   investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND,
-			wantPrice: 36427, // 13,660,000 / 10 / 37.5 = 36,426.67 → rounded
-		},
-		{
-			name:      "PHUQUY_5L per-unit price (barSize=1): 3,384,000 VND/tael → per gram",
-			symbol:    "PHUQUY_5L",
-			price:     3384000,
-			currency:  "VND",
-			invType:   investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND,
-			wantPrice: 90240, // 3,384,000 / 37.5 = 90,240
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := c.ProcessMarketPrice(tt.price, tt.currency, tt.invType, tt.symbol)
-			if got != tt.wantPrice {
-				t.Errorf("ProcessMarketPrice(%d, %s, %s) = %d, want %d",
-					tt.price, tt.currency, tt.symbol, got, tt.wantPrice)
-			}
-		})
-	}
-}

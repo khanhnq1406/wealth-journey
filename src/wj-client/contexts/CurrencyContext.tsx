@@ -54,10 +54,10 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
       // Sync local state with backend state
       if (backendIsConverting && !isConverting) {
         // Backend says conversion is in progress, update local state
-        setIsConverting(true);
+        queueMicrotask(() => setIsConverting(true));
       } else if (!backendIsConverting && isConverting) {
         // Backend says conversion is done, update local state
-        setIsConverting(false);
+        queueMicrotask(() => setIsConverting(false));
         // Invalidate all queries to refetch with new converted values
         queryClient.invalidateQueries();
 

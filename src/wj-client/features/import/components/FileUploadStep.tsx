@@ -140,7 +140,8 @@ export function FileUploadStep({
       setSelectedFile(file);
       onFileSelected(file);
     },
-    [onFileSelected],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [onFileSelected, validateFile],
   );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {

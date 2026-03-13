@@ -26,7 +26,7 @@ type Services struct {
 
 // NewServices creates all service instances with proper dependency ordering.
 // No Set* hacks — all dependencies are passed via constructors.
-func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider storage.StorageProvider, rdb *pkgredis.RedisClient) *Services {
+func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider storage.StorageProvider, communityStorage storage.StorageProvider, rdb *pkgredis.RedisClient) *Services {
 	// Phase 1: Services with no service dependencies
 	categorySvc := NewCategoryService(repos.Category)
 	fxRateSvc := NewFXRateService(repos.FXRate, redisClient)
@@ -48,7 +48,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	portfolioHistorySvc := NewPortfolioHistoryService(repos.PortfolioHistory, investmentSvc, repos.User, fxRateSvc)
 
 	// Phase 1 (cont.): CommunityService — depends on storage provider for image uploads
-	communitySvc := NewCommunityService(repos.Post, repos.Comment, repos.Like, repos.Follow, repos.Report, repos.User, repos.Notification, repos.SavedPost, repos.Hashtag, storageProvider, rdb)
+	communitySvc := NewCommunityService(repos.Post, repos.Comment, repos.Like, repos.Follow, repos.Report, repos.User, repos.Notification, repos.SavedPost, repos.Hashtag, communityStorage, rdb)
 
 	return &Services{
 		Wallet:           walletSvc,

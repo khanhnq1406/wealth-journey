@@ -166,7 +166,7 @@ func fetchDomesticSilverData(ctx context.Context, silverType string, days int) (
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch from giabac.vn: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("giabac.vn returned status %d", resp.StatusCode)
@@ -295,10 +295,10 @@ func fetchGlobalSilverData(ctx context.Context, days int) ([]silverChartDataPoin
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch from Yahoo Finance: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Yahoo Finance returned status %d", resp.StatusCode)
+		return nil, fmt.Errorf("yahoo Finance returned status %d", resp.StatusCode)
 	}
 
 	limitedReader := io.LimitReader(resp.Body, 1<<20)
@@ -313,7 +313,7 @@ func fetchGlobalSilverData(ctx context.Context, days int) ([]silverChartDataPoin
 	}
 
 	if chartResp.Chart.Error != nil {
-		return nil, fmt.Errorf("Yahoo Finance API error: %s", chartResp.Chart.Error.Description)
+		return nil, fmt.Errorf("yahoo Finance API error: %s", chartResp.Chart.Error.Description)
 	}
 
 	if len(chartResp.Chart.Result) == 0 {

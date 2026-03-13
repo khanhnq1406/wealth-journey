@@ -144,11 +144,12 @@ func TestStringSimilarity(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := stringSimilarity(tt.s1, tt.s2)
-			if tt.minScore == 100.0 {
+			switch tt.minScore {
+			case 100.0:
 				assert.Equal(t, 100.0, result)
-			} else if tt.minScore == 0.0 {
+			case 0.0:
 				assert.Less(t, result, 50.0)
-			} else {
+			default:
 				assert.GreaterOrEqual(t, result, tt.minScore)
 			}
 		})

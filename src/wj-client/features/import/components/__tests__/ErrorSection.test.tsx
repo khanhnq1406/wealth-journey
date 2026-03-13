@@ -1,4 +1,5 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
+import { renderWithIntl as render } from "@/test-utils";
 import { ErrorSection } from "../ErrorSection";
 import { ParsedTransaction } from "@/gen/protobuf/v1/import";
 
@@ -22,6 +23,7 @@ describe("ErrorSection", () => {
       exchangeRate: 0,
       exchangeRateSource: "",
       exchangeRateDate: 0 as any,
+      originalDescription: "Invalid transaction",
     },
     {
       rowNumber: 52,
@@ -40,6 +42,7 @@ describe("ErrorSection", () => {
       exchangeRate: 0,
       exchangeRateSource: "",
       exchangeRateDate: 0 as any,
+      originalDescription: "Another error",
     },
   ];
 
@@ -212,6 +215,7 @@ describe("ErrorSection", () => {
         exchangeRate: 0,
         exchangeRateSource: "",
         exchangeRateDate: 0 as any,
+        originalDescription: "Test",
       },
     ];
 

@@ -9,11 +9,13 @@ import (
 	protobufv1 "wealthjourney/protobuf/v1"
 )
 
+//nolint:unused
 // Convert time to protobuf timestamp
 func toProtoTimestamp(t time.Time) *timestamppb.Timestamp {
 	return timestamppb.New(t)
 }
 
+//nolint:unused
 // Convert proto Money to domain Money
 func protoToDomainMoney(m *protobufv1.Money) types.Money {
 	if m == nil {
@@ -25,6 +27,7 @@ func protoToDomainMoney(m *protobufv1.Money) types.Money {
 	}
 }
 
+//nolint:unused
 // Convert domain Money to proto Money
 func domainToProtoMoney(m types.Money) *protobufv1.Money {
 	return &protobufv1.Money{

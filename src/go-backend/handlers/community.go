@@ -488,7 +488,7 @@ func (h *CommunityHandler) UploadImage(c *gin.Context) {
 		handler.HandleError(c, apperrors.NewValidationError("missing file field"))
 		return
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	// Read file bytes
 	fileData := make([]byte, fileHeader.Size)
@@ -902,7 +902,7 @@ func (h *CommunityHandler) StreamNotifications(c *gin.Context) {
 	// Subscribe to the user's personal notification channel
 	channel := fmt.Sprintf("user:%d:notifications", userID)
 	pubsub := h.redisClient.Subscribe(channel)
-	defer pubsub.Close()
+	defer func() { _ = pubsub.Close() }()
 
 	// Keep-alive ticker sends a comment every 30 s to prevent proxy timeouts
 	ctx := c.Request.Context()
@@ -915,11 +915,11 @@ func (h *CommunityHandler) StreamNotifications(c *gin.Context) {
 			if !ok {
 				return false
 			}
-			fmt.Fprintf(w, "event: notification\ndata: %s\n\n", msg.Payload)
+			_, _ = fmt.Fprintf(w, "event: notification\ndata: %s\n\n", msg.Payload)
 			return true
 		case <-ticker.C:
 			// SSE comment (keep-alive ping)
-			fmt.Fprintf(w, ":ping\n\n")
+			_, _ = fmt.Fprintf(w, ":ping\n\n")
 			return true
 		case <-ctx.Done():
 			return false

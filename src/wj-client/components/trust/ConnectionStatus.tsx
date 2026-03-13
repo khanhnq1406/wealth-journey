@@ -9,7 +9,7 @@ export function ConnectionStatus() {
 
   useEffect(() => {
     // Check if the connection is secure (HTTPS)
-    setIsSecure(window.location.protocol === "https:");
+    queueMicrotask(() => setIsSecure(window.location.protocol === "https:"));
   }, []);
 
   if (!isSecure) {

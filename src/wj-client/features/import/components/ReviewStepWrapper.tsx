@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { ReviewStep } from "./ReviewStep";
 import { ColumnMapping } from "./ColumnMappingStep";
 import { ParsedTransaction, DuplicateHandlingStrategy, ImportSummary, DuplicateMatch, CurrencyConversion, CurrencyInfo, DuplicateAction } from "@/gen/protobuf/v1/import";
@@ -52,6 +52,9 @@ export function ReviewStepWrapper({
     { pagination: { page: 1, pageSize: 1000, orderBy: "", order: "" } },
     { staleTime: 5 * 60 * 1000 } // Cache for 5 minutes
   );
+
+  // Stable ref to the parse mutate function — prevents useCallback re-creation on mutation state changes
+  const parseMutateRef = useRef<typeof parseStatementMutation.mutate | null>(null);
 
   // Parse statement mutation (backend API)
   const parseStatementMutation = useMutationParseStatement({
@@ -140,23 +143,14 @@ export function ReviewStepWrapper({
     },
   });
 
-  // Parse the file when component mounts using backend API
+  // Keep the ref up to date with the latest mutate function (in effect to avoid render-time ref mutation)
   useEffect(() => {
-    parseFileViaBackend();
-  }, [fileId, columnMapping, bankTemplateId]);
+    parseMutateRef.current = parseStatementMutation.mutate;
+  });
 
-  // Detect duplicates when transactions are loaded
-  useEffect(() => {
-    if (transactions.length > 0 && walletId) {
-      detectDuplicatesMutation.mutate({
-        transactions,
-        walletId,
-      });
-    }
-  }, [transactions, walletId]);
-
-  const parseFileViaBackend = () => {
-    // Build custom mapping if provided (for CSV files)
+  // Define parseFileViaBackend before useEffect to avoid variable ordering issue
+  const parseFileViaBackend = React.useCallback(() => {
+    // Build custom mapping if provided
     let customMapping = undefined;
     if (columnMapping) {
       customMapping = {
@@ -172,15 +166,32 @@ export function ReviewStepWrapper({
       setCurrency(columnMapping.currency || "VND");
     }
 
-    // Call backend parse API
-    parseStatementMutation.mutate({
+    // Call backend parse API via ref — avoids re-creating this callback when mutation state changes
+    parseMutateRef.current?.({
       fileId,
       bankTemplateId: bankTemplateId || "",
       customMapping,
       sheetName: "",
       useOcr: false,
     });
-  };
+  }, [columnMapping, fileId, bankTemplateId]); // parseStatementMutation intentionally excluded
+
+  // Parse the file once on mount (fileId/walletId are stable for the lifetime of this component)
+  useEffect(() => {
+    queueMicrotask(() => parseFileViaBackend());
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Detect duplicates when transactions are first loaded (run once per transactions set)
+  const detectMutateRef = useRef(detectDuplicatesMutation.mutate);
+  useEffect(() => {
+    detectMutateRef.current = detectDuplicatesMutation.mutate;
+  });
+
+  useEffect(() => {
+    if (transactions.length > 0 && walletId) {
+      detectMutateRef.current({ transactions, walletId });
+    }
+  }, [transactions, walletId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleImport = (
     selectedRowNumbers: number[],

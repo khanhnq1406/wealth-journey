@@ -54,7 +54,7 @@ func (s *portfolioHistoryService) GetHistoricalValues(ctx context.Context, userI
 
 	// 2. Get user's preferred currency
 	user, err := s.userRepo.GetByID(ctx, userID)
-	if user == nil {
+	if err != nil || user == nil {
 		return nil, apperrors.NewNotFoundError("user")
 	}
 	userCurrency := user.PreferredCurrency

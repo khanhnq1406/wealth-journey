@@ -33,7 +33,7 @@ export default function LandingNavbar() {
   useEffect(() => {
     // Check auth state from store
     const authState = store.getState().setAuthReducer.isAuthenticated;
-    setIsAuthenticated(authState ?? false);
+    queueMicrotask(() => setIsAuthenticated(authState ?? false));
   }, []);
 
   // Mobile menu animation variants

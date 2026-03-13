@@ -405,7 +405,8 @@ export function InvestmentDetailModal({
         ),
       },
     ],
-    [investment?.type, investment?.currency, investment?.purchaseUnit, t],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [investment, t, getTransactionTypeLabel],
   );
 
   // Define mobile table columns
@@ -499,7 +500,8 @@ export function InvestmentDetailModal({
         ),
       },
     ],
-    [investment?.type, investment?.currency, investment?.purchaseUnit, t],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [investment, t, getTransactionTypeLabel],
   );
 
   // Handle successful transaction addition

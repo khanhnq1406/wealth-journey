@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/Button";
@@ -140,7 +140,7 @@ export function Tour({
     try {
       const completed = localStorage.getItem(TOUR_COMPLETION_KEY);
       if (completed === "true") {
-        setIsCompleted(true);
+        queueMicrotask(() => setIsCompleted(true));
         return;
       }
 
@@ -148,8 +148,10 @@ export function Tour({
       if (savedStep && autoStart) {
         const stepIndex = parseInt(savedStep, 10);
         if (stepIndex < steps.length) {
-          setCurrentStep(stepIndex);
-          setIsActive(true);
+          queueMicrotask(() => {
+            setCurrentStep(stepIndex);
+            setIsActive(true);
+          });
         }
       }
     } catch (e) {
@@ -177,23 +179,25 @@ export function Tour({
 
     if (step.target) {
       const element = document.querySelector(step.target);
-      setTargetElement(element);
+      queueMicrotask(() => setTargetElement(element));
 
       if (element) {
         const rect = element.getBoundingClientRect();
         const scrollY = window.scrollY || window.pageYOffset;
         const scrollX = window.scrollX || window.pageXOffset;
 
-        setTooltipPosition({
-          top: rect.top + scrollY,
-          left: rect.left + scrollX,
-        });
+        queueMicrotask(() =>
+          setTooltipPosition({
+            top: rect.top + scrollY,
+            left: rect.left + scrollX,
+          }),
+        );
 
         // Scroll element into view if needed
         element.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     } else {
-      setTargetElement(null);
+      queueMicrotask(() => setTargetElement(null));
     }
   }, [isActive, currentStep, steps]);
 
@@ -207,6 +211,46 @@ export function Tour({
       }
     }
   }, [isActive, isCompleted, currentStep]);
+
+  // Define handlers before keyboard navigation effect
+  const handleComplete = useCallback(() => {
+    setIsActive(false);
+    setIsCompleted(true);
+    onComplete?.();
+
+    try {
+      localStorage.setItem(TOUR_COMPLETION_KEY, "true");
+      localStorage.removeItem(TOUR_STEP_KEY);
+    } catch (e) {
+      console.error("Failed to save tour completion:", e);
+    }
+  }, [onComplete]);
+
+  const handleNext = useCallback(() => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep((prev) => prev + 1);
+    } else {
+      handleComplete();
+    }
+  }, [currentStep, steps.length, handleComplete]);
+
+  const handlePrevious = useCallback(() => {
+    if (currentStep > 0) {
+      setCurrentStep((prev) => prev - 1);
+    }
+  }, [currentStep]);
+
+  const handleSkip = useCallback(() => {
+    setIsActive(false);
+    onSkip?.();
+
+    try {
+      localStorage.setItem(TOUR_COMPLETION_KEY, "true");
+      localStorage.removeItem(TOUR_STEP_KEY);
+    } catch (e) {
+      console.error("Failed to save tour completion:", e);
+    }
+  }, [onSkip]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -227,7 +271,7 @@ export function Tour({
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isActive, currentStep]);
+  }, [isActive, keyboardNavigation, handleNext, handlePrevious, handleSkip]);
 
   // Handle window resize
   useEffect(() => {
@@ -248,48 +292,51 @@ export function Tour({
     return () => window.removeEventListener("resize", handleResize);
   }, [isActive, targetElement]);
 
-  const handleNext = useCallback(() => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep((prev) => prev + 1);
-    } else {
-      handleComplete();
-    }
-  }, [currentStep, steps.length]);
-
-  const handlePrevious = useCallback(() => {
-    if (currentStep > 0) {
-      setCurrentStep((prev) => prev - 1);
-    }
-  }, [currentStep]);
-
-  const handleSkip = useCallback(() => {
-    setIsActive(false);
-    onSkip?.();
-
-    try {
-      localStorage.setItem(TOUR_COMPLETION_KEY, "true");
-      localStorage.removeItem(TOUR_STEP_KEY);
-    } catch (e) {
-      console.error("Failed to save tour completion:", e);
-    }
-  }, [onSkip]);
-
-  const handleComplete = useCallback(() => {
-    setIsActive(false);
-    setIsCompleted(true);
-    onComplete?.();
-
-    try {
-      localStorage.setItem(TOUR_COMPLETION_KEY, "true");
-      localStorage.removeItem(TOUR_STEP_KEY);
-    } catch (e) {
-      console.error("Failed to save tour completion:", e);
-    }
-  }, [onComplete]);
-
   const step = steps[currentStep];
   const isFirstStep = currentStep === 0;
   const isLastStep = currentStep === steps.length - 1;
+
+  // Center overlay for welcome/completion steps - computed before early returns for useMemo
+  const isCenterStep = !step?.target || step?.placement === "center";
+
+  // Calculate tooltip position using useMemo to avoid accessing refs during render
+  // Must be called before any early returns to follow React Hooks rules
+  const tooltipStyle = useMemo(() => {
+    if (!isActive || !step) return undefined;
+    if (isCenterStep || !targetElement) return undefined;
+
+    const rect = targetElement.getBoundingClientRect();
+    const tooltipHeight = 200; // Default height, will adjust after mount
+    const tooltipWidth = 400; // Default width
+
+    switch (step.placement) {
+      case "top":
+        return {
+          top: `${tooltipPosition.top - tooltipHeight - 16}px`,
+          left: `${tooltipPosition.left + rect.width / 2 - tooltipWidth / 2}px`,
+        };
+      case "bottom":
+        return {
+          top: `${tooltipPosition.top + rect.height + 16}px`,
+          left: `${tooltipPosition.left + rect.width / 2 - tooltipWidth / 2}px`,
+        };
+      case "left":
+        return {
+          top: `${tooltipPosition.top + rect.height / 2 - tooltipHeight / 2}px`,
+          left: `${tooltipPosition.left - tooltipWidth - 16}px`,
+        };
+      case "right":
+        return {
+          top: `${tooltipPosition.top + rect.height / 2 - tooltipHeight / 2}px`,
+          left: `${tooltipPosition.left + rect.width + 16}px`,
+        };
+      default:
+        return {
+          top: `${tooltipPosition.top + rect.height + 16}px`,
+          left: `${Math.max(16, Math.min(tooltipPosition.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - 16))}px`,
+        };
+    }
+  }, [isActive, step, isCenterStep, targetElement, tooltipPosition]);
 
   if (!isActive || !step) return null;
 
@@ -297,9 +344,6 @@ export function Tour({
   const portalTarget = typeof document !== "undefined" ? document.body : null;
 
   if (!portalTarget) return null;
-
-  // Center overlay for welcome/completion steps
-  const isCenterStep = !step.target || step.placement === "center";
 
   return createPortal(
     <div className="fixed inset-0 z-[60] pointer-events-none">
@@ -338,41 +382,8 @@ export function Tour({
           isCenterStep
             ? "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-scale-in"
             : "animate-fade-in",
-          !isCenterStep && targetElement && (() => {
-            const rect = targetElement.getBoundingClientRect();
-            const tooltipHeight = containerRef.current?.offsetHeight || 200;
-            const tooltipWidth = containerRef.current?.offsetWidth || 400;
-
-            switch (step.placement) {
-              case "top":
-                return {
-                  top: `${tooltipPosition.top - tooltipHeight - 16}px`,
-                  left: `${tooltipPosition.left + rect.width / 2 - tooltipWidth / 2}px`,
-                };
-              case "bottom":
-                return {
-                  top: `${tooltipPosition.top + rect.height + 16}px`,
-                  left: `${tooltipPosition.left + rect.width / 2 - tooltipWidth / 2}px`,
-                };
-              case "left":
-                return {
-                  top: `${tooltipPosition.top + rect.height / 2 - tooltipHeight / 2}px`,
-                  left: `${tooltipPosition.left - tooltipWidth - 16}px`,
-                };
-              case "right":
-                return {
-                  top: `${tooltipPosition.top + rect.height / 2 - tooltipHeight / 2}px`,
-                  left: `${tooltipPosition.left + rect.width + 16}px`,
-                };
-              default:
-                return {
-                  top: `${tooltipPosition.top + rect.height + 16}px`,
-                  left: `${Math.max(16, Math.min(tooltipPosition.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - 16))}px`,
-                };
-            }
-          })()
         )}
-        style={!isCenterStep && targetElement ? undefined : undefined}
+        style={tooltipStyle}
       >
         {/* Progress Bar */}
         {showProgress && (
@@ -489,11 +500,11 @@ export function useTour() {
 
     try {
       const completed = localStorage.getItem(TOUR_COMPLETION_KEY);
-      setIsCompleted(completed === "true");
+      queueMicrotask(() => setIsCompleted(completed === "true"));
 
       const savedStep = localStorage.getItem(TOUR_STEP_KEY);
       if (savedStep) {
-        setCurrentStep(parseInt(savedStep, 10));
+        queueMicrotask(() => setCurrentStep(parseInt(savedStep, 10)));
       }
     } catch (e) {
       console.error("Failed to load tour state:", e);

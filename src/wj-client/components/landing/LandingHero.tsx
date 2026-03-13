@@ -32,7 +32,7 @@ function DashboardPreview() {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
-    setOrigin(window.location.origin);
+    queueMicrotask(() => setOrigin(window.location.origin));
   }, []);
 
   return (

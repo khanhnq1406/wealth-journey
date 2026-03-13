@@ -49,7 +49,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("❌ Failed to connect to database: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	// Auto-migrate tables
 	fmt.Println("📊 Creating/updating database tables...")

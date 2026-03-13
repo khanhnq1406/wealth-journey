@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo } from "react";
+import React, { memo, useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { BaseCard } from "@/components/BaseCard";
 import { InvestmentType } from "@/gen/protobuf/v1/investment";
@@ -92,6 +92,15 @@ export const InvestmentCard = memo(function InvestmentCard({
   const displayCcy = displayCurrency || userCurrency;
   const pnl = unrealizedPnl || 0;
   const pnlPercent = unrealizedPnlPercent || 0;
+
+  // Use state to capture Date.now() once on mount to avoid impure function during render
+  const [now] = useState(() => Date.now());
+
+  // Compute if data is recent (within 5 minutes)
+  const isRecent = useMemo(() => {
+    if (!updatedAt) return false;
+    return now / 1000 - updatedAt < 300;
+  }, [now, updatedAt]);
 
   const handleClick = () => {
     onClick?.(id);
@@ -221,7 +230,7 @@ export const InvestmentCard = memo(function InvestmentCard({
                 <>
                   <span
                     className={`w-2 h-2 rounded-full ${
-                      Date.now() / 1000 - updatedAt < 300
+                      isRecent
                         ? "bg-v2-green-positive"
                         : "bg-gray-400"
                     }`}

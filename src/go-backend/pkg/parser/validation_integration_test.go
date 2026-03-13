@@ -16,6 +16,8 @@ func TestCSVParser_WithTransactionValidation(t *testing.T) {
 		Currency:          "VND",
 		TypeColumn:        -1,
 		ReferenceColumn:   -1,
+		DebitColumn:       -1,
+		CreditColumn:      -1,
 	}
 
 	tests := []struct {
@@ -138,6 +140,8 @@ func TestExcelParser_WithTransactionValidation(t *testing.T) {
 		Currency:          "VND",
 		TypeColumn:        -1,
 		ReferenceColumn:   -1,
+		DebitColumn:       -1,
+		CreditColumn:      -1,
 	}
 
 	tests := []struct {
@@ -193,6 +197,8 @@ func TestPDFParser_WithTransactionValidation(t *testing.T) {
 		Currency:          "VND",
 		TypeColumn:        -1,
 		ReferenceColumn:   -1,
+		DebitColumn:       -1,
+		CreditColumn:      -1,
 	}
 
 	tests := []struct {
@@ -263,6 +269,8 @@ func TestDateAgeValidation_Boundary(t *testing.T) {
 			AmountColumn:      1,
 			DescriptionColumn: 2,
 			Currency:          "VND",
+			DebitColumn:       -1,
+			CreditColumn:      -1,
 		},
 	}
 

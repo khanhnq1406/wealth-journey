@@ -149,7 +149,7 @@ func (s *communityService) UpdatePost(ctx context.Context, userID int32, req *v1
 	}
 
 	// Update hashtags (Phase 2): delete old, re-extract
-	s.hashtagRepo.DeleteByPostID(ctx, post.ID)
+	_ = s.hashtagRepo.DeleteByPostID(ctx, post.ID)
 	s.extractAndStoreHashtags(ctx, post.ID, content, post.CreatedAt)
 
 	return &v1.UpdatePostResponse{
@@ -175,7 +175,7 @@ func (s *communityService) DeletePost(ctx context.Context, userID int32, postID 
 	}
 
 	// Clean up hashtags (Phase 2)
-	s.hashtagRepo.DeleteByPostID(ctx, postID)
+	_ = s.hashtagRepo.DeleteByPostID(ctx, postID)
 	return nil
 }
 
@@ -912,7 +912,7 @@ func extractHashtags(content string) []string {
 func (s *communityService) extractAndStoreHashtags(ctx context.Context, postID int32, content string, createdAt time.Time) {
 	hashtags := extractHashtags(content)
 	if len(hashtags) > 0 {
-		s.hashtagRepo.CreateBatch(ctx, postID, hashtags, createdAt)
+		_ = s.hashtagRepo.CreateBatch(ctx, postID, hashtags, createdAt)
 	}
 }
 
@@ -920,7 +920,7 @@ func (s *communityService) createNotification(ctx context.Context, userID, actor
 	if userID == actorID {
 		return // No self-notifications
 	}
-	s.notificationRepo.Create(ctx, &models.Notification{
+	_ = s.notificationRepo.Create(ctx, &models.Notification{
 		UserID:  userID,
 		ActorID: actorID,
 		Type:    notifType,
@@ -977,7 +977,7 @@ func (s *communityService) SharePost(ctx context.Context, userID int32, req *v1.
 	}
 
 	// Increment share count on original
-	s.postRepo.IncrementShareCount(ctx, rootPostID, 1)
+	_ = s.postRepo.IncrementShareCount(ctx, rootPostID, 1)
 
 	// Fetch root post for notification
 	rootPost, _ := s.postRepo.GetByID(ctx, rootPostID)

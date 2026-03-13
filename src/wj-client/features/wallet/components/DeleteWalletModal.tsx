@@ -82,7 +82,8 @@ export function DeleteWalletModal({
       option: deletionOption,
       targetWalletId: option === "transfer" ? targetWalletId : 0,
     });
-  }, [option, targetWalletId, wallet.id, deleteWalletMutation]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [option, targetWalletId, wallet.id, deleteWalletMutation, t]);
 
   const isLoading = deleteWalletMutation.isPending || isPending;
 

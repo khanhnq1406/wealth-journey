@@ -26,7 +26,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 
 	// Initialize repositories
 	repos := &service.Repositories{
@@ -49,7 +49,7 @@ func main() {
 	}
 
 	// Initialize services (no storage provider needed for this CLI tool)
-	services := service.NewServices(repos, underlyingRedisClient, nil, redisClient)
+	services := service.NewServices(repos, underlyingRedisClient, nil, nil, redisClient)
 
 	// Run migration
 	ctx := context.Background()

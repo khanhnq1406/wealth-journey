@@ -44,13 +44,13 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
   // Update input value when selection changes externally
   useEffect(() => {
     if (selectedOption) {
-      setInputValue(selectedOption.label);
+      queueMicrotask(() => setInputValue(selectedOption.label));
     } else if (value === "") {
-      setInputValue("");
+      queueMicrotask(() => setInputValue(""));
     } else if (displayValue) {
       // Use displayValue if the selected option is not in the options list
       // (e.g., when a new item was just created)
-      setInputValue(displayValue);
+      queueMicrotask(() => setInputValue(displayValue));
     }
   }, [value, selectedOption, displayValue]);
 

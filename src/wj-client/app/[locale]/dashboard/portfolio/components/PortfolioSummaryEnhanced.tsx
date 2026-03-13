@@ -286,8 +286,7 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
       value:
         currentValue -
         variance +
-        (variance * 2 * i) / 9 +
-        (Math.random() - 0.5) * variance * 0.2,
+        (variance * 2 * i) / 9,
     }));
   }, [historicalData, displayValue, portfolioSummary.historicalValues]);
 
@@ -325,7 +324,7 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
     const avgPerType = displayValue / Math.max(holdings, 1);
     return types.map((type, i) => ({
       name: type,
-      value: Math.round(avgPerType * (0.5 + Math.random() * 1)),
+      value: Math.round(avgPerType * (0.5 + ((i + 1) % 3) * 0.25)),
       color: ASSET_COLORS[i % ASSET_COLORS.length],
     }));
   }, [
@@ -333,6 +332,7 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
     portfolioSummary.assetAllocation,
     portfolioSummary.investmentsByType,
     portfolioSummary.totalInvestments,
+    t,
   ]);
 
   // Get best performer from API data

@@ -224,6 +224,8 @@ func TestExcelParser_ParseRow(t *testing.T) {
 		Currency:          "VND",
 		TypeColumn:        -1,
 		ReferenceColumn:   -1,
+		DebitColumn:       -1,
+		CreditColumn:      -1,
 	}
 
 	tests := []struct {

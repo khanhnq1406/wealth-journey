@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo, useState } from "react";
+import React, { memo, useMemo, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { BaseCard } from "@/components/BaseCard";
 import { InvestmentType } from "@/gen/protobuf/v1/investment";
@@ -142,6 +142,15 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
 
   const nativeCurrency = currency || "USD";
   const displayCcy = displayCurrency || userCurrency;
+
+  // Use state to capture Date.now() once on mount to avoid impure function during render
+  const [now] = useState(() => Date.now());
+
+  // Compute if data is recent (within 5 minutes)
+  const isRecent = useMemo(() => {
+    if (!updatedAt) return false;
+    return now / 1000 - updatedAt < 300;
+  }, [now, updatedAt]);
   const pnl = unrealizedPnl || 0;
   const pnlPercent = unrealizedPnlPercent || 0;
 
@@ -287,7 +296,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
           <div className="flex items-center justify-between pt-2 border-t border-neutral-100">
             <div className="flex items-center gap-1">
               <div
-                className={`w-2 h-2 rounded-full ${Date.now() / 1000 - updatedAt < 300 ? "bg-v2-green-positive animate-pulse" : "bg-gray-400"}`}
+                className={`w-2 h-2 rounded-full ${isRecent ? "bg-v2-green-positive animate-pulse" : "bg-gray-400"}`}
               />
               <span className="text-xs text-neutral-500">
                 {formatTimeAgo(updatedAt, t as any, locale).text}

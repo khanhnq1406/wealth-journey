@@ -6,71 +6,67 @@ import (
 	"wealthjourney/domain/models"
 	"wealthjourney/pkg/fx"
 	"wealthjourney/pkg/types"
-	budgetv1 "wealthjourney/protobuf/v1"
-	investmentv1 "wealthjourney/protobuf/v1"
-	transactionv1 "wealthjourney/protobuf/v1"
 	v1 "wealthjourney/protobuf/v1"
-	walletv1 "wealthjourney/protobuf/v1"
 )
 
 // WalletService defines the interface for wallet business logic.
 type WalletService interface {
 	// CreateWallet creates a new wallet for a user.
-	CreateWallet(ctx context.Context, userID int32, req *walletv1.CreateWalletRequest) (*walletv1.CreateWalletResponse, error)
+	CreateWallet(ctx context.Context, userID int32, req *v1.CreateWalletRequest) (*v1.CreateWalletResponse, error)
 
 	// GetWallet retrieves a wallet by ID, ensuring it belongs to the user.
-	GetWallet(ctx context.Context, walletID int32, requestingUserID int32) (*walletv1.GetWalletResponse, error)
+	GetWallet(ctx context.Context, walletID int32, requestingUserID int32) (*v1.GetWalletResponse, error)
 
 	// ListWallets retrieves all wallets for a user with pagination.
-	ListWallets(ctx context.Context, userID int32, params types.PaginationParams) (*walletv1.ListWalletsResponse, error)
+	ListWallets(ctx context.Context, userID int32, params types.PaginationParams) (*v1.ListWalletsResponse, error)
 
 	// UpdateWallet updates a wallet's name.
-	UpdateWallet(ctx context.Context, walletID int32, userID int32, req *walletv1.UpdateWalletRequest) (*walletv1.UpdateWalletResponse, error)
+	UpdateWallet(ctx context.Context, walletID int32, userID int32, req *v1.UpdateWalletRequest) (*v1.UpdateWalletResponse, error)
 
 	// DeleteWallet deletes a wallet with options for handling related transactions.
-	DeleteWallet(ctx context.Context, walletID int32, userID int32, req *walletv1.DeleteWalletRequest) (*walletv1.DeleteWalletResponse, error)
+	DeleteWallet(ctx context.Context, walletID int32, userID int32, req *v1.DeleteWalletRequest) (*v1.DeleteWalletResponse, error)
 
 	// AddFunds adds funds to a wallet.
-	AddFunds(ctx context.Context, walletID int32, userID int32, req *walletv1.AddFundsRequest) (*walletv1.AddFundsResponse, error)
+	AddFunds(ctx context.Context, walletID int32, userID int32, req *v1.AddFundsRequest) (*v1.AddFundsResponse, error)
 
 	// WithdrawFunds withdraws funds from a wallet.
-	WithdrawFunds(ctx context.Context, walletID int32, userID int32, req *walletv1.WithdrawFundsRequest) (*walletv1.WithdrawFundsResponse, error)
+	WithdrawFunds(ctx context.Context, walletID int32, userID int32, req *v1.WithdrawFundsRequest) (*v1.WithdrawFundsResponse, error)
 
 	// TransferFunds transfers funds between two wallets belonging to the same user.
-	TransferFunds(ctx context.Context, userID int32, req *walletv1.TransferFundsRequest) (*walletv1.TransferFundsResponse, error)
+	TransferFunds(ctx context.Context, userID int32, req *v1.TransferFundsRequest) (*v1.TransferFundsResponse, error)
 
 	// AdjustBalance adjusts a wallet's balance and creates a transaction for audit trail.
-	AdjustBalance(ctx context.Context, walletID int32, userID int32, req *walletv1.AdjustBalanceRequest) (*walletv1.AdjustBalanceResponse, error)
+	AdjustBalance(ctx context.Context, walletID int32, userID int32, req *v1.AdjustBalanceRequest) (*v1.AdjustBalanceResponse, error)
 
 	// GetTotalBalance calculates the total balance across all user wallets.
-	GetTotalBalance(ctx context.Context, userID int32) (*walletv1.GetTotalBalanceResponse, error)
+	GetTotalBalance(ctx context.Context, userID int32) (*v1.GetTotalBalanceResponse, error)
 
 	// GetBalanceHistory retrieves balance history for chart visualization.
-	GetBalanceHistory(ctx context.Context, userID int32, req *walletv1.GetBalanceHistoryRequest) (*walletv1.GetBalanceHistoryResponse, error)
+	GetBalanceHistory(ctx context.Context, userID int32, req *v1.GetBalanceHistoryRequest) (*v1.GetBalanceHistoryResponse, error)
 
 	// GetMonthlyDominance retrieves monthly balance data for all wallets.
-	GetMonthlyDominance(ctx context.Context, userID int32, req *walletv1.GetMonthlyDominanceRequest) (*walletv1.GetMonthlyDominanceResponse, error)
+	GetMonthlyDominance(ctx context.Context, userID int32, req *v1.GetMonthlyDominanceRequest) (*v1.GetMonthlyDominanceResponse, error)
 }
 
 // UserService defines the interface for user business logic.
 type UserService interface {
 	// GetUser retrieves a user by ID.
-	GetUser(ctx context.Context, userID int32) (*walletv1.GetUserResponse, error)
+	GetUser(ctx context.Context, userID int32) (*v1.GetUserResponse, error)
 
 	// GetUserByEmail retrieves a user by email.
-	GetUserByEmail(ctx context.Context, email string) (*walletv1.GetUserByEmailResponse, error)
+	GetUserByEmail(ctx context.Context, email string) (*v1.GetUserByEmailResponse, error)
 
 	// ListUsers retrieves all users with pagination.
-	ListUsers(ctx context.Context, params types.PaginationParams) (*walletv1.ListUsersResponse, error)
+	ListUsers(ctx context.Context, params types.PaginationParams) (*v1.ListUsersResponse, error)
 
 	// CreateUser creates a new user.
-	CreateUser(ctx context.Context, email, name, picture string) (*walletv1.CreateUserResponse, error)
+	CreateUser(ctx context.Context, email, name, picture string) (*v1.CreateUserResponse, error)
 
 	// UpdateUser updates a user's information.
-	UpdateUser(ctx context.Context, userID int32, email, name, picture string) (*walletv1.UpdateUserResponse, error)
+	UpdateUser(ctx context.Context, userID int32, email, name, picture string) (*v1.UpdateUserResponse, error)
 
 	// DeleteUser deletes a user.
-	DeleteUser(ctx context.Context, userID int32) (*walletv1.DeleteUserResponse, error)
+	DeleteUser(ctx context.Context, userID int32) (*v1.DeleteUserResponse, error)
 
 	// ExistsByEmail checks if a user exists by email.
 	ExistsByEmail(ctx context.Context, email string) (bool, error)
@@ -82,25 +78,25 @@ type UserService interface {
 // TransactionService defines the interface for transaction business logic.
 type TransactionService interface {
 	// CreateTransaction creates a new transaction and updates wallet balance.
-	CreateTransaction(ctx context.Context, userID int32, req *transactionv1.CreateTransactionRequest) (*transactionv1.CreateTransactionResponse, error)
+	CreateTransaction(ctx context.Context, userID int32, req *v1.CreateTransactionRequest) (*v1.CreateTransactionResponse, error)
 
 	// GetTransaction retrieves a transaction by ID, ensuring it belongs to the user's wallet.
-	GetTransaction(ctx context.Context, transactionID int32, userID int32) (*transactionv1.GetTransactionResponse, error)
+	GetTransaction(ctx context.Context, transactionID int32, userID int32) (*v1.GetTransactionResponse, error)
 
 	// ListTransactions retrieves transactions with filtering and pagination.
-	ListTransactions(ctx context.Context, userID int32, req *transactionv1.ListTransactionsRequest) (*transactionv1.ListTransactionsResponse, error)
+	ListTransactions(ctx context.Context, userID int32, req *v1.ListTransactionsRequest) (*v1.ListTransactionsResponse, error)
 
 	// UpdateTransaction updates a transaction and adjusts wallet balance accordingly.
-	UpdateTransaction(ctx context.Context, transactionID int32, userID int32, req *transactionv1.UpdateTransactionRequest) (*transactionv1.UpdateTransactionResponse, error)
+	UpdateTransaction(ctx context.Context, transactionID int32, userID int32, req *v1.UpdateTransactionRequest) (*v1.UpdateTransactionResponse, error)
 
 	// DeleteTransaction deletes a transaction and restores the wallet balance.
-	DeleteTransaction(ctx context.Context, transactionID int32, userID int32) (*transactionv1.DeleteTransactionResponse, error)
+	DeleteTransaction(ctx context.Context, transactionID int32, userID int32) (*v1.DeleteTransactionResponse, error)
 
 	// GetAvailableYears retrieves distinct years from user's transactions.
-	GetAvailableYears(ctx context.Context, userID int32) (*transactionv1.GetAvailableYearsResponse, error)
+	GetAvailableYears(ctx context.Context, userID int32) (*v1.GetAvailableYearsResponse, error)
 
 	// GetFinancialReport retrieves monthly financial breakdown for wallets in a given year.
-	GetFinancialReport(ctx context.Context, userID int32, req *transactionv1.GetFinancialReportRequest) (*transactionv1.GetFinancialReportResponse, error)
+	GetFinancialReport(ctx context.Context, userID int32, req *v1.GetFinancialReportRequest) (*v1.GetFinancialReportResponse, error)
 
 	// GetCategoryBreakdown retrieves category-wise transaction summary for a date range.
 	GetCategoryBreakdown(ctx context.Context, userID int32, req *v1.GetCategoryBreakdownRequest) (*v1.GetCategoryBreakdownResponse, error)
@@ -109,19 +105,19 @@ type TransactionService interface {
 // CategoryService defines the interface for category business logic.
 type CategoryService interface {
 	// CreateCategory creates a new category for a user.
-	CreateCategory(ctx context.Context, userID int32, req *transactionv1.CreateCategoryRequest) (*transactionv1.CreateCategoryResponse, error)
+	CreateCategory(ctx context.Context, userID int32, req *v1.CreateCategoryRequest) (*v1.CreateCategoryResponse, error)
 
 	// GetCategory retrieves a category by ID, ensuring it belongs to the user.
-	GetCategory(ctx context.Context, categoryID int32, userID int32) (*transactionv1.GetCategoryResponse, error)
+	GetCategory(ctx context.Context, categoryID int32, userID int32) (*v1.GetCategoryResponse, error)
 
 	// ListCategories retrieves categories for a user with optional type filtering.
-	ListCategories(ctx context.Context, userID int32, req *transactionv1.ListCategoriesRequest) (*transactionv1.ListCategoriesResponse, error)
+	ListCategories(ctx context.Context, userID int32, req *v1.ListCategoriesRequest) (*v1.ListCategoriesResponse, error)
 
 	// UpdateCategory updates a category's name.
-	UpdateCategory(ctx context.Context, categoryID int32, userID int32, req *transactionv1.UpdateCategoryRequest) (*transactionv1.UpdateCategoryResponse, error)
+	UpdateCategory(ctx context.Context, categoryID int32, userID int32, req *v1.UpdateCategoryRequest) (*v1.UpdateCategoryResponse, error)
 
 	// DeleteCategory deletes a category.
-	DeleteCategory(ctx context.Context, categoryID int32, userID int32) (*transactionv1.DeleteCategoryResponse, error)
+	DeleteCategory(ctx context.Context, categoryID int32, userID int32) (*v1.DeleteCategoryResponse, error)
 
 	// CreateDefaultCategories creates default categories for a new user.
 	CreateDefaultCategories(ctx context.Context, userID int32) error
@@ -137,76 +133,76 @@ type CategoryService interface {
 // BudgetService defines the interface for budget business logic.
 type BudgetService interface {
 	// GetBudget retrieves a budget by ID, ensuring it belongs to the user.
-	GetBudget(ctx context.Context, budgetID int32, userID int32) (*budgetv1.GetBudgetResponse, error)
+	GetBudget(ctx context.Context, budgetID int32, userID int32) (*v1.GetBudgetResponse, error)
 
 	// ListBudgets retrieves all budgets for a user with pagination.
-	ListBudgets(ctx context.Context, userID int32, params types.PaginationParams) (*budgetv1.ListBudgetsResponse, error)
+	ListBudgets(ctx context.Context, userID int32, params types.PaginationParams) (*v1.ListBudgetsResponse, error)
 
 	// CreateBudget creates a new budget for a user.
-	CreateBudget(ctx context.Context, userID int32, req *budgetv1.CreateBudgetRequest) (*budgetv1.CreateBudgetResponse, error)
+	CreateBudget(ctx context.Context, userID int32, req *v1.CreateBudgetRequest) (*v1.CreateBudgetResponse, error)
 
 	// UpdateBudget updates a budget's information.
-	UpdateBudget(ctx context.Context, budgetID int32, userID int32, req *budgetv1.UpdateBudgetRequest) (*budgetv1.UpdateBudgetResponse, error)
+	UpdateBudget(ctx context.Context, budgetID int32, userID int32, req *v1.UpdateBudgetRequest) (*v1.UpdateBudgetResponse, error)
 
 	// DeleteBudget deletes a budget.
-	DeleteBudget(ctx context.Context, budgetID int32, userID int32) (*budgetv1.DeleteBudgetResponse, error)
+	DeleteBudget(ctx context.Context, budgetID int32, userID int32) (*v1.DeleteBudgetResponse, error)
 
 	// GetBudgetItems retrieves all budget items for a budget.
-	GetBudgetItems(ctx context.Context, budgetID int32, userID int32) (*budgetv1.GetBudgetItemsResponse, error)
+	GetBudgetItems(ctx context.Context, budgetID int32, userID int32) (*v1.GetBudgetItemsResponse, error)
 
 	// CreateBudgetItem creates a new budget item.
-	CreateBudgetItem(ctx context.Context, budgetID int32, userID int32, req *budgetv1.CreateBudgetItemRequest) (*budgetv1.CreateBudgetItemResponse, error)
+	CreateBudgetItem(ctx context.Context, budgetID int32, userID int32, req *v1.CreateBudgetItemRequest) (*v1.CreateBudgetItemResponse, error)
 
 	// UpdateBudgetItem updates a budget item's information.
-	UpdateBudgetItem(ctx context.Context, budgetID int32, itemID int32, userID int32, req *budgetv1.UpdateBudgetItemRequest) (*budgetv1.UpdateBudgetItemResponse, error)
+	UpdateBudgetItem(ctx context.Context, budgetID int32, itemID int32, userID int32, req *v1.UpdateBudgetItemRequest) (*v1.UpdateBudgetItemResponse, error)
 
 	// DeleteBudgetItem deletes a budget item.
-	DeleteBudgetItem(ctx context.Context, budgetID int32, itemID int32, userID int32) (*budgetv1.DeleteBudgetItemResponse, error)
+	DeleteBudgetItem(ctx context.Context, budgetID int32, itemID int32, userID int32) (*v1.DeleteBudgetItemResponse, error)
 }
 
 // InvestmentService defines the interface for investment business logic.
 type InvestmentService interface {
 	// CreateInvestment creates a new investment holding.
-	CreateInvestment(ctx context.Context, userID int32, req *investmentv1.CreateInvestmentRequest) (*investmentv1.CreateInvestmentResponse, error)
+	CreateInvestment(ctx context.Context, userID int32, req *v1.CreateInvestmentRequest) (*v1.CreateInvestmentResponse, error)
 
 	// GetInvestment retrieves an investment by ID, ensuring it belongs to the user.
-	GetInvestment(ctx context.Context, investmentID int32, requestingUserID int32) (*investmentv1.GetInvestmentResponse, error)
+	GetInvestment(ctx context.Context, investmentID int32, requestingUserID int32) (*v1.GetInvestmentResponse, error)
 
 	// ListInvestments retrieves all investments for a wallet with pagination and filtering.
-	ListInvestments(ctx context.Context, userID int32, req *investmentv1.ListInvestmentsRequest) (*investmentv1.ListInvestmentsResponse, error)
+	ListInvestments(ctx context.Context, userID int32, req *v1.ListInvestmentsRequest) (*v1.ListInvestmentsResponse, error)
 
 	// UpdateInvestment updates an investment's details.
-	UpdateInvestment(ctx context.Context, investmentID int32, userID int32, req *investmentv1.UpdateInvestmentRequest) (*investmentv1.UpdateInvestmentResponse, error)
+	UpdateInvestment(ctx context.Context, investmentID int32, userID int32, req *v1.UpdateInvestmentRequest) (*v1.UpdateInvestmentResponse, error)
 
 	// DeleteInvestment deletes an investment.
-	DeleteInvestment(ctx context.Context, investmentID int32, userID int32) (*investmentv1.DeleteInvestmentResponse, error)
+	DeleteInvestment(ctx context.Context, investmentID int32, userID int32) (*v1.DeleteInvestmentResponse, error)
 
 	// AddTransaction adds a buy/sell transaction to an investment.
-	AddTransaction(ctx context.Context, userID int32, req *investmentv1.AddTransactionRequest) (*investmentv1.AddTransactionResponse, error)
+	AddTransaction(ctx context.Context, userID int32, req *v1.AddTransactionRequest) (*v1.AddTransactionResponse, error)
 
 	// ListTransactions retrieves transactions for an investment.
-	ListTransactions(ctx context.Context, userID int32, req *investmentv1.ListInvestmentTransactionsRequest) (*investmentv1.ListInvestmentTransactionsResponse, error)
+	ListTransactions(ctx context.Context, userID int32, req *v1.ListInvestmentTransactionsRequest) (*v1.ListInvestmentTransactionsResponse, error)
 
 	// EditTransaction edits an existing transaction.
-	EditTransaction(ctx context.Context, transactionID int32, userID int32, req *investmentv1.EditInvestmentTransactionRequest) (*investmentv1.EditInvestmentTransactionResponse, error)
+	EditTransaction(ctx context.Context, transactionID int32, userID int32, req *v1.EditInvestmentTransactionRequest) (*v1.EditInvestmentTransactionResponse, error)
 
 	// DeleteTransaction deletes a transaction.
-	DeleteTransaction(ctx context.Context, transactionID int32, userID int32) (*investmentv1.DeleteInvestmentTransactionResponse, error)
+	DeleteTransaction(ctx context.Context, transactionID int32, userID int32) (*v1.DeleteInvestmentTransactionResponse, error)
 
 	// GetPortfolioSummary retrieves portfolio summary for a wallet.
-	GetPortfolioSummary(ctx context.Context, walletID int32, userID int32, period investmentv1.PnlPeriod) (*investmentv1.GetPortfolioSummaryResponse, error)
+	GetPortfolioSummary(ctx context.Context, walletID int32, userID int32, period v1.PnlPeriod) (*v1.GetPortfolioSummaryResponse, error)
 
 	// UpdatePrices updates current prices for investments.
-	UpdatePrices(ctx context.Context, userID int32, req *investmentv1.UpdatePricesRequest) (*investmentv1.UpdatePricesResponse, error)
+	UpdatePrices(ctx context.Context, userID int32, req *v1.UpdatePricesRequest) (*v1.UpdatePricesResponse, error)
 
 	// SearchSymbols searches for investment symbols by query using Yahoo Finance search API.
-	SearchSymbols(ctx context.Context, query string, limit int) (*investmentv1.SearchSymbolsResponse, error)
+	SearchSymbols(ctx context.Context, query string, limit int) (*v1.SearchSymbolsResponse, error)
 
 	// ListUserInvestments retrieves investments across all wallets or filtered by wallet.
-	ListUserInvestments(ctx context.Context, userID int32, req *investmentv1.ListUserInvestmentsRequest) (*investmentv1.ListUserInvestmentsResponse, error)
+	ListUserInvestments(ctx context.Context, userID int32, req *v1.ListUserInvestmentsRequest) (*v1.ListUserInvestmentsResponse, error)
 
 	// GetAggregatedPortfolioSummary retrieves portfolio summary aggregated across all wallets or for specific wallet.
-	GetAggregatedPortfolioSummary(ctx context.Context, userID int32, req *investmentv1.GetAggregatedPortfolioSummaryRequest) (*investmentv1.GetPortfolioSummaryResponse, error)
+	GetAggregatedPortfolioSummary(ctx context.Context, userID int32, req *v1.GetAggregatedPortfolioSummaryRequest) (*v1.GetPortfolioSummaryResponse, error)
 
 	// ListInvestmentWallets retrieves all investment wallets for a user.
 	ListInvestmentWallets(ctx context.Context, userID int32) ([]*models.Wallet, error)
@@ -225,7 +221,7 @@ type CurrencyPair = fx.CurrencyPair
 // PortfolioHistoryService handles historical portfolio data.
 type PortfolioHistoryService interface {
 	// GetHistoricalValues retrieves historical portfolio values for charts.
-	GetHistoricalValues(ctx context.Context, userID int32, req *investmentv1.GetHistoricalPortfolioValuesRequest) (*investmentv1.GetHistoricalPortfolioValuesResponse, error)
+	GetHistoricalValues(ctx context.Context, userID int32, req *v1.GetHistoricalPortfolioValuesRequest) (*v1.GetHistoricalPortfolioValuesResponse, error)
 
 	// CreateSnapshot creates a portfolio value snapshot.
 	CreateSnapshot(ctx context.Context, userID, walletID int32) error

@@ -188,7 +188,7 @@ export function FormDatePicker({
   // Update selected date when value prop changes
   useEffect(() => {
     if (value !== undefined) {
-      setSelectedDate(value);
+      queueMicrotask(() => setSelectedDate(value));
     }
   }, [value]);
 

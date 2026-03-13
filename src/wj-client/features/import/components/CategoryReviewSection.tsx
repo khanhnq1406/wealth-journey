@@ -24,7 +24,7 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
   currency = "VND",
 }: CategoryReviewSectionProps) {
   const [expanded, setExpanded] = useState(false);
-  const t = useTranslations("modals.importWizard.categoryReview");
+  const t = useTranslations("import.categoryReview");
 
   // Memoize category options to avoid recreating on every render
   const categoryOptions = useMemo<SelectOption<string>[]>(() => {

@@ -199,7 +199,7 @@ func (rl *RedisImportRateLimiter) checkLimit(ctx context.Context, prefix, key st
 		}
 	}
 
-	remaining := maxRequests - int(count)
+	remaining := maxRequests - int(count) - 1
 	if remaining < 0 {
 		remaining = 0
 	}

@@ -101,11 +101,12 @@ type Import struct {
 }
 
 type Storage struct {
-	Provider       string // "supabase" or "local" (for backward compatibility)
-	SupabaseURL    string
-	SupabaseAPIKey string
-	SupabaseBucket string
-	UploadDir      string // Local fallback directory
+	Provider                string // "supabase" or "local" (for backward compatibility)
+	SupabaseURL             string
+	SupabaseAPIKey          string
+	SupabaseBucket          string // Private bucket for financial documents
+	SupabaseCommunityBucket string // Public bucket for community images
+	UploadDir               string // Local fallback directory
 }
 
 // Load loads configuration from environment variables
@@ -254,11 +255,12 @@ func Load() (*Config, error) {
 			ValidationOldDateThresholdDays: validationOldDateThresholdDays,
 		},
 		Storage: Storage{
-			Provider:       getEnv("STORAGE_PROVIDER", "supabase"),
-			SupabaseURL:    getEnv("SUPABASE_URL", ""),
-			SupabaseAPIKey: getEnv("SUPABASE_API_KEY", ""),
-			SupabaseBucket: getEnv("SUPABASE_BUCKET", "wealthjourney-uploads"),
-			UploadDir:      getEnv("UPLOAD_DIR", "/tmp/wealthjourney-uploads"),
+			Provider:                getEnv("STORAGE_PROVIDER", "supabase"),
+			SupabaseURL:             getEnv("SUPABASE_URL", ""),
+			SupabaseAPIKey:          getEnv("SUPABASE_API_KEY", ""),
+			SupabaseBucket:          getEnv("SUPABASE_BUCKET", "wealthjourney-uploads"),
+			SupabaseCommunityBucket: getEnv("SUPABASE_COMMUNITY_BUCKET", "community"),
+			UploadDir:               getEnv("UPLOAD_DIR", "/tmp/wealthjourney-uploads"),
 		},
 	}
 

@@ -55,6 +55,15 @@ export function Toast({
   const [visible, setVisible] = useState(true);
   const [exiting, setExiting] = useState(false);
 
+  // Define handleClose before useEffect to avoid variable ordering issue
+  const handleClose = React.useCallback(() => {
+    setExiting(true);
+    setTimeout(() => {
+      setVisible(false);
+      onClose?.();
+    }, 300); // Match animation duration
+  }, [onClose]);
+
   useEffect(() => {
     if (duration > 0) {
       const timer = setTimeout(() => {
@@ -63,15 +72,7 @@ export function Toast({
 
       return () => clearTimeout(timer);
     }
-  }, [duration]);
-
-  const handleClose = () => {
-    setExiting(true);
-    setTimeout(() => {
-      setVisible(false);
-      onClose?.();
-    }, 300); // Match animation duration
-  };
+  }, [duration, handleClose]);
 
   if (!visible) return null;
 

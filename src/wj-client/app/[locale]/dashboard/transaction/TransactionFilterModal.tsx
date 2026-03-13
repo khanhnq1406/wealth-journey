@@ -123,9 +123,11 @@ export function TransactionFilterModal({
   // Ref to track the debounced search value without causing re-renders
   const debouncedSearchRef = useRef(localSearch);
   const typingTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  // Track render count
+  // Track render count - use useEffect to avoid accessing ref during render
   const renderCountRef = useRef(0);
-  renderCountRef.current += 1;
+  useEffect(() => {
+    renderCountRef.current += 1;
+  });
 
   // Custom debounce implementation that doesn't cause re-renders
   useEffect(() => {
@@ -177,16 +179,18 @@ export function TransactionFilterModal({
   // Reset local state when modal opens
   useEffect(() => {
     if (isOpen) {
-      setLocalWallet(currentFilters.walletId);
-      setLocalCategory(currentFilters.categoryFilter);
-      setLocalSort(`${currentFilters.sortField}-${currentFilters.sortOrder}`);
-      setLocalSearch(currentFilters.searchQuery);
-      setAmountMin(currentFilters.amountRange?.min || 0);
-      setAmountMax(currentFilters.amountRange?.max || 0);
-      setCustomStartDate(parseDate(currentFilters.dateRange?.start));
-      setCustomEndDate(parseDate(currentFilters.dateRange?.end));
-      // Reset expanded sections on mobile
-      setExpandedSections(new Set(["search", "filters"]));
+      queueMicrotask(() => {
+        setLocalWallet(currentFilters.walletId);
+        setLocalCategory(currentFilters.categoryFilter);
+        setLocalSort(`${currentFilters.sortField}-${currentFilters.sortOrder}`);
+        setLocalSearch(currentFilters.searchQuery);
+        setAmountMin(currentFilters.amountRange?.min || 0);
+        setAmountMax(currentFilters.amountRange?.max || 0);
+        setCustomStartDate(parseDate(currentFilters.dateRange?.start));
+        setCustomEndDate(parseDate(currentFilters.dateRange?.end));
+        // Reset expanded sections on mobile
+        setExpandedSections(new Set(["search", "filters"]));
+      });
     }
   }, [isOpen, currentFilters]);
 

@@ -58,7 +58,7 @@ func BenchmarkCurrencyConversion_BatchConversion(b *testing.B) {
 // BenchmarkCurrencyConversion_WithRateCache benchmarks conversion with cached rates
 func BenchmarkCurrencyConversion_WithRateCache(b *testing.B) {
 	redisClient := setupBenchmarkRedis(b)
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 
 	fxCache := cache.NewFXRateCache(redisClient)
 	ctx := context.Background()
@@ -165,7 +165,7 @@ func BenchmarkTransactionConversion_List(b *testing.B) {
 // BenchmarkCurrencyCache_Set benchmarks cache write operations
 func BenchmarkCurrencyCache_Set(b *testing.B) {
 	redisClient := setupBenchmarkRedis(b)
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 
 	currencyCache := cache.NewCurrencyCache(redisClient)
 	ctx := context.Background()
@@ -179,7 +179,7 @@ func BenchmarkCurrencyCache_Set(b *testing.B) {
 // BenchmarkCurrencyCache_Get benchmarks cache read operations
 func BenchmarkCurrencyCache_Get(b *testing.B) {
 	redisClient := setupBenchmarkRedis(b)
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 
 	currencyCache := cache.NewCurrencyCache(redisClient)
 	ctx := context.Background()
@@ -198,7 +198,7 @@ func BenchmarkCurrencyCache_Get(b *testing.B) {
 // BenchmarkFXRateCache_ParallelGet benchmarks parallel cache reads
 func BenchmarkFXRateCache_ParallelGet(b *testing.B) {
 	redisClient := setupBenchmarkRedis(b)
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 
 	fxCache := cache.NewFXRateCache(redisClient)
 	ctx := context.Background()
@@ -228,9 +228,8 @@ func BenchmarkFXRateCache_ParallelGet(b *testing.B) {
 
 // BenchmarkBatchFXRateRetrieval benchmarks parallel FX rate fetching
 func BenchmarkBatchFXRateRetrieval(b *testing.B) {
-	ctx := context.Background()
 	redisClient := setupBenchmarkRedis(b)
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 
 	fxRateRepo := setupBenchmarkFXRateRepository(b)
 	fxRateSvc := NewFXRateService(fxRateRepo, redisClient)
@@ -251,7 +250,7 @@ func BenchmarkBatchFXRateRetrieval(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = fxRateSvc.BatchGetRates(ctx, pairs)
+		_, _ = fxRateSvc.BatchGetRates(context.Background(), pairs)
 	}
 }
 
@@ -264,7 +263,7 @@ func BenchmarkBatchFXRateRetrieval(b *testing.B) {
 func BenchmarkDashboardLoad_FullConversion(b *testing.B) {
 	ctx := context.Background()
 	redisClient := setupBenchmarkRedis(b)
-	defer redisClient.Close()
+	defer func() { _ = redisClient.Close() }()
 
 	currencyCache := cache.NewCurrencyCache(redisClient)
 	provider := &mockFXProvider{

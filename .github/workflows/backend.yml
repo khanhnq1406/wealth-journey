@@ -1,0 +1,196 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/go-backend/**'
+      - 'api/protobuf/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/go-backend/**'
+      - 'api/protobuf/**'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/go-backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache-dependency-path: src/go-backend/go.sum
+
+      - name: Run golangci-lint
+        id: golangci
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: latest
+          working-directory: src/go-backend
+
+      - name: Capture lint errors
+        if: failure()
+        run: |
+          mkdir -p /tmp/ci-errors
+          echo "## Backend Lint Errors" >> /tmp/ci-errors/errors.txt
+          echo "Job: ${{ github.job }} | Run: ${{ github.run_id }}" >> /tmp/ci-errors/errors.txt
+          echo "" >> /tmp/ci-errors/errors.txt
+          echo "golangci-lint failed. Check the 'Run golangci-lint' step logs above for details." >> /tmp/ci-errors/errors.txt
+
+      - name: Write lint errors to job summary
+        if: failure()
+        run: |
+          echo "## ❌ Backend Lint Failed" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/ci-errors/errors.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload lint error artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-lint-errors
+          path: /tmp/ci-errors/errors.txt
+          retention-days: 7
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/go-backend
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: wealthjourney_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: testuser
+      DB_PASSWORD: testpass
+      DB_NAME: wealthjourney_test
+      DB_SSL_MODE: disable
+      REDIS_URL: localhost:6379
+      REDIS_PASSWORD: ""
+      JWT_SECRET: ci-test-secret-not-real
+      JWT_EXPIRATION: 168h
+      YAHOO_FINANCE_ENABLED: "false"
+      FX_ENABLED: "false"
+      STORAGE_PROVIDER: local
+      UPLOAD_DIR: /tmp/wealthjourney-uploads
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache-dependency-path: src/go-backend/go.sum
+
+      - name: Run tests
+        id: go-test
+        run: |
+          mkdir -p /tmp/ci-errors
+          go test -v -count=1 -timeout=10m ./... 2>&1 | tee /tmp/ci-errors/test-output.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Capture test errors
+        if: failure()
+        run: |
+          echo "## Backend Test Errors" > /tmp/ci-errors/errors.txt
+          echo "Job: ${{ github.job }} | Run: ${{ github.run_id }}" >> /tmp/ci-errors/errors.txt
+          echo "" >> /tmp/ci-errors/errors.txt
+          grep -E "^(--- FAIL|FAIL|panic:|Error)" /tmp/ci-errors/test-output.txt >> /tmp/ci-errors/errors.txt || true
+          echo "" >> /tmp/ci-errors/errors.txt
+          echo "### Full output:" >> /tmp/ci-errors/errors.txt
+          cat /tmp/ci-errors/test-output.txt >> /tmp/ci-errors/errors.txt
+
+      - name: Write test errors to job summary
+        if: failure()
+        run: |
+          echo "## ❌ Backend Tests Failed" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          grep -E "^(--- FAIL|FAIL|panic:|Error)" /tmp/ci-errors/test-output.txt || echo "See artifact for full output" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "[Download full error log from artifacts]()" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload test error artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-errors
+          path: /tmp/ci-errors/errors.txt
+          retention-days: 7
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/go-backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache-dependency-path: src/go-backend/go.sum
+
+      - name: Verify compilation
+        id: go-build
+        run: |
+          mkdir -p /tmp/ci-errors
+          go build -o /dev/null ./cmd/server/main.go 2>&1 | tee /tmp/ci-errors/build-output.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Capture build errors
+        if: failure()
+        run: |
+          echo "## Backend Build Errors" > /tmp/ci-errors/errors.txt
+          echo "Job: ${{ github.job }} | Run: ${{ github.run_id }}" >> /tmp/ci-errors/errors.txt
+          echo "" >> /tmp/ci-errors/errors.txt
+          cat /tmp/ci-errors/build-output.txt >> /tmp/ci-errors/errors.txt
+
+      - name: Write build errors to job summary
+        if: failure()
+        run: |
+          echo "## ❌ Backend Build Failed" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/ci-errors/build-output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload build error artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-build-errors
+          path: /tmp/ci-errors/errors.txt
+          retention-days: 7

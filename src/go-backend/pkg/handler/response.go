@@ -42,7 +42,7 @@ func Success(c *gin.Context, data interface{}) {
 	}
 	c.Header("Content-Type", "application/json")
 	c.Writer.WriteHeader(http.StatusOK)
-	c.Writer.Write(jsonBytes)
+	_, _ = c.Writer.Write(jsonBytes)
 }
 
 // Created sends a 201 created response with data.
@@ -74,7 +74,7 @@ func Created(c *gin.Context, data interface{}) {
 	}
 	c.Header("Content-Type", "application/json")
 	c.Writer.WriteHeader(http.StatusCreated)
-	c.Writer.Write(jsonBytes)
+	_, _ = c.Writer.Write(jsonBytes)
 }
 
 // NoContent sends a 204 no content response.

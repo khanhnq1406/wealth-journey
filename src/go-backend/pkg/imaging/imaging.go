@@ -78,6 +78,7 @@ func ResizeImage(data []byte, mimeType string, maxWidth int) ([]byte, error) {
 	return encodeImage(dst, mimeType)
 }
 
+//nolint:unused
 // scaleNRGBA is a helper to scale images using draw package for NRGBA output.
 func scaleNRGBA(src image.Image, newWidth, newHeight int) *image.NRGBA {
 	dst := image.NewNRGBA(image.Rect(0, 0, newWidth, newHeight))

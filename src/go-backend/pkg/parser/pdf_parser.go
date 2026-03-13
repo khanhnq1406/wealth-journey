@@ -33,7 +33,7 @@ func (p *PDFParser) ExtractTable() ([]TableRow, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to open PDF: %w", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	// Create PDF reader
 	reader, err := pdf.NewReader(f, f.Size())
@@ -109,7 +109,7 @@ func (p *PDFParser) extractCurrencyFromPDF() string {
 	if err != nil {
 		return "" // Fail silently, will use default
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	// Create PDF reader
 	reader, err := pdf.NewReader(f, f.Size())
@@ -464,18 +464,21 @@ func (p *PDFParser) detectColumnsFromHeader(headerRow TableRow) *ColumnMapping {
 	return mapping
 }
 
+//nolint:unused
 // parseDate is deprecated - use DateParser instead
 func (p *PDFParser) parseDate(dateStr string, preferredFormat string) (time.Time, error) {
 	dateParser := NewDateParser(preferredFormat)
 	return dateParser.Parse(dateStr)
 }
 
+//nolint:unused
 // parseAmount is deprecated - use AmountParser instead
 func (p *PDFParser) parseAmount(amountStr string) (int64, error) {
 	amountParser := NewAmountParserWithAutoDetect()
 	return amountParser.Parse(amountStr)
 }
 
+//nolint:unused
 // detectType is deprecated - use TypeDetector instead
 func (p *PDFParser) detectType(typeStr string, amount int64) string {
 	detector := NewTypeDetector()
@@ -610,7 +613,7 @@ func (p *PDFParser) parseVerticalFormatFromFile() ([]*ParsedRow, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to open PDF: %w", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	reader, err := pdf.NewReader(f, f.Size())
 	if err != nil {

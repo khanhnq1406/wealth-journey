@@ -73,10 +73,10 @@ export function SkeletonText({
               ? ({
                   "--skeleton-width": width,
                   ...(randomDelay && {
-                    animationDelay: `${Math.random() * 0.5}s`,
+                    animationDelay: `${(index * 0.1) % 0.5}s`,
                   }),
                 } as React.CSSProperties)
-              : { ...(randomDelay && { animationDelay: `${Math.random() * 0.5}s` }) } as React.CSSProperties
+              : { ...(randomDelay && { animationDelay: `${(index * 0.1) % 0.5}s` }) } as React.CSSProperties
           }
         />
       ))}

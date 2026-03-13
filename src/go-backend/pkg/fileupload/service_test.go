@@ -47,12 +47,12 @@ func TestFileUploadService_Upload(t *testing.T) {
 	mockStorage := &mockStorageProvider{}
 	service := NewFileUploadService(mockStorage)
 
-	// Create mock file
-	fileContent := []byte("test,data\n1,2")
+	// Create mock file (use PDF since CSV is no longer supported)
+	fileContent := []byte("%PDF-1.4 test content")
 	file := newMockFile(string(fileContent))
 
 	header := &multipart.FileHeader{
-		Filename: "test.csv",
+		Filename: "test.pdf",
 		Size:     int64(len(fileContent)),
 	}
 
@@ -61,12 +61,12 @@ func TestFileUploadService_Upload(t *testing.T) {
 		t.Fatalf("Upload failed: %v", err)
 	}
 
-	if result.FileName != "test.csv" {
-		t.Errorf("Expected filename 'test.csv', got %s", result.FileName)
+	if result.FileName != "test.pdf" {
+		t.Errorf("Expected filename 'test.pdf', got %s", result.FileName)
 	}
 
-	if result.FileType != FileTypeCSV {
-		t.Errorf("Expected FileTypeCSV, got %s", result.FileType)
+	if result.FileType != FileTypePDF {
+		t.Errorf("Expected FileTypePDF, got %s", result.FileType)
 	}
 
 	// FilePath should now be a URL
@@ -79,8 +79,8 @@ func TestFileUploadService_UploadFromBytes(t *testing.T) {
 	mockStorage := &mockStorageProvider{}
 	service := NewFileUploadService(mockStorage)
 
-	fileContent := []byte("test,data\n1,2")
-	fileName := "test.csv"
+	fileContent := []byte("%PDF-1.4 test content")
+	fileName := "test.pdf"
 	fileSize := int64(len(fileContent))
 
 	result, err := service.UploadFromBytes(context.Background(), fileContent, fileName, fileSize)
@@ -92,8 +92,8 @@ func TestFileUploadService_UploadFromBytes(t *testing.T) {
 		t.Errorf("Expected filename '%s', got %s", fileName, result.FileName)
 	}
 
-	if result.FileType != FileTypeCSV {
-		t.Errorf("Expected FileTypeCSV, got %s", result.FileType)
+	if result.FileType != FileTypePDF {
+		t.Errorf("Expected FileTypePDF, got %s", result.FileType)
 	}
 
 	if result.FilePath == "" {
@@ -106,8 +106,8 @@ func TestFileUploadService_Cleanup(t *testing.T) {
 	mockStorage := &mockStorageProvider{
 		deleteFunc: func(ctx context.Context, key string) error {
 			deleteCalled = true
-			if key != "uploads/test-file-id.csv" {
-				t.Errorf("Expected key 'uploads/test-file-id.csv', got %s", key)
+			if key != "uploads/test-file-id.pdf" {
+				t.Errorf("Expected key 'uploads/test-file-id.pdf', got %s", key)
 			}
 			return nil
 		},
@@ -115,7 +115,7 @@ func TestFileUploadService_Cleanup(t *testing.T) {
 
 	service := NewFileUploadService(mockStorage)
 
-	err := service.Cleanup(context.Background(), "test-file-id", ".csv")
+	err := service.Cleanup(context.Background(), "test-file-id", ".pdf")
 	if err != nil {
 		t.Fatalf("Cleanup failed: %v", err)
 	}
@@ -151,8 +151,8 @@ func TestFileUploadService_Upload_FileTooLarge(t *testing.T) {
 	mockFile := &mockFile{Reader: bytes.NewReader(fileContent)}
 
 	header := &multipart.FileHeader{
-		Filename: "test.csv",
-		Size:     MaxCSVSize + 1, // Too large
+		Filename: "test.xlsx",
+		Size:     MaxExcelSize + 1, // Too large
 	}
 
 	_, err := service.Upload(context.Background(), mockFile, header)

@@ -17,8 +17,7 @@ import (
 	"wealthjourney/pkg/units"
 	"wealthjourney/pkg/validator"
 	"wealthjourney/pkg/yahoo"
-	investmentv1 "wealthjourney/protobuf/v1"
-	walletv1 "wealthjourney/protobuf/v1"
+	v1 "wealthjourney/protobuf/v1"
 )
 
 // investmentService implements InvestmentService.
@@ -67,30 +66,34 @@ func NewInvestmentService(
 
 // Helper methods for gold investment handling
 
+//nolint:unused
 // isGoldInvestment checks if an investment is a gold type
-func (s *investmentService) isGoldInvestment(invType investmentv1.InvestmentType) bool {
+func (s *investmentService) isGoldInvestment(invType v1.InvestmentType) bool {
 	return gold.IsGoldType(invType)
 }
 
+//nolint:unused
 // getGoldStorageInfo returns the storage unit and native currency for a gold investment
-func (s *investmentService) getGoldStorageInfo(invType investmentv1.InvestmentType) (gold.GoldUnit, string) {
+func (s *investmentService) getGoldStorageInfo(invType v1.InvestmentType) (gold.GoldUnit, string) {
 	return gold.GetNativeStorageInfo(invType)
 }
 
 // Helper methods for silver investment handling
 
+//nolint:unused
 // isSilverInvestment checks if an investment is a silver type
-func (s *investmentService) isSilverInvestment(invType investmentv1.InvestmentType) bool {
+func (s *investmentService) isSilverInvestment(invType v1.InvestmentType) bool {
 	return silver.IsSilverType(invType)
 }
 
+//nolint:unused
 // getSilverStorageInfo returns the storage unit and native currency for a silver investment
-func (s *investmentService) getSilverStorageInfo(invType investmentv1.InvestmentType) (silver.SilverUnit, string) {
+func (s *investmentService) getSilverStorageInfo(invType v1.InvestmentType) (silver.SilverUnit, string) {
 	return silver.GetNativeStorageInfo(invType)
 }
 
 // CreateInvestment creates a new investment holding in a wallet.
-func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, req *investmentv1.CreateInvestmentRequest) (*investmentv1.CreateInvestmentResponse, error) {
+func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, req *v1.CreateInvestmentRequest) (*v1.CreateInvestmentResponse, error) {
 	// 1. Validate inputs
 	if err := validator.ID(userID); err != nil {
 		return nil, err
@@ -136,7 +139,7 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 	}
 
 	// 3. Validate wallet type - must be INVESTMENT
-	if walletv1.WalletType(wallet.Type) != walletv1.WalletType_INVESTMENT {
+	if v1.WalletType(wallet.Type) != v1.WalletType_INVESTMENT {
 		return nil, apperrors.NewValidationError("investments can only be created in investment wallets")
 	}
 
@@ -213,7 +216,7 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 	tx := &models.InvestmentTransaction{
 		InvestmentID:    investment.ID,
 		WalletID:        req.WalletId,
-		Type:            int32(investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY),
+		Type:            int32(v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY),
 		Quantity:        initialQuantity,
 		Price:           averageCost,
 		Cost:            initialCost,
@@ -279,7 +282,7 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 	// Enrich with conversion fields
 	s.enrichInvestmentProto(ctx, userID, invProto, investment)
 
-	return &investmentv1.CreateInvestmentResponse{
+	return &v1.CreateInvestmentResponse{
 		Success:   true,
 		Message:   "Investment created successfully",
 		Data:      invProto,
@@ -288,7 +291,7 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 }
 
 // GetInvestment retrieves an investment by ID, ensuring it belongs to the user.
-func (s *investmentService) GetInvestment(ctx context.Context, investmentID int32, requestingUserID int32) (*investmentv1.GetInvestmentResponse, error) {
+func (s *investmentService) GetInvestment(ctx context.Context, investmentID int32, requestingUserID int32) (*v1.GetInvestmentResponse, error) {
 	if err := validator.ID(investmentID); err != nil {
 		return nil, err
 	}
@@ -305,7 +308,7 @@ func (s *investmentService) GetInvestment(ctx context.Context, investmentID int3
 	// Enrich with conversion fields
 	s.enrichInvestmentProto(ctx, requestingUserID, invProto, investment)
 
-	return &investmentv1.GetInvestmentResponse{
+	return &v1.GetInvestmentResponse{
 		Success:   true,
 		Message:   "Investment retrieved successfully",
 		Data:      invProto,
@@ -314,7 +317,7 @@ func (s *investmentService) GetInvestment(ctx context.Context, investmentID int3
 }
 
 // ListInvestments retrieves all investments for a wallet with pagination and filtering.
-func (s *investmentService) ListInvestments(ctx context.Context, userID int32, req *investmentv1.ListInvestmentsRequest) (*investmentv1.ListInvestmentsResponse, error) {
+func (s *investmentService) ListInvestments(ctx context.Context, userID int32, req *v1.ListInvestmentsRequest) (*v1.ListInvestmentsResponse, error) {
 	if err := validator.ID(userID); err != nil {
 		return nil, err
 	}
@@ -329,7 +332,7 @@ func (s *investmentService) ListInvestments(ctx context.Context, userID int32, r
 	}
 
 	// Validate wallet type
-	if walletv1.WalletType(wallet.Type) != walletv1.WalletType_INVESTMENT {
+	if v1.WalletType(wallet.Type) != v1.WalletType_INVESTMENT {
 		return nil, apperrors.NewValidationError("investments can only be listed in investment wallets")
 	}
 
@@ -350,7 +353,7 @@ func (s *investmentService) ListInvestments(ctx context.Context, userID int32, r
 	}
 
 	// Get type filter
-	typeFilter := investmentv1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED
+	typeFilter := v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED
 	if req.TypeFilter != 0 {
 		typeFilter = req.TypeFilter
 	}
@@ -367,7 +370,7 @@ func (s *investmentService) ListInvestments(ctx context.Context, userID int32, r
 
 	paginationResult := types.NewPaginationResult(params.Page, params.PageSize, total)
 
-	return &investmentv1.ListInvestmentsResponse{
+	return &v1.ListInvestmentsResponse{
 		Success:    true,
 		Message:    "Investments retrieved successfully",
 		Data:       protoInvestments,
@@ -377,7 +380,7 @@ func (s *investmentService) ListInvestments(ctx context.Context, userID int32, r
 }
 
 // UpdateInvestment updates an investment's details (manual price override).
-func (s *investmentService) UpdateInvestment(ctx context.Context, investmentID int32, userID int32, req *investmentv1.UpdateInvestmentRequest) (*investmentv1.UpdateInvestmentResponse, error) {
+func (s *investmentService) UpdateInvestment(ctx context.Context, investmentID int32, userID int32, req *v1.UpdateInvestmentRequest) (*v1.UpdateInvestmentResponse, error) {
 	if err := validator.ID(investmentID); err != nil {
 		return nil, err
 	}
@@ -446,7 +449,7 @@ func (s *investmentService) UpdateInvestment(ctx context.Context, investmentID i
 	// Enrich with conversion fields
 	s.enrichInvestmentProto(ctx, userID, invProto, investment)
 
-	return &investmentv1.UpdateInvestmentResponse{
+	return &v1.UpdateInvestmentResponse{
 		Success:   true,
 		Message:   "Investment updated successfully",
 		Data:      invProto,
@@ -455,7 +458,7 @@ func (s *investmentService) UpdateInvestment(ctx context.Context, investmentID i
 }
 
 // DeleteInvestment deletes an investment.
-func (s *investmentService) DeleteInvestment(ctx context.Context, investmentID int32, userID int32) (*investmentv1.DeleteInvestmentResponse, error) {
+func (s *investmentService) DeleteInvestment(ctx context.Context, investmentID int32, userID int32) (*v1.DeleteInvestmentResponse, error) {
 	if err := validator.ID(investmentID); err != nil {
 		return nil, err
 	}
@@ -521,7 +524,7 @@ func (s *investmentService) DeleteInvestment(ctx context.Context, investmentID i
 		ws.invalidateInvestmentValueCache(ctx, investment.WalletID)
 	}
 
-	return &investmentv1.DeleteInvestmentResponse{
+	return &v1.DeleteInvestmentResponse{
 		Success:   true,
 		Message:   fmt.Sprintf("Investment %s deleted successfully with all related data", investment.Symbol),
 		Timestamp: time.Now().Format(time.RFC3339),
@@ -529,7 +532,7 @@ func (s *investmentService) DeleteInvestment(ctx context.Context, investmentID i
 }
 
 // AddTransaction adds a buy/sell transaction to an investment with FIFO cost basis tracking.
-func (s *investmentService) AddTransaction(ctx context.Context, userID int32, req *investmentv1.AddTransactionRequest) (*investmentv1.AddTransactionResponse, error) {
+func (s *investmentService) AddTransaction(ctx context.Context, userID int32, req *v1.AddTransactionRequest) (*v1.AddTransactionResponse, error) {
 	// 1. Validate inputs
 	if err := validator.ID(req.InvestmentId); err != nil {
 		return nil, err
@@ -540,7 +543,7 @@ func (s *investmentService) AddTransaction(ctx context.Context, userID int32, re
 	if req.Price <= 0 {
 		return nil, apperrors.NewValidationError("price must be positive")
 	}
-	if req.Type == investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_UNSPECIFIED {
+	if req.Type == v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_UNSPECIFIED {
 		return nil, apperrors.NewValidationError("transaction type must be specified")
 	}
 	// Validate transaction date is not in the future
@@ -562,30 +565,30 @@ func (s *investmentService) AddTransaction(ctx context.Context, userID int32, re
 	}
 	_ = wallet // Used for ownership verification
 
-	if walletv1.WalletType(wallet.Type) != walletv1.WalletType_INVESTMENT {
+	if v1.WalletType(wallet.Type) != v1.WalletType_INVESTMENT {
 		return nil, apperrors.NewValidationError("transactions can only be added to investments in investment wallets")
 	}
 
 	// 4. Calculate transaction cost using utility function
-	cost := units.CalculateTransactionCost(req.Quantity, req.Price, investmentv1.InvestmentType(investment.Type))
+	cost := units.CalculateTransactionCost(req.Quantity, req.Price, v1.InvestmentType(investment.Type))
 	totalCost := cost + req.Fees
 
 	// 5. Handle transaction type
 	var updatedInvestment *models.Investment
 	switch req.Type {
-	case investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY:
+	case v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY:
 		updatedInvestment, err = s.processBuyTransaction(ctx, investment, req, cost, totalCost)
 		if err != nil {
 			return nil, err
 		}
 
-	case investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL:
+	case v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL:
 		updatedInvestment, err = s.processSellTransaction(ctx, investment, req)
 		if err != nil {
 			return nil, err
 		}
 
-	case investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_DIVIDEND:
+	case v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_DIVIDEND:
 		var tx *models.InvestmentTransaction
 		updatedInvestment, tx, err = s.processDividendTransaction(ctx, investment, req)
 		if err != nil {
@@ -596,7 +599,7 @@ func (s *investmentService) AddTransaction(ctx context.Context, userID int32, re
 		s.enrichTransactionProto(ctx, userID, txProto, investment.Currency)
 		updatedInvProto := s.mapper.ModelToProto(updatedInvestment)
 		s.enrichInvestmentProto(ctx, userID, updatedInvProto, updatedInvestment)
-		return &investmentv1.AddTransactionResponse{
+		return &v1.AddTransactionResponse{
 			Success:           true,
 			Message:           "Dividend transaction added successfully",
 			Data:              txProto,
@@ -634,7 +637,7 @@ func (s *investmentService) AddTransaction(ctx context.Context, userID int32, re
 	if err != nil || len(transactions) == 0 {
 		updatedInvProto := s.mapper.ModelToProto(updatedInvestment)
 		s.enrichInvestmentProto(ctx, userID, updatedInvProto, updatedInvestment)
-		return &investmentv1.AddTransactionResponse{
+		return &v1.AddTransactionResponse{
 			Success:           true,
 			Message:           "Transaction added successfully",
 			UpdatedInvestment: updatedInvProto,
@@ -647,7 +650,7 @@ func (s *investmentService) AddTransaction(ctx context.Context, userID int32, re
 	updatedInvProto := s.mapper.ModelToProto(updatedInvestment)
 	s.enrichInvestmentProto(ctx, userID, updatedInvProto, updatedInvestment)
 
-	return &investmentv1.AddTransactionResponse{
+	return &v1.AddTransactionResponse{
 		Success:           true,
 		Message:           "Transaction added successfully",
 		Data:              txProto,
@@ -657,7 +660,7 @@ func (s *investmentService) AddTransaction(ctx context.Context, userID int32, re
 }
 
 // processBuyTransaction handles a buy transaction with lot creation.
-func (s *investmentService) processBuyTransaction(ctx context.Context, investment *models.Investment, req *investmentv1.AddTransactionRequest, cost, totalCost int64) (*models.Investment, error) {
+func (s *investmentService) processBuyTransaction(ctx context.Context, investment *models.Investment, req *v1.AddTransactionRequest, cost, totalCost int64) (*models.Investment, error) {
 	// Fetch wallet to check balance
 	wallet, err := s.walletRepo.GetByID(ctx, investment.WalletID)
 	if err != nil {
@@ -714,14 +717,14 @@ func (s *investmentService) processBuyTransaction(ctx context.Context, investmen
 		// - Gold (VND): totalCost in VND, quantity in grams×10000, returns VND per gram
 		// - Gold (USD): totalCost in cents, quantity in oz×10000, returns cents per oz
 		// - Stocks: totalCost in cents, quantity in shares×100, returns cents per share
-		lot.AverageCost = units.CalculateAverageCost(totalCost, req.Quantity, investmentv1.InvestmentType(investment.Type))
+		lot.AverageCost = units.CalculateAverageCost(totalCost, req.Quantity, v1.InvestmentType(investment.Type))
 		lot.RemainingQuantity = req.Quantity
 	} else {
 		// Update existing lot
 		lot.Quantity += req.Quantity
 		lot.TotalCost += totalCost
 		// Recalculate average cost using utility function
-		lot.AverageCost = units.CalculateAverageCost(lot.TotalCost, lot.Quantity, investmentv1.InvestmentType(investment.Type))
+		lot.AverageCost = units.CalculateAverageCost(lot.TotalCost, lot.Quantity, v1.InvestmentType(investment.Type))
 		lot.RemainingQuantity = lot.Quantity
 	}
 
@@ -740,7 +743,7 @@ func (s *investmentService) processBuyTransaction(ctx context.Context, investmen
 	tx := &models.InvestmentTransaction{
 		InvestmentID:      investment.ID,
 		WalletID:          investment.WalletID,
-		Type:              int32(investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY),
+		Type:              int32(v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY),
 		Quantity:          req.Quantity,
 		Price:             req.Price,
 		Cost:              cost,
@@ -764,7 +767,7 @@ func (s *investmentService) processBuyTransaction(ctx context.Context, investmen
 	investment.Quantity += req.Quantity
 	investment.TotalCost += totalCost
 	// Calculate average cost using utility function
-	investment.AverageCost = units.CalculateAverageCost(investment.TotalCost, investment.Quantity, investmentv1.InvestmentType(investment.Type))
+	investment.AverageCost = units.CalculateAverageCost(investment.TotalCost, investment.Quantity, v1.InvestmentType(investment.Type))
 
 	if err := s.investmentRepo.Update(ctx, investment); err != nil {
 		return nil, apperrors.NewInternalErrorWithCause("failed to update investment", err)
@@ -785,7 +788,7 @@ func (s *investmentService) processBuyTransaction(ctx context.Context, investmen
 }
 
 // processSellTransaction handles a sell transaction with FIFO lot consumption.
-func (s *investmentService) processSellTransaction(ctx context.Context, investment *models.Investment, req *investmentv1.AddTransactionRequest) (*models.Investment, error) {
+func (s *investmentService) processSellTransaction(ctx context.Context, investment *models.Investment, req *v1.AddTransactionRequest) (*models.Investment, error) {
 	// Validate sufficient quantity
 	if investment.Quantity < req.Quantity {
 		return nil, apperrors.NewValidationError(fmt.Sprintf("insufficient quantity: owned %d, trying to sell %d", investment.Quantity, req.Quantity))
@@ -839,7 +842,7 @@ func (s *investmentService) processSellTransaction(ctx context.Context, investme
 
 		// Calculate realized PNL for this lot using utility function
 		// Convert consumeFromLot from smallest units to whole units
-		precision := units.GetPrecisionForInvestmentType(investmentv1.InvestmentType(investment.Type))
+		precision := units.GetPrecisionForInvestmentType(v1.InvestmentType(investment.Type))
 		consumeFromLotWholeUnits := float64(consumeFromLot) / float64(precision)
 		lotCostBasis := float64(lot.AverageCost) * consumeFromLotWholeUnits
 		lotSellValue := float64(sellPrice) * consumeFromLotWholeUnits
@@ -860,13 +863,13 @@ func (s *investmentService) processSellTransaction(ctx context.Context, investme
 
 	// Calculate total proceeds (sale value) for the transaction record
 	// Cost for a sell transaction represents the total sale proceeds
-	totalProceeds := units.CalculateTransactionCost(req.Quantity, req.Price, investmentv1.InvestmentType(investment.Type))
+	totalProceeds := units.CalculateTransactionCost(req.Quantity, req.Price, v1.InvestmentType(investment.Type))
 
 	// Create transaction record
 	tx := &models.InvestmentTransaction{
 		InvestmentID:    investment.ID,
 		WalletID:        investment.WalletID,
-		Type:            int32(investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL),
+		Type:            int32(v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL),
 		Quantity:        req.Quantity,
 		Price:           req.Price,
 		Cost:            totalProceeds,
@@ -941,7 +944,7 @@ func (s *investmentService) processSellTransaction(ctx context.Context, investme
 // Dividend calculation: totalDividend = quantity × price
 // - quantity = number of shares at dividend date
 // - price = dividend per share (e.g., $0.50 per share)
-func (s *investmentService) processDividendTransaction(ctx context.Context, investment *models.Investment, req *investmentv1.AddTransactionRequest) (*models.Investment, *models.InvestmentTransaction, error) {
+func (s *investmentService) processDividendTransaction(ctx context.Context, investment *models.Investment, req *v1.AddTransactionRequest) (*models.Investment, *models.InvestmentTransaction, error) {
 	// Fetch wallet for currency conversion
 	wallet, err := s.walletRepo.GetByID(ctx, investment.WalletID)
 	if err != nil {
@@ -949,13 +952,13 @@ func (s *investmentService) processDividendTransaction(ctx context.Context, inve
 	}
 
 	// Calculate total dividend amount
-	totalDividend := units.CalculateTransactionCost(req.Quantity, req.Price, investmentv1.InvestmentType(investment.Type))
+	totalDividend := units.CalculateTransactionCost(req.Quantity, req.Price, v1.InvestmentType(investment.Type))
 
 	// Create dividend transaction record
 	tx := &models.InvestmentTransaction{
 		InvestmentID:    investment.ID,
 		WalletID:        investment.WalletID,
-		Type:            int32(investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_DIVIDEND),
+		Type:            int32(v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_DIVIDEND),
 		Quantity:        req.Quantity,
 		Price:           req.Price,
 		Cost:            totalDividend,
@@ -1008,7 +1011,7 @@ func (s *investmentService) processDividendTransaction(ctx context.Context, inve
 }
 
 // ListTransactions retrieves transactions for an investment.
-func (s *investmentService) ListTransactions(ctx context.Context, userID int32, req *investmentv1.ListInvestmentTransactionsRequest) (*investmentv1.ListInvestmentTransactionsResponse, error) {
+func (s *investmentService) ListTransactions(ctx context.Context, userID int32, req *v1.ListInvestmentTransactionsRequest) (*v1.ListInvestmentTransactionsResponse, error) {
 	if err := validator.ID(req.InvestmentId); err != nil {
 		return nil, err
 	}
@@ -1040,7 +1043,7 @@ func (s *investmentService) ListTransactions(ctx context.Context, userID int32, 
 	}
 
 	// Get type filter
-	var typeFilter *investmentv1.InvestmentTransactionType
+	var typeFilter *v1.InvestmentTransactionType
 	if req.TypeFilter != 0 {
 		typeFilter = &req.TypeFilter
 	}
@@ -1056,7 +1059,7 @@ func (s *investmentService) ListTransactions(ctx context.Context, userID int32, 
 	s.enrichTransactionSliceProto(ctx, userID, protoTransactions, investment.Currency)
 	paginationResult := types.NewPaginationResult(params.Page, params.PageSize, total)
 
-	return &investmentv1.ListInvestmentTransactionsResponse{
+	return &v1.ListInvestmentTransactionsResponse{
 		Success:    true,
 		Message:    "Transactions retrieved successfully",
 		Data:       protoTransactions,
@@ -1066,7 +1069,7 @@ func (s *investmentService) ListTransactions(ctx context.Context, userID int32, 
 }
 
 // EditTransaction edits an existing transaction.
-func (s *investmentService) EditTransaction(ctx context.Context, transactionID int32, userID int32, req *investmentv1.EditInvestmentTransactionRequest) (*investmentv1.EditInvestmentTransactionResponse, error) {
+func (s *investmentService) EditTransaction(ctx context.Context, transactionID int32, userID int32, req *v1.EditInvestmentTransactionRequest) (*v1.EditInvestmentTransactionResponse, error) {
 	if err := validator.ID(transactionID); err != nil {
 		return nil, err
 	}
@@ -1099,7 +1102,7 @@ func (s *investmentService) EditTransaction(ctx context.Context, transactionID i
 	txProto := s.mapper.TransactionToProto(tx)
 	s.enrichTransactionProto(ctx, userID, txProto, investment.Currency)
 
-	return &investmentv1.EditInvestmentTransactionResponse{
+	return &v1.EditInvestmentTransactionResponse{
 		Success:   true,
 		Message:   "Transaction updated successfully",
 		Data:      txProto,
@@ -1108,7 +1111,7 @@ func (s *investmentService) EditTransaction(ctx context.Context, transactionID i
 }
 
 // DeleteTransaction deletes a transaction and recalculates the parent investment.
-func (s *investmentService) DeleteTransaction(ctx context.Context, transactionID int32, userID int32) (*investmentv1.DeleteInvestmentTransactionResponse, error) {
+func (s *investmentService) DeleteTransaction(ctx context.Context, transactionID int32, userID int32) (*v1.DeleteInvestmentTransactionResponse, error) {
 	if err := validator.ID(transactionID); err != nil {
 		return nil, err
 	}
@@ -1129,16 +1132,16 @@ func (s *investmentService) DeleteTransaction(ctx context.Context, transactionID
 	}
 
 	// Handle based on transaction type
-	switch investmentv1.InvestmentTransactionType(tx.Type) {
-	case investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY:
+	switch v1.InvestmentTransactionType(tx.Type) {
+	case v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY:
 		if err := s.reverseBuyTransaction(ctx, investment, tx); err != nil {
 			return nil, err
 		}
-	case investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL:
+	case v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL:
 		if err := s.reverseSellTransaction(ctx, investment, tx); err != nil {
 			return nil, err
 		}
-	case investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_DIVIDEND:
+	case v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_DIVIDEND:
 		if err := s.reverseDividendTransaction(ctx, investment, tx); err != nil {
 			return nil, err
 		}
@@ -1161,7 +1164,7 @@ func (s *investmentService) DeleteTransaction(ctx context.Context, transactionID
 		ws.invalidateInvestmentValueCache(ctx, investment.WalletID)
 	}
 
-	return &investmentv1.DeleteInvestmentTransactionResponse{
+	return &v1.DeleteInvestmentTransactionResponse{
 		Success:   true,
 		Message:   "Transaction deleted successfully",
 		Timestamp: time.Now().Format(time.RFC3339),
@@ -1193,7 +1196,7 @@ func (s *investmentService) reverseBuyTransaction(ctx context.Context, investmen
 
 		// Recalculate average cost if still has quantity
 		if lot.Quantity > 0 {
-			lot.AverageCost = units.CalculateAverageCost(lot.TotalCost, lot.Quantity, investmentv1.InvestmentType(investment.Type))
+			lot.AverageCost = units.CalculateAverageCost(lot.TotalCost, lot.Quantity, v1.InvestmentType(investment.Type))
 		} else {
 			lot.AverageCost = 0
 		}
@@ -1209,7 +1212,7 @@ func (s *investmentService) reverseBuyTransaction(ctx context.Context, investmen
 
 	// Recalculate average cost if still has quantity
 	if investment.Quantity > 0 {
-		investment.AverageCost = units.CalculateAverageCost(investment.TotalCost, investment.Quantity, investmentv1.InvestmentType(investment.Type))
+		investment.AverageCost = units.CalculateAverageCost(investment.TotalCost, investment.Quantity, v1.InvestmentType(investment.Type))
 	} else {
 		investment.AverageCost = 0
 		investment.TotalCost = 0
@@ -1280,7 +1283,7 @@ func (s *investmentService) reverseSellTransaction(ctx context.Context, investme
 	if err == nil && len(openLots) > 0 {
 		totalCost := int64(0)
 		totalQty := int64(0)
-		precision := int64(units.GetPrecisionForInvestmentType(investmentv1.InvestmentType(investment.Type)))
+		precision := int64(units.GetPrecisionForInvestmentType(v1.InvestmentType(investment.Type)))
 		for _, lot := range openLots {
 			if lot.RemainingQuantity > 0 {
 				// Calculate cost for remaining quantity in this lot
@@ -1291,7 +1294,7 @@ func (s *investmentService) reverseSellTransaction(ctx context.Context, investme
 		}
 		if totalQty > 0 {
 			investment.TotalCost = totalCost
-			investment.AverageCost = units.CalculateAverageCost(totalCost, totalQty, investmentv1.InvestmentType(investment.Type))
+			investment.AverageCost = units.CalculateAverageCost(totalCost, totalQty, v1.InvestmentType(investment.Type))
 		}
 	}
 
@@ -1363,7 +1366,7 @@ func (s *investmentService) reverseDividendTransaction(ctx context.Context, inve
 
 // GetPortfolioSummary retrieves portfolio summary for a wallet.
 // For mixed-currency portfolios, all values are converted to user's preferred currency.
-func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID int32, userID int32, period investmentv1.PnlPeriod) (*investmentv1.GetPortfolioSummaryResponse, error) {
+func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID int32, userID int32, period v1.PnlPeriod) (*v1.GetPortfolioSummaryResponse, error) {
 	if err := validator.ID(walletID); err != nil {
 		return nil, err
 	}
@@ -1391,7 +1394,7 @@ func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID in
 	// Get investments for wallet to check if prices need refresh
 	investments, _, err := s.investmentRepo.ListByWalletID(ctx, walletID, repository.ListOptions{
 		Limit: 1000,
-	}, investmentv1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED)
+	}, v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED)
 	if err != nil {
 		return nil, err
 	}
@@ -1408,7 +1411,7 @@ func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID in
 	// Auto-refresh if stale
 	if needsRefresh {
 		log.Printf("Auto-refreshing prices for wallet %d", walletID)
-		_, err = s.UpdatePrices(ctx, userID, &investmentv1.UpdatePricesRequest{
+		_, err = s.UpdatePrices(ctx, userID, &v1.UpdatePricesRequest{
 			InvestmentIds: []int32{}, // Empty = update all
 			ForceRefresh:  false,     // Use cache if fresh
 		})
@@ -1419,7 +1422,7 @@ func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID in
 			// Re-fetch investments with updated prices
 			investments, _, err = s.investmentRepo.ListByWalletID(ctx, walletID, repository.ListOptions{
 				Limit: 1000,
-			}, investmentv1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED)
+			}, v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED)
 			if err != nil {
 				log.Printf("Warning: failed to re-fetch investments: %v", err)
 			}
@@ -1432,7 +1435,7 @@ func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID in
 	var totalCostInPreferred int64 = 0
 	var realizedPNLInPreferred int64 = 0
 	var unrealizedPNLInPreferred int64 = 0
-	investmentsByType := make(map[investmentv1.InvestmentType]*investmentv1.InvestmentByType)
+	investmentsByType := make(map[v1.InvestmentType]*v1.InvestmentByType)
 
 	for _, inv := range investments {
 		invCurrency := inv.Currency
@@ -1476,9 +1479,9 @@ func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID in
 		unrealizedPNLInPreferred += unrealizedPNL
 
 		// Update type-specific totals (in preferred currency)
-		invType := investmentv1.InvestmentType(inv.Type)
+		invType := v1.InvestmentType(inv.Type)
 		if _, exists := investmentsByType[invType]; !exists {
-			investmentsByType[invType] = &investmentv1.InvestmentByType{
+			investmentsByType[invType] = &v1.InvestmentByType{
 				Type:       invType,
 				TotalValue: 0,
 				Count:      0,
@@ -1498,7 +1501,7 @@ func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID in
 	}
 
 	// Convert map to slice
-	investmentsByTypeSlice := make([]*investmentv1.InvestmentByType, 0, len(investmentsByType))
+	investmentsByTypeSlice := make([]*v1.InvestmentByType, 0, len(investmentsByType))
 	for _, typeSummary := range investmentsByType {
 		investmentsByTypeSlice = append(investmentsByTypeSlice, typeSummary)
 	}
@@ -1511,14 +1514,14 @@ func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID in
 	if err != nil {
 		log.Printf("Warning: failed to calculate performers: %v", err)
 		// Don't fail - continue with empty performers
-		topPerformers = []*investmentv1.InvestmentPerformance{}
-		worstPerformers = []*investmentv1.InvestmentPerformance{}
+		topPerformers = []*v1.InvestmentPerformance{}
+		worstPerformers = []*v1.InvestmentPerformance{}
 	}
 
-	return &investmentv1.GetPortfolioSummaryResponse{
+	return &v1.GetPortfolioSummaryResponse{
 		Success: true,
 		Message: "Portfolio summary retrieved successfully",
-		Data: &investmentv1.PortfolioSummary{
+		Data: &v1.PortfolioSummary{
 			TotalValue:         totalValueInPreferred,
 			TotalCost:          totalCostInPreferred,
 			TotalPnl:           totalPNL,
@@ -1542,7 +1545,7 @@ func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID in
 
 // UpdatePrices updates current prices for investments.
 // This operation runs asynchronously to avoid frontend timeouts.
-func (s *investmentService) UpdatePrices(ctx context.Context, userID int32, req *investmentv1.UpdatePricesRequest) (*investmentv1.UpdatePricesResponse, error) {
+func (s *investmentService) UpdatePrices(ctx context.Context, userID int32, req *v1.UpdatePricesRequest) (*v1.UpdatePricesResponse, error) {
 	if err := validator.ID(userID); err != nil {
 		return nil, err
 	}
@@ -1557,10 +1560,10 @@ func (s *investmentService) UpdatePrices(ctx context.Context, userID int32, req 
 
 	var allInvestments []*models.Investment
 	for _, wallet := range wallets {
-		if walletv1.WalletType(wallet.Type) == walletv1.WalletType_INVESTMENT {
+		if v1.WalletType(wallet.Type) == v1.WalletType_INVESTMENT {
 			investments, _, err := s.investmentRepo.ListByWalletID(ctx, wallet.ID, repository.ListOptions{
 				Limit: 1000,
-			}, investmentv1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED)
+			}, v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED)
 			if err != nil {
 				continue
 			}
@@ -1604,10 +1607,10 @@ func (s *investmentService) UpdatePrices(ctx context.Context, userID int32, req 
 
 	if len(investmentsToUpdate) == 0 {
 		log.Printf("No market-based investments to update (user %d). %d custom investments were skipped.", userID, customCount)
-		return &investmentv1.UpdatePricesResponse{
+		return &v1.UpdatePricesResponse{
 			Success:            true,
 			Message:            "No market-based investments to update",
-			UpdatedInvestments: []*investmentv1.Investment{},
+			UpdatedInvestments: []*v1.Investment{},
 			Timestamp:          time.Now().Format(time.RFC3339),
 		}, nil
 	}
@@ -1668,16 +1671,16 @@ func (s *investmentService) UpdatePrices(ctx context.Context, userID int32, req 
 	}()
 
 	// Return immediately with accepted status
-	return &investmentv1.UpdatePricesResponse{
+	return &v1.UpdatePricesResponse{
 		Success:            true,
 		Message:            fmt.Sprintf("Price update started for %d investments. Refresh the page in a few seconds to see updated prices.", len(investmentsToUpdate)),
-		UpdatedInvestments: []*investmentv1.Investment{},
+		UpdatedInvestments: []*v1.Investment{},
 		Timestamp:          time.Now().Format(time.RFC3339),
 	}, nil
 }
 
 // SearchSymbols searches for investment symbols by query using Yahoo Finance search API.
-func (s *investmentService) SearchSymbols(ctx context.Context, query string, limit int) (*investmentv1.SearchSymbolsResponse, error) {
+func (s *investmentService) SearchSymbols(ctx context.Context, query string, limit int) (*v1.SearchSymbolsResponse, error) {
 	// 1. Validate query
 	if strings.TrimSpace(query) == "" {
 		return nil, apperrors.NewValidationError("query is required")
@@ -1690,9 +1693,9 @@ func (s *investmentService) SearchSymbols(ctx context.Context, query string, lim
 	}
 
 	// 3. Convert to protobuf format
-	data := make([]*investmentv1.SearchResult, 0, len(results))
+	data := make([]*v1.SearchResult, 0, len(results))
 	for _, r := range results {
-		data = append(data, &investmentv1.SearchResult{
+		data = append(data, &v1.SearchResult{
 			Symbol:   r.Symbol,
 			Name:     r.Name,
 			Type:     r.Type,
@@ -1703,7 +1706,7 @@ func (s *investmentService) SearchSymbols(ctx context.Context, query string, lim
 	}
 
 	// 4. Return response
-	return &investmentv1.SearchSymbolsResponse{
+	return &v1.SearchSymbolsResponse{
 		Success:   true,
 		Message:   fmt.Sprintf("found %d symbols", len(data)),
 		Data:      data,
@@ -1713,6 +1716,7 @@ func (s *investmentService) SearchSymbols(ctx context.Context, query string, lim
 
 // Currency conversion helper methods
 
+//nolint:unused
 // convertInvestmentValues converts investment values to the user's preferred currency
 // Converts: TotalCost, CurrentValue, RealizedPNL
 // Uses cache for fast lookups and populates cache on misses
@@ -1791,7 +1795,7 @@ func (s *investmentService) invalidateInvestmentCache(ctx context.Context, userI
 }
 
 // enrichInvestmentProto adds conversion fields to an investment proto response
-func (s *investmentService) enrichInvestmentProto(ctx context.Context, userID int32, invProto *investmentv1.Investment, invModel *models.Investment) {
+func (s *investmentService) enrichInvestmentProto(ctx context.Context, userID int32, invProto *v1.Investment, invModel *models.Investment) {
 	if s.currencyCache == nil {
 		return
 	}
@@ -1810,7 +1814,7 @@ func (s *investmentService) enrichInvestmentProto(ctx context.Context, userID in
 	// Try to get converted total cost from cache
 	convertedTotalCost, err := s.currencyCache.GetConvertedValue(ctx, userID, "investment", invModel.ID, user.PreferredCurrency)
 	if err == nil && convertedTotalCost > 0 {
-		invProto.DisplayTotalCost = &investmentv1.Money{
+		invProto.DisplayTotalCost = &v1.Money{
 			Amount:   convertedTotalCost,
 			Currency: user.PreferredCurrency,
 		}
@@ -1818,19 +1822,19 @@ func (s *investmentService) enrichInvestmentProto(ctx context.Context, userID in
 
 	// For current value and PNL, we need to convert on-the-fly since they change frequently
 	convertedCurrentValue, _ := s.fxRateSvc.ConvertAmount(ctx, invModel.CurrentValue, invModel.Currency, user.PreferredCurrency)
-	invProto.DisplayCurrentValue = &investmentv1.Money{
+	invProto.DisplayCurrentValue = &v1.Money{
 		Amount:   convertedCurrentValue,
 		Currency: user.PreferredCurrency,
 	}
 
 	convertedUnrealizedPNL, _ := s.fxRateSvc.ConvertAmount(ctx, invModel.UnrealizedPNL, invModel.Currency, user.PreferredCurrency)
-	invProto.DisplayUnrealizedPnl = &investmentv1.Money{
+	invProto.DisplayUnrealizedPnl = &v1.Money{
 		Amount:   convertedUnrealizedPNL,
 		Currency: user.PreferredCurrency,
 	}
 
 	convertedRealizedPNL, _ := s.fxRateSvc.ConvertAmount(ctx, invModel.RealizedPNL, invModel.Currency, user.PreferredCurrency)
-	invProto.DisplayRealizedPnl = &investmentv1.Money{
+	invProto.DisplayRealizedPnl = &v1.Money{
 		Amount:   convertedRealizedPNL,
 		Currency: user.PreferredCurrency,
 	}
@@ -1838,7 +1842,7 @@ func (s *investmentService) enrichInvestmentProto(ctx context.Context, userID in
 	// Convert current price for display (important for gold/silver when currency differs)
 	if invModel.CurrentPrice > 0 {
 		convertedCurrentPrice, _ := s.fxRateSvc.ConvertAmount(ctx, invModel.CurrentPrice, invModel.Currency, user.PreferredCurrency)
-		invProto.DisplayCurrentPrice = &investmentv1.Money{
+		invProto.DisplayCurrentPrice = &v1.Money{
 			Amount:   convertedCurrentPrice,
 			Currency: user.PreferredCurrency,
 		}
@@ -1847,7 +1851,7 @@ func (s *investmentService) enrichInvestmentProto(ctx context.Context, userID in
 	// Convert average cost for display (for consistency with current price)
 	if invModel.AverageCost > 0 {
 		convertedAverageCost, _ := s.fxRateSvc.ConvertAmount(ctx, invModel.AverageCost, invModel.Currency, user.PreferredCurrency)
-		invProto.DisplayAverageCost = &investmentv1.Money{
+		invProto.DisplayAverageCost = &v1.Money{
 			Amount:   convertedAverageCost,
 			Currency: user.PreferredCurrency,
 		}
@@ -1857,7 +1861,7 @@ func (s *investmentService) enrichInvestmentProto(ctx context.Context, userID in
 }
 
 // enrichInvestmentSliceProto adds conversion fields to a slice of investment proto responses
-func (s *investmentService) enrichInvestmentSliceProto(ctx context.Context, userID int32, invProtos []*investmentv1.Investment, invModels []*models.Investment) {
+func (s *investmentService) enrichInvestmentSliceProto(ctx context.Context, userID int32, invProtos []*v1.Investment, invModels []*models.Investment) {
 	for i, invProto := range invProtos {
 		if i < len(invModels) {
 			s.enrichInvestmentProto(ctx, userID, invProto, invModels[i])
@@ -1866,7 +1870,7 @@ func (s *investmentService) enrichInvestmentSliceProto(ctx context.Context, user
 }
 
 // enrichTransactionProto adds conversion fields to an investment transaction proto response
-func (s *investmentService) enrichTransactionProto(ctx context.Context, userID int32, txProto *investmentv1.InvestmentTransaction, investmentCurrency string) {
+func (s *investmentService) enrichTransactionProto(ctx context.Context, userID int32, txProto *v1.InvestmentTransaction, investmentCurrency string) {
 	// Get user's preferred currency
 	user, err := s.userRepo.GetByID(ctx, userID)
 	if err != nil || user == nil {
@@ -1881,7 +1885,7 @@ func (s *investmentService) enrichTransactionProto(ctx context.Context, userID i
 	// Convert price, cost, and fees to user's preferred currency
 	if txProto.Price > 0 {
 		convertedPrice, _ := s.fxRateSvc.ConvertAmount(ctx, txProto.Price, investmentCurrency, user.PreferredCurrency)
-		txProto.DisplayPrice = &investmentv1.Money{
+		txProto.DisplayPrice = &v1.Money{
 			Amount:   convertedPrice,
 			Currency: user.PreferredCurrency,
 		}
@@ -1889,7 +1893,7 @@ func (s *investmentService) enrichTransactionProto(ctx context.Context, userID i
 
 	if txProto.Cost > 0 {
 		convertedCost, _ := s.fxRateSvc.ConvertAmount(ctx, txProto.Cost, investmentCurrency, user.PreferredCurrency)
-		txProto.DisplayCost = &investmentv1.Money{
+		txProto.DisplayCost = &v1.Money{
 			Amount:   convertedCost,
 			Currency: user.PreferredCurrency,
 		}
@@ -1897,7 +1901,7 @@ func (s *investmentService) enrichTransactionProto(ctx context.Context, userID i
 
 	if txProto.Fees > 0 {
 		convertedFees, _ := s.fxRateSvc.ConvertAmount(ctx, txProto.Fees, investmentCurrency, user.PreferredCurrency)
-		txProto.DisplayFees = &investmentv1.Money{
+		txProto.DisplayFees = &v1.Money{
 			Amount:   convertedFees,
 			Currency: user.PreferredCurrency,
 		}
@@ -1907,14 +1911,14 @@ func (s *investmentService) enrichTransactionProto(ctx context.Context, userID i
 }
 
 // enrichTransactionSliceProto adds conversion fields to a slice of transaction proto responses
-func (s *investmentService) enrichTransactionSliceProto(ctx context.Context, userID int32, txProtos []*investmentv1.InvestmentTransaction, investmentCurrency string) {
+func (s *investmentService) enrichTransactionSliceProto(ctx context.Context, userID int32, txProtos []*v1.InvestmentTransaction, investmentCurrency string) {
 	for _, txProto := range txProtos {
 		s.enrichTransactionProto(ctx, userID, txProto, investmentCurrency)
 	}
 }
 
 // ListUserInvestments retrieves investments across all user's investment wallets or filtered by specific wallet.
-func (s *investmentService) ListUserInvestments(ctx context.Context, userID int32, req *investmentv1.ListUserInvestmentsRequest) (*investmentv1.ListUserInvestmentsResponse, error) {
+func (s *investmentService) ListUserInvestments(ctx context.Context, userID int32, req *v1.ListUserInvestmentsRequest) (*v1.ListUserInvestmentsResponse, error) {
 	if err := validator.ID(userID); err != nil {
 		return nil, err
 	}
@@ -1946,7 +1950,7 @@ func (s *investmentService) ListUserInvestments(ctx context.Context, userID int3
 	}
 
 	// Get type filter
-	typeFilter := investmentv1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED
+	typeFilter := v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED
 	if req.TypeFilter != 0 {
 		typeFilter = req.TypeFilter
 	}
@@ -1961,7 +1965,7 @@ func (s *investmentService) ListUserInvestments(ctx context.Context, userID int3
 		if err != nil {
 			return nil, err
 		}
-		if walletv1.WalletType(wallet.Type) != walletv1.WalletType_INVESTMENT {
+		if v1.WalletType(wallet.Type) != v1.WalletType_INVESTMENT {
 			return nil, apperrors.NewValidationError("investments can only be listed in investment wallets")
 		}
 		investments, total, err = s.investmentRepo.ListByWalletID(ctx, req.WalletId, opts, typeFilter)
@@ -1977,7 +1981,7 @@ func (s *investmentService) ListUserInvestments(ctx context.Context, userID int3
 	}
 
 	// Build response with wallet names
-	protoInvestments := make([]*investmentv1.Investment, 0, len(investments))
+	protoInvestments := make([]*v1.Investment, 0, len(investments))
 	for _, inv := range investments {
 		proto := s.mapper.ModelToProto(inv)
 		// Fetch wallet name for display
@@ -1992,7 +1996,7 @@ func (s *investmentService) ListUserInvestments(ctx context.Context, userID int3
 
 	paginationResult := types.NewPaginationResult(params.Page, params.PageSize, total)
 
-	return &investmentv1.ListUserInvestmentsResponse{
+	return &v1.ListUserInvestmentsResponse{
 		Success:     true,
 		Message:     "Investments retrieved successfully",
 		Investments: protoInvestments,
@@ -2003,7 +2007,7 @@ func (s *investmentService) ListUserInvestments(ctx context.Context, userID int3
 }
 
 // GetAggregatedPortfolioSummary retrieves portfolio summary aggregated across all investment wallets or for specific wallet.
-func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, userID int32, req *investmentv1.GetAggregatedPortfolioSummaryRequest) (*investmentv1.GetPortfolioSummaryResponse, error) {
+func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, userID int32, req *v1.GetAggregatedPortfolioSummaryRequest) (*v1.GetPortfolioSummaryResponse, error) {
 	if err := validator.ID(userID); err != nil {
 		return nil, err
 	}
@@ -2024,7 +2028,7 @@ func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, u
 	}
 
 	// Get type filter
-	typeFilter := investmentv1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED
+	typeFilter := v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED
 	if req.TypeFilter != 0 {
 		typeFilter = req.TypeFilter
 	}
@@ -2050,7 +2054,7 @@ func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, u
 	// Auto-refresh if stale
 	if needsRefresh && len(investments) > 0 {
 		log.Printf("Auto-refreshing prices for aggregated portfolio")
-		_, err = s.UpdatePrices(ctx, userID, &investmentv1.UpdatePricesRequest{
+		_, err = s.UpdatePrices(ctx, userID, &v1.UpdatePricesRequest{
 			InvestmentIds: []int32{}, // Empty = update all
 			ForceRefresh:  false,     // Use cache if fresh
 		})
@@ -2075,7 +2079,7 @@ func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, u
 	var totalCostInPreferred int64 = 0
 	var realizedPNLInPreferred int64 = 0
 	var unrealizedPNLInPreferred int64 = 0
-	investmentsByType := make(map[investmentv1.InvestmentType]*investmentv1.InvestmentByType)
+	investmentsByType := make(map[v1.InvestmentType]*v1.InvestmentByType)
 
 	for _, inv := range investments {
 		invCurrency := inv.Currency
@@ -2119,9 +2123,9 @@ func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, u
 		unrealizedPNLInPreferred += unrealizedPNL
 
 		// Update type-specific totals (in preferred currency)
-		invType := investmentv1.InvestmentType(inv.Type)
+		invType := v1.InvestmentType(inv.Type)
 		if _, exists := investmentsByType[invType]; !exists {
-			investmentsByType[invType] = &investmentv1.InvestmentByType{
+			investmentsByType[invType] = &v1.InvestmentByType{
 				Type:       invType,
 				TotalValue: 0,
 				Count:      0,
@@ -2141,7 +2145,7 @@ func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, u
 	}
 
 	// Convert map to slice
-	investmentsByTypeSlice := make([]*investmentv1.InvestmentByType, 0, len(investmentsByType))
+	investmentsByTypeSlice := make([]*v1.InvestmentByType, 0, len(investmentsByType))
 	for _, typeSummary := range investmentsByType {
 		investmentsByTypeSlice = append(investmentsByTypeSlice, typeSummary)
 	}
@@ -2154,14 +2158,14 @@ func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, u
 	if err != nil {
 		log.Printf("Warning: failed to calculate performers: %v", err)
 		// Don't fail - continue with empty performers
-		topPerformers = []*investmentv1.InvestmentPerformance{}
-		worstPerformers = []*investmentv1.InvestmentPerformance{}
+		topPerformers = []*v1.InvestmentPerformance{}
+		worstPerformers = []*v1.InvestmentPerformance{}
 	}
 
-	return &investmentv1.GetPortfolioSummaryResponse{
+	return &v1.GetPortfolioSummaryResponse{
 		Success: true,
 		Message: "Aggregated portfolio summary retrieved successfully",
-		Data: &investmentv1.PortfolioSummary{
+		Data: &v1.PortfolioSummary{
 			TotalValue:         totalValueInPreferred,
 			TotalCost:          totalCostInPreferred,
 			TotalPnl:           totalPNL,
@@ -2200,7 +2204,7 @@ func (s *investmentService) ListInvestmentWallets(ctx context.Context, userID in
 	// Filter to only investment wallets
 	var investmentWallets []*models.Wallet
 	for _, wallet := range wallets {
-		if walletv1.WalletType(wallet.Type) == walletv1.WalletType_INVESTMENT {
+		if v1.WalletType(wallet.Type) == v1.WalletType_INVESTMENT {
 			investmentWallets = append(investmentWallets, wallet)
 		}
 	}
@@ -2210,7 +2214,7 @@ func (s *investmentService) ListInvestmentWallets(ctx context.Context, userID in
 
 // calculatePerformers computes top and worst performing investments based on unrealized PNL percentage.
 // Returns top 3 and worst 3 performers.
-func (s *investmentService) calculatePerformers(ctx context.Context, userID int32, investments []*models.Investment, preferredCurrency string) (topPerformers, worstPerformers []*investmentv1.InvestmentPerformance, err error) {
+func (s *investmentService) calculatePerformers(ctx context.Context, userID int32, investments []*models.Investment, preferredCurrency string) (topPerformers, worstPerformers []*v1.InvestmentPerformance, err error) {
 	// Build list of investments with their performance
 	type investmentPerformance struct {
 		investment           *models.Investment
@@ -2292,7 +2296,7 @@ func (s *investmentService) calculatePerformers(ctx context.Context, userID int3
 	}
 
 	// Convert to protobuf format
-	topPerformers = make([]*investmentv1.InvestmentPerformance, 0, len(positivePerformers))
+	topPerformers = make([]*v1.InvestmentPerformance, 0, len(positivePerformers))
 	for _, p := range positivePerformers {
 		displayUnrealizedPNL := p.unrealizedPNL
 		displayCurrency := preferredCurrency
@@ -2305,14 +2309,14 @@ func (s *investmentService) calculatePerformers(ctx context.Context, userID int3
 			}
 		}
 
-		topPerformers = append(topPerformers, &investmentv1.InvestmentPerformance{
+		topPerformers = append(topPerformers, &v1.InvestmentPerformance{
 			InvestmentId:         p.investment.ID,
 			Symbol:               p.investment.Symbol,
 			Name:                 p.investment.Name,
-			Type:                 investmentv1.InvestmentType(p.investment.Type),
+			Type:                 v1.InvestmentType(p.investment.Type),
 			UnrealizedPnl:        p.unrealizedPNL,
 			UnrealizedPnlPercent: p.unrealizedPNLPercent,
-			DisplayUnrealizedPnl: &investmentv1.Money{
+			DisplayUnrealizedPnl: &v1.Money{
 				Amount:   displayUnrealizedPNL,
 				Currency: displayCurrency,
 			},
@@ -2320,7 +2324,7 @@ func (s *investmentService) calculatePerformers(ctx context.Context, userID int3
 		})
 	}
 
-	worstPerformers = make([]*investmentv1.InvestmentPerformance, 0, len(negativePerformers))
+	worstPerformers = make([]*v1.InvestmentPerformance, 0, len(negativePerformers))
 	for _, p := range negativePerformers {
 		displayUnrealizedPNL := p.unrealizedPNL
 		displayCurrency := preferredCurrency
@@ -2333,14 +2337,14 @@ func (s *investmentService) calculatePerformers(ctx context.Context, userID int3
 			}
 		}
 
-		worstPerformers = append(worstPerformers, &investmentv1.InvestmentPerformance{
+		worstPerformers = append(worstPerformers, &v1.InvestmentPerformance{
 			InvestmentId:         p.investment.ID,
 			Symbol:               p.investment.Symbol,
 			Name:                 p.investment.Name,
-			Type:                 investmentv1.InvestmentType(p.investment.Type),
+			Type:                 v1.InvestmentType(p.investment.Type),
 			UnrealizedPnl:        p.unrealizedPNL,
 			UnrealizedPnlPercent: p.unrealizedPNLPercent,
-			DisplayUnrealizedPnl: &investmentv1.Money{
+			DisplayUnrealizedPnl: &v1.Money{
 				Amount:   displayUnrealizedPNL,
 				Currency: displayCurrency,
 			},

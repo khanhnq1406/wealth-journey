@@ -10,8 +10,9 @@ import (
 // TestNewClient verifies that NewClient creates a client with the correct symbol
 func TestNewClient(t *testing.T) {
 	tests := []struct {
-		name   string
-		symbol string
+		name      string
+		symbol    string
+		expectNil bool
 	}{
 		{
 			name:   "Valid symbol AAPL",
@@ -30,14 +31,21 @@ func TestNewClient(t *testing.T) {
 			symbol: "BTC-USD",
 		},
 		{
-			name:   "Empty symbol",
-			symbol: "",
+			name:      "Empty symbol",
+			symbol:    "",
+			expectNil: true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			client := NewClient(tt.symbol)
+			if tt.expectNil {
+				if client != nil {
+					t.Errorf("NewClient(%q) = non-nil, want nil", tt.symbol)
+				}
+				return
+			}
 			if client == nil {
 				t.Fatal("NewClient() returned nil")
 			}
@@ -515,16 +523,7 @@ func TestQuoteDataValidation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Custom validation logic
-			hasError := false
-			if tt.quote.Symbol == "" {
-				hasError = true
-			}
-			if tt.quote.Price < 0 {
-				hasError = true
-			}
-			if tt.quote.Volume24h < 0 {
-				hasError = true
-			}
+			hasError := tt.quote.Symbol == "" || tt.quote.Price < 0 || tt.quote.Volume24h < 0
 
 			if hasError != tt.wantErr {
 				t.Errorf("Validation error mismatch: got %v, want %v", hasError, tt.wantErr)

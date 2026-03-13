@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState, useRef, useCallback, useEffect } from "react";
+import { memo, useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils/cn";
 import { formatCurrency } from "@/utils/currency-formatter";
 import { Transaction } from "@/gen/protobuf/v1/transaction";
@@ -28,6 +28,68 @@ const SWIPE_MAX_OFFSET = 120; // max px to translate
  * - Touch-friendly 44px minimum targets
  * - Group headers for date grouping
  */
+// Group header component - separate to avoid conditional hooks
+function GroupHeader({ groupLabel, className }: { groupLabel: string; className?: string }) {
+  return (
+    <div
+      className={cn(
+        "sticky top-0 z-1 bg-gray-50 dark:bg-dark-background px-3 py-2 sm:px-4",
+        className,
+      )}
+    >
+      <span className="text-xs font-semibold text-gray-600 dark:text-dark-text-secondary uppercase tracking-wide">
+        {groupLabel}
+      </span>
+    </div>
+  );
+}
+
+// Transaction icon component - extracted to avoid creating during render
+function TransactionIcon({ isExpense }: { isExpense: boolean }) {
+  const Icon = isExpense ? (
+    <svg
+      className="w-5 h-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M20 12H4"
+      />
+    </svg>
+  ) : (
+    <svg
+      className="w-5 h-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 4v16m8-8H4"
+      />
+    </svg>
+  );
+
+  return (
+    <div
+      className={cn(
+        "flex items-center justify-center w-10 h-10 rounded-full",
+        isExpense
+          ? "bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400"
+          : "bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-400",
+      )}
+    >
+      {Icon}
+    </div>
+  );
+}
+
 export const TransactionCard = memo(function TransactionCard({
   transaction,
   categoryName,
@@ -47,34 +109,17 @@ export const TransactionCard = memo(function TransactionCard({
   const touchStartY = useRef(0);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Group header - render early to avoid accessing null transaction properties
-  if (isGroupHeader && groupLabel) {
-    return (
-      <div
-        className={cn(
-          "sticky top-0 z-1 bg-gray-50 dark:bg-dark-background px-3 py-2 sm:px-4",
-          className,
-        )}
-      >
-        <span className="text-xs font-semibold text-gray-600 dark:text-dark-text-secondary uppercase tracking-wide">
-          {groupLabel}
-        </span>
-      </div>
-    );
-  }
-
-  // Guard against null transaction (shouldn't happen if not a group header)
-  if (!transaction) {
-    return null;
-  }
-
-  // Calculate amount display
-  const amountValue =
-    transaction.displayAmount?.amount ?? transaction.amount?.amount ?? 0;
-  const numericAmount =
-    typeof amountValue === "number" ? amountValue : Number(amountValue) || 0;
-  const isExpense = numericAmount < 0;
-  const displayAmount = Math.abs(numericAmount);
+  // Calculate amount display - memoized to avoid recalculation
+  const { amountValue, numericAmount, isExpense, displayAmount } = useMemo(() => {
+    const amt = transaction?.displayAmount?.amount ?? transaction?.amount?.amount ?? 0;
+    const numeric = typeof amt === "number" ? amt : Number(amt) || 0;
+    return {
+      amountValue: amt,
+      numericAmount: numeric,
+      isExpense: numeric < 0,
+      displayAmount: Math.abs(numeric),
+    };
+  }, [transaction?.displayAmount?.amount, transaction?.amount?.amount]);
 
   // Format transaction time
   const formatTime = useCallback((timestamp: number) => {
@@ -115,6 +160,18 @@ export const TransactionCard = memo(function TransactionCard({
     [isDragging],
   );
 
+  const handleEdit = useCallback(() => {
+    if (transaction?.id) {
+      onEdit(transaction.id);
+    }
+  }, [transaction, onEdit]);
+
+  const handleDelete = useCallback(() => {
+    if (transaction?.id) {
+      onDelete(transaction.id);
+    }
+  }, [transaction, onDelete]);
+
   const handleTouchEnd = useCallback(() => {
     if (!isDragging) return;
 
@@ -131,61 +188,7 @@ export const TransactionCard = memo(function TransactionCard({
 
     // Reset offset
     setSwipeOffset(0);
-  }, [isDragging, swipeOffset]);
-
-  const handleEdit = useCallback(() => {
-    onEdit(transaction.id);
-  }, [transaction.id, onEdit]);
-
-  const handleDelete = useCallback(() => {
-    onDelete(transaction.id);
-  }, [transaction.id, onDelete]);
-
-  // Get icon based on transaction type
-  const TransactionIcon = useCallback(() => {
-    const Icon = isExpense ? (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M20 12H4"
-        />
-      </svg>
-    ) : (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 4v16m8-8H4"
-        />
-      </svg>
-    );
-
-    return (
-      <div
-        className={cn(
-          "flex items-center justify-center w-10 h-10 rounded-full",
-          isExpense
-            ? "bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400"
-            : "bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-400",
-        )}
-      >
-        {Icon}
-      </div>
-    );
-  }, [isExpense]);
+  }, [isDragging, swipeOffset, handleEdit, handleDelete]);
 
   // Reset swipe when clicking outside
   useEffect(() => {
@@ -207,6 +210,16 @@ export const TransactionCard = memo(function TransactionCard({
       document.removeEventListener("touchstart", handleClickOutside);
     };
   }, [swipeOffset]);
+
+  // Early return for group header
+  if (isGroupHeader && groupLabel) {
+    return <GroupHeader groupLabel={groupLabel} className={className} />;
+  }
+
+  // Guard against null transaction
+  if (!transaction) {
+    return null;
+  }
 
   return (
     <div
@@ -283,7 +296,7 @@ export const TransactionCard = memo(function TransactionCard({
       >
         <div className="flex items-center gap-3 p-3 sm:p-4">
           {/* Transaction Icon */}
-          <TransactionIcon />
+          <TransactionIcon isExpense={isExpense} />
 
           {/* Transaction Details */}
           <div className="flex-1 min-w-0">

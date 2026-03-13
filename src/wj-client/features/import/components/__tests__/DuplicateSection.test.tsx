@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
+import { renderWithIntl as render } from "@/test-utils";
 import { DuplicateSection } from "../DuplicateSection";
 import { DuplicateMatch } from "@/gen/protobuf/v1/import";
 
@@ -20,23 +21,21 @@ describe("DuplicateSection", () => {
         exchangeRate: 0,
         exchangeRateSource: "",
         exchangeRateDate: 0 as any,
+        originalDescription: "CAFE HIGHLANDS",
       },
       existingTransaction: {
         id: 9876,
         walletId: 42,
         categoryId: 123,
+        type: 2,
         amount: { amount: -50000 as any, currency: "VND" },
         date: 1707638400 as any,
         note: "CAFE HIGHLANDS - HCM",
         createdAt: 1707638400 as any,
         updatedAt: 1707638400 as any,
         currency: "VND",
-        externalId: "",
-        originalAmount: undefined,
-        originalCurrency: "",
-        exchangeRate: 0,
-        exchangeRateDate: 0 as any,
-        exchangeRateSource: "",
+        displayAmount: undefined,
+        displayCurrency: "",
       },
       confidence: 95.5,
       matchReason: "Exact match: same date, amount, and similar description",
@@ -57,23 +56,21 @@ describe("DuplicateSection", () => {
         exchangeRate: 0,
         exchangeRateSource: "",
         exchangeRateDate: 0 as any,
+        originalDescription: "Grocery Store",
       },
       existingTransaction: {
         id: 9877,
         walletId: 42,
         categoryId: 124,
+        type: 2,
         amount: { amount: -100000 as any, currency: "VND" },
         date: 1707638500 as any,
         note: "Grocery",
         createdAt: 1707638500 as any,
         updatedAt: 1707638500 as any,
         currency: "VND",
-        externalId: "",
-        originalAmount: undefined,
-        originalCurrency: "",
-        exchangeRate: 0,
-        exchangeRateDate: 0 as any,
-        exchangeRateSource: "",
+        displayAmount: undefined,
+        displayCurrency: "",
       },
       confidence: 75.0,
       matchReason: "Similar date and amount",
@@ -125,8 +122,8 @@ describe("DuplicateSection", () => {
       />
     );
 
-    // Should show row number
-    expect(screen.getByText(/Row 10/i)).toBeInTheDocument();
+    // Should show match progress (Match 1 of 2)
+    expect(screen.getByText(/Match 1 of 2/i)).toBeInTheDocument();
 
     // Should show confidence
     expect(screen.getByText(/95.5%/i)).toBeInTheDocument();
@@ -140,19 +137,19 @@ describe("DuplicateSection", () => {
       />
     );
 
-    // Initially expanded
-    expect(screen.getByText(/Row 10/i)).toBeInTheDocument();
+    // Initially expanded (shows match progress)
+    expect(screen.getByText(/Match 1 of 2/i)).toBeInTheDocument();
 
     // Click to collapse
     const header = screen.getByRole("button", { name: /2 Potential Duplicates/i });
     fireEvent.click(header);
 
     // Should be hidden
-    expect(screen.queryByText(/Row 10/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Match 1 of 2/i)).not.toBeInTheDocument();
 
     // Click to expand again
     fireEvent.click(header);
-    expect(screen.getByText(/Row 10/i)).toBeInTheDocument();
+    expect(screen.getByText(/Match 1 of 2/i)).toBeInTheDocument();
   });
 
   it("displays match reason", () => {
@@ -217,15 +214,15 @@ describe("DuplicateSection", () => {
     );
 
     // First duplicate
-    expect(screen.getByText(/Row 10/i)).toBeInTheDocument();
+    expect(screen.getByText(/Match 1 of 2/i)).toBeInTheDocument();
 
     // Click merge
     const mergeButton = screen.getByText("Merge");
     fireEvent.click(mergeButton);
 
     // Should move to second duplicate
-    expect(screen.getByText(/Row 15/i)).toBeInTheDocument();
-    expect(screen.getByText(/75.0%/i)).toBeInTheDocument();
+    expect(screen.getByText(/Match 2 of 2/i)).toBeInTheDocument();
+    expect(screen.getByText(/75%/i)).toBeInTheDocument();
   });
 
   it("shows high confidence badge for confidence >= 90", () => {
@@ -253,7 +250,7 @@ describe("DuplicateSection", () => {
     const mergeButton = screen.getByText("Merge");
     fireEvent.click(mergeButton);
 
-    const badge = screen.getByText(/75.0%/i);
+    const badge = screen.getByText(/75%/i);
     expect(badge.className).toContain("warning"); // Medium confidence uses warning color
   });
 

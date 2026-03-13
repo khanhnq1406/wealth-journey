@@ -22,6 +22,7 @@ export function useNotificationStream() {
   const reconnectDelayRef = useRef(MIN_RECONNECT_DELAY);
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(true);
+  const connectRef = useRef<(() => void) | null>(null);
 
   const getToken = useCallback((): string | null => {
     if (typeof window === "undefined") return null;
@@ -106,10 +107,15 @@ export function useNotificationStream() {
       reconnectDelayRef.current = Math.min(delay * 2, MAX_RECONNECT_DELAY);
 
       reconnectTimerRef.current = setTimeout(() => {
-        if (mountedRef.current) connect();
+        if (mountedRef.current) connectRef.current?.();
       }, delay);
     };
   }, [getToken, handleNotification]);
+
+  // Store connect in ref to avoid circular dependency
+  useEffect(() => {
+    connectRef.current = connect;
+  });
 
   useEffect(() => {
     mountedRef.current = true;

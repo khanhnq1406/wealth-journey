@@ -45,9 +45,7 @@ func AuthInterceptor(redisClient *redis.RedisClient) grpc.UnaryServerInterceptor
 			return nil, status.Error(codes.Unauthenticated, "missing authorization token")
 		}
 
-		token := tokens[0]
-		// Remove "Bearer " prefix if present
-		token = strings.TrimPrefix(token, "Bearer ")
+		_ = strings.TrimPrefix(tokens[0], "Bearer ")
 
 		// Verify token is in whitelist (this is a simplified check)
 		// In production, you would decode JWT and get email from it

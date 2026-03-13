@@ -341,7 +341,7 @@ func (r *transactionRepository) GetCategoryBreakdown(ctx context.Context, userID
 	if err != nil {
 		return nil, apperrors.NewInternalErrorWithCause("failed to get category breakdown", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	// First, collect all raw breakdown items
 	type rawBreakdownItem struct {

@@ -12,9 +12,7 @@ import (
 	apperrors "wealthjourney/pkg/errors"
 	"wealthjourney/pkg/types"
 	"wealthjourney/pkg/validator"
-	commonv1 "wealthjourney/protobuf/v1"
 	v1 "wealthjourney/protobuf/v1"
-	walletv1 "wealthjourney/protobuf/v1"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -61,7 +59,7 @@ func NewWalletService(
 
 // CreateWallet creates a new wallet for a user.
 // If initialBalance is provided, it creates a transaction with "Initial Balance" category.
-func (s *walletService) CreateWallet(ctx context.Context, userID int32, req *walletv1.CreateWalletRequest) (*walletv1.CreateWalletResponse, error) {
+func (s *walletService) CreateWallet(ctx context.Context, userID int32, req *v1.CreateWalletRequest) (*v1.CreateWalletResponse, error) {
 	// Validate inputs
 	if err := validator.ID(userID); err != nil {
 		return nil, err
@@ -150,7 +148,7 @@ func (s *walletService) CreateWallet(ctx context.Context, userID int32, req *wal
 	// Enrich with conversion fields
 	_ = s.enrichWalletProto(ctx, userID, walletProto, wallet)
 
-	return &walletv1.CreateWalletResponse{
+	return &v1.CreateWalletResponse{
 		Success:   true,
 		Message:   "Wallet created successfully",
 		Data:      walletProto,
@@ -159,7 +157,7 @@ func (s *walletService) CreateWallet(ctx context.Context, userID int32, req *wal
 }
 
 // GetWallet retrieves a wallet by ID, ensuring it belongs to the user.
-func (s *walletService) GetWallet(ctx context.Context, walletID int32, requestingUserID int32) (*walletv1.GetWalletResponse, error) {
+func (s *walletService) GetWallet(ctx context.Context, walletID int32, requestingUserID int32) (*v1.GetWalletResponse, error) {
 	if err := validator.ID(walletID); err != nil {
 		return nil, err
 	}
@@ -174,7 +172,7 @@ func (s *walletService) GetWallet(ctx context.Context, walletID int32, requestin
 
 	// Calculate investment value for INVESTMENT wallets
 	var investmentValue int64 = 0
-	if v1.WalletType(wallet.Type) == walletv1.WalletType_INVESTMENT {
+	if v1.WalletType(wallet.Type) == v1.WalletType_INVESTMENT {
 		// Use the new function that properly converts investment values to wallet currency
 		investmentValue, err = s.getInvestmentValueInWalletCurrency(ctx, walletID, wallet.Currency)
 		if err != nil {
@@ -204,12 +202,12 @@ func (s *walletService) GetWallet(ctx context.Context, walletID int32, requestin
 	_ = s.enrichWalletProto(ctx, requestingUserID, walletProto, wallet)
 
 	// Set investment value fields
-	walletProto.InvestmentValue = &commonv1.Money{Amount: investmentValue, Currency: wallet.Currency}
+	walletProto.InvestmentValue = &v1.Money{Amount: investmentValue, Currency: wallet.Currency}
 	walletProto.DisplayInvestmentValue = displayInvestmentValue
-	walletProto.TotalValue = &commonv1.Money{Amount: totalValue, Currency: wallet.Currency}
+	walletProto.TotalValue = &v1.Money{Amount: totalValue, Currency: wallet.Currency}
 	walletProto.DisplayTotalValue = displayTotalValue
 
-	return &walletv1.GetWalletResponse{
+	return &v1.GetWalletResponse{
 		Success:   true,
 		Message:   "Wallet retrieved successfully",
 		Data:      walletProto,
@@ -218,7 +216,7 @@ func (s *walletService) GetWallet(ctx context.Context, walletID int32, requestin
 }
 
 // ListWallets retrieves all wallets for a user with pagination.
-func (s *walletService) ListWallets(ctx context.Context, userID int32, params types.PaginationParams) (*walletv1.ListWalletsResponse, error) {
+func (s *walletService) ListWallets(ctx context.Context, userID int32, params types.PaginationParams) (*v1.ListWalletsResponse, error) {
 	if err := validator.ID(userID); err != nil {
 		return nil, err
 	}
@@ -247,7 +245,7 @@ func (s *walletService) ListWallets(ctx context.Context, userID int32, params ty
 	// Collect investment wallet IDs
 	investmentWalletIDs := []int32{}
 	for _, wallet := range wallets {
-		if v1.WalletType(wallet.Type) == walletv1.WalletType_INVESTMENT {
+		if v1.WalletType(wallet.Type) == v1.WalletType_INVESTMENT {
 			investmentWalletIDs = append(investmentWalletIDs, wallet.ID)
 		}
 	}
@@ -277,7 +275,7 @@ func (s *walletService) ListWallets(ctx context.Context, userID int32, params ty
 	}
 
 	// Build response with investment values
-	protoWallets := make([]*walletv1.Wallet, len(wallets))
+	protoWallets := make([]*v1.Wallet, len(wallets))
 	for i, wallet := range wallets {
 		investmentValue := investmentValueMap[wallet.ID]
 		totalValue := wallet.Balance + investmentValue
@@ -291,15 +289,15 @@ func (s *walletService) ListWallets(ctx context.Context, userID int32, params ty
 		_ = s.enrichWalletProto(ctx, userID, protoWallets[i], wallet)
 
 		// Set investment value fields
-		protoWallets[i].InvestmentValue = &commonv1.Money{Amount: investmentValue, Currency: wallet.Currency}
+		protoWallets[i].InvestmentValue = &v1.Money{Amount: investmentValue, Currency: wallet.Currency}
 		protoWallets[i].DisplayInvestmentValue = displayInvestmentValue
-		protoWallets[i].TotalValue = &commonv1.Money{Amount: totalValue, Currency: wallet.Currency}
+		protoWallets[i].TotalValue = &v1.Money{Amount: totalValue, Currency: wallet.Currency}
 		protoWallets[i].DisplayTotalValue = displayTotalValue
 	}
 
 	paginationResult := types.NewPaginationResult(params.Page, params.PageSize, total)
 
-	return &walletv1.ListWalletsResponse{
+	return &v1.ListWalletsResponse{
 		Success:    true,
 		Message:    "Wallets retrieved successfully",
 		Wallets:    protoWallets,
@@ -309,7 +307,7 @@ func (s *walletService) ListWallets(ctx context.Context, userID int32, params ty
 }
 
 // UpdateWallet updates a wallet's name.
-func (s *walletService) UpdateWallet(ctx context.Context, walletID int32, userID int32, req *walletv1.UpdateWalletRequest) (*walletv1.UpdateWalletResponse, error) {
+func (s *walletService) UpdateWallet(ctx context.Context, walletID int32, userID int32, req *v1.UpdateWalletRequest) (*v1.UpdateWalletResponse, error) {
 	if err := validator.ID(walletID); err != nil {
 		return nil, err
 	}
@@ -345,7 +343,7 @@ func (s *walletService) UpdateWallet(ctx context.Context, walletID int32, userID
 	walletProto := s.mapper.ModelToProto(wallet)
 	_ = s.enrichWalletProto(ctx, userID, walletProto, wallet)
 
-	return &walletv1.UpdateWalletResponse{
+	return &v1.UpdateWalletResponse{
 		Success:   true,
 		Message:   "Wallet updated successfully",
 		Data:      walletProto,
@@ -354,7 +352,7 @@ func (s *walletService) UpdateWallet(ctx context.Context, walletID int32, userID
 }
 
 // DeleteWallet deletes a wallet with options for handling related transactions.
-func (s *walletService) DeleteWallet(ctx context.Context, walletID int32, userID int32, req *walletv1.DeleteWalletRequest) (*walletv1.DeleteWalletResponse, error) {
+func (s *walletService) DeleteWallet(ctx context.Context, walletID int32, userID int32, req *v1.DeleteWalletRequest) (*v1.DeleteWalletResponse, error) {
 	if err := validator.ID(walletID); err != nil {
 		return nil, err
 	}
@@ -376,22 +374,22 @@ func (s *walletService) DeleteWallet(ctx context.Context, walletID int32, userID
 
 	// Handle based on deletion option
 	switch req.Option {
-	case walletv1.WalletDeletionOption_WALLET_DELETION_OPTION_ARCHIVE:
+	case v1.WalletDeletionOption_WALLET_DELETION_OPTION_ARCHIVE:
 		// Archive wallet - set status to ARCHIVED
-		wallet.Status = int32(walletv1.WalletStatus_WALLET_STATUS_ARCHIVED)
+		wallet.Status = int32(v1.WalletStatus_WALLET_STATUS_ARCHIVED)
 		if err := s.walletRepo.Update(ctx, wallet); err != nil {
 			return nil, err
 		}
 		// Invalidate currency cache
 		_ = s.invalidateWalletCache(ctx, userID, walletID)
-		return &walletv1.DeleteWalletResponse{
+		return &v1.DeleteWalletResponse{
 			Success:              true,
 			Message:              "Wallet archived successfully",
 			Timestamp:            time.Now().Format(time.RFC3339),
 			TransactionsAffected: txCount,
 		}, nil
 
-	case walletv1.WalletDeletionOption_WALLET_DELETION_OPTION_TRANSFER:
+	case v1.WalletDeletionOption_WALLET_DELETION_OPTION_TRANSFER:
 		// Transfer transactions to another wallet
 		if req.TargetWalletId == 0 {
 			return nil, apperrors.NewValidationError("target wallet required for transfer option")
@@ -440,21 +438,21 @@ func (s *walletService) DeleteWallet(ctx context.Context, walletID int32, userID
 		_ = s.invalidateWalletCache(ctx, userID, walletID)
 		_ = s.invalidateWalletCache(ctx, userID, req.TargetWalletId)
 
-		return &walletv1.DeleteWalletResponse{
+		return &v1.DeleteWalletResponse{
 			Success:              true,
 			Message:              fmt.Sprintf("Transferred %d transactions and deleted wallet", txCount),
 			Timestamp:            time.Now().Format(time.RFC3339),
 			TransactionsAffected: txCount,
 		}, nil
 
-	case walletv1.WalletDeletionOption_WALLET_DELETION_OPTION_DELETE_ONLY:
+	case v1.WalletDeletionOption_WALLET_DELETION_OPTION_DELETE_ONLY:
 		// Current behavior - soft delete only
 		if err := s.walletRepo.Delete(ctx, walletID); err != nil {
 			return nil, err
 		}
 		// Invalidate currency cache
 		_ = s.invalidateWalletCache(ctx, userID, walletID)
-		return &walletv1.DeleteWalletResponse{
+		return &v1.DeleteWalletResponse{
 			Success:              true,
 			Message:              fmt.Sprintf("Wallet deleted. %d transactions will be preserved but inaccessible", txCount),
 			Timestamp:            time.Now().Format(time.RFC3339),
@@ -467,7 +465,7 @@ func (s *walletService) DeleteWallet(ctx context.Context, walletID int32, userID
 }
 
 // AddFunds adds funds to a wallet.
-func (s *walletService) AddFunds(ctx context.Context, walletID int32, userID int32, req *walletv1.AddFundsRequest) (*walletv1.AddFundsResponse, error) {
+func (s *walletService) AddFunds(ctx context.Context, walletID int32, userID int32, req *v1.AddFundsRequest) (*v1.AddFundsResponse, error) {
 	if err := validator.ID(walletID); err != nil {
 		return nil, err
 	}
@@ -507,7 +505,7 @@ func (s *walletService) AddFunds(ctx context.Context, walletID int32, userID int
 	walletProto := s.mapper.ModelToProto(updated)
 	_ = s.enrichWalletProto(ctx, userID, walletProto, updated)
 
-	return &walletv1.AddFundsResponse{
+	return &v1.AddFundsResponse{
 		Success:   true,
 		Message:   "Funds added successfully",
 		Data:      walletProto,
@@ -516,7 +514,7 @@ func (s *walletService) AddFunds(ctx context.Context, walletID int32, userID int
 }
 
 // WithdrawFunds withdraws funds from a wallet.
-func (s *walletService) WithdrawFunds(ctx context.Context, walletID int32, userID int32, req *walletv1.WithdrawFundsRequest) (*walletv1.WithdrawFundsResponse, error) {
+func (s *walletService) WithdrawFunds(ctx context.Context, walletID int32, userID int32, req *v1.WithdrawFundsRequest) (*v1.WithdrawFundsResponse, error) {
 	if err := validator.ID(walletID); err != nil {
 		return nil, err
 	}
@@ -561,7 +559,7 @@ func (s *walletService) WithdrawFunds(ctx context.Context, walletID int32, userI
 	walletProto := s.mapper.ModelToProto(updated)
 	_ = s.enrichWalletProto(ctx, userID, walletProto, updated)
 
-	return &walletv1.WithdrawFundsResponse{
+	return &v1.WithdrawFundsResponse{
 		Success:   true,
 		Message:   "Funds withdrawn successfully",
 		Data:      walletProto,
@@ -571,7 +569,7 @@ func (s *walletService) WithdrawFunds(ctx context.Context, walletID int32, userI
 
 // TransferFunds transfers funds between two wallets belonging to the same user.
 // It also creates two transactions: one for the outgoing transfer (expense) and one for the incoming transfer (income).
-func (s *walletService) TransferFunds(ctx context.Context, userID int32, req *walletv1.TransferFundsRequest) (*walletv1.TransferFundsResponse, error) {
+func (s *walletService) TransferFunds(ctx context.Context, userID int32, req *v1.TransferFundsRequest) (*v1.TransferFundsResponse, error) {
 	if err := validator.ID(userID); err != nil {
 		return nil, err
 	}
@@ -607,13 +605,13 @@ func (s *walletService) TransferFunds(ctx context.Context, userID int32, req *wa
 	}
 
 	// Find or create "Outgoing Transfer" category (expense)
-	outgoingCategory, err := s.categoryRepo.GetByNameAndType(ctx, userID, "Outgoing Transfer", walletv1.CategoryType_CATEGORY_TYPE_EXPENSE)
+	outgoingCategory, err := s.categoryRepo.GetByNameAndType(ctx, userID, "Outgoing Transfer", v1.CategoryType_CATEGORY_TYPE_EXPENSE)
 	if err != nil {
 		return nil, apperrors.NewInternalErrorWithCause("failed to get outgoing transfer category", err)
 	}
 
 	// Find or create "Incoming Transfer" category (income)
-	incomingCategory, err := s.categoryRepo.GetByNameAndType(ctx, userID, "Incoming Transfer", walletv1.CategoryType_CATEGORY_TYPE_INCOME)
+	incomingCategory, err := s.categoryRepo.GetByNameAndType(ctx, userID, "Incoming Transfer", v1.CategoryType_CATEGORY_TYPE_INCOME)
 	if err != nil {
 		return nil, apperrors.NewInternalErrorWithCause("failed to get incoming transfer category", err)
 	}
@@ -673,7 +671,7 @@ func (s *walletService) TransferFunds(ctx context.Context, userID int32, req *wa
 	_ = s.invalidateWalletCache(ctx, userID, req.ToWalletId)
 	_ = s.populateWalletCache(ctx, userID, toWallet)
 
-	return &walletv1.TransferFundsResponse{
+	return &v1.TransferFundsResponse{
 		Success:   true,
 		Message:   "Funds transferred successfully",
 		Timestamp: time.Now().Format(time.RFC3339),
@@ -682,7 +680,7 @@ func (s *walletService) TransferFunds(ctx context.Context, userID int32, req *wa
 
 // AdjustBalance adjusts a wallet's balance and creates a transaction for audit trail.
 // The amount is always positive; adjustmentType determines if it's added or removed.
-func (s *walletService) AdjustBalance(ctx context.Context, walletID int32, userID int32, req *walletv1.AdjustBalanceRequest) (*walletv1.AdjustBalanceResponse, error) {
+func (s *walletService) AdjustBalance(ctx context.Context, walletID int32, userID int32, req *v1.AdjustBalanceRequest) (*v1.AdjustBalanceResponse, error) {
 	if err := validator.ID(walletID); err != nil {
 		return nil, err
 	}
@@ -705,12 +703,12 @@ func (s *walletService) AdjustBalance(ctx context.Context, walletID int32, userI
 	}
 
 	// Validate adjustment type
-	if req.AdjustmentType == walletv1.AdjustmentType_ADJUSTMENT_TYPE_UNSPECIFIED {
+	if req.AdjustmentType == v1.AdjustmentType_ADJUSTMENT_TYPE_UNSPECIFIED {
 		return nil, apperrors.NewValidationError("adjustment type must be specified")
 	}
 
 	// Determine if this is an add (income) or remove (expense) operation
-	isAddOperation := req.AdjustmentType == walletv1.AdjustmentType_ADJUSTMENT_TYPE_ADD
+	isAddOperation := req.AdjustmentType == v1.AdjustmentType_ADJUSTMENT_TYPE_ADD
 
 	// Check sufficient balance for remove operations
 	if !isAddOperation && wallet.Balance < req.Amount.Amount {
@@ -763,7 +761,7 @@ func (s *walletService) AdjustBalance(ctx context.Context, walletID int32, userI
 	walletProto := s.mapper.ModelToProto(updatedWallet)
 	_ = s.enrichWalletProto(ctx, userID, walletProto, updatedWallet)
 
-	return &walletv1.AdjustBalanceResponse{
+	return &v1.AdjustBalanceResponse{
 		Success:   true,
 		Message:   "Balance adjusted successfully",
 		Data:      walletProto,
@@ -771,7 +769,7 @@ func (s *walletService) AdjustBalance(ctx context.Context, walletID int32, userI
 	}, nil
 }
 
-func (s *walletService) GetTotalBalance(ctx context.Context, userID int32) (*walletv1.GetTotalBalanceResponse, error) {
+func (s *walletService) GetTotalBalance(ctx context.Context, userID int32) (*v1.GetTotalBalanceResponse, error) {
 	// Validate user ID
 	if err := validator.ID(userID); err != nil {
 		return nil, err
@@ -805,7 +803,7 @@ func (s *walletService) GetTotalBalance(ctx context.Context, userID int32) (*wal
 	investmentWalletIDs := []int32{}
 	for _, wallet := range wallets {
 		// Skip inactive wallets
-		if v1.WalletStatus(wallet.Status) != walletv1.WalletStatus_WALLET_STATUS_ACTIVE {
+		if v1.WalletStatus(wallet.Status) != v1.WalletStatus_WALLET_STATUS_ACTIVE {
 			continue
 		}
 
@@ -817,7 +815,7 @@ func (s *walletService) GetTotalBalance(ctx context.Context, userID int32) (*wal
 			totalCash += converted.Amount
 		}
 
-		if v1.WalletType(wallet.Type) == walletv1.WalletType_INVESTMENT {
+		if v1.WalletType(wallet.Type) == v1.WalletType_INVESTMENT {
 			investmentWalletIDs = append(investmentWalletIDs, wallet.ID)
 		}
 	}
@@ -863,32 +861,32 @@ func (s *walletService) GetTotalBalance(ctx context.Context, userID int32) (*wal
 	displayNetWorth := s.convertToUserCurrency(netWorth, baseCurrency, preferredCurrency)
 
 	// Return response with display values
-	return &walletv1.GetTotalBalanceResponse{
+	return &v1.GetTotalBalanceResponse{
 		Success: true,
 		Message: "Total balance retrieved successfully",
-		Data: &walletv1.Money{
+		Data: &v1.Money{
 			Amount:   totalCash,
 			Currency: baseCurrency,
 		},
 		Currency: baseCurrency,
-		DisplayValue: &walletv1.Money{
+		DisplayValue: &v1.Money{
 			Amount:   displayCash.Amount,
 			Currency: displayCash.Currency,
 		},
 		DisplayCurrency: preferredCurrency,
-		TotalInvestments: &walletv1.Money{
+		TotalInvestments: &v1.Money{
 			Amount:   totalInvestments,
 			Currency: baseCurrency,
 		},
-		DisplayTotalInvestments: &walletv1.Money{
+		DisplayTotalInvestments: &v1.Money{
 			Amount:   displayInvestments.Amount,
 			Currency: displayInvestments.Currency,
 		},
-		NetWorth: &walletv1.Money{
+		NetWorth: &v1.Money{
 			Amount:   netWorth,
 			Currency: baseCurrency,
 		},
-		DisplayNetWorth: &walletv1.Money{
+		DisplayNetWorth: &v1.Money{
 			Amount:   displayNetWorth.Amount,
 			Currency: displayNetWorth.Currency,
 		},
@@ -897,7 +895,7 @@ func (s *walletService) GetTotalBalance(ctx context.Context, userID int32) (*wal
 }
 
 // GetBalanceHistory retrieves balance history for chart visualization.
-func (s *walletService) GetBalanceHistory(ctx context.Context, userID int32, req *walletv1.GetBalanceHistoryRequest) (*walletv1.GetBalanceHistoryResponse, error) {
+func (s *walletService) GetBalanceHistory(ctx context.Context, userID int32, req *v1.GetBalanceHistoryRequest) (*v1.GetBalanceHistoryResponse, error) {
 	// Validate user ID
 	if err := validator.ID(userID); err != nil {
 		return nil, err
@@ -944,10 +942,10 @@ func (s *walletService) GetBalanceHistory(ctx context.Context, userID int32, req
 	}
 
 	if len(walletIDs) == 0 {
-		return &walletv1.GetBalanceHistoryResponse{
+		return &v1.GetBalanceHistoryResponse{
 			Success:   true,
 			Message:   "No wallets found",
-			Data:      []*walletv1.BalanceDataPoint{},
+			Data:      []*v1.BalanceDataPoint{},
 			Timestamp: time.Now().Format(time.RFC3339),
 		}, nil
 	}
@@ -993,7 +991,7 @@ func (s *walletService) GetBalanceHistory(ctx context.Context, userID int32, req
 	}
 
 	// Generate data points
-	var dataPoints []*walletv1.BalanceDataPoint
+	var dataPoints []*v1.BalanceDataPoint
 
 	if req.Month > 0 && req.Month <= 12 {
 		// Daily data for month
@@ -1019,7 +1017,7 @@ func (s *walletService) GetBalanceHistory(ctx context.Context, userID int32, req
 				}
 			}
 
-			dataPoints = append(dataPoints, &walletv1.BalanceDataPoint{
+			dataPoints = append(dataPoints, &v1.BalanceDataPoint{
 				Timestamp: dayStart.Unix(),
 				Label:     fmt.Sprintf("%d %d", day+1, req.Month),
 				Balance:   currentBalance,
@@ -1051,7 +1049,7 @@ func (s *walletService) GetBalanceHistory(ctx context.Context, userID int32, req
 				}
 			}
 
-			dataPoints = append(dataPoints, &walletv1.BalanceDataPoint{
+			dataPoints = append(dataPoints, &v1.BalanceDataPoint{
 				Timestamp: monthStart.Unix(),
 				Label:     monthNames[month-1],
 				Balance:   currentBalance,
@@ -1061,7 +1059,7 @@ func (s *walletService) GetBalanceHistory(ctx context.Context, userID int32, req
 		}
 	}
 
-	return &walletv1.GetBalanceHistoryResponse{
+	return &v1.GetBalanceHistoryResponse{
 		Success:   true,
 		Message:   "Balance history retrieved successfully",
 		Data:      dataPoints,
@@ -1070,7 +1068,7 @@ func (s *walletService) GetBalanceHistory(ctx context.Context, userID int32, req
 }
 
 // GetMonthlyDominance retrieves monthly balance data for all wallets.
-func (s *walletService) GetMonthlyDominance(ctx context.Context, userID int32, req *walletv1.GetMonthlyDominanceRequest) (*walletv1.GetMonthlyDominanceResponse, error) {
+func (s *walletService) GetMonthlyDominance(ctx context.Context, userID int32, req *v1.GetMonthlyDominanceRequest) (*v1.GetMonthlyDominanceResponse, error) {
 	// Validate user ID
 	if err := validator.ID(userID); err != nil {
 		return nil, err
@@ -1091,10 +1089,10 @@ func (s *walletService) GetMonthlyDominance(ctx context.Context, userID int32, r
 	}
 
 	if len(wallets) == 0 {
-		return &walletv1.GetMonthlyDominanceResponse{
+		return &v1.GetMonthlyDominanceResponse{
 			Success:   true,
 			Message:   "No wallets found",
-			Data:      []*walletv1.WalletMonthlyData{},
+			Data:      []*v1.WalletMonthlyData{},
 			Timestamp: time.Now().Format(time.RFC3339),
 		}, nil
 	}
@@ -1153,7 +1151,7 @@ func (s *walletService) GetMonthlyDominance(ctx context.Context, userID int32, r
 	}
 
 	// Build response with monthly data for each wallet
-	var result []*walletv1.WalletMonthlyData
+	var result []*v1.WalletMonthlyData
 
 	for _, wallet := range wallets {
 		monthlyBalances := make([]int64, 12)
@@ -1177,14 +1175,14 @@ func (s *walletService) GetMonthlyDominance(ctx context.Context, userID int32, r
 			monthlyBalances[month-1] = currentBalance
 		}
 
-		result = append(result, &walletv1.WalletMonthlyData{
+		result = append(result, &v1.WalletMonthlyData{
 			WalletId:        wallet.ID,
 			WalletName:      wallet.WalletName,
 			MonthlyBalances: monthlyBalances,
 		})
 	}
 
-	return &walletv1.GetMonthlyDominanceResponse{
+	return &v1.GetMonthlyDominanceResponse{
 		Success:   true,
 		Message:   "Monthly dominance data retrieved successfully",
 		Data:      result,
@@ -1194,6 +1192,7 @@ func (s *walletService) GetMonthlyDominance(ctx context.Context, userID int32, r
 
 // Currency conversion helper methods
 
+//nolint:unused
 // convertWalletBalance converts a wallet's balance to the user's preferred currency
 // Uses cache for fast lookups and populates cache on misses
 func (s *walletService) convertWalletBalance(ctx context.Context, userID int32, wallet *models.Wallet) (int64, error) {
@@ -1262,7 +1261,7 @@ func (s *walletService) invalidateWalletCache(ctx context.Context, userID int32,
 // enrichWalletProto adds conversion fields to a wallet proto response
 // This fetches the user's preferred currency and gets the converted balance from cache
 // If cache is empty, performs on-the-fly conversion
-func (s *walletService) enrichWalletProto(ctx context.Context, userID int32, walletProto *walletv1.Wallet, walletModel *models.Wallet) error {
+func (s *walletService) enrichWalletProto(ctx context.Context, userID int32, walletProto *v1.Wallet, walletModel *models.Wallet) error {
 	if s.currencyCache == nil {
 		return nil
 	}
@@ -1291,7 +1290,7 @@ func (s *walletService) enrichWalletProto(ctx context.Context, userID int32, wal
 		_ = s.currencyCache.SetConvertedValue(ctx, userID, "wallet", walletModel.ID, user.PreferredCurrency, convertedBalance)
 	}
 
-	walletProto.DisplayBalance = &walletv1.Money{
+	walletProto.DisplayBalance = &v1.Money{
 		Amount:   convertedBalance,
 		Currency: user.PreferredCurrency,
 	}
@@ -1300,8 +1299,9 @@ func (s *walletService) enrichWalletProto(ctx context.Context, userID int32, wal
 	return nil
 }
 
+//nolint:unused
 // enrichWalletSliceProto adds conversion fields to a slice of wallet proto responses
-func (s *walletService) enrichWalletSliceProto(ctx context.Context, userID int32, walletProtos []*walletv1.Wallet, walletModels []*models.Wallet) {
+func (s *walletService) enrichWalletSliceProto(ctx context.Context, userID int32, walletProtos []*v1.Wallet, walletModels []*models.Wallet) {
 	for i, walletProto := range walletProtos {
 		if i < len(walletModels) {
 			_ = s.enrichWalletProto(ctx, userID, walletProto, walletModels[i])
@@ -1309,6 +1309,7 @@ func (s *walletService) enrichWalletSliceProto(ctx context.Context, userID int32
 	}
 }
 
+//nolint:unused
 // getInvestmentValueWithCache retrieves investment value from cache or database
 func (s *walletService) getInvestmentValueWithCache(ctx context.Context, walletID int32) (int64, error) {
 	// Try cache first
@@ -1378,6 +1379,7 @@ func (s *walletService) invalidateInvestmentValueCache(ctx context.Context, wall
 	s.redisCache.Del(ctx, cacheKey)
 }
 
+//nolint:unused
 // getInvestmentValuesForWallets batch fetches investment values for multiple wallets (with caching)
 func (s *walletService) getInvestmentValuesForWallets(ctx context.Context, walletIDs []int32) (map[int32]int64, error) {
 	if len(walletIDs) == 0 {
@@ -1418,9 +1420,9 @@ func (s *walletService) getInvestmentValuesForWallets(ctx context.Context, walle
 
 // convertToUserCurrency converts an amount from wallet currency to user's preferred currency
 // Uses the FXRateService which properly handles decimal differences between currencies
-func (s *walletService) convertToUserCurrency(amount int64, fromCurrency, toCurrency string) *commonv1.Money {
+func (s *walletService) convertToUserCurrency(amount int64, fromCurrency, toCurrency string) *v1.Money {
 	if fromCurrency == toCurrency {
-		return &commonv1.Money{Amount: amount, Currency: toCurrency}
+		return &v1.Money{Amount: amount, Currency: toCurrency}
 	}
 
 	// Use FXRateService.ConvertAmount which properly handles decimal multipliers
@@ -1428,8 +1430,8 @@ func (s *walletService) convertToUserCurrency(amount int64, fromCurrency, toCurr
 	convertedAmount, err := s.fxRateSvc.ConvertAmount(context.Background(), amount, fromCurrency, toCurrency)
 	if err != nil {
 		// Return original amount if conversion fails
-		return &commonv1.Money{Amount: amount, Currency: fromCurrency}
+		return &v1.Money{Amount: amount, Currency: fromCurrency}
 	}
 
-	return &commonv1.Money{Amount: convertedAmount, Currency: toCurrency}
+	return &v1.Money{Amount: convertedAmount, Currency: toCurrency}
 }

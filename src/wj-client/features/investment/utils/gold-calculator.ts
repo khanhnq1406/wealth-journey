@@ -14,8 +14,8 @@
 export type GoldUnit = 'tael' | 'gram' | 'oz';
 
 // Constants for unit conversions
-const GRAMS_PER_TAEL = 37.5;
-const GRAMS_PER_OUNCE = 31.1034768;
+export const GRAMS_PER_TAEL = 37.5;
+export const GRAMS_PER_OUNCE = 31.1034768;
 
 /**
  * Gold type options for frontend dropdown

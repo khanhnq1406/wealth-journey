@@ -2,60 +2,67 @@
 
 // Mock ExcelJS module - this must be before imports
 jest.mock("exceljs", () => {
-  const mockWorksheet = {
-    name: "Test Sheet",
-    columns: [],
-    rows: [],
-    rowCount: 0,
-    getRow: function (rowNumber) {
-      if (!this.rows[rowNumber]) {
-        this.rows[rowNumber] = {
-          number: rowNumber,
-          values: [],
-          font: undefined,
-          fill: undefined,
+  // Helper to create a mock row with all required methods
+  function createMockRow(rowNumber: number, values?: unknown) {
+    return {
+      number: rowNumber,
+      values: values ?? [],
+      font: undefined,
+      fill: undefined,
+      alignment: undefined,
+      height: undefined,
+      getCell: function(col: string | number) {
+        return {
           alignment: undefined,
-          height: undefined,
-          eachCell: function (callback) {
-            // Mock eachCell to iterate over columns
-            for (let i = 1; i <= 5; i++) {
-              callback({ alignment: undefined }, i);
-            }
-          },
-          getCell: () => ({
-            alignment: undefined,
-            font: undefined,
-          }),
+          font: undefined,
+          value: undefined,
         };
-      }
-      return this.rows[rowNumber];
-    },
-    addRow: function (values) {
-      const row = {
-        number: ++this.rowCount,
-        values,
-        font: undefined,
-        fill: undefined,
-        alignment: undefined,
-        height: undefined,
-        getCell: () => ({ alignment: undefined }),
-        eachCell: function (callback) {
-          for (let i = 1; i <= 5; i++) {
-            callback({ alignment: undefined }, i);
-          }
-        },
-      };
-      this.rows.push(row);
-      return row;
-    },
-    eachRow: function (callback) {
-      this.rows.forEach((row, idx) => callback(row, idx + 1));
-    },
-    views: [],
-    autoFilter: {},
-  };
+      },
+      eachCell: function (callback: (cell: unknown, colNumber: number) => void) {
+        // Mock eachCell to iterate over columns (assume 5 columns max)
+        for (let i = 1; i <= 5; i++) {
+          callback({ alignment: undefined, font: undefined, value: undefined }, i);
+        }
+      },
+    };
+  }
+
+  // Factory function to create a fresh mock worksheet for each workbook
+  function createMockWorksheet(name: string) {
+    const worksheet = {
+      name,
+      columns: [] as { header: string; key: string; width?: number }[],
+      rows: [] as ReturnType<typeof createMockRow>[],
+      rowCount: 0,
+      getRow: function (rowNumber: number) {
+        // Ensure the row exists
+        while (this.rows.length < rowNumber) {
+          this.rows.push(createMockRow(this.rows.length + 1));
+        }
+        return this.rows[rowNumber - 1]; // Convert to 0-indexed
+      },
+      addRow: function (values: unknown) {
+        this.rowCount++;
+        const row = createMockRow(this.rowCount, values);
+        this.rows.push(row);
+        return row;
+      },
+      eachRow: function (callback: (row: ReturnType<typeof createMockRow>, idx: number) => void) {
+        this.rows.forEach((row, idx) => callback(row, idx + 1));
+      },
+      views: [] as unknown[],
+      autoFilter: {} as unknown,
+    };
+    return worksheet;
+  }
 
   class Workbook {
+    worksheets: ReturnType<typeof createMockWorksheet>[];
+    creator: string;
+    created: null;
+    modified: null;
+    properties: Record<string, unknown>;
+
     constructor() {
       this.worksheets = [];
       this.creator = "";
@@ -64,8 +71,8 @@ jest.mock("exceljs", () => {
       this.properties = {};
     }
 
-    addWorksheet(name) {
-      const worksheet = { ...mockWorksheet, name };
+    addWorksheet(name: string) {
+      const worksheet = createMockWorksheet(name);
       this.worksheets.push(worksheet);
       return worksheet;
     }
@@ -230,7 +237,7 @@ describe("generateReportExcel", () => {
 
     const workbook = generateReportExcel(data);
 
-    const categorySheet = workbook.worksheets.find((ws) => ws.name === "Category Breakdown");
+    const categorySheet = workbook.worksheets.find((ws) => ws.name === "Expense Categories Breakdown");
     expect(categorySheet).toBeDefined();
     expect(categorySheet?.rowCount).toBeGreaterThan(0);
   });
@@ -282,7 +289,7 @@ describe("generateReportExcel", () => {
     const workbook = generateReportExcel(data);
 
     // Should not create Category Breakdown sheet for empty data
-    const categorySheet = workbook.worksheets.find((ws) => ws.name === "Category Breakdown");
+    const categorySheet = workbook.worksheets.find((ws) => ws.name === "Expense Categories Breakdown");
     expect(categorySheet).toBeUndefined();
   });
 
@@ -300,7 +307,9 @@ describe("generateReportExcel", () => {
     const summarySheet = workbook.worksheets[0];
 
     // Check that the subtitle row contains the formatted period
-    expect(summarySheet.rows[1]?.values).toBeDefined();
+    // The mock stores rows in a Map, so we use getRow(2) to get the second row (subtitle)
+    const subtitleRow = (summarySheet as unknown as { getRow: (n: number) => { values: unknown } }).getRow(2);
+    expect(subtitleRow?.values).toBeDefined();
   });
 });
 
@@ -360,18 +369,18 @@ describe("downloadExcel", () => {
       download: "",
       style: { visibility: "" as string },
       click: jest.fn(),
-    };
+    } as unknown as HTMLAnchorElement;
 
-    const createElementSpy = jest.spyOn(document, "createElement").mockReturnValue(mockLink as any);
+    const createElementSpy = jest.spyOn(document, "createElement").mockReturnValue(mockLink);
 
-    // Track calls to these methods
-    const appendChildSpy = jest.spyOn(document.body, "appendChild").mockImplementation(() => mockLink as any);
-    const removeChildSpy = jest.spyOn(document.body, "removeChild").mockImplementation(() => mockLink as any);
+    // Track calls to these methods - use explicit any to avoid deep type instantiation
+    const appendChildSpy = jest.spyOn(document.body, "appendChild" as any).mockReturnValue(mockLink);
+    const removeChildSpy = jest.spyOn(document.body, "removeChild" as any).mockReturnValue(mockLink);
 
     // Create a mock workbook with xlsx.writeBuffer
     const mockWorkbook = {
       xlsx: {
-        writeBuffer: jest.fn().mockResolvedValue(Buffer.from("mock data")),
+        writeBuffer: jest.fn().mockResolvedValue(Buffer.from("mock data") as unknown as never),
       },
     } as any;
 
@@ -457,11 +466,11 @@ describe("exportReportToExcel", () => {
       download: "",
       style: { visibility: "" as string },
       click: jest.fn(),
-    };
+    } as unknown as HTMLAnchorElement;
 
-    jest.spyOn(document, "createElement").mockReturnValue(mockLink as any);
-    jest.spyOn(document.body, "appendChild").mockImplementation(() => mockLink as any);
-    jest.spyOn(document.body, "removeChild").mockImplementation(() => mockLink as any);
+    jest.spyOn(document, "createElement").mockReturnValue(mockLink);
+    jest.spyOn(document.body, "appendChild").mockImplementation(() => mockLink as unknown as Node);
+    jest.spyOn(document.body, "removeChild").mockImplementation(() => mockLink as unknown as Node);
     jest.spyOn(URL, "createObjectURL").mockImplementation(() => "blob:mock-url");
 
     const data: ReportExportData = {
@@ -492,11 +501,11 @@ describe("exportReportToExcel", () => {
       download: "",
       style: { visibility: "" as string },
       click: jest.fn(),
-    };
+    } as unknown as HTMLAnchorElement;
 
-    jest.spyOn(document, "createElement").mockReturnValue(mockLink as any);
-    jest.spyOn(document.body, "appendChild").mockImplementation(() => mockLink as any);
-    jest.spyOn(document.body, "removeChild").mockImplementation(() => mockLink as any);
+    jest.spyOn(document, "createElement").mockReturnValue(mockLink);
+    jest.spyOn(document.body, "appendChild").mockImplementation(() => mockLink as unknown as Node);
+    jest.spyOn(document.body, "removeChild").mockImplementation(() => mockLink as unknown as Node);
     jest.spyOn(URL, "createObjectURL").mockImplementation(() => "blob:mock-url");
 
     const data: ReportExportData = {

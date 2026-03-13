@@ -53,6 +53,7 @@ func TestInvestmentService_Integration_ManualPriceUpdate(t *testing.T) {
 		nil, // fxRateSvc not needed for this test
 		nil, // currencyCache not needed for this test
 		nil, // walletService not needed for this test
+		nil, // portfolioHistoryRepo not needed for this test
 	)
 
 	// Create test user

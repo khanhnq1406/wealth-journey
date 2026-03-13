@@ -9,8 +9,9 @@ import { defineConfig, devices } from "@playwright/test";
  * - Authentication setup for protected routes
  */
 export default defineConfig({
-  // Test directory
+  // Test directory (accessibility/ uses Jest+jsdom, not Playwright — excluded here)
   testDir: "./tests",
+  testIgnore: ["**/accessibility/**"],
 
   // Run tests in files in parallel
   fullyParallel: true,

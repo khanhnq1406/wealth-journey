@@ -767,8 +767,8 @@ describe("downloadCSV", () => {
       setAttribute: jest.fn(),
       click: jest.fn(),
       style: { visibility: "" as string },
-    };
-    jest.spyOn(document, "createElement").mockReturnValue(mockLink as any);
+    } as unknown as HTMLAnchorElement;
+    jest.spyOn(document, "createElement").mockReturnValue(mockLink);
 
     downloadCSV("test,content", "test.csv");
 
@@ -783,10 +783,10 @@ describe("downloadCSV", () => {
     expect(mockLink.setAttribute).toHaveBeenCalledWith("download", "test.csv");
     expect(mockLink.style.visibility).toBe("hidden");
 
-    // Verify DOM manipulation
-    expect(document.body.appendChild).toHaveBeenCalledWith(mockLink);
+    // Verify DOM manipulation - use expect.anything() to avoid TypeScript type instantiation issues
+    expect(document.body.appendChild).toHaveBeenCalledWith(expect.anything());
     expect(mockLink.click).toHaveBeenCalled();
-    expect(document.body.removeChild).toHaveBeenCalledWith(mockLink);
+    expect(document.body.removeChild).toHaveBeenCalledWith(expect.anything());
   });
 
   it("should create blob with correct content", () => {
@@ -794,8 +794,8 @@ describe("downloadCSV", () => {
       setAttribute: jest.fn(),
       click: jest.fn(),
       style: { visibility: "" as string },
-    };
-    jest.spyOn(document, "createElement").mockReturnValue(mockLink as any);
+    } as unknown as HTMLAnchorElement;
+    jest.spyOn(document, "createElement").mockReturnValue(mockLink);
 
     const csvContent = "Header1,Header2\nValue1,Value2";
     downloadCSV(csvContent, "test.csv");

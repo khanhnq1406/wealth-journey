@@ -36,7 +36,7 @@ func TestRedisImportRateLimiter_UserLimit(t *testing.T) {
 	}
 
 	client := setupTestRedis(t)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	config := ImportRateLimitConfig{
 		MaxImportsPerHour:         3,
@@ -85,7 +85,7 @@ func TestRedisImportRateLimiter_IPLimit(t *testing.T) {
 	}
 
 	client := setupTestRedis(t)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	config := ImportRateLimitConfig{
 		MaxImportsPerHour:         100, // High user limit
@@ -131,7 +131,7 @@ func TestRedisImportRateLimiter_WalletLimit(t *testing.T) {
 	}
 
 	client := setupTestRedis(t)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	config := ImportRateLimitConfig{
 		MaxImportsPerHour:         100,
@@ -177,7 +177,7 @@ func TestRedisImportRateLimiter_SlidingWindow(t *testing.T) {
 	}
 
 	client := setupTestRedis(t)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	config := ImportRateLimitConfig{
 		MaxImportsPerHour:         2,
@@ -228,7 +228,7 @@ func TestRedisImportRateLimiter_ResetTime(t *testing.T) {
 	}
 
 	client := setupTestRedis(t)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	config := ImportRateLimitConfig{
 		MaxImportsPerHour:         1,
@@ -272,7 +272,7 @@ func TestRedisImportRateLimiter_MultipleUsers(t *testing.T) {
 	}
 
 	client := setupTestRedis(t)
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	config := DefaultImportRateLimitConfig()
 	config.UserPrefix = "test:ratelimit:import:user"

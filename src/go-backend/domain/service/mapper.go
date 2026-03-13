@@ -3,8 +3,7 @@ package service
 import (
 	"wealthjourney/domain/models"
 	"wealthjourney/pkg/types"
-	protobufv1 "wealthjourney/protobuf/v1"
-	investmentv1 "wealthjourney/protobuf/v1"
+	v1 "wealthjourney/protobuf/v1"
 )
 
 // WalletMapper handles conversion between domain models and proto types.
@@ -16,34 +15,34 @@ func NewWalletMapper() *WalletMapper {
 }
 
 // ModelToProto converts a Wallet domain model to proto Wallet type.
-func (m *WalletMapper) ModelToProto(wallet *models.Wallet) *protobufv1.Wallet {
+func (m *WalletMapper) ModelToProto(wallet *models.Wallet) *v1.Wallet {
 	if wallet == nil {
 		return nil
 	}
 
-	return &protobufv1.Wallet{
+	return &v1.Wallet{
 		Id:         wallet.ID,
 		UserId:     wallet.UserID,
 		WalletName: wallet.WalletName,
-		Balance: &protobufv1.Money{
+		Balance: &v1.Money{
 			Amount:   wallet.Balance,
 			Currency: wallet.Currency,
 		},
 		CreatedAt: wallet.CreatedAt.Unix(),
 		UpdatedAt: wallet.UpdatedAt.Unix(),
-		Type:      protobufv1.WalletType(wallet.Type),
-		Status:    protobufv1.WalletStatus(wallet.Status),
+		Type:      v1.WalletType(wallet.Type),
+		Status:    v1.WalletStatus(wallet.Status),
 		Currency:  wallet.Currency,
 	}
 }
 
 // ModelSliceToProto converts a slice of Wallet models to proto Wallets.
-func (m *WalletMapper) ModelSliceToProto(wallets []*models.Wallet) []*protobufv1.Wallet {
+func (m *WalletMapper) ModelSliceToProto(wallets []*models.Wallet) []*v1.Wallet {
 	if wallets == nil {
 		return nil
 	}
 
-	result := make([]*protobufv1.Wallet, len(wallets))
+	result := make([]*v1.Wallet, len(wallets))
 	for i, w := range wallets {
 		result[i] = m.ModelToProto(w)
 	}
@@ -51,8 +50,8 @@ func (m *WalletMapper) ModelSliceToProto(wallets []*models.Wallet) []*protobufv1
 }
 
 // PaginationResultToProto converts service PaginationResult to proto.
-func (m *WalletMapper) PaginationResultToProto(result types.PaginationResult) *protobufv1.PaginationResult {
-	return &protobufv1.PaginationResult{
+func (m *WalletMapper) PaginationResultToProto(result types.PaginationResult) *v1.PaginationResult {
+	return &v1.PaginationResult{
 		Page:       int32(result.Page),
 		PageSize:   int32(result.PageSize),
 		TotalCount: int32(result.TotalCount),
@@ -69,12 +68,12 @@ func NewUserMapper() *UserMapper {
 }
 
 // ModelToProto converts a User domain model to proto User type.
-func (m *UserMapper) ModelToProto(user *models.User) *protobufv1.User {
+func (m *UserMapper) ModelToProto(user *models.User) *v1.User {
 	if user == nil {
 		return nil
 	}
 
-	return &protobufv1.User{
+	return &v1.User{
 		Id:                   user.ID,
 		Email:                user.Email,
 		Name:                 user.Name,
@@ -88,12 +87,12 @@ func (m *UserMapper) ModelToProto(user *models.User) *protobufv1.User {
 }
 
 // ModelSliceToProto converts a slice of User models to proto Users.
-func (m *UserMapper) ModelSliceToProto(users []*models.User) []*protobufv1.User {
+func (m *UserMapper) ModelSliceToProto(users []*models.User) []*v1.User {
 	if users == nil {
 		return nil
 	}
 
-	result := make([]*protobufv1.User, len(users))
+	result := make([]*v1.User, len(users))
 	for i, u := range users {
 		result[i] = m.ModelToProto(u)
 	}
@@ -101,8 +100,8 @@ func (m *UserMapper) ModelSliceToProto(users []*models.User) []*protobufv1.User 
 }
 
 // PaginationResultToProto converts service PaginationResult to proto.
-func (m *UserMapper) PaginationResultToProto(result types.PaginationResult) *protobufv1.PaginationResult {
-	return &protobufv1.PaginationResult{
+func (m *UserMapper) PaginationResultToProto(result types.PaginationResult) *v1.PaginationResult {
+	return &v1.PaginationResult{
 		Page:       int32(result.Page),
 		PageSize:   int32(result.PageSize),
 		TotalCount: int32(result.TotalCount),
@@ -119,7 +118,7 @@ func NewBudgetMapper() *BudgetMapper {
 }
 
 // ModelToProto converts a Budget domain model to proto Budget type.
-func (m *BudgetMapper) ModelToProto(budget *models.Budget) *protobufv1.Budget {
+func (m *BudgetMapper) ModelToProto(budget *models.Budget) *v1.Budget {
 	if budget == nil {
 		return nil
 	}
@@ -130,11 +129,11 @@ func (m *BudgetMapper) ModelToProto(budget *models.Budget) *protobufv1.Budget {
 		currency = types.VND
 	}
 
-	return &protobufv1.Budget{
+	return &v1.Budget{
 		Id:        budget.ID,
 		UserId:    budget.UserID,
 		Name:      budget.Name,
-		Total: &protobufv1.Money{
+		Total: &v1.Money{
 			Amount:   budget.Total,
 			Currency: currency,
 		},
@@ -145,12 +144,12 @@ func (m *BudgetMapper) ModelToProto(budget *models.Budget) *protobufv1.Budget {
 }
 
 // ModelSliceToProto converts a slice of Budget models to proto Budgets.
-func (m *BudgetMapper) ModelSliceToProto(budgets []*models.Budget) []*protobufv1.Budget {
+func (m *BudgetMapper) ModelSliceToProto(budgets []*models.Budget) []*v1.Budget {
 	if budgets == nil {
 		return nil
 	}
 
-	result := make([]*protobufv1.Budget, len(budgets))
+	result := make([]*v1.Budget, len(budgets))
 	for i, b := range budgets {
 		result[i] = m.ModelToProto(b)
 	}
@@ -158,7 +157,7 @@ func (m *BudgetMapper) ModelSliceToProto(budgets []*models.Budget) []*protobufv1
 }
 
 // ModelItemToProto converts a BudgetItem domain model to proto BudgetItem type.
-func (m *BudgetMapper) ModelItemToProto(item *models.BudgetItem) *protobufv1.BudgetItem {
+func (m *BudgetMapper) ModelItemToProto(item *models.BudgetItem) *v1.BudgetItem {
 	if item == nil {
 		return nil
 	}
@@ -169,11 +168,11 @@ func (m *BudgetMapper) ModelItemToProto(item *models.BudgetItem) *protobufv1.Bud
 		currency = types.VND
 	}
 
-	return &protobufv1.BudgetItem{
+	return &v1.BudgetItem{
 		Id:        item.ID,
 		BudgetId:  item.BudgetID,
 		Name:      item.Name,
-		Total: &protobufv1.Money{
+		Total: &v1.Money{
 			Amount:   item.Total,
 			Currency: currency,
 		},
@@ -185,12 +184,12 @@ func (m *BudgetMapper) ModelItemToProto(item *models.BudgetItem) *protobufv1.Bud
 }
 
 // ModelSliceToProtoItems converts a slice of BudgetItem models to proto BudgetItems.
-func (m *BudgetMapper) ModelSliceToProtoItems(items []*models.BudgetItem) []*protobufv1.BudgetItem {
+func (m *BudgetMapper) ModelSliceToProtoItems(items []*models.BudgetItem) []*v1.BudgetItem {
 	if items == nil {
 		return nil
 	}
 
-	result := make([]*protobufv1.BudgetItem, len(items))
+	result := make([]*v1.BudgetItem, len(items))
 	for i, item := range items {
 		result[i] = m.ModelItemToProto(item)
 	}
@@ -198,8 +197,8 @@ func (m *BudgetMapper) ModelSliceToProtoItems(items []*models.BudgetItem) []*pro
 }
 
 // PaginationResultToProto converts service PaginationResult to proto.
-func (m *BudgetMapper) PaginationResultToProto(result types.PaginationResult) *protobufv1.PaginationResult {
-	return &protobufv1.PaginationResult{
+func (m *BudgetMapper) PaginationResultToProto(result types.PaginationResult) *v1.PaginationResult {
+	return &v1.PaginationResult{
 		Page:       int32(result.Page),
 		PageSize:   int32(result.PageSize),
 		TotalCount: int32(result.TotalCount),
@@ -216,17 +215,17 @@ func NewInvestmentMapper() *InvestmentMapper {
 }
 
 // ModelToProto converts an Investment domain model to proto Investment type.
-func (m *InvestmentMapper) ModelToProto(investment *models.Investment) *investmentv1.Investment {
+func (m *InvestmentMapper) ModelToProto(investment *models.Investment) *v1.Investment {
 	if investment == nil {
 		return nil
 	}
 
-	return &investmentv1.Investment{
+	return &v1.Investment{
 		Id:                   investment.ID,
 		WalletId:             investment.WalletID,
 		Symbol:               investment.Symbol,
 		Name:                 investment.Name,
-		Type:                 investmentv1.InvestmentType(investment.Type),
+		Type:                 v1.InvestmentType(investment.Type),
 		Quantity:             investment.Quantity,
 		AverageCost:          investment.AverageCost,
 		TotalCost:            investment.TotalCost,
@@ -245,12 +244,12 @@ func (m *InvestmentMapper) ModelToProto(investment *models.Investment) *investme
 }
 
 // ModelSliceToProto converts a slice of Investment models to proto Investments.
-func (m *InvestmentMapper) ModelSliceToProto(investments []*models.Investment) []*investmentv1.Investment {
+func (m *InvestmentMapper) ModelSliceToProto(investments []*models.Investment) []*v1.Investment {
 	if investments == nil {
 		return nil
 	}
 
-	result := make([]*investmentv1.Investment, len(investments))
+	result := make([]*v1.Investment, len(investments))
 	for i, inv := range investments {
 		result[i] = m.ModelToProto(inv)
 	}
@@ -258,7 +257,7 @@ func (m *InvestmentMapper) ModelSliceToProto(investments []*models.Investment) [
 }
 
 // TransactionToProto converts an InvestmentTransaction domain model to proto type.
-func (m *InvestmentMapper) TransactionToProto(tx *models.InvestmentTransaction) *investmentv1.InvestmentTransaction {
+func (m *InvestmentMapper) TransactionToProto(tx *models.InvestmentTransaction) *v1.InvestmentTransaction {
 	if tx == nil {
 		return nil
 	}
@@ -268,11 +267,11 @@ func (m *InvestmentMapper) TransactionToProto(tx *models.InvestmentTransaction) 
 		lotID = *tx.LotID
 	}
 
-	return &investmentv1.InvestmentTransaction{
+	return &v1.InvestmentTransaction{
 		Id:                tx.ID,
 		InvestmentId:      tx.InvestmentID,
 		WalletId:          tx.WalletID,
-		Type:              investmentv1.InvestmentTransactionType(tx.Type),
+		Type:              v1.InvestmentTransactionType(tx.Type),
 		Quantity:          tx.Quantity,
 		Price:             tx.Price,
 		Cost:              tx.Cost,
@@ -287,12 +286,12 @@ func (m *InvestmentMapper) TransactionToProto(tx *models.InvestmentTransaction) 
 }
 
 // TransactionSliceToProto converts a slice of InvestmentTransaction models to proto.
-func (m *InvestmentMapper) TransactionSliceToProto(transactions []*models.InvestmentTransaction) []*investmentv1.InvestmentTransaction {
+func (m *InvestmentMapper) TransactionSliceToProto(transactions []*models.InvestmentTransaction) []*v1.InvestmentTransaction {
 	if transactions == nil {
 		return nil
 	}
 
-	result := make([]*investmentv1.InvestmentTransaction, len(transactions))
+	result := make([]*v1.InvestmentTransaction, len(transactions))
 	for i, tx := range transactions {
 		result[i] = m.TransactionToProto(tx)
 	}
@@ -300,8 +299,8 @@ func (m *InvestmentMapper) TransactionSliceToProto(transactions []*models.Invest
 }
 
 // PaginationResultToProto converts service PaginationResult to proto.
-func (m *InvestmentMapper) PaginationResultToProto(result types.PaginationResult) *investmentv1.PaginationResult {
-	return &investmentv1.PaginationResult{
+func (m *InvestmentMapper) PaginationResultToProto(result types.PaginationResult) *v1.PaginationResult {
+	return &v1.PaginationResult{
 		Page:       int32(result.Page),
 		PageSize:   int32(result.PageSize),
 		TotalCount: int32(result.TotalCount),

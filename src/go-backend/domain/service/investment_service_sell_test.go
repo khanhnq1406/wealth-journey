@@ -8,8 +8,7 @@ import (
 	"wealthjourney/domain/models"
 	apperrors "wealthjourney/pkg/errors"
 
-	investmentv1 "wealthjourney/protobuf/v1"
-	walletv1 "wealthjourney/protobuf/v1"
+	v1 "wealthjourney/protobuf/v1"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -68,13 +67,14 @@ func TestSellTransaction_CostBasisPreserved(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
 
 	// Initial state: Bought 100 shares @ $150 = $15,000 total cost
 	// Quantity: 10000 (1 share with 4 decimals), TotalCost: $15,000, AverageCost: $150
@@ -83,7 +83,7 @@ func TestSellTransaction_CostBasisPreserved(t *testing.T) {
 		WalletID:    walletID,
 		Symbol:      "AAPL",
 		Name:        "Apple Inc.",
-		Type:        int32(investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK),
+		Type:        int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
 		Quantity:    10000,  // 1 share (4 decimal places)
 		AverageCost: 1500000, // $150.00
 		TotalCost:   15000000000, // $15,000.00
@@ -102,9 +102,9 @@ func TestSellTransaction_CostBasisPreserved(t *testing.T) {
 	}
 
 	// Sell 30 shares @ $170
-	req := &investmentv1.AddTransactionRequest{
+	req := &v1.AddTransactionRequest{
 		InvestmentId:     investmentID,
-		Type:             investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
+		Type:             v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
 		Quantity:         3000,  // 0.3 shares (4 decimal places)
 		Price:            1700000, // $170.00
 		Fees:             100,    // $1.00 fee
@@ -135,7 +135,7 @@ func TestSellTransaction_CostBasisPreserved(t *testing.T) {
 		return l.ID == 1 && l.RemainingQuantity == 7000
 	})).Return(nil)
 	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
-	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*investmentv1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
+	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*v1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
 
 	// CRITICAL ASSERTION: TotalCost and AverageCost should NOT change
 	mockInvestmentRepo.On("Update", ctx, mock.MatchedBy(func(inv *models.Investment) bool {
@@ -183,13 +183,14 @@ func TestSellTransaction_SellAllShares(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
 
 	// Initial state: Bought 100 shares @ $150 = $15,000 total cost
 	investment := &models.Investment{
@@ -197,7 +198,7 @@ func TestSellTransaction_SellAllShares(t *testing.T) {
 		WalletID:    walletID,
 		Symbol:      "AAPL",
 		Name:        "Apple Inc.",
-		Type:        int32(investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK),
+		Type:        int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
 		Quantity:    10000,
 		AverageCost: 1500000,
 		TotalCost:   15000000000,
@@ -215,9 +216,9 @@ func TestSellTransaction_SellAllShares(t *testing.T) {
 	}
 
 	// Sell all shares
-	req := &investmentv1.AddTransactionRequest{
+	req := &v1.AddTransactionRequest{
 		InvestmentId:     investmentID,
-		Type:             investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
+		Type:             v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
 		Quantity:         10000, // Sell all
 		Price:            1700000,
 		Fees:             100,
@@ -237,7 +238,7 @@ func TestSellTransaction_SellAllShares(t *testing.T) {
 		return l.ID == 1 && l.RemainingQuantity == 0
 	})).Return(nil)
 	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
-	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*investmentv1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
+	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*v1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
 
 	// CRITICAL: Even when Quantity = 0, TotalCost and AverageCost are preserved
 	mockInvestmentRepo.On("Update", ctx, mock.MatchedBy(func(inv *models.Investment) bool {
@@ -284,13 +285,14 @@ func TestSellTransaction_MultipleBuysThenSell(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
 
 	// Scenario:
 	// Buy 1: 100 shares @ $150 = $15,000
@@ -308,7 +310,7 @@ func TestSellTransaction_MultipleBuysThenSell(t *testing.T) {
 		WalletID:    walletID,
 		Symbol:      "AAPL",
 		Name:        "Apple Inc.",
-		Type:        int32(investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK),
+		Type:        int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
 		Quantity:    15000, // 150 shares (4 decimals)
 		AverageCost: 1533333, // ~$153.33
 		TotalCost:   23000000000, // $23,000.00
@@ -336,9 +338,9 @@ func TestSellTransaction_MultipleBuysThenSell(t *testing.T) {
 		PurchasedAt:       time.Now().Add(-24 * time.Hour), // More recent
 	}
 
-	req := &investmentv1.AddTransactionRequest{
+	req := &v1.AddTransactionRequest{
 		InvestmentId:     investmentID,
-		Type:             investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
+		Type:             v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
 		Quantity:         3000, // 30 shares
 		Price:            1700000, // $170.00
 		Fees:             100,
@@ -358,7 +360,7 @@ func TestSellTransaction_MultipleBuysThenSell(t *testing.T) {
 		return l.ID == 1 && l.RemainingQuantity == 7000 // Oldest lot consumed first
 	})).Return(nil)
 	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
-	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*investmentv1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
+	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*v1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
 
 	mockInvestmentRepo.On("Update", ctx, mock.MatchedBy(func(inv *models.Investment) bool {
 		return inv.Quantity == 12000 && // 15000 - 3000
@@ -399,29 +401,30 @@ func TestSellTransaction_InsufficientQuantity(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
 
 	investment := &models.Investment{
 		ID:          investmentID,
 		WalletID:    walletID,
 		Symbol:      "AAPL",
 		Name:        "Apple Inc.",
-		Type:        int32(investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK),
+		Type:        int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
 		Quantity:    5000, // Only 0.5 shares
 		AverageCost: 1500000,
 		TotalCost:   7500000000,
 		Currency:    "USD",
 	}
 
-	req := &investmentv1.AddTransactionRequest{
+	req := &v1.AddTransactionRequest{
 		InvestmentId:     investmentID,
-		Type:             investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
+		Type:             v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
 		Quantity:         10000, // Trying to sell 1 share (more than owned)
 		Price:            1700000,
 		Fees:             100,
@@ -463,29 +466,30 @@ func TestSellTransaction_NoOpenLots(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
 
 	investment := &models.Investment{
 		ID:          investmentID,
 		WalletID:    walletID,
 		Symbol:      "AAPL",
 		Name:        "Apple Inc.",
-		Type:        int32(investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK),
+		Type:        int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
 		Quantity:    10000,
 		AverageCost: 1500000,
 		TotalCost:   15000000000,
 		Currency:    "USD",
 	}
 
-	req := &investmentv1.AddTransactionRequest{
+	req := &v1.AddTransactionRequest{
 		InvestmentId:     investmentID,
-		Type:             investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
+		Type:             v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
 		Quantity:         3000,
 		Price:            1700000,
 		Fees:             100,
@@ -529,13 +533,14 @@ func TestSellTransaction_FIFOMultipleLots(t *testing.T) {
 		mockFXRateSvc,
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, walletv1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
 
 	// Scenario: Sell quantity that spans multiple lots
 	// Lot 1: 20 shares @ $150 (oldest)
@@ -551,7 +556,7 @@ func TestSellTransaction_FIFOMultipleLots(t *testing.T) {
 		WalletID:    walletID,
 		Symbol:      "AAPL",
 		Name:        "Apple Inc.",
-		Type:        int32(investmentv1.InvestmentType_INVESTMENT_TYPE_STOCK),
+		Type:        int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
 		Quantity:    10000, // 100 shares
 		AverageCost: 1630000, // Weighted average: ($3,000 + $4,800 + $8,500) / 100 = $163
 		TotalCost:   16300000000, // $16,300
@@ -588,9 +593,9 @@ func TestSellTransaction_FIFOMultipleLots(t *testing.T) {
 		PurchasedAt:       time.Now().Add(-24 * time.Hour), // Newest
 	}
 
-	req := &investmentv1.AddTransactionRequest{
+	req := &v1.AddTransactionRequest{
 		InvestmentId:     investmentID,
-		Type:             investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
+		Type:             v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
 		Quantity:         4000, // 40 shares - consumes all of lot1 (20) and 20 from lot2
 		Price:            1800000, // $180.00
 		Fees:             100,
@@ -621,7 +626,7 @@ func TestSellTransaction_FIFOMultipleLots(t *testing.T) {
 	})).Return(nil).Times(2)
 
 	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
-	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*investmentv1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
+	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*v1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
 
 	mockInvestmentRepo.On("Update", ctx, mock.MatchedBy(func(inv *models.Investment) bool {
 		return inv.Quantity == 6000 && // 10000 - 4000

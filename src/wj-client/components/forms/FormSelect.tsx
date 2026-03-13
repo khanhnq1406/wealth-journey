@@ -287,6 +287,24 @@ export function FormSelect({
     }
   }, [isOpen]);
 
+  // Handle option selection - defined before handleKeyDown to avoid access-before-declaration
+  const handleSelect = useCallback((option: SelectOption) => {
+    if (option.disabled) return;
+
+    if (multiple) {
+      const newValues = values?.includes(option.value)
+        ? values.filter((v) => v !== option.value)
+        : [...(values || []), option.value];
+      onValuesChange?.(newValues);
+    } else {
+      onChange?.(option.value);
+      setIsOpen(false);
+    }
+
+    setSearchQuery("");
+    setHighlightedIndex(-1);
+  }, [multiple, values, onValuesChange, onChange]);
+
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLButtonElement>) => {
@@ -327,26 +345,8 @@ export function FormSelect({
           break;
       }
     },
-    [isOpen, highlightedIndex, filteredOptions],
+    [isOpen, highlightedIndex, filteredOptions, handleSelect],
   );
-
-  // Handle option selection
-  const handleSelect = (option: SelectOption) => {
-    if (option.disabled) return;
-
-    if (multiple) {
-      const newValues = values?.includes(option.value)
-        ? values.filter((v) => v !== option.value)
-        : [...(values || []), option.value];
-      onValuesChange?.(newValues);
-    } else {
-      onChange?.(option.value);
-      setIsOpen(false);
-    }
-
-    setSearchQuery("");
-    setHighlightedIndex(-1);
-  };
 
   // Handle blur
   const handleBlur = (e: FocusEvent) => {

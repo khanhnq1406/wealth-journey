@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest";
 import { InvestmentType } from "@/gen/protobuf/v1/investment";
 import {
   quantityToStorage,
@@ -179,7 +178,7 @@ describe("Unit Conversions", () => {
       const totalCost = 6000000; // $60,000
       const percent = calculateUnrealizedPNLPercent(unrealizedPNL, totalCost);
 
-      expect(percent).toBe(16.666666666666668);
+      expect(percent).toBeCloseTo(16.666666666666668, 10);
     });
 
     it("should return 0 for unrealized PNL percent when cost is 0", () => {
