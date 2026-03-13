@@ -38,13 +38,13 @@ export function SilverPriceTable({
         <table className="w-full">
           <thead>
             <tr className="bg-v2-silver-light">
-              <th className="text-left px-5 py-2.5 font-jetbrains font-semibold text-[11px] tracking-[1px] text-v2-silver-dark">
+              <th className="text-left px-5 py-3.5 font-vietnam font-bold text-[14px] tracking-normal text-v2-silver-dark">
                 {t("silverType")}
               </th>
-              <th className="text-right px-5 py-2.5 font-jetbrains font-semibold text-[11px] tracking-[1px] text-v2-silver-dark">
+              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-silver-dark">
                 {t("buy")}
               </th>
-              <th className="text-right px-5 py-2.5 font-jetbrains font-semibold text-[11px] tracking-[1px] text-v2-silver-dark">
+              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-silver-dark">
                 {t("sell")}
               </th>
             </tr>
@@ -57,7 +57,7 @@ export function SilverPriceTable({
                   index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"
                 }
               >
-                <td className="px-5 py-3 font-vietnam font-medium text-[13px] text-v2-text-primary">
+                <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-text-primary">
                   {item.name || item.typeCode}
                 </td>
                 <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-text-primary">

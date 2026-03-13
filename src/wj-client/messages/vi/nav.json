@@ -274,8 +274,10 @@
     "priceTeaser": {
       "goldTableTitle": "Giá Vàng",
       "silverTableTitle": "Giá Bạc",
+      "currencyTableTitle": "Giá Ngoại Tệ",
       "goldType": "LOẠI VÀNG",
       "silverType": "LOẠI BẠC",
+      "currencyType": "LOẠI NGOẠI TỆ",
       "buy": "MUA",
       "sell": "BÁN",
       "loginPrompt": "Vui lòng <loginLink>đăng nhập</loginLink> để xem giá",

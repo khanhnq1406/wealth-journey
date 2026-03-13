@@ -4,18 +4,17 @@ import { useTranslations } from "next-intl";
 import { formatPriceValue } from "../prices/helpers";
 import { BaseCard } from "@/components/BaseCard";
 import type { PriceItem } from "@/gen/protobuf/v1/investment";
-import { filterGoldPrices } from "@/features/market-prices/constants/gold-filter";
 
-interface GoldPriceTableProps {
+interface CurrencyPriceTableProps {
   prices: PriceItem[];
   updatedTime?: string;
 }
 
-export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
+export function CurrencyPriceTable({
+  prices,
+  updatedTime,
+}: CurrencyPriceTableProps) {
   const t = useTranslations("dashboard.home");
-
-  // Filter and reorder to show only 9 configured gold types
-  const filteredPrices = filterGoldPrices(prices);
 
   return (
     <BaseCard
@@ -23,10 +22,10 @@ export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
       className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
     >
       {/* Header */}
-      <div className="px-5 py-3 ">
+      <div className="px-5 py-3">
         <div className="flex items-center justify-between">
           <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
-            {t("goldPriceTitle")}
+            {t("currencyPriceTitle")}
           </h3>
           {updatedTime && (
             <span className="font-jetbrains text-[11px] text-v2-text-tertiary">
@@ -40,20 +39,20 @@ export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-v2-gold-light">
-              <th className="text-left px-5 py-3.5 font-vietnam font-bold text-[14px] tracking-normal text-v2-gold-dark">
-                {t("goldType")}
+            <tr className="bg-v2-currency-light">
+              <th className="text-left px-5 py-3.5 font-vietnam font-bold text-[14px] tracking-normal text-v2-currency-dark">
+                {t("currencyType")}
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-gold-dark">
+              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-currency-dark">
                 {t("buy")}
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-gold-dark">
+              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-currency-dark">
                 {t("sell")}
               </th>
             </tr>
           </thead>
           <tbody>
-            {filteredPrices.map((item, index) => (
+            {prices.map((item, index) => (
               <tr
                 key={item.typeCode || index}
                 className={
@@ -61,17 +60,17 @@ export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
                 }
               >
                 <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-text-primary">
-                  {item.displayName}
+                  {item.name || item.typeCode}
                 </td>
                 <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-text-primary">
-                  {formatPriceValue(item.buy, item.currency || "VND")}
+                  {formatPriceValue(item.buy, "VND")}
                 </td>
                 <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-text-primary">
-                  {formatPriceValue(item.sell, item.currency || "VND")}
+                  {formatPriceValue(item.sell, "VND")}
                 </td>
               </tr>
             ))}
-            {filteredPrices.length === 0 && (
+            {prices.length === 0 && (
               <tr>
                 <td
                   colSpan={3}

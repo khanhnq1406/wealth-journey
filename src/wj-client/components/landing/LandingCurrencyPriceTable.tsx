@@ -5,17 +5,17 @@ import { useTranslations } from "next-intl";
 import { BaseCard } from "@/components/BaseCard";
 import type { MarketTypeItem } from "@/features/market-prices/hooks/usePublicMarketTypes";
 
-interface LandingSilverPriceTableProps {
+interface LandingCurrencyPriceTableProps {
   types: MarketTypeItem[];
   isLoading?: boolean;
   updatedTime?: string;
 }
 
-export function LandingSilverPriceTable({
+export function LandingCurrencyPriceTable({
   types,
   isLoading,
   updatedTime,
-}: LandingSilverPriceTableProps) {
+}: LandingCurrencyPriceTableProps) {
   const t = useTranslations("landing.priceTeaser");
 
   if (isLoading) {
@@ -26,7 +26,7 @@ export function LandingSilverPriceTable({
       >
         <div className="px-5 py-3">
           <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
-            {t("silverTableTitle")}
+            {t("currencyTableTitle")}
           </h3>
         </div>
         <div className="px-5 py-8 text-center font-vietnam text-[13px] text-v2-text-tertiary animate-pulse">
@@ -37,12 +37,15 @@ export function LandingSilverPriceTable({
   }
 
   return (
-    <BaseCard className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden !p-0">
+    <BaseCard
+      padding="none"
+      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
+    >
       {/* Header */}
       <div className="px-5 py-3">
         <div className="flex items-center justify-between">
           <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
-            {t("silverTableTitle")}
+            {t("currencyTableTitle")}
           </h3>
           {updatedTime && (
             <span className="font-jetbrains text-[11px] text-v2-text-tertiary">
@@ -56,14 +59,14 @@ export function LandingSilverPriceTable({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-v2-silver-light">
-              <th className="text-left px-5 py-3.5 font-vietnam font-bold text-[14px] tracking-normal text-v2-silver-dark">
-                {t("silverType")}
+            <tr className="bg-v2-currency-light">
+              <th className="text-left px-5 py-2.5 font-jetbrains font-semibold text-[11px] tracking-[1px] text-v2-currency-dark">
+                {t("currencyType")}
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-silver-dark">
+              <th className="text-right px-5 py-2.5 font-jetbrains font-semibold text-[11px] tracking-[1px] text-v2-currency-dark">
                 {t("buy")}
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-silver-dark">
+              <th className="text-right px-5 py-2.5 font-jetbrains font-semibold text-[11px] tracking-[1px] text-v2-currency-dark">
                 {t("sell")}
               </th>
             </tr>
@@ -76,7 +79,7 @@ export function LandingSilverPriceTable({
                   index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"
                 }
               >
-                <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-text-primary">
+                <td className="px-5 py-3 font-vietnam font-medium text-[13px] text-v2-text-primary">
                   {item.name || item.code}
                 </td>
                 <td className="px-5 py-3 text-right font-vietnam text-[12px] text-v2-text-secondary">
