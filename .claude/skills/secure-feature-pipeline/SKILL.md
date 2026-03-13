@@ -382,6 +382,16 @@ Save to: `docs/plans/YYYY-MM-DD-<feature>-plan.md`
 **Step 5: [Additional steps if needed — validation, auth checks, etc.]**
 [Exact code]
 
+**Step N-1: Playwright E2E Audit** *(skip if backend-only task)*
+
+- Identify pages affected by this task
+- Run existing spec: `cd src/wj-client && npx playwright test tests/e2e/<spec>.spec.ts --reporter=list`
+- Update or add Playwright tests following patterns in `tests/e2e/`
+- Run again to confirm green
+- Document result in report under `## Playwright E2E Results`
+
+See `./implementer-prompt.md` for the full Playwright audit protocol.
+
 **Step N: Commit**
 ```
 
@@ -403,6 +413,7 @@ Each step is one action (2-5 minutes):
 - **Backend handler:** Integration test for HTTP request/response, auth, validation
 - **Frontend component:** Component test for rendering, user interaction, error states
 - **Proto changes:** Verify generated code compiles (`task proto:all && go build ./...`)
+- **Frontend UI changes:** E2E test updated/added in `tests/e2e/` using Playwright (see `./implementer-prompt.md`)
 
 **Red flags:**
 - Implementation step before test step = plan violation

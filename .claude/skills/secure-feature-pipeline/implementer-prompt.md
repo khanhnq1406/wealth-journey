@@ -139,6 +139,86 @@ Task tool (general-purpose):
 
     If you find issues during self-review, fix them before reporting.
 
+    ## Playwright E2E Audit (REQUIRED for any UI task)
+
+    > **When to run this:** Any task that creates or modifies a page, component, modal, form, or route. Skip only for pure backend tasks with zero frontend changes — and explicitly document why you skipped.
+
+    ### Step 1 — Identify affected pages
+
+    List every route/page changed by this task. Example:
+    - `/dashboard/portfolio` — added "Set Price" tab to investment detail modal
+
+    ### Step 2 — Find the matching spec file
+
+    Use this mapping:
+
+    | Page / Route | Spec file |
+    |---|---|
+    | `/auth/login`, `/auth/register` | `tests/e2e/login-flow.spec.ts` |
+    | `/dashboard/wallets` | `tests/e2e/create-wallet-flow.spec.ts` |
+    | `/dashboard/transaction` | `tests/e2e/add-transaction-flow.spec.ts`, `tests/e2e/filter-transactions.spec.ts` |
+    | `/dashboard/portfolio` | `tests/e2e/view-portfolio-flow.spec.ts`, `tests/integration/portfolio-calculations.test.ts` |
+    | New page (no existing spec) | Create `tests/e2e/<feature>-flow.spec.ts` |
+    | Shared component used across pages | Update all relevant specs |
+
+    All paths are relative to `src/wj-client/`.
+
+    ### Step 3 — Run existing tests first (verify nothing broken)
+
+    ```bash
+    cd src/wj-client
+    npx playwright test tests/e2e/<relevant-spec>.spec.ts --reporter=list
+    ```
+
+    Expected: all tests pass (or skip — skips are OK). Any failure means the existing code is already broken — fix that first.
+
+    ### Step 4 — Decide: update, add, or no-change
+
+    | Situation | Action |
+    |---|---|
+    | Changed an existing interactive element (button label, form field, modal title) | Update the test that covers it |
+    | Added a new interactive element (button, form, tab, modal) | Add a new `test()` block |
+    | Added a new page/route | Add a new `test.describe()` block (or new spec file) |
+    | Backend-only change OR pure CSS/style-only (no new elements, no new routes) | No change — document reason in report |
+
+    ### Step 5 — Write or update the test
+
+    Follow the existing patterns:
+    - Mock `**/api/v1/auth/verify**` in `beforeEach`
+    - Mock the feature's API endpoint(s) with realistic response shape
+    - Set `localStorage.setItem("token", "mock-test-token")` in `beforeEach`
+    - Use flexible selectors: `locator("button").filter({ hasText: /pattern/i })`
+    - Use graceful existence checks: `if ((await element.count()) > 0) { ... }`
+    - Add a `Mobile <Feature> View` describe block with `test.use({ viewport: { width: 375, height: 667 } })`
+    - Call `await page.waitForLoadState("networkidle")` before assertions
+
+    **Do NOT:**
+    - Use `:has-text()` with multiple comma-separated strings (not valid Playwright CSS)
+    - Create page objects or shared fixtures (project uses inline selectors)
+    - Write tests that pass even when the feature is broken (weak assertions like `count >= 0`)
+
+    ### Step 6 — Run tests again (verify green)
+
+    ```bash
+    cd src/wj-client
+    npx playwright test tests/e2e/<relevant-spec>.spec.ts --reporter=list
+    ```
+
+    All tests must pass before marking the task complete.
+
+    ### Step 7 — Include Playwright results in your report
+
+    Add to your task report:
+
+    ```
+    ## Playwright E2E Results
+    - Spec file(s) updated: [list or "none — backend-only change"]
+    - Tests added: N
+    - Tests updated: N
+    - Run result: N passed, 0 failed
+    - Mobile coverage: yes / no
+    ```
+
     ## Report Format
 
     When done, report:
