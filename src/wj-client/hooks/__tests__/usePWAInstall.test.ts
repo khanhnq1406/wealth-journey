@@ -4,7 +4,7 @@ import { usePWAInstall } from "../usePWAInstall";
 // Helper to flush microtasks
 const flushMicrotasks = async () => {
   await act(async () => {
-    await new Promise((resolve) => queueMicrotask(resolve));
+    await new Promise<void>((resolve) => queueMicrotask(() => resolve()));
   });
 };
 

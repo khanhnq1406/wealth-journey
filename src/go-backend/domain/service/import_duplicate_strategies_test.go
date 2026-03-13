@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -664,9 +666,17 @@ func setupTestUserWalletCategory(
 	walletRepo repository.WalletRepository,
 	categoryRepo repository.CategoryRepository,
 ) (user *models.User, wallet *models.Wallet, category *models.Category) {
+	// Use t.Name() to generate a unique email per test to avoid unique constraint violations
+	// when multiple tests share the same database.
+	safeName := strings.ToLower(strings.ReplaceAll(t.Name(), "/", "-"))
+	if len(safeName) > 40 {
+		safeName = safeName[:40]
+	}
+	email := fmt.Sprintf("%s@example.com", safeName)
+
 	// Create test user
 	user = &models.User{
-		Email:             "test-dup-strategies@example.com",
+		Email:             email,
 		Name:              "Test User",
 		PreferredCurrency: "VND",
 		CreatedAt:         time.Now(),
