@@ -25,6 +25,7 @@ import {
   formatUpdateTimestamp,
   getLatestTimestamp,
 } from "@/features/market-prices/utils/format-update-time";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { NetWorthDisplay } from "./NetWorthDisplay";
 import { PNLCard } from "./PNLCard";
 import { GoldPriceTable } from "./GoldPriceTable";
@@ -44,6 +45,8 @@ export default function Home() {
   const queryClient = useQueryClient();
   const [modalType, setModalType] = useState<ModalType>(null);
   const user = store.getState().setAuthReducer;
+  const { user: authUser } = useAuth();
+  const isAdmin = authUser?.isAdmin ?? false;
   const { currency } = useCurrency();
   const pnlRef = useRef<HTMLDivElement>(null);
   const [pnlHeight, setPnlHeight] = useState<number | undefined>(undefined);
@@ -176,7 +179,7 @@ export default function Home() {
         <PNLCard currency={currency} />
 
         {/* 3. Gold Price Table */}
-        <GoldPriceTable prices={goldPrices} updatedTime={goldUpdatedTime} />
+        <GoldPriceTable prices={goldPrices} updatedTime={goldUpdatedTime} isAdmin={isAdmin} />
 
         {/* 4. Gold Price Chart */}
         <GoldPriceChart />
@@ -185,13 +188,14 @@ export default function Home() {
         <SilverPriceTable
           prices={silverPrices}
           updatedTime={silverUpdatedTime}
+          isAdmin={isAdmin}
         />
 
         {/* 6. Silver Price Chart */}
         <SilverPriceChart />
 
         {/* 7. Currency Price Table */}
-        <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} />
+        <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} isAdmin={isAdmin} />
 
         {/* 8. Dollar Index Chart */}
         <DollarIndexChart />
@@ -244,6 +248,7 @@ export default function Home() {
           <GoldPriceTable
             prices={goldPrices}
             updatedTime={goldUpdatedTime}
+            isAdmin={isAdmin}
           />
           <GoldPriceChart />
         </div>
@@ -253,13 +258,14 @@ export default function Home() {
           <SilverPriceTable
             prices={silverPrices}
             updatedTime={silverUpdatedTime}
+            isAdmin={isAdmin}
           />
           <SilverPriceChart />
         </div>
 
         {/* Row 5: Currency Table + Dollar Index Chart */}
         <div className="grid grid-cols-2 gap-6">
-          <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} />
+          <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} isAdmin={isAdmin} />
           <DollarIndexChart />
         </div>
 

@@ -105,3 +105,9 @@ Implemented a complete admin price override system that allows admin users to ma
 - `apiClient.delete` does not support request body — the delete mutation uses raw `fetch` instead
 - No automated tests (frontend component tests or backend handler tests) — TDD was skipped due to this being a Redis-only feature with no business logic layer
 - Proto-generated admin hooks use numeric PriceCategory enum but backend expects string — custom hooks work around this
+
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-14 | Added inline price editing to dashboard home page tables (gold, silver, currency) — reuses existing `InlinePriceEdit` component and `OverrideIndicator` | Minor | pending |
