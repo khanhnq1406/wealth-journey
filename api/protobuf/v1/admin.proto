@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+package wealthjourney.admin.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "protobuf/v1";
+
+// AdminService provides admin-only operations for managing price overrides.
+service AdminService {
+  // SetPriceOverride creates or updates a price override
+  rpc SetPriceOverride(SetPriceOverrideRequest) returns (SetPriceOverrideResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/price-overrides"
+      body: "*"
+    };
+  }
+
+  // ListPriceOverrides returns all price overrides, optionally filtered by category
+  rpc ListPriceOverrides(ListPriceOverridesRequest) returns (ListPriceOverridesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/price-overrides"
+    };
+  }
+
+  // DeletePriceOverride removes a price override
+  rpc DeletePriceOverride(DeletePriceOverrideRequest) returns (DeletePriceOverrideResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/admin/price-overrides"
+    };
+  }
+}
+
+// PriceCategory represents the type of market price
+enum PriceCategory {
+  PRICE_CATEGORY_UNSPECIFIED = 0;
+  PRICE_CATEGORY_GOLD = 1;
+  PRICE_CATEGORY_SILVER = 2;
+  PRICE_CATEGORY_CURRENCY = 3;
+  PRICE_CATEGORY_STOCK = 4;
+}
+
+// PriceOverride represents an admin-set price override stored in Redis
+message PriceOverride {
+  string typeCode = 1 [json_name = "typeCode"];
+  string name = 2 [json_name = "name"];
+  int64 buy = 3 [json_name = "buy"];
+  int64 sell = 4 [json_name = "sell"];
+  string currency = 5 [json_name = "currency"];
+  PriceCategory category = 6 [json_name = "category"];
+  int32 updatedBy = 7 [json_name = "updatedBy"];
+  int64 updatedAt = 8 [json_name = "updatedAt"];
+}
+
+// SetPriceOverrideRequest creates or updates a price override
+message SetPriceOverrideRequest {
+  PriceCategory category = 1 [json_name = "category"];
+  string typeCode = 2 [json_name = "typeCode"];
+  string currency = 3 [json_name = "currency"];
+  int64 buy = 4 [json_name = "buy"];
+  int64 sell = 5 [json_name = "sell"];
+  string name = 6 [json_name = "name"];
+}
+
+// SetPriceOverrideResponse returns the saved override
+message SetPriceOverrideResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  PriceOverride override = 3 [json_name = "override"];
+}
+
+// ListPriceOverridesRequest optionally filters by category
+message ListPriceOverridesRequest {
+  PriceCategory category = 1 [json_name = "category"];
+}
+
+// ListPriceOverridesResponse returns all matching overrides
+message ListPriceOverridesResponse {
+  bool success = 1 [json_name = "success"];
+  repeated PriceOverride overrides = 2 [json_name = "overrides"];
+}
+
+// DeletePriceOverrideRequest identifies the override to remove
+message DeletePriceOverrideRequest {
+  PriceCategory category = 1 [json_name = "category"];
+  string typeCode = 2 [json_name = "typeCode"];
+  string currency = 3 [json_name = "currency"];
+}
+
+// DeletePriceOverrideResponse confirms deletion
+message DeletePriceOverrideResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+}

@@ -21,6 +21,8 @@ export interface User {
   conversionInProgress: boolean;
   /** ISO 639-1: "en", "vi" */
   preferredLanguage: string;
+  /** Admin flag (read-only from server) */
+  isAdmin: boolean;
   createdAt: number;
   updatedAt: number;
 }
@@ -111,6 +113,7 @@ function createBaseUser(): User {
     preferredCurrency: "",
     conversionInProgress: false,
     preferredLanguage: "",
+    isAdmin: false,
     createdAt: 0,
     updatedAt: 0,
   };
@@ -138,6 +141,9 @@ export const User: MessageFns<User> = {
     }
     if (message.preferredLanguage !== "") {
       writer.uint32(74).string(message.preferredLanguage);
+    }
+    if (message.isAdmin !== false) {
+      writer.uint32(80).bool(message.isAdmin);
     }
     if (message.createdAt !== 0) {
       writer.uint32(40).int64(message.createdAt);
@@ -211,6 +217,14 @@ export const User: MessageFns<User> = {
           message.preferredLanguage = reader.string();
           continue;
         }
+        case 10: {
+          if (tag !== 80) {
+            break;
+          }
+
+          message.isAdmin = reader.bool();
+          continue;
+        }
         case 5: {
           if (tag !== 40) {
             break;
@@ -247,6 +261,7 @@ export const User: MessageFns<User> = {
         ? globalThis.Boolean(object.conversionInProgress)
         : false,
       preferredLanguage: isSet(object.preferredLanguage) ? globalThis.String(object.preferredLanguage) : "",
+      isAdmin: isSet(object.isAdmin) ? globalThis.Boolean(object.isAdmin) : false,
       createdAt: isSet(object.createdAt) ? globalThis.Number(object.createdAt) : 0,
       updatedAt: isSet(object.updatedAt) ? globalThis.Number(object.updatedAt) : 0,
     };
@@ -275,6 +290,9 @@ export const User: MessageFns<User> = {
     if (message.preferredLanguage !== "") {
       obj.preferredLanguage = message.preferredLanguage;
     }
+    if (message.isAdmin !== false) {
+      obj.isAdmin = message.isAdmin;
+    }
     if (message.createdAt !== 0) {
       obj.createdAt = Math.round(message.createdAt);
     }
@@ -296,6 +314,7 @@ export const User: MessageFns<User> = {
     message.preferredCurrency = object.preferredCurrency ?? "";
     message.conversionInProgress = object.conversionInProgress ?? false;
     message.preferredLanguage = object.preferredLanguage ?? "";
+    message.isAdmin = object.isAdmin ?? false;
     message.createdAt = object.createdAt ?? 0;
     message.updatedAt = object.updatedAt ?? 0;
     return message;

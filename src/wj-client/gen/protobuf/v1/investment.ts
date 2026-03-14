@@ -539,6 +539,8 @@ export interface PriceItem {
   currency: string;
   updatedAt: number;
   name: string;
+  /** True if price was admin-overridden */
+  isOverridden: boolean;
 }
 
 /** GetMarketPricesRequest for fetching all gold and silver prices */
@@ -3501,7 +3503,17 @@ export const GetMarketPriceResponse: MessageFns<GetMarketPriceResponse> = {
 };
 
 function createBasePriceItem(): PriceItem {
-  return { typeCode: "", buy: 0, sell: 0, changeBuy: 0, changeSell: 0, currency: "", updatedAt: 0, name: "" };
+  return {
+    typeCode: "",
+    buy: 0,
+    sell: 0,
+    changeBuy: 0,
+    changeSell: 0,
+    currency: "",
+    updatedAt: 0,
+    name: "",
+    isOverridden: false,
+  };
 }
 
 export const PriceItem: MessageFns<PriceItem> = {
@@ -3529,6 +3541,9 @@ export const PriceItem: MessageFns<PriceItem> = {
     }
     if (message.name !== "") {
       writer.uint32(66).string(message.name);
+    }
+    if (message.isOverridden !== false) {
+      writer.uint32(72).bool(message.isOverridden);
     }
     return writer;
   },
@@ -3604,6 +3619,14 @@ export const PriceItem: MessageFns<PriceItem> = {
           message.name = reader.string();
           continue;
         }
+        case 9: {
+          if (tag !== 72) {
+            break;
+          }
+
+          message.isOverridden = reader.bool();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3623,6 +3646,7 @@ export const PriceItem: MessageFns<PriceItem> = {
       currency: isSet(object.currency) ? globalThis.String(object.currency) : "",
       updatedAt: isSet(object.updatedAt) ? globalThis.Number(object.updatedAt) : 0,
       name: isSet(object.name) ? globalThis.String(object.name) : "",
+      isOverridden: isSet(object.isOverridden) ? globalThis.Boolean(object.isOverridden) : false,
     };
   },
 
@@ -3652,6 +3676,9 @@ export const PriceItem: MessageFns<PriceItem> = {
     if (message.name !== "") {
       obj.name = message.name;
     }
+    if (message.isOverridden !== false) {
+      obj.isOverridden = message.isOverridden;
+    }
     return obj;
   },
 
@@ -3668,6 +3695,7 @@ export const PriceItem: MessageFns<PriceItem> = {
     message.currency = object.currency ?? "";
     message.updatedAt = object.updatedAt ?? 0;
     message.name = object.name ?? "";
+    message.isOverridden = object.isOverridden ?? false;
     return message;
   },
 };
