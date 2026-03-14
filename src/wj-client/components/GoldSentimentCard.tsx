@@ -67,7 +67,6 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [page, setPage] = useState(1);
-  const [allComments, setAllComments] = useState<CommentItem[]>([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -93,11 +92,7 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
       { refetchOnMount: "always" },
     );
 
-  useEffect(() => {
-    if (commentsData?.comments) {
-      setAllComments(commentsData.comments);
-    }
-  }, [commentsData]);
+  const allComments: CommentItem[] = commentsData?.comments ?? [];
 
   // Mutations
   const castVoteMutation = useMutationCastGoldVote({
@@ -122,6 +117,13 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
         queryKey: [EVENT_GoldSentimentGetGoldSentimentComments],
       });
     },
+    onError: (error) => {
+      if (error.message?.includes("comments per day")) {
+        showToast(t("dailyLimitReached", { count: 5 }));
+      } else {
+        showToast(error.message || "Failed to post comment");
+      }
+    },
   });
 
   const deleteCommentMutation = useMutationDeleteGoldSentimentComment({
@@ -130,6 +132,9 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
       queryClient.invalidateQueries({
         queryKey: [EVENT_GoldSentimentGetGoldSentimentComments],
       });
+    },
+    onError: (error) => {
+      showToast(error.message || "Failed to delete comment");
     },
   });
 

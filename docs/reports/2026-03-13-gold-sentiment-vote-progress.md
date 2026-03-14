@@ -182,7 +182,9 @@ c23adc6 feat(proto): add gold_sentiment.proto for daily vote & comments
 |------|-----|----------|--------|
 | 2026-03-14 | Add Vietnamese diacritics (accent marks) to all 25 goldSentiment i18n keys in `vi/ui.json` | Minor | 94d4ff3 |
 | 2026-03-14 | Allow unauthenticated users to vote (anonymous voting with UUID dedup) | Enhancement | bf35c0f |
-| 2026-03-14 | Improve mobile UI, add comment fallback to previous days, replace img with Avatar, add sentiment progress bar | Minor | pending |
+| 2026-03-14 | Improve mobile UI, add comment fallback to previous days, replace img with Avatar, add sentiment progress bar | Minor | 9164347 |
+| 2026-03-14 | Fix `react-hooks/set-state-in-effect` lint error — replace `useState`+`useEffect` sync pattern with derived `const` for `allComments` | Minor | pending |
+| 2026-03-14 | Add `onError` handlers to `postCommentMutation` and `deleteCommentMutation` — shows localized toast for daily limit (5/day) and generic error messages | Minor | pending |
 
 ### Anonymous Voting Enhancement (2026-03-14)
 
