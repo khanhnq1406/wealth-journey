@@ -61,6 +61,7 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 			service.NewGoldPriceService(deps.RDB.GetClient()),
 			service.NewSilverPriceService(deps.RDB.GetClient()),
 			service.NewCurrencyPriceService(deps.RDB.GetClient()),
+			cache.NewPriceOverrideCache(deps.RDB.GetClient()),
 		)
 	}
 

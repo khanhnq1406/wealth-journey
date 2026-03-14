@@ -8,22 +8,25 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"wealthjourney/domain/service"
+	"wealthjourney/pkg/cache"
 	investmentv1 "wealthjourney/protobuf/v1"
 )
 
 // MarketPricesHandler handles the combined gold + silver + currency prices endpoint
 type MarketPricesHandler struct {
-	goldSvc     service.GoldPriceService
-	silverSvc   service.SilverPriceService
-	currencySvc service.CurrencyPriceService
+	goldSvc       service.GoldPriceService
+	silverSvc     service.SilverPriceService
+	currencySvc   service.CurrencyPriceService
+	overrideCache *cache.PriceOverrideCache
 }
 
 // NewMarketPricesHandler creates a new market prices handler
-func NewMarketPricesHandler(goldSvc service.GoldPriceService, silverSvc service.SilverPriceService, currencySvc service.CurrencyPriceService) *MarketPricesHandler {
+func NewMarketPricesHandler(goldSvc service.GoldPriceService, silverSvc service.SilverPriceService, currencySvc service.CurrencyPriceService, overrideCache *cache.PriceOverrideCache) *MarketPricesHandler {
 	return &MarketPricesHandler{
-		goldSvc:     goldSvc,
-		silverSvc:   silverSvc,
-		currencySvc: currencySvc,
+		goldSvc:       goldSvc,
+		silverSvc:     silverSvc,
+		currencySvc:   currencySvc,
+		overrideCache: overrideCache,
 	}
 }
 
@@ -112,6 +115,21 @@ func (h *MarketPricesHandler) GetMarketPrices(c *gin.Context) {
 
 	wg.Wait()
 
+	// Apply admin price overrides (graceful — skip if Redis fails)
+	if h.overrideCache != nil {
+		allOverrides, overrideErr := h.overrideCache.GetAll(ctx)
+		if overrideErr == nil && len(allOverrides) > 0 {
+			// Build lookup map: "typeCode:currency" -> override
+			overrideMap := make(map[string]*cache.PriceOverride, len(allOverrides))
+			for _, o := range allOverrides {
+				overrideMap[o.TypeCode+":"+o.Currency] = o
+			}
+			applyOverrides(goldItems, overrideMap)
+			applyOverrides(silverItems, overrideMap)
+			applyOverrides(currencyItems, overrideMap)
+		}
+	}
+
 	// All three failed — return error
 	if goldErr != nil && silverErr != nil && currencyErr != nil {
 		c.JSON(http.StatusServiceUnavailable, gin.H{
@@ -140,4 +158,16 @@ func (h *MarketPricesHandler) GetMarketPrices(c *gin.Context) {
 		"currency":  currencyItems,
 		"timestamp": time.Now().Format(time.RFC3339),
 	})
+}
+
+// applyOverrides merges admin price overrides into price items.
+func applyOverrides(items []*investmentv1.PriceItem, overrides map[string]*cache.PriceOverride) {
+	for _, item := range items {
+		key := item.TypeCode + ":" + item.Currency
+		if override, ok := overrides[key]; ok {
+			item.Buy = override.Buy
+			item.Sell = override.Sell
+			item.IsOverridden = true
+		}
+	}
 }
