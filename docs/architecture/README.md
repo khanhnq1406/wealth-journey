@@ -25,6 +25,7 @@ Runtime flows showing how data moves through the system during feature execution
 | [Cross-Cutting Flows](flow-cross-cutting.md) | Infrastructure | 4 | FX resolution, API lifecycle, scheduler, currency conversion |
 | [i18n Flows](flow-i18n.md) | Internationalization | 2 | First visit locale detection, language switch in settings |
 | [Community Flows](flow-community.md) | Community | 12 | Create post, feed generation, like/unlike, follow/unfollow, share post, view profile, following/followers list, image upload, edit comment, reply threads, SSE notification stream, get reply list |
+| [Gold Sentiment Flows](flow-gold-sentiment.md) | Gold Sentiment | 3 | Cast vote with upsert, get sentiment with Redis cache, post comment with rate limiting and content sanitization |
 
 ## Supporting Documents
 

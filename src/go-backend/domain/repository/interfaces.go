@@ -389,6 +389,25 @@ type SavedPostRepository interface {
 	GetSavedPostIDs(ctx context.Context, userID int32, postIDs []int32) ([]int32, error)
 }
 
+// GoldVoteRepository handles gold sentiment vote persistence.
+type GoldVoteRepository interface {
+	Upsert(ctx context.Context, vote *models.GoldVote) error
+	GetByUserAndDate(ctx context.Context, userID int32, voteDate time.Time) (*models.GoldVote, error)
+	CountByDate(ctx context.Context, voteDate time.Time) (bullish int32, bearish int32, err error)
+	UpsertAnonymous(ctx context.Context, vote *models.GoldVote) error
+	GetByAnonymousIDAndDate(ctx context.Context, anonymousID string, voteDate time.Time) (*models.GoldVote, error)
+	DeleteByAnonymousIDAndDate(ctx context.Context, anonymousID string, voteDate time.Time) error
+}
+
+// GoldVoteCommentRepository handles gold sentiment comment persistence.
+type GoldVoteCommentRepository interface {
+	Create(ctx context.Context, comment *models.GoldVoteComment) error
+	GetByID(ctx context.Context, id int32) (*models.GoldVoteComment, error)
+	ListByDate(ctx context.Context, voteDate time.Time, limit, offset int) ([]*models.GoldVoteComment, int, error)
+	Delete(ctx context.Context, id int32) error
+	CountByUserAndDate(ctx context.Context, userID int32, voteDate time.Time) (int, error)
+}
+
 // HashtagRepository defines the interface for hashtag data operations.
 type HashtagRepository interface {
 	CreateBatch(ctx context.Context, postID int32, hashtags []string, createdAt time.Time) error

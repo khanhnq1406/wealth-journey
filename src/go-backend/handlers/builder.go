@@ -24,8 +24,9 @@ type AllHandlers struct {
 	GoldChart    *GoldChartHandler
 	SilverChart  *SilverChartHandler
 	Import       *ImportHandler
-	Community    *CommunityHandler
-	Public       *PublicHandler
+	Community     *CommunityHandler
+	Public        *PublicHandler
+	GoldSentiment *GoldSentimentHandler
 }
 
 // HandlerDeps holds the infrastructure dependencies needed by NewHandlers.
@@ -102,7 +103,8 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 		GoldChart:    goldChartHandler,
 		SilverChart:  silverChartHandler,
 		Import:       NewImportHandler(repos.Import, importService),
-		Community:    NewCommunityHandler(services.Community, deps.RDB, deps.AuthSrv),
+		Community:     NewCommunityHandler(services.Community, deps.RDB, deps.AuthSrv),
+		GoldSentiment: NewGoldSentimentHandler(services.GoldSentiment, deps.AuthSrv),
 		Public: NewPublicHandler(
 			func() service.GoldPriceService {
 				if deps.RDB != nil {

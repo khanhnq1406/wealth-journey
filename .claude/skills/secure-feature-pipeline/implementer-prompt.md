@@ -45,6 +45,52 @@ Task tool (general-purpose):
        - Touch targets must be ≥ 44×44px
        - No horizontal scroll on mobile
 
+    3. **`react-best-practices` skill** — Performance optimization from Vercel Engineering.
+       - Eliminate async waterfalls — use `Promise.all()` for independent fetches
+       - Direct imports only — `import { Button } from "@/components/Button"` NOT from barrel files
+       - Dynamic imports for heavy components — `next/dynamic` for charts, modals with heavy deps
+       - Minimize re-renders — use `React.memo()`, primitive deps, derived state
+       - Functional `setState` — `setState(prev => ({...prev, field: value}))`
+       - `"use client"` only where needed — keep server components where possible
+
+    ### Component Reuse (MANDATORY — Check Before Creating)
+
+    **Before creating ANY new component, search the existing codebase:**
+
+    1. **Shared components** (`components/`) — 29 subdirectories of reusable UI:
+       - Cards: `BaseCard` | Buttons: `Button`, `FloatingActionButton` | Forms: `FormInput`, `FormSelect`, `FormNumberInput`, `FormDatePicker`, `FormToggle`, `FormTextarea`, `FormCreatableSelect`, `FormWizard` | Modals: `BaseModal`, `ConfirmationDialog`, `Success` | Tables: `MobileTable`, `TanStackTable`, `VirtualizedTransactionList` | Charts: `BarChart`, `LineChart`, `DonutChart`, `Sparkline` | Feedback: `EmptyState`, `ErrorState`, `Toast` | Loading: `LoadingSpinner`, `FullPageLoading`, `Skeleton` | Navigation: `BottomNav`, `ActiveLink`, `SidebarToggle`
+    2. **Feature components** (`features/<domain>/components/`) — Feature-specific components
+    3. **Icons** (`components/icons/`) — Comprehensive SVG library (actions, finance, navigation, ui)
+
+    **Decision flow:**
+    - Need a form field? → Use `components/forms/Form*` components
+    - Need a modal? → Use `BaseModal` + component-level state pattern
+    - Need an icon? → Use SVG from `components/icons/` (NEVER emojis)
+    - Need a card layout? → Use `BaseCard`
+    - Need loading/empty/error states? → Use `components/loading/` or `components/feedback/`
+    - None of the above fit? → Create in `features/<domain>/components/` (feature-specific) or `components/<category>/` (shared across features)
+
+    ### Image Handling (MANDATORY)
+
+    **Use Next.js `<Image>` component via the project's wrappers:**
+
+    | Use Case | Component | Import |
+    |----------|-----------|--------|
+    | **Static images** (logos, icons, hero) | `Image` from `next/image` | `import Image from "next/image"` |
+    | **User avatars/profile photos** | `Avatar` from `OptimizedImage` | `import { Avatar } from "@/components/OptimizedImage"` |
+    | **Any image needing blur/fallback** | `OptimizedImage` | `import { OptimizedImage } from "@/components/OptimizedImage"` |
+    | **User-uploaded content** (unpredictable dims) | Plain `<img>` with `loading="lazy"` | Only when dimensions truly unknown |
+
+    **`OptimizedImage` features:** blur placeholder, error fallback, responsive fill mode, quality control (default: 75).
+
+    **`Avatar` pre-built sizes:** `xs` (24px), `sm` (32px), `md` (40px), `lg` (48px), `xl` (64px), `full` (100px).
+
+    **Rules:**
+    - Always set `width` + `height` OR use `fill` with a sized parent + `sizes` attribute
+    - Use `priority` for above-the-fold hero images only
+    - Use `alt` text for all meaningful images (empty `alt=""` for decorative only)
+    - Landing page hero pattern: `width={0} sizes="100vw" className="w-full h-auto"`
+
     **Non-negotiable UI checklist before reporting back:**
     - [ ] Mobile layout works at 375px (no horizontal scroll, touch targets ≥ 44px)
     - [ ] Desktop layout works at 1024px+ (using `sm:` breakpoint at 800px)
@@ -52,6 +98,10 @@ Task tool (general-purpose):
     - [ ] All interactive elements have `cursor-pointer`
     - [ ] No emojis used as icons (use SVG from `components/icons/`)
     - [ ] Hover/focus states visible
+    - [ ] Images use `next/image` or `OptimizedImage`/`Avatar` (not plain `<img>` unless justified)
+    - [ ] Direct imports used (not barrel file imports)
+    - [ ] Existing shared components reused (not recreated)
+    - [ ] No async waterfalls in data fetching
 
     ## Before You Begin
 

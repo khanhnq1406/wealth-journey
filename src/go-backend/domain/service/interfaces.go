@@ -230,6 +230,15 @@ type PortfolioHistoryService interface {
 	CreateAggregatedSnapshot(ctx context.Context, userID int32) error
 }
 
+// GoldSentimentService handles daily gold sentiment voting and comments.
+type GoldSentimentService interface {
+	GetSentiment(ctx context.Context, userID int32, anonymousID string) (*v1.GetGoldSentimentResponse, error)
+	CastVote(ctx context.Context, userID int32, anonymousID string, req *v1.CastGoldVoteRequest) (*v1.CastGoldVoteResponse, error)
+	GetComments(ctx context.Context, userID int32, req *v1.GetGoldSentimentCommentsRequest) (*v1.GetGoldSentimentCommentsResponse, error)
+	PostComment(ctx context.Context, userID int32, req *v1.PostGoldSentimentCommentRequest) (*v1.PostGoldSentimentCommentResponse, error)
+	DeleteComment(ctx context.Context, userID int32, commentID int32) error
+}
+
 // CommunityService defines the interface for community business logic.
 type CommunityService interface {
 	CreatePost(ctx context.Context, userID int32, req *v1.CreatePostRequest) (*v1.CreatePostResponse, error)

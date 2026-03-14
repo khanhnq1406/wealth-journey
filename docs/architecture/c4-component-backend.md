@@ -27,6 +27,7 @@ C4Component
         Component(gold_chart_h, "Gold Chart Handler", "handlers/gold_chart.go", "Proxies gold price history from mihong.vn with Redis caching")
         Component(silver_chart_h, "Silver Chart Handler", "handlers/silver_chart.go", "Proxies silver price history from giabac.vn and Yahoo Finance SI=F with Redis caching")
         Component(community_h, "Community Handlers", "Posts + Comments + Likes + Follows + Reports", "Social feed, post CRUD, commenting, liking, user following, content moderation; Phase 3: UploadImage, UpdateComment, GetReplies, GetLikedPosts, UpdateProfile, StreamNotifications")
+        Component(gold_sentiment_h, "GoldSentiment Handler", "handlers/gold_sentiment.go", "Daily gold sentiment vote & comments. Public GET with optional auth, protected POST/DELETE for voting and commenting.")
         Component(public_h, "Public Handlers", "handlers/public.go", "No-auth endpoint returning gold/silver/currency type names from in-memory registries. IP-rate-limited only.")
     }
 
@@ -44,6 +45,7 @@ C4Component
         Component(fx_svc, "FX Rate Service", "domain/service", "Currency conversion rates, cross-currency calculations")
         Component(import_svc, "Import Service", "domain/service", "File parsing, field mapping, duplicate detection, batch execution")
         Component(portfolio_svc, "Portfolio History Service", "domain/service", "Historical portfolio value snapshots for charts")
+        Component(gold_sentiment_svc, "GoldSentiment Service", "domain/service", "Vote upsert, comments with rate limiting, Redis caching (30s TTL), Vietnam TZ daily reset")
         Component(community_svc, "Community Service", "domain/service", "Social interactions: posts, comments, likes, follows, content reports; Phase 2: SharePost, GetNotifications, GetUnreadNotificationCount, MarkNotificationsRead, SavePost, UnsavePost, GetSavedPosts, GetSuggestedUsers, GetTrendingTopics, GetFollowing, GetFollowers; Phase 3: UploadImage, UpdateComment, GetReplies, GetLikedPosts, UpdateProfile, StreamNotifications")
     }
 
@@ -67,6 +69,8 @@ C4Component
         Component(notification_repo, "Notification Repository", "GORM", "CRUD for user notifications (like, comment, follow, share events)")
         Component(saved_post_repo, "Saved Post Repository", "GORM", "Save/unsave posts per user with unique constraints")
         Component(hashtag_repo, "Hashtag Repository", "GORM", "Hashtag extraction index and trending hashtag aggregations")
+        Component(gold_vote_repo, "GoldVote Repository", "GORM", "Vote persistence with upsert (ON CONFLICT), count by date")
+        Component(gold_vote_comment_repo, "GoldVoteComment Repository", "GORM", "Comment CRUD with soft delete, daily count for rate limiting")
     }
 
     Container_Boundary(external, "External Integrations — TRUST BOUNDARY: Untrusted external responses") {
@@ -102,6 +106,7 @@ C4Component
     Rel(gin, gold_chart_h, "Routes /investments/gold-chart")
     Rel(gin, silver_chart_h, "Routes /investments/silver-chart")
     Rel(gin, community_h, "Routes /community/*")
+    Rel(gin, gold_sentiment_h, "Routes /public/gold-sentiment/* & /gold-sentiment/*")
 
     Rel(auth_h, auth_svc, "Delegates auth logic")
     Rel(user_h, user_svc, "Delegates user ops")
@@ -116,6 +121,7 @@ C4Component
     Rel(price_h, market_svc, "Gold prices")
     Rel(price_h, currency_svc, "Currency prices")
     Rel(public_h, currency_svc, "Currency update timestamps")
+    Rel(gold_sentiment_h, gold_sentiment_svc, "Delegates sentiment ops")
     Rel(community_h, community_svc, "Delegates social interactions")
     Rel(community_h, redis_pubsub, "Subscribes for SSE StreamNotifications")
     Rel(gold_chart_h, redis, "Read/write price history cache")
@@ -145,6 +151,9 @@ C4Component
     Rel(community_svc, redis_pubsub, "Publishes notification events")
     Rel(community_svc, supabase_client, "Stores community images")
     Rel(community_svc, imaging_pkg, "Processes images before upload")
+    Rel(gold_sentiment_svc, gold_vote_repo, "Reads/Writes votes")
+    Rel(gold_sentiment_svc, gold_vote_comment_repo, "Reads/Writes comments")
+    Rel(gold_sentiment_svc, redis, "Caches vote counts (30s TTL)")
     Rel(community_svc, post_repo, "Persists posts")
     Rel(community_svc, comment_repo, "Persists comments")
     Rel(community_svc, like_repo, "Persists likes")
@@ -165,6 +174,8 @@ C4Component
     Rel(notification_repo, postgres, "SQL")
     Rel(saved_post_repo, postgres, "SQL")
     Rel(hashtag_repo, postgres, "SQL")
+    Rel(gold_vote_repo, postgres, "SQL")
+    Rel(gold_vote_comment_repo, postgres, "SQL")
     Rel(auth_svc, redis, "JWT whitelist")
     Rel(market_svc, redis, "Price cache")
     Rel(fx_svc, redis, "Rate cache")

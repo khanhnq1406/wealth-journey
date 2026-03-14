@@ -26,6 +26,28 @@ func RegisterRoutes(
 		publicGroup.GET("/market-types", h.Public.GetPublicMarketTypes)
 	}
 
+	// Gold Sentiment — Public routes (no auth, optional auth for user_vote)
+	goldSentimentPublic := v1.Group("/public/gold-sentiment")
+	if rateLimiter != nil {
+		goldSentimentPublic.Use(appmiddleware.RateLimitByIP(rateLimiter))
+	}
+	{
+		goldSentimentPublic.GET("", h.GoldSentiment.GetGoldSentiment)
+		goldSentimentPublic.GET("/comments", h.GoldSentiment.GetGoldSentimentComments)
+		goldSentimentPublic.POST("/vote", h.GoldSentiment.CastGoldVote)
+	}
+
+	// Gold Sentiment — Protected routes (auth required for comments)
+	goldSentiment := v1.Group("/gold-sentiment")
+	if rateLimiter != nil {
+		goldSentiment.Use(appmiddleware.RateLimitByUser(rateLimiter))
+	}
+	goldSentiment.Use(AuthMiddleware(authSrv))
+	{
+		goldSentiment.POST("/comments", h.GoldSentiment.PostGoldSentimentComment)
+		goldSentiment.DELETE("/comments/:comment_id", h.GoldSentiment.DeleteGoldSentimentComment)
+	}
+
 	// Auth routes (higher rate limit allowed for auth)
 	authGroup := v1.Group("/auth")
 	if rateLimiter != nil {

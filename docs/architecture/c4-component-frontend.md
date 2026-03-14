@@ -45,6 +45,7 @@ C4Component
         Component(icons, "Icon System", "shared/components/icons", "SVG icon library: actions, finance, navigation, ui")
         Component(hooks, "Shared Hooks", "shared/hooks", "useMobile, useDebounce, useInfiniteScroll, useExchangeRate")
         Component(contexts, "React Contexts", "shared/contexts", "CurrencyContext, NotificationContext")
+        Component(gold_sentiment_card, "GoldSentimentCard", "shared/components", "Daily gold sentiment vote & comments with landing/home variants; bullish/bearish vote buttons, comment list, auth-gated interaction")
         Component(utils, "Shared Utilities", "shared/utils", "cn, date, number-format, z-index, error-sanitizer")
     }
 
@@ -107,6 +108,9 @@ C4Component
     Rel(intl_mw, dashboard, "Resolves locale, provides translations")
     Rel(intl_mw, intl_catalogs, "Loads per-locale strings")
     Rel(settings, intl_mw, "Language toggle updates locale cookie")
+    Rel(landing, gold_sentiment_card, "Uses GoldSentimentCard variant=landing")
+    Rel(dashboard, gold_sentiment_card, "Uses GoldSentimentCard variant=home")
+    Rel(gold_sentiment_card, gen_hooks, "useQueryGetGoldSentiment, useMutationCastGoldVote, useQueryGetGoldSentimentComments, useMutationPostGoldSentimentComment, useMutationDeleteGoldSentimentComment")
     Rel(landing, prices_feat, "usePublicMarketTypes hook — fetches gold/silver/currency type names (no auth)")
 ```
 
