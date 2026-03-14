@@ -3,6 +3,7 @@ package handlers
 import (
 	"wealthjourney/domain/auth"
 	"wealthjourney/domain/service"
+	"wealthjourney/pkg/cache"
 	"wealthjourney/pkg/database"
 	"wealthjourney/pkg/jobs"
 	"wealthjourney/pkg/redis"
@@ -24,9 +25,10 @@ type AllHandlers struct {
 	GoldChart    *GoldChartHandler
 	SilverChart  *SilverChartHandler
 	Import       *ImportHandler
-	Community     *CommunityHandler
-	Public        *PublicHandler
-	GoldSentiment *GoldSentimentHandler
+	Community      *CommunityHandler
+	Public         *PublicHandler
+	GoldSentiment  *GoldSentimentHandler
+	PriceOverride  *PriceOverrideHandler
 }
 
 // HandlerDeps holds the infrastructure dependencies needed by NewHandlers.
@@ -59,6 +61,15 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 			service.NewGoldPriceService(deps.RDB.GetClient()),
 			service.NewSilverPriceService(deps.RDB.GetClient()),
 			service.NewCurrencyPriceService(deps.RDB.GetClient()),
+			cache.NewPriceOverrideCache(deps.RDB.GetClient()),
+		)
+	}
+
+	// Create price override handler (requires Redis for override storage)
+	var priceOverrideHandler *PriceOverrideHandler
+	if deps.RDB != nil {
+		priceOverrideHandler = NewPriceOverrideHandler(
+			cache.NewPriceOverrideCache(deps.RDB.GetClient()),
 		)
 	}
 
@@ -104,7 +115,8 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 		SilverChart:  silverChartHandler,
 		Import:       NewImportHandler(repos.Import, importService),
 		Community:     NewCommunityHandler(services.Community, deps.RDB, deps.AuthSrv),
-		GoldSentiment: NewGoldSentimentHandler(services.GoldSentiment, deps.AuthSrv),
+		GoldSentiment:  NewGoldSentimentHandler(services.GoldSentiment, deps.AuthSrv),
+		PriceOverride:  priceOverrideHandler,
 		Public: NewPublicHandler(
 			func() service.GoldPriceService {
 				if deps.RDB != nil {

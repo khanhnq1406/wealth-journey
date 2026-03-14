@@ -64,6 +64,7 @@ type UserData struct {
 	Picture              string    `json:"picture"`
 	PreferredCurrency    string    `json:"preferredCurrency"`
 	ConversionInProgress bool      `json:"conversionInProgress"`
+	IsAdmin              bool      `json:"isAdmin"`
 	CreatedAt            time.Time `json:"createdAt"`
 	UpdatedAt            time.Time `json:"updatedAt"`
 }
@@ -80,6 +81,7 @@ func userDataToProto(data *UserData) *authv1.User {
 		Picture:              data.Picture,
 		PreferredCurrency:    data.PreferredCurrency,
 		ConversionInProgress: data.ConversionInProgress,
+		IsAdmin:              data.IsAdmin,
 		CreatedAt:            data.CreatedAt.Unix(),
 		UpdatedAt:            data.UpdatedAt.Unix(),
 	}
@@ -359,6 +361,7 @@ func (s *Server) VerifyAuth(tokenString string) (*authv1.VerifyAuthResponse, err
 		Picture:              user.Picture,
 		PreferredCurrency:    user.PreferredCurrency,
 		ConversionInProgress: user.ConversionInProgress,
+		IsAdmin:              user.IsAdmin,
 		CreatedAt:            user.CreatedAt,
 		UpdatedAt:            user.UpdatedAt,
 	}
@@ -409,6 +412,7 @@ func (s *Server) GetAuth(ctx context.Context, email string) (*authv1.GetAuthResp
 			Picture:              user.Picture,
 			PreferredCurrency:    user.PreferredCurrency,
 			ConversionInProgress: user.ConversionInProgress,
+			IsAdmin:              user.IsAdmin,
 			CreatedAt:            user.CreatedAt,
 			UpdatedAt:            user.UpdatedAt,
 		}),

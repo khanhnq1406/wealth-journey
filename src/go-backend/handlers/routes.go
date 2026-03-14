@@ -48,6 +48,21 @@ func RegisterRoutes(
 		goldSentiment.DELETE("/comments/:comment_id", h.GoldSentiment.DeleteGoldSentimentComment)
 	}
 
+	// Admin routes (auth + admin required)
+	admin := v1.Group("/admin")
+	if rateLimiter != nil {
+		admin.Use(appmiddleware.RateLimitByUser(rateLimiter))
+	}
+	admin.Use(AuthMiddleware(authSrv))
+	admin.Use(AdminMiddleware())
+	{
+		if h.PriceOverride != nil {
+			admin.POST("/price-overrides", h.PriceOverride.SetPriceOverride)
+			admin.GET("/price-overrides", h.PriceOverride.ListPriceOverrides)
+			admin.DELETE("/price-overrides", h.PriceOverride.DeletePriceOverride)
+		}
+	}
+
 	// Auth routes (higher rate limit allowed for auth)
 	authGroup := v1.Group("/auth")
 	if rateLimiter != nil {

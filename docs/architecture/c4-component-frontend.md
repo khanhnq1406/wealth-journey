@@ -15,7 +15,7 @@ C4Component
         Component(portfolio_page, "Portfolio Page", "app/dashboard/portfolio", "Investment portfolio with analytics; period pill selector (1D/1W/1M/ALL) via PortfolioSummaryEnhanced")
         Component(budget_page, "Budget Page", "app/dashboard/budget", "Budget tracking with progress indicators")
         Component(report_page, "Report Page", "app/dashboard/report", "Financial reports with exports; Wallet Analytics section: Balance, AccountBalance, Dominance, MonthlyDominance chart components (co-located)")
-        Component(prices_page, "Prices Page", "app/dashboard/prices", "Live gold/silver/currency/market prices with 4 tabs (Gold, Silver, Currency, Symbol Lookup)")
+        Component(prices_page, "Prices Page", "app/dashboard/prices", "Live gold/silver/currency/market prices with 4 tabs (Gold, Silver, Currency, Symbol Lookup). Admin users see inline price edit controls via useAuth isAdmin check.")
         Component(community_page, "Community Page", "app/dashboard/community", "Social feed with posts, comments, likes, user profiles")
         Component(settings, "Settings Pages", "app/dashboard/settings", "Sessions, import templates, language toggle")
     }
@@ -27,7 +27,7 @@ C4Component
         Component(budget_feat, "Budget Feature", "features/budget", "Budget forms, progress cards, category breakdown")
         Component(invest_feat, "Investment Feature", "features/investment", "Investment forms, detail modal, portfolio analytics, gold/silver calculators")
         Component(import_feat, "Import Feature", "features/import", "Import wizard steps, template management, file upload")
-        Component(prices_feat, "Market Prices Feature", "features/market-prices", "Price display tables (gold/silver/currency), symbol lookup; hooks/usePublicMarketTypes.ts — public no-auth hook for landing page type names; CurrencyPriceTable, LandingCurrencyPriceTable components")
+        Component(prices_feat, "Market Prices Feature", "features/market-prices", "Price display tables (gold/silver/currency), symbol lookup; hooks/usePublicMarketTypes.ts — public no-auth hook for landing page type names; CurrencyPriceTable, LandingCurrencyPriceTable components; InlinePriceEdit — inline price editing UI for admin users (click-to-edit with save/cancel); OverrideIndicator — blue dot indicator for overridden prices; hooks/usePriceOverride.ts — usePriceOverrideSet and usePriceOverrideDelete mutation hooks for admin price override CRUD")
         Component(report_feat, "Report Feature", "features/report", "Financial tables, period selectors, CSV/PDF export")
         Component(community_feat, "Community Feature", "features/community", "Posts, comments, likes, follows, profiles, topic tags; Phase 2 components: SharePostModal, SharedPostEmbed, HashtagLink, SavedPostsView, SuggestedUserCard, SuggestedUsers, TrendingTopics, ProfileView, FollowingView, UserListItem; updated: PostCard (share+save actions, onUserClick), PostBody (hashtag rendering, shared post embed), PostActions (Share/Save buttons), PostEngagement (shareCount), PostHeader (clickable avatar+name via onUserClick), CommunityFeed (onUserClick prop); hooks: useSavedPost, useNotifications (useNotificationCount, useMarkAllRead); utils: hashtag.ts (extractHashtags, tokenizeContent); Phase 3 components: ImageUpload, EditCommentForm, ReplyBubble, ReplyInput, ReplyList, ProfileEditModal, ProfileTabs; Phase 3 hooks: useNotificationStream (SSE-based real-time notifications), useImageUpload (upload progress, preview, Supabase integration)")
     }
@@ -76,6 +76,7 @@ C4Component
     Rel(budget_page, budget_feat, "Renders budgets")
     Rel(report_page, report_feat, "Renders reports")
     Rel(prices_page, prices_feat, "Renders price tables")
+    Rel(prices_page, auth_feat, "useAuth isAdmin check for inline price editing")
     Rel(auth_pages, auth_feat, "Renders auth forms")
     Rel(settings, import_feat, "Renders import templates")
     Rel(community_page, community_feat, "Renders social feed and profiles")
@@ -97,6 +98,7 @@ C4Component
     Rel(txn_feat, gen_hooks, "useQueryListTransactions, useMutationCreateTransaction, etc.")
     Rel(invest_feat, gen_hooks, "useQueryListInvestments, useMutationCreateInvestment, etc.")
     Rel(budget_feat, gen_hooks, "useQueryListBudgets, useMutationCreateBudget, etc.")
+    Rel(prices_feat, gen_hooks, "usePriceOverrideSet, usePriceOverrideDelete (admin price override mutations)")
     Rel(import_feat, gen_hooks, "useMutationUploadFile, useMutationParseFile, etc.")
     Rel(community_feat, gen_hooks, "useQueryGetFeed, useMutationCreatePost, useMutationLikePost, useMutationFollowUser; Phase 2: useMutationSharePost, useQueryGetNotifications, useQueryGetUnreadNotificationCount, useMutationMarkNotificationsRead, useMutationSavePost, useMutationUnsavePost, useQueryGetSavedPosts, useQueryGetSuggestedUsers, useQueryGetTrendingTopics, useQueryGetFollowing, useQueryGetFollowers, useQueryGetCommunityProfile, useQueryGetUserPosts, useMutationUpdateBio; Phase 3: useMutationUploadImage, useMutationUpdateComment, useQueryGetReplies, useQueryGetLikedPosts, useMutationUpdateProfile")
 

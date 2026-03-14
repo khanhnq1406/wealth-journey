@@ -9,6 +9,7 @@ Infrastructure-level flows that are referenced by multiple domain flows. Read th
 - [Background Scheduler Jobs](#3-background-scheduler-jobs)
 - [Currency Conversion Logic](#4-currency-conversion-logic)
 - [Market Prices Aggregation Flow](#5-market-prices-aggregation-flow)
+- [Admin Price Override Flow](#6-admin-price-override-flow)
 
 ---
 
@@ -326,3 +327,182 @@ sequenceDiagram
 | Individual silver source fails (e.g., Phú Quý down) | Rows from that source omitted | Other sources still included |
 | Redis cache write fails | Logged warning | Next request re-fetches from source |
 | vangsaigon.vn timeout | Gold/currency return empty | Stale cache if available |
+
+---
+
+## 6. Admin Price Override Flow
+
+Admin users can manually override buy/sell prices for any market price item (gold, silver, currency). Overrides are stored in Redis with no TTL and merged into the GetMarketPrices response at read time.
+
+### 6a. Set Price Override
+
+**Trigger:** Admin clicks the edit (pencil) icon on `InlinePriceEdit`, enters new buy/sell values, clicks save
+**Endpoint:** `POST /api/v1/admin/price-overrides`
+**Source:** `handlers/price_override.go`, `pkg/cache/price_override_cache.go`, `features/market-prices/components/InlinePriceEdit.tsx`
+
+```mermaid
+sequenceDiagram
+    participant SPA as Next.js SPA
+    participant RQ as React Query
+    participant AM as AuthMiddleware
+    participant ADM as AdminMiddleware
+    participant PH as PriceOverrideHandler
+    participant POC as PriceOverrideCache
+    participant R as Redis
+    participant MPH as MarketPricesHandler
+
+    SPA->>SPA: Admin clicks edit pencil on InlinePriceEdit<br/>Pre-fills buy/sell inputs with current values
+    SPA->>SPA: Admin modifies values, clicks save
+    SPA->>SPA: Client-side validation<br/>(parseInt, > 0 check)
+
+    SPA->>AM: POST /api/v1/admin/price-overrides<br/>{category, typeCode, currency, buy, sell, name}<br/>Authorization: Bearer {token}
+
+    AM->>AM: ExtractBearerToken()
+    AM->>AM: VerifyAuth(token)
+    alt Invalid/expired token
+        AM-->>SPA: 401 Unauthorized
+    end
+    AM->>AM: Set user_id, is_admin in context
+
+    AM->>ADM: Next()
+    ADM->>ADM: Check is_admin == true
+    alt Not admin
+        ADM-->>SPA: 403 Forbidden<br/>"Admin access required"
+    end
+
+    ADM->>PH: SetPriceOverride(ctx)
+    activate PH
+    PH->>PH: BindJSON → setPriceOverrideRequest
+    PH->>PH: Validate category ∈ {gold, silver, currency, stock}
+    PH->>PH: Validate typeCode length ≤ 50
+    PH->>PH: Validate currency matches ^[A-Z]{3}$
+    PH->>PH: Validate buy > 0 and sell > 0
+    PH->>PH: Validate name length ≤ 100
+
+    alt Any validation fails
+        PH-->>SPA: 400 Bad Request<br/>{success: false, message: "..."}
+    end
+
+    PH->>PH: Build PriceOverride struct<br/>(updatedBy = user_id, updatedAt = now)
+    PH->>POC: Set(ctx, override)
+    POC->>R: SET price_override:{category}:{typeCode}:{currency}<br/>JSON payload, TTL = 0 (no expiry)
+
+    alt Redis error
+        R-->>POC: Error
+        POC-->>PH: Error
+        PH-->>SPA: 503 Service Unavailable<br/>"Failed to save price override"
+    end
+
+    R-->>POC: OK
+    POC-->>PH: nil
+    deactivate PH
+    PH-->>SPA: 200 {success: true, message: "Price override saved", override}
+
+    SPA->>RQ: invalidateQueries([EVENT_InvestmentGetMarketPrices])
+    RQ->>MPH: GET /api/v1/investments/market-prices (refetch)
+
+    activate MPH
+    Note over MPH: Parallel fetch: gold + silver + currency
+    MPH->>POC: GetAll(ctx)
+    POC->>R: SCAN price_override:*
+    R-->>POC: All overrides
+    POC-->>MPH: []*PriceOverride
+    MPH->>MPH: Build overrideMap[typeCode:currency]
+    MPH->>MPH: applyOverrides(goldItems, overrideMap)<br/>applyOverrides(silverItems, overrideMap)<br/>applyOverrides(currencyItems, overrideMap)
+    Note over MPH: Matching items get buy/sell replaced<br/>and isOverridden = true
+    deactivate MPH
+
+    MPH-->>RQ: 200 {gold, silver, currency, timestamp}
+    RQ-->>SPA: Updated data with overridden prices
+    SPA->>SPA: Re-render table<br/>Blue dot appears on overridden item
+```
+
+### 6b. Delete Price Override
+
+**Trigger:** Admin clicks the blue override indicator dot on an overridden item, confirms removal
+**Endpoint:** `DELETE /api/v1/admin/price-overrides`
+**Source:** `handlers/price_override.go`, `pkg/cache/price_override_cache.go`, `features/market-prices/components/InlinePriceEdit.tsx`
+
+```mermaid
+sequenceDiagram
+    participant SPA as Next.js SPA
+    participant RQ as React Query
+    participant AM as AuthMiddleware
+    participant ADM as AdminMiddleware
+    participant PH as PriceOverrideHandler
+    participant POC as PriceOverrideCache
+    participant R as Redis
+    participant MPH as MarketPricesHandler
+
+    SPA->>SPA: Admin clicks blue override dot<br/>on InlinePriceEdit
+    SPA->>SPA: Browser confirm() dialog
+    alt User cancels
+        SPA->>SPA: No-op, return
+    end
+
+    SPA->>AM: DELETE /api/v1/admin/price-overrides<br/>{category, typeCode, currency}<br/>Authorization: Bearer {token}
+
+    AM->>AM: ExtractBearerToken() → VerifyAuth()
+    alt Invalid/expired token
+        AM-->>SPA: 401 Unauthorized
+    end
+    AM->>AM: Set user_id, is_admin in context
+
+    AM->>ADM: Next()
+    ADM->>ADM: Check is_admin == true
+    alt Not admin
+        ADM-->>SPA: 403 Forbidden
+    end
+
+    ADM->>PH: DeletePriceOverride(ctx)
+    activate PH
+    PH->>PH: BindJSON → deletePriceOverrideRequest<br/>{category, typeCode, currency}
+    PH->>POC: Delete(ctx, category, typeCode, currency)
+    POC->>R: DEL price_override:{category}:{typeCode}:{currency}
+
+    alt Redis error
+        R-->>POC: Error
+        POC-->>PH: Error
+        PH-->>SPA: 503 Service Unavailable<br/>"Failed to delete price override"
+    end
+
+    R-->>POC: OK
+    POC-->>PH: nil
+    deactivate PH
+    PH-->>SPA: 200 {success: true, message: "Price override removed"}
+
+    SPA->>RQ: invalidateQueries([EVENT_InvestmentGetMarketPrices])
+    RQ->>MPH: GET /api/v1/investments/market-prices (refetch)
+    Note over MPH: Override no longer in Redis<br/>→ item.isOverridden = false
+    MPH-->>RQ: 200 {gold, silver, currency, timestamp}
+    RQ-->>SPA: Updated data without override
+    SPA->>SPA: Re-render table<br/>Blue dot disappears, original price restored
+```
+
+### Key Invariants
+
+- Only users with `is_admin = true` can access `/api/v1/admin/*` routes — enforced by `AuthMiddleware` + `AdminMiddleware` chain
+- Price overrides are stored in Redis with **no TTL** — they persist until explicitly deleted
+- Redis key format: `price_override:{category}:{typeCode}:{currency}` — uniquely identifies one price row
+- Override merge happens at **read time** in `GetMarketPrices` — overrides do not mutate the upstream price source data
+- The `applyOverrides` function matches by `typeCode:currency` composite key and replaces only `buy` and `sell` fields, preserving all other fields (changeBuy, changeSell, updatedAt, name)
+- The `isOverridden` flag is set to `true` on matched items so the frontend can display the blue indicator dot
+- Override cache failures during `GetMarketPrices` are **graceful** — original prices are returned without overrides (no 503)
+- Category validation allows `gold`, `silver`, `currency`, `stock` — a fixed allowlist, not a dynamic enum
+- Client-side validation (parseInt, positive check) runs before the API call; server-side validation is the authoritative gate
+- Delete operation is idempotent — deleting a non-existent key returns success
+
+### Error Paths
+
+| Condition | Response | Fallback |
+|-----------|----------|----------|
+| Missing/invalid JWT | 401 Unauthorized | Redirect to login |
+| Non-admin user | 403 Forbidden | No fallback |
+| Invalid category | 400 Bad Request | Client shows error toast |
+| TypeCode > 50 chars | 400 Bad Request | Client shows error toast |
+| Currency not `^[A-Z]{3}$` | 400 Bad Request | Client shows error toast |
+| Buy or sell ≤ 0 | 400 Bad Request | Client shows error toast |
+| Name > 100 chars | 400 Bad Request | Client shows error toast |
+| Redis SET/DEL failure | 503 Service Unavailable | Client shows error toast |
+| Redis SCAN failure during GetMarketPrices | Original prices returned (no override applied) | Graceful degradation |
+| Delete non-existent override | 200 OK (idempotent) | No-op |

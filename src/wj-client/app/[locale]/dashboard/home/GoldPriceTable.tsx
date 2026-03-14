@@ -5,13 +5,15 @@ import { formatPriceValue } from "../prices/helpers";
 import { BaseCard } from "@/components/BaseCard";
 import type { PriceItem } from "@/gen/protobuf/v1/investment";
 import { filterGoldPrices } from "@/features/market-prices/constants/gold-filter";
+import { InlinePriceEdit, OverrideIndicator } from "@/features/market-prices/components/InlinePriceEdit";
 
 interface GoldPriceTableProps {
   prices: PriceItem[];
   updatedTime?: string;
+  isAdmin?: boolean;
 }
 
-export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
+export function GoldPriceTable({ prices, updatedTime, isAdmin = false }: GoldPriceTableProps) {
   const t = useTranslations("dashboard.home");
 
   // Filter and reorder to show only 9 configured gold types
@@ -50,6 +52,7 @@ export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
               <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-gold-dark">
                 {t("sell")}
               </th>
+              {isAdmin && <th className="w-10" />}
             </tr>
           </thead>
           <tbody>
@@ -62,6 +65,7 @@ export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
               >
                 <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-gold-dark">
                   {item.displayName}
+                  <OverrideIndicator item={item} category="gold" isAdmin={isAdmin} />
                 </td>
                 <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-text-primary">
                   {formatPriceValue(item.buy, item.currency || "VND")}
@@ -69,12 +73,17 @@ export function GoldPriceTable({ prices, updatedTime }: GoldPriceTableProps) {
                 <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-text-primary">
                   {formatPriceValue(item.sell, item.currency || "VND")}
                 </td>
+                {isAdmin && (
+                  <td className="px-2 py-3">
+                    <InlinePriceEdit item={item} category="gold" />
+                  </td>
+                )}
               </tr>
             ))}
             {filteredPrices.length === 0 && (
               <tr>
                 <td
-                  colSpan={3}
+                  colSpan={isAdmin ? 4 : 3}
                   className="px-5 py-8 text-center font-vietnam text-[13px] text-v2-text-tertiary"
                 >
                   {t("comingSoon")}

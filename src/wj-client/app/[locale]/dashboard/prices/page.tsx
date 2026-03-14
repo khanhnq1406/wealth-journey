@@ -15,6 +15,8 @@ import {
 } from "@/utils/generated/hooks";
 import { InvestmentType } from "@/gen/protobuf/v1/investment";
 import { formatPriceValue, formatChangeValue, PriceItem } from "./helpers";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { InlinePriceEdit, OverrideIndicator } from "@/features/market-prices/components/InlinePriceEdit";
 
 type Tab = "gold" | "silver" | "currency" | "symbol";
 
@@ -63,20 +65,21 @@ const TAB_TYPE_COLOR: Record<Tab, string> = {
   symbol: "text-gray-900 dark:text-dark-text",
 };
 
-function buildTanstackColumns(t: (key: string) => string, tab: Tab) {
+function buildTanstackColumns(t: (key: string) => string, tab: Tab, isAdmin: boolean) {
   const typeColor = TAB_TYPE_COLOR[tab];
-  return [
+  const cols = [
     columnHelper.display({
       id: "name",
       header: t("table.type"),
       cell: ({ row }) => (
-        <div>
+        <div className="flex items-center">
           <span className={`font-medium ${typeColor}`}>
             {row.original.name || row.original.typeCode}
           </span>
           <span className="ml-1.5 text-xs text-gray-400">
             {row.original.currency}
           </span>
+          <OverrideIndicator item={row.original} category={tab} isAdmin={isAdmin} />
         </div>
       ),
     }),
@@ -106,22 +109,37 @@ function buildTanstackColumns(t: (key: string) => string, tab: Tab) {
       ),
     }),
   ];
+
+  if (isAdmin) {
+    cols.push(
+      columnHelper.display({
+        id: "admin",
+        header: "",
+        cell: ({ row }) => (
+          <InlinePriceEdit item={row.original} category={tab} />
+        ),
+      }),
+    );
+  }
+
+  return cols;
 }
 
 // ─── MobileTable columns (mobile fallback) ─────────────────────────────────────
 
-function buildMobileColumns(t: (key: string) => string, tab: Tab): MobileColumnDef<PriceItem>[] {
+function buildMobileColumns(t: (key: string) => string, tab: Tab, isAdmin: boolean): MobileColumnDef<PriceItem>[] {
   const typeColor = TAB_TYPE_COLOR[tab];
-  return [
+  const cols: MobileColumnDef<PriceItem>[] = [
     {
       id: "name",
       header: t("table.type"),
       cell: ({ row }) => (
-        <div>
+        <div className="flex items-center">
           <span className={`font-medium ${typeColor}`}>
             {row.name || row.typeCode}
           </span>
           <span className="ml-1.5 text-xs text-gray-400">{row.currency}</span>
+          <OverrideIndicator item={row} category={tab} isAdmin={isAdmin} />
         </div>
       ),
     },
@@ -151,6 +169,18 @@ function buildMobileColumns(t: (key: string) => string, tab: Tab): MobileColumnD
       ),
     },
   ];
+
+  if (isAdmin) {
+    cols.push({
+      id: "admin",
+      header: "",
+      cell: ({ row }) => (
+        <InlinePriceEdit item={row} category={tab} />
+      ),
+    });
+  }
+
+  return cols;
 }
 
 interface SymbolLookupTabProps {
@@ -260,9 +290,11 @@ export default function PricesPage() {
   const t = useTranslations("prices");
   const tc = useTranslations("common");
   const locale = useLocale();
+  const { user } = useAuth();
+  const isAdmin = user?.isAdmin ?? false;
   const [activeTab, setActiveTab] = useState<Tab>("gold");
-  const tanstackColumns = useMemo(() => buildTanstackColumns(t as (key: string) => string, activeTab), [t, activeTab]);
-  const mobileColumns = useMemo(() => buildMobileColumns(t as (key: string) => string, activeTab), [t, activeTab]);
+  const tanstackColumns = useMemo(() => buildTanstackColumns(t as (key: string) => string, activeTab, isAdmin), [t, activeTab, isAdmin]);
+  const mobileColumns = useMemo(() => buildMobileColumns(t as (key: string) => string, activeTab, isAdmin), [t, activeTab, isAdmin]);
   const [symbolInput, setSymbolInput] = useState("");
   const [querySymbol, setQuerySymbol] = useState("");
 

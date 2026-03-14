@@ -57,6 +57,7 @@ message User {
   string preferredCurrency = 7 [json_name = "preferredCurrency"];  // User's preferred display currency (ISO 4217)
   bool conversionInProgress = 8 [json_name = "conversionInProgress"];  // Whether currency conversion is in progress
   string preferredLanguage = 9 [json_name = "preferredLanguage"];  // ISO 639-1: "en", "vi"
+  bool isAdmin = 10 [json_name = "isAdmin"];  // Admin flag (read-only from server)
   int64 createdAt = 5 [json_name = "createdAt"];
   int64 updatedAt = 6 [json_name = "updatedAt"];
 }
