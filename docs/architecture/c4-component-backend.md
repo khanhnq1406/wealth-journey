@@ -8,7 +8,8 @@ C4Component
 
     Container_Boundary(transport, "Transport Layer — TRUST BOUNDARY: Untrusted input enters here") {
         Component(gin, "Gin HTTP Server", "gin-gonic/gin", "Request routing, CORS, middleware pipeline")
-        Component(auth_mw, "Auth Middleware", "JWT + Redis", "Extracts bearer token, verifies against Redis whitelist, sets user context")
+        Component(auth_mw, "Auth Middleware", "JWT + Redis", "Extracts bearer token, verifies against Redis whitelist, sets user context and is_admin flag")
+        Component(admin_mw, "Admin Middleware", "handlers/middleware.go", "Checks is_admin flag in gin context, rejects non-admin requests with 403")
         Component(rate_mw, "Rate Limiter", "Token bucket", "Per-IP (public) and per-user (protected) rate limiting")
         Component(grpc_srv, "gRPC Server", "google.golang.org/grpc", "Protocol Buffer service implementations")
         Component(grpc_gw, "gRPC-Gateway", "grpc-ecosystem/grpc-gateway", "HTTP-to-gRPC reverse proxy")
@@ -28,6 +29,7 @@ C4Component
         Component(silver_chart_h, "Silver Chart Handler", "handlers/silver_chart.go", "Proxies silver price history from giabac.vn and Yahoo Finance SI=F with Redis caching")
         Component(community_h, "Community Handlers", "Posts + Comments + Likes + Follows + Reports", "Social feed, post CRUD, commenting, liking, user following, content moderation; Phase 3: UploadImage, UpdateComment, GetReplies, GetLikedPosts, UpdateProfile, StreamNotifications")
         Component(gold_sentiment_h, "GoldSentiment Handler", "handlers/gold_sentiment.go", "Daily gold sentiment vote & comments. Public GET with optional auth, protected POST/DELETE for voting and commenting.")
+        Component(price_override_h, "PriceOverride Handler", "handlers/price_override.go", "Admin-only REST handler for price override CRUD (Set/List/Delete). Protected by AdminMiddleware.")
         Component(public_h, "Public Handlers", "handlers/public.go", "No-auth endpoint returning gold/silver/currency type names from in-memory registries. IP-rate-limited only.")
     }
 
@@ -90,6 +92,7 @@ C4Component
         ComponentDb(postgres, "PostgreSQL 16", "Supabase", "All domain tables")
         ComponentDb(redis, "Redis 7", "Cache/Queue", "Sessions, prices, queues")
         Component(redis_pubsub, "Redis Pub/Sub", "Redis channels", "Real-time notification fanout for StreamNotifications SSE endpoint; community_notifications channel")
+        Component(price_override_cache, "PriceOverride Cache", "pkg/cache/price_override_cache.go", "Redis cache for admin price overrides. Set/Get/Delete/List operations with per-type-code keys.")
     }
 
     Rel(gin, auth_mw, "Applies to protected routes")
@@ -106,6 +109,8 @@ C4Component
     Rel(gin, gold_chart_h, "Routes /investments/gold-chart")
     Rel(gin, silver_chart_h, "Routes /investments/silver-chart")
     Rel(gin, community_h, "Routes /community/*")
+    Rel(gin, price_override_h, "Routes /admin/price-overrides/*")
+    Rel(gin, admin_mw, "Applies to admin routes")
     Rel(gin, gold_sentiment_h, "Routes /public/gold-sentiment/* & /gold-sentiment/*")
 
     Rel(auth_h, auth_svc, "Delegates auth logic")
@@ -119,8 +124,10 @@ C4Component
     Rel(invest_h, portfolio_svc, "Historical values")
     Rel(import_h, import_svc, "Delegates import ops")
     Rel(price_h, market_svc, "Gold prices")
+    Rel(price_h, price_override_cache, "Merges admin overrides into market prices")
     Rel(price_h, currency_svc, "Currency prices")
     Rel(public_h, currency_svc, "Currency update timestamps")
+    Rel(price_override_h, price_override_cache, "Set/List/Delete overrides")
     Rel(gold_sentiment_h, gold_sentiment_svc, "Delegates sentiment ops")
     Rel(community_h, community_svc, "Delegates social interactions")
     Rel(community_h, redis_pubsub, "Subscribes for SSE StreamNotifications")
@@ -177,6 +184,7 @@ C4Component
     Rel(gold_vote_repo, postgres, "SQL")
     Rel(gold_vote_comment_repo, postgres, "SQL")
     Rel(auth_svc, redis, "JWT whitelist")
+    Rel(price_override_cache, redis, "Price override cache")
     Rel(market_svc, redis, "Price cache")
     Rel(fx_svc, redis, "Rate cache")
     Rel(auth_svc, google_client, "Verify ID tokens")
@@ -191,7 +199,8 @@ C4Component
 | Boundary | Where | What Happens |
 |----------|-------|--------------|
 | **Untrusted → Auth Middleware** | Transport Layer entry | Raw HTTP request enters. JWT extracted and verified against Redis whitelist. Rate limiting applied. |
-| **Auth Middleware → Handlers** | After authentication | User ID set in context (from JWT, never from request params). Request is authenticated but input not yet validated. |
+| **Auth Middleware → Handlers** | After authentication | User ID set in context (from JWT, never from request params). is_admin flag set from user record. Request is authenticated but input not yet validated. |
+| **Admin Middleware → Admin Handlers** | After admin check | Verifies is_admin flag in gin context. Non-admin requests rejected with 403 Forbidden before reaching handler logic. |
 | **Handlers → Service Layer** | Handler calls service method | Handler validates/parses request body. Service layer performs business validation + ownership checks. After service validation, data is considered trusted. |
 | **Service Layer → Repository** | Service calls repository | Data is validated and authorized. Repository only handles persistence logic (no business rules). |
 | **Service → External APIs** | Outbound to Yahoo/vangsaigon.vn/Google | Responses are UNTRUSTED. Must validate types, ranges, handle timeouts. Cache with TTL for resilience. |
@@ -236,6 +245,18 @@ User → SPA → REST API → Auth MW → SilverChartHandler → Redis (cache hi
                                   [global]             → Yahoo Finance SI=F (fetch history)
                                                        → Redis (write fresh cache + stale fallback)
                                   ← chart data points ←
+```
+
+### Admin Price Override Flow
+```
+Admin → SPA → REST API → Auth MW (sets is_admin) → Admin MW (verifies is_admin)
+                                                   → PriceOverride Handler → PriceOverride Cache (Redis)
+                                ← override saved ←
+
+User → SPA → REST API → Auth MW → Market Price Handler → Market Data Service (fetch prices)
+                                                        → PriceOverride Cache (list overrides)
+                                                        → Merge: overrides replace matching type codes
+                                ← merged prices with isOverridden flags ←
 ```
 
 ### Background Price Update Flow

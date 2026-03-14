@@ -6,8 +6,8 @@
 - **Spec file:** docs/specs/2026-03-13-admin-price-override-spec.md
 - **Started:** 2026-03-14T00:00:00Z
 - **Last updated:** 2026-03-14T12:00:00Z
-- **Current state:** in_progress
-- **Current task:** 11
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -22,9 +22,9 @@
 | 7 | Market Prices Merge Logic | done | 040e0fb | Override merge after parallel fetch, applyOverrides helper |
 | 8 | Frontend Auth State | done | 9f9b28d | Added isAdmin to AuthPayload interface |
 | 9 | Frontend API Hooks | done | e8ac285 | Custom mutation hooks with apiClient, raw fetch for DELETE |
-| 10 | Frontend Inline Edit | done | — | InlinePriceEdit component, i18n, page integration |
-| 11 | Update C4 Architecture Diagrams | pending | — | — |
-| 12 | Create/Update Runtime Flow Diagrams | pending | — | — |
+| 10 | Frontend Inline Edit | done | ff983c8 | InlinePriceEdit component, i18n, page integration |
+| 11 | Update C4 Architecture Diagrams | done | — | Updated backend+frontend C4 with new components |
+| 12 | Create/Update Runtime Flow Diagrams | done | — | Added set/delete override flows to flow-cross-cutting.md |
 
 ## Resume Instructions
 
