@@ -324,6 +324,20 @@
       "emptyMessage": "No currency prices available",
       "emptyDescription": "Could not fetch currency prices from the price provider.",
       "failedToLoad": "Failed to load currency prices. Try refreshing."
+    },
+    "override": {
+      "edit": "Edit price",
+      "save": "Save",
+      "cancel": "Cancel",
+      "buy": "Buy",
+      "sell": "Sell",
+      "saved": "Price override saved",
+      "saveFailed": "Failed to save override",
+      "removed": "Override removed",
+      "removeFailed": "Failed to remove override",
+      "removeOverride": "Click to remove override",
+      "confirmRemove": "Remove this price override?",
+      "invalidValues": "Please enter valid positive numbers"
     }
   },
   "investmentPrice": {

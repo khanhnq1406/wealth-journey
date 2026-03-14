@@ -5,24 +5,24 @@
 - **Plan file:** docs/plans/2026-03-14-admin-price-override-plan.md
 - **Spec file:** docs/specs/2026-03-13-admin-price-override-spec.md
 - **Started:** 2026-03-14T00:00:00Z
-- **Last updated:** 2026-03-14T00:00:00Z
+- **Last updated:** 2026-03-14T12:00:00Z
 - **Current state:** in_progress
-- **Current task:** 1
+- **Current task:** 11
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 1 | Proto Changes | pending | — | — |
-| 2 | User Model & DB Migration | pending | — | — |
-| 3 | Auth Flow — Expose is_admin | pending | — | — |
-| 4 | Admin Middleware | pending | — | — |
-| 5 | PriceOverrideCache | pending | — | — |
-| 6 | PriceOverrideHandler | pending | — | — |
-| 7 | Market Prices Merge Logic | pending | — | — |
-| 8 | Frontend Auth State | pending | — | — |
-| 9 | Frontend API Hooks | pending | — | — |
-| 10 | Frontend Inline Edit | pending | — | — |
+| 1 | Proto Changes | done | 9477ed0 | Added isAdmin to User, isOverridden to PriceItem, created admin.proto |
+| 2 | User Model & DB Migration | done | 269ff13 | Added IsAdmin to User model, created migrate-admin command |
+| 3 | Auth Flow — Expose is_admin | done | e5e6376 | Added IsAdmin to UserData, mapped in VerifyAuth/GetAuth, set in middleware |
+| 4 | Admin Middleware | done | 53c8dee | Added AdminMiddleware for 403 on non-admin |
+| 5 | PriceOverrideCache | done | 2712e98 | Redis cache with Set/Get/Delete/GetAll, SCAN-based retrieval |
+| 6 | PriceOverrideHandler | done | 91ef12d | Set/List/Delete handlers, wired in builder.go and routes.go |
+| 7 | Market Prices Merge Logic | done | 040e0fb | Override merge after parallel fetch, applyOverrides helper |
+| 8 | Frontend Auth State | done | 9f9b28d | Added isAdmin to AuthPayload interface |
+| 9 | Frontend API Hooks | done | e8ac285 | Custom mutation hooks with apiClient, raw fetch for DELETE |
+| 10 | Frontend Inline Edit | done | — | InlinePriceEdit component, i18n, page integration |
 | 11 | Update C4 Architecture Diagrams | pending | — | — |
 | 12 | Create/Update Runtime Flow Diagrams | pending | — | — |
 
@@ -37,6 +37,6 @@ To resume this implementation in a new session:
 
 ## Notes
 
-- Tasks 1+2 can run in parallel (no shared files)
-- Tasks 4+5 can run in parallel after Task 3
-- Tasks 11+12 can run in parallel
+- Tasks 1-9 committed individually
+- Task 10 includes InlinePriceEdit component, OverrideIndicator, usePriceOverride hooks, i18n keys (en+vi), and page integration
+- Tasks 11+12 can run in parallel (architecture documentation)

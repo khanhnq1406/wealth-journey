@@ -324,6 +324,20 @@
       "emptyMessage": "Không có giá ngoại tệ",
       "emptyDescription": "Không thể lấy giá ngoại tệ từ nhà cung cấp.",
       "failedToLoad": "Không thể tải giá ngoại tệ. Hãy thử làm mới."
+    },
+    "override": {
+      "edit": "Sửa giá",
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "buy": "Mua",
+      "sell": "Bán",
+      "saved": "Đã lưu giá ghi đè",
+      "saveFailed": "Không thể lưu giá ghi đè",
+      "removed": "Đã xóa giá ghi đè",
+      "removeFailed": "Không thể xóa giá ghi đè",
+      "removeOverride": "Nhấn để xóa giá ghi đè",
+      "confirmRemove": "Xóa giá ghi đè này?",
+      "invalidValues": "Vui lòng nhập số dương hợp lệ"
     }
   },
   "investmentPrice": {
