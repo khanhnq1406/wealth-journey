@@ -112,6 +112,12 @@ tasks:
     cmds:
       - go run cmd/migrate-gold-sentiment/main.go
 
+  backend:migrate-admin:
+    desc: "Add is_admin column to user table"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-admin/main.go
+
   # Frontend tasks
   frontend:dev:
     desc: "Start frontend in development mode"

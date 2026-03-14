@@ -22,6 +22,7 @@ type User struct {
 	CoverPhotoURL string `gorm:"size:2048" json:"coverPhotoUrl"`
 	Location      string `gorm:"size:100" json:"location"`
 	Website       string `gorm:"size:200" json:"website"`
+	IsAdmin       bool   `gorm:"default:false;not null" json:"isAdmin"`
 }
 
 // TableName specifies the table name for User model
