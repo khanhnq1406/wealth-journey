@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/google/uuid"
 
 	"wealthjourney/domain/models"
 	"wealthjourney/domain/repository"
@@ -22,6 +24,8 @@ const (
 	maxCommentsPerDay        = 5
 	maxCommentLength         = 500
 )
+
+var uuidRegex = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`)
 
 type goldSentimentService struct {
 	voteRepo    repository.GoldVoteRepository
@@ -51,19 +55,13 @@ func getTodayVietnam() time.Time {
 	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 }
 
-func (s *goldSentimentService) GetSentiment(ctx context.Context, userID int32) (*v1.GetGoldSentimentResponse, error) {
+func (s *goldSentimentService) GetSentiment(ctx context.Context, userID int32, anonymousID string) (*v1.GetGoldSentimentResponse, error) {
 	today := getTodayVietnam()
 
 	// Try cache first
 	resp, err := s.getCachedSentiment(ctx, today)
 	if err == nil && resp != nil {
-		// If authenticated, also get user's vote
-		if userID > 0 {
-			vote, err := s.voteRepo.GetByUserAndDate(ctx, userID, today)
-			if err == nil && vote != nil {
-				resp.UserVote = v1.VoteDirection(vote.Direction)
-			}
-		}
+		s.populateUserVote(ctx, resp, userID, anonymousID, today)
 		return resp, nil
 	}
 
@@ -88,33 +86,65 @@ func (s *goldSentimentService) GetSentiment(ctx context.Context, userID int32) (
 	// Cache the result
 	_ = s.cacheSentiment(ctx, today, resp)
 
-	// If authenticated, get user's vote
+	s.populateUserVote(ctx, resp, userID, anonymousID, today)
+
+	return resp, nil
+}
+
+// populateUserVote sets the userVote field based on auth or anonymous ID.
+func (s *goldSentimentService) populateUserVote(ctx context.Context, resp *v1.GetGoldSentimentResponse, userID int32, anonymousID string, today time.Time) {
 	if userID > 0 {
 		vote, err := s.voteRepo.GetByUserAndDate(ctx, userID, today)
 		if err == nil && vote != nil {
 			resp.UserVote = v1.VoteDirection(vote.Direction)
 		}
+	} else if anonymousID != "" {
+		vote, err := s.voteRepo.GetByAnonymousIDAndDate(ctx, anonymousID, today)
+		if err == nil && vote != nil {
+			resp.UserVote = v1.VoteDirection(vote.Direction)
+		}
 	}
-
-	return resp, nil
 }
 
-func (s *goldSentimentService) CastVote(ctx context.Context, userID int32, req *v1.CastGoldVoteRequest) (*v1.CastGoldVoteResponse, error) {
+func (s *goldSentimentService) CastVote(ctx context.Context, userID int32, anonymousID string, req *v1.CastGoldVoteRequest) (*v1.CastGoldVoteResponse, error) {
 	// Validate direction
 	if req.Direction != v1.VoteDirection_VOTE_DIRECTION_BULLISH && req.Direction != v1.VoteDirection_VOTE_DIRECTION_BEARISH {
 		return nil, apperrors.NewValidationError("direction must be BULLISH (1) or BEARISH (2)")
 	}
 
 	today := getTodayVietnam()
+	var responseAnonymousID string
 
-	vote := &models.GoldVote{
-		UserID:    userID,
-		VoteDate:  today,
-		Direction: int32(req.Direction),
-	}
+	if userID > 0 {
+		// Authenticated user vote
+		// If anonymous ID provided, delete the anonymous vote to prevent double-counting
+		if anonymousID != "" && isValidUUID(anonymousID) {
+			_ = s.voteRepo.DeleteByAnonymousIDAndDate(ctx, anonymousID, today)
+		}
 
-	if err := s.voteRepo.Upsert(ctx, vote); err != nil {
-		return nil, err
+		vote := &models.GoldVote{
+			UserID:    &userID,
+			VoteDate:  today,
+			Direction: int32(req.Direction),
+		}
+		if err := s.voteRepo.Upsert(ctx, vote); err != nil {
+			return nil, err
+		}
+	} else {
+		// Anonymous vote
+		if anonymousID == "" || !isValidUUID(anonymousID) {
+			anonymousID = uuid.New().String()
+		}
+
+		vote := &models.GoldVote{
+			AnonymousID: &anonymousID,
+			VoteDate:    today,
+			Direction:   int32(req.Direction),
+		}
+		if err := s.voteRepo.UpsertAnonymous(ctx, vote); err != nil {
+			return nil, err
+		}
+		responseAnonymousID = anonymousID
 	}
 
 	// Invalidate cache
@@ -136,7 +166,13 @@ func (s *goldSentimentService) CastVote(ctx context.Context, userID int32, req *
 		TotalVotes:        total,
 		BullishPercentage: bullishPct,
 		BearishPercentage: bearishPct,
+		AnonymousId:       responseAnonymousID,
 	}, nil
+}
+
+// isValidUUID checks if the string is a valid UUID format.
+func isValidUUID(s string) bool {
+	return len(s) == 36 && uuidRegex.MatchString(s)
 }
 
 func (s *goldSentimentService) GetComments(ctx context.Context, userID int32, req *v1.GetGoldSentimentCommentsRequest) (*v1.GetGoldSentimentCommentsResponse, error) {

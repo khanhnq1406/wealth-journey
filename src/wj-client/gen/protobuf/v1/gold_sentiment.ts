@@ -104,6 +104,7 @@ export interface CastGoldVoteResponse {
   totalVotes: number;
   bullishPercentage: number;
   bearishPercentage: number;
+  anonymousId: string;
 }
 
 export interface PostGoldSentimentCommentRequest {
@@ -818,7 +819,15 @@ export const CastGoldVoteRequest: MessageFns<CastGoldVoteRequest> = {
 };
 
 function createBaseCastGoldVoteResponse(): CastGoldVoteResponse {
-  return { direction: 0, bullishCount: 0, bearishCount: 0, totalVotes: 0, bullishPercentage: 0, bearishPercentage: 0 };
+  return {
+    direction: 0,
+    bullishCount: 0,
+    bearishCount: 0,
+    totalVotes: 0,
+    bullishPercentage: 0,
+    bearishPercentage: 0,
+    anonymousId: "",
+  };
 }
 
 export const CastGoldVoteResponse: MessageFns<CastGoldVoteResponse> = {
@@ -840,6 +849,9 @@ export const CastGoldVoteResponse: MessageFns<CastGoldVoteResponse> = {
     }
     if (message.bearishPercentage !== 0) {
       writer.uint32(49).double(message.bearishPercentage);
+    }
+    if (message.anonymousId !== "") {
+      writer.uint32(58).string(message.anonymousId);
     }
     return writer;
   },
@@ -899,6 +911,14 @@ export const CastGoldVoteResponse: MessageFns<CastGoldVoteResponse> = {
           message.bearishPercentage = reader.double();
           continue;
         }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.anonymousId = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -936,6 +956,11 @@ export const CastGoldVoteResponse: MessageFns<CastGoldVoteResponse> = {
         : isSet(object.bearish_percentage)
         ? globalThis.Number(object.bearish_percentage)
         : 0,
+      anonymousId: isSet(object.anonymousId)
+        ? globalThis.String(object.anonymousId)
+        : isSet(object.anonymous_id)
+        ? globalThis.String(object.anonymous_id)
+        : "",
     };
   },
 
@@ -959,6 +984,9 @@ export const CastGoldVoteResponse: MessageFns<CastGoldVoteResponse> = {
     if (message.bearishPercentage !== 0) {
       obj.bearishPercentage = message.bearishPercentage;
     }
+    if (message.anonymousId !== "") {
+      obj.anonymousId = message.anonymousId;
+    }
     return obj;
   },
 
@@ -973,6 +1001,7 @@ export const CastGoldVoteResponse: MessageFns<CastGoldVoteResponse> = {
     message.totalVotes = object.totalVotes ?? 0;
     message.bullishPercentage = object.bullishPercentage ?? 0;
     message.bearishPercentage = object.bearishPercentage ?? 0;
+    message.anonymousId = object.anonymousId ?? "";
     return message;
   },
 };

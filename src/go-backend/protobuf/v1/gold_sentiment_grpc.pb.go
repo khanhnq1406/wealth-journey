@@ -32,6 +32,7 @@ const (
 type GoldSentimentServiceClient interface {
 	GetGoldSentiment(ctx context.Context, in *GetGoldSentimentRequest, opts ...grpc.CallOption) (*GetGoldSentimentResponse, error)
 	GetGoldSentimentComments(ctx context.Context, in *GetGoldSentimentCommentsRequest, opts ...grpc.CallOption) (*GetGoldSentimentCommentsResponse, error)
+	// Public: Cast or update vote (auth optional, anonymous voting supported)
 	CastGoldVote(ctx context.Context, in *CastGoldVoteRequest, opts ...grpc.CallOption) (*CastGoldVoteResponse, error)
 	PostGoldSentimentComment(ctx context.Context, in *PostGoldSentimentCommentRequest, opts ...grpc.CallOption) (*PostGoldSentimentCommentResponse, error)
 	DeleteGoldSentimentComment(ctx context.Context, in *DeleteGoldSentimentCommentRequest, opts ...grpc.CallOption) (*DeleteGoldSentimentCommentResponse, error)
@@ -96,6 +97,7 @@ func (c *goldSentimentServiceClient) DeleteGoldSentimentComment(ctx context.Cont
 type GoldSentimentServiceServer interface {
 	GetGoldSentiment(context.Context, *GetGoldSentimentRequest) (*GetGoldSentimentResponse, error)
 	GetGoldSentimentComments(context.Context, *GetGoldSentimentCommentsRequest) (*GetGoldSentimentCommentsResponse, error)
+	// Public: Cast or update vote (auth optional, anonymous voting supported)
 	CastGoldVote(context.Context, *CastGoldVoteRequest) (*CastGoldVoteResponse, error)
 	PostGoldSentimentComment(context.Context, *PostGoldSentimentCommentRequest) (*PostGoldSentimentCommentResponse, error)
 	DeleteGoldSentimentComment(context.Context, *DeleteGoldSentimentCommentRequest) (*DeleteGoldSentimentCommentResponse, error)

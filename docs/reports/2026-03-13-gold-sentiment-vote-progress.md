@@ -126,9 +126,9 @@ c23adc6 feat(proto): add gold_sentiment.proto for daily vote & comments
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| GET | `/api/v1/public/gold-sentiment` | Optional | Get today's vote counts + user vote (if authenticated) |
+| GET | `/api/v1/public/gold-sentiment` | Optional | Get today's vote counts + user vote (via auth or X-Anonymous-ID) |
 | GET | `/api/v1/public/gold-sentiment/comments` | Optional | Paginated comments for today |
-| POST | `/api/v1/gold-sentiment/vote` | Required | Cast or update daily vote (bullish/bearish) |
+| POST | `/api/v1/public/gold-sentiment/vote` | Optional | Cast or update daily vote (auth or anonymous with UUID) |
 | POST | `/api/v1/gold-sentiment/comments` | Required | Post a comment (max 500 chars, 5/day limit) |
 | DELETE | `/api/v1/gold-sentiment/comments/:comment_id` | Required | Delete own comment (ownership verified) |
 
@@ -138,7 +138,9 @@ c23adc6 feat(proto): add gold_sentiment.proto for daily vote & comments
 
 | Control | Implementation |
 |---------|---------------|
-| **Vote deduplication** | UNIQUE constraint on (user_id, vote_date), upsert with ON CONFLICT |
+| **Vote deduplication** | Partial UNIQUE indexes: `(user_id, vote_date) WHERE user_id IS NOT NULL` + `(anonymous_id, vote_date) WHERE anonymous_id IS NOT NULL`, upsert with ON CONFLICT |
+| **Anonymous ID validation** | UUID format validation server-side (36 chars, regex) |
+| **Auth-replaces-anon** | When authenticated user votes, anonymous vote from same device is deleted |
 | **Comment rate limiting** | 5 comments/day per user, enforced in service layer |
 | **XSS prevention** | `html.EscapeString()` server-side; no `dangerouslySetInnerHTML` on frontend |
 | **Input validation** | Direction enum (1 or 2 only), content length (1-500 chars, trimmed) |
@@ -178,4 +180,34 @@ c23adc6 feat(proto): add gold_sentiment.proto for daily vote & comments
 
 | Date | Fix | Severity | Commit |
 |------|-----|----------|--------|
-| 2026-03-14 | Add Vietnamese diacritics (accent marks) to all 25 goldSentiment i18n keys in `vi/ui.json` | Minor | pending |
+| 2026-03-14 | Add Vietnamese diacritics (accent marks) to all 25 goldSentiment i18n keys in `vi/ui.json` | Minor | 94d4ff3 |
+| 2026-03-14 | Allow unauthenticated users to vote (anonymous voting with UUID dedup) | Enhancement | pending |
+
+### Anonymous Voting Enhancement (2026-03-14)
+
+**Changes:**
+- `CastGoldVote` endpoint moved from protected (`/api/v1/gold-sentiment/vote`) to public (`/api/v1/public/gold-sentiment/vote`)
+- Backend generates UUID for first-time anonymous voters, returns in `anonymousId` response field
+- Frontend stores UUID in localStorage (`gold_vote_anonymous_id`)
+- `api-client.ts` sends `X-Anonymous-ID` header globally on all requests
+- When authenticated user votes, any anonymous vote from same device is replaced
+- `GoldVote.UserID` changed to nullable `*int32` for anonymous votes
+- Partial unique indexes: `(user_id, vote_date) WHERE user_id IS NOT NULL` + `(anonymous_id, vote_date) WHERE anonymous_id IS NOT NULL`
+- Vote buttons enabled for all users on both landing and home pages
+- Login CTA changed from "login to vote" to "login to comment"
+- Comments still require authentication (no change)
+
+**Files modified:**
+- `api/protobuf/v1/gold_sentiment.proto` — added `anonymous_id` field, moved vote RPC to public route
+- `src/go-backend/domain/models/gold_vote.go` — `UserID` → `*int32`, added `AnonymousID *string`
+- `src/go-backend/cmd/migrate-gold-sentiment/main.go` — added nullable migration + partial indexes
+- `src/go-backend/domain/repository/interfaces.go` — 3 new methods on `GoldVoteRepository`
+- `src/go-backend/domain/repository/gold_vote_repository.go` — `UpsertAnonymous`, `GetByAnonymousIDAndDate`, `DeleteByAnonymousIDAndDate`
+- `src/go-backend/domain/service/interfaces.go` — updated signatures with `anonymousID string`
+- `src/go-backend/domain/service/gold_sentiment_service.go` — anonymous vote logic, UUID generation/validation
+- `src/go-backend/handlers/gold_sentiment.go` — reads `X-Anonymous-ID` header, optional auth for vote
+- `src/go-backend/handlers/routes.go` — moved vote to public group
+- `src/wj-client/utils/api-client.ts` — added `X-Anonymous-ID` header globally
+- `src/wj-client/components/GoldSentimentCard.tsx` — removed auth guard from voting, save anonymous ID on success
+- `src/wj-client/messages/en/ui.json` — updated `loginToVote`, added `loginToComment`
+- `src/wj-client/messages/vi/ui.json` — updated `loginToVote`, added `loginToComment`

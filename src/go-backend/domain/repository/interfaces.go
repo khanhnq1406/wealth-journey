@@ -394,6 +394,9 @@ type GoldVoteRepository interface {
 	Upsert(ctx context.Context, vote *models.GoldVote) error
 	GetByUserAndDate(ctx context.Context, userID int32, voteDate time.Time) (*models.GoldVote, error)
 	CountByDate(ctx context.Context, voteDate time.Time) (bullish int32, bearish int32, err error)
+	UpsertAnonymous(ctx context.Context, vote *models.GoldVote) error
+	GetByAnonymousIDAndDate(ctx context.Context, anonymousID string, voteDate time.Time) (*models.GoldVote, error)
+	DeleteByAnonymousIDAndDate(ctx context.Context, anonymousID string, voteDate time.Time) error
 }
 
 // GoldVoteCommentRepository handles gold sentiment comment persistence.

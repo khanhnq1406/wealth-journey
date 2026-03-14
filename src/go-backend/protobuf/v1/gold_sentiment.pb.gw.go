@@ -236,7 +236,7 @@ func RegisterGoldSentimentServiceHandlerServer(ctx context.Context, mux *runtime
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wealthjourney.v1.GoldSentimentService/CastGoldVote", runtime.WithHTTPPathPattern("/api/v1/gold-sentiment/vote"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/wealthjourney.v1.GoldSentimentService/CastGoldVote", runtime.WithHTTPPathPattern("/api/v1/public/gold-sentiment/vote"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -368,7 +368,7 @@ func RegisterGoldSentimentServiceHandlerClient(ctx context.Context, mux *runtime
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/wealthjourney.v1.GoldSentimentService/CastGoldVote", runtime.WithHTTPPathPattern("/api/v1/gold-sentiment/vote"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/wealthjourney.v1.GoldSentimentService/CastGoldVote", runtime.WithHTTPPathPattern("/api/v1/public/gold-sentiment/vote"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -421,7 +421,7 @@ func RegisterGoldSentimentServiceHandlerClient(ctx context.Context, mux *runtime
 var (
 	pattern_GoldSentimentService_GetGoldSentiment_0           = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "public", "gold-sentiment"}, ""))
 	pattern_GoldSentimentService_GetGoldSentimentComments_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "public", "gold-sentiment", "comments"}, ""))
-	pattern_GoldSentimentService_CastGoldVote_0               = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "gold-sentiment", "vote"}, ""))
+	pattern_GoldSentimentService_CastGoldVote_0               = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "public", "gold-sentiment", "vote"}, ""))
 	pattern_GoldSentimentService_PostGoldSentimentComment_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "gold-sentiment", "comments"}, ""))
 	pattern_GoldSentimentService_DeleteGoldSentimentComment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "gold-sentiment", "comments", "comment_id"}, ""))
 )

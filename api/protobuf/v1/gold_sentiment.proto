@@ -58,6 +58,7 @@ message CastGoldVoteResponse {
     int32 total_votes = 4 [json_name = "totalVotes"];
     double bullish_percentage = 5 [json_name = "bullishPercentage"];
     double bearish_percentage = 6 [json_name = "bearishPercentage"];
+    string anonymous_id = 7 [json_name = "anonymousId"];
 }
 
 message PostGoldSentimentCommentRequest {
@@ -87,9 +88,10 @@ service GoldSentimentService {
         };
     }
 
+    // Public: Cast or update vote (auth optional, anonymous voting supported)
     rpc CastGoldVote(CastGoldVoteRequest) returns (CastGoldVoteResponse) {
         option (google.api.http) = {
-            post: "/api/v1/gold-sentiment/vote"
+            post: "/api/v1/public/gold-sentiment/vote"
             body: "*"
         };
     }

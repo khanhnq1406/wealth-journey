@@ -34,16 +34,16 @@ func RegisterRoutes(
 	{
 		goldSentimentPublic.GET("", h.GoldSentiment.GetGoldSentiment)
 		goldSentimentPublic.GET("/comments", h.GoldSentiment.GetGoldSentimentComments)
+		goldSentimentPublic.POST("/vote", h.GoldSentiment.CastGoldVote)
 	}
 
-	// Gold Sentiment — Protected routes (auth required)
+	// Gold Sentiment — Protected routes (auth required for comments)
 	goldSentiment := v1.Group("/gold-sentiment")
 	if rateLimiter != nil {
 		goldSentiment.Use(appmiddleware.RateLimitByUser(rateLimiter))
 	}
 	goldSentiment.Use(AuthMiddleware(authSrv))
 	{
-		goldSentiment.POST("/vote", h.GoldSentiment.CastGoldVote)
 		goldSentiment.POST("/comments", h.GoldSentiment.PostGoldSentimentComment)
 		goldSentiment.DELETE("/comments/:comment_id", h.GoldSentiment.DeleteGoldSentimentComment)
 	}

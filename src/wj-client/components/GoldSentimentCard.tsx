@@ -75,7 +75,11 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
 
   // Mutations
   const castVoteMutation = useMutationCastGoldVote({
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Save anonymous ID if returned (anonymous vote)
+      if (data?.anonymousId) {
+        localStorage.setItem("gold_vote_anonymous_id", data.anonymousId);
+      }
       queryClient.invalidateQueries({
         queryKey: [EVENT_GoldSentimentGetGoldSentiment],
       });
@@ -108,10 +112,9 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
 
   const handleVote = useCallback(
     (direction: VoteDirection) => {
-      if (!isAuthenticated) return;
       castVoteMutation.mutate({ direction });
     },
-    [isAuthenticated, castVoteMutation],
+    [castVoteMutation],
   );
 
   const handlePostComment = useCallback(() => {
@@ -177,7 +180,7 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
         <button
           type="button"
           onClick={() => handleVote(VoteDirection.VOTE_DIRECTION_BULLISH)}
-          disabled={!isHome || !isAuthenticated || castVoteMutation.isPending}
+          disabled={castVoteMutation.isPending}
           className={`flex-1 flex items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-medium transition-all duration-200 ${
             userVote === VoteDirection.VOTE_DIRECTION_BULLISH
               ? "bg-green-600 text-white ring-2 ring-green-300 dark:ring-green-700"
@@ -193,7 +196,7 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
         <button
           type="button"
           onClick={() => handleVote(VoteDirection.VOTE_DIRECTION_BEARISH)}
-          disabled={!isHome || !isAuthenticated || castVoteMutation.isPending}
+          disabled={castVoteMutation.isPending}
           className={`flex-1 flex items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-medium transition-all duration-200 ${
             userVote === VoteDirection.VOTE_DIRECTION_BEARISH
               ? "bg-red-600 text-white ring-2 ring-red-300 dark:ring-red-700"
@@ -219,7 +222,7 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
             href="/auth/login"
             className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400 font-medium underline"
           >
-            {t("loginToVote")}
+            {t("loginToComment")}
           </Link>
         </div>
       )}
@@ -323,7 +326,7 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
         </div>
       )}
 
-      {/* Login prompt for home when not authenticated */}
+      {/* Login prompt for home when not authenticated — for commenting */}
       {isHome && !isAuthenticated && (
         <div className="mt-4 border-t border-neutral-200 dark:border-dark-border pt-4 text-center">
           <Link
@@ -333,7 +336,7 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
             {t("login")}
           </Link>
           <span className="text-sm text-neutral-500 dark:text-dark-text-secondary ml-1">
-            {t("loginToVote")}
+            {t("loginToComment")}
           </span>
         </div>
       )}

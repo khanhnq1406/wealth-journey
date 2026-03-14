@@ -31,11 +31,36 @@ func main() {
 }
 
 func migrateGoldSentiment(db *gorm.DB) error {
-	log.Println("Creating gold_vote table...")
+	log.Println("Creating/updating gold_vote table...")
 	if err := db.AutoMigrate(&models.GoldVote{}); err != nil {
-		return fmt.Errorf("failed to create gold_vote table: %w", err)
+		return fmt.Errorf("failed to migrate gold_vote table: %w", err)
 	}
-	log.Println("gold_vote table created")
+	log.Println("gold_vote table migrated")
+
+	// Make user_id nullable for anonymous votes
+	log.Println("Making user_id nullable...")
+	if err := db.Exec(`ALTER TABLE gold_vote ALTER COLUMN user_id DROP NOT NULL`).Error; err != nil {
+		log.Printf("Warning: user_id may already be nullable: %v", err)
+	}
+
+	// Add anonymous_id column if not exists
+	log.Println("Adding anonymous_id column...")
+	if err := db.Exec(`ALTER TABLE gold_vote ADD COLUMN IF NOT EXISTS anonymous_id VARCHAR(36)`).Error; err != nil {
+		log.Printf("Warning: anonymous_id column may already exist: %v", err)
+	}
+
+	// Drop old unique index (may not exist if fresh migration)
+	log.Println("Dropping old unique index...")
+	db.Exec(`DROP INDEX IF EXISTS idx_gold_vote_user_date`)
+
+	// Create partial unique indexes for deduplication
+	log.Println("Creating partial unique indexes...")
+	if err := db.Exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_gold_vote_user_date ON gold_vote(user_id, vote_date) WHERE user_id IS NOT NULL`).Error; err != nil {
+		return fmt.Errorf("failed to create user partial index: %w", err)
+	}
+	if err := db.Exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_gold_vote_anon_date ON gold_vote(anonymous_id, vote_date) WHERE anonymous_id IS NOT NULL`).Error; err != nil {
+		return fmt.Errorf("failed to create anonymous partial index: %w", err)
+	}
 
 	log.Println("Creating gold_vote_comment table...")
 	if err := db.AutoMigrate(&models.GoldVoteComment{}); err != nil {

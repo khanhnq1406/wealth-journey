@@ -74,6 +74,16 @@ export function invalidateAuthTokenCache(): void {
   tokenCacheExpired = true;
 }
 
+const ANONYMOUS_ID_KEY = "gold_vote_anonymous_id";
+
+/**
+ * Get anonymous ID from localStorage for anonymous vote deduplication
+ */
+function getAnonymousId(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(ANONYMOUS_ID_KEY);
+}
+
 /**
  * Build URL with base URL
  */
@@ -180,12 +190,14 @@ export const apiClient = {
   async get<T>(endpoint: string): Promise<ApiResponse<T>> {
     const url = buildUrl(endpoint);
     const token = getAuthToken();
+    const anonId = getAnonymousId();
 
     const options: RequestInit = {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
+        ...(anonId && { "X-Anonymous-ID": anonId }),
       },
     };
 
@@ -204,12 +216,14 @@ export const apiClient = {
   async post<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     const url = buildUrl(endpoint);
     const token = getAuthToken();
+    const anonId = getAnonymousId();
 
     const options: RequestInit = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
+        ...(anonId && { "X-Anonymous-ID": anonId }),
       },
       body: data ? JSON.stringify(data) : undefined,
     };
@@ -229,12 +243,14 @@ export const apiClient = {
   async put<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     const url = buildUrl(endpoint);
     const token = getAuthToken();
+    const anonId = getAnonymousId();
 
     const options: RequestInit = {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
+        ...(anonId && { "X-Anonymous-ID": anonId }),
       },
       body: data ? JSON.stringify(data) : undefined,
     };
@@ -254,12 +270,14 @@ export const apiClient = {
   async patch<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     const url = buildUrl(endpoint);
     const token = getAuthToken();
+    const anonId = getAnonymousId();
 
     const options: RequestInit = {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
+        ...(anonId && { "X-Anonymous-ID": anonId }),
       },
       body: data ? JSON.stringify(data) : undefined,
     };
@@ -279,12 +297,14 @@ export const apiClient = {
   async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
     const url = buildUrl(endpoint);
     const token = getAuthToken();
+    const anonId = getAnonymousId();
 
     const options: RequestInit = {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
+        ...(anonId && { "X-Anonymous-ID": anonId }),
       },
     };
 
@@ -309,11 +329,13 @@ export const apiClient = {
  */
 export default function fetcher(url: string, options?: RequestInit) {
   const token = getAuthToken();
+  const anonId = getAnonymousId();
   const updatedOptions: RequestInit = {
     ...options,
     headers: {
       ...options?.headers,
       ...(token && { Authorization: `Bearer ${token}` }),
+      ...(anonId && { "X-Anonymous-ID": anonId }),
     },
   };
   return fetch(buildUrl(url), updatedOptions);

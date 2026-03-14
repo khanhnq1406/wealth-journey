@@ -44,8 +44,9 @@ func (h *GoldSentimentHandler) tryGetUserID(c *gin.Context) int32 {
 // Public endpoint with optional auth for user_vote field.
 func (h *GoldSentimentHandler) GetGoldSentiment(c *gin.Context) {
 	userID := h.tryGetUserID(c)
+	anonymousID := c.GetHeader("X-Anonymous-ID")
 
-	result, err := h.service.GetSentiment(c.Request.Context(), userID)
+	result, err := h.service.GetSentiment(c.Request.Context(), userID, anonymousID)
 	if err != nil {
 		handler.HandleError(c, err)
 		return
@@ -76,14 +77,11 @@ func (h *GoldSentimentHandler) GetGoldSentimentComments(c *gin.Context) {
 	handler.Success(c, result)
 }
 
-// CastGoldVote creates or updates a user's vote for today.
-// Protected endpoint — requires auth.
+// CastGoldVote creates or updates a vote for today.
+// Public endpoint — auth optional, supports anonymous voting.
 func (h *GoldSentimentHandler) CastGoldVote(c *gin.Context) {
-	userID, ok := handler.GetUserID(c)
-	if !ok {
-		handler.Unauthorized(c, "User not authenticated")
-		return
-	}
+	userID := h.tryGetUserID(c)
+	anonymousID := c.GetHeader("X-Anonymous-ID")
 
 	var req v1.CastGoldVoteRequest
 	if err := handler.BindAndValidate(c, &req); err != nil {
@@ -91,7 +89,7 @@ func (h *GoldSentimentHandler) CastGoldVote(c *gin.Context) {
 		return
 	}
 
-	result, err := h.service.CastVote(c.Request.Context(), userID, &req)
+	result, err := h.service.CastVote(c.Request.Context(), userID, anonymousID, &req)
 	if err != nil {
 		handler.HandleError(c, err)
 		return

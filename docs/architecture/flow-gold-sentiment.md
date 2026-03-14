@@ -12,8 +12,8 @@ Daily gold sentiment voting and commenting flows. Public GET endpoints support o
 
 ## 1. Cast Vote
 
-**Trigger:** Authenticated user clicks bullish or bearish vote button
-**Endpoint:** `POST /api/v1/gold-sentiment/vote`
+**Trigger:** User (authenticated or anonymous) clicks bullish or bearish vote button
+**Endpoint:** `POST /api/v1/public/gold-sentiment/vote`
 **Source:** `domain/service/gold_sentiment_service.go`, `handlers/gold_sentiment.go`
 
 ```mermaid
@@ -24,10 +24,11 @@ sequenceDiagram
     participant VR as GoldVoteRepository
     participant R as Redis
 
-    SPA->>H: POST /api/v1/gold-sentiment/vote<br/>{direction: 1|2}
-    H->>H: GetUserID from JWT
+    SPA->>H: POST /api/v1/public/gold-sentiment/vote<br/>{direction: 1|2}<br/>Headers: Authorization (optional), X-Anonymous-ID (optional)
+    H->>H: tryGetUserID (optional auth)
+    H->>H: Read X-Anonymous-ID header
     H->>H: BindAndValidate request body
-    H->>GS: CastVote(userID, req)
+    H->>GS: CastVote(userID, anonymousID, req)
 
     activate GS
     GS->>GS: Validate direction (must be 1 or 2)
@@ -37,8 +38,22 @@ sequenceDiagram
     end
 
     GS->>GS: getTodayVietnam() → UTC+7 date
-    GS->>VR: Upsert(GoldVote{userID, voteDate, direction})
-    Note over VR: ON CONFLICT (user_id, vote_date)<br/>DO UPDATE SET direction
+
+    alt userID > 0 (Authenticated)
+        alt anonymousID provided
+            GS->>VR: DeleteByAnonymousIDAndDate(anonymousID, today)
+            Note over VR: Remove anonymous vote from same device
+        end
+        GS->>VR: Upsert(GoldVote{userID, voteDate, direction})
+        Note over VR: ON CONFLICT (user_id, vote_date)<br/>WHERE user_id IS NOT NULL<br/>DO UPDATE SET direction
+    else Anonymous
+        alt No anonymousID or invalid
+            GS->>GS: Generate new UUID
+        end
+        GS->>VR: UpsertAnonymous(GoldVote{anonymousID, voteDate, direction})
+        Note over VR: ON CONFLICT (anonymous_id, vote_date)<br/>WHERE anonymous_id IS NOT NULL<br/>DO UPDATE SET direction
+    end
+
     alt DB error
         VR-->>GS: Error
         GS-->>H: 500 Internal Error
@@ -55,21 +70,24 @@ sequenceDiagram
     deactivate GS
 
     GS-->>H: CastGoldVoteResponse
-    H-->>SPA: {success: true, direction, counts, percentages}
+    H-->>SPA: {success: true, direction, counts, percentages, anonymousId}
+    Note over SPA: If anonymousId present,<br/>save to localStorage
 ```
 
 **Key Invariants:**
 - Direction must be 1 (BULLISH) or 2 (BEARISH); 0 (UNSPECIFIED) is rejected
-- User can vote once per day (UNIQUE constraint), subsequent votes update direction
+- Public endpoint — no auth required, supports both authenticated and anonymous votes
+- Authenticated users: 1 vote/day via UNIQUE partial index `(user_id, vote_date) WHERE user_id IS NOT NULL`
+- Anonymous users: 1 vote/day per UUID via UNIQUE partial index `(anonymous_id, vote_date) WHERE anonymous_id IS NOT NULL`
+- When authenticated user votes, any anonymous vote from same device (same `X-Anonymous-ID`) is deleted
 - Vote date calculated in Vietnam timezone (UTC+7)
 - Redis cache invalidated after every vote to ensure fresh counts
-- User ID comes from JWT (never from request body)
+- Anonymous ID validated as UUID format (36 chars, regex)
 
 **Error Paths:**
 
 | Condition | Response | Rollback |
 |-----------|----------|----------|
-| Missing/invalid JWT | 401 Unauthorized | None |
 | Direction = 0 or > 2 | 400 Validation Error | None |
 | DB upsert failure | 500 Internal Error | None |
 
@@ -89,10 +107,11 @@ sequenceDiagram
     participant R as Redis
     participant VR as GoldVoteRepository
 
-    SPA->>H: GET /api/v1/public/gold-sentiment
+    SPA->>H: GET /api/v1/public/gold-sentiment<br/>Headers: Authorization (optional), X-Anonymous-ID (optional)
     H->>H: tryGetUserID(optional auth)
+    H->>H: Read X-Anonymous-ID header
     Note over H: Extract bearer token if present<br/>Verify via AuthService<br/>Return 0 if no token or invalid
-    H->>GS: GetSentiment(ctx, userID)
+    H->>GS: GetSentiment(ctx, userID, anonymousID)
 
     activate GS
     GS->>GS: getTodayVietnam() → UTC+7 date
@@ -108,8 +127,15 @@ sequenceDiagram
         GS->>R: Set("gold_sentiment:{date}", data, 30s TTL)
     end
 
-    alt userID > 0
+    alt userID > 0 (Authenticated)
         GS->>VR: GetByUserAndDate(userID, voteDate)
+        alt Vote found
+            VR-->>GS: GoldVote{direction}
+        else No vote
+            VR-->>GS: nil (userVote = 0)
+        end
+    else anonymousID present
+        GS->>VR: GetByAnonymousIDAndDate(anonymousID, voteDate)
         alt Vote found
             VR-->>GS: GoldVote{direction}
         else No vote
@@ -123,9 +149,10 @@ sequenceDiagram
 ```
 
 **Key Invariants:**
-- Public endpoint — no auth required, but auth is attempted for `userVote` field
+- Public endpoint — no auth required, but auth or `X-Anonymous-ID` is attempted for `userVote` field
 - Redis cache with 30s TTL prevents excessive DB queries
-- `userVote` is 0 (UNSPECIFIED) when not authenticated or no vote exists
+- `userVote` populated from auth (user_id lookup) or anonymous ID (anonymous_id lookup)
+- `userVote` is 0 (UNSPECIFIED) when neither authenticated nor anonymous ID present, or no vote exists
 - Cache stores only aggregate counts, not per-user data
 
 **Error Paths:**
