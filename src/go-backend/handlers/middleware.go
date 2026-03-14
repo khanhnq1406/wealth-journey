@@ -40,3 +40,20 @@ func AuthMiddleware(authSrv *auth.Server) gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+// AdminMiddleware checks that the authenticated user is an admin.
+// Must be used after AuthMiddleware in the middleware chain.
+func AdminMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		isAdmin, exists := c.Get("is_admin")
+		if !exists || !isAdmin.(bool) {
+			c.JSON(http.StatusForbidden, gin.H{
+				"success": false,
+				"message": "Admin access required",
+			})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
