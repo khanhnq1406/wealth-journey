@@ -234,7 +234,24 @@ Save to: `docs/specs/YYYY-MM-DD-<feature>-spec.md`
 **REQUIRED for any frontend/UI work:**
 - Follow **mobile-first design** — use `responsive-design` skill for Tailwind breakpoints and layout
 - Follow **ui-ux-pro-max** skill for design system, color palette, typography, accessibility, and component patterns
+- Follow **react-best-practices** skill for performance (no waterfalls, direct imports, dynamic imports for heavy components)
 - This app uses `sm:` at 800px (custom breakpoint) — always verify against `tailwind.config.ts`
+
+### Existing Component Inventory (REQUIRED)
+Before proposing new components, check what already exists and can be reused:
+
+| Need | Existing Component | Location |
+|------|--------------------|----------|
+| [describe need] | [component name or "NEW — create in features/<domain>/components/"] | [path] |
+
+**Shared components reference** (`components/`): BaseCard, Button, FormInput, FormSelect, FormNumberInput, FormDatePicker, FormToggle, FormTextarea, FormCreatableSelect, FormWizard, BaseModal, ConfirmationDialog, Success, MobileTable, TanStackTable, BarChart, LineChart, DonutChart, Sparkline, EmptyState, ErrorState, Toast, LoadingSpinner, FullPageLoading, Skeleton, BottomNav, ActiveLink, FloatingActionButton, SVG icons (components/icons/)
+
+**Image components**: `OptimizedImage` (blur placeholder + fallback), `Avatar` (pre-sized: xs/sm/md/lg/xl/full) — both from `components/OptimizedImage.tsx`. Use `next/image` directly for static assets.
+
+### New Components (if any)
+| Component | Location | Justification (why not reuse existing) |
+|-----------|----------|----------------------------------------|
+| [name] | `features/<domain>/components/` or `components/<category>/` | [reason] |
 
 ## Security & Risk Assessment
 
@@ -394,6 +411,49 @@ See `./implementer-prompt.md` for the full Playwright audit protocol.
 
 **Step N: Commit**
 ```
+
+### Frontend Task Template (For UI Tasks)
+
+For tasks involving frontend/UI work, include these additional steps:
+
+```markdown
+### Task N: [Frontend Component/Page Name]
+
+**Files:**
+- Create: `exact/path/to/file`
+- Modify: `exact/path/to/existing`
+
+**Security notes:** [Task-specific security concerns]
+
+**Step 0: Component inventory check**
+Search existing components before creating new ones:
+- [ ] Checked `components/` for reusable shared components
+- [ ] Checked `features/<domain>/components/` for feature components
+- [ ] Checked `components/icons/` for SVG icons (not emojis)
+- [ ] Checked `components/OptimizedImage.tsx` for image needs (OptimizedImage, Avatar)
+- Reusing: [list components to reuse]
+- Creating new: [list with justification]
+
+**Step 1: Write the failing test**
+[Component test with React Testing Library]
+
+**Step 2-4: [Standard TDD steps]**
+
+**Step 5: Responsive & accessibility check**
+- Mobile (375px): [verify no horizontal scroll, touch targets >= 44px]
+- Desktop (800px+): [verify sm: breakpoint layout]
+- Images: Use `next/image` / `OptimizedImage` / `Avatar` (not plain `<img>`)
+- Imports: Direct imports only (not barrel files)
+- Performance: No async waterfalls, dynamic import for heavy components
+
+**Step N-1: Playwright E2E Audit** [per implementer-prompt.md]
+**Step N: Commit**
+```
+
+**Required sub-skills for frontend tasks:**
+- `ui-ux-pro-max` — Design system, accessibility, component patterns
+- `responsive-design` — Mobile-first Tailwind, custom `sm:` breakpoint at 800px
+- `react-best-practices` — Performance (waterfalls, bundle size, re-renders)
 
 ### Task Granularity (TDD Enforced)
 
@@ -886,6 +946,9 @@ Use when ANY of these are true:
 - Missing audit logging for financial operations
 - No graceful degradation when external services fail
 - Implementing multi-step business logic without creating/updating runtime flow diagrams
+- Using plain `<img>` tags instead of `next/image` / `OptimizedImage` / `Avatar` without justification
+- Creating new components without checking if `components/` already has a suitable one
+- Barrel file imports instead of direct imports (bundle size impact)
 - Using the full fix pipeline for a one-line typo fix (use minor fix path)
 - Proceeding to the next task without committing the current task and updating the progress file
 - Proceeding to the next task without showing the user a summary
@@ -909,7 +972,7 @@ Use when ANY of these are true:
 - subagent-driven-development patterns (from subagent-driven-development skill)
 
 **Required sub-skills by context:**
-- **Any UI/frontend work** → `ui-ux-pro-max` skill (design system, color, typography, accessibility, component patterns) + `responsive-design` skill (mobile-first Tailwind breakpoints, container queries)
+- **Any UI/frontend work** → `ui-ux-pro-max` skill (design system, color, typography, accessibility, component patterns) + `responsive-design` skill (mobile-first Tailwind breakpoints, container queries) + `react-best-practices` skill (performance: waterfalls, bundle size, re-renders, next/image)
 - **C4 or architecture diagrams** → `c4-architecture` skill (Mermaid C4 syntax, element types, best practices)
 
 **Subagents should follow:**

@@ -43,6 +43,18 @@ Task tool (general-purpose):
     - [ ] No unnecessary re-renders (proper memoization if needed)
     - [ ] Proper error/loading state handling
 
+    ### Frontend Best Practices (react-best-practices + responsive-design)
+    - [ ] **Images**: Uses `next/image`, `OptimizedImage`, or `Avatar` — NOT plain `<img>` (unless user-uploaded content with unpredictable dimensions)
+    - [ ] **Imports**: Direct imports (`import { Button } from "@/components/Button"`) — NOT barrel file imports
+    - [ ] **Component reuse**: Shared components from `components/` reused (not recreated) — BaseCard, Button, Form*, Modal, etc.
+    - [ ] **Icons**: SVG from `components/icons/` — NOT emojis
+    - [ ] **Responsive**: Mobile-first styles (unprefixed = mobile), `sm:` breakpoint at 800px, 2-3 breakpoints max per property
+    - [ ] **Touch targets**: >= 44x44px on mobile, `cursor-pointer` on interactive elements
+    - [ ] **No async waterfalls**: Independent fetches use `Promise.all()`, not sequential await
+    - [ ] **Dynamic imports**: Heavy components (charts, large modals) use `next/dynamic`
+    - [ ] **Feature modules**: Feature-specific code in `features/<domain>/` — no cross-feature imports
+    - [ ] **Contrast**: Text contrast >= 4.5:1, hover/focus states visible
+
     ### Go Quality (Backend)
     - [ ] Error handling first (early returns)
     - [ ] Context propagation
