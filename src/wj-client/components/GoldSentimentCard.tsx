@@ -68,6 +68,7 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
   const [commentText, setCommentText] = useState("");
   const [page, setPage] = useState(1);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [toastType, setToastType] = useState<"success" | "error">("success");
 
   useEffect(() => {
     const authState = store.getState().setAuthReducer.isAuthenticated;
@@ -119,9 +120,9 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
     },
     onError: (error) => {
       if (error.message?.includes("comments per day")) {
-        showToast(t("dailyLimitReached", { count: 5 }));
+        showToast(t("dailyLimitReached", { count: 5 }), "error");
       } else {
-        showToast(error.message || "Failed to post comment");
+        showToast(error.message || "Failed to post comment", "error");
       }
     },
   });
@@ -134,14 +135,18 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
       });
     },
     onError: (error) => {
-      showToast(error.message || "Failed to delete comment");
+      showToast(error.message || "Failed to delete comment", "error");
     },
   });
 
-  const showToast = useCallback((message: string) => {
-    setToastMessage(message);
-    setTimeout(() => setToastMessage(null), 2500);
-  }, []);
+  const showToast = useCallback(
+    (message: string, type: "success" | "error" = "success") => {
+      setToastMessage(message);
+      setToastType(type);
+      setTimeout(() => setToastMessage(null), 2500);
+    },
+    [],
+  );
 
   const handleVote = useCallback(
     (direction: VoteDirection) => {
@@ -199,7 +204,13 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
     <BaseCard padding="md" mobileOptimized>
       {/* Toast notification */}
       {toastMessage && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-toast bg-neutral-800 dark:bg-neutral-700 text-white px-4 py-2 rounded-lg shadow-lg text-sm animate-fade-in">
+        <div
+          className={`fixed top-4 left-1/2 -translate-x-1/2 z-toast text-white px-4 py-2 rounded-lg shadow-lg text-sm animate-fade-in ${
+            toastType === "error"
+              ? "bg-red-600 dark:bg-red-700"
+              : "bg-neutral-800 dark:bg-neutral-700"
+          }`}
+        >
           {toastMessage}
         </div>
       )}
