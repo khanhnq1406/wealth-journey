@@ -89,7 +89,8 @@ Implemented a complete admin price override system that allows admin users to ma
 ## How to Test
 
 1. Run migration: `task backend:migrate-admin`
-2. Set a user as admin: `UPDATE "user" SET is_admin = true WHERE email = '<admin-email>';`
+2. Set a user as admin: `task backend:set-admin -- user@example.com`
+   - To revoke: `task backend:revoke-admin -- user@example.com`
 3. Start backend + frontend: `task dev`
 4. Log in as the admin user
 5. Navigate to `/dashboard/prices`

@@ -118,6 +118,18 @@ tasks:
     cmds:
       - go run cmd/migrate-admin/main.go
 
+  backend:set-admin:
+    desc: "Grant or revoke admin access for a user by email"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/set-admin/main.go -email={{.CLI_ARGS}}
+
+  backend:revoke-admin:
+    desc: "Revoke admin access for a user by email"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/set-admin/main.go -email={{.CLI_ARGS}} -revoke
+
   # Frontend tasks
   frontend:dev:
     desc: "Start frontend in development mode"
