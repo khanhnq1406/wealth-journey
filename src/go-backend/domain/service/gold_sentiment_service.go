@@ -175,6 +175,8 @@ func isValidUUID(s string) bool {
 	return len(s) == 36 && uuidRegex.MatchString(s)
 }
 
+const maxCommentFallbackDays = 7
+
 func (s *goldSentimentService) GetComments(ctx context.Context, userID int32, req *v1.GetGoldSentimentCommentsRequest) (*v1.GetGoldSentimentCommentsResponse, error) {
 	today := getTodayVietnam()
 
@@ -188,9 +190,25 @@ func (s *goldSentimentService) GetComments(ctx context.Context, userID int32, re
 	}
 	offset := (page - 1) * pageSize
 
-	comments, total, err := s.commentRepo.ListByDate(ctx, today, pageSize, offset)
+	// Try today first; if empty (page 1 only), fall back to recent days
+	commentDate := today
+	comments, total, err := s.commentRepo.ListByDate(ctx, commentDate, pageSize, offset)
 	if err != nil {
 		return nil, err
+	}
+
+	if total == 0 && page == 1 {
+		for i := 1; i <= maxCommentFallbackDays; i++ {
+			prevDay := today.AddDate(0, 0, -i)
+			comments, total, err = s.commentRepo.ListByDate(ctx, prevDay, pageSize, offset)
+			if err != nil {
+				return nil, err
+			}
+			if total > 0 {
+				commentDate = prevDay
+				break
+			}
+		}
 	}
 
 	// Get user vote directions for comment authors
@@ -209,8 +227,8 @@ func (s *goldSentimentService) GetComments(ctx context.Context, userID int32, re
 			item.UserPicture = c.User.Picture
 		}
 
-		// Get author's vote direction for today
-		vote, err := s.voteRepo.GetByUserAndDate(ctx, c.UserID, today)
+		// Get author's vote direction for that day
+		vote, err := s.voteRepo.GetByUserAndDate(ctx, c.UserID, commentDate)
 		if err == nil && vote != nil {
 			item.UserVoteDirection = v1.VoteDirection(vote.Direction)
 		}
@@ -219,10 +237,11 @@ func (s *goldSentimentService) GetComments(ctx context.Context, userID int32, re
 	}
 
 	return &v1.GetGoldSentimentCommentsResponse{
-		Comments:  items,
-		TotalCount: int32(total),
-		Page:      int32(page),
-		PageSize:  int32(pageSize),
+		Comments:    items,
+		TotalCount:  int32(total),
+		Page:        int32(page),
+		PageSize:    int32(pageSize),
+		CommentDate: commentDate.Format("2006-01-02"),
 	}, nil
 }
 

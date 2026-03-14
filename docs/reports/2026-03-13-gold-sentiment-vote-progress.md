@@ -8,8 +8,8 @@
 - **Started:** 2026-03-13
 - **Completed:** 2026-03-14
 - **Current state:** completed
-- **Total commits:** 9
-- **Files changed:** 31 (+4,998 lines)
+- **Total commits:** 10
+- **Files changed:** 31 (+4,998 lines, not counting fix commits)
 
 ---
 
@@ -181,7 +181,8 @@ c23adc6 feat(proto): add gold_sentiment.proto for daily vote & comments
 | Date | Fix | Severity | Commit |
 |------|-----|----------|--------|
 | 2026-03-14 | Add Vietnamese diacritics (accent marks) to all 25 goldSentiment i18n keys in `vi/ui.json` | Minor | 94d4ff3 |
-| 2026-03-14 | Allow unauthenticated users to vote (anonymous voting with UUID dedup) | Enhancement | pending |
+| 2026-03-14 | Allow unauthenticated users to vote (anonymous voting with UUID dedup) | Enhancement | bf35c0f |
+| 2026-03-14 | Improve mobile UI, add comment fallback to previous days, replace img with Avatar, add sentiment progress bar | Minor | pending |
 
 ### Anonymous Voting Enhancement (2026-03-14)
 
@@ -211,3 +212,30 @@ c23adc6 feat(proto): add gold_sentiment.proto for daily vote & comments
 - `src/wj-client/components/GoldSentimentCard.tsx` — removed auth guard from voting, save anonymous ID on success
 - `src/wj-client/messages/en/ui.json` — updated `loginToVote`, added `loginToComment`
 - `src/wj-client/messages/vi/ui.json` — updated `loginToVote`, added `loginToComment`
+
+### Mobile UI & Comment Fallback Fix (2026-03-14)
+
+**3 issues fixed + mobile UX polish:**
+
+1. **Comment fallback to previous days** — Backend `GetComments` now falls back up to 7 days when today has no comments (page 1 only). New `comment_date` proto field lets frontend show "Showing comments from [date]" label.
+
+2. **Replace `<img>` with Next.js `<Image>`** — Replaced raw `<img>` avatar with existing `Avatar` component (`features/community/components/Avatar.tsx`) which uses Next.js `Image` with `onError` fallback to gold-gradient initials.
+
+3. **Mobile UI improvements:**
+   - **Sentiment progress bar** — New horizontal green/red bar showing bullish vs bearish proportion with animated transitions
+   - **Touch optimization** — `touch-action: manipulation` on vote buttons, send button, delete button, load more (eliminates 300ms tap delay)
+   - **Vote buttons** — `select-none` prevents text selection, `active:` states replace `hover:` for mobile, bolder arrow icons (strokeWidth 2.5), `tabular-nums` on percentages, subtle `shadow-sm` for selected state
+   - **Auto-growing textarea** — Starts as 1 row, grows to max 120px as user types (ref-based resize)
+   - **Send button → icon-only** — Arrow-up icon with loading spinner (saves horizontal space)
+   - **Character counter** — Only shows when typing, `123/500` format instead of "X remaining"
+   - **Comment rows** — Tighter `gap-2`, responsive username truncate (`max-w-[120px]` mobile → `max-w-[180px]` desktop), delete button hidden on desktop until hover via `group/comment`
+   - **Spacing** — Uniform `mb-2.5` / `my-2.5` for denser mobile card
+   - **Empty state** — Split into two lines with different visual weights
+
+**Files modified:**
+- `api/protobuf/v1/gold_sentiment.proto` — added `comment_date` field (5) to `GetGoldSentimentCommentsResponse`
+- `src/go-backend/domain/service/gold_sentiment_service.go` — 7-day fallback logic in `GetComments`
+- `src/wj-client/components/GoldSentimentCard.tsx` — full mobile UX rewrite (447 lines)
+- `src/wj-client/messages/en/ui.json` — added `commentsFrom` key
+- `src/wj-client/messages/vi/ui.json` — added `commentsFrom` key
+- Plus regenerated proto files (Go + TypeScript + hooks)

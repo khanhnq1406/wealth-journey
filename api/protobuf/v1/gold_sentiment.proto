@@ -45,6 +45,9 @@ message GetGoldSentimentCommentsResponse {
     int32 total_count = 2 [json_name = "totalCount"];
     int32 page = 3 [json_name = "page"];
     int32 page_size = 4 [json_name = "pageSize"];
+    // The date these comments belong to (YYYY-MM-DD). May differ from today if
+    // today has no comments and the backend fell back to a recent day.
+    string comment_date = 5 [json_name = "commentDate"];
 }
 
 message CastGoldVoteRequest {

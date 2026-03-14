@@ -91,6 +91,11 @@ export interface GetGoldSentimentCommentsResponse {
   totalCount: number;
   page: number;
   pageSize: number;
+  /**
+   * The date these comments belong to (YYYY-MM-DD). May differ from today if
+   * today has no comments and the backend fell back to a recent day.
+   */
+  commentDate: string;
 }
 
 export interface CastGoldVoteRequest {
@@ -643,7 +648,7 @@ export const GoldSentimentCommentItem: MessageFns<GoldSentimentCommentItem> = {
 };
 
 function createBaseGetGoldSentimentCommentsResponse(): GetGoldSentimentCommentsResponse {
-  return { comments: [], totalCount: 0, page: 0, pageSize: 0 };
+  return { comments: [], totalCount: 0, page: 0, pageSize: 0, commentDate: "" };
 }
 
 export const GetGoldSentimentCommentsResponse: MessageFns<GetGoldSentimentCommentsResponse> = {
@@ -659,6 +664,9 @@ export const GetGoldSentimentCommentsResponse: MessageFns<GetGoldSentimentCommen
     }
     if (message.pageSize !== 0) {
       writer.uint32(32).int32(message.pageSize);
+    }
+    if (message.commentDate !== "") {
+      writer.uint32(42).string(message.commentDate);
     }
     return writer;
   },
@@ -702,6 +710,14 @@ export const GetGoldSentimentCommentsResponse: MessageFns<GetGoldSentimentCommen
           message.pageSize = reader.int32();
           continue;
         }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.commentDate = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -727,6 +743,11 @@ export const GetGoldSentimentCommentsResponse: MessageFns<GetGoldSentimentCommen
         : isSet(object.page_size)
         ? globalThis.Number(object.page_size)
         : 0,
+      commentDate: isSet(object.commentDate)
+        ? globalThis.String(object.commentDate)
+        : isSet(object.comment_date)
+        ? globalThis.String(object.comment_date)
+        : "",
     };
   },
 
@@ -744,6 +765,9 @@ export const GetGoldSentimentCommentsResponse: MessageFns<GetGoldSentimentCommen
     if (message.pageSize !== 0) {
       obj.pageSize = Math.round(message.pageSize);
     }
+    if (message.commentDate !== "") {
+      obj.commentDate = message.commentDate;
+    }
     return obj;
   },
 
@@ -756,6 +780,7 @@ export const GetGoldSentimentCommentsResponse: MessageFns<GetGoldSentimentCommen
     message.totalCount = object.totalCount ?? 0;
     message.page = object.page ?? 0;
     message.pageSize = object.pageSize ?? 0;
+    message.commentDate = object.commentDate ?? "";
     return message;
   },
 };

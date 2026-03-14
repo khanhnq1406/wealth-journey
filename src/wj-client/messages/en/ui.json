@@ -392,6 +392,7 @@
     "hoursAgo": "{count}h ago",
     "daysAgo": "{count}d ago",
     "comments": "Comments",
+    "commentsFrom": "Showing comments from {date}",
     "dailyLimitReached": "You've reached the {count} comments/day limit"
   },
   "landingErrorBoundary": {

@@ -392,6 +392,7 @@
     "hoursAgo": "{count} giờ trước",
     "daysAgo": "{count} ngày trước",
     "comments": "Bình luận",
+    "commentsFrom": "Bình luận từ ngày {date}",
     "dailyLimitReached": "Bạn đã đạt giới hạn {count} bình luận/ngày"
   },
   "landingErrorBoundary": {
