@@ -5,7 +5,7 @@
 - **Plan file:** docs/plans/2026-03-15-rebrand-and-ui-improvements-plan.md
 - **Spec file:** docs/specs/2026-03-15-rebrand-and-ui-improvements-spec.md
 - **Started:** 2026-03-15
-- **Last updated:** 2026-03-15
+- **Last updated:** 2026-03-15T23:59:00
 - **Current state:** completed
 - **Current task:** done
 
@@ -17,6 +17,8 @@
 | 2 | Rebrand dashboard layout (sidebar, header, mobile menu) | done | 5e6c86c | W→C, WealthJourney→congdongvang.com in sidebar, mobile header, mobile menu |
 | 3 | Optimize price tables for mobile | done | 1fb8ab0 | Responsive padding/fonts/tracking on all 3 price tables, table-fixed layout |
 | 4 | Enhance FAB — Add Wallet + Desktop visibility | done | ce74542 | Removed sm:hidden, responsive positioning, Add Wallet action + modal |
+| 5 | Extended rebrand — translations (EN+VI) | done | a9b6b12 | 10 translation files: auth, common, nav, report, ui in both en/ and vi/ |
+| 6 | Extended rebrand — auth, landing, components, tests, config, docs, SQL | done | 967871b | 36 files: auth pages, landing page+metadata+URLs, components, report exports, tests, config, READMEs, SQL headers |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
@@ -31,6 +33,9 @@ To resume this implementation in a new session:
 
 ## Notes
 
-- Tasks 1 and 3 are independent (different files) — can run in parallel
-- Tasks 2 and 4 both modify dashboard/layout.tsx — must be sequential
-- Task 4 is blocked by Task 2
+- Tasks 1 and 3 are independent (different files) — ran in parallel
+- Tasks 2 and 4 both modify dashboard/layout.tsx — ran sequentially
+- Task 4 was blocked by Task 2
+- Tasks 5-6: Extended rebrand requested by user to cover ALL remaining "WealthJourney" references project-wide
+- Final grep verified 0 remaining "WealthJourney" references in src/
+- TypeScript compilation passed after all changes
