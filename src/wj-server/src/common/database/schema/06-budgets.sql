@@ -1,5 +1,5 @@
 -- ============================================================================
--- WealthJourney Budgets Table
+-- congdongvang.com Budgets Table
 -- ============================================================================
 -- This table stores budget plans for expense tracking
 -- Aligned with API Communication Guide improvements

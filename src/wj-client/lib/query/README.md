@@ -1,6 +1,6 @@
 # React Query Cache Configuration
 
-Centralized caching strategies for WealthJourney's data fetching layer, implementing best practices from the UI/UX optimization plan.
+Centralized caching strategies for congdongvang.com's data fetching layer, implementing best practices from the UI/UX optimization plan.
 
 ## Quick Start
 
@@ -148,7 +148,7 @@ After implementing cache configurations:
 
 - [UI/UX Optimization Plan](../../../docs/UI_UX_OPTIMIZATION_PLAN.md) - Section 3.4
 - [React Query Docs](https://tanstack.com/query/latest)
-- [WealthJourney CLAUDE.md](../../../.claude/CLAUDE.md)
+- [congdongvang.com CLAUDE.md](../../../.claude/CLAUDE.md)
 
 ## Contributing
 

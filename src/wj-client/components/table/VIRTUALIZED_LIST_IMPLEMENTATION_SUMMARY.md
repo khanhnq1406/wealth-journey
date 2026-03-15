@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document summarizes the implementation of the virtualized transaction list component for the WealthJourney Personal Financial Management application, as specified in section 3.2 of the UI/UX Optimization Plan.
+This document summarizes the implementation of the virtualized transaction list component for the congdongvang.com Personal Financial Management application, as specified in section 3.2 of the UI/UX Optimization Plan.
 
 ## Implementation Details
 

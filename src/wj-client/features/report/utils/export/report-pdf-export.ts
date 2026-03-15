@@ -117,8 +117,8 @@ export interface ReportExportTranslations {
   changePercent?: string; // "Change %"
   pageNumber?: string; // Pre-resolved, e.g. "Page 1 of 3" — set per-page at render time
   generatedOn?: string; // Pre-resolved, e.g. "Generated on 3/6/2026"
-  brandFooter?: string; // "WealthJourney Financial Report"
-  workbookCreator?: string; // "WealthJourney Financial Reports"
+  brandFooter?: string; // "congdongvang.com Financial Report"
+  workbookCreator?: string; // "congdongvang.com Financial Reports"
 }
 
 /**
@@ -636,7 +636,7 @@ function addFooter(pdf: jsPDF, translations?: ReportExportTranslations): void {
     pdf.text(generatedText, LAYOUT.margin, pageHeight - 7);
 
     // Brand text
-    const brandText = translations?.brandFooter ?? "WealthJourney Financial Report";
+    const brandText = translations?.brandFooter ?? "congdongvang.com Financial Report";
     const brandTextWidth = pdf.getTextWidth(brandText);
     pdf.text(
       brandText,

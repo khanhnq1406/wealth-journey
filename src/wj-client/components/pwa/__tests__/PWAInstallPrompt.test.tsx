@@ -21,7 +21,7 @@ describe('PWAInstallPrompt', () => {
     render(<PWAInstallPrompt showDelay={0} />);
 
     // Wait for prompt to appear
-    await screen.findByText('Install WealthJourney');
+    await screen.findByText('Install congdongvang.com');
 
     expect(screen.getByText(/Get the full app experience/i)).toBeInTheDocument();
   });

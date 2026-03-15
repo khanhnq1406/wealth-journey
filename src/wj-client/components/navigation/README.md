@@ -2,7 +2,7 @@
 
 ## Overview
 
-WealthJourney's navigation system provides a responsive, accessible navigation experience across all device sizes. The system automatically switches between desktop sidebar navigation and mobile menu navigation based on screen size.
+congdongvang.com's navigation system provides a responsive, accessible navigation experience across all device sizes. The system automatically switches between desktop sidebar navigation and mobile menu navigation based on screen size.
 
 ## Desktop Navigation (Collapsible Sidebar)
 

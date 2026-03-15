@@ -1,7 +1,7 @@
 -- ============================================================================
--- WealthJourney Database Initialization Script
+-- congdongvang.com Database Initialization Script
 -- ============================================================================
--- This script sets up the complete database schema for the WealthJourney
+-- This script sets up the complete database schema for the congdongvang.com
 -- Personal Financial Management application.
 --
 -- Version: 2.0.0

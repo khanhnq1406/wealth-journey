@@ -1,7 +1,7 @@
 -- ============================================================================
--- WealthJourney Database Initialization
+-- congdongvang.com Database Initialization
 -- ============================================================================
--- This script initializes the WealthJourney database with proper character set
+-- This script initializes the congdongvang.com database with proper character set
 -- and collation for full Unicode support.
 -- ============================================================================
 

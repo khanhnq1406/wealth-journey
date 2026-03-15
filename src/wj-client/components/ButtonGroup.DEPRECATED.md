@@ -8,7 +8,7 @@
 
 ## Why is ButtonGroup deprecated?
 
-The `ButtonGroup` component has several issues that violate the WealthJourney Design System:
+The `ButtonGroup` component has several issues that violate the congdongvang.com Design System:
 
 1. **Old Redux Pattern**: Uses global Redux state for modal management instead of component-level state
 2. **Image Icons**: Uses PNG images instead of SVG icons (not scalable, poor for dark mode)

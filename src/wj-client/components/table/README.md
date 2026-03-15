@@ -1,6 +1,6 @@
 # Table Components
 
-This directory contains reusable table components for the WealthJourney application, including support for both regular tables and high-performance virtualized lists.
+This directory contains reusable table components for the congdongvang.com application, including support for both regular tables and high-performance virtualized lists.
 
 ## Components
 

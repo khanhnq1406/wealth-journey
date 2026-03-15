@@ -1,7 +1,7 @@
 /**
  * React Query Cache Configuration
  *
- * Centralized cache strategies for different data types in WealthJourney.
+ * Centralized cache strategies for different data types in congdongvang.com.
  * Implements UI/UX optimization plan section 3.4: Data Fetching Optimization.
  *
  * @see docs/UI_UX_OPTIMIZATION_PLAN.md - Section 3.4

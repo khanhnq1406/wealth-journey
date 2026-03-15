@@ -184,7 +184,7 @@ describe("generateReportExcel", () => {
 
     expect(workbook).toBeDefined();
     expect(workbook.worksheets.length).toBeGreaterThan(0);
-    expect(workbook.creator).toBe("WealthJourney Financial Reports");
+    expect(workbook.creator).toBe("congdongvang.com Financial Reports");
     expect(workbook.worksheets[0].name).toBe("Summary");
   });
 

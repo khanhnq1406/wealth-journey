@@ -492,7 +492,7 @@ export function generateReportExcel(
   const workbook = new ExcelJS.Workbook();
 
   // Set workbook properties
-  workbook.creator = translations?.workbookCreator ?? "WealthJourney Financial Reports";
+  workbook.creator = translations?.workbookCreator ?? "congdongvang.com Financial Reports";
   workbook.created = new Date();
   workbook.modified = new Date();
 

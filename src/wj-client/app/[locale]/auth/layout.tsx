@@ -13,7 +13,7 @@ export default async function AuthLayout({
           <div className="flex gap-2">
             <img className="w-[80px] h-[80px]" src="/logo.svg" alt="Logo" />
             <div className="text-white">
-              <p className="font-extrabold text-[30px]">WealthJourney</p>
+              <p className="font-extrabold text-[30px]">congdongvang.com</p>
               <p>{t("tagline")}</p>
             </div>
           </div>

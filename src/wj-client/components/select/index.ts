@@ -1,5 +1,5 @@
 /**
- * Select components for the WealthJourney application.
+ * Select components for the congdongvang.com application.
  *
  * This module exports reusable select/dropdown components with various features:
  * - Select: Basic select with custom render support

@@ -1,5 +1,5 @@
 -- ============================================================================
--- WealthJourney Users Table
+-- congdongvang.com Users Table
 -- ============================================================================
 -- This table stores user account information including OAuth data
 -- Aligned with API Communication Guide improvements

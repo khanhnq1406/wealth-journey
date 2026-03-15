@@ -1,7 +1,7 @@
 import type { StorybookConfig } from "@storybook/nextjs";
 
 /**
- * Storybook Configuration for WealthJourney
+ * Storybook Configuration for congdongvang.com
  *
  * Configured for Next.js 15 with:
  * - TypeScript support

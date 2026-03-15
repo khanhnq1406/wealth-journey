@@ -80,7 +80,7 @@ export default function Register() {
             </svg>
           </div>
           <span className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-dark-text">
-            WealthJourney
+            congdongvang.com
           </span>
         </Link>
       </div>

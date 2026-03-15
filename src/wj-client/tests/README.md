@@ -1,6 +1,6 @@
 # E2E Testing with Playwright
 
-This directory contains end-to-end tests for the WealthJourney application using Playwright.
+This directory contains end-to-end tests for the congdongvang.com application using Playwright.
 
 ## Setup
 

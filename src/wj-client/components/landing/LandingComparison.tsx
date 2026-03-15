@@ -122,7 +122,7 @@ export default function LandingComparison() {
                     </span>
                     <div>
                       <div className="text-xs font-semibold text-v2-red-primary mb-1">
-                        WealthJourney
+                        congdongvang.com
                       </div>
                       <div className="text-sm text-gray-700">
                         {t(`items.${item.key}.wj`)}
