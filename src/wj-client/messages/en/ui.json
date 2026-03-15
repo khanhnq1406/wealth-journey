@@ -188,7 +188,7 @@
   },
   "pwa": {
     "installPrompt": {
-      "title": "Install WealthJourney",
+      "title": "Install congdongvang.com",
       "description": "Get the full app experience with faster loading, offline access, and home screen convenience.",
       "installButton": "Install",
       "dismissButton": "Not now",
@@ -211,10 +211,10 @@
       "iosTapAdd": "Tap",
       "iosAdd": "Add",
       "iosToConfirm": "to confirm",
-      "androidDescription": "You can install WealthJourney directly to your home screen for a native app experience.",
-      "androidInstallButton": "Install WealthJourney",
+      "androidDescription": "You can install congdongvang.com directly to your home screen for a native app experience.",
+      "androidInstallButton": "Install congdongvang.com",
       "androidOr": "Or tap the menu (⋮) and select \"Add to Home screen\"",
-      "genericInstallTitle": "To install WealthJourney as an app:",
+      "genericInstallTitle": "To install congdongvang.com as an app:",
       "genericStep1": "Open this website in Chrome or Safari",
       "genericStep2": "Use the browser menu to add to home screen"
     }
