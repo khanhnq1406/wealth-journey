@@ -264,17 +264,17 @@ export default function DashboardLayout({
                 >
                   <div className="w-[38px] h-[38px] bg-v2-red-primary rounded-[10px] flex items-center justify-center">
                     <span className="text-white font-vietnam font-bold text-[18px]">
-                      W
+                      C
                     </span>
                   </div>
-                  <h1 className="text-v2-text-primary font-vietnam font-bold text-[19px]">
-                    WealthJourney
+                  <h1 className="text-v2-text-primary font-vietnam font-bold text-[16px]">
+                    congdongvang.com
                   </h1>
                 </div>
                 {!isExpanded && (
                   <div className="w-[38px] h-[38px] bg-v2-red-primary rounded-[10px] flex items-center justify-center mx-auto animate-scale-in">
                     <span className="text-white font-vietnam font-bold text-[18px]">
-                      W
+                      C
                     </span>
                   </div>
                 )}
@@ -472,11 +472,11 @@ export default function DashboardLayout({
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-v2-red-primary rounded-[8px] flex items-center justify-center">
                     <span className="text-white font-vietnam font-bold text-[14px]">
-                      W
+                      C
                     </span>
                   </div>
-                  <span className="font-vietnam font-bold text-[16px] text-v2-text-primary">
-                    WealthJourney
+                  <span className="font-vietnam font-bold text-[14px] text-v2-text-primary">
+                    congdongvang.com
                   </span>
                 </div>
 
@@ -526,11 +526,11 @@ export default function DashboardLayout({
                     <div className="flex items-center gap-3">
                       <div className="w-[38px] h-[38px] bg-v2-red-primary rounded-[10px] flex items-center justify-center">
                         <span className="text-white font-vietnam font-bold text-[18px]">
-                          W
+                          C
                         </span>
                       </div>
                       <span className="text-v2-text-primary font-vietnam font-bold text-lg">
-                        WealthJourney
+                        congdongvang.com
                       </span>
                     </div>
                     <button
