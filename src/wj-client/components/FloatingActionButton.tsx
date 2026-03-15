@@ -35,7 +35,7 @@ export function FloatingActionButton({ actions }: FABProps) {
       {/* Backdrop when expanded */}
       <div
         className={cn(
-          "fixed inset-0 bg-neutral-900/20 sm:hidden transition-opacity duration-300",
+          "fixed inset-0 bg-neutral-900/20 transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none",
         )}
         style={{ zIndex: ZIndex.floating }}
@@ -43,9 +43,9 @@ export function FloatingActionButton({ actions }: FABProps) {
         aria-hidden="true"
       />
 
-      {/* FAB Container - only visible on mobile */}
+      {/* FAB Container */}
       <div
-        className="fixed right-3 sm:hidden flex items-end"
+        className="fixed right-3 sm:right-6 sm:!bottom-6 flex items-end"
         style={{
           zIndex: ZIndex.floating + 1,
           bottom: "calc(env(safe-area-inset-bottom, 0px) + 70px)",

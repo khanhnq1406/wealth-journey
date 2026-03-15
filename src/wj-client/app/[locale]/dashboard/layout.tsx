@@ -17,6 +17,7 @@ import { ZIndex } from "@/lib/utils/z-index";
 import { BaseModal } from "@/components/modals/BaseModal";
 import { AddTransactionForm } from "@/features/transaction/forms/AddTransactionForm";
 import { TransferMoneyForm } from "@/features/wallet/forms/TransferMoneyForm";
+import { CreateWalletForm } from "@/features/wallet/forms/CreateWalletForm";
 import { useSidebarState } from "@/hooks/useSidebarState";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { SidebarToggle } from "@/components/navigation/SidebarToggle";
@@ -673,6 +674,13 @@ export default function DashboardLayout({
                 setModalType(ModalType.TRANSFER_MONEY);
               },
             },
+            {
+              label: tQuickActions("createNewWallet"),
+              icon: <Wallet className="w-6 h-6" />,
+              onClick: () => {
+                setModalType(ModalType.CREATE_WALLET);
+              },
+            },
           ]}
         />
 
@@ -691,6 +699,13 @@ export default function DashboardLayout({
           )}
           {modalType === ModalType.TRANSFER_MONEY && (
             <TransferMoneyForm
+              onSuccess={() => {
+                setModalType(null);
+              }}
+            />
+          )}
+          {modalType === ModalType.CREATE_WALLET && (
+            <CreateWalletForm
               onSuccess={() => {
                 setModalType(null);
               }}
