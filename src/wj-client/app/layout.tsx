@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "WealthJourney",
+  title: "congdongvang.com",
   description:
-    "Welcome to WealthJourney - Your Trusted Guide to Financial Freedom",
+    "congdongvang.com - Theo dõi giá vàng & quản lý tài chính",
   icons: {
     icon: "/logo.svg",
     apple: "/icons/apple-touch-icon.png",
@@ -18,17 +18,17 @@ export const metadata: Metadata = {
     viewportFit: "cover",
     interactiveWidget: "resizes-content",
   },
-  applicationName: "WealthJourney",
+  applicationName: "congdongvang.com",
   appleWebApp: {
     capable: true,
-    title: "WealthJourney",
+    title: "congdongvang.com",
     statusBarStyle: "black-translucent",
   },
   formatDetection: {
     telephone: false,
   },
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#B91C1C" },
+    { media: "(prefers-color-scheme: light)", color: "#d2a74b" },
     { media: "(prefers-color-scheme: dark)", color: "#0F172A" },
   ],
 };

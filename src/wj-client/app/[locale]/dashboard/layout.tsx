@@ -17,6 +17,7 @@ import { ZIndex } from "@/lib/utils/z-index";
 import { BaseModal } from "@/components/modals/BaseModal";
 import { AddTransactionForm } from "@/features/transaction/forms/AddTransactionForm";
 import { TransferMoneyForm } from "@/features/wallet/forms/TransferMoneyForm";
+import { CreateWalletForm } from "@/features/wallet/forms/CreateWalletForm";
 import { useSidebarState } from "@/hooks/useSidebarState";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { SidebarToggle } from "@/components/navigation/SidebarToggle";
@@ -262,21 +263,25 @@ export default function DashboardLayout({
                       : "opacity-0 w-0 overflow-hidden scale-95 -translate-x-2",
                   )}
                 >
-                  <div className="w-[38px] h-[38px] bg-v2-red-primary rounded-[10px] flex items-center justify-center">
-                    <span className="text-white font-vietnam font-bold text-[18px]">
-                      W
-                    </span>
-                  </div>
-                  <h1 className="text-v2-text-primary font-vietnam font-bold text-[19px]">
-                    WealthJourney
+                  <NextImage
+                    src="/logo.svg"
+                    alt="congdongvang.com"
+                    width={38}
+                    height={38}
+                    className="rounded-[10px]"
+                  />
+                  <h1 className="text-v2-text-primary font-vietnam font-bold text-[16px]">
+                    congdongvang.com
                   </h1>
                 </div>
                 {!isExpanded && (
-                  <div className="w-[38px] h-[38px] bg-v2-red-primary rounded-[10px] flex items-center justify-center mx-auto animate-scale-in">
-                    <span className="text-white font-vietnam font-bold text-[18px]">
-                      W
-                    </span>
-                  </div>
+                  <NextImage
+                    src="/logo.svg"
+                    alt="congdongvang.com"
+                    width={38}
+                    height={38}
+                    className="rounded-[10px] mx-auto animate-scale-in"
+                  />
                 )}
               </div>
             </div>
@@ -470,13 +475,15 @@ export default function DashboardLayout({
               <div className="flex items-center justify-between px-4 py-3">
                 {/* Logo area */}
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-v2-red-primary rounded-[8px] flex items-center justify-center">
-                    <span className="text-white font-vietnam font-bold text-[14px]">
-                      W
-                    </span>
-                  </div>
-                  <span className="font-vietnam font-bold text-[16px] text-v2-text-primary">
-                    WealthJourney
+                  <NextImage
+                    src="/logo.svg"
+                    alt="congdongvang.com"
+                    width={32}
+                    height={32}
+                    className="rounded-[8px]"
+                  />
+                  <span className="font-vietnam font-bold text-[14px] text-v2-text-primary">
+                    congdongvang.com
                   </span>
                 </div>
 
@@ -524,13 +531,15 @@ export default function DashboardLayout({
                   {/* Close Button */}
                   <div className="flex items-center justify-between p-4 border-b border-v2-border-light">
                     <div className="flex items-center gap-3">
-                      <div className="w-[38px] h-[38px] bg-v2-red-primary rounded-[10px] flex items-center justify-center">
-                        <span className="text-white font-vietnam font-bold text-[18px]">
-                          W
-                        </span>
-                      </div>
+                      <NextImage
+                        src="/logo.svg"
+                        alt="congdongvang.com"
+                        width={38}
+                        height={38}
+                        className="rounded-[10px]"
+                      />
                       <span className="text-v2-text-primary font-vietnam font-bold text-lg">
-                        WealthJourney
+                        congdongvang.com
                       </span>
                     </div>
                     <button
@@ -673,6 +682,13 @@ export default function DashboardLayout({
                 setModalType(ModalType.TRANSFER_MONEY);
               },
             },
+            {
+              label: tQuickActions("createNewWallet"),
+              icon: <Wallet className="w-6 h-6" />,
+              onClick: () => {
+                setModalType(ModalType.CREATE_WALLET);
+              },
+            },
           ]}
         />
 
@@ -691,6 +707,13 @@ export default function DashboardLayout({
           )}
           {modalType === ModalType.TRANSFER_MONEY && (
             <TransferMoneyForm
+              onSuccess={() => {
+                setModalType(null);
+              }}
+            />
+          )}
+          {modalType === ModalType.CREATE_WALLET && (
+            <CreateWalletForm
               onSuccess={() => {
                 setModalType(null);
               }}

@@ -1,5 +1,5 @@
 -- ============================================================================
--- WealthJourney Transactions Table
+-- congdongvang.com Transactions Table
 -- ============================================================================
 -- This table stores financial transaction records
 -- Aligned with API Communication Guide improvements

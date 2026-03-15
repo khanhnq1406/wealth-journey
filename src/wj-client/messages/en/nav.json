@@ -172,11 +172,11 @@
       "step5TitleAlt": "Export & Analyze"
     },
     "comparison": {
-      "sectionTitle": "Why WealthJourney?",
+      "sectionTitle": "Why congdongvang.com?",
       "title": "Stop Juggling Multiple Apps",
-      "description": "Most investors use Coinbase for crypto, Robinhood for stocks, spreadsheets for gold, and another app for budgets. WealthJourney gives you everything in one unified platform with powerful tools you'll love.",
+      "description": "Most investors use Coinbase for crypto, Robinhood for stocks, spreadsheets for gold, and another app for budgets. congdongvang.com gives you everything in one unified platform with powerful tools you'll love.",
       "feature": "Feature",
-      "wealthJourney": "WealthJourney",
+      "wealthJourney": "congdongvang.com",
       "others": "Others",
       "otherApps": "Other Apps",
       "items": {
@@ -219,12 +219,12 @@
     },
     "testimonials": {
       "sectionTitle": "What Our Users Say",
-      "sectionSubtitle": "Join thousands of users who trust WealthJourney for their financial management needs",
+      "sectionSubtitle": "Join thousands of users who trust congdongvang.com for their financial management needs",
       "items": {
         "user1": {
           "name": "Nguyễn Văn A",
           "role": "Investment Enthusiast",
-          "content": "WealthJourney has transformed how I track my investment portfolio. The FIFO cost basis tracking and real-time PNL calculations help me make informed decisions about my stock holdings."
+          "content": "congdongvang.com has transformed how I track my investment portfolio. The FIFO cost basis tracking and real-time PNL calculations help me make informed decisions about my stock holdings."
         },
         "user2": {
           "name": "Trần Thị B",
@@ -253,12 +253,12 @@
       "analytics": "Analytics"
     },
     "footer": {
-      "copyright": "WealthJourney. All rights reserved.",
+      "copyright": "congdongvang.com. All rights reserved.",
       "privacyPolicy": "Privacy Policy",
       "termsOfService": "Terms of Service",
       "tagline": "Your trusted guide to financial freedom.",
       "builtWith": "Built with",
-      "allRightsReserved": "WealthJourney. All rights reserved."
+      "allRightsReserved": "congdongvang.com. All rights reserved."
     },
     "navbar": {
       "features": "Features",

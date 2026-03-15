@@ -16,9 +16,12 @@ export function SuggestedUsersPlaceholder({ className }: SuggestedUsersPlacehold
           Gợi ý theo dõi
         </p>
       </div>
-      <p className="font-vietnam text-sm text-v2-text-tertiary text-center py-4">
-        Sắp ra mắt...
-      </p>
+      <div className="flex items-center justify-center gap-2 py-4">
+        <div className="w-4 h-4 border-2 border-v2-text-tertiary border-t-transparent rounded-full animate-spin" />
+        <p className="font-vietnam text-sm text-v2-text-tertiary">
+          Đang tải...
+        </p>
+      </div>
     </div>
   );
 }

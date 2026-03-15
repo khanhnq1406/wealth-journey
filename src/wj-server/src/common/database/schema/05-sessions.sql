@@ -1,5 +1,5 @@
 -- ============================================================================
--- WealthJourney Sessions Table
+-- congdongvang.com Sessions Table
 -- ============================================================================
 -- This table stores user session information for authentication
 -- Aligned with API Communication Guide improvements

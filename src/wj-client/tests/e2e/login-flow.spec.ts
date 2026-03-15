@@ -21,7 +21,7 @@ test.describe("Authentication Flow", () => {
   });
 
   test("should display login page with Google OAuth button", async ({ page }) => {
-    await expect(page).toHaveTitle(/WealthJourney/);
+    await expect(page).toHaveTitle(/congdongvang/);
 
     // Check for login page heading - actual text is "Welcome back"
     await expect(page.locator("h1")).toBeVisible();

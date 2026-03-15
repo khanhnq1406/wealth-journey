@@ -1,6 +1,6 @@
 # Loading Components
 
-This directory contains loading state components for the WealthJourney application. All skeleton components use a polished shimmer animation that provides better visual feedback than simple pulse animations.
+This directory contains loading state components for the congdongvang.com application. All skeleton components use a polished shimmer animation that provides better visual feedback than simple pulse animations.
 
 ## Features
 
@@ -663,4 +663,4 @@ If you experience performance issues with many skeletons:
 ---
 
 **Last Updated:** 2026-02-04
-**Maintainer:** WealthJourney Team
+**Maintainer:** congdongvang.com Team

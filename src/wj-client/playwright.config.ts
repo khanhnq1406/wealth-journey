@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * Playwright Configuration for WealthJourney E2E Tests
+ * Playwright Configuration for congdongvang.com E2E Tests
  *
  * This configuration supports testing against:
  * - Local development server (http://localhost:3000)

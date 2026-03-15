@@ -134,7 +134,7 @@ export function ShareDialog({
   // Handle social media share
   const handleSocialShare = useCallback((platform: "twitter" | "linkedin" | "facebook") => {
     const urls = {
-      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out my financial report on WealthJourney! ${reportTitle}`)}&url=${encodeURIComponent(shareableLink)}`,
+      twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out my financial report on congdongvang.com! ${reportTitle}`)}&url=${encodeURIComponent(shareableLink)}`,
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareableLink)}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareableLink)}`,
     };

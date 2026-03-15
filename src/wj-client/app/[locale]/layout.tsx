@@ -56,7 +56,7 @@ export default async function LocaleLayout({
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
-        <meta name="apple-mobile-web-app-title" content="WealthJourney" />
+        <meta name="apple-mobile-web-app-title" content="congdongvang.com" />
 
         {/* iOS Splash Screens */}
         <link
@@ -86,7 +86,7 @@ export default async function LocaleLayout({
         />
 
         {/* Microsoft Tiles */}
-        <meta name="msapplication-TileColor" content="#B91C1C" />
+        <meta name="msapplication-TileColor" content="#d2a74b" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>
       <body className={`${plusJakartaSans.variable} ${beVietnamPro.variable} ${jetbrainsMono.variable} antialiased h-dvh`}>

@@ -1,5 +1,5 @@
 -- ============================================================================
--- WealthJourney Wallets Table
+-- congdongvang.com Wallets Table
 -- ============================================================================
 -- This table stores user wallet information
 -- Aligned with API Communication Guide improvements

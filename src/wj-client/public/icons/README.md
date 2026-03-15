@@ -50,5 +50,5 @@ Use any image editor (Photoshop, GIMP, Figma, etc.) to create PNG files with the
 
 All icons should:
 - Have transparent backgrounds (PNG format)
-- Use the WealthJourney logo/brand colors
+- Use the congdongvang.com logo/brand colors
 - Be optimized for file size

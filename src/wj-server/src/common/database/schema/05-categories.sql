@@ -1,5 +1,5 @@
 -- ============================================================================
--- WealthJourney Categories Table
+-- congdongvang.com Categories Table
 -- ============================================================================
 -- This table stores transaction categories (Income/Expense)
 -- Aligned with API Communication Guide improvements

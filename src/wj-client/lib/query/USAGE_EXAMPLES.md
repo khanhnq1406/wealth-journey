@@ -789,4 +789,4 @@ queryClient.invalidateQueries({
 
 - [React Query Documentation](https://tanstack.com/query/latest)
 - [UI/UX Optimization Plan](../../docs/UI_UX_OPTIMIZATION_PLAN.md)
-- [WealthJourney CLAUDE.md](./.claude/CLAUDE.md)
+- [congdongvang.com CLAUDE.md](./.claude/CLAUDE.md)

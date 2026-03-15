@@ -188,7 +188,7 @@
   },
   "pwa": {
     "installPrompt": {
-      "title": "Cài đặt WealthJourney",
+      "title": "Cài đặt congdongvang.com",
       "description": "Trải nghiệm đầy đủ với tải nhanh hơn, truy cập ngoại tuyến và tiện lợi từ màn hình chính.",
       "installButton": "Cài đặt",
       "dismissButton": "Để sau",
@@ -211,10 +211,10 @@
       "iosTapAdd": "Nhấn",
       "iosAdd": "Thêm",
       "iosToConfirm": "để xác nhận",
-      "androidDescription": "Bạn có thể cài đặt WealthJourney trực tiếp vào màn hình chính để có trải nghiệm ứng dụng gốc.",
-      "androidInstallButton": "Cài đặt WealthJourney",
+      "androidDescription": "Bạn có thể cài đặt congdongvang.com trực tiếp vào màn hình chính để có trải nghiệm ứng dụng gốc.",
+      "androidInstallButton": "Cài đặt congdongvang.com",
       "androidOr": "Hoặc nhấn menu (⋮) và chọn \"Thêm vào màn hình chính\"",
-      "genericInstallTitle": "Để cài đặt WealthJourney như ứng dụng:",
+      "genericInstallTitle": "Để cài đặt congdongvang.com như ứng dụng:",
       "genericStep1": "Mở trang web này trong Chrome hoặc Safari",
       "genericStep2": "Dùng menu trình duyệt để thêm vào màn hình chính"
     }

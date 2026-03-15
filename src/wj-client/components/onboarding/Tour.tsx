@@ -26,7 +26,7 @@ const DEFAULT_STEPS: TourStep[] = [
   {
     target: "",
     placement: "center",
-    title: "Welcome to WealthJourney! 👋",
+    title: "Welcome to congdongvang.com! 👋",
     content: "Take a quick tour to learn how to manage your finances effectively. This will only take a minute.",
   },
   {
