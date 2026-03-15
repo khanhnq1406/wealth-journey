@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import Image from "next/image";
 
 export default async function AuthLayout({
   children,
@@ -10,8 +11,14 @@ export default async function AuthLayout({
     <div className="bg-v2-red-primary h-screen">
       <div className="block sm:grid grid-cols-[40%_60%]">
         <div className="hidden sm:flex justify-center content-center flex-wrap gap-[20px]">
-          <div className="flex gap-2">
-            <img className="w-[80px] h-[80px]" src="/logo.svg" alt="Logo" />
+          <div className="flex gap-2 items-center px-5">
+            <Image
+              src="/logo.svg"
+              alt="Logo"
+              width={80}
+              height={80}
+              className="rounded-md"
+            />
             <div className="text-white">
               <p className="font-extrabold text-[30px]">congdongvang.com</p>
               <p>{t("tagline")}</p>

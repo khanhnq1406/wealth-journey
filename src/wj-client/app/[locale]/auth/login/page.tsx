@@ -23,9 +23,7 @@ export default function Login() {
   const login = useMutationLogin({
     onError(error) {
       console.error("Login error:", error);
-      setError(
-        error.message || t("genericError"),
-      );
+      setError(error.message || t("genericError"));
       setIsLoading(false);
     },
     onSuccess(data) {
@@ -71,22 +69,14 @@ export default function Login() {
       {/* Header with Logo */}
       <div className="pt-6 pb-4 px-4 sm:px-6">
         <Link href="/" className="inline-flex items-center gap-2">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-v2-red-primary rounded-xl flex items-center justify-center shadow-lg">
-            <svg
-              className="w-6 h-6 sm:w-7 sm:h-7 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-              />
-            </svg>
-          </div>
-          <span className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-dark-text">
+          <Image
+            src="/logo.svg"
+            alt="congdongvang.com"
+            width={48}
+            height={48}
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-[10px]"
+          />
+          <span className="text-xl sm:text-2xl font-bold dark:text-dark-text text-v2-red-primary">
             congdongvang.com
           </span>
         </Link>

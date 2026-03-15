@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     telephone: false,
   },
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#d1a64a" },
+    { media: "(prefers-color-scheme: light)", color: "#d2a74b" },
     { media: "(prefers-color-scheme: dark)", color: "#0F172A" },
   ],
 };
