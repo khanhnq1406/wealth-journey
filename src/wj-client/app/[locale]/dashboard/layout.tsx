@@ -263,21 +263,25 @@ export default function DashboardLayout({
                       : "opacity-0 w-0 overflow-hidden scale-95 -translate-x-2",
                   )}
                 >
-                  <div className="w-[38px] h-[38px] bg-v2-red-primary rounded-[10px] flex items-center justify-center">
-                    <span className="text-white font-vietnam font-bold text-[18px]">
-                      C
-                    </span>
-                  </div>
+                  <NextImage
+                    src="/logo.svg"
+                    alt="congdongvang.com"
+                    width={38}
+                    height={38}
+                    className="rounded-[10px]"
+                  />
                   <h1 className="text-v2-text-primary font-vietnam font-bold text-[16px]">
                     congdongvang.com
                   </h1>
                 </div>
                 {!isExpanded && (
-                  <div className="w-[38px] h-[38px] bg-v2-red-primary rounded-[10px] flex items-center justify-center mx-auto animate-scale-in">
-                    <span className="text-white font-vietnam font-bold text-[18px]">
-                      C
-                    </span>
-                  </div>
+                  <NextImage
+                    src="/logo.svg"
+                    alt="congdongvang.com"
+                    width={38}
+                    height={38}
+                    className="rounded-[10px] mx-auto animate-scale-in"
+                  />
                 )}
               </div>
             </div>
@@ -471,11 +475,13 @@ export default function DashboardLayout({
               <div className="flex items-center justify-between px-4 py-3">
                 {/* Logo area */}
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-v2-red-primary rounded-[8px] flex items-center justify-center">
-                    <span className="text-white font-vietnam font-bold text-[14px]">
-                      C
-                    </span>
-                  </div>
+                  <NextImage
+                    src="/logo.svg"
+                    alt="congdongvang.com"
+                    width={32}
+                    height={32}
+                    className="rounded-[8px]"
+                  />
                   <span className="font-vietnam font-bold text-[14px] text-v2-text-primary">
                     congdongvang.com
                   </span>
@@ -525,11 +531,13 @@ export default function DashboardLayout({
                   {/* Close Button */}
                   <div className="flex items-center justify-between p-4 border-b border-v2-border-light">
                     <div className="flex items-center gap-3">
-                      <div className="w-[38px] h-[38px] bg-v2-red-primary rounded-[10px] flex items-center justify-center">
-                        <span className="text-white font-vietnam font-bold text-[18px]">
-                          C
-                        </span>
-                      </div>
+                      <NextImage
+                        src="/logo.svg"
+                        alt="congdongvang.com"
+                        width={38}
+                        height={38}
+                        className="rounded-[10px]"
+                      />
                       <span className="text-v2-text-primary font-vietnam font-bold text-lg">
                         congdongvang.com
                       </span>

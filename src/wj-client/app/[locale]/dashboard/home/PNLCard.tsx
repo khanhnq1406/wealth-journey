@@ -149,7 +149,7 @@ export function PNLCard({ currency }: PNLCardProps) {
         {!histLoading && chartPoints.length === 0 && (
           <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
             <p className="font-vietnam text-[13px] text-v2-text-tertiary">
-              {t("comingSoon")}
+              {t("noData")}
             </p>
           </div>
         )}

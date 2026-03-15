@@ -86,7 +86,7 @@ export default async function LocaleLayout({
         />
 
         {/* Microsoft Tiles */}
-        <meta name="msapplication-TileColor" content="#B91C1C" />
+        <meta name="msapplication-TileColor" content="#d1a64a" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>
       <body className={`${plusJakartaSans.variable} ${beVietnamPro.variable} ${jetbrainsMono.variable} antialiased h-dvh`}>

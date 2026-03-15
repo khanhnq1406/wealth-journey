@@ -11,9 +11,10 @@ interface GoldPriceTableProps {
   prices: PriceItem[];
   updatedTime?: string;
   isAdmin?: boolean;
+  isLoading?: boolean;
 }
 
-export function GoldPriceTable({ prices, updatedTime, isAdmin = false }: GoldPriceTableProps) {
+export function GoldPriceTable({ prices, updatedTime, isAdmin = false, isLoading = false }: GoldPriceTableProps) {
   const t = useTranslations("dashboard.home");
 
   // Filter and reorder to show only 9 configured gold types
@@ -86,7 +87,14 @@ export function GoldPriceTable({ prices, updatedTime, isAdmin = false }: GoldPri
                   colSpan={isAdmin ? 4 : 3}
                   className="px-5 py-8 text-center font-vietnam text-[13px] text-v2-text-tertiary"
                 >
-                  {t("comingSoon")}
+                  {isLoading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-v2-gold-dark border-t-transparent rounded-full animate-spin" />
+                      {t("loading")}
+                    </div>
+                  ) : (
+                    t("noData")
+                  )}
                 </td>
               </tr>
             )}

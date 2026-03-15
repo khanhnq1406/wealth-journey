@@ -62,12 +62,12 @@ export default function Home() {
   }, []);
 
   // Data fetching
-  const { data: walletsData } = useQueryListWallets(
+  const { data: walletsData, isLoading: walletsLoading } = useQueryListWallets(
     { pagination: { page: 1, pageSize: 20, orderBy: "", order: "" } },
     { refetchOnMount: "always" },
   );
 
-  const { data: marketPrices } = useQueryGetMarketPrices(
+  const { data: marketPrices, isLoading: marketPricesLoading } = useQueryGetMarketPrices(
     {},
     { staleTime: 5 * 60 * 1000 },
   );
@@ -179,7 +179,7 @@ export default function Home() {
         <PNLCard currency={currency} />
 
         {/* 3. Gold Price Table */}
-        <GoldPriceTable prices={goldPrices} updatedTime={goldUpdatedTime} isAdmin={isAdmin} />
+        <GoldPriceTable prices={goldPrices} updatedTime={goldUpdatedTime} isAdmin={isAdmin} isLoading={marketPricesLoading} />
 
         {/* 4. Gold Price Chart */}
         <GoldPriceChart />
@@ -189,13 +189,14 @@ export default function Home() {
           prices={silverPrices}
           updatedTime={silverUpdatedTime}
           isAdmin={isAdmin}
+          isLoading={marketPricesLoading}
         />
 
         {/* 6. Silver Price Chart */}
         <SilverPriceChart />
 
         {/* 7. Currency Price Table */}
-        <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} isAdmin={isAdmin} />
+        <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} isAdmin={isAdmin} isLoading={marketPricesLoading} />
 
         {/* 8. Dollar Index Chart */}
         <DollarIndexChart />
@@ -204,7 +205,7 @@ export default function Home() {
         <GoldSentimentCard variant="home" />
 
         {/* 10. Wallets */}
-        <WalletsSection wallets={wallets} />
+        <WalletsSection wallets={wallets} isLoading={walletsLoading} />
       </div>
 
       {/* Desktop Layout */}
@@ -238,7 +239,7 @@ export default function Home() {
               noMobileMargin
               className="h-full rounded-[20px] border border-v2-border-light shadow-v2-card p-5 flex flex-col"
             >
-              <WalletsSection wallets={wallets} />
+              <WalletsSection wallets={wallets} isLoading={walletsLoading} />
             </BaseCard>
           </div>
         </div>
@@ -249,6 +250,7 @@ export default function Home() {
             prices={goldPrices}
             updatedTime={goldUpdatedTime}
             isAdmin={isAdmin}
+            isLoading={marketPricesLoading}
           />
           <GoldPriceChart />
         </div>
@@ -259,13 +261,14 @@ export default function Home() {
             prices={silverPrices}
             updatedTime={silverUpdatedTime}
             isAdmin={isAdmin}
+            isLoading={marketPricesLoading}
           />
           <SilverPriceChart />
         </div>
 
         {/* Row 5: Currency Table + Dollar Index Chart */}
         <div className="grid grid-cols-2 gap-6">
-          <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} isAdmin={isAdmin} />
+          <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} isAdmin={isAdmin} isLoading={marketPricesLoading} />
           <DollarIndexChart />
         </div>
 

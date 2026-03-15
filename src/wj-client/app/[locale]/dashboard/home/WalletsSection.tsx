@@ -17,9 +17,10 @@ interface WalletItem {
 
 interface WalletsSectionProps {
   wallets: WalletItem[];
+  isLoading?: boolean;
 }
 
-export function WalletsSection({ wallets }: WalletsSectionProps) {
+export function WalletsSection({ wallets, isLoading = false }: WalletsSectionProps) {
   const t = useTranslations("dashboard.home");
 
   const formatBalance = (balance: number, currency: string) => {
@@ -84,9 +85,18 @@ export function WalletsSection({ wallets }: WalletsSectionProps) {
 
         {wallets.length === 0 && (
           <div className="text-center py-8">
-            <p className="font-vietnam text-[13px] text-v2-text-tertiary">
-              {t("comingSoon")}
-            </p>
+            {isLoading ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-v2-red-primary border-t-transparent rounded-full animate-spin" />
+                <p className="font-vietnam text-[13px] text-v2-text-tertiary">
+                  {t("loading")}
+                </p>
+              </div>
+            ) : (
+              <p className="font-vietnam text-[13px] text-v2-text-tertiary">
+                {t("noData")}
+              </p>
+            )}
           </div>
         )}
       </div>

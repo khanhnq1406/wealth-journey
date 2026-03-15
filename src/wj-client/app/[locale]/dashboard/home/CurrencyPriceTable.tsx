@@ -10,12 +10,14 @@ interface CurrencyPriceTableProps {
   prices: PriceItem[];
   updatedTime?: string;
   isAdmin?: boolean;
+  isLoading?: boolean;
 }
 
 export function CurrencyPriceTable({
   prices,
   updatedTime,
   isAdmin = false,
+  isLoading = false,
 }: CurrencyPriceTableProps) {
   const t = useTranslations("dashboard.home");
 
@@ -86,7 +88,14 @@ export function CurrencyPriceTable({
                   colSpan={isAdmin ? 4 : 3}
                   className="px-5 py-8 text-center font-vietnam text-[13px] text-v2-text-tertiary"
                 >
-                  {t("comingSoon")}
+                  {isLoading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-v2-currency-dark border-t-transparent rounded-full animate-spin" />
+                      {t("loading")}
+                    </div>
+                  ) : (
+                    t("noData")
+                  )}
                 </td>
               </tr>
             )}

@@ -293,3 +293,11 @@ No security concerns — all changes are frontend branding, CSS, and UI componen
 2. Switch language to Vietnamese — verify all brand references say "congdongvang.com"
 3. Check PWA install prompt text in both languages
 4. Export a report (PDF/Excel) — verify footer says "congdongvang.com"
+
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-15 | Reverted Task 3 (Optimize Price Tables for Mobile) — restored original table styling for GoldPriceTable, SilverPriceTable, CurrencyPriceTable | Minor | `7cc44de` |
+| 2026-03-15 | Replaced "Coming Soon" empty states with proper loading spinners and "No data" messages in GoldPriceTable, SilverPriceTable, CurrencyPriceTable, WalletsSection, PNLCard, SuggestedUsersPlaceholder | Minor | *pending* |
+| 2026-03-15 | Replaced all 4 hardcoded "C" letter logos in dashboard layout with actual `<NextImage src="/logo.svg">` — desktop sidebar (expanded + collapsed), mobile header, mobile slide-out menu | Minor | *pending* |
