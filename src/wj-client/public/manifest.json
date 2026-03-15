@@ -1,11 +1,11 @@
 {
-  "name": "WealthJourney - Personal Financial Management",
-  "short_name": "WealthJourney",
-  "description": "Your Trusted Guide to Financial Freedom - Track expenses, manage wallets, and monitor investments",
+  "name": "congdongvang.com - Theo dõi giá vàng & quản lý tài chính",
+  "short_name": "congdongvang.com",
+  "description": "Theo dõi giá vàng, bạc, ngoại tệ & quản lý tài chính cá nhân",
   "start_url": "/dashboard/home",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#008148",
+  "theme_color": "#B91C1C",
   "orientation": "portrait-primary",
   "scope": "/",
   "icons": [
