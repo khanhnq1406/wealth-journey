@@ -6,17 +6,17 @@
 - **Spec file:** docs/specs/2026-03-15-rebrand-and-ui-improvements-spec.md
 - **Started:** 2026-03-15
 - **Last updated:** 2026-03-15
-- **Current state:** in_progress
-- **Current task:** 1
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 1 | Rebrand metadata + Fix iOS status bar | pending | — | — |
-| 2 | Rebrand dashboard layout (sidebar, header, mobile menu) | pending | — | — |
-| 3 | Optimize price tables for mobile | pending | — | — |
-| 4 | Enhance FAB — Add Wallet + Desktop visibility | pending | — | — |
+| 1 | Rebrand metadata + Fix iOS status bar | done | d4e39e6 | Updated layout.tsx metadata, manifest.json, [locale]/layout.tsx apple-mobile-web-app-title |
+| 2 | Rebrand dashboard layout (sidebar, header, mobile menu) | done | 5e6c86c | W→C, WealthJourney→congdongvang.com in sidebar, mobile header, mobile menu |
+| 3 | Optimize price tables for mobile | done | 1fb8ab0 | Responsive padding/fonts/tracking on all 3 price tables, table-fixed layout |
+| 4 | Enhance FAB — Add Wallet + Desktop visibility | done | ce74542 | Removed sm:hidden, responsive positioning, Add Wallet action + modal |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
