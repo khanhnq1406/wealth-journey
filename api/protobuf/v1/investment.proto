@@ -54,6 +54,9 @@ enum InvestmentType {
   // Silver-specific types for dual conversion (unit + currency)
   INVESTMENT_TYPE_SILVER_VND = 10;   // Vietnamese silver - priced in VND, stored in grams
   INVESTMENT_TYPE_SILVER_USD = 11;   // World silver (XAG/USD) - priced in USD, stored in ounces
+  // Additional asset types
+  INVESTMENT_TYPE_CASH = 12;              // Cash/savings tracking
+  INVESTMENT_TYPE_FOREIGN_CURRENCY = 13;  // Foreign currency holdings
 }
 
 // InvestmentTransaction represents a buy or sell transaction
@@ -519,6 +522,7 @@ message CreateInvestmentRequest {
   double initialQuantityDecimal = 8 [json_name = "initialQuantityDecimal"];
   double initialCostDecimal = 9 [json_name = "initialCostDecimal"];  // Total cost as decimal (e.g., 1500.50 for $1,500.50)
   bool isCustom = 10 [json_name = "isCustom"];  // If true, skip market data validation and allow currentPrice=0
+  int64 purchaseDate = 11 [json_name = "purchaseDate"];  // Optional: Unix timestamp (0 = not set, use current time)
   string purchaseUnit = 13 [json_name = "purchaseUnit"];  // User's input unit ("tael", "kg", "oz", "gram")
 }
 

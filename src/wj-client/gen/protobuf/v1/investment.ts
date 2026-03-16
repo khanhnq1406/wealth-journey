@@ -27,6 +27,10 @@ export const InvestmentType = {
   INVESTMENT_TYPE_SILVER_VND: 10,
   /** INVESTMENT_TYPE_SILVER_USD - World silver (XAG/USD) - priced in USD, stored in ounces */
   INVESTMENT_TYPE_SILVER_USD: 11,
+  /** INVESTMENT_TYPE_CASH - Additional asset types */
+  INVESTMENT_TYPE_CASH: 12,
+  /** INVESTMENT_TYPE_FOREIGN_CURRENCY - Foreign currency holdings */
+  INVESTMENT_TYPE_FOREIGN_CURRENCY: 13,
   UNRECOGNIZED: -1,
 } as const;
 
@@ -45,6 +49,8 @@ export namespace InvestmentType {
   export type INVESTMENT_TYPE_GOLD_USD = typeof InvestmentType.INVESTMENT_TYPE_GOLD_USD;
   export type INVESTMENT_TYPE_SILVER_VND = typeof InvestmentType.INVESTMENT_TYPE_SILVER_VND;
   export type INVESTMENT_TYPE_SILVER_USD = typeof InvestmentType.INVESTMENT_TYPE_SILVER_USD;
+  export type INVESTMENT_TYPE_CASH = typeof InvestmentType.INVESTMENT_TYPE_CASH;
+  export type INVESTMENT_TYPE_FOREIGN_CURRENCY = typeof InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY;
   export type UNRECOGNIZED = typeof InvestmentType.UNRECOGNIZED;
 }
 
@@ -86,6 +92,12 @@ export function investmentTypeFromJSON(object: any): InvestmentType {
     case 11:
     case "INVESTMENT_TYPE_SILVER_USD":
       return InvestmentType.INVESTMENT_TYPE_SILVER_USD;
+    case 12:
+    case "INVESTMENT_TYPE_CASH":
+      return InvestmentType.INVESTMENT_TYPE_CASH;
+    case 13:
+    case "INVESTMENT_TYPE_FOREIGN_CURRENCY":
+      return InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -119,6 +131,10 @@ export function investmentTypeToJSON(object: InvestmentType): string {
       return "INVESTMENT_TYPE_SILVER_VND";
     case InvestmentType.INVESTMENT_TYPE_SILVER_USD:
       return "INVESTMENT_TYPE_SILVER_USD";
+    case InvestmentType.INVESTMENT_TYPE_CASH:
+      return "INVESTMENT_TYPE_CASH";
+    case InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY:
+      return "INVESTMENT_TYPE_FOREIGN_CURRENCY";
     case InvestmentType.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -678,6 +694,8 @@ export interface CreateInvestmentRequest {
   initialCostDecimal: number;
   /** If true, skip market data validation and allow currentPrice=0 */
   isCustom: boolean;
+  /** Optional: Unix timestamp (0 = not set, use current time) */
+  purchaseDate: number;
   /** User's input unit ("tael", "kg", "oz", "gram") */
   purchaseUnit: string;
 }
@@ -5061,6 +5079,7 @@ function createBaseCreateInvestmentRequest(): CreateInvestmentRequest {
     initialQuantityDecimal: 0,
     initialCostDecimal: 0,
     isCustom: false,
+    purchaseDate: 0,
     purchaseUnit: "",
   };
 }
@@ -5096,6 +5115,9 @@ export const CreateInvestmentRequest: MessageFns<CreateInvestmentRequest> = {
     }
     if (message.isCustom !== false) {
       writer.uint32(80).bool(message.isCustom);
+    }
+    if (message.purchaseDate !== 0) {
+      writer.uint32(88).int64(message.purchaseDate);
     }
     if (message.purchaseUnit !== "") {
       writer.uint32(106).string(message.purchaseUnit);
@@ -5190,6 +5212,14 @@ export const CreateInvestmentRequest: MessageFns<CreateInvestmentRequest> = {
           message.isCustom = reader.bool();
           continue;
         }
+        case 11: {
+          if (tag !== 88) {
+            break;
+          }
+
+          message.purchaseDate = longToNumber(reader.int64());
+          continue;
+        }
         case 13: {
           if (tag !== 106) {
             break;
@@ -5221,6 +5251,7 @@ export const CreateInvestmentRequest: MessageFns<CreateInvestmentRequest> = {
         : 0,
       initialCostDecimal: isSet(object.initialCostDecimal) ? globalThis.Number(object.initialCostDecimal) : 0,
       isCustom: isSet(object.isCustom) ? globalThis.Boolean(object.isCustom) : false,
+      purchaseDate: isSet(object.purchaseDate) ? globalThis.Number(object.purchaseDate) : 0,
       purchaseUnit: isSet(object.purchaseUnit) ? globalThis.String(object.purchaseUnit) : "",
     };
   },
@@ -5257,6 +5288,9 @@ export const CreateInvestmentRequest: MessageFns<CreateInvestmentRequest> = {
     if (message.isCustom !== false) {
       obj.isCustom = message.isCustom;
     }
+    if (message.purchaseDate !== 0) {
+      obj.purchaseDate = Math.round(message.purchaseDate);
+    }
     if (message.purchaseUnit !== "") {
       obj.purchaseUnit = message.purchaseUnit;
     }
@@ -5278,6 +5312,7 @@ export const CreateInvestmentRequest: MessageFns<CreateInvestmentRequest> = {
     message.initialQuantityDecimal = object.initialQuantityDecimal ?? 0;
     message.initialCostDecimal = object.initialCostDecimal ?? 0;
     message.isCustom = object.isCustom ?? false;
+    message.purchaseDate = object.purchaseDate ?? 0;
     message.purchaseUnit = object.purchaseUnit ?? "";
     return message;
   },
