@@ -468,12 +468,10 @@ func (s *userService) invalidateInvestmentValueCachesForUser(ctx context.Context
 		return fmt.Errorf("failed to list wallets: %w", err)
 	}
 
-	// Clear investment value cache for each investment wallet
+	// Clear investment value cache for all wallets
 	for _, wallet := range wallets {
-		if v1.WalletType(wallet.Type) == v1.WalletType_INVESTMENT {
-			cacheKey := cache.GetInvestmentValueCacheKey(wallet.ID)
-			s.redisCache.Del(ctx, cacheKey)
-		}
+		cacheKey := cache.GetInvestmentValueCacheKey(wallet.ID)
+		s.redisCache.Del(ctx, cacheKey)
 	}
 
 	return nil

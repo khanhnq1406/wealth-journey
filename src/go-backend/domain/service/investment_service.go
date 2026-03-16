@@ -306,14 +306,9 @@ func (s *investmentService) ListInvestments(ctx context.Context, userID int32, r
 	}
 
 	// Verify wallet belongs to user
-	wallet, err := s.walletRepo.GetByIDForUser(ctx, req.WalletId, userID)
+	_, err := s.walletRepo.GetByIDForUser(ctx, req.WalletId, userID)
 	if err != nil {
 		return nil, err
-	}
-
-	// Validate wallet type
-	if v1.WalletType(wallet.Type) != v1.WalletType_INVESTMENT {
-		return nil, apperrors.NewValidationError("investments can only be listed in investment wallets")
 	}
 
 	// Parse pagination parameters from protobuf
@@ -1535,15 +1530,13 @@ func (s *investmentService) UpdatePrices(ctx context.Context, userID int32, req 
 
 	var allInvestments []*models.Investment
 	for _, wallet := range wallets {
-		if v1.WalletType(wallet.Type) == v1.WalletType_INVESTMENT {
-			investments, _, err := s.investmentRepo.ListByWalletID(ctx, wallet.ID, repository.ListOptions{
-				Limit: 1000,
-			}, v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED)
-			if err != nil {
-				continue
-			}
-			allInvestments = append(allInvestments, investments...)
+		investments, _, err := s.investmentRepo.ListByWalletID(ctx, wallet.ID, repository.ListOptions{
+			Limit: 1000,
+		}, v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED)
+		if err != nil {
+			continue
 		}
+		allInvestments = append(allInvestments, investments...)
 	}
 
 	// Filter by investment IDs if specified, and count custom investments
@@ -1935,13 +1928,10 @@ func (s *investmentService) ListUserInvestments(ctx context.Context, userID int3
 	var err error
 
 	if req.WalletId != 0 {
-		// Specific wallet requested - validate ownership and type
-		wallet, err := s.walletRepo.GetByIDForUser(ctx, req.WalletId, userID)
+		// Specific wallet requested - validate ownership
+		_, err := s.walletRepo.GetByIDForUser(ctx, req.WalletId, userID)
 		if err != nil {
 			return nil, err
-		}
-		if v1.WalletType(wallet.Type) != v1.WalletType_INVESTMENT {
-			return nil, apperrors.NewValidationError("investments can only be listed in investment wallets")
 		}
 		investments, total, err = s.investmentRepo.ListByWalletID(ctx, req.WalletId, opts, typeFilter)
 		if err != nil {
@@ -2162,13 +2152,13 @@ func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, u
 	}, nil
 }
 
-// ListInvestmentWallets retrieves all investment wallets for a user.
+// ListInvestmentWallets retrieves all active wallets for a user.
+// Investments are no longer tied to a specific wallet type — any wallet can hold investments.
 func (s *investmentService) ListInvestmentWallets(ctx context.Context, userID int32) ([]*models.Wallet, error) {
 	if err := validator.ID(userID); err != nil {
 		return nil, err
 	}
 
-	// Get all wallets for the user
 	wallets, _, err := s.walletRepo.ListByUserID(ctx, userID, repository.ListOptions{
 		Limit: 1000,
 	})
@@ -2176,15 +2166,7 @@ func (s *investmentService) ListInvestmentWallets(ctx context.Context, userID in
 		return nil, err
 	}
 
-	// Filter to only investment wallets
-	var investmentWallets []*models.Wallet
-	for _, wallet := range wallets {
-		if v1.WalletType(wallet.Type) == v1.WalletType_INVESTMENT {
-			investmentWallets = append(investmentWallets, wallet)
-		}
-	}
-
-	return investmentWallets, nil
+	return wallets, nil
 }
 
 // calculatePerformers computes top and worst performing investments based on unrealized PNL percentage.
