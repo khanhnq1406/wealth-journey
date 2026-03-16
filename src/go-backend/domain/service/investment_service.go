@@ -98,9 +98,6 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 	if err := validator.ID(userID); err != nil {
 		return nil, err
 	}
-	if err := validator.ID(req.WalletId); err != nil {
-		return nil, err
-	}
 	if req.Symbol == "" {
 		return nil, apperrors.NewValidationError("symbol is required")
 	}
@@ -109,6 +106,22 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 	}
 	if err := validator.Currency(req.Currency); err != nil {
 		return nil, err
+	}
+
+	// 1.5. Auto-select wallet if walletId is 0
+	if req.WalletId == 0 {
+		wallets, _, err := s.walletRepo.ListByUserID(ctx, userID, repository.ListOptions{
+			Limit:   1,
+			OrderBy: "created_at",
+			Order:   "asc",
+		})
+		if err != nil {
+			return nil, err
+		}
+		if len(wallets) == 0 {
+			return nil, apperrors.NewValidationError("please create a wallet first")
+		}
+		req.WalletId = wallets[0].ID
 	}
 
 	// Convert decimal inputs to integer format if provided
@@ -133,35 +146,12 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 	}
 
 	// 2. Verify wallet exists and belongs to user
-	wallet, err := s.walletRepo.GetByIDForUser(ctx, req.WalletId, userID)
+	_, err := s.walletRepo.GetByIDForUser(ctx, req.WalletId, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	// 3. Validate wallet type - must be INVESTMENT
-	if v1.WalletType(wallet.Type) != v1.WalletType_INVESTMENT {
-		return nil, apperrors.NewValidationError("investments can only be created in investment wallets")
-	}
-
-	// 3.5. Convert initial cost to wallet currency for balance check
-	// initialCost is in investment currency (req.Currency), wallet.Balance is in wallet.Currency
-	initialCostInWalletCurrency := initialCost
-	if req.Currency != wallet.Currency {
-		converted, err := s.fxRateSvc.ConvertAmount(ctx, initialCost, req.Currency, wallet.Currency)
-		if err != nil {
-			return nil, apperrors.NewInternalErrorWithCause(
-				fmt.Sprintf("failed to convert %s to %s for balance check", req.Currency, wallet.Currency), err)
-		}
-		initialCostInWalletCurrency = converted
-	}
-
-	// 3.6. Check wallet has sufficient balance for initial investment
-	if wallet.Balance < initialCostInWalletCurrency {
-		return nil, apperrors.NewValidationError(
-			fmt.Sprintf("Insufficient balance: have %d %s, need %d %s", wallet.Balance, wallet.Currency, initialCostInWalletCurrency, wallet.Currency))
-	}
-
-	// 4. Check for duplicate symbol in wallet
+	// 3. Check for duplicate symbol in wallet
 	existing, err := s.investmentRepo.GetByWalletAndSymbol(ctx, req.WalletId, req.Symbol)
 	if err == nil && existing != nil {
 		return nil, apperrors.NewConflictError(fmt.Sprintf("investment with symbol %s already exists in this wallet", req.Symbol))
@@ -254,16 +244,6 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 	if err := s.txRepo.Update(ctx, tx); err != nil {
 		// Log error but don't fail - transaction is created
 		fmt.Printf("Warning: failed to update transaction with lot ID: %v\n", err)
-	}
-
-	// 11. Deduct initial cost from wallet balance (using converted amount in wallet currency)
-	_, err = s.walletRepo.UpdateBalance(ctx, req.WalletId, -initialCostInWalletCurrency)
-	if err != nil {
-		// Rollback: delete the investment, transaction, and lot
-		_ = s.txRepo.Delete(ctx, tx.ID)
-		_ = s.txRepo.DeleteLotsByInvestmentID(ctx, investment.ID)
-		_ = s.investmentRepo.Delete(ctx, investment.ID)
-		return nil, apperrors.NewInternalErrorWithCause("failed to deduct from wallet balance", err)
 	}
 
 	// Populate currency cache

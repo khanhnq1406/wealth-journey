@@ -523,8 +523,7 @@ func TestInvestmentService_CreateInvestment_Success(t *testing.T) {
 	ctx := context.Background()
 	userID := int32(1)
 	walletID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
-	wallet.Balance = 20000000000 // $200,000 in cents - enough for the investment
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 
 	req := &v1.CreateInvestmentRequest{
 		WalletId:        walletID,
@@ -538,7 +537,6 @@ func TestInvestmentService_CreateInvestment_Success(t *testing.T) {
 
 	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
 	mockInvestmentRepo.On("GetByWalletAndSymbol", ctx, walletID, "AAPL").Return(nil, nil)
-	mockWalletRepo.On("UpdateBalance", ctx, walletID, mock.AnythingOfType("int64")).Return(wallet, nil)
 	mockInvestmentRepo.On("Create", ctx, mock.AnythingOfType("*models.Investment")).Return(nil).Run(
 		func(args mock.Arguments) {
 			// Set the ID after creation
@@ -563,6 +561,127 @@ func TestInvestmentService_CreateInvestment_Success(t *testing.T) {
 
 	mockWalletRepo.AssertExpectations(t)
 	mockInvestmentRepo.AssertExpectations(t)
+}
+
+func TestInvestmentService_CreateInvestment_AutoSelectsOldestWallet(t *testing.T) {
+	// Setup
+	mockWalletRepo := new(MockWalletRepository)
+	mockInvestmentRepo := new(MockInvestmentRepository)
+	mockTxRepo := new(MockInvestmentTransactionRepository)
+	mockMarketDataService := new(MockMarketDataService)
+	mockUserRepo := new(MockUserRepository)
+	mockFXRateSvc := new(MockFXRateService)
+
+	service := NewInvestmentService(
+		mockInvestmentRepo,
+		mockWalletRepo,
+		mockTxRepo,
+		mockMarketDataService,
+		mockUserRepo,
+		mockFXRateSvc,
+		nil,
+		new(MockWalletService),
+		nil,
+	).(*investmentService)
+
+	ctx := context.Background()
+	userID := int32(1)
+	oldestWallet := createTestWallet(5, userID, v1.WalletType_BASIC)
+	oldestWallet.CreatedAt = time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+
+	req := &v1.CreateInvestmentRequest{
+		WalletId:        0, // Auto-assign
+		Symbol:          "AAPL",
+		Name:            "Apple Inc.",
+		Type:            v1.InvestmentType_INVESTMENT_TYPE_STOCK,
+		InitialQuantity: 10000,
+		InitialCost:     15000000000,
+		Currency:        "USD",
+	}
+
+	// Auto-select oldest wallet
+	mockWalletRepo.On("ListByUserID", ctx, userID, repository.ListOptions{
+		Limit:   1,
+		OrderBy: "created_at",
+		Order:   "asc",
+	}).Return([]*models.Wallet{oldestWallet}, 1, nil)
+	mockWalletRepo.On("GetByIDForUser", ctx, int32(5), userID).Return(oldestWallet, nil)
+	mockInvestmentRepo.On("GetByWalletAndSymbol", ctx, int32(5), "AAPL").Return(nil, nil)
+	mockInvestmentRepo.On("Create", ctx, mock.AnythingOfType("*models.Investment")).Return(nil).Run(
+		func(args mock.Arguments) {
+			inv := args.Get(1).(*models.Investment)
+			inv.ID = 1
+			// Verify auto-assigned wallet ID
+			assert.Equal(t, int32(5), inv.WalletID)
+		},
+	)
+	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
+	mockTxRepo.On("CreateLot", ctx, mock.AnythingOfType("*models.InvestmentLot")).Return(nil)
+	mockTxRepo.On("Update", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
+	mockUserRepo.On("GetByID", ctx, userID).Return(&models.User{ID: userID, PreferredCurrency: "USD"}, nil)
+
+	// Execute
+	response, err := service.CreateInvestment(ctx, userID, req)
+
+	// Assert
+	assert.NoError(t, err)
+	assert.NotNil(t, response)
+	assert.True(t, response.Success)
+
+	mockWalletRepo.AssertExpectations(t)
+}
+
+func TestInvestmentService_CreateInvestment_NoWallets_ReturnsError(t *testing.T) {
+	// Setup
+	mockWalletRepo := new(MockWalletRepository)
+	mockInvestmentRepo := new(MockInvestmentRepository)
+	mockTxRepo := new(MockInvestmentTransactionRepository)
+	mockMarketDataService := new(MockMarketDataService)
+	mockUserRepo := new(MockUserRepository)
+	mockFXRateSvc := new(MockFXRateService)
+
+	service := NewInvestmentService(
+		mockInvestmentRepo,
+		mockWalletRepo,
+		mockTxRepo,
+		mockMarketDataService,
+		mockUserRepo,
+		mockFXRateSvc,
+		nil,
+		new(MockWalletService),
+		nil,
+	).(*investmentService)
+
+	ctx := context.Background()
+	userID := int32(1)
+
+	req := &v1.CreateInvestmentRequest{
+		WalletId:        0, // Auto-assign
+		Symbol:          "AAPL",
+		Name:            "Apple Inc.",
+		Type:            v1.InvestmentType_INVESTMENT_TYPE_STOCK,
+		InitialQuantity: 10000,
+		InitialCost:     15000000000,
+		Currency:        "USD",
+	}
+
+	// No wallets found
+	mockWalletRepo.On("ListByUserID", ctx, userID, repository.ListOptions{
+		Limit:   1,
+		OrderBy: "created_at",
+		Order:   "asc",
+	}).Return([]*models.Wallet{}, 0, nil)
+
+	// Execute
+	response, err := service.CreateInvestment(ctx, userID, req)
+
+	// Assert
+	assert.Error(t, err)
+	assert.Nil(t, response)
+	assert.IsType(t, apperrors.ValidationError{}, err)
+	assert.Contains(t, err.Error(), "please create a wallet first")
+
+	mockWalletRepo.AssertExpectations(t)
 }
 
 func TestInvestmentService_CreateInvestment_WalletNotFound(t *testing.T) {
@@ -613,56 +732,6 @@ func TestInvestmentService_CreateInvestment_WalletNotFound(t *testing.T) {
 	mockWalletRepo.AssertExpectations(t)
 }
 
-func TestInvestmentService_CreateInvestment_WrongWalletType(t *testing.T) {
-	// Setup
-	mockWalletRepo := new(MockWalletRepository)
-	mockInvestmentRepo := new(MockInvestmentRepository)
-	mockTxRepo := new(MockInvestmentTransactionRepository)
-	mockMarketDataService := new(MockMarketDataService)
-	mockUserRepo := new(MockUserRepository)
-	mockFXRateSvc := new(MockFXRateService)
-
-	service := NewInvestmentService(
-		mockInvestmentRepo,
-		mockWalletRepo,
-		mockTxRepo,
-		mockMarketDataService,
-		mockUserRepo,
-		mockFXRateSvc,
-		nil, // currencyCache not needed for this test
-		new(MockWalletService),
-		nil, // portfolioHistoryRepo not needed for this test
-	).(*investmentService)
-
-	ctx := context.Background()
-	userID := int32(1)
-	walletID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC) // Wrong type
-
-	req := &v1.CreateInvestmentRequest{
-		WalletId:        walletID,
-		Symbol:          "AAPL",
-		Name:            "Apple Inc.",
-		Type:            v1.InvestmentType_INVESTMENT_TYPE_STOCK,
-		InitialQuantity: 10000,
-		InitialCost:     15000000000,
-		Currency:        "USD",
-	}
-
-	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
-
-	// Execute
-	response, err := service.CreateInvestment(ctx, userID, req)
-
-	// Assert
-	assert.Error(t, err)
-	assert.Nil(t, response)
-	assert.IsType(t, apperrors.ValidationError{}, err)
-	assert.Contains(t, err.Error(), "investment wallet")
-
-	mockWalletRepo.AssertExpectations(t)
-}
-
 func TestInvestmentService_CreateInvestment_DuplicateSymbol(t *testing.T) {
 	// Setup
 	mockWalletRepo := new(MockWalletRepository)
@@ -687,7 +756,7 @@ func TestInvestmentService_CreateInvestment_DuplicateSymbol(t *testing.T) {
 	ctx := context.Background()
 	userID := int32(1)
 	walletID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 	existingInvestment := createTestInvestment(1, walletID, "AAPL", 10000, 1500000, 15000000000)
 
 	req := &v1.CreateInvestmentRequest{
