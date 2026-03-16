@@ -12,6 +12,7 @@ import { useTranslations } from "next-intl";
 import { useMutationRegister } from "@/utils/generated/hooks";
 import { updateAuthTokenCache } from "@/utils/api-client";
 import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
+import { RegisterPasswordForm } from "@/features/auth/forms/RegisterPasswordForm";
 
 export default function Register() {
   const router = useRouter();
@@ -140,6 +141,21 @@ export default function Register() {
               </div>
             </div>
 
+            {/* Password Register Form */}
+            <RegisterPasswordForm />
+
+            {/* OR Divider */}
+            <div className="my-5 relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-neutral-200 dark:border-dark-border"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white dark:bg-dark-surface text-neutral-500 dark:text-dark-text-tertiary">
+                  {t("orDivider")}
+                </span>
+              </div>
+            </div>
+
             {/* Google Register Button */}
             <div className={isLoading ? "opacity-50 pointer-events-none" : ""}>
               <GoogleOAuthProvider
@@ -167,7 +183,7 @@ export default function Register() {
               </div>
             )}
 
-            {/* Error Message */}
+            {/* Error Message (Google OAuth) */}
             {error && (
               <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-800 rounded-xl animate-fade-in">
                 <div className="flex items-start gap-3">

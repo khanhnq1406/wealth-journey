@@ -7,27 +7,27 @@
 - **Started:** 2026-03-16
 - **Last updated:** 2026-03-16
 - **Current state:** in_progress
-- **Current task:** 1
+- **Current task:** 16
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 1 | Database Migration — Add Username, PasswordHash, AuthProvider | pending | — | — |
-| 2 | Update Validators — Username and Password Strength | pending | — | — |
-| 3 | Proto API Definitions — Password Auth RPCs and Messages | pending | — | — |
-| 4 | User Repository — Add GetByUsername | pending | — | — |
-| 5 | Auth Service — Password Register, Login, Link, Change | pending | — | — |
-| 6 | Auth Handlers — HTTP Endpoints | pending | — | — |
-| 7 | Route Registration — Wire New Endpoints | pending | — | — |
-| 8 | Update Google OAuth Flow — Set AuthProvider | pending | — | — |
-| 9 | i18n Translation Keys | pending | — | — |
-| 10 | Frontend — PasswordInput Component | pending | — | — |
-| 11 | Frontend — PasswordStrengthIndicator Component | pending | — | — |
-| 12 | Frontend — RegisterPasswordForm | pending | — | — |
-| 13 | Frontend — LoginPasswordForm | pending | — | — |
-| 14 | Frontend — Update Login Page | pending | — | — |
-| 15 | Frontend — Update Register Page | pending | — | — |
+| 1 | Database Migration — Add Username, PasswordHash, AuthProvider | done | 76f3978 | Added Username, PasswordHash, AuthProvider fields to User model + migration |
+| 2 | Update Validators — Username and Password Strength | done | fa4905b | Added Username() and StrongPassword() validators |
+| 3 | Proto API Definitions — Password Auth RPCs and Messages | done | df668e9 | Added 5 RPCs, 10+ message types to auth.proto |
+| 4 | User Repository — Add GetByUsername | done | 348ad7a | Added GetByUsername to UserRepository |
+| 5 | Auth Service — Password Register, Login, Link, Change | done | 5b76224 | Implemented all password auth methods with bcrypt |
+| 6 | Auth Handlers — HTTP Endpoints | done | df2ed25 | Added 5 handler methods for password auth |
+| 7 | Route Registration — Wire New Endpoints | done | e693eef | Wired public + protected password auth routes |
+| 8 | Update Google OAuth Flow — Set AuthProvider | done | e35fc9d | Set AuthProvider on Google registration, auto-link password users |
+| 9 | i18n Translation Keys | done | a505f64 | Added en/vi translations for auth + security settings |
+| 10 | Frontend — PasswordInput Component | done | e2796f5 | Created PasswordInput with show/hide toggle |
+| 11 | Frontend — PasswordStrengthIndicator Component | done | e2796f5 | Created 4-segment strength bar |
+| 12 | Frontend — RegisterPasswordForm | done | 150fde9 | Created form with Zod validation + strength indicator |
+| 13 | Frontend — LoginPasswordForm | done | 150fde9 | Created form with generic error messages |
+| 14 | Frontend — Update Login Page | done | — | Added LoginPasswordForm + OR divider to login page |
+| 15 | Frontend — Update Register Page | done | — | Added RegisterPasswordForm + OR divider to register page |
 | 16 | Frontend — LinkPasswordForm | pending | — | — |
 | 17 | Frontend — ChangePasswordForm | pending | — | — |
 | 18 | Frontend — AuthMethodsCard Component | pending | — | — |
