@@ -49,6 +49,14 @@ type JWTClaims struct {
 	jwt.RegisteredClaims
 }
 
+// getUserEmail safely dereferences user email, returning empty string for nil
+func getUserEmail(user models.User) string {
+	if user.Email != nil {
+		return *user.Email
+	}
+	return ""
+}
+
 // NewServer creates a new auth server with all dependencies.
 func NewServer(db *database.Database, rdb *redis.RedisClient, cfg *config.Config, userSvc UserService, categorySvc CategoryService) *Server {
 	return &Server{
@@ -144,7 +152,7 @@ func (s *Server) RegisterWithDevice(ctx context.Context, googleToken string, dev
 		}
 	} else {
 		user = models.User{
-			Email:        email,
+			Email:        &email,
 			Name:         name,
 			Picture:      picture,
 			AuthProvider: "google",
@@ -172,7 +180,7 @@ func (s *Server) generateLoginResponse(ctx context.Context, user models.User, de
 	// Generate JWT token with session ID
 	claims := JWTClaims{
 		UserID:    user.ID,
-		Email:     user.Email,
+		Email:     getUserEmail(user),
 		SessionID: sessionID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(s.cfg.JWT.Expiration)),
@@ -200,7 +208,7 @@ func (s *Server) generateLoginResponse(ctx context.Context, user models.User, de
 	}
 
 	// Store session in Redis
-	if err := s.rdb.AddSession(user.Email, sessionID, tokenString, sessionData); err != nil {
+	if err := s.rdb.AddSession(getUserEmail(user), sessionID, tokenString, sessionData); err != nil {
 		return nil, fmt.Errorf("failed to store session: %w", err)
 	}
 
@@ -227,7 +235,7 @@ func (s *Server) generateLoginResponse(ctx context.Context, user models.User, de
 		Message: "User registered successfully",
 		Data: &authv1.LoginData{
 			AccessToken: tokenString,
-			Email:       user.Email,
+			Email:       getUserEmail(user),
 			Fullname:    user.Name,
 			Picture:     user.Picture,
 		},
@@ -368,7 +376,7 @@ func (s *Server) VerifyAuth(tokenString string) (*authv1.VerifyAuthResponse, err
 
 	userData := &UserData{
 		ID:                   user.ID,
-		Email:                user.Email,
+		Email:                getUserEmail(user),
 		Name:                 user.Name,
 		Picture:              user.Picture,
 		PreferredCurrency:    user.PreferredCurrency,
@@ -419,7 +427,7 @@ func (s *Server) GetAuth(ctx context.Context, email string) (*authv1.GetAuthResp
 		Message:   "User retrieved successfully",
 		Data: userDataToProto(&UserData{
 			ID:                   user.ID,
-			Email:                user.Email,
+			Email:                getUserEmail(user),
 			Name:                 user.Name,
 			Picture:              user.Picture,
 			PreferredCurrency:    user.PreferredCurrency,
@@ -487,8 +495,13 @@ func (s *Server) RegisterWithPassword(ctx context.Context, req *authv1.RegisterW
 
 	// Create user
 	username := req.Username
+	email := req.Email
+	var emailPtr *string
+	if email != "" {
+		emailPtr = &email
+	}
 	user := models.User{
-		Email:        req.Email,
+		Email:        emailPtr,
 		Name:         req.DisplayName,
 		Username:     &username,
 		PasswordHash: passwordHash,
@@ -711,10 +724,10 @@ func (s *Server) GetAuthMethods(ctx context.Context, userID int32) (*authv1.GetA
 		Success: true,
 		Message: "Auth methods retrieved successfully",
 		Data: &authv1.AuthMethods{
-			HasGoogle:  strings.Contains(user.AuthProvider, "google"),
+			HasGoogle:   strings.Contains(user.AuthProvider, "google"),
 			HasPassword: user.PasswordHash != "",
-			Username:   username,
-			Email:      user.Email,
+			Username:    username,
+			Email:       getUserEmail(user),
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil

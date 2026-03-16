@@ -676,7 +676,7 @@ func setupTestUserWalletCategory(
 
 	// Create test user
 	user = &models.User{
-		Email:             email,
+		Email:             &email,
 		Name:              "Test User",
 		PreferredCurrency: "VND",
 		CreatedAt:         time.Now(),

@@ -154,7 +154,7 @@ func (s *userService) CreateUser(ctx context.Context, email, name, picture strin
 
 	// Create user model
 	user := &models.User{
-		Email:   email,
+		Email:   &email,
 		Name:    name,
 		Picture: picture,
 	}
@@ -193,7 +193,11 @@ func (s *userService) UpdateUser(ctx context.Context, userID int32, email, name,
 	}
 
 	// Validate and update email if provided
-	if email != "" && email != user.Email {
+	currentEmail := ""
+	if user.Email != nil {
+		currentEmail = *user.Email
+	}
+	if email != "" && email != currentEmail {
 		if err := validator.Email(email); err != nil {
 			return nil, err
 		}
@@ -205,7 +209,7 @@ func (s *userService) UpdateUser(ctx context.Context, userID int32, email, name,
 		if exists {
 			return nil, apperrors.NewConflictError("email already in use")
 		}
-		user.Email = email
+		user.Email = &email
 	}
 
 	// Validate and update name if provided
