@@ -82,6 +82,16 @@ func (r *userRepository) Delete(ctx context.Context, id int32) error {
 	return r.executeDelete(ctx, &models.User{}, id, "user")
 }
 
+// GetByUsername retrieves a user by username.
+func (r *userRepository) GetByUsername(ctx context.Context, username string) (*models.User, error) {
+	var user models.User
+	result := r.db.DB.WithContext(ctx).Where("username = ?", username).First(&user)
+	if result.Error != nil {
+		return nil, r.handleDBError(result.Error, "user", "get user by username")
+	}
+	return &user, nil
+}
+
 // Exists checks if a user exists by email.
 func (r *userRepository) ExistsByEmail(ctx context.Context, email string) (bool, error) {
 	var count int64
