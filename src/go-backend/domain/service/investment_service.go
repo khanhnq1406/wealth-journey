@@ -151,6 +151,14 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		return nil, err
 	}
 
+	// Validate purchase_date if provided
+	if req.PurchaseDate > 0 {
+		purchaseTime := time.Unix(req.PurchaseDate, 0)
+		if purchaseTime.After(time.Now()) {
+			return nil, apperrors.NewValidationError("purchase date cannot be in the future")
+		}
+	}
+
 	// 3. Check for duplicate symbol in wallet
 	existing, err := s.investmentRepo.GetByWalletAndSymbol(ctx, req.WalletId, req.Symbol)
 	if err == nil && existing != nil {
@@ -202,6 +210,12 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		return nil, err
 	}
 
+	// Determine transaction date
+	txDate := time.Now()
+	if req.PurchaseDate > 0 {
+		txDate = time.Unix(req.PurchaseDate, 0)
+	}
+
 	// 8. Create initial buy transaction
 	tx := &models.InvestmentTransaction{
 		InvestmentID:    investment.ID,
@@ -211,7 +225,7 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		Price:           averageCost,
 		Cost:            initialCost,
 		Fees:            0,
-		TransactionDate: time.Now(),
+		TransactionDate: txDate,
 		Notes:           "Initial investment",
 	}
 
@@ -228,7 +242,7 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		RemainingQuantity: initialQuantity,
 		AverageCost:       averageCost,
 		TotalCost:         initialCost,
-		PurchasedAt:       time.Now(),
+		PurchasedAt:       txDate,
 	}
 
 	if err := s.txRepo.CreateLot(ctx, lot); err != nil {
