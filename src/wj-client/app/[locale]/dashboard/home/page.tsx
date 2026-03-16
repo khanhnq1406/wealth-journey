@@ -36,7 +36,7 @@ import { CurrencyPriceTable } from "./CurrencyPriceTable";
 import { DollarIndexChart } from "./DollarIndexChart";
 import { WalletsSection } from "./WalletsSection";
 import { BaseCard } from "@/components/BaseCard";
-import { GoldSentimentCard } from "@/components/GoldSentimentCard";
+import { SentimentCard } from "@/components/GoldSentimentCard";
 
 type ModalType = "add-transaction" | "transfer-money" | "create-wallet" | null;
 
@@ -184,7 +184,10 @@ export default function Home() {
         {/* 4. Gold Price Chart */}
         <GoldPriceChart />
 
-        {/* 5. Silver Price Table */}
+        {/* 5. Gold Sentiment Survey */}
+        <SentimentCard variant="home" asset="gold" />
+
+        {/* 6. Silver Price Table */}
         <SilverPriceTable
           prices={silverPrices}
           updatedTime={silverUpdatedTime}
@@ -192,19 +195,19 @@ export default function Home() {
           isLoading={marketPricesLoading}
         />
 
-        {/* 6. Silver Price Chart */}
+        {/* 7. Silver Price Chart */}
         <SilverPriceChart />
 
-        {/* 7. Currency Price Table */}
+        {/* 8. Silver Sentiment Survey */}
+        <SentimentCard variant="home" asset="silver" />
+
+        {/* 9. Currency Price Table */}
         <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} isAdmin={isAdmin} isLoading={marketPricesLoading} />
 
-        {/* 8. Dollar Index Chart */}
+        {/* 10. Dollar Index Chart */}
         <DollarIndexChart />
 
-        {/* 9. Gold Sentiment */}
-        <GoldSentimentCard variant="home" />
-
-        {/* 10. Wallets */}
+        {/* 11. Wallets */}
         <WalletsSection wallets={wallets} isLoading={walletsLoading} />
       </div>
 
@@ -255,6 +258,9 @@ export default function Home() {
           <GoldPriceChart />
         </div>
 
+        {/* Gold Sentiment Survey */}
+        <SentimentCard variant="home" asset="gold" />
+
         {/* Row 4: Silver Table + Silver Chart */}
         <div className="grid grid-cols-2 gap-6">
           <SilverPriceTable
@@ -266,14 +272,14 @@ export default function Home() {
           <SilverPriceChart />
         </div>
 
+        {/* Silver Sentiment Survey */}
+        <SentimentCard variant="home" asset="silver" />
+
         {/* Row 5: Currency Table + Dollar Index Chart */}
         <div className="grid grid-cols-2 gap-6">
           <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} isAdmin={isAdmin} isLoading={marketPricesLoading} />
           <DollarIndexChart />
         </div>
-
-        {/* Row 6: Gold Sentiment */}
-        <GoldSentimentCard variant="home" />
       </div>
 
       {/* Modals */}

@@ -45,8 +45,9 @@ func (h *GoldSentimentHandler) tryGetUserID(c *gin.Context) int32 {
 func (h *GoldSentimentHandler) GetGoldSentiment(c *gin.Context) {
 	userID := h.tryGetUserID(c)
 	anonymousID := c.GetHeader("X-Anonymous-ID")
+	category, _ := strconv.Atoi(c.DefaultQuery("category", "0"))
 
-	result, err := h.service.GetSentiment(c.Request.Context(), userID, anonymousID)
+	result, err := h.service.GetSentiment(c.Request.Context(), userID, anonymousID, int32(category))
 	if err != nil {
 		handler.HandleError(c, err)
 		return
@@ -63,9 +64,12 @@ func (h *GoldSentimentHandler) GetGoldSentimentComments(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
 
+	category, _ := strconv.Atoi(c.DefaultQuery("category", "0"))
+
 	req := &v1.GetGoldSentimentCommentsRequest{
 		Page:     int32(page),
 		PageSize: int32(pageSize),
+		Category: v1.SentimentCategory(category),
 	}
 
 	result, err := h.service.GetComments(c.Request.Context(), userID, req)

@@ -57,7 +57,49 @@ export function voteDirectionToJSON(object: VoteDirection): string {
   }
 }
 
+export const SentimentCategory = {
+  SENTIMENT_CATEGORY_GOLD: 0,
+  SENTIMENT_CATEGORY_SILVER: 1,
+  UNRECOGNIZED: -1,
+} as const;
+
+export type SentimentCategory = typeof SentimentCategory[keyof typeof SentimentCategory];
+
+export namespace SentimentCategory {
+  export type SENTIMENT_CATEGORY_GOLD = typeof SentimentCategory.SENTIMENT_CATEGORY_GOLD;
+  export type SENTIMENT_CATEGORY_SILVER = typeof SentimentCategory.SENTIMENT_CATEGORY_SILVER;
+  export type UNRECOGNIZED = typeof SentimentCategory.UNRECOGNIZED;
+}
+
+export function sentimentCategoryFromJSON(object: any): SentimentCategory {
+  switch (object) {
+    case 0:
+    case "SENTIMENT_CATEGORY_GOLD":
+      return SentimentCategory.SENTIMENT_CATEGORY_GOLD;
+    case 1:
+    case "SENTIMENT_CATEGORY_SILVER":
+      return SentimentCategory.SENTIMENT_CATEGORY_SILVER;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return SentimentCategory.UNRECOGNIZED;
+  }
+}
+
+export function sentimentCategoryToJSON(object: SentimentCategory): string {
+  switch (object) {
+    case SentimentCategory.SENTIMENT_CATEGORY_GOLD:
+      return "SENTIMENT_CATEGORY_GOLD";
+    case SentimentCategory.SENTIMENT_CATEGORY_SILVER:
+      return "SENTIMENT_CATEGORY_SILVER";
+    case SentimentCategory.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface GetGoldSentimentRequest {
+  category: SentimentCategory;
 }
 
 export interface GetGoldSentimentResponse {
@@ -68,11 +110,13 @@ export interface GetGoldSentimentResponse {
   bearishPercentage: number;
   voteDate: string;
   userVote: VoteDirection;
+  category: SentimentCategory;
 }
 
 export interface GetGoldSentimentCommentsRequest {
   page: number;
   pageSize: number;
+  category: SentimentCategory;
 }
 
 export interface GoldSentimentCommentItem {
@@ -96,10 +140,12 @@ export interface GetGoldSentimentCommentsResponse {
    * today has no comments and the backend fell back to a recent day.
    */
   commentDate: string;
+  category: SentimentCategory;
 }
 
 export interface CastGoldVoteRequest {
   direction: VoteDirection;
+  category: SentimentCategory;
 }
 
 export interface CastGoldVoteResponse {
@@ -114,6 +160,7 @@ export interface CastGoldVoteResponse {
 
 export interface PostGoldSentimentCommentRequest {
   content: string;
+  category: SentimentCategory;
 }
 
 export interface PostGoldSentimentCommentResponse {
@@ -122,17 +169,21 @@ export interface PostGoldSentimentCommentResponse {
 
 export interface DeleteGoldSentimentCommentRequest {
   commentId: number;
+  category: SentimentCategory;
 }
 
 export interface DeleteGoldSentimentCommentResponse {
 }
 
 function createBaseGetGoldSentimentRequest(): GetGoldSentimentRequest {
-  return {};
+  return { category: 0 };
 }
 
 export const GetGoldSentimentRequest: MessageFns<GetGoldSentimentRequest> = {
-  encode(_: GetGoldSentimentRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+  encode(message: GetGoldSentimentRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.category !== 0) {
+      writer.uint32(8).int32(message.category);
+    }
     return writer;
   },
 
@@ -143,6 +194,14 @@ export const GetGoldSentimentRequest: MessageFns<GetGoldSentimentRequest> = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.category = reader.int32() as any;
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -152,20 +211,24 @@ export const GetGoldSentimentRequest: MessageFns<GetGoldSentimentRequest> = {
     return message;
   },
 
-  fromJSON(_: any): GetGoldSentimentRequest {
-    return {};
+  fromJSON(object: any): GetGoldSentimentRequest {
+    return { category: isSet(object.category) ? sentimentCategoryFromJSON(object.category) : 0 };
   },
 
-  toJSON(_: GetGoldSentimentRequest): unknown {
+  toJSON(message: GetGoldSentimentRequest): unknown {
     const obj: any = {};
+    if (message.category !== 0) {
+      obj.category = sentimentCategoryToJSON(message.category);
+    }
     return obj;
   },
 
   create(base?: DeepPartial<GetGoldSentimentRequest>): GetGoldSentimentRequest {
     return GetGoldSentimentRequest.fromPartial(base ?? {});
   },
-  fromPartial(_: DeepPartial<GetGoldSentimentRequest>): GetGoldSentimentRequest {
+  fromPartial(object: DeepPartial<GetGoldSentimentRequest>): GetGoldSentimentRequest {
     const message = createBaseGetGoldSentimentRequest();
+    message.category = object.category ?? 0;
     return message;
   },
 };
@@ -179,6 +242,7 @@ function createBaseGetGoldSentimentResponse(): GetGoldSentimentResponse {
     bearishPercentage: 0,
     voteDate: "",
     userVote: 0,
+    category: 0,
   };
 }
 
@@ -204,6 +268,9 @@ export const GetGoldSentimentResponse: MessageFns<GetGoldSentimentResponse> = {
     }
     if (message.userVote !== 0) {
       writer.uint32(56).int32(message.userVote);
+    }
+    if (message.category !== 0) {
+      writer.uint32(64).int32(message.category);
     }
     return writer;
   },
@@ -271,6 +338,14 @@ export const GetGoldSentimentResponse: MessageFns<GetGoldSentimentResponse> = {
           message.userVote = reader.int32() as any;
           continue;
         }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
+
+          message.category = reader.int32() as any;
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -317,6 +392,7 @@ export const GetGoldSentimentResponse: MessageFns<GetGoldSentimentResponse> = {
         : isSet(object.user_vote)
         ? voteDirectionFromJSON(object.user_vote)
         : 0,
+      category: isSet(object.category) ? sentimentCategoryFromJSON(object.category) : 0,
     };
   },
 
@@ -343,6 +419,9 @@ export const GetGoldSentimentResponse: MessageFns<GetGoldSentimentResponse> = {
     if (message.userVote !== 0) {
       obj.userVote = voteDirectionToJSON(message.userVote);
     }
+    if (message.category !== 0) {
+      obj.category = sentimentCategoryToJSON(message.category);
+    }
     return obj;
   },
 
@@ -358,12 +437,13 @@ export const GetGoldSentimentResponse: MessageFns<GetGoldSentimentResponse> = {
     message.bearishPercentage = object.bearishPercentage ?? 0;
     message.voteDate = object.voteDate ?? "";
     message.userVote = object.userVote ?? 0;
+    message.category = object.category ?? 0;
     return message;
   },
 };
 
 function createBaseGetGoldSentimentCommentsRequest(): GetGoldSentimentCommentsRequest {
-  return { page: 0, pageSize: 0 };
+  return { page: 0, pageSize: 0, category: 0 };
 }
 
 export const GetGoldSentimentCommentsRequest: MessageFns<GetGoldSentimentCommentsRequest> = {
@@ -373,6 +453,9 @@ export const GetGoldSentimentCommentsRequest: MessageFns<GetGoldSentimentComment
     }
     if (message.pageSize !== 0) {
       writer.uint32(16).int32(message.pageSize);
+    }
+    if (message.category !== 0) {
+      writer.uint32(24).int32(message.category);
     }
     return writer;
   },
@@ -400,6 +483,14 @@ export const GetGoldSentimentCommentsRequest: MessageFns<GetGoldSentimentComment
           message.pageSize = reader.int32();
           continue;
         }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.category = reader.int32() as any;
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -417,6 +508,7 @@ export const GetGoldSentimentCommentsRequest: MessageFns<GetGoldSentimentComment
         : isSet(object.page_size)
         ? globalThis.Number(object.page_size)
         : 0,
+      category: isSet(object.category) ? sentimentCategoryFromJSON(object.category) : 0,
     };
   },
 
@@ -428,6 +520,9 @@ export const GetGoldSentimentCommentsRequest: MessageFns<GetGoldSentimentComment
     if (message.pageSize !== 0) {
       obj.pageSize = Math.round(message.pageSize);
     }
+    if (message.category !== 0) {
+      obj.category = sentimentCategoryToJSON(message.category);
+    }
     return obj;
   },
 
@@ -438,6 +533,7 @@ export const GetGoldSentimentCommentsRequest: MessageFns<GetGoldSentimentComment
     const message = createBaseGetGoldSentimentCommentsRequest();
     message.page = object.page ?? 0;
     message.pageSize = object.pageSize ?? 0;
+    message.category = object.category ?? 0;
     return message;
   },
 };
@@ -648,7 +744,7 @@ export const GoldSentimentCommentItem: MessageFns<GoldSentimentCommentItem> = {
 };
 
 function createBaseGetGoldSentimentCommentsResponse(): GetGoldSentimentCommentsResponse {
-  return { comments: [], totalCount: 0, page: 0, pageSize: 0, commentDate: "" };
+  return { comments: [], totalCount: 0, page: 0, pageSize: 0, commentDate: "", category: 0 };
 }
 
 export const GetGoldSentimentCommentsResponse: MessageFns<GetGoldSentimentCommentsResponse> = {
@@ -667,6 +763,9 @@ export const GetGoldSentimentCommentsResponse: MessageFns<GetGoldSentimentCommen
     }
     if (message.commentDate !== "") {
       writer.uint32(42).string(message.commentDate);
+    }
+    if (message.category !== 0) {
+      writer.uint32(48).int32(message.category);
     }
     return writer;
   },
@@ -718,6 +817,14 @@ export const GetGoldSentimentCommentsResponse: MessageFns<GetGoldSentimentCommen
           message.commentDate = reader.string();
           continue;
         }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.category = reader.int32() as any;
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -748,6 +855,7 @@ export const GetGoldSentimentCommentsResponse: MessageFns<GetGoldSentimentCommen
         : isSet(object.comment_date)
         ? globalThis.String(object.comment_date)
         : "",
+      category: isSet(object.category) ? sentimentCategoryFromJSON(object.category) : 0,
     };
   },
 
@@ -768,6 +876,9 @@ export const GetGoldSentimentCommentsResponse: MessageFns<GetGoldSentimentCommen
     if (message.commentDate !== "") {
       obj.commentDate = message.commentDate;
     }
+    if (message.category !== 0) {
+      obj.category = sentimentCategoryToJSON(message.category);
+    }
     return obj;
   },
 
@@ -781,18 +892,22 @@ export const GetGoldSentimentCommentsResponse: MessageFns<GetGoldSentimentCommen
     message.page = object.page ?? 0;
     message.pageSize = object.pageSize ?? 0;
     message.commentDate = object.commentDate ?? "";
+    message.category = object.category ?? 0;
     return message;
   },
 };
 
 function createBaseCastGoldVoteRequest(): CastGoldVoteRequest {
-  return { direction: 0 };
+  return { direction: 0, category: 0 };
 }
 
 export const CastGoldVoteRequest: MessageFns<CastGoldVoteRequest> = {
   encode(message: CastGoldVoteRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.direction !== 0) {
       writer.uint32(8).int32(message.direction);
+    }
+    if (message.category !== 0) {
+      writer.uint32(16).int32(message.category);
     }
     return writer;
   },
@@ -812,6 +927,14 @@ export const CastGoldVoteRequest: MessageFns<CastGoldVoteRequest> = {
           message.direction = reader.int32() as any;
           continue;
         }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.category = reader.int32() as any;
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -822,13 +945,19 @@ export const CastGoldVoteRequest: MessageFns<CastGoldVoteRequest> = {
   },
 
   fromJSON(object: any): CastGoldVoteRequest {
-    return { direction: isSet(object.direction) ? voteDirectionFromJSON(object.direction) : 0 };
+    return {
+      direction: isSet(object.direction) ? voteDirectionFromJSON(object.direction) : 0,
+      category: isSet(object.category) ? sentimentCategoryFromJSON(object.category) : 0,
+    };
   },
 
   toJSON(message: CastGoldVoteRequest): unknown {
     const obj: any = {};
     if (message.direction !== 0) {
       obj.direction = voteDirectionToJSON(message.direction);
+    }
+    if (message.category !== 0) {
+      obj.category = sentimentCategoryToJSON(message.category);
     }
     return obj;
   },
@@ -839,6 +968,7 @@ export const CastGoldVoteRequest: MessageFns<CastGoldVoteRequest> = {
   fromPartial(object: DeepPartial<CastGoldVoteRequest>): CastGoldVoteRequest {
     const message = createBaseCastGoldVoteRequest();
     message.direction = object.direction ?? 0;
+    message.category = object.category ?? 0;
     return message;
   },
 };
@@ -1032,13 +1162,16 @@ export const CastGoldVoteResponse: MessageFns<CastGoldVoteResponse> = {
 };
 
 function createBasePostGoldSentimentCommentRequest(): PostGoldSentimentCommentRequest {
-  return { content: "" };
+  return { content: "", category: 0 };
 }
 
 export const PostGoldSentimentCommentRequest: MessageFns<PostGoldSentimentCommentRequest> = {
   encode(message: PostGoldSentimentCommentRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.content !== "") {
       writer.uint32(10).string(message.content);
+    }
+    if (message.category !== 0) {
+      writer.uint32(16).int32(message.category);
     }
     return writer;
   },
@@ -1058,6 +1191,14 @@ export const PostGoldSentimentCommentRequest: MessageFns<PostGoldSentimentCommen
           message.content = reader.string();
           continue;
         }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.category = reader.int32() as any;
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1068,13 +1209,19 @@ export const PostGoldSentimentCommentRequest: MessageFns<PostGoldSentimentCommen
   },
 
   fromJSON(object: any): PostGoldSentimentCommentRequest {
-    return { content: isSet(object.content) ? globalThis.String(object.content) : "" };
+    return {
+      content: isSet(object.content) ? globalThis.String(object.content) : "",
+      category: isSet(object.category) ? sentimentCategoryFromJSON(object.category) : 0,
+    };
   },
 
   toJSON(message: PostGoldSentimentCommentRequest): unknown {
     const obj: any = {};
     if (message.content !== "") {
       obj.content = message.content;
+    }
+    if (message.category !== 0) {
+      obj.category = sentimentCategoryToJSON(message.category);
     }
     return obj;
   },
@@ -1085,6 +1232,7 @@ export const PostGoldSentimentCommentRequest: MessageFns<PostGoldSentimentCommen
   fromPartial(object: DeepPartial<PostGoldSentimentCommentRequest>): PostGoldSentimentCommentRequest {
     const message = createBasePostGoldSentimentCommentRequest();
     message.content = object.content ?? "";
+    message.category = object.category ?? 0;
     return message;
   },
 };
@@ -1150,13 +1298,16 @@ export const PostGoldSentimentCommentResponse: MessageFns<PostGoldSentimentComme
 };
 
 function createBaseDeleteGoldSentimentCommentRequest(): DeleteGoldSentimentCommentRequest {
-  return { commentId: 0 };
+  return { commentId: 0, category: 0 };
 }
 
 export const DeleteGoldSentimentCommentRequest: MessageFns<DeleteGoldSentimentCommentRequest> = {
   encode(message: DeleteGoldSentimentCommentRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.commentId !== 0) {
       writer.uint32(8).int32(message.commentId);
+    }
+    if (message.category !== 0) {
+      writer.uint32(16).int32(message.category);
     }
     return writer;
   },
@@ -1176,6 +1327,14 @@ export const DeleteGoldSentimentCommentRequest: MessageFns<DeleteGoldSentimentCo
           message.commentId = reader.int32();
           continue;
         }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.category = reader.int32() as any;
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1192,6 +1351,7 @@ export const DeleteGoldSentimentCommentRequest: MessageFns<DeleteGoldSentimentCo
         : isSet(object.comment_id)
         ? globalThis.Number(object.comment_id)
         : 0,
+      category: isSet(object.category) ? sentimentCategoryFromJSON(object.category) : 0,
     };
   },
 
@@ -1199,6 +1359,9 @@ export const DeleteGoldSentimentCommentRequest: MessageFns<DeleteGoldSentimentCo
     const obj: any = {};
     if (message.commentId !== 0) {
       obj.commentId = Math.round(message.commentId);
+    }
+    if (message.category !== 0) {
+      obj.category = sentimentCategoryToJSON(message.category);
     }
     return obj;
   },
@@ -1209,6 +1372,7 @@ export const DeleteGoldSentimentCommentRequest: MessageFns<DeleteGoldSentimentCo
   fromPartial(object: DeepPartial<DeleteGoldSentimentCommentRequest>): DeleteGoldSentimentCommentRequest {
     const message = createBaseDeleteGoldSentimentCommentRequest();
     message.commentId = object.commentId ?? 0;
+    message.category = object.category ?? 0;
     return message;
   },
 };

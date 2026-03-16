@@ -28,7 +28,7 @@ C4Component
         Component(gold_chart_h, "Gold Chart Handler", "handlers/gold_chart.go", "Proxies gold price history from mihong.vn with Redis caching")
         Component(silver_chart_h, "Silver Chart Handler", "handlers/silver_chart.go", "Proxies silver price history from giabac.vn and Yahoo Finance SI=F with Redis caching")
         Component(community_h, "Community Handlers", "Posts + Comments + Likes + Follows + Reports", "Social feed, post CRUD, commenting, liking, user following, content moderation; Phase 3: UploadImage, UpdateComment, GetReplies, GetLikedPosts, UpdateProfile, StreamNotifications")
-        Component(gold_sentiment_h, "GoldSentiment Handler", "handlers/gold_sentiment.go", "Daily gold sentiment vote & comments. Public GET with optional auth, protected POST/DELETE for voting and commenting.")
+        Component(gold_sentiment_h, "GoldSentiment Handler", "handlers/gold_sentiment.go", "Daily asset sentiment vote & comments (gold/silver via category query param). Public GET with optional auth, protected POST/DELETE for voting and commenting.")
         Component(price_override_h, "PriceOverride Handler", "handlers/price_override.go", "Admin-only REST handler for price override CRUD (Set/List/Delete). Protected by AdminMiddleware.")
         Component(public_h, "Public Handlers", "handlers/public.go", "No-auth endpoint returning gold/silver/currency type names from in-memory registries. IP-rate-limited only.")
     }
@@ -47,7 +47,7 @@ C4Component
         Component(fx_svc, "FX Rate Service", "domain/service", "Currency conversion rates, cross-currency calculations")
         Component(import_svc, "Import Service", "domain/service", "File parsing, field mapping, duplicate detection, batch execution")
         Component(portfolio_svc, "Portfolio History Service", "domain/service", "Historical portfolio value snapshots for charts")
-        Component(gold_sentiment_svc, "GoldSentiment Service", "domain/service", "Vote upsert, comments with rate limiting, Redis caching (30s TTL), Vietnam TZ daily reset")
+        Component(gold_sentiment_svc, "GoldSentiment Service", "domain/service", "Vote upsert, comments with rate limiting, Redis caching (30s TTL) with per-category key isolation (gold/silver), Vietnam TZ daily reset")
         Component(community_svc, "Community Service", "domain/service", "Social interactions: posts, comments, likes, follows, content reports; Phase 2: SharePost, GetNotifications, GetUnreadNotificationCount, MarkNotificationsRead, SavePost, UnsavePost, GetSavedPosts, GetSuggestedUsers, GetTrendingTopics, GetFollowing, GetFollowers; Phase 3: UploadImage, UpdateComment, GetReplies, GetLikedPosts, UpdateProfile, StreamNotifications")
     }
 

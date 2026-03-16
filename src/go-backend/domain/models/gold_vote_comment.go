@@ -11,6 +11,7 @@ type GoldVoteComment struct {
 	UserID    int32          `gorm:"not null;index:idx_gold_vote_comment_user" json:"userId"`
 	VoteDate  time.Time      `gorm:"type:date;not null;index:idx_gold_vote_comment_date" json:"voteDate"`
 	Content   string         `gorm:"type:text;not null" json:"content"`
+	Category  int32          `gorm:"type:smallint;default:0;not null" json:"category"` // 0=gold, 1=silver
 	CreatedAt time.Time      `json:"createdAt"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 	User      *User          `gorm:"foreignKey:UserID" json:"user,omitempty"`

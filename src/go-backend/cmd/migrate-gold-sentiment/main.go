@@ -79,6 +79,39 @@ func migrateGoldSentiment(db *gorm.DB) error {
 		log.Printf("Warning: failed to add content length constraint: %v", err)
 	}
 
+	// Add category column to gold_vote
+	log.Println("Adding category column to gold_vote...")
+	if err := db.Exec(`ALTER TABLE gold_vote ADD COLUMN IF NOT EXISTS category SMALLINT DEFAULT 0 NOT NULL`).Error; err != nil {
+		log.Printf("Warning: category column may already exist on gold_vote: %v", err)
+	}
+
+	// Drop old partial unique indexes and recreate with category
+	log.Println("Recreating partial unique indexes with category...")
+	db.Exec(`DROP INDEX IF EXISTS idx_gold_vote_user_date`)
+	db.Exec(`DROP INDEX IF EXISTS idx_gold_vote_anon_date`)
+	if err := db.Exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_gold_vote_user_cat_date ON gold_vote(category, user_id, vote_date) WHERE user_id IS NOT NULL`).Error; err != nil {
+		return fmt.Errorf("failed to create user+category partial index: %w", err)
+	}
+	if err := db.Exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_gold_vote_anon_cat_date ON gold_vote(category, anonymous_id, vote_date) WHERE anonymous_id IS NOT NULL`).Error; err != nil {
+		return fmt.Errorf("failed to create anonymous+category partial index: %w", err)
+	}
+
+	// Add index for efficient count queries by category+date
+	if err := db.Exec(`CREATE INDEX IF NOT EXISTS idx_gold_vote_cat_date ON gold_vote(category, vote_date)`).Error; err != nil {
+		log.Printf("Warning: failed to create category+date index: %v", err)
+	}
+
+	// Add category column to gold_vote_comment
+	log.Println("Adding category column to gold_vote_comment...")
+	if err := db.Exec(`ALTER TABLE gold_vote_comment ADD COLUMN IF NOT EXISTS category SMALLINT DEFAULT 0 NOT NULL`).Error; err != nil {
+		log.Printf("Warning: category column may already exist on gold_vote_comment: %v", err)
+	}
+
+	// Add index for comment queries by category+date
+	if err := db.Exec(`CREATE INDEX IF NOT EXISTS idx_gold_vote_comment_cat_date ON gold_vote_comment(category, vote_date)`).Error; err != nil {
+		log.Printf("Warning: failed to create comment category+date index: %v", err)
+	}
+
 	log.Println("Gold sentiment tables created successfully")
 	return nil
 }

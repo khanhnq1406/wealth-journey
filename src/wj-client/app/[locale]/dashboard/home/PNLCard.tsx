@@ -10,6 +10,8 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { PnlPeriod } from "@/gen/protobuf/v1/investment";
 import { parseAmount } from "@/utils/currency-formatter";
+import Link from "next/link";
+import { routes } from "@/app/constants";
 
 interface PNLCardProps {
   currency: string;
@@ -21,14 +23,14 @@ const PERIOD_TO_ENUM: Record<PeriodKey, PnlPeriod> = {
   "1d": PnlPeriod.PNL_PERIOD_1D,
   "1w": PnlPeriod.PNL_PERIOD_1W,
   "1m": PnlPeriod.PNL_PERIOD_1M,
-  "all": PnlPeriod.PNL_PERIOD_ALL,
+  all: PnlPeriod.PNL_PERIOD_ALL,
 };
 
 const PERIOD_TO_CHART_DAYS: Record<PeriodKey, number> = {
   "1d": 1,
   "1w": 7,
   "1m": 30,
-  "all": 90,
+  all: 90,
 };
 
 export function PNLCard({ currency }: PNLCardProps) {
@@ -52,7 +54,12 @@ export function PNLCard({ currency }: PNLCardProps) {
 
   const { data: histData, isLoading: histLoading } =
     useQueryGetHistoricalPortfolioValues(
-      { walletId: 0, typeFilter: 0, days: chartDays, points: Math.min(chartDays, 30) },
+      {
+        walletId: 0,
+        typeFilter: 0,
+        days: chartDays,
+        points: Math.min(chartDays, 30),
+      },
       { staleTime: 5 * 60 * 1000, refetchOnWindowFocus: false },
     );
 
@@ -90,13 +97,17 @@ export function PNLCard({ currency }: PNLCardProps) {
     "1d": "pnl1d",
     "1w": "pnl1w",
     "1m": "pnl1m",
-    "all": "pnlAll",
+    all: "pnlAll",
   };
 
   const isPositive = periodPnl >= 0;
 
   return (
-    <BaseCard padding="none" noMobileMargin className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden">
+    <BaseCard
+      padding="none"
+      noMobileMargin
+      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
+    >
       {/* Header */}
       <div className="p-5 pb-4">
         <div className="flex items-center justify-between">
@@ -147,10 +158,16 @@ export function PNLCard({ currency }: PNLCardProps) {
           </div>
         )}
         {!histLoading && chartPoints.length === 0 && (
-          <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex items-center justify-center">
-            <p className="font-vietnam text-[13px] text-v2-text-tertiary">
-              {t("noData")}
+          <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex flex-col items-center justify-center gap-3">
+            <p className="font-vietnam text-[13px] text-v2-text-tertiary text-center px-4">
+              {t("pnlNoData")}
             </p>
+            <Link
+              href={routes.portfolio}
+              className="font-vietnam text-[13px] font-medium text-v2-red-primary underline underline-offset-2"
+            >
+              {t("pnlGoToPortfolio")}
+            </Link>
           </div>
         )}
         {!histLoading && chartPoints.length > 0 && (

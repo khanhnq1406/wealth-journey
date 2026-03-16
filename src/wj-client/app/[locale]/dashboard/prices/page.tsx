@@ -20,6 +20,7 @@ import {
   InlinePriceEdit,
   OverrideIndicator,
 } from "@/features/market-prices/components/InlinePriceEdit";
+import { SentimentCard } from "@/components/GoldSentimentCard";
 
 type Tab = "gold" | "silver" | "currency" | "symbol";
 
@@ -436,6 +437,10 @@ export default function PricesPage() {
                   expandable
                 />
               </div>
+              {/* Gold Sentiment */}
+              <div className="mt-4">
+                <SentimentCard variant="home" asset="gold" />
+              </div>
             </>
           )}
 
@@ -470,6 +475,10 @@ export default function PricesPage() {
                   emptyDescription={t("silver.emptyDescription")}
                   expandable
                 />
+              </div>
+              {/* Silver Sentiment */}
+              <div className="mt-4">
+                <SentimentCard variant="home" asset="silver" />
               </div>
             </>
           )}

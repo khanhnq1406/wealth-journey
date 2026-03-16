@@ -16,15 +16,35 @@ import {
   EVENT_GoldSentimentGetGoldSentiment,
   EVENT_GoldSentimentGetGoldSentimentComments,
 } from "@/utils/generated/hooks";
-import { VoteDirection } from "@/gen/protobuf/v1/gold_sentiment";
+import { VoteDirection, SentimentCategory } from "@/gen/protobuf/v1/gold_sentiment";
 import type { GoldSentimentCommentItem as CommentItem } from "@/gen/protobuf/v1/gold_sentiment";
 
-interface GoldSentimentCardProps {
+type SentimentAsset = "gold" | "silver";
+
+interface SentimentCardProps {
   variant: "landing" | "home";
+  asset?: SentimentAsset;
 }
 
 const MAX_COMMENT_LENGTH = 500;
 const COMMENTS_PER_PAGE = 10;
+
+const ASSET_THEME = {
+  gold: {
+    spinnerBorder: "border-v2-gold-primary",
+    focusRing: "focus:ring-v2-gold-primary/30 focus:border-v2-gold-primary",
+    accentText: "text-v2-gold-primary hover:text-v2-gold-dark dark:hover:text-v2-gold-accent",
+    sendButton: "bg-v2-gold-primary hover:bg-v2-gold-dark active:bg-v2-gold-dark",
+    loadMoreText: "text-v2-gold-primary hover:text-v2-gold-dark dark:hover:text-v2-gold-accent",
+  },
+  silver: {
+    spinnerBorder: "border-v2-silver-primary",
+    focusRing: "focus:ring-v2-silver-primary/30 focus:border-v2-silver-primary",
+    accentText: "text-v2-silver-primary hover:text-v2-silver-dark dark:hover:text-gray-300",
+    sendButton: "bg-v2-silver-primary hover:bg-v2-silver-dark active:bg-v2-silver-dark",
+    loadMoreText: "text-v2-silver-primary hover:text-v2-silver-dark dark:hover:text-gray-300",
+  },
+} as const;
 
 function formatRelativeTime(
   timestampSeconds: number,
@@ -42,27 +62,18 @@ function formatRelativeTime(
   return t("daysAgo", { count: days });
 }
 
-/** Check if a YYYY-MM-DD string is today (Vietnam TZ UTC+7). */
-function isToday(dateStr: string): boolean {
-  if (!dateStr) return true;
-  const now = new Date();
-  const vnNow = new Date(now.getTime() + 7 * 60 * 60 * 1000);
-  const todayStr = vnNow.toISOString().slice(0, 10);
-  return dateStr === todayStr;
-}
-
-/** Format YYYY-MM-DD to a human-readable short date (e.g. "Mar 13"). */
-function formatShortDate(dateStr: string): string {
-  const [y, m, d] = dateStr.split("-").map(Number);
-  const dt = new Date(y, m - 1, d);
-  return dt.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-}
-
-export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
-  const t = useTranslations("goldSentiment");
+export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
+  const t = useTranslations(asset === "silver" ? "silverSentiment" : "goldSentiment");
   const queryClient = useQueryClient();
   const isHome = variant === "home";
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const theme = ASSET_THEME[asset];
+
+  const category = asset === "silver"
+    ? SentimentCategory.SENTIMENT_CATEGORY_SILVER
+    : SentimentCategory.SENTIMENT_CATEGORY_GOLD;
+
+  const anonymousIdKey = asset === "silver" ? "silver_vote_anonymous_id" : "gold_vote_anonymous_id";
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -85,11 +96,11 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
 
   // Data fetching
   const { data: sentiment, isLoading: sentimentLoading } =
-    useQueryGetGoldSentiment({}, { refetchOnMount: "always" });
+    useQueryGetGoldSentiment({ category }, { refetchOnMount: "always" });
 
   const { data: commentsData, isLoading: commentsLoading } =
     useQueryGetGoldSentimentComments(
-      { page: 1, pageSize: isHome ? COMMENTS_PER_PAGE * page : 2 },
+      { page: 1, pageSize: isHome ? COMMENTS_PER_PAGE * page : 2, category },
       { refetchOnMount: "always" },
     );
 
@@ -99,7 +110,7 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
   const castVoteMutation = useMutationCastGoldVote({
     onSuccess: (data) => {
       if (data?.anonymousId) {
-        localStorage.setItem("gold_vote_anonymous_id", data.anonymousId);
+        localStorage.setItem(anonymousIdKey, data.anonymousId);
       }
       queryClient.invalidateQueries({
         queryKey: [EVENT_GoldSentimentGetGoldSentiment],
@@ -150,22 +161,22 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
 
   const handleVote = useCallback(
     (direction: VoteDirection) => {
-      castVoteMutation.mutate({ direction });
+      castVoteMutation.mutate({ direction, category });
     },
-    [castVoteMutation],
+    [castVoteMutation, category],
   );
 
   const handlePostComment = useCallback(() => {
     const trimmed = commentText.trim();
     if (!trimmed || trimmed.length > MAX_COMMENT_LENGTH) return;
-    postCommentMutation.mutate({ content: trimmed });
-  }, [commentText, postCommentMutation]);
+    postCommentMutation.mutate({ content: trimmed, category });
+  }, [commentText, postCommentMutation, category]);
 
   const handleDeleteComment = useCallback(
     (commentId: number) => {
-      deleteCommentMutation.mutate({ commentId });
+      deleteCommentMutation.mutate({ commentId, category });
     },
-    [deleteCommentMutation],
+    [deleteCommentMutation, category],
   );
 
   const handleLoadMore = useCallback(() => {
@@ -179,22 +190,18 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
   const totalVotes = sentiment?.totalVotes ?? 0;
   const totalComments = commentsData?.totalCount ?? 0;
   const hasMore = allComments.length < totalComments;
-  const commentDate = commentsData?.commentDate ?? "";
-  const showingOlderComments = commentDate && !isToday(commentDate) && allComments.length > 0;
 
   const getSummaryText = () => {
     if (totalVotes === 0) return t("communityNeutral");
-    if (bullishPct >= bearishPct) {
-      return t("communityBullish", { count: totalVotes });
-    }
-    return t("communityBearish", { count: totalVotes });
+    if (bullishPct >= bearishPct) return t("communityBullish");
+    return t("communityBearish");
   };
 
   if (sentimentLoading) {
     return (
       <BaseCard padding="md" mobileOptimized>
         <div className="flex items-center justify-center py-8">
-          <div className="w-6 h-6 border-2 border-v2-gold-primary border-t-transparent rounded-full animate-spin" />
+          <div className={`w-6 h-6 border-2 ${theme.spinnerBorder} border-t-transparent rounded-full animate-spin`} />
         </div>
       </BaseCard>
     );
@@ -287,7 +294,7 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
         <div className="text-center text-sm text-v2-text-secondary dark:text-dark-text-secondary mb-2.5">
           <Link
             href="/auth/login"
-            className="text-v2-gold-primary hover:text-v2-gold-dark dark:hover:text-v2-gold-accent font-medium underline"
+            className={`${theme.accentText} font-medium underline`}
           >
             {t("loginToComment")}
           </Link>
@@ -302,18 +309,13 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
         <h4 className="text-xs sm:text-sm font-medium text-v2-text-secondary dark:text-dark-text-secondary">
           {t("comments")} {totalComments > 0 && <span className="text-v2-text-tertiary">({totalComments})</span>}
         </h4>
-        {showingOlderComments && (
-          <span className="text-[11px] text-v2-text-tertiary dark:text-dark-text-tertiary italic">
-            {t("commentsFrom", { date: formatShortDate(commentDate) })}
-          </span>
-        )}
       </div>
 
       {/* Comments list */}
       <div className="space-y-2 relative">
         {commentsLoading ? (
           <div className="flex items-center justify-center py-4">
-            <div className="w-5 h-5 border-2 border-v2-gold-primary border-t-transparent rounded-full animate-spin" />
+            <div className={`w-5 h-5 border-2 ${theme.spinnerBorder} border-t-transparent rounded-full animate-spin`} />
           </div>
         ) : allComments.length === 0 ? (
           <div className="text-center py-5">
@@ -354,7 +356,7 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <Link
                     href="/auth/login"
-                    className="text-sm font-medium text-v2-gold-primary hover:text-v2-gold-dark dark:hover:text-v2-gold-accent underline"
+                    className={`text-sm font-medium ${theme.accentText} underline`}
                   >
                     {t("loginToSeeMore")}
                   </Link>
@@ -370,7 +372,7 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
         <button
           type="button"
           onClick={handleLoadMore}
-          className="w-full mt-2 text-xs text-v2-gold-primary hover:text-v2-gold-dark dark:hover:text-v2-gold-accent font-medium py-2 min-h-11 transition-colors"
+          className={`w-full mt-2 text-xs ${theme.loadMoreText} font-medium py-2 min-h-11 transition-colors`}
           style={{ touchAction: "manipulation" }}
         >
           {t("loadMore")}
@@ -391,7 +393,7 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
               placeholder={t("writeComment")}
               maxLength={MAX_COMMENT_LENGTH}
               rows={1}
-              className="flex-1 resize-none rounded-lg border border-v2-border bg-v2-bg-primary dark:border-dark-border dark:bg-neutral-800 text-sm text-v2-text-primary dark:text-dark-text placeholder-v2-text-tertiary dark:placeholder-dark-text-tertiary px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary/30 focus:border-v2-gold-primary transition-colors"
+              className={`flex-1 resize-none rounded-lg border border-v2-border bg-v2-bg-primary dark:border-dark-border dark:bg-neutral-800 text-sm text-v2-text-primary dark:text-dark-text placeholder-v2-text-tertiary dark:placeholder-dark-text-tertiary px-3 py-2.5 focus:outline-none focus:ring-2 ${theme.focusRing} transition-colors`}
               style={{ minHeight: "2.75rem", maxHeight: "7.5rem" }}
             />
             <button
@@ -400,7 +402,7 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
               disabled={
                 !commentText.trim() || postCommentMutation.isPending
               }
-              className="shrink-0 min-h-11 min-w-11 flex items-center justify-center rounded-lg bg-v2-gold-primary text-white hover:bg-v2-gold-dark active:bg-v2-gold-dark transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className={`shrink-0 min-h-11 min-w-11 flex items-center justify-center rounded-lg ${theme.sendButton} text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed`}
               style={{ touchAction: "manipulation" }}
               aria-label={t("send")}
             >
@@ -426,7 +428,7 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
         <div className="mt-2.5 border-t border-v2-border-light dark:border-dark-border pt-2.5 text-center">
           <Link
             href="/auth/login"
-            className="inline-flex items-center gap-1 text-sm font-medium text-v2-gold-primary hover:text-v2-gold-dark dark:hover:text-v2-gold-accent"
+            className={`inline-flex items-center gap-1 text-sm font-medium ${theme.accentText}`}
           >
             <span>{t("login")}</span>
             <span className="text-v2-text-secondary dark:text-dark-text-secondary font-normal">
@@ -438,6 +440,9 @@ export function GoldSentimentCard({ variant }: GoldSentimentCardProps) {
     </BaseCard>
   );
 }
+
+// Backward compat alias
+export const GoldSentimentCard = SentimentCard;
 
 // --- Comment Row ---
 

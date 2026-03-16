@@ -392,20 +392,20 @@ type SavedPostRepository interface {
 // GoldVoteRepository handles gold sentiment vote persistence.
 type GoldVoteRepository interface {
 	Upsert(ctx context.Context, vote *models.GoldVote) error
-	GetByUserAndDate(ctx context.Context, userID int32, voteDate time.Time) (*models.GoldVote, error)
-	CountByDate(ctx context.Context, voteDate time.Time) (bullish int32, bearish int32, err error)
+	GetByUserAndDate(ctx context.Context, userID int32, voteDate time.Time, category int32) (*models.GoldVote, error)
+	CountByDate(ctx context.Context, voteDate time.Time, category int32) (bullish int32, bearish int32, err error)
 	UpsertAnonymous(ctx context.Context, vote *models.GoldVote) error
-	GetByAnonymousIDAndDate(ctx context.Context, anonymousID string, voteDate time.Time) (*models.GoldVote, error)
-	DeleteByAnonymousIDAndDate(ctx context.Context, anonymousID string, voteDate time.Time) error
+	GetByAnonymousIDAndDate(ctx context.Context, anonymousID string, voteDate time.Time, category int32) (*models.GoldVote, error)
+	DeleteByAnonymousIDAndDate(ctx context.Context, anonymousID string, voteDate time.Time, category int32) error
 }
 
 // GoldVoteCommentRepository handles gold sentiment comment persistence.
 type GoldVoteCommentRepository interface {
 	Create(ctx context.Context, comment *models.GoldVoteComment) error
 	GetByID(ctx context.Context, id int32) (*models.GoldVoteComment, error)
-	ListByDate(ctx context.Context, voteDate time.Time, limit, offset int) ([]*models.GoldVoteComment, int, error)
+	ListByDate(ctx context.Context, voteDate time.Time, category int32, limit, offset int) ([]*models.GoldVoteComment, int, error)
 	Delete(ctx context.Context, id int32) error
-	CountByUserAndDate(ctx context.Context, userID int32, voteDate time.Time) (int, error)
+	CountByUserAndDate(ctx context.Context, userID int32, voteDate time.Time, category int32) (int, error)
 }
 
 // HashtagRepository defines the interface for hashtag data operations.
