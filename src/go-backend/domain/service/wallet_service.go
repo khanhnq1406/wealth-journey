@@ -94,7 +94,7 @@ func (s *walletService) CreateWallet(ctx context.Context, userID int32, req *v1.
 		WalletName: req.WalletName,
 		Balance:    0,
 		Currency:   currency,
-		Type:       int32(req.Type),
+		Type:       int32(v1.WalletType_BASIC), // Always BASIC — wallet type selection removed
 	}
 
 	if err := s.walletRepo.Create(ctx, wallet); err != nil {

@@ -17,8 +17,8 @@
 | 2 | Backend — Remove wallet type check from AddTransaction | done | pending-commit | Removed wallet type check from AddTransaction. Updated all tests to use BASIC wallet type. |
 | 3 | Backend — Remove investment value enrichment from wallet service | done | pending-commit | Removed investment value calculation from GetWallet and ListWallets. Set investment values to 0. |
 | 4 | Backend — Update ListInvestmentWallets and portfolio snapshot job | done | pending-commit | Removed type filter from ListInvestmentWallets, UpdatePrices, ListInvestments. Simplified snapshot job. Updated user cache invalidation. |
-| 5 | Backend — Force wallet type to BASIC in CreateWallet | pending | — | — |
-| 6 | Backend — Database migration to convert INVESTMENT wallets to BASIC | pending | — | — |
+| 5 | Backend — Force wallet type to BASIC in CreateWallet | done | pending-commit | Force WalletType_BASIC in CreateWallet, ignore request type field. |
+| 6 | Backend — Database migration to convert INVESTMENT wallets to BASIC | done | pending-commit | Created migrate-wallet-type command with dry-run support. Added Taskfile entry. |
 | 7 | Frontend — Remove wallet selector and balance display from AddInvestmentForm | pending | — | — |
 | 8 | Frontend — Remove wallet type selector from CreateWalletForm | pending | — | — |
 | 9 | Frontend — Remove wallet filter and cash balance from portfolio page | pending | — | — |
