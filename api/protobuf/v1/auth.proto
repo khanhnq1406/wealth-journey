@@ -46,6 +46,45 @@ service AuthService {
       get: "/api/v1/auth"
     };
   }
+
+  // Register with email/username/password
+  rpc RegisterWithPassword(RegisterWithPasswordRequest) returns (RegisterWithPasswordResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/register-password"
+      body: "*"
+    };
+  }
+
+  // Login with email-or-username + password
+  rpc LoginWithPassword(LoginWithPasswordRequest) returns (LoginWithPasswordResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/login-password"
+      body: "*"
+    };
+  }
+
+  // Link username/password to existing account (authenticated)
+  rpc LinkPassword(LinkPasswordRequest) returns (LinkPasswordResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/link-password"
+      body: "*"
+    };
+  }
+
+  // Change password (authenticated)
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/change-password"
+      body: "*"
+    };
+  }
+
+  // Get auth methods for current user (authenticated)
+  rpc GetAuthMethods(GetAuthMethodsRequest) returns (GetAuthMethodsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/auth/methods"
+    };
+  }
 }
 
 // User data message
@@ -58,6 +97,8 @@ message User {
   bool conversionInProgress = 8 [json_name = "conversionInProgress"];  // Whether currency conversion is in progress
   string preferredLanguage = 9 [json_name = "preferredLanguage"];  // ISO 639-1: "en", "vi"
   bool isAdmin = 10 [json_name = "isAdmin"];  // Admin flag (read-only from server)
+  string username = 11 [json_name = "username"];
+  string authProvider = 12 [json_name = "authProvider"];
   int64 createdAt = 5 [json_name = "createdAt"];
   int64 updatedAt = 6 [json_name = "updatedAt"];
 }
@@ -132,4 +173,79 @@ message GetAuthResponse {
   string message = 2 [json_name = "message"];
   User data = 3 [json_name = "data"];
   string timestamp = 4 [json_name = "timestamp"];
+}
+
+// RegisterWithPassword request
+message RegisterWithPasswordRequest {
+  string email = 1 [json_name = "email"];
+  string username = 2 [json_name = "username"];
+  string password = 3 [json_name = "password"];
+  string display_name = 4 [json_name = "displayName"];
+}
+
+// RegisterWithPassword response
+message RegisterWithPasswordResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  LoginData data = 3 [json_name = "data"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+// LoginWithPassword request
+message LoginWithPasswordRequest {
+  string identifier = 1 [json_name = "identifier"];
+  string password = 2 [json_name = "password"];
+}
+
+// LoginWithPassword response
+message LoginWithPasswordResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  LoginData data = 3 [json_name = "data"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+// LinkPassword request (authenticated)
+message LinkPasswordRequest {
+  string username = 1 [json_name = "username"];
+  string password = 2 [json_name = "password"];
+}
+
+// LinkPassword response
+message LinkPasswordResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+// ChangePassword request (authenticated)
+message ChangePasswordRequest {
+  string current_password = 1 [json_name = "currentPassword"];
+  string new_password = 2 [json_name = "newPassword"];
+}
+
+// ChangePassword response
+message ChangePasswordResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+// GetAuthMethods request (authenticated)
+message GetAuthMethodsRequest {}
+
+// GetAuthMethods response
+message GetAuthMethodsResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  AuthMethods data = 3 [json_name = "data"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+// AuthMethods describes which auth methods are linked for a user
+message AuthMethods {
+  bool has_google = 1 [json_name = "hasGoogle"];
+  bool has_password = 2 [json_name = "hasPassword"];
+  string username = 3 [json_name = "username"];
+  string email = 4 [json_name = "email"];
 }
