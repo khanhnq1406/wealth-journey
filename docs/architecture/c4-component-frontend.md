@@ -12,7 +12,7 @@ C4Component
         Component(dashboard, "Dashboard Home", "app/dashboard/home", "V2 Crimson & Gold: net worth, PNL card (self-contained with 1D/1W/1M/ALL period tabs), gold/silver TradingView charts (XAUUSD, XAGUSD), currency price table, wallets")
         Component(finance_page, "Finance Page", "app/dashboard/finance", "Unified tabbed view: FinanceTabBar switches between TransactionContent, ReportContent, BudgetContent via URL query params (?tab=transaction|report|budget). Content lazy-loaded via next/dynamic. Old routes (/transaction, /report, /budget) redirect here via middleware.")
         Component(wallet_page, "Wallet Page", "app/dashboard/wallets", "Wallet grid/list with fund operations")
-        Component(portfolio_page, "Portfolio Page", "app/dashboard/portfolio", "Investment portfolio with analytics; period pill selector (1D/1W/1M/ALL) via PortfolioSummaryEnhanced")
+        Component(portfolio_page, "Portfolio Page", "app/dashboard/portfolio", "Investment portfolio with analytics; period pill selector (1D/1W/1M/ALL) via PortfolioSummaryEnhanced. No wallet filter — queries all investments via walletId=0.")
         Component(prices_page, "Prices Page", "app/dashboard/prices", "Live gold/silver/currency/market prices with 4 tabs (Gold, Silver, Currency, Symbol Lookup). Admin users see inline price edit controls via useAuth isAdmin check.")
         Component(community_page, "Community Page", "app/dashboard/community", "Social feed with posts, comments, likes, user profiles")
         Component(settings, "Settings Pages", "app/dashboard/settings", "Sessions, import templates, language toggle")
@@ -20,10 +20,10 @@ C4Component
 
     Container_Boundary(features, "Feature Modules (Target State)") {
         Component(auth_feat, "Auth Feature", "features/auth", "Login/register forms, auth hooks, Redux auth state")
-        Component(wallet_feat, "Wallet Feature", "features/wallet", "Wallet CRUD forms, wallet cards, balance display")
+        Component(wallet_feat, "Wallet Feature", "features/wallet", "Wallet CRUD forms (type always BASIC, no type selector), wallet cards, balance display")
         Component(txn_feat, "Transaction Feature", "features/transaction", "Transaction forms, filters, cards, category management")
         Component(budget_feat, "Budget Feature", "features/budget", "Budget forms, progress cards, category breakdown")
-        Component(invest_feat, "Investment Feature", "features/investment", "Investment forms, detail modal, portfolio analytics, gold/silver calculators")
+        Component(invest_feat, "Investment Feature", "features/investment", "Investment forms (no wallet selector — walletId=0 auto-assigned), detail modal, portfolio analytics, gold/silver calculators")
         Component(import_feat, "Import Feature", "features/import", "Import wizard steps, template management, file upload")
         Component(prices_feat, "Market Prices Feature", "features/market-prices", "Price display tables (gold/silver/currency), symbol lookup; hooks/usePublicMarketTypes.ts — public no-auth hook for landing page type names; CurrencyPriceTable, LandingCurrencyPriceTable components; InlinePriceEdit — inline price editing UI for admin users (click-to-edit with save/cancel); OverrideIndicator — blue dot indicator for overridden prices; hooks/usePriceOverride.ts — usePriceOverrideSet and usePriceOverrideDelete mutation hooks for admin price override CRUD")
         Component(report_feat, "Report Feature", "features/report", "Financial tables, period selectors, CSV/PDF export")

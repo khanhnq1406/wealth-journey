@@ -9,7 +9,6 @@ import {
 } from "@/utils/generated/hooks";
 import { RHFFormInput as FormInput } from "@/components/forms/RHFFormInput";
 import { FormNumberInput } from "@/components/forms/FormNumberInput";
-import { RHFFormSelect as FormSelect } from "@/components/forms/RHFFormSelect";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
 import { WalletType } from "@/gen/protobuf/v1/wallet";
@@ -18,7 +17,6 @@ import {
   createWalletSchemaWithExisting,
   CreateWalletFormOutput,
 } from "@/features/wallet/utils/wallet.schema";
-import { SelectOption } from "@/components/forms/FormSelect";
 import { useMemo } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { amountToSmallestUnit } from "@/lib/utils/units";
@@ -26,7 +24,6 @@ import { useTranslations } from "next-intl";
 
 interface CreateWalletFormProps {
   onSuccess?: () => void;
-  defaultType?: WalletType;
 }
 
 /**
@@ -36,7 +33,6 @@ interface CreateWalletFormProps {
  */
 export function CreateWalletForm({
   onSuccess,
-  defaultType,
 }: CreateWalletFormProps) {
   const t = useTranslations("wallet");
   const tForm = useTranslations("wallet.form");
@@ -60,15 +56,10 @@ export function CreateWalletForm({
     defaultValues: {
       walletName: "",
       initialBalance: 0,
-      type: String(defaultType ?? WalletType.BASIC),
+      type: String(WalletType.BASIC),
     },
     mode: "onSubmit",
   });
-
-  const walletTypeOptions: SelectOption[] = [
-    { value: String(WalletType.BASIC), label: tForm("walletTypeBasic") },
-    { value: String(WalletType.INVESTMENT), label: tForm("walletTypeInvestment") },
-  ];
 
   const onSubmit = (data: CreateWalletFormOutput) => {
     setErrorMessage("");
@@ -79,7 +70,7 @@ export function CreateWalletForm({
           amount: amountToSmallestUnit(data.initialBalance, currency),
           currency: currency,
         },
-        type: Number(data.type) as WalletType,
+        type: WalletType.BASIC,
       },
       {
         onSuccess: (data) => {
@@ -126,15 +117,6 @@ export function CreateWalletForm({
         control={control}
         label={tForm("initialBalance")}
         suffix={currency}
-      />
-
-      <FormSelect
-        name="type"
-        control={control}
-        label={tForm("walletType")}
-        options={walletTypeOptions}
-        placeholder={tForm("selectWalletType")}
-        portal
       />
 
       <div className="mt-4">

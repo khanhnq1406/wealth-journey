@@ -1,15 +1,12 @@
 {
   "investment": {
-    "title": "Danh mục đầu tư",
+    "title": "Sổ đầu tư tích lũy",
     "holdings": "Tài sản nắm giữ",
-    "selectWallet": "Chọn ví",
-    "allInvestmentWallets": "Tất cả ví đầu tư",
     "filterByType": "Lọc theo loại",
     "sortBy": "Sắp xếp theo",
     "errorLoading": "Lỗi khi tải danh mục đầu tư",
     "errorLoadingPortfolio": "Lỗi khi tải danh mục đầu tư",
     "priceNotSet": "Chưa cài giá",
-    "selectWalletPlaceholder": "Chọn ví",
     "filterByTypePlaceholder": "Lọc theo loại",
     "sortByPlaceholder": "Sắp xếp theo",
     "analytics": {
@@ -27,7 +24,7 @@
       "moreDetails": "Thêm chi tiết"
     },
     "summary": {
-      "totalValue": "Tổng giá trị",
+      "totalValue": "Giá trị hiện tại",
       "totalCost": "Tổng chi phí",
       "totalPnl": "Tổng lãi/lỗ",
       "periodPnl": "Lãi/lỗ theo kỳ",
@@ -129,8 +126,6 @@
       "purchasePrice": "Giá mua",
       "pricePerUnit": "Giá mỗi đơn vị ({currency})",
       "totalCost": "Tổng chi phí",
-      "walletLabel": "Ví",
-      "selectWalletPlaceholder": "Chọn ví đầu tư",
       "create": "Tạo",
       "failedToCreate": "Không thể tạo khoản đầu tư. Vui lòng thử lại",
       "searchSymbolPlaceholder": "Tìm kiếm cổ phiếu, ETF, crypto (vd: AAPL, BTC, VTI)...",
@@ -139,14 +134,12 @@
       "selectSilverTypePlaceholder": "Chọn loại bạc (AG_VND, XAG, v.v.)",
       "customSymbolInfo": "Nhập định danh duy nhất cho khoản đầu tư tùy chỉnh của bạn",
       "customPriceNote": "Lưu ý: Khoản đầu tư tùy chỉnh không có giá thị trường. Bạn có thể đặt giá thủ công sau khi tạo.",
-      "investmentWalletLabel": "Ví đầu tư",
       "nameLabel": "Tên",
       "goldTypeLabel": "Loại vàng",
       "silverTypeLabel": "Loại bạc",
       "unitLabel": "Đơn vị",
       "initialQuantityLabel": "Số lượng ban đầu",
       "currencyLabel": "Tiền tệ",
-      "selectWalletError": "Vui lòng chọn ví",
       "goldUnitCurrencyInfo": "Đơn vị: {unit} | Tiền tệ: {currency}",
       "silverCurrencyInfo": "Tiền tệ: {currency}",
       "loadingPrice": "Đang tải giá...",
@@ -267,7 +260,7 @@
       "cashAndInvestments": "Tiền mặt + Đầu tư"
     },
     "page": {
-      "title": "Danh mục đầu tư",
+      "title": "Sổ đầu tư tích lũy",
       "selectWallet": "Chọn ví",
       "filterByType": "Lọc theo loại",
       "sortBy": "Sắp xếp theo",

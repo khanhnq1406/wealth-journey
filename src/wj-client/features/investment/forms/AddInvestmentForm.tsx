@@ -18,7 +18,6 @@ import { SymbolAutocomplete } from "@/features/investment/components/SymbolAutoc
 import { MarketPriceDisplay } from "@/components/forms/MarketPriceDisplay";
 import {
   useMutationCreateInvestment,
-  useQueryListWallets,
   useQueryGetMarketPrice,
   EVENT_InvestmentCreateInvestment,
   EVENT_InvestmentListInvestments,
@@ -27,7 +26,6 @@ import {
   EVENT_InvestmentGetAggregatedPortfolioSummary,
   EVENT_WalletListWallets,
 } from "@/utils/generated/hooks";
-import { WalletType } from "@/gen/protobuf/v1/wallet";
 import { InvestmentType, SearchResult } from "@/gen/protobuf/v1/investment";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -35,19 +33,12 @@ import {
   CreateInvestmentFormInput,
 } from "@/features/investment/utils/investment-schema";
 import {
-  quantityToStorage,
-  amountToSmallestUnit,
   getQuantityInputConfig,
   formatCurrency,
 } from "@/lib/utils/units";
 import { Label } from "@/components/forms/Label";
 import { ErrorMessage } from "@/components/forms/ErrorMessage";
 import { CurrencyBadge } from "@/components/forms/CurrencyBadge";
-import {
-  useExchangeRate,
-  convertAmount,
-  formatExchangeRate,
-} from "@/hooks/useExchangeRate";
 import {
   isGoldType,
   getGoldTypeOptions,
@@ -62,25 +53,17 @@ import {
   type SilverUnit,
   calculateSilverFromUserInput,
 } from "@/features/investment/utils/silver-calculator";
-import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface AddInvestmentFormProps {
-  walletId?: number; // Optional: if not provided, user must select from dropdown
-  walletBalance?: number; // Wallet balance in smallest currency unit
-  walletCurrency?: string; // Currency of the wallet (ISO 4217)
   onSuccess?: () => void;
 }
 
 
 export function AddInvestmentForm({
-  walletId: propWalletId,
-  walletBalance: propWalletBalance,
-  walletCurrency: propWalletCurrency,
   onSuccess,
 }: AddInvestmentFormProps) {
   const t = useTranslations("investment");
   const queryClient = useQueryClient();
-  const { currency: preferredCurrency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
 
@@ -98,11 +81,6 @@ export function AddInvestmentForm({
     { value: String(InvestmentType.INVESTMENT_TYPE_OTHER), label: t("typeOptions.other") },
   ], [t]);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [insufficientBalance, setInsufficientBalance] = useState(false);
-  // Local wallet selection state (used when walletId not provided)
-  const [selectedWalletId, setSelectedWalletId] = useState<number | null>(
-    propWalletId ?? null,
-  );
   // Gold-specific state
   const [selectedGoldType, setSelectedGoldType] =
     useState<GoldTypeOption | null>(null);
@@ -120,48 +98,6 @@ export function AddInvestmentForm({
 
   // Custom investment toggle state
   const [isCustomInvestment, setIsCustomInvestment] = useState(false);
-
-  // Fetch user's wallets if walletId not provided
-  const getListWallets = useQueryListWallets(
-    {
-      pagination: {
-        page: 1,
-        pageSize: 100,
-        orderBy: "created_at",
-        order: "desc",
-      },
-    },
-    {
-      refetchOnMount: "always",
-      enabled: propWalletId === undefined, // Only fetch if no wallet provided
-    },
-  );
-
-  // Filter for investment wallets
-  const investmentWallets = useMemo(() => {
-    if (!getListWallets.data?.wallets) return [];
-    return getListWallets.data.wallets.filter(
-      (wallet) => wallet.type === WalletType.INVESTMENT,
-    );
-  }, [getListWallets.data]);
-
-  // Determine the active wallet ID (either from props or from selector)
-  const walletId = propWalletId ?? selectedWalletId;
-
-  // Get wallet balance and currency from selected wallet or props
-  const walletBalance = useMemo(() => {
-    if (propWalletBalance !== undefined) return propWalletBalance;
-    if (!walletId) return 0;
-    const wallet = investmentWallets.find((w) => w.id === walletId);
-    return wallet?.balance?.amount || 0;
-  }, [propWalletBalance, walletId, investmentWallets]);
-
-  const walletCurrency = useMemo(() => {
-    if (propWalletCurrency !== undefined) return propWalletCurrency;
-    if (!walletId) return "USD";
-    const wallet = investmentWallets.find((w) => w.id === walletId);
-    return wallet?.balance?.currency || "USD";
-  }, [propWalletCurrency, walletId, investmentWallets]);
 
   const createInvestmentMutation = useMutationCreateInvestment({
     onSuccess: (data) => {
@@ -248,7 +184,6 @@ export function AddInvestmentForm({
   // Watch investment type to update quantity input config dynamically
   const investmentType = watch("type");
   const currency = watch("currency");
-  const initialCost = watch("initialCost");
   const quantityConfig = getQuantityInputConfig(investmentType);
 
   // Check if current investment type is gold (convert to number for comparison)
@@ -357,69 +292,6 @@ export function AddInvestmentForm({
     }
   }, [isSilverInvestment, investmentType, setValue]);
 
-  // Fetch exchange rate when currencies differ
-  const currenciesMatch = currency === walletCurrency;
-  const { rate: exchangeRate, isLoading: isLoadingRate } = useExchangeRate(
-    walletCurrency,
-    currency,
-  );
-
-  // Fetch exchange rate from wallet currency to preferred currency for display
-  const { rate: walletToPreferredRate } = useExchangeRate(
-    walletCurrency,
-    preferredCurrency,
-  );
-
-  // Convert wallet balance to preferred currency for display
-  const walletBalanceInPreferredCurrency = useMemo(() => {
-    if (walletCurrency === preferredCurrency || !walletToPreferredRate) {
-      return walletBalance;
-    }
-    return convertAmount(
-      walletBalance,
-      walletToPreferredRate,
-      walletCurrency,
-      preferredCurrency,
-    );
-  }, [walletBalance, walletToPreferredRate, walletCurrency, preferredCurrency]);
-
-  // Calculate initial cost in smallest unit for balance validation
-  const initialCostInSmallestUnit = useMemo(() => {
-    return amountToSmallestUnit(Number(initialCost) || 0, currency);
-  }, [initialCost, currency]);
-
-  // Convert wallet balance to investment currency for comparison
-  const walletBalanceInInvestmentCurrency = useMemo(() => {
-    if (currenciesMatch || !exchangeRate) {
-      return walletBalance;
-    }
-    return convertAmount(walletBalance, exchangeRate, walletCurrency, currency);
-  }, [walletBalance, exchangeRate, walletCurrency, currency, currenciesMatch]);
-
-  // Check for insufficient balance (with currency conversion when needed)
-  useEffect(() => {
-    if (currenciesMatch) {
-      setInsufficientBalance(
-        initialCostInSmallestUnit > walletBalance && walletBalance > 0,
-      );
-    } else if (exchangeRate) {
-      // Compare in investment currency
-      setInsufficientBalance(
-        initialCostInSmallestUnit > walletBalanceInInvestmentCurrency &&
-          walletBalance > 0,
-      );
-    } else {
-      // No rate available yet, don't block submission
-      setInsufficientBalance(false);
-    }
-  }, [
-    initialCostInSmallestUnit,
-    walletBalance,
-    walletBalanceInInvestmentCurrency,
-    currenciesMatch,
-    exchangeRate,
-  ]);
-
   // Handle symbol selection - auto-fill name and currency from search result
   const handleSymbolChange = (symbol: string, result?: SearchResult) => {
     setValue("symbol", symbol);
@@ -436,12 +308,6 @@ export function AddInvestmentForm({
 
   const onSubmit = (data: CreateInvestmentFormInput) => {
     setErrorMessage(undefined);
-
-    // Validate wallet is selected
-    if (!walletId) {
-      setErrorMessage(t("form.selectWalletError"));
-      return;
-    }
 
     // Validate gold type is selected for gold investments
     if (isGoldInvestment && !selectedGoldType) {
@@ -465,12 +331,12 @@ export function AddInvestmentForm({
         priceCurrency: formData.currency,
         priceUnit: goldQuantityUnit,
         investmentType: formData.type,
-        walletCurrency: walletCurrency,
-        fxRate: exchangeRate || 1,
+        walletCurrency: formData.currency,
+        fxRate: 1,
       });
 
       createInvestmentMutation.mutate({
-        walletId,
+        walletId: 0, // Auto-assigned by backend
         symbol: selectedGoldType.value,
         name: selectedGoldType.label,
         type: formData.type,
@@ -493,13 +359,13 @@ export function AddInvestmentForm({
         priceCurrency: formData.currency,
         priceUnit: silverQuantityUnit,
         investmentType: formData.type,
-        walletCurrency: walletCurrency,
-        fxRate: exchangeRate || 1,
+        walletCurrency: formData.currency,
+        fxRate: 1,
       });
 
       // Use full symbol with unit suffix to allow multiple VND silver investments (tael and kg)
       createInvestmentMutation.mutate({
-        walletId,
+        walletId: 0, // Auto-assigned by backend
         symbol: selectedSilverType.value, // Keep unit suffix: AG_VND_Tael or AG_VND_Kg
         name: selectedSilverType.label,
         type: formData.type,
@@ -517,7 +383,7 @@ export function AddInvestmentForm({
       // Use form.getValues() instead of data because zodResolver may return partial data on validation failure
       const formData = form.getValues();
       createInvestmentMutation.mutate({
-        walletId,
+        walletId: 0, // Auto-assigned by backend
         symbol: (formData.symbol || "").toUpperCase(),
         name: formData.name || "",
         type: formData.type,
@@ -533,19 +399,6 @@ export function AddInvestmentForm({
     }
   };
 
-  // Build wallet options for selector
-  const walletSelectOptions = useMemo((): SelectOption[] => {
-    return investmentWallets.map((wallet) => {
-      const balance = wallet.balance?.amount || 0;
-      const currency = wallet.balance?.currency || "USD";
-      const formattedBalance = formatCurrency(balance, currency);
-      return {
-        value: String(wallet.id),
-        label: `${wallet.walletName} (${formattedBalance})`,
-      };
-    });
-  }, [investmentWallets]);
-
   // Show success state (AFTER all hooks have been called)
   if (showSuccess) {
     return <Success message={successMessage} onDone={onSuccess} />;
@@ -553,26 +406,6 @@ export function AddInvestmentForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Wallet Selector - only shown when walletId not provided */}
-      {propWalletId === undefined && (
-        <div className="mb-4">
-          <BasicFormSelect
-            label={t("form.investmentWalletLabel")}
-            options={walletSelectOptions}
-            value={selectedWalletId ? String(selectedWalletId) : undefined}
-            onChange={(value) => setSelectedWalletId(parseInt(value, 10))}
-            placeholder={t("form.selectWalletPlaceholder")}
-            disabled={isSubmitting || getListWallets.isLoading}
-            required
-          />
-          {!walletId && (
-            <ErrorMessage id="wallet-error">
-              Please select a wallet
-            </ErrorMessage>
-          )}
-        </div>
-      )}
-
       {/* Type */}
       <FormSelect
         name="type"
@@ -998,131 +831,6 @@ export function AddInvestmentForm({
         </p>
       </div>
 
-      {/* Balance Preview - same currency */}
-      {walletBalance > 0 && currenciesMatch && (
-        <div className="mt-4 p-3 bg-gray-50 rounded-md">
-          <div className="flex justify-between text-sm">
-            <span>Wallet Balance:</span>
-            <span>
-              {formatCurrency(
-                walletBalanceInPreferredCurrency,
-                preferredCurrency,
-              )}
-              {walletCurrency !== preferredCurrency &&
-                walletToPreferredRate && (
-                  <span className="text-gray-500 ml-1">
-                    ({formatCurrency(walletBalance, walletCurrency)})
-                  </span>
-                )}
-            </span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span>Initial Cost:</span>
-            <span className="text-red-600">
-              -
-              {currency
-                ? formatCurrency(initialCostInSmallestUnit, currency)
-                : `${(initialCostInSmallestUnit / 100).toFixed(2)}`}
-            </span>
-          </div>
-          <hr className="my-2" />
-          <div className="flex justify-between font-medium">
-            <span>Remaining:</span>
-            <span
-              className={
-                walletBalance - initialCostInSmallestUnit < 0
-                  ? "text-red-600"
-                  : "text-v2-green-positive"
-              }
-            >
-              {formatCurrency(
-                walletBalance - initialCostInSmallestUnit,
-                currency,
-              )}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Balance Preview - different currencies with conversion */}
-      {walletBalance > 0 && !currenciesMatch && (
-        <div className="mt-4 p-3 bg-gray-50 rounded-md">
-          <div className="flex justify-between text-sm">
-            <span>Wallet Balance:</span>
-            <span>
-              {formatCurrency(
-                walletBalanceInPreferredCurrency,
-                preferredCurrency,
-              )}
-              {walletCurrency !== preferredCurrency &&
-                walletToPreferredRate && (
-                  <span className="text-gray-500 ml-1">
-                    ({formatCurrency(walletBalance, walletCurrency)})
-                  </span>
-                )}
-              {exchangeRate && (
-                <span className="text-gray-500 ml-1">
-                  ≈{" "}
-                  {currency
-                    ? formatCurrency(
-                        walletBalanceInInvestmentCurrency,
-                        currency,
-                      )
-                    : `${(walletBalanceInInvestmentCurrency / 100).toFixed(2)}`}
-                </span>
-              )}
-            </span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span>Initial Cost:</span>
-            <span className="text-red-600">
-              -
-              {currency
-                ? formatCurrency(initialCostInSmallestUnit, currency)
-                : `${(initialCostInSmallestUnit / 100).toFixed(2)}`}
-            </span>
-          </div>
-          <hr className="my-2" />
-          <div className="flex justify-between font-medium">
-            <span>Remaining:</span>
-            {isLoadingRate ? (
-              <span className="text-gray-400">Loading rate...</span>
-            ) : exchangeRate ? (
-              <span
-                className={
-                  walletBalanceInInvestmentCurrency -
-                    initialCostInSmallestUnit <
-                  0
-                    ? "text-red-600"
-                    : "text-v2-green-positive"
-                }
-              >
-                ≈{" "}
-                {formatCurrency(
-                  walletBalanceInInvestmentCurrency - initialCostInSmallestUnit,
-                  currency,
-                )}
-              </span>
-            ) : (
-              <span className="text-gray-400">Rate unavailable</span>
-            )}
-          </div>
-          {exchangeRate && (
-            <p className="text-xs text-gray-500 mt-2">
-              Exchange rate: 1 {walletCurrency} ≈{" "}
-              {formatExchangeRate(exchangeRate)} {currency}
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Insufficient balance error */}
-      {insufficientBalance && (
-        <p className="text-red-600 text-sm mt-2">
-          Insufficient wallet balance for this investment.
-        </p>
-      )}
-
       {/* Error message */}
       {errorMessage && (
         <div className="bg-red-50 border border-danger-600 text-danger-600 px-4 py-3 rounded">
@@ -1134,7 +842,6 @@ export function AddInvestmentForm({
       <Button
         type={ButtonType.PRIMARY}
         loading={createInvestmentMutation.isPending || isSubmitting}
-        disabled={insufficientBalance}
         className="w-full"
         htmlType="submit"
       >

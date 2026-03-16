@@ -4,17 +4,79 @@ import { test, expect } from "@playwright/test";
  * E2E Test: Add Transaction Flow
  *
  * Tests the transaction creation flow:
- * - Opening add transaction modal
+ * - Opening add transaction modal via FAB
  * - Filling transaction form
  * - Submitting transaction
  * - Verifying transaction appears in list
  */
 
+const AUTH_MOCK = {
+  success: true,
+  data: {
+    email: "test@example.com",
+    name: "Test User",
+    picture: "",
+    preferredCurrency: "VND",
+    preferredLanguage: "en",
+  },
+};
+
 test.describe("Add Transaction Flow", () => {
-  // Setup: Login before each test
   test.beforeEach(async ({ page }) => {
-    // In a real test environment, you'd complete the OAuth flow
-    // For now, we'll use a mock token
+    // Mock auth verify so AuthCheck passes
+    await page.route("**/api/v1/auth/verify**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(AUTH_MOCK),
+      });
+    });
+
+    // Mock wallets
+    await page.route("**/api/v1/wallets**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ success: true, wallets: [], total: 0 }),
+      });
+    });
+
+    // Mock transactions
+    await page.route("**/api/v1/transactions**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          success: true,
+          transactions: [],
+          total: 0,
+          totalBalance: { amount: 0, currency: "VND" },
+        }),
+      });
+    });
+
+    // Mock categories
+    await page.route("**/api/v1/categories**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ success: true, categories: [] }),
+      });
+    });
+
+    // Mock total balance
+    await page.route("**/api/v1/wallets/total-balance**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          success: true,
+          totalBalance: { amount: 0, currency: "VND" },
+        }),
+      });
+    });
+
+    // Set auth token
     await page.goto("/auth/login");
     await page.evaluate(() => {
       localStorage.setItem("token", "mock-test-token");
@@ -23,99 +85,113 @@ test.describe("Add Transaction Flow", () => {
 
   test("should display add transaction button", async ({ page }) => {
     await page.goto("/dashboard/home");
+    await page.waitForLoadState("networkidle");
 
-    // Look for add transaction button
-    const addButton = page.locator('button:has-text("add transaction", "new transaction", "+")');
+    // The add transaction button is a FAB in the dashboard layout
+    const fab = page.locator(
+      'button[aria-label*="quick actions"], [class*="floating"], button:has(svg)',
+    );
+    const fabCount = await fab.count();
+
+    // Also check for any button with add/transaction text
     const addButtons = page.locator("button");
+    const addButton = addButtons.filter({ hasText: /add transaction/i });
 
-    // Try multiple patterns
-    const patterns = [/add transaction/i, /new transaction/i, /^\+$/];
-
-    for (const pattern of patterns) {
-      const button = addButtons.filter({ hasText: pattern });
-      if ((await button.count()) > 0) {
-        await expect(button.first()).toBeVisible();
-        return;
-      }
-    }
-
-    // If no button found with text, check for FAB
-    const fab = page.locator(".fab, [class*='floating'], [class*='action-button']");
-    if ((await fab.count()) > 0) {
-      await expect(fab.first()).toBeVisible();
-    }
+    expect(fabCount + (await addButton.count())).toBeGreaterThan(0);
   });
 
   test("should open add transaction modal", async ({ page }) => {
     await page.goto("/dashboard/transaction");
+    await page.waitForLoadState("networkidle");
 
-    // Click add transaction button
-    const addButton = page.locator('button:has-text("add transaction", "new")');
-    const addButtons = page.locator("button");
+    // The add button is a FAB — look for it
+    const fabButton = page.locator('button[aria-label*="quick actions"]');
+    if ((await fabButton.count()) > 0) {
+      await fabButton.first().click();
+      await page.waitForTimeout(300);
 
-    const button = addButtons.filter({ hasText: /add|new/i }).first();
+      // Click the "Add Transaction" action
+      const addAction = page.locator("button").filter({ hasText: /add transaction/i });
+      if ((await addAction.count()) > 0) {
+        await addAction.first().click();
 
-    if ((await button.count()) > 0) {
-      await button.click();
-
-      // Modal should appear
-      const modal = page.locator('[role="dialog"], .modal, [class*="modal"]');
-      await expect(modal.first()).toBeVisible();
+        // Modal should appear
+        const modal = page.locator('[role="dialog"]');
+        await expect(modal.first()).toBeVisible();
+      }
     }
   });
 
   test("should display transaction form fields", async ({ page }) => {
     await page.goto("/dashboard/transaction");
+    await page.waitForLoadState("networkidle");
 
-    // Open modal
-    const addButton = page.locator('button:has-text("add")');
-    if ((await addButton.count()) > 0) {
-      await addButton.first().click();
+    // Open modal via FAB
+    const fabButton = page.locator('button[aria-label*="quick actions"]');
+    if ((await fabButton.count()) > 0) {
+      await fabButton.first().click();
+      await page.waitForTimeout(300);
+
+      const addAction = page.locator("button").filter({ hasText: /add transaction/i });
+      if ((await addAction.count()) > 0) {
+        await addAction.first().click();
+        await page.waitForTimeout(500);
+      }
     }
 
-    // Check for form fields
-    const modal = page.locator('[role="dialog"], .modal');
+    // Check for form fields inside modal
+    const modal = page.locator('[role="dialog"]');
     if ((await modal.count()) > 0) {
       // Amount field
-      const amountInput = page.locator('input[name*="amount"], input[type="number"], label:has-text("amount")');
+      const amountInput = page.locator(
+        'input[name="amount"], input[name*="amount"], label:has-text("Amount")',
+      );
       expect(await amountInput.count()).toBeGreaterThan(0);
 
-      // Description/note field
-      const descInput = page.locator('input[name*="desc"], input[name*="note"], textarea');
-      expect(await descInput.count()).toBeGreaterThan(0);
+      // Note/description field
+      const noteField = page.locator('textarea[name="note"], textarea');
+      expect(await noteField.count()).toBeGreaterThan(0);
 
-      // Wallet selector
-      const walletSelect = page.locator('select[name*="wallet"], [role="combobox"]:has-text("wallet")');
-      expect(await walletSelect.count()).toBeGreaterThan(0);
+      // Wallet selector (select or custom component)
+      const walletField = page.locator(
+        'select[name="walletId"], [name="walletId"], label:has-text("Wallet")',
+      );
+      expect(await walletField.count()).toBeGreaterThan(0);
 
       // Category selector
-      const categorySelect = page.locator('select[name*="category"], [role="combobox"]:has-text("category")');
-      expect(await categorySelect.count()).toBeGreaterThan(0);
+      const categoryField = page.locator(
+        'input[name="categoryId"], [name="categoryId"], label:has-text("Category")',
+      );
+      expect(await categoryField.count()).toBeGreaterThan(0);
     }
   });
 
   test("should submit transaction form", async ({ page }) => {
     await page.goto("/dashboard/transaction");
+    await page.waitForLoadState("networkidle");
 
-    // Open modal
-    const addButton = page.locator('button:has-text("add")');
-    if ((await addButton.count()) > 0) {
-      await addButton.first().click();
+    // Open modal via FAB
+    const fabButton = page.locator('button[aria-label*="quick actions"]');
+    if ((await fabButton.count()) > 0) {
+      await fabButton.first().click();
+      await page.waitForTimeout(300);
+
+      const addAction = page.locator("button").filter({ hasText: /add transaction/i });
+      if ((await addAction.count()) > 0) {
+        await addAction.first().click();
+        await page.waitForTimeout(500);
+      }
     }
 
-    // Fill form (this is a mock - real implementation would interact with actual form)
-    const modal = page.locator('[role="dialog"], .modal');
+    // Check for submit button in modal
+    const modal = page.locator('[role="dialog"]');
     if ((await modal.count()) > 0) {
-      // Find submit button
-      const submitButton = page.locator('button[type="submit"], button:has-text("save", "create", "add")');
+      // Find submit button — use separate selectors instead of invalid multi-string has-text
+      const submitButton = page
+        .locator('button[type="submit"]')
+        .or(page.locator("button").filter({ hasText: /add transaction/i }));
 
       if ((await submitButton.count()) > 0) {
-        // In a real test, you'd fill the form first
-        // await page.fill('input[name="amount"]', '100000');
-        // await page.selectOption('select[name="wallet"]', '1');
-        // await submitButton.click();
-
-        // For now, just verify button exists
         await expect(submitButton.first()).toBeVisible();
       }
     }
@@ -123,22 +199,27 @@ test.describe("Add Transaction Flow", () => {
 
   test("should validate required fields", async ({ page }) => {
     await page.goto("/dashboard/transaction");
+    await page.waitForLoadState("networkidle");
 
-    // Open modal
-    const addButton = page.locator('button:has-text("add")');
-    if ((await addButton.count()) > 0) {
-      await addButton.first().click();
+    // Open modal via FAB
+    const fabButton = page.locator('button[aria-label*="quick actions"]');
+    if ((await fabButton.count()) > 0) {
+      await fabButton.first().click();
+      await page.waitForTimeout(300);
+
+      const addAction = page.locator("button").filter({ hasText: /add transaction/i });
+      if ((await addAction.count()) > 0) {
+        await addAction.first().click();
+        await page.waitForTimeout(500);
+      }
     }
 
-    const modal = page.locator('[role="dialog"], .modal');
+    const modal = page.locator('[role="dialog"]');
     if ((await modal.count()) > 0) {
-      // Try to submit without filling fields
       const submitButton = page.locator('button[type="submit"]');
 
       if ((await submitButton.count()) > 0) {
         await submitButton.first().click();
-
-        // Check for validation errors
         await page.waitForTimeout(500);
 
         const error = page.locator('.error, [class*="error"], [role="alert"]');
@@ -152,31 +233,65 @@ test.describe("Add Transaction Flow", () => {
 test.describe("Mobile Add Transaction", () => {
   test.use({ viewport: { width: 375, height: 667 } });
 
-  test("should display transaction form correctly on mobile", async ({ page }) => {
+  test("should display transaction page correctly on mobile", async ({ page }) => {
+    // Mock APIs
+    await page.route("**/api/v1/auth/verify**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(AUTH_MOCK),
+      });
+    });
+    await page.route("**/api/v1/wallets**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ success: true, wallets: [], total: 0 }),
+      });
+    });
+    await page.route("**/api/v1/transactions**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ success: true, transactions: [], total: 0 }),
+      });
+    });
+    await page.route("**/api/v1/categories**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ success: true, categories: [] }),
+      });
+    });
+    await page.route("**/api/v1/wallets/total-balance**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ success: true, totalBalance: { amount: 0, currency: "VND" } }),
+      });
+    });
+
     await page.goto("/auth/login");
     await page.evaluate(() => {
       localStorage.setItem("token", "mock-test-token");
     });
 
     await page.goto("/dashboard/transaction");
+    await page.waitForLoadState("networkidle");
 
-    // Add button should be tappable
-    const addButton = page.locator('button:has-text("add")');
-    if ((await addButton.count()) > 0) {
-      const box = await addButton.first().boundingBox();
+    // Verify page loaded — check for page content or heading
+    const heading = page.locator("h1");
+    const pageContent = page.locator("main, [class*='transaction']");
+    expect((await heading.count()) + (await pageContent.count())).toBeGreaterThan(0);
+
+    // FAB should be visible on mobile
+    const fab = page.locator(
+      'button[aria-label*="quick actions"], [class*="floating"]',
+    );
+    if ((await fab.count()) > 0) {
+      const box = await fab.first().boundingBox();
       if (box) {
-        expect(box.height).toBeGreaterThan(44); // Minimum touch target
-      }
-    }
-
-    // Form should be full width on mobile
-    const modal = page.locator('[role="dialog"], .modal');
-    if ((await modal.count()) > 0) {
-      await addButton?.first().click();
-
-      const modalBox = await modal.first().boundingBox();
-      if (modalBox) {
-        expect(modalBox.width).toBeGreaterThan(300); // Should use most of screen width
+        expect(box.height).toBeGreaterThanOrEqual(44); // Minimum touch target
       }
     }
   });

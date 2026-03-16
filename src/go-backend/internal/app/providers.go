@@ -242,7 +242,7 @@ func ProvideScheduler(
 
 	backgroundJobs = append(backgroundJobs,
 		scheduler.NewPriceUpdateJob(services.User, services.Investment),
-		scheduler.NewPortfolioSnapshotJob(repos.User, repos.Wallet, services.PortfolioHistory),
+		scheduler.NewPortfolioSnapshotJob(repos.User, services.PortfolioHistory),
 	)
 
 	return scheduler.New(backgroundJobs...)

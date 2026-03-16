@@ -17,7 +17,6 @@ import {
   useMutationUpdatePrices,
   useMutationDeleteInvestmentTransaction,
   useMutationDeleteInvestment,
-  useQueryGetWallet,
   EVENT_InvestmentGetInvestment,
   EVENT_InvestmentListInvestments,
   EVENT_InvestmentGetPortfolioSummary,
@@ -141,14 +140,6 @@ export function InvestmentDetailModal({
         isCustom,
       )
     : { text: "N/A", colorClass: "text-gray-500" };
-
-  // Fetch wallet balance and currency for balance validation in AddInvestmentTransactionForm
-  const getWallet = useQueryGetWallet(
-    { walletId: investment?.walletId || 0 },
-    { enabled: !!investment?.walletId },
-  );
-  const walletBalance = getWallet.data?.data?.balance?.amount || 0;
-  const walletCurrency = getWallet.data?.data?.balance?.currency || "USD";
 
   // Mutation for updating investment prices
   const updatePricesMutation = useMutationUpdatePrices({
@@ -942,8 +933,6 @@ export function InvestmentDetailModal({
               investmentType={investment.type}
               investmentCurrency={investment.currency || "USD"}
               purchaseUnit={investment.purchaseUnit}
-              walletBalance={walletBalance}
-              walletCurrency={walletCurrency}
               onSuccess={handleTransactionSuccess}
               symbol={investment.symbol}
             />

@@ -94,7 +94,7 @@ func (s *walletService) CreateWallet(ctx context.Context, userID int32, req *v1.
 		WalletName: req.WalletName,
 		Balance:    0,
 		Currency:   currency,
-		Type:       int32(req.Type),
+		Type:       int32(v1.WalletType_BASIC), // Always BASIC — wallet type selection removed
 	}
 
 	if err := s.walletRepo.Create(ctx, wallet); err != nil {
@@ -170,42 +170,15 @@ func (s *walletService) GetWallet(ctx context.Context, walletID int32, requestin
 		return nil, err
 	}
 
-	// Calculate investment value for INVESTMENT wallets
-	var investmentValue int64 = 0
-	if v1.WalletType(wallet.Type) == v1.WalletType_INVESTMENT {
-		// Use the new function that properly converts investment values to wallet currency
-		investmentValue, err = s.getInvestmentValueInWalletCurrency(ctx, walletID, wallet.Currency)
-		if err != nil {
-			// Log error but don't fail the request
-			log.Printf("Error calculating investment value for wallet %d: %v", walletID, err)
-			// Return wallet with 0 investment value
-			investmentValue = 0
-		}
-	}
-
-	// Calculate total value (both are now in wallet.Currency)
-	totalValue := wallet.Balance + investmentValue
-
-	// Get user for currency conversion
-	user, err := s.userRepo.GetByID(ctx, requestingUserID)
-	if err != nil {
-		return nil, err
-	}
-	userCurrency := user.PreferredCurrency
-
-	// Convert values to user's preferred currency
-	displayInvestmentValue := s.convertToUserCurrency(investmentValue, wallet.Currency, userCurrency)
-	displayTotalValue := s.convertToUserCurrency(totalValue, wallet.Currency, userCurrency)
-
 	walletProto := s.mapper.ModelToProto(wallet)
 	// Enrich with conversion fields
 	_ = s.enrichWalletProto(ctx, requestingUserID, walletProto, wallet)
 
-	// Set investment value fields
-	walletProto.InvestmentValue = &v1.Money{Amount: investmentValue, Currency: wallet.Currency}
-	walletProto.DisplayInvestmentValue = displayInvestmentValue
-	walletProto.TotalValue = &v1.Money{Amount: totalValue, Currency: wallet.Currency}
-	walletProto.DisplayTotalValue = displayTotalValue
+	// Investment values are no longer enriched on wallets (decoupled)
+	walletProto.InvestmentValue = &v1.Money{Amount: 0, Currency: wallet.Currency}
+	walletProto.DisplayInvestmentValue = &v1.Money{Amount: 0, Currency: wallet.Currency}
+	walletProto.TotalValue = &v1.Money{Amount: wallet.Balance, Currency: wallet.Currency}
+	walletProto.DisplayTotalValue = walletProto.DisplayBalance
 
 	return &v1.GetWalletResponse{
 		Success:   true,
@@ -235,64 +208,18 @@ func (s *walletService) ListWallets(ctx context.Context, userID int32, params ty
 		return nil, err
 	}
 
-	// Get user for currency conversion
-	user, err := s.userRepo.GetByID(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	userCurrency := user.PreferredCurrency
-
-	// Collect investment wallet IDs
-	investmentWalletIDs := []int32{}
-	for _, wallet := range wallets {
-		if v1.WalletType(wallet.Type) == v1.WalletType_INVESTMENT {
-			investmentWalletIDs = append(investmentWalletIDs, wallet.ID)
-		}
-	}
-
-	// Calculate investment values for each wallet (with proper currency conversion)
-	investmentValueMap := make(map[int32]int64)
-	for _, walletID := range investmentWalletIDs {
-		// Find the wallet to get its currency
-		var walletCurrency string
-		for _, w := range wallets {
-			if w.ID == walletID {
-				walletCurrency = w.Currency
-				break
-			}
-		}
-		if walletCurrency == "" {
-			walletCurrency = "USD" // Default fallback
-		}
-
-		// Calculate investment value in the wallet's currency
-		value, err := s.getInvestmentValueInWalletCurrency(ctx, walletID, walletCurrency)
-		if err != nil {
-			log.Printf("Error calculating investment value for wallet %d: %v", walletID, err)
-			value = 0
-		}
-		investmentValueMap[walletID] = value
-	}
-
-	// Build response with investment values
+	// Build response (investment values are no longer enriched on wallets)
 	protoWallets := make([]*v1.Wallet, len(wallets))
 	for i, wallet := range wallets {
-		investmentValue := investmentValueMap[wallet.ID]
-		totalValue := wallet.Balance + investmentValue
-
-		// Convert values to user's preferred currency
-		displayInvestmentValue := s.convertToUserCurrency(investmentValue, wallet.Currency, userCurrency)
-		displayTotalValue := s.convertToUserCurrency(totalValue, wallet.Currency, userCurrency)
-
 		protoWallets[i] = s.mapper.ModelToProto(wallet)
 		// Enrich with conversion fields
 		_ = s.enrichWalletProto(ctx, userID, protoWallets[i], wallet)
 
-		// Set investment value fields
-		protoWallets[i].InvestmentValue = &v1.Money{Amount: investmentValue, Currency: wallet.Currency}
-		protoWallets[i].DisplayInvestmentValue = displayInvestmentValue
-		protoWallets[i].TotalValue = &v1.Money{Amount: totalValue, Currency: wallet.Currency}
-		protoWallets[i].DisplayTotalValue = displayTotalValue
+		// Investment values decoupled — set to 0
+		protoWallets[i].InvestmentValue = &v1.Money{Amount: 0, Currency: wallet.Currency}
+		protoWallets[i].DisplayInvestmentValue = &v1.Money{Amount: 0, Currency: wallet.Currency}
+		protoWallets[i].TotalValue = &v1.Money{Amount: wallet.Balance, Currency: wallet.Currency}
+		protoWallets[i].DisplayTotalValue = protoWallets[i].DisplayBalance
 	}
 
 	paginationResult := types.NewPaginationResult(params.Page, params.PageSize, total)

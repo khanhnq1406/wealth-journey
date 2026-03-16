@@ -36,11 +36,11 @@ C4Component
     Container_Boundary(services, "Service Layer — TRUST BOUNDARY: Data considered validated after this point") {
         Component(auth_svc, "Auth Service", "domain/auth", "Google token verification, JWT generation, session management")
         Component(user_svc, "User Service", "domain/service", "User CRUD, preferences (currency + language), currency conversion orchestration")
-        Component(wallet_svc, "Wallet Service", "domain/service", "Balance tracking, fund transfers, multi-currency support")
+        Component(wallet_svc, "Wallet Service", "domain/service", "Balance tracking, fund transfers, multi-currency support. CreateWallet forces type to BASIC regardless of request.")
         Component(txn_svc, "Transaction Service", "domain/service", "Transaction CRUD, financial reports, category breakdowns")
         Component(cat_svc, "Category Service", "domain/service", "Category CRUD, default category seeding for new users")
         Component(budget_svc, "Budget Service", "domain/service", "Budget lifecycle, budget item tracking, spending analysis")
-        Component(invest_svc, "Investment Service", "domain/service", "Holdings management, FIFO cost basis, PNL calculation")
+        Component(invest_svc, "Investment Service", "domain/service", "Holdings management, FIFO cost basis, PNL calculation. Auto-selects user's oldest active wallet when walletId=0.")
         Component(market_svc, "Market Data Service", "domain/service", "Price caching, Yahoo Finance integration, gold/silver normalization")
         Component(currency_svc, "Currency Price Service", "domain/service", "Foreign currency price fetching from vangsaigon API, Redis caching")
         Component(silver_ext, "External Silver Clients", "pkg/silverprice", "Multi-source silver prices: Phú Quý (HTML), Ancarat (JSON), DOJI (text)")
@@ -226,7 +226,7 @@ User → SPA → REST API → Auth Middleware → Auth Service → Google OAuth 
 ### Create Investment Flow
 ```
 User → SPA → REST API → Auth MW → Investment Handler → Investment Service
-                                                      → Wallet Service (verify wallet ownership)
+                                                      → Wallet Repository (auto-select wallet if walletId=0)
                                                       → Investment Repository (create holding)
                                                       → Investment Lot Repository (create FIFO lot)
                                                       → Market Data Service (fetch current price)

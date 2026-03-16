@@ -12,7 +12,6 @@ import (
 	"wealthjourney/pkg/fx"
 	"wealthjourney/pkg/handler"
 	"wealthjourney/pkg/types"
-	"wealthjourney/pkg/validator"
 	investmentv1 "wealthjourney/protobuf/v1"
 )
 
@@ -59,9 +58,9 @@ func (h *InvestmentHandlers) CreateInvestment(c *gin.Context) {
 		return
 	}
 
-	// Validate wallet ID
-	if err := validator.ID(req.WalletId); err != nil {
-		handler.BadRequest(c, err)
+	// Validate wallet ID: 0 means auto-select, positive means explicit
+	if req.WalletId < 0 {
+		handler.BadRequest(c, apperrors.NewValidationError("invalid wallet ID"))
 		return
 	}
 

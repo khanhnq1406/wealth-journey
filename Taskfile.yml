@@ -70,6 +70,12 @@ tasks:
     cmds:
       - go run cmd/migrate-add-is-custom/main.go
 
+  backend:migrate-wallet-type:
+    desc: "Convert INVESTMENT wallets to BASIC"
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - go run cmd/migrate-wallet-type/main.go {{.CLI_ARGS}}
+
   backend:migrate-gold-silver-types:
     desc: "Migrate existing gold/silver investments to new vang247 type codes"
     dir: "{{.BACKEND_DIR}}"

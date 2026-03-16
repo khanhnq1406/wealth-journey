@@ -73,7 +73,7 @@ func TestInvestmentService_Integration_ManualPriceUpdate(t *testing.T) {
 		WalletName: "Test Investment Wallet",
 		Balance:    100000000, // $1,000,000
 		Currency:   "USD",
-		Type:       int32(walletv1.WalletType_INVESTMENT),
+		Type:       int32(walletv1.WalletType_BASIC),
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
