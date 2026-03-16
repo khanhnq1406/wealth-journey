@@ -12,6 +12,7 @@ import { PasswordStrengthIndicator } from "@/features/auth/components/PasswordSt
 import { Button } from "@/components/Button";
 import { ButtonType, LOCAL_STORAGE_TOKEN_NAME, routes } from "@/app/constants";
 import { useMutationRegisterWithPassword } from "@/utils/generated/hooks";
+import { mapRegisterError } from "@/features/auth/utils/error-mapper";
 import { store } from "@/features/auth/store/store";
 import { setAuth } from "@/features/auth/store/actions";
 import { updateAuthTokenCache } from "@/utils/api-client";
@@ -73,7 +74,8 @@ export function RegisterPasswordForm() {
       }
     },
     onError(error: any) {
-      setServerError(error.message || t("registrationFailed"));
+      const key = mapRegisterError(error.message);
+      setServerError(key ? t(`errors.${key}`) : t("registrationFailed"));
     },
   });
 
@@ -115,6 +117,7 @@ export function RegisterPasswordForm() {
             placeholder={t("emailPlaceholder")}
             type="email"
             autoComplete="email"
+            required
             error={errors.email?.message}
             {...register("email")}
           />
@@ -123,6 +126,7 @@ export function RegisterPasswordForm() {
             label={t("username")}
             placeholder={t("usernamePlaceholder")}
             autoComplete="username"
+            required
             error={errors.username?.message}
             {...register("username")}
           />
@@ -131,6 +135,7 @@ export function RegisterPasswordForm() {
             label={t("displayName")}
             placeholder={t("displayNamePlaceholder")}
             autoComplete="name"
+            required
             error={errors.displayName?.message}
             {...register("displayName")}
           />
@@ -151,6 +156,7 @@ export function RegisterPasswordForm() {
               label={t("password")}
               placeholder={t("passwordPlaceholder")}
               autoComplete="new-password"
+              required
               error={errors.password?.message}
               {...register("password")}
             />
@@ -166,6 +172,7 @@ export function RegisterPasswordForm() {
             label={t("confirmPassword")}
             placeholder={t("confirmPasswordPlaceholder")}
             autoComplete="new-password"
+            required
             error={errors.confirmPassword?.message}
             {...register("confirmPassword")}
           />

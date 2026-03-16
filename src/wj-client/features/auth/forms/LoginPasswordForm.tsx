@@ -71,6 +71,7 @@ export function LoginPasswordForm() {
         label={t("emailOrUsername")}
         placeholder={t("emailOrUsernamePlaceholder")}
         autoComplete="username"
+        required
         error={errors.identifier?.message}
         {...register("identifier")}
       />
@@ -79,6 +80,7 @@ export function LoginPasswordForm() {
         label={t("password")}
         placeholder={t("passwordPlaceholder")}
         autoComplete="current-password"
+        required
         error={errors.password?.message}
         {...register("password")}
       />

@@ -41,7 +41,27 @@
       "confirmNewPasswordPlaceholder": "Re-enter your new password",
       "usernamePlaceholder": "Choose a username",
       "passwordPlaceholder": "Create a password",
-      "confirmPasswordPlaceholder": "Re-enter your password"
+      "confirmPasswordPlaceholder": "Re-enter your password",
+      "errors": {
+        "passwordAlreadySet": "A password is already set for this account",
+        "usernameAlreadyTaken": "This username is already taken. Please choose another.",
+        "noPasswordSet": "No password is set for this account",
+        "currentPasswordIncorrect": "Current password is incorrect",
+        "newPasswordSameAsCurrent": "New password must be different from your current password",
+        "usernameRequired": "Username is required",
+        "usernameMinLength": "Username must be at least 3 characters",
+        "usernameMaxLength": "Username must be at most 30 characters",
+        "usernameInvalidChars": "Username can only contain letters, numbers, and underscores",
+        "passwordMinLength": "Password must be at least 10 characters",
+        "passwordMaxLength": "Password must be at most 72 characters",
+        "passwordNeedsUppercase": "Password must contain at least one uppercase letter",
+        "passwordNeedsLowercase": "Password must contain at least one lowercase letter",
+        "passwordNeedsDigit": "Password must contain at least one digit",
+        "passwordNeedsSpecial": "Password must contain at least one special character",
+        "linkPasswordFailed": "Failed to set password. Please try again.",
+        "changePasswordFailed": "Failed to change password. Please try again.",
+        "genericError": "Something went wrong. Please try again."
+      }
     },
     "passwordStrength": {
       "weak": "Weak",

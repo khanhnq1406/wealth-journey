@@ -11,6 +11,7 @@ import { PasswordStrengthIndicator } from "@/features/auth/components/PasswordSt
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
 import { useMutationLinkPassword } from "@/utils/generated/hooks";
+import { mapLinkPasswordError } from "@/features/auth/utils/error-mapper";
 import { Success } from "@/components/modals/Success";
 
 const linkPasswordSchema = z
@@ -55,7 +56,8 @@ export function LinkPasswordForm({ onSuccess }: LinkPasswordFormProps) {
       setShowSuccess(true);
     },
     onError(error: any) {
-      setServerError(error.message || "Failed to set password");
+      const key = mapLinkPasswordError(error.message);
+      setServerError(key ? t(`errors.${key}`) : t("errors.linkPasswordFailed"));
     },
   });
 
@@ -77,6 +79,7 @@ export function LinkPasswordForm({ onSuccess }: LinkPasswordFormProps) {
         label={t("username")}
         placeholder={t("usernamePlaceholder")}
         autoComplete="username"
+        required
         error={errors.username?.message}
         {...register("username")}
       />
@@ -86,6 +89,7 @@ export function LinkPasswordForm({ onSuccess }: LinkPasswordFormProps) {
           label={t("newPassword")}
           placeholder={t("passwordPlaceholder")}
           autoComplete="new-password"
+          required
           error={errors.password?.message}
           {...register("password")}
         />
@@ -96,6 +100,7 @@ export function LinkPasswordForm({ onSuccess }: LinkPasswordFormProps) {
         label={t("confirmNewPassword")}
         placeholder={t("confirmPasswordPlaceholder")}
         autoComplete="new-password"
+        required
         error={errors.confirmPassword?.message}
         {...register("confirmPassword")}
       />

@@ -10,6 +10,7 @@ import { PasswordStrengthIndicator } from "@/features/auth/components/PasswordSt
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
 import { useMutationChangePassword } from "@/utils/generated/hooks";
+import { mapChangePasswordError } from "@/features/auth/utils/error-mapper";
 import { Success } from "@/components/modals/Success";
 
 const changePasswordSchema = z
@@ -50,7 +51,8 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
       setShowSuccess(true);
     },
     onError(error: any) {
-      setServerError(error.message || "Failed to change password");
+      const key = mapChangePasswordError(error.message);
+      setServerError(key ? t(`errors.${key}`) : t("errors.changePasswordFailed"));
     },
   });
 
@@ -72,6 +74,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
         label={t("currentPassword")}
         placeholder={t("currentPasswordPlaceholder")}
         autoComplete="current-password"
+        required
         error={errors.currentPassword?.message}
         {...register("currentPassword")}
       />
@@ -81,6 +84,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
           label={t("newPassword")}
           placeholder={t("newPasswordPlaceholder")}
           autoComplete="new-password"
+          required
           error={errors.newPassword?.message}
           {...register("newPassword")}
         />
@@ -91,6 +95,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
         label={t("confirmNewPassword")}
         placeholder={t("confirmNewPasswordPlaceholder")}
         autoComplete="new-password"
+        required
         error={errors.confirmNewPassword?.message}
         {...register("confirmNewPassword")}
       />
