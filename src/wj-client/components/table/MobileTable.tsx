@@ -141,9 +141,8 @@ const MobileTableRow = memo(function MobileTableRow<T>({
   const hasExpandableContent = expandable && expandedOnlyColumns.length > 0;
 
   const renderColumn = (column: MobileColumnDef<T>, cellIndex: number) => {
-    // Get column header
-    const headerText =
-      typeof column.header === "string" ? column.header : column.id;
+    // Get column header — support both string and ReactNode
+    const headerContent = column.header ?? column.id;
 
     // Get cell value using accessorFn or accessorKey
     let cellValue: any;
@@ -165,7 +164,7 @@ const MobileTableRow = memo(function MobileTableRow<T>({
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <p className="text-gray-900 text-sm font-bold mb-1">
-              {headerText}
+              {headerContent}
             </p>
             <p className="text-gray-900 text-sm font-light text-right">
               {displayValue ?? "-"}

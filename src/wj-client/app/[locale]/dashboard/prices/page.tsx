@@ -16,7 +16,10 @@ import {
 import { InvestmentType } from "@/gen/protobuf/v1/investment";
 import { formatPriceValue, formatChangeValue, PriceItem } from "./helpers";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { InlinePriceEdit, OverrideIndicator } from "@/features/market-prices/components/InlinePriceEdit";
+import {
+  InlinePriceEdit,
+  OverrideIndicator,
+} from "@/features/market-prices/components/InlinePriceEdit";
 
 type Tab = "gold" | "silver" | "currency" | "symbol";
 
@@ -65,7 +68,11 @@ const TAB_TYPE_COLOR: Record<Tab, string> = {
   symbol: "text-gray-900 dark:text-dark-text",
 };
 
-function buildTanstackColumns(t: (key: string) => string, tab: Tab, isAdmin: boolean) {
+function buildTanstackColumns(
+  t: (key: string) => string,
+  tab: Tab,
+  isAdmin: boolean,
+) {
   const typeColor = TAB_TYPE_COLOR[tab];
   const cols = [
     columnHelper.display({
@@ -79,22 +86,30 @@ function buildTanstackColumns(t: (key: string) => string, tab: Tab, isAdmin: boo
           <span className="ml-1.5 text-xs text-gray-400">
             {row.original.currency}
           </span>
-          <OverrideIndicator item={row.original} category={tab} isAdmin={isAdmin} />
+          <OverrideIndicator
+            item={row.original}
+            category={tab}
+            isAdmin={isAdmin}
+          />
         </div>
       ),
     }),
     columnHelper.accessor("buy", {
-      header: t("table.buy"),
+      header: () => (
+        <span className="text-base font-bold">{t("table.buy")}</span>
+      ),
       cell: ({ row }) => (
-        <span className="font-medium text-gray-900 dark:text-dark-text">
+        <span className="font-medium text-lred">
           {formatPriceValue(row.original.buy, row.original.currency)}
         </span>
       ),
     }),
     columnHelper.accessor("sell", {
-      header: t("table.sell"),
+      header: () => (
+        <span className="text-base font-bold">{t("table.sell")}</span>
+      ),
       cell: ({ row }) => (
-        <span className="text-gray-500 dark:text-gray-400">
+        <span className="font-medium text-v2-green-positive">
           {formatPriceValue(row.original.sell, row.original.currency)}
         </span>
       ),
@@ -127,7 +142,11 @@ function buildTanstackColumns(t: (key: string) => string, tab: Tab, isAdmin: boo
 
 // ─── MobileTable columns (mobile fallback) ─────────────────────────────────────
 
-function buildMobileColumns(t: (key: string) => string, tab: Tab, isAdmin: boolean): MobileColumnDef<PriceItem>[] {
+function buildMobileColumns(
+  t: (key: string) => string,
+  tab: Tab,
+  isAdmin: boolean,
+): MobileColumnDef<PriceItem>[] {
   const typeColor = TAB_TYPE_COLOR[tab];
   const cols: MobileColumnDef<PriceItem>[] = [
     {
@@ -145,18 +164,18 @@ function buildMobileColumns(t: (key: string) => string, tab: Tab, isAdmin: boole
     },
     {
       id: "buy",
-      header: t("table.buy"),
+      header: <span className="text-base">{t("table.buy")}</span>,
       cell: ({ row }) => (
-        <span className="font-medium text-gray-900 dark:text-dark-text">
+        <span className="font-medium text-lred">
           {formatPriceValue(row.buy, row.currency)}
         </span>
       ),
     },
     {
       id: "sell",
-      header: t("table.sell"),
+      header: <span className="text-base">{t("table.sell")}</span>,
       cell: ({ row }) => (
-        <span className="text-gray-500 dark:text-gray-400">
+        <span className="font-medium text-v2-green-positive">
           {formatPriceValue(row.sell, row.currency)}
         </span>
       ),
@@ -174,9 +193,7 @@ function buildMobileColumns(t: (key: string) => string, tab: Tab, isAdmin: boole
     cols.push({
       id: "admin",
       header: "",
-      cell: ({ row }) => (
-        <InlinePriceEdit item={row} category={tab} />
-      ),
+      cell: ({ row }) => <InlinePriceEdit item={row} category={tab} />,
     });
   }
 
@@ -247,9 +264,7 @@ function SymbolLookupTab({
       </div>
 
       {(isError || (priceResp && !priceResp.success)) && (
-        <p className="text-lred text-sm">
-          {t("failedToFetch")}
-        </p>
+        <p className="text-lred text-sm">{t("failedToFetch")}</p>
       )}
 
       {priceData && querySymbol && (
@@ -261,7 +276,9 @@ function SymbolLookupTab({
               </p>
               <p className="text-xs text-gray-400 mt-0.5">
                 {priceData.timestamp
-                  ? new Date(priceData.timestamp * 1000).toLocaleTimeString(locale)
+                  ? new Date(priceData.timestamp * 1000).toLocaleTimeString(
+                      locale,
+                    )
                   : ""}
               </p>
             </div>
@@ -293,8 +310,15 @@ export default function PricesPage() {
   const { user } = useAuth();
   const isAdmin = user?.isAdmin ?? false;
   const [activeTab, setActiveTab] = useState<Tab>("gold");
-  const tanstackColumns = useMemo(() => buildTanstackColumns(t as (key: string) => string, activeTab, isAdmin), [t, activeTab, isAdmin]);
-  const mobileColumns = useMemo(() => buildMobileColumns(t as (key: string) => string, activeTab, isAdmin), [t, activeTab, isAdmin]);
+  const tanstackColumns = useMemo(
+    () =>
+      buildTanstackColumns(t as (key: string) => string, activeTab, isAdmin),
+    [t, activeTab, isAdmin],
+  );
+  const mobileColumns = useMemo(
+    () => buildMobileColumns(t as (key: string) => string, activeTab, isAdmin),
+    [t, activeTab, isAdmin],
+  );
   const [symbolInput, setSymbolInput] = useState("");
   const [querySymbol, setQuerySymbol] = useState("");
 

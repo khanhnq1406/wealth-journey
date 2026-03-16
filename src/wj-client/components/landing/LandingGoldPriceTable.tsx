@@ -72,10 +72,10 @@ export function LandingGoldPriceTable({
               <th className="text-left px-5 py-3.5 font-vietnam font-bold text-[14px] tracking-normal text-v2-gold-dark">
                 {t("goldType")}
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-gold-dark">
+              <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-gold-dark">
                 {t("buy")}
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-gold-dark">
+              <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-gold-dark">
                 {t("sell")}
               </th>
             </tr>

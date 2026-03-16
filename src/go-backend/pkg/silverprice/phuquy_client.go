@@ -63,14 +63,16 @@ func parsePhuQuyHTML(html string) ([]ExternalSilverPrice, error) {
 
 	for _, row := range rows {
 		cells := cellRe.FindAllStringSubmatch(row[1], -1)
-		if len(cells) < 3 {
+		// Phú Quý HTML has 4 columns: Product | Unit | Buy (GIÁ MUA VÀO) | Sell (GIÁ BÁN RA)
+		if len(cells) < 4 {
 			continue
 		}
 
 		// Clean cell content by removing HTML tags
 		name := strings.TrimSpace(tagRe.ReplaceAllString(cells[0][1], ""))
-		buyStr := strings.TrimSpace(tagRe.ReplaceAllString(cells[1][1], ""))
-		sellStr := strings.TrimSpace(tagRe.ReplaceAllString(cells[2][1], ""))
+		// cells[1] is the unit column (ĐƠN VỊ) — skip it
+		buyStr := strings.TrimSpace(tagRe.ReplaceAllString(cells[2][1], ""))
+		sellStr := strings.TrimSpace(tagRe.ReplaceAllString(cells[3][1], ""))
 
 		// Skip header rows
 		nameLower := strings.ToLower(name)

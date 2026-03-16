@@ -4,7 +4,10 @@ import { useTranslations } from "next-intl";
 import { formatPriceValue } from "../prices/helpers";
 import { BaseCard } from "@/components/BaseCard";
 import type { PriceItem } from "@/gen/protobuf/v1/investment";
-import { InlinePriceEdit, OverrideIndicator } from "@/features/market-prices/components/InlinePriceEdit";
+import {
+  InlinePriceEdit,
+  OverrideIndicator,
+} from "@/features/market-prices/components/InlinePriceEdit";
 
 interface SilverPriceTableProps {
   prices: PriceItem[];
@@ -46,10 +49,10 @@ export function SilverPriceTable({
               <th className="text-left px-5 py-3.5 font-vietnam font-bold text-[14px] tracking-normal text-v2-silver-dark">
                 {t("silverType")}
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-silver-dark">
+              <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-silver-dark">
                 {t("buy")}
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-bold text-[13px] uppercase tracking-[1px] text-v2-silver-dark">
+              <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-silver-dark">
                 {t("sell")}
               </th>
               {isAdmin && <th className="w-10" />}
@@ -65,12 +68,16 @@ export function SilverPriceTable({
               >
                 <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-silver-dark">
                   {item.name || item.typeCode}
-                  <OverrideIndicator item={item} category="silver" isAdmin={isAdmin} />
+                  <OverrideIndicator
+                    item={item}
+                    category="silver"
+                    isAdmin={isAdmin}
+                  />
                 </td>
-                <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-text-primary">
+                <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-lred">
                   {formatPriceValue(item.buy, item.currency || "VND")}
                 </td>
-                <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-text-primary">
+                <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-green-positive">
                   {formatPriceValue(item.sell, item.currency || "VND")}
                 </td>
                 {isAdmin && (
