@@ -7,7 +7,7 @@
 - **Started:** 2026-03-16T00:00:00Z
 - **Last updated:** 2026-03-16T12:00:00Z
 - **Current state:** in_progress
-- **Current task:** 10
+- **Current task:** 11
 
 ## Task Progress
 
@@ -22,7 +22,7 @@
 | 7 | Frontend — Remove wallet selector and balance display from AddInvestmentForm | done | pending-commit | Removed wallet props, selector UI, balance preview, insufficient balance check. Set walletId=0 for auto-assign. Removed unused imports. |
 | 8 | Frontend — Remove wallet type selector from CreateWalletForm | done | pending-commit | Removed defaultType prop, wallet type selector dropdown, walletTypeOptions. Hardcoded WalletType.BASIC. |
 | 9 | Frontend — Remove wallet filter and cash balance from portfolio page | done | pending-commit | Removed wallet selector, cash balance card, empty wallets state. Replaced wallet-gated queries with walletId=0. Cleaned up unused imports. |
-| 10 | Frontend — Clean up unused translation keys and wallet type references | pending | — | — |
+| 10 | Frontend — Clean up unused translation keys and wallet type references | done | pending-commit | Removed 12 unused i18n keys (walletType*, selectWallet*, investmentWalletLabel, allInvestmentWallets) from en/vi wallet.json and investment.json. |
 | 11 | Update C4 Architecture Diagrams | pending | — | — |
 | 12 | Update Runtime Flow Diagrams | pending | — | — |
 
