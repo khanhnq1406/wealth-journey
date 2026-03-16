@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { CommunityFeed } from "@/features/community/components/CommunityFeed";
 import { CommunityLeftSidebar } from "@/features/community/components/CommunityLeftSidebar";
@@ -25,6 +26,17 @@ export default function CommunityPage() {
   const [hashtagFilter, setHashtagFilter] = useState<string>("");
   const [profileUserId, setProfileUserId] = useState<number | null>(null);
   const [followingTab, setFollowingTab] = useState<"following" | "followers">("following");
+  const searchParams = useSearchParams();
+
+  // Handle ?view=profile URL param from navbar navigation
+  useEffect(() => {
+    const viewParam = searchParams.get("view");
+    if (viewParam === "profile") {
+      setActiveView("profile");
+      setMobileView("profile");
+      setProfileUserId(null); // Own profile
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- Run once on mount only
 
   const handleHashtagClick = (tag: string) => {
     setHashtagFilter(tag);

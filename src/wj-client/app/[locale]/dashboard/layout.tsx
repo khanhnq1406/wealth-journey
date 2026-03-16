@@ -37,6 +37,7 @@ import {
   X,
   Menu,
   Users,
+  CircleUser,
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -171,6 +172,16 @@ export default function DashboardLayout({
           >
             <Users size={22} />
             <span>{t("community")}</span>
+          </ActiveLink>
+          <ActiveLink
+            href={routes.communityProfile}
+            className={cn(
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+              "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
+            )}
+          >
+            <CircleUser size={22} />
+            <span>{t("profile")}</span>
           </ActiveLink>
         </div>
 
@@ -318,6 +329,16 @@ export default function DashboardLayout({
                     isActive={path === routes.community}
                     isPremium
                   />
+                  <NavItem
+                    href={routes.communityProfile}
+                    label={t("profile")}
+                    isExpanded={isExpanded}
+                    showTooltip={!isExpanded}
+                    animationDelay={90}
+                    icon={<CircleUser size={20} />}
+                    isActive={false}
+                    isPremium
+                  />
                 </div>
 
                 {/* Standard group */}
@@ -332,7 +353,7 @@ export default function DashboardLayout({
                     label={t("finance")}
                     isExpanded={isExpanded}
                     showTooltip={!isExpanded}
-                    animationDelay={90}
+                    animationDelay={120}
                     icon={<Banknote size={20} />}
                     isActive={path.startsWith(routes.finance)}
                   />
@@ -341,7 +362,7 @@ export default function DashboardLayout({
                     label={t("wallets")}
                     isExpanded={isExpanded}
                     showTooltip={!isExpanded}
-                    animationDelay={120}
+                    animationDelay={150}
                     icon={<Wallet size={20} />}
                     isActive={path === routes.wallets}
                   />
@@ -356,7 +377,7 @@ export default function DashboardLayout({
                   label={t("settings")}
                   isExpanded={isExpanded}
                   showTooltip={!isExpanded}
-                  animationDelay={150}
+                  animationDelay={180}
                   icon={<Settings size={20} />}
                   isActive={path.startsWith("/dashboard/settings")}
                 />
