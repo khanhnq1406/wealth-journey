@@ -21,6 +21,34 @@
       "revokeAllMessage": "Bạn có chắc chắn muốn thu hồi {count} phiên khác? Các thiết bị đó sẽ cần đăng nhập lại.",
       "revokeAllConfirm": "Thu hồi tất cả"
     },
+    "security": {
+      "title": "Bảo mật",
+      "authMethods": "Phương thức xác thực",
+      "googleLinked": "Đã liên kết Google",
+      "passwordSet": "Đã đặt mật khẩu",
+      "notSet": "Chưa thiết lập",
+      "linked": "Đã liên kết",
+      "setPassword": "Đặt mật khẩu",
+      "changePassword": "Đổi mật khẩu",
+      "username": "Tên người dùng",
+      "currentPassword": "Mật khẩu hiện tại",
+      "newPassword": "Mật khẩu mới",
+      "confirmNewPassword": "Xác nhận mật khẩu mới",
+      "passwordChanged": "Đổi mật khẩu thành công. Tất cả phiên khác đã bị đăng xuất.",
+      "passwordLinked": "Đã thiết lập mật khẩu và tên người dùng thành công",
+      "currentPasswordPlaceholder": "Nhập mật khẩu hiện tại",
+      "newPasswordPlaceholder": "Nhập mật khẩu mới",
+      "confirmNewPasswordPlaceholder": "Nhập lại mật khẩu mới",
+      "usernamePlaceholder": "Chọn tên người dùng",
+      "passwordPlaceholder": "Tạo mật khẩu",
+      "confirmPasswordPlaceholder": "Nhập lại mật khẩu"
+    },
+    "passwordStrength": {
+      "weak": "Yếu",
+      "medium": "Trung bình",
+      "strong": "Mạnh",
+      "veryStrong": "Rất mạnh"
+    },
     "importTemplates": {
       "title": "Mẫu nhập",
       "description": "Quản lý các mẫu nhập đã lưu để sử dụng lại",

@@ -21,6 +21,34 @@
       "revokeAllMessage": "Are you sure you want to revoke {count} other session(s)? Those devices will need to log in again.",
       "revokeAllConfirm": "Revoke All"
     },
+    "security": {
+      "title": "Security",
+      "authMethods": "Authentication Methods",
+      "googleLinked": "Google Account Linked",
+      "passwordSet": "Password Set",
+      "notSet": "Not Set",
+      "linked": "Linked",
+      "setPassword": "Set Password",
+      "changePassword": "Change Password",
+      "username": "Username",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmNewPassword": "Confirm New Password",
+      "passwordChanged": "Password changed successfully. All other sessions have been logged out.",
+      "passwordLinked": "Password and username set successfully",
+      "currentPasswordPlaceholder": "Enter your current password",
+      "newPasswordPlaceholder": "Enter your new password",
+      "confirmNewPasswordPlaceholder": "Re-enter your new password",
+      "usernamePlaceholder": "Choose a username",
+      "passwordPlaceholder": "Create a password",
+      "confirmPasswordPlaceholder": "Re-enter your password"
+    },
+    "passwordStrength": {
+      "weak": "Weak",
+      "medium": "Medium",
+      "strong": "Strong",
+      "veryStrong": "Very Strong"
+    },
     "importTemplates": {
       "title": "Import Templates",
       "description": "Manage your saved import templates for reuse",
