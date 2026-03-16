@@ -25,34 +25,35 @@ func periodToDays(period investmentv1.PnlPeriod) int {
 
 // computePeriodPnl fetches the start-of-period snapshot and computes the periodPnl delta.
 // Falls back to (totalPnl, totalPnlPercent) when no snapshot is available or period is ALL.
+// Returns isApproximate=true when falling back to all-time values due to missing snapshot.
 func (s *investmentService) computePeriodPnl(
 	ctx context.Context,
 	userID int32,
 	period investmentv1.PnlPeriod,
 	currentTotalPnl int64,
 	currentTotalPnlPercent float64,
-) (periodPnl int64, periodPnlPercent float64, err error) {
+) (periodPnl int64, periodPnlPercent float64, isApproximate bool, err error) {
 	days := periodToDays(period)
 	if days == 0 {
-		// PERIOD_ALL or PERIOD_UNSPECIFIED — mirror all-time values
-		return currentTotalPnl, currentTotalPnlPercent, nil
+		// PERIOD_ALL or PERIOD_UNSPECIFIED — mirror all-time values (not approximate)
+		return currentTotalPnl, currentTotalPnlPercent, false, nil
 	}
 
 	from := time.Now().AddDate(0, 0, -days)
 	snapshot, err := s.portfolioHistoryRepo.GetPeriodStartSnapshot(ctx, userID, from)
 	if err != nil {
 		log.Printf("Warning: failed to fetch period start snapshot: %v", err)
-		// Non-fatal — fall back to all-time
-		return currentTotalPnl, currentTotalPnlPercent, nil
+		// Non-fatal — fall back to all-time (approximate)
+		return currentTotalPnl, currentTotalPnlPercent, true, nil
 	}
 	if snapshot == nil {
-		// No history for the period — fallback to all-time
-		return currentTotalPnl, currentTotalPnlPercent, nil
+		// No history for the period — fallback to all-time (approximate)
+		return currentTotalPnl, currentTotalPnlPercent, true, nil
 	}
 
 	periodPnl = currentTotalPnl - snapshot.TotalPnl
 	if snapshot.TotalValue > 0 {
 		periodPnlPercent = float64(periodPnl) / float64(snapshot.TotalValue) * 100
 	}
-	return periodPnl, periodPnlPercent, nil
+	return periodPnl, periodPnlPercent, false, nil
 }

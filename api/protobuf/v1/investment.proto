@@ -123,6 +123,7 @@ message PortfolioSummary {
   int64  periodPnl        = 18 [json_name = "periodPnl"];        // PnL for the selected period window
   double periodPnlPercent = 19 [json_name = "periodPnlPercent"]; // PnL% for the selected period window
   PnlPeriod period        = 20 [json_name = "period"];           // The period used for this response
+  bool periodPnlApproximate = 21 [json_name = "periodPnlApproximate"]; // true when period PnL falls back to all-time (no snapshot available)
 }
 
 message InvestmentByType {

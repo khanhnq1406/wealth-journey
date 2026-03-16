@@ -417,6 +417,8 @@ export interface PortfolioSummary {
   periodPnlPercent: number;
   /** The period used for this response */
   period: PnlPeriod;
+  /** true when period PnL falls back to all-time (no snapshot available) */
+  periodPnlApproximate: boolean;
 }
 
 export interface InvestmentByType {
@@ -1800,6 +1802,7 @@ function createBasePortfolioSummary(): PortfolioSummary {
     periodPnl: 0,
     periodPnlPercent: 0,
     period: 0,
+    periodPnlApproximate: false,
   };
 }
 
@@ -1864,6 +1867,9 @@ export const PortfolioSummary: MessageFns<PortfolioSummary> = {
     }
     if (message.period !== 0) {
       writer.uint32(160).int32(message.period);
+    }
+    if (message.periodPnlApproximate !== false) {
+      writer.uint32(168).bool(message.periodPnlApproximate);
     }
     return writer;
   },
@@ -2035,6 +2041,14 @@ export const PortfolioSummary: MessageFns<PortfolioSummary> = {
           message.period = reader.int32() as any;
           continue;
         }
+        case 21: {
+          if (tag !== 168) {
+            break;
+          }
+
+          message.periodPnlApproximate = reader.bool();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2074,6 +2088,9 @@ export const PortfolioSummary: MessageFns<PortfolioSummary> = {
       periodPnl: isSet(object.periodPnl) ? globalThis.Number(object.periodPnl) : 0,
       periodPnlPercent: isSet(object.periodPnlPercent) ? globalThis.Number(object.periodPnlPercent) : 0,
       period: isSet(object.period) ? pnlPeriodFromJSON(object.period) : 0,
+      periodPnlApproximate: isSet(object.periodPnlApproximate)
+        ? globalThis.Boolean(object.periodPnlApproximate)
+        : false,
     };
   },
 
@@ -2139,6 +2156,9 @@ export const PortfolioSummary: MessageFns<PortfolioSummary> = {
     if (message.period !== 0) {
       obj.period = pnlPeriodToJSON(message.period);
     }
+    if (message.periodPnlApproximate !== false) {
+      obj.periodPnlApproximate = message.periodPnlApproximate;
+    }
     return obj;
   },
 
@@ -2177,6 +2197,7 @@ export const PortfolioSummary: MessageFns<PortfolioSummary> = {
     message.periodPnl = object.periodPnl ?? 0;
     message.periodPnlPercent = object.periodPnlPercent ?? 0;
     message.period = object.period ?? 0;
+    message.periodPnlApproximate = object.periodPnlApproximate ?? false;
     return message;
   },
 };

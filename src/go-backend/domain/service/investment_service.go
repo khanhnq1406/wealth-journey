@@ -159,10 +159,44 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		}
 	}
 
-	// 3. Check for duplicate symbol in wallet
+	// 3. Check for duplicate symbol in wallet — auto-add as BUY transaction if exists
 	existing, err := s.investmentRepo.GetByWalletAndSymbol(ctx, req.WalletId, req.Symbol)
 	if err == nil && existing != nil {
-		return nil, apperrors.NewConflictError(fmt.Sprintf("investment with symbol %s already exists in this wallet", req.Symbol))
+		// Calculate per-unit price for the AddTransaction request
+		var perUnitPrice int64
+		if initialQuantity > 0 {
+			perUnitPrice = units.CalculateAverageCost(initialCost, initialQuantity, req.Type)
+		}
+
+		// Determine transaction date as Unix timestamp
+		var txTimestamp int64
+		if req.PurchaseDate > 0 {
+			txTimestamp = req.PurchaseDate
+		} else {
+			txTimestamp = time.Now().Unix()
+		}
+
+		addReq := &v1.AddTransactionRequest{
+			InvestmentId:    existing.ID,
+			Type:            v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY,
+			Quantity:        initialQuantity,
+			Price:           perUnitPrice,
+			Fees:            0,
+			TransactionDate: txTimestamp,
+			Notes:           "Additional purchase",
+		}
+
+		addResp, err := s.AddTransaction(ctx, userID, addReq)
+		if err != nil {
+			return nil, err
+		}
+
+		return &v1.CreateInvestmentResponse{
+			Success:   true,
+			Message:   "Transaction added to existing investment",
+			Data:      addResp.UpdatedInvestment,
+			Timestamp: time.Now().Format(time.RFC3339),
+		}, nil
 	}
 
 	// 5. Calculate initial average cost using utility function
@@ -1290,7 +1324,7 @@ func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID in
 	}
 
 	// Compute period-scoped PnL
-	periodPnl, periodPnlPercent, _ := s.computePeriodPnl(ctx, userID, period, totalPNL, totalPNLPercent)
+	periodPnl, periodPnlPercent, periodApprox, _ := s.computePeriodPnl(ctx, userID, period, totalPNL, totalPNLPercent)
 
 	// Calculate top and worst performers
 	topPerformers, worstPerformers, err := s.calculatePerformers(ctx, userID, investments, preferredCurrency)
@@ -1305,22 +1339,22 @@ func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID in
 		Success: true,
 		Message: "Portfolio summary retrieved successfully",
 		Data: &v1.PortfolioSummary{
-			TotalValue:         totalValueInPreferred,
-			TotalCost:          totalCostInPreferred,
-			TotalPnl:           totalPNL,
-			TotalPnlPercent:    totalPNLPercent,
-			RealizedPnl:        realizedPNLInPreferred,
-			UnrealizedPnl:      unrealizedPNLInPreferred,
-			TotalInvestments:   int32(len(investments)),
-			InvestmentsByType:  investmentsByTypeSlice,
-			// Currency fields - summary is in user's preferred currency
-			Currency:           preferredCurrency,
-			DisplayCurrency:    preferredCurrency,
-			TopPerformers:      topPerformers,
-			WorstPerformers:    worstPerformers,
-			PeriodPnl:          periodPnl,
-			PeriodPnlPercent:   periodPnlPercent,
-			Period:             period,
+			TotalValue:           totalValueInPreferred,
+			TotalCost:            totalCostInPreferred,
+			TotalPnl:             totalPNL,
+			TotalPnlPercent:      totalPNLPercent,
+			RealizedPnl:          realizedPNLInPreferred,
+			UnrealizedPnl:        unrealizedPNLInPreferred,
+			TotalInvestments:     int32(len(investments)),
+			InvestmentsByType:    investmentsByTypeSlice,
+			Currency:             preferredCurrency,
+			DisplayCurrency:      preferredCurrency,
+			TopPerformers:        topPerformers,
+			WorstPerformers:      worstPerformers,
+			PeriodPnl:            periodPnl,
+			PeriodPnlPercent:     periodPnlPercent,
+			Period:               period,
+			PeriodPnlApproximate: periodApprox,
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
@@ -1929,7 +1963,7 @@ func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, u
 	}
 
 	// Compute period-scoped PnL
-	periodPnlAgg, periodPnlPercentAgg, _ := s.computePeriodPnl(ctx, userID, req.Period, totalPNL, totalPNLPercent)
+	periodPnlAgg, periodPnlPercentAgg, periodApproxAgg, _ := s.computePeriodPnl(ctx, userID, req.Period, totalPNL, totalPNLPercent)
 
 	// Calculate top and worst performers
 	topPerformers, worstPerformers, err := s.calculatePerformers(ctx, userID, investments, preferredCurrency)
@@ -1944,22 +1978,22 @@ func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, u
 		Success: true,
 		Message: "Aggregated portfolio summary retrieved successfully",
 		Data: &v1.PortfolioSummary{
-			TotalValue:         totalValueInPreferred,
-			TotalCost:          totalCostInPreferred,
-			TotalPnl:           totalPNL,
-			TotalPnlPercent:    totalPNLPercent,
-			RealizedPnl:        realizedPNLInPreferred,
-			UnrealizedPnl:      unrealizedPNLInPreferred,
-			TotalInvestments:   int32(len(investments)),
-			InvestmentsByType:  investmentsByTypeSlice,
-			// Currency fields - summary is in user's preferred currency
-			Currency:           preferredCurrency,
-			DisplayCurrency:    preferredCurrency,
-			TopPerformers:      topPerformers,
-			WorstPerformers:    worstPerformers,
-			PeriodPnl:          periodPnlAgg,
-			PeriodPnlPercent:   periodPnlPercentAgg,
-			Period:             req.Period,
+			TotalValue:           totalValueInPreferred,
+			TotalCost:            totalCostInPreferred,
+			TotalPnl:             totalPNL,
+			TotalPnlPercent:      totalPNLPercent,
+			RealizedPnl:          realizedPNLInPreferred,
+			UnrealizedPnl:        unrealizedPNLInPreferred,
+			TotalInvestments:     int32(len(investments)),
+			InvestmentsByType:    investmentsByTypeSlice,
+			Currency:             preferredCurrency,
+			DisplayCurrency:      preferredCurrency,
+			TopPerformers:        topPerformers,
+			WorstPerformers:      worstPerformers,
+			PeriodPnl:            periodPnlAgg,
+			PeriodPnlPercent:     periodPnlPercentAgg,
+			Period:               req.Period,
+			PeriodPnlApproximate: periodApproxAgg,
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
