@@ -293,6 +293,7 @@
       "pnl1w": "P/L 1 WEEK",
       "pnl1m": "P/L 1 MONTH",
       "pnlAll": "P/L ALL TIME",
+      "pnlApproximate": "Approximate — limited historical data",
       "pnlNoData": "You haven't entered your balance yet. Update your balance now.",
       "pnlGoToPortfolio": "Update",
       "today": "Today",

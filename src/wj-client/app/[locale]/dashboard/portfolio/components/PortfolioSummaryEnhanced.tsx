@@ -31,6 +31,8 @@ const INVESTMENT_TYPE_TRANSLATION_KEYS: Record<number, string> = {
   [InvestmentType.INVESTMENT_TYPE_GOLD_USD]: "typeLabels.goldWorld",
   [InvestmentType.INVESTMENT_TYPE_SILVER_VND]: "typeLabels.silverVietnam",
   [InvestmentType.INVESTMENT_TYPE_SILVER_USD]: "typeLabels.silverWorld",
+  [InvestmentType.INVESTMENT_TYPE_CASH]: "typeLabels.cash",
+  [InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY]: "typeLabels.foreignCurrency",
   [InvestmentType.INVESTMENT_TYPE_OTHER]: "typeLabels.other",
 };
 

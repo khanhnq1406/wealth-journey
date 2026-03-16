@@ -30,7 +30,7 @@ sequenceDiagram
     participant LR as LotRepository
     participant Units as units Package
 
-    SPA->>H: POST /api/v1/investments<br/>{walletId: 0, symbol, name, type, currency,<br/>initialQuantity, initialCost, isCustom}
+    SPA->>H: POST /api/v1/investments<br/>{walletId: 0, symbol, name, type, currency,<br/>initialQuantity, initialCost, isCustom, purchaseDate}
     H->>IS: CreateInvestment(userID, req)
 
     activate IS
@@ -40,6 +40,10 @@ sequenceDiagram
         WR-->>IS: Selected wallet
     else walletId provided
         IS->>WR: GetByIDForUser(walletId, userID)
+    end
+
+    alt purchaseDate > 0
+        IS->>IS: Validate purchaseDate ≤ now<br/>(reject future dates)
     end
 
     IS->>IS: Validate symbol not already in wallet
@@ -52,10 +56,17 @@ sequenceDiagram
 
     IS->>Units: CalculateAverageCost(totalCost, quantity, type)
 
+    Note over IS: Determine txDate
+    alt purchaseDate > 0
+        IS->>IS: txDate = time.Unix(purchaseDate, 0)
+    else purchaseDate == 0
+        IS->>IS: txDate = time.Now()
+    end
+
     IS->>IR: Create(Investment{symbol, name, type, currency,<br/>quantity, averageCost, totalCost, isCustom})
     IR-->>IS: Investment created
 
-    IS->>ITR: Create(InvestmentTx{type: BUY, quantity, price, cost})
+    IS->>ITR: Create(InvestmentTx{type: BUY, quantity, price, cost,<br/>transactionDate: txDate})
     alt Transaction creation fails
         ITR-->>IS: Error
         IS->>IR: Delete(investmentID)
@@ -63,7 +74,7 @@ sequenceDiagram
         IS-->>H: Error
     end
 
-    IS->>LR: Create(Lot{quantity, remainingQty: quantity,<br/>averageCost, totalCost, purchasedAt: now})
+    IS->>LR: Create(Lot{quantity, remainingQty: quantity,<br/>averageCost, totalCost, purchasedAt: txDate})
     alt Lot creation fails
         LR-->>IS: Error
         IS->>ITR: Delete(txID)

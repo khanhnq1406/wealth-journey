@@ -151,10 +151,52 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		return nil, err
 	}
 
-	// 3. Check for duplicate symbol in wallet
+	// Validate purchase_date if provided
+	if req.PurchaseDate > 0 {
+		purchaseTime := time.Unix(req.PurchaseDate, 0)
+		if purchaseTime.After(time.Now()) {
+			return nil, apperrors.NewValidationError("purchase date cannot be in the future")
+		}
+	}
+
+	// 3. Check for duplicate symbol in wallet — auto-add as BUY transaction if exists
 	existing, err := s.investmentRepo.GetByWalletAndSymbol(ctx, req.WalletId, req.Symbol)
 	if err == nil && existing != nil {
-		return nil, apperrors.NewConflictError(fmt.Sprintf("investment with symbol %s already exists in this wallet", req.Symbol))
+		// Calculate per-unit price for the AddTransaction request
+		var perUnitPrice int64
+		if initialQuantity > 0 {
+			perUnitPrice = units.CalculateAverageCost(initialCost, initialQuantity, req.Type)
+		}
+
+		// Determine transaction date as Unix timestamp
+		var txTimestamp int64
+		if req.PurchaseDate > 0 {
+			txTimestamp = req.PurchaseDate
+		} else {
+			txTimestamp = time.Now().Unix()
+		}
+
+		addReq := &v1.AddTransactionRequest{
+			InvestmentId:    existing.ID,
+			Type:            v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY,
+			Quantity:        initialQuantity,
+			Price:           perUnitPrice,
+			Fees:            0,
+			TransactionDate: txTimestamp,
+			Notes:           "Additional purchase",
+		}
+
+		addResp, err := s.AddTransaction(ctx, userID, addReq)
+		if err != nil {
+			return nil, err
+		}
+
+		return &v1.CreateInvestmentResponse{
+			Success:   true,
+			Message:   "Transaction added to existing investment",
+			Data:      addResp.UpdatedInvestment,
+			Timestamp: time.Now().Format(time.RFC3339),
+		}, nil
 	}
 
 	// 5. Calculate initial average cost using utility function
@@ -181,6 +223,13 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		currentPrice = averageCost
 	}
 
+	// CASH and FOREIGN_CURRENCY: seed with average cost even when custom,
+	// so CurrentValue = TotalCost and UnrealizedPNL = 0 (not -100%)
+	if req.Type == v1.InvestmentType_INVESTMENT_TYPE_CASH ||
+		req.Type == v1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY {
+		currentPrice = averageCost
+	}
+
 	// 6. Create investment model
 	investment := &models.Investment{
 		WalletID:     req.WalletId,
@@ -202,6 +251,12 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		return nil, err
 	}
 
+	// Determine transaction date
+	txDate := time.Now()
+	if req.PurchaseDate > 0 {
+		txDate = time.Unix(req.PurchaseDate, 0)
+	}
+
 	// 8. Create initial buy transaction
 	tx := &models.InvestmentTransaction{
 		InvestmentID:    investment.ID,
@@ -211,7 +266,7 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		Price:           averageCost,
 		Cost:            initialCost,
 		Fees:            0,
-		TransactionDate: time.Now(),
+		TransactionDate: txDate,
 		Notes:           "Initial investment",
 	}
 
@@ -228,7 +283,7 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		RemainingQuantity: initialQuantity,
 		AverageCost:       averageCost,
 		TotalCost:         initialCost,
-		PurchasedAt:       time.Now(),
+		PurchasedAt:       txDate,
 	}
 
 	if err := s.txRepo.CreateLot(ctx, lot); err != nil {
@@ -256,6 +311,27 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 	// (current_value was set by GORM BeforeCreate hook)
 	if ws, ok := s.walletService.(*walletService); ok {
 		ws.invalidateInvestmentValueCache(ctx, req.WalletId)
+	}
+
+	// Backfill portfolio history snapshot at purchase date for period PNL accuracy.
+	// When an investment is created with a past purchase date, we create a snapshot
+	// so that period PNL calculations have a baseline including this investment.
+	if req.PurchaseDate > 0 {
+		summary, err := s.GetPortfolioSummary(ctx, req.WalletId, userID, 0)
+		if err == nil && summary.Data != nil {
+			snapshot := &models.PortfolioHistory{
+				UserID:     userID,
+				WalletID:   req.WalletId,
+				TotalValue: summary.Data.TotalValue,
+				TotalCost:  summary.Data.TotalCost,
+				TotalPnl:   summary.Data.TotalPnl,
+				Currency:   summary.Data.Currency,
+				Timestamp:  txDate,
+			}
+			if _, err := s.portfolioHistoryRepo.CreateSnapshotIfNotDuplicate(ctx, snapshot); err != nil {
+				fmt.Printf("Warning: failed to backfill portfolio snapshot at purchase date: %v\n", err)
+			}
+		}
 	}
 
 	invProto := s.mapper.ModelToProto(investment)
@@ -1269,7 +1345,7 @@ func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID in
 	}
 
 	// Compute period-scoped PnL
-	periodPnl, periodPnlPercent, _ := s.computePeriodPnl(ctx, userID, period, totalPNL, totalPNLPercent)
+	periodPnl, periodPnlPercent, periodApprox, _ := s.computePeriodPnl(ctx, userID, period, totalPNL, totalPNLPercent)
 
 	// Calculate top and worst performers
 	topPerformers, worstPerformers, err := s.calculatePerformers(ctx, userID, investments, preferredCurrency)
@@ -1284,22 +1360,22 @@ func (s *investmentService) GetPortfolioSummary(ctx context.Context, walletID in
 		Success: true,
 		Message: "Portfolio summary retrieved successfully",
 		Data: &v1.PortfolioSummary{
-			TotalValue:         totalValueInPreferred,
-			TotalCost:          totalCostInPreferred,
-			TotalPnl:           totalPNL,
-			TotalPnlPercent:    totalPNLPercent,
-			RealizedPnl:        realizedPNLInPreferred,
-			UnrealizedPnl:      unrealizedPNLInPreferred,
-			TotalInvestments:   int32(len(investments)),
-			InvestmentsByType:  investmentsByTypeSlice,
-			// Currency fields - summary is in user's preferred currency
-			Currency:           preferredCurrency,
-			DisplayCurrency:    preferredCurrency,
-			TopPerformers:      topPerformers,
-			WorstPerformers:    worstPerformers,
-			PeriodPnl:          periodPnl,
-			PeriodPnlPercent:   periodPnlPercent,
-			Period:             period,
+			TotalValue:           totalValueInPreferred,
+			TotalCost:            totalCostInPreferred,
+			TotalPnl:             totalPNL,
+			TotalPnlPercent:      totalPNLPercent,
+			RealizedPnl:          realizedPNLInPreferred,
+			UnrealizedPnl:        unrealizedPNLInPreferred,
+			TotalInvestments:     int32(len(investments)),
+			InvestmentsByType:    investmentsByTypeSlice,
+			Currency:             preferredCurrency,
+			DisplayCurrency:      preferredCurrency,
+			TopPerformers:        topPerformers,
+			WorstPerformers:      worstPerformers,
+			PeriodPnl:            periodPnl,
+			PeriodPnlPercent:     periodPnlPercent,
+			Period:               period,
+			PeriodPnlApproximate: periodApprox,
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
@@ -1908,7 +1984,7 @@ func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, u
 	}
 
 	// Compute period-scoped PnL
-	periodPnlAgg, periodPnlPercentAgg, _ := s.computePeriodPnl(ctx, userID, req.Period, totalPNL, totalPNLPercent)
+	periodPnlAgg, periodPnlPercentAgg, periodApproxAgg, _ := s.computePeriodPnl(ctx, userID, req.Period, totalPNL, totalPNLPercent)
 
 	// Calculate top and worst performers
 	topPerformers, worstPerformers, err := s.calculatePerformers(ctx, userID, investments, preferredCurrency)
@@ -1923,22 +1999,22 @@ func (s *investmentService) GetAggregatedPortfolioSummary(ctx context.Context, u
 		Success: true,
 		Message: "Aggregated portfolio summary retrieved successfully",
 		Data: &v1.PortfolioSummary{
-			TotalValue:         totalValueInPreferred,
-			TotalCost:          totalCostInPreferred,
-			TotalPnl:           totalPNL,
-			TotalPnlPercent:    totalPNLPercent,
-			RealizedPnl:        realizedPNLInPreferred,
-			UnrealizedPnl:      unrealizedPNLInPreferred,
-			TotalInvestments:   int32(len(investments)),
-			InvestmentsByType:  investmentsByTypeSlice,
-			// Currency fields - summary is in user's preferred currency
-			Currency:           preferredCurrency,
-			DisplayCurrency:    preferredCurrency,
-			TopPerformers:      topPerformers,
-			WorstPerformers:    worstPerformers,
-			PeriodPnl:          periodPnlAgg,
-			PeriodPnlPercent:   periodPnlPercentAgg,
-			Period:             req.Period,
+			TotalValue:           totalValueInPreferred,
+			TotalCost:            totalCostInPreferred,
+			TotalPnl:             totalPNL,
+			TotalPnlPercent:      totalPNLPercent,
+			RealizedPnl:          realizedPNLInPreferred,
+			UnrealizedPnl:        unrealizedPNLInPreferred,
+			TotalInvestments:     int32(len(investments)),
+			InvestmentsByType:    investmentsByTypeSlice,
+			Currency:             preferredCurrency,
+			DisplayCurrency:      preferredCurrency,
+			TopPerformers:        topPerformers,
+			WorstPerformers:      worstPerformers,
+			PeriodPnl:            periodPnlAgg,
+			PeriodPnlPercent:     periodPnlPercentAgg,
+			Period:               req.Period,
+			PeriodPnlApproximate: periodApproxAgg,
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil

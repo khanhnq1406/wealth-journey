@@ -51,22 +51,34 @@ func (r *portfolioHistoryRepositoryImpl) GetHistoryByWallet(ctx context.Context,
 	return histories, err
 }
 
-// GetAggregatedHistory retrieves aggregated history across all investment wallets
-// Returns daily aggregated snapshots
+// GetAggregatedHistory retrieves aggregated history across all investment wallets.
+// Groups per-wallet snapshots by hour and sums TotalValue, TotalCost, TotalPnl.
 func (r *portfolioHistoryRepositoryImpl) GetAggregatedHistory(ctx context.Context, userID int32, from, to time.Time, limit int) ([]*models.PortfolioHistory, error) {
-	// For now, we'll fetch all history and aggregate in memory
-	// In production, consider using SQL aggregation for better performance
 	var histories []*models.PortfolioHistory
-	query := r.db.WithContext(ctx).
-		Where("user_id = ?", userID).
-		Where("timestamp >= ? AND timestamp <= ?", from, to).
-		Order("timestamp ASC")
+
+	sql := `
+		SELECT 0 AS id, user_id, 0 AS wallet_id,
+		       SUM(total_value) AS total_value,
+		       SUM(total_cost) AS total_cost,
+		       SUM(total_pnl) AS total_pnl,
+		       MIN(currency) AS currency,
+		       date_trunc('hour', timestamp) AS timestamp,
+		       MIN(created_at) AS created_at,
+		       MIN(updated_at) AS updated_at,
+		       NULL AS deleted_at
+		FROM portfolio_history
+		WHERE user_id = ? AND timestamp >= ? AND timestamp <= ? AND deleted_at IS NULL
+		GROUP BY user_id, date_trunc('hour', timestamp)
+		ORDER BY timestamp ASC
+	`
+	args := []interface{}{userID, from, to}
 
 	if limit > 0 {
-		query = query.Limit(limit)
+		sql += " LIMIT ?"
+		args = append(args, limit)
 	}
 
-	err := query.Find(&histories).Error
+	err := r.db.WithContext(ctx).Raw(sql, args...).Scan(&histories).Error
 	return histories, err
 }
 

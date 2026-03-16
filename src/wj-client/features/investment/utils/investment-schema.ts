@@ -8,11 +8,14 @@ import {
  * Zod schema for investment creation
  */
 
-const GOLD_SILVER_TYPES = new Set<InvestmentType>([
+// Gold/silver/cash/foreign currency types allow any symbol format
+const FLEXIBLE_SYMBOL_TYPES = new Set<InvestmentType>([
   InvestmentType.INVESTMENT_TYPE_GOLD_VND,
   InvestmentType.INVESTMENT_TYPE_GOLD_USD,
   InvestmentType.INVESTMENT_TYPE_SILVER_VND,
   InvestmentType.INVESTMENT_TYPE_SILVER_USD,
+  InvestmentType.INVESTMENT_TYPE_CASH,
+  InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY,
 ]);
 
 export const createInvestmentSchema = z
@@ -28,6 +31,8 @@ export const createInvestmentSchema = z
     type: z.nativeEnum(InvestmentType),
     initialQuantity: z.number().min(0.00000001, "Quantity must be positive"),
     initialCost: z.number().min(0, "Initial cost must be 0 or greater"),
+    pricePerUnit: z.number().min(0, "Price per unit must be 0 or greater"),
+    purchaseDate: z.string().min(1, "Purchase date is required"),
     currency: z
       .string()
       .length(3, "Currency must be a 3-letter ISO code")
@@ -41,8 +46,8 @@ export const createInvestmentSchema = z
   )
   .refine(
     (data) => {
-      // Only enforce symbol format for non-gold/silver types (user-entered symbols)
-      if (GOLD_SILVER_TYPES.has(data.type)) return true;
+      // Only enforce symbol format for non-gold/silver/cash/forex types (user-entered symbols)
+      if (FLEXIBLE_SYMBOL_TYPES.has(data.type)) return true;
       return /^[A-Za-z0-9._-]+$/.test(data.symbol);
     },
     {

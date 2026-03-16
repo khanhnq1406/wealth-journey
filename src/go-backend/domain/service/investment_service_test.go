@@ -756,8 +756,9 @@ func TestInvestmentService_CreateInvestment_DuplicateSymbol(t *testing.T) {
 	ctx := context.Background()
 	userID := int32(1)
 	walletID := int32(1)
+	investmentID := int32(1)
 	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
-	existingInvestment := createTestInvestment(1, walletID, "AAPL", 10000, 1500000, 15000000000)
+	existingInvestment := createTestInvestment(investmentID, walletID, "AAPL", 10000, 1500000, 15000000000)
 
 	req := &v1.CreateInvestmentRequest{
 		WalletId:        walletID,
@@ -769,19 +770,34 @@ func TestInvestmentService_CreateInvestment_DuplicateSymbol(t *testing.T) {
 		Currency:        "USD",
 	}
 
+	// CreateInvestment finds duplicate → delegates to AddTransaction
 	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
 	mockInvestmentRepo.On("GetByWalletAndSymbol", ctx, walletID, "AAPL").Return(existingInvestment, nil)
+	// AddTransaction internally fetches the investment and wallet again
+	mockInvestmentRepo.On("GetByIDForUser", ctx, investmentID, userID).Return(existingInvestment, nil)
+	mockInvestmentRepo.On("GetByID", ctx, investmentID).Return(existingInvestment, nil)
+	// processBuyTransaction: no recent lots → creates new lot
+	mockTxRepo.On("GetOpenLots", ctx, investmentID).Return([]*models.InvestmentLot{}, nil)
+	mockTxRepo.On("CreateLot", ctx, mock.AnythingOfType("*models.InvestmentLot")).Return(nil)
+	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
+	mockInvestmentRepo.On("Update", ctx, mock.AnythingOfType("*models.Investment")).Return(nil)
+	// Post-transaction: list transactions for response
+	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*v1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
+	// enrichInvestmentProto calls GetByID for user's preferred currency
+	mockUserRepo.On("GetByID", ctx, userID).Return(&models.User{ID: userID, PreferredCurrency: "USD"}, nil)
 
 	// Execute
 	response, err := service.CreateInvestment(ctx, userID, req)
 
-	// Assert
-	assert.Error(t, err)
-	assert.Nil(t, response)
-	assert.IsType(t, apperrors.ConflictError{}, err)
+	// Assert — duplicate now auto-adds a BUY transaction instead of returning ConflictError
+	assert.NoError(t, err)
+	assert.NotNil(t, response)
+	assert.True(t, response.Success)
+	assert.Equal(t, "Transaction added to existing investment", response.Message)
 
 	mockWalletRepo.AssertExpectations(t)
 	mockInvestmentRepo.AssertExpectations(t)
+	mockTxRepo.AssertExpectations(t)
 }
 
 // Test AddTransaction - Buy (creates lot)

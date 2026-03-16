@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
 import { FormNumberInput } from "@/components/forms/FormNumberInput";
@@ -13,6 +12,7 @@ import { RHFFormInput as FormInput } from "@/components/forms/RHFFormInput";
 import { ErrorMessage } from "@/components/forms/ErrorMessage";
 import {
   useMutationAddInvestmentTransaction,
+  useQueryGetMarketPrice,
   EVENT_WalletListWallets,
   EVENT_WalletGetWallet,
 } from "@/utils/generated/hooks";
@@ -22,7 +22,6 @@ import {
 } from "@/gen/protobuf/v1/investment";
 import type { AddTransactionRequest } from "@/gen/protobuf/v1/investment";
 import { useQueryClient } from "@tanstack/react-query";
-import { z } from "zod";
 import {
   quantityToStorage,
   amountToSmallestUnit,
@@ -48,7 +47,6 @@ import {
   type SilverUnit,
 } from "@/features/investment/utils/silver-calculator";
 import { SuccessAnimation } from "@/components/success/SuccessAnimation";
-import { MarketPriceDisplay } from "@/components/forms/MarketPriceDisplay";
 
 interface AddInvestmentTransactionFormProps {
   investmentId: number;
@@ -79,15 +77,18 @@ export function AddInvestmentTransactionForm({
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [showSuccess, setShowSuccess] = useState(false);
 
-
   const transactionTypeOptions: SelectOption[] = useMemo(
     () => [
       {
-        value: String(InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_BUY),
+        value: String(
+          InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_BUY,
+        ),
         label: t("transaction.buy"),
       },
       {
-        value: String(InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_SELL),
+        value: String(
+          InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_SELL,
+        ),
         label: t("transaction.sell"),
       },
       {
@@ -102,7 +103,9 @@ export function AddInvestmentTransactionForm({
 
   const addTransactionMutation = useMutationAddInvestmentTransaction({
     onSuccess: (data) => {
-      setSuccessMessage(data.message || t("transaction.transactionAddedMessage"));
+      setSuccessMessage(
+        data.message || t("transaction.transactionAddedMessage"),
+      );
       setShowSuccess(true);
       setErrorMessage("");
       // Invalidate investment queries
@@ -117,9 +120,7 @@ export function AddInvestmentTransactionForm({
       queryClient.invalidateQueries({ queryKey: [EVENT_WalletGetWallet] });
     },
     onError: (error: any) => {
-      setErrorMessage(
-        error.message || t("transaction.failedToAdd"),
-      );
+      setErrorMessage(error.message || t("transaction.failedToAdd"));
     },
   });
 
@@ -132,6 +133,7 @@ export function AddInvestmentTransactionForm({
     formState: { isSubmitting, errors },
     getValues,
     setError,
+    setValue,
   } = useForm<AddTransactionFormInput>({
     // NOTE: Removed zodResolver due to bug where it strips type and transactionDate fields
     // See: https://github.com/react-hook-form/resolvers/issues/XXX
@@ -178,6 +180,29 @@ export function AddInvestmentTransactionForm({
       ? ("tael" as const)
       : ("oz" as const);
   }, [investmentType, isSilverInvestment, purchaseUnit]);
+
+  // Fetch market price for auto-fill
+  const priceQuery = useQueryGetMarketPrice(
+    {
+      symbol: symbol || "",
+      currency: investmentCurrency,
+      type: investmentType,
+    },
+    {
+      enabled: !!symbol && symbol.length >= 2,
+      refetchOnMount: "always",
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  );
+
+  // Auto-fill price from market data — always use priceDecimal (human-readable)
+  useEffect(() => {
+    if (!priceQuery.data?.data) return;
+    const data = priceQuery.data.data;
+    if (data.priceDecimal) setValue("price", data.priceDecimal);
+  }, [priceQuery.data, setValue]);
+
+  const isRefreshing = priceQuery.isFetching;
 
   const onSubmit = () => {
     setErrorMessage(undefined);
@@ -281,7 +306,9 @@ export function AddInvestmentTransactionForm({
     return (
       <div className="text-center py-8 flex flex-col gap-2">
         <SuccessAnimation />
-        <h3 className="text-lg font-semibold">{t("transaction.transactionAddedSuccess")}</h3>
+        <h3 className="text-lg font-semibold">
+          {t("transaction.transactionAddedSuccess")}
+        </h3>
         <p className="text-gray-600 mb-6">{successMessage}</p>
         <Button type={ButtonType.PRIMARY} onClick={onSuccess}>
           {tCommon("done")}
@@ -340,33 +367,47 @@ export function AddInvestmentTransactionForm({
         showRecommendations={false}
       />
 
-      {/* Price */}
-      <FormNumberInput
-        name="price"
-        control={control}
-        label={
-          isGoldInvestment
-            ? `Price per ${getInvestmentUnitLabelFull(goldDisplayUnit || "oz", investmentType)} (${investmentCurrency})`
-            : isSilverInvestment && silverDisplayUnit
-              ? `Price per ${getInvestmentUnitLabelFull(silverDisplayUnit, investmentType)} (${investmentCurrency})`
-              : t("transaction.pricePerUnit", { currency: investmentCurrency })
-        }
-        placeholder="0.00"
-        required
-        disabled={isSubmitting}
-        min={0}
-        step="0.01"
-      />
-
-      {/* Market price display */}
-      {symbol && (
-        <MarketPriceDisplay
-          symbol={symbol}
-          currency={investmentCurrency}
-          investmentType={investmentType}
-          className="mt-2 mb-4"
-        />
-      )}
+      {/* Price + Refresh Button */}
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          <label className="block text-sm font-medium text-gray-700">
+            {isGoldInvestment
+              ? `Price per ${getInvestmentUnitLabelFull(goldDisplayUnit || "oz", investmentType)} (${investmentCurrency})`
+              : isSilverInvestment && silverDisplayUnit
+                ? `Price per ${getInvestmentUnitLabelFull(silverDisplayUnit, investmentType)} (${investmentCurrency})`
+                : t("transaction.pricePerUnit", {
+                    currency: investmentCurrency,
+                  })}
+            <span className="text-red-500 ml-0.5">*</span>
+          </label>
+        </div>
+        <div className="flex items-start gap-2">
+          <div className="flex-1">
+            <FormNumberInput
+              name="price"
+              control={control}
+              placeholder="0.00"
+              required
+              disabled={isSubmitting}
+              min={0}
+              step="0.01"
+            />
+          </div>
+          {/* Refresh button - shown when symbol is available */}
+          {symbol && symbol.length >= 2 && (
+            <button
+              type="button"
+              onClick={() => priceQuery.refetch()}
+              disabled={isRefreshing}
+              className="px-3 py-2 text-sm font-medium text-bg bg-red-50 border border-bg rounded-md hover:bg-red-100 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap h-[50px]"
+            >
+              {isRefreshing
+                ? t("transaction.refreshingPrice")
+                : t("transaction.refreshPrice")}
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* Fees */}
       <FormNumberInput

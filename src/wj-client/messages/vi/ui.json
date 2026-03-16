@@ -293,6 +293,7 @@
       "pnl1w": "L/L 1 TUẦN",
       "pnl1m": "L/L 1 THÁNG",
       "pnlAll": "L/L TOÀN THỜI GIAN",
+      "pnlApproximate": "Ước tính — dữ liệu lịch sử hạn chế",
       "pnlNoData": "Bạn chưa nhập số dư, cập nhật số dư bạn ngay",
       "pnlGoToPortfolio": "Cập nhật",
       "today": "Hôm nay",

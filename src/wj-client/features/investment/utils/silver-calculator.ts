@@ -31,20 +31,21 @@ export interface SilverTypeOption {
   availableUnits: SilverUnit[]; // Units user can input
 }
 
-// Vietnamese silver type options
+// Vietnamese silver type options — aligned with silver price API
 export const SILVER_VND_OPTIONS: SilverTypeOption[] = [
   // Tael-based (lượng)
-  { value: "GOLDENFUND_1L", label: "Golden Fund 1 Lượng", currency: "VND", type: 10, availableUnits: ['tael'] },
-  { value: "GOLDENFUND_5L", label: "Golden Fund 5 Lượng", currency: "VND", type: 10, availableUnits: ['tael'] },
-  { value: "GOLDENFUND_10L", label: "Golden Fund 10 Lượng", currency: "VND", type: 10, availableUnits: ['tael'] },
-  { value: "PHUQUY_1L", label: "Phú Quý 1 Lượng", currency: "VND", type: 10, availableUnits: ['tael'] },
-  { value: "PHUQUY_5L", label: "Phú Quý 5 Lượng", currency: "VND", type: 10, availableUnits: ['tael'] },
-  { value: "ANCARAT_1L", label: "Ancarat 1 Lượng", currency: "VND", type: 10, availableUnits: ['tael'] },
-  { value: "ANCARAT_5L", label: "Ancarat 5 Lượng", currency: "VND", type: 10, availableUnits: ['tael'] },
+  { value: "PH_QU_THI_1L", label: "Phú Quý thỏi 1L", currency: "VND", type: 10, availableUnits: ['tael'] },
+  { value: "PH_QU_THI_5L_10L", label: "Phú Quý thỏi 5L,10L", currency: "VND", type: 10, availableUnits: ['tael'] },
+  { value: "BC_M_NGH_PH_QU", label: "Bạc Mỹ nghệ Phú Quý", currency: "VND", type: 10, availableUnits: ['tael'] },
+  { value: "ANCARAT_NGN_LONG_1L", label: "Ancarat Ngân Long 1L", currency: "VND", type: 10, availableUnits: ['tael'] },
+  { value: "ANCARAT_NGN_LONG_5L", label: "Ancarat Ngân Long 5L", currency: "VND", type: 10, availableUnits: ['tael'] },
+  { value: "SBJ_1L_10L_50L", label: "SBJ 1L,10L,50L", currency: "VND", type: 10, availableUnits: ['tael'] },
+  { value: "DOJI_99.9_1L", label: "DOJI 99.9 1L", currency: "VND", type: 10, availableUnits: ['tael'] },
+  { value: "DOJI_99.9_5L", label: "DOJI 99.9 5L", currency: "VND", type: 10, availableUnits: ['tael'] },
   // Kg-based
-  { value: "GOLDENFUND_1KG", label: "Golden Fund 1 Kg", currency: "VND", type: 10, availableUnits: ['kg'] },
-  { value: "PHUQUY_1KG", label: "Phú Quý 1 Kg", currency: "VND", type: 10, availableUnits: ['kg'] },
-  { value: "ANCARAT_1KG", label: "Ancarat 1 Kg", currency: "VND", type: 10, availableUnits: ['kg'] },
+  { value: "ANCARAT_NGN_LONG_1KG", label: "Ancarat Ngân Long 1kg", currency: "VND", type: 10, availableUnits: ['kg'] },
+  { value: "ANCARAT_THI_999_-_1KG", label: "Ancarat thỏi 999 - 1kg", currency: "VND", type: 10, availableUnits: ['kg'] },
+  { value: "SBJ_1KG", label: "SBJ 1kg", currency: "VND", type: 10, availableUnits: ['kg'] },
 ];
 
 // World silver type options
@@ -351,13 +352,13 @@ export function getSilverTypeLabel(type: InvestmentType): string {
 /**
  * Get silver type options for a given currency
  */
-export function getSilverTypeOptions(currency: string): SilverTypeOption[] {
+export function getSilverTypeOptions(currency?: string): SilverTypeOption[] {
   if (currency === "VND") {
     return SILVER_VND_OPTIONS;
   } else if (currency === "USD") {
     return SILVER_USD_OPTIONS;
   }
-  return [];
+  return [...SILVER_VND_OPTIONS, ...SILVER_USD_OPTIONS];
 }
 
 /**

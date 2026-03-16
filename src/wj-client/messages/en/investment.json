@@ -65,7 +65,11 @@
       "goldWorld": "Gold (World)",
       "silverVietnam": "Silver (Vietnam)",
       "silverWorld": "Silver (World)",
-      "other": "Other"
+      "other": "Other",
+      "gold": "Gold",
+      "silver": "Silver",
+      "cash": "Cash",
+      "foreignCurrency": "Foreign Currency"
     },
     "timeAgo": {
       "justNow": "Just now",
@@ -85,7 +89,11 @@
       "goldWorld": "Gold (World)",
       "silverVietnam": "Silver (Vietnam)",
       "silverWorld": "Silver (World)",
-      "other": "Other"
+      "other": "Other",
+      "gold": "Gold",
+      "silver": "Silver",
+      "cash": "Cash",
+      "foreignCurrency": "Foreign Currency"
     },
     "sortOptions": {
       "nameAZ": "Name (A-Z)",
@@ -157,7 +165,15 @@
       "defaultGoldName": "Gold Investment",
       "defaultSilverName": "Silver Investment",
       "selectGoldTypeError": "Please select a gold type",
-      "selectSilverTypeError": "Please select a silver type"
+      "selectSilverTypeError": "Please select a silver type",
+      "purchaseDate": "Purchase Date",
+      "purchaseDateHint": "Optional — defaults to today",
+      "pricePerUnitLabel": "Price per unit",
+      "refreshPrice": "Current price",
+      "refreshingPrice": "Loading...",
+      "totalCostSummary": "Total cost: {amount}",
+      "totalCostConverted": "≈ {amount}",
+      "priceUnavailable": "Unable to fetch price"
     },
     "transactionTypes": {
       "buy": "Buy",
@@ -198,7 +214,9 @@
       "transactionAddedSuccess": "Transaction Added!",
       "transactionAddedMessage": "Transaction added successfully",
       "failedToAdd": "Failed to add transaction. Please try again",
-      "fixValidationErrors": "Please fix the validation errors"
+      "fixValidationErrors": "Please fix the validation errors",
+      "refreshPrice": "Current price",
+      "refreshingPrice": "Loading..."
     },
     "detail": {
       "overview": "Overview",
@@ -268,6 +286,7 @@
       "errorLoadingPortfolio": "Error loading portfolio"
     },
     "errors": {
+      "addedToExisting": "Purchase added to your existing holding",
       "createdSuccessfully": "Investment created successfully",
       "failedToCreate": "Failed to create investment",
       "duplicateSymbol": "An investment with this symbol already exists in this wallet",

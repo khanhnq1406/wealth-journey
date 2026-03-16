@@ -65,13 +65,14 @@ export function PNLCard({ currency }: PNLCardProps) {
 
   const periodPnl = parseAmount(summaryData?.data?.periodPnl);
   const periodPnlPercent = Number(summaryData?.data?.periodPnlPercent ?? 0);
+  const isApproximate = summaryData?.data?.periodPnlApproximate === true;
 
   const chartPoints = (histData?.data || []).map((point) => ({
     date: new Date(Number(point.timestamp) * 1000).toLocaleDateString("vi-VN", {
       month: "2-digit",
       day: "2-digit",
     }),
-    value: Number(point.totalValue) / 100,
+    value: parseAmount(point.displayTotalValue?.amount ?? point.totalValue),
   }));
 
   const firstValue = chartPoints[0]?.value ?? 0;
@@ -151,6 +152,11 @@ export function PNLCard({ currency }: PNLCardProps) {
           <p className="font-jetbrains font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
             {t(pnlLabelKey[selectedPeriod] as any)}
           </p>
+          {isApproximate && selectedPeriod !== "all" && (
+            <p className="font-vietnam text-[10px] text-v2-text-tertiary mt-1">
+              {t("pnlApproximate")}
+            </p>
+          )}
         </div>
       </div>
 
