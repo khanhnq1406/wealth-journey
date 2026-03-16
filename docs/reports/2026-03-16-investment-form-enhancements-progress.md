@@ -6,21 +6,21 @@
 - **Spec file:** docs/specs/2026-03-16-investment-form-enhancements-spec.md
 - **Started:** 2026-03-16
 - **Last updated:** 2026-03-16
-- **Current state:** in_progress
-- **Current task:** 1
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 1 | Proto — Add CASH/FOREIGN_CURRENCY enums and purchase_date | in_progress | — | — |
-| 2 | Backend — Use purchase_date for initial transaction and lot | pending | — | — |
-| 3 | Frontend — Update i18n messages (en + vi) | pending | — | — |
-| 4 | Frontend — Update gold-calculator labels to match price table | pending | — | — |
-| 5 | Frontend — Update investment-schema for new types | pending | — | — |
-| 6 | Frontend — Rewrite AddInvestmentForm with all enhancements | pending | — | — |
-| 7 | Frontend — Update portfolio page type labels for new types | pending | — | — |
-| 8 | Update Architecture Diagrams | pending | — | — |
+| 1 | Proto — Add CASH/FOREIGN_CURRENCY enums and purchase_date | done | 04124d9 | Added CASH=12, FOREIGN_CURRENCY=13 enums + purchase_date field |
+| 2 | Backend — Use purchase_date for initial transaction and lot | done | 23d6ad8 | Validate & use purchase_date for tx/lot dates |
+| 3 | Frontend — Update i18n messages (en + vi) | done | 4549ea8 | Added 13 new keys to en + vi |
+| 4 | Frontend — Update gold-calculator labels to match price table | done | 1ef65b8 | Updated 6 labels + added Vàng nhẫn SJC |
+| 5 | Frontend — Update investment-schema for new types | done | d670054 | FLEXIBLE_SYMBOL_TYPES with CASH/FOREIGN_CURRENCY |
+| 6 | Frontend — Rewrite AddInvestmentForm with all enhancements | done | d53bb5e | Major form rewrite with all 4 FRs |
+| 7 | Frontend — Update portfolio page type labels for new types | done | e99d08f | Added CASH/FOREIGN_CURRENCY to type labels & filters |
+| 8 | Update Architecture Diagrams | done | — | Updated C4 frontend + flow-investment.md |
 
 ## Resume Instructions
 
