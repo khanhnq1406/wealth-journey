@@ -7,7 +7,7 @@
 - **Started:** 2026-03-16
 - **Last updated:** 2026-03-16
 - **Current state:** in_progress
-- **Current task:** 6
+- **Current task:** 9
 
 ## Task Progress
 
@@ -18,9 +18,9 @@
 | 3 | Update Repository Layer — Category-aware queries | done | — | Added category param to all repo interface methods and implementations |
 | 4 | Update Service Layer — Category-aware business logic | done | — | Thread category through service, cache isolation per category |
 | 5 | Update Handler Layer — Pass category from HTTP requests | done | — | Parse category from query params in GET handlers |
-| 6 | Regenerate Frontend Types and Hooks | pending | — | — |
-| 7 | Generalize Frontend Component — SentimentCard with asset prop | pending | — | — |
-| 8 | Add i18n Translations for Silver Sentiment | pending | — | — |
+| 6 | Regenerate Frontend Types and Hooks | done | 0989f99 | Already generated in Task 2 — SentimentCategory enum + category fields confirmed |
+| 7 | Generalize Frontend Component — SentimentCard with asset prop | done | — | Added asset prop, per-asset theming, scoped anonymous IDs, removed vote count and date indicator |
+| 8 | Add i18n Translations for Silver Sentiment | done | — | Added silverSentiment namespace, removed vote count from goldSentiment summary |
 | 9 | Add Sentiment Cards to Prices Page Tabs | pending | — | — |
 | 10 | Update Landing and Home Pages — Add Silver Sentiment | pending | — | — |
 | 11 | Update Architecture Diagrams | pending | — | — |
