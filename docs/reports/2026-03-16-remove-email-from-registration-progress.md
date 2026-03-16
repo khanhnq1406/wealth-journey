@@ -25,7 +25,7 @@
 | 10 | Frontend — Update Register Page Layout | done | df8ba97 | Changed expand button icon from email to user |
 | 11 | Frontend — Update i18n Translations | done | c8bc104 | Removed email keys, updated button text in en + vi |
 | 12 | Update Architecture Diagrams | done | 00e4525 | Updated flow-auth.md and c4-component-backend.md |
-| 13 | Final Verification — Build and Test Everything | done | PENDING | Go build + tests pass, TS type check passes |
+| 13 | Final Verification — Build and Test Everything | done | 5c48409 | Go build + tests pass, TS type check passes |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
