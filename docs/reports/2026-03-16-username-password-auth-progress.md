@@ -6,8 +6,8 @@
 - **Spec file:** docs/specs/2026-03-16-username-password-auth-spec.md
 - **Started:** 2026-03-16
 - **Last updated:** 2026-03-16
-- **Current state:** in_progress
-- **Current task:** 16
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -26,16 +26,16 @@
 | 11 | Frontend — PasswordStrengthIndicator Component | done | e2796f5 | Created 4-segment strength bar |
 | 12 | Frontend — RegisterPasswordForm | done | 150fde9 | Created form with Zod validation + strength indicator |
 | 13 | Frontend — LoginPasswordForm | done | 150fde9 | Created form with generic error messages |
-| 14 | Frontend — Update Login Page | done | — | Added LoginPasswordForm + OR divider to login page |
-| 15 | Frontend — Update Register Page | done | — | Added RegisterPasswordForm + OR divider to register page |
-| 16 | Frontend — LinkPasswordForm | pending | — | — |
-| 17 | Frontend — ChangePasswordForm | pending | — | — |
-| 18 | Frontend — AuthMethodsCard Component | pending | — | — |
-| 19 | Frontend — Security Settings Page | pending | — | — |
-| 20 | Frontend — Settings Navigation Link | pending | — | — |
-| 21 | Update C4 Architecture Diagrams | pending | — | — |
-| 22 | Update Runtime Flow Diagrams | pending | — | — |
-| 23 | Backend Build Verification & Integration Test | pending | — | — |
+| 14 | Frontend — Update Login Page | done | bd7e215 | Added LoginPasswordForm + OR divider to login page |
+| 15 | Frontend — Update Register Page | done | bd7e215 | Added RegisterPasswordForm + OR divider to register page |
+| 16 | Frontend — LinkPasswordForm | done | 43f4394 | Created form for Google-only users to set username + password |
+| 17 | Frontend — ChangePasswordForm | done | 43f4394 | Created form for changing existing password |
+| 18 | Frontend — AuthMethodsCard Component | done | 1ed3179 | AuthMethodsCard with Google/password status badges |
+| 19 | Frontend — Security Settings Page | done | 1ed3179 | Security settings page with conditional forms |
+| 20 | Frontend — Settings Navigation Link | done | 1ed3179 | Added security link to settings page |
+| 21 | Update C4 Architecture Diagrams | done | 525f9bb | Updated backend + frontend C4 component descriptions |
+| 22 | Update Runtime Flow Diagrams | done | 525f9bb | Added 4 new sequence diagrams to flow-auth.md |
+| 23 | Backend Build Verification & Integration Test | done | — | go build + next build pass |
 
 ## Resume Instructions
 
