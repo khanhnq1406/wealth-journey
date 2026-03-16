@@ -90,6 +90,8 @@
       "silverVietnam": "Silver (Vietnam)",
       "silverWorld": "Silver (World)",
       "other": "Other",
+      "gold": "Gold",
+      "silver": "Silver",
       "cash": "Cash",
       "foreignCurrency": "Foreign Currency"
     },

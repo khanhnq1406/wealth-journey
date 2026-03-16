@@ -32,10 +32,7 @@ import {
   createInvestmentSchema,
   CreateInvestmentFormInput,
 } from "@/features/investment/utils/investment-schema";
-import {
-  getQuantityInputConfig,
-  formatCurrency,
-} from "@/lib/utils/units";
+import { getQuantityInputConfig, formatCurrency } from "@/lib/utils/units";
 import { Label } from "@/components/forms/Label";
 import { ErrorMessage } from "@/components/forms/ErrorMessage";
 import { CurrencyBadge } from "@/components/forms/CurrencyBadge";
@@ -62,10 +59,7 @@ interface AddInvestmentFormProps {
   onSuccess?: () => void;
 }
 
-
-export function AddInvestmentForm({
-  onSuccess,
-}: AddInvestmentFormProps) {
+export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
   const t = useTranslations("investment");
   const queryClient = useQueryClient();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -73,22 +67,52 @@ export function AddInvestmentForm({
 
   // UI type tracks the main dropdown selection (includes merged gold/silver values)
   const [selectedUIType, setSelectedUIType] = useState<string>(
-    String(InvestmentType.INVESTMENT_TYPE_STOCK)
+    String(InvestmentType.INVESTMENT_TYPE_STOCK),
   );
 
-  const investmentTypeOptions = useMemo<SelectOption[]>(() => [
-    { value: GOLD_UI_TYPE, label: t("typeOptions.gold") },
-    { value: SILVER_UI_TYPE, label: t("typeOptions.silver") },
-    { value: String(InvestmentType.INVESTMENT_TYPE_CASH), label: t("typeOptions.cash") },
-    { value: String(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY), label: t("typeOptions.foreignCurrency") },
-    { value: String(InvestmentType.INVESTMENT_TYPE_STOCK), label: t("typeOptions.stock") },
-    { value: String(InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY), label: t("typeOptions.cryptocurrency") },
-    { value: String(InvestmentType.INVESTMENT_TYPE_ETF), label: t("typeOptions.etf") },
-    { value: String(InvestmentType.INVESTMENT_TYPE_BOND), label: t("typeOptions.bond") },
-    { value: String(InvestmentType.INVESTMENT_TYPE_COMMODITY), label: t("typeOptions.commodity") },
-    { value: String(InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND), label: t("typeOptions.mutualFund") },
-    { value: String(InvestmentType.INVESTMENT_TYPE_OTHER), label: t("typeOptions.other") },
-  ], [t]);
+  const investmentTypeOptions = useMemo<SelectOption[]>(
+    () => [
+      { value: GOLD_UI_TYPE, label: t("typeOptions.gold") },
+      { value: SILVER_UI_TYPE, label: t("typeOptions.silver") },
+      {
+        value: String(InvestmentType.INVESTMENT_TYPE_CASH),
+        label: t("typeOptions.cash"),
+      },
+      {
+        value: String(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY),
+        label: t("typeOptions.foreignCurrency"),
+      },
+      {
+        value: String(InvestmentType.INVESTMENT_TYPE_STOCK),
+        label: t("typeOptions.stock"),
+      },
+      {
+        value: String(InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY),
+        label: t("typeOptions.cryptocurrency"),
+      },
+      {
+        value: String(InvestmentType.INVESTMENT_TYPE_ETF),
+        label: t("typeOptions.etf"),
+      },
+      {
+        value: String(InvestmentType.INVESTMENT_TYPE_BOND),
+        label: t("typeOptions.bond"),
+      },
+      {
+        value: String(InvestmentType.INVESTMENT_TYPE_COMMODITY),
+        label: t("typeOptions.commodity"),
+      },
+      {
+        value: String(InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND),
+        label: t("typeOptions.mutualFund"),
+      },
+      {
+        value: String(InvestmentType.INVESTMENT_TYPE_OTHER),
+        label: t("typeOptions.other"),
+      },
+    ],
+    [t],
+  );
 
   const [showSuccess, setShowSuccess] = useState(false);
   // Gold-specific state
@@ -111,7 +135,7 @@ export function AddInvestmentForm({
 
   // Purchase date state (YYYY-MM-DD string, defaults to today)
   const [purchaseDate, setPurchaseDate] = useState<string>(
-    new Date().toISOString().split("T")[0]
+    new Date().toISOString().split("T")[0],
   );
 
   // Price per unit state (replaces total cost input)
@@ -324,34 +348,37 @@ export function AddInvestmentForm({
   }, [totalCost, setValue]);
 
   // Handle UI type dropdown change
-  const handleUITypeChange = useCallback((value: string) => {
-    setSelectedUIType(value);
-    setPricePerUnit(0);
-    setSelectedSymbol("");
+  const handleUITypeChange = useCallback(
+    (value: string) => {
+      setSelectedUIType(value);
+      setPricePerUnit(0);
+      setSelectedSymbol("");
 
-    if (value === GOLD_UI_TYPE) {
-      // Gold: set a default type (GOLD_VND), will be overridden by brand selection
-      setValue("type", InvestmentType.INVESTMENT_TYPE_GOLD_VND);
-      setIsCustomInvestment(false);
-    } else if (value === SILVER_UI_TYPE) {
-      // Silver: set a default type (SILVER_VND), will be overridden by brand selection
-      setValue("type", InvestmentType.INVESTMENT_TYPE_SILVER_VND);
-      setIsCustomInvestment(false);
-    } else if (
-      value === String(InvestmentType.INVESTMENT_TYPE_CASH) ||
-      value === String(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY)
-    ) {
-      // Cash/Foreign Currency: auto-enable custom mode
-      setValue("type", Number(value) as InvestmentType);
-      setIsCustomInvestment(true);
-      setValue("symbol", "");
-      setValue("name", "");
-    } else {
-      // Standard types
-      setValue("type", Number(value) as InvestmentType);
-      setIsCustomInvestment(false);
-    }
-  }, [setValue]);
+      if (value === GOLD_UI_TYPE) {
+        // Gold: set a default type (GOLD_VND), will be overridden by brand selection
+        setValue("type", InvestmentType.INVESTMENT_TYPE_GOLD_VND);
+        setIsCustomInvestment(false);
+      } else if (value === SILVER_UI_TYPE) {
+        // Silver: set a default type (SILVER_VND), will be overridden by brand selection
+        setValue("type", InvestmentType.INVESTMENT_TYPE_SILVER_VND);
+        setIsCustomInvestment(false);
+      } else if (
+        value === String(InvestmentType.INVESTMENT_TYPE_CASH) ||
+        value === String(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY)
+      ) {
+        // Cash/Foreign Currency: auto-enable custom mode
+        setValue("type", Number(value) as InvestmentType);
+        setIsCustomInvestment(true);
+        setValue("symbol", "");
+        setValue("name", "");
+      } else {
+        // Standard types
+        setValue("type", Number(value) as InvestmentType);
+        setIsCustomInvestment(false);
+      }
+    },
+    [setValue],
+  );
 
   // Handle symbol selection - auto-fill name and currency from search result
   const handleSymbolChange = (symbol: string, result?: SearchResult) => {
@@ -624,11 +651,16 @@ export function AddInvestmentForm({
           {selectedGoldType && (
             <div className="mt-2 space-y-1">
               <p className="text-xs text-gray-500 ml-1">
-                {t("form.goldUnitCurrencyInfo", { unit: selectedGoldType.unit, currency: selectedGoldType.currency })}
+                {t("form.goldUnitCurrencyInfo", {
+                  unit: selectedGoldType.unit,
+                  currency: selectedGoldType.currency,
+                })}
               </p>
               {/* Market Price Display */}
               {goldPriceQuery.isLoading && (
-                <p className="text-xs text-gray-400 ml-1">{t("form.loadingPrice")}</p>
+                <p className="text-xs text-gray-400 ml-1">
+                  {t("form.loadingPrice")}
+                </p>
               )}
               {goldPriceQuery.data?.data && (
                 <div className="p-2 bg-v2-green-light border border-v2-border rounded-md">
@@ -692,11 +724,15 @@ export function AddInvestmentForm({
           {selectedSilverType && (
             <div className="mt-2 space-y-1">
               <p className="text-xs text-gray-500 ml-1">
-                {t("form.silverCurrencyInfo", { currency: selectedSilverType.currency })}
+                {t("form.silverCurrencyInfo", {
+                  currency: selectedSilverType.currency,
+                })}
               </p>
               {/* Market Price Display */}
               {silverPriceQuery.isLoading && (
-                <p className="text-xs text-gray-400 ml-1">{t("form.loadingPrice")}</p>
+                <p className="text-xs text-gray-400 ml-1">
+                  {t("form.loadingPrice")}
+                </p>
               )}
               {silverPriceQuery.data?.data && (
                 <div className="p-2 bg-v2-green-light border border-v2-border rounded-md">
@@ -748,11 +784,12 @@ export function AddInvestmentForm({
             />
             <p className="text-xs text-gray-500 -mt-2 ml-1">
               {t("form.amountOfGold", {
-                unit: goldQuantityUnit === "tael"
-                  ? t("form.taelUnitLong")
-                  : goldQuantityUnit === "oz"
-                    ? "oz"
-                    : t("form.gramUnit"),
+                unit:
+                  goldQuantityUnit === "tael"
+                    ? t("form.taelUnitLong")
+                    : goldQuantityUnit === "oz"
+                      ? "oz"
+                      : t("form.gramUnit"),
               })}
             </p>
           </>
@@ -776,13 +813,14 @@ export function AddInvestmentForm({
               />
               <p className="text-xs text-gray-500 -mt-2 ml-1">
                 {t("form.amountOfSilver", {
-                  unit: silverQuantityUnit === "tael"
-                    ? t("form.taelUnitLong")
-                    : silverQuantityUnit === "kg"
-                      ? t("form.kgUnit")
-                      : silverQuantityUnit === "oz"
-                        ? "oz"
-                        : t("form.gramUnit"),
+                  unit:
+                    silverQuantityUnit === "tael"
+                      ? t("form.taelUnitLong")
+                      : silverQuantityUnit === "kg"
+                        ? t("form.kgUnit")
+                        : silverQuantityUnit === "oz"
+                          ? "oz"
+                          : t("form.gramUnit"),
                 })}
               </p>
             </div>
@@ -847,7 +885,9 @@ export function AddInvestmentForm({
           className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-bg focus:border-bg text-sm"
           disabled={isSubmitting}
         />
-        <p className="text-xs text-gray-500 mt-1 ml-1">{t("form.purchaseDateHint")}</p>
+        <p className="text-xs text-gray-500 mt-1 ml-1">
+          {t("form.purchaseDateHint")}
+        </p>
       </div>
 
       {/* Currency Input - shown for custom investments before Price Per Unit */}
@@ -869,6 +909,7 @@ export function AddInvestmentForm({
           required
           disabled={isSubmitting}
           className="mb-4"
+          portal
         />
       )}
 
@@ -918,7 +959,9 @@ export function AddInvestmentForm({
               disabled={isRefreshing}
               className="px-3 py-2 text-sm font-medium text-bg bg-green-50 border border-bg rounded-md hover:bg-green-100 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap"
             >
-              {isRefreshing ? t("form.refreshingPrice") : t("form.refreshPrice")}
+              {isRefreshing
+                ? t("form.refreshingPrice")
+                : t("form.refreshPrice")}
             </button>
           )}
         </div>

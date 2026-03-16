@@ -112,3 +112,10 @@ Enhanced the AddInvestmentForm with four major improvements: (1) reordered type 
 6. **Gold label alignment**: In Gold brand dropdown, verify labels match the price table: "SJC" (not "SJC 9999"), "SJC Mi Hồng" (not "Mi Hồng Gold"), "Nhẫn Doji 9999" (not "DOJI 24K"), etc.
 7. **Portfolio type filter**: Navigate to Portfolio. Verify "Cash" and "Foreign Currency" appear in the type filter dropdown.
 8. **Standard investment**: Select Stock → search for a symbol → manually enter price per unit → set quantity → verify total cost. Submit with a past purchase date.
+
+## Fix History
+
+| Date | Fix | Severity | Commit | Files Changed |
+|------|-----|----------|--------|---------------|
+| 2026-03-16 | Add missing `typeOptions.gold` and `typeOptions.silver` i18n keys in both en and vi locales — caused IntlError MISSING_MESSAGE in AddInvestmentForm merged gold/silver dropdown | Minor | — | en/investment.json, vi/investment.json |
+| 2026-03-16 | Align gold type options (18→9 VND + 1 USD) with `GOLD_TABLE_FILTER` price table; align silver type options (10→11 VND + 1 USD) with silver price API codes | Minor | — | gold-calculator.ts, silver-calculator.ts |
