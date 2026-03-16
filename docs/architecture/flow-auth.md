@@ -7,6 +7,10 @@ Authentication and session management flows covering Google OAuth, JWT token lif
 - [Google OAuth Register/Login](#1-google-oauth-registerlogin)
 - [JWT Validation Middleware Chain](#2-jwt-validation-middleware-chain)
 - [Session Lifecycle](#3-session-lifecycle)
+- [Password Registration](#4-password-registration)
+- [Password Login](#5-password-login)
+- [Link Password (Account Linking)](#6-link-password-account-linking)
+- [Change Password](#7-change-password)
 
 ---
 
@@ -165,8 +169,10 @@ flowchart TD
 ### Unprotected Routes
 
 These routes skip the middleware entirely:
-- `POST /api/v1/auth/register`
-- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/register` (Google OAuth)
+- `POST /api/v1/auth/login` (Google OAuth)
+- `POST /api/v1/auth/register-password` (email/password)
+- `POST /api/v1/auth/login-password` (email/password)
 - `POST /api/v1/auth/logout`
 - `GET /api/v1/auth/verify` (uses header OR query param)
 
@@ -243,3 +249,300 @@ session_token:<sessionID>   → JWT string for exact-match validation (TTL: 7d)
 | Redis removal partially fails | Error returned | Session may remain active |
 | Revoke-all: some sessions fail | Warning logged per session | Successful count returned |
 | DB delete fails on logout | Warning logged | Redis removal still succeeds |
+
+---
+
+## 4. Password Registration
+
+**Trigger:** User submits the registration form with email, username, display name, and password
+**Endpoint:** `POST /api/v1/auth/register-password`
+**Source:** `domain/auth/auth.go`, `handlers/auth.go`
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant SPA as Next.js SPA
+    participant Handler as AuthHandler
+    participant Auth as AuthService
+    participant UserRepo as UserRepository
+    participant CatSvc as CategoryService
+    participant Redis
+    participant DB as PostgreSQL
+
+    Browser->>SPA: Submit registration form
+    SPA->>Handler: POST /api/v1/auth/register-password<br/>{email, username, password, displayName}
+    Handler->>Handler: ExtractDeviceInfo(c)
+
+    activate Auth
+    Handler->>Auth: RegisterWithPassword(ctx, req, deviceInfo)
+    Auth->>Auth: Validate email, username, password, displayName
+    alt Validation fails
+        Auth-->>Handler: 400 Validation error
+        Handler-->>SPA: Error message
+    end
+
+    Auth->>UserRepo: GetByEmail(email)
+    alt Email exists
+        UserRepo-->>Auth: User found
+        Auth-->>Handler: 409 "Email already registered"
+    end
+
+    Auth->>UserRepo: GetByUsername(username)
+    alt Username exists
+        UserRepo-->>Auth: User found
+        Auth-->>Handler: 409 "Username already taken"
+    end
+
+    Auth->>Auth: bcrypt.GenerateFromPassword(password, cost=12)
+    Auth->>UserRepo: Create(User{email, name, username, passwordHash, authProvider="password"})
+
+    opt CategoryService available
+        Auth->>CatSvc: CreateDefaultCategories(userID)
+    end
+
+    Auth->>Auth: generateLoginResponse(user, deviceInfo)
+    Auth->>Redis: Store session (same as Google OAuth)
+    Auth->>DB: Create Session record
+    deactivate Auth
+
+    Auth-->>Handler: {accessToken, email, name, picture}
+    Handler-->>SPA: 200 OK + accessToken
+    SPA->>Browser: Store token, redirect to dashboard
+```
+
+### Key Invariants
+
+- Password is hashed with bcrypt cost 12 before storage
+- Email and username uniqueness checked before creation
+- Username is case-sensitive, 3-30 chars, alphanumeric + underscore only
+- Password requires 10-72 chars (72 is bcrypt limit)
+- Same session creation flow as Google OAuth
+
+### Error Paths
+
+| Condition | Response | Rollback |
+|-----------|----------|----------|
+| Invalid email/username/password format | 400 Validation error | None |
+| Email already registered | 409 Conflict | None |
+| Username already taken | 409 Conflict | None |
+| bcrypt hashing failure | 500 Internal | None |
+| Database error on user creation | 500 Internal | None |
+
+---
+
+## 5. Password Login
+
+**Trigger:** User submits login form with email/username and password
+**Endpoint:** `POST /api/v1/auth/login-password`
+**Source:** `domain/auth/auth.go`, `handlers/auth.go`
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant SPA as Next.js SPA
+    participant Handler as AuthHandler
+    participant Auth as AuthService
+    participant UserRepo as UserRepository
+    participant Redis
+    participant DB as PostgreSQL
+
+    Browser->>SPA: Submit login form
+    SPA->>Handler: POST /api/v1/auth/login-password<br/>{identifier, password}
+    Handler->>Handler: ExtractDeviceInfo(c)
+
+    activate Auth
+    Handler->>Auth: LoginWithPassword(ctx, req, deviceInfo)
+
+    Auth->>Auth: Determine: identifier contains '@'?
+    alt Email login
+        Auth->>UserRepo: GetByEmail(identifier)
+    else Username login
+        Auth->>UserRepo: GetByUsername(identifier)
+    end
+
+    alt User not found
+        UserRepo-->>Auth: nil
+        Auth-->>Handler: 401 "Invalid credentials"
+        Note over Auth: Generic error — no user enumeration
+    end
+
+    Auth->>Auth: Check user.PasswordHash != ""
+    alt No password set
+        Auth-->>Handler: 401 "Invalid credentials"
+        Note over Auth: Generic error — no enumeration
+    end
+
+    Auth->>Auth: bcrypt.CompareHashAndPassword(hash, password)
+    alt Password mismatch
+        Auth-->>Handler: 401 "Invalid credentials"
+        Note over Auth: Generic error — no enumeration
+    end
+
+    Auth->>Auth: generateLoginResponse(user, deviceInfo)
+    Auth->>Redis: Store session
+    Auth->>DB: Create Session record
+    deactivate Auth
+
+    Auth-->>Handler: {accessToken, email, name, picture}
+    Handler-->>SPA: 200 OK + accessToken
+    SPA->>Browser: Store token, redirect to dashboard
+```
+
+### Key Invariants
+
+- **No user enumeration**: All failure cases return the same generic "Invalid credentials" error
+- Identifier is treated as email if it contains `@`, otherwise as username
+- Users with Google-only auth (no password) get the same generic error
+- No timing oracle: bcrypt comparison is constant-time
+
+### Error Paths
+
+| Condition | Response | Rollback |
+|-----------|----------|----------|
+| Missing identifier or password | 400 Bad Request | None |
+| User not found (any reason) | 401 "Invalid credentials" | None |
+| Password not set on account | 401 "Invalid credentials" | None |
+| Password mismatch | 401 "Invalid credentials" | None |
+
+---
+
+## 6. Link Password (Account Linking)
+
+**Trigger:** Google-only user sets a username and password from security settings
+**Endpoint:** `POST /api/v1/auth/link-password` (authenticated)
+**Source:** `domain/auth/auth.go`, `handlers/auth.go`
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant SPA as Next.js SPA
+    participant Handler as AuthHandler
+    participant AuthMW as AuthMiddleware
+    participant Auth as AuthService
+    participant UserRepo as UserRepository
+    participant DB as PostgreSQL
+
+    Browser->>SPA: Submit link password form
+    SPA->>Handler: POST /api/v1/auth/link-password<br/>{username, password}
+    Handler->>AuthMW: Validate JWT
+    AuthMW-->>Handler: user_id from context
+
+    activate Auth
+    Handler->>Auth: LinkPassword(ctx, userID, req)
+
+    Auth->>UserRepo: GetByID(userID)
+    Auth->>Auth: Check user.PasswordHash == ""
+    alt Password already set
+        Auth-->>Handler: 400 "Password already set"
+    end
+
+    Auth->>Auth: Validate username and password
+    Auth->>UserRepo: GetByUsername(username)
+    alt Username taken
+        Auth-->>Handler: 409 "Username already taken"
+    end
+
+    Auth->>Auth: bcrypt.GenerateFromPassword(password, cost=12)
+    Auth->>UserRepo: Update user {username, passwordHash, authProvider: "google+password"}
+    deactivate Auth
+
+    Auth-->>Handler: {success: true}
+    Handler-->>SPA: 200 OK
+    SPA->>Browser: Show success, refresh auth methods
+```
+
+### Key Invariants
+
+- Only users without an existing password can link one
+- AuthProvider is updated from "google" to "google+password"
+- Username uniqueness is enforced
+- Existing sessions remain valid (no invalidation needed)
+
+### Error Paths
+
+| Condition | Response | Rollback |
+|-----------|----------|----------|
+| Not authenticated | 401 Unauthorized | None |
+| Password already set | 400 "Password already set" | None |
+| Invalid username/password | 400 Validation error | None |
+| Username already taken | 409 Conflict | None |
+
+---
+
+## 7. Change Password
+
+**Trigger:** User with existing password changes it from security settings
+**Endpoint:** `POST /api/v1/auth/change-password` (authenticated)
+**Source:** `domain/auth/auth.go`, `handlers/auth.go`
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant SPA as Next.js SPA
+    participant Handler as AuthHandler
+    participant AuthMW as AuthMiddleware
+    participant Auth as AuthService
+    participant UserRepo as UserRepository
+    participant Redis
+    participant DB as PostgreSQL
+
+    Browser->>SPA: Submit change password form
+    SPA->>Handler: POST /api/v1/auth/change-password<br/>{currentPassword, newPassword}
+    Handler->>AuthMW: Validate JWT
+    AuthMW-->>Handler: user_id, user_email, sessionID
+
+    activate Auth
+    Handler->>Auth: ChangePassword(ctx, userID, email, req, sessionID)
+
+    Auth->>UserRepo: GetByID(userID)
+    Auth->>Auth: Check user.PasswordHash != ""
+    alt No password set
+        Auth-->>Handler: 400 "No password set"
+    end
+
+    Auth->>Auth: bcrypt.CompareHashAndPassword(hash, currentPassword)
+    alt Wrong current password
+        Auth-->>Handler: 401 "Invalid credentials"
+    end
+
+    Auth->>Auth: Validate new password strength
+    Auth->>Auth: Check new != current
+    alt Same password
+        Auth-->>Handler: 400 "New password must differ"
+    end
+
+    Auth->>Auth: bcrypt.GenerateFromPassword(newPassword, cost=12)
+    Auth->>UserRepo: Update user {passwordHash}
+
+    Note over Auth,Redis: Invalidate all OTHER sessions
+    Auth->>Redis: SMembers(session:{email})
+    loop Each session except current
+        Auth->>Redis: SRem(session:{email}, sessionID)
+        Auth->>Redis: Del(session_meta:{sessionID})
+        Auth->>Redis: Del(session_token:{sessionID})
+    end
+    Auth->>DB: Delete sessions WHERE user_id=? AND session_id != currentSessionID
+    deactivate Auth
+
+    Auth-->>Handler: {success: true}
+    Handler-->>SPA: 200 OK
+    SPA->>Browser: Show success + "All other sessions logged out"
+```
+
+### Key Invariants
+
+- Current password must be verified before allowing change
+- New password must differ from current password
+- All other sessions are invalidated (Redis + DB) — only the current session survives
+- The current session's JWT remains valid (no re-authentication needed)
+
+### Error Paths
+
+| Condition | Response | Rollback |
+|-----------|----------|----------|
+| Not authenticated | 401 Unauthorized | None |
+| No password set on account | 400 "No password set" | None |
+| Wrong current password | 401 "Invalid credentials" | None |
+| Weak new password | 400 Validation error | None |
+| New password same as current | 400 "New password must differ" | None |
+| Partial Redis session cleanup failure | Warning logged | Some sessions may remain active |
