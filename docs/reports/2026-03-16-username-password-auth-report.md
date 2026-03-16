@@ -136,3 +136,9 @@ task backend:migrate-password-auth
 cd src/go-backend && go build ./...
 cd src/wj-client && npx next build
 ```
+
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-16 | Register page overload: Google OAuth now primary action with expandable password form; password form split into 2-step wizard (identity fields → password fields); logo header hidden on desktop for both auth pages | Minor | See commit |

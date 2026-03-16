@@ -20,6 +20,7 @@ export default function Register() {
   const tCommon = useTranslations("common");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
 
   const register = useMutationRegister({
     onError(error) {
@@ -63,8 +64,8 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-accent-50 via-white to-primary-50 dark:from-dark-background dark:via-dark-surface dark:to-dark-background flex flex-col">
-      {/* Header with Logo */}
-      <div className="pt-6 pb-4 px-4 sm:px-6">
+      {/* Header with Logo — mobile only */}
+      <div className="pt-6 pb-4 px-4 sm:hidden">
         <Link href="/" className="inline-flex items-center gap-2">
           <Image
             src="/logo.svg"
@@ -94,69 +95,7 @@ export default function Register() {
               </p>
             </div>
 
-            {/* Feature Highlights */}
-            <div className="mb-6 sm:mb-8 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-              <div className="flex items-center gap-2 text-xs sm:text-sm text-neutral-600 dark:text-dark-text-secondary">
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5 text-accent-600 flex-shrink-0"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span>{t("freeForever")}</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs sm:text-sm text-neutral-600 dark:text-dark-text-secondary">
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5 text-accent-600 flex-shrink-0"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span>{t("bankLevelSecurity")}</span>
-              </div>
-              <div className="flex items-center gap-2 text-xs sm:text-sm text-neutral-600 dark:text-dark-text-secondary">
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5 text-accent-600 flex-shrink-0"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                  <path
-                    fillRule="evenodd"
-                    d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span>{t("noCreditCard")}</span>
-              </div>
-            </div>
-
-            {/* Password Register Form */}
-            <RegisterPasswordForm />
-
-            {/* OR Divider */}
-            <div className="my-5 relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-neutral-200 dark:border-dark-border"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white dark:bg-dark-surface text-neutral-500 dark:text-dark-text-tertiary">
-                  {t("orDivider")}
-                </span>
-              </div>
-            </div>
-
-            {/* Google Register Button */}
+            {/* Google Register Button (Primary) */}
             <div className={isLoading ? "opacity-50 pointer-events-none" : ""}>
               <GoogleOAuthProvider
                 clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}
@@ -202,6 +141,46 @@ export default function Register() {
                     {error}
                   </p>
                 </div>
+              </div>
+            )}
+
+            {/* OR Divider */}
+            <div className="my-5 relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-neutral-200 dark:border-dark-border"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white dark:bg-dark-surface text-neutral-500 dark:text-dark-text-tertiary">
+                  {t("orDivider")}
+                </span>
+              </div>
+            </div>
+
+            {/* Expandable Password Form */}
+            {!showPasswordForm ? (
+              <button
+                type="button"
+                onClick={() => setShowPasswordForm(true)}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-neutral-300 dark:border-dark-border rounded-xl text-sm font-medium text-neutral-700 dark:text-dark-text-secondary hover:bg-neutral-50 dark:hover:bg-dark-border/30 transition-colors"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+                {t("createWithPassword")}
+              </button>
+            ) : (
+              <div className="animate-fade-in">
+                <RegisterPasswordForm />
               </div>
             )}
 

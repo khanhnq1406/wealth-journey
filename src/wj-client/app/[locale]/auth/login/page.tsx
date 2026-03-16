@@ -67,8 +67,8 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-dark-background dark:via-dark-surface dark:to-dark-background flex flex-col">
-      {/* Header with Logo */}
-      <div className="pt-6 pb-4 px-4 sm:px-6">
+      {/* Header with Logo — mobile only */}
+      <div className="pt-6 pb-4 px-4 sm:hidden">
         <Link href="/" className="inline-flex items-center gap-2">
           <Image
             src="/logo.svg"
