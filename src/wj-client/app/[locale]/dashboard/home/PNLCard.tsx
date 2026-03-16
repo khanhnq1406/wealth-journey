@@ -72,7 +72,7 @@ export function PNLCard({ currency }: PNLCardProps) {
       month: "2-digit",
       day: "2-digit",
     }),
-    value: Number(point.totalValue) / 100,
+    value: parseAmount(point.displayTotalValue?.amount ?? point.totalValue),
   }));
 
   const firstValue = chartPoints[0]?.value ?? 0;
@@ -140,14 +140,14 @@ export function PNLCard({ currency }: PNLCardProps) {
               isPositive ? "text-v2-green-positive" : "text-v2-red-negative"
             }`}
           >
-            {isApproximate && selectedPeriod !== "all" ? "≈ " : ""}{formatAmount(periodPnl)} {currency}
+            {formatAmount(periodPnl)} {currency}
           </p>
           <p
             className={`font-jetbrains font-bold text-[24px] ${
               isPositive ? "text-v2-green-positive" : "text-v2-red-negative"
             }`}
           >
-            {isApproximate && selectedPeriod !== "all" ? "≈ " : ""}{formatPercent(periodPnlPercent)}
+            {formatPercent(periodPnlPercent)}
           </p>
           <p className="font-jetbrains font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
             {t(pnlLabelKey[selectedPeriod] as any)}
