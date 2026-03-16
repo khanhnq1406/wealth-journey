@@ -65,7 +65,11 @@
       "goldWorld": "Vàng (Thế giới)",
       "silverVietnam": "Bạc (Việt Nam)",
       "silverWorld": "Bạc (Thế giới)",
-      "other": "Khác"
+      "other": "Khác",
+      "gold": "Vàng",
+      "silver": "Bạc",
+      "cash": "Tiền mặt",
+      "foreignCurrency": "Ngoại tệ"
     },
     "timeAgo": {
       "justNow": "Vừa xong",
@@ -85,7 +89,9 @@
       "goldWorld": "Vàng (Thế giới)",
       "silverVietnam": "Bạc (Việt Nam)",
       "silverWorld": "Bạc (Thế giới)",
-      "other": "Khác"
+      "other": "Khác",
+      "cash": "Tiền mặt",
+      "foreignCurrency": "Ngoại tệ"
     },
     "sortOptions": {
       "nameAZ": "Tên (A-Z)",
@@ -157,7 +163,14 @@
       "defaultGoldName": "Đầu tư vàng",
       "defaultSilverName": "Đầu tư bạc",
       "selectGoldTypeError": "Vui lòng chọn loại vàng",
-      "selectSilverTypeError": "Vui lòng chọn loại bạc"
+      "selectSilverTypeError": "Vui lòng chọn loại bạc",
+      "purchaseDate": "Ngày mua",
+      "purchaseDateHint": "Tùy chọn — mặc định là hôm nay",
+      "pricePerUnitLabel": "Đơn giá",
+      "refreshPrice": "Giá hiện tại",
+      "refreshingPrice": "Đang tải...",
+      "totalCostSummary": "Tổng chi phí: {amount}",
+      "priceUnavailable": "Không thể lấy giá"
     },
     "transactionTypes": {
       "buy": "Mua",
