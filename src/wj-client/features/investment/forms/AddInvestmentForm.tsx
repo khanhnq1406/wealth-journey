@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,6 +54,10 @@ import {
   calculateSilverFromUserInput,
 } from "@/features/investment/utils/silver-calculator";
 
+// UI-only type values for merged gold/silver dropdowns
+const GOLD_UI_TYPE = "GOLD_MERGED";
+const SILVER_UI_TYPE = "SILVER_MERGED";
+
 interface AddInvestmentFormProps {
   onSuccess?: () => void;
 }
@@ -67,19 +71,25 @@ export function AddInvestmentForm({
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
 
+  // UI type tracks the main dropdown selection (includes merged gold/silver values)
+  const [selectedUIType, setSelectedUIType] = useState<string>(
+    String(InvestmentType.INVESTMENT_TYPE_STOCK)
+  );
+
   const investmentTypeOptions = useMemo<SelectOption[]>(() => [
+    { value: GOLD_UI_TYPE, label: t("typeOptions.gold") },
+    { value: SILVER_UI_TYPE, label: t("typeOptions.silver") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_CASH), label: t("typeOptions.cash") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY), label: t("typeOptions.foreignCurrency") },
     { value: String(InvestmentType.INVESTMENT_TYPE_STOCK), label: t("typeOptions.stock") },
-    { value: String(InvestmentType.INVESTMENT_TYPE_ETF), label: t("typeOptions.etf") },
-    { value: String(InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND), label: t("typeOptions.mutualFund") },
     { value: String(InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY), label: t("typeOptions.cryptocurrency") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_ETF), label: t("typeOptions.etf") },
     { value: String(InvestmentType.INVESTMENT_TYPE_BOND), label: t("typeOptions.bond") },
     { value: String(InvestmentType.INVESTMENT_TYPE_COMMODITY), label: t("typeOptions.commodity") },
-    { value: String(InvestmentType.INVESTMENT_TYPE_GOLD_VND), label: t("typeOptions.goldVietnam") },
-    { value: String(InvestmentType.INVESTMENT_TYPE_GOLD_USD), label: t("typeOptions.goldWorld") },
-    { value: String(InvestmentType.INVESTMENT_TYPE_SILVER_VND), label: t("typeOptions.silverVietnam") },
-    { value: String(InvestmentType.INVESTMENT_TYPE_SILVER_USD), label: t("typeOptions.silverWorld") },
+    { value: String(InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND), label: t("typeOptions.mutualFund") },
     { value: String(InvestmentType.INVESTMENT_TYPE_OTHER), label: t("typeOptions.other") },
   ], [t]);
+
   const [showSuccess, setShowSuccess] = useState(false);
   // Gold-specific state
   const [selectedGoldType, setSelectedGoldType] =
@@ -98,6 +108,21 @@ export function AddInvestmentForm({
 
   // Custom investment toggle state
   const [isCustomInvestment, setIsCustomInvestment] = useState(false);
+
+  // Purchase date state (YYYY-MM-DD string, defaults to today)
+  const [purchaseDate, setPurchaseDate] = useState<string>(
+    new Date().toISOString().split("T")[0]
+  );
+
+  // Price per unit state (replaces total cost input)
+  const [pricePerUnit, setPricePerUnit] = useState<number>(0);
+
+  // Derived type flags
+  const isGoldInvestment = selectedUIType === GOLD_UI_TYPE;
+  const isSilverInvestment = selectedUIType === SILVER_UI_TYPE;
+  const isCashOrForeignCurrency =
+    selectedUIType === String(InvestmentType.INVESTMENT_TYPE_CASH) ||
+    selectedUIType === String(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY);
 
   const createInvestmentMutation = useMutationCreateInvestment({
     onSuccess: (data) => {
@@ -184,15 +209,8 @@ export function AddInvestmentForm({
   // Watch investment type to update quantity input config dynamically
   const investmentType = watch("type");
   const currency = watch("currency");
+  const watchedQuantity = watch("initialQuantity");
   const quantityConfig = getQuantityInputConfig(investmentType);
-
-  // Check if current investment type is gold (convert to number for comparison)
-  const isGoldInvestment = isGoldType(Number(investmentType));
-
-  // Check if current investment type is silver (cast to InvestmentType enum)
-  const isSilverInvestment = isSilverType(
-    Number(investmentType) as InvestmentType,
-  );
 
   // Fetch gold market price when gold type is selected
   const goldPriceQuery = useQueryGetMarketPrice(
@@ -222,16 +240,17 @@ export function AddInvestmentForm({
     },
   );
 
-  // Get gold type options based on investment type (not currency field)
+  // Get ALL gold type options (no currency filter — show all 19)
   const goldTypeOptions = useMemo(() => {
     if (!isGoldInvestment) return [];
-    // Determine currency from investment type: GOLD_VND → VND, GOLD_USD → USD
-    const goldCurrency =
-      Number(investmentType) === InvestmentType.INVESTMENT_TYPE_GOLD_VND
-        ? "VND"
-        : "USD";
-    return getGoldTypeOptions(goldCurrency);
-  }, [isGoldInvestment, investmentType]);
+    return getGoldTypeOptions(); // No currency filter
+  }, [isGoldInvestment]);
+
+  // Get ALL silver type options (no currency filter — show all)
+  const silverTypeOptions = useMemo(() => {
+    if (!isSilverInvestment) return [];
+    return getSilverTypeOptions(); // No currency filter
+  }, [isSilverInvestment]);
 
   // Update gold quantity unit based on selected gold type
   useEffect(() => {
@@ -245,28 +264,11 @@ export function AddInvestmentForm({
     if (!isGoldInvestment) {
       setSelectedGoldType(null);
     } else {
-      // Auto-set currency based on gold investment type
-      const targetCurrency =
-        Number(investmentType) === InvestmentType.INVESTMENT_TYPE_GOLD_VND
-          ? "VND"
-          : "USD";
-      setValue("currency", targetCurrency);
       // Pre-populate symbol/name to pass Zod validation (real guard is in onSubmit)
       setValue("symbol", "GOLD");
       setValue("name", t("form.defaultGoldName"));
     }
-  }, [isGoldInvestment, investmentType, setValue]);
-
-  // Get silver type options based on investment type
-  const silverTypeOptions = useMemo(() => {
-    if (!isSilverInvestment) return [];
-    // Determine currency from investment type: SILVER_VND → VND, SILVER_USD → USD
-    const silverCurrency =
-      Number(investmentType) === InvestmentType.INVESTMENT_TYPE_SILVER_VND
-        ? "VND"
-        : "USD";
-    return getSilverTypeOptions(silverCurrency);
-  }, [isSilverInvestment, investmentType]);
+  }, [isGoldInvestment, setValue, t]);
 
   // Update silver quantity unit based on selected silver type
   useEffect(() => {
@@ -280,17 +282,76 @@ export function AddInvestmentForm({
     if (!isSilverInvestment) {
       setSelectedSilverType(null);
     } else {
-      // Auto-set currency based on silver investment type
-      const targetCurrency =
-        Number(investmentType) === InvestmentType.INVESTMENT_TYPE_SILVER_VND
-          ? "VND"
-          : "USD";
-      setValue("currency", targetCurrency);
       // Pre-populate symbol/name to pass Zod validation (real guard is in onSubmit)
       setValue("symbol", "SILVER");
       setValue("name", t("form.defaultSilverName"));
     }
-  }, [isSilverInvestment, investmentType, setValue]);
+  }, [isSilverInvestment, setValue, t]);
+
+  // Handle CASH/FOREIGN_CURRENCY: auto-enable custom mode
+  useEffect(() => {
+    if (isCashOrForeignCurrency) {
+      setIsCustomInvestment(true);
+      setValue("type", Number(selectedUIType) as InvestmentType);
+    }
+  }, [isCashOrForeignCurrency, selectedUIType, setValue]);
+
+  // Auto-fill price per unit from gold market price
+  useEffect(() => {
+    if (isGoldInvestment && goldPriceQuery.data?.data?.price) {
+      setPricePerUnit(goldPriceQuery.data.data.price);
+    }
+  }, [isGoldInvestment, goldPriceQuery.data]);
+
+  // Auto-fill price per unit from silver market price
+  useEffect(() => {
+    if (isSilverInvestment && silverPriceQuery.data?.data?.price) {
+      setPricePerUnit(silverPriceQuery.data.data.price);
+    }
+  }, [isSilverInvestment, silverPriceQuery.data]);
+
+  // Compute total cost in real time
+  const totalCost = useMemo(() => {
+    if (watchedQuantity > 0 && pricePerUnit > 0) {
+      return watchedQuantity * pricePerUnit;
+    }
+    return 0;
+  }, [watchedQuantity, pricePerUnit]);
+
+  // Sync total cost to form's initialCost field for validation
+  useEffect(() => {
+    setValue("initialCost", totalCost);
+  }, [totalCost, setValue]);
+
+  // Handle UI type dropdown change
+  const handleUITypeChange = useCallback((value: string) => {
+    setSelectedUIType(value);
+    setPricePerUnit(0);
+    setSelectedSymbol("");
+
+    if (value === GOLD_UI_TYPE) {
+      // Gold: set a default type (GOLD_VND), will be overridden by brand selection
+      setValue("type", InvestmentType.INVESTMENT_TYPE_GOLD_VND);
+      setIsCustomInvestment(false);
+    } else if (value === SILVER_UI_TYPE) {
+      // Silver: set a default type (SILVER_VND), will be overridden by brand selection
+      setValue("type", InvestmentType.INVESTMENT_TYPE_SILVER_VND);
+      setIsCustomInvestment(false);
+    } else if (
+      value === String(InvestmentType.INVESTMENT_TYPE_CASH) ||
+      value === String(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY)
+    ) {
+      // Cash/Foreign Currency: auto-enable custom mode
+      setValue("type", Number(value) as InvestmentType);
+      setIsCustomInvestment(true);
+      setValue("symbol", "");
+      setValue("name", "");
+    } else {
+      // Standard types
+      setValue("type", Number(value) as InvestmentType);
+      setIsCustomInvestment(false);
+    }
+  }, [setValue]);
 
   // Handle symbol selection - auto-fill name and currency from search result
   const handleSymbolChange = (symbol: string, result?: SearchResult) => {
@@ -306,8 +367,20 @@ export function AddInvestmentForm({
     }
   };
 
+  // Convert purchase date to Unix timestamp
+  const getPurchaseDateTs = (): number => {
+    if (!purchaseDate) return 0;
+    const ts = Math.floor(new Date(purchaseDate).getTime() / 1000);
+    return Number.isNaN(ts) ? 0 : ts;
+  };
+
+  const isRefreshing =
+    (isGoldInvestment && goldPriceQuery.isFetching) ||
+    (isSilverInvestment && silverPriceQuery.isFetching);
+
   const onSubmit = (data: CreateInvestmentFormInput) => {
     setErrorMessage(undefined);
+    const purchaseDateTs = getPurchaseDateTs();
 
     // Validate gold type is selected for gold investments
     if (isGoldInvestment && !selectedGoldType) {
@@ -327,7 +400,7 @@ export function AddInvestmentForm({
       const goldCalculation = calculateGoldFromUserInput({
         quantity: data.initialQuantity,
         quantityUnit: goldQuantityUnit,
-        pricePerUnit: data.initialCost / data.initialQuantity, // Calculate price per unit
+        pricePerUnit: pricePerUnit,
         priceCurrency: formData.currency,
         priceUnit: goldQuantityUnit,
         investmentType: formData.type,
@@ -336,18 +409,18 @@ export function AddInvestmentForm({
       });
 
       createInvestmentMutation.mutate({
-        walletId: 0, // Auto-assigned by backend
+        walletId: 0,
         symbol: selectedGoldType.value,
         name: selectedGoldType.label,
         type: formData.type,
-        initialQuantityDecimal: goldCalculation.storedQuantity / 10000, // Convert storage format (grams×10000) to decimal (grams)
-        initialCostDecimal: data.initialCost, // Send decimal value in the user's input currency
-        currency: formData.currency, // Send the currency the user actually paid in (NOT wallet currency)
-        purchaseUnit: goldQuantityUnit, // Store user's purchase unit for display
-        // Set int64 fields to 0 (decimal fields take precedence)
+        initialQuantityDecimal: goldCalculation.storedQuantity / 10000,
+        initialCostDecimal: data.initialQuantity * pricePerUnit,
+        currency: formData.currency,
+        purchaseUnit: goldQuantityUnit,
+        purchaseDate: purchaseDateTs,
         initialQuantity: 0,
         initialCost: 0,
-        isCustom: false, // Gold investments are never custom
+        isCustom: false,
       });
     } else if (isSilverInvestment && selectedSilverType) {
       // Use silver calculator for silver investments
@@ -355,7 +428,7 @@ export function AddInvestmentForm({
       const silverCalculation = calculateSilverFromUserInput({
         quantity: data.initialQuantity,
         quantityUnit: silverQuantityUnit,
-        pricePerUnit: data.initialCost / data.initialQuantity, // Calculate price per unit
+        pricePerUnit: pricePerUnit,
         priceCurrency: formData.currency,
         priceUnit: silverQuantityUnit,
         investmentType: formData.type,
@@ -363,38 +436,36 @@ export function AddInvestmentForm({
         fxRate: 1,
       });
 
-      // Use full symbol with unit suffix to allow multiple VND silver investments (tael and kg)
       createInvestmentMutation.mutate({
-        walletId: 0, // Auto-assigned by backend
-        symbol: selectedSilverType.value, // Keep unit suffix: AG_VND_Tael or AG_VND_Kg
+        walletId: 0,
+        symbol: selectedSilverType.value,
         name: selectedSilverType.label,
         type: formData.type,
-        initialQuantityDecimal: silverCalculation.storedQuantity / 10000, // Convert storage format (grams×10000 or oz×10000) to decimal
-        initialCostDecimal: data.initialCost, // Send decimal value in the user's input currency
-        currency: formData.currency, // Send the currency the user actually paid in (NOT wallet currency)
-        purchaseUnit: silverCalculation.purchaseUnit, // Store user's purchase unit for display
-        // Set int64 fields to 0 (decimal fields take precedence)
+        initialQuantityDecimal: silverCalculation.storedQuantity / 10000,
+        initialCostDecimal: data.initialQuantity * pricePerUnit,
+        currency: formData.currency,
+        purchaseUnit: silverCalculation.purchaseUnit,
+        purchaseDate: purchaseDateTs,
         initialQuantity: 0,
         initialCost: 0,
-        isCustom: false, // Silver investments are never custom
+        isCustom: false,
       });
     } else {
-      // Convert to API format using utility functions for non-gold, non-silver investments
-      // Use form.getValues() instead of data because zodResolver may return partial data on validation failure
+      // Standard and custom investments (including CASH/FOREIGN_CURRENCY)
       const formData = form.getValues();
       createInvestmentMutation.mutate({
-        walletId: 0, // Auto-assigned by backend
+        walletId: 0,
         symbol: (formData.symbol || "").toUpperCase(),
         name: formData.name || "",
         type: formData.type,
-        initialQuantityDecimal: data.initialQuantity, // Send decimal value
-        initialCostDecimal: data.initialCost, // Send decimal value
+        initialQuantityDecimal: data.initialQuantity,
+        initialCostDecimal: data.initialQuantity * pricePerUnit,
         currency: formData.currency || "USD",
-        purchaseUnit: "gram", // Default unit for non-gold, non-silver investments
-        // Set int64 fields to 0 (decimal fields take precedence)
+        purchaseUnit: "gram",
+        purchaseDate: purchaseDateTs,
         initialQuantity: 0,
         initialCost: 0,
-        isCustom: isCustomInvestment, // Set custom flag based on toggle
+        isCustom: isCustomInvestment,
       });
     }
   };
@@ -407,20 +478,18 @@ export function AddInvestmentForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Type */}
-      <FormSelect
-        name="type"
-        control={control}
+      <BasicFormSelect
         label={t("form.investmentType")}
         options={investmentTypeOptions}
+        value={selectedUIType}
+        onChange={handleUITypeChange}
         placeholder={t("form.selectType")}
-        required
         disabled={isSubmitting}
-        className="mb-4"
-        parseAsNumber={true}
+        required
       />
 
-      {/* Custom Investment Toggle - shown only for non-gold, non-silver investments */}
-      {!isGoldInvestment && !isSilverInvestment && (
+      {/* Custom Investment Toggle - shown for non-gold, non-silver, non-cash/forex */}
+      {!isGoldInvestment && !isSilverInvestment && !isCashOrForeignCurrency && (
         <div className="mb-4 p-3 bg-gray-50 rounded-md border border-gray-200">
           <label className="flex items-center space-x-3 cursor-pointer">
             <input
@@ -465,7 +534,6 @@ export function AddInvestmentForm({
                 value={watch("symbol")}
                 onChange={handleSymbolChange}
                 placeholder={t("form.searchSymbolPlaceholder")}
-                // disabled={isSubmitting}
                 className="mt-1"
               />
               {errors.symbol && (
@@ -484,7 +552,7 @@ export function AddInvestmentForm({
               )}
             </>
           ) : (
-            // Manual input for custom investments
+            // Manual input for custom investments (including CASH/FOREIGN_CURRENCY)
             <>
               <FormInput
                 name="symbol"
@@ -544,7 +612,9 @@ export function AddInvestmentForm({
                 setSelectedGoldType(selected);
                 setValue("symbol", selected.value);
                 setValue("name", selected.label);
-                // Currency is already set based on investment type, no need to override
+                // Set the actual proto type based on the brand's currency
+                setValue("type", selected.type as InvestmentType);
+                setValue("currency", selected.currency);
               }
             }}
             placeholder={t("form.selectGoldTypePlaceholder")}
@@ -606,6 +676,9 @@ export function AddInvestmentForm({
                 setSelectedSilverType(selected);
                 setValue("symbol", selected.value);
                 setValue("name", selected.label);
+                // Set the actual proto type based on the brand's type
+                setValue("type", selected.type as InvestmentType);
+                setValue("currency", selected.currency);
                 // Reset quantity unit to first available unit for this type
                 if (selected.availableUnits.length > 0) {
                   setSilverQuantityUnit(selected.availableUnits[0]);
@@ -661,18 +734,6 @@ export function AddInvestmentForm({
               <Label htmlFor="initialQuantity" required>
                 {t("form.quantity")}
               </Label>
-              {/* {selectedGoldType?.currency === "VND" && (
-                <Select
-                  options={[
-                    { value: "tael", label: "Tael (lượng)" },
-                    { value: "gram", label: "Gram (g)" },
-                  ]}
-                  value={goldQuantityUnit}
-                  onChange={(value) => setGoldQuantityUnit(value as GoldUnit)}
-                  disabled={isSubmitting}
-                  className="w-40"
-                />
-              )} */}
             </div>
             <FormNumberInput
               name="initialQuantity"
@@ -774,7 +835,22 @@ export function AddInvestmentForm({
         )}
       </div>
 
-      {/* Currency Input - shown for custom investments before Initial Cost */}
+      {/* Purchase Date */}
+      <div>
+        <Label htmlFor="purchaseDate">{t("form.purchaseDate")}</Label>
+        <input
+          type="date"
+          id="purchaseDate"
+          value={purchaseDate}
+          onChange={(e) => setPurchaseDate(e.target.value)}
+          max={new Date().toISOString().split("T")[0]}
+          className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-bg focus:border-bg text-sm"
+          disabled={isSubmitting}
+        />
+        <p className="text-xs text-gray-500 mt-1 ml-1">{t("form.purchaseDateHint")}</p>
+      </div>
+
+      {/* Currency Input - shown for custom investments before Price Per Unit */}
       {!isGoldInvestment && !isSilverInvestment && isCustomInvestment && (
         <FormSelect
           name="currency"
@@ -796,11 +872,11 @@ export function AddInvestmentForm({
         />
       )}
 
-      {/* Initial Cost */}
+      {/* Price Per Unit + Refresh Button */}
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <Label htmlFor="initialCost" required>
-            Total Initial Cost
+          <Label htmlFor="pricePerUnit" required>
+            {t("form.pricePerUnitLabel")}
           </Label>
           {/* CurrencyBadge - hidden for custom investments (manual select above) */}
           {!isCustomInvestment && (
@@ -817,18 +893,43 @@ export function AddInvestmentForm({
             </span>
           )}
         </div>
-        <FormNumberInput
-          name="initialCost"
-          control={control}
-          placeholder="15000.00"
-          required
-          disabled={isSubmitting}
-          min={0}
-          step="0.01"
-        />
-        <p className="text-xs text-gray-500 mt-1 -mb-3 ml-1">
-          Total amount paid to acquire this investment (including fees)
-        </p>
+        <div className="flex items-center gap-2">
+          <div className="flex-1">
+            <input
+              type="number"
+              id="pricePerUnit"
+              value={pricePerUnit || ""}
+              onChange={(e) => setPricePerUnit(Number(e.target.value) || 0)}
+              placeholder="0.00"
+              min={0}
+              step="0.01"
+              disabled={isSubmitting}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-bg focus:border-bg text-sm"
+            />
+          </div>
+          {/* Refresh button - only for gold/silver */}
+          {(isGoldInvestment || isSilverInvestment) && (
+            <button
+              type="button"
+              onClick={() => {
+                if (isGoldInvestment) goldPriceQuery.refetch();
+                else if (isSilverInvestment) silverPriceQuery.refetch();
+              }}
+              disabled={isRefreshing}
+              className="px-3 py-2 text-sm font-medium text-bg bg-green-50 border border-bg rounded-md hover:bg-green-100 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap"
+            >
+              {isRefreshing ? t("form.refreshingPrice") : t("form.refreshPrice")}
+            </button>
+          )}
+        </div>
+        {/* Total cost summary */}
+        {watchedQuantity > 0 && pricePerUnit > 0 && (
+          <p className="text-sm font-medium text-gray-700 mt-2">
+            {t("form.totalCostSummary", {
+              amount: formatCurrency(totalCost, currency),
+            })}
+          </p>
+        )}
       </div>
 
       {/* Error message */}

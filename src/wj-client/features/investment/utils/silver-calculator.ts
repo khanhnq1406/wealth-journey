@@ -351,13 +351,13 @@ export function getSilverTypeLabel(type: InvestmentType): string {
 /**
  * Get silver type options for a given currency
  */
-export function getSilverTypeOptions(currency: string): SilverTypeOption[] {
+export function getSilverTypeOptions(currency?: string): SilverTypeOption[] {
   if (currency === "VND") {
     return SILVER_VND_OPTIONS;
   } else if (currency === "USD") {
     return SILVER_USD_OPTIONS;
   }
-  return [];
+  return [...SILVER_VND_OPTIONS, ...SILVER_USD_OPTIONS];
 }
 
 /**
