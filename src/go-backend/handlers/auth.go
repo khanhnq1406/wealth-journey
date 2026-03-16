@@ -182,8 +182,8 @@ func (h *AuthHandlers) LoginWithPassword(c *gin.Context) {
 
 // LinkPassword handles linking a password to an existing account
 func (h *AuthHandlers) LinkPassword(c *gin.Context) {
-	userID := int32(c.GetInt("user_id"))
-	if userID == 0 {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
 		handler.UnauthorizedWithPath(c, "User not authenticated")
 		return
 	}
@@ -205,14 +205,17 @@ func (h *AuthHandlers) LinkPassword(c *gin.Context) {
 
 // ChangePassword handles password change for authenticated users
 func (h *AuthHandlers) ChangePassword(c *gin.Context) {
-	userID := int32(c.GetInt("user_id"))
-	if userID == 0 {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
 		handler.UnauthorizedWithPath(c, "User not authenticated")
 		return
 	}
 
-	userEmail, _ := c.Get("user_email")
-	email := userEmail.(string)
+	email, ok := handler.GetUserEmail(c)
+	if !ok {
+		handler.UnauthorizedWithPath(c, "User not authenticated")
+		return
+	}
 
 	// Extract session ID from JWT token
 	token, ok := ExtractBearerToken(c)
@@ -250,8 +253,8 @@ func (h *AuthHandlers) ChangePassword(c *gin.Context) {
 
 // GetAuthMethods handles retrieving auth methods for the current user
 func (h *AuthHandlers) GetAuthMethods(c *gin.Context) {
-	userID := int32(c.GetInt("user_id"))
-	if userID == 0 {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
 		handler.UnauthorizedWithPath(c, "User not authenticated")
 		return
 	}
@@ -263,7 +266,17 @@ func (h *AuthHandlers) GetAuthMethods(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, gin.H{
+		"success": result.Success,
+		"message": result.Message,
+		"data": gin.H{
+			"hasGoogle":   result.Data.HasGoogle,
+			"hasPassword": result.Data.HasPassword,
+			"username":    result.Data.Username,
+			"email":       result.Data.Email,
+		},
+		"timestamp": result.Timestamp,
+	})
 }
 
 // GetAuth handles GET /auth - returns user information for authenticated user
