@@ -123,7 +123,10 @@ func (s *Server) RegisterWithDevice(ctx context.Context, googleToken string, dev
 	// Check if user exists
 	result := s.db.DB.Where("email = ?", email).First(&user)
 	if result.Error == nil {
-		// User exists - login instead
+		// User exists - auto-link Google if user registered with password only
+		if user.AuthProvider == "password" {
+			s.db.DB.Model(&user).Update("auth_provider", "google+password")
+		}
 		return s.generateLoginResponse(ctx, user, deviceInfo)
 	} else if result.Error != gorm.ErrRecordNotFound {
 		return nil, fmt.Errorf("database error: %w", result.Error)
@@ -141,9 +144,10 @@ func (s *Server) RegisterWithDevice(ctx context.Context, googleToken string, dev
 		}
 	} else {
 		user = models.User{
-			Email:   email,
-			Name:    name,
-			Picture: picture,
+			Email:        email,
+			Name:         name,
+			Picture:      picture,
+			AuthProvider: "google",
 		}
 
 		if err := s.db.DB.Create(&user).Error; err != nil {
