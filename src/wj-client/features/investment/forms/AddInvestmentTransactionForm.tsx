@@ -195,17 +195,12 @@ export function AddInvestmentTransactionForm({
     },
   );
 
-  // Auto-fill price from market data
-  // Gold/silver use .price (display unit price), standard uses .priceDecimal
+  // Auto-fill price from market data — always use priceDecimal (human-readable)
   useEffect(() => {
     if (!priceQuery.data?.data) return;
     const data = priceQuery.data.data;
-    if (isGoldInvestment || isSilverInvestment) {
-      if (data.price) setValue("price", data.price);
-    } else {
-      if (data.priceDecimal) setValue("price", data.priceDecimal);
-    }
-  }, [priceQuery.data, isGoldInvestment, isSilverInvestment, setValue]);
+    if (data.priceDecimal) setValue("price", data.priceDecimal);
+  }, [priceQuery.data, setValue]);
 
   const isRefreshing = priceQuery.isFetching;
 

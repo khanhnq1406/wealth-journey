@@ -31,7 +31,7 @@ import {
   createInvestmentSchema,
   CreateInvestmentFormInput,
 } from "@/features/investment/utils/investment-schema";
-import { getQuantityInputConfig, formatCurrency } from "@/lib/utils/units";
+import { getQuantityInputConfig } from "@/lib/utils/units";
 import { Label } from "@/components/forms/Label";
 import { ErrorMessage } from "@/components/forms/ErrorMessage";
 import { CurrencyBadge } from "@/components/forms/CurrencyBadge";
@@ -65,9 +65,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
   const [successMessage, setSuccessMessage] = useState<string>("");
 
   // UI type tracks the main dropdown selection (includes merged gold/silver values)
-  const [selectedUIType, setSelectedUIType] = useState<string>(
-    String(InvestmentType.INVESTMENT_TYPE_STOCK),
-  );
+  const [selectedUIType, setSelectedUIType] = useState<string>(GOLD_UI_TYPE);
 
   const investmentTypeOptions = useMemo<SelectOption[]>(
     () => [
@@ -214,10 +212,10 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
     defaultValues: {
       symbol: "",
       name: "",
-      type: InvestmentType.INVESTMENT_TYPE_STOCK,
+      type: InvestmentType.INVESTMENT_TYPE_GOLD_VND,
       initialQuantity: 0,
       initialCost: 0,
-      currency: "USD",
+      currency: "VND",
     },
   });
 
@@ -339,17 +337,17 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
     }
   }, [isCashOrForeignCurrency, selectedUIType, setValue]);
 
-  // Auto-fill price per unit from gold market price
+  // Auto-fill price per unit from gold market price (use priceDecimal for human-readable display)
   useEffect(() => {
-    if (isGoldInvestment && goldPriceQuery.data?.data?.price) {
-      setPricePerUnit(goldPriceQuery.data.data.price);
+    if (isGoldInvestment && goldPriceQuery.data?.data?.priceDecimal) {
+      setPricePerUnit(goldPriceQuery.data.data.priceDecimal);
     }
   }, [isGoldInvestment, goldPriceQuery.data]);
 
-  // Auto-fill price per unit from silver market price
+  // Auto-fill price per unit from silver market price (use priceDecimal for human-readable display)
   useEffect(() => {
-    if (isSilverInvestment && silverPriceQuery.data?.data?.price) {
-      setPricePerUnit(silverPriceQuery.data.data.price);
+    if (isSilverInvestment && silverPriceQuery.data?.data?.priceDecimal) {
+      setPricePerUnit(silverPriceQuery.data.data.priceDecimal);
     }
   }, [isSilverInvestment, silverPriceQuery.data]);
 
@@ -602,24 +600,6 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
                   {t("form.loadingPrice")}
                 </p>
               )}
-              {isStandardWithSymbol && standardPriceQuery.data?.data && (
-                <div className="mt-2 p-2 bg-v2-green-light border border-v2-border rounded-md">
-                  <p className="text-sm font-medium text-v2-green-positive">
-                    {t("form.currentMarketPrice", {
-                      price: new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: standardPriceQuery.data.data.currency || selectedCurrency,
-                      }).format(standardPriceQuery.data.data.priceDecimal),
-                      unit: standardPriceQuery.data.data.displayUnit || "unit",
-                    })}
-                  </p>
-                  {standardPriceQuery.data.data.isCached && (
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {t("form.cachedPrice")}
-                    </p>
-                  )}
-                </div>
-              )}
               {isStandardWithSymbol && standardPriceQuery.isError && (
                 <p className="text-xs text-red-500 mt-2 ml-1">
                   {t("form.unableToFetchPrice")}
@@ -710,24 +690,6 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
                   {t("form.loadingPrice")}
                 </p>
               )}
-              {goldPriceQuery.data?.data && (
-                <div className="p-2 bg-v2-green-light border border-v2-border rounded-md">
-                  <p className="text-sm font-medium text-v2-green-positive">
-                    {t("form.currentMarketPrice", {
-                      price: formatCurrency(
-                        goldPriceQuery.data.data.price,
-                        goldPriceQuery.data.data.currency,
-                      ),
-                      unit: selectedGoldType.unit,
-                    })}
-                  </p>
-                  {goldPriceQuery.data.data.isCached && (
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {t("form.cachedPrice")}
-                    </p>
-                  )}
-                </div>
-              )}
               {goldPriceQuery.isError && (
                 <p className="text-xs text-red-500 ml-1">
                   {t("form.unableToFetchPrice")}
@@ -781,24 +743,6 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
                 <p className="text-xs text-gray-400 ml-1">
                   {t("form.loadingPrice")}
                 </p>
-              )}
-              {silverPriceQuery.data?.data && (
-                <div className="p-2 bg-v2-green-light border border-v2-border rounded-md">
-                  <p className="text-sm font-medium text-v2-green-positive">
-                    {t("form.currentMarketPrice", {
-                      price: formatCurrency(
-                        silverPriceQuery.data.data.price,
-                        silverPriceQuery.data.data.currency,
-                      ),
-                      unit: selectedSilverType.availableUnits[0] || "unit",
-                    })}
-                  </p>
-                  {silverPriceQuery.data.data.isCached && (
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {t("form.cachedPrice")}
-                    </p>
-                  )}
-                </div>
               )}
               {silverPriceQuery.isError && (
                 <p className="text-xs text-red-500 ml-1">
@@ -1014,11 +958,16 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
             </button>
           )}
         </div>
-        {/* Total cost summary */}
+        {/* Total cost summary — pricePerUnit is human-readable, so totalCost is too */}
         {watchedQuantity > 0 && pricePerUnit > 0 && (
           <p className="text-sm font-medium text-gray-700 mt-2">
             {t("form.totalCostSummary", {
-              amount: formatCurrency(totalCost, currency),
+              amount: new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: currency || "USD",
+                minimumFractionDigits: currency === "VND" || currency === "JPY" || currency === "KRW" ? 0 : 2,
+                maximumFractionDigits: currency === "VND" || currency === "JPY" || currency === "KRW" ? 0 : 2,
+              }).format(totalCost),
             })}
           </p>
         )}
