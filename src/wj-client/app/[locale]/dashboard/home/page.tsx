@@ -36,7 +36,7 @@ import { CurrencyPriceTable } from "./CurrencyPriceTable";
 import { DollarIndexChart } from "./DollarIndexChart";
 import { WalletsSection } from "./WalletsSection";
 import { BaseCard } from "@/components/BaseCard";
-import { GoldSentimentCard } from "@/components/GoldSentimentCard";
+import { SentimentCard } from "@/components/GoldSentimentCard";
 
 type ModalType = "add-transaction" | "transfer-money" | "create-wallet" | null;
 
@@ -201,8 +201,9 @@ export default function Home() {
         {/* 8. Dollar Index Chart */}
         <DollarIndexChart />
 
-        {/* 9. Gold Sentiment */}
-        <GoldSentimentCard variant="home" />
+        {/* 9. Sentiment Cards */}
+        <SentimentCard variant="home" asset="gold" />
+        <SentimentCard variant="home" asset="silver" />
 
         {/* 10. Wallets */}
         <WalletsSection wallets={wallets} isLoading={walletsLoading} />
@@ -272,8 +273,11 @@ export default function Home() {
           <DollarIndexChart />
         </div>
 
-        {/* Row 6: Gold Sentiment */}
-        <GoldSentimentCard variant="home" />
+        {/* Row 6: Sentiment Cards */}
+        <div className="grid grid-cols-2 gap-6">
+          <SentimentCard variant="home" asset="gold" />
+          <SentimentCard variant="home" asset="silver" />
+        </div>
       </div>
 
       {/* Modals */}

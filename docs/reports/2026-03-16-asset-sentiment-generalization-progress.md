@@ -7,7 +7,7 @@
 - **Started:** 2026-03-16
 - **Last updated:** 2026-03-16
 - **Current state:** in_progress
-- **Current task:** 9
+- **Current task:** 11
 
 ## Task Progress
 
@@ -21,8 +21,8 @@
 | 6 | Regenerate Frontend Types and Hooks | done | 0989f99 | Already generated in Task 2 — SentimentCategory enum + category fields confirmed |
 | 7 | Generalize Frontend Component — SentimentCard with asset prop | done | — | Added asset prop, per-asset theming, scoped anonymous IDs, removed vote count and date indicator |
 | 8 | Add i18n Translations for Silver Sentiment | done | — | Added silverSentiment namespace, removed vote count from goldSentiment summary |
-| 9 | Add Sentiment Cards to Prices Page Tabs | pending | — | — |
-| 10 | Update Landing and Home Pages — Add Silver Sentiment | pending | — | — |
+| 9 | Add Sentiment Cards to Prices Page Tabs | done | — | Added gold/silver SentimentCard to gold and silver tabs on prices page |
+| 10 | Update Landing and Home Pages — Add Silver Sentiment | done | — | Replaced GoldSentimentCard with SentimentCard on landing and home pages, added silver sentiment |
 | 11 | Update Architecture Diagrams | pending | — | — |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`

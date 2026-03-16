@@ -9,7 +9,7 @@ import { LandingSilverPriceChart } from "@/components/landing/LandingSilverPrice
 import { LandingCurrencyPriceTable } from "@/components/landing/LandingCurrencyPriceTable";
 import { LandingDollarIndexChart } from "@/components/landing/LandingDollarIndexChart";
 import LandingFooter from "@/components/landing/LandingFooter";
-import { GoldSentimentCard } from "@/components/GoldSentimentCard";
+import { SentimentCard } from "@/components/GoldSentimentCard";
 import { usePublicMarketTypes } from "@/features/market-prices/hooks/usePublicMarketTypes";
 import { formatUpdateTimestamp } from "@/features/market-prices/utils/format-update-time";
 import { useTranslations } from "next-intl";
@@ -61,7 +61,8 @@ export default function LandingPage() {
             <LandingSilverPriceChart />
             <LandingCurrencyPriceTable types={currencyTypes} isLoading={isLoading} updatedTime={currencyUpdatedTime} />
             <LandingDollarIndexChart />
-            <GoldSentimentCard variant="landing" />
+            <SentimentCard variant="landing" asset="gold" />
+            <SentimentCard variant="landing" asset="silver" />
           </div>
 
           {/* Desktop Layout */}
@@ -85,8 +86,11 @@ export default function LandingPage() {
               <LandingCurrencyPriceTable types={currencyTypes} isLoading={isLoading} updatedTime={currencyUpdatedTime} />
               <LandingDollarIndexChart />
             </div>
-            {/* Row 4: Gold Sentiment */}
-            <GoldSentimentCard variant="landing" />
+            {/* Row 4: Sentiment Cards */}
+            <div className="grid grid-cols-2 gap-6">
+              <SentimentCard variant="landing" asset="gold" />
+              <SentimentCard variant="landing" asset="silver" />
+            </div>
           </div>
         </main>
         <LandingFooter />
