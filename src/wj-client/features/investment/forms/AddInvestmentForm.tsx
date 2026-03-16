@@ -8,6 +8,7 @@ import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
 import { RHFFormInput as FormInput } from "@/components/forms/RHFFormInput";
 import { FormNumberInput } from "@/components/forms/FormNumberInput";
+import { FormDateTimePicker } from "@/components/forms/FormDateTimePicker";
 import { RHFFormSelect as FormSelect } from "@/components/forms/RHFFormSelect";
 import {
   FormSelect as BasicFormSelect,
@@ -133,13 +134,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
   // Custom investment toggle state
   const [isCustomInvestment, setIsCustomInvestment] = useState(false);
 
-  // Purchase date state (YYYY-MM-DD string, defaults to today)
-  const [purchaseDate, setPurchaseDate] = useState<string>(
-    new Date().toISOString().split("T")[0],
-  );
-
-  // Price per unit state (replaces total cost input)
-  const [pricePerUnit, setPricePerUnit] = useState<number>(0);
+  // purchaseDate and pricePerUnit are managed via React Hook Form (see defaultValues)
 
   // Derived type flags
   const isGoldInvestment = selectedUIType === GOLD_UI_TYPE;
@@ -218,6 +213,8 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
       type: InvestmentType.INVESTMENT_TYPE_GOLD_VND,
       initialQuantity: 0,
       initialCost: 0,
+      pricePerUnit: 0,
+      purchaseDate: new Date().toISOString().split("T")[0],
       currency: "VND",
     },
   });
@@ -234,6 +231,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
   const investmentType = watch("type");
   const currency = watch("currency");
   const watchedQuantity = watch("initialQuantity");
+  const pricePerUnit = watch("pricePerUnit");
   const quantityConfig = getQuantityInputConfig(investmentType);
 
   // Fetch exchange rate when investment currency differs from user's preferred currency
@@ -350,24 +348,24 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
   // Auto-fill price per unit from gold market price (use priceDecimal for human-readable display)
   useEffect(() => {
     if (isGoldInvestment && goldPriceQuery.data?.data?.priceDecimal) {
-      setPricePerUnit(goldPriceQuery.data.data.priceDecimal);
+      setValue("pricePerUnit", goldPriceQuery.data.data.priceDecimal);
     }
-  }, [isGoldInvestment, goldPriceQuery.data]);
+  }, [isGoldInvestment, goldPriceQuery.data, setValue]);
 
   // Auto-fill price per unit from silver market price (use priceDecimal for human-readable display)
   useEffect(() => {
     if (isSilverInvestment && silverPriceQuery.data?.data?.priceDecimal) {
-      setPricePerUnit(silverPriceQuery.data.data.priceDecimal);
+      setValue("pricePerUnit", silverPriceQuery.data.data.priceDecimal);
     }
-  }, [isSilverInvestment, silverPriceQuery.data]);
+  }, [isSilverInvestment, silverPriceQuery.data, setValue]);
 
   // Auto-fill price per unit from standard investment market price
   // Use priceDecimal (human-readable value) since pricePerUnit is displayed directly
   useEffect(() => {
     if (isStandardWithSymbol && standardPriceQuery.data?.data?.priceDecimal) {
-      setPricePerUnit(standardPriceQuery.data.data.priceDecimal);
+      setValue("pricePerUnit", standardPriceQuery.data.data.priceDecimal);
     }
-  }, [isStandardWithSymbol, standardPriceQuery.data]);
+  }, [isStandardWithSymbol, standardPriceQuery.data, setValue]);
 
   // Compute total cost in real time
   const totalCost = useMemo(() => {
@@ -386,7 +384,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
   const handleUITypeChange = useCallback(
     (value: string) => {
       setSelectedUIType(value);
-      setPricePerUnit(0);
+      setValue("pricePerUnit", 0);
       setSelectedSymbol("");
 
       if (value === GOLD_UI_TYPE) {
@@ -431,8 +429,9 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
 
   // Convert purchase date to Unix timestamp
   const getPurchaseDateTs = (): number => {
-    if (!purchaseDate) return 0;
-    const ts = Math.floor(new Date(purchaseDate).getTime() / 1000);
+    const dateVal = form.getValues("purchaseDate");
+    if (!dateVal) return 0;
+    const ts = Math.floor(new Date(dateVal).getTime() / 1000);
     return Number.isNaN(ts) ? 0 : ts;
   };
 
@@ -876,21 +875,13 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
       </div>
 
       {/* Purchase Date */}
-      <div>
-        <Label htmlFor="purchaseDate">{t("form.purchaseDate")}</Label>
-        <input
-          type="date"
-          id="purchaseDate"
-          value={purchaseDate}
-          onChange={(e) => setPurchaseDate(e.target.value)}
-          max={new Date().toISOString().split("T")[0]}
-          className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-bg focus:border-bg text-sm"
-          disabled={isSubmitting}
-        />
-        <p className="text-xs text-gray-500 mt-1 ml-1">
-          {t("form.purchaseDateHint")}
-        </p>
-      </div>
+      <FormDateTimePicker
+        name="purchaseDate"
+        control={control}
+        label={t("form.purchaseDate")}
+        showTime={false}
+        disabled={isSubmitting}
+      />
 
       {/* Currency Input - shown for custom investments before Price Per Unit */}
       {!isGoldInvestment && !isSilverInvestment && isCustomInvestment && (
@@ -936,18 +927,18 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-start gap-2">
           <div className="flex-1">
-            <input
-              type="number"
-              id="pricePerUnit"
-              value={pricePerUnit || ""}
-              onChange={(e) => setPricePerUnit(Number(e.target.value) || 0)}
+            <FormNumberInput
+              name="pricePerUnit"
+              control={control}
               placeholder="0.00"
+              required
+              disabled={isSubmitting}
               min={0}
               step="0.01"
-              disabled={isSubmitting}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-bg focus:border-bg text-sm"
+              suffix={currency || "USD"}
+              showRecommendations={false}
             />
           </div>
           {/* Refresh button - for gold/silver/standard investments with symbol */}
@@ -960,7 +951,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
                 else if (isStandardWithSymbol) standardPriceQuery.refetch();
               }}
               disabled={isRefreshing}
-              className="px-3 py-2 text-sm font-medium text-bg bg-red-50 border border-bg rounded-md hover:bg-red-100 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap"
+              className="px-3 py-2 text-sm font-medium text-bg bg-red-50 border border-bg rounded-md hover:bg-red-100 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap h-[44px] sm:h-[48px]"
             >
               {isRefreshing
                 ? t("form.refreshingPrice")

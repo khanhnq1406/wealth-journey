@@ -72,7 +72,7 @@ Enhanced the AddInvestmentForm with four major improvements: (1) reordered type 
 
 - The `initialCost` field in `createInvestmentSchema` still exists (used as computed field from `quantity × pricePerUnit`) — could be renamed to `totalCost` for clarity in a future refactor
 - ~~Market price auto-fill for standard investments (stocks, crypto, ETF) from `MarketPriceDisplay` is not yet wired to `pricePerUnit` state~~ — **FIXED** (see Fix History below)
-- The purchase date HTML `<input type="date">` styling may differ across browsers — could be replaced with a custom DatePicker component in a future UX pass
+- ~~The purchase date HTML `<input type="date">` styling may differ across browsers~~ — **FIXED**: now uses `FormDateTimePicker` component with consistent styling, dark mode, error states, and accessibility
 
 ## Files Changed
 
@@ -125,3 +125,4 @@ Enhanced the AddInvestmentForm with four major improvements: (1) reordered type 
 | 2026-03-16 | Change default investment type from Stock to Gold — `selectedUIType` now initializes to `GOLD_MERGED`, form defaults to `INVESTMENT_TYPE_GOLD_VND` with VND currency | Minor | — | AddInvestmentForm.tsx |
 | 2026-03-16 | Fix price-per-unit auto-fill using `priceDecimal` (human-readable) instead of `price` (smallest currency unit) for gold/silver — previously XAU showed 500784 (cents) in input instead of 5007.84 (dollars). Also fixed total cost display to format consistently without double-dividing by currency multiplier. Same fix applied to AddInvestmentTransactionForm | Minor | — | AddInvestmentForm.tsx, AddInvestmentTransactionForm.tsx |
 | 2026-03-16 | Add converted currency display to total cost summary — when investment currency differs from user's preferred currency, shows approximate converted amount below the total cost line (e.g., "Total cost: $100.00" then "≈ ₫2,600,000"). Uses existing `useExchangeRate` hook with 1-hour cache and fallback rates | Minor | — | AddInvestmentForm.tsx, en/investment.json, vi/investment.json |
+| 2026-03-16 | Replace raw HTML inputs with existing shared components — purchase date now uses `FormDateTimePicker` (RHF-integrated, `showTime={false}`) instead of raw `<input type="date">`, price-per-unit now uses `FormNumberInput` (RHF-integrated, thousand separator, currency suffix) instead of raw `<input type="number">`. Both fields added to Zod schema (`pricePerUnit`, `purchaseDate`) and RHF `defaultValues`. Eliminates standalone `useState` for these fields | Minor | — | AddInvestmentForm.tsx, investment-schema.ts |

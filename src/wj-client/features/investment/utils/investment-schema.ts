@@ -31,6 +31,8 @@ export const createInvestmentSchema = z
     type: z.nativeEnum(InvestmentType),
     initialQuantity: z.number().min(0.00000001, "Quantity must be positive"),
     initialCost: z.number().min(0, "Initial cost must be 0 or greater"),
+    pricePerUnit: z.number().min(0, "Price per unit must be 0 or greater"),
+    purchaseDate: z.string().min(1, "Purchase date is required"),
     currency: z
       .string()
       .length(3, "Currency must be a 3-letter ISO code")
