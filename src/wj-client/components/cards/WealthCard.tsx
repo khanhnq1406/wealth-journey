@@ -260,7 +260,7 @@ export function WealthCard({
         )}
 
         {/* Sparkline */}
-        {showSparkline && sparklinePath && !loading && (
+        {showSparkline && !loading && (
           <div className="mb-3 h-8">
             <svg
               width="100%"
@@ -269,21 +269,32 @@ export function WealthCard({
               preserveAspectRatio="none"
               className="overflow-visible"
             >
-              <path
-                d={sparklinePath}
-                fill="none"
-                stroke={sparklineColor}
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              {/* Gradient fill under the line */}
-              <path
-                d={`${sparklinePath} L 100,30 L 0,30 Z`}
-                fill={sparklineColor}
-                fillOpacity="0.2"
-                stroke="none"
-              />
+              {sparklinePath ? (
+                <>
+                  <path
+                    d={sparklinePath}
+                    fill="none"
+                    stroke={sparklineColor}
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d={`${sparklinePath} L 100,30 L 0,30 Z`}
+                    fill={sparklineColor}
+                    fillOpacity="0.2"
+                    stroke="none"
+                  />
+                </>
+              ) : (
+                <line
+                  x1="0" y1="15" x2="100" y2="15"
+                  stroke={sparklineColor}
+                  strokeWidth="1.5"
+                  strokeOpacity="0.4"
+                  strokeDasharray={sparklineData.length === 0 ? "4 4" : "0"}
+                />
+              )}
             </svg>
           </div>
         )}

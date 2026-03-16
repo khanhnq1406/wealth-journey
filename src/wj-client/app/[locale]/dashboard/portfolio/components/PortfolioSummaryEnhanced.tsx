@@ -177,7 +177,7 @@ const StatCard = memo(function StatCard({
         </div>
       )}
 
-      {showSparkline && sparklineData && sparklineData.length > 1 && (
+      {showSparkline && sparklineData && (
         <div className="mt-2 w-full">
           <Sparkline data={sparklineData} height={40} />
         </div>

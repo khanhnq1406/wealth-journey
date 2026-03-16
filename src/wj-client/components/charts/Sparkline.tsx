@@ -90,7 +90,39 @@ export const Sparkline = memo(function Sparkline({
     })();
 
   if (!data || data.length === 0) {
-    return null;
+    // Render a flat dashed horizontal line to indicate "no data"
+    return (
+      <div className={className} style={{ height }}>
+        <svg width="100%" height="100%" preserveAspectRatio="none">
+          <line
+            x1="0" y1="50%" x2="100%" y2="50%"
+            stroke="#9CA3AF"
+            strokeWidth={strokeWidth}
+            strokeOpacity={0.5}
+            strokeDasharray="4 4"
+          />
+        </svg>
+      </div>
+    );
+  }
+
+  if (data.length === 1) {
+    // Render a solid horizontal line for a single data point
+    return (
+      <div className={className} style={{ height }}>
+        <svg width="100%" height="100%" preserveAspectRatio="none">
+          <line
+            x1="0" y1="50%" x2="100%" y2="50%"
+            stroke={trendColor}
+            strokeWidth={strokeWidth}
+            strokeOpacity={0.5}
+          />
+          {showDots && (
+            <circle cx="50%" cy="50%" r={3} fill={trendColor} />
+          )}
+        </svg>
+      </div>
+    );
   }
 
   // Single pass: parse values and track min/max
