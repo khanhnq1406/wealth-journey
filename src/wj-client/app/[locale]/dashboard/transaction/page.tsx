@@ -105,7 +105,7 @@ const ImportTransactionsForm = dynamic(
   { ssr: false },
 );
 
-export default function TransactionPage() {
+export function TransactionContent() {
   const t = useTranslations("transaction");
   const tCommon = useTranslations("common");
   const tDelete = useTranslations("transaction.delete");
@@ -807,4 +807,8 @@ export default function TransactionPage() {
       )}
     </div>
   );
+}
+
+export default function TransactionPage() {
+  return <TransactionContent />;
 }

@@ -60,7 +60,7 @@ import {
   CategoryType,
 } from "@/gen/protobuf/v1/transaction";
 
-export default function ReportPageEnhanced() {
+export function ReportContent() {
   const t = useTranslations("report");
   const tc = useTranslations("common");
   const [selectedPeriod, setSelectedPeriod] =
@@ -752,4 +752,8 @@ export default function ReportPageEnhanced() {
       </div>
     </div>
   );
+}
+
+export default function ReportPage() {
+  return <ReportContent />;
 }

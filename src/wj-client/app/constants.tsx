@@ -81,6 +81,7 @@ export const routes = {
   transaction: `/dashboard/transaction`,
   report: `/dashboard/report`,
   budget: `/dashboard/budget`,
+  finance: `/dashboard/finance`,
   wallets: `/dashboard/wallets`,
   portfolio: `/dashboard/portfolio`,
   prices: `/dashboard/prices`,
