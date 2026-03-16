@@ -72,11 +72,11 @@ func TestConvertQuantity(t *testing.T) {
 		to       GoldUnit
 		expected float64
 	}{
-		{"Tael to Gram", 2.0, UnitTael, UnitGram, 75.0},
-		{"Gram to Tael", 75.0, UnitGram, UnitTael, 2.0},
+		{"Mace to Gram", 20.0, UnitMace, UnitGram, 75.0},
+		{"Gram to Mace", 75.0, UnitGram, UnitMace, 20.0},
 		{"Ounce to Gram", 1.0, UnitOunce, UnitGram, GramsPerOunce},
 		{"Gram to Ounce", GramsPerOunce, UnitGram, UnitOunce, 1.0},
-		{"Tael to Tael", 1.0, UnitTael, UnitTael, 1.0},
+		{"Mace to Mace", 1.0, UnitMace, UnitMace, 1.0},
 		{"Gram to Gram", 1.0, UnitGram, UnitGram, 1.0},
 	}
 
@@ -99,9 +99,9 @@ func TestConvertPricePerUnit(t *testing.T) {
 		to       GoldUnit
 		expected float64
 	}{
-		{"Tael to Gram", 75000000.0, UnitTael, UnitGram, 2000000.0}, // 75M/tael / 37.5 = 2M/gram
-		{"Gram to Tael", 2000000.0, UnitGram, UnitTael, 75000000.0},
-		{"Tael to Tael", 85000000.0, UnitTael, UnitTael, 85000000.0},
+		{"Mace to Gram", 7500000.0, UnitMace, UnitGram, 2000000.0}, // 7.5M/mace / 3.75 = 2M/gram
+		{"Gram to Mace", 2000000.0, UnitGram, UnitMace, 7500000.0},
+		{"Mace to Mace", 8500000.0, UnitMace, UnitMace, 8500000.0},
 	}
 
 	for _, tt := range tests {
@@ -126,11 +126,11 @@ func TestNormalizeQuantityForStorage(t *testing.T) {
 		expected       int64
 	}{
 		{
-			name:           "VND Gold: 2 taels to grams",
-			quantity:       2.0,
-			inputUnit:      UnitTael,
+			name:           "VND Gold: 20 mace to grams",
+			quantity:       20.0,
+			inputUnit:      UnitMace,
 			investmentType: investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
-			expected:       750000, // 75g * 10000
+			expected:       750000, // 20 mace × 3.75g = 75g × 10000
 		},
 		{
 			name:           "VND Gold: 100 grams to grams",
@@ -173,11 +173,11 @@ func TestDenormalizeQuantityForDisplay(t *testing.T) {
 		expectedQuantity float64
 	}{
 		{
-			name:             "VND Gold: 750000 stored to taels",
+			name:             "VND Gold: 750000 stored to mace",
 			storedQuantity:   750000, // 75g * 10000
 			investmentType:   investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
-			displayUnit:      UnitTael,
-			expectedQuantity: 2.0, // 75g / 37.5 = 2 taels
+			displayUnit:      UnitMace,
+			expectedQuantity: 20.0, // 75g / 3.75 = 20 mace
 		},
 		{
 			name:             "VND Gold: 750000 stored to grams",
@@ -210,8 +210,8 @@ func TestProcessMarketPrice(t *testing.T) {
 		expected       int64
 	}{
 		{
-			name:           "VND Gold: price per tael to price per gram",
-			marketPrice:    85000000000, // 85M VND per tael
+			name:           "VND Gold: price per lượng to price per gram",
+			marketPrice:    85000000000, // 85M VND per lượng (from vang.today API)
 			marketCurrency: "VND",
 			investmentType: investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 			expected:       2266666667, // 85M / 37.5 ≈ 2.2666M per gram (in VND dong)

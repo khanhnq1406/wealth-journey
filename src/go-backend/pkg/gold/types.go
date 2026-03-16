@@ -5,13 +5,17 @@ import (
 )
 
 const (
-	// GramsPerTael is the conversion factor for Vietnamese tael to grams
-	// 1 tael (lượng) = 37.5 grams
-	GramsPerTael = 37.5
+	// GramsPerMace is the conversion factor for Vietnamese mace (chỉ) to grams
+	// 1 mace (chỉ) = 3.75 grams (1 tael/lượng = 10 mace = 37.5g)
+	GramsPerMace = 3.75
 
 	// GramsPerOunce is the conversion factor for troy ounce to grams
 	// 1 troy ounce = 31.1034768 grams
 	GramsPerOunce = 31.1034768
+
+	// gramsPerLuong is used internally for market price normalization.
+	// The vang.today API returns VND gold prices per lượng (= 10 mace = 37.5g).
+	gramsPerLuong = 37.5
 )
 
 // GoldUnit represents the physical unit for gold quantity
@@ -19,7 +23,7 @@ type GoldUnit string
 
 const (
 	UnitGram  GoldUnit = "gram"
-	UnitTael  GoldUnit = "tael"
+	UnitMace  GoldUnit = "mace"
 	UnitOunce GoldUnit = "oz"
 )
 
@@ -28,165 +32,165 @@ type GoldType struct {
 	Code       string                      // Type code (e.g., "SJL1L10", "XAU")
 	Name       string                      // Display name
 	Currency   string                      // "VND" or "USD"
-	Unit       GoldUnit                    // "tael", "gram", or "oz"
+	Unit       GoldUnit                    // "mace", "gram", or "oz"
 	UnitWeight float64                     // Weight in grams
 	Type       investmentv1.InvestmentType // InvestmentType enum value
 }
 
 // GoldTypes is the registry of all supported gold types
 var GoldTypes = []GoldType{
-	// SJC Gold (tael-based, VND × 1000)
+	// SJC Gold (mace-based, VND × 1000)
 	{
 		Code:       "SJC",
 		Name:       "SJC 9999",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "SJC TD",
 		Name:       "SJC Tự Do",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "Eximbank",
 		Name:       "Eximbank SJC",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "TPBank",
 		Name:       "TPBank SJC",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "Doji",
 		Name:       "DOJI",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "VietinGold",
 		Name:       "VietinBank Gold",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "ACBBank",
 		Name:       "ACB Gold",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "Mi hồng",
 		Name:       "Mi Hồng Gold",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "Vàng nhẫn SJC",
 		Name:       "Nhẫn SJC 9999",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "BTMC",
 		Name:       "Bảo Tín SJC",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "PNJ HCM",
 		Name:       "PNJ",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
-	// Other Gold Types (tael-based, VND × 1000)
+	// Other Gold Types (mace-based, VND × 1000)
 	{
 		Code:       "999,9 TD",
 		Name:       "Vàng 999.9 Tự Do",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "99,9 TD",
 		Name:       "Vàng 99.9 Tự Do",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "Vàng 95%",
 		Name:       "Vàng 95%",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "Doji_24K",
 		Name:       "DOJI 24K",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "BTMC_24K",
 		Name:       "Bảo Tín 24K",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "Mihong_999",
 		Name:       "Mi Hồng 999",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "99,99% GF",
 		Name:       "Golden Fund 99.99%",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	{
 		Code:       "95% GF",
 		Name:       "Golden Fund 95%",
 		Currency:   "VND",
-		Unit:       UnitTael,
-		UnitWeight: GramsPerTael,
+		Unit:       UnitMace,
+		UnitWeight: GramsPerMace,
 		Type:       investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
 	},
 	// World Gold (ounce-based, USD)
@@ -233,11 +237,13 @@ func GetNativeStorageInfo(investmentType investmentv1.InvestmentType) (GoldUnit,
 	}
 }
 
-// GetPriceUnitForMarketData returns what unit market prices are in
+// GetPriceUnitForMarketData returns what unit market prices are in for display.
+// Note: vang.today API returns VND gold prices per lượng (37.5g), but we display per mace (3.75g).
+// The ProcessMarketPrice function handles the lượng→gram conversion internally.
 func GetPriceUnitForMarketData(investmentType investmentv1.InvestmentType) GoldUnit {
 	switch investmentType {
 	case investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND:
-		return UnitTael // VND gold market price is per tael
+		return UnitMace // VND gold display unit is mace (chỉ)
 	case investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_USD:
 		return UnitOunce // World gold market price is per ounce
 	default:

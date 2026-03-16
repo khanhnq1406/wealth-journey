@@ -95,7 +95,7 @@ sequenceDiagram
 | Investment Type | Quantity Unit | Storage Multiplier | Example |
 |----------------|-------------|-------------------|---------|
 | Stocks, ETFs, Crypto | Shares | ×100 | 10 shares = 1000 |
-| Gold (VND) | Grams | ×10,000 | 75g (2 taels) = 750,000 |
+| Gold (VND) | Grams | ×10,000 | 75g (20 chỉ) = 750,000 |
 | Gold (USD) | Ounces | ×10,000 | 1 oz = 10,000 |
 | Silver (VND) | Grams | ×10,000 | Same as gold |
 | Silver (USD) | Ounces | ×10,000 | Same as gold |
@@ -346,7 +346,7 @@ flowchart TD
     G -- "Gold (VND/USD)" --> L["goldPriceService.FetchPriceForSymbol()"]
     L --> M["vang.today API\nGold prices by type code"]
     M --> N{"Gold type?"}
-    N -- "VND" --> O["Price per tael →\ngoldConverter.ProcessMarketPrice()\n→ price per gram (storage format)"]
+    N -- "VND" --> O["Price per lượng →\ngoldConverter.ProcessMarketPrice()\n→ price per gram (storage format)"]
     N -- "USD" --> P["Price per ounce × 100\n(convert to cents)"]
     O --> K
     P --> K
@@ -383,7 +383,7 @@ flowchart TD
 - Custom investments (`isCustom: true`) are excluded from automatic price updates — they use manual price via `UpdateInvestmentPriceForm`
 - Price update runs asynchronously to avoid HTTP timeouts; client is notified immediately
 - Stale cache is preferred over no data — API failures gracefully degrade
-- Gold VND prices require tael-to-gram normalization before storage
+- Gold VND prices require lượng-to-gram normalization before storage
 - Silver USD uses Yahoo Finance as a fallback since the primary silver API only covers VND
 
 ### Price Sources by Type

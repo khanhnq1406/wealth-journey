@@ -966,7 +966,7 @@ func (h *InvestmentHandlers) GetMarketPrice(c *gin.Context) {
 func getDisplayUnitForType(investmentType investmentv1.InvestmentType, symbol string) string {
 	switch investmentType {
 	case investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND:
-		return "tael"
+		return "mace"
 	case investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_USD:
 		return "oz"
 	case investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND:
@@ -989,20 +989,21 @@ func convertToDecimal(amount int64, currency string) float64 {
 }
 
 // convertPriceForDisplay converts price from storage format to display format.
-// For gold VND: storage is per gram, display is per tael (×37.5)
+// For gold VND: storage is per gram, display is per mace (×3.75)
 // For gold USD: storage is per oz, display is per oz (no conversion)
 // For silver VND: storage is per gram, display depends on symbol suffix:
 //   - *_L symbols: display per tael (×37.5)
 //   - *_KG symbols: display per kg (×1000)
 // For silver USD: storage is per oz, display is per oz (no conversion)
 func convertPriceForDisplay(storagePrice int64, currency string, investmentType investmentv1.InvestmentType, symbol string) int64 {
+	const gramsPerMace = 3.75
 	const gramsPerTael = 37.5
 	const gramsPerKg = 1000.0
 
 	switch investmentType {
 	case investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND:
-		// Gold VND: Storage per gram, Display per tael
-		return int64(float64(storagePrice) * gramsPerTael)
+		// Gold VND: Storage per gram, Display per mace (chỉ)
+		return int64(float64(storagePrice) * gramsPerMace)
 
 	case investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND:
 		// Silver VND: Storage per gram, Display depends on symbol suffix

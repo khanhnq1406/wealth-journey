@@ -212,7 +212,7 @@ Remaining: Lot B: qty=30, price=$12, cost=$360
 | MUTUAL_FUND | 5 | Any | units × 10000 | per unit |
 | COMMODITY | 6 | Any | units × 10000 | per unit |
 | OTHER | 7 | Any | units × 10000 | per unit |
-| GOLD_VND | 8 | VND | grams × 10000 | per tael (convert) |
+| GOLD_VND | 8 | VND | grams × 10000 | per mace (convert) |
 | GOLD_USD | 9 | USD | ounces × 10000 | per ounce |
 | SILVER_VND | 10 | VND | grams × 10000 | per tael (convert) |
 | SILVER_USD | 11 | USD | ounces × 10000 | per ounce |
@@ -222,6 +222,6 @@ Remaining: Lot B: qty=30, price=$12, cost=$360
 1. **All quantities stored as int64 × 10000**: Avoids floating-point precision issues
 2. **FIFO lot tracking**: Each buy creates a lot; sells consume oldest lots first
 3. **Market data cached in both Redis (15min TTL) and PostgreSQL (permanent)**
-4. **Gold/silver prices normalized**: VND prices converted from per-tael to per-gram for storage
+4. **Gold/silver prices normalized**: VND prices converted from per-lượng to per-gram for storage
 5. **Custom investments**: `isCustom=true` skips market data lookup, uses manual price updates
 6. **Portfolio snapshots**: Hourly snapshots enable historical performance charts without recalculating

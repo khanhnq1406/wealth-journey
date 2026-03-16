@@ -10,7 +10,7 @@ import (
 )
 
 // Converter handles BOTH unit and currency conversions for gold
-// LAYER 1: Unit conversion (tael ↔ gram ↔ ounce)
+// LAYER 1: Unit conversion (mace ↔ gram ↔ ounce)
 // LAYER 2: Currency conversion (VND ↔ USD via FXRateService)
 type Converter struct {
 	fxService fx.Service
@@ -29,8 +29,8 @@ func ConvertQuantity(quantity float64, fromUnit, toUnit GoldUnit) float64 {
 	var inGrams float64
 
 	switch fromUnit {
-	case UnitTael:
-		inGrams = quantity * GramsPerTael
+	case UnitMace:
+		inGrams = quantity * GramsPerMace
 	case UnitOunce:
 		inGrams = quantity * GramsPerOunce
 	case UnitGram:
@@ -38,8 +38,8 @@ func ConvertQuantity(quantity float64, fromUnit, toUnit GoldUnit) float64 {
 	}
 
 	switch toUnit {
-	case UnitTael:
-		return inGrams / GramsPerTael
+	case UnitMace:
+		return inGrams / GramsPerMace
 	case UnitOunce:
 		return inGrams / GramsPerOunce
 	case UnitGram:
@@ -50,28 +50,28 @@ func ConvertQuantity(quantity float64, fromUnit, toUnit GoldUnit) float64 {
 }
 
 // ConvertPricePerUnit converts price between units (no currency involved)
-// Used when converting price per tael to price per gram
+// Used when converting price per mace to price per gram
 // Price is inversely proportional to quantity
 func ConvertPricePerUnit(price float64, fromUnit, toUnit GoldUnit) float64 {
 	// Get quantity ratio for from unit
 	var quantityRatio float64
 
 	switch fromUnit {
-	case UnitTael:
-		quantityRatio = GramsPerTael
+	case UnitMace:
+		quantityRatio = GramsPerMace
 	case UnitOunce:
 		quantityRatio = GramsPerOunce
 	case UnitGram:
 		quantityRatio = 1
 	}
 
-	// Convert price: if price is per tael, price per gram = price / 37.5
+	// Convert price: if price is per mace, price per gram = price / 3.75
 	pricePerGram := price / quantityRatio
 
 	// Convert from grams to target unit
 	switch toUnit {
-	case UnitTael:
-		return pricePerGram * GramsPerTael
+	case UnitMace:
+		return pricePerGram * GramsPerMace
 	case UnitOunce:
 		return pricePerGram * GramsPerOunce
 	case UnitGram:
@@ -118,11 +118,11 @@ func (c *Converter) DenormalizeQuantityForDisplay(
 // Handles BOTH LAYERS: Unit conversion AND Currency conversion
 //
 // Parameters:
-//   - userQuantity: quantity entered by user (e.g., 2 taels)
-//   - userQuantityUnit: unit of userQuantity (e.g., "tael")
-//   - userPricePerUnit: price entered by user (e.g., 85,000,000 VND per tael)
+//   - userQuantity: quantity entered by user (e.g., 20 mace)
+//   - userQuantityUnit: unit of userQuantity (e.g., "mace")
+//   - userPricePerUnit: price entered by user (e.g., 8,500,000 VND per mace)
 //   - userPriceCurrency: currency of userPricePerUnit (e.g., "VND")
-//   - userPriceUnit: unit of userPricePerUnit (e.g., "tael")
+//   - userPriceUnit: unit of userPricePerUnit (e.g., "mace")
 //   - investmentType: type of gold investment
 //   - walletCurrency: currency of wallet for final cost
 //
@@ -147,7 +147,7 @@ func (c *Converter) CalculateTotalCostFromUserInput(
 	quantityInStorageUnit := ConvertQuantity(userQuantity, userQuantityUnit, storageUnit)
 
 	// LAYER 1: Convert price to storage unit price
-	// User price is in userPriceUnit (e.g., per tael), need price in storageUnit (e.g., per gram)
+	// User price is in userPriceUnit (e.g., per mace), need price in storageUnit (e.g., per gram)
 	priceInStorageUnitCurrency := ConvertPricePerUnit(userPricePerUnit, userPriceUnit, storageUnit)
 
 	// Calculate total cost in the price's currency
@@ -218,27 +218,24 @@ func (c *Converter) CalculateTotalCostFromUserInput(
 // ===== MARKET DATA PROCESSING (Unit + Currency) =====
 
 // ProcessMarketPrice processes market price from vang.today API
-// Market prices come as: VND gold = per tael, World gold = per ounce
+// Market prices come as: VND gold = per lượng (37.5g), World gold = per ounce
 // Storage needs: VND gold = per gram, World gold = per ounce
 func (c *Converter) ProcessMarketPrice(
 	marketPrice int64,      // Price from API in smallest currency unit
 	marketCurrency string,  // Currency of market price (VND or USD)
 	investmentType investmentv1.InvestmentType,
 ) int64 {
-	priceUnit := GetPriceUnitForMarketData(investmentType)
 	storageUnit, _ := GetNativeStorageInfo(investmentType)
 
-	// If market price unit equals storage unit, no conversion needed
-	if priceUnit == storageUnit {
-		return marketPrice
+	// For VND gold: API returns price per lượng (37.5g), convert to per gram for storage
+	if investmentType == investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND && storageUnit == UnitGram {
+		priceInBaseUnits := float64(marketPrice) / float64(fx.GetDecimalMultiplier(marketCurrency))
+		pricePerGram := priceInBaseUnits / gramsPerLuong
+		return int64(math.Round(pricePerGram * float64(fx.GetDecimalMultiplier(marketCurrency))))
 	}
 
-	// Need unit conversion
-	// Convert price per tael to price per gram
-	priceInBaseUnits := float64(marketPrice) / float64(fx.GetDecimalMultiplier(marketCurrency))
-	pricePerStorageUnit := ConvertPricePerUnit(priceInBaseUnits, priceUnit, storageUnit)
-
-	return int64(math.Round(pricePerStorageUnit * float64(fx.GetDecimalMultiplier(marketCurrency))))
+	// USD gold: price per ounce, storage per ounce — no conversion needed
+	return marketPrice
 }
 
 // ===== DISPLAY CALCULATIONS (Unit + Currency) =====
@@ -248,11 +245,11 @@ func (c *Converter) CalculateDisplayQuantity(
 	storedQuantity int64,
 	investmentType investmentv1.InvestmentType,
 ) (value float64, unit GoldUnit) {
-	// For VND gold: display in taels (Vietnamese convention)
+	// For VND gold: display in mace/chỉ (Vietnamese convention)
 	// For USD gold: display in ounces (international convention)
 	switch investmentType {
 	case investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND:
-		displayUnit := UnitTael // Default to taels for VND gold
+		displayUnit := UnitMace // Default to mace (chỉ) for VND gold
 		value = c.DenormalizeQuantityForDisplay(storedQuantity, investmentType, displayUnit)
 		return value, displayUnit
 

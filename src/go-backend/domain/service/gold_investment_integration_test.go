@@ -45,7 +45,7 @@ func TestGoldInvestmentCreation_VND(t *testing.T) {
 	defer cleanupTestWallet(t, ctx, wallet.ID)
 
 	// Test Case 1: Create VND gold investment (SJC 1L-10L)
-	// User buys 2 taels of SJC gold at 85,000,000 VND/tael
+	// User buys 20 mace of SJC gold at 8,500,000 VND/mace
 	// Total cost: 170,000,000 VND
 	testCases := []struct {
 		name             string
@@ -59,16 +59,16 @@ func TestGoldInvestmentCreation_VND(t *testing.T) {
 		expectedCost     int64 // In smallest currency unit
 	}{
 		{
-			name:           "SJC 1L-10L - 2 taels",
+			name:           "SJC 1L-10L - 20 mace",
 			symbol:         "SJL1L10",
 			investmentName: "SJC 1L-10L (Vàng miếng)",
-			quantity:       2.0, // 2 taels
-			quantityUnit:   "tael",
-			pricePerUnit:   85000000, // 85M VND per tael
+			quantity:       20.0, // 20 mace (= 2 lượng)
+			quantityUnit:   "mace",
+			pricePerUnit:   8500000, // 8.5M VND per mace
 			priceCurrency:  "VND",
-			// 2 taels = 75 grams → stored as 750000 (75 × 10000)
+			// 20 mace = 75 grams → stored as 750000 (75 × 10000)
 			expectedQuantity: 750000,
-			// Total cost: 2 × 85,000,000 = 170,000,000 VND
+			// Total cost: 20 × 8,500,000 = 170,000,000 VND
 			expectedCost: 170000000,
 		},
 		{
@@ -91,9 +91,9 @@ func TestGoldInvestmentCreation_VND(t *testing.T) {
 			// Calculate stored quantity using gold converter logic
 			// For VND gold: store in grams × 10000
 			var storedQuantity int64
-			if tc.quantityUnit == "tael" {
-				// Convert taels to grams: 1 tael = 37.5 grams
-				grams := tc.quantity * 37.5
+			if tc.quantityUnit == "mace" {
+				// Convert mace to grams: 1 mace = 3.75 grams
+				grams := tc.quantity * 3.75
 				storedQuantity = int64(grams * 10000)
 			} else {
 				storedQuantity = int64(tc.quantity * 10000)
