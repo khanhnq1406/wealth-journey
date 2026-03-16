@@ -226,20 +226,11 @@ describe("Portfolio Page", () => {
   });
 
   test("renders error state when loading fails", async () => {
-    // The page checks getListWallets.error for the main error state
-    const { useQueryListWallets } = require("@/utils/generated/hooks");
-    (useQueryListWallets as jest.Mock).mockReturnValue({
-      isLoading: false,
-      isPending: false,
-      error: new Error("Network error"),
-      data: undefined,
-      refetch: jest.fn(),
-    });
-
+    // The page checks getListInvestments.error for the main error state
     mockedListInvestments.mockReturnValue({
       isLoading: false,
       isPending: false,
-      error: null,
+      error: new Error("Network error"),
       data: undefined,
       refetch: jest.fn(),
     } as any);
