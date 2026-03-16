@@ -313,6 +313,27 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		ws.invalidateInvestmentValueCache(ctx, req.WalletId)
 	}
 
+	// Backfill portfolio history snapshot at purchase date for period PNL accuracy.
+	// When an investment is created with a past purchase date, we create a snapshot
+	// so that period PNL calculations have a baseline including this investment.
+	if req.PurchaseDate > 0 {
+		summary, err := s.GetPortfolioSummary(ctx, req.WalletId, userID, 0)
+		if err == nil && summary.Data != nil {
+			snapshot := &models.PortfolioHistory{
+				UserID:     userID,
+				WalletID:   req.WalletId,
+				TotalValue: summary.Data.TotalValue,
+				TotalCost:  summary.Data.TotalCost,
+				TotalPnl:   summary.Data.TotalPnl,
+				Currency:   summary.Data.Currency,
+				Timestamp:  txDate,
+			}
+			if _, err := s.portfolioHistoryRepo.CreateSnapshotIfNotDuplicate(ctx, snapshot); err != nil {
+				fmt.Printf("Warning: failed to backfill portfolio snapshot at purchase date: %v\n", err)
+			}
+		}
+	}
+
 	invProto := s.mapper.ModelToProto(investment)
 	// Enrich with conversion fields
 	s.enrichInvestmentProto(ctx, userID, invProto, investment)
