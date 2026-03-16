@@ -172,6 +172,7 @@
       "refreshPrice": "Giá hiện tại",
       "refreshingPrice": "Đang tải...",
       "totalCostSummary": "Tổng chi phí: {amount}",
+      "totalCostConverted": "≈ {amount}",
       "priceUnavailable": "Không thể lấy giá"
     },
     "transactionTypes": {

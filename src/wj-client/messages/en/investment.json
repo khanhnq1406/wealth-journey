@@ -172,6 +172,7 @@
       "refreshPrice": "Current price",
       "refreshingPrice": "Loading...",
       "totalCostSummary": "Total cost: {amount}",
+      "totalCostConverted": "≈ {amount}",
       "priceUnavailable": "Unable to fetch price"
     },
     "transactionTypes": {

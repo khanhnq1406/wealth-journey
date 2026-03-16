@@ -399,7 +399,7 @@ export function AddInvestmentTransactionForm({
               type="button"
               onClick={() => priceQuery.refetch()}
               disabled={isRefreshing}
-              className="px-3 py-2 text-sm font-medium text-bg bg-green-50 border border-bg rounded-md hover:bg-green-100 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap h-[50px]"
+              className="px-3 py-2 text-sm font-medium text-bg bg-red-50 border border-bg rounded-md hover:bg-red-100 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap h-[50px]"
             >
               {isRefreshing
                 ? t("transaction.refreshingPrice")

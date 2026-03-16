@@ -49,6 +49,8 @@ import {
   type SilverUnit,
   calculateSilverFromUserInput,
 } from "@/features/investment/utils/silver-calculator";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { useExchangeRate } from "@/hooks/useExchangeRate";
 
 // UI-only type values for merged gold/silver dropdowns
 const GOLD_UI_TYPE = "GOLD_MERGED";
@@ -61,6 +63,7 @@ interface AddInvestmentFormProps {
 export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
   const t = useTranslations("investment");
   const queryClient = useQueryClient();
+  const { currency: userCurrency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
 
@@ -232,6 +235,13 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
   const currency = watch("currency");
   const watchedQuantity = watch("initialQuantity");
   const quantityConfig = getQuantityInputConfig(investmentType);
+
+  // Fetch exchange rate when investment currency differs from user's preferred currency
+  const needsCurrencyConversion = currency && userCurrency && currency !== userCurrency;
+  const { rate: exchangeRate } = useExchangeRate(
+    currency || "USD",
+    userCurrency || "VND",
+  );
 
   // Fetch gold market price when gold type is selected
   const goldPriceQuery = useQueryGetMarketPrice(
@@ -950,7 +960,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
                 else if (isStandardWithSymbol) standardPriceQuery.refetch();
               }}
               disabled={isRefreshing}
-              className="px-3 py-2 text-sm font-medium text-bg bg-green-50 border border-bg rounded-md hover:bg-green-100 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap"
+              className="px-3 py-2 text-sm font-medium text-bg bg-red-50 border border-bg rounded-md hover:bg-red-100 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap"
             >
               {isRefreshing
                 ? t("form.refreshingPrice")
@@ -960,16 +970,42 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
         </div>
         {/* Total cost summary — pricePerUnit is human-readable, so totalCost is too */}
         {watchedQuantity > 0 && pricePerUnit > 0 && (
-          <p className="text-sm font-medium text-gray-700 mt-2">
-            {t("form.totalCostSummary", {
-              amount: new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: currency || "USD",
-                minimumFractionDigits: currency === "VND" || currency === "JPY" || currency === "KRW" ? 0 : 2,
-                maximumFractionDigits: currency === "VND" || currency === "JPY" || currency === "KRW" ? 0 : 2,
-              }).format(totalCost),
-            })}
-          </p>
+          <div className="mt-2">
+            <p className="text-sm font-medium text-gray-700">
+              {t("form.totalCostSummary", {
+                amount: new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: currency || "USD",
+                  minimumFractionDigits:
+                    currency === "VND" || currency === "JPY" || currency === "KRW"
+                      ? 0
+                      : 2,
+                  maximumFractionDigits:
+                    currency === "VND" || currency === "JPY" || currency === "KRW"
+                      ? 0
+                      : 2,
+                }).format(totalCost),
+              })}
+            </p>
+            {needsCurrencyConversion && exchangeRate && (
+              <p className="text-xs text-gray-500 mt-0.5">
+                {t("form.totalCostConverted", {
+                  amount: new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: userCurrency,
+                    minimumFractionDigits:
+                      userCurrency === "VND" || userCurrency === "JPY" || userCurrency === "KRW"
+                        ? 0
+                        : 2,
+                    maximumFractionDigits:
+                      userCurrency === "VND" || userCurrency === "JPY" || userCurrency === "KRW"
+                        ? 0
+                        : 2,
+                  }).format(totalCost * exchangeRate),
+                })}
+              </p>
+            )}
+          </div>
         )}
       </div>
 
