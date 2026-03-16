@@ -7,7 +7,7 @@
 - **Started:** 2026-03-16T00:00:00Z
 - **Last updated:** 2026-03-16T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 11
+- **Current task:** 12
 
 ## Task Progress
 
@@ -21,9 +21,9 @@
 | 6 | Update Proto — Remove Email from RegisterWithPasswordRequest | done | 10f39c9 | Removed email field, added reserved 1, regenerated code |
 | 7 | Update Backend Registration Logic — Remove Email Handling | done | 20430a6 | Removed email validation, uniqueness check, nil email on user creation |
 | 8 | Update Existing Auth Tests | done | c51dc1a | Fixed *string email, userID-based GetUserSessions in tests |
-| 9 | Frontend — Update RegisterPasswordForm | done | PENDING | Removed email, converted to single-step form, updated error mapper |
-| 10 | Frontend — Update Register Page Layout | done | PENDING | Changed expand button icon from email to user |
-| 11 | Frontend — Update i18n Translations | pending | — | — |
+| 9 | Frontend — Update RegisterPasswordForm | done | df8ba97 | Removed email, converted to single-step form, updated error mapper |
+| 10 | Frontend — Update Register Page Layout | done | df8ba97 | Changed expand button icon from email to user |
+| 11 | Frontend — Update i18n Translations | done | PENDING | Removed email keys, updated button text in en + vi |
 | 12 | Update Architecture Diagrams | pending | — | — |
 | 13 | Final Verification — Build and Test Everything | pending | — | — |
 
