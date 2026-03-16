@@ -92,6 +92,10 @@ export const getInvestmentTypeLabel = (type: InvestmentType, t?: (key: string) =
         return t("typeOptions.bond");
       case InvestmentType.INVESTMENT_TYPE_COMMODITY:
         return t("typeOptions.commodity");
+      case InvestmentType.INVESTMENT_TYPE_CASH:
+        return t("typeLabels.cash");
+      case InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY:
+        return t("typeLabels.foreignCurrency");
       case InvestmentType.INVESTMENT_TYPE_OTHER:
         return t("typeLabels.other");
       default:
@@ -112,6 +116,10 @@ export const getInvestmentTypeLabel = (type: InvestmentType, t?: (key: string) =
       return "Bond";
     case InvestmentType.INVESTMENT_TYPE_COMMODITY:
       return "Commodity";
+    case InvestmentType.INVESTMENT_TYPE_CASH:
+      return "Cash";
+    case InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY:
+      return "Foreign Currency";
     case InvestmentType.INVESTMENT_TYPE_OTHER:
       return "Other";
     default:

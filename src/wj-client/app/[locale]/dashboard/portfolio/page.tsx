@@ -84,6 +84,14 @@ const TYPE_FILTER_KEYS = [
     key: "typeOptions.goldWorld",
   },
   {
+    value: String(InvestmentType.INVESTMENT_TYPE_CASH),
+    key: "typeOptions.cash",
+  },
+  {
+    value: String(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY),
+    key: "typeOptions.foreignCurrency",
+  },
+  {
     value: String(InvestmentType.INVESTMENT_TYPE_OTHER),
     key: "typeOptions.other",
   },
