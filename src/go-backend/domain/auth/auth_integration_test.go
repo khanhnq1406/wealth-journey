@@ -47,8 +47,9 @@ func TestMultiDeviceLogin(t *testing.T) {
 	defer cleanup()
 
 	// Create test user
+	email := "multidevice@example.com"
 	user := &models.User{
-		Email:   "multidevice@example.com",
+		Email:   &email,
 		Name:    "Multi Device User",
 		Picture: "https://example.com/pic.jpg",
 	}
@@ -58,7 +59,7 @@ func TestMultiDeviceLogin(t *testing.T) {
 	ctx := context.Background()
 
 	// Simulate login from Device 1
-	token1, sessionID1, err := authServer.LoginWithDevice(ctx, user.Email, &redis.SessionData{
+	token1, sessionID1, err := authServer.LoginWithDevice(ctx, email, &redis.SessionData{
 		DeviceName: "iPhone 13",
 		DeviceType: "mobile",
 		IPAddress:  "192.168.1.1",
@@ -68,7 +69,7 @@ func TestMultiDeviceLogin(t *testing.T) {
 	require.NotEmpty(t, sessionID1)
 
 	// Simulate login from Device 2
-	token2, sessionID2, err := authServer.LoginWithDevice(ctx, user.Email, &redis.SessionData{
+	token2, sessionID2, err := authServer.LoginWithDevice(ctx, email, &redis.SessionData{
 		DeviceName: "MacBook Pro",
 		DeviceType: "desktop",
 		IPAddress:  "192.168.1.2",
@@ -90,7 +91,7 @@ func TestMultiDeviceLogin(t *testing.T) {
 	assert.NoError(t, err, "Device 2 token should be valid")
 
 	// List active sessions
-	sessions, err := rdb.GetUserSessions(user.Email)
+	sessions, err := rdb.GetUserSessions(user.ID)
 	require.NoError(t, err)
 	assert.Len(t, sessions, 2)
 	assert.Contains(t, sessions, sessionID1)
@@ -109,7 +110,7 @@ func TestMultiDeviceLogin(t *testing.T) {
 	assert.NoError(t, err, "Device 2 token should still be valid")
 
 	// Verify only 1 session remains
-	sessions, err = rdb.GetUserSessions(user.Email)
+	sessions, err = rdb.GetUserSessions(user.ID)
 	require.NoError(t, err)
 	assert.Len(t, sessions, 1)
 	assert.Contains(t, sessions, sessionID2)

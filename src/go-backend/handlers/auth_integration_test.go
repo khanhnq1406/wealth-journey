@@ -48,7 +48,7 @@ func (m *MockAuthServer) VerifyAuth(token string) (*authv1.VerifyAuthResponse, e
 	return m.verifyResponse, nil
 }
 
-func (m *MockAuthServer) GetAuth(ctx context.Context, email string) (*authv1.GetAuthResponse, error) {
+func (m *MockAuthServer) GetAuth(ctx context.Context, userID int32) (*authv1.GetAuthResponse, error) {
 	return nil, nil
 }
 
