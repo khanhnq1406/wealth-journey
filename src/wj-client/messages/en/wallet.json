@@ -17,7 +17,7 @@
     },
     "form": {
       "name": "Name",
-      "namePlaceholder": "Enter wallet's name",
+      "namePlaceholder": "e.g. Daily Spending, Savings, Travel Fund",
       "initialBalance": "Initial Balance",
       "create": "Create",
       "save": "Save",

@@ -17,7 +17,7 @@
     },
     "form": {
       "name": "Tên",
-      "namePlaceholder": "Nhập tên ví",
+      "namePlaceholder": "vd: Chi tiêu hàng ngày, Tiết kiệm, Du lịch",
       "initialBalance": "Số dư ban đầu",
       "create": "Tạo",
       "save": "Lưu",
