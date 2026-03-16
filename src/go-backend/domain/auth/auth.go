@@ -410,15 +410,15 @@ func (s *Server) ParseToken(tokenString string) (*JWTClaims, error) {
 	return claims, nil
 }
 
-// GetAuth retrieves user information by email
-func (s *Server) GetAuth(ctx context.Context, email string) (*authv1.GetAuthResponse, error) {
-	// Get user from database
+// GetAuth retrieves user information by userID
+func (s *Server) GetAuth(ctx context.Context, userID int32) (*authv1.GetAuthResponse, error) {
+	// Get user from database by ID
 	var user models.User
-	result := s.db.DB.Where("email = ?", email).First(&user)
-	if result.Error == gorm.ErrRecordNotFound {
-		return nil, fmt.Errorf("user not found")
-	} else if result.Error != nil {
-		return nil, fmt.Errorf("database error: %w", result.Error)
+	if err := s.db.DB.First(&user, userID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("user not found")
+		}
+		return nil, fmt.Errorf("database error: %w", err)
 	}
 
 	return &authv1.GetAuthResponse{

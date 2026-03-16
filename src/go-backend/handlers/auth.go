@@ -275,16 +275,14 @@ func (h *AuthHandlers) GetAuthMethods(c *gin.Context) {
 
 // GetAuth handles GET /auth - returns user information for authenticated user
 func (h *AuthHandlers) GetAuth(c *gin.Context) {
-	// Extract email from context (set by AuthMiddleware)
-	userEmail, exists := c.Get("user_email")
-	if !exists {
+	// Extract userID from context (set by AuthMiddleware)
+	userID, ok := handler.GetUserID(c)
+	if !ok {
 		handler.UnauthorizedWithPath(c, "User not authenticated")
 		return
 	}
 
-	email := userEmail.(string)
-
-	userData, err := h.authSrv.GetAuth(c.Request.Context(), email)
+	userData, err := h.authSrv.GetAuth(c.Request.Context(), userID)
 
 	if err != nil {
 		handler.NotFoundWithPath(c, err.Error())
