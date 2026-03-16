@@ -9,7 +9,7 @@ import (
 // User represents a user in the system
 type User struct {
 	ID                  int32          `gorm:"primaryKey;autoIncrement" json:"id"`
-	Email               string         `gorm:"uniqueIndex;size:100;not null" json:"email"`
+	Email               *string        `gorm:"size:100" json:"email,omitempty"`
 	Name                string         `gorm:"size:100" json:"name"`
 	Picture             string         `gorm:"size:2048" json:"picture"`
 	CreatedAt           time.Time      `json:"createdAt"`
