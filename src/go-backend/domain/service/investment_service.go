@@ -189,6 +189,13 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		currentPrice = averageCost
 	}
 
+	// CASH and FOREIGN_CURRENCY: seed with average cost even when custom,
+	// so CurrentValue = TotalCost and UnrealizedPNL = 0 (not -100%)
+	if req.Type == v1.InvestmentType_INVESTMENT_TYPE_CASH ||
+		req.Type == v1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY {
+		currentPrice = averageCost
+	}
+
 	// 6. Create investment model
 	investment := &models.Investment{
 		WalletID:     req.WalletId,
