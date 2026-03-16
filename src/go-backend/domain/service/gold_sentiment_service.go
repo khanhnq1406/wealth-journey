@@ -55,18 +55,36 @@ func getTodayVietnam() time.Time {
 	return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 }
 
-func (s *goldSentimentService) GetSentiment(ctx context.Context, userID int32, anonymousID string) (*v1.GetGoldSentimentResponse, error) {
+// validateCategory ensures category is a valid value (0=gold, 1=silver), defaulting to gold.
+func validateCategory(category int32) int32 {
+	if category == int32(v1.SentimentCategory_SENTIMENT_CATEGORY_SILVER) {
+		return int32(v1.SentimentCategory_SENTIMENT_CATEGORY_SILVER)
+	}
+	return int32(v1.SentimentCategory_SENTIMENT_CATEGORY_GOLD)
+}
+
+// sentimentCacheKey returns a category-scoped cache key.
+func sentimentCacheKey(date time.Time, category int32) string {
+	cat := "gold"
+	if category == 1 {
+		cat = "silver"
+	}
+	return fmt.Sprintf("%s%s:%s", goldSentimentCachePrefix, cat, date.Format("2006-01-02"))
+}
+
+func (s *goldSentimentService) GetSentiment(ctx context.Context, userID int32, anonymousID string, category int32) (*v1.GetGoldSentimentResponse, error) {
+	category = validateCategory(category)
 	today := getTodayVietnam()
 
 	// Try cache first
-	resp, err := s.getCachedSentiment(ctx, today)
+	resp, err := s.getCachedSentiment(ctx, today, category)
 	if err == nil && resp != nil {
-		s.populateUserVote(ctx, resp, userID, anonymousID, today)
+		s.populateUserVote(ctx, resp, userID, anonymousID, today, category)
 		return resp, nil
 	}
 
 	// Cache miss — query DB
-	bullish, bearish, err := s.voteRepo.CountByDate(ctx, today)
+	bullish, bearish, err := s.voteRepo.CountByDate(ctx, today, category)
 	if err != nil {
 		return nil, apperrors.NewInternalErrorWithCause("failed to get vote counts", err)
 	}
@@ -81,25 +99,26 @@ func (s *goldSentimentService) GetSentiment(ctx context.Context, userID int32, a
 		BullishPercentage: bullishPct,
 		BearishPercentage: bearishPct,
 		VoteDate:          today.Format("2006-01-02"),
+		Category:          v1.SentimentCategory(category),
 	}
 
 	// Cache the result
-	_ = s.cacheSentiment(ctx, today, resp)
+	_ = s.cacheSentiment(ctx, today, category, resp)
 
-	s.populateUserVote(ctx, resp, userID, anonymousID, today)
+	s.populateUserVote(ctx, resp, userID, anonymousID, today, category)
 
 	return resp, nil
 }
 
 // populateUserVote sets the userVote field based on auth or anonymous ID.
-func (s *goldSentimentService) populateUserVote(ctx context.Context, resp *v1.GetGoldSentimentResponse, userID int32, anonymousID string, today time.Time) {
+func (s *goldSentimentService) populateUserVote(ctx context.Context, resp *v1.GetGoldSentimentResponse, userID int32, anonymousID string, today time.Time, category int32) {
 	if userID > 0 {
-		vote, err := s.voteRepo.GetByUserAndDate(ctx, userID, today)
+		vote, err := s.voteRepo.GetByUserAndDate(ctx, userID, today, category)
 		if err == nil && vote != nil {
 			resp.UserVote = v1.VoteDirection(vote.Direction)
 		}
 	} else if anonymousID != "" {
-		vote, err := s.voteRepo.GetByAnonymousIDAndDate(ctx, anonymousID, today)
+		vote, err := s.voteRepo.GetByAnonymousIDAndDate(ctx, anonymousID, today, category)
 		if err == nil && vote != nil {
 			resp.UserVote = v1.VoteDirection(vote.Direction)
 		}
@@ -112,6 +131,7 @@ func (s *goldSentimentService) CastVote(ctx context.Context, userID int32, anony
 		return nil, apperrors.NewValidationError("direction must be BULLISH (1) or BEARISH (2)")
 	}
 
+	category := validateCategory(int32(req.Category))
 	today := getTodayVietnam()
 	var responseAnonymousID string
 
@@ -119,13 +139,14 @@ func (s *goldSentimentService) CastVote(ctx context.Context, userID int32, anony
 		// Authenticated user vote
 		// If anonymous ID provided, delete the anonymous vote to prevent double-counting
 		if anonymousID != "" && isValidUUID(anonymousID) {
-			_ = s.voteRepo.DeleteByAnonymousIDAndDate(ctx, anonymousID, today)
+			_ = s.voteRepo.DeleteByAnonymousIDAndDate(ctx, anonymousID, today, category)
 		}
 
 		vote := &models.GoldVote{
 			UserID:    &userID,
 			VoteDate:  today,
 			Direction: int32(req.Direction),
+			Category:  category,
 		}
 		if err := s.voteRepo.Upsert(ctx, vote); err != nil {
 			return nil, err
@@ -140,6 +161,7 @@ func (s *goldSentimentService) CastVote(ctx context.Context, userID int32, anony
 			AnonymousID: &anonymousID,
 			VoteDate:    today,
 			Direction:   int32(req.Direction),
+			Category:    category,
 		}
 		if err := s.voteRepo.UpsertAnonymous(ctx, vote); err != nil {
 			return nil, err
@@ -148,10 +170,10 @@ func (s *goldSentimentService) CastVote(ctx context.Context, userID int32, anony
 	}
 
 	// Invalidate cache
-	s.invalidateCache(ctx, today)
+	s.invalidateCache(ctx, today, category)
 
 	// Get updated counts
-	bullish, bearish, err := s.voteRepo.CountByDate(ctx, today)
+	bullish, bearish, err := s.voteRepo.CountByDate(ctx, today, category)
 	if err != nil {
 		return nil, apperrors.NewInternalErrorWithCause("failed to get updated counts", err)
 	}
@@ -178,6 +200,7 @@ func isValidUUID(s string) bool {
 const maxCommentFallbackDays = 7
 
 func (s *goldSentimentService) GetComments(ctx context.Context, userID int32, req *v1.GetGoldSentimentCommentsRequest) (*v1.GetGoldSentimentCommentsResponse, error) {
+	category := validateCategory(int32(req.Category))
 	today := getTodayVietnam()
 
 	page := int(req.Page)
@@ -192,7 +215,7 @@ func (s *goldSentimentService) GetComments(ctx context.Context, userID int32, re
 
 	// Try today first; if empty (page 1 only), fall back to recent days
 	commentDate := today
-	comments, total, err := s.commentRepo.ListByDate(ctx, commentDate, pageSize, offset)
+	comments, total, err := s.commentRepo.ListByDate(ctx, commentDate, category, pageSize, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -200,7 +223,7 @@ func (s *goldSentimentService) GetComments(ctx context.Context, userID int32, re
 	if total == 0 && page == 1 {
 		for i := 1; i <= maxCommentFallbackDays; i++ {
 			prevDay := today.AddDate(0, 0, -i)
-			comments, total, err = s.commentRepo.ListByDate(ctx, prevDay, pageSize, offset)
+			comments, total, err = s.commentRepo.ListByDate(ctx, prevDay, category, pageSize, offset)
 			if err != nil {
 				return nil, err
 			}
@@ -228,7 +251,7 @@ func (s *goldSentimentService) GetComments(ctx context.Context, userID int32, re
 		}
 
 		// Get author's vote direction for that day
-		vote, err := s.voteRepo.GetByUserAndDate(ctx, c.UserID, commentDate)
+		vote, err := s.voteRepo.GetByUserAndDate(ctx, c.UserID, commentDate, category)
 		if err == nil && vote != nil {
 			item.UserVoteDirection = v1.VoteDirection(vote.Direction)
 		}
@@ -242,6 +265,7 @@ func (s *goldSentimentService) GetComments(ctx context.Context, userID int32, re
 		Page:        int32(page),
 		PageSize:    int32(pageSize),
 		CommentDate: commentDate.Format("2006-01-02"),
+		Category:    v1.SentimentCategory(category),
 	}, nil
 }
 
@@ -258,10 +282,11 @@ func (s *goldSentimentService) PostComment(ctx context.Context, userID int32, re
 	// HTML-escape for XSS prevention
 	content = html.EscapeString(content)
 
+	category := validateCategory(int32(req.Category))
 	today := getTodayVietnam()
 
 	// Check daily limit
-	count, err := s.commentRepo.CountByUserAndDate(ctx, userID, today)
+	count, err := s.commentRepo.CountByUserAndDate(ctx, userID, today, category)
 	if err != nil {
 		return nil, err
 	}
@@ -273,6 +298,7 @@ func (s *goldSentimentService) PostComment(ctx context.Context, userID int32, re
 		UserID:   userID,
 		VoteDate: today,
 		Content:  content,
+		Category: category,
 	}
 
 	if err := s.commentRepo.Create(ctx, comment); err != nil {
@@ -287,21 +313,21 @@ func (s *goldSentimentService) PostComment(ctx context.Context, userID int32, re
 
 	// Get user's vote direction for today
 	var voteDirection v1.VoteDirection
-	vote, err := s.voteRepo.GetByUserAndDate(ctx, userID, today)
+	vote, err := s.voteRepo.GetByUserAndDate(ctx, userID, today, category)
 	if err == nil && vote != nil {
 		voteDirection = v1.VoteDirection(vote.Direction)
 	}
 
 	return &v1.PostGoldSentimentCommentResponse{
 		Comment: &v1.GoldSentimentCommentItem{
-			Id:                 comment.ID,
-			UserId:             comment.UserID,
-			UserName:           user.Name,
-			UserPicture:        user.Picture,
-			Content:            comment.Content,
-			CreatedAt:          comment.CreatedAt.Unix(),
-			IsOwnComment:       true,
-			UserVoteDirection:  voteDirection,
+			Id:                comment.ID,
+			UserId:            comment.UserID,
+			UserName:          user.Name,
+			UserPicture:       user.Picture,
+			Content:           comment.Content,
+			CreatedAt:         comment.CreatedAt.Unix(),
+			IsOwnComment:      true,
+			UserVoteDirection: voteDirection,
 		},
 	}, nil
 }
@@ -341,12 +367,12 @@ type cachedSentimentData struct {
 	VoteDate          string  `json:"vd"`
 }
 
-func (s *goldSentimentService) getCachedSentiment(ctx context.Context, date time.Time) (*v1.GetGoldSentimentResponse, error) {
+func (s *goldSentimentService) getCachedSentiment(ctx context.Context, date time.Time, category int32) (*v1.GetGoldSentimentResponse, error) {
 	if s.redis == nil {
 		return nil, fmt.Errorf("no redis")
 	}
 
-	key := goldSentimentCachePrefix + date.Format("2006-01-02")
+	key := sentimentCacheKey(date, category)
 	data, err := s.redis.Get(ctx, key).Bytes()
 	if err != nil {
 		return nil, err
@@ -367,7 +393,7 @@ func (s *goldSentimentService) getCachedSentiment(ctx context.Context, date time
 	}, nil
 }
 
-func (s *goldSentimentService) cacheSentiment(ctx context.Context, date time.Time, resp *v1.GetGoldSentimentResponse) error {
+func (s *goldSentimentService) cacheSentiment(ctx context.Context, date time.Time, category int32, resp *v1.GetGoldSentimentResponse) error {
 	if s.redis == nil {
 		return nil
 	}
@@ -386,14 +412,14 @@ func (s *goldSentimentService) cacheSentiment(ctx context.Context, date time.Tim
 		return err
 	}
 
-	key := goldSentimentCachePrefix + date.Format("2006-01-02")
+	key := sentimentCacheKey(date, category)
 	return s.redis.Set(ctx, key, data, goldSentimentCacheTTL).Err()
 }
 
-func (s *goldSentimentService) invalidateCache(ctx context.Context, date time.Time) {
+func (s *goldSentimentService) invalidateCache(ctx context.Context, date time.Time, category int32) {
 	if s.redis == nil {
 		return
 	}
-	key := goldSentimentCachePrefix + date.Format("2006-01-02")
+	key := sentimentCacheKey(date, category)
 	_ = s.redis.Del(ctx, key)
 }

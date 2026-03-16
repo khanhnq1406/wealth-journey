@@ -7,7 +7,7 @@
 - **Started:** 2026-03-16
 - **Last updated:** 2026-03-16
 - **Current state:** in_progress
-- **Current task:** 3
+- **Current task:** 6
 
 ## Task Progress
 
@@ -15,9 +15,9 @@
 |---|-----------|--------|--------|---------|
 | 1 | Database Migration — Add category column | done | — | Added Category field to GoldVote and GoldVoteComment models, updated migration with category-aware indexes |
 | 2 | Update Proto Definitions — Add SentimentCategory enum | done | — | Added SentimentCategory enum and category field to all request/response messages |
-| 3 | Update Repository Layer — Category-aware queries | pending | — | — |
-| 4 | Update Service Layer — Category-aware business logic | pending | — | — |
-| 5 | Update Handler Layer — Pass category from HTTP requests | pending | — | — |
+| 3 | Update Repository Layer — Category-aware queries | done | — | Added category param to all repo interface methods and implementations |
+| 4 | Update Service Layer — Category-aware business logic | done | — | Thread category through service, cache isolation per category |
+| 5 | Update Handler Layer — Pass category from HTTP requests | done | — | Parse category from query params in GET handlers |
 | 6 | Regenerate Frontend Types and Hooks | pending | — | — |
 | 7 | Generalize Frontend Component — SentimentCard with asset prop | pending | — | — |
 | 8 | Add i18n Translations for Silver Sentiment | pending | — | — |

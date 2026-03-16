@@ -36,20 +36,20 @@ func (r *goldVoteCommentRepository) GetByID(ctx context.Context, id int32) (*mod
 	return &comment, nil
 }
 
-func (r *goldVoteCommentRepository) ListByDate(ctx context.Context, voteDate time.Time, limit, offset int) ([]*models.GoldVoteComment, int, error) {
+func (r *goldVoteCommentRepository) ListByDate(ctx context.Context, voteDate time.Time, category int32, limit, offset int) ([]*models.GoldVoteComment, int, error) {
 	var comments []*models.GoldVoteComment
 	var total int64
 
 	baseQuery := r.db.DB.WithContext(ctx).
 		Model(&models.GoldVoteComment{}).
-		Where("vote_date = ?", voteDate)
+		Where("vote_date = ? AND category = ?", voteDate, category)
 
 	if err := baseQuery.Count(&total).Error; err != nil {
 		return nil, 0, apperrors.NewInternalErrorWithCause("failed to count comments", err)
 	}
 
 	result := r.db.DB.WithContext(ctx).
-		Where("vote_date = ?", voteDate).
+		Where("vote_date = ? AND category = ?", voteDate, category).
 		Preload("User").
 		Order("created_at DESC").
 		Limit(limit).
@@ -74,11 +74,11 @@ func (r *goldVoteCommentRepository) Delete(ctx context.Context, id int32) error 
 	return nil
 }
 
-func (r *goldVoteCommentRepository) CountByUserAndDate(ctx context.Context, userID int32, voteDate time.Time) (int, error) {
+func (r *goldVoteCommentRepository) CountByUserAndDate(ctx context.Context, userID int32, voteDate time.Time, category int32) (int, error) {
 	var count int64
 	err := r.db.DB.WithContext(ctx).
 		Model(&models.GoldVoteComment{}).
-		Where("user_id = ? AND vote_date = ?", userID, voteDate).
+		Where("user_id = ? AND vote_date = ? AND category = ?", userID, voteDate, category).
 		Count(&count).Error
 	if err != nil {
 		return 0, apperrors.NewInternalErrorWithCause("failed to count user comments", err)
