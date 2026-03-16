@@ -14,6 +14,7 @@ const messageGroups = [
   'investment',  // investment.*, prices, investmentPrice, changeRate, currencyConversion
   'budget',      // budget.*
   'report',      // report.*, export, share
+  'finance',     // finance.tabs
   'import',      // import.*, reviewStep
   'settings',    // settings.*, currency
   'ui',          // modals, feedback, emptyState, errorState, formWizard, skeleton,

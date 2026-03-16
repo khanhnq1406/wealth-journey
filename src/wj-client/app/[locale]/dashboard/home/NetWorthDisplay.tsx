@@ -40,10 +40,12 @@ function PnlValue({ percent, amount, label, currency }: PnlValueProps) {
       <p
         className={`font-jetbrains font-bold text-[14px] ${isPositive ? "text-v2-green-positive" : "text-v2-red-negative"}`}
       >
-        {formatPercent(percent)}
-      </p>
-      <p className="font-jetbrains font-medium text-[12px] text-v2-text-secondary">
         {formatAmount(amount)} {currency}
+      </p>
+      <p
+        className={`font-jetbrains font-bold text-[14px] ${isPositive ? "text-v2-green-positive" : "text-v2-red-negative"}`}
+      >
+        {formatPercent(percent)}
       </p>
       <p className="font-jetbrains font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
         {label}

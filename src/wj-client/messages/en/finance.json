@@ -1,0 +1,9 @@
+{
+  "finance": {
+    "tabs": {
+      "transaction": "Transactions",
+      "report": "Reports",
+      "budget": "Budget"
+    }
+  }
+}

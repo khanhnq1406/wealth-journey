@@ -1,0 +1,9 @@
+{
+  "finance": {
+    "tabs": {
+      "transaction": "Giao dịch",
+      "report": "Báo cáo",
+      "budget": "Ngân sách"
+    }
+  }
+}

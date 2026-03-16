@@ -38,7 +38,7 @@ type ModalState =
   | { type: "edit-budget-item"; budgetId: number; item: BudgetItem }
   | null;
 
-export default function BudgetPage() {
+export function BudgetContent() {
   const t = useTranslations("budget");
   const tCommon = useTranslations("common");
   const queryClient = useQueryClient();
@@ -204,4 +204,8 @@ export default function BudgetPage() {
       )}
     </div>
   );
+}
+
+export default function BudgetPage() {
+  return <BudgetContent />;
 }

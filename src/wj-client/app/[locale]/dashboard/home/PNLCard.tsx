@@ -139,10 +139,14 @@ export function PNLCard({ currency }: PNLCardProps) {
               isPositive ? "text-v2-green-positive" : "text-v2-red-negative"
             }`}
           >
-            {formatPercent(periodPnlPercent)}
-          </p>
-          <p className="font-jetbrains font-medium text-[14px] text-v2-text-secondary mt-0.5">
             {formatAmount(periodPnl)} {currency}
+          </p>
+          <p
+            className={`font-jetbrains font-bold text-[24px] ${
+              isPositive ? "text-v2-green-positive" : "text-v2-red-negative"
+            }`}
+          >
+            {formatPercent(periodPnlPercent)}
           </p>
           <p className="font-jetbrains font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
             {t(pnlLabelKey[selectedPeriod] as any)}

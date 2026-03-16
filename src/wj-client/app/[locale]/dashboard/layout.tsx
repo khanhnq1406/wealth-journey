@@ -27,11 +27,9 @@ import { cn } from "@/lib/utils/cn";
 import { useCallback } from "react";
 import {
   House,
-  ArrowLeftRight,
+  Banknote,
   Wallet,
   ChartNoAxesCombined,
-  Calculator,
-  ChartPie,
   Settings,
   Bell,
   Search,
@@ -121,21 +119,11 @@ export default function DashboardLayout({
   const navigationItems = useMemo(() => {
     const standardItems = [
       {
-        href: routes.transaction,
-        label: t("transactions"),
-        icon: <ArrowLeftRight size={22} />,
+        href: routes.finance,
+        label: t("finance"),
+        icon: <Banknote size={22} />,
       },
       { href: routes.wallets, label: t("wallets"), icon: <Wallet size={22} /> },
-      {
-        href: routes.report,
-        label: t("reports"),
-        icon: <ChartPie size={22} />,
-      },
-      {
-        href: routes.budget,
-        label: t("budget"),
-        icon: <Calculator size={22} />,
-      },
     ];
 
     return (
@@ -194,7 +182,7 @@ export default function DashboardLayout({
               href={item.href}
               className={cn(
                 "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
-                path === item.href
+                path.startsWith(item.href)
                   ? "text-v2-red-primary bg-v2-red-light font-semibold"
                   : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
               )}
@@ -340,13 +328,13 @@ export default function DashboardLayout({
                   )}
                 >
                   <NavItem
-                    href={routes.transaction}
-                    label={t("transactions")}
+                    href={routes.finance}
+                    label={t("finance")}
                     isExpanded={isExpanded}
                     showTooltip={!isExpanded}
                     animationDelay={90}
-                    icon={<ArrowLeftRight size={20} />}
-                    isActive={path === routes.transaction}
+                    icon={<Banknote size={20} />}
+                    isActive={path.startsWith(routes.finance)}
                   />
                   <NavItem
                     href={routes.wallets}
@@ -356,24 +344,6 @@ export default function DashboardLayout({
                     animationDelay={120}
                     icon={<Wallet size={20} />}
                     isActive={path === routes.wallets}
-                  />
-                  <NavItem
-                    href={routes.report}
-                    label={t("reports")}
-                    isExpanded={isExpanded}
-                    showTooltip={!isExpanded}
-                    animationDelay={150}
-                    icon={<ChartPie size={20} />}
-                    isActive={path === routes.report}
-                  />
-                  <NavItem
-                    href={routes.budget}
-                    label={t("budget")}
-                    isExpanded={isExpanded}
-                    showTooltip={!isExpanded}
-                    animationDelay={180}
-                    icon={<Calculator size={20} />}
-                    isActive={path === routes.budget}
                   />
                 </div>
 
@@ -386,7 +356,7 @@ export default function DashboardLayout({
                   label={t("settings")}
                   isExpanded={isExpanded}
                   showTooltip={!isExpanded}
-                  animationDelay={210}
+                  animationDelay={150}
                   icon={<Settings size={20} />}
                   isActive={path.startsWith("/dashboard/settings")}
                 />
@@ -622,7 +592,7 @@ export default function DashboardLayout({
               </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-safe-mobile sm:pb-8 transition-all duration-300 ease-in-out">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-safe-mobile sm:pb-8 transition-all duration-300 ease-in-out pt-0 sm:pt-0 lg:pt-0">
               {children}
             </div>
           </main>
