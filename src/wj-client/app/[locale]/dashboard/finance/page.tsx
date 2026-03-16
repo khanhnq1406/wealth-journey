@@ -53,7 +53,7 @@ function FinancePageInner() {
   );
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col">
       <div className="px-4 sm:px-6 pt-4 pb-2">
         <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
           {t("financePageTitle")}
@@ -66,7 +66,6 @@ function FinancePageInner() {
         role="tabpanel"
         id={`tabpanel-${activeTab}`}
         aria-labelledby={`tab-${activeTab}`}
-        className="flex-1 overflow-y-auto"
       >
         {activeTab === "transaction" && <TransactionContent />}
         {activeTab === "report" && <ReportContent />}

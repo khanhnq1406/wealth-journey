@@ -592,7 +592,7 @@ export default function DashboardLayout({
               </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-safe-mobile sm:pb-8 transition-all duration-300 ease-in-out">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-safe-mobile sm:pb-8 transition-all duration-300 ease-in-out pt-0 sm:pt-0 lg:pt-0">
               {children}
             </div>
           </main>
