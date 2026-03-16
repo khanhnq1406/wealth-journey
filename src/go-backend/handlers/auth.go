@@ -135,13 +135,25 @@ func (h *AuthHandlers) VerifyAuth(c *gin.Context) {
 
 // RegisterWithPassword handles user registration with email/username/password
 func (h *AuthHandlers) RegisterWithPassword(c *gin.Context) {
-	var req authv1.RegisterWithPasswordRequest
-	if !bindJSON(c, &req) {
+	var body struct {
+		Email       string `json:"email"`
+		Username    string `json:"username"`
+		Password    string `json:"password"`
+		DisplayName string `json:"displayName"`
+	}
+	if !bindJSON(c, &body) {
 		return
 	}
 
+	req := &authv1.RegisterWithPasswordRequest{
+		Email:       body.Email,
+		Username:    body.Username,
+		Password:    body.Password,
+		DisplayName: body.DisplayName,
+	}
+
 	deviceInfo := device.ExtractDeviceInfo(c)
-	result, err := h.authSrv.RegisterWithPassword(c.Request.Context(), &req, deviceInfo)
+	result, err := h.authSrv.RegisterWithPassword(c.Request.Context(), req, deviceInfo)
 	if err != nil {
 		log.Printf("[AUTH] Password registration failed: %v", err)
 		handler.HandleError(c, err)
@@ -213,12 +225,20 @@ func (h *AuthHandlers) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	var req authv1.ChangePasswordRequest
-	if !bindJSON(c, &req) {
+	var body struct {
+		CurrentPassword string `json:"currentPassword"`
+		NewPassword     string `json:"newPassword"`
+	}
+	if !bindJSON(c, &body) {
 		return
 	}
 
-	result, err := h.authSrv.ChangePassword(c.Request.Context(), userID, email, &req, claims.SessionID)
+	req := &authv1.ChangePasswordRequest{
+		CurrentPassword: body.CurrentPassword,
+		NewPassword:     body.NewPassword,
+	}
+
+	result, err := h.authSrv.ChangePassword(c.Request.Context(), userID, email, req, claims.SessionID)
 	if err != nil {
 		log.Printf("[AUTH] Change password failed: %v", err)
 		handler.HandleError(c, err)
