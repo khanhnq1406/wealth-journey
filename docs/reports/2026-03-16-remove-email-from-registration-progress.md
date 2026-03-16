@@ -7,7 +7,7 @@
 - **Started:** 2026-03-16T00:00:00Z
 - **Last updated:** 2026-03-16T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 12
+- **Current task:** 13
 
 ## Task Progress
 
@@ -23,8 +23,8 @@
 | 8 | Update Existing Auth Tests | done | c51dc1a | Fixed *string email, userID-based GetUserSessions in tests |
 | 9 | Frontend — Update RegisterPasswordForm | done | df8ba97 | Removed email, converted to single-step form, updated error mapper |
 | 10 | Frontend — Update Register Page Layout | done | df8ba97 | Changed expand button icon from email to user |
-| 11 | Frontend — Update i18n Translations | done | PENDING | Removed email keys, updated button text in en + vi |
-| 12 | Update Architecture Diagrams | pending | — | — |
+| 11 | Frontend — Update i18n Translations | done | c8bc104 | Removed email keys, updated button text in en + vi |
+| 12 | Update Architecture Diagrams | done | PENDING | Updated flow-auth.md and c4-component-backend.md |
 | 13 | Final Verification — Build and Test Everything | pending | — | — |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`

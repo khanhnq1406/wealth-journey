@@ -16,7 +16,7 @@ C4Component
     }
 
     Container_Boundary(handlers, "HTTP Handlers — Input validated and user authenticated at this layer") {
-        Component(auth_h, "Auth Handlers", "Register, Login, Logout, Verify, Password Auth", "Google OAuth + email/password auth (register, login, link, change password, get auth methods)")
+        Component(auth_h, "Auth Handlers", "Register, Login, Logout, Verify, Password Auth", "Google OAuth + username/password auth (register, login, link, change password, get auth methods)")
         Component(user_h, "User Handlers", "CRUD + Preferences", "Handles user CRUD, preferences (currency + language), and profile operations")
         Component(wallet_h, "Wallet Handlers", "CRUD + Transfer + Balance", "Wallet management and fund operations")
         Component(txn_h, "Transaction Handlers", "CRUD + Reports", "Transaction management and financial reports")

@@ -75,7 +75,7 @@ sequenceDiagram
     Auth->>Auth: jwt.Sign(claims, HS256, secret)
 
     par Store in Redis (source of truth)
-        Auth->>Redis: SAdd(session:{email}, sessionID)
+        Auth->>Redis: SAdd(session:user:{userID}, sessionID)
         Auth->>Redis: Set(session_meta:{sessionID}, metadata, 7d)
         Auth->>Redis: Set(session_token:{sessionID}, jwt, 7d)
     and Store in PostgreSQL (audit trail)
@@ -141,7 +141,7 @@ flowchart TD
     H -- No --> I["401 Invalid token\nc.Abort()"]:::error
     H -- Yes --> J["Extract: userID, email, sessionID"]
 
-    J --> K["Redis: SIsMember\n(session:{email}, sessionID)"]
+    J --> K["Redis: SIsMember\n(session:user:{userID}, sessionID)"]
     K --> L{Session exists\nin Redis?}
     L -- No --> M["401 Session expired/revoked\nc.Abort()"]:::error
     L -- Yes --> N["Redis: Get\n(session_token:{sessionID})"]
@@ -171,8 +171,8 @@ flowchart TD
 These routes skip the middleware entirely:
 - `POST /api/v1/auth/register` (Google OAuth)
 - `POST /api/v1/auth/login` (Google OAuth)
-- `POST /api/v1/auth/register-password` (email/password)
-- `POST /api/v1/auth/login-password` (email/password)
+- `POST /api/v1/auth/register-password` (username/password)
+- `POST /api/v1/auth/login-password` (username or email/password)
 - `POST /api/v1/auth/logout`
 - `GET /api/v1/auth/verify` (uses header OR query param)
 
@@ -235,7 +235,7 @@ stateDiagram-v2
 ### Redis Data Structures
 
 ```
-session:<email>             → Redis Set of session IDs (TTL: 7d)
+session:user:<userID>       → Redis Set of session IDs (TTL: 7d)
 session_meta:<sessionID>    → JSON {deviceName, deviceType, ip, createdAt, lastActiveAt, expiresAt} (TTL: 7d)
 session_token:<sessionID>   → JWT string for exact-match validation (TTL: 7d)
 ```
@@ -254,7 +254,7 @@ session_token:<sessionID>   → JWT string for exact-match validation (TTL: 7d)
 
 ## 4. Password Registration
 
-**Trigger:** User submits the registration form with email, username, display name, and password
+**Trigger:** User submits the registration form with username, display name, and password
 **Endpoint:** `POST /api/v1/auth/register-password`
 **Source:** `domain/auth/auth.go`, `handlers/auth.go`
 
@@ -270,21 +270,15 @@ sequenceDiagram
     participant DB as PostgreSQL
 
     Browser->>SPA: Submit registration form
-    SPA->>Handler: POST /api/v1/auth/register-password<br/>{email, username, password, displayName}
+    SPA->>Handler: POST /api/v1/auth/register-password<br/>{username, password, displayName}
     Handler->>Handler: ExtractDeviceInfo(c)
 
     activate Auth
     Handler->>Auth: RegisterWithPassword(ctx, req, deviceInfo)
-    Auth->>Auth: Validate email, username, password, displayName
+    Auth->>Auth: Validate username, password, displayName
     alt Validation fails
         Auth-->>Handler: 400 Validation error
         Handler-->>SPA: Error message
-    end
-
-    Auth->>UserRepo: GetByEmail(email)
-    alt Email exists
-        UserRepo-->>Auth: User found
-        Auth-->>Handler: 409 "Email already registered"
     end
 
     Auth->>UserRepo: GetByUsername(username)
@@ -294,7 +288,8 @@ sequenceDiagram
     end
 
     Auth->>Auth: bcrypt.GenerateFromPassword(password, cost=12)
-    Auth->>UserRepo: Create(User{email, name, username, passwordHash, authProvider="password"})
+    Auth->>UserRepo: Create(User{name, username, passwordHash, authProvider="password"})
+    Note over Auth: Email is NULL for password-only users
 
     opt CategoryService available
         Auth->>CatSvc: CreateDefaultCategories(userID)
@@ -313,7 +308,8 @@ sequenceDiagram
 ### Key Invariants
 
 - Password is hashed with bcrypt cost 12 before storage
-- Email and username uniqueness checked before creation
+- Email is not required — password-only users have NULL email
+- Username uniqueness checked before creation
 - Username is case-sensitive, 3-30 chars, alphanumeric + underscore only
 - Password requires 10-72 chars (72 is bcrypt limit)
 - Same session creation flow as Google OAuth
@@ -322,8 +318,7 @@ sequenceDiagram
 
 | Condition | Response | Rollback |
 |-----------|----------|----------|
-| Invalid email/username/password format | 400 Validation error | None |
-| Email already registered | 409 Conflict | None |
+| Invalid username/password format | 400 Validation error | None |
 | Username already taken | 409 Conflict | None |
 | bcrypt hashing failure | 500 Internal | None |
 | Database error on user creation | 500 Internal | None |
@@ -489,10 +484,10 @@ sequenceDiagram
     Browser->>SPA: Submit change password form
     SPA->>Handler: POST /api/v1/auth/change-password<br/>{currentPassword, newPassword}
     Handler->>AuthMW: Validate JWT
-    AuthMW-->>Handler: user_id, user_email, sessionID
+    AuthMW-->>Handler: user_id, sessionID
 
     activate Auth
-    Handler->>Auth: ChangePassword(ctx, userID, email, req, sessionID)
+    Handler->>Auth: ChangePassword(ctx, userID, req, sessionID)
 
     Auth->>UserRepo: GetByID(userID)
     Auth->>Auth: Check user.PasswordHash != ""
@@ -515,9 +510,9 @@ sequenceDiagram
     Auth->>UserRepo: Update user {passwordHash}
 
     Note over Auth,Redis: Invalidate all OTHER sessions
-    Auth->>Redis: SMembers(session:{email})
+    Auth->>Redis: SMembers(session:user:{userID})
     loop Each session except current
-        Auth->>Redis: SRem(session:{email}, sessionID)
+        Auth->>Redis: SRem(session:user:{userID}, sessionID)
         Auth->>Redis: Del(session_meta:{sessionID})
         Auth->>Redis: Del(session_token:{sessionID})
     end
