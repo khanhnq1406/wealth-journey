@@ -23,6 +23,9 @@ type User struct {
 	Location      string `gorm:"size:100" json:"location"`
 	Website       string `gorm:"size:200" json:"website"`
 	IsAdmin       bool   `gorm:"default:false;not null" json:"isAdmin"`
+	Username      *string `gorm:"size:30;uniqueIndex" json:"username,omitempty"`
+	PasswordHash  string  `gorm:"size:255" json:"-"`
+	AuthProvider  string  `gorm:"size:20;default:'google';not null" json:"authProvider"`
 }
 
 // TableName specifies the table name for User model
