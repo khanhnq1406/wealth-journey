@@ -7,7 +7,7 @@
 - **Started:** 2026-03-16T00:00:00Z
 - **Last updated:** 2026-03-16T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 6
+- **Current task:** 8
 
 ## Task Progress
 
@@ -18,8 +18,8 @@
 | 3 | Migrate Redis Session Functions from Email to UserID | done | 7493b36 | SessionKey now uses userID int32, all functions updated |
 | 4 | Update All Redis Session Callers to Use UserID | done | 7493b36 | All callers migrated to userID, cmd/ scripts fixed |
 | 5 | Update GetAuth to Use UserID Instead of Email | done | 653479a | GetAuth now uses userID, gRPC endpoint deprecated |
-| 6 | Update Proto — Remove Email from RegisterWithPasswordRequest | pending | — | — |
-| 7 | Update Backend Registration Logic — Remove Email Handling | pending | — | — |
+| 6 | Update Proto — Remove Email from RegisterWithPasswordRequest | done | 10f39c9 | Removed email field, added reserved 1, regenerated code |
+| 7 | Update Backend Registration Logic — Remove Email Handling | done | PENDING | Removed email validation, uniqueness check, nil email on user creation |
 | 8 | Update Existing Auth Tests | pending | — | — |
 | 9 | Frontend — Update RegisterPasswordForm | pending | — | — |
 | 10 | Frontend — Update Register Page Layout | pending | — | — |

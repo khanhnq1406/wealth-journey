@@ -133,10 +133,9 @@ func (h *AuthHandlers) VerifyAuth(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// RegisterWithPassword handles user registration with email/username/password
+// RegisterWithPassword handles user registration with username/password
 func (h *AuthHandlers) RegisterWithPassword(c *gin.Context) {
 	var body struct {
-		Email       string `json:"email"`
 		Username    string `json:"username"`
 		Password    string `json:"password"`
 		DisplayName string `json:"displayName"`
@@ -146,7 +145,6 @@ func (h *AuthHandlers) RegisterWithPassword(c *gin.Context) {
 	}
 
 	req := &authv1.RegisterWithPasswordRequest{
-		Email:       body.Email,
 		Username:    body.Username,
 		Password:    body.Password,
 		DisplayName: body.DisplayName,

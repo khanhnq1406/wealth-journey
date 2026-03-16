@@ -453,12 +453,9 @@ func checkPassword(hash, password string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
 }
 
-// RegisterWithPassword registers a new user with email, username, and password
+// RegisterWithPassword registers a new user with username, display name, and password (no email required)
 func (s *Server) RegisterWithPassword(ctx context.Context, req *authv1.RegisterWithPasswordRequest, deviceInfo *redis.SessionData) (*authv1.RegisterWithPasswordResponse, error) {
 	// Validate inputs
-	if err := validator.Email(req.Email); err != nil {
-		return nil, err
-	}
 	if err := validator.Username(req.Username); err != nil {
 		return nil, err
 	}
@@ -469,17 +466,9 @@ func (s *Server) RegisterWithPassword(ctx context.Context, req *authv1.RegisterW
 		return nil, apperrors.NewValidationError("display name is required")
 	}
 
-	// Check email uniqueness
-	var existingUser models.User
-	result := s.db.DB.Where("email = ?", req.Email).First(&existingUser)
-	if result.Error == nil {
-		return nil, apperrors.NewValidationError("email already registered")
-	} else if result.Error != gorm.ErrRecordNotFound {
-		return nil, fmt.Errorf("database error: %w", result.Error)
-	}
-
 	// Check username uniqueness
-	result = s.db.DB.Where("username = ?", req.Username).First(&existingUser)
+	var existingUser models.User
+	result := s.db.DB.Where("username = ?", req.Username).First(&existingUser)
 	if result.Error == nil {
 		return nil, apperrors.NewValidationError("username already taken")
 	} else if result.Error != gorm.ErrRecordNotFound {
@@ -492,15 +481,9 @@ func (s *Server) RegisterWithPassword(ctx context.Context, req *authv1.RegisterW
 		return nil, fmt.Errorf("failed to process password: %w", err)
 	}
 
-	// Create user
+	// Create user (no email — password-only users have NULL email)
 	username := req.Username
-	email := req.Email
-	var emailPtr *string
-	if email != "" {
-		emailPtr = &email
-	}
 	user := models.User{
-		Email:        emailPtr,
 		Name:         req.DisplayName,
 		Username:     &username,
 		PasswordHash: passwordHash,
@@ -514,7 +497,7 @@ func (s *Server) RegisterWithPassword(ctx context.Context, req *authv1.RegisterW
 	// Create default categories
 	if s.categorySvc != nil {
 		if err := s.categorySvc.CreateDefaultCategories(ctx, user.ID); err != nil {
-			log.Printf("Warning: Failed to create default categories for user %d (%s): %v", user.ID, req.Email, err)
+			log.Printf("Warning: Failed to create default categories for user %d (%s): %v", user.ID, req.Username, err)
 		}
 	}
 
