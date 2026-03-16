@@ -143,3 +143,4 @@ cd src/wj-client && npx next build
 |------|-----|----------|--------|
 | 2026-03-16 | Register page overload: Google OAuth now primary action with expandable password form; password form split into 2-step wizard (identity fields → password fields); logo header hidden on desktop for both auth pages | Minor | See commit |
 | 2026-03-16 | Add missing `GetByUsername` method to `MockUserRepository` in investment service tests — interface was extended by password auth feature but test mock was not updated | Minor | See commit |
+| 2026-03-16 | Proto JSON tag mismatch: `protoc-gen-go` generates snake_case `json` struct tags (e.g., `json:"display_name"`) but frontend sends camelCase (e.g., `displayName`). Fixed `RegisterWithPassword` and `ChangePassword` handlers to use local request structs with correct camelCase JSON tags instead of binding directly to proto-generated structs | Minor | See commit |
