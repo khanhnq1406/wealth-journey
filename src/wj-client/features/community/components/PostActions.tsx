@@ -1,7 +1,8 @@
 "use client";
 
-import { Heart, MessageCircle, Share2, Bookmark } from "lucide-react";
+import { Heart, MessageCircle, Share2, Bookmark, Star } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import { useNotification } from "@/contexts/NotificationContext";
 
 interface PostActionsProps {
   isLiked: boolean;
@@ -24,6 +25,8 @@ export function PostActions({
   isLikeLoading,
   isSaveLoading,
 }: PostActionsProps) {
+  const { toast } = useNotification();
+
   return (
     <div className="flex items-center gap-1 mt-2 pt-2 border-t border-[#EDE8E1]">
       <button
@@ -87,6 +90,15 @@ export function PostActions({
           <span className="hidden sm:inline">{isSaved ? "Đã lưu" : "Lưu"}</span>
         </button>
       )}
+
+      <button
+        onClick={() => toast.info("Tính năng Tặng sao sẽ sớm được ra mắt!")}
+        className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-vietnam text-sm font-medium text-v2-text-secondary hover:bg-v2-bg-primary flex-1 justify-center"
+        aria-label="Donate stars"
+      >
+        <Star size={18} />
+        <span className="hidden sm:inline">Tặng sao</span>
+      </button>
     </div>
   );
 }
