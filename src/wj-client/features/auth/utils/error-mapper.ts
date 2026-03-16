@@ -7,15 +7,11 @@
 
 /** Error map for register password form (uses auth.register.errors namespace) */
 const REGISTER_ERROR_MAP: Record<string, string> = {
-  "email is required": "emailRequired",
-  "email is too long (max 255 characters)": "emailTooLong",
-  "invalid email format": "invalidEmailFormat",
   "username is required": "usernameRequired",
   "username must be at least 3 characters": "usernameMinLength",
   "username must be at most 30 characters": "usernameMaxLength",
   "username can only contain letters, numbers, and underscores":
     "usernameInvalidChars",
-  "email already registered": "emailAlreadyRegistered",
   "username already taken": "usernameAlreadyTaken",
   "display name is required": "displayNameRequired",
   "password must be at least 10 characters": "passwordMinLength",
