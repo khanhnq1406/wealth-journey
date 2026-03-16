@@ -1,6 +1,6 @@
-# Gold Sentiment Domain — Runtime Flows
+# Sentiment Domain — Runtime Flows
 
-Daily gold sentiment voting and commenting flows. Public GET endpoints support optional auth for user-specific data. Protected write endpoints require JWT authentication.
+Daily asset sentiment voting and commenting flows (gold and silver via `category` parameter: 0=gold, 1=silver). Public GET endpoints support optional auth for user-specific data. Protected write endpoints require JWT authentication. Cache keys are scoped per category (`gold_sentiment:{category}:{date}`).
 
 ## Table of Contents
 
@@ -24,11 +24,11 @@ sequenceDiagram
     participant VR as GoldVoteRepository
     participant R as Redis
 
-    SPA->>H: POST /api/v1/public/gold-sentiment/vote<br/>{direction: 1|2}<br/>Headers: Authorization (optional), X-Anonymous-ID (optional)
+    SPA->>H: POST /api/v1/public/gold-sentiment/vote<br/>{direction: 1|2, category: 0|1}<br/>Headers: Authorization (optional), X-Anonymous-ID (optional)
     H->>H: tryGetUserID (optional auth)
     H->>H: Read X-Anonymous-ID header
     H->>H: BindAndValidate request body
-    H->>GS: CastVote(userID, anonymousID, req)
+    H->>GS: CastVote(userID, anonymousID, req) [category from body]
 
     activate GS
     GS->>GS: Validate direction (must be 1 or 2)
@@ -41,17 +41,17 @@ sequenceDiagram
 
     alt userID > 0 (Authenticated)
         alt anonymousID provided
-            GS->>VR: DeleteByAnonymousIDAndDate(anonymousID, today)
+            GS->>VR: DeleteByAnonymousIDAndDate(anonymousID, category, today)
             Note over VR: Remove anonymous vote from same device
         end
-        GS->>VR: Upsert(GoldVote{userID, voteDate, direction})
-        Note over VR: ON CONFLICT (user_id, vote_date)<br/>WHERE user_id IS NOT NULL<br/>DO UPDATE SET direction
+        GS->>VR: Upsert(GoldVote{userID, category, voteDate, direction})
+        Note over VR: ON CONFLICT (category, user_id, vote_date)<br/>WHERE user_id IS NOT NULL<br/>DO UPDATE SET direction
     else Anonymous
         alt No anonymousID or invalid
             GS->>GS: Generate new UUID
         end
-        GS->>VR: UpsertAnonymous(GoldVote{anonymousID, voteDate, direction})
-        Note over VR: ON CONFLICT (anonymous_id, vote_date)<br/>WHERE anonymous_id IS NOT NULL<br/>DO UPDATE SET direction
+        GS->>VR: UpsertAnonymous(GoldVote{anonymousID, category, voteDate, direction})
+        Note over VR: ON CONFLICT (category, anonymous_id, vote_date)<br/>WHERE anonymous_id IS NOT NULL<br/>DO UPDATE SET direction
     end
 
     alt DB error
@@ -61,10 +61,10 @@ sequenceDiagram
     end
     VR-->>GS: OK
 
-    GS->>R: Delete("gold_sentiment:{date}")
-    Note over R: Invalidate cached counts
+    GS->>R: Delete("gold_sentiment:{category}:{date}")
+    Note over R: Invalidate cached counts for this category
 
-    GS->>VR: CountByDate(voteDate)
+    GS->>VR: CountByDate(category, voteDate)
     VR-->>GS: bullish, bearish counts
     GS->>GS: computePercentages(bullish, bearish)
     deactivate GS
@@ -76,13 +76,15 @@ sequenceDiagram
 
 **Key Invariants:**
 - Direction must be 1 (BULLISH) or 2 (BEARISH); 0 (UNSPECIFIED) is rejected
+- Category must be 0 (GOLD) or 1 (SILVER); defaults to 0 if not provided
 - Public endpoint — no auth required, supports both authenticated and anonymous votes
-- Authenticated users: 1 vote/day via UNIQUE partial index `(user_id, vote_date) WHERE user_id IS NOT NULL`
-- Anonymous users: 1 vote/day per UUID via UNIQUE partial index `(anonymous_id, vote_date) WHERE anonymous_id IS NOT NULL`
-- When authenticated user votes, any anonymous vote from same device (same `X-Anonymous-ID`) is deleted
+- Authenticated users: 1 vote/day/category via UNIQUE partial index `(category, user_id, vote_date) WHERE user_id IS NOT NULL`
+- Anonymous users: 1 vote/day/category per UUID via UNIQUE partial index `(category, anonymous_id, vote_date) WHERE anonymous_id IS NOT NULL`
+- When authenticated user votes, any anonymous vote from same device (same `X-Anonymous-ID`) for the same category is deleted
 - Vote date calculated in Vietnam timezone (UTC+7)
-- Redis cache invalidated after every vote to ensure fresh counts
+- Redis cache invalidated per category after every vote to ensure fresh counts
 - Anonymous ID validated as UUID format (36 chars, regex)
+- Frontend scopes anonymous IDs per asset: `gold_vote_anonymous_id` / `silver_vote_anonymous_id`
 
 **Error Paths:**
 
@@ -95,8 +97,8 @@ sequenceDiagram
 
 ## 2. Get Sentiment
 
-**Trigger:** Page loads gold sentiment card (landing or dashboard)
-**Endpoint:** `GET /api/v1/public/gold-sentiment`
+**Trigger:** Page loads sentiment card (landing, dashboard, or prices page)
+**Endpoint:** `GET /api/v1/public/gold-sentiment?category=0|1`
 **Source:** `domain/service/gold_sentiment_service.go`, `handlers/gold_sentiment.go`
 
 ```mermaid
@@ -107,35 +109,36 @@ sequenceDiagram
     participant R as Redis
     participant VR as GoldVoteRepository
 
-    SPA->>H: GET /api/v1/public/gold-sentiment<br/>Headers: Authorization (optional), X-Anonymous-ID (optional)
+    SPA->>H: GET /api/v1/public/gold-sentiment?category=0|1<br/>Headers: Authorization (optional), X-Anonymous-ID (optional)
     H->>H: tryGetUserID(optional auth)
     H->>H: Read X-Anonymous-ID header
+    H->>H: Parse category from query (default 0)
     Note over H: Extract bearer token if present<br/>Verify via AuthService<br/>Return 0 if no token or invalid
-    H->>GS: GetSentiment(ctx, userID, anonymousID)
+    H->>GS: GetSentiment(ctx, userID, anonymousID, category)
 
     activate GS
     GS->>GS: getTodayVietnam() → UTC+7 date
-    GS->>R: Get("gold_sentiment:{date}")
+    GS->>R: Get("gold_sentiment:{category}:{date}")
 
     alt Cache hit
         R-->>GS: Cached {bullish, bearish, total, percentages}
     else Cache miss
         R-->>GS: nil
-        GS->>VR: CountByDate(voteDate)
+        GS->>VR: CountByDate(category, voteDate)
         VR-->>GS: bullish, bearish counts
         GS->>GS: computePercentages(bullish, bearish)
-        GS->>R: Set("gold_sentiment:{date}", data, 30s TTL)
+        GS->>R: Set("gold_sentiment:{category}:{date}", data, 30s TTL)
     end
 
     alt userID > 0 (Authenticated)
-        GS->>VR: GetByUserAndDate(userID, voteDate)
+        GS->>VR: GetByUserAndDate(userID, category, voteDate)
         alt Vote found
             VR-->>GS: GoldVote{direction}
         else No vote
             VR-->>GS: nil (userVote = 0)
         end
     else anonymousID present
-        GS->>VR: GetByAnonymousIDAndDate(anonymousID, voteDate)
+        GS->>VR: GetByAnonymousIDAndDate(anonymousID, category, voteDate)
         alt Vote found
             VR-->>GS: GoldVote{direction}
         else No vote
@@ -150,10 +153,11 @@ sequenceDiagram
 
 **Key Invariants:**
 - Public endpoint — no auth required, but auth or `X-Anonymous-ID` is attempted for `userVote` field
-- Redis cache with 30s TTL prevents excessive DB queries
-- `userVote` populated from auth (user_id lookup) or anonymous ID (anonymous_id lookup)
-- `userVote` is 0 (UNSPECIFIED) when neither authenticated nor anonymous ID present, or no vote exists
-- Cache stores only aggregate counts, not per-user data
+- Category parsed from query string (default 0=gold); all lookups scoped by category
+- Redis cache with 30s TTL prevents excessive DB queries; cache key scoped per category
+- `userVote` populated from auth (user_id + category lookup) or anonymous ID (anonymous_id + category lookup)
+- `userVote` is 0 (UNSPECIFIED) when neither authenticated nor anonymous ID present, or no vote exists for this category
+- Cache stores only aggregate counts per category, not per-user data
 
 **Error Paths:**
 
@@ -167,7 +171,7 @@ sequenceDiagram
 
 ## 3. Post Comment
 
-**Trigger:** Authenticated user submits a comment on dashboard home
+**Trigger:** Authenticated user submits a comment on dashboard home or prices page
 **Endpoint:** `POST /api/v1/gold-sentiment/comments`
 **Source:** `domain/service/gold_sentiment_service.go`, `handlers/gold_sentiment.go`
 
@@ -178,10 +182,10 @@ sequenceDiagram
     participant GS as GoldSentimentService
     participant CR as GoldVoteCommentRepository
 
-    SPA->>H: POST /api/v1/gold-sentiment/comments<br/>{content: "..."}
+    SPA->>H: POST /api/v1/gold-sentiment/comments<br/>{content: "...", category: 0|1}
     H->>H: GetUserID from JWT
     H->>H: BindAndValidate request body
-    H->>GS: PostComment(userID, req)
+    H->>GS: PostComment(userID, req) [category from body]
 
     activate GS
     GS->>GS: strings.TrimSpace(content)
@@ -195,7 +199,7 @@ sequenceDiagram
     Note over GS: XSS prevention server-side
 
     GS->>GS: getTodayVietnam() → UTC+7 date
-    GS->>CR: CountByUserAndDate(userID, voteDate)
+    GS->>CR: CountByUserAndDate(userID, category, voteDate)
     CR-->>GS: dailyCount
 
     alt dailyCount >= 5
@@ -203,7 +207,7 @@ sequenceDiagram
         H-->>SPA: {success: false, message: "daily limit reached"}
     end
 
-    GS->>CR: Create(GoldVoteComment{userID, voteDate, content})
+    GS->>CR: Create(GoldVoteComment{userID, category, voteDate, content})
     alt DB error
         CR-->>GS: Error
         GS-->>H: 500 Internal Error
@@ -220,7 +224,8 @@ sequenceDiagram
 
 **Key Invariants:**
 - Content trimmed, validated (1-500 chars), and HTML-escaped server-side
-- Rate limit: 5 comments per user per day (enforced in service layer)
+- Category scoped: rate limit and comments isolated per asset (gold/silver)
+- Rate limit: 5 comments per user per day per category (enforced in service layer)
 - Comment date matches today's vote date (Vietnam TZ)
 - User info preloaded for response (avatar, name)
 - No `dangerouslySetInnerHTML` on frontend — all content rendered as text nodes

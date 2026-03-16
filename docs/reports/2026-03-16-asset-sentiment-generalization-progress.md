@@ -6,8 +6,8 @@
 - **Spec file:** docs/specs/2026-03-16-asset-sentiment-generalization-spec.md
 - **Started:** 2026-03-16
 - **Last updated:** 2026-03-16
-- **Current state:** in_progress
-- **Current task:** 11
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -23,7 +23,7 @@
 | 8 | Add i18n Translations for Silver Sentiment | done | — | Added silverSentiment namespace, removed vote count from goldSentiment summary |
 | 9 | Add Sentiment Cards to Prices Page Tabs | done | — | Added gold/silver SentimentCard to gold and silver tabs on prices page |
 | 10 | Update Landing and Home Pages — Add Silver Sentiment | done | — | Replaced GoldSentimentCard with SentimentCard on landing and home pages, added silver sentiment |
-| 11 | Update Architecture Diagrams | pending | — | — |
+| 11 | Update Architecture Diagrams | done | — | Updated C4 backend/frontend diagrams and flow diagrams with category-aware descriptions |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
