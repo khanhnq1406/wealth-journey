@@ -57,12 +57,12 @@ export default function LandingPage() {
           <div className="sm:hidden px-4 py-4 pb-8 space-y-6">
             <LandingGoldPriceTable types={goldTypes} isLoading={isLoading} updatedTime={goldUpdatedTime} />
             <LandingGoldPriceChart />
+            <SentimentCard variant="landing" asset="gold" />
             <LandingSilverPriceTable types={silverTypes} isLoading={isLoading} updatedTime={silverUpdatedTime} />
             <LandingSilverPriceChart />
+            <SentimentCard variant="landing" asset="silver" />
             <LandingCurrencyPriceTable types={currencyTypes} isLoading={isLoading} updatedTime={currencyUpdatedTime} />
             <LandingDollarIndexChart />
-            <SentimentCard variant="landing" asset="gold" />
-            <SentimentCard variant="landing" asset="silver" />
           </div>
 
           {/* Desktop Layout */}
@@ -72,6 +72,8 @@ export default function LandingPage() {
               <LandingGoldPriceTable types={goldTypes} isLoading={isLoading} updatedTime={goldUpdatedTime} />
               <LandingGoldPriceChart />
             </div>
+            {/* Gold Sentiment Survey */}
+            <SentimentCard variant="landing" asset="gold" />
             {/* Row 2: Silver Table + Silver Chart */}
             <div className="grid grid-cols-2 gap-6 [&>*]:!mb-0">
               <LandingSilverPriceTable
@@ -81,15 +83,12 @@ export default function LandingPage() {
               />
               <LandingSilverPriceChart />
             </div>
+            {/* Silver Sentiment Survey */}
+            <SentimentCard variant="landing" asset="silver" />
             {/* Row 3: Currency Table + Dollar Index Chart */}
             <div className="grid grid-cols-2 gap-6 [&>*]:!mb-0">
               <LandingCurrencyPriceTable types={currencyTypes} isLoading={isLoading} updatedTime={currencyUpdatedTime} />
               <LandingDollarIndexChart />
-            </div>
-            {/* Row 4: Sentiment Cards */}
-            <div className="grid grid-cols-2 gap-6">
-              <SentimentCard variant="landing" asset="gold" />
-              <SentimentCard variant="landing" asset="silver" />
             </div>
           </div>
         </main>
