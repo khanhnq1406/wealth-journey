@@ -65,6 +65,7 @@ export function PNLCard({ currency }: PNLCardProps) {
 
   const periodPnl = parseAmount(summaryData?.data?.periodPnl);
   const periodPnlPercent = Number(summaryData?.data?.periodPnlPercent ?? 0);
+  const isApproximate = summaryData?.data?.periodPnlApproximate === true;
 
   const chartPoints = (histData?.data || []).map((point) => ({
     date: new Date(Number(point.timestamp) * 1000).toLocaleDateString("vi-VN", {
@@ -139,18 +140,23 @@ export function PNLCard({ currency }: PNLCardProps) {
               isPositive ? "text-v2-green-positive" : "text-v2-red-negative"
             }`}
           >
-            {formatAmount(periodPnl)} {currency}
+            {isApproximate && selectedPeriod !== "all" ? "≈ " : ""}{formatAmount(periodPnl)} {currency}
           </p>
           <p
             className={`font-jetbrains font-bold text-[24px] ${
               isPositive ? "text-v2-green-positive" : "text-v2-red-negative"
             }`}
           >
-            {formatPercent(periodPnlPercent)}
+            {isApproximate && selectedPeriod !== "all" ? "≈ " : ""}{formatPercent(periodPnlPercent)}
           </p>
           <p className="font-jetbrains font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
             {t(pnlLabelKey[selectedPeriod] as any)}
           </p>
+          {isApproximate && selectedPeriod !== "all" && (
+            <p className="font-vietnam text-[10px] text-v2-text-tertiary mt-1">
+              {t("pnlApproximate")}
+            </p>
+          )}
         </div>
       </div>
 
