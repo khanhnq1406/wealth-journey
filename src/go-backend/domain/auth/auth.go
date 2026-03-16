@@ -4,14 +4,18 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/api/idtoken"
 
 	"wealthjourney/domain/models"
 	"wealthjourney/pkg/config"
 	"wealthjourney/pkg/database"
+	apperrors "wealthjourney/pkg/errors"
 	"wealthjourney/pkg/redis"
+	"wealthjourney/pkg/validator"
 	authv1 "wealthjourney/protobuf/v1"
 
 	jwt "github.com/golang-jwt/jwt/v5"
@@ -65,6 +69,8 @@ type UserData struct {
 	PreferredCurrency    string    `json:"preferredCurrency"`
 	ConversionInProgress bool      `json:"conversionInProgress"`
 	IsAdmin              bool      `json:"isAdmin"`
+	Username             string    `json:"username"`
+	AuthProvider         string    `json:"authProvider"`
 	CreatedAt            time.Time `json:"createdAt"`
 	UpdatedAt            time.Time `json:"updatedAt"`
 }
@@ -82,6 +88,8 @@ func userDataToProto(data *UserData) *authv1.User {
 		PreferredCurrency:    data.PreferredCurrency,
 		ConversionInProgress: data.ConversionInProgress,
 		IsAdmin:              data.IsAdmin,
+		Username:             data.Username,
+		AuthProvider:         data.AuthProvider,
 		CreatedAt:            data.CreatedAt.Unix(),
 		UpdatedAt:            data.UpdatedAt.Unix(),
 	}
@@ -416,6 +424,294 @@ func (s *Server) GetAuth(ctx context.Context, email string) (*authv1.GetAuthResp
 			CreatedAt:            user.CreatedAt,
 			UpdatedAt:            user.UpdatedAt,
 		}),
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+const bcryptCost = 12
+
+func hashPassword(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
+	if err != nil {
+		return "", fmt.Errorf("failed to hash password: %w", err)
+	}
+	return string(hash), nil
+}
+
+func checkPassword(hash, password string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
+}
+
+// RegisterWithPassword registers a new user with email, username, and password
+func (s *Server) RegisterWithPassword(ctx context.Context, req *authv1.RegisterWithPasswordRequest, deviceInfo *redis.SessionData) (*authv1.RegisterWithPasswordResponse, error) {
+	// Validate inputs
+	if err := validator.Email(req.Email); err != nil {
+		return nil, err
+	}
+	if err := validator.Username(req.Username); err != nil {
+		return nil, err
+	}
+	if err := validator.StrongPassword(req.Password); err != nil {
+		return nil, err
+	}
+	if err := validator.NameWithConstraints(req.DisplayName, 1, 100); err != nil {
+		return nil, apperrors.NewValidationError("display name is required")
+	}
+
+	// Check email uniqueness
+	var existingUser models.User
+	result := s.db.DB.Where("email = ?", req.Email).First(&existingUser)
+	if result.Error == nil {
+		return nil, apperrors.NewValidationError("email already registered")
+	} else if result.Error != gorm.ErrRecordNotFound {
+		return nil, fmt.Errorf("database error: %w", result.Error)
+	}
+
+	// Check username uniqueness
+	result = s.db.DB.Where("username = ?", req.Username).First(&existingUser)
+	if result.Error == nil {
+		return nil, apperrors.NewValidationError("username already taken")
+	} else if result.Error != gorm.ErrRecordNotFound {
+		return nil, fmt.Errorf("database error: %w", result.Error)
+	}
+
+	// Hash password
+	passwordHash, err := hashPassword(req.Password)
+	if err != nil {
+		return nil, fmt.Errorf("failed to process password: %w", err)
+	}
+
+	// Create user
+	username := req.Username
+	user := models.User{
+		Email:        req.Email,
+		Name:         req.DisplayName,
+		Username:     &username,
+		PasswordHash: passwordHash,
+		AuthProvider: "password",
+	}
+
+	if err := s.db.DB.Create(&user).Error; err != nil {
+		return nil, fmt.Errorf("failed to create user: %w", err)
+	}
+
+	// Create default categories
+	if s.categorySvc != nil {
+		if err := s.categorySvc.CreateDefaultCategories(ctx, user.ID); err != nil {
+			log.Printf("Warning: Failed to create default categories for user %d (%s): %v", user.ID, req.Email, err)
+		}
+	}
+
+	// Generate login response
+	resp, err := s.generateLoginResponse(ctx, user, deviceInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	return &authv1.RegisterWithPasswordResponse{
+		Success:   true,
+		Message:   "User registered successfully",
+		Data:      resp.Data,
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+// LoginWithPassword logs in a user with email/username and password
+func (s *Server) LoginWithPassword(ctx context.Context, req *authv1.LoginWithPasswordRequest, deviceInfo *redis.SessionData) (*authv1.LoginWithPasswordResponse, error) {
+	genericErr := apperrors.NewInvalidCredentialsError()
+
+	if req.Identifier == "" || req.Password == "" {
+		return nil, genericErr
+	}
+
+	// Determine if identifier is email or username
+	var user models.User
+	var result *gorm.DB
+	if strings.Contains(req.Identifier, "@") {
+		result = s.db.DB.Where("email = ?", req.Identifier).First(&user)
+	} else {
+		result = s.db.DB.Where("username = ?", req.Identifier).First(&user)
+	}
+
+	if result.Error != nil {
+		return nil, genericErr
+	}
+
+	// Check user has a password set
+	if user.PasswordHash == "" {
+		return nil, genericErr
+	}
+
+	// Verify password
+	if !checkPassword(user.PasswordHash, req.Password) {
+		return nil, genericErr
+	}
+
+	// Generate login response
+	resp, err := s.generateLoginResponse(ctx, user, deviceInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	return &authv1.LoginWithPasswordResponse{
+		Success:   true,
+		Message:   "Login successful",
+		Data:      resp.Data,
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+// LinkPassword links a username/password to an existing Google OAuth account
+func (s *Server) LinkPassword(ctx context.Context, userID int32, req *authv1.LinkPasswordRequest) (*authv1.LinkPasswordResponse, error) {
+	// Get user
+	var user models.User
+	if err := s.db.DB.First(&user, userID).Error; err != nil {
+		return nil, fmt.Errorf("user not found: %w", err)
+	}
+
+	// Check if user already has a password
+	if user.PasswordHash != "" {
+		return nil, apperrors.NewValidationError("password already set for this account")
+	}
+
+	// Validate inputs
+	if err := validator.Username(req.Username); err != nil {
+		return nil, err
+	}
+	if err := validator.StrongPassword(req.Password); err != nil {
+		return nil, err
+	}
+
+	// Check username uniqueness
+	var existingUser models.User
+	result := s.db.DB.Where("username = ?", req.Username).First(&existingUser)
+	if result.Error == nil {
+		return nil, apperrors.NewValidationError("username already taken")
+	} else if result.Error != gorm.ErrRecordNotFound {
+		return nil, fmt.Errorf("database error: %w", result.Error)
+	}
+
+	// Hash password
+	passwordHash, err := hashPassword(req.Password)
+	if err != nil {
+		return nil, fmt.Errorf("failed to process password: %w", err)
+	}
+
+	// Update user
+	username := req.Username
+	authProvider := user.AuthProvider
+	if strings.Contains(authProvider, "google") && !strings.Contains(authProvider, "password") {
+		authProvider = authProvider + "+password"
+	}
+
+	if err := s.db.DB.Model(&user).Updates(map[string]interface{}{
+		"username":      &username,
+		"password_hash": passwordHash,
+		"auth_provider": authProvider,
+	}).Error; err != nil {
+		return nil, fmt.Errorf("failed to update user: %w", err)
+	}
+
+	return &authv1.LinkPasswordResponse{
+		Success:   true,
+		Message:   "Password and username set successfully",
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+// ChangePassword changes the user's password and invalidates all other sessions
+func (s *Server) ChangePassword(ctx context.Context, userID int32, email string, req *authv1.ChangePasswordRequest, currentSessionID string) (*authv1.ChangePasswordResponse, error) {
+	// Get user
+	var user models.User
+	if err := s.db.DB.First(&user, userID).Error; err != nil {
+		return nil, fmt.Errorf("user not found: %w", err)
+	}
+
+	// Check user has a password set
+	if user.PasswordHash == "" {
+		return nil, apperrors.NewValidationError("no password set for this account")
+	}
+
+	// Verify current password
+	if !checkPassword(user.PasswordHash, req.CurrentPassword) {
+		return nil, apperrors.NewValidationError("current password is incorrect")
+	}
+
+	// Validate new password
+	if err := validator.StrongPassword(req.NewPassword); err != nil {
+		return nil, err
+	}
+
+	// Ensure new password differs from current
+	if checkPassword(user.PasswordHash, req.NewPassword) {
+		return nil, apperrors.NewValidationError("new password must be different from current password")
+	}
+
+	// Hash new password
+	newHash, err := hashPassword(req.NewPassword)
+	if err != nil {
+		return nil, fmt.Errorf("failed to process password: %w", err)
+	}
+
+	// Update password
+	if err := s.db.DB.Model(&user).Update("password_hash", newHash).Error; err != nil {
+		return nil, fmt.Errorf("failed to update password: %w", err)
+	}
+
+	// Invalidate all other sessions except current
+	s.invalidateOtherSessions(email, currentSessionID)
+
+	return &authv1.ChangePasswordResponse{
+		Success:   true,
+		Message:   "Password changed successfully. All other sessions have been logged out.",
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+// invalidateOtherSessions removes all sessions for a user except the current one
+func (s *Server) invalidateOtherSessions(email string, keepSessionID string) {
+	// Get all session IDs from Redis
+	sessionIDs, err := s.rdb.GetUserSessions(email)
+	if err != nil {
+		log.Printf("Warning: Failed to get user sessions for invalidation: %v", err)
+		return
+	}
+
+	for _, sessionID := range sessionIDs {
+		if sessionID != keepSessionID {
+			if err := s.rdb.RemoveSession(email, sessionID); err != nil {
+				log.Printf("Warning: Failed to remove session %s: %v", sessionID, err)
+			}
+		}
+	}
+
+	// Also clean up database sessions
+	if err := s.db.DB.Where("user_id = (SELECT id FROM \"user\" WHERE email = ?) AND session_id != ?", email, keepSessionID).Delete(&models.Session{}).Error; err != nil {
+		log.Printf("Warning: Failed to delete other sessions from database: %v", err)
+	}
+}
+
+// GetAuthMethods returns which auth methods are linked for a user
+func (s *Server) GetAuthMethods(ctx context.Context, userID int32) (*authv1.GetAuthMethodsResponse, error) {
+	var user models.User
+	if err := s.db.DB.First(&user, userID).Error; err != nil {
+		return nil, fmt.Errorf("user not found: %w", err)
+	}
+
+	username := ""
+	if user.Username != nil {
+		username = *user.Username
+	}
+
+	return &authv1.GetAuthMethodsResponse{
+		Success: true,
+		Message: "Auth methods retrieved successfully",
+		Data: &authv1.AuthMethods{
+			HasGoogle:  strings.Contains(user.AuthProvider, "google"),
+			HasPassword: user.PasswordHash != "",
+			Username:   username,
+			Email:      user.Email,
+		},
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
 }
