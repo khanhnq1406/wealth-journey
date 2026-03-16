@@ -175,9 +175,9 @@ message GetAuthResponse {
   string timestamp = 4 [json_name = "timestamp"];
 }
 
-// RegisterWithPassword request
+// RegisterWithPassword request (email removed — password-only users don't need email)
 message RegisterWithPasswordRequest {
-  string email = 1 [json_name = "email"];
+  reserved 1;
   string username = 2 [json_name = "username"];
   string password = 3 [json_name = "password"];
   string display_name = 4 [json_name = "displayName"];

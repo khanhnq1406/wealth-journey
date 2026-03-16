@@ -106,9 +106,8 @@ export interface GetAuthResponse {
   timestamp: string;
 }
 
-/** RegisterWithPassword request */
+/** RegisterWithPassword request (email removed — password-only users don't need email) */
 export interface RegisterWithPasswordRequest {
-  email: string;
   username: string;
   password: string;
   displayName: string;
@@ -1356,14 +1355,11 @@ export const GetAuthResponse: MessageFns<GetAuthResponse> = {
 };
 
 function createBaseRegisterWithPasswordRequest(): RegisterWithPasswordRequest {
-  return { email: "", username: "", password: "", displayName: "" };
+  return { username: "", password: "", displayName: "" };
 }
 
 export const RegisterWithPasswordRequest: MessageFns<RegisterWithPasswordRequest> = {
   encode(message: RegisterWithPasswordRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.email !== "") {
-      writer.uint32(10).string(message.email);
-    }
     if (message.username !== "") {
       writer.uint32(18).string(message.username);
     }
@@ -1383,14 +1379,6 @@ export const RegisterWithPasswordRequest: MessageFns<RegisterWithPasswordRequest
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 10) {
-            break;
-          }
-
-          message.email = reader.string();
-          continue;
-        }
         case 2: {
           if (tag !== 18) {
             break;
@@ -1426,7 +1414,6 @@ export const RegisterWithPasswordRequest: MessageFns<RegisterWithPasswordRequest
 
   fromJSON(object: any): RegisterWithPasswordRequest {
     return {
-      email: isSet(object.email) ? globalThis.String(object.email) : "",
       username: isSet(object.username) ? globalThis.String(object.username) : "",
       password: isSet(object.password) ? globalThis.String(object.password) : "",
       displayName: isSet(object.displayName)
@@ -1439,9 +1426,6 @@ export const RegisterWithPasswordRequest: MessageFns<RegisterWithPasswordRequest
 
   toJSON(message: RegisterWithPasswordRequest): unknown {
     const obj: any = {};
-    if (message.email !== "") {
-      obj.email = message.email;
-    }
     if (message.username !== "") {
       obj.username = message.username;
     }
@@ -1459,7 +1443,6 @@ export const RegisterWithPasswordRequest: MessageFns<RegisterWithPasswordRequest
   },
   fromPartial(object: DeepPartial<RegisterWithPasswordRequest>): RegisterWithPasswordRequest {
     const message = createBaseRegisterWithPasswordRequest();
-    message.email = object.email ?? "";
     message.username = object.username ?? "";
     message.password = object.password ?? "";
     message.displayName = object.displayName ?? "";
