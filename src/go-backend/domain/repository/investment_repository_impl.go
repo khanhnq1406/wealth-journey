@@ -75,11 +75,11 @@ func (r *investmentRepository) GetByWalletAndSymbol(ctx context.Context, walletI
 
 // ListByUserID retrieves all investments for a user (via their wallets).
 func (r *investmentRepository) ListByUserID(ctx context.Context, userID int32, opts ListOptions, typeFilter v1.InvestmentType) ([]*models.Investment, int, error) {
-	// First, get all investment wallet IDs for the user
+	// First, get all active wallet IDs for the user (any type can hold investments)
 	var walletIDs []int32
 	err := r.db.DB.WithContext(ctx).
 		Model(&models.Wallet{}).
-		Where("user_id = ? AND status = 1 AND type = ?", userID, int32(v1.WalletType_INVESTMENT)).
+		Where("user_id = ? AND status = 1", userID).
 		Pluck("id", &walletIDs).Error
 	if err != nil {
 		return nil, 0, apperrors.NewInternalErrorWithCause("failed to get user wallets", err)

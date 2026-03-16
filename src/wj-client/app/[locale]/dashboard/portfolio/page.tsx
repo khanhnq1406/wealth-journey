@@ -54,15 +54,39 @@ const ModalType = {
 // These will be populated with translations inside the component
 const TYPE_FILTER_KEYS = [
   { value: "0", key: "typeOptions.allTypes" },
-  { value: String(InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY), key: "typeOptions.cryptocurrency" },
-  { value: String(InvestmentType.INVESTMENT_TYPE_STOCK), key: "typeOptions.stock" },
+  {
+    value: String(InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY),
+    key: "typeOptions.cryptocurrency",
+  },
+  {
+    value: String(InvestmentType.INVESTMENT_TYPE_STOCK),
+    key: "typeOptions.stock",
+  },
   { value: String(InvestmentType.INVESTMENT_TYPE_ETF), key: "typeOptions.etf" },
-  { value: String(InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND), key: "typeOptions.mutualFund" },
-  { value: String(InvestmentType.INVESTMENT_TYPE_BOND), key: "typeOptions.bond" },
-  { value: String(InvestmentType.INVESTMENT_TYPE_COMMODITY), key: "typeOptions.commodity" },
-  { value: String(InvestmentType.INVESTMENT_TYPE_GOLD_VND), key: "typeOptions.goldVietnam" },
-  { value: String(InvestmentType.INVESTMENT_TYPE_GOLD_USD), key: "typeOptions.goldWorld" },
-  { value: String(InvestmentType.INVESTMENT_TYPE_OTHER), key: "typeOptions.other" },
+  {
+    value: String(InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND),
+    key: "typeOptions.mutualFund",
+  },
+  {
+    value: String(InvestmentType.INVESTMENT_TYPE_BOND),
+    key: "typeOptions.bond",
+  },
+  {
+    value: String(InvestmentType.INVESTMENT_TYPE_COMMODITY),
+    key: "typeOptions.commodity",
+  },
+  {
+    value: String(InvestmentType.INVESTMENT_TYPE_GOLD_VND),
+    key: "typeOptions.goldVietnam",
+  },
+  {
+    value: String(InvestmentType.INVESTMENT_TYPE_GOLD_USD),
+    key: "typeOptions.goldWorld",
+  },
+  {
+    value: String(InvestmentType.INVESTMENT_TYPE_OTHER),
+    key: "typeOptions.other",
+  },
 ] as const;
 
 const SORT_KEYS = [
@@ -94,7 +118,9 @@ export default function PortfolioPageEnhanced() {
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
   const [showSuccessBanner, setShowSuccessBanner] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>();
-  const [summaryPeriod, setSummaryPeriod] = useState<"1d" | "1w" | "1m" | "all">("all");
+  const [summaryPeriod, setSummaryPeriod] = useState<
+    "1d" | "1w" | "1m" | "all"
+  >("all");
 
   const typeFilterForApi = useMemo(() => {
     return parseInt(
@@ -105,10 +131,14 @@ export default function PortfolioPageEnhanced() {
 
   const summaryPeriodEnum = useMemo((): PnlPeriod => {
     switch (summaryPeriod) {
-      case "1d": return PnlPeriod.PNL_PERIOD_1D;
-      case "1w": return PnlPeriod.PNL_PERIOD_1W;
-      case "1m": return PnlPeriod.PNL_PERIOD_1M;
-      default:   return PnlPeriod.PNL_PERIOD_ALL;
+      case "1d":
+        return PnlPeriod.PNL_PERIOD_1D;
+      case "1w":
+        return PnlPeriod.PNL_PERIOD_1W;
+      case "1m":
+        return PnlPeriod.PNL_PERIOD_1M;
+      default:
+        return PnlPeriod.PNL_PERIOD_ALL;
     }
   }, [summaryPeriod]);
 
@@ -315,14 +345,14 @@ export default function PortfolioPageEnhanced() {
       <div className="flex justify-center w-full">
         <div className="w-full max-w-7xl space-y-3 sm:space-y-4">
           {/* Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 py-2">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">
               {t("page.title")}
             </h1>
 
             {/* Filter Controls */}
             <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-              <div className="w-full sm:w-full md:w-40">
+              <div className="w-full sm:w-full md:w-40 flex items-center">
                 <FormSelect
                   options={TYPE_FILTER_OPTIONS}
                   value={typeFilter}
@@ -330,10 +360,11 @@ export default function PortfolioPageEnhanced() {
                     startTransition(() => setTypeFilter(value));
                   }}
                   placeholder={t("filterByTypePlaceholder")}
+                  containerClassName="!m-0"
                 />
               </div>
 
-              <div className="w-full sm:w-full md:w-40">
+              <div className="w-full sm:w-full md:w-40 flex items-center">
                 <FormSelect
                   options={SORT_OPTIONS}
                   value={sortBy}
@@ -341,6 +372,7 @@ export default function PortfolioPageEnhanced() {
                     startTransition(() => setSortBy(value));
                   }}
                   placeholder={t("sortByPlaceholder")}
+                  containerClassName="!m-0"
                 />
               </div>
             </div>
@@ -418,9 +450,7 @@ export default function PortfolioPageEnhanced() {
         title={modalTitle}
       >
         {modalType === ModalType.ADD_INVESTMENT && (
-          <AddInvestmentForm
-            onSuccess={handleModalSuccess}
-          />
+          <AddInvestmentForm onSuccess={handleModalSuccess} />
         )}
       </BaseModal>
     </>

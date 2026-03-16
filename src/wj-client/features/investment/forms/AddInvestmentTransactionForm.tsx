@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,19 +27,12 @@ import {
   quantityToStorage,
   amountToSmallestUnit,
   getQuantityInputConfig,
-  calculateTransactionCost,
-  formatCurrency,
 } from "@/lib/utils/units";
 import { getInvestmentUnitLabelFull } from "@/app/[locale]/dashboard/portfolio/helpers";
 import {
   AddTransactionFormInput,
   addTransactionSchema,
 } from "@/features/investment/utils/investment-schema";
-import {
-  useExchangeRate,
-  convertAmount,
-  formatExchangeRate,
-} from "@/hooks/useExchangeRate";
 import {
   getGoldStorageInfo,
   convertGoldQuantity,
@@ -62,8 +55,6 @@ interface AddInvestmentTransactionFormProps {
   investmentType: InvestmentType;
   investmentCurrency?: string; // Currency of the parent investment (ISO 4217)
   purchaseUnit?: string; // User's purchase unit for display ("tael", "kg", "oz", "gram")
-  walletBalance?: number; // Wallet balance in smallest currency unit
-  walletCurrency?: string; // Currency of the wallet (ISO 4217)
   symbol?: string; // Symbol for price lookup
   onSuccess?: () => void;
 }
@@ -78,8 +69,6 @@ export function AddInvestmentTransactionForm({
   investmentType,
   investmentCurrency = "USD",
   purchaseUnit,
-  walletBalance = 0,
-  walletCurrency = "USD",
   symbol,
   onSuccess,
 }: AddInvestmentTransactionFormProps) {
@@ -89,7 +78,7 @@ export function AddInvestmentTransactionForm({
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const [insufficientBalance, setInsufficientBalance] = useState(false);
+
 
   const transactionTypeOptions: SelectOption[] = useMemo(
     () => [
@@ -141,7 +130,6 @@ export function AddInvestmentTransactionForm({
     control,
     handleSubmit,
     formState: { isSubmitting, errors },
-    watch,
     getValues,
     setError,
   } = useForm<AddTransactionFormInput>({
@@ -157,15 +145,6 @@ export function AddInvestmentTransactionForm({
       transactionDate: new Date().toISOString().split("T")[0],
     },
   });
-
-  // Watch form values for balance validation
-  const transactionType = watch("type");
-  const quantity = watch("quantity");
-  const price = watch("price");
-  const fees = watch("fees");
-
-  // Check if currencies match
-  const currenciesMatch = investmentCurrency === walletCurrency;
 
   // Check if this is a gold investment
   const isGoldInvestment =
@@ -199,166 +178,6 @@ export function AddInvestmentTransactionForm({
       ? ("tael" as const)
       : ("oz" as const);
   }, [investmentType, isSilverInvestment, purchaseUnit]);
-
-  // Fetch exchange rate when currencies differ
-  const { rate: exchangeRate, isLoading: isLoadingRate } = useExchangeRate(
-    walletCurrency,
-    investmentCurrency,
-  );
-
-  // Calculate total cost for BUY transactions
-  const totalCost = useMemo(() => {
-    if (
-      transactionType !==
-      InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_BUY
-    )
-      return 0;
-
-    let quantityInStorage: number;
-    let priceInCents: number;
-
-    if (isGoldInvestment && goldDisplayUnit) {
-      // For gold: user enters quantity in display units, price in display units
-      const { unit: storageUnit } = getGoldStorageInfo(investmentType);
-
-      // Convert quantity to storage units (grams for VND gold, ounces for USD gold)
-      const quantityInStorageUnits = convertGoldQuantity(
-        Number(quantity) || 0,
-        goldDisplayUnit,
-        storageUnit,
-      );
-      quantityInStorage = Math.round(quantityInStorageUnits * 10000);
-
-      // Convert price from display units to storage units
-      // VND gold: price per tael → price per gram (using price conversion function)
-      // USD gold: price per ounce (already in storage units)
-      let priceInStorageUnits = Number(price) || 0;
-      if (investmentType === InvestmentType.INVESTMENT_TYPE_GOLD_VND) {
-        // User enters price per tael, convert to price per gram
-        // IMPORTANT: Use convertGoldPricePerUnit, not convertGoldQuantity!
-        priceInStorageUnits = convertGoldPricePerUnit(
-          priceInStorageUnits,
-          goldDisplayUnit, // tael
-          storageUnit, // gram
-        );
-      }
-      // For USD gold, price is already per ounce, no conversion needed
-
-      priceInCents = amountToSmallestUnit(
-        priceInStorageUnits,
-        investmentCurrency,
-      );
-    } else if (isSilverInvestment && silverDisplayUnit) {
-      // For silver: user enters quantity in display units, price in display units
-      const { unit: storageUnit } = getSilverStorageInfo(investmentType);
-
-      // Convert quantity to storage units (grams for VND silver, ounces for USD silver)
-      const quantityInStorageUnits = convertSilverQuantity(
-        Number(quantity) || 0,
-        silverDisplayUnit,
-        storageUnit,
-      );
-      quantityInStorage = Math.round(quantityInStorageUnits * 10000);
-
-      // Convert price from display units to storage units
-      // VND silver: price per tael → price per gram (using price conversion function)
-      // USD silver: price per ounce (already in storage units)
-      let priceInStorageUnits = Number(price) || 0;
-      if (investmentType === InvestmentType.INVESTMENT_TYPE_SILVER_VND) {
-        // User enters price per tael, convert to price per gram
-        priceInStorageUnits = convertSilverPricePerUnit(
-          priceInStorageUnits,
-          silverDisplayUnit, // tael
-          storageUnit, // gram
-        );
-      }
-      // For USD silver, price is already per ounce, no conversion needed
-
-      priceInCents = amountToSmallestUnit(
-        priceInStorageUnits,
-        investmentCurrency,
-      );
-    } else {
-      // For non-gold, non-silver: use standard conversions
-      quantityInStorage = quantityToStorage(
-        Number(quantity) || 0,
-        investmentType,
-      );
-      priceInCents = amountToSmallestUnit(
-        Number(price) || 0,
-        investmentCurrency,
-      );
-    }
-
-    const feesInCents = amountToSmallestUnit(
-      Number(fees) || 0,
-      investmentCurrency,
-    );
-    return (
-      calculateTransactionCost(
-        quantityInStorage,
-        priceInCents,
-        investmentType,
-      ) + feesInCents
-    );
-  }, [
-    quantity,
-    price,
-    fees,
-    transactionType,
-    investmentType,
-    investmentCurrency,
-    isGoldInvestment,
-    goldDisplayUnit,
-    isSilverInvestment,
-    silverDisplayUnit,
-  ]);
-
-  // Convert wallet balance to investment currency for comparison
-  const walletBalanceInInvestmentCurrency = useMemo(() => {
-    if (currenciesMatch || !exchangeRate) {
-      return walletBalance;
-    }
-    return convertAmount(
-      walletBalance,
-      exchangeRate,
-      walletCurrency,
-      investmentCurrency,
-    );
-  }, [
-    walletBalance,
-    exchangeRate,
-    walletCurrency,
-    investmentCurrency,
-    currenciesMatch,
-  ]);
-
-  // Check for insufficient balance (with currency conversion when needed)
-  useEffect(() => {
-    const isBuyTransaction =
-      transactionType ===
-      InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_BUY;
-    if (!isBuyTransaction || walletBalance <= 0) {
-      setInsufficientBalance(false);
-      return;
-    }
-
-    if (currenciesMatch) {
-      setInsufficientBalance(totalCost > walletBalance);
-    } else if (exchangeRate) {
-      setInsufficientBalance(totalCost > walletBalanceInInvestmentCurrency);
-    } else {
-      // No rate available yet, don't block submission
-      setInsufficientBalance(false);
-    }
-  }, [
-    totalCost,
-    walletBalance,
-    walletBalanceInInvestmentCurrency,
-    transactionType,
-    currenciesMatch,
-    exchangeRate,
-  ]);
 
   const onSubmit = () => {
     setErrorMessage(undefined);
@@ -573,120 +392,10 @@ export function AddInvestmentTransactionForm({
         }}
       />
 
-      {/* Balance Preview for BUY transactions - same currency */}
-      {transactionType ===
-        InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_BUY &&
-        walletBalance > 0 &&
-        currenciesMatch && (
-          <div className="mt-4 p-3 bg-gray-50 rounded-md">
-            <div className="flex justify-between text-sm">
-              <span>{t("transaction.walletBalance")}</span>
-              <span>{formatCurrency(walletBalance, walletCurrency)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span>{t("transaction.transactionCost")}</span>
-              <span className="text-red-600">
-                -{formatCurrency(totalCost, investmentCurrency)}
-              </span>
-            </div>
-            <hr className="my-2" />
-            <div className="flex justify-between font-medium">
-              <span>{t("transaction.remaining")}</span>
-              <span
-                className={
-                  walletBalance - totalCost < 0
-                    ? "text-red-600"
-                    : "text-v2-green-positive"
-                }
-              >
-                {formatCurrency(walletBalance - totalCost, investmentCurrency)}
-              </span>
-            </div>
-          </div>
-        )}
-
-      {/* Balance Preview for BUY transactions - different currencies with conversion */}
-      {transactionType ===
-        InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_BUY &&
-        walletBalance > 0 &&
-        !currenciesMatch && (
-          <div className="mt-4 p-3 bg-gray-50 rounded-md">
-            <div className="flex justify-between text-sm">
-              <span>{t("transaction.walletBalance")}</span>
-              <span>
-                {formatCurrency(walletBalance, walletCurrency)}
-                {exchangeRate && (
-                  <span className="text-gray-500 ml-1">
-                    (≈{" "}
-                    {formatCurrency(
-                      walletBalanceInInvestmentCurrency,
-                      investmentCurrency,
-                    )}
-                    )
-                  </span>
-                )}
-              </span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span>{t("transaction.transactionCost")}</span>
-              <span className="text-red-600">
-                -{formatCurrency(totalCost, investmentCurrency)}
-              </span>
-            </div>
-            <hr className="my-2" />
-            <div className="flex justify-between font-medium">
-              <span>{t("transaction.remaining")}</span>
-              {isLoadingRate ? (
-                <span className="text-gray-400">{t("transaction.loadingRate")}</span>
-              ) : exchangeRate ? (
-                <span
-                  className={
-                    walletBalanceInInvestmentCurrency - totalCost < 0
-                      ? "text-red-600"
-                      : "text-v2-green-positive"
-                  }
-                >
-                  ≈{" "}
-                  {formatCurrency(
-                    walletBalanceInInvestmentCurrency - totalCost,
-                    investmentCurrency,
-                  )}
-                </span>
-              ) : (
-                <span className="text-gray-400">{t("transaction.rateUnavailable")}</span>
-              )}
-            </div>
-            {exchangeRate && (
-              <p className="text-xs text-gray-500 mt-2">
-                {t("transaction.exchangeRate", {
-                  from: walletCurrency,
-                  rate: formatExchangeRate(exchangeRate),
-                  to: investmentCurrency,
-                })}
-              </p>
-            )}
-          </div>
-        )}
-
-      {/* Insufficient balance error */}
-      {insufficientBalance && (
-        <p className="text-red-600 text-sm mt-2">
-          {t("transaction.insufficientBalance", {
-            amount: formatCurrency(
-              currenciesMatch
-                ? totalCost - walletBalance
-                : totalCost - walletBalanceInInvestmentCurrency,
-              investmentCurrency,
-            ),
-          })}
-        </p>
-      )}
-
       {/* Submit button */}
       <Button
         htmlType="submit"
         type={ButtonType.PRIMARY}
-        disabled={insufficientBalance}
         loading={addTransactionMutation.isPending || isSubmitting}
         className="w-full"
       >
