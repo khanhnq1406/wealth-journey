@@ -21,7 +21,6 @@ import {
   TableSkeleton,
 } from "@/components/loading/Skeleton";
 import {
-  useQueryListWallets,
   useQueryListUserInvestments,
   useQueryGetAggregatedPortfolioSummary,
   useMutationUpdatePrices,
@@ -29,36 +28,28 @@ import {
   EVENT_InvestmentGetAggregatedPortfolioSummary,
 } from "@/utils/generated/hooks";
 import { useQueryClient } from "@tanstack/react-query";
-import { WalletType } from "@/gen/protobuf/v1/wallet";
 import { InvestmentType, PnlPeriod } from "@/gen/protobuf/v1/investment";
 import { FormSelect, SelectOption } from "@/components/forms/FormSelect";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import {
-  CreateWalletForm,
   AddInvestmentForm,
   InvestmentDetailModal,
   preloadInvestmentDetailModal,
 } from "@/components/lazy/OptimizedComponents";
 import { BaseModal } from "@/components/modals/BaseModal";
 import { PortfolioSummaryEnhanced } from "./components/PortfolioSummaryEnhanced";
-import { InvestmentList } from "./components/InvestmentList";
 import { InvestmentCardEnhanced } from "./components/InvestmentCardEnhanced";
 import {
   EmptyInvestmentsState,
-  EmptyWalletsState,
   UpdateProgressBanner,
   UpdateSuccessBanner,
-  WalletCashBalanceCard,
 } from "./components";
 import { TabType } from "@/features/investment/components/InvestmentDetailModal";
 
 const ModalType = {
-  CREATE_WALLET: "CREATE_WALLET",
   ADD_INVESTMENT: "ADD_INVESTMENT",
   INVESTMENT_DETAIL: "INVESTMENT_DETAIL",
 } as const;
-
-type WalletFilterValue = "all" | string;
 
 // These will be populated with translations inside the component
 const TYPE_FILTER_KEYS = [
@@ -92,8 +83,6 @@ export default function PortfolioPageEnhanced() {
     label: t(opt.key),
   }));
   const { currency } = useCurrency();
-  const [selectedWallet, setSelectedWallet] =
-    useState<WalletFilterValue>("all");
   const [typeFilter, setTypeFilter] = useState<string>("0");
   const [sortBy, setSortBy] = useState<string>("name");
   const [modalType, setModalType] = useState<keyof typeof ModalType | null>(
@@ -107,52 +96,12 @@ export default function PortfolioPageEnhanced() {
   const [activeTab, setActiveTab] = useState<TabType>();
   const [summaryPeriod, setSummaryPeriod] = useState<"1d" | "1w" | "1m" | "all">("all");
 
-  // Fetch data
-  const getListWallets = useQueryListWallets(
-    {
-      pagination: {
-        page: 1,
-        pageSize: 100,
-        orderBy: "created_at",
-        order: "desc",
-      },
-    },
-    { refetchOnMount: "always" },
-  );
-
-  const investmentWallets = useMemo(() => {
-    if (!getListWallets.data?.wallets) return [];
-    return getListWallets.data.wallets.filter(
-      (wallet) => wallet.type === WalletType.INVESTMENT,
-    );
-  }, [getListWallets.data]);
-
-  const walletOptions = useMemo((): SelectOption[] => {
-    const options: SelectOption[] = [
-      { value: "all", label: t("allInvestmentWallets") },
-    ];
-    investmentWallets.forEach((wallet) => {
-      options.push({
-        value: String(wallet.id),
-        label: wallet.walletName,
-      });
-    });
-    return options;
-  }, [investmentWallets]);
-
-  const walletIdForApi = useMemo(() => {
-    if (selectedWallet === "all") return 0;
-    return parseInt(selectedWallet, 10);
-  }, [selectedWallet]);
-
   const typeFilterForApi = useMemo(() => {
     return parseInt(
       typeFilter,
       10,
     ) as (typeof InvestmentType)[keyof typeof InvestmentType];
   }, [typeFilter]);
-
-  const isAllWalletsView = selectedWallet === "all";
 
   const summaryPeriodEnum = useMemo((): PnlPeriod => {
     switch (summaryPeriod) {
@@ -165,24 +114,22 @@ export default function PortfolioPageEnhanced() {
 
   const getPortfolioSummary = useQueryGetAggregatedPortfolioSummary(
     {
-      walletId: walletIdForApi,
+      walletId: 0,
       typeFilter: typeFilterForApi,
       period: summaryPeriodEnum,
     },
     {
-      enabled: investmentWallets.length > 0,
       refetchOnMount: "always",
     },
   );
 
   const getListInvestments = useQueryListUserInvestments(
     {
-      walletId: walletIdForApi,
+      walletId: 0,
       pagination: { page: 1, pageSize: 100, orderBy: "symbol", order: "asc" },
       typeFilter: typeFilterForApi,
     },
     {
-      enabled: investmentWallets.length > 0,
       refetchOnMount: "always",
     },
   );
@@ -210,20 +157,6 @@ export default function PortfolioPageEnhanced() {
       }
     });
   }, [getListInvestments.data?.investments, sortBy]);
-
-  const selectedWalletBalance = useMemo(() => {
-    if (isAllWalletsView) return 0;
-    const walletId = parseInt(selectedWallet, 10);
-    const wallet = investmentWallets.find((w) => w.id === walletId);
-    return wallet?.balance?.amount || 0;
-  }, [selectedWallet, investmentWallets, isAllWalletsView]);
-
-  const selectedWalletCurrency = useMemo(() => {
-    if (isAllWalletsView) return "USD";
-    const walletId = parseInt(selectedWallet, 10);
-    const wallet = investmentWallets.find((w) => w.id === walletId);
-    return wallet?.balance?.currency || "USD";
-  }, [selectedWallet, investmentWallets, isAllWalletsView]);
 
   const queryClient = useQueryClient();
 
@@ -277,8 +210,6 @@ export default function PortfolioPageEnhanced() {
 
   const modalTitle = useMemo(() => {
     switch (modalType) {
-      case ModalType.CREATE_WALLET:
-        return t("modal.createWallet");
       case ModalType.ADD_INVESTMENT:
         return t("modal.addInvestment");
       case ModalType.INVESTMENT_DETAIL:
@@ -348,7 +279,7 @@ export default function PortfolioPageEnhanced() {
   );
 
   // Loading state
-  if (getListWallets.isLoading || getListWallets.isPending) {
+  if (getListInvestments.isLoading || getListInvestments.isPending) {
     return (
       <div className="flex flex-col gap-6 px-3 sm:px-4 md:px-6 py-3 sm:py-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
@@ -365,12 +296,12 @@ export default function PortfolioPageEnhanced() {
   }
 
   // Error state
-  if (getListWallets.error) {
+  if (getListInvestments.error) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-danger-600 text-center">
           <p className="text-lg font-semibold">{t("errorLoading")}</p>
-          <p className="text-sm">{getListWallets.error.message}</p>
+          <p className="text-sm">{getListInvestments.error.message}</p>
         </div>
       </div>
     );
@@ -378,29 +309,6 @@ export default function PortfolioPageEnhanced() {
 
   const portfolioSummary = getPortfolioSummary.data?.data;
   const investments = sortedInvestments;
-
-  // No investment wallets
-  if (investmentWallets.length === 0) {
-    return (
-      <>
-        <EmptyWalletsState
-          onOpenModal={() => handleOpenModal(ModalType.CREATE_WALLET)}
-        />
-        <BaseModal
-          isOpen={modalType !== null}
-          onClose={handleCloseModal}
-          title={modalTitle}
-        >
-          {modalType === ModalType.CREATE_WALLET && (
-            <CreateWalletForm
-              onSuccess={handleModalSuccess}
-              defaultType={WalletType.INVESTMENT}
-            />
-          )}
-        </BaseModal>
-      </>
-    );
-  }
 
   return (
     <>
@@ -414,19 +322,6 @@ export default function PortfolioPageEnhanced() {
 
             {/* Filter Controls */}
             <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-              <div className="w-full sm:w-56 md:w-fit">
-                <FormSelect
-                  options={walletOptions}
-                  value={selectedWallet}
-                  onChange={(value) => {
-                    startTransition(() =>
-                      setSelectedWallet(value as WalletFilterValue),
-                    );
-                  }}
-                  placeholder={t("selectWalletPlaceholder")}
-                />
-              </div>
-
               <div className="w-full sm:w-full md:w-40">
                 <FormSelect
                   options={TYPE_FILTER_OPTIONS}
@@ -472,16 +367,6 @@ export default function PortfolioPageEnhanced() {
           {/* Success Banner */}
           {showSuccessBanner && <UpdateSuccessBanner />}
 
-          {/* Wallet Cash Balance */}
-          {!isAllWalletsView && (
-            <WalletCashBalanceCard
-              wallet={investmentWallets.find(
-                (w) => w.id === Number(selectedWallet),
-              )}
-              userCurrency={currency}
-            />
-          )}
-
           {/* Holdings - Mobile Card View */}
           <BaseCard className="p-4">
             <div className="flex justify-between items-center mb-4">
@@ -505,7 +390,6 @@ export default function PortfolioPageEnhanced() {
                       handleOpenModal(ModalType.INVESTMENT_DETAIL, id)
                     }
                     // onRowHover={handleRowHover} // Not supported in InvestmentCardEnhanced
-                    showWallet={isAllWalletsView}
                     onBuyMore={handleBuyMore}
                     onSell={handleSell}
                     onEdit={handleEdit}
@@ -533,12 +417,6 @@ export default function PortfolioPageEnhanced() {
         onClose={handleCloseModal}
         title={modalTitle}
       >
-        {modalType === ModalType.CREATE_WALLET && (
-          <CreateWalletForm
-            onSuccess={handleModalSuccess}
-            defaultType={WalletType.INVESTMENT}
-          />
-        )}
         {modalType === ModalType.ADD_INVESTMENT && (
           <AddInvestmentForm
             onSuccess={handleModalSuccess}

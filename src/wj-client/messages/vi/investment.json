@@ -1,6 +1,6 @@
 {
   "investment": {
-    "title": "Danh mục đầu tư",
+    "title": "Sổ đầu tư tích lũy",
     "holdings": "Tài sản nắm giữ",
     "selectWallet": "Chọn ví",
     "allInvestmentWallets": "Tất cả ví đầu tư",
@@ -27,7 +27,7 @@
       "moreDetails": "Thêm chi tiết"
     },
     "summary": {
-      "totalValue": "Tổng giá trị",
+      "totalValue": "Giá trị hiện tại",
       "totalCost": "Tổng chi phí",
       "totalPnl": "Tổng lãi/lỗ",
       "periodPnl": "Lãi/lỗ theo kỳ",
@@ -267,7 +267,7 @@
       "cashAndInvestments": "Tiền mặt + Đầu tư"
     },
     "page": {
-      "title": "Danh mục đầu tư",
+      "title": "Sổ đầu tư tích lũy",
       "selectWallet": "Chọn ví",
       "filterByType": "Lọc theo loại",
       "sortBy": "Sắp xếp theo",
