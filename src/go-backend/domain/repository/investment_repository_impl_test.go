@@ -490,13 +490,13 @@ func TestInvestmentRepository_ListByUserID(t *testing.T) {
 	repo := NewInvestmentRepository(database)
 	ctx := context.Background()
 
-	// Mock wallet query (GORM Pluck uses backticks and wraps compound WHERE in parens)
+	// Mock wallet query — after decoupling, no wallet type filter (any wallet can hold investments)
 	walletRows := sqlmock.NewRows([]string{"id"}).
 		AddRow(1).
 		AddRow(2)
 
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT `id` FROM `wallet` WHERE (user_id = ? AND status = 1 AND type = ?) AND `wallet`.`deleted_at` IS NULL")).
-		WithArgs(10, 1).
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT `id` FROM `wallet` WHERE (user_id = ? AND status = 1) AND `wallet`.`deleted_at` IS NULL")).
+		WithArgs(10).
 		WillReturnRows(walletRows)
 
 	// Mock investment query: COUNT first, then SELECT
@@ -536,11 +536,11 @@ func TestInvestmentRepository_ListByUserID_NoWallets(t *testing.T) {
 	repo := NewInvestmentRepository(database)
 	ctx := context.Background()
 
-	// Mock empty wallet result (GORM Pluck uses backticks and wraps compound WHERE in parens)
+	// Mock empty wallet result — after decoupling, no wallet type filter
 	walletRows := sqlmock.NewRows([]string{"id"})
 
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT `id` FROM `wallet` WHERE (user_id = ? AND status = 1 AND type = ?) AND `wallet`.`deleted_at` IS NULL")).
-		WithArgs(10, 1).
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT `id` FROM `wallet` WHERE (user_id = ? AND status = 1) AND `wallet`.`deleted_at` IS NULL")).
+		WithArgs(10).
 		WillReturnRows(walletRows)
 
 	investments, total, err := repo.ListByUserID(ctx, 10, ListOptions{}, 0)
