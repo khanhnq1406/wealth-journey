@@ -5,9 +5,9 @@
 - **Plan file:** docs/plans/2026-03-16-decouple-investment-wallet-plan.md
 - **Spec file:** docs/specs/2026-03-16-decouple-investment-wallet-spec.md
 - **Started:** 2026-03-16T00:00:00Z
-- **Last updated:** 2026-03-16T00:00:00Z
+- **Last updated:** 2026-03-16T12:00:00Z
 - **Current state:** in_progress
-- **Current task:** 1
+- **Current task:** 9
 
 ## Task Progress
 
@@ -19,8 +19,8 @@
 | 4 | Backend — Update ListInvestmentWallets and portfolio snapshot job | done | pending-commit | Removed type filter from ListInvestmentWallets, UpdatePrices, ListInvestments. Simplified snapshot job. Updated user cache invalidation. |
 | 5 | Backend — Force wallet type to BASIC in CreateWallet | done | pending-commit | Force WalletType_BASIC in CreateWallet, ignore request type field. |
 | 6 | Backend — Database migration to convert INVESTMENT wallets to BASIC | done | pending-commit | Created migrate-wallet-type command with dry-run support. Added Taskfile entry. |
-| 7 | Frontend — Remove wallet selector and balance display from AddInvestmentForm | pending | — | — |
-| 8 | Frontend — Remove wallet type selector from CreateWalletForm | pending | — | — |
+| 7 | Frontend — Remove wallet selector and balance display from AddInvestmentForm | done | pending-commit | Removed wallet props, selector UI, balance preview, insufficient balance check. Set walletId=0 for auto-assign. Removed unused imports. |
+| 8 | Frontend — Remove wallet type selector from CreateWalletForm | done | pending-commit | Removed defaultType prop, wallet type selector dropdown, walletTypeOptions. Hardcoded WalletType.BASIC. |
 | 9 | Frontend — Remove wallet filter and cash balance from portfolio page | pending | — | — |
 | 10 | Frontend — Clean up unused translation keys and wallet type references | pending | — | — |
 | 11 | Update C4 Architecture Diagrams | pending | — | — |

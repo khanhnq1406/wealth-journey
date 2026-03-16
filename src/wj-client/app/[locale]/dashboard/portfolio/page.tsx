@@ -541,15 +541,6 @@ export default function PortfolioPageEnhanced() {
         )}
         {modalType === ModalType.ADD_INVESTMENT && (
           <AddInvestmentForm
-            walletId={
-              !isAllWalletsView ? parseInt(selectedWallet, 10) : undefined
-            }
-            walletBalance={
-              !isAllWalletsView ? selectedWalletBalance : undefined
-            }
-            walletCurrency={
-              !isAllWalletsView ? selectedWalletCurrency : undefined
-            }
             onSuccess={handleModalSuccess}
           />
         )}
