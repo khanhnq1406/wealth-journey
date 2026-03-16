@@ -539,14 +539,9 @@ func (s *investmentService) AddTransaction(ctx context.Context, userID int32, re
 	}
 
 	// 3. Verify wallet ownership
-	wallet, err := s.walletRepo.GetByIDForUser(ctx, investment.WalletID, userID)
+	_, err = s.walletRepo.GetByIDForUser(ctx, investment.WalletID, userID)
 	if err != nil {
 		return nil, err
-	}
-	_ = wallet // Used for ownership verification
-
-	if v1.WalletType(wallet.Type) != v1.WalletType_INVESTMENT {
-		return nil, apperrors.NewValidationError("transactions can only be added to investments in investment wallets")
 	}
 
 	// 4. Calculate transaction cost using utility function

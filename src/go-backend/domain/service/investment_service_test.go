@@ -810,7 +810,7 @@ func TestInvestmentService_AddTransaction_BuyCreatesLot(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 	investment := createTestInvestment(investmentID, walletID, "AAPL", 0, 0, 0)
 
 	req := &v1.AddTransactionRequest{
@@ -874,7 +874,7 @@ func TestInvestmentService_AddTransaction_SellConsumesOldestLot(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 	investment := createTestInvestment(investmentID, walletID, "AAPL", 20000, 1500000, 30000000000)
 
 	// Create two lots - oldest should be consumed first
@@ -963,7 +963,7 @@ func TestInvestmentService_AddTransaction_SellConsumesMultipleLots(t *testing.T)
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 	investment := createTestInvestment(investmentID, walletID, "AAPL", 20000, 1500000, 30000000000)
 
 	// Create two lots with small quantities
@@ -1048,7 +1048,7 @@ func TestInvestmentService_AddTransaction_SellExceedsQuantity(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 	investment := createTestInvestment(investmentID, walletID, "AAPL", 5000, 1500000, 7500000000)
 
 	req := &v1.AddTransactionRequest{
@@ -1102,7 +1102,7 @@ func TestInvestmentService_GetPortfolioSummary_Success(t *testing.T) {
 	ctx := context.Background()
 	userID := int32(1)
 	walletID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 
 	// GetPortfolioSummary aggregates from investments in-memory.
 	// Create 5 investments (3 STOCK, 2 CRYPTO) with known values in USD (matches preferred currency).
@@ -1208,7 +1208,7 @@ func TestInvestmentService_UpdatePrices_Success(t *testing.T) {
 	}
 
 	mockWalletRepo.On("ListByUserID", ctx, userID, mock.Anything).Return([]*models.Wallet{
-		{ID: 1, UserID: userID, Type: int32(v1.WalletType_INVESTMENT)},
+		{ID: 1, UserID: userID, Type: int32(v1.WalletType_BASIC)},
 	}, 1, nil)
 	mockInvestmentRepo.On("ListByWalletID", ctx, int32(1), mock.Anything, v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED).Return([]*models.Investment{investment1, investment2}, 2, nil)
 	// UpdatePrices runs async in a goroutine with its own timeout context — use mock.Anything + Maybe()
@@ -1260,7 +1260,7 @@ func TestInvestmentService_UpdatePrices_SkipsCustomInvestments(t *testing.T) {
 	).(*investmentService)
 
 	// Create test wallets
-	wallet1 := &models.Wallet{ID: 1, UserID: userID, Type: int32(v1.WalletType_INVESTMENT), Currency: "USD"}
+	wallet1 := &models.Wallet{ID: 1, UserID: userID, Type: int32(v1.WalletType_BASIC), Currency: "USD"}
 	mockWalletRepo.On("ListByUserID", ctx, userID, mock.Anything).Return([]*models.Wallet{wallet1}, 1, nil)
 
 	// Create mixed investments (1 market-based, 1 custom)
@@ -1323,7 +1323,7 @@ func TestInvestmentService_DeleteInvestment_RefundsWalletBalance(t *testing.T) {
 	investmentID := int32(1)
 
 	// Create test wallet and investment with same currency (no conversion needed)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 	wallet.Currency = "USD"
 	wallet.Balance = 5000000000 // $50,000 in cents
 
@@ -1380,7 +1380,7 @@ func TestInvestmentService_DeleteInvestment_RefundsWithCurrencyConversion(t *tes
 	investmentID := int32(1)
 
 	// Create test wallet in VND and investment in USD
-	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 	wallet.Currency = "VND"
 	wallet.Balance = 500000000 // 5M VND
 

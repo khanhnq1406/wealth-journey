@@ -74,7 +74,7 @@ func TestSellTransaction_CostBasisPreserved(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 
 	// Initial state: Bought 100 shares @ $150 = $15,000 total cost
 	// Quantity: 10000 (1 share with 4 decimals), TotalCost: $15,000, AverageCost: $150
@@ -190,7 +190,7 @@ func TestSellTransaction_SellAllShares(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 
 	// Initial state: Bought 100 shares @ $150 = $15,000 total cost
 	investment := &models.Investment{
@@ -292,7 +292,7 @@ func TestSellTransaction_MultipleBuysThenSell(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 
 	// Scenario:
 	// Buy 1: 100 shares @ $150 = $15,000
@@ -408,7 +408,7 @@ func TestSellTransaction_InsufficientQuantity(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 
 	investment := &models.Investment{
 		ID:          investmentID,
@@ -473,7 +473,7 @@ func TestSellTransaction_NoOpenLots(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 
 	investment := &models.Investment{
 		ID:          investmentID,
@@ -540,7 +540,7 @@ func TestSellTransaction_FIFOMultipleLots(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_INVESTMENT)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 
 	// Scenario: Sell quantity that spans multiple lots
 	// Lot 1: 20 shares @ $150 (oldest)

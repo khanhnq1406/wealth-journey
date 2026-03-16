@@ -14,7 +14,7 @@
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
 | 1 | Backend — Remove wallet type validation and balance checks from CreateInvestment | done | pending-commit | Removed wallet type check, balance validation, balance deduction. Added auto-wallet selection when walletId=0. |
-| 2 | Backend — Remove wallet type check from AddTransaction | pending | — | — |
+| 2 | Backend — Remove wallet type check from AddTransaction | done | pending-commit | Removed wallet type check from AddTransaction. Updated all tests to use BASIC wallet type. |
 | 3 | Backend — Remove investment value enrichment from wallet service | pending | — | — |
 | 4 | Backend — Update ListInvestmentWallets and portfolio snapshot job | pending | — | — |
 | 5 | Backend — Force wallet type to BASIC in CreateWallet | pending | — | — |
