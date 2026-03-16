@@ -6,36 +6,26 @@
 - **Spec file:** docs/specs/2026-03-16-finance-page-consolidation-spec.md
 - **Started:** 2026-03-16
 - **Last updated:** 2026-03-16
-- **Current state:** in_progress
-- **Current task:** 1
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 1 | Add translation keys for Finance page | pending | — | — |
-| 2 | Add finance route to constants | pending | — | — |
-| 3 | Extract page content into named exports | pending | — | — |
-| 4 | Create FinanceTabBar component | pending | — | — |
-| 5 | Create Finance page | pending | — | — |
-| 6 | Set up middleware redirects | pending | — | — |
-| 7 | Update navigation (sidebar + mobile + icons) | pending | — | — |
-| 8 | Verify page content in tab context | pending | — | — |
-| 9 | Update C4 frontend architecture diagram | pending | — | — |
-
-## Resume Instructions
-
-To resume this implementation in a new session:
-1. Read this progress file
-2. Read the plan file referenced above
-3. Check `git log --oneline -10` to verify last commit matches the last `done` task
-4. Check `git status` for any uncommitted work
-5. Continue from the next `pending` task
+| 1 | Add translation keys for Finance page | done | b7ec9ad | Added nav keys (en/vi), finance.json files, messageGroups entry |
+| 2 | Add finance route to constants | done | b7ec9ad | Added `finance: '/dashboard/finance'` to routes |
+| 3 | Extract page content into named exports | done | b7ec9ad | TransactionContent, ReportContent, BudgetContent as named exports |
+| 4 | Create FinanceTabBar component | done | b7ec9ad | ARIA tablist, keyboard nav, responsive layout, active indicator |
+| 5 | Create Finance page | done | 67bc084 | Dynamic imports, URL-synced tabs, Suspense boundary |
+| 6 | Set up middleware redirects | done | 04ba2be | Custom middleware with 308 redirects, query param preservation |
+| 7 | Update navigation (sidebar + mobile + icons) | done | 04ba2be | Consolidated to Finance + Wallets, removed unused icons |
+| 8 | Verify page content in tab context | done | — | No changes needed, layout verified correct |
+| 9 | Update C4 frontend architecture diagram | done | (this commit) | Replaced txn/report/budget pages with finance_page in diagram |
 
 ## Notes
 
-- Tasks 1-4 are independent and can be done in parallel (different files)
-- Task 5 depends on 1-4
-- Tasks 6, 7 are independent of each other but 7 modifies layout.tsx only
-- Task 8 depends on 5
-- Task 9 (C4 diagram) is independent
+- Build verified passing after all changes
+- Old route pages kept in codebase (serve as source for dynamic imports)
+- Middleware handles locale-prefixed redirects correctly
+- No nested scroll issues — tab panel scroll context works with layout

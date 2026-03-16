@@ -10,11 +10,9 @@ C4Component
         Component(landing, "Landing Page", "app/landing", "Price teaser page: gold/silver/currency type tables with login links. Live TradingView gold/silver charts (no login required). Fetches from public /api/v1/public/market-types endpoint (no auth).")
         Component(auth_pages, "Auth Pages", "app/auth", "Login and register with Google OAuth")
         Component(dashboard, "Dashboard Home", "app/dashboard/home", "V2 Crimson & Gold: net worth, PNL card (self-contained with 1D/1W/1M/ALL period tabs), gold/silver TradingView charts (XAUUSD, XAGUSD), currency price table, wallets")
-        Component(txn_page, "Transaction Page", "app/dashboard/transaction", "Transaction list with filters and search")
+        Component(finance_page, "Finance Page", "app/dashboard/finance", "Unified tabbed view: FinanceTabBar switches between TransactionContent, ReportContent, BudgetContent via URL query params (?tab=transaction|report|budget). Content lazy-loaded via next/dynamic. Old routes (/transaction, /report, /budget) redirect here via middleware.")
         Component(wallet_page, "Wallet Page", "app/dashboard/wallets", "Wallet grid/list with fund operations")
         Component(portfolio_page, "Portfolio Page", "app/dashboard/portfolio", "Investment portfolio with analytics; period pill selector (1D/1W/1M/ALL) via PortfolioSummaryEnhanced")
-        Component(budget_page, "Budget Page", "app/dashboard/budget", "Budget tracking with progress indicators")
-        Component(report_page, "Report Page", "app/dashboard/report", "Financial reports with exports; Wallet Analytics section: Balance, AccountBalance, Dominance, MonthlyDominance chart components (co-located)")
         Component(prices_page, "Prices Page", "app/dashboard/prices", "Live gold/silver/currency/market prices with 4 tabs (Gold, Silver, Currency, Symbol Lookup). Admin users see inline price edit controls via useAuth isAdmin check.")
         Component(community_page, "Community Page", "app/dashboard/community", "Social feed with posts, comments, likes, user profiles")
         Component(settings, "Settings Pages", "app/dashboard/settings", "Sessions, import templates, language toggle")
@@ -62,7 +60,7 @@ C4Component
     }
 
     Container_Boundary(i18n, "Internationalization") {
-        Component(intl_mw, "next-intl Middleware", "middleware.ts", "Intercepts all requests, resolves locale from URL/cookie/Accept-Language, redirects locale-less URLs")
+        Component(intl_mw, "next-intl Middleware", "middleware.ts", "Intercepts all requests, resolves locale from URL/cookie/Accept-Language, redirects locale-less URLs. Also redirects old finance routes (/transaction, /report, /budget) to /dashboard/finance with ?tab= param.")
         ComponentDb(intl_catalogs, "Translation Catalogs", "messages/en.json, messages/vi.json", "Static per-locale string catalogs")
     }
 
@@ -70,11 +68,11 @@ C4Component
     Rel(dashboard, txn_feat, "Renders recent transactions")
     Rel(dashboard, gen_hooks, "PNLCard: useQueryGetAggregatedPortfolioSummary(period) + useQueryGetHistoricalPortfolioValues")
     Rel(dashboard, charts, "GoldPriceChart & SilverPriceChart use TradingViewChart (TVC:GOLD, TVC:SILVER)")
-    Rel(txn_page, txn_feat, "Renders transaction management")
+    Rel(finance_page, txn_feat, "Renders transaction tab content")
+    Rel(finance_page, budget_feat, "Renders budget tab content")
+    Rel(finance_page, report_feat, "Renders report tab content")
     Rel(wallet_page, wallet_feat, "Renders wallet management")
     Rel(portfolio_page, invest_feat, "Renders portfolio")
-    Rel(budget_page, budget_feat, "Renders budgets")
-    Rel(report_page, report_feat, "Renders reports")
     Rel(prices_page, prices_feat, "Renders price tables")
     Rel(prices_page, auth_feat, "useAuth isAdmin check for inline price editing")
     Rel(auth_pages, auth_feat, "Renders auth forms")
