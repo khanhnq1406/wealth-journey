@@ -155,6 +155,8 @@
       "cachedPrice": "(Giá đã lưu cache)",
       "unableToFetchPrice": "Không thể lấy giá",
       "quantityHint": "Số cổ phiếu, đồng coin hoặc đơn vị bạn đang nắm giữ",
+      "maceUnit": "Chỉ",
+      "maceUnitLong": "chỉ",
       "taelUnit": "Tael (lượng)",
       "kgUnit": "Kg",
       "customInvestmentDescription": "Tạo khoản đầu tư cho tài sản không có trên thị trường",

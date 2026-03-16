@@ -320,7 +320,7 @@ export interface Investment {
   totalDividends: number;
   /** Name of the wallet (for display in "All Wallets" view) */
   walletName: string;
-  /** User's purchase unit for display ("tael", "kg", "oz", "gram") */
+  /** User's purchase unit for display ("mace", "tael", "kg", "oz", "gram") */
   purchaseUnit: string;
   /** Current price in user's preferred currency */
   displayCurrentPrice:
@@ -480,7 +480,7 @@ export interface GoldTypeCode {
   name: string;
   /** "VND" or "USD" */
   currency: string;
-  /** "tael", "gram", or "oz" */
+  /** "mace", "gram", or "oz" */
   unit: string;
   /** Weight in grams */
   unitWeight: number;
@@ -587,7 +587,7 @@ export interface MarketPrice {
   timestamp: number;
   /** Cache hit indicator */
   isCached: boolean;
-  /** "tael", "oz", "unit", etc. */
+  /** "mace", "oz", "unit", etc. */
   displayUnit: string;
 }
 
@@ -698,7 +698,7 @@ export interface CreateInvestmentRequest {
   isCustom: boolean;
   /** Optional: Unix timestamp (0 = not set, use current time) */
   purchaseDate: number;
-  /** User's input unit ("tael", "kg", "oz", "gram") */
+  /** User's input unit ("mace", "tael", "kg", "oz", "gram") */
   purchaseUnit: string;
 }
 

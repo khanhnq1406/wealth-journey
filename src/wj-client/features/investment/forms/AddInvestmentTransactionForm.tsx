@@ -52,7 +52,7 @@ interface AddInvestmentTransactionFormProps {
   investmentId: number;
   investmentType: InvestmentType;
   investmentCurrency?: string; // Currency of the parent investment (ISO 4217)
-  purchaseUnit?: string; // User's purchase unit for display ("tael", "kg", "oz", "gram")
+  purchaseUnit?: string; // User's purchase unit for display ("mace", "tael", "kg", "oz", "gram")
   symbol?: string; // Symbol for price lookup
   onSuccess?: () => void;
 }
@@ -160,10 +160,10 @@ export function AddInvestmentTransactionForm({
   const goldDisplayUnit = useMemo(() => {
     if (!isGoldInvestment) return null;
     const { unit } = getGoldStorageInfo(investmentType);
-    // For VND gold, user enters quantity in taels (display convention)
+    // For VND gold, user enters quantity in mace/chỉ (display convention)
     // For USD gold, user enters quantity in ounces (storage convention)
     return investmentType === InvestmentType.INVESTMENT_TYPE_GOLD_VND
-      ? ("tael" as const)
+      ? ("mace" as const)
       : ("oz" as const);
   }, [investmentType, isGoldInvestment]);
 
@@ -244,11 +244,11 @@ export function AddInvestmentTransactionForm({
       // Convert price from display units to storage units
       priceInStorage = completeData.price;
       if (investmentType === InvestmentType.INVESTMENT_TYPE_GOLD_VND) {
-        // User enters price per tael, convert to price per gram
+        // User enters price per mace (chỉ), convert to price per gram
         // IMPORTANT: Use convertGoldPricePerUnit, not convertGoldQuantity!
         priceInStorage = convertGoldPricePerUnit(
           completeData.price,
-          goldDisplayUnit, // tael
+          goldDisplayUnit, // mace
           storageUnit, // gram
         );
       }
@@ -346,7 +346,7 @@ export function AddInvestmentTransactionForm({
               : t("transaction.quantity")
         }
         placeholder={
-          (isGoldInvestment && goldDisplayUnit === "tael") ||
+          (isGoldInvestment && goldDisplayUnit === "mace") ||
           (isSilverInvestment && silverDisplayUnit === "tael")
             ? "0.0000"
             : isSilverInvestment && silverDisplayUnit === "kg"
@@ -357,7 +357,7 @@ export function AddInvestmentTransactionForm({
         disabled={isSubmitting}
         min={0}
         step={
-          (isGoldInvestment && goldDisplayUnit === "tael") ||
+          (isGoldInvestment && goldDisplayUnit === "mace") ||
           (isSilverInvestment && silverDisplayUnit === "tael")
             ? "0.0001"
             : isSilverInvestment && silverDisplayUnit === "kg"
