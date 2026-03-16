@@ -7,14 +7,14 @@
 - **Started:** 2026-03-16
 - **Last updated:** 2026-03-16
 - **Current state:** in_progress
-- **Current task:** 2
+- **Current task:** 3
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
 | 1 | Database Migration — Add category column | done | — | Added Category field to GoldVote and GoldVoteComment models, updated migration with category-aware indexes |
-| 2 | Update Proto Definitions — Add SentimentCategory enum | pending | — | — |
+| 2 | Update Proto Definitions — Add SentimentCategory enum | done | — | Added SentimentCategory enum and category field to all request/response messages |
 | 3 | Update Repository Layer — Category-aware queries | pending | — | — |
 | 4 | Update Service Layer — Category-aware business logic | pending | — | — |
 | 5 | Update Handler Layer — Pass category from HTTP requests | pending | — | — |

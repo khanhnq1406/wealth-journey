@@ -12,7 +12,14 @@ enum VoteDirection {
     VOTE_DIRECTION_BEARISH = 2;
 }
 
-message GetGoldSentimentRequest {}
+enum SentimentCategory {
+    SENTIMENT_CATEGORY_GOLD = 0;
+    SENTIMENT_CATEGORY_SILVER = 1;
+}
+
+message GetGoldSentimentRequest {
+    SentimentCategory category = 1 [json_name = "category"];
+}
 
 message GetGoldSentimentResponse {
     int32 bullish_count = 1 [json_name = "bullishCount"];
@@ -22,11 +29,13 @@ message GetGoldSentimentResponse {
     double bearish_percentage = 5 [json_name = "bearishPercentage"];
     string vote_date = 6 [json_name = "voteDate"];
     VoteDirection user_vote = 7 [json_name = "userVote"];
+    SentimentCategory category = 8 [json_name = "category"];
 }
 
 message GetGoldSentimentCommentsRequest {
     int32 page = 1 [json_name = "page"];
     int32 page_size = 2 [json_name = "pageSize"];
+    SentimentCategory category = 3 [json_name = "category"];
 }
 
 message GoldSentimentCommentItem {
@@ -48,10 +57,12 @@ message GetGoldSentimentCommentsResponse {
     // The date these comments belong to (YYYY-MM-DD). May differ from today if
     // today has no comments and the backend fell back to a recent day.
     string comment_date = 5 [json_name = "commentDate"];
+    SentimentCategory category = 6 [json_name = "category"];
 }
 
 message CastGoldVoteRequest {
     VoteDirection direction = 1 [json_name = "direction"];
+    SentimentCategory category = 2 [json_name = "category"];
 }
 
 message CastGoldVoteResponse {
@@ -66,6 +77,7 @@ message CastGoldVoteResponse {
 
 message PostGoldSentimentCommentRequest {
     string content = 1 [json_name = "content"];
+    SentimentCategory category = 2 [json_name = "category"];
 }
 
 message PostGoldSentimentCommentResponse {
@@ -74,6 +86,7 @@ message PostGoldSentimentCommentResponse {
 
 message DeleteGoldSentimentCommentRequest {
     int32 comment_id = 1 [json_name = "commentId"];
+    SentimentCategory category = 2 [json_name = "category"];
 }
 
 message DeleteGoldSentimentCommentResponse {}
