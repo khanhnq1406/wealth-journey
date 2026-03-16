@@ -7,14 +7,14 @@
 - **Started:** 2026-03-16T00:00:00Z
 - **Last updated:** 2026-03-16T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 2
+- **Current task:** 3
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
 | 1 | Database Migration — Make Email Nullable | done | 5de621c | Migration script + User.Email changed to *string |
-| 2 | Fix All Email *string Type Propagation | pending | — | — |
+| 2 | Fix All Email *string Type Propagation | done | 7007279 | getUserEmail helper + all *string fixes across auth, service, jobs |
 | 3 | Migrate Redis Session Functions from Email to UserID | pending | — | — |
 | 4 | Update All Redis Session Callers to Use UserID | pending | — | — |
 | 5 | Update GetAuth to Use UserID Instead of Email | pending | — | — |

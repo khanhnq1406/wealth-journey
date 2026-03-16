@@ -207,8 +207,8 @@ func (s *Server) generateLoginResponse(ctx context.Context, user models.User, de
 		ExpiresAt:    now.Add(s.cfg.JWT.Expiration),
 	}
 
-	// Store session in Redis
-	if err := s.rdb.AddSession(getUserEmail(user), sessionID, tokenString, sessionData); err != nil {
+	// Store session in Redis (keyed by userID)
+	if err := s.rdb.AddSession(user.ID, sessionID, tokenString, sessionData); err != nil {
 		return nil, fmt.Errorf("failed to store session: %w", err)
 	}
 
@@ -315,8 +315,8 @@ func (s *Server) Logout(tokenString string) (*authv1.LogoutResponse, error) {
 		return nil, fmt.Errorf("invalid token claims")
 	}
 
-	// Remove specific session from Redis
-	if err := s.rdb.RemoveSession(claims.Email, claims.SessionID); err != nil {
+	// Remove specific session from Redis (keyed by userID)
+	if err := s.rdb.RemoveSession(claims.UserID, claims.SessionID); err != nil {
 		return nil, fmt.Errorf("failed to logout: %w", err)
 	}
 
@@ -347,8 +347,8 @@ func (s *Server) VerifyAuth(tokenString string) (*authv1.VerifyAuthResponse, err
 		return nil, fmt.Errorf("invalid token claims")
 	}
 
-	// Verify session exists in Redis
-	exists, err := s.rdb.SessionExists(claims.Email, claims.SessionID)
+	// Verify session exists in Redis (keyed by userID)
+	exists, err := s.rdb.SessionExists(claims.UserID, claims.SessionID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to verify session: %w", err)
 	}
@@ -367,10 +367,9 @@ func (s *Server) VerifyAuth(tokenString string) (*authv1.VerifyAuthResponse, err
 		log.Printf("Warning: Failed to update session activity: %v", err)
 	}
 
-	// Get user from database
+	// Get user from database (by userID, not email)
 	var user models.User
-	result := s.db.DB.Where("email = ?", claims.Email).First(&user)
-	if result.Error != nil {
+	if err := s.db.DB.First(&user, claims.UserID).Error; err != nil {
 		return nil, fmt.Errorf("user not found")
 	}
 
@@ -637,7 +636,7 @@ func (s *Server) LinkPassword(ctx context.Context, userID int32, req *authv1.Lin
 }
 
 // ChangePassword changes the user's password and invalidates all other sessions
-func (s *Server) ChangePassword(ctx context.Context, userID int32, email string, req *authv1.ChangePasswordRequest, currentSessionID string) (*authv1.ChangePasswordResponse, error) {
+func (s *Server) ChangePassword(ctx context.Context, userID int32, req *authv1.ChangePasswordRequest, currentSessionID string) (*authv1.ChangePasswordResponse, error) {
 	// Get user
 	var user models.User
 	if err := s.db.DB.First(&user, userID).Error; err != nil {
@@ -675,8 +674,8 @@ func (s *Server) ChangePassword(ctx context.Context, userID int32, email string,
 		return nil, fmt.Errorf("failed to update password: %w", err)
 	}
 
-	// Invalidate all other sessions except current
-	s.invalidateOtherSessions(email, currentSessionID)
+	// Invalidate all other sessions except current (by userID)
+	s.invalidateOtherSessions(userID, currentSessionID)
 
 	return &authv1.ChangePasswordResponse{
 		Success:   true,
@@ -686,9 +685,9 @@ func (s *Server) ChangePassword(ctx context.Context, userID int32, email string,
 }
 
 // invalidateOtherSessions removes all sessions for a user except the current one
-func (s *Server) invalidateOtherSessions(email string, keepSessionID string) {
-	// Get all session IDs from Redis
-	sessionIDs, err := s.rdb.GetUserSessions(email)
+func (s *Server) invalidateOtherSessions(userID int32, keepSessionID string) {
+	// Get all session IDs from Redis (keyed by userID)
+	sessionIDs, err := s.rdb.GetUserSessions(userID)
 	if err != nil {
 		log.Printf("Warning: Failed to get user sessions for invalidation: %v", err)
 		return
@@ -696,14 +695,14 @@ func (s *Server) invalidateOtherSessions(email string, keepSessionID string) {
 
 	for _, sessionID := range sessionIDs {
 		if sessionID != keepSessionID {
-			if err := s.rdb.RemoveSession(email, sessionID); err != nil {
+			if err := s.rdb.RemoveSession(userID, sessionID); err != nil {
 				log.Printf("Warning: Failed to remove session %s: %v", sessionID, err)
 			}
 		}
 	}
 
 	// Also clean up database sessions
-	if err := s.db.DB.Where("user_id = (SELECT id FROM \"user\" WHERE email = ?) AND session_id != ?", email, keepSessionID).Delete(&models.Session{}).Error; err != nil {
+	if err := s.db.DB.Where("user_id = ? AND session_id != ?", userID, keepSessionID).Delete(&models.Session{}).Error; err != nil {
 		log.Printf("Warning: Failed to delete other sessions from database: %v", err)
 	}
 }

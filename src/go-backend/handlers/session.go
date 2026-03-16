@@ -30,18 +30,16 @@ func NewSessionHandlers(authSrv *auth.Server, rdb *redis.RedisClient) *SessionHa
 
 // ListSessions lists all active sessions for the authenticated user
 func (h *SessionHandlers) ListSessions(c *gin.Context) {
-	// Get user email from context (set by AuthMiddleware)
-	userEmail, exists := c.Get("user_email")
-	if !exists {
+	// Get user ID from context (set by AuthMiddleware)
+	userID, ok := handler.GetUserID(c)
+	if !ok {
 		handler.UnauthorizedWithPath(c, "User not authenticated")
 		return
 	}
 
-	email := userEmail.(string)
-
 	// Get current session ID from token
-	token, ok := ExtractBearerToken(c)
-	if !ok {
+	token, tokenOk := ExtractBearerToken(c)
+	if !tokenOk {
 		handler.UnauthorizedWithPath(c, "Invalid token")
 		return
 	}
@@ -54,8 +52,8 @@ func (h *SessionHandlers) ListSessions(c *gin.Context) {
 
 	currentSessionID := claims.SessionID
 
-	// Get all sessions for user from Redis
-	sessionIDs, err := h.rdb.GetUserSessions(email)
+	// Get all sessions for user from Redis (keyed by userID)
+	sessionIDs, err := h.rdb.GetUserSessions(userID)
 	if err != nil {
 		log.Printf("[SESSION] Failed to get sessions: %v", err)
 		handler.HandleError(c, apperrors.NewInternalError("Failed to retrieve sessions"))
@@ -101,18 +99,16 @@ func (h *SessionHandlers) RevokeSession(c *gin.Context) {
 		return
 	}
 
-	// Get user email from context
-	userEmail, exists := c.Get("user_email")
-	if !exists {
+	// Get user ID from context
+	userID, ok := handler.GetUserID(c)
+	if !ok {
 		handler.UnauthorizedWithPath(c, "User not authenticated")
 		return
 	}
 
-	email := userEmail.(string)
-
 	// Get current session ID to prevent self-revocation
-	token, ok := ExtractBearerToken(c)
-	if !ok {
+	token, tokenOk := ExtractBearerToken(c)
+	if !tokenOk {
 		handler.UnauthorizedWithPath(c, "Invalid token")
 		return
 	}
@@ -131,8 +127,8 @@ func (h *SessionHandlers) RevokeSession(c *gin.Context) {
 		return
 	}
 
-	// Verify session belongs to user
-	exists, err = h.rdb.SessionExists(email, sessionID)
+	// Verify session belongs to user (keyed by userID)
+	exists, err := h.rdb.SessionExists(userID, sessionID)
 	if err != nil {
 		log.Printf("[SESSION] Error checking session: %v", err)
 		handler.HandleError(c, apperrors.NewInternalError("Failed to verify session"))
@@ -144,8 +140,8 @@ func (h *SessionHandlers) RevokeSession(c *gin.Context) {
 		return
 	}
 
-	// Revoke session
-	if err := h.rdb.RemoveSession(email, sessionID); err != nil {
+	// Revoke session (keyed by userID)
+	if err := h.rdb.RemoveSession(userID, sessionID); err != nil {
 		log.Printf("[SESSION] Failed to revoke session: %v", err)
 		handler.HandleError(c, apperrors.NewInternalError("Failed to revoke session"))
 		return
@@ -162,18 +158,16 @@ func (h *SessionHandlers) RevokeSession(c *gin.Context) {
 
 // RevokeAllSessions revokes all sessions except the current one
 func (h *SessionHandlers) RevokeAllSessions(c *gin.Context) {
-	// Get user email from context
-	userEmail, exists := c.Get("user_email")
-	if !exists {
+	// Get user ID from context
+	userID, ok := handler.GetUserID(c)
+	if !ok {
 		handler.UnauthorizedWithPath(c, "User not authenticated")
 		return
 	}
 
-	email := userEmail.(string)
-
 	// Get current session ID
-	token, ok := ExtractBearerToken(c)
-	if !ok {
+	token, tokenOk := ExtractBearerToken(c)
+	if !tokenOk {
 		handler.UnauthorizedWithPath(c, "Invalid token")
 		return
 	}
@@ -186,8 +180,8 @@ func (h *SessionHandlers) RevokeAllSessions(c *gin.Context) {
 
 	currentSessionID := claims.SessionID
 
-	// Get all sessions
-	sessionIDs, err := h.rdb.GetUserSessions(email)
+	// Get all sessions (keyed by userID)
+	sessionIDs, err := h.rdb.GetUserSessions(userID)
 	if err != nil {
 		log.Printf("[SESSION] Failed to get sessions: %v", err)
 		handler.HandleError(c, apperrors.NewInternalError("Failed to retrieve sessions"))
@@ -198,7 +192,7 @@ func (h *SessionHandlers) RevokeAllSessions(c *gin.Context) {
 	revokedCount := 0
 	for _, sessionID := range sessionIDs {
 		if sessionID != currentSessionID {
-			if err := h.rdb.RemoveSession(email, sessionID); err != nil {
+			if err := h.rdb.RemoveSession(userID, sessionID); err != nil {
 				log.Printf("[SESSION] Failed to revoke session %s: %v", sessionID, err)
 				continue
 			}

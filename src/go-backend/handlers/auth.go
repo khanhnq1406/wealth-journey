@@ -211,12 +211,6 @@ func (h *AuthHandlers) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	email, ok := handler.GetUserEmail(c)
-	if !ok {
-		handler.UnauthorizedWithPath(c, "User not authenticated")
-		return
-	}
-
 	// Extract session ID from JWT token
 	token, ok := ExtractBearerToken(c)
 	if !ok {
@@ -241,7 +235,7 @@ func (h *AuthHandlers) ChangePassword(c *gin.Context) {
 		NewPassword:     body.NewPassword,
 	}
 
-	result, err := h.authSrv.ChangePassword(c.Request.Context(), userID, email, req, claims.SessionID)
+	result, err := h.authSrv.ChangePassword(c.Request.Context(), userID, req, claims.SessionID)
 	if err != nil {
 		log.Printf("[AUTH] Change password failed: %v", err)
 		handler.HandleError(c, err)

@@ -13,10 +13,10 @@ import (
 // Integration tests should be in a separate file with build tag
 
 func TestSessionKey(t *testing.T) {
-	email := "test@example.com"
-	expected := "session:test@example.com"
+	var userID int32 = 123
+	expected := "session:user:123"
 
-	key := redis.SessionKey(email)
+	key := redis.SessionKey(userID)
 	assert.Equal(t, expected, key)
 }
 

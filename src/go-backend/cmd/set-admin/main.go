@@ -10,6 +10,13 @@ import (
 	"wealthjourney/pkg/database"
 )
 
+func userEmail(u *models.User) string {
+	if u.Email != nil {
+		return *u.Email
+	}
+	return "<no email>"
+}
+
 func main() {
 	email := flag.String("email", "", "Email of the user to set as admin")
 	revoke := flag.Bool("revoke", false, "Revoke admin access instead of granting it")
@@ -39,9 +46,9 @@ func main() {
 
 	if user.IsAdmin == newValue {
 		if newValue {
-			fmt.Printf("User %q (ID: %d) is already an admin.\n", user.Email, user.ID)
+			fmt.Printf("User %q (ID: %d) is already an admin.\n", userEmail(&user), user.ID)
 		} else {
-			fmt.Printf("User %q (ID: %d) is already a non-admin.\n", user.Email, user.ID)
+			fmt.Printf("User %q (ID: %d) is already a non-admin.\n", userEmail(&user), user.ID)
 		}
 		return
 	}
@@ -52,8 +59,8 @@ func main() {
 	}
 
 	if newValue {
-		fmt.Printf("Successfully granted admin access to %q (ID: %d)\n", user.Email, user.ID)
+		fmt.Printf("Successfully granted admin access to %q (ID: %d)\n", userEmail(&user), user.ID)
 	} else {
-		fmt.Printf("Successfully revoked admin access from %q (ID: %d)\n", user.Email, user.ID)
+		fmt.Printf("Successfully revoked admin access from %q (ID: %d)\n", userEmail(&user), user.ID)
 	}
 }

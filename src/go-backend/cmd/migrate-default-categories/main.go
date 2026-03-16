@@ -7,6 +7,7 @@ import (
 
 	redisv8 "github.com/go-redis/redis/v8"
 
+	"wealthjourney/domain/models"
 	"wealthjourney/domain/repository"
 	"wealthjourney/domain/service"
 	"wealthjourney/pkg/config"
@@ -60,6 +61,13 @@ func main() {
 	log.Println("Migration completed successfully!")
 }
 
+func userEmail(u *models.User) string {
+	if u.Email != nil {
+		return *u.Email
+	}
+	return "<no email>"
+}
+
 func migrateDefaultCategories(ctx context.Context, repos *service.Repositories, categorySvc service.CategoryService) error {
 	// Get all users
 	users, _, err := repos.User.List(ctx, repository.ListOptions{
@@ -83,13 +91,13 @@ func migrateDefaultCategories(ctx context.Context, repos *service.Repositories, 
 		}
 
 		if categoryCount > 0 {
-			log.Printf("Skipping user %d (%s) - already has %d categories\n", user.ID, user.Email, categoryCount)
+			log.Printf("Skipping user %d (%s) - already has %d categories\n", user.ID, userEmail(user), categoryCount)
 			skippedCount++
 			continue
 		}
 
 		// Create default categories for this user
-		log.Printf("Creating default categories for user %d (%s)...\n", user.ID, user.Email)
+		log.Printf("Creating default categories for user %d (%s)...\n", user.ID, userEmail(user))
 		if err := categorySvc.CreateDefaultCategories(ctx, user.ID); err != nil {
 			log.Printf("Error: failed to create default categories for user %d: %v\n", user.ID, err)
 			continue
@@ -100,7 +108,7 @@ func migrateDefaultCategories(ctx context.Context, repos *service.Repositories, 
 		if err != nil {
 			log.Printf("Warning: failed to verify categories for user %d: %v\n", user.ID, err)
 		} else {
-			log.Printf("Successfully created %d default categories for user %d (%s)\n", newCount, user.ID, user.Email)
+			log.Printf("Successfully created %d default categories for user %d (%s)\n", newCount, user.ID, userEmail(user))
 		}
 		migratedCount++
 	}
