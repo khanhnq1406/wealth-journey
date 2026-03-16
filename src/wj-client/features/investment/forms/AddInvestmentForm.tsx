@@ -15,7 +15,6 @@ import {
 } from "@/components/forms/FormSelect";
 import { Success } from "@/components/modals/Success";
 import { SymbolAutocomplete } from "@/features/investment/components/SymbolAutocomplete";
-import { MarketPriceDisplay } from "@/components/forms/MarketPriceDisplay";
 import {
   useMutationCreateInvestment,
   useQueryGetMarketPrice,
@@ -264,6 +263,26 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
     },
   );
 
+  // Fetch market price for standard investments (stocks, crypto, ETF, etc.)
+  const isStandardWithSymbol =
+    !isGoldInvestment &&
+    !isSilverInvestment &&
+    !isCustomInvestment &&
+    !!selectedSymbol &&
+    selectedSymbol.length >= 2;
+  const standardPriceQuery = useQueryGetMarketPrice(
+    {
+      symbol: selectedSymbol,
+      currency: selectedCurrency,
+      type: Number(investmentType) as InvestmentType,
+    },
+    {
+      enabled: isStandardWithSymbol,
+      refetchOnMount: "always",
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  );
+
   // Get ALL gold type options (no currency filter — show all 19)
   const goldTypeOptions = useMemo(() => {
     if (!isGoldInvestment) return [];
@@ -334,6 +353,14 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
     }
   }, [isSilverInvestment, silverPriceQuery.data]);
 
+  // Auto-fill price per unit from standard investment market price
+  // Use priceDecimal (human-readable value) since pricePerUnit is displayed directly
+  useEffect(() => {
+    if (isStandardWithSymbol && standardPriceQuery.data?.data?.priceDecimal) {
+      setPricePerUnit(standardPriceQuery.data.data.priceDecimal);
+    }
+  }, [isStandardWithSymbol, standardPriceQuery.data]);
+
   // Compute total cost in real time
   const totalCost = useMemo(() => {
     if (watchedQuantity > 0 && pricePerUnit > 0) {
@@ -403,7 +430,8 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
 
   const isRefreshing =
     (isGoldInvestment && goldPriceQuery.isFetching) ||
-    (isSilverInvestment && silverPriceQuery.isFetching);
+    (isSilverInvestment && silverPriceQuery.isFetching) ||
+    (isStandardWithSymbol && standardPriceQuery.isFetching);
 
   const onSubmit = (data: CreateInvestmentFormInput) => {
     setErrorMessage(undefined);
@@ -568,14 +596,34 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
                   {errors.symbol.message}
                 </ErrorMessage>
               )}
-              {/* Market price display */}
-              {selectedSymbol && selectedSymbol.length >= 2 && (
-                <MarketPriceDisplay
-                  symbol={selectedSymbol}
-                  currency={selectedCurrency}
-                  investmentType={Number(watch("type")) as InvestmentType}
-                  className="mt-2"
-                />
+              {/* Market price display for standard investments */}
+              {isStandardWithSymbol && standardPriceQuery.isLoading && (
+                <p className="text-xs text-gray-400 mt-2 ml-1">
+                  {t("form.loadingPrice")}
+                </p>
+              )}
+              {isStandardWithSymbol && standardPriceQuery.data?.data && (
+                <div className="mt-2 p-2 bg-v2-green-light border border-v2-border rounded-md">
+                  <p className="text-sm font-medium text-v2-green-positive">
+                    {t("form.currentMarketPrice", {
+                      price: new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: standardPriceQuery.data.data.currency || selectedCurrency,
+                      }).format(standardPriceQuery.data.data.priceDecimal),
+                      unit: standardPriceQuery.data.data.displayUnit || "unit",
+                    })}
+                  </p>
+                  {standardPriceQuery.data.data.isCached && (
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {t("form.cachedPrice")}
+                    </p>
+                  )}
+                </div>
+              )}
+              {isStandardWithSymbol && standardPriceQuery.isError && (
+                <p className="text-xs text-red-500 mt-2 ml-1">
+                  {t("form.unableToFetchPrice")}
+                </p>
               )}
             </>
           ) : (
@@ -948,13 +996,14 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-bg focus:border-bg text-sm"
             />
           </div>
-          {/* Refresh button - only for gold/silver */}
-          {(isGoldInvestment || isSilverInvestment) && (
+          {/* Refresh button - for gold/silver/standard investments with symbol */}
+          {(isGoldInvestment || isSilverInvestment || isStandardWithSymbol) && (
             <button
               type="button"
               onClick={() => {
                 if (isGoldInvestment) goldPriceQuery.refetch();
                 else if (isSilverInvestment) silverPriceQuery.refetch();
+                else if (isStandardWithSymbol) standardPriceQuery.refetch();
               }}
               disabled={isRefreshing}
               className="px-3 py-2 text-sm font-medium text-bg bg-green-50 border border-bg rounded-md hover:bg-green-100 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap"

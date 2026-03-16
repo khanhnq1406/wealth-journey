@@ -71,7 +71,7 @@ Enhanced the AddInvestmentForm with four major improvements: (1) reordered type 
 ## Known Issues / Technical Debt
 
 - The `initialCost` field in `createInvestmentSchema` still exists (used as computed field from `quantity × pricePerUnit`) — could be renamed to `totalCost` for clarity in a future refactor
-- Market price auto-fill for standard investments (stocks, crypto, ETF) from `MarketPriceDisplay` is not yet wired to `pricePerUnit` state — user must manually enter price for non-gold/silver investments
+- ~~Market price auto-fill for standard investments (stocks, crypto, ETF) from `MarketPriceDisplay` is not yet wired to `pricePerUnit` state~~ — **FIXED** (see Fix History below)
 - The purchase date HTML `<input type="date">` styling may differ across browsers — could be replaced with a custom DatePicker component in a future UX pass
 
 ## Files Changed
@@ -119,3 +119,5 @@ Enhanced the AddInvestmentForm with four major improvements: (1) reordered type 
 |------|-----|----------|--------|---------------|
 | 2026-03-16 | Add missing `typeOptions.gold` and `typeOptions.silver` i18n keys in both en and vi locales — caused IntlError MISSING_MESSAGE in AddInvestmentForm merged gold/silver dropdown | Minor | — | en/investment.json, vi/investment.json |
 | 2026-03-16 | Align gold type options (18→9 VND + 1 USD) with `GOLD_TABLE_FILTER` price table; align silver type options (10→11 VND + 1 USD) with silver price API codes | Minor | — | gold-calculator.ts, silver-calculator.ts |
+| 2026-03-16 | Add price auto-fill and refresh button to AddInvestmentTransactionForm — uses `useQueryGetMarketPrice` to auto-fill price field on mount, adds refresh button matching AddInvestmentForm pattern, shows market price info box with cached indicator | Minor | — | AddInvestmentTransactionForm.tsx, en/investment.json, vi/investment.json |
+| 2026-03-16 | Wire market price auto-fill for standard investments (stocks, crypto, ETF) — adds `useQueryGetMarketPrice` for non-gold/silver symbols, auto-fills `pricePerUnit` via `useEffect`, extends refresh button to standard investments, replaces `MarketPriceDisplay` with inline price display matching gold/silver pattern | Minor | — | AddInvestmentForm.tsx |

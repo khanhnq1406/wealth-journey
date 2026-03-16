@@ -213,7 +213,9 @@
       "transactionAddedSuccess": "Transaction Added!",
       "transactionAddedMessage": "Transaction added successfully",
       "failedToAdd": "Failed to add transaction. Please try again",
-      "fixValidationErrors": "Please fix the validation errors"
+      "fixValidationErrors": "Please fix the validation errors",
+      "refreshPrice": "Current price",
+      "refreshingPrice": "Loading..."
     },
     "detail": {
       "overview": "Overview",
