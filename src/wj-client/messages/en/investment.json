@@ -286,6 +286,7 @@
       "errorLoadingPortfolio": "Error loading portfolio"
     },
     "errors": {
+      "addedToExisting": "Purchase added to your existing holding",
       "createdSuccessfully": "Investment created successfully",
       "failedToCreate": "Failed to create investment",
       "duplicateSymbol": "An investment with this symbol already exists in this wallet",

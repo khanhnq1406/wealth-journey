@@ -286,6 +286,7 @@
       "errorLoadingPortfolio": "Lỗi khi tải danh mục đầu tư"
     },
     "errors": {
+      "addedToExisting": "Đã thêm giao dịch mua vào khoản đầu tư hiện có",
       "createdSuccessfully": "Tạo khoản đầu tư thành công",
       "failedToCreate": "Không thể tạo khoản đầu tư",
       "duplicateSymbol": "Đã có khoản đầu tư với mã này trong ví",
