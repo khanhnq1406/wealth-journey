@@ -5,9 +5,9 @@
 - **Plan file:** docs/plans/2026-03-16-decouple-investment-wallet-plan.md
 - **Spec file:** docs/specs/2026-03-16-decouple-investment-wallet-spec.md
 - **Started:** 2026-03-16T00:00:00Z
-- **Last updated:** 2026-03-16T12:00:00Z
-- **Current state:** in_progress
-- **Current task:** 11
+- **Last updated:** 2026-03-16T18:00:00Z
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -23,8 +23,8 @@
 | 8 | Frontend — Remove wallet type selector from CreateWalletForm | done | pending-commit | Removed defaultType prop, wallet type selector dropdown, walletTypeOptions. Hardcoded WalletType.BASIC. |
 | 9 | Frontend — Remove wallet filter and cash balance from portfolio page | done | pending-commit | Removed wallet selector, cash balance card, empty wallets state. Replaced wallet-gated queries with walletId=0. Cleaned up unused imports. |
 | 10 | Frontend — Clean up unused translation keys and wallet type references | done | pending-commit | Removed 12 unused i18n keys (walletType*, selectWallet*, investmentWalletLabel, allInvestmentWallets) from en/vi wallet.json and investment.json. |
-| 11 | Update C4 Architecture Diagrams | pending | — | — |
-| 12 | Update Runtime Flow Diagrams | pending | — | — |
+| 11 | Update C4 Architecture Diagrams | done | pending-commit | Updated backend C4 (invest_svc auto-wallet, wallet_svc BASIC-only, Create Investment flow). Updated frontend C4 (portfolio_page no wallet filter, invest_feat no wallet selector, wallet_feat BASIC-only). |
+| 12 | Update Runtime Flow Diagrams | done | pending-commit | Updated Create Investment (auto-wallet selection, removed balance check/deduction). Updated Buy/Sell/Dividend flows (removed wallet balance operations). Updated Market Price Update (all wallets). Updated Create Wallet (type forced to BASIC). |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 

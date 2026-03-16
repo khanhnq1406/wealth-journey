@@ -15,7 +15,7 @@ Investment portfolio management flows covering the most complex business logic i
 
 ## 1. Create Investment (incl. Gold/Silver)
 
-**Trigger:** User adds a new investment holding to an investment wallet
+**Trigger:** User adds a new investment holding (wallet auto-selected by backend)
 **Endpoint:** `POST /api/v1/investments`
 **Source:** `domain/service/investment_service.go`, `handlers/investment.go`
 
@@ -28,15 +28,19 @@ sequenceDiagram
     participant IR as InvestmentRepository
     participant ITR as InvestmentTxRepository
     participant LR as LotRepository
-    participant FX as FXRateService
     participant Units as units Package
 
-    SPA->>H: POST /api/v1/investments<br/>{walletId, symbol, name, type, currency,<br/>initialQuantity, initialCost, isCustom}
+    SPA->>H: POST /api/v1/investments<br/>{walletId: 0, symbol, name, type, currency,<br/>initialQuantity, initialCost, isCustom}
     H->>IS: CreateInvestment(userID, req)
 
     activate IS
-    IS->>WR: GetByIDForUser(walletId, userID)
-    IS->>IS: Validate wallet type == INVESTMENT
+
+    alt walletId == 0 (auto-select)
+        IS->>WR: ListByUserID(userID) — oldest active wallet
+        WR-->>IS: Selected wallet
+    else walletId provided
+        IS->>WR: GetByIDForUser(walletId, userID)
+    end
 
     IS->>IS: Validate symbol not already in wallet
 
@@ -45,13 +49,6 @@ sequenceDiagram
     Note over IS,Units: Gold VND: grams × 10000<br/>Gold USD: ounces × 10000<br/>Stocks: shares × 100
     IS->>Units: ToSmallestCurrencyUnit(cost, currency)
     Note over IS,Units: VND: ×1, USD: ×100
-
-    opt Investment currency != wallet currency
-        IS->>FX: ConvertAmount(cost, invCurrency, walletCurrency)
-        FX-->>IS: Converted cost
-    end
-
-    IS->>IS: Verify wallet.Balance >= convertedCost
 
     IS->>Units: CalculateAverageCost(totalCost, quantity, type)
 
@@ -72,16 +69,6 @@ sequenceDiagram
         IS->>ITR: Delete(txID)
         IS->>IR: Delete(investmentID)
         Note over IS,LR: ROLLBACK: delete tx + investment
-        IS-->>H: Error
-    end
-
-    IS->>WR: UpdateBalance(walletId, -convertedCost)
-    alt Balance update fails
-        WR-->>IS: Error
-        IS->>LR: Delete(lotID)
-        IS->>ITR: Delete(txID)
-        IS->>IR: Delete(investmentID)
-        Note over IS,WR: ROLLBACK: delete all created records
         IS-->>H: Error
     end
 
@@ -106,12 +93,11 @@ sequenceDiagram
 
 | Condition | Response | Rollback |
 |-----------|----------|----------|
-| Wallet not INVESTMENT type | 400 Validation | None |
+| No active wallet found (auto-select) | 400 Validation | None |
+| Wallet not found or not owned | 404 | None |
 | Symbol already exists in wallet | 400 Validation | None |
-| Insufficient wallet balance | 400 Validation | None |
 | Transaction creation fails | 500 | Delete investment |
 | Lot creation fails | 500 | Delete tx + investment |
-| Balance deduction fails | 500 | Delete lot + tx + investment |
 
 ---
 
@@ -128,8 +114,6 @@ sequenceDiagram
     participant LR as LotRepository
     participant ITR as InvestmentTxRepository
     participant IR as InvestmentRepository
-    participant WR as WalletRepository
-    participant FX as FXRateService
     participant Units as units Package
 
     SPA->>IS: AddTransaction(investmentId,<br/>{type: BUY, quantity, price, fees, date})
@@ -138,11 +122,6 @@ sequenceDiagram
     IS->>IS: Validate quantity > 0, price > 0
     IS->>Units: CalculateTransactionCost(quantity, price, type)
     IS->>IS: totalCost = cost + fees
-
-    opt Cross-currency
-        IS->>FX: ConvertAmount(totalCost, invCurrency, walletCurrency)
-    end
-    IS->>IS: Verify wallet.Balance >= convertedTotalCost
 
     IS->>LR: GetOpenLots(investmentId, order: purchasedAt ASC)
     LR-->>IS: Open lots
@@ -170,8 +149,6 @@ sequenceDiagram
     IS->>IS: investment.TotalCost += totalCost
     IS->>Units: CalculateAverageCost(investment.TotalCost, investment.Quantity, type)
     IS->>IR: Update(investment)
-
-    IS->>WR: UpdateBalance(walletId, -convertedTotalCost)
     deactivate IS
 
     IS-->>SPA: Transaction + updated investment
@@ -189,8 +166,8 @@ Current purchase at:          2025-03-06 12:00  → NEW LOT (26h > 24h)
 
 - Lot merging prevents excessive lot fragmentation for same-day purchases
 - Average cost is recalculated at both the lot and investment level after each buy
-- Fees are included in total cost (deducted from wallet) but tracked separately on the transaction
-- Balance check uses FX-converted amount for cross-currency investments
+- Fees are included in total cost but tracked separately on the transaction
+- No wallet balance deduction — investments are decoupled from wallet balances
 
 ---
 
@@ -208,8 +185,6 @@ sequenceDiagram
     participant Units as units Package
     participant ITR as InvestmentTxRepository
     participant IR as InvestmentRepository
-    participant WR as WalletRepository
-    participant FX as FXRateService
 
     SPA->>IS: AddTransaction(investmentId,<br/>{type: SELL, quantity, price, fees})
 
@@ -252,12 +227,6 @@ sequenceDiagram
     IS->>IS: investment.RealizedPNL += realizedPNL
     Note over IS: TotalCost and AverageCost unchanged<br/>(preserves cost basis history)
     IS->>IR: Update(investment)
-
-    IS->>Units: net proceeds = proceeds - fees
-    opt Cross-currency
-        IS->>FX: ConvertAmount(netProceeds, invCurrency, walletCurrency)
-    end
-    IS->>WR: UpdateBalance(walletId, +convertedNetProceeds)
     deactivate IS
 
     IS-->>SPA: Transaction + updated investment
@@ -293,7 +262,6 @@ Sell 120 shares @ $95:
 | Total remaining lots < sell quantity | 400 Validation | None |
 | Lot update fails mid-loop | 500 | Earlier lots already consumed (inconsistency risk) |
 | Transaction creation fails | 500 | Lots consumed but no tx record |
-| Balance credit fails | 500 | Restore investment qty/PNL, delete tx |
 
 ---
 
@@ -310,8 +278,6 @@ sequenceDiagram
     participant Units as units Package
     participant ITR as InvestmentTxRepository
     participant IR as InvestmentRepository
-    participant WR as WalletRepository
-    participant FX as FXRateService
 
     SPA->>IS: AddTransaction(investmentId,<br/>{type: DIVIDEND, quantity: sharesAtDividend,<br/>price: dividendPerShare})
 
@@ -325,18 +291,6 @@ sequenceDiagram
     IS->>IS: investment.TotalDividends += totalDividend
     Note over IS: No change to Quantity, TotalCost, or AverageCost
     IS->>IR: Update(investment)
-
-    opt Cross-currency
-        IS->>FX: ConvertAmount(totalDividend, invCurrency, walletCurrency)
-    end
-    IS->>WR: UpdateBalance(walletId, +convertedDividend)
-
-    alt Balance credit fails
-        WR-->>IS: Error
-        IS->>IS: Restore investment.TotalDividends
-        IS->>ITR: Delete(txID)
-        IS-->>SPA: Error
-    end
     deactivate IS
 
     IS-->>SPA: Transaction + updated investment
@@ -355,7 +309,6 @@ sequenceDiagram
 |-----------|----------|----------|
 | Transaction creation fails | 500 | None |
 | Investment update fails | 500 | Delete tx |
-| Balance credit fails | 500 | Restore dividends + delete tx |
 
 ---
 
@@ -366,7 +319,7 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    A["UpdatePrices(userID)\nFetch all investment wallets"] --> B["List all investments\nacross wallets"]
+    A["UpdatePrices(userID)\nFetch all user wallets"] --> B["List all investments\nacross wallets"]
     B --> C["Filter out isCustom=true\n(manual price only)"]
     C --> D["Categorize by type"]
     D --> E["Return immediately to client\n'Price update started for N investments'"]

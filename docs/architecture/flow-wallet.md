@@ -27,8 +27,9 @@ sequenceDiagram
     participant TR as TransactionRepository
     participant Cache as CurrencyCache
 
-    SPA->>H: POST /api/v1/wallets<br/>{walletName, initialBalance, currency, type}
+    SPA->>H: POST /api/v1/wallets<br/>{walletName, initialBalance, currency}
     H->>H: Validate walletName, currency
+    H->>H: Force type = BASIC (ignore request type)
     H->>WS: CreateWallet(userID, req)
 
     activate WS
@@ -88,6 +89,7 @@ sequenceDiagram
 
 ### Key Invariants
 
+- Wallet type is always forced to `BASIC` regardless of the request `type` field (INVESTMENT type removed)
 - Wallet is always created with `balance: 0` first; initial balance is applied via a transaction
 - The "Initial Balance" category is auto-created if it doesn't exist (income type)
 - Rollback is manual (delete operations), not database-transaction-based
