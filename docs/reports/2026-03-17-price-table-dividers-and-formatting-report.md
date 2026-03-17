@@ -106,7 +106,7 @@ No security concerns — purely cosmetic frontend change:
 
 | Date | Fix | Severity | Commit |
 |------|-----|----------|--------|
-| 2026-03-17 | Changed VND_DIVISOR from 100 to 1000; updated i18n labels from "(x100₫)" to "(x1.000₫)" | Minor | pending |
+| 2026-03-17 | Changed VND_DIVISOR from 100 to 1000; updated i18n labels from "(x100₫)" to "(x1.000₫)" | Minor | `f047f11` |
 
 ## Known Issues / Technical Debt
 
