@@ -39,6 +39,7 @@ import {
   Menu,
   Users,
   CircleUser,
+  MessageCircle,
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -128,6 +129,7 @@ export default function DashboardLayout({
         icon: <Banknote size={22} />,
       },
       { href: routes.wallets, label: t("wallets"), icon: <Wallet size={22} /> },
+      { href: routes.feedback, label: t("feedback"), icon: <MessageCircle size={22} /> },
     ];
 
     return (
@@ -377,6 +379,15 @@ export default function DashboardLayout({
                     icon={<Wallet size={20} />}
                     isActive={path === routes.wallets}
                   />
+                  <NavItem
+                    href={routes.feedback}
+                    label={t("feedback")}
+                    isExpanded={isExpanded}
+                    showTooltip={!isExpanded}
+                    animationDelay={180}
+                    icon={<MessageCircle size={20} />}
+                    isActive={path === routes.feedback}
+                  />
                 </div>
 
                 {/* Spacer + Divider + Settings */}
@@ -388,7 +399,7 @@ export default function DashboardLayout({
                   label={t("settings")}
                   isExpanded={isExpanded}
                   showTooltip={!isExpanded}
-                  animationDelay={180}
+                  animationDelay={210}
                   icon={<Settings size={20} />}
                   isActive={path.startsWith("/dashboard/settings")}
                 />
