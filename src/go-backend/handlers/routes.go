@@ -339,6 +339,17 @@ func RegisterRoutes(
 		community.GET("/trending", h.Community.GetTrendingTopics)
 	}
 
+	// Feedback routes (protected)
+	feedback := v1.Group("/feedback")
+	feedback.Use(AuthMiddleware(authSrv))
+	if rateLimiter != nil {
+		feedback.Use(appmiddleware.RateLimitByUser(rateLimiter))
+	}
+	{
+		feedback.POST("", h.Feedback.SubmitFeedback)
+		feedback.GET("", h.Feedback.ListMyFeedback)
+	}
+
 	// Import routes (protected)
 	imports := v1.Group("/import")
 	if rateLimiter != nil {
