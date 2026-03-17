@@ -230,6 +230,15 @@ type PortfolioHistoryService interface {
 	CreateAggregatedSnapshot(ctx context.Context, userID int32) error
 }
 
+// SiteSettingsService manages CMS site settings.
+type SiteSettingsService interface {
+	// GetAll returns all site settings (cache-first, DB fallback).
+	GetAll(ctx context.Context) ([]*models.SiteSetting, error)
+
+	// UpdateSettings bulk-updates settings. Validates keys and values. Invalidates cache.
+	UpdateSettings(ctx context.Context, adminUserID int32, settings []*models.SiteSetting) ([]*models.SiteSetting, error)
+}
+
 // GoldSentimentService handles daily gold/silver sentiment voting and comments.
 type GoldSentimentService interface {
 	GetSentiment(ctx context.Context, userID int32, anonymousID string, category int32) (*v1.GetGoldSentimentResponse, error)
