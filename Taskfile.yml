@@ -136,6 +136,12 @@ tasks:
     cmds:
       - go run cmd/migrate-admin/main.go
 
+  backend:migrate-investment-user-ownership:
+    desc: "Add user_id to investment/investment_transaction, make wallet_id nullable"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-investment-user-ownership/main.go {{.CLI_ARGS}}
+
   backend:set-admin:
     desc: "Grant or revoke admin access for a user by email"
     dir: src/go-backend
