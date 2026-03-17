@@ -15,13 +15,13 @@ type InvestmentRepository interface {
 	// GetByID retrieves an investment by ID.
 	GetByID(ctx context.Context, id int32) (*models.Investment, error)
 
-	// GetByIDForUser retrieves an investment by ID, ensuring it belongs to the user's wallet.
+	// GetByIDForUser retrieves an investment by ID, ensuring it belongs to the user.
 	GetByIDForUser(ctx context.Context, investmentID, userID int32) (*models.Investment, error)
 
-	// GetByWalletAndSymbol retrieves an investment by wallet and symbol.
-	GetByWalletAndSymbol(ctx context.Context, walletID int32, symbol string) (*models.Investment, error)
+	// GetByUserAndSymbol retrieves an investment by user and symbol.
+	GetByUserAndSymbol(ctx context.Context, userID int32, symbol string) (*models.Investment, error)
 
-	// ListByUserID retrieves all investments for a user (via their wallets).
+	// ListByUserID retrieves all investments for a user directly via user_id.
 	ListByUserID(ctx context.Context, userID int32, opts ListOptions, typeFilter v1.InvestmentType) ([]*models.Investment, int, error)
 
 	// ListByWalletID retrieves all investments in a wallet.
