@@ -314,7 +314,9 @@
     "table": {
       "type": "Loại",
       "buy": "Mua",
+      "buyUnit": "(x1.000₫)",
       "sell": "Bán",
+      "sellUnit": "(x1.000₫)",
       "change": "Thay đổi"
     },
     "symbolLookup": {
