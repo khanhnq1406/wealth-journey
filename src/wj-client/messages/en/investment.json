@@ -314,9 +314,9 @@
     "table": {
       "type": "Type",
       "buy": "Buy",
-      "buyUnit": "(x100₫)",
+      "buyUnit": "(x1.000₫)",
       "sell": "Sell",
-      "sellUnit": "(x100₫)",
+      "sellUnit": "(x1.000₫)",
       "change": "Change"
     },
     "symbolLookup": {

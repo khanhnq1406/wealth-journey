@@ -2,8 +2,8 @@ import type { PriceItem } from "@/gen/protobuf/v1/investment";
 
 // USD: multiplied by 100 (cents), so raw 280000 → display as $2,800.00
 const USD_DIVISOR = 100;
-// VND: multiplied by 100, so raw 8500000 → display as 85,000
-const VND_DIVISOR = 100;
+// VND: multiplied by 1000, so raw 8500000 → display as 8,500
+const VND_DIVISOR = 1000;
 
 export function formatPriceValue(
   value: number | null | undefined,

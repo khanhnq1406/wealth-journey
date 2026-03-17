@@ -102,6 +102,12 @@ No security concerns — purely cosmetic frontend change:
 6. **Zebra striping**: Should still alternate correctly alongside the new dividers
 7. **Admin mode**: Admin edit column should have proper borders too
 
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-17 | Changed VND_DIVISOR from 100 to 1000; updated i18n labels from "(x100₫)" to "(x1.000₫)" | Minor | pending |
+
 ## Known Issues / Technical Debt
 
 None identified. All changes are additive CSS and i18n modifications.
