@@ -45,7 +45,7 @@ func (r *investmentTransactionRepository) GetByIDForUser(ctx context.Context, tx
 	var tx models.InvestmentTransaction
 	result := r.db.DB.WithContext(ctx).
 		Joins("JOIN investment ON investment_transaction.investment_id = investment.id").
-		Where("investment_transaction.id = ? AND investment.wallet_id IN (SELECT id FROM wallet WHERE user_id = ?)", txID, userID).
+		Where("investment_transaction.id = ? AND investment.user_id = ?", txID, userID).
 		First(&tx)
 
 	if result.Error != nil {
