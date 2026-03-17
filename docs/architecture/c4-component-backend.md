@@ -31,6 +31,7 @@ C4Component
         Component(gold_sentiment_h, "GoldSentiment Handler", "handlers/gold_sentiment.go", "Daily asset sentiment vote & comments (gold/silver via category query param). Public GET with optional auth, protected POST/DELETE for voting and commenting.")
         Component(price_override_h, "PriceOverride Handler", "handlers/price_override.go", "Admin-only REST handler for price override CRUD (Set/List/Delete). Protected by AdminMiddleware.")
         Component(public_h, "Public Handlers", "handlers/public.go", "No-auth endpoint returning gold/silver/currency type names from in-memory registries. IP-rate-limited only.")
+        Component(feedback_h, "Feedback Handlers", "handlers/feedback.go", "Submit feedback and list user's own feedback. Auth + rate limit middleware.")
     }
 
     Container_Boundary(services, "Service Layer — TRUST BOUNDARY: Data considered validated after this point") {
@@ -49,6 +50,7 @@ C4Component
         Component(portfolio_svc, "Portfolio History Service", "domain/service", "Historical portfolio value snapshots for charts")
         Component(gold_sentiment_svc, "GoldSentiment Service", "domain/service", "Vote upsert, comments with rate limiting, Redis caching (30s TTL) with per-category key isolation (gold/silver), Vietnam TZ daily reset")
         Component(community_svc, "Community Service", "domain/service", "Social interactions: posts, comments, likes, follows, content reports; Phase 2: SharePost, GetNotifications, GetUnreadNotificationCount, MarkNotificationsRead, SavePost, UnsavePost, GetSavedPosts, GetSuggestedUsers, GetTrendingTopics, GetFollowing, GetFollowers; Phase 3: UploadImage, UpdateComment, GetReplies, GetLikedPosts, UpdateProfile, StreamNotifications")
+        Component(feedback_svc, "Feedback Service", "domain/service", "Submit feedback with validation (subject 1-200, message 1-2000), rate limiting (10/user/hour), list user feedback")
     }
 
     Container_Boundary(repos, "Repository Layer (Data Access)") {
@@ -73,6 +75,7 @@ C4Component
         Component(hashtag_repo, "Hashtag Repository", "GORM", "Hashtag extraction index and trending hashtag aggregations")
         Component(gold_vote_repo, "GoldVote Repository", "GORM", "Vote persistence with upsert (ON CONFLICT), count by date")
         Component(gold_vote_comment_repo, "GoldVoteComment Repository", "GORM", "Comment CRUD with soft delete, daily count for rate limiting")
+        Component(feedback_repo, "Feedback Repository", "GORM", "Feedback CRUD with user scoping and rate limit counting")
     }
 
     Container_Boundary(external, "External Integrations — TRUST BOUNDARY: Untrusted external responses") {
@@ -112,6 +115,7 @@ C4Component
     Rel(gin, price_override_h, "Routes /admin/price-overrides/*")
     Rel(gin, admin_mw, "Applies to admin routes")
     Rel(gin, gold_sentiment_h, "Routes /public/gold-sentiment/* & /gold-sentiment/*")
+    Rel(gin, feedback_h, "Routes /feedback/*")
 
     Rel(auth_h, auth_svc, "Delegates auth logic")
     Rel(user_h, user_svc, "Delegates user ops")
@@ -130,6 +134,7 @@ C4Component
     Rel(price_override_h, price_override_cache, "Set/List/Delete overrides")
     Rel(gold_sentiment_h, gold_sentiment_svc, "Delegates sentiment ops")
     Rel(community_h, community_svc, "Delegates social interactions")
+    Rel(feedback_h, feedback_svc, "Delegates feedback ops")
     Rel(community_h, redis_pubsub, "Subscribes for SSE StreamNotifications")
     Rel(gold_chart_h, redis, "Read/write price history cache")
     Rel(silver_chart_h, redis, "Read/write price history cache")
@@ -160,6 +165,7 @@ C4Component
     Rel(community_svc, imaging_pkg, "Processes images before upload")
     Rel(gold_sentiment_svc, gold_vote_repo, "Reads/Writes votes")
     Rel(gold_sentiment_svc, gold_vote_comment_repo, "Reads/Writes comments")
+    Rel(feedback_svc, feedback_repo, "Persists feedback")
     Rel(gold_sentiment_svc, redis, "Caches vote counts (30s TTL)")
     Rel(community_svc, post_repo, "Persists posts")
     Rel(community_svc, comment_repo, "Persists comments")
@@ -183,6 +189,7 @@ C4Component
     Rel(hashtag_repo, postgres, "SQL")
     Rel(gold_vote_repo, postgres, "SQL")
     Rel(gold_vote_comment_repo, postgres, "SQL")
+    Rel(feedback_repo, postgres, "SQL")
     Rel(auth_svc, redis, "JWT whitelist")
     Rel(price_override_cache, redis, "Price override cache")
     Rel(market_svc, redis, "Price cache")

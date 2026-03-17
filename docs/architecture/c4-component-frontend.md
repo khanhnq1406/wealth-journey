@@ -16,6 +16,7 @@ C4Component
         Component(prices_page, "Prices Page", "app/dashboard/prices", "Live gold/silver/currency/market prices with 4 tabs (Gold, Silver, Currency, Symbol Lookup). Admin users see inline price edit controls via useAuth isAdmin check.")
         Component(community_page, "Community Page", "app/dashboard/community", "Social feed with posts, comments, likes, user profiles")
         Component(settings, "Settings Pages", "app/dashboard/settings", "Sessions, import templates, language toggle, security (auth methods, set/change password)")
+        Component(feedback_page, "Feedback Page", "app/dashboard/feedback", "Submit feedback form and view personal feedback history with status badges")
     }
 
     Container_Boundary(features, "Feature Modules (Target State)") {
@@ -28,6 +29,7 @@ C4Component
         Component(prices_feat, "Market Prices Feature", "features/market-prices", "Price display tables (gold/silver/currency), symbol lookup; hooks/usePublicMarketTypes.ts — public no-auth hook for landing page type names; CurrencyPriceTable, LandingCurrencyPriceTable components; InlinePriceEdit — inline price editing UI for admin users (click-to-edit with save/cancel); OverrideIndicator — blue dot indicator for overridden prices; hooks/usePriceOverride.ts — usePriceOverrideSet and usePriceOverrideDelete mutation hooks for admin price override CRUD")
         Component(report_feat, "Report Feature", "features/report", "Financial tables, period selectors, CSV/PDF export")
         Component(community_feat, "Community Feature", "features/community", "Posts, comments, likes, follows, profiles, topic tags; Phase 2 components: SharePostModal, SharedPostEmbed, HashtagLink, SavedPostsView, SuggestedUserCard, SuggestedUsers, TrendingTopics, ProfileView, FollowingView, UserListItem; updated: PostCard (share+save actions, onUserClick), PostBody (hashtag rendering, shared post embed), PostActions (Share/Save buttons), PostEngagement (shareCount), PostHeader (clickable avatar+name via onUserClick), CommunityFeed (onUserClick prop); hooks: useSavedPost, useNotifications (useNotificationCount, useMarkAllRead); utils: hashtag.ts (extractHashtags, tokenizeContent); Phase 3 components: ImageUpload, EditCommentForm, ReplyBubble, ReplyInput, ReplyList, ProfileEditModal, ProfileTabs; Phase 3 hooks: useNotificationStream (SSE-based real-time notifications), useImageUpload (upload progress, preview, Supabase integration)")
+        Component(feedback_feat, "Feedback Feature", "features/feedback", "SubmitFeedbackForm (Zod validation, rate limit handling), StatusBadge (pending/reviewed/resolved), FeedbackItem (expandable card), feedback-schema.ts")
     }
 
     Container_Boundary(shared, "Shared Layer") {
@@ -78,6 +80,7 @@ C4Component
     Rel(auth_pages, auth_feat, "Renders auth forms")
     Rel(settings, import_feat, "Renders import templates")
     Rel(community_page, community_feat, "Renders social feed and profiles")
+    Rel(feedback_page, feedback_feat, "Renders feedback form and history")
 
     Rel(wallet_feat, forms, "Uses form components")
     Rel(wallet_feat, modals, "Uses modal components")
@@ -99,6 +102,9 @@ C4Component
     Rel(prices_feat, gen_hooks, "usePriceOverrideSet, usePriceOverrideDelete (admin price override mutations)")
     Rel(import_feat, gen_hooks, "useMutationUploadFile, useMutationParseFile, etc.")
     Rel(community_feat, gen_hooks, "useQueryGetFeed, useMutationCreatePost, useMutationLikePost, useMutationFollowUser; Phase 2: useMutationSharePost, useQueryGetNotifications, useQueryGetUnreadNotificationCount, useMutationMarkNotificationsRead, useMutationSavePost, useMutationUnsavePost, useQueryGetSavedPosts, useQueryGetSuggestedUsers, useQueryGetTrendingTopics, useQueryGetFollowing, useQueryGetFollowers, useQueryGetCommunityProfile, useQueryGetUserPosts, useMutationUpdateBio; Phase 3: useMutationUploadImage, useMutationUpdateComment, useQueryGetReplies, useQueryGetLikedPosts, useMutationUpdateProfile")
+    Rel(feedback_feat, gen_hooks, "useMutationSubmitFeedback, useQueryListMyFeedback")
+    Rel(feedback_feat, forms, "Uses FormInput, FormTextarea")
+    Rel(feedback_feat, feedback, "Uses EmptyState")
 
     Rel(gen_hooks, gen_api, "Wraps API calls")
     Rel(gen_api, gen_types, "Uses request/response types")
