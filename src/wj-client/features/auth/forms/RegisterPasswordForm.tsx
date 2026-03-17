@@ -63,6 +63,7 @@ export function RegisterPasswordForm() {
             email: data.data.email,
             fullname: data.data.fullname,
             picture: data.data.picture,
+            username: data.data.username,
           })
         );
         router.push(routes.home);
@@ -84,7 +85,7 @@ export function RegisterPasswordForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
       <FormInput
         label={t("username")}
         placeholder={t("usernamePlaceholder")}
@@ -112,8 +113,8 @@ export function RegisterPasswordForm() {
           error={errors.password?.message}
           {...register("password")}
         />
-        <PasswordStrengthIndicator password={password} />
-        {!errors.password && (
+        {!errors.password && <PasswordStrengthIndicator password={password} />}
+        {!errors.password && !password && (
           <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
             {t("passwordRequirements")}
           </p>
@@ -130,7 +131,7 @@ export function RegisterPasswordForm() {
       />
 
       {serverError && (
-        <div className="p-3 bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-800 rounded-xl">
+        <div className="p-2.5 bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-800 rounded-xl">
           <p className="text-sm text-danger-800 dark:text-danger-200">
             {serverError}
           </p>

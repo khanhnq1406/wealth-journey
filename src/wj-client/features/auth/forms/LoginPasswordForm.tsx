@@ -47,6 +47,7 @@ export function LoginPasswordForm() {
             email: data.data.email,
             fullname: data.data.fullname,
             picture: data.data.picture,
+            username: data.data.username,
           })
         );
         router.push(routes.home);

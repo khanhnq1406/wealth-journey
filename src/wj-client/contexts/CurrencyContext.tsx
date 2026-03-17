@@ -69,6 +69,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
               email: userData.data.email,
               fullname: userData.data.name,
               picture: userData.data.picture,
+              username: userData.data.username,
               preferredCurrency: userData.data.preferredCurrency,
             }) as any,
           );
@@ -86,6 +87,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
           email: auth?.email || "",
           fullname: auth?.fullname || "",
           picture: auth?.picture || "",
+          username: auth?.username || "",
           preferredCurrency: data.data.preferredCurrency,
         };
 

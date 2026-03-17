@@ -30,7 +30,7 @@ export default function Register() {
     },
     onSuccess(data) {
       if (data.data) {
-        const { accessToken, email, fullname, picture } = data.data;
+        const { accessToken, email, fullname, picture, username } = data.data;
 
         localStorage.setItem(LOCAL_STORAGE_TOKEN_NAME, accessToken);
         updateAuthTokenCache(accessToken);
@@ -41,6 +41,7 @@ export default function Register() {
             email: email,
             fullname: fullname,
             picture: picture,
+            username: username,
           }),
         );
 
@@ -85,9 +86,9 @@ export default function Register() {
         <div className="w-full max-w-md">
           {/* Registration Card */}
           <div className="bg-white dark:bg-dark-surface rounded-2xl sm:rounded-3xl shadow-card sm:shadow-lg p-6 sm:p-8 md:p-10 animate-fade-in-up">
-            {/* Title */}
-            <div className="text-center mb-6 sm:mb-8">
-              <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-dark-text mb-2">
+            {/* Title — compact when password form is open */}
+            <div className={`text-center ${showPasswordForm ? "mb-4 sm:mb-6" : "mb-6 sm:mb-8"}`}>
+              <h1 className={`${showPasswordForm ? "text-xl sm:text-2xl" : "text-2xl sm:text-3xl"} font-bold text-neutral-900 dark:text-dark-text mb-1`}>
                 {t("title")}
               </h1>
               <p className="text-sm sm:text-base text-neutral-600 dark:text-dark-text-secondary">
@@ -95,66 +96,70 @@ export default function Register() {
               </p>
             </div>
 
-            {/* Google Register Button (Primary) */}
-            <div className={isLoading ? "opacity-50 pointer-events-none" : ""}>
-              <GoogleOAuthProvider
-                clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}
-              >
-                <div className="flex justify-center">
-                  <GoogleLogin
-                    onSuccess={handleGoogleRegister}
-                    onError={handleGoogleRegisterError}
-                    width="100%"
-                    theme="filled_blue"
-                    size="large"
-                    text="signup_with"
-                    shape="rectangular"
-                    logo_alignment="left"
-                  />
-                </div>
-              </GoogleOAuthProvider>
-            </div>
-
-            {/* Loading Spinner */}
-            {isLoading && (
-              <div className="mt-6 flex justify-center">
-                <LoadingSpinner text={t("creatingAccount")} />
-              </div>
-            )}
-
-            {/* Error Message (Google OAuth) */}
-            {error && (
-              <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-800 rounded-xl animate-fade-in">
-                <div className="flex items-start gap-3">
-                  <svg
-                    className="w-5 h-5 text-danger-600 dark:text-danger-400 flex-shrink-0 mt-0.5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
+            {/* Google Register Button (Primary) — hidden when password form is open */}
+            {!showPasswordForm && (
+              <>
+                <div className={isLoading ? "opacity-50 pointer-events-none" : ""}>
+                  <GoogleOAuthProvider
+                    clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <p className="text-sm text-danger-800 dark:text-danger-200">
-                    {error}
-                  </p>
+                    <div className="flex justify-center">
+                      <GoogleLogin
+                        onSuccess={handleGoogleRegister}
+                        onError={handleGoogleRegisterError}
+                        width="100%"
+                        theme="filled_blue"
+                        size="large"
+                        text="signup_with"
+                        shape="rectangular"
+                        logo_alignment="left"
+                      />
+                    </div>
+                  </GoogleOAuthProvider>
                 </div>
-              </div>
-            )}
 
-            {/* OR Divider */}
-            <div className="my-5 relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-neutral-200 dark:border-dark-border"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white dark:bg-dark-surface text-neutral-500 dark:text-dark-text-tertiary">
-                  {t("orDivider")}
-                </span>
-              </div>
-            </div>
+                {/* Loading Spinner */}
+                {isLoading && (
+                  <div className="mt-6 flex justify-center">
+                    <LoadingSpinner text={t("creatingAccount")} />
+                  </div>
+                )}
+
+                {/* Error Message (Google OAuth) */}
+                {error && (
+                  <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-800 rounded-xl animate-fade-in">
+                    <div className="flex items-start gap-3">
+                      <svg
+                        className="w-5 h-5 text-danger-600 dark:text-danger-400 flex-shrink-0 mt-0.5"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <p className="text-sm text-danger-800 dark:text-danger-200">
+                        {error}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* OR Divider */}
+                <div className="my-5 relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-neutral-200 dark:border-dark-border"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-4 bg-white dark:bg-dark-surface text-neutral-500 dark:text-dark-text-tertiary">
+                      {t("orDivider")}
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* Expandable Password Form */}
             {!showPasswordForm ? (
@@ -181,6 +186,17 @@ export default function Register() {
             ) : (
               <div className="animate-fade-in">
                 <RegisterPasswordForm />
+                {/* Back to Google option */}
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordForm(false)}
+                  className="w-full mt-3 flex items-center justify-center gap-2 text-sm text-neutral-500 dark:text-dark-text-tertiary hover:text-neutral-700 dark:hover:text-dark-text-secondary transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+                  </svg>
+                  {t("useGoogleInstead")}
+                </button>
               </div>
             )}
 

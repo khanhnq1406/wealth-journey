@@ -57,6 +57,14 @@ func getUserEmail(user models.User) string {
 	return ""
 }
 
+// getUserUsername safely dereferences user username, returning empty string for nil
+func getUserUsername(user models.User) string {
+	if user.Username != nil {
+		return *user.Username
+	}
+	return ""
+}
+
 // NewServer creates a new auth server with all dependencies.
 func NewServer(db *database.Database, rdb *redis.RedisClient, cfg *config.Config, userSvc UserService, categorySvc CategoryService) *Server {
 	return &Server{
@@ -238,6 +246,7 @@ func (s *Server) generateLoginResponse(ctx context.Context, user models.User, de
 			Email:       getUserEmail(user),
 			Fullname:    user.Name,
 			Picture:     user.Picture,
+			Username:    getUserUsername(user),
 		},
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
@@ -381,6 +390,8 @@ func (s *Server) VerifyAuth(tokenString string) (*authv1.VerifyAuthResponse, err
 		PreferredCurrency:    user.PreferredCurrency,
 		ConversionInProgress: user.ConversionInProgress,
 		IsAdmin:              user.IsAdmin,
+		Username:             getUserUsername(user),
+		AuthProvider:         user.AuthProvider,
 		CreatedAt:            user.CreatedAt,
 		UpdatedAt:            user.UpdatedAt,
 	}
@@ -432,6 +443,8 @@ func (s *Server) GetAuth(ctx context.Context, userID int32) (*authv1.GetAuthResp
 			PreferredCurrency:    user.PreferredCurrency,
 			ConversionInProgress: user.ConversionInProgress,
 			IsAdmin:              user.IsAdmin,
+			Username:             getUserUsername(user),
+			AuthProvider:         user.AuthProvider,
 			CreatedAt:            user.CreatedAt,
 			UpdatedAt:            user.UpdatedAt,
 		}),

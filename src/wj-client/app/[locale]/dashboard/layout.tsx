@@ -407,7 +407,7 @@ export default function DashboardLayout({
                     {user.fullname || "User"}
                   </p>
                   <p className="font-jetbrains text-[11px] text-v2-text-tertiary truncate">
-                    {user.email || "user@example.com"}
+                    {user.email || (user.username ? `@${user.username}` : "")}
                   </p>
                 </div>
               </div>
@@ -549,7 +549,7 @@ export default function DashboardLayout({
                           {user.fullname || "User"}
                         </p>
                         <p className="font-jetbrains text-[11px] text-v2-text-tertiary truncate">
-                          {user.email || "user@example.com"}
+                          {user.email || (user.username ? `@${user.username}` : "")}
                         </p>
                       </div>
                     </div>

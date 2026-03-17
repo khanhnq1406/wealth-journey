@@ -119,6 +119,7 @@ message LoginData {
   string email = 2 [json_name = "email"];
   string fullname = 3 [json_name = "fullname"];
   string picture = 4 [json_name = "picture"];
+  string username = 5 [json_name = "username"];
 }
 
 // Logout request

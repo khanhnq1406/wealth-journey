@@ -47,6 +47,7 @@ export interface LoginData {
   email: string;
   fullname: string;
   picture: string;
+  username: string;
 }
 
 /** Logout request */
@@ -549,7 +550,7 @@ export const LoginRequest: MessageFns<LoginRequest> = {
 };
 
 function createBaseLoginData(): LoginData {
-  return { accessToken: "", email: "", fullname: "", picture: "" };
+  return { accessToken: "", email: "", fullname: "", picture: "", username: "" };
 }
 
 export const LoginData: MessageFns<LoginData> = {
@@ -565,6 +566,9 @@ export const LoginData: MessageFns<LoginData> = {
     }
     if (message.picture !== "") {
       writer.uint32(34).string(message.picture);
+    }
+    if (message.username !== "") {
+      writer.uint32(42).string(message.username);
     }
     return writer;
   },
@@ -608,6 +612,14 @@ export const LoginData: MessageFns<LoginData> = {
           message.picture = reader.string();
           continue;
         }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.username = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -623,6 +635,7 @@ export const LoginData: MessageFns<LoginData> = {
       email: isSet(object.email) ? globalThis.String(object.email) : "",
       fullname: isSet(object.fullname) ? globalThis.String(object.fullname) : "",
       picture: isSet(object.picture) ? globalThis.String(object.picture) : "",
+      username: isSet(object.username) ? globalThis.String(object.username) : "",
     };
   },
 
@@ -640,6 +653,9 @@ export const LoginData: MessageFns<LoginData> = {
     if (message.picture !== "") {
       obj.picture = message.picture;
     }
+    if (message.username !== "") {
+      obj.username = message.username;
+    }
     return obj;
   },
 
@@ -652,6 +668,7 @@ export const LoginData: MessageFns<LoginData> = {
     message.email = object.email ?? "";
     message.fullname = object.fullname ?? "";
     message.picture = object.picture ?? "";
+    message.username = object.username ?? "";
     return message;
   },
 };
