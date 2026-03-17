@@ -221,11 +221,11 @@ func runPostMigrations(db *gorm.DB) error {
 	log.Println("Running data backfills...")
 	backfillStartTime := time.Now()
 
-	// Gold VND (type 8): default to tael display
+	// Gold VND (type 8): default to mace (chỉ) display
 	// Only update records where purchase_unit is NULL or 'gram'
 	result := db.Exec(`
 		UPDATE investment
-		SET purchase_unit = 'tael'
+		SET purchase_unit = 'mace'
 		WHERE type = 8 AND (purchase_unit IS NULL OR purchase_unit = 'gram')
 	`)
 	if result.Error != nil {

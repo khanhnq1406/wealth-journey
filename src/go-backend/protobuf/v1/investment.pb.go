@@ -247,7 +247,7 @@ type Investment struct {
 	DisplayCurrency      string `protobuf:"bytes,21,opt,name=displayCurrency,proto3" json:"displayCurrency,omitempty"`           // User's preferred currency code
 	TotalDividends       int64  `protobuf:"varint,22,opt,name=totalDividends,proto3" json:"totalDividends,omitempty"`            // Total dividends received
 	WalletName           string `protobuf:"bytes,23,opt,name=walletName,proto3" json:"walletName,omitempty"`                     // Name of the wallet (for display in "All Wallets" view)
-	PurchaseUnit         string `protobuf:"bytes,24,opt,name=purchaseUnit,proto3" json:"purchaseUnit,omitempty"`                 // User's purchase unit for display ("tael", "kg", "oz", "gram")
+	PurchaseUnit         string `protobuf:"bytes,24,opt,name=purchaseUnit,proto3" json:"purchaseUnit,omitempty"`                 // User's purchase unit for display ("mace", "tael", "kg", "oz", "gram")
 	DisplayCurrentPrice  *Money `protobuf:"bytes,25,opt,name=displayCurrentPrice,proto3" json:"displayCurrentPrice,omitempty"`   // Current price in user's preferred currency
 	DisplayAverageCost   *Money `protobuf:"bytes,26,opt,name=displayAverageCost,proto3" json:"displayAverageCost,omitempty"`     // Average cost in user's preferred currency
 	IsCustom             bool   `protobuf:"varint,27,opt,name=isCustom,proto3" json:"isCustom,omitempty"`                        // True if manual entry without market data validation
@@ -1254,7 +1254,7 @@ type GoldTypeCode struct {
 	Code       string  `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`               // e.g., "SJL1L10", "XAU"
 	Name       string  `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`               // Display name (e.g., "SJC 1L-10L", "Gold World")
 	Currency   string  `protobuf:"bytes,3,opt,name=currency,proto3" json:"currency,omitempty"`       // "VND" or "USD"
-	Unit       string  `protobuf:"bytes,4,opt,name=unit,proto3" json:"unit,omitempty"`               // "tael", "gram", or "oz"
+	Unit       string  `protobuf:"bytes,4,opt,name=unit,proto3" json:"unit,omitempty"`               // "mace", "gram", or "oz"
 	UnitWeight float64 `protobuf:"fixed64,5,opt,name=unitWeight,proto3" json:"unitWeight,omitempty"` // Weight in grams
 	Type       int32   `protobuf:"varint,6,opt,name=type,proto3" json:"type,omitempty"`              // InvestmentType enum value
 }
@@ -2017,7 +2017,7 @@ type MarketPrice struct {
 	PriceDecimal float64 `protobuf:"fixed64,4,opt,name=priceDecimal,proto3" json:"priceDecimal,omitempty"` // Convenience field
 	Timestamp    int64   `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`        // Unix seconds
 	IsCached     bool    `protobuf:"varint,6,opt,name=isCached,proto3" json:"isCached,omitempty"`          // Cache hit indicator
-	DisplayUnit  string  `protobuf:"bytes,7,opt,name=displayUnit,proto3" json:"displayUnit,omitempty"`     // "tael", "oz", "unit", etc.
+	DisplayUnit  string  `protobuf:"bytes,7,opt,name=displayUnit,proto3" json:"displayUnit,omitempty"`     // "mace", "oz", "unit", etc.
 }
 
 func (x *MarketPrice) Reset() {
@@ -2791,7 +2791,7 @@ type CreateInvestmentRequest struct {
 	InitialCostDecimal     float64 `protobuf:"fixed64,9,opt,name=initialCostDecimal,proto3" json:"initialCostDecimal,omitempty"` // Total cost as decimal (e.g., 1500.50 for $1,500.50)
 	IsCustom               bool    `protobuf:"varint,10,opt,name=isCustom,proto3" json:"isCustom,omitempty"`                     // If true, skip market data validation and allow currentPrice=0
 	PurchaseDate           int64   `protobuf:"varint,11,opt,name=purchaseDate,proto3" json:"purchaseDate,omitempty"`             // Optional: Unix timestamp (0 = not set, use current time)
-	PurchaseUnit           string  `protobuf:"bytes,13,opt,name=purchaseUnit,proto3" json:"purchaseUnit,omitempty"`              // User's input unit ("tael", "kg", "oz", "gram")
+	PurchaseUnit           string  `protobuf:"bytes,13,opt,name=purchaseUnit,proto3" json:"purchaseUnit,omitempty"`              // User's input unit ("mace", "tael", "kg", "oz", "gram")
 }
 
 func (x *CreateInvestmentRequest) Reset() {

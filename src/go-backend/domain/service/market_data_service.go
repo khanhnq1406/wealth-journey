@@ -258,7 +258,7 @@ func (s *marketDataService) fetchGoldPriceFromAPI(ctx context.Context, symbol, c
 	}
 
 	// Convert market price to storage format
-	// Market price for VND gold is per tael, need to convert to per gram for storage
+	// Market price for VND gold is per lượng (from vang.today), need to convert to per gram for storage
 	// Market price for USD gold is already per ounce
 	normalizedPrice := s.goldConverter.ProcessMarketPrice(price.Buy, currency, investmentType)
 

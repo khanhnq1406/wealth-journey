@@ -1,20 +1,20 @@
 /**
  * Gold Calculator - Dual Conversion System for Gold Investments
  *
- * Handles BOTH unit conversions (tael/gram/oz) AND currency conversions (VND/USD)
+ * Handles BOTH unit conversions (mace/gram/oz) AND currency conversions (VND/USD)
  * for gold investment tracking.
  *
  * LAYER 1: Unit Conversion
- *   - Tael (37.5g) ↔ Gram (1g) ↔ Ounce (31.1034768g)
+ *   - Mace/chỉ (3.75g) ↔ Gram (1g) ↔ Ounce (31.1034768g)
  *
  * LAYER 2: Currency Conversion (via FX rates)
  *   - VND ↔ USD (using existing FX rate service)
  */
 
-export type GoldUnit = 'tael' | 'gram' | 'oz';
+export type GoldUnit = 'mace' | 'gram' | 'oz';
 
 // Constants for unit conversions
-export const GRAMS_PER_TAEL = 37.5;
+export const GRAMS_PER_MACE = 3.75; // 1 mace (chỉ) = 3.75g (1 lượng = 10 mace = 37.5g)
 export const GRAMS_PER_OUNCE = 31.1034768;
 
 /**
@@ -23,7 +23,7 @@ export const GRAMS_PER_OUNCE = 31.1034768;
 export interface GoldTypeOption {
   value: string;      // e.g., "SJL1L10", "XAU"
   label: string;      // Display name
-  unit: GoldUnit;    // "tael", "gram", or "oz"
+  unit: GoldUnit;    // "mace", "gram", or "oz"
   currency: string;   // "VND" or "USD"
   unitWeight: number; // Weight in grams
   type: number;      // InvestmentType enum value
@@ -31,15 +31,15 @@ export interface GoldTypeOption {
 
 // Vietnamese gold type options — aligned with GOLD_TABLE_FILTER (price table display)
 export const GOLD_VND_OPTIONS: GoldTypeOption[] = [
-  { value: "SJC", label: "SJC", unit: "tael" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_TAEL, type: 8 },
-  { value: "SJC TD", label: "SJC Tự Do", unit: "tael" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_TAEL, type: 8 },
-  { value: "Vàng nhẫn SJC", label: "Nhẫn SJC 9999", unit: "tael" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_TAEL, type: 8 },
-  { value: "Doji_24K", label: "Nhẫn Doji 9999", unit: "tael" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_TAEL, type: 8 },
-  { value: "Mi hồng", label: "SJC Mi Hồng", unit: "tael" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_TAEL, type: 8 },
-  { value: "Mihong_999", label: "Nhẫn Mi Hồng 9999", unit: "tael" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_TAEL, type: 8 },
-  { value: "BTMC", label: "SJC BTMC", unit: "tael" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_TAEL, type: 8 },
-  { value: "BTMC_24K", label: "Nhẫn BTMC", unit: "tael" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_TAEL, type: 8 },
-  { value: "PNJ HCM", label: "PNJ", unit: "tael" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_TAEL, type: 8 },
+  { value: "SJC", label: "SJC", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
+  { value: "SJC TD", label: "SJC Tự Do", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
+  { value: "Vàng nhẫn SJC", label: "Nhẫn SJC 9999", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
+  { value: "Doji_24K", label: "Nhẫn Doji 9999", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
+  { value: "Mi hồng", label: "SJC Mi Hồng", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
+  { value: "Mihong_999", label: "Nhẫn Mi Hồng 9999", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
+  { value: "BTMC", label: "SJC BTMC", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
+  { value: "BTMC_24K", label: "Nhẫn BTMC", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
+  { value: "PNJ HCM", label: "PNJ", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
 ];
 
 // World gold type options (from backend pkg/gold/types.go)
@@ -67,8 +67,8 @@ export function convertGoldQuantity(
   let inGrams: number;
 
   switch (from) {
-    case 'tael':
-      inGrams = quantity * GRAMS_PER_TAEL;
+    case 'mace':
+      inGrams = quantity * GRAMS_PER_MACE;
       break;
     case 'oz':
       inGrams = quantity * GRAMS_PER_OUNCE;
@@ -81,8 +81,8 @@ export function convertGoldQuantity(
 
   // Convert from grams to target unit
   switch (to) {
-    case 'tael':
-      return inGrams / GRAMS_PER_TAEL;
+    case 'mace':
+      return inGrams / GRAMS_PER_MACE;
     case 'oz':
       return inGrams / GRAMS_PER_OUNCE;
     case 'gram':
@@ -108,8 +108,8 @@ export function convertGoldPricePerUnit(
   let quantityRatio: number;
 
   switch (from) {
-    case 'tael':
-      quantityRatio = GRAMS_PER_TAEL;
+    case 'mace':
+      quantityRatio = GRAMS_PER_MACE;
       break;
     case 'oz':
       quantityRatio = GRAMS_PER_OUNCE;
@@ -125,8 +125,8 @@ export function convertGoldPricePerUnit(
 
   // Convert from price per gram to target unit
   switch (to) {
-    case 'tael':
-      return pricePerGram * GRAMS_PER_TAEL;
+    case 'mace':
+      return pricePerGram * GRAMS_PER_MACE;
     case 'oz':
       return pricePerGram * GRAMS_PER_OUNCE;
     case 'gram':
@@ -157,7 +157,7 @@ export function getGoldStorageInfo(investmentType: number): { unit: GoldUnit; cu
  */
 export function getGoldMarketPriceUnit(investmentType: number): GoldUnit {
   if (investmentType === 8) { // GOLD_VND
-    return 'tael' as GoldUnit; // VND gold prices are per tael
+    return 'mace' as GoldUnit; // VND gold display unit is mace (chỉ)
   } else if (investmentType === 9) { // GOLD_USD
     return 'oz' as GoldUnit; // World gold prices are per ounce
   }
@@ -173,10 +173,10 @@ export function getGoldMarketPriceUnit(investmentType: number): GoldUnit {
  */
 export interface GoldCalculationInput {
   quantity: number;           // User-entered quantity
-  quantityUnit: GoldUnit;     // Unit of quantity (tael/gram/oz)
+  quantityUnit: GoldUnit;     // Unit of quantity (mace/gram/oz)
   pricePerUnit: number;       // Price entered by user
   priceCurrency: string;      // Currency of price (VND/USD)
-  priceUnit: GoldUnit;        // Unit of price (tael/gram/oz)
+  priceUnit: GoldUnit;        // Unit of price (mace/gram/oz)
   investmentType: number;     // InvestmentType enum value
   walletCurrency: string;     // Wallet currency for final cost
   fxRate?: number;            // Optional FX rate if currencies differ
@@ -284,10 +284,10 @@ export function formatGoldQuantityDisplay(
   const { unit: storageUnit } = getGoldStorageInfo(investmentType);
   let displayUnit: GoldUnit;
 
-  // For VND gold: display in taels (Vietnamese convention)
+  // For VND gold: display in mace/chỉ (Vietnamese convention)
   // For USD gold: display in ounces (international convention)
   if (investmentType === 8) { // GOLD_VND
-    displayUnit = 'tael' as GoldUnit;
+    displayUnit = 'mace' as GoldUnit;
   } else if (investmentType === 9) { // GOLD_USD
     displayUnit = 'oz' as GoldUnit;
   } else {
@@ -306,8 +306,8 @@ export function formatGoldQuantityDisplay(
  */
 export function getGoldUnitLabel(unit: GoldUnit): string {
   switch (unit) {
-    case 'tael':
-      return 'lượng';
+    case 'mace':
+      return 'chỉ';
     case 'gram':
       return 'g';
     case 'oz':
@@ -319,12 +319,12 @@ export function getGoldUnitLabel(unit: GoldUnit): string {
 
 /**
  * Get gold display unit label for forms (with full name)
- * Returns user-friendly labels like "Tael (lượng)", "Ounce"
+ * Returns user-friendly labels like "Mace (chỉ)", "Ounce"
  */
 export function getGoldUnitLabelFull(unit: GoldUnit): string {
   switch (unit) {
-    case 'tael':
-      return 'Tael (lượng)';
+    case 'mace':
+      return 'Mace (chỉ)';
     case 'gram':
       return 'Gram';
     case 'oz':
@@ -338,7 +338,7 @@ export function getGoldUnitLabelFull(unit: GoldUnit): string {
  * Format gold price for display
  * @param price - Price in smallest currency unit
  * @param currency - Currency code (VND or USD)
- * @param priceUnit - Unit of the price (tael/gram/oz)
+ * @param priceUnit - Unit of the price (mace/gram/oz)
  * @returns Formatted price string
  */
 export function formatGoldPriceDisplay(
@@ -348,7 +348,7 @@ export function formatGoldPriceDisplay(
 ): string {
   const priceInMainUnits = price / (currency === 'VND' ? 1 : 100);
 
-  const unit = priceUnit || (currency === 'VND' ? 'tael' : 'oz');
+  const unit = priceUnit || (currency === 'VND' ? 'mace' : 'oz');
 
   // Format the price number
   const formattedPrice = new Intl.NumberFormat('en-US', {

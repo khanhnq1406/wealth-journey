@@ -21,7 +21,7 @@ import {
   getGoldTypeByCode,
   isGoldType,
   getGoldTypeLabel,
-  GRAMS_PER_TAEL,
+  GRAMS_PER_MACE,
   GRAMS_PER_OUNCE,
   GOLD_VND_OPTIONS,
   GOLD_USD_OPTIONS,
@@ -31,14 +31,14 @@ import {
 
 describe('Gold Calculator - Unit Conversions (LAYER 1)', () => {
   describe('convertGoldQuantity', () => {
-    it('should convert taels to grams correctly', () => {
-      expect(convertGoldQuantity(2, 'tael', 'gram')).toBe(75); // 2 × 37.5 = 75
-      expect(convertGoldQuantity(1, 'tael', 'gram')).toBe(37.5);
+    it('should convert mace to grams correctly', () => {
+      expect(convertGoldQuantity(20, 'mace', 'gram')).toBe(75); // 20 × 3.75 = 75
+      expect(convertGoldQuantity(1, 'mace', 'gram')).toBe(3.75);
     });
 
-    it('should convert grams to taels correctly', () => {
-      expect(convertGoldQuantity(75, 'gram', 'tael')).toBe(2); // 75 / 37.5 = 2
-      expect(convertGoldQuantity(37.5, 'gram', 'tael')).toBe(1);
+    it('should convert grams to mace correctly', () => {
+      expect(convertGoldQuantity(75, 'gram', 'mace')).toBe(20); // 75 / 3.75 = 20
+      expect(convertGoldQuantity(3.75, 'gram', 'mace')).toBe(1);
     });
 
     it('should convert ounces to grams correctly', () => {
@@ -52,24 +52,24 @@ describe('Gold Calculator - Unit Conversions (LAYER 1)', () => {
 
     it('should handle same unit conversion', () => {
       expect(convertGoldQuantity(1, 'gram', 'gram')).toBe(1);
-      expect(convertGoldQuantity(1, 'tael', 'tael')).toBe(1);
+      expect(convertGoldQuantity(1, 'mace', 'mace')).toBe(1);
       expect(convertGoldQuantity(1, 'oz', 'oz')).toBe(1);
     });
   });
 
   describe('convertGoldPricePerUnit', () => {
-    it('should convert price per tael to price per gram', () => {
-      // 75,000,000 VND per tael / 37.5 = 2,000,000 VND per gram
-      expect(convertGoldPricePerUnit(75000000, 'tael', 'gram')).toBeCloseTo(2000000, 0);
+    it('should convert price per mace to price per gram', () => {
+      // 7,500,000 VND per mace / 3.75 = 2,000,000 VND per gram
+      expect(convertGoldPricePerUnit(7500000, 'mace', 'gram')).toBeCloseTo(2000000, 0);
     });
 
-    it('should convert price per gram to price per tael', () => {
-      expect(convertGoldPricePerUnit(2000000, 'gram', 'tael')).toBeCloseTo(75000000, 0);
+    it('should convert price per gram to price per mace', () => {
+      expect(convertGoldPricePerUnit(2000000, 'gram', 'mace')).toBeCloseTo(7500000, 0);
     });
 
     it('should handle same unit conversion', () => {
       expect(convertGoldPricePerUnit(1000, 'gram', 'gram')).toBe(1000);
-      expect(convertGoldPricePerUnit(1000, 'tael', 'tael')).toBe(1000);
+      expect(convertGoldPricePerUnit(1000, 'mace', 'mace')).toBeCloseTo(1000, 4);
     });
   });
 });
@@ -95,8 +95,8 @@ describe('Gold Calculator - Storage Info', () => {
 });
 
 describe('Gold Calculator - Market Price Unit', () => {
-  it('should return tael for GOLD_VND', () => {
-    expect(getGoldMarketPriceUnit(8)).toBe('tael'); // GOLD_VND
+  it('should return mace for GOLD_VND', () => {
+    expect(getGoldMarketPriceUnit(8)).toBe('mace'); // GOLD_VND
   });
 
   it('should return ounce for GOLD_USD', () => {
@@ -107,24 +107,24 @@ describe('Gold Calculator - Market Price Unit', () => {
 describe('Gold Calculator - Total Cost Calculation', () => {
   it('should calculate VND gold cost with no currency conversion', () => {
     const input: GoldCalculationInput = {
-      quantity: 2,
-      quantityUnit: 'tael',
-      pricePerUnit: 85000000, // 85M VND per tael
+      quantity: 20,
+      quantityUnit: 'mace',
+      pricePerUnit: 8500000, // 8.5M VND per mace
       priceCurrency: 'VND',
-      priceUnit: 'tael',
+      priceUnit: 'mace',
       investmentType: 8, // GOLD_VND
       walletCurrency: 'VND',
     };
 
     const result = calculateGoldFromUserInput(input);
 
-    // 2 taels = 75 grams
-    // Price per gram = 85M / 37.5 = 2,266,667 VND
+    // 20 mace = 75 grams
+    // Price per gram = 8.5M / 3.75 = 2,266,667 VND
     // Total cost = 75 × 2,266,667 = 170,000,000 VND (rounded)
     expect(result.storedQuantity).toBe(750000); // 75g × 10000
     expect(result.totalCostNative).toBe(170000000); // 170M VND dong
-    expect(result.displayInfo.quantity).toBe(2);
-    expect(result.displayInfo.unit).toBe('tael');
+    expect(result.displayInfo.quantity).toBe(20);
+    expect(result.displayInfo.unit).toBe('mace');
   });
 
   it('should calculate USD gold cost with no currency conversion', () => {
@@ -148,11 +148,11 @@ describe('Gold Calculator - Total Cost Calculation', () => {
 
   it('should calculate VND gold with currency conversion to USD wallet', () => {
     const input: GoldCalculationInput = {
-      quantity: 2,
-      quantityUnit: 'tael',
-      pricePerUnit: 85000000, // 85M VND per tael
+      quantity: 20,
+      quantityUnit: 'mace',
+      pricePerUnit: 8500000, // 8.5M VND per mace
       priceCurrency: 'VND',
-      priceUnit: 'tael',
+      priceUnit: 'mace',
       investmentType: 8, // GOLD_VND
       walletCurrency: 'USD',
       fxRate: 0.00004, // 1 VND = 0.00004 USD (or 1 USD = 25,000 VND)
@@ -171,8 +171,8 @@ describe('Gold Calculator - Display Functions', () => {
   it('should format VND gold quantity for display', () => {
     const result = formatGoldQuantityDisplay(750000, 8, 'VND'); // 75g stored
 
-    expect(result.value).toBeCloseTo(2, 4); // Should show in taels
-    expect(result.unit).toBe('tael');
+    expect(result.value).toBeCloseTo(20, 4); // Should show in mace (75g / 3.75 = 20)
+    expect(result.unit).toBe('mace');
   });
 
   it('should format USD gold quantity for display', () => {
@@ -250,13 +250,13 @@ describe('Gold Calculator - Utility Functions', () => {
 
 describe('Gold Calculator - Integration Tests', () => {
   it('should handle complete VND gold investment flow', () => {
-    // User buys 2.5 taels of SJC gold at 86,000,000 VND/tael
+    // User buys 25 mace of SJC gold at 8,600,000 VND/mace
     const input: GoldCalculationInput = {
-      quantity: 2.5,
-      quantityUnit: 'tael',
-      pricePerUnit: 86000000,
+      quantity: 25,
+      quantityUnit: 'mace',
+      pricePerUnit: 8600000,
       priceCurrency: 'VND',
-      priceUnit: 'tael',
+      priceUnit: 'mace',
       investmentType: 8,
       walletCurrency: 'VND',
     };
@@ -264,9 +264,9 @@ describe('Gold Calculator - Integration Tests', () => {
     const result = calculateGoldFromUserInput(input);
 
     // Verify calculations
-    expect(result.storedQuantity).toBe(937500); // 2.5 × 37.5g × 10000 = 937,500
+    expect(result.storedQuantity).toBe(937500); // 25 × 3.75g × 10000 = 937,500
     expect(result.totalCostNative).toBe(215000000); // ~215M VND
-    expect(result.displayInfo.quantity).toBe(2.5);
+    expect(result.displayInfo.quantity).toBe(25);
   });
 
   it('should handle VND gold with gram input', () => {

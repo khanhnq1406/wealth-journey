@@ -61,7 +61,7 @@ export default function LandingInvestmentFeatures() {
           { icon: "🇻🇳", label: t("investmentFeatures.sjcGold") },
           { icon: "🌍", label: t("investmentFeatures.worldGold") },
           { icon: "🥈", label: t("investmentFeatures.silver") },
-          { icon: "⚖️", label: t("investmentFeatures.taelGramOunce") },
+          { icon: "⚖️", label: t("investmentFeatures.maceGramOunce") },
           { icon: "💱", label: t("investmentFeatures.multiCurrency") },
           { icon: "🏷️", label: t("investmentFeatures.livePricing") },
         ],

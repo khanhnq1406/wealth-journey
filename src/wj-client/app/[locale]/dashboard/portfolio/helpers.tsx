@@ -26,7 +26,7 @@ export const formatQuantity = (
   type: InvestmentType,
   purchaseUnit?: string,
 ): string => {
-  // Gold types have special formatting with unit display (tael/oz)
+  // Gold types have special formatting with unit display (mace/oz)
   if (isGoldType(type)) {
     return formatGoldQuantity(quantity, type);
   }
@@ -199,13 +199,13 @@ export function formatGoldQuantity(storedQuantity: number, investmentType: Inves
  * - USD gold: Price per ounce in USD cents
  *
  * Display format:
- * - VND gold: Price per tael (multiply per-gram by 37.5)
+ * - VND gold: Price per mace/chỉ (multiply per-gram by 3.75)
  * - USD gold: Price per ounce (divide cents by 100)
  *
  * @param price - Price from backend (VND: per gram, USD: cents per ounce)
  * @param currency - Currency code
  * @param priceUnit - Unit of the price (if different from market default)
- * @returns Formatted price string (e.g., "85,000,000 ₫/lượng" for VND gold)
+ * @returns Formatted price string (e.g., "8,500,000 ₫/chỉ" for VND gold)
  */
 export function formatGoldPrice(
   price: number,
@@ -214,9 +214,9 @@ export function formatGoldPrice(
   investmentType?: InvestmentType
 ): string {
   // Determine the display unit
-  // For VND gold (type 8): use tael (lượng) regardless of display currency
+  // For VND gold (type 8): use mace (chỉ) regardless of display currency
   // For USD gold (type 9): use oz
-  let unit: 'tael' | 'oz' = 'tael';
+  let unit: 'mace' | 'oz' = 'mace';
 
   if (investmentType === 9) { // GOLD_USD
     unit = 'oz';
@@ -224,7 +224,7 @@ export function formatGoldPrice(
 
   // Use provided priceUnit if available (overrides default)
   if (priceUnit) {
-    unit = priceUnit as 'tael' | 'oz';
+    unit = priceUnit as 'mace' | 'oz';
   }
 
   const unitLabel = getGoldUnitLabel(unit);
@@ -234,8 +234,8 @@ export function formatGoldPrice(
 
   if (currency === 'VND') {
     // Case 1: Native VND gold (price per gram in VND)
-    // Convert to price per tael: multiply by 37.5
-    priceForDisplay = price * 37.5;
+    // Convert to price per mace: multiply by 3.75
+    priceForDisplay = price * 3.75;
   } else if (investmentType === 9) {
     // Case 2: Native USD gold (XAU) - price per ounce in cents
     // Convert cents to dollars
@@ -243,9 +243,9 @@ export function formatGoldPrice(
   } else {
     // Case 3: VND gold with backend currency conversion to USD
     // Backend returns price per gram in USD cents
-    // Convert cents to dollars, then gram to tael
+    // Convert cents to dollars, then gram to mace
     const pricePerGramInDollars = price / 100;
-    priceForDisplay = pricePerGramInDollars * 37.5;
+    priceForDisplay = pricePerGramInDollars * 3.75;
   }
 
   // Format price with currency
@@ -284,12 +284,14 @@ export function isGoldInvestment(type: InvestmentType): boolean {
 
 /**
  * Get display unit label for investment forms (full name)
- * Returns user-friendly labels like "Tael (lượng)", "Kg", "Ounce"
- * @param unit - The unit string ("tael", "kg", "oz", "gram")
+ * Returns user-friendly labels like "Mace (chỉ)", "Tael (lượng)", "Kg", "Ounce"
+ * @param unit - The unit string ("mace", "tael", "kg", "oz", "gram")
  * @param investmentType - The investment type enum (optional, for context)
  */
 export function getInvestmentUnitLabelFull(unit: string, investmentType?: InvestmentType): string {
   switch (unit) {
+    case 'mace':
+      return 'Mace (chỉ)';
     case 'tael':
       return 'Tael (lượng)';
     case 'kg':

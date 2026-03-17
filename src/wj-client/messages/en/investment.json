@@ -155,6 +155,8 @@
       "cachedPrice": "(Cached price)",
       "unableToFetchPrice": "Unable to fetch price",
       "quantityHint": "Number of shares, coins, or units you hold",
+      "maceUnit": "Mace (chỉ)",
+      "maceUnitLong": "mace (chỉ)",
       "taelUnit": "Tael (lượng)",
       "kgUnit": "Kg",
       "customInvestmentDescription": "Create investment for assets not available in market data",

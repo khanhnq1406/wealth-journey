@@ -119,7 +119,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
   // Gold-specific state
   const [selectedGoldType, setSelectedGoldType] =
     useState<GoldTypeOption | null>(null);
-  const [goldQuantityUnit, setGoldQuantityUnit] = useState<GoldUnit>("tael");
+  const [goldQuantityUnit, setGoldQuantityUnit] = useState<GoldUnit>("mace");
 
   // Silver-specific state
   const [selectedSilverType, setSelectedSilverType] =
@@ -689,7 +689,12 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
             <div className="mt-2 space-y-1">
               <p className="text-xs text-gray-500 ml-1">
                 {t("form.goldUnitCurrencyInfo", {
-                  unit: selectedGoldType.unit,
+                  unit:
+                    selectedGoldType.unit === "mace"
+                      ? t("form.maceUnit")
+                      : selectedGoldType.unit === "gram"
+                        ? t("form.gramUnit")
+                        : "oz",
                   currency: selectedGoldType.currency,
                 })}
               </p>
@@ -776,7 +781,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
               name="initialQuantity"
               control={control}
               label=""
-              placeholder={`e.g., ${goldQuantityUnit === "tael" ? "2.5" : "100"}`}
+              placeholder={`e.g., ${goldQuantityUnit === "mace" ? "20" : "100"}`}
               required
               disabled={isSubmitting}
               min={0}
@@ -786,8 +791,8 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
             <p className="text-xs text-gray-500 -mt-2 ml-1">
               {t("form.amountOfGold", {
                 unit:
-                  goldQuantityUnit === "tael"
-                    ? t("form.taelUnitLong")
+                  goldQuantityUnit === "mace"
+                    ? t("form.maceUnitLong")
                     : goldQuantityUnit === "oz"
                       ? "oz"
                       : t("form.gramUnit"),

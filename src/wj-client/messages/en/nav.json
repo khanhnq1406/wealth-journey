@@ -69,7 +69,7 @@
       "multiWalletDescLong": "Create unlimited BASIC and INVESTMENT wallets. Transfer funds seamlessly between accounts with real-time balance updates.",
       "portfolioTrackingDescLong": "Track stocks, crypto, ETFs, bonds, mutual funds, and commodities with real-time Yahoo Finance market data integration.",
       "mobileFirstDescLong": "Fully responsive layout optimized for mobile, tablet, and desktop. Touch-friendly interactions with pull-to-refresh and smooth animations.",
-      "goldSilverDescLong": "Specialized support for Vietnamese SJC gold (10 varieties), world gold (XAU), and silver with automatic tael/gram/ounce conversions.",
+      "goldSilverDescLong": "Specialized support for Vietnamese SJC gold (10 varieties), world gold (XAU), and silver with automatic mace/gram/ounce conversions.",
       "smartTransactionsDescLong": "Categorize income and expenses with custom categories. Advanced filtering by wallet, date range, amount, and text search.",
       "bankImportDescLong": "Bulk import transactions from CSV, Excel, or PDF statements. Smart duplicate detection, auto-categorization, and 24-hour undo.",
       "analyticsDescLong": "Beautiful charts showing balance history, income vs expenses, wallet distribution, and portfolio performance with interactive tooltips.",
@@ -102,7 +102,7 @@
       "goldSilverSupportDesc": "Vietnam gold market + world gold prices with automatic unit conversions",
       "sjcGold": "SJC Gold (10 Types)",
       "worldGold": "World Gold (XAU)",
-      "taelGramOunce": "Tael/Gram/Ounce",
+      "maceGramOunce": "Mace/Gram/Ounce",
       "multiCurrency": "Multi-Currency",
       "livePricing": "Live Pricing",
       "allInOneTitle": "All-In-One",
@@ -231,7 +231,7 @@
         "user2": {
           "name": "Trần Thị B",
           "role": "Gold Investor",
-          "content": "Managing gold investments has never been easier. I love how it automatically converts between Vietnamese tael and international ounces. The vang.today price integration is incredibly convenient!"
+          "content": "Managing gold investments has never been easier. I love how it automatically converts between Vietnamese mace (chỉ) and international ounces. The vang.today price integration is incredibly convenient!"
         },
         "user3": {
           "name": "Lê Văn C",

@@ -33,7 +33,7 @@ message Investment {
   string displayCurrency = 21 [json_name = "displayCurrency"];  // User's preferred currency code
   int64 totalDividends = 22 [json_name = "totalDividends"];  // Total dividends received
   string walletName = 23 [json_name = "walletName"];  // Name of the wallet (for display in "All Wallets" view)
-  string purchaseUnit = 24 [json_name = "purchaseUnit"];  // User's purchase unit for display ("tael", "kg", "oz", "gram")
+  string purchaseUnit = 24 [json_name = "purchaseUnit"];  // User's purchase unit for display ("mace", "tael", "kg", "oz", "gram")
   wealthjourney.common.v1.Money displayCurrentPrice = 25 [json_name = "displayCurrentPrice"];  // Current price in user's preferred currency
   wealthjourney.common.v1.Money displayAverageCost = 26 [json_name = "displayAverageCost"];  // Average cost in user's preferred currency
   bool isCustom = 27 [json_name = "isCustom"];  // True if manual entry without market data validation
@@ -173,7 +173,7 @@ message GoldTypeCode {
   string code = 1 [json_name = "code"];           // e.g., "SJL1L10", "XAU"
   string name = 2 [json_name = "name"];           // Display name (e.g., "SJC 1L-10L", "Gold World")
   string currency = 3 [json_name = "currency"];   // "VND" or "USD"
-  string unit = 4 [json_name = "unit"];           // "tael", "gram", or "oz"
+  string unit = 4 [json_name = "unit"];           // "mace", "gram", or "oz"
   double unitWeight = 5 [json_name = "unitWeight"]; // Weight in grams
   int32 type = 6 [json_name = "type"];            // InvestmentType enum value
 }
@@ -260,7 +260,7 @@ message MarketPrice {
   double priceDecimal = 4 [json_name = "priceDecimal"]; // Convenience field
   int64 timestamp = 5 [json_name = "timestamp"];      // Unix seconds
   bool isCached = 6 [json_name = "isCached"];         // Cache hit indicator
-  string displayUnit = 7 [json_name = "displayUnit"]; // "tael", "oz", "unit", etc.
+  string displayUnit = 7 [json_name = "displayUnit"]; // "mace", "oz", "unit", etc.
 }
 
 // ChartDataPoint represents a single price data point for chart display
@@ -524,7 +524,7 @@ message CreateInvestmentRequest {
   double initialCostDecimal = 9 [json_name = "initialCostDecimal"];  // Total cost as decimal (e.g., 1500.50 for $1,500.50)
   bool isCustom = 10 [json_name = "isCustom"];  // If true, skip market data validation and allow currentPrice=0
   int64 purchaseDate = 11 [json_name = "purchaseDate"];  // Optional: Unix timestamp (0 = not set, use current time)
-  string purchaseUnit = 13 [json_name = "purchaseUnit"];  // User's input unit ("tael", "kg", "oz", "gram")
+  string purchaseUnit = 13 [json_name = "purchaseUnit"];  // User's input unit ("mace", "tael", "kg", "oz", "gram")
 }
 
 message CreateInvestmentResponse {
