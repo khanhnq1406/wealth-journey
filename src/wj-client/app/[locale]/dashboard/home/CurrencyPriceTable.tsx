@@ -45,30 +45,30 @@ export function CurrencyPriceTable({
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full border-collapse">
           <thead>
             <tr className="bg-v2-currency-light">
-              <th className="text-left px-5 py-3.5 font-vietnam font-bold text-[14px] tracking-normal text-v2-currency-dark">
+              <th className="text-left px-5 py-3.5 font-vietnam font-bold text-[14px] tracking-normal text-v2-currency-dark border-x border-white/30 first:border-l-0">
                 {t("currencyType")}
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-currency-dark">
-                {t("buy")}
+              <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-currency-dark border-x border-white/30">
+                <div>{t("buy")}</div>
+                <div className="font-normal text-[10px] tracking-normal opacity-70">{t("buyUnit")}</div>
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-currency-dark">
-                {t("sell")}
+              <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-currency-dark border-x border-white/30 last:border-r-0">
+                <div>{t("sell")}</div>
+                <div className="font-normal text-[10px] tracking-normal opacity-70">{t("sellUnit")}</div>
               </th>
-              {isAdmin && <th className="w-10" />}
+              {isAdmin && <th className="w-10 border-x border-white/30 last:border-r-0" />}
             </tr>
           </thead>
           <tbody>
             {prices.map((item, index) => (
               <tr
                 key={item.typeCode || index}
-                className={
-                  index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"
-                }
+                className={`border-b border-v2-border-light ${index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"}`}
               >
-                <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-currency-dark">
+                <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-currency-dark border-x border-v2-border-light first:border-l-0">
                   {item.name || item.typeCode}
                   <OverrideIndicator
                     item={item}
@@ -76,14 +76,14 @@ export function CurrencyPriceTable({
                     isAdmin={isAdmin}
                   />
                 </td>
-                <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-lred">
+                <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-lred border-x border-v2-border-light">
                   {formatPriceValue(item.buy, "VND")}
                 </td>
-                <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-green-positive">
+                <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-green-positive border-x border-v2-border-light last:border-r-0">
                   {formatPriceValue(item.sell, "VND")}
                 </td>
                 {isAdmin && (
-                  <td className="px-2 py-3">
+                  <td className="px-2 py-3 border-x border-v2-border-light last:border-r-0">
                     <InlinePriceEdit item={item} category="currency" />
                   </td>
                 )}
