@@ -272,6 +272,7 @@ export function pnlPeriodToJSON(object: PnlPeriod): string {
 /** Investment represents an individual holding within an investment wallet */
 export interface Investment {
   id: number;
+  /** Optional: 0 or omitted = no wallet association */
   walletId: number;
   /** e.g., "BTC", "AAPL", "VFINX" */
   symbol: string;
@@ -332,6 +333,8 @@ export interface Investment {
     | undefined;
   /** True if manual entry without market data validation */
   isCustom: boolean;
+  /** Owner user ID (read-only, set by server from JWT) */
+  userId: number;
 }
 
 /** InvestmentTransaction represents a buy or sell transaction */
@@ -934,6 +937,7 @@ function createBaseInvestment(): Investment {
     displayCurrentPrice: undefined,
     displayAverageCost: undefined,
     isCustom: false,
+    userId: 0,
   };
 }
 
@@ -1019,6 +1023,9 @@ export const Investment: MessageFns<Investment> = {
     }
     if (message.isCustom !== false) {
       writer.uint32(216).bool(message.isCustom);
+    }
+    if (message.userId !== 0) {
+      writer.uint32(224).int32(message.userId);
     }
     return writer;
   },
@@ -1246,6 +1253,14 @@ export const Investment: MessageFns<Investment> = {
           message.isCustom = reader.bool();
           continue;
         }
+        case 28: {
+          if (tag !== 224) {
+            break;
+          }
+
+          message.userId = reader.int32();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1286,6 +1301,7 @@ export const Investment: MessageFns<Investment> = {
       displayCurrentPrice: isSet(object.displayCurrentPrice) ? Money.fromJSON(object.displayCurrentPrice) : undefined,
       displayAverageCost: isSet(object.displayAverageCost) ? Money.fromJSON(object.displayAverageCost) : undefined,
       isCustom: isSet(object.isCustom) ? globalThis.Boolean(object.isCustom) : false,
+      userId: isSet(object.userId) ? globalThis.Number(object.userId) : 0,
     };
   },
 
@@ -1372,6 +1388,9 @@ export const Investment: MessageFns<Investment> = {
     if (message.isCustom !== false) {
       obj.isCustom = message.isCustom;
     }
+    if (message.userId !== 0) {
+      obj.userId = Math.round(message.userId);
+    }
     return obj;
   },
 
@@ -1419,6 +1438,7 @@ export const Investment: MessageFns<Investment> = {
       ? Money.fromPartial(object.displayAverageCost)
       : undefined;
     message.isCustom = object.isCustom ?? false;
+    message.userId = object.userId ?? 0;
     return message;
   },
 };
