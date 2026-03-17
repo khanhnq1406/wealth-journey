@@ -28,6 +28,7 @@
       "passwordSet": "Đã đặt mật khẩu",
       "notSet": "Chưa thiết lập",
       "linked": "Đã liên kết",
+      "connectGoogle": "Kết nối Google",
       "setPassword": "Đặt mật khẩu",
       "changePassword": "Đổi mật khẩu",
       "username": "Tên người dùng",
@@ -60,6 +61,11 @@
         "passwordNeedsSpecial": "Mật khẩu phải chứa ít nhất một ký tự đặc biệt",
         "linkPasswordFailed": "Thiết lập mật khẩu thất bại. Vui lòng thử lại.",
         "changePasswordFailed": "Đổi mật khẩu thất bại. Vui lòng thử lại.",
+        "googleAlreadyLinked": "Tài khoản Google đã được liên kết",
+        "googleEmailTaken": "Tài khoản Google này đã được sử dụng bởi người dùng khác",
+        "googleEmailMismatch": "Email Google không khớp với email tài khoản của bạn",
+        "invalidGoogleToken": "Xác thực Google thất bại. Vui lòng thử lại.",
+        "linkGoogleFailed": "Liên kết Google thất bại. Vui lòng thử lại.",
         "genericError": "Đã xảy ra lỗi. Vui lòng thử lại."
       }
     },

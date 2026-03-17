@@ -62,6 +62,15 @@ const CHANGE_PASSWORD_ERROR_MAP: Record<string, string> = {
     "passwordNeedsSpecial",
 };
 
+/** Error map for link Google action (uses settings.security.errors namespace) */
+const LINK_GOOGLE_ERROR_MAP: Record<string, string> = {
+  "google account is already linked": "googleAlreadyLinked",
+  "this google account is linked to a different user": "googleEmailTaken",
+  "google email does not match your account email": "googleEmailMismatch",
+  "invalid google token": "invalidGoogleToken",
+  "google account does not have an email": "invalidGoogleToken",
+};
+
 /**
  * Maps a server error message to an i18n key for the register form.
  * Returns the i18n key if found, or null for the fallback.
@@ -96,4 +105,16 @@ export function mapChangePasswordError(
   if (!serverMessage) return null;
   const lower = serverMessage.toLowerCase();
   return CHANGE_PASSWORD_ERROR_MAP[lower] ?? null;
+}
+
+/**
+ * Maps a server error message to an i18n key for the link Google action.
+ * Returns the i18n key if found, or null for the fallback.
+ */
+export function mapLinkGoogleError(
+  serverMessage: string | undefined
+): string | null {
+  if (!serverMessage) return null;
+  const lower = serverMessage.toLowerCase();
+  return LINK_GOOGLE_ERROR_MAP[lower] ?? null;
 }
