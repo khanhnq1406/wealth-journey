@@ -125,6 +125,31 @@ export interface DeletePriceOverrideResponse {
   message: string;
 }
 
+export interface SiteSetting {
+  key: string;
+  value: string;
+  updatedBy: number;
+  updatedAt: number;
+}
+
+export interface GetSiteSettingsRequest {
+}
+
+export interface GetSiteSettingsResponse {
+  success: boolean;
+  settings: SiteSetting[];
+}
+
+export interface UpdateSiteSettingsRequest {
+  settings: SiteSetting[];
+}
+
+export interface UpdateSiteSettingsResponse {
+  success: boolean;
+  message: string;
+  settings: SiteSetting[];
+}
+
 function createBasePriceOverride(): PriceOverride {
   return { typeCode: "", name: "", buy: 0, sell: 0, currency: "", category: 0, updatedBy: 0, updatedAt: 0 };
 }
@@ -831,6 +856,391 @@ export const DeletePriceOverrideResponse: MessageFns<DeletePriceOverrideResponse
     const message = createBaseDeletePriceOverrideResponse();
     message.success = object.success ?? false;
     message.message = object.message ?? "";
+    return message;
+  },
+};
+
+function createBaseSiteSetting(): SiteSetting {
+  return { key: "", value: "", updatedBy: 0, updatedAt: 0 };
+}
+
+export const SiteSetting: MessageFns<SiteSetting> = {
+  encode(message: SiteSetting, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.value !== "") {
+      writer.uint32(18).string(message.value);
+    }
+    if (message.updatedBy !== 0) {
+      writer.uint32(24).int32(message.updatedBy);
+    }
+    if (message.updatedAt !== 0) {
+      writer.uint32(32).int64(message.updatedAt);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): SiteSetting {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSiteSetting();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.key = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.value = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.updatedBy = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.updatedAt = longToNumber(reader.int64());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): SiteSetting {
+    return {
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      value: isSet(object.value) ? globalThis.String(object.value) : "",
+      updatedBy: isSet(object.updatedBy) ? globalThis.Number(object.updatedBy) : 0,
+      updatedAt: isSet(object.updatedAt) ? globalThis.Number(object.updatedAt) : 0,
+    };
+  },
+
+  toJSON(message: SiteSetting): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.value !== "") {
+      obj.value = message.value;
+    }
+    if (message.updatedBy !== 0) {
+      obj.updatedBy = Math.round(message.updatedBy);
+    }
+    if (message.updatedAt !== 0) {
+      obj.updatedAt = Math.round(message.updatedAt);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<SiteSetting>): SiteSetting {
+    return SiteSetting.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<SiteSetting>): SiteSetting {
+    const message = createBaseSiteSetting();
+    message.key = object.key ?? "";
+    message.value = object.value ?? "";
+    message.updatedBy = object.updatedBy ?? 0;
+    message.updatedAt = object.updatedAt ?? 0;
+    return message;
+  },
+};
+
+function createBaseGetSiteSettingsRequest(): GetSiteSettingsRequest {
+  return {};
+}
+
+export const GetSiteSettingsRequest: MessageFns<GetSiteSettingsRequest> = {
+  encode(_: GetSiteSettingsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetSiteSettingsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetSiteSettingsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): GetSiteSettingsRequest {
+    return {};
+  },
+
+  toJSON(_: GetSiteSettingsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetSiteSettingsRequest>): GetSiteSettingsRequest {
+    return GetSiteSettingsRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<GetSiteSettingsRequest>): GetSiteSettingsRequest {
+    const message = createBaseGetSiteSettingsRequest();
+    return message;
+  },
+};
+
+function createBaseGetSiteSettingsResponse(): GetSiteSettingsResponse {
+  return { success: false, settings: [] };
+}
+
+export const GetSiteSettingsResponse: MessageFns<GetSiteSettingsResponse> = {
+  encode(message: GetSiteSettingsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    for (const v of message.settings) {
+      SiteSetting.encode(v!, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetSiteSettingsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetSiteSettingsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.settings.push(SiteSetting.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetSiteSettingsResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      settings: globalThis.Array.isArray(object?.settings)
+        ? object.settings.map((e: any) => SiteSetting.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: GetSiteSettingsResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.settings?.length) {
+      obj.settings = message.settings.map((e) => SiteSetting.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetSiteSettingsResponse>): GetSiteSettingsResponse {
+    return GetSiteSettingsResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetSiteSettingsResponse>): GetSiteSettingsResponse {
+    const message = createBaseGetSiteSettingsResponse();
+    message.success = object.success ?? false;
+    message.settings = object.settings?.map((e) => SiteSetting.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseUpdateSiteSettingsRequest(): UpdateSiteSettingsRequest {
+  return { settings: [] };
+}
+
+export const UpdateSiteSettingsRequest: MessageFns<UpdateSiteSettingsRequest> = {
+  encode(message: UpdateSiteSettingsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.settings) {
+      SiteSetting.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateSiteSettingsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateSiteSettingsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.settings.push(SiteSetting.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateSiteSettingsRequest {
+    return {
+      settings: globalThis.Array.isArray(object?.settings)
+        ? object.settings.map((e: any) => SiteSetting.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: UpdateSiteSettingsRequest): unknown {
+    const obj: any = {};
+    if (message.settings?.length) {
+      obj.settings = message.settings.map((e) => SiteSetting.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UpdateSiteSettingsRequest>): UpdateSiteSettingsRequest {
+    return UpdateSiteSettingsRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateSiteSettingsRequest>): UpdateSiteSettingsRequest {
+    const message = createBaseUpdateSiteSettingsRequest();
+    message.settings = object.settings?.map((e) => SiteSetting.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseUpdateSiteSettingsResponse(): UpdateSiteSettingsResponse {
+  return { success: false, message: "", settings: [] };
+}
+
+export const UpdateSiteSettingsResponse: MessageFns<UpdateSiteSettingsResponse> = {
+  encode(message: UpdateSiteSettingsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.settings) {
+      SiteSetting.encode(v!, writer.uint32(26).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateSiteSettingsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateSiteSettingsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.settings.push(SiteSetting.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateSiteSettingsResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      settings: globalThis.Array.isArray(object?.settings)
+        ? object.settings.map((e: any) => SiteSetting.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: UpdateSiteSettingsResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.settings?.length) {
+      obj.settings = message.settings.map((e) => SiteSetting.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UpdateSiteSettingsResponse>): UpdateSiteSettingsResponse {
+    return UpdateSiteSettingsResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateSiteSettingsResponse>): UpdateSiteSettingsResponse {
+    const message = createBaseUpdateSiteSettingsResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.settings = object.settings?.map((e) => SiteSetting.fromPartial(e)) || [];
     return message;
   },
 };

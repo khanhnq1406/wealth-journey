@@ -32,6 +32,7 @@ C4Component
         Component(price_override_h, "PriceOverride Handler", "handlers/price_override.go", "Admin-only REST handler for price override CRUD (Set/List/Delete). Protected by AdminMiddleware.")
         Component(public_h, "Public Handlers", "handlers/public.go", "No-auth endpoint returning gold/silver/currency type names from in-memory registries. IP-rate-limited only.")
         Component(feedback_h, "Feedback Handlers", "handlers/feedback.go", "Submit feedback and list user's own feedback. Auth + rate limit middleware.")
+        Component(site_settings_h, "SiteSettings Handler", "handlers/site_settings.go", "Public GET (no auth) for all site settings. Admin-only PUT for bulk-updating settings. Protected by AdminMiddleware for writes.")
     }
 
     Container_Boundary(services, "Service Layer — TRUST BOUNDARY: Data considered validated after this point") {
@@ -51,6 +52,7 @@ C4Component
         Component(gold_sentiment_svc, "GoldSentiment Service", "domain/service", "Vote upsert, comments with rate limiting, Redis caching (30s TTL) with per-category key isolation (gold/silver), Vietnam TZ daily reset")
         Component(community_svc, "Community Service", "domain/service", "Social interactions: posts, comments, likes, follows, content reports; Phase 2: SharePost, GetNotifications, GetUnreadNotificationCount, MarkNotificationsRead, SavePost, UnsavePost, GetSavedPosts, GetSuggestedUsers, GetTrendingTopics, GetFollowing, GetFollowers; Phase 3: UploadImage, UpdateComment, GetReplies, GetLikedPosts, UpdateProfile, StreamNotifications")
         Component(feedback_svc, "Feedback Service", "domain/service", "Submit feedback with validation (subject 1-200, message 1-2000), rate limiting (10/user/hour), list user feedback")
+        Component(site_settings_svc, "SiteSettings Service", "domain/service", "Validates setting keys against allowlist (17 keys), strips HTML from values, max 5000 chars. Cache-first reads, DB fallback.")
     }
 
     Container_Boundary(repos, "Repository Layer (Data Access)") {
@@ -76,6 +78,7 @@ C4Component
         Component(gold_vote_repo, "GoldVote Repository", "GORM", "Vote persistence with upsert (ON CONFLICT), count by date")
         Component(gold_vote_comment_repo, "GoldVoteComment Repository", "GORM", "Comment CRUD with soft delete, daily count for rate limiting")
         Component(feedback_repo, "Feedback Repository", "GORM", "Feedback CRUD with user scoping and rate limit counting")
+        Component(site_settings_repo, "SiteSettings Repository", "GORM", "site_settings table CRUD with bulk upsert via ON CONFLICT")
     }
 
     Container_Boundary(external, "External Integrations — TRUST BOUNDARY: Untrusted external responses") {
@@ -96,6 +99,7 @@ C4Component
         ComponentDb(redis, "Redis 7", "Cache/Queue", "Sessions, prices, queues")
         Component(redis_pubsub, "Redis Pub/Sub", "Redis channels", "Real-time notification fanout for StreamNotifications SSE endpoint; community_notifications channel")
         Component(price_override_cache, "PriceOverride Cache", "pkg/cache/price_override_cache.go", "Redis cache for admin price overrides. Set/Get/Delete/List operations with per-type-code keys.")
+        Component(site_settings_cache, "SiteSettings Cache", "pkg/cache/site_settings_cache.go", "Redis cache for site settings. Single key 'site_settings:all' with 5-minute TTL.")
     }
 
     Rel(gin, auth_mw, "Applies to protected routes")
@@ -132,6 +136,7 @@ C4Component
     Rel(price_h, currency_svc, "Currency prices")
     Rel(public_h, currency_svc, "Currency update timestamps")
     Rel(price_override_h, price_override_cache, "Set/List/Delete overrides")
+    Rel(gin, site_settings_h, "Routes /public/site-settings (GET), /admin/site-settings (PUT)")
     Rel(gold_sentiment_h, gold_sentiment_svc, "Delegates sentiment ops")
     Rel(community_h, community_svc, "Delegates social interactions")
     Rel(feedback_h, feedback_svc, "Delegates feedback ops")
@@ -175,6 +180,9 @@ C4Component
     Rel(community_svc, notification_repo, "Persists notifications")
     Rel(community_svc, saved_post_repo, "Persists saved posts")
     Rel(community_svc, hashtag_repo, "Persists and queries hashtags")
+    Rel(site_settings_h, site_settings_svc, "Delegates site settings ops")
+    Rel(site_settings_svc, site_settings_repo, "Persists site settings")
+    Rel(site_settings_svc, site_settings_cache, "Cache-first reads, invalidates on write")
 
     Rel(user_repo, postgres, "SQL")
     Rel(wallet_repo, postgres, "SQL")
@@ -190,8 +198,10 @@ C4Component
     Rel(gold_vote_repo, postgres, "SQL")
     Rel(gold_vote_comment_repo, postgres, "SQL")
     Rel(feedback_repo, postgres, "SQL")
+    Rel(site_settings_repo, postgres, "SQL")
     Rel(auth_svc, redis, "JWT whitelist")
     Rel(price_override_cache, redis, "Price override cache")
+    Rel(site_settings_cache, redis, "Site settings cache")
     Rel(market_svc, redis, "Price cache")
     Rel(fx_svc, redis, "Rate cache")
     Rel(auth_svc, google_client, "Verify ID tokens")
@@ -275,4 +285,20 @@ Scheduler (every 15min) → User Repository (list all users)
                                               → Phú Quý / Ancarat / DOJI (silver)
                                               → Redis (update price cache)
                                               → Market Data Repository (persist to DB)
+```
+
+### Admin CMS Settings Flow
+```
+Admin → SPA → REST API → Auth MW → Admin MW → SiteSettings Handler → SiteSettings Service
+                                                                     → Validate keys (allowlist)
+                                                                     → Strip HTML tags
+                                                                     → SiteSettings Repository (DB upsert)
+                                                                     → SiteSettings Cache (invalidate)
+                                ← Updated settings ←
+
+Landing → SSR (generateMetadata) → GET /public/site-settings → SiteSettings Handler
+                                                               → SiteSettings Cache (hit? return)
+                                                               → SiteSettings Repository (miss: load from DB)
+                                                               → SiteSettings Cache (set with 5min TTL)
+                                   ← SEO metadata + footer ←
 ```
