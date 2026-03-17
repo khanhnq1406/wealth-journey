@@ -57,17 +57,19 @@ export function LandingCurrencyPriceTable({
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full border-collapse">
           <thead>
             <tr className="bg-v2-currency-light">
-              <th className="text-left px-5 py-3.5 font-vietnam font-bold text-[14px] tracking-normal text-v2-currency-dark">
+              <th className="text-left px-5 py-3.5 font-vietnam font-bold text-[14px] tracking-normal text-v2-currency-dark border-x border-white/30 first:border-l-0">
                 {t("currencyType")}
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-currency-dark">
-                {t("buy")}
+              <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-currency-dark border-x border-white/30">
+                <div>{t("buy")}</div>
+                <div className="font-normal text-[10px] tracking-normal opacity-70">{t("buyUnit")}</div>
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-currency-dark">
-                {t("sell")}
+              <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-currency-dark border-x border-white/30 last:border-r-0">
+                <div>{t("sell")}</div>
+                <div className="font-normal text-[10px] tracking-normal opacity-70">{t("sellUnit")}</div>
               </th>
             </tr>
           </thead>
@@ -75,14 +77,12 @@ export function LandingCurrencyPriceTable({
             {types.map((item, index) => (
               <tr
                 key={item.code}
-                className={
-                  index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"
-                }
+                className={`border-b border-v2-border-light ${index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"}`}
               >
-                <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-currency-dark">
+                <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-currency-dark border-x border-v2-border-light first:border-l-0">
                   {item.name || item.code}
                 </td>
-                <td className="px-5 py-3 text-right font-vietnam text-[12px] text-v2-text-secondary">
+                <td className="px-5 py-3 text-right font-vietnam text-[12px] text-v2-text-secondary border-x border-v2-border-light">
                   {t.rich("loginPrompt", {
                     loginLink: (chunks) => (
                       <Link
@@ -94,7 +94,7 @@ export function LandingCurrencyPriceTable({
                     ),
                   })}
                 </td>
-                <td className="px-5 py-3 text-right font-vietnam text-[12px] text-v2-text-secondary">
+                <td className="px-5 py-3 text-right font-vietnam text-[12px] text-v2-text-secondary border-x border-v2-border-light last:border-r-0">
                   {t.rich("loginPrompt", {
                     loginLink: (chunks) => (
                       <Link
