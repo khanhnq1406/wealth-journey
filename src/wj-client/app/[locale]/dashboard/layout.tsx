@@ -6,6 +6,7 @@ import { AuthCheck } from "../auth/utils/AuthCheck";
 import { store } from "@/features/auth/store/store";
 import { useState, useMemo, useEffect } from "react";
 import { usePathname } from "@/lib/navigation";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { FloatingActionButton } from "@/components/FloatingActionButton";
 import NextImage from "next/image";
@@ -37,6 +38,7 @@ import {
   X,
   Menu,
   Users,
+  CircleUser,
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -45,6 +47,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   const path = usePathname();
+  const searchParams = useSearchParams();
+  const isProfileView = path === routes.community && searchParams.get("view") === "profile";
   const t = useTranslations("nav");
   const tHome = useTranslations("dashboard.home");
   const tQuickActions = useTranslations("dashboard.quickActions");
@@ -138,6 +142,7 @@ export default function DashboardLayout({
         >
           <ActiveLink
             href={routes.home}
+            disableBuiltInActive
             className={cn(
               "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target animate-stagger-fade-in",
               path === routes.home
@@ -150,6 +155,7 @@ export default function DashboardLayout({
           </ActiveLink>
           <ActiveLink
             href={routes.portfolio}
+            disableBuiltInActive
             className={cn(
               "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
               path === routes.portfolio
@@ -162,15 +168,29 @@ export default function DashboardLayout({
           </ActiveLink>
           <ActiveLink
             href={routes.community}
+            disableBuiltInActive
             className={cn(
               "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
-              path === routes.community
+              path === routes.community && !isProfileView
                 ? "text-v2-red-primary bg-v2-red-light font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
             )}
           >
             <Users size={22} />
             <span>{t("community")}</span>
+          </ActiveLink>
+          <ActiveLink
+            href={routes.communityProfile}
+            disableBuiltInActive
+            className={cn(
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+              isProfileView
+                ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
+            )}
+          >
+            <CircleUser size={22} />
+            <span>{t("profile")}</span>
           </ActiveLink>
         </div>
 
@@ -180,6 +200,7 @@ export default function DashboardLayout({
             <ActiveLink
               key={item.href}
               href={item.href}
+              disableBuiltInActive
               className={cn(
                 "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
                 path.startsWith(item.href)
@@ -198,6 +219,7 @@ export default function DashboardLayout({
           <div className="border-t border-v2-border-light mb-1" />
           <ActiveLink
             href="/dashboard/settings"
+            disableBuiltInActive
             className={cn(
               "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
               path.startsWith("/dashboard/settings")
@@ -219,7 +241,7 @@ export default function DashboardLayout({
         </div>
       </div>
     );
-  }, [handleNavClick, t, path]);
+  }, [handleNavClick, t, path, isProfileView]);
 
   return (
     <AuthCheck>
@@ -315,7 +337,17 @@ export default function DashboardLayout({
                     showTooltip={!isExpanded}
                     animationDelay={60}
                     icon={<Users size={20} />}
-                    isActive={path === routes.community}
+                    isActive={path === routes.community && !isProfileView}
+                    isPremium
+                  />
+                  <NavItem
+                    href={routes.communityProfile}
+                    label={t("profile")}
+                    isExpanded={isExpanded}
+                    showTooltip={!isExpanded}
+                    animationDelay={90}
+                    icon={<CircleUser size={20} />}
+                    isActive={isProfileView}
                     isPremium
                   />
                 </div>
@@ -332,7 +364,7 @@ export default function DashboardLayout({
                     label={t("finance")}
                     isExpanded={isExpanded}
                     showTooltip={!isExpanded}
-                    animationDelay={90}
+                    animationDelay={120}
                     icon={<Banknote size={20} />}
                     isActive={path.startsWith(routes.finance)}
                   />
@@ -341,7 +373,7 @@ export default function DashboardLayout({
                     label={t("wallets")}
                     isExpanded={isExpanded}
                     showTooltip={!isExpanded}
-                    animationDelay={120}
+                    animationDelay={150}
                     icon={<Wallet size={20} />}
                     isActive={path === routes.wallets}
                   />
@@ -356,7 +388,7 @@ export default function DashboardLayout({
                   label={t("settings")}
                   isExpanded={isExpanded}
                   showTooltip={!isExpanded}
-                  animationDelay={150}
+                  animationDelay={180}
                   icon={<Settings size={20} />}
                   isActive={path.startsWith("/dashboard/settings")}
                 />

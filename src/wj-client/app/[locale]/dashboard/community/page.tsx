@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { CommunityFeed } from "@/features/community/components/CommunityFeed";
 import { CommunityLeftSidebar } from "@/features/community/components/CommunityLeftSidebar";
@@ -20,8 +21,10 @@ type MobileView = "feed" | "saved" | "profile" | "notifications";
 
 export default function CommunityPage() {
   const { user, isLoading: authLoading } = useAuth();
-  const [activeView, setActiveView] = useState<CommunityView>("feed");
-  const [mobileView, setMobileView] = useState<MobileView>("feed");
+  const searchParams = useSearchParams();
+  const initialView = searchParams.get("view") === "profile" ? "profile" : "feed";
+  const [activeView, setActiveView] = useState<CommunityView>(initialView);
+  const [mobileView, setMobileView] = useState<MobileView>(initialView as MobileView);
   const [hashtagFilter, setHashtagFilter] = useState<string>("");
   const [profileUserId, setProfileUserId] = useState<number | null>(null);
   const [followingTab, setFollowingTab] = useState<"following" | "followers">("following");

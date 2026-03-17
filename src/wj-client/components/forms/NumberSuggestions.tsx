@@ -134,15 +134,15 @@ export function NumberSuggestions({
               tabIndex={index === 0 ? 0 : -1}
               className="
                 px-3 py-2 min-h-[44px]
-                bg-v2-green-light border border-v2-border
-                text-v2-green-positive font-medium text-sm
+                bg-v2-red-light border border-v2-border
+                text-v2-red-primary font-medium text-sm
                 rounded-md
-                hover:bg-v2-green-light
+                hover:bg-red-100
                 active:scale-95
                 focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:ring-offset-1
                 transition-all duration-150
-                dark:bg-green-900/20 dark:border-green-700
-                dark:text-green-300 dark:hover:bg-green-900/30
+                dark:bg-red-900/20 dark:border-red-700
+                dark:text-red-300 dark:hover:bg-red-900/30
               "
               aria-label={`Select ${formatted}${currency ? ` ${currency}` : ""}`}
             >

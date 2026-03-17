@@ -89,8 +89,38 @@ export const Sparkline = memo(function Sparkline({
       return last >= first ? "#10b981" : "#ef4444"; // Green if up, red if down
     })();
 
-  if (!data || data.length === 0) {
-    return null;
+  if (!data || data.length <= 1) {
+    // Render a flat horizontal line with gradient fill, matching normal sparkline style
+    const flatGradientId = `sparkline-flat-gradient-${uniqueId.replace(/:/g, '-')}`;
+    const lineY = Math.round(height * 0.4); // Line at 40% from top
+    return (
+      <div className={className} style={{ height }}>
+        <svg width="100%" height="100%" preserveAspectRatio="none">
+          {showGradient && (
+            <defs>
+              <linearGradient id={flatGradientId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={trendColor} stopOpacity={0.3} />
+                <stop offset="100%" stopColor={trendColor} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+          )}
+          {showGradient && (
+            <rect
+              x="0" y={lineY} width="100%" height={height - lineY}
+              fill={`url(#${flatGradientId})`}
+            />
+          )}
+          <line
+            x1="0" y1={lineY} x2="100%" y2={lineY}
+            stroke={trendColor}
+            strokeWidth={strokeWidth}
+          />
+          {showDots && data.length === 1 && (
+            <circle cx="50%" cy={lineY} r={3} fill={trendColor} />
+          )}
+        </svg>
+      </div>
+    );
   }
 
   // Single pass: parse values and track min/max

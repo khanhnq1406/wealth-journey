@@ -7,13 +7,16 @@ function ActiveLink({
   children,
   href,
   className,
+  disableBuiltInActive,
 }: {
   children: React.ReactNode;
   href: string;
   className?: string;
+  disableBuiltInActive?: boolean;
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const isActive = !disableBuiltInActive && pathname === href;
 
   const handleClick = (e: React.MouseEvent) => {
     // Allow Cmd/Ctrl+click and middle-click to open in new tab
@@ -31,12 +34,12 @@ function ActiveLink({
       className={cn(
         "text-white w-full flex flex-nowrap gap-3 items-center font-medium min-h-[44px] px-3 py-2.5 rounded-lg transition-all duration-200",
         "hover:bg-white/20 hover:shadow-md",
-        pathname === href
+        isActive
           ? "bg-white/30 shadow-md bfont-semibold"
           : "border-transparent border-none",
         className,
       )}
-      aria-current={pathname === href ? "page" : undefined}
+      aria-current={isActive ? "page" : undefined}
     >
       {children}
     </a>
