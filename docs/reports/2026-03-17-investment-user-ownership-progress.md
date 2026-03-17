@@ -21,7 +21,7 @@
 | 5-8 | Service Layer Changes | done | 20dc72a | Updated all service methods for user ownership, nil-guarded wallet ops |
 | 9 | Handler Comment Update | done | — | Updated comment from "auto-select" to "no wallet association" |
 | 10 | Build Verification & Test Fixes | done | db44f95 | Build clean, all tests updated for user ownership (WalletID→*int32, removed wallet auto-select, updated mock expectations) |
-| 11-12 | Architecture & Flow Diagrams | done | — | Updated C4 code + component diagrams, updated Create Investment + UpdatePrices flows |
+| 11-12 | Architecture & Flow Diagrams | done | 79cfdf6 | Updated C4 code + component diagrams, updated Create Investment + UpdatePrices flows |
 
 ## Resume Instructions
 
