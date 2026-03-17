@@ -15,7 +15,7 @@ Investment portfolio management flows covering the most complex business logic i
 
 ## 1. Create Investment (incl. Gold/Silver)
 
-**Trigger:** User adds a new investment holding (wallet auto-selected by backend)
+**Trigger:** User adds a new investment holding (owned directly by user_id; wallet is optional)
 **Endpoint:** `POST /api/v1/investments`
 **Source:** `domain/service/investment_service.go`, `handlers/investment.go`
 
@@ -35,18 +35,19 @@ sequenceDiagram
 
     activate IS
 
-    alt walletId == 0 (auto-select)
-        IS->>WR: ListByUserID(userID) — oldest active wallet
-        WR-->>IS: Selected wallet
-    else walletId provided
+    alt walletId > 0 (wallet association requested)
         IS->>WR: GetByIDForUser(walletId, userID)
+        WR-->>IS: Verified wallet
+        IS->>IS: walletIDPtr = &walletId
+    else walletId == 0 (no wallet association)
+        IS->>IS: walletIDPtr = nil
     end
 
     alt purchaseDate > 0
         IS->>IS: Validate purchaseDate ≤ now<br/>(reject future dates)
     end
 
-    IS->>IS: Validate symbol not already in wallet
+    IS->>IS: Validate symbol not already owned by user
 
     Note over IS,Units: Unit conversion for gold/silver
     IS->>Units: QuantityToStorage(quantity, type)
@@ -63,7 +64,7 @@ sequenceDiagram
         IS->>IS: txDate = time.Now()
     end
 
-    IS->>IR: Create(Investment{symbol, name, type, currency,<br/>quantity, averageCost, totalCost, isCustom})
+    IS->>IR: Create(Investment{userID, walletIDPtr,<br/>symbol, name, type, currency,<br/>quantity, averageCost, totalCost, isCustom})
     IR-->>IS: Investment created
 
     IS->>ITR: Create(InvestmentTx{type: BUY, quantity, price, cost,<br/>transactionDate: txDate})
@@ -104,9 +105,8 @@ sequenceDiagram
 
 | Condition | Response | Rollback |
 |-----------|----------|----------|
-| No active wallet found (auto-select) | 400 Validation | None |
-| Wallet not found or not owned | 404 | None |
-| Symbol already exists in wallet | 400 Validation | None |
+| Wallet not found or not owned (when walletId > 0) | 404 | None |
+| Symbol already exists for user | 400 Validation | None |
 | Transaction creation fails | 500 | Delete investment |
 | Lot creation fails | 500 | Delete tx + investment |
 
@@ -330,7 +330,7 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    A["UpdatePrices(userID)\nFetch all user wallets"] --> B["List all investments\nacross wallets"]
+    A["UpdatePrices(userID)\nList all investments by user_id"] --> B["investmentRepo.ListByUserID(userID)"]
     B --> C["Filter out isCustom=true\n(manual price only)"]
     C --> D["Categorize by type"]
     D --> E["Return immediately to client\n'Price update started for N investments'"]
@@ -361,7 +361,7 @@ flowchart TD
     U --> K
 
     K --> V["investmentRepo.UpdatePrices()\nBatch SQL update of current_price"]
-    V --> W["Invalidate wallet investment\nvalue cache per wallet"]
+    V --> W["Invalidate wallet investment\nvalue cache (nil-guarded,\nskipped if no wallet)"]
 
     subgraph CacheFallback["Cache + Fallback Logic"]
         direction TB

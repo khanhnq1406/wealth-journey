@@ -12,7 +12,8 @@ import (
 type InvestmentTransaction struct {
 	ID                int32     `gorm:"primaryKey;autoIncrement" json:"id"`
 	InvestmentID      int32     `gorm:"not null;index:idx_tx_investment" json:"investmentId"`
-	WalletID          int32     `gorm:"not null;index:idx_tx_wallet" json:"walletId"`
+	UserID            int32     `gorm:"not null;default:0;index:idx_investment_tx_user" json:"userId"`
+	WalletID          *int32    `gorm:"index:idx_tx_wallet" json:"walletId"`
 	Type              int32     `gorm:"type:int;not null;default:0" json:"type"`
 	Quantity          int64     `gorm:"type:bigint;not null" json:"quantity"`
 	Price             int64     `gorm:"type:bigint;not null" json:"price"`
@@ -48,7 +49,7 @@ func (tx *InvestmentTransaction) ToProto() *investmentv1.InvestmentTransaction {
 	return &investmentv1.InvestmentTransaction{
 		Id:                tx.ID,
 		InvestmentId:      tx.InvestmentID,
-		WalletId:          tx.WalletID,
+		WalletId:          DerefInt32(tx.WalletID),
 		Type:              investmentv1.InvestmentTransactionType(tx.Type), // Convert int32 to enum
 		Quantity:          tx.Quantity,
 		Price:             tx.Price,

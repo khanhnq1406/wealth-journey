@@ -10,7 +10,7 @@ option go_package = "protobuf/v1";
 // Investment represents an individual holding within an investment wallet
 message Investment {
   int32 id = 1 [json_name = "id"];
-  int32 walletId = 2 [json_name = "walletId"];
+  int32 walletId = 2 [json_name = "walletId"];  // Optional: 0 or omitted = no wallet association
   string symbol = 3 [json_name = "symbol"];  // e.g., "BTC", "AAPL", "VFINX"
   string name = 4 [json_name = "name"];  // e.g., "Bitcoin", "Apple Inc.", "Vanguard 500 Index"
   InvestmentType type = 5 [json_name = "type"];
@@ -37,6 +37,7 @@ message Investment {
   wealthjourney.common.v1.Money displayCurrentPrice = 25 [json_name = "displayCurrentPrice"];  // Current price in user's preferred currency
   wealthjourney.common.v1.Money displayAverageCost = 26 [json_name = "displayAverageCost"];  // Average cost in user's preferred currency
   bool isCustom = 27 [json_name = "isCustom"];  // True if manual entry without market data validation
+  int32 userId = 28 [json_name = "userId"];  // Owner user ID (read-only, set by server from JWT)
 }
 
 enum InvestmentType {

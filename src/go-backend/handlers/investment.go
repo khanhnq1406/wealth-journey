@@ -58,7 +58,7 @@ func (h *InvestmentHandlers) CreateInvestment(c *gin.Context) {
 		return
 	}
 
-	// Validate wallet ID: 0 means auto-select, positive means explicit
+	// Validate wallet ID: 0 means no wallet association, positive means explicit
 	if req.WalletId < 0 {
 		handler.BadRequest(c, apperrors.NewValidationError("invalid wallet ID"))
 		return

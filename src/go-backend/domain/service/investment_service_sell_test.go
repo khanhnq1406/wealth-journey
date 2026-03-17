@@ -74,13 +74,12 @@ func TestSellTransaction_CostBasisPreserved(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 
 	// Initial state: Bought 100 shares @ $150 = $15,000 total cost
 	// Quantity: 10000 (1 share with 4 decimals), TotalCost: $15,000, AverageCost: $150
 	investment := &models.Investment{
 		ID:          investmentID,
-		WalletID:    walletID,
+		WalletID:    &walletID,
 		Symbol:      "AAPL",
 		Name:        "Apple Inc.",
 		Type:        int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
@@ -123,7 +122,6 @@ func TestSellTransaction_CostBasisPreserved(t *testing.T) {
 	// realizedPNL = 60000 - 100 (fees) = 59900 (cents) = $599.99
 	expectedRealizedPNL := int64(59900)
 
-	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
 	mockInvestmentRepo.On("GetByIDForUser", ctx, investmentID, userID).Return(investment, nil)
 	mockInvestmentRepo.On("GetByID", ctx, investmentID).Return(investment, nil)
 	mockTxRepo.On("GetOpenLots", ctx, investmentID).Return([]*models.InvestmentLot{lot}, nil)
@@ -188,12 +186,11 @@ func TestSellTransaction_SellAllShares(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 
 	// Initial state: Bought 100 shares @ $150 = $15,000 total cost
 	investment := &models.Investment{
 		ID:          investmentID,
-		WalletID:    walletID,
+		WalletID:    &walletID,
 		Symbol:      "AAPL",
 		Name:        "Apple Inc.",
 		Type:        int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
@@ -224,7 +221,6 @@ func TestSellTransaction_SellAllShares(t *testing.T) {
 		Notes:            "Complete exit",
 	}
 
-	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
 	mockInvestmentRepo.On("GetByIDForUser", ctx, investmentID, userID).Return(investment, nil)
 	mockInvestmentRepo.On("GetByID", ctx, investmentID).Return(investment, nil)
 	mockTxRepo.On("GetOpenLots", ctx, investmentID).Return([]*models.InvestmentLot{lot}, nil)
@@ -288,7 +284,6 @@ func TestSellTransaction_MultipleBuysThenSell(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 
 	// Scenario:
 	// Buy 1: 100 shares @ $150 = $15,000
@@ -303,7 +298,7 @@ func TestSellTransaction_MultipleBuysThenSell(t *testing.T) {
 
 	investment := &models.Investment{
 		ID:          investmentID,
-		WalletID:    walletID,
+		WalletID:    &walletID,
 		Symbol:      "AAPL",
 		Name:        "Apple Inc.",
 		Type:        int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
@@ -344,7 +339,6 @@ func TestSellTransaction_MultipleBuysThenSell(t *testing.T) {
 		Notes:            "Take profit",
 	}
 
-	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
 	mockInvestmentRepo.On("GetByIDForUser", ctx, investmentID, userID).Return(investment, nil)
 	mockInvestmentRepo.On("GetByID", ctx, investmentID).Return(investment, nil)
 	mockTxRepo.On("GetOpenLots", ctx, investmentID).Return([]*models.InvestmentLot{lot1, lot2}, nil)
@@ -402,11 +396,10 @@ func TestSellTransaction_InsufficientQuantity(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 
 	investment := &models.Investment{
 		ID:          investmentID,
-		WalletID:    walletID,
+		WalletID:    &walletID,
 		Symbol:      "AAPL",
 		Name:        "Apple Inc.",
 		Type:        int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
@@ -426,7 +419,6 @@ func TestSellTransaction_InsufficientQuantity(t *testing.T) {
 		Notes:            "Excessive sell",
 	}
 
-	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
 	mockInvestmentRepo.On("GetByIDForUser", ctx, investmentID, userID).Return(investment, nil)
 
 	// Execute
@@ -465,11 +457,10 @@ func TestSellTransaction_NoOpenLots(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 
 	investment := &models.Investment{
 		ID:          investmentID,
-		WalletID:    walletID,
+		WalletID:    &walletID,
 		Symbol:      "AAPL",
 		Name:        "Apple Inc.",
 		Type:        int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
@@ -489,7 +480,6 @@ func TestSellTransaction_NoOpenLots(t *testing.T) {
 		Notes:            "Sell without lots",
 	}
 
-	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
 	mockInvestmentRepo.On("GetByIDForUser", ctx, investmentID, userID).Return(investment, nil)
 	mockTxRepo.On("GetOpenLots", ctx, investmentID).Return([]*models.InvestmentLot{}, nil)
 
@@ -529,7 +519,6 @@ func TestSellTransaction_FIFOMultipleLots(t *testing.T) {
 	userID := int32(1)
 	walletID := int32(1)
 	investmentID := int32(1)
-	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
 
 	// Scenario: Sell quantity that spans multiple lots
 	// Lot 1: 20 shares @ $150 (oldest)
@@ -542,7 +531,7 @@ func TestSellTransaction_FIFOMultipleLots(t *testing.T) {
 
 	investment := &models.Investment{
 		ID:          investmentID,
-		WalletID:    walletID,
+		WalletID:    &walletID,
 		Symbol:      "AAPL",
 		Name:        "Apple Inc.",
 		Type:        int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
@@ -592,7 +581,6 @@ func TestSellTransaction_FIFOMultipleLots(t *testing.T) {
 		Notes:            "Multi-lot sell",
 	}
 
-	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
 	mockInvestmentRepo.On("GetByIDForUser", ctx, investmentID, userID).Return(investment, nil)
 	mockInvestmentRepo.On("GetByID", ctx, investmentID).Return(investment, nil)
 	mockTxRepo.On("GetOpenLots", ctx, investmentID).Return([]*models.InvestmentLot{lot1, lot2, lot3}, nil)

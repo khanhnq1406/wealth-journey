@@ -44,12 +44,11 @@ func (r *investmentRepository) GetByID(ctx context.Context, id int32) (*models.I
 	return &investment, nil
 }
 
-// GetByIDForUser retrieves an investment by ID, ensuring it belongs to the user's wallet.
+// GetByIDForUser retrieves an investment by ID, ensuring it belongs to the user.
 func (r *investmentRepository) GetByIDForUser(ctx context.Context, investmentID, userID int32) (*models.Investment, error) {
 	var investment models.Investment
 	result := r.db.DB.WithContext(ctx).
-		Joins("JOIN wallet ON wallet.id = investment.wallet_id").
-		Where("investment.id = ? AND wallet.user_id = ?", investmentID, userID).
+		Where("id = ? AND user_id = ?", investmentID, userID).
 		First(&investment)
 	if result.Error != nil {
 		return nil, r.handleDBError(result.Error, "investment", "get investment")
@@ -57,41 +56,26 @@ func (r *investmentRepository) GetByIDForUser(ctx context.Context, investmentID,
 	return &investment, nil
 }
 
-// GetByWalletAndSymbol retrieves an investment by wallet and symbol.
+// GetByUserAndSymbol retrieves an investment by user and symbol.
 // Returns nil if not found (no error).
-func (r *investmentRepository) GetByWalletAndSymbol(ctx context.Context, walletID int32, symbol string) (*models.Investment, error) {
+func (r *investmentRepository) GetByUserAndSymbol(ctx context.Context, userID int32, symbol string) (*models.Investment, error) {
 	var investment models.Investment
 	result := r.db.DB.WithContext(ctx).
-		Where("wallet_id = ? AND symbol = ?", walletID, symbol).
+		Where("user_id = ? AND symbol = ?", userID, symbol).
 		First(&investment)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil // Not found is not an error for this method
 		}
-		return nil, r.handleDBError(result.Error, "investment", "get investment by wallet and symbol")
+		return nil, r.handleDBError(result.Error, "investment", "get investment by user and symbol")
 	}
 	return &investment, nil
 }
 
-// ListByUserID retrieves all investments for a user (via their wallets).
+// ListByUserID retrieves all investments for a user directly via user_id.
 func (r *investmentRepository) ListByUserID(ctx context.Context, userID int32, opts ListOptions, typeFilter v1.InvestmentType) ([]*models.Investment, int, error) {
-	// First, get all active wallet IDs for the user (any type can hold investments)
-	var walletIDs []int32
-	err := r.db.DB.WithContext(ctx).
-		Model(&models.Wallet{}).
-		Where("user_id = ? AND status = 1", userID).
-		Pluck("id", &walletIDs).Error
-	if err != nil {
-		return nil, 0, apperrors.NewInternalErrorWithCause("failed to get user wallets", err)
-	}
-
-	// If no wallets, return empty result
-	if len(walletIDs) == 0 {
-		return []*models.Investment{}, 0, nil
-	}
-
-	// Build base query
-	query := r.db.DB.WithContext(ctx).Model(&models.Investment{}).Where("wallet_id IN ?", walletIDs)
+	// Build base query using direct user_id filter
+	query := r.db.DB.WithContext(ctx).Model(&models.Investment{}).Where("user_id = ?", userID)
 
 	// Apply type filter if specified
 	if typeFilter != v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED && typeFilter != 0 {
@@ -111,8 +95,7 @@ func (r *investmentRepository) ListByUserID(ctx context.Context, userID int32, o
 
 	// Execute query
 	var investments []*models.Investment
-	err = query.Find(&investments).Error
-	if err != nil {
+	if err := query.Find(&investments).Error; err != nil {
 		return nil, 0, apperrors.NewInternalErrorWithCause("failed to list investments", err)
 	}
 
