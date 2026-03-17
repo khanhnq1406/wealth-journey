@@ -35,6 +35,7 @@ export const NavItem = memo(function NavItem({
     <div className="relative">
       <ActiveLink
         href={href}
+        disableBuiltInActive
         className={cn(
           "flex items-center py-2.5 rounded-[10px] font-vietnam text-[14px] transition-all duration-300 ease-in-out touch-target",
           isExpanded

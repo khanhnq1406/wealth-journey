@@ -46,7 +46,7 @@ export function ProfileView({
   return (
     <div className="flex flex-col gap-4">
       {/* Profile Header Card */}
-      <div className="bg-white sm:rounded-2xl border-b sm:border border-v2-border-light overflow-hidden">
+      <div className="bg-white sm:rounded-2xl border-b sm:border border-v2-border-light overflow-hidden isolate">
         {/* Cover photo banner */}
         <div
           className="w-full h-32 sm:h-40 relative"

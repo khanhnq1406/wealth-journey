@@ -281,9 +281,11 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
         value: v.value,
       }));
     }
+    // No historical data — let Sparkline render a flat horizontal line
+    if (displayValue === 0) return [];
     // Generate mock trend data based on current value as last resort
     const currentValue = displayValue;
-    const variance = currentValue > 0 ? currentValue * 0.1 : 100; // 10% variance
+    const variance = currentValue * 0.1; // 10% variance
     return Array.from({ length: 10 }, (_, i) => ({
       value:
         currentValue -

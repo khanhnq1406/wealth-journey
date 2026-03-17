@@ -46,6 +46,16 @@ No security concerns — all changes are frontend display/UX only. No new API ca
 - `src/wj-client/app/[locale]/dashboard/layout.tsx` — added profile NavItem to sidebar + mobile menu
 - `src/wj-client/app/[locale]/dashboard/community/page.tsx` — added ?view=profile URL param handling
 
+## Fix History
+
+| Date | Fix | Severity | File |
+|------|-----|----------|------|
+| 2026-03-17 | Replace useEffect setState with useState initializer to fix `react-hooks/set-state-in-effect` lint error | Minor | `community/page.tsx` |
+| 2026-03-17 | Fix Profile nav item not highlighting when on profile route — compute `isActive` from pathname + `?view=profile` search param; also prevent Community item from highlighting when profile view is active | Minor | `layout.tsx` |
+| 2026-03-17 | Fix sparkline showing increasing diagonal line instead of flat horizontal line when portfolio value is 0 — mock fallback generated linear sequence from -100 to +100; now returns empty array so Sparkline renders flat line. Also updated Sparkline empty/single-point handler to render green solid line with gradient fill (matching normal sparkline style) instead of plain gray dashed line | Minor | `PortfolioSummaryEnhanced.tsx`, `Sparkline.tsx` |
+| 2026-03-17 | Fix mobile menu being overlapped by profile avatar and Edit Profile/Edit Cover buttons — add `isolate` to profile card container to scope child z-indices within the card's stacking context, preventing them from competing with the global mobile menu overlay (z-45/z-50) | Minor | `ProfileView.tsx` |
+| 2026-03-17 | Fix Community nav item showing ghost shadow in mobile menu when on profile view — `ActiveLink` built-in active style (`shadow-md`) was stacking on top of custom active logic; add `disableBuiltInActive` to all mobile menu `ActiveLink` items so only custom className controls active state | Minor | `layout.tsx` |
+
 ## How to Test
 
 1. **Wallet placeholder** — Open Create Wallet modal, verify placeholder shows examples
