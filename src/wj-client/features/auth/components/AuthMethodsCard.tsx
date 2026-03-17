@@ -1,9 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { useQueryClient } from "@tanstack/react-query";
 import { BaseCard } from "@/components/BaseCard";
-import { useQueryGetAuthMethods } from "@/utils/generated/hooks";
+import {
+  useQueryGetAuthMethods,
+  useMutationLinkGoogle,
+  EVENT_AuthGetAuthMethods,
+} from "@/utils/generated/hooks";
 import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
+import { mapLinkGoogleError } from "@/features/auth/utils/error-mapper";
 
 interface AuthMethodsCardProps {
   onSetPassword?: () => void;
@@ -12,8 +20,29 @@ interface AuthMethodsCardProps {
 
 export function AuthMethodsCard({ onSetPassword, onChangePassword }: AuthMethodsCardProps) {
   const t = useTranslations("settings.security");
+  const queryClient = useQueryClient();
   const { data, isLoading } = useQueryGetAuthMethods({}, { refetchOnMount: "always" });
   const methods = data?.data;
+
+  const [linkGoogleError, setLinkGoogleError] = useState<string | null>(null);
+
+  const linkGoogle = useMutationLinkGoogle({
+    onSuccess() {
+      setLinkGoogleError(null);
+      queryClient.invalidateQueries({ queryKey: [EVENT_AuthGetAuthMethods] });
+    },
+    onError(error: any) {
+      const i18nKey = mapLinkGoogleError(error.message);
+      setLinkGoogleError(
+        i18nKey ? t(`errors.${i18nKey}`) : error.message || t("errors.linkGoogleFailed")
+      );
+    },
+  });
+
+  const handleGoogleLink = (credentialResponse: any) => {
+    setLinkGoogleError(null);
+    linkGoogle.mutate({ token: credentialResponse.credential });
+  };
 
   if (isLoading) {
     return (
@@ -53,16 +82,33 @@ export function AuthMethodsCard({ onSetPassword, onChangePassword }: AuthMethods
             </svg>
             <span className="text-sm font-medium">{t("googleLinked")}</span>
           </div>
-          <span
-            className={`text-xs font-medium px-2 py-1 rounded-full ${
-              methods?.hasGoogle
-                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                : "bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
-            }`}
-          >
-            {methods?.hasGoogle ? t("linked") : t("notSet")}
-          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className={`text-xs font-medium px-2 py-1 rounded-full ${
+                methods?.hasGoogle
+                  ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                  : "bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
+              }`}
+            >
+              {methods?.hasGoogle ? t("linked") : t("notSet")}
+            </span>
+            {!methods?.hasGoogle && (
+              <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""}>
+                <GoogleLogin
+                  onSuccess={handleGoogleLink}
+                  onError={() => setLinkGoogleError(t("errors.linkGoogleFailed"))}
+                  size="small"
+                  text="continue_with"
+                  shape="rectangular"
+                  theme="outline"
+                />
+              </GoogleOAuthProvider>
+            )}
+          </div>
         </div>
+        {linkGoogleError && (
+          <p className="text-xs text-red-600 dark:text-red-400 -mt-2">{linkGoogleError}</p>
+        )}
 
         {/* Password */}
         <div className="flex items-center justify-between py-2">

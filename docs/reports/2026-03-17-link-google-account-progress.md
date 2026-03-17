@@ -7,7 +7,7 @@
 - **Started:** 2026-03-17
 - **Last updated:** 2026-03-17
 - **Current state:** in_progress
-- **Current task:** 5
+- **Current task:** 6
 
 ## Task Progress
 
@@ -16,8 +16,8 @@
 | 1 | Proto — Add LinkGoogle RPC and Messages | done | e951cf9 | Added RPC + messages to auth.proto, generated Go+TS code |
 | 2 | Backend — Auth Service LinkGoogle Method | done | — | Added LinkGoogle method with token validation, email collision check |
 | 3 | Backend — LinkGoogle Handler + Route | done | 97c38fb | Added handler + registered POST /link-google route |
-| 4 | Frontend — Generate Hooks + i18n + Error Mappings | done | — | Added EN+VI translations, error mapper for link Google |
-| 5 | Frontend — Connect Google Button in AuthMethodsCard | pending | — | — |
+| 4 | Frontend — Generate Hooks + i18n + Error Mappings | done | 389fdea | Added EN+VI translations, error mapper for link Google |
+| 5 | Frontend — Connect Google Button in AuthMethodsCard | done | — | Added GoogleLogin button with scoped provider, mutation, error display |
 | 6 | Architecture Diagrams — Update Auth Flow | pending | — | — |
 | 7 | Build Verification + Report | pending | — | — |
 
