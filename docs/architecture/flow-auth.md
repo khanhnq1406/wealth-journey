@@ -11,6 +11,7 @@ Authentication and session management flows covering Google OAuth, JWT token lif
 - [Password Login](#5-password-login)
 - [Link Password (Account Linking)](#6-link-password-account-linking)
 - [Change Password](#7-change-password)
+- [Link Google (Account Linking)](#8-link-google-account-linking)
 
 ---
 
@@ -541,3 +542,89 @@ sequenceDiagram
 | Weak new password | 400 Validation error | None |
 | New password same as current | 400 "New password must differ" | None |
 | Partial Redis session cleanup failure | Warning logged | Some sessions may remain active |
+
+---
+
+## 8. Link Google (Account Linking)
+
+**Trigger:** Password-only user clicks "Connect Google" in Security Settings
+**Endpoint:** `POST /api/v1/auth/link-google` (authenticated)
+**Source:** `domain/auth/auth.go`, `handlers/auth.go`
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant SPA as Next.js SPA
+    participant Google as Google OAuth
+    participant Handler as AuthHandler
+    participant AuthMW as AuthMiddleware
+    participant Auth as AuthService
+    participant GV as Google Validator
+    participant DB as PostgreSQL
+
+    Browser->>SPA: Click "Connect Google"
+    SPA->>Google: Open consent popup
+    Google-->>SPA: ID token (JWT)
+    SPA->>Handler: POST /api/v1/auth/link-google<br/>{token}
+    Handler->>AuthMW: Validate JWT
+    AuthMW-->>Handler: user_id from context
+
+    activate Auth
+    Handler->>Auth: LinkGoogle(ctx, userID, token)
+    Auth->>GV: idtoken.Validate(token, clientID)
+
+    alt Invalid token
+        GV-->>Auth: Error
+        Auth-->>Handler: 401 "Invalid Google token"
+        Handler-->>SPA: 401 Error
+    end
+
+    GV-->>Auth: Claims {email, picture}
+    Auth->>DB: SELECT * FROM user WHERE id = userID
+    DB-->>Auth: User record
+
+    Auth->>Auth: Check AuthProvider contains "google"
+    alt Google already linked
+        Auth-->>Handler: 400 "Google account is already linked"
+    end
+
+    Auth->>DB: SELECT * FROM user WHERE email = googleEmail
+    alt Email belongs to different user
+        DB-->>Auth: Different user found
+        Auth-->>Handler: 400 "Linked to a different user"
+    end
+
+    alt User has email and it doesn't match Google email
+        Auth-->>Handler: 400 "Email mismatch"
+    end
+
+    Auth->>DB: UPDATE user SET auth_provider, email?, picture?
+    DB-->>Auth: OK
+    deactivate Auth
+
+    Auth-->>Handler: {success: true}
+    Handler-->>SPA: 200 OK
+    SPA->>SPA: Invalidate auth methods query
+    SPA-->>Browser: Badge updates to "Linked"
+```
+
+### Key Invariants
+
+- Google token must be validated server-side (never trust client email)
+- Google email must not belong to a different user (prevents account takeover)
+- If user has an email set, it must match the Google email
+- AuthProvider is updated from "password" to "password+google"
+- Email is set from Google if user has no email (password-only registration)
+- Picture is updated from Google if currently empty
+- Existing sessions remain valid (no invalidation needed)
+
+### Error Paths
+
+| Condition | Response | Rollback |
+|-----------|----------|----------|
+| Not authenticated | 401 Unauthorized | None |
+| Invalid/expired Google token | 401 "Invalid Google token" | None |
+| Google already linked | 400 "Google account is already linked" | None |
+| Email belongs to different user | 400 "Linked to a different user" | None |
+| Email mismatch (user has different email) | 400 "Email mismatch" | None |
+| Database error | 500 Internal Error | None (no partial state) |
