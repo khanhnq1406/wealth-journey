@@ -109,10 +109,18 @@ None — all tests pass, build is clean.
 - `src/go-backend/domain/service/investment_service_test.go`
 - `src/go-backend/domain/service/investment_service_sell_test.go`
 
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-17 | Add `default:0` to `UserID` GORM tag on Investment and InvestmentTransaction models — fixes GORM auto-migration failing with "column user_id contains null values" on existing tables | Minor | (see git log) |
+| 2026-03-17 | Add `constraint:false` to `User` relationship on Investment model — prevents GORM auto-migrate from creating FK constraint `fk_investment_user` before backfill runs (existing rows have `user_id=0` which violates referential integrity). Added Phase 11 to migration tool to create FK after backfill. | Minor | (see git log) |
+
 ## How to Test
 
-1. Run migration: `task backend:migrate-investment-user-ownership -- --dry-run=false`
-2. Build: `go build ./...`
-3. Run tests: `go test -short ./domain/...`
-4. Verify via API: `POST /api/v1/investments` with `walletId: 0` — should succeed with nil WalletID
-5. Verify via API: `POST /api/v1/investments` with `walletId: N` — should verify wallet ownership
+1. Run migration first (connects directly, no auto-migrate): `task backend:migrate-investment-user-ownership -- --dry-run=false`
+2. Start the app: `task backend:dev`
+3. Build: `go build ./...`
+4. Run tests: `go test -short ./domain/...`
+5. Verify via API: `POST /api/v1/investments` with `walletId: 0` — should succeed with nil WalletID
+6. Verify via API: `POST /api/v1/investments` with `walletId: N` — should verify wallet ownership

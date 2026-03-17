@@ -3,10 +3,15 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
+	"os"
 
 	"wealthjourney/pkg/config"
-	"wealthjourney/pkg/database"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func main() {
@@ -18,13 +23,30 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	db, err := database.New(cfg)
+	// Connect directly without auto-migrate — this migration must run
+	// BEFORE auto-migrate can safely create FK constraints
+	sslMode := os.Getenv("DB_SSL_MODE")
+	if sslMode == "" {
+		sslMode = "require"
+	}
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		cfg.Database.Host, cfg.Database.Port, cfg.Database.User,
+		cfg.Database.Password, cfg.Database.Name, sslMode,
+	)
+	db, err := gorm.Open(postgres.New(postgres.Config{
+		DSN:                  dsn,
+		PreferSimpleProtocol: true,
+	}), &gorm.Config{
+		Logger:                 logger.Default.LogMode(logger.Info),
+		PrepareStmt:            false,
+		SkipDefaultTransaction: true,
+	})
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
 	ctx := context.Background()
-	sqlDB := db.DB.WithContext(ctx)
+	sqlDB := db.WithContext(ctx)
 
 	log.Println("=== Investment User Ownership Migration ===")
 	if *dryRun {
@@ -134,6 +156,19 @@ func main() {
 			log.Printf("Warning: index may already exist: %v", err)
 		}
 		log.Println("Created indexes on investment_transaction table")
+	}
+
+	// ========== FOREIGN KEY CONSTRAINTS ==========
+	log.Println("\n--- Phase 11: Add foreign key constraint on investment.user_id ---")
+	if !*dryRun {
+		if err := sqlDB.Exec("ALTER TABLE investment DROP CONSTRAINT IF EXISTS fk_investment_user").Error; err != nil {
+			log.Printf("Warning: could not drop existing FK constraint: %v", err)
+		}
+		if err := sqlDB.Exec("ALTER TABLE investment ADD CONSTRAINT fk_investment_user FOREIGN KEY (user_id) REFERENCES \"user\"(id)").Error; err != nil {
+			log.Printf("Warning: could not add FK constraint on investment.user_id: %v", err)
+		} else {
+			log.Println("Added FK constraint fk_investment_user on investment.user_id")
+		}
 	}
 
 	log.Println("\n=== Migration Summary ===")

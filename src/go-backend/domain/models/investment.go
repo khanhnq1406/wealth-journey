@@ -11,7 +11,7 @@ import (
 // Investment represents an individual investment holding within a wallet
 type Investment struct {
 	ID                   int32                        `gorm:"primaryKey;autoIncrement" json:"id"`
-	UserID               int32                        `gorm:"not null;index:idx_investment_user" json:"userId"`
+	UserID               int32                        `gorm:"not null;default:0;index:idx_investment_user" json:"userId"`
 	WalletID             *int32                       `gorm:"index:idx_investment_wallet" json:"walletId"`
 	Symbol               string                       `gorm:"size:20;not null;index" json:"symbol"`
 	Name                 string                       `gorm:"size:100;not null" json:"name"`
@@ -33,7 +33,7 @@ type Investment struct {
 	DeletedAt            gorm.DeletedAt               `gorm:"index" json:"-"`
 
 	// Relationships
-	User                 *User                        `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	User                 *User                        `gorm:"foreignKey:UserID;constraint:false" json:"user,omitempty"`
 	Wallet               *Wallet                      `gorm:"foreignKey:WalletID;constraint:OnDelete:SET NULL" json:"wallet,omitempty"`
 }
 
