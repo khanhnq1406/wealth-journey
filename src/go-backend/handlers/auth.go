@@ -271,6 +271,31 @@ func (h *AuthHandlers) GetAuthMethods(c *gin.Context) {
 	})
 }
 
+// LinkGoogle handles linking a Google account to an existing user
+func (h *AuthHandlers) LinkGoogle(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.UnauthorizedWithPath(c, "User not authenticated")
+		return
+	}
+
+	var body struct {
+		Token string `json:"token" binding:"required"`
+	}
+	if !bindJSON(c, &body) {
+		return
+	}
+
+	result, err := h.authSrv.LinkGoogle(c.Request.Context(), userID, body.Token)
+	if err != nil {
+		log.Printf("[AUTH] Link Google failed: %v", err)
+		handler.HandleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
+}
+
 // GetAuth handles GET /auth - returns user information for authenticated user
 func (h *AuthHandlers) GetAuth(c *gin.Context) {
 	// Extract userID from context (set by AuthMiddleware)
