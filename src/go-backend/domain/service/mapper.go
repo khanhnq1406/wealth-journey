@@ -227,7 +227,8 @@ func (m *InvestmentMapper) ModelToProto(investment *models.Investment) *v1.Inves
 
 	return &v1.Investment{
 		Id:                   investment.ID,
-		WalletId:             investment.WalletID,
+		UserId:               investment.UserID,
+		WalletId:             models.DerefInt32(investment.WalletID),
 		Symbol:               investment.Symbol,
 		Name:                 investment.Name,
 		Type:                 v1.InvestmentType(investment.Type),
@@ -275,7 +276,7 @@ func (m *InvestmentMapper) TransactionToProto(tx *models.InvestmentTransaction) 
 	return &v1.InvestmentTransaction{
 		Id:                tx.ID,
 		InvestmentId:      tx.InvestmentID,
-		WalletId:          tx.WalletID,
+		WalletId:          models.DerefInt32(tx.WalletID),
 		Type:              v1.InvestmentTransactionType(tx.Type),
 		Quantity:          tx.Quantity,
 		Price:             tx.Price,

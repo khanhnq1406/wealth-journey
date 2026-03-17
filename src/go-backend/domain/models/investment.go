@@ -11,7 +11,8 @@ import (
 // Investment represents an individual investment holding within a wallet
 type Investment struct {
 	ID                   int32                        `gorm:"primaryKey;autoIncrement" json:"id"`
-	WalletID             int32                        `gorm:"not null;index:idx_investment_wallet" json:"walletId"`
+	UserID               int32                        `gorm:"not null;index:idx_investment_user" json:"userId"`
+	WalletID             *int32                       `gorm:"index:idx_investment_wallet" json:"walletId"`
 	Symbol               string                       `gorm:"size:20;not null;index" json:"symbol"`
 	Name                 string                       `gorm:"size:100;not null" json:"name"`
 	Type                 int32                        `gorm:"type:int;not null;default:0;index" json:"type"`
@@ -32,7 +33,8 @@ type Investment struct {
 	DeletedAt            gorm.DeletedAt               `gorm:"index" json:"-"`
 
 	// Relationships
-	Wallet               *Wallet                      `gorm:"foreignKey:WalletID" json:"wallet,omitempty"`
+	User                 *User                        `gorm:"foreignKey:UserID" json:"user,omitempty"`
+	Wallet               *Wallet                      `gorm:"foreignKey:WalletID;constraint:OnDelete:SET NULL" json:"wallet,omitempty"`
 }
 
 // TableName specifies the table name for Investment model
@@ -102,11 +104,20 @@ func (i *Investment) Recalculate() {
 	}
 }
 
+// DerefInt32 safely dereferences an *int32 pointer, returning 0 if nil.
+func DerefInt32(p *int32) int32 {
+	if p != nil {
+		return *p
+	}
+	return 0
+}
+
 // ToProto converts the model to protobuf message
 func (i *Investment) ToProto() *v1.Investment {
 	return &v1.Investment{
 		Id:                   i.ID,
-		WalletId:             i.WalletID,
+		UserId:               i.UserID,
+		WalletId:             DerefInt32(i.WalletID),
 		Symbol:               i.Symbol,
 		Name:                 i.Name,
 		Type:                 v1.InvestmentType(i.Type), // Convert int32 to enum
