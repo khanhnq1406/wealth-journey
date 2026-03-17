@@ -6,8 +6,8 @@
 - **Spec file:** docs/specs/2026-03-18-admin-cms-spec.md
 - **Started:** 2026-03-18
 - **Last updated:** 2026-03-18
-- **Current state:** in_progress
-- **Current task:** 15
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -24,11 +24,11 @@
 | 8 | Fix Auth Reducer + Frontend Hooks + Constants | done | 29b0f07 | Added isAdmin to reducer, 6 setAuth call sites, admin route |
 | 9 | Create AdminGuard Component | done | 29b0f07 | Redux-based admin guard with redirect |
 | 10 | Create TagInput Component | done | 29b0f07 | RHF-compatible tag input with chips |
-| 11 | Create Admin CMS Page | done | pending | CMS page with SEO + footer form sections |
-| 12 | Add Admin Link to Dashboard Sidebar | done | pending | Conditional Shield icon in desktop + mobile nav |
-| 13 | Dynamic Landing Page Metadata | done | pending | generateMetadata() with ISR 5min revalidate |
-| 14 | Dynamic Landing Footer | done | pending | Client-side fetch with hardcoded fallbacks |
-| 15 | Create Runtime Flow Diagrams | pending | — | — |
+| 11 | Create Admin CMS Page | done | 144e71e | CMS page with SEO + footer form sections |
+| 12 | Add Admin Link to Dashboard Sidebar | done | 144e71e | Conditional Shield icon in desktop + mobile nav |
+| 13 | Dynamic Landing Page Metadata | done | 144e71e | generateMetadata() with ISR 5min revalidate |
+| 14 | Dynamic Landing Footer | done | 144e71e | Client-side fetch with hardcoded fallbacks |
+| 15 | Create Runtime Flow Diagrams | done | pending | flow-admin.md with 2 sequence diagrams |
 
 ## Resume Instructions
 
