@@ -98,6 +98,7 @@ type Repositories struct {
 	Hashtag               repository.HashtagRepository
 	GoldVote              repository.GoldVoteRepository
 	GoldVoteComment       repository.GoldVoteCommentRepository
+	Feedback              repository.FeedbackRepository
 }
 
 // NewRepositories creates all repository instances.

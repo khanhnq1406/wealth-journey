@@ -419,3 +419,10 @@ type HashtagRepository interface {
 	GetTrending(ctx context.Context, since time.Time, limit int) ([]TrendingHashtag, error)
 	GetPostIDsByHashtag(ctx context.Context, hashtag string, opts ListOptions) ([]int32, int, error)
 }
+
+// FeedbackRepository defines the interface for feedback data operations.
+type FeedbackRepository interface {
+	Create(ctx context.Context, feedback *models.Feedback) error
+	ListByUserID(ctx context.Context, userID int32, opts ListOptions) ([]*models.Feedback, int, error)
+	CountRecentByUserID(ctx context.Context, userID int32, since time.Time) (int, error)
+}
