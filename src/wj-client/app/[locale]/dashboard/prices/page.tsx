@@ -97,7 +97,10 @@ function buildTanstackColumns(
     }),
     columnHelper.accessor("buy", {
       header: () => (
-        <span className="text-base font-bold">{t("table.buy")}</span>
+        <div>
+          <span className="text-base font-bold">{t("table.buy")}</span>
+          <div className="font-normal text-[10px] text-gray-400">{t("table.buyUnit")}</div>
+        </div>
       ),
       cell: ({ row }) => (
         <span className="font-medium text-lred">
@@ -107,7 +110,10 @@ function buildTanstackColumns(
     }),
     columnHelper.accessor("sell", {
       header: () => (
-        <span className="text-base font-bold">{t("table.sell")}</span>
+        <div>
+          <span className="text-base font-bold">{t("table.sell")}</span>
+          <div className="font-normal text-[10px] text-gray-400">{t("table.sellUnit")}</div>
+        </div>
       ),
       cell: ({ row }) => (
         <span className="font-medium text-v2-green-positive">
@@ -165,7 +171,12 @@ function buildMobileColumns(
     },
     {
       id: "buy",
-      header: <span className="text-base">{t("table.buy")}</span>,
+      header: (
+        <div>
+          <span className="text-base">{t("table.buy")}</span>
+          <span className="text-[10px] text-gray-400 ml-1">{t("table.buyUnit")}</span>
+        </div>
+      ),
       cell: ({ row }) => (
         <span className="font-medium text-lred">
           {formatPriceValue(row.buy, row.currency)}
@@ -174,7 +185,12 @@ function buildMobileColumns(
     },
     {
       id: "sell",
-      header: <span className="text-base">{t("table.sell")}</span>,
+      header: (
+        <div>
+          <span className="text-base">{t("table.sell")}</span>
+          <span className="text-[10px] text-gray-400 ml-1">{t("table.sellUnit")}</span>
+        </div>
+      ),
       cell: ({ row }) => (
         <span className="font-medium text-v2-green-positive">
           {formatPriceValue(row.sell, row.currency)}
