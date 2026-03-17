@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strings"
 
 	"wealthjourney/domain/models"
 	"wealthjourney/domain/service"
@@ -19,6 +20,20 @@ func NewSiteSettingsHandler(svc service.SiteSettingsService) *SiteSettingsHandle
 	return &SiteSettingsHandler{service: svc}
 }
 
+// SiteSettingDTO is the public-facing site setting (no updatedBy).
+type SiteSettingDTO struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+func toSiteSettingDTOs(settings []*models.SiteSetting) []SiteSettingDTO {
+	dtos := make([]SiteSettingDTO, len(settings))
+	for i, s := range settings {
+		dtos[i] = SiteSettingDTO{Key: s.Key, Value: s.Value}
+	}
+	return dtos
+}
+
 // GetSiteSettings handles GET /api/v1/public/site-settings (no auth).
 func (h *SiteSettingsHandler) GetSiteSettings(c *gin.Context) {
 	settings, err := h.service.GetAll(c.Request.Context())
@@ -26,7 +41,10 @@ func (h *SiteSettingsHandler) GetSiteSettings(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to fetch settings"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"success": true, "settings": settings})
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    gin.H{"settings": toSiteSettingDTOs(settings)},
+	})
 }
 
 type updateSiteSettingsRequest struct {
@@ -49,23 +67,8 @@ func (h *SiteSettingsHandler) UpdateSiteSettings(c *gin.Context) {
 		return
 	}
 
-	// Get admin user ID from auth context
-	adminUserID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized"})
-		return
-	}
-
-	userID, ok := adminUserID.(int32)
-	if !ok {
-		// Try int conversion
-		if intID, ok := adminUserID.(int); ok {
-			userID = int32(intID)
-		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Invalid user context"})
-			return
-		}
-	}
+	// Get admin user ID from auth context (consistent with other handlers)
+	userID := int32(c.GetInt("user_id"))
 
 	// Convert to models
 	settingsModels := make([]*models.SiteSetting, len(req.Settings))
@@ -78,13 +81,23 @@ func (h *SiteSettingsHandler) UpdateSiteSettings(c *gin.Context) {
 
 	updated, err := h.service.UpdateSettings(c.Request.Context(), userID, settingsModels)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
+		errMsg := err.Error()
+		// Validation errors are safe to return; internal errors are not
+		if strings.HasPrefix(errMsg, "invalid setting key:") ||
+			strings.HasPrefix(errMsg, "setting value cannot be empty") ||
+			strings.HasPrefix(errMsg, "setting value exceeds") ||
+			strings.HasPrefix(errMsg, "seo.") ||
+			strings.HasPrefix(errMsg, "no settings provided") {
+			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": errMsg})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to update settings"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"success":  true,
-		"message":  "Settings updated successfully",
-		"settings": updated,
+		"success": true,
+		"message": "Settings updated successfully",
+		"data":    gin.H{"settings": toSiteSettingDTOs(updated)},
 	})
 }

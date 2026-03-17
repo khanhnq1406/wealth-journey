@@ -73,8 +73,8 @@ async function fetchSiteSettings(): Promise<Record<string, string> | null> {
     });
     if (!res.ok) return null;
     const data = await res.json();
-    if (!data?.data?.success && !data?.success) return null;
-    const settings = data?.data?.settings || data?.settings;
+    if (!data?.success) return null;
+    const settings = data?.data?.settings;
     if (!Array.isArray(settings)) return null;
     const map: Record<string, string> = {};
     for (const s of settings) {

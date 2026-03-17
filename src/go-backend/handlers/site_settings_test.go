@@ -61,8 +61,15 @@ func TestGetSiteSettings_Success(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, true, body["success"])
 
-	settings := body["settings"].([]interface{})
+	data := body["data"].(map[string]interface{})
+	settings := data["settings"].([]interface{})
 	assert.Equal(t, 2, len(settings))
+
+	// Verify no updatedBy field in DTO response
+	first := settings[0].(map[string]interface{})
+	assert.Nil(t, first["updatedBy"])
+	assert.Equal(t, "seo.title", first["key"])
+	assert.Equal(t, "Test Title", first["value"])
 }
 
 func TestUpdateSiteSettings_Success(t *testing.T) {
@@ -79,7 +86,7 @@ func TestUpdateSiteSettings_Success(t *testing.T) {
 	handler := NewSiteSettingsHandler(mockSvc)
 	router := gin.New()
 	router.PUT("/api/v1/admin/site-settings", func(c *gin.Context) {
-		c.Set("user_id", int32(1))
+		c.Set("user_id", 1)
 		handler.UpdateSiteSettings(c)
 	})
 
@@ -109,7 +116,7 @@ func TestUpdateSiteSettings_EmptyBody(t *testing.T) {
 	handler := NewSiteSettingsHandler(&mockSiteSettingsService{})
 	router := gin.New()
 	router.PUT("/api/v1/admin/site-settings", func(c *gin.Context) {
-		c.Set("user_id", int32(1))
+		c.Set("user_id", 1)
 		handler.UpdateSiteSettings(c)
 	})
 

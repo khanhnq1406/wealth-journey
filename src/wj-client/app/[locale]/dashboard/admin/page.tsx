@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/utils/api-client";
@@ -106,20 +106,17 @@ function formToSettings(values: FormValues): SiteSetting[] {
 function AdminCMSContent() {
   const { toast } = useNotification();
   const queryClient = useQueryClient();
-  const [initialValues, setInitialValues] = useState<FormValues | null>(null);
-
   const { data, isLoading } = useQuery({
     queryKey: [QUERY_KEY],
     queryFn: () => apiClient.get<SiteSettingsResponse>("/v1/public/site-settings"),
   });
 
-  const { register, handleSubmit, control, reset, formState: { errors, isDirty } } = useForm<FormValues>();
+  const { register, handleSubmit, control, reset } = useForm<FormValues>();
 
   useEffect(() => {
-    if (data?.data?.settings) {
-      const formValues = settingsToForm(data.data.settings);
-      reset(formValues);
-      setInitialValues(formValues);
+    const settings = data?.data?.settings;
+    if (settings) {
+      reset(settingsToForm(settings));
     }
   }, [data, reset]);
 

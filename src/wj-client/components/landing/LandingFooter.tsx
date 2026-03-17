@@ -24,7 +24,7 @@ export default function LandingFooter() {
     fetch(`${apiUrl}/api/v1/public/site-settings`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        const settings = data?.data?.settings || data?.settings;
+        const settings = data?.data?.settings;
         if (!Array.isArray(settings)) return;
         const map: Record<string, string> = {};
         for (const s of settings) map[s.key] = s.value;

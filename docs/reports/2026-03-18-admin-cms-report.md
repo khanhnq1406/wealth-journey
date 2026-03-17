@@ -136,3 +136,13 @@ Implemented an admin CMS feature allowing admin users to edit the landing page's
 5. Click "Save Settings" and verify success toast
 6. Visit the landing page and verify metadata in view-source matches updated values
 7. Verify footer text matches updated values
+
+## Fix History
+
+| Date | Fix | Severity | Files Changed | Commit |
+|------|-----|----------|---------------|--------|
+| 2026-03-18 | Fix runtime bug: backend responses now wrapped in `data` field to match `ApiResponse<T>` type contract; frontend data access pattern corrected | Critical | site_settings.go, site_settings_test.go, admin/page.tsx, landing/layout.tsx, LandingFooter.tsx | (see below) |
+| 2026-03-18 | Fix information disclosure: added SiteSettingDTO to strip `updatedBy` admin user ID from public API responses | Medium | site_settings.go, site_settings_test.go | (same commit) |
+| 2026-03-18 | Fix error message leakage: handler now distinguishes validation errors (400, safe to return) from internal errors (500, generic message) | Medium | site_settings.go | (same commit) |
+| 2026-03-18 | Fix user_id extraction: use `c.GetInt("user_id")` consistent with other handlers | Minor | site_settings.go, site_settings_test.go | (same commit) |
+| 2026-03-18 | Remove unused code: removed `initialValues` state and unused `errors` from formState | Minor | admin/page.tsx | (same commit) |
