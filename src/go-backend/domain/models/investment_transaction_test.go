@@ -133,7 +133,7 @@ func TestInvestmentTransaction_ToProto(t *testing.T) {
 	tx := &models.InvestmentTransaction{
 		ID:              1,
 		InvestmentID:    10,
-		WalletID:        5,
+		WalletID:        int32Ptr(5),
 		Type:            int32(investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY),
 		Quantity:        100000000,
 		Price:           50000000000,
@@ -178,7 +178,7 @@ func TestInvestmentTransaction_ToProto_NilLotID(t *testing.T) {
 	tx := &models.InvestmentTransaction{
 		ID:              1,
 		InvestmentID:    10,
-		WalletID:        5,
+		WalletID:        int32Ptr(5),
 		Type:            int32(investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_DIVIDEND),
 		Quantity:        0,
 		Price:           0,

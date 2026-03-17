@@ -7,7 +7,7 @@
 - **Started:** 2026-03-17
 - **Last updated:** 2026-03-17
 - **Current state:** in_progress
-- **Current task:** 10
+- **Current task:** 11-12
 
 ## Task Progress
 
@@ -20,7 +20,7 @@
 | 4 | Repository Implementation | done | b0b4832 | Updated all queries to use direct user_id filter |
 | 5-8 | Service Layer Changes | done | 20dc72a | Updated all service methods for user ownership, nil-guarded wallet ops |
 | 9 | Handler Comment Update | done | — | Updated comment from "auto-select" to "no wallet association" |
-| 10 | Build Verification | in_progress | — | — |
+| 10 | Build Verification & Test Fixes | done | — | Build clean, all tests updated for user ownership (WalletID→*int32, removed wallet auto-select, updated mock expectations) |
 | 11-12 | Architecture & Flow Diagrams | pending | — | — |
 
 ## Resume Instructions

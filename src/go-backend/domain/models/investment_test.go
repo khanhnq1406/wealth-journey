@@ -8,6 +8,8 @@ import (
 	v1 "wealthjourney/protobuf/v1"
 )
 
+func int32Ptr(v int32) *int32 { return &v }
+
 func TestInvestment_TableName(t *testing.T) {
 	inv := &models.Investment{}
 	if inv.TableName() != "investment" {
@@ -19,7 +21,7 @@ func TestInvestment_Fields(t *testing.T) {
 	now := time.Now()
 	inv := &models.Investment{
 		ID:                   1,
-		WalletID:             10,
+		WalletID:             int32Ptr(10),
 		Symbol:               "BTC",
 		Name:                 "Bitcoin",
 		Type:                 int32(v1.InvestmentType_INVESTMENT_TYPE_CRYPTOCURRENCY),
@@ -89,7 +91,7 @@ func TestInvestment_ToProto(t *testing.T) {
 	now := time.Now()
 	inv := &models.Investment{
 		ID:                   1,
-		WalletID:             10,
+		WalletID:             int32Ptr(10),
 		Symbol:               "AAPL",
 		Name:                 "Apple Inc.",
 		Type:                 int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),

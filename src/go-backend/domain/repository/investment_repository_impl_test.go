@@ -17,6 +17,8 @@ import (
 	"gorm.io/gorm"
 )
 
+func int32Ptr(v int32) *int32 { return &v }
+
 // Helper function to create a mock database
 func setupMockDB(t *testing.T) (*gorm.DB, sqlmock.Sqlmock, *database.Database) {
 	sqlDB, mock, err := sqlmock.New()
@@ -59,7 +61,7 @@ func TestInvestmentRepository_Create(t *testing.T) {
 	ctx := context.Background()
 
 	investment := &models.Investment{
-		WalletID:    1,
+		WalletID:    int32Ptr(1),
 		Symbol:      "AAPL",
 		Name:        "Apple Inc.",
 		Type:        0, // STOCK
@@ -92,7 +94,7 @@ func TestInvestmentRepository_Create_Error(t *testing.T) {
 	ctx := context.Background()
 
 	investment := &models.Investment{
-		WalletID:    1,
+		WalletID:    int32Ptr(1),
 		Symbol:      "AAPL",
 		Name:        "Apple Inc.",
 		Type:        0,
@@ -172,7 +174,7 @@ func TestInvestmentRepository_GetByID_NotFound(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestInvestmentRepository_GetByWalletAndSymbol(t *testing.T) {
+func TestInvestmentRepository_GetByUserAndSymbol(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
@@ -183,31 +185,31 @@ func TestInvestmentRepository_GetByWalletAndSymbol(t *testing.T) {
 	ctx := context.Background()
 
 	rows := sqlmock.NewRows([]string{
-		"id", "wallet_id", "symbol", "name", "type", "quantity",
+		"id", "user_id", "wallet_id", "symbol", "name", "type", "quantity",
 		"average_cost", "total_cost", "currency", "current_price",
 		"current_value", "unrealized_pnl", "unrealized_pnl_percent",
 		"realized_pnl", "created_at", "updated_at",
 	}).AddRow(
-		1, 5, "BTC", "Bitcoin", 1, 100000000,
+		1, 5, nil, "BTC", "Bitcoin", 1, 100000000,
 		50000000000, 50000000000, "USD", 60000000000,
 		60000000000, 10000000000, 20.0,
 		0, time.Now(), time.Now(),
 	)
 
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `investment` WHERE (wallet_id = ? AND symbol = ?) AND `investment`.`deleted_at` IS NULL ORDER BY `investment`.`id` LIMIT ?")).
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `investment` WHERE (user_id = ? AND symbol = ?) AND `investment`.`deleted_at` IS NULL ORDER BY `investment`.`id` LIMIT ?")).
 		WithArgs(5, "BTC", 1).
 		WillReturnRows(rows)
 
-	investment, err := repo.GetByWalletAndSymbol(ctx, 5, "BTC")
+	investment, err := repo.GetByUserAndSymbol(ctx, 5, "BTC")
 
 	assert.NoError(t, err)
 	assert.NotNil(t, investment)
-	assert.Equal(t, int32(5), investment.WalletID)
 	assert.Equal(t, "BTC", investment.Symbol)
+	assert.Equal(t, int32(5), investment.UserID)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestInvestmentRepository_GetByWalletAndSymbol_NotFound(t *testing.T) {
+func TestInvestmentRepository_GetByUserAndSymbol_NotFound(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
@@ -217,11 +219,11 @@ func TestInvestmentRepository_GetByWalletAndSymbol_NotFound(t *testing.T) {
 	repo := NewInvestmentRepository(database)
 	ctx := context.Background()
 
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `investment` WHERE (wallet_id = ? AND symbol = ?) AND `investment`.`deleted_at` IS NULL ORDER BY `investment`.`id` LIMIT ?")).
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `investment` WHERE (user_id = ? AND symbol = ?) AND `investment`.`deleted_at` IS NULL ORDER BY `investment`.`id` LIMIT ?")).
 		WithArgs(5, "ETH", 1).
 		WillReturnError(gorm.ErrRecordNotFound)
 
-	investment, err := repo.GetByWalletAndSymbol(ctx, 5, "ETH")
+	investment, err := repo.GetByUserAndSymbol(ctx, 5, "ETH")
 
 	assert.NoError(t, err) // Returns nil, not error
 	assert.Nil(t, investment)
@@ -278,7 +280,7 @@ func TestInvestmentRepository_Update(t *testing.T) {
 
 	investment := &models.Investment{
 		ID:           1,
-		WalletID:     1,
+		WalletID:     int32Ptr(1),
 		Symbol:       "AAPL",
 		Name:         "Apple Inc.",
 		Type:         0,
@@ -490,32 +492,23 @@ func TestInvestmentRepository_ListByUserID(t *testing.T) {
 	repo := NewInvestmentRepository(database)
 	ctx := context.Background()
 
-	// Mock wallet query — after decoupling, no wallet type filter (any wallet can hold investments)
-	walletRows := sqlmock.NewRows([]string{"id"}).
-		AddRow(1).
-		AddRow(2)
-
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT `id` FROM `wallet` WHERE (user_id = ? AND status = 1) AND `wallet`.`deleted_at` IS NULL")).
-		WithArgs(10).
-		WillReturnRows(walletRows)
-
-	// Mock investment query: COUNT first, then SELECT
+	// Mock investment query: COUNT first, then SELECT (direct user_id filter)
 	countRows := sqlmock.NewRows([]string{"count"}).AddRow(2)
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `investment` WHERE wallet_id IN (?,?) AND `investment`.`deleted_at` IS NULL")).
-		WithArgs(1, 2).
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `investment` WHERE user_id = ? AND `investment`.`deleted_at` IS NULL")).
+		WithArgs(10).
 		WillReturnRows(countRows)
 
 	investmentRows := sqlmock.NewRows([]string{
-		"id", "wallet_id", "symbol", "name", "type", "quantity",
+		"id", "user_id", "wallet_id", "symbol", "name", "type", "quantity",
 		"average_cost", "total_cost", "currency", "current_price",
 		"current_value", "unrealized_pnl", "unrealized_pnl_percent",
 		"realized_pnl", "created_at", "updated_at",
 	}).
-		AddRow(1, 1, "AAPL", "Apple", 0, 10000, 150000, 150000, "USD", 175000, 175000, 25000, 16.67, 0, time.Now(), time.Now()).
-		AddRow(2, 2, "BTC", "Bitcoin", 1, 100000000, 50000000000, 50000000000, "USD", 60000000000, 60000000000, 10000000000, 20.0, 0, time.Now(), time.Now())
+		AddRow(1, 10, 1, "AAPL", "Apple", 0, 10000, 150000, 150000, "USD", 175000, 175000, 25000, 16.67, 0, time.Now(), time.Now()).
+		AddRow(2, 10, 2, "BTC", "Bitcoin", 1, 100000000, 50000000000, 50000000000, "USD", 60000000000, 60000000000, 10000000000, 20.0, 0, time.Now(), time.Now())
 
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `investment` WHERE wallet_id IN (?,?) AND `investment`.`deleted_at` IS NULL ORDER BY created_at desc")).
-		WithArgs(1, 2).
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `investment` WHERE user_id = ? AND `investment`.`deleted_at` IS NULL ORDER BY created_at desc")).
+		WithArgs(10).
 		WillReturnRows(investmentRows)
 
 	investments, total, err := repo.ListByUserID(ctx, 10, ListOptions{}, 0)
@@ -526,7 +519,7 @@ func TestInvestmentRepository_ListByUserID(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestInvestmentRepository_ListByUserID_NoWallets(t *testing.T) {
+func TestInvestmentRepository_ListByUserID_Empty(t *testing.T) {
 	db, mock, database := setupMockDB(t)
 	defer func() {
 		sqlDB, _ := db.DB()
@@ -536,12 +529,22 @@ func TestInvestmentRepository_ListByUserID_NoWallets(t *testing.T) {
 	repo := NewInvestmentRepository(database)
 	ctx := context.Background()
 
-	// Mock empty wallet result — after decoupling, no wallet type filter
-	walletRows := sqlmock.NewRows([]string{"id"})
-
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT `id` FROM `wallet` WHERE (user_id = ? AND status = 1) AND `wallet`.`deleted_at` IS NULL")).
+	// Mock empty result with direct user_id query
+	countRows := sqlmock.NewRows([]string{"count"}).AddRow(0)
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `investment` WHERE user_id = ? AND `investment`.`deleted_at` IS NULL")).
 		WithArgs(10).
-		WillReturnRows(walletRows)
+		WillReturnRows(countRows)
+
+	investmentRows := sqlmock.NewRows([]string{
+		"id", "user_id", "wallet_id", "symbol", "name", "type", "quantity",
+		"average_cost", "total_cost", "currency", "current_price",
+		"current_value", "unrealized_pnl", "unrealized_pnl_percent",
+		"realized_pnl", "created_at", "updated_at",
+	})
+
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `investment` WHERE user_id = ? AND `investment`.`deleted_at` IS NULL ORDER BY created_at desc")).
+		WithArgs(10).
+		WillReturnRows(investmentRows)
 
 	investments, total, err := repo.ListByUserID(ctx, 10, ListOptions{}, 0)
 

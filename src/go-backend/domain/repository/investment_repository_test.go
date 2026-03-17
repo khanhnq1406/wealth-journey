@@ -8,6 +8,8 @@ import (
 	v1 "wealthjourney/protobuf/v1"
 )
 
+func ptrInt32(v int32) *int32 { return &v }
+
 // TestGetPortfolioSummary_Aggregation verifies that the portfolio summary aggregation logic
 // correctly sums up investment values across all investments in a wallet.
 //
@@ -143,7 +145,7 @@ func MockInvestmentsForTesting() []*models.Investment {
 	return []*models.Investment{
 		{
 			ID:           1,
-			WalletID:     1,
+			WalletID:     ptrInt32(1),
 			Symbol:       "BTC",
 			Name:         "Bitcoin",
 			Type:         int32(v1.InvestmentType_INVESTMENT_TYPE_CRYPTOCURRENCY),
@@ -155,7 +157,7 @@ func MockInvestmentsForTesting() []*models.Investment {
 		},
 		{
 			ID:           2,
-			WalletID:     1,
+			WalletID:     ptrInt32(1),
 			Symbol:       "ETH",
 			Name:         "Ethereum",
 			Type:         int32(v1.InvestmentType_INVESTMENT_TYPE_CRYPTOCURRENCY),
@@ -167,7 +169,7 @@ func MockInvestmentsForTesting() []*models.Investment {
 		},
 		{
 			ID:           3,
-			WalletID:     1,
+			WalletID:     ptrInt32(1),
 			Symbol:       "AAPL",
 			Name:         "Apple Inc.",
 			Type:         int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
