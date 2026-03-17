@@ -7,18 +7,18 @@
 - **Started:** 2026-03-18
 - **Last updated:** 2026-03-18
 - **Current state:** in_progress
-- **Current task:** 0
+- **Current task:** 5
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 0 | Define Protobuf API Contract | pending | — | — |
-| 1 | Create Backend Model & Migration | pending | — | — |
-| 2 | Create Backend Repository | pending | — | — |
-| 3 | Create Backend Service | pending | — | — |
-| 4 | Create Backend Handler & Routes | pending | — | — |
-| 5 | Add i18n Translations | pending | — | — |
+| 0 | Define Protobuf API Contract | done | 8da41e4 | Created feedback.proto with SubmitFeedback/ListMyFeedback RPCs, generated Go+TS code |
+| 1 | Create Backend Model & Migration | done | 04f8449 | Created Feedback GORM model and migration command |
+| 2 | Create Backend Repository | done | 71594b5 | Implemented FeedbackRepository with Create, ListByUserID, CountRecentByUserID |
+| 3 | Create Backend Service | done | a7e1e15 | Implemented FeedbackService with validation, rate limiting (10/hr), 10 passing tests |
+| 4 | Create Backend Handler & Routes | done | 769242e | Created REST handler with POST/GET /feedback routes, auth + rate limit middleware |
+| 5 | Add i18n Translations | in_progress | — | — |
 | 6 | Add Frontend Route & Navigation | pending | — | — |
 | 7 | Create Frontend Form & Validation | pending | — | — |
 | 8 | Create StatusBadge & FeedbackItem Components | pending | — | — |

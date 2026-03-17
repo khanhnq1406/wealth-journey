@@ -17,6 +17,7 @@ const messageGroups = [
   'finance',     // finance.tabs
   'import',      // import.*, reviewStep
   'settings',    // settings.*, currency
+  'feedback',    // feedback.* (user feedback submission & history)
   'ui',          // modals, feedback, emptyState, errorState, formWizard, skeleton,
                  // pullToRefresh, pwa, search, select, datePicker, currencySelector,
                  // dashboard, symbolAutocomplete, connectionStatus, dataFreshness,

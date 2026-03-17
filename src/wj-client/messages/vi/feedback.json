@@ -1,0 +1,27 @@
+{
+  "feedback": {
+    "title": "Phản hồi",
+    "sendFeedback": "Gửi phản hồi",
+    "myFeedback": "Phản hồi của tôi",
+    "loading": "Đang tải phản hồi...",
+    "noFeedbackTitle": "Chưa có phản hồi",
+    "noFeedbackDescription": "Chia sẻ ý kiến của bạn để giúp chúng tôi cải thiện ứng dụng",
+    "form": {
+      "subject": "Tiêu đề",
+      "subjectPlaceholder": "Tóm tắt ngắn gọn phản hồi của bạn",
+      "message": "Nội dung",
+      "messagePlaceholder": "Hãy cho chúng tôi biết suy nghĩ của bạn...",
+      "submit": "Gửi phản hồi",
+      "submittedSuccess": "Cảm ơn bạn! Phản hồi đã được gửi thành công.",
+      "failedToSubmit": "Gửi phản hồi thất bại. Vui lòng thử lại.",
+      "rateLimited": "Bạn đã gửi quá nhiều phản hồi. Vui lòng thử lại sau."
+    },
+    "status": {
+      "pending": "Đang chờ",
+      "reviewed": "Đã xem",
+      "resolved": "Đã giải quyết"
+    },
+    "loadMore": "Xem thêm",
+    "noMore": "Không còn phản hồi"
+  }
+}
