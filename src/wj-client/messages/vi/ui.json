@@ -317,7 +317,9 @@
       "silverType": "LOẠI BẠC",
       "currencyType": "LOẠI NGOẠI TỆ",
       "buy": "MUA",
+      "buyUnit": "(x100₫)",
       "sell": "BÁN",
+      "sellUnit": "(x100₫)",
       "period": {
         "24h": "24h",
         "week": "Tuần",

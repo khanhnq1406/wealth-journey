@@ -317,7 +317,9 @@
       "silverType": "SILVER TYPE",
       "currencyType": "CURRENCY TYPE",
       "buy": "BUY",
+      "buyUnit": "(x100₫)",
       "sell": "SELL",
+      "sellUnit": "(x100₫)",
       "period": {
         "24h": "24h",
         "week": "Week",
