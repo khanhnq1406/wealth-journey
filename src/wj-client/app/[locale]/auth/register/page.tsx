@@ -42,6 +42,7 @@ export default function Register() {
             fullname: fullname,
             picture: picture,
             username: username,
+            isAdmin: false,
           }),
         );
 

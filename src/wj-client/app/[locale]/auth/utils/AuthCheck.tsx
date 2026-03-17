@@ -65,6 +65,7 @@ export const AuthCheck = ({ children }: { children: React.ReactNode }) => {
           username: authResponse.data.username,
           preferredCurrency: authResponse.data.preferredCurrency || "VND",
           preferredLanguage: lang,
+          isAdmin: authResponse.data.isAdmin || false,
         })
       );
 
