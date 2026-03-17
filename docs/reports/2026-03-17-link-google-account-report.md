@@ -86,3 +86,9 @@ Implemented the "Connect Google" feature for Security Settings, allowing passwor
 ## Known Issues / Technical Debt
 
 None. This is a clean, focused feature with no deferred work.
+
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-17 | Redesigned Security Settings page UI — vertical stacked layout per auth method, proper icon circles, status badges with checkmarks, Google button on its own line (no overflow), proper touch targets, close buttons on form cards, consistent BaseCard usage, dark mode support | Minor | — |
