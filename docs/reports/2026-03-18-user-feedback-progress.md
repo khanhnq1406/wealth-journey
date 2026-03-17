@@ -6,8 +6,8 @@
 - **Spec file:** docs/specs/2026-03-18-user-feedback-spec.md
 - **Started:** 2026-03-18
 - **Last updated:** 2026-03-18
-- **Current state:** in_progress
-- **Current task:** 5
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -18,26 +18,16 @@
 | 2 | Create Backend Repository | done | 71594b5 | Implemented FeedbackRepository with Create, ListByUserID, CountRecentByUserID |
 | 3 | Create Backend Service | done | a7e1e15 | Implemented FeedbackService with validation, rate limiting (10/hr), 10 passing tests |
 | 4 | Create Backend Handler & Routes | done | 769242e | Created REST handler with POST/GET /feedback routes, auth + rate limit middleware |
-| 5 | Add i18n Translations | in_progress | — | — |
-| 6 | Add Frontend Route & Navigation | pending | — | — |
-| 7 | Create Frontend Form & Validation | pending | — | — |
-| 8 | Create StatusBadge & FeedbackItem Components | pending | — | — |
-| 9 | Build Complete Feedback Page | pending | — | — |
-| 10 | Update C4 Architecture Diagrams | pending | — | — |
-| 11 | Write Implementation Report | pending | — | — |
-
-## Resume Instructions
-
-To resume this implementation in a new session:
-1. Read this progress file
-2. Read the plan file referenced above
-3. Check `git log --oneline -10` to verify last commit matches the last `done` task
-4. Check `git status` for any uncommitted work
-5. Continue from the next `pending` task
+| 5 | Add i18n Translations | done | 9101cec | English + Vietnamese translations, registered feedback message group |
+| 6 | Add Frontend Route & Navigation | done | 8959ff7 | Added route constant, sidebar NavItem, mobile nav, placeholder page |
+| 7 | Create Frontend Form & Validation | done | 5425032 | SubmitFeedbackForm with Zod schema and rate limit error handling |
+| 8 | Create StatusBadge & FeedbackItem | done | 6402df6 | StatusBadge (colored status labels) and FeedbackItem (expandable card) |
+| 9 | Build Complete Feedback Page | done | c185470 | Full page with form, history list, pagination, empty state |
+| 10 | Update C4 Architecture Diagrams | done | 931e8ae | Added feedback components to backend + frontend C4 diagrams |
+| 11 | Write Implementation Report | done | — | Final report at docs/reports/2026-03-18-user-feedback-report.md |
 
 ## Notes
 - Proto common.proto uses `PaginationParams` and `PaginationResult` (not PaginationRequest/PaginationResponse as in the plan)
 - `RateLimitError` already exists in `pkg/errors/errors.go` — no need to create `TooManyRequestsError`
-- i18n requires registering 'feedback' in `src/wj-client/i18n/request.ts` messageGroups array
 - BaseCard is at `components/BaseCard.tsx` (not `components/cards/BaseCard.tsx`)
-- RHFFormInput import: `@/components/forms/RHFFormInput`
+- PaginationResult uses `totalCount` not `totalItems`
