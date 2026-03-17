@@ -689,7 +689,12 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
             <div className="mt-2 space-y-1">
               <p className="text-xs text-gray-500 ml-1">
                 {t("form.goldUnitCurrencyInfo", {
-                  unit: selectedGoldType.unit,
+                  unit:
+                    selectedGoldType.unit === "mace"
+                      ? t("form.maceUnit")
+                      : selectedGoldType.unit === "gram"
+                        ? t("form.gramUnit")
+                        : "oz",
                   currency: selectedGoldType.currency,
                 })}
               </p>

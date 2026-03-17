@@ -91,4 +91,10 @@ Replaced tael (lượng, 37.5g) with mace (chỉ, 3.75g) as the display unit for
 2. **Frontend**: `cd src/wj-client && npx jest features/investment/utils/gold-calculator.test.ts`
 3. **Build**: `cd src/go-backend && go build ./...`
 4. **TypeScript**: `cd src/wj-client && npx tsc --noEmit`
-5. **Manual**: Create a VND gold investment — quantity should be in mace (chỉ), prices per chỉ
+5. **Manual**: Create a VND gold investment — quantity should be in chỉ, prices per chỉ
+
+## Fix History
+
+| Date | Fix | Severity | File |
+|------|-----|----------|------|
+| 2026-03-17 | Gold unit info line displayed raw internal value "mace" instead of localized label "Chỉ" (VI) / "Mace (chỉ)" (EN). Fixed by mapping `selectedGoldType.unit` through i18n keys in `AddInvestmentForm.tsx:691`. | Minor | `src/wj-client/features/investment/forms/AddInvestmentForm.tsx` |
