@@ -23,6 +23,7 @@ type Services struct {
 	Import             ImportService
 	Community          CommunityService
 	GoldSentiment      GoldSentimentService
+	Feedback           FeedbackService
 }
 
 // NewServices creates all service instances with proper dependency ordering.
@@ -67,6 +68,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		Import:           nil, // Created separately with job queue
 		Community:        communitySvc,
 		GoldSentiment:    goldSentimentSvc,
+		Feedback:         NewFeedbackService(repos.Feedback),
 	}
 }
 
