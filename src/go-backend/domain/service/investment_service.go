@@ -108,20 +108,15 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		return nil, err
 	}
 
-	// 1.5. Auto-select wallet if walletId is 0
-	if req.WalletId == 0 {
-		wallets, _, err := s.walletRepo.ListByUserID(ctx, userID, repository.ListOptions{
-			Limit:   1,
-			OrderBy: "created_at",
-			Order:   "asc",
-		})
+	// 1.5. walletId is now optional — 0 means no wallet association
+	var walletIDPtr *int32
+	if req.WalletId > 0 {
+		// Verify wallet belongs to user
+		_, err := s.walletRepo.GetByIDForUser(ctx, req.WalletId, userID)
 		if err != nil {
 			return nil, err
 		}
-		if len(wallets) == 0 {
-			return nil, apperrors.NewValidationError("please create a wallet first")
-		}
-		req.WalletId = wallets[0].ID
+		walletIDPtr = &req.WalletId
 	}
 
 	// Convert decimal inputs to integer format if provided
@@ -145,12 +140,6 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		return nil, apperrors.NewValidationError("initialCost must be positive")
 	}
 
-	// 2. Verify wallet exists and belongs to user
-	_, err := s.walletRepo.GetByIDForUser(ctx, req.WalletId, userID)
-	if err != nil {
-		return nil, err
-	}
-
 	// Validate purchase_date if provided
 	if req.PurchaseDate > 0 {
 		purchaseTime := time.Unix(req.PurchaseDate, 0)
@@ -159,8 +148,8 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		}
 	}
 
-	// 3. Check for duplicate symbol in wallet — auto-add as BUY transaction if exists
-	existing, err := s.investmentRepo.GetByWalletAndSymbol(ctx, req.WalletId, req.Symbol)
+	// 3. Check for duplicate symbol for user — auto-add as BUY transaction if exists
+	existing, err := s.investmentRepo.GetByUserAndSymbol(ctx, userID, req.Symbol)
 	if err == nil && existing != nil {
 		// Calculate per-unit price for the AddTransaction request
 		var perUnitPrice int64
@@ -232,7 +221,8 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 
 	// 6. Create investment model
 	investment := &models.Investment{
-		WalletID:     req.WalletId,
+		UserID:       userID,
+		WalletID:     walletIDPtr,
 		Symbol:       req.Symbol,
 		Name:         req.Name,
 		Type:         int32(req.Type), // Convert enum to int32 for database storage
@@ -260,7 +250,8 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 	// 8. Create initial buy transaction
 	tx := &models.InvestmentTransaction{
 		InvestmentID:    investment.ID,
-		WalletID:        req.WalletId,
+		UserID:          userID,
+		WalletID:        walletIDPtr,
 		Type:            int32(v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY),
 		Quantity:        initialQuantity,
 		Price:           averageCost,
@@ -307,21 +298,22 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		fmt.Printf("Warning: failed to populate currency cache for investment %d: %v\n", investment.ID, err)
 	}
 
-	// Invalidate wallet investment value cache
-	// (current_value was set by GORM BeforeCreate hook)
-	if ws, ok := s.walletService.(*walletService); ok {
-		ws.invalidateInvestmentValueCache(ctx, req.WalletId)
+	// Invalidate wallet investment value cache (only if wallet is associated)
+	if walletIDPtr != nil {
+		if ws, ok := s.walletService.(*walletService); ok {
+			ws.invalidateInvestmentValueCache(ctx, *walletIDPtr)
+		}
 	}
 
 	// Backfill portfolio history snapshot at purchase date for period PNL accuracy.
 	// When an investment is created with a past purchase date, we create a snapshot
 	// so that period PNL calculations have a baseline including this investment.
-	if req.PurchaseDate > 0 {
-		summary, err := s.GetPortfolioSummary(ctx, req.WalletId, userID, 0)
+	if req.PurchaseDate > 0 && walletIDPtr != nil {
+		summary, err := s.GetPortfolioSummary(ctx, *walletIDPtr, userID, 0)
 		if err == nil && summary.Data != nil {
 			snapshot := &models.PortfolioHistory{
 				UserID:     userID,
-				WalletID:   req.WalletId,
+				WalletID:   *walletIDPtr,
 				TotalValue: summary.Data.TotalValue,
 				TotalCost:  summary.Data.TotalCost,
 				TotalPnl:   summary.Data.TotalPnl,
@@ -543,9 +535,11 @@ func (s *investmentService) DeleteInvestment(ctx context.Context, investmentID i
 		fmt.Printf("Warning: failed to invalidate currency cache for investment %d: %v\n", investmentID, err)
 	}
 
-	// Invalidate wallet investment value cache
-	if ws, ok := s.walletService.(*walletService); ok {
-		ws.invalidateInvestmentValueCache(ctx, investment.WalletID)
+	// Invalidate wallet investment value cache (only if wallet is associated)
+	if investment.WalletID != nil {
+		if ws, ok := s.walletService.(*walletService); ok {
+			ws.invalidateInvestmentValueCache(ctx, *investment.WalletID)
+		}
 	}
 
 	return &v1.DeleteInvestmentResponse{
@@ -582,11 +576,7 @@ func (s *investmentService) AddTransaction(ctx context.Context, userID int32, re
 		return nil, err
 	}
 
-	// 3. Verify wallet ownership
-	_, err = s.walletRepo.GetByIDForUser(ctx, investment.WalletID, userID)
-	if err != nil {
-		return nil, err
-	}
+	// 3. Investment ownership already verified via GetByIDForUser (uses user_id directly)
 
 	// 4. Calculate transaction cost using utility function
 	cost := units.CalculateTransactionCost(req.Quantity, req.Price, v1.InvestmentType(investment.Type))
@@ -642,9 +632,11 @@ func (s *investmentService) AddTransaction(ctx context.Context, userID int32, re
 		}
 	}
 
-	// Invalidate wallet investment value cache
-	if ws, ok := s.walletService.(*walletService); ok {
-		ws.invalidateInvestmentValueCache(ctx, investment.WalletID)
+	// Invalidate wallet investment value cache (only if wallet is associated)
+	if investment.WalletID != nil {
+		if ws, ok := s.walletService.(*walletService); ok {
+			ws.invalidateInvestmentValueCache(ctx, *investment.WalletID)
+		}
 	}
 
 	// Get the created transaction for response
@@ -738,7 +730,8 @@ func (s *investmentService) processBuyTransaction(ctx context.Context, investmen
 	// Create transaction record
 	tx := &models.InvestmentTransaction{
 		InvestmentID:      investment.ID,
-		WalletID:          investment.WalletID,
+		UserID:            investment.UserID,
+		WalletID:          investment.WalletID, // Already *int32 after model change
 		Type:              int32(v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY),
 		Quantity:          req.Quantity,
 		Price:             req.Price,
@@ -842,6 +835,7 @@ func (s *investmentService) processSellTransaction(ctx context.Context, investme
 	// Create transaction record
 	tx := &models.InvestmentTransaction{
 		InvestmentID:    investment.ID,
+		UserID:          investment.UserID,
 		WalletID:        investment.WalletID,
 		Type:            int32(v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL),
 		Quantity:        req.Quantity,
@@ -898,6 +892,7 @@ func (s *investmentService) processDividendTransaction(ctx context.Context, inve
 	// Create dividend transaction record
 	tx := &models.InvestmentTransaction{
 		InvestmentID:    investment.ID,
+		UserID:          investment.UserID,
 		WalletID:        investment.WalletID,
 		Type:            int32(v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_DIVIDEND),
 		Quantity:        req.Quantity,
@@ -1072,9 +1067,11 @@ func (s *investmentService) DeleteTransaction(ctx context.Context, transactionID
 		fmt.Printf("Warning: failed to invalidate currency cache for investment %d: %v\n", tx.InvestmentID, err)
 	}
 
-	// Invalidate wallet investment value cache
-	if ws, ok := s.walletService.(*walletService); ok {
-		ws.invalidateInvestmentValueCache(ctx, investment.WalletID)
+	// Invalidate wallet investment value cache (only if wallet is associated)
+	if investment.WalletID != nil {
+		if ws, ok := s.walletService.(*walletService); ok {
+			ws.invalidateInvestmentValueCache(ctx, *investment.WalletID)
+		}
 	}
 
 	return &v1.DeleteInvestmentTransactionResponse{
@@ -1388,23 +1385,12 @@ func (s *investmentService) UpdatePrices(ctx context.Context, userID int32, req 
 		return nil, err
 	}
 
-	// Get all investments for the user
-	wallets, _, err := s.walletRepo.ListByUserID(ctx, userID, repository.ListOptions{
-		Limit: 1000,
-	})
+	// Get all investments for the user directly via user_id
+	allInvestments, _, err := s.investmentRepo.ListByUserID(ctx, userID, repository.ListOptions{
+		Limit: 10000,
+	}, v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED)
 	if err != nil {
 		return nil, err
-	}
-
-	var allInvestments []*models.Investment
-	for _, wallet := range wallets {
-		investments, _, err := s.investmentRepo.ListByWalletID(ctx, wallet.ID, repository.ListOptions{
-			Limit: 1000,
-		}, v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED)
-		if err != nil {
-			continue
-		}
-		allInvestments = append(allInvestments, investments...)
 	}
 
 	// Filter by investment IDs if specified, and count custom investments
@@ -1484,16 +1470,17 @@ func (s *investmentService) UpdatePrices(ctx context.Context, userID int32, req 
 		}
 
 		// Invalidate wallet investment value cache for all affected wallets
-		// Collect unique wallet IDs
+		// Collect unique wallet IDs (skip investments with no wallet)
 		walletIDMap := make(map[int32]bool)
 		for investmentID := range priceUpdates {
-			// Get the investment to find its wallet
 			inv, err := s.investmentRepo.GetByID(bgCtx, investmentID)
 			if err != nil {
 				log.Printf("Warning: failed to fetch investment %d for cache invalidation: %v", investmentID, err)
 				continue
 			}
-			walletIDMap[inv.WalletID] = true
+			if inv.WalletID != nil {
+				walletIDMap[*inv.WalletID] = true
+			}
 		}
 
 		// Invalidate cache for each wallet
@@ -1817,10 +1804,12 @@ func (s *investmentService) ListUserInvestments(ctx context.Context, userID int3
 	protoInvestments := make([]*v1.Investment, 0, len(investments))
 	for _, inv := range investments {
 		proto := s.mapper.ModelToProto(inv)
-		// Fetch wallet name for display
-		wallet, _ := s.walletRepo.GetByID(ctx, inv.WalletID)
-		if wallet != nil {
-			proto.WalletName = wallet.WalletName
+		// Fetch wallet name for display (only if wallet is associated)
+		if inv.WalletID != nil {
+			wallet, _ := s.walletRepo.GetByID(ctx, *inv.WalletID)
+			if wallet != nil {
+				proto.WalletName = wallet.WalletName
+			}
 		}
 		// Enrich with conversion fields
 		s.enrichInvestmentProto(ctx, userID, proto, inv)
