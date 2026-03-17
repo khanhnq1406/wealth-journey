@@ -182,6 +182,18 @@ export interface AuthMethods {
   email: string;
 }
 
+/** LinkGoogle request (authenticated) */
+export interface LinkGoogleRequest {
+  token: string;
+}
+
+/** LinkGoogle response */
+export interface LinkGoogleResponse {
+  success: boolean;
+  message: string;
+  timestamp: string;
+}
+
 function createBaseUser(): User {
   return {
     id: 0,
@@ -2368,6 +2380,156 @@ export const AuthMethods: MessageFns<AuthMethods> = {
     message.hasPassword = object.hasPassword ?? false;
     message.username = object.username ?? "";
     message.email = object.email ?? "";
+    return message;
+  },
+};
+
+function createBaseLinkGoogleRequest(): LinkGoogleRequest {
+  return { token: "" };
+}
+
+export const LinkGoogleRequest: MessageFns<LinkGoogleRequest> = {
+  encode(message: LinkGoogleRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.token !== "") {
+      writer.uint32(10).string(message.token);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): LinkGoogleRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseLinkGoogleRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.token = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): LinkGoogleRequest {
+    return { token: isSet(object.token) ? globalThis.String(object.token) : "" };
+  },
+
+  toJSON(message: LinkGoogleRequest): unknown {
+    const obj: any = {};
+    if (message.token !== "") {
+      obj.token = message.token;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<LinkGoogleRequest>): LinkGoogleRequest {
+    return LinkGoogleRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<LinkGoogleRequest>): LinkGoogleRequest {
+    const message = createBaseLinkGoogleRequest();
+    message.token = object.token ?? "";
+    return message;
+  },
+};
+
+function createBaseLinkGoogleResponse(): LinkGoogleResponse {
+  return { success: false, message: "", timestamp: "" };
+}
+
+export const LinkGoogleResponse: MessageFns<LinkGoogleResponse> = {
+  encode(message: LinkGoogleResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(26).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): LinkGoogleResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseLinkGoogleResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): LinkGoogleResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: LinkGoogleResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<LinkGoogleResponse>): LinkGoogleResponse {
+    return LinkGoogleResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<LinkGoogleResponse>): LinkGoogleResponse {
+    const message = createBaseLinkGoogleResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.timestamp = object.timestamp ?? "";
     return message;
   },
 };

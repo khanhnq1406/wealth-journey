@@ -85,6 +85,14 @@ service AuthService {
       get: "/api/v1/auth/methods"
     };
   }
+
+  // Link Google account to existing user (authenticated)
+  rpc LinkGoogle(LinkGoogleRequest) returns (LinkGoogleResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/link-google"
+      body: "*"
+    };
+  }
 }
 
 // User data message
@@ -249,4 +257,16 @@ message AuthMethods {
   bool has_password = 2 [json_name = "hasPassword"];
   string username = 3 [json_name = "username"];
   string email = 4 [json_name = "email"];
+}
+
+// LinkGoogle request (authenticated)
+message LinkGoogleRequest {
+  string token = 1 [json_name = "token"];
+}
+
+// LinkGoogle response
+message LinkGoogleResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
 }
