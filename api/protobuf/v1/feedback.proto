@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package wealthjourney.feedback.v1;
+
+import "protobuf/v1/common.proto";
+import "google/api/annotations.proto";
+
+option go_package = "protobuf/v1";
+
+service FeedbackService {
+  rpc SubmitFeedback(SubmitFeedbackRequest) returns (SubmitFeedbackResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/feedback"
+      body: "*"
+    };
+  }
+
+  rpc ListMyFeedback(ListMyFeedbackRequest) returns (ListMyFeedbackResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/feedback"
+    };
+  }
+}
+
+enum FeedbackStatus {
+  FEEDBACK_STATUS_UNSPECIFIED = 0;
+  FEEDBACK_STATUS_PENDING = 1;
+  FEEDBACK_STATUS_REVIEWED = 2;
+  FEEDBACK_STATUS_RESOLVED = 3;
+}
+
+message FeedbackItem {
+  int32 id = 1 [json_name = "id"];
+  string subject = 2 [json_name = "subject"];
+  string message = 3 [json_name = "message"];
+  FeedbackStatus status = 4 [json_name = "status"];
+  int64 createdAt = 5 [json_name = "createdAt"];
+  int64 updatedAt = 6 [json_name = "updatedAt"];
+}
+
+message SubmitFeedbackRequest {
+  string subject = 1 [json_name = "subject"];
+  string message = 2 [json_name = "message"];
+}
+
+message SubmitFeedbackResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  FeedbackItem feedback = 3 [json_name = "feedback"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+message ListMyFeedbackRequest {
+  wealthjourney.common.v1.PaginationParams pagination = 1 [json_name = "pagination"];
+}
+
+message ListMyFeedbackResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated FeedbackItem feedback = 3 [json_name = "feedback"];
+  wealthjourney.common.v1.PaginationResult pagination = 4 [json_name = "pagination"];
+  string timestamp = 5 [json_name = "timestamp"];
+}
