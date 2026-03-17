@@ -165,6 +165,66 @@ func PasswordWithConstraints(password string, minLen, maxLen int) error {
 	return nil
 }
 
+var usernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
+
+// Username validates a username (3-30 chars, alphanumeric + underscore only).
+func Username(username string) error {
+	if username == "" {
+		return apperrors.NewValidationError("username is required")
+	}
+	if len(username) < 3 {
+		return apperrors.NewValidationError("username must be at least 3 characters")
+	}
+	if len(username) > 30 {
+		return apperrors.NewValidationError("username must be at most 30 characters")
+	}
+	if !usernameRegex.MatchString(username) {
+		return apperrors.NewValidationError("username can only contain letters, numbers, and underscores")
+	}
+	return nil
+}
+
+// StrongPassword validates a password with strict requirements (min 10 chars, 1 upper, 1 lower, 1 digit, 1 special).
+func StrongPassword(password string) error {
+	return StrongPasswordWithConstraints(password, 10, 72)
+}
+
+// StrongPasswordWithConstraints validates a password with custom length and strict character requirements.
+func StrongPasswordWithConstraints(password string, minLen, maxLen int) error {
+	if len(password) < minLen {
+		return apperrors.NewValidationError(fmt.Sprintf("password must be at least %d characters", minLen))
+	}
+	if len(password) > maxLen {
+		return apperrors.NewValidationError(fmt.Sprintf("password must be at most %d characters", maxLen))
+	}
+	var hasUpper, hasLower, hasDigit, hasSpecial bool
+	for _, char := range password {
+		switch {
+		case unicode.IsUpper(char):
+			hasUpper = true
+		case unicode.IsLower(char):
+			hasLower = true
+		case unicode.IsDigit(char):
+			hasDigit = true
+		case !unicode.IsLetter(char) && !unicode.IsDigit(char):
+			hasSpecial = true
+		}
+	}
+	if !hasUpper {
+		return apperrors.NewValidationError("password must contain at least one uppercase letter")
+	}
+	if !hasLower {
+		return apperrors.NewValidationError("password must contain at least one lowercase letter")
+	}
+	if !hasDigit {
+		return apperrors.NewValidationError("password must contain at least one digit")
+	}
+	if !hasSpecial {
+		return apperrors.NewValidationError("password must contain at least one special character")
+	}
+	return nil
+}
+
 // Required validates that a string is not empty.
 func Required(field, value string) error {
 	if value == "" {

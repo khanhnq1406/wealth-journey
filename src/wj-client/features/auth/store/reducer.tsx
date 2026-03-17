@@ -2,7 +2,7 @@ import { REDUX_TYPE } from "@/app/constants";
 import { AuthAction, ModalAction } from "./interface";
 
 export const setAuthReducer = (
-  state = { email: null, isAuthenticated: null, fullname: null, picture: null, preferredCurrency: "VND" },
+  state = { email: null, isAuthenticated: null, fullname: null, picture: null, username: null, preferredCurrency: "VND" },
   action: AuthAction
 ) => {
   switch (action.type) {
@@ -12,6 +12,7 @@ export const setAuthReducer = (
         email: action.payload.email,
         fullname: action.payload.fullname,
         picture: action.payload.picture,
+        username: action.payload.username || null,
         preferredCurrency: action.payload.preferredCurrency || "VND",
       };
     }
@@ -21,6 +22,7 @@ export const setAuthReducer = (
         isAuthenticated: null,
         fullname: null,
         picture: null,
+        username: null,
         preferredCurrency: "VND",
       };
     }

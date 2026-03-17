@@ -19,11 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	AuthService_Register_FullMethodName   = "/wealthjourney.auth.v1.AuthService/Register"
-	AuthService_Login_FullMethodName      = "/wealthjourney.auth.v1.AuthService/Login"
-	AuthService_Logout_FullMethodName     = "/wealthjourney.auth.v1.AuthService/Logout"
-	AuthService_VerifyAuth_FullMethodName = "/wealthjourney.auth.v1.AuthService/VerifyAuth"
-	AuthService_GetAuth_FullMethodName    = "/wealthjourney.auth.v1.AuthService/GetAuth"
+	AuthService_Register_FullMethodName             = "/wealthjourney.auth.v1.AuthService/Register"
+	AuthService_Login_FullMethodName                = "/wealthjourney.auth.v1.AuthService/Login"
+	AuthService_Logout_FullMethodName               = "/wealthjourney.auth.v1.AuthService/Logout"
+	AuthService_VerifyAuth_FullMethodName           = "/wealthjourney.auth.v1.AuthService/VerifyAuth"
+	AuthService_GetAuth_FullMethodName              = "/wealthjourney.auth.v1.AuthService/GetAuth"
+	AuthService_RegisterWithPassword_FullMethodName = "/wealthjourney.auth.v1.AuthService/RegisterWithPassword"
+	AuthService_LoginWithPassword_FullMethodName    = "/wealthjourney.auth.v1.AuthService/LoginWithPassword"
+	AuthService_LinkPassword_FullMethodName         = "/wealthjourney.auth.v1.AuthService/LinkPassword"
+	AuthService_ChangePassword_FullMethodName       = "/wealthjourney.auth.v1.AuthService/ChangePassword"
+	AuthService_GetAuthMethods_FullMethodName       = "/wealthjourney.auth.v1.AuthService/GetAuthMethods"
+	AuthService_LinkGoogle_FullMethodName           = "/wealthjourney.auth.v1.AuthService/LinkGoogle"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -40,6 +46,18 @@ type AuthServiceClient interface {
 	VerifyAuth(ctx context.Context, in *VerifyAuthRequest, opts ...grpc.CallOption) (*VerifyAuthResponse, error)
 	// Get authenticated user information
 	GetAuth(ctx context.Context, in *GetAuthRequest, opts ...grpc.CallOption) (*GetAuthResponse, error)
+	// Register with email/username/password
+	RegisterWithPassword(ctx context.Context, in *RegisterWithPasswordRequest, opts ...grpc.CallOption) (*RegisterWithPasswordResponse, error)
+	// Login with email-or-username + password
+	LoginWithPassword(ctx context.Context, in *LoginWithPasswordRequest, opts ...grpc.CallOption) (*LoginWithPasswordResponse, error)
+	// Link username/password to existing account (authenticated)
+	LinkPassword(ctx context.Context, in *LinkPasswordRequest, opts ...grpc.CallOption) (*LinkPasswordResponse, error)
+	// Change password (authenticated)
+	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error)
+	// Get auth methods for current user (authenticated)
+	GetAuthMethods(ctx context.Context, in *GetAuthMethodsRequest, opts ...grpc.CallOption) (*GetAuthMethodsResponse, error)
+	// Link Google account to existing user (authenticated)
+	LinkGoogle(ctx context.Context, in *LinkGoogleRequest, opts ...grpc.CallOption) (*LinkGoogleResponse, error)
 }
 
 type authServiceClient struct {
@@ -95,6 +113,60 @@ func (c *authServiceClient) GetAuth(ctx context.Context, in *GetAuthRequest, opt
 	return out, nil
 }
 
+func (c *authServiceClient) RegisterWithPassword(ctx context.Context, in *RegisterWithPasswordRequest, opts ...grpc.CallOption) (*RegisterWithPasswordResponse, error) {
+	out := new(RegisterWithPasswordResponse)
+	err := c.cc.Invoke(ctx, AuthService_RegisterWithPassword_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) LoginWithPassword(ctx context.Context, in *LoginWithPasswordRequest, opts ...grpc.CallOption) (*LoginWithPasswordResponse, error) {
+	out := new(LoginWithPasswordResponse)
+	err := c.cc.Invoke(ctx, AuthService_LoginWithPassword_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) LinkPassword(ctx context.Context, in *LinkPasswordRequest, opts ...grpc.CallOption) (*LinkPasswordResponse, error) {
+	out := new(LinkPasswordResponse)
+	err := c.cc.Invoke(ctx, AuthService_LinkPassword_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error) {
+	out := new(ChangePasswordResponse)
+	err := c.cc.Invoke(ctx, AuthService_ChangePassword_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) GetAuthMethods(ctx context.Context, in *GetAuthMethodsRequest, opts ...grpc.CallOption) (*GetAuthMethodsResponse, error) {
+	out := new(GetAuthMethodsResponse)
+	err := c.cc.Invoke(ctx, AuthService_GetAuthMethods_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) LinkGoogle(ctx context.Context, in *LinkGoogleRequest, opts ...grpc.CallOption) (*LinkGoogleResponse, error) {
+	out := new(LinkGoogleResponse)
+	err := c.cc.Invoke(ctx, AuthService_LinkGoogle_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility
@@ -109,6 +181,18 @@ type AuthServiceServer interface {
 	VerifyAuth(context.Context, *VerifyAuthRequest) (*VerifyAuthResponse, error)
 	// Get authenticated user information
 	GetAuth(context.Context, *GetAuthRequest) (*GetAuthResponse, error)
+	// Register with email/username/password
+	RegisterWithPassword(context.Context, *RegisterWithPasswordRequest) (*RegisterWithPasswordResponse, error)
+	// Login with email-or-username + password
+	LoginWithPassword(context.Context, *LoginWithPasswordRequest) (*LoginWithPasswordResponse, error)
+	// Link username/password to existing account (authenticated)
+	LinkPassword(context.Context, *LinkPasswordRequest) (*LinkPasswordResponse, error)
+	// Change password (authenticated)
+	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error)
+	// Get auth methods for current user (authenticated)
+	GetAuthMethods(context.Context, *GetAuthMethodsRequest) (*GetAuthMethodsResponse, error)
+	// Link Google account to existing user (authenticated)
+	LinkGoogle(context.Context, *LinkGoogleRequest) (*LinkGoogleResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -130,6 +214,24 @@ func (UnimplementedAuthServiceServer) VerifyAuth(context.Context, *VerifyAuthReq
 }
 func (UnimplementedAuthServiceServer) GetAuth(context.Context, *GetAuthRequest) (*GetAuthResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAuth not implemented")
+}
+func (UnimplementedAuthServiceServer) RegisterWithPassword(context.Context, *RegisterWithPasswordRequest) (*RegisterWithPasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterWithPassword not implemented")
+}
+func (UnimplementedAuthServiceServer) LoginWithPassword(context.Context, *LoginWithPasswordRequest) (*LoginWithPasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LoginWithPassword not implemented")
+}
+func (UnimplementedAuthServiceServer) LinkPassword(context.Context, *LinkPasswordRequest) (*LinkPasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LinkPassword not implemented")
+}
+func (UnimplementedAuthServiceServer) ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ChangePassword not implemented")
+}
+func (UnimplementedAuthServiceServer) GetAuthMethods(context.Context, *GetAuthMethodsRequest) (*GetAuthMethodsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAuthMethods not implemented")
+}
+func (UnimplementedAuthServiceServer) LinkGoogle(context.Context, *LinkGoogleRequest) (*LinkGoogleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LinkGoogle not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 
@@ -234,6 +336,114 @@ func _AuthService_GetAuth_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_RegisterWithPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterWithPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).RegisterWithPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_RegisterWithPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).RegisterWithPassword(ctx, req.(*RegisterWithPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_LoginWithPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginWithPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).LoginWithPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_LoginWithPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).LoginWithPassword(ctx, req.(*LoginWithPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_LinkPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LinkPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).LinkPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_LinkPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).LinkPassword(ctx, req.(*LinkPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_ChangePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChangePasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ChangePassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_ChangePassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ChangePassword(ctx, req.(*ChangePasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_GetAuthMethods_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAuthMethodsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetAuthMethods(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetAuthMethods_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetAuthMethods(ctx, req.(*GetAuthMethodsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_LinkGoogle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LinkGoogleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).LinkGoogle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_LinkGoogle_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).LinkGoogle(ctx, req.(*LinkGoogleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -260,6 +470,30 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAuth",
 			Handler:    _AuthService_GetAuth_Handler,
+		},
+		{
+			MethodName: "RegisterWithPassword",
+			Handler:    _AuthService_RegisterWithPassword_Handler,
+		},
+		{
+			MethodName: "LoginWithPassword",
+			Handler:    _AuthService_LoginWithPassword_Handler,
+		},
+		{
+			MethodName: "LinkPassword",
+			Handler:    _AuthService_LinkPassword_Handler,
+		},
+		{
+			MethodName: "ChangePassword",
+			Handler:    _AuthService_ChangePassword_Handler,
+		},
+		{
+			MethodName: "GetAuthMethods",
+			Handler:    _AuthService_GetAuthMethods_Handler,
+		},
+		{
+			MethodName: "LinkGoogle",
+			Handler:    _AuthService_LinkGoogle_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

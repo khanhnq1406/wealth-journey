@@ -64,11 +64,14 @@ func (s *grpcAuthServer) VerifyAuth(ctx context.Context, req *protobufv1.VerifyA
 	return result, nil
 }
 
-// GetAuth retrieves user information by email
+// GetAuth retrieves user information
+// NOTE: This gRPC endpoint is deprecated in favor of the REST handler which uses userID from JWT.
+// Kept for gRPC-Gateway compatibility. The email field in the request is no longer used;
+// authentication is handled via JWT middleware which provides userID.
 func (s *grpcAuthServer) GetAuth(ctx context.Context, req *protobufv1.GetAuthRequest) (*protobufv1.GetAuthResponse, error) {
-	if req.Email == "" {
-		return nil, status.Error(codes.InvalidArgument, "email is required")
-	}
-
-	return s.server.GetAuth(ctx, req.Email)
+	// In gRPC-Gateway flow, auth middleware sets user_id in context.
+	// For direct gRPC calls, the token must be provided and parsed.
+	// Since this endpoint requires authentication, userID should be available from middleware.
+	// Fallback: return an error indicating this flow requires the REST endpoint.
+	return nil, status.Error(codes.Unimplemented, "use REST /api/v1/auth endpoint instead")
 }

@@ -7,6 +7,7 @@ import (
 
 	redisv8 "github.com/go-redis/redis/v8"
 
+	"wealthjourney/domain/models"
 	"wealthjourney/domain/repository"
 	"wealthjourney/domain/service"
 	"wealthjourney/pkg/config"
@@ -68,6 +69,13 @@ func main() {
 	log.Println("Portfolio snapshot completed successfully!")
 }
 
+func userEmail(u *models.User) string {
+	if u.Email != nil {
+		return *u.Email
+	}
+	return "<no email>"
+}
+
 func createPortfolioSnapshots(ctx context.Context, repos *service.Repositories, portfolioHistorySvc service.PortfolioHistoryService) error {
 	// Get all users
 	users, _, err := repos.User.List(ctx, repository.ListOptions{
@@ -104,13 +112,13 @@ func createPortfolioSnapshots(ctx context.Context, repos *service.Repositories, 
 		}
 
 		if !hasInvestmentWallets {
-			log.Printf("Skipping user %d (%s) - no investment wallets\n", user.ID, user.Email)
+			log.Printf("Skipping user %d (%s) - no investment wallets\n", user.ID, userEmail(user))
 			skippedCount++
 			continue
 		}
 
 		// Create aggregated snapshot for all investment wallets
-		log.Printf("Creating portfolio snapshot for user %d (%s)...\n", user.ID, user.Email)
+		log.Printf("Creating portfolio snapshot for user %d (%s)...\n", user.ID, userEmail(user))
 		if err := portfolioHistorySvc.CreateAggregatedSnapshot(ctx, user.ID); err != nil {
 			log.Printf("Error: failed to create portfolio snapshot for user %d: %v\n", user.ID, err)
 			errorCount++

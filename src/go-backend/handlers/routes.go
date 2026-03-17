@@ -73,6 +73,8 @@ func RegisterRoutes(
 		authGroup.POST("/login", h.Auth.Login)
 		authGroup.POST("/logout", h.Auth.Logout)
 		authGroup.GET("/verify", h.Auth.VerifyAuth)
+		authGroup.POST("/register-password", h.Auth.RegisterWithPassword)
+		authGroup.POST("/login-password", h.Auth.LoginWithPassword)
 	}
 
 	// Protected auth routes (require authentication)
@@ -83,6 +85,10 @@ func RegisterRoutes(
 	}
 	{
 		authProtected.GET("", h.Auth.GetAuth) // Get current authenticated user
+		authProtected.POST("/link-password", h.Auth.LinkPassword)
+		authProtected.POST("/link-google", h.Auth.LinkGoogle)
+		authProtected.POST("/change-password", h.Auth.ChangePassword)
+		authProtected.GET("/methods", h.Auth.GetAuthMethods)
 	}
 
 	// Session management endpoints (protected)

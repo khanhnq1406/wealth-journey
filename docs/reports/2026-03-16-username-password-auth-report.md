@@ -1,0 +1,155 @@
+# Username & Password Authentication — Implementation Report
+
+## Summary
+
+Added username/password authentication alongside existing Google OAuth. Users can now register and login with email/username + password, link a password to their Google-only account, and change their password from security settings. All 23 planned tasks completed.
+
+## Spec Reference
+
+`docs/specs/2026-03-16-username-password-auth-spec.md`
+
+## Plan Reference
+
+`docs/plans/2026-03-16-username-password-auth-plan.md`
+
+## Tasks Completed
+
+| # | Task | Status | Commit | Key Files |
+|---|------|--------|--------|-----------|
+| 1 | Database Migration | Done | 76f3978 | models/user.go, migrate-password-auth/main.go |
+| 2 | Validators | Done | fa4905b | pkg/validator/validator.go |
+| 3 | Proto API Definitions | Done | df668e9 | api/protobuf/v1/auth.proto |
+| 4 | User Repository | Done | 348ad7a | repository/interfaces.go, user_repository.go |
+| 5 | Auth Service | Done | 5b76224 | domain/auth/auth.go |
+| 6 | Auth Handlers | Done | df2ed25 | handlers/auth.go |
+| 7 | Route Registration | Done | e693eef | handlers/routes.go |
+| 8 | Google OAuth Update | Done | e35fc9d | domain/auth/auth.go |
+| 9 | i18n Translations | Done | a505f64 | messages/en/*.json, messages/vi/*.json |
+| 10-11 | PasswordInput + StrengthIndicator | Done | e2796f5 | features/auth/components/ |
+| 12-13 | RegisterPasswordForm + LoginPasswordForm | Done | 150fde9 | features/auth/forms/ |
+| 14-15 | Login + Register Page Updates | Done | bd7e215 | app/[locale]/auth/ |
+| 16-17 | LinkPasswordForm + ChangePasswordForm | Done | 43f4394 | features/auth/forms/ |
+| 18-20 | AuthMethodsCard + Security Page + Nav | Done | 1ed3179 | features/auth/components/, settings/security/ |
+| 21-22 | Architecture Diagrams | Done | 525f9bb | docs/architecture/ |
+| 23 | Build Verification | Done | — | go build + next build pass |
+
+## Security Implementation Summary
+
+| Concern | Implementation | Verified |
+|---------|---------------|----------|
+| Password hashing | bcrypt cost 12 | Yes |
+| No user enumeration | Generic "Invalid credentials" for all login failures | Yes |
+| Password never in responses | `json:"-"` GORM tag on PasswordHash | Yes |
+| Authorization | Link/change/methods endpoints require AuthMiddleware | Yes |
+| Input validation | Server-side: email, username regex, password 10-72 chars | Yes |
+| Session invalidation | Password change removes all other Redis + DB sessions | Yes |
+| Client-side validation | Zod schemas mirror server rules | Yes |
+
+## Architecture Updates
+
+- **C4 Backend**: Auth Handler + Auth Service descriptions updated for dual auth
+- **C4 Frontend**: Auth pages, Auth feature, Settings pages descriptions updated
+- **Flow Auth**: 4 new sequence diagrams (password register, login, link, change)
+- **Unprotected routes list**: Updated with register-password and login-password
+
+## New API Endpoints
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | /api/v1/auth/register-password | Public | Register with email/username/password |
+| POST | /api/v1/auth/login-password | Public | Login with email or username + password |
+| POST | /api/v1/auth/link-password | Protected | Link password to Google-only account |
+| POST | /api/v1/auth/change-password | Protected | Change existing password |
+| POST | /api/v1/auth/link-google | Protected | Link Google account to password-only user |
+| GET | /api/v1/auth/methods | Protected | Get auth methods for current user |
+
+## New Frontend Components
+
+| Component | Location |
+|-----------|----------|
+| PasswordInput | features/auth/components/PasswordInput.tsx |
+| PasswordStrengthIndicator | features/auth/components/PasswordStrengthIndicator.tsx |
+| AuthMethodsCard | features/auth/components/AuthMethodsCard.tsx |
+| LoginPasswordForm | features/auth/forms/LoginPasswordForm.tsx |
+| RegisterPasswordForm | features/auth/forms/RegisterPasswordForm.tsx |
+| LinkPasswordForm | features/auth/forms/LinkPasswordForm.tsx |
+| ChangePasswordForm | features/auth/forms/ChangePasswordForm.tsx |
+| SecuritySettingsPage | app/[locale]/dashboard/settings/security/page.tsx |
+
+## Files Changed (Complete List)
+
+### Backend (Go)
+- `src/go-backend/domain/models/user.go` — Added Username, PasswordHash, AuthProvider fields
+- `src/go-backend/cmd/migrate-password-auth/main.go` — New migration
+- `src/go-backend/pkg/validator/validator.go` — Added Username + StrongPassword validators
+- `src/go-backend/domain/repository/interfaces.go` — Added GetByUsername to UserRepository
+- `src/go-backend/domain/repository/user_repository.go` — Implemented GetByUsername
+- `src/go-backend/domain/auth/auth.go` — 5 new methods + bcrypt helpers + Google OAuth update
+- `src/go-backend/handlers/auth.go` — 5 new handler methods
+- `src/go-backend/handlers/routes.go` — 5 new routes (2 public, 3 protected)
+
+### Proto
+- `api/protobuf/v1/auth.proto` — 5 RPCs, 10+ message types, User fields
+
+### Frontend (TypeScript/React)
+- `src/wj-client/features/auth/components/PasswordInput.tsx` — New
+- `src/wj-client/features/auth/components/PasswordStrengthIndicator.tsx` — New
+- `src/wj-client/features/auth/components/AuthMethodsCard.tsx` — New
+- `src/wj-client/features/auth/forms/LoginPasswordForm.tsx` — New
+- `src/wj-client/features/auth/forms/RegisterPasswordForm.tsx` — New
+- `src/wj-client/features/auth/forms/LinkPasswordForm.tsx` — New
+- `src/wj-client/features/auth/forms/ChangePasswordForm.tsx` — New
+- `src/wj-client/app/[locale]/auth/login/page.tsx` — Added password form + OR divider
+- `src/wj-client/app/[locale]/auth/register/page.tsx` — Added password form + OR divider
+- `src/wj-client/app/[locale]/dashboard/settings/security/page.tsx` — New page
+- `src/wj-client/app/[locale]/dashboard/settings/page.tsx` — Added security nav link
+
+### i18n
+- `src/wj-client/messages/en/auth.json` — Login + register password keys
+- `src/wj-client/messages/vi/auth.json` — Login + register password keys
+- `src/wj-client/messages/en/settings.json` — Security + password strength keys
+- `src/wj-client/messages/vi/settings.json` — Security + password strength keys
+
+### Architecture Docs
+- `docs/architecture/c4-component-backend.md` — Updated Auth descriptions
+- `docs/architecture/c4-component-frontend.md` — Updated Auth + Settings descriptions
+- `docs/architecture/flow-auth.md` — 4 new sequence diagrams + updated unprotected routes
+
+### Other
+- `Taskfile.yml` — Added migrate-password-auth task
+
+## How to Test
+
+### Database Migration
+```bash
+task backend:migrate-password-auth
+```
+
+### Manual Testing
+1. **Register**: Go to `/auth/register`, fill in email/username/display name/password, submit
+2. **Login**: Go to `/auth/login`, enter email or username + password, submit
+3. **Google + Password**: Login with Google, go to Settings > Security, click "Set Password"
+4. **Change Password**: From Security settings, click "Change Password", enter current + new
+5. **Session Invalidation**: After changing password, verify other sessions are logged out
+
+### Build Verification
+```bash
+cd src/go-backend && go build ./...
+cd src/wj-client && npx next build
+```
+
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-16 | Register page overload: Google OAuth now primary action with expandable password form; password form split into 2-step wizard (identity fields → password fields); logo header hidden on desktop for both auth pages | Minor | See commit |
+| 2026-03-16 | Add missing `GetByUsername` method to `MockUserRepository` in investment service tests — interface was extended by password auth feature but test mock was not updated | Minor | See commit |
+| 2026-03-16 | Proto JSON tag mismatch: `protoc-gen-go` generates snake_case `json` struct tags (e.g., `json:"display_name"`) but frontend sends camelCase (e.g., `displayName`). Fixed `RegisterWithPassword` and `ChangePassword` handlers to use local request structs with correct camelCase JSON tags instead of binding directly to proto-generated structs | Minor | See commit |
+| 2026-03-16 | Proto JSON response mismatch in `GetAuthMethods`: handler returned proto struct directly via `c.JSON()`, which serializes as snake_case (`has_google`, `has_password`), but frontend expects camelCase (`hasGoogle`, `hasPassword`). Both auth method cards always showed "Not set up". Fixed by using `gin.H{}` with camelCase keys, same pattern as other fixed handlers | Minor | See commit |
+| 2026-03-16 | Type mismatch in `GetAuthMethods`, `LinkPassword`, `ChangePassword` handlers: used `c.GetInt("user_id")` which asserts to Go `int`, but middleware stores `int32` via proto `User.Id`. Type assertion fails silently → `userID == 0` → 401. Fixed all three handlers to use `handler.GetUserID(c)` which correctly asserts `int32`. Also fixed `ChangePassword` to use `handler.GetUserEmail(c)` instead of unsafe bare type assertion | Minor | See commit |
+| 2026-03-16 | Add required field indicator (`*`) to all auth form fields. `FormInput` already supports `required` prop (renders red asterisk + `aria-required`), but none of the 4 auth forms were passing it. Added `required` to all 13 field instances across RegisterPasswordForm, LoginPasswordForm, LinkPasswordForm, ChangePasswordForm | Minor | See commit |
+| 2026-03-16 | Auth forms showed raw English server error messages instead of user-friendly translated text. Created `features/auth/utils/error-mapper.ts` to map backend error strings to i18n keys. Updated RegisterPasswordForm, LinkPasswordForm, ChangePasswordForm to use the mapper. Added `errors` namespace with 17+ keys to `auth.json` and `settings.json` for both EN and VI locales. LoginPasswordForm already correct (uses generic i18n key for security). Hardcoded English fallbacks in LinkPasswordForm/ChangePasswordForm replaced with i18n keys. | Minor | See commit |
+| 2026-03-17 | Register form screen overload when all validation errors shown: reduced form gap from `space-y-4` to `space-y-3`, hide PasswordStrengthIndicator when password has validation error (redundant with error message), only show password requirements hint when field is empty and no error, tightened server error banner padding. Additionally, hide Google OAuth button + OR divider when password form is expanded to free up screen space; added "Use Google instead" back-link below the password form so users can switch back | Minor | See commit |
+| 2026-03-17 | Navbar showed "user@example.com" for username/password users (no email). Root cause: `LoginData` proto lacked `username` field, `VerifyAuth`/`GetAuth` didn't populate Username/AuthProvider in UserData, Redux store had no `username` field, and layout had hardcoded fallback. Fix: added `username` field to `LoginData` proto, populated it in `generateLoginResponse`, fixed `VerifyAuth` and `GetAuth` to include Username+AuthProvider, added `username` to Redux auth state, updated all 7 `setAuth` dispatch sites, changed layout fallback to `@username` | Minor | See commit |
+| 2026-03-17 | Auth forms always showed generic fallback error ("Đổi mật khẩu thất bại") instead of specific translated messages. Root cause: `error-sanitizer.ts` has `/password/i` in `SENSITIVE_PATTERNS` which blocked ALL password-related validation messages (e.g., "new password must be different from current password") before the error-mapper could translate them. The sanitizer replaced them with "Invalid input. Please check your data.", which the error-mapper couldn't match → generic fallback. Fix: added `SAFE_VALIDATION_MESSAGES` allowlist of known backend validation messages to `error-sanitizer.ts`. The `containsSensitiveInfo()` check now skips messages that match the allowlist, letting them pass through to the error-mapper for proper i18n translation. Affects ChangePasswordForm, LinkPasswordForm, and RegisterPasswordForm. | Minor | See commit |
+| 2026-03-17 | Added "Link Google Account" feature — the reverse direction of "Link Password". Password-only users can now connect their Google account from Security Settings via a "Connect Google" button (GoogleLogin component). Backend: new `POST /api/v1/auth/link-google` protected endpoint validates Google ID token server-side, prevents account takeover (email collision check), handles email mismatch, updates `auth_provider` to `password+google`, sets email/picture from Google if empty. Frontend: scoped `GoogleOAuthProvider` + `GoogleLogin` button in AuthMethodsCard, `useMutationLinkGoogle` hook, error mapper with 5 error keys, EN+VI i18n. Architecture: sequence diagram added to `flow-auth.md` section 8. Full report: `docs/reports/2026-03-17-link-google-account-report.md` | Major | e951cf9..8656740 |

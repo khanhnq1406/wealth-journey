@@ -23,6 +23,8 @@ export interface User {
   preferredLanguage: string;
   /** Admin flag (read-only from server) */
   isAdmin: boolean;
+  username: string;
+  authProvider: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -45,6 +47,7 @@ export interface LoginData {
   email: string;
   fullname: string;
   picture: string;
+  username: string;
 }
 
 /** Logout request */
@@ -104,6 +107,93 @@ export interface GetAuthResponse {
   timestamp: string;
 }
 
+/** RegisterWithPassword request (email removed — password-only users don't need email) */
+export interface RegisterWithPasswordRequest {
+  username: string;
+  password: string;
+  displayName: string;
+}
+
+/** RegisterWithPassword response */
+export interface RegisterWithPasswordResponse {
+  success: boolean;
+  message: string;
+  data: LoginData | undefined;
+  timestamp: string;
+}
+
+/** LoginWithPassword request */
+export interface LoginWithPasswordRequest {
+  identifier: string;
+  password: string;
+}
+
+/** LoginWithPassword response */
+export interface LoginWithPasswordResponse {
+  success: boolean;
+  message: string;
+  data: LoginData | undefined;
+  timestamp: string;
+}
+
+/** LinkPassword request (authenticated) */
+export interface LinkPasswordRequest {
+  username: string;
+  password: string;
+}
+
+/** LinkPassword response */
+export interface LinkPasswordResponse {
+  success: boolean;
+  message: string;
+  timestamp: string;
+}
+
+/** ChangePassword request (authenticated) */
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+/** ChangePassword response */
+export interface ChangePasswordResponse {
+  success: boolean;
+  message: string;
+  timestamp: string;
+}
+
+/** GetAuthMethods request (authenticated) */
+export interface GetAuthMethodsRequest {
+}
+
+/** GetAuthMethods response */
+export interface GetAuthMethodsResponse {
+  success: boolean;
+  message: string;
+  data: AuthMethods | undefined;
+  timestamp: string;
+}
+
+/** AuthMethods describes which auth methods are linked for a user */
+export interface AuthMethods {
+  hasGoogle: boolean;
+  hasPassword: boolean;
+  username: string;
+  email: string;
+}
+
+/** LinkGoogle request (authenticated) */
+export interface LinkGoogleRequest {
+  token: string;
+}
+
+/** LinkGoogle response */
+export interface LinkGoogleResponse {
+  success: boolean;
+  message: string;
+  timestamp: string;
+}
+
 function createBaseUser(): User {
   return {
     id: 0,
@@ -114,6 +204,8 @@ function createBaseUser(): User {
     conversionInProgress: false,
     preferredLanguage: "",
     isAdmin: false,
+    username: "",
+    authProvider: "",
     createdAt: 0,
     updatedAt: 0,
   };
@@ -144,6 +236,12 @@ export const User: MessageFns<User> = {
     }
     if (message.isAdmin !== false) {
       writer.uint32(80).bool(message.isAdmin);
+    }
+    if (message.username !== "") {
+      writer.uint32(90).string(message.username);
+    }
+    if (message.authProvider !== "") {
+      writer.uint32(98).string(message.authProvider);
     }
     if (message.createdAt !== 0) {
       writer.uint32(40).int64(message.createdAt);
@@ -225,6 +323,22 @@ export const User: MessageFns<User> = {
           message.isAdmin = reader.bool();
           continue;
         }
+        case 11: {
+          if (tag !== 90) {
+            break;
+          }
+
+          message.username = reader.string();
+          continue;
+        }
+        case 12: {
+          if (tag !== 98) {
+            break;
+          }
+
+          message.authProvider = reader.string();
+          continue;
+        }
         case 5: {
           if (tag !== 40) {
             break;
@@ -262,6 +376,8 @@ export const User: MessageFns<User> = {
         : false,
       preferredLanguage: isSet(object.preferredLanguage) ? globalThis.String(object.preferredLanguage) : "",
       isAdmin: isSet(object.isAdmin) ? globalThis.Boolean(object.isAdmin) : false,
+      username: isSet(object.username) ? globalThis.String(object.username) : "",
+      authProvider: isSet(object.authProvider) ? globalThis.String(object.authProvider) : "",
       createdAt: isSet(object.createdAt) ? globalThis.Number(object.createdAt) : 0,
       updatedAt: isSet(object.updatedAt) ? globalThis.Number(object.updatedAt) : 0,
     };
@@ -293,6 +409,12 @@ export const User: MessageFns<User> = {
     if (message.isAdmin !== false) {
       obj.isAdmin = message.isAdmin;
     }
+    if (message.username !== "") {
+      obj.username = message.username;
+    }
+    if (message.authProvider !== "") {
+      obj.authProvider = message.authProvider;
+    }
     if (message.createdAt !== 0) {
       obj.createdAt = Math.round(message.createdAt);
     }
@@ -315,6 +437,8 @@ export const User: MessageFns<User> = {
     message.conversionInProgress = object.conversionInProgress ?? false;
     message.preferredLanguage = object.preferredLanguage ?? "";
     message.isAdmin = object.isAdmin ?? false;
+    message.username = object.username ?? "";
+    message.authProvider = object.authProvider ?? "";
     message.createdAt = object.createdAt ?? 0;
     message.updatedAt = object.updatedAt ?? 0;
     return message;
@@ -438,7 +562,7 @@ export const LoginRequest: MessageFns<LoginRequest> = {
 };
 
 function createBaseLoginData(): LoginData {
-  return { accessToken: "", email: "", fullname: "", picture: "" };
+  return { accessToken: "", email: "", fullname: "", picture: "", username: "" };
 }
 
 export const LoginData: MessageFns<LoginData> = {
@@ -454,6 +578,9 @@ export const LoginData: MessageFns<LoginData> = {
     }
     if (message.picture !== "") {
       writer.uint32(34).string(message.picture);
+    }
+    if (message.username !== "") {
+      writer.uint32(42).string(message.username);
     }
     return writer;
   },
@@ -497,6 +624,14 @@ export const LoginData: MessageFns<LoginData> = {
           message.picture = reader.string();
           continue;
         }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.username = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -512,6 +647,7 @@ export const LoginData: MessageFns<LoginData> = {
       email: isSet(object.email) ? globalThis.String(object.email) : "",
       fullname: isSet(object.fullname) ? globalThis.String(object.fullname) : "",
       picture: isSet(object.picture) ? globalThis.String(object.picture) : "",
+      username: isSet(object.username) ? globalThis.String(object.username) : "",
     };
   },
 
@@ -529,6 +665,9 @@ export const LoginData: MessageFns<LoginData> = {
     if (message.picture !== "") {
       obj.picture = message.picture;
     }
+    if (message.username !== "") {
+      obj.username = message.username;
+    }
     return obj;
   },
 
@@ -541,6 +680,7 @@ export const LoginData: MessageFns<LoginData> = {
     message.email = object.email ?? "";
     message.fullname = object.fullname ?? "";
     message.picture = object.picture ?? "";
+    message.username = object.username ?? "";
     return message;
   },
 };
@@ -1238,6 +1378,1157 @@ export const GetAuthResponse: MessageFns<GetAuthResponse> = {
     message.success = object.success ?? false;
     message.message = object.message ?? "";
     message.data = (object.data !== undefined && object.data !== null) ? User.fromPartial(object.data) : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseRegisterWithPasswordRequest(): RegisterWithPasswordRequest {
+  return { username: "", password: "", displayName: "" };
+}
+
+export const RegisterWithPasswordRequest: MessageFns<RegisterWithPasswordRequest> = {
+  encode(message: RegisterWithPasswordRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.username !== "") {
+      writer.uint32(18).string(message.username);
+    }
+    if (message.password !== "") {
+      writer.uint32(26).string(message.password);
+    }
+    if (message.displayName !== "") {
+      writer.uint32(34).string(message.displayName);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): RegisterWithPasswordRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRegisterWithPasswordRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.username = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.password = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.displayName = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RegisterWithPasswordRequest {
+    return {
+      username: isSet(object.username) ? globalThis.String(object.username) : "",
+      password: isSet(object.password) ? globalThis.String(object.password) : "",
+      displayName: isSet(object.displayName)
+        ? globalThis.String(object.displayName)
+        : isSet(object.display_name)
+        ? globalThis.String(object.display_name)
+        : "",
+    };
+  },
+
+  toJSON(message: RegisterWithPasswordRequest): unknown {
+    const obj: any = {};
+    if (message.username !== "") {
+      obj.username = message.username;
+    }
+    if (message.password !== "") {
+      obj.password = message.password;
+    }
+    if (message.displayName !== "") {
+      obj.displayName = message.displayName;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<RegisterWithPasswordRequest>): RegisterWithPasswordRequest {
+    return RegisterWithPasswordRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RegisterWithPasswordRequest>): RegisterWithPasswordRequest {
+    const message = createBaseRegisterWithPasswordRequest();
+    message.username = object.username ?? "";
+    message.password = object.password ?? "";
+    message.displayName = object.displayName ?? "";
+    return message;
+  },
+};
+
+function createBaseRegisterWithPasswordResponse(): RegisterWithPasswordResponse {
+  return { success: false, message: "", data: undefined, timestamp: "" };
+}
+
+export const RegisterWithPasswordResponse: MessageFns<RegisterWithPasswordResponse> = {
+  encode(message: RegisterWithPasswordResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.data !== undefined) {
+      LoginData.encode(message.data, writer.uint32(26).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): RegisterWithPasswordResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRegisterWithPasswordResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.data = LoginData.decode(reader, reader.uint32());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RegisterWithPasswordResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      data: isSet(object.data) ? LoginData.fromJSON(object.data) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: RegisterWithPasswordResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.data !== undefined) {
+      obj.data = LoginData.toJSON(message.data);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<RegisterWithPasswordResponse>): RegisterWithPasswordResponse {
+    return RegisterWithPasswordResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RegisterWithPasswordResponse>): RegisterWithPasswordResponse {
+    const message = createBaseRegisterWithPasswordResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.data = (object.data !== undefined && object.data !== null) ? LoginData.fromPartial(object.data) : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseLoginWithPasswordRequest(): LoginWithPasswordRequest {
+  return { identifier: "", password: "" };
+}
+
+export const LoginWithPasswordRequest: MessageFns<LoginWithPasswordRequest> = {
+  encode(message: LoginWithPasswordRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.identifier !== "") {
+      writer.uint32(10).string(message.identifier);
+    }
+    if (message.password !== "") {
+      writer.uint32(18).string(message.password);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): LoginWithPasswordRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseLoginWithPasswordRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.identifier = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.password = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): LoginWithPasswordRequest {
+    return {
+      identifier: isSet(object.identifier) ? globalThis.String(object.identifier) : "",
+      password: isSet(object.password) ? globalThis.String(object.password) : "",
+    };
+  },
+
+  toJSON(message: LoginWithPasswordRequest): unknown {
+    const obj: any = {};
+    if (message.identifier !== "") {
+      obj.identifier = message.identifier;
+    }
+    if (message.password !== "") {
+      obj.password = message.password;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<LoginWithPasswordRequest>): LoginWithPasswordRequest {
+    return LoginWithPasswordRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<LoginWithPasswordRequest>): LoginWithPasswordRequest {
+    const message = createBaseLoginWithPasswordRequest();
+    message.identifier = object.identifier ?? "";
+    message.password = object.password ?? "";
+    return message;
+  },
+};
+
+function createBaseLoginWithPasswordResponse(): LoginWithPasswordResponse {
+  return { success: false, message: "", data: undefined, timestamp: "" };
+}
+
+export const LoginWithPasswordResponse: MessageFns<LoginWithPasswordResponse> = {
+  encode(message: LoginWithPasswordResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.data !== undefined) {
+      LoginData.encode(message.data, writer.uint32(26).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): LoginWithPasswordResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseLoginWithPasswordResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.data = LoginData.decode(reader, reader.uint32());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): LoginWithPasswordResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      data: isSet(object.data) ? LoginData.fromJSON(object.data) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: LoginWithPasswordResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.data !== undefined) {
+      obj.data = LoginData.toJSON(message.data);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<LoginWithPasswordResponse>): LoginWithPasswordResponse {
+    return LoginWithPasswordResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<LoginWithPasswordResponse>): LoginWithPasswordResponse {
+    const message = createBaseLoginWithPasswordResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.data = (object.data !== undefined && object.data !== null) ? LoginData.fromPartial(object.data) : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseLinkPasswordRequest(): LinkPasswordRequest {
+  return { username: "", password: "" };
+}
+
+export const LinkPasswordRequest: MessageFns<LinkPasswordRequest> = {
+  encode(message: LinkPasswordRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.username !== "") {
+      writer.uint32(10).string(message.username);
+    }
+    if (message.password !== "") {
+      writer.uint32(18).string(message.password);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): LinkPasswordRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseLinkPasswordRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.username = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.password = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): LinkPasswordRequest {
+    return {
+      username: isSet(object.username) ? globalThis.String(object.username) : "",
+      password: isSet(object.password) ? globalThis.String(object.password) : "",
+    };
+  },
+
+  toJSON(message: LinkPasswordRequest): unknown {
+    const obj: any = {};
+    if (message.username !== "") {
+      obj.username = message.username;
+    }
+    if (message.password !== "") {
+      obj.password = message.password;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<LinkPasswordRequest>): LinkPasswordRequest {
+    return LinkPasswordRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<LinkPasswordRequest>): LinkPasswordRequest {
+    const message = createBaseLinkPasswordRequest();
+    message.username = object.username ?? "";
+    message.password = object.password ?? "";
+    return message;
+  },
+};
+
+function createBaseLinkPasswordResponse(): LinkPasswordResponse {
+  return { success: false, message: "", timestamp: "" };
+}
+
+export const LinkPasswordResponse: MessageFns<LinkPasswordResponse> = {
+  encode(message: LinkPasswordResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(26).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): LinkPasswordResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseLinkPasswordResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): LinkPasswordResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: LinkPasswordResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<LinkPasswordResponse>): LinkPasswordResponse {
+    return LinkPasswordResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<LinkPasswordResponse>): LinkPasswordResponse {
+    const message = createBaseLinkPasswordResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseChangePasswordRequest(): ChangePasswordRequest {
+  return { currentPassword: "", newPassword: "" };
+}
+
+export const ChangePasswordRequest: MessageFns<ChangePasswordRequest> = {
+  encode(message: ChangePasswordRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.currentPassword !== "") {
+      writer.uint32(10).string(message.currentPassword);
+    }
+    if (message.newPassword !== "") {
+      writer.uint32(18).string(message.newPassword);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ChangePasswordRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChangePasswordRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.currentPassword = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.newPassword = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ChangePasswordRequest {
+    return {
+      currentPassword: isSet(object.currentPassword)
+        ? globalThis.String(object.currentPassword)
+        : isSet(object.current_password)
+        ? globalThis.String(object.current_password)
+        : "",
+      newPassword: isSet(object.newPassword)
+        ? globalThis.String(object.newPassword)
+        : isSet(object.new_password)
+        ? globalThis.String(object.new_password)
+        : "",
+    };
+  },
+
+  toJSON(message: ChangePasswordRequest): unknown {
+    const obj: any = {};
+    if (message.currentPassword !== "") {
+      obj.currentPassword = message.currentPassword;
+    }
+    if (message.newPassword !== "") {
+      obj.newPassword = message.newPassword;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ChangePasswordRequest>): ChangePasswordRequest {
+    return ChangePasswordRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChangePasswordRequest>): ChangePasswordRequest {
+    const message = createBaseChangePasswordRequest();
+    message.currentPassword = object.currentPassword ?? "";
+    message.newPassword = object.newPassword ?? "";
+    return message;
+  },
+};
+
+function createBaseChangePasswordResponse(): ChangePasswordResponse {
+  return { success: false, message: "", timestamp: "" };
+}
+
+export const ChangePasswordResponse: MessageFns<ChangePasswordResponse> = {
+  encode(message: ChangePasswordResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(26).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ChangePasswordResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseChangePasswordResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ChangePasswordResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: ChangePasswordResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ChangePasswordResponse>): ChangePasswordResponse {
+    return ChangePasswordResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ChangePasswordResponse>): ChangePasswordResponse {
+    const message = createBaseChangePasswordResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseGetAuthMethodsRequest(): GetAuthMethodsRequest {
+  return {};
+}
+
+export const GetAuthMethodsRequest: MessageFns<GetAuthMethodsRequest> = {
+  encode(_: GetAuthMethodsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAuthMethodsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetAuthMethodsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): GetAuthMethodsRequest {
+    return {};
+  },
+
+  toJSON(_: GetAuthMethodsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetAuthMethodsRequest>): GetAuthMethodsRequest {
+    return GetAuthMethodsRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<GetAuthMethodsRequest>): GetAuthMethodsRequest {
+    const message = createBaseGetAuthMethodsRequest();
+    return message;
+  },
+};
+
+function createBaseGetAuthMethodsResponse(): GetAuthMethodsResponse {
+  return { success: false, message: "", data: undefined, timestamp: "" };
+}
+
+export const GetAuthMethodsResponse: MessageFns<GetAuthMethodsResponse> = {
+  encode(message: GetAuthMethodsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.data !== undefined) {
+      AuthMethods.encode(message.data, writer.uint32(26).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAuthMethodsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetAuthMethodsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.data = AuthMethods.decode(reader, reader.uint32());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetAuthMethodsResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      data: isSet(object.data) ? AuthMethods.fromJSON(object.data) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetAuthMethodsResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.data !== undefined) {
+      obj.data = AuthMethods.toJSON(message.data);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetAuthMethodsResponse>): GetAuthMethodsResponse {
+    return GetAuthMethodsResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetAuthMethodsResponse>): GetAuthMethodsResponse {
+    const message = createBaseGetAuthMethodsResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.data = (object.data !== undefined && object.data !== null)
+      ? AuthMethods.fromPartial(object.data)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseAuthMethods(): AuthMethods {
+  return { hasGoogle: false, hasPassword: false, username: "", email: "" };
+}
+
+export const AuthMethods: MessageFns<AuthMethods> = {
+  encode(message: AuthMethods, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.hasGoogle !== false) {
+      writer.uint32(8).bool(message.hasGoogle);
+    }
+    if (message.hasPassword !== false) {
+      writer.uint32(16).bool(message.hasPassword);
+    }
+    if (message.username !== "") {
+      writer.uint32(26).string(message.username);
+    }
+    if (message.email !== "") {
+      writer.uint32(34).string(message.email);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AuthMethods {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAuthMethods();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.hasGoogle = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.hasPassword = reader.bool();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.username = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.email = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AuthMethods {
+    return {
+      hasGoogle: isSet(object.hasGoogle)
+        ? globalThis.Boolean(object.hasGoogle)
+        : isSet(object.has_google)
+        ? globalThis.Boolean(object.has_google)
+        : false,
+      hasPassword: isSet(object.hasPassword)
+        ? globalThis.Boolean(object.hasPassword)
+        : isSet(object.has_password)
+        ? globalThis.Boolean(object.has_password)
+        : false,
+      username: isSet(object.username) ? globalThis.String(object.username) : "",
+      email: isSet(object.email) ? globalThis.String(object.email) : "",
+    };
+  },
+
+  toJSON(message: AuthMethods): unknown {
+    const obj: any = {};
+    if (message.hasGoogle !== false) {
+      obj.hasGoogle = message.hasGoogle;
+    }
+    if (message.hasPassword !== false) {
+      obj.hasPassword = message.hasPassword;
+    }
+    if (message.username !== "") {
+      obj.username = message.username;
+    }
+    if (message.email !== "") {
+      obj.email = message.email;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AuthMethods>): AuthMethods {
+    return AuthMethods.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AuthMethods>): AuthMethods {
+    const message = createBaseAuthMethods();
+    message.hasGoogle = object.hasGoogle ?? false;
+    message.hasPassword = object.hasPassword ?? false;
+    message.username = object.username ?? "";
+    message.email = object.email ?? "";
+    return message;
+  },
+};
+
+function createBaseLinkGoogleRequest(): LinkGoogleRequest {
+  return { token: "" };
+}
+
+export const LinkGoogleRequest: MessageFns<LinkGoogleRequest> = {
+  encode(message: LinkGoogleRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.token !== "") {
+      writer.uint32(10).string(message.token);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): LinkGoogleRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseLinkGoogleRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.token = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): LinkGoogleRequest {
+    return { token: isSet(object.token) ? globalThis.String(object.token) : "" };
+  },
+
+  toJSON(message: LinkGoogleRequest): unknown {
+    const obj: any = {};
+    if (message.token !== "") {
+      obj.token = message.token;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<LinkGoogleRequest>): LinkGoogleRequest {
+    return LinkGoogleRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<LinkGoogleRequest>): LinkGoogleRequest {
+    const message = createBaseLinkGoogleRequest();
+    message.token = object.token ?? "";
+    return message;
+  },
+};
+
+function createBaseLinkGoogleResponse(): LinkGoogleResponse {
+  return { success: false, message: "", timestamp: "" };
+}
+
+export const LinkGoogleResponse: MessageFns<LinkGoogleResponse> = {
+  encode(message: LinkGoogleResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(26).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): LinkGoogleResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseLinkGoogleResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): LinkGoogleResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: LinkGoogleResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<LinkGoogleResponse>): LinkGoogleResponse {
+    return LinkGoogleResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<LinkGoogleResponse>): LinkGoogleResponse {
+    const message = createBaseLinkGoogleResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
     message.timestamp = object.timestamp ?? "";
     return message;
   },

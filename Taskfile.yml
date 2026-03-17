@@ -118,6 +118,18 @@ tasks:
     cmds:
       - go run cmd/migrate-gold-sentiment/main.go
 
+  backend:migrate-password-auth:
+    desc: "Add username, password_hash, auth_provider columns to user table"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-password-auth/main.go
+
+  backend:migrate-email-nullable:
+    desc: "Make email nullable for password-only users"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-email-nullable/main.go
+
   backend:migrate-admin:
     desc: "Add is_admin column to user table"
     dir: src/go-backend

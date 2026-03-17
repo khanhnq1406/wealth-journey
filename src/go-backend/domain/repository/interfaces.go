@@ -37,6 +37,9 @@ type UserRepository interface {
 
 	// Exists checks if a user exists by email.
 	ExistsByEmail(ctx context.Context, email string) (bool, error)
+
+	// GetByUsername retrieves a user by username.
+	GetByUsername(ctx context.Context, username string) (*models.User, error)
 }
 
 // WalletRepository defines the interface for wallet data operations.

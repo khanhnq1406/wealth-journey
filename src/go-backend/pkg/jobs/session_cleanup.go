@@ -45,15 +45,8 @@ func (j *SessionCleanupJob) Run(ctx context.Context) error {
 	// Clean up each expired session
 	cleanedCount := 0
 	for _, session := range expiredSessions {
-		// Get user email
-		var user models.User
-		if err := j.db.DB.First(&user, session.UserID).Error; err != nil {
-			log.Printf("[JOB] Error finding user for session %s: %v", session.SessionID, err)
-			continue
-		}
-
-		// Remove from Redis
-		if err := j.rdb.RemoveSession(user.Email, session.SessionID); err != nil {
+		// Remove from Redis using userID directly (no user lookup needed)
+		if err := j.rdb.RemoveSession(session.UserID, session.SessionID); err != nil {
 			log.Printf("[JOB] Error removing session from Redis: %v", err)
 			// Continue anyway to clean database
 		}

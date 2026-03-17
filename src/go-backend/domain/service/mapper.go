@@ -73,9 +73,14 @@ func (m *UserMapper) ModelToProto(user *models.User) *v1.User {
 		return nil
 	}
 
+	email := ""
+	if user.Email != nil {
+		email = *user.Email
+	}
+
 	return &v1.User{
 		Id:                   user.ID,
-		Email:                user.Email,
+		Email:                email,
 		Name:                 user.Name,
 		Picture:              user.Picture,
 		PreferredCurrency:    user.PreferredCurrency,

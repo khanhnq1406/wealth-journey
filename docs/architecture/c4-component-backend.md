@@ -16,7 +16,7 @@ C4Component
     }
 
     Container_Boundary(handlers, "HTTP Handlers — Input validated and user authenticated at this layer") {
-        Component(auth_h, "Auth Handlers", "Register, Login, Logout, Verify", "Google OAuth token verification, JWT issuance")
+        Component(auth_h, "Auth Handlers", "Register, Login, Logout, Verify, Password Auth", "Google OAuth + username/password auth (register, login, link, change password, get auth methods)")
         Component(user_h, "User Handlers", "CRUD + Preferences", "Handles user CRUD, preferences (currency + language), and profile operations")
         Component(wallet_h, "Wallet Handlers", "CRUD + Transfer + Balance", "Wallet management and fund operations")
         Component(txn_h, "Transaction Handlers", "CRUD + Reports", "Transaction management and financial reports")
@@ -34,7 +34,7 @@ C4Component
     }
 
     Container_Boundary(services, "Service Layer — TRUST BOUNDARY: Data considered validated after this point") {
-        Component(auth_svc, "Auth Service", "domain/auth", "Google token verification, JWT generation, session management")
+        Component(auth_svc, "Auth Service", "domain/auth", "Google OAuth + bcrypt password auth, JWT generation, session management, password change with session invalidation")
         Component(user_svc, "User Service", "domain/service", "User CRUD, preferences (currency + language), currency conversion orchestration")
         Component(wallet_svc, "Wallet Service", "domain/service", "Balance tracking, fund transfers, multi-currency support. CreateWallet forces type to BASIC regardless of request.")
         Component(txn_svc, "Transaction Service", "domain/service", "Transaction CRUD, financial reports, category breakdowns")

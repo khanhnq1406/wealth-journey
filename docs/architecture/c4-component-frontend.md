@@ -8,18 +8,18 @@ C4Component
 
     Container_Boundary(app, "App Router (Pages)") {
         Component(landing, "Landing Page", "app/landing", "Price teaser page: gold/silver/currency type tables with login links. Live TradingView gold/silver charts (no login required). Fetches from public /api/v1/public/market-types endpoint (no auth).")
-        Component(auth_pages, "Auth Pages", "app/auth", "Login and register with Google OAuth")
+        Component(auth_pages, "Auth Pages", "app/auth", "Login and register with Google OAuth + email/password forms")
         Component(dashboard, "Dashboard Home", "app/dashboard/home", "V2 Crimson & Gold: net worth, PNL card (self-contained with 1D/1W/1M/ALL period tabs), gold/silver TradingView charts (XAUUSD, XAGUSD), currency price table, wallets")
         Component(finance_page, "Finance Page", "app/dashboard/finance", "Unified tabbed view: FinanceTabBar switches between TransactionContent, ReportContent, BudgetContent via URL query params (?tab=transaction|report|budget). Content lazy-loaded via next/dynamic. Old routes (/transaction, /report, /budget) redirect here via middleware.")
         Component(wallet_page, "Wallet Page", "app/dashboard/wallets", "Wallet grid/list with fund operations")
         Component(portfolio_page, "Portfolio Page", "app/dashboard/portfolio", "Investment portfolio with analytics; period pill selector (1D/1W/1M/ALL) via PortfolioSummaryEnhanced. No wallet filter — queries all investments via walletId=0.")
         Component(prices_page, "Prices Page", "app/dashboard/prices", "Live gold/silver/currency/market prices with 4 tabs (Gold, Silver, Currency, Symbol Lookup). Admin users see inline price edit controls via useAuth isAdmin check.")
         Component(community_page, "Community Page", "app/dashboard/community", "Social feed with posts, comments, likes, user profiles")
-        Component(settings, "Settings Pages", "app/dashboard/settings", "Sessions, import templates, language toggle")
+        Component(settings, "Settings Pages", "app/dashboard/settings", "Sessions, import templates, language toggle, security (auth methods, set/change password)")
     }
 
     Container_Boundary(features, "Feature Modules (Target State)") {
-        Component(auth_feat, "Auth Feature", "features/auth", "Login/register forms, auth hooks, Redux auth state")
+        Component(auth_feat, "Auth Feature", "features/auth", "Login/register forms (Google OAuth + password), PasswordInput, PasswordStrengthIndicator, LinkPasswordForm, ChangePasswordForm, AuthMethodsCard, auth hooks, Redux auth state")
         Component(wallet_feat, "Wallet Feature", "features/wallet", "Wallet CRUD forms (type always BASIC, no type selector), wallet cards, balance display")
         Component(txn_feat, "Transaction Feature", "features/transaction", "Transaction forms, filters, cards, category management")
         Component(budget_feat, "Budget Feature", "features/budget", "Budget forms, progress cards, category breakdown")

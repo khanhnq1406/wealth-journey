@@ -50,9 +50,9 @@ func (s *SessionData) FromJSON(jsonStr string) error {
 	return nil
 }
 
-// SessionKey returns the Redis key for user's session set
-func SessionKey(email string) string {
-	return fmt.Sprintf("session:%s", email)
+// SessionKey returns the Redis key for user's session set (keyed by userID)
+func SessionKey(userID int32) string {
+	return fmt.Sprintf("session:user:%d", userID)
 }
 
 // SessionMetadataKey returns the Redis key for session metadata
@@ -119,10 +119,10 @@ func (r *RedisClient) RemoveFromWhitelist(email string) error {
 	return r.Delete(whitelistPrefix, email)
 }
 
-// AddSession adds a new session for a user
-func (r *RedisClient) AddSession(email, sessionID, token string, metadata *SessionData) error {
+// AddSession adds a new session for a user (keyed by userID)
+func (r *RedisClient) AddSession(userID int32, sessionID, token string, metadata *SessionData) error {
 	// Add session ID to user's session set
-	sessionKey := SessionKey(email)
+	sessionKey := SessionKey(userID)
 	if err := r.client.SAdd(r.ctx, sessionKey, sessionID).Err(); err != nil {
 		return fmt.Errorf("failed to add session to set: %w", err)
 	}
@@ -184,9 +184,9 @@ func (r *RedisClient) GetSessionToken(sessionID string) (string, error) {
 	return token, nil
 }
 
-// GetUserSessions retrieves all session IDs for a user
-func (r *RedisClient) GetUserSessions(email string) ([]string, error) {
-	sessionKey := SessionKey(email)
+// GetUserSessions retrieves all session IDs for a user (keyed by userID)
+func (r *RedisClient) GetUserSessions(userID int32) ([]string, error) {
+	sessionKey := SessionKey(userID)
 	sessions, err := r.client.SMembers(r.ctx, sessionKey).Result()
 	if err != nil {
 		if err == redis.Nil {
@@ -197,10 +197,10 @@ func (r *RedisClient) GetUserSessions(email string) ([]string, error) {
 	return sessions, nil
 }
 
-// RemoveSession removes a specific session for a user
-func (r *RedisClient) RemoveSession(email, sessionID string) error {
+// RemoveSession removes a specific session for a user (keyed by userID)
+func (r *RedisClient) RemoveSession(userID int32, sessionID string) error {
 	// Remove from session set
-	sessionKey := SessionKey(email)
+	sessionKey := SessionKey(userID)
 	if err := r.client.SRem(r.ctx, sessionKey, sessionID).Err(); err != nil {
 		return fmt.Errorf("failed to remove session from set: %w", err)
 	}
@@ -220,24 +220,24 @@ func (r *RedisClient) RemoveSession(email, sessionID string) error {
 	return nil
 }
 
-// RemoveAllSessions removes all sessions for a user
-func (r *RedisClient) RemoveAllSessions(email string) error {
+// RemoveAllSessions removes all sessions for a user (keyed by userID)
+func (r *RedisClient) RemoveAllSessions(userID int32) error {
 	// Get all session IDs first
-	sessions, err := r.GetUserSessions(email)
+	sessions, err := r.GetUserSessions(userID)
 	if err != nil {
 		return err
 	}
 
 	// Remove each session
 	for _, sessionID := range sessions {
-		if err := r.RemoveSession(email, sessionID); err != nil {
+		if err := r.RemoveSession(userID, sessionID); err != nil {
 			// Log error but continue removing other sessions
 			log.Printf("Error removing session %s: %v", sessionID, err)
 		}
 	}
 
 	// Delete the session set itself
-	sessionKey := SessionKey(email)
+	sessionKey := SessionKey(userID)
 	if err := r.client.Del(r.ctx, sessionKey).Err(); err != nil {
 		return fmt.Errorf("failed to delete session set: %w", err)
 	}
@@ -245,9 +245,9 @@ func (r *RedisClient) RemoveAllSessions(email string) error {
 	return nil
 }
 
-// SessionExists checks if a session exists for a user
-func (r *RedisClient) SessionExists(email, sessionID string) (bool, error) {
-	sessionKey := SessionKey(email)
+// SessionExists checks if a session exists for a user (keyed by userID)
+func (r *RedisClient) SessionExists(userID int32, sessionID string) (bool, error) {
+	sessionKey := SessionKey(userID)
 	exists, err := r.client.SIsMember(r.ctx, sessionKey, sessionID).Result()
 	if err != nil {
 		return false, fmt.Errorf("failed to check session existence: %w", err)
