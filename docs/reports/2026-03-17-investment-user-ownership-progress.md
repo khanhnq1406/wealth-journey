@@ -6,8 +6,8 @@
 - **Spec file:** docs/specs/2026-03-17-investment-user-ownership-spec.md
 - **Started:** 2026-03-17
 - **Last updated:** 2026-03-17
-- **Current state:** in_progress
-- **Current task:** 11-12
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -20,8 +20,8 @@
 | 4 | Repository Implementation | done | b0b4832 | Updated all queries to use direct user_id filter |
 | 5-8 | Service Layer Changes | done | 20dc72a | Updated all service methods for user ownership, nil-guarded wallet ops |
 | 9 | Handler Comment Update | done | — | Updated comment from "auto-select" to "no wallet association" |
-| 10 | Build Verification & Test Fixes | done | — | Build clean, all tests updated for user ownership (WalletID→*int32, removed wallet auto-select, updated mock expectations) |
-| 11-12 | Architecture & Flow Diagrams | pending | — | — |
+| 10 | Build Verification & Test Fixes | done | db44f95 | Build clean, all tests updated for user ownership (WalletID→*int32, removed wallet auto-select, updated mock expectations) |
+| 11-12 | Architecture & Flow Diagrams | done | — | Updated C4 code + component diagrams, updated Create Investment + UpdatePrices flows |
 
 ## Resume Instructions
 

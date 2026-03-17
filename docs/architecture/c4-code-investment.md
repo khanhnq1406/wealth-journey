@@ -40,15 +40,12 @@ classDiagram
         <<interface>>
         +Create(ctx, investment) error
         +GetByID(ctx, id) (*Investment, error)
-        +GetByIDAndUserID(ctx, id, userID) (*Investment, error)
-        +ListByWalletID(ctx, walletID, pagination) ([]*Investment, int64, error)
-        +ListByUserID(ctx, userID, pagination) ([]*Investment, int64, error)
+        +GetByIDForUser(ctx, id, userID) (*Investment, error)
+        +GetByUserAndSymbol(ctx, userID, symbol) (*Investment, error)
+        +ListByUserID(ctx, userID, opts, typeFilter) ([]*Investment, int, error)
+        +ListByWalletID(ctx, walletID, opts, typeFilter) ([]*Investment, int, error)
         +Update(ctx, investment) error
         +Delete(ctx, id) error
-        +GetLots(ctx, investmentID) ([]*InvestmentLot, error)
-        +CreateLot(ctx, lot) error
-        +UpdateLot(ctx, lot) error
-        +DeleteLot(ctx, id) error
     }
 
     class InvestmentTransactionRepository {
@@ -102,7 +99,7 @@ classDiagram
     class Investment {
         +ID int32
         +UserID int32
-        +WalletID int32
+        +WalletID *int32 ⟨optional⟩
         +Symbol string
         +Name string
         +Type InvestmentType
