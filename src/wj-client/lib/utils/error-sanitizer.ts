@@ -4,6 +4,22 @@
  * this provides extra protection against accidental exposure
  */
 
+// Known safe validation messages that contain sensitive keywords but are
+// intentional user-facing errors from the backend (not leaked secrets).
+const SAFE_VALIDATION_MESSAGES = new Set([
+	"no password set for this account",
+	"current password is incorrect",
+	"new password must be different from current password",
+	"password must be at least 10 characters",
+	"password must be at most 72 characters",
+	"password must contain at least one uppercase letter",
+	"password must contain at least one lowercase letter",
+	"password must contain at least one digit",
+	"password must contain at least one special character",
+	"password already set for this account",
+	"username already taken",
+]);
+
 // Patterns that indicate sensitive information
 const SENSITIVE_PATTERNS = [
 	/password/i,
@@ -35,9 +51,13 @@ const SAFE_MESSAGES = {
 } as const;
 
 /**
- * Checks if error message contains sensitive information
+ * Checks if error message contains sensitive information.
+ * Known safe validation messages are allowlisted to pass through.
  */
 export function containsSensitiveInfo(message: string): boolean {
+	if (SAFE_VALIDATION_MESSAGES.has(message.toLowerCase())) {
+		return false;
+	}
 	return SENSITIVE_PATTERNS.some((pattern) => pattern.test(message));
 }
 
