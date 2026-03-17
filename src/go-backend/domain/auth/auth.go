@@ -728,6 +728,71 @@ func (s *Server) GetAuthMethods(ctx context.Context, userID int32) (*authv1.GetA
 	}, nil
 }
 
+// LinkGoogle links a Google account to an existing user
+func (s *Server) LinkGoogle(ctx context.Context, userID int32, googleToken string) (*authv1.LinkGoogleResponse, error) {
+	// Verify Google token
+	payload, err := idtoken.Validate(ctx, googleToken, s.cfg.Google.ClientID)
+	if err != nil {
+		return nil, apperrors.NewUnauthorizedError("invalid Google token")
+	}
+
+	// Extract Google user info
+	googleEmail, _ := payload.Claims["email"].(string)
+	googlePicture, _ := payload.Claims["picture"].(string)
+
+	if googleEmail == "" {
+		return nil, apperrors.NewValidationError("Google account does not have an email")
+	}
+
+	// Get current user
+	var user models.User
+	if err := s.db.DB.First(&user, userID).Error; err != nil {
+		return nil, fmt.Errorf("user not found: %w", err)
+	}
+
+	// Check if user already has Google linked
+	if strings.Contains(user.AuthProvider, "google") {
+		return nil, apperrors.NewValidationError("Google account is already linked")
+	}
+
+	// Check if another user already has this Google email
+	var existingUser models.User
+	result := s.db.DB.Where("email = ?", googleEmail).First(&existingUser)
+	if result.Error == nil && existingUser.ID != userID {
+		return nil, apperrors.NewValidationError("this Google account is linked to a different user")
+	}
+
+	// If user has an email set, verify it matches Google email
+	if user.Email != nil && *user.Email != "" && *user.Email != googleEmail {
+		return nil, apperrors.NewValidationError("Google email does not match your account email")
+	}
+
+	// Build updates
+	updates := map[string]interface{}{
+		"auth_provider": user.AuthProvider + "+google",
+	}
+
+	// Set email from Google if user has no email
+	if user.Email == nil || *user.Email == "" {
+		updates["email"] = googleEmail
+	}
+
+	// Update picture from Google if currently empty
+	if user.Picture == "" && googlePicture != "" {
+		updates["picture"] = googlePicture
+	}
+
+	if err := s.db.DB.Model(&user).Updates(updates).Error; err != nil {
+		return nil, fmt.Errorf("failed to update user: %w", err)
+	}
+
+	return &authv1.LinkGoogleResponse{
+		Success:   true,
+		Message:   "Google account linked successfully",
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
 // LoginWithDevice is a helper for testing multi-device login
 // In production, device info is extracted from HTTP headers
 func (s *Server) LoginWithDevice(ctx context.Context, email string, deviceInfo *redis.SessionData) (string, string, error) {
