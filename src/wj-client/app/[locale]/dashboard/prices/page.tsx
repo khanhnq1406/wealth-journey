@@ -29,9 +29,11 @@ type Tab = "gold" | "silver" | "currency" | "symbol";
 function ChangeCell({
   value,
   currency,
+  divide = true,
 }: {
   value: number | null | undefined;
   currency: string;
+  divide?: boolean;
 }) {
   if (!value) return <span className="text-gray-400">—</span>;
   const isUp = value > 0;
@@ -53,7 +55,7 @@ function ChangeCell({
           d={isUp ? "M5 10l7-7m0 0l7 7m-7-7v18" : "M19 14l-7 7m0 0l-7-7m7 7V3"}
         />
       </svg>
-      <span>{formatChangeValue(value, currency)}</span>
+      <span>{formatChangeValue(value, currency, { divide })}</span>
     </span>
   );
 }
@@ -75,6 +77,8 @@ function buildTanstackColumns(
   isAdmin: boolean,
 ) {
   const typeColor = TAB_TYPE_COLOR[tab];
+  const showUnitLabel = tab !== "currency";
+  const divideValues = tab !== "currency";
   const cols = [
     columnHelper.display({
       id: "name",
@@ -99,12 +103,12 @@ function buildTanstackColumns(
       header: () => (
         <div>
           <span className="text-base font-bold">{t("table.buy")}</span>
-          <div className="font-normal text-[10px] text-gray-400">{t("table.buyUnit")}</div>
+          {showUnitLabel && <div className="font-normal text-[10px] text-gray-400">{t("table.buyUnit")}</div>}
         </div>
       ),
       cell: ({ row }) => (
         <span className="font-medium text-lred">
-          {formatPriceValue(row.original.buy, row.original.currency)}
+          {formatPriceValue(row.original.buy, row.original.currency, { divide: divideValues })}
         </span>
       ),
     }),
@@ -112,12 +116,12 @@ function buildTanstackColumns(
       header: () => (
         <div>
           <span className="text-base font-bold">{t("table.sell")}</span>
-          <div className="font-normal text-[10px] text-gray-400">{t("table.sellUnit")}</div>
+          {showUnitLabel && <div className="font-normal text-[10px] text-gray-400">{t("table.sellUnit")}</div>}
         </div>
       ),
       cell: ({ row }) => (
         <span className="font-medium text-v2-green-positive">
-          {formatPriceValue(row.original.sell, row.original.currency)}
+          {formatPriceValue(row.original.sell, row.original.currency, { divide: divideValues })}
         </span>
       ),
     }),
@@ -127,6 +131,7 @@ function buildTanstackColumns(
         <ChangeCell
           value={row.original.changeBuy}
           currency={row.original.currency}
+          divide={divideValues}
         />
       ),
     }),
@@ -155,6 +160,8 @@ function buildMobileColumns(
   isAdmin: boolean,
 ): MobileColumnDef<PriceItem>[] {
   const typeColor = TAB_TYPE_COLOR[tab];
+  const showUnitLabel = tab !== "currency";
+  const divideValues = tab !== "currency";
   const cols: MobileColumnDef<PriceItem>[] = [
     {
       id: "name",
@@ -174,12 +181,12 @@ function buildMobileColumns(
       header: (
         <div>
           <span className="text-base">{t("table.buy")}</span>
-          <span className="text-[10px] text-gray-400 ml-1">{t("table.buyUnit")}</span>
+          {showUnitLabel && <span className="text-[10px] text-gray-400 ml-1">{t("table.buyUnit")}</span>}
         </div>
       ),
       cell: ({ row }) => (
         <span className="font-medium text-lred">
-          {formatPriceValue(row.buy, row.currency)}
+          {formatPriceValue(row.buy, row.currency, { divide: divideValues })}
         </span>
       ),
     },
@@ -188,12 +195,12 @@ function buildMobileColumns(
       header: (
         <div>
           <span className="text-base">{t("table.sell")}</span>
-          <span className="text-[10px] text-gray-400 ml-1">{t("table.sellUnit")}</span>
+          {showUnitLabel && <span className="text-[10px] text-gray-400 ml-1">{t("table.sellUnit")}</span>}
         </div>
       ),
       cell: ({ row }) => (
         <span className="font-medium text-v2-green-positive">
-          {formatPriceValue(row.sell, row.currency)}
+          {formatPriceValue(row.sell, row.currency, { divide: divideValues })}
         </span>
       ),
     },
@@ -201,7 +208,7 @@ function buildMobileColumns(
       id: "change",
       header: t("table.change"),
       cell: ({ row }) => (
-        <ChangeCell value={row.changeBuy} currency={row.currency} />
+        <ChangeCell value={row.changeBuy} currency={row.currency} divide={divideValues} />
       ),
     },
   ];

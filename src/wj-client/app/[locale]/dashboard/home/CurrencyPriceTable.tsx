@@ -52,12 +52,10 @@ export function CurrencyPriceTable({
                 {t("currencyType")}
               </th>
               <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-currency-dark border-x border-white/30">
-                <div>{t("buy")}</div>
-                <div className="font-normal text-[10px] tracking-normal opacity-70">{t("buyUnit")}</div>
+                {t("buy")}
               </th>
               <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-currency-dark border-x border-white/30 last:border-r-0">
-                <div>{t("sell")}</div>
-                <div className="font-normal text-[10px] tracking-normal opacity-70">{t("sellUnit")}</div>
+                {t("sell")}
               </th>
               {isAdmin && <th className="w-10 border-x border-white/30 last:border-r-0" />}
             </tr>
@@ -77,10 +75,10 @@ export function CurrencyPriceTable({
                   />
                 </td>
                 <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-lred border-x border-v2-border-light">
-                  {formatPriceValue(item.buy, "VND")}
+                  {formatPriceValue(item.buy, "VND", { divide: false })}
                 </td>
                 <td className="px-5 py-3 text-right font-jetbrains font-medium text-[13px] text-v2-green-positive border-x border-v2-border-light last:border-r-0">
-                  {formatPriceValue(item.sell, "VND")}
+                  {formatPriceValue(item.sell, "VND", { divide: false })}
                 </td>
                 {isAdmin && (
                   <td className="px-2 py-3 border-x border-v2-border-light last:border-r-0">

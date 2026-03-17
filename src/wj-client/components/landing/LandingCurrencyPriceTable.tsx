@@ -64,12 +64,10 @@ export function LandingCurrencyPriceTable({
                 {t("currencyType")}
               </th>
               <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-currency-dark border-x border-white/30">
-                <div>{t("buy")}</div>
-                <div className="font-normal text-[10px] tracking-normal opacity-70">{t("buyUnit")}</div>
+                {t("buy")}
               </th>
               <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-currency-dark border-x border-white/30 last:border-r-0">
-                <div>{t("sell")}</div>
-                <div className="font-normal text-[10px] tracking-normal opacity-70">{t("sellUnit")}</div>
+                {t("sell")}
               </th>
             </tr>
           </thead>
