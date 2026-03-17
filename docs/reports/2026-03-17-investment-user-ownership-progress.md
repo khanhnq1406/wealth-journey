@@ -7,20 +7,20 @@
 - **Started:** 2026-03-17
 - **Last updated:** 2026-03-17
 - **Current state:** in_progress
-- **Current task:** 0
+- **Current task:** 10
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 0 | Protobuf — Add userId field | pending | — | — |
-| 1 | Database Migration | pending | — | — |
-| 2 | Model Changes | pending | — | — |
-| 3 | Repository Interface | pending | — | — |
-| 4 | Repository Implementation | pending | — | — |
-| 5-8 | Service Layer Changes | pending | — | — |
-| 9 | Handler Comment Update | pending | — | — |
-| 10 | Build Verification | pending | — | — |
+| 0 | Protobuf — Add userId field | done | b21574f | Added userId field to Investment proto message |
+| 1 | Database Migration | done | d5cf420 | 10-phase migration: add user_id, backfill, make wallet_id nullable |
+| 2 | Model Changes | done | a08d842 | Added UserID to models, made WalletID *int32, updated ToProto() |
+| 3 | Repository Interface | done | bb7afd7 | Renamed GetByWalletAndSymbol to GetByUserAndSymbol |
+| 4 | Repository Implementation | done | b0b4832 | Updated all queries to use direct user_id filter |
+| 5-8 | Service Layer Changes | done | 20dc72a | Updated all service methods for user ownership, nil-guarded wallet ops |
+| 9 | Handler Comment Update | done | — | Updated comment from "auto-select" to "no wallet association" |
+| 10 | Build Verification | in_progress | — | — |
 | 11-12 | Architecture & Flow Diagrams | pending | — | — |
 
 ## Resume Instructions
@@ -36,3 +36,4 @@ To resume this implementation in a new session:
 
 - No frontend changes needed (frontend already sends walletId: 0)
 - Backend-only changes: proto, models, repo, service, handler, migration
+- .gitignore has `migrate-*` pattern — use `git add -f` for migration files
