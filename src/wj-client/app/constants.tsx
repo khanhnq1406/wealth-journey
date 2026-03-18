@@ -87,6 +87,7 @@ export const routes = {
   prices: `/dashboard/prices`,
   community: `/dashboard/community`,
   communityProfile: `/dashboard/community?view=profile`,
+  feedback: `/dashboard/feedback`,
 };
 
 export const resources = "/resources/icons/";

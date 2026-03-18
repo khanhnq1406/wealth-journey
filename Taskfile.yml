@@ -142,6 +142,12 @@ tasks:
     cmds:
       - go run cmd/migrate-investment-user-ownership/main.go {{.CLI_ARGS}}
 
+  backend:migrate-feedback:
+    desc: "Create feedback table"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-feedback/main.go
+
   backend:set-admin:
     desc: "Grant or revoke admin access for a user by email"
     dir: src/go-backend

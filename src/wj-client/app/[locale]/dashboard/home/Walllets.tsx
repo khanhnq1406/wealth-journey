@@ -84,7 +84,7 @@ const WalletItem = memo(function WalletItem({
 
 // Memoized empty state
 const EmptyWalletsState = memo(function EmptyWalletsState() {
-  const tFeedback = useTranslations("feedback.emptyState");
+  const tFeedback = useTranslations("uiFeedback.emptyState");
   return (
     <div className="flex items-center justify-center py-8 text-gray-400">
       {tFeedback("noWalletsFound")}. {tFeedback("noWalletsDescription")}

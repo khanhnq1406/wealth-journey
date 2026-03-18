@@ -41,7 +41,7 @@ const WalletCardSkeleton = memo(function WalletCardSkeleton() {
 
 // Empty state component
 const EmptyWalletsState = memo(function EmptyWalletsState() {
-  const tFeedback = useTranslations("feedback.emptyState");
+  const tFeedback = useTranslations("uiFeedback.emptyState");
   return (
     <BaseCard className="p-8">
       <div className="flex flex-col items-center justify-center gap-4 py-12">

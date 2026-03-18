@@ -67,7 +67,7 @@
       "failedToUndoImport": "Không thể hoàn tác nhập: {error}"
     }
   },
-  "feedback": {
+  "uiFeedback": {
     "emptyState": {
       "noDataFound": "Không tìm thấy dữ liệu",
       "noResultsFound": "Không tìm thấy kết quả",

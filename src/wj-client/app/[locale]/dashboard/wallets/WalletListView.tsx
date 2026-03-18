@@ -43,7 +43,7 @@ export const WalletListView = memo(function WalletListView({
 }: WalletListViewProps) {
   const t = useTranslations("wallet");
   const tCommon = useTranslations("common");
-  const tFeedback = useTranslations("feedback.emptyState");
+  const tFeedback = useTranslations("uiFeedback.emptyState");
   const tDashboard = useTranslations("dashboard.home");
   const { currency } = useCurrency();
 

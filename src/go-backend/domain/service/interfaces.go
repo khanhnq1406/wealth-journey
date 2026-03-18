@@ -280,3 +280,9 @@ type CommunityService interface {
 	// GetReplies returns paginated replies for a comment.
 	GetReplies(ctx context.Context, viewerUserID int32, commentID int32, req *v1.GetRepliesRequest) (*v1.GetRepliesResponse, error)
 }
+
+// FeedbackService defines the interface for user feedback business logic.
+type FeedbackService interface {
+	SubmitFeedback(ctx context.Context, userID int32, req *v1.SubmitFeedbackRequest) (*v1.SubmitFeedbackResponse, error)
+	ListMyFeedback(ctx context.Context, userID int32, params types.PaginationParams) (*v1.ListMyFeedbackResponse, error)
+}

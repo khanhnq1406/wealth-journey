@@ -109,6 +109,7 @@ func ProvideRepositories(db *database.Database) *service.Repositories {
 		Hashtag:               repository.NewHashtagRepository(db),
 		GoldVote:              repository.NewGoldVoteRepository(db),
 		GoldVoteComment:       repository.NewGoldVoteCommentRepository(db),
+		Feedback:              repository.NewFeedbackRepository(db),
 	}
 }
 

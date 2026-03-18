@@ -84,7 +84,7 @@ export function ErrorState({
   className,
   icon,
 }: ErrorStateProps) {
-  const t = useTranslations("feedback.errorState");
+  const t = useTranslations("uiFeedback.errorState");
   const tCommon = useTranslations("common");
   const resolvedTitle = title ?? t("somethingWentWrong");
   const severityConfig = {
@@ -383,7 +383,7 @@ export function ErrorStatePreset({
   className,
   details,
 }: ErrorStatePresetProps) {
-  const t = useTranslations("feedback.errorState");
+  const t = useTranslations("uiFeedback.errorState");
   const tCommon = useTranslations("common");
   const keys = errorPresetTranslationKeys[type];
   const icon = errorPresetIcons[type];

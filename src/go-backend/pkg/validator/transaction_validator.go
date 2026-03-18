@@ -205,10 +205,12 @@ func ValidateTransactionDateWithConfig(date time.Time, config *TransactionValida
 	}
 
 	// Age validation (1 year threshold)
-	// Use AddDate to subtract days, then compare
-	threshold := now.AddDate(0, 0, -config.OldDateThresholdDays)
+	// Truncate to start-of-day so comparison is date-only (parsed dates have no time component)
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	threshold := today.AddDate(0, 0, -config.OldDateThresholdDays)
+	dateDay := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
 	// A date is "old" if it's strictly before the threshold (not on or after)
-	if date.Before(threshold) {
+	if dateDay.Before(threshold) {
 		errors = append(errors, &TransactionValidationError{
 			Field:    "date",
 			Message:  "Date is older than 1 year. Please verify.",

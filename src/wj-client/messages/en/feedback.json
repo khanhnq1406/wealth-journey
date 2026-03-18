@@ -1,0 +1,27 @@
+{
+  "feedback": {
+    "title": "Feedback",
+    "sendFeedback": "Send Feedback",
+    "myFeedback": "My Feedback",
+    "loading": "Loading feedback...",
+    "noFeedbackTitle": "No feedback yet",
+    "noFeedbackDescription": "Share your thoughts to help us improve the app",
+    "form": {
+      "subject": "Subject",
+      "subjectPlaceholder": "Brief summary of your feedback",
+      "message": "Message",
+      "messagePlaceholder": "Tell us what you think...",
+      "submit": "Submit Feedback",
+      "submittedSuccess": "Thank you! Your feedback has been submitted.",
+      "failedToSubmit": "Failed to submit feedback. Please try again.",
+      "rateLimited": "You've submitted too many feedback recently. Please try again later."
+    },
+    "status": {
+      "pending": "Pending",
+      "reviewed": "Reviewed",
+      "resolved": "Resolved"
+    },
+    "loadMore": "Load More",
+    "noMore": "No more feedback"
+  }
+}

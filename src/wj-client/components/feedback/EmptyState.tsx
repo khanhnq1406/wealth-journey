@@ -71,7 +71,7 @@ export function EmptyState({
   className,
   children,
 }: EmptyStateProps) {
-  const t = useTranslations("feedback.emptyState");
+  const t = useTranslations("uiFeedback.emptyState");
   const resolvedTitle = title ?? t("noDataFound");
   const sizeClasses = {
     sm: {
@@ -327,7 +327,7 @@ export function EmptyStatePreset({
   variant = "default",
   className,
 }: EmptyStatePresetProps) {
-  const t = useTranslations("feedback.emptyState");
+  const t = useTranslations("uiFeedback.emptyState");
   const keys = presetTranslationKeys[type];
   const icon = presetIcons[type];
 
