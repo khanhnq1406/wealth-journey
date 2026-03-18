@@ -159,9 +159,14 @@ async function fetchWithRetry(
 
     // Don't retry on client errors (4xx) except 408, 429
     if (response.status >= 400 && response.status < 500) {
-      if (response.status === 408 || response.status === 429) {
+      if (
+        (response.status === 408 || response.status === 429) &&
+        attempt < CONFIG.retryAttempts
+      ) {
         throw new Error(`Retryable status: ${response.status}`);
       }
+      // After max retries (or non-retryable 4xx), return response
+      // so handleErrorResponse() can parse the backend error body
       return response;
     }
 
