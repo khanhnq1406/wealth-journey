@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"strings"
 
 	"wealthjourney/domain/models"
 	"wealthjourney/pkg/database"
@@ -90,6 +91,44 @@ func (r *userRepository) GetByUsername(ctx context.Context, username string) (*m
 		return nil, r.handleDBError(result.Error, "user", "get user by username")
 	}
 	return &user, nil
+}
+
+// ListWithSearch retrieves users with optional search filter on name/email/username.
+func (r *userRepository) ListWithSearch(ctx context.Context, search string, opts ListOptions) ([]*models.User, int, error) {
+	var users []*models.User
+	var total int64
+
+	query := r.db.DB.WithContext(ctx).Model(&models.User{})
+
+	if search != "" {
+		escaped := strings.NewReplacer("%", "\\%", "_", "\\_").Replace(search)
+		pattern := "%" + escaped + "%"
+		query = query.Where("name ILIKE ? OR email ILIKE ? OR username ILIKE ?", pattern, pattern, pattern)
+	}
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, apperrors.NewInternalErrorWithCause("failed to count users", err)
+	}
+
+	orderClause := r.buildOrderClause(opts)
+	if orderClause == "" {
+		orderClause = "created_at DESC"
+	}
+
+	dataQuery := r.db.DB.WithContext(ctx)
+	if search != "" {
+		escaped := strings.NewReplacer("%", "\\%", "_", "\\_").Replace(search)
+		pattern := "%" + escaped + "%"
+		dataQuery = dataQuery.Where("name ILIKE ? OR email ILIKE ? OR username ILIKE ?", pattern, pattern, pattern)
+	}
+	dataQuery = dataQuery.Order(orderClause)
+	dataQuery = r.applyPagination(dataQuery, opts)
+
+	if err := dataQuery.Find(&users).Error; err != nil {
+		return nil, 0, apperrors.NewInternalErrorWithCause("failed to list users", err)
+	}
+
+	return users, int(total), nil
 }
 
 // Exists checks if a user exists by email.

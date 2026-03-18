@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/utils/api-client";
@@ -315,7 +316,42 @@ function AdminCMSContent() {
   );
 }
 
+type AdminTab = "seo" | "users" | "feedback";
+
+const TABS: { id: AdminTab; label: string }[] = [
+  { id: "seo", label: "SEO" },
+  { id: "users", label: "Users" },
+  { id: "feedback", label: "Feedback" },
+];
+
+function AdminUsersTab() {
+  return (
+    <div className="text-center py-12 text-neutral-500 dark:text-dark-text-tertiary">
+      Coming soon
+    </div>
+  );
+}
+
+function AdminFeedbackTab() {
+  return (
+    <div className="text-center py-12 text-neutral-500 dark:text-dark-text-tertiary">
+      Coming soon
+    </div>
+  );
+}
+
 export default function AdminCMSPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const activeTab = (searchParams.get("tab") as AdminTab) || "seo";
+
+  const handleTabChange = (tab: AdminTab) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tab);
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
   return (
     <AdminGuard>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
@@ -324,11 +360,31 @@ export default function AdminCMSPage() {
             Content Management
           </h1>
           <p className="text-sm text-neutral-500 dark:text-dark-text-tertiary mt-1">
-            Manage landing page SEO metadata and footer content
+            Manage admin settings and user data
           </p>
         </div>
 
-        <AdminCMSContent />
+        {/* Tabs */}
+        <div className="flex gap-1 border-b border-neutral-200 dark:border-dark-border mb-6">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => handleTabChange(tab.id)}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === tab.id
+                  ? "border-bg text-bg"
+                  : "border-transparent text-neutral-500 hover:text-neutral-700 dark:text-dark-text-tertiary dark:hover:text-dark-text-secondary"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab content */}
+        {activeTab === "seo" && <AdminCMSContent />}
+        {activeTab === "users" && <AdminUsersTab />}
+        {activeTab === "feedback" && <AdminFeedbackTab />}
       </div>
     </AdminGuard>
   );
