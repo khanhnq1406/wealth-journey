@@ -122,6 +122,12 @@ Implemented a `/dashboard/feedback` page where authenticated users can submit fe
 8. **Rate limit**: Submit 10+ feedback within an hour to verify 429 error
 9. **Run backend tests**: `cd src/go-backend && go test ./domain/service/ -run TestFeedback -v`
 
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-18 | Fix date age validation boundary: truncate to day granularity so 364-days-ago dates are not falsely flagged as >1 year old due to time-of-day differences between parsed date (midnight) and threshold (current time) | Minor | pending |
+
 ## Known Issues / Technical Debt
 
 - No admin UI for reviewing/resolving feedback (out of scope per spec)
