@@ -146,3 +146,6 @@ Implemented an admin CMS feature allowing admin users to edit the landing page's
 | 2026-03-18 | Fix error message leakage: handler now distinguishes validation errors (400, safe to return) from internal errors (500, generic message) | Medium | site_settings.go | (same commit) |
 | 2026-03-18 | Fix user_id extraction: use `c.GetInt("user_id")` consistent with other handlers | Minor | site_settings.go, site_settings_test.go | (same commit) |
 | 2026-03-18 | Remove unused code: removed `initialValues` state and unused `errors` from formState | Minor | admin/page.tsx | (same commit) |
+| 2026-03-18 | Fix CI build error: remove `isAdmin` access from `LoginData` type (field only exists on `User` type from VerifyAuth); hardcode `isAdmin: false` at login/register time since AuthCheck sets the real value | Critical | login/page.tsx, LoginPasswordForm.tsx, RegisterPasswordForm.tsx | (see below) |
+| 2026-03-18 | Fix CI lint error: add `user?.isAdmin` to `useMemo` deps in dashboard layout, remove unused `handleNavClick` dep, suppress React Compiler false positive | Medium | dashboard/layout.tsx | (same commit) |
+| 2026-03-18 | Fix CI lint warning: wrap `tags` array in `useMemo` in TagInput to stabilize `useCallback` dependencies | Minor | TagInput.tsx | (same commit) |

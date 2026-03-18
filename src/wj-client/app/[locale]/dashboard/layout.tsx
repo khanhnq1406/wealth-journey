@@ -123,6 +123,7 @@ export default function DashboardLayout({
   }, [path]);
 
   // Mobile navigation items for slide-out menu
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const navigationItems = useMemo(() => {
     const standardItems = [
       {
@@ -264,7 +265,7 @@ export default function DashboardLayout({
         </div>
       </div>
     );
-  }, [handleNavClick, t, path, isProfileView]);
+  }, [t, path, isProfileView, user?.isAdmin]);
 
   return (
     <AuthCheck>

@@ -39,7 +39,7 @@ export default function Login() {
             fullname: data.data.fullname,
             picture: data.data.picture,
             username: data.data.username,
-            isAdmin: data.data.isAdmin || false,
+            isAdmin: false,
           }),
         );
         router.push(routes.home);

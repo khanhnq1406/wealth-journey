@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, KeyboardEvent } from "react";
+import { useState, useCallback, useMemo, KeyboardEvent } from "react";
 import { useController } from "react-hook-form";
 import { Label } from "./Label";
 import { ErrorMessage } from "./ErrorMessage";
@@ -29,7 +29,7 @@ export function TagInput({
   } = useController({ name, control, defaultValue: [] });
 
   const [inputValue, setInputValue] = useState("");
-  const tags: string[] = Array.isArray(field.value) ? field.value : [];
+  const tags: string[] = useMemo(() => Array.isArray(field.value) ? field.value : [], [field.value]);
   const hasError = !!error;
   const errorId = `${name}-error`;
   const helperId = `${name}-helper`;
