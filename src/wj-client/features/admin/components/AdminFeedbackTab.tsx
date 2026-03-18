@@ -213,12 +213,12 @@ export function AdminFeedbackTab() {
         page_size: "10",
       });
       if (statusFilter > 0) params.set("status", String(statusFilter));
-      const response = await apiClient.get<AdminListFeedbackResponse>(
+      const response = (await apiClient.get(
         `/api/v1/admin/feedback?${params}`
-      );
-      if (response.data) {
-        setFeedback(response.data.feedback || []);
-        setTotalPages(response.data.pagination?.totalPages || 0);
+      )) as unknown as AdminListFeedbackResponse;
+      if (response.success) {
+        setFeedback(response.feedback || []);
+        setTotalPages(response.pagination?.totalPages || 0);
       }
     } catch {
       toast.error("Failed to load feedback");

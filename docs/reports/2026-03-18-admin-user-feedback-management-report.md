@@ -161,6 +161,12 @@ curl -X PUT http://localhost:8080/api/v1/admin/feedback/1 \
 # Should save: "alert(1)Looking into it" (tags stripped)
 ```
 
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-18 | Fix "no users/no feedback found" — components accessed `response.data.users` but `apiClient` returns raw JSON directly; fixed to cast response and read `response.users` / `response.feedback` | Minor | pending |
+
 ## Known Issues / Technical Debt
 
 1. **No audit logging** — Admin role changes and feedback deletions are not logged to an audit trail. Spec explicitly notes this as out of scope.

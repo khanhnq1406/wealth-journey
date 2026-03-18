@@ -62,12 +62,12 @@ export function AdminUsersTab() {
         page_size: "10",
       });
       if (debouncedSearch) params.set("search", debouncedSearch);
-      const response = await apiClient.get<AdminListUsersResponse>(
+      const response = (await apiClient.get(
         `/api/v1/admin/users?${params}`
-      );
-      if (response.data) {
-        setUsers(response.data.users || []);
-        setTotalPages(response.data.pagination?.totalPages || 0);
+      )) as unknown as AdminListUsersResponse;
+      if (response.success) {
+        setUsers(response.users || []);
+        setTotalPages(response.pagination?.totalPages || 0);
       }
     } catch {
       toast.error("Failed to load users");
