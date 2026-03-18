@@ -24,6 +24,7 @@ type Services struct {
 	Community          CommunityService
 	GoldSentiment      GoldSentimentService
 	Feedback           FeedbackService
+	SiteSettings       SiteSettingsService
 }
 
 // NewServices creates all service instances with proper dependency ordering.
@@ -52,6 +53,15 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	// Phase 1 (cont.): GoldSentimentService — depends on vote/comment repos and Redis
 	goldSentimentSvc := NewGoldSentimentService(repos.GoldVote, repos.GoldVoteComment, repos.User, redisClient)
 
+	// Phase 1 (cont.): SiteSettingsService — depends on repo and Redis cache
+	var siteSettingsSvc SiteSettingsService
+	if redisClient != nil {
+		siteSettingsCache := cache.NewSiteSettingsCache(redisClient)
+		siteSettingsSvc = NewSiteSettingsService(repos.SiteSettings, siteSettingsCache)
+	} else {
+		siteSettingsSvc = NewSiteSettingsService(repos.SiteSettings, nil)
+	}
+
 	// Phase 1 (cont.): CommunityService — depends on storage provider for image uploads
 	communitySvc := NewCommunityService(repos.Post, repos.Comment, repos.Like, repos.Follow, repos.Report, repos.User, repos.Notification, repos.SavedPost, repos.Hashtag, communityStorage, rdb)
 
@@ -69,6 +79,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		Community:        communitySvc,
 		GoldSentiment:    goldSentimentSvc,
 		Feedback:         NewFeedbackService(repos.Feedback),
+		SiteSettings:     siteSettingsSvc,
 	}
 }
 
@@ -101,6 +112,7 @@ type Repositories struct {
 	GoldVote              repository.GoldVoteRepository
 	GoldVoteComment       repository.GoldVoteCommentRepository
 	Feedback              repository.FeedbackRepository
+	SiteSettings          repository.SiteSettingsRepository
 }
 
 // NewRepositories creates all repository instances.

@@ -24,6 +24,9 @@ func RegisterRoutes(
 	}
 	{
 		publicGroup.GET("/market-types", h.Public.GetPublicMarketTypes)
+		if h.SiteSettings != nil {
+			publicGroup.GET("/site-settings", h.SiteSettings.GetSiteSettings)
+		}
 	}
 
 	// Gold Sentiment — Public routes (no auth, optional auth for user_vote)
@@ -60,6 +63,9 @@ func RegisterRoutes(
 			admin.POST("/price-overrides", h.PriceOverride.SetPriceOverride)
 			admin.GET("/price-overrides", h.PriceOverride.ListPriceOverrides)
 			admin.DELETE("/price-overrides", h.PriceOverride.DeletePriceOverride)
+		}
+		if h.SiteSettings != nil {
+			admin.PUT("/site-settings", h.SiteSettings.UpdateSiteSettings)
 		}
 	}
 

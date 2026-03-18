@@ -92,3 +92,29 @@ message DeletePriceOverrideResponse {
   bool success = 1 [json_name = "success"];
   string message = 2 [json_name = "message"];
 }
+
+// CMS — Site Settings Management
+
+message SiteSetting {
+  string key = 1 [json_name = "key"];
+  string value = 2 [json_name = "value"];
+  int32 updatedBy = 3 [json_name = "updatedBy"];
+  int64 updatedAt = 4 [json_name = "updatedAt"];
+}
+
+message GetSiteSettingsRequest {}
+
+message GetSiteSettingsResponse {
+  bool success = 1 [json_name = "success"];
+  repeated SiteSetting settings = 2 [json_name = "settings"];
+}
+
+message UpdateSiteSettingsRequest {
+  repeated SiteSetting settings = 1 [json_name = "settings"];
+}
+
+message UpdateSiteSettingsResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated SiteSetting settings = 3 [json_name = "settings"];
+}

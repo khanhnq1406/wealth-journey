@@ -40,6 +40,7 @@ import {
   Users,
   CircleUser,
   MessageCircle,
+  Shield,
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -122,6 +123,7 @@ export default function DashboardLayout({
   }, [path]);
 
   // Mobile navigation items for slide-out menu
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const navigationItems = useMemo(() => {
     const standardItems = [
       {
@@ -237,6 +239,21 @@ export default function DashboardLayout({
             <Settings size={22} />
             <span>{t("settings")}</span>
           </ActiveLink>
+          {user?.isAdmin && (
+            <ActiveLink
+              href={routes.admin}
+              disableBuiltInActive
+              className={cn(
+                "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+                path.startsWith(routes.admin)
+                  ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                  : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
+              )}
+            >
+              <Shield size={22} />
+              <span>Admin</span>
+            </ActiveLink>
+          )}
           <button
             onClick={logout}
             className="flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target w-full text-left"
@@ -248,7 +265,7 @@ export default function DashboardLayout({
         </div>
       </div>
     );
-  }, [handleNavClick, t, path, isProfileView]);
+  }, [t, path, isProfileView, user?.isAdmin]);
 
   return (
     <AuthCheck>
@@ -408,6 +425,17 @@ export default function DashboardLayout({
                   icon={<Settings size={20} />}
                   isActive={path.startsWith("/dashboard/settings")}
                 />
+                {user?.isAdmin && (
+                  <NavItem
+                    href={routes.admin}
+                    label="Admin"
+                    isExpanded={isExpanded}
+                    showTooltip={!isExpanded}
+                    animationDelay={210}
+                    icon={<Shield size={20} />}
+                    isActive={path.startsWith(routes.admin)}
+                  />
+                )}
               </div>
             </nav>
 

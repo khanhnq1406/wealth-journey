@@ -58,6 +58,12 @@ tasks:
     cmds:
       - go run ./cmd/migrate-category-idx
 
+  backend:migrate-site-settings:
+    desc: "Create site_settings table and seed initial data"
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - go run cmd/migrate-site-settings/main.go
+
   backend:migrate-sessions:
     desc: "Create session indexes for multi-device login support"
     dir: "{{.BACKEND_DIR}}"

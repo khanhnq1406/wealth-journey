@@ -30,6 +30,7 @@ type AllHandlers struct {
 	GoldSentiment  *GoldSentimentHandler
 	PriceOverride  *PriceOverrideHandler
 	Feedback       *FeedbackHandlers
+	SiteSettings   *SiteSettingsHandler
 }
 
 // HandlerDeps holds the infrastructure dependencies needed by NewHandlers.
@@ -118,7 +119,8 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 		Community:     NewCommunityHandler(services.Community, deps.RDB, deps.AuthSrv),
 		GoldSentiment:  NewGoldSentimentHandler(services.GoldSentiment, deps.AuthSrv),
 		PriceOverride:  priceOverrideHandler,
-		Feedback: NewFeedbackHandlers(services.Feedback),
+		Feedback:       NewFeedbackHandlers(services.Feedback),
+		SiteSettings:   NewSiteSettingsHandler(services.SiteSettings),
 		Public: NewPublicHandler(
 			func() service.GoldPriceService {
 				if deps.RDB != nil {

@@ -71,6 +71,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
               picture: userData.data.picture,
               username: userData.data.username,
               preferredCurrency: userData.data.preferredCurrency,
+              isAdmin: userData.data.isAdmin || false,
             }) as any,
           );
         }
