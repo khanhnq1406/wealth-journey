@@ -15,6 +15,7 @@ import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
 import { useNotification } from "@/contexts/NotificationContext";
 import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
+import { AdminUsersTab } from "@/features/admin/components/AdminUsersTab";
 
 interface SiteSetting {
   key: string;
@@ -323,14 +324,6 @@ const TABS: { id: AdminTab; label: string }[] = [
   { id: "users", label: "Users" },
   { id: "feedback", label: "Feedback" },
 ];
-
-function AdminUsersTab() {
-  return (
-    <div className="text-center py-12 text-neutral-500 dark:text-dark-text-tertiary">
-      Coming soon
-    </div>
-  );
-}
 
 function AdminFeedbackTab() {
   return (
