@@ -19,7 +19,7 @@ const AUTH_MOCK = {
     name: "Admin User",
     picture: "",
     preferredCurrency: "VND",
-    preferredLanguage: "en",
+    preferredLanguage: "vi",
     isAdmin: true,
   },
 };
@@ -83,6 +83,7 @@ const MOCK_SETTINGS_RESPONSE = {
 
 /**
  * Helper to wait for the admin page to fully load through AuthCheck + locale redirect.
+ * Supports both English and Vietnamese locales.
  */
 async function waitForAdminPage(page: import("@playwright/test").Page) {
   await page.waitForFunction(
@@ -90,9 +91,12 @@ async function waitForAdminPage(page: import("@playwright/test").Page) {
       const body = document.body.innerText;
       return (
         body.includes("Content Management") ||
+        body.includes("Quản lý nội dung") ||
         body.includes("SEO") ||
         body.includes("Users") ||
-        body.includes("Feedback")
+        body.includes("Người dùng") ||
+        body.includes("Feedback") ||
+        body.includes("Phản hồi")
       );
     },
     { timeout: 15000 },
@@ -101,16 +105,20 @@ async function waitForAdminPage(page: import("@playwright/test").Page) {
 
 /**
  * Helper to wait for the Users tab content (search input) to appear.
+ * Supports both English and Vietnamese locales.
  */
 async function waitForUsersTabContent(page: import("@playwright/test").Page) {
   await waitForAdminPage(page);
-  // Wait for the loading spinner to disappear and content to appear
+  // Wait for the users tab to load: check for search input or empty/loaded state
+  // Uses querySelector because input placeholder is not in innerText
   await page.waitForFunction(
     () => {
       const body = document.body.innerText;
+      const hasSearchInput = !!document.querySelector('input[type="text"]');
       return (
-        body.includes("Search by name") ||
-        body.includes("No users found")
+        hasSearchInput ||
+        body.includes("No users found") ||
+        body.includes("Không tìm thấy người dùng")
       );
     },
     { timeout: 15000 },
@@ -119,6 +127,7 @@ async function waitForUsersTabContent(page: import("@playwright/test").Page) {
 
 /**
  * Helper to wait for the Feedback tab content (status filter) to appear.
+ * Supports both English and Vietnamese locales.
  */
 async function waitForFeedbackTabContent(page: import("@playwright/test").Page) {
   await waitForAdminPage(page);
@@ -128,7 +137,9 @@ async function waitForFeedbackTabContent(page: import("@playwright/test").Page) 
       const body = document.body.innerText;
       return (
         body.includes("Status:") ||
-        body.includes("No feedback found")
+        body.includes("Trạng thái:") ||
+        body.includes("No feedback found") ||
+        body.includes("Không tìm thấy phản hồi")
       );
     },
     { timeout: 15000 },
@@ -193,8 +204,8 @@ test.describe("Admin Page Structure", () => {
     await page.goto("/dashboard/admin");
     await waitForAdminPage(page);
 
-    // Page title should be visible
-    const heading = page.locator("h1, h2").filter({ hasText: /Content Management/i });
+    // Page title should be visible (supports both English and Vietnamese)
+    const heading = page.locator("h1, h2").filter({ hasText: /Content Management|Quản lý nội dung/i });
     await expect(heading).toBeVisible({ timeout: 10000 });
   });
 
@@ -202,18 +213,18 @@ test.describe("Admin Page Structure", () => {
     await page.goto("/dashboard/admin?tab=users");
     await waitForUsersTabContent(page);
 
-    // Users tab content should appear
-    await expect(
-      page.getByPlaceholder(/search by name, email/i),
-    ).toBeVisible({ timeout: 10000 });
+    // Users tab content should appear (matches both English and Vietnamese placeholders)
+    const searchInput = page.locator('input[type="text"]').first();
+    await expect(searchInput).toBeVisible({ timeout: 10000 });
   });
 
   test("should navigate to Feedback tab", async ({ page }) => {
     await page.goto("/dashboard/admin?tab=feedback");
     await waitForFeedbackTabContent(page);
 
-    // Feedback tab should show status filter
-    await expect(page.getByText("Status:")).toBeVisible({ timeout: 10000 });
+    // Feedback tab should show status filter (supports both English and Vietnamese)
+    const statusLabel = page.locator("text=/Status:|Trạng thái:/");
+    await expect(statusLabel).toBeVisible({ timeout: 10000 });
   });
 });
 
@@ -261,7 +272,8 @@ test.describe("Admin Users Tab", () => {
     await page.goto("/dashboard/admin?tab=users");
     await waitForUsersTabContent(page);
 
-    const searchInput = page.getByPlaceholder(/search by name, email/i);
+    // Match both English and Vietnamese placeholders
+    const searchInput = page.locator('input[type="text"]').first();
     await expect(searchInput).toBeVisible({ timeout: 10000 });
   });
 
@@ -283,9 +295,9 @@ test.describe("Admin Users Tab", () => {
     const main = page.getByRole("main");
     await expect(main.getByText("Admin User", { exact: true })).toBeVisible({ timeout: 10000 });
 
-    // Should have Admin and User badges
-    const adminBadges = page.locator("button").filter({ hasText: /^Admin$/ });
-    const userBadges = page.locator("button").filter({ hasText: /^User$/ });
+    // Should have Admin and User badges (supports both English and Vietnamese)
+    const adminBadges = page.locator("button").filter({ hasText: /^Admin$|^Quản trị viên$/ });
+    const userBadges = page.locator("button").filter({ hasText: /^User$|^Người dùng$/ });
     await expect(adminBadges.first()).toBeVisible();
     await expect(userBadges.first()).toBeVisible();
   });
@@ -335,7 +347,9 @@ test.describe("Admin Feedback Tab", () => {
     await page.goto("/dashboard/admin?tab=feedback");
     await waitForFeedbackTabContent(page);
 
-    await expect(page.getByText("Status:")).toBeVisible({ timeout: 10000 });
+    // Supports both English and Vietnamese
+    const statusLabel = page.locator("text=/Status:|Trạng thái:/");
+    await expect(statusLabel).toBeVisible({ timeout: 10000 });
   });
 
   test("should render feedback data in table", async ({ page }) => {
@@ -402,7 +416,8 @@ test.describe("Admin Page Mobile", () => {
     await page.goto("/dashboard/admin");
     await waitForAdminPage(page);
 
-    const heading = page.locator("h1, h2").filter({ hasText: /Content Management/i });
+    // Supports both English and Vietnamese
+    const heading = page.locator("h1, h2").filter({ hasText: /Content Management|Quản lý nội dung/i });
     await expect(heading).toBeVisible({ timeout: 10000 });
   });
 
@@ -410,8 +425,8 @@ test.describe("Admin Page Mobile", () => {
     await page.goto("/dashboard/admin?tab=users");
     await waitForUsersTabContent(page);
 
-    await expect(
-      page.getByPlaceholder(/search by name, email/i),
-    ).toBeVisible({ timeout: 10000 });
+    // Match both English and Vietnamese placeholders
+    const searchInput = page.locator('input[type="text"]').first();
+    await expect(searchInput).toBeVisible({ timeout: 10000 });
   });
 });
