@@ -18,6 +18,7 @@ const messageGroups = [
   'import',      // import.*, reviewStep
   'settings',    // settings.*, currency
   'feedback',    // feedback.* (user feedback submission & history)
+  'admin',       // admin.* (CMS, users, feedback management)
   'ui',          // modals, feedback, emptyState, errorState, formWizard, skeleton,
                  // pullToRefresh, pwa, search, select, datePicker, currencySelector,
                  // dashboard, symbolAutocomplete, connectionStatus, dataFreshness,

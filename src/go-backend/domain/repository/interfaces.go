@@ -40,6 +40,9 @@ type UserRepository interface {
 
 	// GetByUsername retrieves a user by username.
 	GetByUsername(ctx context.Context, username string) (*models.User, error)
+
+	// ListWithSearch retrieves users with optional search filter on name/email/username.
+	ListWithSearch(ctx context.Context, search string, opts ListOptions) ([]*models.User, int, error)
 }
 
 // WalletRepository defines the interface for wallet data operations.
@@ -425,4 +428,9 @@ type FeedbackRepository interface {
 	Create(ctx context.Context, feedback *models.Feedback) error
 	ListByUserID(ctx context.Context, userID int32, opts ListOptions) ([]*models.Feedback, int, error)
 	CountRecentByUserID(ctx context.Context, userID int32, since time.Time) (int, error)
+	// Admin methods
+	GetByID(ctx context.Context, id int32) (*models.Feedback, error)
+	ListAll(ctx context.Context, statusFilter int16, opts ListOptions) ([]*models.Feedback, int, error)
+	Update(ctx context.Context, feedback *models.Feedback) error
+	Delete(ctx context.Context, id int32) error
 }

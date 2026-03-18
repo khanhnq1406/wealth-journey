@@ -25,6 +25,7 @@ type Services struct {
 	GoldSentiment      GoldSentimentService
 	Feedback           FeedbackService
 	SiteSettings       SiteSettingsService
+	Admin              AdminService
 }
 
 // NewServices creates all service instances with proper dependency ordering.
@@ -80,6 +81,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		GoldSentiment:    goldSentimentSvc,
 		Feedback:         NewFeedbackService(repos.Feedback),
 		SiteSettings:     siteSettingsSvc,
+		Admin:            NewAdminService(repos.User, repos.Feedback),
 	}
 }
 

@@ -6,6 +6,8 @@
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import { PaginationParams, PaginationResult } from "./common";
+import { FeedbackStatus, feedbackStatusFromJSON, feedbackStatusToJSON } from "./feedback";
 
 export const protobufPackage = "wealthjourney.admin.v1";
 
@@ -123,6 +125,91 @@ export interface DeletePriceOverrideRequest {
 export interface DeletePriceOverrideResponse {
   success: boolean;
   message: string;
+}
+
+export interface AdminUserItem {
+  id: number;
+  name: string;
+  email: string;
+  username: string;
+  picture: string;
+  authProvider: string;
+  isAdmin: boolean;
+  createdAt: number;
+}
+
+export interface AdminListUsersRequest {
+  pagination: PaginationParams | undefined;
+  search: string;
+}
+
+export interface AdminListUsersResponse {
+  success: boolean;
+  message: string;
+  users: AdminUserItem[];
+  pagination: PaginationResult | undefined;
+  timestamp: string;
+}
+
+export interface AdminToggleRoleRequest {
+  userId: number;
+  isAdmin: boolean;
+}
+
+export interface AdminToggleRoleResponse {
+  success: boolean;
+  message: string;
+  user: AdminUserItem | undefined;
+  timestamp: string;
+}
+
+export interface AdminFeedbackItem {
+  id: number;
+  userId: number;
+  userName: string;
+  userEmail: string;
+  subject: string;
+  message: string;
+  status: FeedbackStatus;
+  adminNote: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface AdminListFeedbackRequest {
+  pagination: PaginationParams | undefined;
+  status: number;
+}
+
+export interface AdminListFeedbackResponse {
+  success: boolean;
+  message: string;
+  feedback: AdminFeedbackItem[];
+  pagination: PaginationResult | undefined;
+  timestamp: string;
+}
+
+export interface AdminUpdateFeedbackRequest {
+  feedbackId: number;
+  status: number;
+  adminNote: string;
+}
+
+export interface AdminUpdateFeedbackResponse {
+  success: boolean;
+  message: string;
+  feedback: AdminFeedbackItem | undefined;
+  timestamp: string;
+}
+
+export interface AdminDeleteFeedbackRequest {
+  feedbackId: number;
+}
+
+export interface AdminDeleteFeedbackResponse {
+  success: boolean;
+  message: string;
+  timestamp: string;
 }
 
 export interface SiteSetting {
@@ -856,6 +943,1341 @@ export const DeletePriceOverrideResponse: MessageFns<DeletePriceOverrideResponse
     const message = createBaseDeletePriceOverrideResponse();
     message.success = object.success ?? false;
     message.message = object.message ?? "";
+    return message;
+  },
+};
+
+function createBaseAdminUserItem(): AdminUserItem {
+  return { id: 0, name: "", email: "", username: "", picture: "", authProvider: "", isAdmin: false, createdAt: 0 };
+}
+
+export const AdminUserItem: MessageFns<AdminUserItem> = {
+  encode(message: AdminUserItem, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== 0) {
+      writer.uint32(8).int32(message.id);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.email !== "") {
+      writer.uint32(26).string(message.email);
+    }
+    if (message.username !== "") {
+      writer.uint32(34).string(message.username);
+    }
+    if (message.picture !== "") {
+      writer.uint32(42).string(message.picture);
+    }
+    if (message.authProvider !== "") {
+      writer.uint32(50).string(message.authProvider);
+    }
+    if (message.isAdmin !== false) {
+      writer.uint32(56).bool(message.isAdmin);
+    }
+    if (message.createdAt !== 0) {
+      writer.uint32(64).int64(message.createdAt);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminUserItem {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminUserItem();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.id = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.email = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.username = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.picture = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.authProvider = reader.string();
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
+
+          message.isAdmin = reader.bool();
+          continue;
+        }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
+
+          message.createdAt = longToNumber(reader.int64());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminUserItem {
+    return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      email: isSet(object.email) ? globalThis.String(object.email) : "",
+      username: isSet(object.username) ? globalThis.String(object.username) : "",
+      picture: isSet(object.picture) ? globalThis.String(object.picture) : "",
+      authProvider: isSet(object.authProvider) ? globalThis.String(object.authProvider) : "",
+      isAdmin: isSet(object.isAdmin) ? globalThis.Boolean(object.isAdmin) : false,
+      createdAt: isSet(object.createdAt) ? globalThis.Number(object.createdAt) : 0,
+    };
+  },
+
+  toJSON(message: AdminUserItem): unknown {
+    const obj: any = {};
+    if (message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.email !== "") {
+      obj.email = message.email;
+    }
+    if (message.username !== "") {
+      obj.username = message.username;
+    }
+    if (message.picture !== "") {
+      obj.picture = message.picture;
+    }
+    if (message.authProvider !== "") {
+      obj.authProvider = message.authProvider;
+    }
+    if (message.isAdmin !== false) {
+      obj.isAdmin = message.isAdmin;
+    }
+    if (message.createdAt !== 0) {
+      obj.createdAt = Math.round(message.createdAt);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminUserItem>): AdminUserItem {
+    return AdminUserItem.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminUserItem>): AdminUserItem {
+    const message = createBaseAdminUserItem();
+    message.id = object.id ?? 0;
+    message.name = object.name ?? "";
+    message.email = object.email ?? "";
+    message.username = object.username ?? "";
+    message.picture = object.picture ?? "";
+    message.authProvider = object.authProvider ?? "";
+    message.isAdmin = object.isAdmin ?? false;
+    message.createdAt = object.createdAt ?? 0;
+    return message;
+  },
+};
+
+function createBaseAdminListUsersRequest(): AdminListUsersRequest {
+  return { pagination: undefined, search: "" };
+}
+
+export const AdminListUsersRequest: MessageFns<AdminListUsersRequest> = {
+  encode(message: AdminListUsersRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PaginationParams.encode(message.pagination, writer.uint32(10).fork()).join();
+    }
+    if (message.search !== "") {
+      writer.uint32(18).string(message.search);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminListUsersRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminListUsersRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.pagination = PaginationParams.decode(reader, reader.uint32());
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.search = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminListUsersRequest {
+    return {
+      pagination: isSet(object.pagination) ? PaginationParams.fromJSON(object.pagination) : undefined,
+      search: isSet(object.search) ? globalThis.String(object.search) : "",
+    };
+  },
+
+  toJSON(message: AdminListUsersRequest): unknown {
+    const obj: any = {};
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationParams.toJSON(message.pagination);
+    }
+    if (message.search !== "") {
+      obj.search = message.search;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminListUsersRequest>): AdminListUsersRequest {
+    return AdminListUsersRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminListUsersRequest>): AdminListUsersRequest {
+    const message = createBaseAdminListUsersRequest();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationParams.fromPartial(object.pagination)
+      : undefined;
+    message.search = object.search ?? "";
+    return message;
+  },
+};
+
+function createBaseAdminListUsersResponse(): AdminListUsersResponse {
+  return { success: false, message: "", users: [], pagination: undefined, timestamp: "" };
+}
+
+export const AdminListUsersResponse: MessageFns<AdminListUsersResponse> = {
+  encode(message: AdminListUsersResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.users) {
+      AdminUserItem.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.pagination !== undefined) {
+      PaginationResult.encode(message.pagination, writer.uint32(34).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(42).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminListUsersResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminListUsersResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.users.push(AdminUserItem.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.pagination = PaginationResult.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminListUsersResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      users: globalThis.Array.isArray(object?.users) ? object.users.map((e: any) => AdminUserItem.fromJSON(e)) : [],
+      pagination: isSet(object.pagination) ? PaginationResult.fromJSON(object.pagination) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: AdminListUsersResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.users?.length) {
+      obj.users = message.users.map((e) => AdminUserItem.toJSON(e));
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationResult.toJSON(message.pagination);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminListUsersResponse>): AdminListUsersResponse {
+    return AdminListUsersResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminListUsersResponse>): AdminListUsersResponse {
+    const message = createBaseAdminListUsersResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.users = object.users?.map((e) => AdminUserItem.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationResult.fromPartial(object.pagination)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseAdminToggleRoleRequest(): AdminToggleRoleRequest {
+  return { userId: 0, isAdmin: false };
+}
+
+export const AdminToggleRoleRequest: MessageFns<AdminToggleRoleRequest> = {
+  encode(message: AdminToggleRoleRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.userId !== 0) {
+      writer.uint32(8).int32(message.userId);
+    }
+    if (message.isAdmin !== false) {
+      writer.uint32(16).bool(message.isAdmin);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminToggleRoleRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminToggleRoleRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.userId = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.isAdmin = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminToggleRoleRequest {
+    return {
+      userId: isSet(object.userId) ? globalThis.Number(object.userId) : 0,
+      isAdmin: isSet(object.isAdmin) ? globalThis.Boolean(object.isAdmin) : false,
+    };
+  },
+
+  toJSON(message: AdminToggleRoleRequest): unknown {
+    const obj: any = {};
+    if (message.userId !== 0) {
+      obj.userId = Math.round(message.userId);
+    }
+    if (message.isAdmin !== false) {
+      obj.isAdmin = message.isAdmin;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminToggleRoleRequest>): AdminToggleRoleRequest {
+    return AdminToggleRoleRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminToggleRoleRequest>): AdminToggleRoleRequest {
+    const message = createBaseAdminToggleRoleRequest();
+    message.userId = object.userId ?? 0;
+    message.isAdmin = object.isAdmin ?? false;
+    return message;
+  },
+};
+
+function createBaseAdminToggleRoleResponse(): AdminToggleRoleResponse {
+  return { success: false, message: "", user: undefined, timestamp: "" };
+}
+
+export const AdminToggleRoleResponse: MessageFns<AdminToggleRoleResponse> = {
+  encode(message: AdminToggleRoleResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.user !== undefined) {
+      AdminUserItem.encode(message.user, writer.uint32(26).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminToggleRoleResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminToggleRoleResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.user = AdminUserItem.decode(reader, reader.uint32());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminToggleRoleResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      user: isSet(object.user) ? AdminUserItem.fromJSON(object.user) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: AdminToggleRoleResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.user !== undefined) {
+      obj.user = AdminUserItem.toJSON(message.user);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminToggleRoleResponse>): AdminToggleRoleResponse {
+    return AdminToggleRoleResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminToggleRoleResponse>): AdminToggleRoleResponse {
+    const message = createBaseAdminToggleRoleResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.user = (object.user !== undefined && object.user !== null)
+      ? AdminUserItem.fromPartial(object.user)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseAdminFeedbackItem(): AdminFeedbackItem {
+  return {
+    id: 0,
+    userId: 0,
+    userName: "",
+    userEmail: "",
+    subject: "",
+    message: "",
+    status: 0,
+    adminNote: "",
+    createdAt: 0,
+    updatedAt: 0,
+  };
+}
+
+export const AdminFeedbackItem: MessageFns<AdminFeedbackItem> = {
+  encode(message: AdminFeedbackItem, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== 0) {
+      writer.uint32(8).int32(message.id);
+    }
+    if (message.userId !== 0) {
+      writer.uint32(16).int32(message.userId);
+    }
+    if (message.userName !== "") {
+      writer.uint32(26).string(message.userName);
+    }
+    if (message.userEmail !== "") {
+      writer.uint32(34).string(message.userEmail);
+    }
+    if (message.subject !== "") {
+      writer.uint32(42).string(message.subject);
+    }
+    if (message.message !== "") {
+      writer.uint32(50).string(message.message);
+    }
+    if (message.status !== 0) {
+      writer.uint32(56).int32(message.status);
+    }
+    if (message.adminNote !== "") {
+      writer.uint32(66).string(message.adminNote);
+    }
+    if (message.createdAt !== 0) {
+      writer.uint32(72).int64(message.createdAt);
+    }
+    if (message.updatedAt !== 0) {
+      writer.uint32(80).int64(message.updatedAt);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminFeedbackItem {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminFeedbackItem();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.id = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.userId = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.userName = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.userEmail = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.subject = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
+
+          message.status = reader.int32() as any;
+          continue;
+        }
+        case 8: {
+          if (tag !== 66) {
+            break;
+          }
+
+          message.adminNote = reader.string();
+          continue;
+        }
+        case 9: {
+          if (tag !== 72) {
+            break;
+          }
+
+          message.createdAt = longToNumber(reader.int64());
+          continue;
+        }
+        case 10: {
+          if (tag !== 80) {
+            break;
+          }
+
+          message.updatedAt = longToNumber(reader.int64());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminFeedbackItem {
+    return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      userId: isSet(object.userId) ? globalThis.Number(object.userId) : 0,
+      userName: isSet(object.userName) ? globalThis.String(object.userName) : "",
+      userEmail: isSet(object.userEmail) ? globalThis.String(object.userEmail) : "",
+      subject: isSet(object.subject) ? globalThis.String(object.subject) : "",
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      status: isSet(object.status) ? feedbackStatusFromJSON(object.status) : 0,
+      adminNote: isSet(object.adminNote) ? globalThis.String(object.adminNote) : "",
+      createdAt: isSet(object.createdAt) ? globalThis.Number(object.createdAt) : 0,
+      updatedAt: isSet(object.updatedAt) ? globalThis.Number(object.updatedAt) : 0,
+    };
+  },
+
+  toJSON(message: AdminFeedbackItem): unknown {
+    const obj: any = {};
+    if (message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    if (message.userId !== 0) {
+      obj.userId = Math.round(message.userId);
+    }
+    if (message.userName !== "") {
+      obj.userName = message.userName;
+    }
+    if (message.userEmail !== "") {
+      obj.userEmail = message.userEmail;
+    }
+    if (message.subject !== "") {
+      obj.subject = message.subject;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.status !== 0) {
+      obj.status = feedbackStatusToJSON(message.status);
+    }
+    if (message.adminNote !== "") {
+      obj.adminNote = message.adminNote;
+    }
+    if (message.createdAt !== 0) {
+      obj.createdAt = Math.round(message.createdAt);
+    }
+    if (message.updatedAt !== 0) {
+      obj.updatedAt = Math.round(message.updatedAt);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminFeedbackItem>): AdminFeedbackItem {
+    return AdminFeedbackItem.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminFeedbackItem>): AdminFeedbackItem {
+    const message = createBaseAdminFeedbackItem();
+    message.id = object.id ?? 0;
+    message.userId = object.userId ?? 0;
+    message.userName = object.userName ?? "";
+    message.userEmail = object.userEmail ?? "";
+    message.subject = object.subject ?? "";
+    message.message = object.message ?? "";
+    message.status = object.status ?? 0;
+    message.adminNote = object.adminNote ?? "";
+    message.createdAt = object.createdAt ?? 0;
+    message.updatedAt = object.updatedAt ?? 0;
+    return message;
+  },
+};
+
+function createBaseAdminListFeedbackRequest(): AdminListFeedbackRequest {
+  return { pagination: undefined, status: 0 };
+}
+
+export const AdminListFeedbackRequest: MessageFns<AdminListFeedbackRequest> = {
+  encode(message: AdminListFeedbackRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.pagination !== undefined) {
+      PaginationParams.encode(message.pagination, writer.uint32(10).fork()).join();
+    }
+    if (message.status !== 0) {
+      writer.uint32(16).int32(message.status);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminListFeedbackRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminListFeedbackRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.pagination = PaginationParams.decode(reader, reader.uint32());
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.status = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminListFeedbackRequest {
+    return {
+      pagination: isSet(object.pagination) ? PaginationParams.fromJSON(object.pagination) : undefined,
+      status: isSet(object.status) ? globalThis.Number(object.status) : 0,
+    };
+  },
+
+  toJSON(message: AdminListFeedbackRequest): unknown {
+    const obj: any = {};
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationParams.toJSON(message.pagination);
+    }
+    if (message.status !== 0) {
+      obj.status = Math.round(message.status);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminListFeedbackRequest>): AdminListFeedbackRequest {
+    return AdminListFeedbackRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminListFeedbackRequest>): AdminListFeedbackRequest {
+    const message = createBaseAdminListFeedbackRequest();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationParams.fromPartial(object.pagination)
+      : undefined;
+    message.status = object.status ?? 0;
+    return message;
+  },
+};
+
+function createBaseAdminListFeedbackResponse(): AdminListFeedbackResponse {
+  return { success: false, message: "", feedback: [], pagination: undefined, timestamp: "" };
+}
+
+export const AdminListFeedbackResponse: MessageFns<AdminListFeedbackResponse> = {
+  encode(message: AdminListFeedbackResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.feedback) {
+      AdminFeedbackItem.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.pagination !== undefined) {
+      PaginationResult.encode(message.pagination, writer.uint32(34).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(42).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminListFeedbackResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminListFeedbackResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.feedback.push(AdminFeedbackItem.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.pagination = PaginationResult.decode(reader, reader.uint32());
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminListFeedbackResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      feedback: globalThis.Array.isArray(object?.feedback)
+        ? object.feedback.map((e: any) => AdminFeedbackItem.fromJSON(e))
+        : [],
+      pagination: isSet(object.pagination) ? PaginationResult.fromJSON(object.pagination) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: AdminListFeedbackResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.feedback?.length) {
+      obj.feedback = message.feedback.map((e) => AdminFeedbackItem.toJSON(e));
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationResult.toJSON(message.pagination);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminListFeedbackResponse>): AdminListFeedbackResponse {
+    return AdminListFeedbackResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminListFeedbackResponse>): AdminListFeedbackResponse {
+    const message = createBaseAdminListFeedbackResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.feedback = object.feedback?.map((e) => AdminFeedbackItem.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationResult.fromPartial(object.pagination)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseAdminUpdateFeedbackRequest(): AdminUpdateFeedbackRequest {
+  return { feedbackId: 0, status: 0, adminNote: "" };
+}
+
+export const AdminUpdateFeedbackRequest: MessageFns<AdminUpdateFeedbackRequest> = {
+  encode(message: AdminUpdateFeedbackRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.feedbackId !== 0) {
+      writer.uint32(8).int32(message.feedbackId);
+    }
+    if (message.status !== 0) {
+      writer.uint32(16).int32(message.status);
+    }
+    if (message.adminNote !== "") {
+      writer.uint32(26).string(message.adminNote);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminUpdateFeedbackRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminUpdateFeedbackRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.feedbackId = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.status = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.adminNote = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminUpdateFeedbackRequest {
+    return {
+      feedbackId: isSet(object.feedbackId) ? globalThis.Number(object.feedbackId) : 0,
+      status: isSet(object.status) ? globalThis.Number(object.status) : 0,
+      adminNote: isSet(object.adminNote) ? globalThis.String(object.adminNote) : "",
+    };
+  },
+
+  toJSON(message: AdminUpdateFeedbackRequest): unknown {
+    const obj: any = {};
+    if (message.feedbackId !== 0) {
+      obj.feedbackId = Math.round(message.feedbackId);
+    }
+    if (message.status !== 0) {
+      obj.status = Math.round(message.status);
+    }
+    if (message.adminNote !== "") {
+      obj.adminNote = message.adminNote;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminUpdateFeedbackRequest>): AdminUpdateFeedbackRequest {
+    return AdminUpdateFeedbackRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminUpdateFeedbackRequest>): AdminUpdateFeedbackRequest {
+    const message = createBaseAdminUpdateFeedbackRequest();
+    message.feedbackId = object.feedbackId ?? 0;
+    message.status = object.status ?? 0;
+    message.adminNote = object.adminNote ?? "";
+    return message;
+  },
+};
+
+function createBaseAdminUpdateFeedbackResponse(): AdminUpdateFeedbackResponse {
+  return { success: false, message: "", feedback: undefined, timestamp: "" };
+}
+
+export const AdminUpdateFeedbackResponse: MessageFns<AdminUpdateFeedbackResponse> = {
+  encode(message: AdminUpdateFeedbackResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.feedback !== undefined) {
+      AdminFeedbackItem.encode(message.feedback, writer.uint32(26).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminUpdateFeedbackResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminUpdateFeedbackResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.feedback = AdminFeedbackItem.decode(reader, reader.uint32());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminUpdateFeedbackResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      feedback: isSet(object.feedback) ? AdminFeedbackItem.fromJSON(object.feedback) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: AdminUpdateFeedbackResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.feedback !== undefined) {
+      obj.feedback = AdminFeedbackItem.toJSON(message.feedback);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminUpdateFeedbackResponse>): AdminUpdateFeedbackResponse {
+    return AdminUpdateFeedbackResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminUpdateFeedbackResponse>): AdminUpdateFeedbackResponse {
+    const message = createBaseAdminUpdateFeedbackResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.feedback = (object.feedback !== undefined && object.feedback !== null)
+      ? AdminFeedbackItem.fromPartial(object.feedback)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseAdminDeleteFeedbackRequest(): AdminDeleteFeedbackRequest {
+  return { feedbackId: 0 };
+}
+
+export const AdminDeleteFeedbackRequest: MessageFns<AdminDeleteFeedbackRequest> = {
+  encode(message: AdminDeleteFeedbackRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.feedbackId !== 0) {
+      writer.uint32(8).int32(message.feedbackId);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminDeleteFeedbackRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminDeleteFeedbackRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.feedbackId = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminDeleteFeedbackRequest {
+    return { feedbackId: isSet(object.feedbackId) ? globalThis.Number(object.feedbackId) : 0 };
+  },
+
+  toJSON(message: AdminDeleteFeedbackRequest): unknown {
+    const obj: any = {};
+    if (message.feedbackId !== 0) {
+      obj.feedbackId = Math.round(message.feedbackId);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminDeleteFeedbackRequest>): AdminDeleteFeedbackRequest {
+    return AdminDeleteFeedbackRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminDeleteFeedbackRequest>): AdminDeleteFeedbackRequest {
+    const message = createBaseAdminDeleteFeedbackRequest();
+    message.feedbackId = object.feedbackId ?? 0;
+    return message;
+  },
+};
+
+function createBaseAdminDeleteFeedbackResponse(): AdminDeleteFeedbackResponse {
+  return { success: false, message: "", timestamp: "" };
+}
+
+export const AdminDeleteFeedbackResponse: MessageFns<AdminDeleteFeedbackResponse> = {
+  encode(message: AdminDeleteFeedbackResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(26).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminDeleteFeedbackResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminDeleteFeedbackResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminDeleteFeedbackResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: AdminDeleteFeedbackResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminDeleteFeedbackResponse>): AdminDeleteFeedbackResponse {
+    return AdminDeleteFeedbackResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminDeleteFeedbackResponse>): AdminDeleteFeedbackResponse {
+    const message = createBaseAdminDeleteFeedbackResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.timestamp = object.timestamp ?? "";
     return message;
   },
 };

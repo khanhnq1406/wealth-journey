@@ -12,6 +12,7 @@ type Feedback struct {
 	Subject   string         `gorm:"size:200;not null" json:"subject"`
 	Message   string         `gorm:"type:text;not null" json:"message"`
 	Status    int16          `gorm:"type:smallint;not null;default:1" json:"status"` // 1=pending, 2=reviewed, 3=resolved
+	AdminNote string         `gorm:"type:text" json:"adminNote"`
 	CreatedAt time.Time      `gorm:"index:idx_feedback_created_at" json:"createdAt"`
 	UpdatedAt time.Time      `json:"updatedAt"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`

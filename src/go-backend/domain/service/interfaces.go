@@ -295,3 +295,12 @@ type FeedbackService interface {
 	SubmitFeedback(ctx context.Context, userID int32, req *v1.SubmitFeedbackRequest) (*v1.SubmitFeedbackResponse, error)
 	ListMyFeedback(ctx context.Context, userID int32, params types.PaginationParams) (*v1.ListMyFeedbackResponse, error)
 }
+
+// AdminService defines admin-only business logic.
+type AdminService interface {
+	ListUsers(ctx context.Context, search string, params types.PaginationParams) (*v1.AdminListUsersResponse, error)
+	ToggleAdminRole(ctx context.Context, adminUserID int32, req *v1.AdminToggleRoleRequest) (*v1.AdminToggleRoleResponse, error)
+	ListFeedback(ctx context.Context, statusFilter int32, params types.PaginationParams) (*v1.AdminListFeedbackResponse, error)
+	UpdateFeedback(ctx context.Context, feedbackID int32, req *v1.AdminUpdateFeedbackRequest) (*v1.AdminUpdateFeedbackResponse, error)
+	DeleteFeedback(ctx context.Context, feedbackID int32) (*v1.AdminDeleteFeedbackResponse, error)
+}

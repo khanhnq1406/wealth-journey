@@ -67,6 +67,17 @@ func RegisterRoutes(
 		if h.SiteSettings != nil {
 			admin.PUT("/site-settings", h.SiteSettings.UpdateSiteSettings)
 		}
+		// Admin user management
+		if h.AdminUser != nil {
+			admin.GET("/users", h.AdminUser.ListUsers)
+			admin.PUT("/users/:id/role", h.AdminUser.ToggleRole)
+		}
+		// Admin feedback management
+		if h.AdminFeedback != nil {
+			admin.GET("/feedback", h.AdminFeedback.ListFeedback)
+			admin.PUT("/feedback/:id", h.AdminFeedback.UpdateFeedback)
+			admin.DELETE("/feedback/:id", h.AdminFeedback.DeleteFeedback)
+		}
 	}
 
 	// Auth routes (higher rate limit allowed for auth)

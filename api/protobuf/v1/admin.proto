@@ -3,6 +3,8 @@ syntax = "proto3";
 package wealthjourney.admin.v1;
 
 import "google/api/annotations.proto";
+import "protobuf/v1/common.proto";
+import "protobuf/v1/feedback.proto";
 
 option go_package = "protobuf/v1";
 
@@ -27,6 +29,43 @@ service AdminService {
   rpc DeletePriceOverride(DeletePriceOverrideRequest) returns (DeletePriceOverrideResponse) {
     option (google.api.http) = {
       delete: "/api/v1/admin/price-overrides"
+    };
+  }
+
+  // AdminListUsers lists all users with optional search and pagination
+  rpc AdminListUsers(AdminListUsersRequest) returns (AdminListUsersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/users"
+    };
+  }
+
+  // AdminToggleRole toggles a user's admin role
+  rpc AdminToggleRole(AdminToggleRoleRequest) returns (AdminToggleRoleResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/admin/users/{userId}/role"
+      body: "*"
+    };
+  }
+
+  // AdminListFeedback lists all feedback with optional status filter
+  rpc AdminListFeedback(AdminListFeedbackRequest) returns (AdminListFeedbackResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/admin/feedback"
+    };
+  }
+
+  // AdminUpdateFeedback updates feedback status and admin note
+  rpc AdminUpdateFeedback(AdminUpdateFeedbackRequest) returns (AdminUpdateFeedbackResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/admin/feedback/{feedbackId}"
+      body: "*"
+    };
+  }
+
+  // AdminDeleteFeedback soft-deletes a feedback entry
+  rpc AdminDeleteFeedback(AdminDeleteFeedbackRequest) returns (AdminDeleteFeedbackResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/admin/feedback/{feedbackId}"
     };
   }
 }
@@ -91,6 +130,95 @@ message DeletePriceOverrideRequest {
 message DeletePriceOverrideResponse {
   bool success = 1 [json_name = "success"];
   string message = 2 [json_name = "message"];
+}
+
+// --- Admin User Management ---
+
+message AdminUserItem {
+  int32 id = 1 [json_name = "id"];
+  string name = 2 [json_name = "name"];
+  string email = 3 [json_name = "email"];
+  string username = 4 [json_name = "username"];
+  string picture = 5 [json_name = "picture"];
+  string authProvider = 6 [json_name = "authProvider"];
+  bool isAdmin = 7 [json_name = "isAdmin"];
+  int64 createdAt = 8 [json_name = "createdAt"];
+}
+
+message AdminListUsersRequest {
+  wealthjourney.common.v1.PaginationParams pagination = 1 [json_name = "pagination"];
+  string search = 2 [json_name = "search"];
+}
+
+message AdminListUsersResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated AdminUserItem users = 3 [json_name = "users"];
+  wealthjourney.common.v1.PaginationResult pagination = 4 [json_name = "pagination"];
+  string timestamp = 5 [json_name = "timestamp"];
+}
+
+message AdminToggleRoleRequest {
+  int32 userId = 1 [json_name = "userId"];
+  bool isAdmin = 2 [json_name = "isAdmin"];
+}
+
+message AdminToggleRoleResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  AdminUserItem user = 3 [json_name = "user"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+// --- Admin Feedback Management ---
+
+message AdminFeedbackItem {
+  int32 id = 1 [json_name = "id"];
+  int32 userId = 2 [json_name = "userId"];
+  string userName = 3 [json_name = "userName"];
+  string userEmail = 4 [json_name = "userEmail"];
+  string subject = 5 [json_name = "subject"];
+  string message = 6 [json_name = "message"];
+  wealthjourney.feedback.v1.FeedbackStatus status = 7 [json_name = "status"];
+  string adminNote = 8 [json_name = "adminNote"];
+  int64 createdAt = 9 [json_name = "createdAt"];
+  int64 updatedAt = 10 [json_name = "updatedAt"];
+}
+
+message AdminListFeedbackRequest {
+  wealthjourney.common.v1.PaginationParams pagination = 1 [json_name = "pagination"];
+  int32 status = 2 [json_name = "status"];
+}
+
+message AdminListFeedbackResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated AdminFeedbackItem feedback = 3 [json_name = "feedback"];
+  wealthjourney.common.v1.PaginationResult pagination = 4 [json_name = "pagination"];
+  string timestamp = 5 [json_name = "timestamp"];
+}
+
+message AdminUpdateFeedbackRequest {
+  int32 feedbackId = 1 [json_name = "feedbackId"];
+  int32 status = 2 [json_name = "status"];
+  string adminNote = 3 [json_name = "adminNote"];
+}
+
+message AdminUpdateFeedbackResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  AdminFeedbackItem feedback = 3 [json_name = "feedback"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+message AdminDeleteFeedbackRequest {
+  int32 feedbackId = 1 [json_name = "feedbackId"];
+}
+
+message AdminDeleteFeedbackResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
 }
 
 // CMS — Site Settings Management

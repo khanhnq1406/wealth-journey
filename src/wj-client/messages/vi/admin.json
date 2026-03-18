@@ -1,0 +1,107 @@
+{
+  "admin": {
+    "page": {
+      "title": "Quản lý nội dung",
+      "subtitle": "Quản lý cài đặt hệ thống và dữ liệu người dùng",
+      "tabs": {
+        "seo": "SEO",
+        "users": "Người dùng",
+        "feedback": "Phản hồi"
+      },
+      "loading": "Đang tải cài đặt..."
+    },
+    "cms": {
+      "seoMetadata": "Thông tin SEO",
+      "footerContent": "Nội dung chân trang",
+      "saveSettings": "Lưu cài đặt",
+      "savedSuccess": "Đã lưu cài đặt thành công!",
+      "saveFailed": "Không thể lưu cài đặt"
+    },
+    "users": {
+      "searchPlaceholder": "Tìm kiếm theo tên, email hoặc tên đăng nhập...",
+      "columns": {
+        "name": "Họ tên",
+        "email": "Email",
+        "provider": "Nhà cung cấp",
+        "admin": "Quản trị",
+        "created": "Ngày tạo"
+      },
+      "loading": "Đang tải danh sách người dùng...",
+      "noUsers": "Không tìm thấy người dùng",
+      "loadFailed": "Không thể tải danh sách người dùng",
+      "roleBadge": {
+        "admin": "Quản trị viên",
+        "user": "Người dùng"
+      },
+      "roleTooltip": {
+        "cannotSelf": "Không thể thay đổi quyền của chính mình",
+        "revoke": "Nhấn để thu hồi quyền quản trị",
+        "grant": "Nhấn để cấp quyền quản trị"
+      },
+      "dialog": {
+        "revokeTitle": "Thu hồi quyền quản trị",
+        "grantTitle": "Cấp quyền quản trị",
+        "revokeMessage": "Bạn có chắc chắn muốn thu hồi quyền quản trị của {name}?",
+        "grantMessage": "Bạn có chắc chắn muốn cấp quyền quản trị cho {name}?",
+        "revokeConfirm": "Thu hồi",
+        "grantConfirm": "Cấp quyền"
+      },
+      "toast": {
+        "revokeSuccess": "Đã thu hồi quyền quản trị của {name}",
+        "grantSuccess": "Đã cấp quyền quản trị cho {name}",
+        "toggleFailed": "Không thể thay đổi quyền quản trị"
+      }
+    },
+    "feedback": {
+      "statusLabel": "Trạng thái:",
+      "statusFilter": {
+        "all": "Tất cả",
+        "pending": "Chờ xử lý",
+        "reviewed": "Đã xem",
+        "resolved": "Đã giải quyết"
+      },
+      "statusBadge": {
+        "pending": "Chờ xử lý",
+        "reviewed": "Đã xem",
+        "resolved": "Đã giải quyết",
+        "unknown": "Không xác định"
+      },
+      "columns": {
+        "subject": "Tiêu đề",
+        "user": "Người dùng",
+        "status": "Trạng thái",
+        "message": "Nội dung",
+        "created": "Ngày tạo"
+      },
+      "loading": "Đang tải phản hồi...",
+      "noFeedback": "Không tìm thấy phản hồi",
+      "loadFailed": "Không thể tải danh sách phản hồi",
+      "editPanel": {
+        "title": "Phản hồi #{id}",
+        "subject": "Tiêu đề",
+        "from": "Từ",
+        "message": "Nội dung",
+        "status": "Trạng thái",
+        "adminNote": "Ghi chú quản trị viên",
+        "notePlaceholder": "Thêm ghi chú...",
+        "save": "Lưu",
+        "delete": "Xóa"
+      },
+      "dialog": {
+        "deleteTitle": "Xóa phản hồi",
+        "deleteMessage": "Bạn có chắc chắn muốn xóa phản hồi \"{subject}\" từ {name}? Thao tác này không thể hoàn tác.",
+        "deleteConfirm": "Xóa"
+      },
+      "toast": {
+        "updateSuccess": "Đã cập nhật phản hồi",
+        "updateFailed": "Không thể cập nhật phản hồi",
+        "deleteSuccess": "Đã xóa phản hồi",
+        "deleteFailed": "Không thể xóa phản hồi"
+      }
+    },
+    "pagination": {
+      "prev": "Trước",
+      "next": "Sau"
+    }
+  }
+}

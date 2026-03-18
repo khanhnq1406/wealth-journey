@@ -1,0 +1,107 @@
+{
+  "admin": {
+    "page": {
+      "title": "Content Management",
+      "subtitle": "Manage admin settings and user data",
+      "tabs": {
+        "seo": "SEO",
+        "users": "Users",
+        "feedback": "Feedback"
+      },
+      "loading": "Loading settings..."
+    },
+    "cms": {
+      "seoMetadata": "SEO Metadata",
+      "footerContent": "Footer Content",
+      "saveSettings": "Save Settings",
+      "savedSuccess": "Settings saved successfully!",
+      "saveFailed": "Failed to save settings"
+    },
+    "users": {
+      "searchPlaceholder": "Search by name, email, or username...",
+      "columns": {
+        "name": "Name",
+        "email": "Email",
+        "provider": "Provider",
+        "admin": "Admin",
+        "created": "Created"
+      },
+      "loading": "Loading users...",
+      "noUsers": "No users found",
+      "loadFailed": "Failed to load users",
+      "roleBadge": {
+        "admin": "Admin",
+        "user": "User"
+      },
+      "roleTooltip": {
+        "cannotSelf": "Cannot modify your own role",
+        "revoke": "Click to revoke admin",
+        "grant": "Click to grant admin"
+      },
+      "dialog": {
+        "revokeTitle": "Revoke Admin",
+        "grantTitle": "Grant Admin",
+        "revokeMessage": "Are you sure you want to revoke admin access from {name}?",
+        "grantMessage": "Are you sure you want to grant admin access to {name}?",
+        "revokeConfirm": "Revoke",
+        "grantConfirm": "Grant"
+      },
+      "toast": {
+        "revokeSuccess": "Admin role revoked for {name}",
+        "grantSuccess": "Admin role granted for {name}",
+        "toggleFailed": "Failed to toggle admin role"
+      }
+    },
+    "feedback": {
+      "statusLabel": "Status:",
+      "statusFilter": {
+        "all": "All",
+        "pending": "Pending",
+        "reviewed": "Reviewed",
+        "resolved": "Resolved"
+      },
+      "statusBadge": {
+        "pending": "Pending",
+        "reviewed": "Reviewed",
+        "resolved": "Resolved",
+        "unknown": "Unknown"
+      },
+      "columns": {
+        "subject": "Subject",
+        "user": "User",
+        "status": "Status",
+        "message": "Message",
+        "created": "Created"
+      },
+      "loading": "Loading feedback...",
+      "noFeedback": "No feedback found",
+      "loadFailed": "Failed to load feedback",
+      "editPanel": {
+        "title": "Feedback #{id}",
+        "subject": "Subject",
+        "from": "From",
+        "message": "Message",
+        "status": "Status",
+        "adminNote": "Admin Note",
+        "notePlaceholder": "Add a note...",
+        "save": "Save",
+        "delete": "Delete"
+      },
+      "dialog": {
+        "deleteTitle": "Delete Feedback",
+        "deleteMessage": "Are you sure you want to delete feedback \"{subject}\" from {name}? This action cannot be undone.",
+        "deleteConfirm": "Delete"
+      },
+      "toast": {
+        "updateSuccess": "Feedback updated",
+        "updateFailed": "Failed to update feedback",
+        "deleteSuccess": "Feedback deleted",
+        "deleteFailed": "Failed to delete feedback"
+      }
+    },
+    "pagination": {
+      "prev": "Prev",
+      "next": "Next"
+    }
+  }
+}

@@ -154,6 +154,12 @@ tasks:
     cmds:
       - go run cmd/migrate-feedback/main.go
 
+  backend:migrate-feedback-admin-note:
+    desc: "Add admin_note column to feedback table"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-feedback-admin-note/main.go
+
   backend:set-admin:
     desc: "Grant or revoke admin access for a user by email"
     dir: src/go-backend
