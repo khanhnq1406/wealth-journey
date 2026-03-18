@@ -10,9 +10,34 @@ on:
     paths:
       - 'src/wj-client/**'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
-  lint-and-test:
-    name: Lint & Test
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      frontend-src: ${{ steps.filter.outputs.frontend-src }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dorny/paths-filter@d1c1ffe0248fe513906c8e24db8ea791d46f8590  # v3.0.3
+        id: filter
+        with:
+          filters: |
+            frontend-src:
+              - 'src/wj-client/app/**'
+              - 'src/wj-client/components/**'
+              - 'src/wj-client/features/**'
+              - 'src/wj-client/hooks/**'
+              - 'src/wj-client/contexts/**'
+              - 'src/wj-client/lib/**'
+              - 'src/wj-client/utils/**'
+
+  lint-test-build:
+    name: Lint, Test & Build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -23,10 +48,16 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: src/wj-client/package-lock.json
+
+      - name: Cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: src/wj-client/node_modules
+          key: node-modules-${{ hashFiles('src/wj-client/package-lock.json') }}
 
       - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci
 
       - name: Run linter
@@ -48,96 +79,68 @@ jobs:
           npx jest --ci --coverage 2>&1 | tee /tmp/ci-errors/jest-output.txt
           exit ${PIPESTATUS[0]}
 
-      - name: Capture frontend errors
-        if: failure()
-        run: |
-          {
-            echo "## Frontend Lint & Test Errors"
-            echo "Job: ${{ github.job }} | Run: ${{ github.run_id }}"
-            echo ""
-            if [ -s /tmp/ci-errors/lint-output.txt ]; then
-              echo "### ESLint errors:"
-              cat /tmp/ci-errors/lint-output.txt
-              echo ""
-            fi
-            if [ -s /tmp/ci-errors/typecheck-output.txt ]; then
-              echo "### TypeScript errors:"
-              cat /tmp/ci-errors/typecheck-output.txt
-              echo ""
-            fi
-            if [ -s /tmp/ci-errors/jest-output.txt ]; then
-              echo "### Jest test failures:"
-              grep -E "^(FAIL|●|✕|×)" /tmp/ci-errors/jest-output.txt || cat /tmp/ci-errors/jest-output.txt
-            fi
-          } > /tmp/ci-errors/errors.txt
-
-      - name: Write frontend errors to job summary
-        if: failure()
-        run: |
-          echo "## ❌ Frontend Lint & Tests Failed" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          cat /tmp/ci-errors/errors.txt >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-
-      - name: Upload frontend error artifact
-        if: failure()
-        uses: actions/upload-artifact@v4
+      - name: Cache Next.js build
+        uses: actions/cache@v4
         with:
-          name: frontend-lint-test-errors
-          path: /tmp/ci-errors/errors.txt
-          retention-days: 7
-
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: src/wj-client
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: src/wj-client/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
+          path: src/wj-client/.next/cache
+          key: nextjs-${{ hashFiles('src/wj-client/package-lock.json') }}-${{ hashFiles('src/wj-client/**/*.ts', 'src/wj-client/**/*.tsx') }}
+          restore-keys: |
+            nextjs-${{ hashFiles('src/wj-client/package-lock.json') }}-
 
       - name: Build Next.js
         id: nextjs-build
         run: |
-          mkdir -p /tmp/ci-errors
           npm run build 2>&1 | tee /tmp/ci-errors/build-output.txt
           exit ${PIPESTATUS[0]}
 
-      - name: Capture build errors
+      - name: Capture errors
         if: failure()
         run: |
-          echo "## Frontend Build Errors" > /tmp/ci-errors/errors.txt
-          echo "Job: ${{ github.job }} | Run: ${{ github.run_id }}" >> /tmp/ci-errors/errors.txt
-          echo "" >> /tmp/ci-errors/errors.txt
-          cat /tmp/ci-errors/build-output.txt >> /tmp/ci-errors/errors.txt
+          {
+            echo "## Frontend Lint, Test & Build Errors"
+            echo "Job: ${{ github.job }} | Run: ${{ github.run_id }}"
+            echo ""
+            if [ -s /tmp/ci-errors/lint-output.txt ] && [ "${{ steps.lint.outcome }}" == "failure" ]; then
+              echo "### ESLint errors:"
+              cat /tmp/ci-errors/lint-output.txt
+              echo ""
+            fi
+            if [ -s /tmp/ci-errors/typecheck-output.txt ] && [ "${{ steps.typecheck.outcome }}" == "failure" ]; then
+              echo "### TypeScript errors:"
+              cat /tmp/ci-errors/typecheck-output.txt
+              echo ""
+            fi
+            if [ -s /tmp/ci-errors/jest-output.txt ] && [ "${{ steps.jest.outcome }}" == "failure" ]; then
+              echo "### Jest test failures:"
+              grep -E "^(FAIL|●|✕|×)" /tmp/ci-errors/jest-output.txt || cat /tmp/ci-errors/jest-output.txt
+              echo ""
+            fi
+            if [ -s /tmp/ci-errors/build-output.txt ] && [ "${{ steps.nextjs-build.outcome }}" == "failure" ]; then
+              echo "### Build errors:"
+              grep -E "^(Error|Failed|error TS)" /tmp/ci-errors/build-output.txt | head -50 || cat /tmp/ci-errors/build-output.txt | tail -50
+            fi
+          } > /tmp/ci-errors/errors.txt
 
-      - name: Write build errors to job summary
+      - name: Write errors to job summary
         if: failure()
         run: |
-          echo "## ❌ Frontend Build Failed" >> $GITHUB_STEP_SUMMARY
+          echo "## ❌ Frontend Lint, Test & Build Failed" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          grep -E "^(Error|Failed|error TS)" /tmp/ci-errors/build-output.txt | head -50 || cat /tmp/ci-errors/build-output.txt | tail -50 >> $GITHUB_STEP_SUMMARY
+          cat /tmp/ci-errors/errors.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
-      - name: Upload build error artifact
+      - name: Upload error artifact
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-build-errors
+          name: frontend-lint-test-build-errors
           path: /tmp/ci-errors/errors.txt
           retention-days: 7
 
   e2e:
     name: E2E Tests
+    needs: [changes]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -148,14 +151,32 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: src/wj-client/package-lock.json
+
+      - name: Cache node_modules
+        id: cache-node-modules
+        uses: actions/cache@v4
+        with:
+          path: src/wj-client/node_modules
+          key: node-modules-${{ hashFiles('src/wj-client/package-lock.json') }}
 
       - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci
 
+      - name: Cache Playwright browsers
+        id: cache-playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('src/wj-client/package-lock.json') }}
+
       - name: Install Playwright Chromium
+        if: steps.cache-playwright.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright system dependencies
+        if: steps.cache-playwright.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
 
       - name: Run E2E tests
         run: npx playwright test --project=chromium

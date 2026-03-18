@@ -10,8 +10,50 @@ import { test, expect } from "@playwright/test";
  * - Search functionality
  */
 
+const AUTH_MOCK = {
+  success: true,
+  data: {
+    email: "user@test.com",
+    name: "Test User",
+    picture: "",
+    preferredCurrency: "VND",
+    preferredLanguage: "vi",
+    isAdmin: false,
+  },
+};
+
+async function setupAuthMocks(page: import("@playwright/test").Page) {
+  await page.route("**/api/v1/auth/verify**", (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(AUTH_MOCK),
+    });
+  });
+
+  await page.route("**/api/v1/wallets**", (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ success: true, wallets: [], total: 0 }),
+    });
+  });
+
+  await page.route("**/api/v1/public/site-settings**", (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        success: true,
+        data: { settings: [] },
+      }),
+    });
+  });
+}
+
 test.describe("Filter Transactions", () => {
   test.beforeEach(async ({ page }) => {
+    await setupAuthMocks(page);
     await page.goto("/auth/login");
     await page.evaluate(() => {
       localStorage.setItem("token", "mock-test-token");
@@ -158,6 +200,7 @@ test.describe("Filter Transactions", () => {
 
 test.describe("Transaction Sorting", () => {
   test.beforeEach(async ({ page }) => {
+    await setupAuthMocks(page);
     await page.goto("/auth/login");
     await page.evaluate(() => {
       localStorage.setItem("token", "mock-test-token");
@@ -201,6 +244,7 @@ test.describe("Mobile Transaction Filters", () => {
   test.use({ viewport: { width: 375, height: 667 } });
 
   test("should display filters on mobile", async ({ page }) => {
+    await setupAuthMocks(page);
     await page.goto("/auth/login");
     await page.evaluate(() => {
       localStorage.setItem("token", "mock-test-token");
@@ -222,6 +266,7 @@ test.describe("Mobile Transaction Filters", () => {
   });
 
   test("should have collapsible filters on mobile", async ({ page }) => {
+    await setupAuthMocks(page);
     await page.goto("/auth/login");
     await page.evaluate(() => {
       localStorage.setItem("token", "mock-test-token");
