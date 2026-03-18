@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 interface PaginationProps {
   page: number;
   totalPages: number;
@@ -7,6 +9,8 @@ interface PaginationProps {
 }
 
 export function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
+  const t = useTranslations("admin.pagination");
+
   if (totalPages <= 1) return null;
 
   return (
@@ -16,7 +20,7 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
         disabled={page <= 1}
         className="px-3 py-1 text-sm rounded border border-neutral-200 dark:border-dark-border disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-50 dark:hover:bg-dark-hover transition-colors"
       >
-        Prev
+        {t("prev")}
       </button>
       <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">
         {page} / {totalPages}
@@ -26,7 +30,7 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
         disabled={page >= totalPages}
         className="px-3 py-1 text-sm rounded border border-neutral-200 dark:border-dark-border disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-50 dark:hover:bg-dark-hover transition-colors"
       >
-        Next
+        {t("next")}
       </button>
     </div>
   );

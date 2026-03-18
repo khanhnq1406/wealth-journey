@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { apiClient } from "@/utils/api-client";
 import { MobileTable } from "@/components/table/MobileTable";
 import type { MobileColumnDef } from "@/components/table/MobileTable";
@@ -36,34 +37,35 @@ interface AdminListFeedbackResponse {
   };
 }
 
-const STATUS_OPTIONS = [
-  { value: 0, label: "All" },
-  { value: 1, label: "Pending" },
-  { value: 2, label: "Reviewed" },
-  { value: 3, label: "Resolved" },
-];
+const STATUS_VALUES = [
+  { value: 0, key: "all" },
+  { value: 1, key: "pending" },
+  { value: 2, key: "reviewed" },
+  { value: 3, key: "resolved" },
+] as const;
 
 function StatusBadge({ status }: { status: number }) {
-  const config: Record<number, { label: string; className: string }> = {
+  const t = useTranslations("admin.feedback.statusBadge");
+  const config: Record<number, { labelKey: string; className: string }> = {
     1: {
-      label: "Pending",
+      labelKey: "pending",
       className:
         "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
     },
     2: {
-      label: "Reviewed",
+      labelKey: "reviewed",
       className:
         "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
     },
     3: {
-      label: "Resolved",
+      labelKey: "resolved",
       className:
         "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
     },
   };
 
-  const { label, className } = config[status] || {
-    label: "Unknown",
+  const { labelKey, className } = config[status] || {
+    labelKey: "unknown",
     className:
       "bg-neutral-100 text-neutral-500 dark:bg-dark-hover dark:text-dark-text-tertiary",
   };
@@ -72,7 +74,7 @@ function StatusBadge({ status }: { status: number }) {
     <span
       className={`px-2 py-0.5 text-xs font-medium rounded-full ${className}`}
     >
-      {label}
+      {t(labelKey)}
     </span>
   );
 }
@@ -88,12 +90,14 @@ interface EditPanelProps {
 function EditPanel({ item, onSave, onDelete, onClose, isSaving }: EditPanelProps) {
   const [note, setNote] = useState(item.adminNote || "");
   const [status, setStatus] = useState(item.status);
+  const t = useTranslations("admin.feedback");
+  const tFilter = useTranslations("admin.feedback.statusFilter");
 
   return (
     <BaseCard padding="lg">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-neutral-900 dark:text-dark-text">
-          Feedback #{item.id}
+          {t("editPanel.title", { id: item.id })}
         </h3>
         <button
           onClick={onClose}
@@ -109,7 +113,7 @@ function EditPanel({ item, onSave, onDelete, onClose, isSaving }: EditPanelProps
         {/* Subject */}
         <div>
           <p className="text-xs font-medium text-neutral-500 dark:text-dark-text-tertiary mb-1">
-            Subject
+            {t("editPanel.subject")}
           </p>
           <p className="text-sm font-medium text-neutral-900 dark:text-dark-text">
             {item.subject}
@@ -119,7 +123,7 @@ function EditPanel({ item, onSave, onDelete, onClose, isSaving }: EditPanelProps
         {/* User */}
         <div>
           <p className="text-xs font-medium text-neutral-500 dark:text-dark-text-tertiary mb-1">
-            From
+            {t("editPanel.from")}
           </p>
           <p className="text-sm text-neutral-700 dark:text-dark-text-secondary">
             {item.userName} ({item.userEmail})
@@ -129,7 +133,7 @@ function EditPanel({ item, onSave, onDelete, onClose, isSaving }: EditPanelProps
         {/* Message */}
         <div>
           <p className="text-xs font-medium text-neutral-500 dark:text-dark-text-tertiary mb-1">
-            Message
+            {t("editPanel.message")}
           </p>
           <p className="text-sm text-neutral-700 dark:text-dark-text-secondary whitespace-pre-wrap bg-neutral-50 dark:bg-dark-hover rounded-lg p-3">
             {item.message}
@@ -139,30 +143,30 @@ function EditPanel({ item, onSave, onDelete, onClose, isSaving }: EditPanelProps
         {/* Status dropdown */}
         <div>
           <label className="block text-xs font-medium text-neutral-500 dark:text-dark-text-tertiary mb-1">
-            Status
+            {t("editPanel.status")}
           </label>
           <select
             value={status}
             onChange={(e) => setStatus(Number(e.target.value))}
             className="w-full sm:w-48 px-3 py-1.5 text-sm border border-neutral-200 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg focus:outline-none focus:ring-2 focus:ring-bg/50 dark:text-dark-text"
           >
-            <option value={1}>Pending</option>
-            <option value={2}>Reviewed</option>
-            <option value={3}>Resolved</option>
+            <option value={1}>{tFilter("pending")}</option>
+            <option value={2}>{tFilter("reviewed")}</option>
+            <option value={3}>{tFilter("resolved")}</option>
           </select>
         </div>
 
         {/* Admin note */}
         <div>
           <label className="block text-xs font-medium text-neutral-500 dark:text-dark-text-tertiary mb-1">
-            Admin Note
+            {t("editPanel.adminNote")}
           </label>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
             maxLength={2000}
             rows={3}
-            placeholder="Add a note..."
+            placeholder={t("editPanel.notePlaceholder")}
             className="w-full px-3 py-2 text-sm border border-neutral-200 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg focus:outline-none focus:ring-2 focus:ring-bg/50 dark:text-dark-text resize-none"
           />
           <p className="text-xs text-neutral-400 dark:text-dark-text-tertiary mt-0.5 text-right">
@@ -178,13 +182,13 @@ function EditPanel({ item, onSave, onDelete, onClose, isSaving }: EditPanelProps
             loading={isSaving}
             className="text-sm"
           >
-            Save
+            {t("editPanel.save")}
           </Button>
           <button
             onClick={() => onDelete(item)}
             className="px-3 py-1.5 text-sm text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
           >
-            Delete
+            {t("editPanel.delete")}
           </button>
         </div>
       </div>
@@ -194,6 +198,13 @@ function EditPanel({ item, onSave, onDelete, onClose, isSaving }: EditPanelProps
 
 export function AdminFeedbackTab() {
   const { toast } = useNotification();
+  const t = useTranslations("admin.feedback");
+  const tFilter = useTranslations("admin.feedback.statusFilter");
+
+  const STATUS_OPTIONS = STATUS_VALUES.map((s) => ({
+    value: s.value,
+    label: tFilter(s.key),
+  }));
 
   const [feedback, setFeedback] = useState<AdminFeedbackItem[]>([]);
   const [page, setPage] = useState(1);
@@ -221,11 +232,11 @@ export function AdminFeedbackTab() {
         setTotalPages(response.pagination?.totalPages || 0);
       }
     } catch {
-      toast.error("Failed to load feedback");
+      toast.error(t("loadFailed"));
     } finally {
       setIsLoading(false);
     }
-  }, [page, statusFilter, toast]);
+  }, [page, statusFilter, toast, t]);
 
   useEffect(() => {
     fetchFeedback();
@@ -244,14 +255,14 @@ export function AdminFeedbackTab() {
         adminNote,
       });
       if (response.success) {
-        toast.success("Feedback updated");
+        toast.success(t("toast.updateSuccess"));
         setSelectedItem(null);
         fetchFeedback();
       } else {
-        toast.error(response.message || "Failed to update feedback");
+        toast.error(response.message || t("toast.updateFailed"));
       }
     } catch (error: any) {
-      toast.error(error.message || "Failed to update feedback");
+      toast.error(error.message || t("toast.updateFailed"));
     } finally {
       setIsSaving(false);
     }
@@ -265,16 +276,16 @@ export function AdminFeedbackTab() {
         `/api/v1/admin/feedback/${deleteTarget.id}`
       );
       if (response.success) {
-        toast.success("Feedback deleted");
+        toast.success(t("toast.deleteSuccess"));
         if (selectedItem?.id === deleteTarget.id) {
           setSelectedItem(null);
         }
         fetchFeedback();
       } else {
-        toast.error("Failed to delete feedback");
+        toast.error(t("toast.deleteFailed"));
       }
     } catch (error: any) {
-      toast.error(error.message || "Failed to delete feedback");
+      toast.error(error.message || t("toast.deleteFailed"));
     } finally {
       setIsDeleting(false);
       setDeleteTarget(null);
@@ -284,7 +295,7 @@ export function AdminFeedbackTab() {
   const columns: MobileColumnDef<AdminFeedbackItem>[] = [
     {
       id: "subject",
-      header: "Subject",
+      header: t("columns.subject"),
       showInCollapsed: true,
       cell: ({ row }) => (
         <button
@@ -300,7 +311,7 @@ export function AdminFeedbackTab() {
     },
     {
       id: "userName",
-      header: "User",
+      header: t("columns.user"),
       showInCollapsed: true,
       cell: ({ row }) => (
         <span className="text-neutral-600 dark:text-dark-text-secondary text-sm truncate max-w-[150px] inline-block">
@@ -310,13 +321,13 @@ export function AdminFeedbackTab() {
     },
     {
       id: "status",
-      header: "Status",
+      header: t("columns.status"),
       showInCollapsed: true,
       cell: ({ row }) => <StatusBadge status={row.status} />,
     },
     {
       id: "message",
-      header: "Message",
+      header: t("columns.message"),
       showInCollapsed: false,
       cell: ({ row }) => (
         <p className="text-sm text-neutral-600 dark:text-dark-text-secondary line-clamp-3">
@@ -326,7 +337,7 @@ export function AdminFeedbackTab() {
     },
     {
       id: "createdAt",
-      header: "Created",
+      header: t("columns.created"),
       showInCollapsed: false,
       cell: ({ row }) => {
         const date = new Date(row.createdAt * 1000);
@@ -342,7 +353,7 @@ export function AdminFeedbackTab() {
   if (isLoading && feedback.length === 0) {
     return (
       <div className="flex items-center justify-center py-12">
-        <LoadingSpinner text="Loading feedback..." />
+        <LoadingSpinner text={t("loading")} />
       </div>
     );
   }
@@ -352,7 +363,7 @@ export function AdminFeedbackTab() {
       {/* Status filter */}
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">
-          Status:
+          {t("statusLabel")}
         </span>
         <div className="flex gap-1 flex-wrap">
           {STATUS_OPTIONS.map((option) => (
@@ -389,7 +400,7 @@ export function AdminFeedbackTab() {
         columns={columns}
         getKey={(item) => item.id}
         isLoading={isLoading}
-        emptyMessage="No feedback found"
+        emptyMessage={t("noFeedback")}
         expandable
       />
 
@@ -399,9 +410,12 @@ export function AdminFeedbackTab() {
       {/* Delete Confirmation */}
       {deleteTarget && (
         <ConfirmationDialog
-          title="Delete Feedback"
-          message={`Are you sure you want to delete feedback "${deleteTarget.subject}" from ${deleteTarget.userName}? This action cannot be undone.`}
-          confirmText="Delete"
+          title={t("dialog.deleteTitle")}
+          message={t("dialog.deleteMessage", {
+            subject: deleteTarget.subject,
+            name: deleteTarget.userName,
+          })}
+          confirmText={t("dialog.deleteConfirm")}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
           isLoading={isDeleting}

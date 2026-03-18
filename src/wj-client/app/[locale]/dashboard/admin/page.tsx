@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { apiClient } from "@/utils/api-client";
 import { AdminGuard } from "@/features/admin/components/AdminGuard";
 import { BaseCard } from "@/components/BaseCard";
@@ -109,6 +110,7 @@ function formToSettings(values: FormValues): SiteSetting[] {
 function AdminCMSContent() {
   const { toast } = useNotification();
   const queryClient = useQueryClient();
+  const t = useTranslations("admin");
   const { data, isLoading } = useQuery({
     queryKey: [QUERY_KEY],
     queryFn: () => apiClient.get<SiteSettingsResponse>("/api/v1/public/site-settings"),
@@ -127,11 +129,11 @@ function AdminCMSContent() {
     mutationFn: (settings: SiteSetting[]) =>
       apiClient.put("/api/v1/admin/site-settings", { settings }),
     onSuccess: () => {
-      toast.success("Settings saved successfully!");
+      toast.success(t("cms.savedSuccess"));
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to save settings");
+      toast.error(error.message || t("cms.saveFailed"));
     },
   });
 
@@ -143,7 +145,7 @@ function AdminCMSContent() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <LoadingSpinner text="Loading settings..." />
+        <LoadingSpinner text={t("page.loading")} />
       </div>
     );
   }
@@ -153,7 +155,7 @@ function AdminCMSContent() {
       {/* SEO Metadata */}
       <BaseCard padding="lg">
         <h2 className="text-lg font-semibold text-neutral-900 dark:text-dark-text mb-4">
-          SEO Metadata
+          {t("cms.seoMetadata")}
         </h2>
 
         <div className="space-y-1">
@@ -281,7 +283,7 @@ function AdminCMSContent() {
       {/* Footer Content */}
       <BaseCard padding="lg">
         <h2 className="text-lg font-semibold text-neutral-900 dark:text-dark-text mb-4">
-          Footer Content
+          {t("cms.footerContent")}
         </h2>
 
         <div className="space-y-1">
@@ -311,7 +313,7 @@ function AdminCMSContent() {
           loading={mutation.isPending}
           className="w-full sm:w-auto"
         >
-          Save Settings
+          {t("cms.saveSettings")}
         </Button>
       </div>
     </form>
@@ -320,17 +322,18 @@ function AdminCMSContent() {
 
 type AdminTab = "seo" | "users" | "feedback";
 
-const TABS: { id: AdminTab; label: string }[] = [
-  { id: "seo", label: "SEO" },
-  { id: "users", label: "Users" },
-  { id: "feedback", label: "Feedback" },
-];
-
 export default function AdminCMSPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  const t = useTranslations("admin");
   const activeTab = (searchParams.get("tab") as AdminTab) || "seo";
+
+  const TABS: { id: AdminTab; label: string }[] = [
+    { id: "seo", label: t("page.tabs.seo") },
+    { id: "users", label: t("page.tabs.users") },
+    { id: "feedback", label: t("page.tabs.feedback") },
+  ];
 
   const handleTabChange = (tab: AdminTab) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -343,10 +346,10 @@ export default function AdminCMSPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-neutral-900 dark:text-dark-text">
-            Content Management
+            {t("page.title")}
           </h1>
           <p className="text-sm text-neutral-500 dark:text-dark-text-tertiary mt-1">
-            Manage admin settings and user data
+            {t("page.subtitle")}
           </p>
         </div>
 
