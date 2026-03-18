@@ -33,6 +33,8 @@ C4Component
         Component(public_h, "Public Handlers", "handlers/public.go", "No-auth endpoint returning gold/silver/currency type names from in-memory registries. IP-rate-limited only.")
         Component(feedback_h, "Feedback Handlers", "handlers/feedback.go", "Submit feedback and list user's own feedback. Auth + rate limit middleware.")
         Component(site_settings_h, "SiteSettings Handler", "handlers/site_settings.go", "Public GET (no auth) for all site settings. Admin-only PUT for bulk-updating settings. Protected by AdminMiddleware for writes.")
+        Component(admin_user_h, "AdminUser Handler", "handlers/admin_user.go", "Admin-only: list users with search, toggle admin role. Protected by AdminMiddleware. Self-protection: cannot toggle own role.")
+        Component(admin_feedback_h, "AdminFeedback Handler", "handlers/admin_feedback.go", "Admin-only: list all feedback with status filter, update feedback (status + admin note), soft-delete feedback. Protected by AdminMiddleware.")
     }
 
     Container_Boundary(services, "Service Layer — TRUST BOUNDARY: Data considered validated after this point") {
@@ -53,6 +55,7 @@ C4Component
         Component(community_svc, "Community Service", "domain/service", "Social interactions: posts, comments, likes, follows, content reports; Phase 2: SharePost, GetNotifications, GetUnreadNotificationCount, MarkNotificationsRead, SavePost, UnsavePost, GetSavedPosts, GetSuggestedUsers, GetTrendingTopics, GetFollowing, GetFollowers; Phase 3: UploadImage, UpdateComment, GetReplies, GetLikedPosts, UpdateProfile, StreamNotifications")
         Component(feedback_svc, "Feedback Service", "domain/service", "Submit feedback with validation (subject 1-200, message 1-2000), rate limiting (10/user/hour), list user feedback")
         Component(site_settings_svc, "SiteSettings Service", "domain/service", "Validates setting keys against allowlist (17 keys), strips HTML from values, max 5000 chars. Cache-first reads, DB fallback.")
+        Component(admin_svc, "Admin Service", "domain/service", "Admin user management (list with search, toggle role with self-protection) and feedback management (list with status filter, update status/note with HTML stripping, soft-delete)")
     }
 
     Container_Boundary(repos, "Repository Layer (Data Access)") {
@@ -120,6 +123,8 @@ C4Component
     Rel(gin, admin_mw, "Applies to admin routes")
     Rel(gin, gold_sentiment_h, "Routes /public/gold-sentiment/* & /gold-sentiment/*")
     Rel(gin, feedback_h, "Routes /feedback/*")
+    Rel(gin, admin_user_h, "Routes /admin/users/*")
+    Rel(gin, admin_feedback_h, "Routes /admin/feedback/*")
 
     Rel(auth_h, auth_svc, "Delegates auth logic")
     Rel(user_h, user_svc, "Delegates user ops")
@@ -140,6 +145,8 @@ C4Component
     Rel(gold_sentiment_h, gold_sentiment_svc, "Delegates sentiment ops")
     Rel(community_h, community_svc, "Delegates social interactions")
     Rel(feedback_h, feedback_svc, "Delegates feedback ops")
+    Rel(admin_user_h, admin_svc, "Delegates admin user ops")
+    Rel(admin_feedback_h, admin_svc, "Delegates admin feedback ops")
     Rel(community_h, redis_pubsub, "Subscribes for SSE StreamNotifications")
     Rel(gold_chart_h, redis, "Read/write price history cache")
     Rel(silver_chart_h, redis, "Read/write price history cache")
@@ -171,6 +178,8 @@ C4Component
     Rel(gold_sentiment_svc, gold_vote_repo, "Reads/Writes votes")
     Rel(gold_sentiment_svc, gold_vote_comment_repo, "Reads/Writes comments")
     Rel(feedback_svc, feedback_repo, "Persists feedback")
+    Rel(admin_svc, user_repo, "Lists and updates users")
+    Rel(admin_svc, feedback_repo, "Lists, updates, and deletes feedback")
     Rel(gold_sentiment_svc, redis, "Caches vote counts (30s TTL)")
     Rel(community_svc, post_repo, "Persists posts")
     Rel(community_svc, comment_repo, "Persists comments")
