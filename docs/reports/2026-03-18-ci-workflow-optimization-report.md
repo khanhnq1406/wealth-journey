@@ -45,7 +45,7 @@ Implemented all 8 functional requirements from the CI workflow optimization spec
 |-----|-----------|-----------|
 | `changes` | — | Always (path-triggered) |
 | `lint-test-build` | — | Always (path-triggered) |
-| `e2e` | `changes` | frontend-src changed OR push to main |
+| `e2e` | `changes` | Push to main only |
 
 **Steps in `lint-test-build`:**
 1. checkout
@@ -138,13 +138,18 @@ Both files validated with `python3 + pyyaml`:
 
 ## How to Test
 
-1. Push a branch with only `src/wj-client/*.md` changes — verify `e2e` job is **skipped**
-2. Push a branch with `src/wj-client/app/**` changes — verify `e2e` job **runs**
+1. Push a branch with any `src/wj-client/**` changes — verify `e2e` job is **skipped**
+2. Push to main — verify both `lint-test-build` and `e2e` run
 3. Push a second run for the same branch — verify the first run is **cancelled** (concurrency)
-4. Push to main — verify both `lint-test-build` and `e2e` run (never cancelled)
-5. Introduce a lint error — verify `frontend-lint-test-build-errors` artifact appears with correct content
-6. Check second run on same lockfile — verify `npm ci` step is **skipped** (cache hit)
+4. Introduce a lint error — verify `frontend-lint-test-build-errors` artifact appears with correct content
+5. Check second run on same lockfile — verify `npm ci` step is **skipped** (cache hit)
 
-## Commit
+## Commits
 
 `8bec7a5` — ci: optimize workflows — concurrency, job merging, caching, conditional E2E
+
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-18 | Restrict E2E to push on main only (`github.event_name == 'push' && github.ref == 'refs/heads/main'`) | Minor | `f72b8d7` |
