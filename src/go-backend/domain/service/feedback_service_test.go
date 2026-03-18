@@ -42,6 +42,29 @@ func (m *mockFeedbackRepo) CountRecentByUserID(ctx context.Context, userID int32
 	return args.Int(0), args.Error(1)
 }
 
+func (m *mockFeedbackRepo) GetByID(ctx context.Context, id int32) (*models.Feedback, error) {
+	args := m.Called(ctx, id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.Feedback), args.Error(1)
+}
+
+func (m *mockFeedbackRepo) ListAll(ctx context.Context, statusFilter int16, opts repository.ListOptions) ([]*models.Feedback, int, error) {
+	args := m.Called(ctx, statusFilter, opts)
+	return args.Get(0).([]*models.Feedback), args.Int(1), args.Error(2)
+}
+
+func (m *mockFeedbackRepo) Update(ctx context.Context, feedback *models.Feedback) error {
+	args := m.Called(ctx, feedback)
+	return args.Error(0)
+}
+
+func (m *mockFeedbackRepo) Delete(ctx context.Context, id int32) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
 func TestSubmitFeedback_Success(t *testing.T) {
 	repo := new(mockFeedbackRepo)
 	svc := NewFeedbackService(repo)

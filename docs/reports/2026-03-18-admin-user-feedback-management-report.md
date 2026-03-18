@@ -166,6 +166,7 @@ curl -X PUT http://localhost:8080/api/v1/admin/feedback/1 \
 | Date | Fix | Severity | Commit |
 |------|-----|----------|--------|
 | 2026-03-18 | Fix "no users/no feedback found" — components accessed `response.data.users` but `apiClient` returns raw JSON directly; fixed to cast response and read `response.users` / `response.feedback` | Minor | pending |
+| 2026-03-18 | Fix golangci-lint typecheck failures — `mockFeedbackRepo` in `feedback_service_test.go` was missing 4 methods added by admin feature (`GetByID`, `ListAll`, `Update`, `Delete`); `MockUserRepository` in `investment_service_test.go` was missing `ListWithSearch` added by admin feature | Minor | pending |
 
 ## Known Issues / Technical Debt
 
