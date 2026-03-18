@@ -12,9 +12,13 @@ on:
       - 'src/go-backend/**'
       - 'api/protobuf/**'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
-  lint:
-    name: Lint
+  lint-and-build:
+    name: Lint & Build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -27,6 +31,15 @@ jobs:
           go-version: '1.25'
           cache-dependency-path: src/go-backend/go.sum
 
+      - name: Cache Go build
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/go-build
+          key: go-build-${{ hashFiles('src/go-backend/go.sum') }}-${{ hashFiles('src/go-backend/**/*.go') }}
+          restore-keys: |
+            go-build-${{ hashFiles('src/go-backend/go.sum') }}-
+            go-build-
+
       - name: Run golangci-lint
         id: golangci
         uses: golangci/golangci-lint-action@v7
@@ -34,28 +47,45 @@ jobs:
           version: latest
           working-directory: src/go-backend
 
-      - name: Capture lint errors
+      - name: Verify compilation
+        id: go-build
+        run: |
+          mkdir -p /tmp/ci-errors
+          go build -o /dev/null ./cmd/server/main.go 2>&1 | tee /tmp/ci-errors/build-output.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Capture errors
         if: failure()
         run: |
           mkdir -p /tmp/ci-errors
-          echo "## Backend Lint Errors" >> /tmp/ci-errors/errors.txt
-          echo "Job: ${{ github.job }} | Run: ${{ github.run_id }}" >> /tmp/ci-errors/errors.txt
-          echo "" >> /tmp/ci-errors/errors.txt
-          echo "golangci-lint failed. Check the 'Run golangci-lint' step logs above for details." >> /tmp/ci-errors/errors.txt
+          {
+            echo "## Backend Lint & Build Errors"
+            echo "Job: ${{ github.job }} | Run: ${{ github.run_id }}"
+            echo ""
+            if [ "${{ steps.golangci.outcome }}" == "failure" ]; then
+              echo "### Lint errors:"
+              echo "golangci-lint failed. Check the 'Run golangci-lint' step logs above for details."
+              echo ""
+            fi
+            if [ -s /tmp/ci-errors/build-output.txt ] && [ "${{ steps.go-build.outcome }}" == "failure" ]; then
+              echo "### Build errors:"
+              cat /tmp/ci-errors/build-output.txt
+            fi
+          } > /tmp/ci-errors/errors.txt
 
-      - name: Write lint errors to job summary
+      - name: Write errors to job summary
         if: failure()
         run: |
-          echo "## ❌ Backend Lint Failed" >> $GITHUB_STEP_SUMMARY
+          echo "## ❌ Backend Lint & Build Failed" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat /tmp/ci-errors/errors.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
-      - name: Upload lint error artifact
+      - name: Upload error artifact
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: backend-lint-errors
+          name: backend-lint-build-errors
           path: /tmp/ci-errors/errors.txt
           retention-days: 7
 
@@ -115,6 +145,15 @@ jobs:
           go-version: '1.25'
           cache-dependency-path: src/go-backend/go.sum
 
+      - name: Cache Go build
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/go-build
+          key: go-build-${{ hashFiles('src/go-backend/go.sum') }}-${{ hashFiles('src/go-backend/**/*.go') }}
+          restore-keys: |
+            go-build-${{ hashFiles('src/go-backend/go.sum') }}-
+            go-build-
+
       - name: Run tests
         id: go-test
         run: |
@@ -147,50 +186,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-test-errors
-          path: /tmp/ci-errors/errors.txt
-          retention-days: 7
-
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: src/go-backend
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.25'
-          cache-dependency-path: src/go-backend/go.sum
-
-      - name: Verify compilation
-        id: go-build
-        run: |
-          mkdir -p /tmp/ci-errors
-          go build -o /dev/null ./cmd/server/main.go 2>&1 | tee /tmp/ci-errors/build-output.txt
-          exit ${PIPESTATUS[0]}
-
-      - name: Capture build errors
-        if: failure()
-        run: |
-          echo "## Backend Build Errors" > /tmp/ci-errors/errors.txt
-          echo "Job: ${{ github.job }} | Run: ${{ github.run_id }}" >> /tmp/ci-errors/errors.txt
-          echo "" >> /tmp/ci-errors/errors.txt
-          cat /tmp/ci-errors/build-output.txt >> /tmp/ci-errors/errors.txt
-
-      - name: Write build errors to job summary
-        if: failure()
-        run: |
-          echo "## ❌ Backend Build Failed" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          cat /tmp/ci-errors/build-output.txt >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-
-      - name: Upload build error artifact
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-build-errors
           path: /tmp/ci-errors/errors.txt
           retention-days: 7
