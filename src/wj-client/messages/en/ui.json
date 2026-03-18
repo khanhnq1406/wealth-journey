@@ -67,7 +67,7 @@
       "failedToUndoImport": "Failed to undo import: {error}"
     }
   },
-  "feedback": {
+  "uiFeedback": {
     "emptyState": {
       "noDataFound": "No data found",
       "noResultsFound": "No results found",

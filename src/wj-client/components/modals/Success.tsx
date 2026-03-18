@@ -12,7 +12,7 @@ type SuccessProps = {
 };
 
 export const Success: React.FC<SuccessProps> = ({ message: propMessage, onDone }) => {
-  const t = useTranslations("feedback.success");
+  const t = useTranslations("uiFeedback.success");
   const tCommon = useTranslations("common");
   const [message, setMessage] = useState(propMessage || "");
 

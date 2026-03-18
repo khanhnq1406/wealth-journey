@@ -8,7 +8,7 @@ type LoadingSpinnerProps = {
 };
 
 export const LoadingSpinner = ({ text }: LoadingSpinnerProps) => {
-  const t = useTranslations("feedback.loading");
+  const t = useTranslations("uiFeedback.loading");
   const resolvedText = text ?? t("loadingText");
 
   return (

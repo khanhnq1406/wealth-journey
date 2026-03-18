@@ -7,7 +7,7 @@ type FullPageLoadingProps = {
 };
 
 export const FullPageLoading = ({ text }: FullPageLoadingProps) => {
-  const t = useTranslations("feedback.loading");
+  const t = useTranslations("uiFeedback.loading");
   const resolvedText = text ?? t("loadingText");
 
   return (
