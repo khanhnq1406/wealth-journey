@@ -7,7 +7,7 @@
 - **Started:** 2026-03-18
 - **Last updated:** 2026-03-18
 - **Current state:** in_progress
-- **Current task:** 4
+- **Current task:** 5
 
 ## Task Progress
 
@@ -16,7 +16,7 @@
 | 1 | Extend Protobuf definitions | done | (next commit) | Added admin user/feedback messages and RPCs to admin.proto, generated Go+TS code |
 | 2 | Add admin_note column to Feedback model + migration | done | (next commit) | Added AdminNote field to Feedback model, created migration, added Taskfile task |
 | 3 | Extend repository interfaces and implementations | done | (next commit) | Added GetByID/ListAll/Update/Delete to FeedbackRepo, ListWithSearch to UserRepo |
-| 4 | Create Admin service | pending | — | — |
+| 4 | Create Admin service | done | (next commit) | Created AdminService with ListUsers, ToggleAdminRole, ListFeedback, UpdateFeedback, DeleteFeedback |
 | 5 | Create Admin handlers + routes | pending | — | — |
 | 6 | Refactor admin page to tabbed layout | done | (next commit) | Added 3-tab layout (SEO/Users/Feedback) with URL query param state |
 | 7 | Frontend Admin Users tab component | pending | — | — |
