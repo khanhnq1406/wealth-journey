@@ -108,7 +108,7 @@ function AdminCMSContent() {
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: [QUERY_KEY],
-    queryFn: () => apiClient.get<SiteSettingsResponse>("/v1/public/site-settings"),
+    queryFn: () => apiClient.get<SiteSettingsResponse>("/api/v1/public/site-settings"),
   });
 
   const { register, handleSubmit, control, reset } = useForm<FormValues>();
@@ -122,7 +122,7 @@ function AdminCMSContent() {
 
   const mutation = useMutation({
     mutationFn: (settings: SiteSetting[]) =>
-      apiClient.put("/v1/admin/site-settings", { settings }),
+      apiClient.put("/api/v1/admin/site-settings", { settings }),
     onSuccess: () => {
       toast.success("Settings saved successfully!");
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
