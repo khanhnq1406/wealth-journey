@@ -168,6 +168,7 @@ curl -X PUT http://localhost:8080/api/v1/admin/feedback/1 \
 | 2026-03-18 | Fix "no users/no feedback found" — components accessed `response.data.users` but `apiClient` returns raw JSON directly; fixed to cast response and read `response.users` / `response.feedback` | Minor | pending |
 | 2026-03-18 | Fix golangci-lint typecheck failures — `mockFeedbackRepo` in `feedback_service_test.go` was missing 4 methods added by admin feature (`GetByID`, `ListAll`, `Update`, `Delete`); `MockUserRepository` in `investment_service_test.go` was missing `ListWithSearch` added by admin feature | Minor | pending |
 | 2026-03-18 | Fix missing Vietnamese (i18n) translations in admin tabs — all strings in `AdminUsersTab`, `AdminFeedbackTab`, `Pagination`, and `page.tsx` were hardcoded English; created `messages/en/admin.json` + `messages/vi/admin.json`, registered `admin` namespace in `i18n/request.ts`, and updated all 4 components to use `useTranslations("admin.*")` | Minor | pending |
+| 2026-03-18 | Fix 7 failing E2E tests in `admin-flow.spec.ts` — two root causes: (1) tests used `waitForAdminPage` which waits for the tab nav to appear but not for tab content to finish loading; added `waitForUsersTabContent` and `waitForFeedbackTabContent` helpers that wait for the loading spinner to clear; (2) `getByText("Admin User")` caused strict mode violation because "Admin User" appears in sidebar, heading, and table — scoped ambiguous lookups to `page.getByRole("main")` | Minor | pending |
 
 ## Test Coverage
 

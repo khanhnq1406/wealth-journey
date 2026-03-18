@@ -99,6 +99,42 @@ async function waitForAdminPage(page: import("@playwright/test").Page) {
   );
 }
 
+/**
+ * Helper to wait for the Users tab content (search input) to appear.
+ */
+async function waitForUsersTabContent(page: import("@playwright/test").Page) {
+  await waitForAdminPage(page);
+  // Wait for the loading spinner to disappear and content to appear
+  await page.waitForFunction(
+    () => {
+      const body = document.body.innerText;
+      return (
+        body.includes("Search by name") ||
+        body.includes("No users found")
+      );
+    },
+    { timeout: 15000 },
+  );
+}
+
+/**
+ * Helper to wait for the Feedback tab content (status filter) to appear.
+ */
+async function waitForFeedbackTabContent(page: import("@playwright/test").Page) {
+  await waitForAdminPage(page);
+  // Wait for the loading spinner to disappear and content to appear
+  await page.waitForFunction(
+    () => {
+      const body = document.body.innerText;
+      return (
+        body.includes("Status:") ||
+        body.includes("No feedback found")
+      );
+    },
+    { timeout: 15000 },
+  );
+}
+
 test.describe("Admin Page Structure", () => {
   test.beforeEach(async ({ page }) => {
     // Mock auth verify
@@ -164,7 +200,7 @@ test.describe("Admin Page Structure", () => {
 
   test("should navigate to Users tab", async ({ page }) => {
     await page.goto("/dashboard/admin?tab=users");
-    await waitForAdminPage(page);
+    await waitForUsersTabContent(page);
 
     // Users tab content should appear
     await expect(
@@ -174,7 +210,7 @@ test.describe("Admin Page Structure", () => {
 
   test("should navigate to Feedback tab", async ({ page }) => {
     await page.goto("/dashboard/admin?tab=feedback");
-    await waitForAdminPage(page);
+    await waitForFeedbackTabContent(page);
 
     // Feedback tab should show status filter
     await expect(page.getByText("Status:")).toBeVisible({ timeout: 10000 });
@@ -223,7 +259,7 @@ test.describe("Admin Users Tab", () => {
 
   test("should render search input", async ({ page }) => {
     await page.goto("/dashboard/admin?tab=users");
-    await waitForAdminPage(page);
+    await waitForUsersTabContent(page);
 
     const searchInput = page.getByPlaceholder(/search by name, email/i);
     await expect(searchInput).toBeVisible({ timeout: 10000 });
@@ -231,18 +267,21 @@ test.describe("Admin Users Tab", () => {
 
   test("should render user data in table", async ({ page }) => {
     await page.goto("/dashboard/admin?tab=users");
-    await waitForAdminPage(page);
+    await waitForUsersTabContent(page);
 
-    await expect(page.getByText("Admin User")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText("Regular User")).toBeVisible({ timeout: 10000 });
+    // Scope to main content to avoid strict mode violation with sidebar/heading
+    const main = page.getByRole("main");
+    await expect(main.getByText("Admin User", { exact: true })).toBeVisible({ timeout: 10000 });
+    await expect(main.getByText("Regular User", { exact: true })).toBeVisible({ timeout: 10000 });
   });
 
   test("should display role badges", async ({ page }) => {
     await page.goto("/dashboard/admin?tab=users");
-    await waitForAdminPage(page);
+    await waitForUsersTabContent(page);
 
-    // Wait for user data to load
-    await expect(page.getByText("Admin User")).toBeVisible({ timeout: 10000 });
+    // Wait for user data to load (scoped to main to avoid strict mode violation)
+    const main = page.getByRole("main");
+    await expect(main.getByText("Admin User", { exact: true })).toBeVisible({ timeout: 10000 });
 
     // Should have Admin and User badges
     const adminBadges = page.locator("button").filter({ hasText: /^Admin$/ });
@@ -294,17 +333,18 @@ test.describe("Admin Feedback Tab", () => {
 
   test("should render status filter", async ({ page }) => {
     await page.goto("/dashboard/admin?tab=feedback");
-    await waitForAdminPage(page);
+    await waitForFeedbackTabContent(page);
 
     await expect(page.getByText("Status:")).toBeVisible({ timeout: 10000 });
   });
 
   test("should render feedback data in table", async ({ page }) => {
     await page.goto("/dashboard/admin?tab=feedback");
-    await waitForAdminPage(page);
+    await waitForFeedbackTabContent(page);
 
     await expect(page.getByText("Bug Report")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText("Regular User")).toBeVisible({ timeout: 10000 });
+    const main = page.getByRole("main");
+    await expect(main.getByText("Regular User", { exact: true })).toBeVisible({ timeout: 10000 });
   });
 });
 
@@ -368,7 +408,7 @@ test.describe("Admin Page Mobile", () => {
 
   test("should navigate to users tab on mobile", async ({ page }) => {
     await page.goto("/dashboard/admin?tab=users");
-    await waitForAdminPage(page);
+    await waitForUsersTabContent(page);
 
     await expect(
       page.getByPlaceholder(/search by name, email/i),
