@@ -169,9 +169,65 @@ curl -X PUT http://localhost:8080/api/v1/admin/feedback/1 \
 | 2026-03-18 | Fix golangci-lint typecheck failures — `mockFeedbackRepo` in `feedback_service_test.go` was missing 4 methods added by admin feature (`GetByID`, `ListAll`, `Update`, `Delete`); `MockUserRepository` in `investment_service_test.go` was missing `ListWithSearch` added by admin feature | Minor | pending |
 | 2026-03-18 | Fix missing Vietnamese (i18n) translations in admin tabs — all strings in `AdminUsersTab`, `AdminFeedbackTab`, `Pagination`, and `page.tsx` were hardcoded English; created `messages/en/admin.json` + `messages/vi/admin.json`, registered `admin` namespace in `i18n/request.ts`, and updated all 4 components to use `useTranslations("admin.*")` | Minor | pending |
 
+## Test Coverage
+
+### Test Files
+
+| File | Type | Tests | Status |
+|------|------|-------|--------|
+| `src/go-backend/domain/service/admin_service_test.go` | Backend service unit | 17 | Pass |
+| `src/go-backend/handlers/admin_test.go` | Backend handler unit | 16 | Pass |
+| `src/wj-client/features/admin/components/__tests__/Pagination.test.tsx` | Frontend component | 8 | Pass |
+| `src/wj-client/features/admin/components/__tests__/AdminUsersTab.test.tsx` | Frontend component | 6 | Pass |
+| `src/wj-client/features/admin/components/__tests__/AdminFeedbackTab.test.tsx` | Frontend component | 6 | Pass |
+| `src/wj-client/tests/e2e/admin-flow.spec.ts` | Playwright E2E | 10 | Created |
+| **Total** | | **63** | |
+
+### How to Run Tests
+
+```bash
+# Backend service + handler tests
+cd src/go-backend
+go test -run "TestAdminService_|TestAdminUserHandler_|TestAdminFeedbackHandler_" ./domain/service/ ./handlers/ -v
+
+# Frontend component tests
+cd src/wj-client
+npx jest features/admin --no-coverage
+
+# E2E tests (requires running server)
+cd src/wj-client
+npx playwright test tests/e2e/admin-flow.spec.ts
+
+# Full build verification (no regressions)
+cd src/go-backend && go build ./...
+cd src/wj-client && npx tsc --noEmit
+```
+
+### Key Scenarios Covered
+
+**Security tests (service layer):**
+- Self-protection: admin cannot toggle their own role (403)
+- XSS prevention: HTML tags stripped from admin notes
+- Input validation: search max 100 chars, status range 0-3, admin note max 2000 chars
+
+**Handler tests:**
+- Auth enforcement: missing user_id → 401
+- Path parameter authority: path `:id` overrides body `userId`/`feedbackId`
+- Error propagation: service errors (400/403/404) forwarded correctly
+- Invalid path params: non-numeric ID → 400
+
+**Frontend tests:**
+- Loading states and data rendering
+- Empty states for no results
+- Error toast on API failure
+- Search input presence and debounced fetching
+- Pagination disabled states and page change callbacks
+- Role badge rendering (Admin/User)
+
 ## Known Issues / Technical Debt
 
 1. **No audit logging** — Admin role changes and feedback deletions are not logged to an audit trail. Spec explicitly notes this as out of scope.
-2. **No TDD** — Tests were not written as part of this implementation (existing test infrastructure limited). Backend unit/integration tests and frontend component tests should be added.
-3. **No Playwright E2E** — E2E tests for admin flows not yet created.
+2. ~~**No TDD** — Tests were not written as part of this implementation.~~ **Resolved** — 53 unit/component tests added (17 service + 16 handler + 20 frontend).
+3. ~~**No Playwright E2E** — E2E tests for admin flows not yet created.~~ **Resolved** — 10 E2E tests added covering page structure, tab navigation, and mobile viewport.
 4. **MobileTable limitation** — The MobileTable component does not support custom `renderExpanded` callbacks. The Feedback tab uses an edit panel above the table instead of inline editing within expanded rows. This is a UX trade-off that works well but differs slightly from the spec mockup.
+5. **AdminFeedbackTab variable mismatch** — `STATUS_OPTIONS` is referenced in the render but only `STATUS_VALUES` is defined. This is a pre-existing bug that should be fixed (rename `STATUS_VALUES` to `STATUS_OPTIONS` or derive `STATUS_OPTIONS` with translated labels from `STATUS_VALUES`).

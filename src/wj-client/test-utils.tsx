@@ -21,6 +21,7 @@ import settingsMessages from "./messages/en/settings.json";
 import transactionMessages from "./messages/en/transaction.json";
 import uiMessages from "./messages/en/ui.json";
 import walletMessages from "./messages/en/wallet.json";
+import adminMessages from "./messages/en/admin.json";
 
 const allMessages = {
   ...authMessages,
@@ -34,6 +35,7 @@ const allMessages = {
   ...transactionMessages,
   ...uiMessages,
   ...walletMessages,
+  ...adminMessages,
 };
 
 interface IntlWrapperProps {
