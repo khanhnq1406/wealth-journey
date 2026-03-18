@@ -129,6 +129,7 @@ Implemented a `/dashboard/feedback` page where authenticated users can submit fe
 | 2026-03-18 | Fix date age validation boundary: truncate to day granularity so 364-days-ago dates are not falsely flagged as >1 year old due to time-of-day differences between parsed date (midnight) and threshold (current time) | Minor | pending |
 | 2026-03-18 | Fix i18n key collision: `ui.json` and `feedback.json` both had top-level `feedback` key; `Object.assign` merge in `request.ts` caused `ui.json` to overwrite `feedback.json` translations. Renamed `ui.json`'s key to `uiFeedback` and updated 10 component references. Also changed Vietnamese navbar label from "Phản hồi" to "Hộp thư góp ý" | Minor | pending |
 | 2026-03-18 | Fix raw error message leaking on 429 rate limit: `fetchWithRetry` in `api-client.ts` threw a plain `Error("Retryable status: 429")` after max retries instead of returning the response for `handleErrorResponse()` to parse. After exhausting retries, the response is now returned so the backend's error JSON body (with user-friendly message) is properly parsed into `ApiRequestError` with correct `statusCode`, `message`, and `code` fields | Minor | pending |
+| 2026-03-18 | Fix mobile slide-out menu not scrolling when nav items overflow viewport: changed outer container from `overflow-y-auto` to `flex flex-col`, made nav section `flex-1 overflow-y-auto` so it scrolls independently, and pinned header/user-info with `shrink-0` | Minor | pending |
 
 ## Known Issues / Technical Debt
 

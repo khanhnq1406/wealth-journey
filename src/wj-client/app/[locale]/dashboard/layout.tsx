@@ -49,7 +49,8 @@ export default function DashboardLayout({
 }>) {
   const path = usePathname();
   const searchParams = useSearchParams();
-  const isProfileView = path === routes.community && searchParams.get("view") === "profile";
+  const isProfileView =
+    path === routes.community && searchParams.get("view") === "profile";
   const t = useTranslations("nav");
   const tHome = useTranslations("dashboard.home");
   const tQuickActions = useTranslations("dashboard.quickActions");
@@ -129,7 +130,11 @@ export default function DashboardLayout({
         icon: <Banknote size={22} />,
       },
       { href: routes.wallets, label: t("wallets"), icon: <Wallet size={22} /> },
-      { href: routes.feedback, label: t("feedback"), icon: <MessageCircle size={22} /> },
+      {
+        href: routes.feedback,
+        label: t("feedback"),
+        icon: <MessageCircle size={22} />,
+      },
     ];
 
     return (
@@ -534,7 +539,7 @@ export default function DashboardLayout({
                   style={{ zIndex: ZIndex.modalBackdrop }}
                 />
                 <div
-                  className={`fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-white z-modal sm:hidden overflow-y-auto ${
+                  className={`fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-white z-modal sm:hidden flex flex-col ${
                     isClosing
                       ? "animate-slide-out-left"
                       : "animate-slide-in-left"
@@ -542,7 +547,7 @@ export default function DashboardLayout({
                   style={{ zIndex: ZIndex.modal }}
                 >
                   {/* Close Button */}
-                  <div className="flex items-center justify-between p-4 border-b border-v2-border-light">
+                  <div className="flex items-center justify-between p-4 border-b border-v2-border-light shrink-0">
                     <div className="flex items-center gap-3">
                       <NextImage
                         src="/logo.svg"
@@ -564,13 +569,16 @@ export default function DashboardLayout({
                     </button>
                   </div>
 
-                  {/* Navigation Items */}
-                  <nav className="p-4" aria-label={t("mobileNavigation")}>
+                  {/* Navigation Items — scrollable when overflowing */}
+                  <nav
+                    className="flex-1 overflow-y-auto p-4"
+                    aria-label={t("mobileNavigation")}
+                  >
                     {navigationItems}
                   </nav>
 
-                  {/* User Info */}
-                  <div className="p-4 border-t border-v2-border-light">
+                  {/* User Info — pinned to bottom */}
+                  <div className="p-4 pb-20 border-t border-v2-border-light shrink-0">
                     <div className="flex items-center gap-3 px-3 py-2 bg-v2-bg-primary rounded-xl">
                       <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center overflow-hidden">
                         {user.picture ? (
@@ -592,7 +600,8 @@ export default function DashboardLayout({
                           {user.fullname || "User"}
                         </p>
                         <p className="font-jetbrains text-[11px] text-v2-text-tertiary truncate">
-                          {user.email || (user.username ? `@${user.username}` : "")}
+                          {user.email ||
+                            (user.username ? `@${user.username}` : "")}
                         </p>
                       </div>
                     </div>
