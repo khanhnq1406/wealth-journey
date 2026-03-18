@@ -22,6 +22,11 @@ const (
 	AdminService_SetPriceOverride_FullMethodName    = "/wealthjourney.admin.v1.AdminService/SetPriceOverride"
 	AdminService_ListPriceOverrides_FullMethodName  = "/wealthjourney.admin.v1.AdminService/ListPriceOverrides"
 	AdminService_DeletePriceOverride_FullMethodName = "/wealthjourney.admin.v1.AdminService/DeletePriceOverride"
+	AdminService_AdminListUsers_FullMethodName      = "/wealthjourney.admin.v1.AdminService/AdminListUsers"
+	AdminService_AdminToggleRole_FullMethodName     = "/wealthjourney.admin.v1.AdminService/AdminToggleRole"
+	AdminService_AdminListFeedback_FullMethodName   = "/wealthjourney.admin.v1.AdminService/AdminListFeedback"
+	AdminService_AdminUpdateFeedback_FullMethodName = "/wealthjourney.admin.v1.AdminService/AdminUpdateFeedback"
+	AdminService_AdminDeleteFeedback_FullMethodName = "/wealthjourney.admin.v1.AdminService/AdminDeleteFeedback"
 )
 
 // AdminServiceClient is the client API for AdminService service.
@@ -34,6 +39,16 @@ type AdminServiceClient interface {
 	ListPriceOverrides(ctx context.Context, in *ListPriceOverridesRequest, opts ...grpc.CallOption) (*ListPriceOverridesResponse, error)
 	// DeletePriceOverride removes a price override
 	DeletePriceOverride(ctx context.Context, in *DeletePriceOverrideRequest, opts ...grpc.CallOption) (*DeletePriceOverrideResponse, error)
+	// AdminListUsers lists all users with optional search and pagination
+	AdminListUsers(ctx context.Context, in *AdminListUsersRequest, opts ...grpc.CallOption) (*AdminListUsersResponse, error)
+	// AdminToggleRole toggles a user's admin role
+	AdminToggleRole(ctx context.Context, in *AdminToggleRoleRequest, opts ...grpc.CallOption) (*AdminToggleRoleResponse, error)
+	// AdminListFeedback lists all feedback with optional status filter
+	AdminListFeedback(ctx context.Context, in *AdminListFeedbackRequest, opts ...grpc.CallOption) (*AdminListFeedbackResponse, error)
+	// AdminUpdateFeedback updates feedback status and admin note
+	AdminUpdateFeedback(ctx context.Context, in *AdminUpdateFeedbackRequest, opts ...grpc.CallOption) (*AdminUpdateFeedbackResponse, error)
+	// AdminDeleteFeedback soft-deletes a feedback entry
+	AdminDeleteFeedback(ctx context.Context, in *AdminDeleteFeedbackRequest, opts ...grpc.CallOption) (*AdminDeleteFeedbackResponse, error)
 }
 
 type adminServiceClient struct {
@@ -71,6 +86,51 @@ func (c *adminServiceClient) DeletePriceOverride(ctx context.Context, in *Delete
 	return out, nil
 }
 
+func (c *adminServiceClient) AdminListUsers(ctx context.Context, in *AdminListUsersRequest, opts ...grpc.CallOption) (*AdminListUsersResponse, error) {
+	out := new(AdminListUsersResponse)
+	err := c.cc.Invoke(ctx, AdminService_AdminListUsers_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminServiceClient) AdminToggleRole(ctx context.Context, in *AdminToggleRoleRequest, opts ...grpc.CallOption) (*AdminToggleRoleResponse, error) {
+	out := new(AdminToggleRoleResponse)
+	err := c.cc.Invoke(ctx, AdminService_AdminToggleRole_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminServiceClient) AdminListFeedback(ctx context.Context, in *AdminListFeedbackRequest, opts ...grpc.CallOption) (*AdminListFeedbackResponse, error) {
+	out := new(AdminListFeedbackResponse)
+	err := c.cc.Invoke(ctx, AdminService_AdminListFeedback_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminServiceClient) AdminUpdateFeedback(ctx context.Context, in *AdminUpdateFeedbackRequest, opts ...grpc.CallOption) (*AdminUpdateFeedbackResponse, error) {
+	out := new(AdminUpdateFeedbackResponse)
+	err := c.cc.Invoke(ctx, AdminService_AdminUpdateFeedback_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminServiceClient) AdminDeleteFeedback(ctx context.Context, in *AdminDeleteFeedbackRequest, opts ...grpc.CallOption) (*AdminDeleteFeedbackResponse, error) {
+	out := new(AdminDeleteFeedbackResponse)
+	err := c.cc.Invoke(ctx, AdminService_AdminDeleteFeedback_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AdminServiceServer is the server API for AdminService service.
 // All implementations must embed UnimplementedAdminServiceServer
 // for forward compatibility
@@ -81,6 +141,16 @@ type AdminServiceServer interface {
 	ListPriceOverrides(context.Context, *ListPriceOverridesRequest) (*ListPriceOverridesResponse, error)
 	// DeletePriceOverride removes a price override
 	DeletePriceOverride(context.Context, *DeletePriceOverrideRequest) (*DeletePriceOverrideResponse, error)
+	// AdminListUsers lists all users with optional search and pagination
+	AdminListUsers(context.Context, *AdminListUsersRequest) (*AdminListUsersResponse, error)
+	// AdminToggleRole toggles a user's admin role
+	AdminToggleRole(context.Context, *AdminToggleRoleRequest) (*AdminToggleRoleResponse, error)
+	// AdminListFeedback lists all feedback with optional status filter
+	AdminListFeedback(context.Context, *AdminListFeedbackRequest) (*AdminListFeedbackResponse, error)
+	// AdminUpdateFeedback updates feedback status and admin note
+	AdminUpdateFeedback(context.Context, *AdminUpdateFeedbackRequest) (*AdminUpdateFeedbackResponse, error)
+	// AdminDeleteFeedback soft-deletes a feedback entry
+	AdminDeleteFeedback(context.Context, *AdminDeleteFeedbackRequest) (*AdminDeleteFeedbackResponse, error)
 	mustEmbedUnimplementedAdminServiceServer()
 }
 
@@ -96,6 +166,21 @@ func (UnimplementedAdminServiceServer) ListPriceOverrides(context.Context, *List
 }
 func (UnimplementedAdminServiceServer) DeletePriceOverride(context.Context, *DeletePriceOverrideRequest) (*DeletePriceOverrideResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeletePriceOverride not implemented")
+}
+func (UnimplementedAdminServiceServer) AdminListUsers(context.Context, *AdminListUsersRequest) (*AdminListUsersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminListUsers not implemented")
+}
+func (UnimplementedAdminServiceServer) AdminToggleRole(context.Context, *AdminToggleRoleRequest) (*AdminToggleRoleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminToggleRole not implemented")
+}
+func (UnimplementedAdminServiceServer) AdminListFeedback(context.Context, *AdminListFeedbackRequest) (*AdminListFeedbackResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminListFeedback not implemented")
+}
+func (UnimplementedAdminServiceServer) AdminUpdateFeedback(context.Context, *AdminUpdateFeedbackRequest) (*AdminUpdateFeedbackResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminUpdateFeedback not implemented")
+}
+func (UnimplementedAdminServiceServer) AdminDeleteFeedback(context.Context, *AdminDeleteFeedbackRequest) (*AdminDeleteFeedbackResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminDeleteFeedback not implemented")
 }
 func (UnimplementedAdminServiceServer) mustEmbedUnimplementedAdminServiceServer() {}
 
@@ -164,6 +249,96 @@ func _AdminService_DeletePriceOverride_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AdminService_AdminListUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminListUsersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).AdminListUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_AdminListUsers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).AdminListUsers(ctx, req.(*AdminListUsersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AdminService_AdminToggleRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminToggleRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).AdminToggleRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_AdminToggleRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).AdminToggleRole(ctx, req.(*AdminToggleRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AdminService_AdminListFeedback_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminListFeedbackRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).AdminListFeedback(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_AdminListFeedback_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).AdminListFeedback(ctx, req.(*AdminListFeedbackRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AdminService_AdminUpdateFeedback_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminUpdateFeedbackRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).AdminUpdateFeedback(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_AdminUpdateFeedback_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).AdminUpdateFeedback(ctx, req.(*AdminUpdateFeedbackRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AdminService_AdminDeleteFeedback_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminDeleteFeedbackRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).AdminDeleteFeedback(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_AdminDeleteFeedback_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).AdminDeleteFeedback(ctx, req.(*AdminDeleteFeedbackRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AdminService_ServiceDesc is the grpc.ServiceDesc for AdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -182,6 +357,26 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeletePriceOverride",
 			Handler:    _AdminService_DeletePriceOverride_Handler,
+		},
+		{
+			MethodName: "AdminListUsers",
+			Handler:    _AdminService_AdminListUsers_Handler,
+		},
+		{
+			MethodName: "AdminToggleRole",
+			Handler:    _AdminService_AdminToggleRole_Handler,
+		},
+		{
+			MethodName: "AdminListFeedback",
+			Handler:    _AdminService_AdminListFeedback_Handler,
+		},
+		{
+			MethodName: "AdminUpdateFeedback",
+			Handler:    _AdminService_AdminUpdateFeedback_Handler,
+		},
+		{
+			MethodName: "AdminDeleteFeedback",
+			Handler:    _AdminService_AdminDeleteFeedback_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
