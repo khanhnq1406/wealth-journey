@@ -7,7 +7,7 @@
 - **Started:** 2026-03-18
 - **Last updated:** 2026-03-18
 - **Current state:** in_progress
-- **Current task:** 8
+- **Current task:** 9
 
 ## Task Progress
 
@@ -20,7 +20,7 @@
 | 5 | Create Admin handlers + routes | done | (next commit) | Created AdminUserHandler, AdminFeedbackHandler, wired into builder + routes |
 | 6 | Refactor admin page to tabbed layout | done | (next commit) | Added 3-tab layout (SEO/Users/Feedback) with URL query param state |
 | 7 | Frontend Admin Users tab component | done | (next commit) | Created AdminUsersTab with search, MobileTable, admin toggle, pagination |
-| 8 | Frontend Admin Feedback tab component | pending | — | — |
+| 8 | Frontend Admin Feedback tab component | done | (next commit) | Created AdminFeedbackTab with status filter, edit panel, delete confirmation, pagination |
 | 9 | Update C4 architecture diagrams | pending | — | — |
 | 10 | Integration verification and build check | pending | — | — |
 
