@@ -34,10 +34,17 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
       // Fire-and-forget the API call to persist on the server.
       markReadMutation.mutate({});
     }
-    // Navigate to the community page. Close the panel first so it doesn't
-    // stay open while the navigation animation plays.
+
     onClose?.();
-    router.push(routes.community as Parameters<typeof router.push>[0]);
+
+    // Route based on notification type
+    if (notif.type === "price_alert") {
+      router.push("/dashboard/prices" as Parameters<typeof router.push>[0]);
+    } else if (notif.type === "admin_broadcast") {
+      // No navigation for broadcast — just mark as read
+    } else {
+      router.push(routes.community as Parameters<typeof router.push>[0]);
+    }
   };
 
   return (
