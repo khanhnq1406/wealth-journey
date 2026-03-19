@@ -5,23 +5,23 @@
 - **Plan file:** docs/plans/2026-03-19-price-alert-admin-config-plan.md
 - **Spec file:** docs/specs/2026-03-19-price-alert-admin-config-spec.md
 - **Started:** 2026-03-19T17:00:00Z
-- **Last updated:** 2026-03-19T17:00:00Z
+- **Last updated:** 2026-03-19T19:30:00Z
 - **Current state:** in_progress
-- **Current task:** 1
+- **Current task:** 10
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 1 | Add priceDiff field to priceMover struct | pending | — | — |
-| 2 | Create price alert config model and Redis read/write | pending | — | — |
-| 3 | Refactor PriceAlertService to read config from Redis | pending | — | — |
-| 4 | Update AdminService broadcast to use configurable title | pending | — | — |
-| 5 | Create PriceAlertConfig handler and register routes | pending | — | — |
-| 6 | Backend unit tests for config and refactored service | pending | — | — |
-| 7 | Update frontend notification interfaces | pending | — | — |
-| 8 | Add i18n translations for price alert config | pending | — | — |
-| 9 | Create PriceAlertConfigForm component | pending | — | — |
+| 1 | Add priceDiff field to priceMover struct | done | 804287a | Added PriceDiff int64 to priceMover, set in checkPrice |
+| 2 | Create price alert config model and Redis read/write | done | 804287a | Config structs, defaults, validation, sanitization, Redis load/save |
+| 3 | Refactor PriceAlertService to read config from Redis | done | 68d614c | Runtime config from Redis, template resolution, skip disabled categories |
+| 4 | Update AdminService broadcast to use configurable title | done | dbde364 | Broadcast uses cfg.BroadcastTitle from Redis config |
+| 5 | Create PriceAlertConfig handler and register routes | done | 68d614c | GET/PUT admin endpoints with merge, sanitize, validate |
+| 6 | Backend unit tests for config and refactored service | done | f19ccb1 | 14 unit tests with miniredis |
+| 7 | Update frontend notification interfaces | done | 95d8461 | Added priceDiff to PriceAlertMetadata, broadcastTitle to BroadcastMetadata |
+| 8 | Add i18n translations for price alert config | done | 95d8461 | Vietnamese + English translations for all config form labels |
+| 9 | Create PriceAlertConfigForm component | done | pending | Accordion form with global + per-category settings |
 | 10 | Update admin page: rename tab and integrate form | pending | — | — |
 | 11 | Update C4 architecture diagrams | pending | — | — |
 | 12 | Update runtime flow diagrams | pending | — | — |
