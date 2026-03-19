@@ -17,7 +17,7 @@ function isDismissed(): boolean {
 }
 
 export function PushPermissionBanner() {
-  const { isSubscribed, subscribe, isLoading, permissionState } = usePushSubscription();
+  const { isSubscribed, subscribe, isLoading, error, permissionState } = usePushSubscription();
   const { isInstalled, platform } = usePWAInstall();
   const [dismissed, setDismissed] = useState(true);
 
@@ -25,12 +25,12 @@ export function PushPermissionBanner() {
     setDismissed(isDismissed());
   }, []);
 
-  // Auto-subscribe if permission already granted but not subscribed
+  // Auto-subscribe if permission already granted but not subscribed (skip if errored)
   useEffect(() => {
-    if (permissionState === "granted" && !isSubscribed && !isLoading) {
+    if (permissionState === "granted" && !isSubscribed && !isLoading && !error) {
       subscribe();
     }
-  }, [permissionState, isSubscribed, isLoading, subscribe]);
+  }, [permissionState, isSubscribed, isLoading, error, subscribe]);
 
   // Hide conditions
   if (dismissed) return null;

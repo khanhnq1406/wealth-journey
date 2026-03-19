@@ -19,6 +19,7 @@ type PermissionState = "default" | "granted" | "denied" | "unsupported";
 interface UsePushSubscriptionReturn {
   isSubscribed: boolean;
   isLoading: boolean;
+  error: string | null;
   permissionState: PermissionState;
   subscribe: () => Promise<void>;
   unsubscribe: () => Promise<void>;
@@ -27,6 +28,7 @@ interface UsePushSubscriptionReturn {
 export function usePushSubscription(): UsePushSubscriptionReturn {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [permissionState, setPermissionState] = useState<PermissionState>("default");
   const vapidKeyRef = useRef<string | null>(null);
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
@@ -82,8 +84,9 @@ export function usePushSubscription(): UsePushSubscriptionReturn {
   }, []);
 
   const subscribe = useCallback(async () => {
-    if (!isSupported || isLoading) return;
+    if (!isSupported || isLoading || error) return;
     setIsLoading(true);
+    setError(null);
 
     try {
       const permission = await Notification.requestPermission();
@@ -115,12 +118,13 @@ export function usePushSubscription(): UsePushSubscriptionReturn {
       });
 
       setIsSubscribed(true);
-    } catch {
-      // Subscription failed — user can retry
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Push subscription failed";
+      setError(message);
     } finally {
       setIsLoading(false);
     }
-  }, [isSupported, isLoading, getVapidKey]);
+  }, [isSupported, isLoading, error, getVapidKey]);
 
   const unsubscribe = useCallback(async () => {
     if (!isSupported || isLoading) return;
@@ -153,5 +157,5 @@ export function usePushSubscription(): UsePushSubscriptionReturn {
     }
   }, [isSupported, isLoading]);
 
-  return { isSubscribed, isLoading, permissionState, subscribe, unsubscribe };
+  return { isSubscribed, isLoading, error, permissionState, subscribe, unsubscribe };
 }

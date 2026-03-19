@@ -13,6 +13,19 @@ End-to-end feature delivery pipeline for the WealthJourney financial application
 
 **Announce at start:** "I'm using the secure-feature-pipeline skill — step: `{step}`."
 
+## CRITICAL: Do NOT Use Claude Code Plan Mode
+
+**NEVER call `EnterPlanMode` when this skill is active.** This skill has its own planning process (Step 2: Plan) that saves plans to `docs/plans/YYYY-MM-DD-<feature>-plan.md`. Claude Code's built-in plan mode writes to `.claude/` which is the WRONG location.
+
+**Red flags that you're about to violate this:**
+
+- Thinking "I should enter plan mode to plan this"
+- Calling `EnterPlanMode` for any reason during this skill's execution
+- Writing plan files to `.claude/` instead of `docs/plans/`
+- Following Claude Code's native planning flow instead of this skill's Step 2
+
+**The rule:** When this skill is active, the word "plan" means **this skill's Step 2**, not Claude Code's `EnterPlanMode`. Always save plans to `docs/plans/`.
+
 ## Priority Rule #1: Error Handling and Retries
 
 **BEFORE retrying any failed command:**
@@ -25,13 +38,13 @@ End-to-end feature delivery pipeline for the WealthJourney financial application
 
 This skill is invoked with one of 5 command steps. The user passes the required input for each step.
 
-| Step | Command | Input | Output |
-|------|---------|-------|--------|
-| 1 | `brainstorm` | Feature requirement (text) | Spec file (`docs/specs/YYYY-MM-DD-<feature>-spec.md`) |
-| 2 | `plan` | Spec file path | Plan file (`docs/plans/YYYY-MM-DD-<feature>-plan.md`) |
-| 3 | `implement` | Plan file path | Implementation report (`docs/reports/YYYY-MM-DD-<feature>-report.md`) |
-| 4 | `review` | Implementation report path | Review verdict (approve / issues found) |
-| 5 | `fix` | Issue description OR report with issues | Loops back to step 1 (brainstorm the fix) |
+| Step | Command      | Input                                   | Output                                                                |
+| ---- | ------------ | --------------------------------------- | --------------------------------------------------------------------- |
+| 1    | `brainstorm` | Feature requirement (text)              | Spec file (`docs/specs/YYYY-MM-DD-<feature>-spec.md`)                 |
+| 2    | `plan`       | Spec file path                          | Plan file (`docs/plans/YYYY-MM-DD-<feature>-plan.md`)                 |
+| 3    | `implement`  | Plan file path                          | Implementation report (`docs/reports/YYYY-MM-DD-<feature>-report.md`) |
+| 4    | `review`     | Implementation report path              | Review verdict (approve / issues found)                               |
+| 5    | `fix`        | Issue description OR report with issues | Loops back to step 1 (brainstorm the fix)                             |
 
 ---
 
@@ -84,6 +97,7 @@ Before asking any questions, explore the codebase to understand:
 5. **Database schema** — Existing tables, relationships, constraints
 
 Use parallel exploration agents to read:
+
 - Related `.proto` files
 - Related backend services and handlers
 - Related frontend pages and components
@@ -123,6 +137,7 @@ Before writing the spec, complete this analysis using the checklist in `./securi
 Before writing the spec, determine which C4 diagrams need to be **created or updated** for this feature. The project maintains C4 diagrams in `docs/architecture/` using **Mermaid syntax**.
 
 **Existing diagrams:**
+
 - `c4-context.md` — Level 1: System Context (external integrations)
 - `c4-container.md` — Level 2: Containers (runtime units)
 - `c4-component-backend.md` — Level 3: Backend components (handlers, services, repos)
@@ -131,20 +146,22 @@ Before writing the spec, determine which C4 diagrams need to be **created or upd
 
 **For each feature, assess:**
 
-| Diagram Level | When to Update | When to Create New |
-|---------------|---------------|-------------------|
-| L1 Context | New external system integration | Never (rarely changes) |
-| L2 Container | New runtime unit (worker, scheduler) | Never (rarely changes) |
-| L3 Backend | New handler, service, or repository | Never (update existing) |
-| L3 Frontend | New page, feature module, or shared component | Never (update existing) |
-| L4 Code | Complex domain with 3+ models/services | New bounded context |
+| Diagram Level | When to Update                                | When to Create New      |
+| ------------- | --------------------------------------------- | ----------------------- |
+| L1 Context    | New external system integration               | Never (rarely changes)  |
+| L2 Container  | New runtime unit (worker, scheduler)          | Never (rarely changes)  |
+| L3 Backend    | New handler, service, or repository           | Never (update existing) |
+| L3 Frontend   | New page, feature module, or shared component | Never (update existing) |
+| L4 Code       | Complex domain with 3+ models/services        | New bounded context     |
 
 **Include in the spec:**
+
 1. Which existing diagrams need updates (with description of changes)
 2. Whether a new L4 code diagram is needed
 3. Draft the Mermaid diagrams for new L4 code diagrams
 
 **Mermaid format conventions** (match existing diagrams):
+
 - Use `C4Component` for L3 diagrams
 - Use `classDiagram` with `direction TB` for L4 code diagrams
 - Include `<<interface>>` annotations for service/repository interfaces
@@ -155,6 +172,7 @@ Before writing the spec, determine which C4 diagrams need to be **created or upd
 After implementation is complete, determine which **runtime flow diagrams** need to be created or updated. C4 diagrams show static structure ("what exists"); flow diagrams show dynamic behavior ("what happens when"). The project maintains flow diagrams in `docs/architecture/flow-*.md` using **Mermaid syntax**.
 
 **Existing flow diagram files:**
+
 - `flow-auth.md` — OAuth login/register, JWT middleware, session lifecycle
 - `flow-wallet.md` — Create wallet, transfer funds, delete wallet
 - `flow-transaction.md` — Create/update/delete transaction, bank statement import
@@ -163,21 +181,23 @@ After implementation is complete, determine which **runtime flow diagrams** need
 
 **For each feature, assess:**
 
-| Condition | Action |
-|-----------|--------|
-| New API endpoint with multi-step business logic | Add sequence diagram to the relevant `flow-*.md` file |
-| New background job or scheduled task | Add to `flow-cross-cutting.md` |
-| New branching/decision logic (e.g., deletion options) | Add flowchart to the relevant `flow-*.md` file |
-| New domain not covered by existing files | Create new `flow-<domain>.md` file |
-| Existing flow changed (new steps, different error paths) | Update the existing diagram |
-| Simple CRUD with no branching or multi-service coordination | No flow diagram needed |
+| Condition                                                   | Action                                                |
+| ----------------------------------------------------------- | ----------------------------------------------------- |
+| New API endpoint with multi-step business logic             | Add sequence diagram to the relevant `flow-*.md` file |
+| New background job or scheduled task                        | Add to `flow-cross-cutting.md`                        |
+| New branching/decision logic (e.g., deletion options)       | Add flowchart to the relevant `flow-*.md` file        |
+| New domain not covered by existing files                    | Create new `flow-<domain>.md` file                    |
+| Existing flow changed (new steps, different error paths)    | Update the existing diagram                           |
+| Simple CRUD with no branching or multi-service coordination | No flow diagram needed                                |
 
 **Include in the spec:**
+
 1. Which existing flow diagrams need updates (with description of changes)
 2. Whether new flow diagrams are needed (and which file they belong in)
 3. Brief description of the flow to be diagrammed
 
 **Flow diagram conventions** (match existing docs):
+
 - `sequenceDiagram` for multi-participant request-response flows (most common)
 - `flowchart TD` for branching/decision logic
 - `stateDiagram-v2` for lifecycle/state-machine flows
@@ -193,113 +213,144 @@ Save to: `docs/specs/YYYY-MM-DD-<feature>-spec.md`
 # [Feature Name] Specification
 
 ## Summary
+
 [One paragraph describing what this feature does and why]
 
 ## User Stories
+
 - As a [role], I want [action], so that [benefit]
 
 ## Functional Requirements
+
 ### FR-1: [Requirement Name]
+
 [Detailed description]
 **Acceptance criteria:**
+
 - [ ] ...
 
 ## Non-Functional Requirements
+
 - Performance: [expectations]
 - Security: [requirements]
 
 ## Architecture Changes (C4)
+
 ### Diagrams to Update
+
 [Which existing C4 diagrams need changes and what changes]
 
 ### New Diagrams
+
 [L4 code diagram if this is a complex domain — include Mermaid source]
 
 ## Runtime Flow Diagrams
+
 ### Flow Diagrams to Update
+
 [Which existing flow-*.md diagrams need changes and what changes]
 
 ### New Flow Diagrams
+
 [New flows to document — specify target file, diagram type, and brief flow description]
 
 ## Data Model Changes
+
 [New/modified tables, fields, relationships]
 
 ## API Changes
+
 [New/modified endpoints with request/response shapes]
 
 ## UI/UX Changes
+
 [New/modified pages, components, flows]
 
 **REQUIRED for any frontend/UI work:**
+
 - Follow **mobile-first design** — use `responsive-design` skill for Tailwind breakpoints and layout
 - Follow **ui-ux-pro-max** skill for design system, color palette, typography, accessibility, and component patterns
 - Follow **react-best-practices** skill for performance (no waterfalls, direct imports, dynamic imports for heavy components)
 - This app uses `sm:` at 800px (custom breakpoint) — always verify against `tailwind.config.ts`
 
 ### Existing Component Inventory (REQUIRED)
+
 Before proposing new components, check what already exists and can be reused:
 
-| Need | Existing Component | Location |
-|------|--------------------|----------|
-| [describe need] | [component name or "NEW — create in features/<domain>/components/"] | [path] |
+| Need            | Existing Component                                                  | Location |
+| --------------- | ------------------------------------------------------------------- | -------- |
+| [describe need] | [component name or "NEW — create in features/<domain>/components/"] | [path]   |
 
 **Shared components reference** (`components/`): BaseCard, Button, FormInput, FormSelect, FormNumberInput, FormDatePicker, FormToggle, FormTextarea, FormCreatableSelect, FormWizard, BaseModal, ConfirmationDialog, Success, MobileTable, TanStackTable, BarChart, LineChart, DonutChart, Sparkline, EmptyState, ErrorState, Toast, LoadingSpinner, FullPageLoading, Skeleton, BottomNav, ActiveLink, FloatingActionButton, SVG icons (components/icons/)
 
 **Image components**: `OptimizedImage` (blur placeholder + fallback), `Avatar` (pre-sized: xs/sm/md/lg/xl/full) — both from `components/OptimizedImage.tsx`. Use `next/image` directly for static assets.
 
 ### New Components (if any)
-| Component | Location | Justification (why not reuse existing) |
-|-----------|----------|----------------------------------------|
-| [name] | `features/<domain>/components/` or `components/<category>/` | [reason] |
+
+| Component | Location                                                    | Justification (why not reuse existing) |
+| --------- | ----------------------------------------------------------- | -------------------------------------- |
+| [name]    | `features/<domain>/components/` or `components/<category>/` | [reason]                               |
 
 ## Security & Risk Assessment
 
 ### Data Flow Diagram
-| # | Source | Data | Trust Boundary Crossed? | Destination | Notes |
-|---|--------|------|------------------------|-------------|-------|
-| 1 | ... | ... | Yes/No: [boundary] | ... | ... |
+
+| #   | Source | Data | Trust Boundary Crossed? | Destination | Notes |
+| --- | ------ | ---- | ----------------------- | ----------- | ----- |
+| 1   | ...    | ...  | Yes/No: [boundary]      | ...         | ...   |
 
 ### Trust Boundaries
-| Boundary | Crossed By | Security Control |
-|----------|-----------|-----------------|
+
+| Boundary       | Crossed By    | Security Control |
+| -------------- | ------------- | ---------------- |
 | Internet → App | User requests | JWT + validation |
 
 ### Threats Identified (STRIDE per boundary crossing)
-| # | Data Flow | Boundary | STRIDE | Threat | Severity | Mitigation |
-|---|-----------|----------|--------|--------|----------|------------|
-| T-1 | 1 | Internet → App | Tampering | ... | High/Medium/Low | ... |
+
+| #   | Data Flow | Boundary       | STRIDE    | Threat | Severity        | Mitigation |
+| --- | --------- | -------------- | --------- | ------ | --------------- | ---------- |
+| T-1 | 1         | Internet → App | Tampering | ...    | High/Medium/Low | ...        |
 
 ### Authorization Rules
+
 [Who can do what]
 
 ### Input Validation Rules
+
 [What needs validation, where]
 
 ### External Dependency Risks
+
 [Third-party APIs/packages, failure modes, trust level]
 
 ### Sensitive Data Handling
+
 [What data is sensitive, how to protect it]
 
 ### Issues & Risks Summary
+
 1. [Issue/risk a]
 2. [Issue/risk b]
 3. [Issue/risk c]
 
 ## Edge Cases & Error Handling
+
 [What can go wrong, how to handle it]
 
 ## Dependencies & Assumptions
+
 [External services, existing features, assumptions]
 
 ## Out of Scope
+
 [What this feature explicitly does NOT include]
 ```
 
 ---
 
 ## Step 2: Plan
+
+**REMINDER: Do NOT call `EnterPlanMode`. Write the plan directly to `docs/plans/` using this skill's process below.**
 
 **Input:** Spec file path from brainstorm step.
 
@@ -331,13 +382,16 @@ Save to: `docs/plans/YYYY-MM-DD-<feature>-plan.md`
 **Tech Stack:** [Key technologies]
 
 ## Security Implementation Notes
+
 [Cross-cutting security concerns for the entire feature]
+
 - Authentication: [how auth is handled]
 - Authorization: [resource ownership checks]
 - Input validation: [server-side validation strategy]
 - Data sanitization: [XSS, injection prevention]
 
 ## C4 Architecture Diagram Updates
+
 [Which diagrams to update/create, referencing spec's Architecture Changes section]
 
 ---
@@ -345,11 +399,13 @@ Save to: `docs/plans/YYYY-MM-DD-<feature>-plan.md`
 ### Task 0: Update C4 Architecture Diagrams
 
 **Files:**
+
 - Modify: `docs/architecture/c4-component-backend.md` (if backend changes)
 - Modify: `docs/architecture/c4-component-frontend.md` (if frontend changes)
 - Create: `docs/architecture/c4-code-<domain>.md` (if new complex domain)
 
 **Steps:**
+
 1. Update existing Mermaid diagrams with new components
 2. Create L4 code diagram if needed (classDiagram with interfaces)
 3. Commit diagram changes
@@ -359,10 +415,12 @@ Save to: `docs/plans/YYYY-MM-DD-<feature>-plan.md`
 ### Task N-1: Create/Update Runtime Flow Diagrams
 
 **Files:**
+
 - Modify: `docs/architecture/flow-<domain>.md` (if updating existing flows)
 - Create: `docs/architecture/flow-<domain>.md` (if new domain)
 
 **Steps:**
+
 1. Read the implemented service code to trace the actual runtime flow
 2. Identify diagram type: `sequenceDiagram` for multi-participant flows, `flowchart TD` for branching logic, `stateDiagram-v2` for lifecycle flows
 3. Write diagram with: trigger, endpoint, source file reference, error/alternative paths
@@ -378,6 +436,7 @@ Save to: `docs/plans/YYYY-MM-DD-<feature>-plan.md`
 ### Task 1: [Component Name]
 
 **Files:**
+
 - Create: `exact/path/to/file`
 - Modify: `exact/path/to/existing:line-range`
 - Test: `exact/path/to/test`
@@ -399,7 +458,7 @@ Save to: `docs/plans/YYYY-MM-DD-<feature>-plan.md`
 **Step 5: [Additional steps if needed — validation, auth checks, etc.]**
 [Exact code]
 
-**Step N-1: Playwright E2E Audit** *(skip if backend-only task)*
+**Step N-1: Playwright E2E Audit** _(skip if backend-only task)_
 
 - Identify pages affected by this task
 - Run existing spec: `cd src/wj-client && npx playwright test tests/e2e/<spec>.spec.ts --reporter=list`
@@ -420,6 +479,7 @@ For tasks involving frontend/UI work, include these additional steps:
 ### Task N: [Frontend Component/Page Name]
 
 **Files:**
+
 - Create: `exact/path/to/file`
 - Modify: `exact/path/to/existing`
 
@@ -427,6 +487,7 @@ For tasks involving frontend/UI work, include these additional steps:
 
 **Step 0: Component inventory check**
 Search existing components before creating new ones:
+
 - [ ] Checked `components/` for reusable shared components
 - [ ] Checked `features/<domain>/components/` for feature components
 - [ ] Checked `components/icons/` for SVG icons (not emojis)
@@ -440,6 +501,7 @@ Search existing components before creating new ones:
 **Step 2-4: [Standard TDD steps]**
 
 **Step 5: Responsive & accessibility check**
+
 - Mobile (375px): [verify no horizontal scroll, touch targets >= 44px]
 - Desktop (800px+): [verify sm: breakpoint layout]
 - Images: Use `next/image` / `OptimizedImage` / `Avatar` (not plain `<img>`)
@@ -451,6 +513,7 @@ Search existing components before creating new ones:
 ```
 
 **Required sub-skills for frontend tasks:**
+
 - `ui-ux-pro-max` — Design system, accessibility, component patterns
 - `responsive-design` — Mobile-first Tailwind, custom `sm:` breakpoint at 800px
 - `react-best-practices` — Performance (waterfalls, bundle size, re-renders)
@@ -460,6 +523,7 @@ Search existing components before creating new ones:
 **Every implementation task MUST follow TDD: test first, then implementation.**
 
 Each step is one action (2-5 minutes):
+
 1. "Write the failing test" — step (ALWAYS FIRST)
 2. "Run it to make sure it fails" — step (VERIFY RED)
 3. "Implement the minimal code to pass" — step (GREEN)
@@ -469,6 +533,7 @@ Each step is one action (2-5 minutes):
 7. "Commit" — step
 
 **Test requirements per layer:**
+
 - **Backend service:** Unit test for business logic, edge cases, error paths
 - **Backend handler:** Integration test for HTTP request/response, auth, validation
 - **Frontend component:** Component test for rendering, user interaction, error states
@@ -476,6 +541,7 @@ Each step is one action (2-5 minutes):
 - **Frontend UI changes:** E2E test updated/added in `tests/e2e/` using Playwright (see `./implementer-prompt.md`)
 
 **Red flags:**
+
 - Implementation step before test step = plan violation
 - "Add tests" as a separate task at the end = NOT TDD
 - Test that only checks happy path = insufficient coverage
@@ -483,6 +549,7 @@ Each step is one action (2-5 minutes):
 ### Security-Specific Tasks
 
 **Always include dedicated tasks for:**
+
 - Input validation (server-side, never trust client)
 - Authorization checks (user owns resource)
 - Rate limiting (if applicable)
@@ -509,6 +576,7 @@ Each step is one action (2-5 minutes):
 # [Feature Name] — Implementation Progress
 
 ## Metadata
+
 - **Feature:** [feature name]
 - **Plan file:** [path to plan file]
 - **Spec file:** [path to spec file]
@@ -519,18 +587,19 @@ Each step is one action (2-5 minutes):
 
 ## Task Progress
 
-| # | Task Name | Status | Commit | Summary |
-|---|-----------|--------|--------|---------|
-| 0 | Update C4 Architecture Diagrams | pending | — | — |
-| 1 | [task name from plan] | pending | — | — |
-| 2 | [task name from plan] | pending | — | — |
-| ... | ... | ... | ... | ... |
+| #   | Task Name                       | Status  | Commit | Summary |
+| --- | ------------------------------- | ------- | ------ | ------- |
+| 0   | Update C4 Architecture Diagrams | pending | —      | —       |
+| 1   | [task name from plan]           | pending | —      | —       |
+| 2   | [task name from plan]           | pending | —      | —       |
+| ... | ...                             | ...     | ...    | ...     |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
 ## Resume Instructions
 
 To resume this implementation in a new session:
+
 1. Read this progress file
 2. Read the plan file referenced above
 3. Check `git log --oneline -10` to verify last commit matches the last `done` task
@@ -543,6 +612,7 @@ To resume this implementation in a new session:
 ```
 
 **Update rules:**
+
 1. **Initialize** the progress file before starting the first task (after creating the task list)
 2. **Update on task start** — set status to `in_progress`, update `Current task`
 3. **Update on task complete** — set status to `done`, add commit hash and one-line summary, advance `Current task`
@@ -632,6 +702,7 @@ Unlike the standard two-stage review, financial features require **three stages*
 **NON-NEGOTIABLE.** After all three reviews pass for a task, execute this 4-step checkpoint sequence before moving to the next task:
 
 **Step 1: Update progress file**
+
 - Set the task status to `done` in the progress table
 - Add the commit hash (from step 2 — use a placeholder, then amend or update after committing)
 - Add a one-line summary of what was implemented
@@ -639,6 +710,7 @@ Unlike the standard two-stage review, financial features require **three stages*
 - Update `Last updated` timestamp
 
 **Step 2: Stage and commit**
+
 - Stage all files changed by the task **plus** the progress file
 - Commit with a descriptive message: `feat(<feature>): implement task N — <task name>`
 - The progress file MUST be included in the commit
@@ -656,6 +728,7 @@ Present a clear summary to the user:
 ```
 
 **Step 4: Auto-proceed to next task**
+
 - Display the summary and immediately continue to the next task
 - Do NOT wait for user approval — keep implementation flowing continuously
 - The user can interrupt at any time if they need to course-correct
@@ -681,50 +754,63 @@ Save to: `docs/reports/YYYY-MM-DD-<feature>-report.md`
 # [Feature Name] Implementation Report
 
 ## Summary
+
 [What was implemented]
 
 ## Spec Reference
+
 [Path to spec file]
 
 ## Plan Reference
+
 [Path to plan file]
 
 ## Tasks Completed
-| # | Task | Status | Files Changed | Tests | TDD |
-|---|------|--------|---------------|-------|-----|
-| 1 | ... | Done | ... | 5/5 pass | Yes |
+
+| #   | Task | Status | Files Changed | Tests    | TDD |
+| --- | ---- | ------ | ------------- | -------- | --- |
+| 1   | ...  | Done   | ...           | 5/5 pass | Yes |
 
 ## Test Coverage Summary
-| Layer | Test File | Tests | Pass | Coverage Area |
-|-------|-----------|-------|------|---------------|
-| Backend Service | `..._test.go` | N | N/N | Business logic, edge cases |
-| Backend Handler | `..._test.go` | N | N/N | HTTP, auth, validation |
-| Frontend Component | `...test.tsx` | N | N/N | Render, interaction, errors |
+
+| Layer              | Test File     | Tests | Pass | Coverage Area               |
+| ------------------ | ------------- | ----- | ---- | --------------------------- |
+| Backend Service    | `..._test.go` | N     | N/N  | Business logic, edge cases  |
+| Backend Handler    | `..._test.go` | N     | N/N  | HTTP, auth, validation      |
+| Frontend Component | `...test.tsx` | N     | N/N  | Render, interaction, errors |
 
 ## Security Implementation Summary
-| Concern | Implementation | Verified |
-|---------|---------------|----------|
-| Input validation | Server-side Zod + Go validators | Yes |
-| Authorization | User ownership check in service layer | Yes |
-| ... | ... | ... |
+
+| Concern          | Implementation                        | Verified |
+| ---------------- | ------------------------------------- | -------- |
+| Input validation | Server-side Zod + Go validators       | Yes      |
+| Authorization    | User ownership check in service layer | Yes      |
+| ...              | ...                                   | ...      |
 
 ## Review Results
+
 ### Spec Compliance
+
 [Summary of spec review findings and resolutions]
 
 ### Security Review
+
 [Summary of security review findings and resolutions]
 
 ### Code Quality
+
 [Summary of quality review findings and resolutions]
 
 ## Known Issues / Technical Debt
+
 [Any issues deferred or technical debt introduced]
 
 ## Files Changed
+
 [Complete list of all files created/modified]
 
 ## How to Test
+
 [Manual testing steps for verification]
 ```
 
@@ -752,6 +838,7 @@ If a session is lost to context compaction or you're starting a new session to c
 **Key rule:** The **progress file is the source of truth**, not TaskList state. TaskList is ephemeral (lives in conversation context only). If there's a conflict between the progress file and TaskList state, trust the progress file.
 
 **Edge case — uncommitted work found:**
+
 - If `git status` shows uncommitted changes, present them to the user
 - Ask whether to: (a) commit them as part of the current task, (b) stash them, or (c) discard them
 - Never silently discard uncommitted work
@@ -774,28 +861,28 @@ If a session is lost to context compaction or you're starting a new session to c
    a. **Full Spec Compliance Review** — Read ALL changed files, verify against every requirement in the spec
 
    b. **Security Audit** — Use `./security-audit-prompt.md` for comprehensive security review:
-      - OWASP Top 10 check (Phase 2)
-      - Financial-specific audit: monetary integrity, race conditions, FIFO accounting (Phase 3)
-      - Cross-cutting: error handling, logging, configuration (Phase 4)
-      - Frontend security: XSS, data handling (Phase 5)
-      - Encryption & data protection: TLS, key management (Phase 6)
-      - Runtime security readiness: monitoring, anomaly detection, incident response (Phase 7)
+   - OWASP Top 10 check (Phase 2)
+   - Financial-specific audit: monetary integrity, race conditions, FIFO accounting (Phase 3)
+   - Cross-cutting: error handling, logging, configuration (Phase 4)
+   - Frontend security: XSS, data handling (Phase 5)
+   - Encryption & data protection: TLS, key management (Phase 6)
+   - Runtime security readiness: monitoring, anomaly detection, incident response (Phase 7)
 
    c. **Integration Review** — Verify components work together:
-      - Proto → Backend → Frontend data flow
-      - Error propagation
-      - Loading states
-      - Edge cases
+   - Proto → Backend → Frontend data flow
+   - Error propagation
+   - Loading states
+   - Edge cases
 
    d. **Architecture Diagram Review** — Verify architecture documentation is updated:
-      - New components reflected in L3 C4 diagrams
-      - New complex domains have L4 code diagrams
-      - Existing C4 diagrams updated if backend/frontend structure changed
-      - Runtime flow diagrams created/updated for new multi-step business logic
-      - Flow diagrams accurately trace through actual service code (not hypothetical)
-      - Flow diagrams include error paths and key invariants
-      - `docs/architecture/README.md` updated if new flow files were created
-      - Mermaid syntax renders correctly
+   - New components reflected in L3 C4 diagrams
+   - New complex domains have L4 code diagrams
+   - Existing C4 diagrams updated if backend/frontend structure changed
+   - Runtime flow diagrams created/updated for new multi-step business logic
+   - Flow diagrams accurately trace through actual service code (not hypothetical)
+   - Flow diagrams include error paths and key invariants
+   - `docs/architecture/README.md` updated if new flow files were created
+   - Mermaid syntax renders correctly
 
 5. **Compile verdict:**
    - **APPROVED** — All reviews pass, ready for production
@@ -807,23 +894,29 @@ If a session is lost to context compaction or you're starting a new session to c
 ## Review Verdict: [APPROVED / ISSUES FOUND]
 
 ### Spec Compliance: [PASS / FAIL]
+
 [Details]
 
 ### Security Audit: [PASS / FAIL]
+
 [Details with specific findings]
 
 ### Integration Review: [PASS / FAIL]
+
 [Details]
 
 ### Architecture Diagrams: [PASS / FAIL]
+
 [C4 + runtime flow diagram updates]
 
 ### Issues (if any)
-| # | Severity | Category | Description | File:Line |
-|---|----------|----------|-------------|-----------|
-| 1 | Critical | Security | ... | ... |
+
+| #   | Severity | Category | Description | File:Line |
+| --- | -------- | -------- | ----------- | --------- |
+| 1   | Critical | Security | ...         | ...       |
 
 ### Recommendation
+
 [Approve / Fix issues and re-review]
 ```
 
@@ -863,12 +956,14 @@ digraph fix_path {
 ### Minor Fix Path (Lightweight)
 
 Use when ALL of these are true:
+
 - Fix touches **1-2 files** only
 - No new business logic or API changes
 - No security implications (e.g., fixing a typo, adjusting UI alignment, fixing a display format)
 - No changes to data models, authorization, or validation logic
 
 **Process:**
+
 1. **Parse the issue** — Understand exactly what's wrong
 2. **Implement the fix** — With a test (TDD still applies)
 3. **Dispatch security reviewer** — Quick check that the fix doesn't introduce vulnerabilities
@@ -876,9 +971,10 @@ Use when ALL of these are true:
 
 ```markdown
 ## Fix History
-| Date | Fix | Severity | Commit |
-|------|-----|----------|--------|
-| YYYY-MM-DD | [description of what was fixed] | Minor | [commit hash] |
+
+| Date       | Fix                             | Severity | Commit        |
+| ---------- | ------------------------------- | -------- | ------------- |
+| YYYY-MM-DD | [description of what was fixed] | Minor    | [commit hash] |
 ```
 
 5. **Done** — No need for full brainstorm/plan cycle or a separate report file
@@ -886,6 +982,7 @@ Use when ALL of these are true:
 ### Major Fix Path (Full Pipeline)
 
 Use when ANY of these are true:
+
 - Fix touches **3+ files**
 - Introduces new business logic
 - Changes authorization, validation, or data models
@@ -894,6 +991,7 @@ Use when ANY of these are true:
 - Root cause analysis reveals a design issue
 
 **Process:**
+
 1. **Parse the issues** — Extract specific problems from the input
 2. **Start brainstorm (step 1)** with the fix as the "feature requirement"
    - The requirement is: "Fix these specific issues: [list]"
@@ -908,20 +1006,25 @@ Use when ANY of these are true:
 # Fix: [Issue Summary]
 
 ## Original Feature
+
 [Reference to original spec/plan/report]
 
 ## Issues to Fix
-| # | Issue | Source | Severity |
-|---|-------|--------|----------|
-| 1 | ... | Review / User report / Bug | ... |
+
+| #   | Issue | Source                     | Severity |
+| --- | ----- | -------------------------- | -------- |
+| 1   | ...   | Review / User report / Bug | ...      |
 
 ## Root Cause Analysis
+
 [Why did this happen? What was missed?]
 
 ## Fix Approach
+
 [How to fix each issue]
 
 ## Regression Risks
+
 [What could break when fixing this?]
 ```
 
@@ -967,15 +1070,18 @@ Use when ANY of these are true:
 ## Integration
 
 **This skill orchestrates:**
+
 - brainstorming patterns (from brainstorming skill)
 - writing-plans patterns (from writing-plans skill)
 - subagent-driven-development patterns (from subagent-driven-development skill)
 
 **Required sub-skills by context:**
+
 - **Any UI/frontend work** → `ui-ux-pro-max` skill (design system, color, typography, accessibility, component patterns) + `responsive-design` skill (mobile-first Tailwind breakpoints, container queries) + `react-best-practices` skill (performance: waterfalls, bundle size, re-renders, next/image)
 - **C4 or architecture diagrams** → `c4-architecture` skill (Mermaid C4 syntax, element types, best practices)
 
 **Subagents should follow:**
+
 - Existing codebase patterns (CLAUDE.md)
 - Protocol Buffer first API design
 - DDD architecture (models → repository → service → handler)
