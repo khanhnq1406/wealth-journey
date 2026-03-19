@@ -16,6 +16,63 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+// --- Mock types ---
+
+// mockAdminNotifRepo implements repository.NotificationRepository for admin service testing.
+type mockAdminNotifRepo struct {
+	mock.Mock
+}
+
+func (m *mockAdminNotifRepo) Create(ctx context.Context, notification *models.Notification) error {
+	args := m.Called(ctx, notification)
+	return args.Error(0)
+}
+
+func (m *mockAdminNotifRepo) BatchCreate(ctx context.Context, notifications []*models.Notification) error {
+	args := m.Called(ctx, notifications)
+	return args.Error(0)
+}
+
+func (m *mockAdminNotifRepo) GetByUserID(ctx context.Context, userID int32, opts repository.ListOptions) ([]*models.Notification, int, error) {
+	args := m.Called(ctx, userID, opts)
+	return args.Get(0).([]*models.Notification), args.Int(1), args.Error(2)
+}
+
+func (m *mockAdminNotifRepo) GetUnreadCount(ctx context.Context, userID int32) (int32, error) {
+	args := m.Called(ctx, userID)
+	return args.Get(0).(int32), args.Error(1)
+}
+
+func (m *mockAdminNotifRepo) MarkAllRead(ctx context.Context, userID int32) error {
+	args := m.Called(ctx, userID)
+	return args.Error(0)
+}
+
+func (m *mockAdminNotifRepo) MarkRead(ctx context.Context, id int32, userID int32) error {
+	args := m.Called(ctx, id, userID)
+	return args.Error(0)
+}
+
+// mockAdminPushSvc implements PushService for admin service testing.
+type mockAdminPushSvc struct {
+	mock.Mock
+}
+
+func (m *mockAdminPushSvc) SendToUser(ctx context.Context, userID int32, title, body, url string) error {
+	args := m.Called(ctx, userID, title, body, url)
+	return args.Error(0)
+}
+
+func (m *mockAdminPushSvc) SendToAll(ctx context.Context, title, body, url string) error {
+	args := m.Called(ctx, title, body, url)
+	return args.Error(0)
+}
+
+func (m *mockAdminPushSvc) GetVAPIDPublicKey() string {
+	args := m.Called()
+	return args.String(0)
+}
+
 // mockAdminUserRepo implements repository.UserRepository for admin service testing.
 type mockAdminUserRepo struct {
 	mock.Mock
@@ -75,9 +132,25 @@ func (m *mockAdminUserRepo) ListWithSearch(ctx context.Context, search string, o
 	return args.Get(0).([]*models.User), args.Int(1), args.Error(2)
 }
 
-// newAdminService creates an admin service with the given mocks for testing.
+func (m *mockAdminUserRepo) GetAllUserIDs(ctx context.Context) ([]int32, error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]int32), args.Error(1)
+}
+
+// newTestAdminService creates an admin service with the given mocks for testing.
+// Passes nil for RedisClient and a noop PushService to test non-Redis paths.
 func newTestAdminService(userRepo *mockAdminUserRepo, feedbackRepo *mockFeedbackRepo) AdminService {
-	return NewAdminService(userRepo, feedbackRepo)
+	return NewAdminService(userRepo, feedbackRepo, new(mockAdminNotifRepo), nil, &noopPushService{})
+}
+
+// newTestAdminServiceFull creates an admin service with all mocks for broadcast testing.
+func newTestAdminServiceFull(
+	userRepo *mockAdminUserRepo,
+	feedbackRepo *mockFeedbackRepo,
+	notifRepo *mockAdminNotifRepo,
+	pushSvc *mockAdminPushSvc,
+) AdminService {
+	return NewAdminService(userRepo, feedbackRepo, notifRepo, nil, pushSvc)
 }
 
 // --- ListUsers tests ---
@@ -409,4 +482,117 @@ func TestAdminService_DeleteFeedback_NotFound(t *testing.T) {
 	assert.Error(t, err)
 	assert.Equal(t, 404, apperrors.GetStatusCode(err))
 	feedbackRepo.AssertExpectations(t)
+}
+
+// --- Broadcast tests ---
+
+func TestAdminService_Broadcast_Success(t *testing.T) {
+	userRepo := new(mockAdminUserRepo)
+	feedbackRepo := new(mockFeedbackRepo)
+	notifRepo := new(mockAdminNotifRepo)
+	pushSvc := new(mockAdminPushSvc)
+	svc := newTestAdminServiceFull(userRepo, feedbackRepo, notifRepo, pushSvc)
+	ctx := context.Background()
+
+	admin := &models.User{ID: 1, Name: "Admin"}
+	userRepo.On("GetByID", ctx, int32(1)).Return(admin, nil)
+	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1, 2, 3}, nil)
+	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
+	pushSvc.On("SendToAll", ctx, "Thông báo từ hệ thống", "Hello everyone", "").Return(nil)
+
+	count, err := svc.Broadcast(ctx, 1, "Hello everyone")
+
+	assert.NoError(t, err)
+	assert.Equal(t, int32(3), count)
+	notifRepo.AssertExpectations(t)
+	pushSvc.AssertExpectations(t)
+}
+
+func TestAdminService_Broadcast_EmptyMessage(t *testing.T) {
+	userRepo := new(mockAdminUserRepo)
+	feedbackRepo := new(mockFeedbackRepo)
+	notifRepo := new(mockAdminNotifRepo)
+	pushSvc := new(mockAdminPushSvc)
+	svc := newTestAdminServiceFull(userRepo, feedbackRepo, notifRepo, pushSvc)
+	ctx := context.Background()
+
+	count, err := svc.Broadcast(ctx, 1, "")
+
+	assert.Error(t, err)
+	assert.Equal(t, int32(0), count)
+	assert.Contains(t, err.Error(), "must not be empty")
+	assert.Equal(t, 400, apperrors.GetStatusCode(err))
+}
+
+func TestAdminService_Broadcast_WhitespaceOnlyMessage(t *testing.T) {
+	userRepo := new(mockAdminUserRepo)
+	feedbackRepo := new(mockFeedbackRepo)
+	notifRepo := new(mockAdminNotifRepo)
+	pushSvc := new(mockAdminPushSvc)
+	svc := newTestAdminServiceFull(userRepo, feedbackRepo, notifRepo, pushSvc)
+	ctx := context.Background()
+
+	count, err := svc.Broadcast(ctx, 1, "   ")
+
+	assert.Error(t, err)
+	assert.Equal(t, int32(0), count)
+	assert.Contains(t, err.Error(), "must not be empty")
+}
+
+func TestAdminService_Broadcast_MessageTooLong(t *testing.T) {
+	userRepo := new(mockAdminUserRepo)
+	feedbackRepo := new(mockFeedbackRepo)
+	notifRepo := new(mockAdminNotifRepo)
+	pushSvc := new(mockAdminPushSvc)
+	svc := newTestAdminServiceFull(userRepo, feedbackRepo, notifRepo, pushSvc)
+	ctx := context.Background()
+
+	longMsg := strings.Repeat("a", 501)
+	count, err := svc.Broadcast(ctx, 1, longMsg)
+
+	assert.Error(t, err)
+	assert.Equal(t, int32(0), count)
+	assert.Contains(t, err.Error(), "500 characters")
+	assert.Equal(t, 400, apperrors.GetStatusCode(err))
+}
+
+func TestAdminService_Broadcast_HTMLStripping(t *testing.T) {
+	userRepo := new(mockAdminUserRepo)
+	feedbackRepo := new(mockFeedbackRepo)
+	notifRepo := new(mockAdminNotifRepo)
+	pushSvc := new(mockAdminPushSvc)
+	svc := newTestAdminServiceFull(userRepo, feedbackRepo, notifRepo, pushSvc)
+	ctx := context.Background()
+
+	admin := &models.User{ID: 1, Name: "Admin"}
+	userRepo.On("GetByID", ctx, int32(1)).Return(admin, nil)
+	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1}, nil)
+	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
+	// The push message should have HTML stripped: "<b>bold</b>" becomes "bold"
+	pushSvc.On("SendToAll", ctx, "Thông báo từ hệ thống", "bold", "").Return(nil)
+
+	count, err := svc.Broadcast(ctx, 1, "<b>bold</b>")
+
+	assert.NoError(t, err)
+	assert.Equal(t, int32(1), count)
+	pushSvc.AssertExpectations(t)
+}
+
+func TestAdminService_Broadcast_GetUserIDsFails(t *testing.T) {
+	userRepo := new(mockAdminUserRepo)
+	feedbackRepo := new(mockFeedbackRepo)
+	notifRepo := new(mockAdminNotifRepo)
+	pushSvc := new(mockAdminPushSvc)
+	svc := newTestAdminServiceFull(userRepo, feedbackRepo, notifRepo, pushSvc)
+	ctx := context.Background()
+
+	admin := &models.User{ID: 1, Name: "Admin"}
+	userRepo.On("GetByID", ctx, int32(1)).Return(admin, nil)
+	userRepo.On("GetAllUserIDs", ctx).Return([]int32(nil), apperrors.NewInternalError("db error"))
+
+	count, err := svc.Broadcast(ctx, 1, "test message")
+
+	assert.Error(t, err)
+	assert.Equal(t, int32(0), count)
+	userRepo.AssertExpectations(t)
 }
