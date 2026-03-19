@@ -244,11 +244,15 @@ func (s *adminService) Broadcast(ctx context.Context, adminUserID int32, message
 		return 0, err
 	}
 
+	// Load config for broadcast title
+	cfg := LoadPriceAlertConfig(ctx, s.redisClient)
+
 	// Build metadata
 	metadata := map[string]interface{}{
-		"message":   message,
-		"adminId":   adminUserID,
-		"adminName": admin.Name,
+		"message":        message,
+		"adminId":        adminUserID,
+		"adminName":      admin.Name,
+		"broadcastTitle": cfg.BroadcastTitle,
 	}
 	metadataJSON, err := json.Marshal(metadata)
 	if err != nil {
@@ -292,9 +296,9 @@ func (s *adminService) Broadcast(ctx context.Context, adminUserID int32, message
 		}
 	}
 
-	// Push notification
+	// Push notification — use configurable broadcast title
 	if s.pushSvc != nil {
-		_ = s.pushSvc.SendToAll(ctx, "Thông báo từ hệ thống", message, "")
+		_ = s.pushSvc.SendToAll(ctx, cfg.BroadcastTitle, message, "")
 	}
 
 	return int32(len(userIDs)), nil
