@@ -1063,6 +1063,9 @@ func (s *communityService) GetNotifications(ctx context.Context, userID int32, r
 				item.PostPreview = preview
 			}
 		}
+		if len(n.Metadata) > 0 {
+			item.Metadata = string(n.Metadata)
+		}
 		items[i] = item
 	}
 
