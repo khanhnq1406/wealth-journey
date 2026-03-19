@@ -30,7 +30,6 @@ func TestDefaultPriceAlertConfig(t *testing.T) {
 
 	assert.Equal(t, 120, cfg.CooldownMinutes)
 	assert.Equal(t, 5, cfg.TopMoversCount)
-	assert.Equal(t, "Thông báo từ hệ thống", cfg.BroadcastTitle)
 	assert.Len(t, cfg.Categories, 4)
 
 	goldVND := cfg.Categories["gold_vnd"]
@@ -93,17 +92,8 @@ func TestValidatePriceAlertConfig_HTMLOnlyTemplate(t *testing.T) {
 	assert.Contains(t, errs, "categories.gold_vnd.titleTemplate")
 }
 
-func TestValidatePriceAlertConfig_EmptyBroadcastTitle(t *testing.T) {
-	cfg := DefaultPriceAlertConfig()
-	cfg.BroadcastTitle = ""
-	errs := ValidatePriceAlertConfig(cfg)
-	assert.NotNil(t, errs)
-	assert.Contains(t, errs, "broadcastTitle")
-}
-
 func TestSanitizePriceAlertConfig(t *testing.T) {
 	cfg := &PriceAlertConfig{
-		BroadcastTitle: "Hello <b>world</b>",
 		Categories: map[string]PriceAlertCategoryConfig{
 			"gold_vnd": {
 				TitleTemplate: "Gold <b>alert</b> notification",
@@ -114,7 +104,6 @@ func TestSanitizePriceAlertConfig(t *testing.T) {
 
 	SanitizePriceAlertConfig(cfg)
 
-	assert.Equal(t, "Hello world", cfg.BroadcastTitle)
 	assert.Equal(t, "Gold alert notification", cfg.Categories["gold_vnd"].TitleTemplate)
 	assert.Equal(t, "Price changed by {changePct}%", cfg.Categories["gold_vnd"].BodyTemplate)
 }
@@ -167,10 +156,9 @@ func TestLoadPriceAlertConfig_FromRedis(t *testing.T) {
 	cfg := PriceAlertConfig{
 		CooldownMinutes: 90,
 		TopMoversCount:  3,
-		BroadcastTitle:  "Custom title",
 		Categories: map[string]PriceAlertCategoryConfig{
-			"gold_vnd": {Enabled: false, ThresholdPct: 5.0, TitleTemplate: "Custom gold", BodyTemplate: "Custom body"},
-			"gold_usd": {Enabled: true, ThresholdPct: 1.5, TitleTemplate: "Gold USD", BodyTemplate: "body"},
+			"gold_vnd":   {Enabled: false, ThresholdPct: 5.0, TitleTemplate: "Custom gold", BodyTemplate: "Custom body"},
+			"gold_usd":   {Enabled: true, ThresholdPct: 1.5, TitleTemplate: "Gold USD", BodyTemplate: "body"},
 			"silver_vnd": {Enabled: true, ThresholdPct: 3.0, TitleTemplate: "Silver VND", BodyTemplate: "body"},
 			"silver_usd": {Enabled: true, ThresholdPct: 2.0, TitleTemplate: "Silver USD", BodyTemplate: "body"},
 		},
@@ -182,7 +170,6 @@ func TestLoadPriceAlertConfig_FromRedis(t *testing.T) {
 
 	assert.Equal(t, 90, loaded.CooldownMinutes)
 	assert.Equal(t, 3, loaded.TopMoversCount)
-	assert.Equal(t, "Custom title", loaded.BroadcastTitle)
 	assert.False(t, loaded.Categories["gold_vnd"].Enabled)
 	assert.Equal(t, 5.0, loaded.Categories["gold_vnd"].ThresholdPct)
 }
@@ -215,7 +202,6 @@ func TestLoadPriceAlertConfig_MergesMissingCategories(t *testing.T) {
 	cfg := PriceAlertConfig{
 		CooldownMinutes: 60,
 		TopMoversCount:  2,
-		BroadcastTitle:  "Test",
 		Categories: map[string]PriceAlertCategoryConfig{
 			"gold_vnd": {Enabled: true, ThresholdPct: 1.0, TitleTemplate: "Gold", BodyTemplate: "body"},
 		},
@@ -240,7 +226,6 @@ func TestSavePriceAlertConfig_RoundTrip(t *testing.T) {
 	cfg := PriceAlertConfig{
 		CooldownMinutes: 45,
 		TopMoversCount:  7,
-		BroadcastTitle:  "Round trip test",
 		Categories: map[string]PriceAlertCategoryConfig{
 			"gold_vnd":   {Enabled: true, ThresholdPct: 1.5, TitleTemplate: "T1", BodyTemplate: "B1"},
 			"gold_usd":   {Enabled: false, ThresholdPct: 2.5, TitleTemplate: "T2", BodyTemplate: "B2"},
@@ -256,6 +241,5 @@ func TestSavePriceAlertConfig_RoundTrip(t *testing.T) {
 
 	assert.Equal(t, cfg.CooldownMinutes, loaded.CooldownMinutes)
 	assert.Equal(t, cfg.TopMoversCount, loaded.TopMoversCount)
-	assert.Equal(t, cfg.BroadcastTitle, loaded.BroadcastTitle)
 	assert.Equal(t, cfg.Categories["gold_usd"].Enabled, loaded.Categories["gold_usd"].Enabled)
 }

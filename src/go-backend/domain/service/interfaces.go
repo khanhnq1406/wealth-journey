@@ -303,7 +303,7 @@ type AdminService interface {
 	ListFeedback(ctx context.Context, statusFilter int32, params types.PaginationParams) (*v1.AdminListFeedbackResponse, error)
 	UpdateFeedback(ctx context.Context, feedbackID int32, req *v1.AdminUpdateFeedbackRequest) (*v1.AdminUpdateFeedbackResponse, error)
 	DeleteFeedback(ctx context.Context, feedbackID int32) (*v1.AdminDeleteFeedbackResponse, error)
-	Broadcast(ctx context.Context, adminUserID int32, message string) (int32, error)
+	Broadcast(ctx context.Context, adminUserID int32, title, message string) (int32, error)
 }
 
 // PushService handles Web Push notification delivery.

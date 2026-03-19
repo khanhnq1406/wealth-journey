@@ -79,6 +79,12 @@ All functional requirements from the spec are implemented:
 - Handler-level integration tests not added (matching existing pattern — most admin handlers lack handler tests)
 - The `stripHTML` function uses regex which could miss edge cases — adequate for admin-only input but consider a proper HTML parser for user-facing input
 
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-19 | Add per-broadcast title input: AdminBroadcastForm now has a title field (optional, max 200 chars). Backend `Broadcast()` accepts title param — falls back to Redis config `broadcastTitle` when empty. Handler, service, interface, tests, i18n all updated. | Minor | (pending) |
+
 ## Files Changed
 
 ### Created
@@ -113,3 +119,11 @@ All functional requirements from the spec are implemented:
    - Modify settings (cooldown, thresholds, enable/disable categories)
    - Save and verify success toast
    - Reload page and verify settings persisted
+   - Type in title/body template fields and verify live preview appears below each field
+   - Verify preview resolves placeholders with sample values matching the category
+
+## Fix History
+
+| Date       | Fix                                                     | Severity | Commit  |
+| ---------- | ------------------------------------------------------- | -------- | ------- |
+| 2026-03-19 | Add live preview for title/body templates in config form | Minor    | pending |

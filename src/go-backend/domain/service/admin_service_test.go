@@ -498,9 +498,9 @@ func TestAdminService_Broadcast_Success(t *testing.T) {
 	userRepo.On("GetByID", ctx, int32(1)).Return(admin, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1, 2, 3}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
-	pushSvc.On("SendToAll", ctx, "Thông báo từ hệ thống", "Hello everyone", "").Return(nil)
+	pushSvc.On("SendToAll", ctx, "Important Update", "Hello everyone", "").Return(nil)
 
-	count, err := svc.Broadcast(ctx, 1, "Hello everyone")
+	count, err := svc.Broadcast(ctx, 1, "Important Update", "Hello everyone")
 
 	assert.NoError(t, err)
 	assert.Equal(t, int32(3), count)
@@ -516,7 +516,7 @@ func TestAdminService_Broadcast_EmptyMessage(t *testing.T) {
 	svc := newTestAdminServiceFull(userRepo, feedbackRepo, notifRepo, pushSvc)
 	ctx := context.Background()
 
-	count, err := svc.Broadcast(ctx, 1, "")
+	count, err := svc.Broadcast(ctx, 1, "", "")
 
 	assert.Error(t, err)
 	assert.Equal(t, int32(0), count)
@@ -532,7 +532,7 @@ func TestAdminService_Broadcast_WhitespaceOnlyMessage(t *testing.T) {
 	svc := newTestAdminServiceFull(userRepo, feedbackRepo, notifRepo, pushSvc)
 	ctx := context.Background()
 
-	count, err := svc.Broadcast(ctx, 1, "   ")
+	count, err := svc.Broadcast(ctx, 1, "", "   ")
 
 	assert.Error(t, err)
 	assert.Equal(t, int32(0), count)
@@ -548,7 +548,7 @@ func TestAdminService_Broadcast_MessageTooLong(t *testing.T) {
 	ctx := context.Background()
 
 	longMsg := strings.Repeat("a", 501)
-	count, err := svc.Broadcast(ctx, 1, longMsg)
+	count, err := svc.Broadcast(ctx, 1, "", longMsg)
 
 	assert.Error(t, err)
 	assert.Equal(t, int32(0), count)
@@ -569,9 +569,10 @@ func TestAdminService_Broadcast_HTMLStripping(t *testing.T) {
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
 	// The push message should have HTML stripped: "<b>bold</b>" becomes "bold"
+	// Empty title falls back to config default
 	pushSvc.On("SendToAll", ctx, "Thông báo từ hệ thống", "bold", "").Return(nil)
 
-	count, err := svc.Broadcast(ctx, 1, "<b>bold</b>")
+	count, err := svc.Broadcast(ctx, 1, "", "<b>bold</b>")
 
 	assert.NoError(t, err)
 	assert.Equal(t, int32(1), count)
@@ -590,7 +591,7 @@ func TestAdminService_Broadcast_GetUserIDsFails(t *testing.T) {
 	userRepo.On("GetByID", ctx, int32(1)).Return(admin, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32(nil), apperrors.NewInternalError("db error"))
 
-	count, err := svc.Broadcast(ctx, 1, "test message")
+	count, err := svc.Broadcast(ctx, 1, "", "test message")
 
 	assert.Error(t, err)
 	assert.Equal(t, int32(0), count)

@@ -23,9 +23,8 @@ type PriceAlertCategoryConfig struct {
 
 // PriceAlertConfig holds the full configuration.
 type PriceAlertConfig struct {
-	CooldownMinutes int                                `json:"cooldownMinutes"`
-	TopMoversCount  int                                `json:"topMoversCount"`
-	BroadcastTitle  string                             `json:"broadcastTitle"`
+	CooldownMinutes int                                 `json:"cooldownMinutes"`
+	TopMoversCount  int                                 `json:"topMoversCount"`
 	Categories      map[string]PriceAlertCategoryConfig `json:"categories"`
 }
 
@@ -34,30 +33,29 @@ func DefaultPriceAlertConfig() PriceAlertConfig {
 	return PriceAlertConfig{
 		CooldownMinutes: envInt("PRICE_ALERT_COOLDOWN_MINUTES", 120),
 		TopMoversCount:  5,
-		BroadcastTitle:  "Thông báo từ hệ thống",
 		Categories: map[string]PriceAlertCategoryConfig{
 			"gold_vnd": {
 				Enabled:       true,
 				ThresholdPct:  envFloat("PRICE_ALERT_GOLD_VND_PCT", 2.0),
-				TitleTemplate: "Giá vàng trong nước biến động mạnh",
+				TitleTemplate: "Giá vàng biến động mạnh",
 				BodyTemplate:  "{moverName} {direction} {changePct}%",
 			},
 			"gold_usd": {
 				Enabled:       true,
 				ThresholdPct:  envFloat("PRICE_ALERT_GOLD_USD_PCT", 1.5),
-				TitleTemplate: "Giá vàng thế giới biến động mạnh",
+				TitleTemplate: "Giá vàng biến động mạnh",
 				BodyTemplate:  "{moverName} {direction} {changePct}%",
 			},
 			"silver_vnd": {
 				Enabled:       true,
 				ThresholdPct:  envFloat("PRICE_ALERT_SILVER_VND_PCT", 3.0),
-				TitleTemplate: "Giá bạc trong nước biến động mạnh",
+				TitleTemplate: "Giá bạc biến động mạnh",
 				BodyTemplate:  "{moverName} {direction} {changePct}%",
 			},
 			"silver_usd": {
 				Enabled:       true,
 				ThresholdPct:  envFloat("PRICE_ALERT_SILVER_USD_PCT", 2.0),
-				TitleTemplate: "Giá bạc thế giới biến động mạnh",
+				TitleTemplate: "Giá bạc biến động mạnh",
 				BodyTemplate:  "{moverName} {direction} {changePct}%",
 			},
 		},
@@ -123,11 +121,6 @@ func ValidatePriceAlertConfig(cfg PriceAlertConfig) map[string]string {
 		errors["topMoversCount"] = "must be between 1 and 20"
 	}
 
-	bt := stripHTML(cfg.BroadcastTitle)
-	if len(bt) == 0 || len(bt) > 200 {
-		errors["broadcastTitle"] = "must be 1-200 characters (no HTML)"
-	}
-
 	validCategories := map[string]bool{
 		"gold_vnd": true, "gold_usd": true,
 		"silver_vnd": true, "silver_usd": true,
@@ -159,7 +152,6 @@ func ValidatePriceAlertConfig(cfg PriceAlertConfig) map[string]string {
 
 // SanitizePriceAlertConfig strips HTML from all string fields in-place.
 func SanitizePriceAlertConfig(cfg *PriceAlertConfig) {
-	cfg.BroadcastTitle = stripHTML(cfg.BroadcastTitle)
 	for cat, catCfg := range cfg.Categories {
 		catCfg.TitleTemplate = stripHTML(catCfg.TitleTemplate)
 		catCfg.BodyTemplate = stripHTML(catCfg.BodyTemplate)

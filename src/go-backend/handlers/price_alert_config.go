@@ -87,9 +87,6 @@ func mergeConfig(current, update service.PriceAlertConfig) service.PriceAlertCon
 	if update.TopMoversCount > 0 {
 		result.TopMoversCount = update.TopMoversCount
 	}
-	if update.BroadcastTitle != "" {
-		result.BroadcastTitle = update.BroadcastTitle
-	}
 
 	// Merge per-category settings
 	for cat, catUpdate := range update.Categories {

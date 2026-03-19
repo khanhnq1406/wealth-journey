@@ -215,7 +215,8 @@ func (s *adminService) DeleteFeedback(ctx context.Context, feedbackID int32) (*v
 	}, nil
 }
 
-func (s *adminService) Broadcast(ctx context.Context, adminUserID int32, message string) (int32, error) {
+func (s *adminService) Broadcast(ctx context.Context, adminUserID int32, title, message string) (int32, error) {
+	title = strings.TrimSpace(title)
 	message = strings.TrimSpace(message)
 	if message == "" {
 		return 0, apperrors.NewValidationError("message must not be empty")
@@ -224,7 +225,16 @@ func (s *adminService) Broadcast(ctx context.Context, adminUserID int32, message
 		return 0, apperrors.NewValidationError("message must be 500 characters or less")
 	}
 	// Strip HTML tags
+	title = htmlTagRegex.ReplaceAllString(title, "")
 	message = htmlTagRegex.ReplaceAllString(message, "")
+
+	// If title is empty, fall back to default
+	if title == "" {
+		title = "Thông báo từ hệ thống"
+	}
+	if len(title) > 200 {
+		return 0, apperrors.NewValidationError("title must be 200 characters or less")
+	}
 
 	// Rate limit: max 10 broadcasts per hour per admin
 	if s.redisClient != nil {
@@ -244,15 +254,12 @@ func (s *adminService) Broadcast(ctx context.Context, adminUserID int32, message
 		return 0, err
 	}
 
-	// Load config for broadcast title
-	cfg := LoadPriceAlertConfig(ctx, s.redisClient)
-
 	// Build metadata
 	metadata := map[string]interface{}{
 		"message":        message,
 		"adminId":        adminUserID,
 		"adminName":      admin.Name,
-		"broadcastTitle": cfg.BroadcastTitle,
+		"broadcastTitle": title,
 	}
 	metadataJSON, err := json.Marshal(metadata)
 	if err != nil {
@@ -296,9 +303,9 @@ func (s *adminService) Broadcast(ctx context.Context, adminUserID int32, message
 		}
 	}
 
-	// Push notification — use configurable broadcast title
+	// Push notification
 	if s.pushSvc != nil {
-		_ = s.pushSvc.SendToAll(ctx, cfg.BroadcastTitle, message, "")
+		_ = s.pushSvc.SendToAll(ctx, title, message, "")
 	}
 
 	return int32(len(userIDs)), nil

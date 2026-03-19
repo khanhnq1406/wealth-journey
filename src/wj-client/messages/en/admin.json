@@ -104,6 +104,9 @@
     "broadcast": {
       "title": "Send broadcast to all users",
       "form": {
+        "title": "Title",
+        "titlePlaceholder": "Notification title (optional)",
+        "titleHelp": "Leave empty to use the default system title",
         "message": "Message",
         "messagePlaceholder": "Type your message...",
         "charLabel": "characters",
@@ -122,13 +125,12 @@
       "cooldownHelp": "Minimum time between alerts of the same category",
       "topMoversCount": "Top movers count",
       "topMoversHelp": "Number of top movers included in notification",
-      "broadcastTitle": "System notification title",
-      "broadcastTitleHelp": "Title for admin broadcast notifications",
       "categorySettings": "Per-Category Settings",
       "enabled": "Enable alerts",
       "thresholdPct": "Threshold (%)",
       "titleTemplate": "Title template",
       "bodyTemplate": "Body template",
+      "preview": "Preview",
       "placeholderGuide": "Available placeholders",
       "placeholders": {
         "moverName": "Product name (e.g. SJC 1L-10L)",

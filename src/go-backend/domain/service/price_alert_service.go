@@ -223,7 +223,7 @@ func (s *priceAlertService) CheckAndAlert(ctx context.Context) error {
 
 			title := ResolvePlaceholders(catCfg.TitleTemplate, placeholders)
 			body := ResolvePlaceholders(catCfg.BodyTemplate, placeholders)
-			_ = s.pushSvc.SendToAll(ctx, title, body, "/dashboard/prices")
+			_ = s.pushSvc.SendToAll(ctx, title, body, "/dashboard/home")
 		}
 
 		// Set cooldown

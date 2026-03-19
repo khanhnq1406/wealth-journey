@@ -17,7 +17,6 @@ interface CategoryConfig {
 interface PriceAlertConfig {
   cooldownMinutes: number;
   topMoversCount: number;
-  broadcastTitle: string;
   categories: Record<string, CategoryConfig>;
 }
 
@@ -27,7 +26,12 @@ interface ConfigResponse {
   message?: string;
 }
 
-const CATEGORIES = ["gold_vnd", "gold_usd", "silver_vnd", "silver_usd"] as const;
+const CATEGORIES = [
+  "gold_vnd",
+  "gold_usd",
+  "silver_vnd",
+  "silver_usd",
+] as const;
 
 const PLACEHOLDERS = [
   "moverName",
@@ -40,6 +44,58 @@ const PLACEHOLDERS = [
   "moverCount",
 ] as const;
 
+const SAMPLE_VALUES: Record<string, Record<string, string>> = {
+  gold_vnd: {
+    moverName: "SJC 1L-10L",
+    moverCode: "SJL1L10",
+    direction: "↑",
+    directionText: "tăng",
+    changePct: "2.5",
+    priceDiff: "1,500,000",
+    category: "Vàng trong nước",
+    moverCount: "3",
+  },
+  gold_usd: {
+    moverName: "Gold World",
+    moverCode: "XAU",
+    direction: "↓",
+    directionText: "giảm",
+    changePct: "1.8",
+    priceDiff: "35",
+    category: "Vàng thế giới",
+    moverCount: "1",
+  },
+  silver_vnd: {
+    moverName: "Bạc hạt SJC",
+    moverCode: "SJC_SILVER",
+    direction: "↑",
+    directionText: "tăng",
+    changePct: "3.2",
+    priceDiff: "250,000",
+    category: "Bạc trong nước",
+    moverCount: "2",
+  },
+  silver_usd: {
+    moverName: "Silver World",
+    moverCode: "XAG",
+    direction: "↓",
+    directionText: "giảm",
+    changePct: "2.0",
+    priceDiff: "0.58",
+    category: "Bạc thế giới",
+    moverCount: "1",
+  },
+};
+
+function resolvePlaceholders(
+  template: string,
+  values: Record<string, string>,
+): string {
+  return template.replace(/\{(\w+)\}/g, (match, key) =>
+    key in values ? values[key] : match,
+  );
+}
+
 export function PriceAlertConfigForm() {
   const t = useTranslations("admin.priceAlertConfig");
   const [config, setConfig] = useState<PriceAlertConfig | null>(null);
@@ -48,7 +104,7 @@ export function PriceAlertConfigForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(
-    "gold_vnd"
+    "gold_vnd",
   );
   const [showPlaceholders, setShowPlaceholders] = useState(false);
 
@@ -56,7 +112,7 @@ export function PriceAlertConfigForm() {
     try {
       setIsLoading(true);
       const res = await apiClient.get<ConfigResponse>(
-        "/api/v1/admin/price-alert-config"
+        "/api/v1/admin/price-alert-config",
       );
       const data = res as unknown as ConfigResponse;
       if (data.success) {
@@ -82,7 +138,7 @@ export function PriceAlertConfigForm() {
     try {
       const res = await apiClient.put<ConfigResponse>(
         "/api/v1/admin/price-alert-config",
-        config
+        config,
       );
       const data = res as unknown as ConfigResponse;
       if (data.success) {
@@ -100,7 +156,7 @@ export function PriceAlertConfigForm() {
 
   const updateGlobal = <K extends keyof PriceAlertConfig>(
     key: K,
-    value: PriceAlertConfig[K]
+    value: PriceAlertConfig[K],
   ) => {
     if (!config) return;
     setConfig({ ...config, [key]: value });
@@ -109,7 +165,7 @@ export function PriceAlertConfigForm() {
   const updateCategory = (
     cat: string,
     key: keyof CategoryConfig,
-    value: string | number | boolean
+    value: string | number | boolean,
   ) => {
     if (!config) return;
     setConfig({
@@ -164,10 +220,7 @@ export function PriceAlertConfigForm() {
                 max={1440}
                 value={config.cooldownMinutes}
                 onChange={(e) =>
-                  updateGlobal(
-                    "cooldownMinutes",
-                    parseInt(e.target.value) || 1
-                  )
+                  updateGlobal("cooldownMinutes", parseInt(e.target.value) || 1)
                 }
                 className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-vietnam text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
               />
@@ -186,10 +239,7 @@ export function PriceAlertConfigForm() {
                 max={20}
                 value={config.topMoversCount}
                 onChange={(e) =>
-                  updateGlobal(
-                    "topMoversCount",
-                    parseInt(e.target.value) || 1
-                  )
+                  updateGlobal("topMoversCount", parseInt(e.target.value) || 1)
                 }
                 className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-vietnam text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
               />
@@ -197,22 +247,6 @@ export function PriceAlertConfigForm() {
                 {t("topMoversHelp")}
               </p>
             </div>
-          </div>
-
-          <div>
-            <label className="block font-vietnam text-sm font-medium text-v2-text-secondary mb-1">
-              {t("broadcastTitle")}
-            </label>
-            <input
-              type="text"
-              maxLength={200}
-              value={config.broadcastTitle}
-              onChange={(e) => updateGlobal("broadcastTitle", e.target.value)}
-              className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-vietnam text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
-            />
-            <p className="mt-1 font-vietnam text-xs text-v2-text-tertiary">
-              {t("broadcastTitleHelp")}
-            </p>
           </div>
         </div>
 
@@ -234,9 +268,7 @@ export function PriceAlertConfigForm() {
               >
                 <button
                   type="button"
-                  onClick={() =>
-                    setExpandedCategory(isExpanded ? null : cat)
-                  }
+                  onClick={() => setExpandedCategory(isExpanded ? null : cat)}
                   className="w-full flex items-center justify-between px-4 py-3 bg-v2-bg-secondary hover:bg-v2-bg-tertiary transition-colors"
                 >
                   <span className="font-vietnam text-sm font-medium text-v2-text-primary">
@@ -285,7 +317,7 @@ export function PriceAlertConfigForm() {
                           updateCategory(
                             cat,
                             "thresholdPct",
-                            parseFloat(e.target.value) || 0.1
+                            parseFloat(e.target.value) || 0.1,
                           )
                         }
                         className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-vietnam text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
@@ -301,14 +333,23 @@ export function PriceAlertConfigForm() {
                         maxLength={200}
                         value={catConfig.titleTemplate}
                         onChange={(e) =>
-                          updateCategory(
-                            cat,
-                            "titleTemplate",
-                            e.target.value
-                          )
+                          updateCategory(cat, "titleTemplate", e.target.value)
                         }
                         className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-vietnam text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
                       />
+                      {catConfig.titleTemplate && (
+                        <div className="rounded-md bg-v2-bg-tertiary">
+                          <span className="font-vietnam text-xs font-medium text-v2-text-tertiary">
+                            {t("preview")}:
+                          </span>
+                          <p className="font-vietnam text-sm text-v2-text-primary mt-0.5">
+                            {resolvePlaceholders(
+                              catConfig.titleTemplate,
+                              SAMPLE_VALUES[cat] ?? SAMPLE_VALUES.gold_vnd,
+                            )}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <div>
@@ -320,14 +361,23 @@ export function PriceAlertConfigForm() {
                         rows={2}
                         value={catConfig.bodyTemplate}
                         onChange={(e) =>
-                          updateCategory(
-                            cat,
-                            "bodyTemplate",
-                            e.target.value
-                          )
+                          updateCategory(cat, "bodyTemplate", e.target.value)
                         }
                         className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-vietnam text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg resize-none"
                       />
+                      {catConfig.bodyTemplate && (
+                        <div className="rounded-md bg-v2-bg-tertiary">
+                          <span className="font-vietnam text-xs font-medium text-v2-text-tertiary">
+                            {t("preview")}:
+                          </span>
+                          <p className="font-vietnam text-sm text-v2-text-primary mt-0.5 whitespace-pre-wrap">
+                            {resolvePlaceholders(
+                              catConfig.bodyTemplate,
+                              SAMPLE_VALUES[cat] ?? SAMPLE_VALUES.gold_vnd,
+                            )}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

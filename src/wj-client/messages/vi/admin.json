@@ -104,6 +104,9 @@
     "broadcast": {
       "title": "Gửi thông báo đến tất cả người dùng",
       "form": {
+        "title": "Tiêu đề",
+        "titlePlaceholder": "Tiêu đề thông báo (không bắt buộc)",
+        "titleHelp": "Để trống sẽ dùng tiêu đề mặc định của hệ thống",
         "message": "Nội dung",
         "messagePlaceholder": "Nhập nội dung thông báo...",
         "charLabel": "ký tự",
@@ -122,13 +125,12 @@
       "cooldownHelp": "Thời gian tối thiểu giữa các cảnh báo cùng loại",
       "topMoversCount": "Số lượng biến động hiển thị",
       "topMoversHelp": "Số lượng sản phẩm biến động mạnh nhất trong thông báo",
-      "broadcastTitle": "Tiêu đề thông báo hệ thống",
-      "broadcastTitleHelp": "Tiêu đề cho thông báo broadcast từ admin",
       "categorySettings": "Cài đặt theo loại",
       "enabled": "Bật cảnh báo",
       "thresholdPct": "Ngưỡng biến động (%)",
       "titleTemplate": "Mẫu tiêu đề",
       "bodyTemplate": "Mẫu nội dung",
+      "preview": "Xem trước",
       "placeholderGuide": "Biến có thể sử dụng",
       "placeholders": {
         "moverName": "Tên sản phẩm (VD: SJC 1L-10L)",

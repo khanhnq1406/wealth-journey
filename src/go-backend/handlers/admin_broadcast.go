@@ -25,6 +25,7 @@ func (h *AdminBroadcastHandler) SendBroadcast(c *gin.Context) {
 	}
 
 	var req struct {
+		Title   string `json:"title"`
 		Message string `json:"message" binding:"required"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -32,7 +33,7 @@ func (h *AdminBroadcastHandler) SendBroadcast(c *gin.Context) {
 		return
 	}
 
-	count, err := h.adminService.Broadcast(c.Request.Context(), userID, req.Message)
+	count, err := h.adminService.Broadcast(c.Request.Context(), userID, req.Title, req.Message)
 	if err != nil {
 		handler.HandleError(c, err)
 		return
