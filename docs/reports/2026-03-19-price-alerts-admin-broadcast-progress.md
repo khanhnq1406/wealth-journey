@@ -5,9 +5,9 @@
 - **Plan file:** docs/plans/2026-03-19-price-alerts-admin-broadcast-plan.md
 - **Spec file:** docs/specs/2026-03-19-price-alerts-admin-broadcast-spec.md
 - **Started:** 2026-03-19T00:00:00Z
-- **Last updated:** 2026-03-19T15:00:00Z
-- **Current state:** in_progress
-- **Current task:** Fix-1
+- **Last updated:** 2026-03-19T16:00:00Z
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -38,11 +38,11 @@
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| Fix-1 | Fix admin_service_test.go + add Broadcast tests | pending | — | — |
-| Fix-2 | Add push_service_test.go unit tests | pending | — | — |
-| Fix-3 | Add price_alert_service_test.go unit tests | pending | — | — |
-| Fix-4 | Update C4 architecture diagrams | pending | — | — |
-| Fix-5 | Add E2E tests for admin broadcast tab | pending | — | — |
+| Fix-1 | Fix admin_service_test.go + add Broadcast tests | done | 451b405 | Fixed broken 2-arg constructor, added 6 Broadcast tests |
+| Fix-2 | Add push_service_test.go unit tests | done | 8995079 | 10 tests: noop fallback, VAPID config, repo interactions |
+| Fix-3 | Add price_alert_service_test.go unit tests | done | 8995079 | 6 tests: baselines, thresholds, cooldowns, error handling |
+| Fix-4 | Update C4 architecture diagrams | done | — | Backend + frontend C4 + README diagram count |
+| Fix-5 | Add E2E tests for admin broadcast tab | done | — | 3 Playwright tests: textarea, char counter, submit button |
 
 ## Notes
 

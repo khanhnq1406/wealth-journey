@@ -35,6 +35,8 @@ C4Component
         Component(site_settings_h, "SiteSettings Handler", "handlers/site_settings.go", "Public GET (no auth) for all site settings. Admin-only PUT for bulk-updating settings. Protected by AdminMiddleware for writes.")
         Component(admin_user_h, "AdminUser Handler", "handlers/admin_user.go", "Admin-only: list users with search, toggle admin role. Protected by AdminMiddleware. Self-protection: cannot toggle own role.")
         Component(admin_feedback_h, "AdminFeedback Handler", "handlers/admin_feedback.go", "Admin-only: list all feedback with status filter, update feedback (status + admin note), soft-delete feedback. Protected by AdminMiddleware.")
+        Component(admin_broadcast_h, "AdminBroadcast Handler", "handlers/admin_broadcast.go", "Admin-only: POST /admin/broadcast. Binds message, delegates to AdminService.Broadcast, returns recipientCount. Protected by AdminMiddleware.")
+        Component(push_h, "Push Handler", "handlers/push.go", "GET /push/vapid-key (public key), POST /push/subscribe (validates HTTPS endpoint, base64 keys, max 5 subs/user), DELETE /push/subscribe (by endpoint). Auth required for subscribe/unsubscribe.")
     }
 
     Container_Boundary(services, "Service Layer — TRUST BOUNDARY: Data considered validated after this point") {
@@ -55,7 +57,9 @@ C4Component
         Component(community_svc, "Community Service", "domain/service", "Social interactions: posts, comments, likes, follows, content reports; Phase 2: SharePost, GetNotifications, GetUnreadNotificationCount, MarkNotificationsRead, SavePost, UnsavePost, GetSavedPosts, GetSuggestedUsers, GetTrendingTopics, GetFollowing, GetFollowers; Phase 3: UploadImage, UpdateComment, GetReplies, GetLikedPosts, UpdateProfile, StreamNotifications")
         Component(feedback_svc, "Feedback Service", "domain/service", "Submit feedback with validation (subject 1-200, message 1-2000), rate limiting (10/user/hour), list user feedback")
         Component(site_settings_svc, "SiteSettings Service", "domain/service", "Validates setting keys against allowlist (17 keys), strips HTML from values, max 5000 chars. Cache-first reads, DB fallback.")
-        Component(admin_svc, "Admin Service", "domain/service", "Admin user management (list with search, toggle role with self-protection) and feedback management (list with status filter, update status/note with HTML stripping, soft-delete)")
+        Component(admin_svc, "Admin Service", "domain/service", "Admin user management (list with search, toggle role with self-protection), feedback management (list with status filter, update status/note with HTML stripping, soft-delete), and broadcast messaging (HTML stripping, rate limiting 10/hr/admin via Redis, batch notification creation, SSE publish, push delivery)")
+        Component(push_svc, "Push Service", "domain/service/push_service.go", "Web Push notification delivery via VAPID/webpush-go. Concurrent fan-out with 20-worker semaphore. Returns noopPushService when VAPID keys absent. Auto-removes 410 Gone subscriptions.")
+        Component(price_alert_svc, "Price Alert Service", "domain/service/price_alert_service.go", "Detects significant gold/silver price movements vs Redis baselines across 4 categories (gold_vnd, gold_usd, silver_vnd, silver_usd). Per-category cooldowns (2h). Batch notification creation, SSE publish, push delivery.")
     }
 
     Container_Boundary(repos, "Repository Layer (Data Access)") {
@@ -75,7 +79,8 @@ C4Component
         Component(like_repo, "Like Repository", "GORM", "Post likes with unique constraints")
         Component(follow_repo, "Follow Repository", "GORM", "User follow relationships; GetFriendsOfFriends, GetTopUsersByFollowers, GetFollowing, GetFollowers (paginated with Preload)")
         Component(report_repo, "Report Repository", "GORM", "Content reports for moderation")
-        Component(notification_repo, "Notification Repository", "GORM", "CRUD for user notifications (like, comment, follow, share events)")
+        Component(notification_repo, "Notification Repository", "GORM", "CRUD for user notifications (like, comment, follow, share, price_alert, admin_broadcast). Supports BatchCreate for bulk notification insertion.")
+        Component(push_sub_repo, "Push Subscription Repository", "GORM", "push_subscription table CRUD. CountByUserID for 5-sub cap enforcement. DeleteByEndpoint for 410 Gone cleanup.")
         Component(saved_post_repo, "Saved Post Repository", "GORM", "Save/unsave posts per user with unique constraints")
         Component(hashtag_repo, "Hashtag Repository", "GORM", "Hashtag extraction index and trending hashtag aggregations")
         Component(gold_vote_repo, "GoldVote Repository", "GORM", "Vote persistence with upsert (ON CONFLICT), count by date")
@@ -125,6 +130,8 @@ C4Component
     Rel(gin, feedback_h, "Routes /feedback/*")
     Rel(gin, admin_user_h, "Routes /admin/users/*")
     Rel(gin, admin_feedback_h, "Routes /admin/feedback/*")
+    Rel(gin, admin_broadcast_h, "Routes /admin/broadcast")
+    Rel(gin, push_h, "Routes /push/*")
 
     Rel(auth_h, auth_svc, "Delegates auth logic")
     Rel(user_h, user_svc, "Delegates user ops")
@@ -147,6 +154,9 @@ C4Component
     Rel(feedback_h, feedback_svc, "Delegates feedback ops")
     Rel(admin_user_h, admin_svc, "Delegates admin user ops")
     Rel(admin_feedback_h, admin_svc, "Delegates admin feedback ops")
+    Rel(admin_broadcast_h, admin_svc, "Delegates broadcast")
+    Rel(push_h, push_svc, "VAPID key + push delivery")
+    Rel(push_h, push_sub_repo, "CRUD subscriptions")
     Rel(community_h, redis_pubsub, "Subscribes for SSE StreamNotifications")
     Rel(gold_chart_h, redis, "Read/write price history cache")
     Rel(silver_chart_h, redis, "Read/write price history cache")
@@ -178,8 +188,17 @@ C4Component
     Rel(gold_sentiment_svc, gold_vote_repo, "Reads/Writes votes")
     Rel(gold_sentiment_svc, gold_vote_comment_repo, "Reads/Writes comments")
     Rel(feedback_svc, feedback_repo, "Persists feedback")
-    Rel(admin_svc, user_repo, "Lists and updates users")
+    Rel(admin_svc, user_repo, "Lists and updates users, gets all user IDs for broadcast")
     Rel(admin_svc, feedback_repo, "Lists, updates, and deletes feedback")
+    Rel(admin_svc, notification_repo, "BatchCreate broadcast notifications")
+    Rel(admin_svc, push_svc, "Push delivery for broadcasts")
+    Rel(admin_svc, redis, "Rate limiting (10/hr/admin), SSE publish")
+    Rel(price_alert_svc, push_svc, "Push delivery for price alerts")
+    Rel(price_alert_svc, notification_repo, "BatchCreate price alert notifications")
+    Rel(price_alert_svc, user_repo, "Gets all user IDs")
+    Rel(price_alert_svc, redis, "Baselines, cooldowns, SSE publish")
+    Rel(push_svc, push_sub_repo, "Fetches subscriptions for delivery")
+    Rel(push_sub_repo, postgres, "SQL")
     Rel(gold_sentiment_svc, redis, "Caches vote counts (30s TTL)")
     Rel(community_svc, post_repo, "Persists posts")
     Rel(community_svc, comment_repo, "Persists comments")
@@ -283,6 +302,33 @@ User → SPA → REST API → Auth MW → Market Price Handler → Market Data S
                                                         → PriceOverride Cache (list overrides)
                                                         → Merge: overrides replace matching type codes
                                 ← merged prices with isOverridden flags ←
+```
+
+### Admin Broadcast Flow
+```
+Admin → SPA → REST API → Auth MW → Admin MW → AdminBroadcast Handler → AdminService.Broadcast
+                                                                       → Validate message (500 char max, strip HTML)
+                                                                       → Rate limit (10/hr/admin via Redis INCR)
+                                                                       → UserRepository.GetAllUserIDs
+                                                                       → NotificationRepository.BatchCreate
+                                                                       → Redis PUBLISH (SSE per user)
+                                                                       → PushService.SendToAll (Web Push)
+                                  ← recipientCount ←
+```
+
+### Price Alert Detection Flow
+```
+Scheduler (every 15min) → PriceAlertService.CheckAndAlert
+                        → GoldPriceService.FetchAllPrices
+                        → SilverPriceService.FetchAllPrices
+                        → Redis GET (baselines per typeCode)
+                        → Calculate % change, filter by threshold
+                        → Redis EXISTS (cooldown check)
+                        → UserRepository.GetAllUserIDs
+                        → NotificationRepository.BatchCreate
+                        → Redis PUBLISH (SSE per user)
+                        → PushService.SendToAll (Web Push)
+                        → Redis SET (cooldown + updated baselines)
 ```
 
 ### Background Price Update Flow

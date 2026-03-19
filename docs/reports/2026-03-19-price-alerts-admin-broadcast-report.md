@@ -209,8 +209,16 @@ Admin Page → Broadcast Tab
 
 ## Known Issues / Technical Debt
 
-1. **C4 architecture diagrams** (Task 0) deferred — should update `c4-component-backend.md` and `c4-component-frontend.md` with new services and components
-2. **Unit tests** not written for new services (PriceAlertService, PushService, AdminService.Broadcast) — should be added as follow-up
-3. **E2E tests** not updated for new admin broadcast tab — should extend `admin-flow.spec.ts`
-4. **VAPID key rotation** not implemented — keys are static once set
-5. **Push subscription cleanup** for expired/invalid subscriptions happens only on 410 responses during send — no periodic cleanup job
+1. ~~**C4 architecture diagrams** (Task 0) deferred~~ — **FIXED**: Updated `c4-component-backend.md` and `c4-component-frontend.md` with new services, handlers, repos, and relationships
+2. ~~**Unit tests** not written for new services~~ — **FIXED**: Added 22 unit tests (6 AdminService.Broadcast + 10 PushService + 6 PriceAlertService)
+3. ~~**E2E tests** not updated for new admin broadcast tab~~ — **FIXED**: Added 3 Playwright tests for broadcast tab (textarea, char counter, submit button)
+4. **VAPID key rotation** not implemented — keys are static once set (operational concern, deferred)
+5. **Push subscription cleanup** for expired/invalid subscriptions happens only on 410 responses during send — no periodic cleanup job (reactive cleanup is sufficient for now)
+
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-19 | Fix broken test compilation (admin_service_test.go 2→5 args, investment mock missing GetAllUserIDs) + add 6 Broadcast unit tests | Major | 451b405 |
+| 2026-03-19 | Add push_service_test.go (10 tests) + price_alert_service_test.go (6 tests) with miniredis | Major | 8995079 |
+| 2026-03-19 | Update C4 backend/frontend diagrams + README + E2E broadcast tests | Major | (this commit) |
