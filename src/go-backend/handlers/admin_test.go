@@ -61,7 +61,7 @@ func (m *mockAdminService) DeleteFeedback(ctx context.Context, feedbackID int32)
 	return nil, nil
 }
 
-func (m *mockAdminService) Broadcast(ctx context.Context, adminUserID int32, message string) (int32, error) {
+func (m *mockAdminService) Broadcast(ctx context.Context, adminUserID int32, title, message string) (int32, error) {
 	return 0, nil
 }
 
