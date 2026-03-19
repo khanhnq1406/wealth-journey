@@ -3,9 +3,11 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 
 	webpush "github.com/SherClockHolmes/webpush-go"
@@ -79,21 +81,13 @@ func (s *pushService) SendToUser(ctx context.Context, userID int32, title, body,
 			VAPIDPublicKey:  s.vapidPublicKey,
 			VAPIDPrivateKey: s.vapidPrivate,
 			TTL:             86400,
+			Urgency:         webpush.UrgencyNormal,
 		})
 		if err != nil {
 			log.Printf("Push notification failed for endpoint %s: %v", sub.Endpoint[:min(50, len(sub.Endpoint))], err)
 			continue
 		}
-		resp.Body.Close()
-		if resp.StatusCode == http.StatusGone {
-			_ = s.subRepo.DeleteByEndpoint(ctx, sub.Endpoint)
-		} else if resp.StatusCode >= 400 {
-			truncated := sub.Endpoint
-			if len(truncated) > 50 {
-				truncated = truncated[:50]
-			}
-			log.Printf("Push endpoint returned HTTP %d for %s...", resp.StatusCode, truncated)
-		}
+		s.handlePushResponse(ctx, resp, sub.Endpoint)
 	}
 	return nil
 }
@@ -138,25 +132,56 @@ func (s *pushService) SendToAll(ctx context.Context, title, body, url string) er
 				VAPIDPublicKey:  s.vapidPublicKey,
 				VAPIDPrivateKey: s.vapidPrivate,
 				TTL:             86400,
+				Urgency:         webpush.UrgencyNormal,
 			})
 			if err != nil {
 				log.Printf("Push notification failed: %v", err)
 				return
 			}
-			resp.Body.Close()
-			if resp.StatusCode == http.StatusGone {
-				_ = s.subRepo.DeleteByEndpoint(ctx, endpoint)
-			} else if resp.StatusCode >= 400 {
-				truncated := endpoint
-				if len(truncated) > 50 {
-					truncated = truncated[:50]
-				}
-				log.Printf("Push endpoint returned HTTP %d for %s...", resp.StatusCode, truncated)
-			}
+			s.handlePushResponse(ctx, resp, endpoint)
 		}(sub.Endpoint, sub.P256dh, sub.Auth)
 	}
 	wg.Wait()
 	return nil
+}
+
+// handlePushResponse processes the HTTP response from a push endpoint.
+// It cleans up gone (410) subscriptions and removes Apple subscriptions
+// that persistently return 403 (Forbidden), which typically indicates
+// an invalid or revoked subscription rather than a transient VAPID error.
+func (s *pushService) handlePushResponse(ctx context.Context, resp *http.Response, endpoint string) {
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		return
+	}
+
+	truncated := endpoint
+	if len(truncated) > 50 {
+		truncated = truncated[:50]
+	}
+
+	switch {
+	case resp.StatusCode == http.StatusGone: // 410
+		log.Printf("Push subscription gone (410), removing: %s...", truncated)
+		_ = s.subRepo.DeleteByEndpoint(ctx, endpoint)
+
+	case resp.StatusCode == http.StatusForbidden: // 403
+		// Read response body for diagnostics (Apple sometimes includes error details).
+		body, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
+		log.Printf("Push endpoint returned HTTP 403 for %s... body=%s", truncated, string(body))
+
+		// Apple's push service returns 403 for invalid/expired subscriptions.
+		// Unlike FCM which returns 410, Apple uses 403. Remove these subscriptions
+		// to prevent repeated failures on every broadcast.
+		if strings.Contains(endpoint, "web.push.apple.com") {
+			log.Printf("Removing invalid Apple push subscription: %s...", truncated)
+			_ = s.subRepo.DeleteByEndpoint(ctx, endpoint)
+		}
+
+	default:
+		log.Printf("Push endpoint returned HTTP %d for %s...", resp.StatusCode, truncated)
+	}
 }
 
 // noopPushService is returned when VAPID keys are not configured.
