@@ -82,6 +82,11 @@ func RegisterRoutes(
 		if h.AdminBroadcast != nil {
 			admin.POST("/broadcast", h.AdminBroadcast.SendBroadcast)
 		}
+		// Price alert configuration
+		if h.PriceAlertConfig != nil {
+			admin.GET("/price-alert-config", h.PriceAlertConfig.GetConfig)
+			admin.PUT("/price-alert-config", h.PriceAlertConfig.UpdateConfig)
+		}
 	}
 
 	// Push notification routes

@@ -33,8 +33,9 @@ type AllHandlers struct {
 	SiteSettings   *SiteSettingsHandler
 	AdminUser      *AdminUserHandler
 	AdminFeedback  *AdminFeedbackHandler
-	AdminBroadcast *AdminBroadcastHandler
-	Push           *PushHandler
+	AdminBroadcast   *AdminBroadcastHandler
+	PriceAlertConfig *PriceAlertConfigHandler
+	Push             *PushHandler
 }
 
 // HandlerDeps holds the infrastructure dependencies needed by NewHandlers.
@@ -128,6 +129,12 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 		AdminUser:      NewAdminUserHandler(services.Admin),
 		AdminFeedback:  NewAdminFeedbackHandler(services.Admin),
 		AdminBroadcast: NewAdminBroadcastHandler(services.Admin),
+		PriceAlertConfig: func() *PriceAlertConfigHandler {
+			if deps.RDB != nil {
+				return NewPriceAlertConfigHandler(deps.RDB)
+			}
+			return nil
+		}(),
 		Push: func() *PushHandler {
 			if services.Push != nil {
 				return NewPushHandler(services.Push, repos.PushSubscription)

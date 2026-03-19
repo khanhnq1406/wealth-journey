@@ -25,12 +25,6 @@ type priceAlertService struct {
 	userRepo       repository.UserRepository
 	redisClient    *pkgredis.RedisClient
 	pushSvc        PushService
-
-	goldVNDPct    float64
-	goldUSDPct    float64
-	silverVNDPct  float64
-	silverUSDPct  float64
-	cooldownMins  int
 }
 
 type priceMover struct {
@@ -58,20 +52,15 @@ func NewPriceAlertService(
 		userRepo:       userRepo,
 		redisClient:    rdb,
 		pushSvc:        pushSvc,
-		goldVNDPct:     envFloat("PRICE_ALERT_GOLD_VND_PCT", 2.0),
-		goldUSDPct:     envFloat("PRICE_ALERT_GOLD_USD_PCT", 1.5),
-		silverVNDPct:   envFloat("PRICE_ALERT_SILVER_VND_PCT", 3.0),
-		silverUSDPct:   envFloat("PRICE_ALERT_SILVER_USD_PCT", 2.0),
-		cooldownMins:   envInt("PRICE_ALERT_COOLDOWN_MINUTES", 120),
 	}
 }
 
 func (s *priceAlertService) CheckAndAlert(ctx context.Context) error {
+	cfg := LoadPriceAlertConfig(ctx, s.redisClient)
+
 	type categoryMovers struct {
-		category  string
-		threshold float64
-		movers    []priceMover
-		title     string
+		category string
+		movers   []priceMover
 	}
 
 	var allCategories []categoryMovers
@@ -96,14 +85,12 @@ func (s *priceAlertService) CheckAndAlert(ctx context.Context) error {
 		}
 		if len(goldVND) > 0 {
 			allCategories = append(allCategories, categoryMovers{
-				category: "gold_vnd", threshold: s.goldVNDPct, movers: goldVND,
-				title: "Giá vàng trong nước biến động mạnh",
+				category: "gold_vnd", movers: goldVND,
 			})
 		}
 		if len(goldUSD) > 0 {
 			allCategories = append(allCategories, categoryMovers{
-				category: "gold_usd", threshold: s.goldUSDPct, movers: goldUSD,
-				title: "Giá vàng thế giới biến động mạnh",
+				category: "gold_usd", movers: goldUSD,
 			})
 		}
 	}
@@ -128,24 +115,27 @@ func (s *priceAlertService) CheckAndAlert(ctx context.Context) error {
 		}
 		if len(silverVND) > 0 {
 			allCategories = append(allCategories, categoryMovers{
-				category: "silver_vnd", threshold: s.silverVNDPct, movers: silverVND,
-				title: "Giá bạc trong nước biến động mạnh",
+				category: "silver_vnd", movers: silverVND,
 			})
 		}
 		if len(silverUSD) > 0 {
 			allCategories = append(allCategories, categoryMovers{
-				category: "silver_usd", threshold: s.silverUSDPct, movers: silverUSD,
-				title: "Giá bạc thế giới biến động mạnh",
+				category: "silver_usd", movers: silverUSD,
 			})
 		}
 	}
 
 	// Process each category
 	for _, cat := range allCategories {
+		catCfg, ok := cfg.Categories[cat.category]
+		if !ok || !catCfg.Enabled {
+			continue
+		}
+
 		// Filter movers that exceed threshold
 		var significant []priceMover
 		for _, m := range cat.movers {
-			if m.ChangePct >= cat.threshold {
+			if m.ChangePct >= catCfg.ThresholdPct {
 				significant = append(significant, m)
 			}
 		}
@@ -160,12 +150,12 @@ func (s *priceAlertService) CheckAndAlert(ctx context.Context) error {
 			continue
 		}
 
-		// Sort by change % descending and take top 5
+		// Sort by change % descending and take top N
 		sort.Slice(significant, func(i, j int) bool {
 			return significant[i].ChangePct > significant[j].ChangePct
 		})
-		if len(significant) > 5 {
-			significant = significant[:5]
+		if len(significant) > cfg.TopMoversCount {
+			significant = significant[:cfg.TopMoversCount]
 		}
 
 		// Build metadata
@@ -217,14 +207,27 @@ func (s *priceAlertService) CheckAndAlert(ctx context.Context) error {
 			_ = s.redisClient.Publish(channel, payload)
 		}
 
-		// Push notification
+		// Push notification — resolve templates
 		if s.pushSvc != nil {
-			body := fmt.Sprintf("%s (%.1f%%)", significant[0].Name, significant[0].ChangePct)
-			_ = s.pushSvc.SendToAll(ctx, cat.title, body, "/dashboard/prices")
+			topMover := significant[0]
+			placeholders := map[string]string{
+				"moverName":     topMover.Name,
+				"moverCode":     topMover.TypeCode,
+				"direction":     directionSymbol(topMover.Direction),
+				"directionText": directionText(topMover.Direction),
+				"changePct":     fmt.Sprintf("%.1f", topMover.ChangePct),
+				"priceDiff":     FormatWithThousandSeparators(topMover.PriceDiff),
+				"category":      categoryDisplayName(cat.category),
+				"moverCount":    fmt.Sprintf("%d", len(significant)),
+			}
+
+			title := ResolvePlaceholders(catCfg.TitleTemplate, placeholders)
+			body := ResolvePlaceholders(catCfg.BodyTemplate, placeholders)
+			_ = s.pushSvc.SendToAll(ctx, title, body, "/dashboard/prices")
 		}
 
 		// Set cooldown
-		cooldownDuration := time.Duration(s.cooldownMins) * time.Minute
+		cooldownDuration := time.Duration(cfg.CooldownMinutes) * time.Minute
 		s.redisClient.GetClient().Set(ctx, cooldownKey, "1", cooldownDuration)
 
 		// Update baselines
