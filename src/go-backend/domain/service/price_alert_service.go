@@ -217,8 +217,12 @@ func (s *priceAlertService) CheckAndAlert(ctx context.Context) error {
 				"directionText": directionText(topMover.Direction),
 				"changePct":     fmt.Sprintf("%.1f", topMover.ChangePct),
 				"priceDiff":     FormatWithThousandSeparators(topMover.PriceDiff),
+				"currentPrice":  FormatWithThousandSeparators(topMover.Current),
+				"baselinePrice": FormatWithThousandSeparators(topMover.Baseline),
 				"category":      categoryDisplayName(cat.category),
 				"moverCount":    fmt.Sprintf("%d", len(significant)),
+				"priceUnit":     priceUnitForMover(cat.category, topMover.TypeCode),
+				"currency":      categoryCurrency(cat.category),
 			}
 
 			title := ResolvePlaceholders(catCfg.TitleTemplate, placeholders)

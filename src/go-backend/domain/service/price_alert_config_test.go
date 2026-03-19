@@ -219,6 +219,38 @@ func TestLoadPriceAlertConfig_MergesMissingCategories(t *testing.T) {
 	assert.Contains(t, loaded.Categories, "silver_usd")
 }
 
+func TestPriceUnitForMover(t *testing.T) {
+	tests := []struct {
+		category string
+		typeCode string
+		expected string
+	}{
+		{"gold_vnd", "SJL1L10", "lượng"},
+		{"gold_vnd", "SJR2", "lượng"},
+		{"gold_usd", "XAU", "oz"},
+		{"silver_vnd", "GOLDENFUND_1L", "lượng"},
+		{"silver_vnd", "ANCARAT_5L", "lượng"},
+		{"silver_vnd", "PHUQUY_1KG", "kg"},
+		{"silver_vnd", "GOLDENFUND_1KG", "kg"},
+		{"silver_usd", "XAGUSD", "oz"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.category+"_"+tt.typeCode, func(t *testing.T) {
+			result := priceUnitForMover(tt.category, tt.typeCode)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestCategoryCurrency(t *testing.T) {
+	assert.Equal(t, "VND", categoryCurrency("gold_vnd"))
+	assert.Equal(t, "USD", categoryCurrency("gold_usd"))
+	assert.Equal(t, "VND", categoryCurrency("silver_vnd"))
+	assert.Equal(t, "USD", categoryCurrency("silver_usd"))
+	assert.Equal(t, "", categoryCurrency("unknown"))
+}
+
 func TestSavePriceAlertConfig_RoundTrip(t *testing.T) {
 	rdb, _ := newTestRedis(t)
 	ctx := context.Background()

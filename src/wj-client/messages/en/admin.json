@@ -139,6 +139,10 @@
         "directionText": "Direction text (tăng or giảm)",
         "changePct": "Change % (e.g. 2.1)",
         "priceDiff": "Price difference (e.g. 1,500,000)",
+        "currentPrice": "Current price (e.g. 85,500,000)",
+        "baselinePrice": "Baseline price at last alert (e.g. 84,000,000)",
+        "priceUnit": "Price unit (e.g. lượng, oz, kg)",
+        "currency": "Currency code (e.g. VND, USD)",
         "category": "Category name (e.g. Vàng trong nước)",
         "moverCount": "Number of movers"
       },

@@ -139,6 +139,10 @@
         "directionText": "Hướng (tăng hoặc giảm)",
         "changePct": "% biến động (VD: 2.1)",
         "priceDiff": "Chênh lệch giá (VD: 1,500,000)",
+        "currentPrice": "Giá hiện tại (VD: 85,500,000)",
+        "baselinePrice": "Giá cơ sở tại lần cảnh báo trước (VD: 84,000,000)",
+        "priceUnit": "Đơn vị giá (VD: lượng, oz, kg)",
+        "currency": "Đơn vị tiền tệ (VD: VND, USD)",
         "category": "Tên loại (VD: Vàng trong nước)",
         "moverCount": "Số sản phẩm biến động"
       },

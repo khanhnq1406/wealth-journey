@@ -127,3 +127,6 @@ All functional requirements from the spec are implemented:
 | Date       | Fix                                                     | Severity | Commit  |
 | ---------- | ------------------------------------------------------- | -------- | ------- |
 | 2026-03-19 | Add live preview for title/body templates in config form | Minor    | pending |
+| 2026-03-19 | Add `{currentPrice}` and `{baselinePrice}` template placeholders for formatted current and baseline prices | Minor | pending |
+| 2026-03-19 | Fix test mock URL mismatch (`/dashboard/prices` → `/dashboard/home`) in price_alert_service_test.go | Minor | pending |
+| 2026-03-19 | Add `{priceUnit}` and `{currency}` template placeholders so admins can include gold/silver unit (lượng, oz, kg) and currency (VND, USD) in alert templates. Backend: `priceUnitForMover()` + `categoryCurrency()` helpers with 2 new tests (16 total). Frontend: updated PLACEHOLDERS, SAMPLE_VALUES, i18n (en+vi). | Minor | pending |

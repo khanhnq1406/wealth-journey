@@ -304,7 +304,7 @@ func TestPriceAlertService_SignificantChange_TriggersAlert(t *testing.T) {
 	silverSvc.On("FetchAllPrices", ctx).Return(silverPrices, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1, 2, 3}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
-	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/prices").Return(nil)
+	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
 
 	err := svc.CheckAndAlert(ctx)
 
@@ -432,7 +432,7 @@ func TestPriceAlertService_GoldFetchError_ContinuesToSilver(t *testing.T) {
 	}, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{10, 20}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
-	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/prices").Return(nil)
+	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
 
 	err := svc.CheckAndAlert(ctx)
 
@@ -476,7 +476,7 @@ func TestPriceAlertService_NoUsers_NoNotifications(t *testing.T) {
 	// The service still calls BatchCreate with an empty slice and SendToAll
 	// (push is decoupled from user count). Register both as optional.
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil).Maybe()
-	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/prices").Return(nil).Maybe()
+	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil).Maybe()
 
 	err := svc.CheckAndAlert(ctx)
 

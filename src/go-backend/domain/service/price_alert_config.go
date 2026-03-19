@@ -38,25 +38,25 @@ func DefaultPriceAlertConfig() PriceAlertConfig {
 				Enabled:       true,
 				ThresholdPct:  envFloat("PRICE_ALERT_GOLD_VND_PCT", 2.0),
 				TitleTemplate: "Giá vàng biến động mạnh",
-				BodyTemplate:  "{moverName} {direction} {changePct}%",
+				BodyTemplate:  "{moverName} {direction} {baselinePrice}->{currentPrice}",
 			},
 			"gold_usd": {
 				Enabled:       true,
 				ThresholdPct:  envFloat("PRICE_ALERT_GOLD_USD_PCT", 1.5),
 				TitleTemplate: "Giá vàng biến động mạnh",
-				BodyTemplate:  "{moverName} {direction} {changePct}%",
+				BodyTemplate:  "{moverName} {direction} {baselinePrice}->{currentPrice}",
 			},
 			"silver_vnd": {
 				Enabled:       true,
 				ThresholdPct:  envFloat("PRICE_ALERT_SILVER_VND_PCT", 3.0),
 				TitleTemplate: "Giá bạc biến động mạnh",
-				BodyTemplate:  "{moverName} {direction} {changePct}%",
+				BodyTemplate:  "{moverName} {direction} {baselinePrice}->{currentPrice}",
 			},
 			"silver_usd": {
 				Enabled:       true,
 				ThresholdPct:  envFloat("PRICE_ALERT_SILVER_USD_PCT", 2.0),
 				TitleTemplate: "Giá bạc biến động mạnh",
-				BodyTemplate:  "{moverName} {direction} {changePct}%",
+				BodyTemplate:  "{moverName} {direction} {baselinePrice}->{currentPrice}",
 			},
 		},
 	}
@@ -214,4 +214,39 @@ func categoryDisplayName(cat string) string {
 		return name
 	}
 	return cat
+}
+
+// categoryCurrency returns the currency code for a given category.
+func categoryCurrency(cat string) string {
+	switch cat {
+	case "gold_vnd", "silver_vnd":
+		return "VND"
+	case "gold_usd", "silver_usd":
+		return "USD"
+	default:
+		return ""
+	}
+}
+
+// priceUnitForMover returns the display unit label for the top mover's price.
+// For gold_vnd, the vang.today API returns prices per lượng.
+// For gold_usd, prices are per ounce.
+// For silver_vnd, the unit depends on the item type code (tael-based ending in "L" vs kg-based ending in "KG").
+// For silver_usd, prices are per ounce.
+func priceUnitForMover(category, typeCode string) string {
+	switch category {
+	case "gold_vnd":
+		return "lượng"
+	case "gold_usd":
+		return "oz"
+	case "silver_vnd":
+		if len(typeCode) >= 2 && typeCode[len(typeCode)-2:] == "KG" {
+			return "kg"
+		}
+		return "lượng"
+	case "silver_usd":
+		return "oz"
+	default:
+		return ""
+	}
 }
