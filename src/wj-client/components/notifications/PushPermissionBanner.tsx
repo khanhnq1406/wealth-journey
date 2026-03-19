@@ -8,14 +8,14 @@ import { BaseModal } from "@/components/modals/BaseModal";
 
 const DISMISS_KEY = "push_banner_dismissed_at";
 const PERMANENT_DISMISS_KEY = "push_banner_permanent_dismiss";
-const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+const LIMIT_DISMISS_DAY_MS = 1 * 24 * 60 * 60 * 1000;
 const MAX_AUTO_SUBSCRIBE_ATTEMPTS = 3;
 
 function getInitialDismissed(): boolean {
   if (typeof window === "undefined") return true;
   if (localStorage.getItem(PERMANENT_DISMISS_KEY) === "true") return true;
   const dismissedAt = localStorage.getItem(DISMISS_KEY);
-  if (dismissedAt && Date.now() - Number(dismissedAt) < SEVEN_DAYS_MS)
+  if (dismissedAt && Date.now() - Number(dismissedAt) < LIMIT_DISMISS_DAY_MS)
     return true;
   return false;
 }

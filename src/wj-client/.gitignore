@@ -50,3 +50,5 @@ hideConstants.tsx
 *.tmp
 *.swp
 *~
+
+certificates
