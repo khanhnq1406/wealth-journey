@@ -224,3 +224,4 @@ Admin Page → Broadcast Tab
 | 2026-03-19 | Update C4 backend/frontend diagrams + README + E2E broadcast tests | Major | 8498440 |
 | 2026-03-19 | Fix VAPID key fetch infinite loop: add error state to usePushSubscription hook, guard auto-subscribe effect in PushPermissionBanner against error state | Minor | (this commit) |
 | 2026-03-19 | Add VAPID + Price Alert env vars to `.env.example` with generation instructions and documentation | Minor | (this commit) |
+| 2026-03-19 | Fix FK violation on `actor_id=0`: make `ActorID` nullable (`*int32`) for system notifications (price_alert, admin_broadcast), add migration to drop NOT NULL + re-add FK with ON DELETE SET NULL | Minor | (this commit) |

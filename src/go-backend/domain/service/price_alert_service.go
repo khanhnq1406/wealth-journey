@@ -192,7 +192,6 @@ func (s *priceAlertService) CheckAndAlert(ctx context.Context) error {
 		for i, uid := range userIDs {
 			notifications[i] = &models.Notification{
 				UserID:    uid,
-				ActorID:   0,
 				Type:      "price_alert",
 				Metadata:  datatypes.JSON(metadataJSON),
 				CreatedAt: now,

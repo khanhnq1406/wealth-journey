@@ -321,7 +321,7 @@ func TestPriceAlertService_SignificantChange_TriggersAlert(t *testing.T) {
 	assert.Len(t, notifications, 3, "expected one notification per user")
 	for _, n := range notifications {
 		assert.Equal(t, "price_alert", n.Type)
-		assert.Zero(t, n.ActorID)
+		assert.Nil(t, n.ActorID)
 	}
 }
 

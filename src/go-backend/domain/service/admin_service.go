@@ -267,7 +267,6 @@ func (s *adminService) Broadcast(ctx context.Context, adminUserID int32, message
 	for i, uid := range userIDs {
 		notifications[i] = &models.Notification{
 			UserID:    uid,
-			ActorID:   0,
 			Type:      "admin_broadcast",
 			Metadata:  datatypes.JSON(metadataJSON),
 			CreatedAt: now,
