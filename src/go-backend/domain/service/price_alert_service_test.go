@@ -663,3 +663,60 @@ func TestPriceAlertService_ForceCheck_NoBaseline_StillSendsAlert(t *testing.T) {
 	mover := movers[0].(map[string]interface{})
 	assert.Equal(t, float64(0), mover["changePct"])
 }
+
+// TestPriceAlertService_ForceCheck_SilverUSD_IncludedInAlert verifies that
+// when FetchAllPrices returns a USD-denominated silver price (XAGUSD),
+// ForceCheckAndAlert creates a silver_usd category alert.
+func TestPriceAlertService_ForceCheck_SilverUSD_IncludedInAlert(t *testing.T) {
+	t.Setenv("PRICE_ALERT_SILVER_USD_PCT", "2.0")
+	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
+
+	goldSvc := new(mockPAGoldPriceSvc)
+	silverSvc := new(mockPASilverPriceSvc)
+	notifRepo := new(mockPANotifRepo)
+	userRepo := new(mockPAUserRepo)
+	pushSvc := new(mockPAPushSvc)
+
+	svc, _ := newPriceAlertServiceWithMiniredis(t, goldSvc, silverSvc, notifRepo, userRepo, pushSvc)
+	ctx := context.Background()
+
+	// Gold: empty (we only care about silver_usd here)
+	goldSvc.On("FetchAllPrices", ctx).Return([]*CachedGoldPrice{}, nil)
+
+	// Silver: include both VND and USD prices
+	silverPrices := []*CachedSilverPrice{
+		{TypeCode: "PHU_QUY_THOI_1L", Name: "Phú Quý thỏi 1L", Buy: 1_500_000, Sell: 1_520_000, Currency: "VND", UpdateTime: time.Now()},
+		{TypeCode: "XAGUSD", Name: "Silver World (XAG/USD)", Buy: 3200, Sell: 3200, Currency: "USD", UpdateTime: time.Now()},
+	}
+	silverSvc.On("FetchAllPrices", ctx).Return(silverPrices, nil)
+	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1}, nil)
+	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
+	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
+
+	err := svc.ForceCheckAndAlert(ctx)
+	assert.NoError(t, err)
+
+	// Must have created notifications — at minimum for silver_usd and silver_vnd
+	notifRepo.AssertCalled(t, "BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification"))
+
+	// Find the silver_usd notification by checking metadata category
+	found := false
+	for _, call := range notifRepo.Calls {
+		if call.Method == "BatchCreate" {
+			notifications := call.Arguments.Get(1).([]*models.Notification)
+			for _, n := range notifications {
+				var meta map[string]interface{}
+				_ = json.Unmarshal([]byte(n.Metadata), &meta)
+				if meta["category"] == "silver_usd" {
+					found = true
+					movers, ok := meta["movers"].([]interface{})
+					assert.True(t, ok)
+					assert.GreaterOrEqual(t, len(movers), 1)
+					mover := movers[0].(map[string]interface{})
+					assert.Equal(t, "XAGUSD", mover["typeCode"])
+				}
+			}
+		}
+	}
+	assert.True(t, found, "expected a silver_usd category notification with XAGUSD mover")
+}

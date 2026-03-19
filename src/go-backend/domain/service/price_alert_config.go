@@ -173,6 +173,28 @@ func ResolvePlaceholders(template string, values map[string]string) string {
 	return result
 }
 
+// FormatPriceForDisplay converts a stored price to display format.
+// USD categories: stored as cents (×100) → display as dollars with 2 decimals.
+// VND categories: stored as raw VND → display with thousand separators (no division).
+func FormatPriceForDisplay(price int64, category string) string {
+	switch category {
+	case "gold_usd", "silver_usd":
+		negative := price < 0
+		if negative {
+			price = -price
+		}
+		dollars := price / 100
+		cents := price % 100
+		result := fmt.Sprintf("%s.%02d", FormatWithThousandSeparators(dollars), cents)
+		if negative {
+			return "-" + result
+		}
+		return result
+	default:
+		return FormatWithThousandSeparators(price)
+	}
+}
+
 // FormatWithThousandSeparators formats an int64 with comma separators.
 func FormatWithThousandSeparators(n int64) string {
 	negative := n < 0

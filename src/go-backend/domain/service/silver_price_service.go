@@ -234,9 +234,24 @@ func (s *silverPriceService) FetchAllPrices(ctx context.Context) ([]*CachedSilve
 		mu.Unlock()
 	}()
 
+	// Also fetch world silver (USD) price from Yahoo Finance
+	var usdSilverPrice *CachedSilverPrice
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		price, err := s.fetchUSDSilverPrice(ctx)
+		if err != nil {
+			log.Printf("Warning: failed to fetch USD silver price: %v", err)
+			return
+		}
+		mu.Lock()
+		usdSilverPrice = price
+		mu.Unlock()
+	}()
+
 	wg.Wait()
 
-	// Build ordered result (12 rows as per spec)
+	// Build ordered result (12 VND rows + optional USD row)
 	// Order: Phú Quý (4), Ancarat (4), SBJ (2), DOJI (2)
 	orderedNames := []struct {
 		name   string
@@ -321,6 +336,11 @@ func (s *silverPriceService) FetchAllPrices(ctx context.Context) ([]*CachedSilve
 				log.Printf("Warning: failed to cache silver price for %s: %v", p.TypeCode, err)
 			}
 		}(price)
+	}
+
+	// Append world silver (USD) if fetched successfully
+	if usdSilverPrice != nil {
+		prices = append(prices, usdSilverPrice)
 	}
 
 	return prices, nil

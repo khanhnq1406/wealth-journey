@@ -243,6 +243,36 @@ func TestPriceUnitForMover(t *testing.T) {
 	}
 }
 
+func TestFormatPriceForDisplay(t *testing.T) {
+	tests := []struct {
+		name     string
+		price    int64
+		category string
+		expected string
+	}{
+		// USD prices stored as cents (×100) — should display as dollars with 2 decimals
+		{"gold_usd positive", 300050, "gold_usd", "3,000.50"},
+		{"gold_usd round", 300000, "gold_usd", "3,000.00"},
+		{"gold_usd small", 2850, "gold_usd", "28.50"},
+		{"silver_usd", 2842, "silver_usd", "28.42"},
+		{"gold_usd zero", 0, "gold_usd", "0.00"},
+		{"gold_usd negative diff", -1075, "gold_usd", "-10.75"},
+		// VND prices stored as raw VND — display with thousand separators (no division)
+		{"gold_vnd", 85000000, "gold_vnd", "85,000,000"},
+		{"gold_vnd large", 8500000000, "gold_vnd", "8,500,000,000"},
+		{"silver_vnd", 2737000, "silver_vnd", "2,737,000"},
+		{"gold_vnd zero", 0, "gold_vnd", "0"},
+		{"gold_vnd negative diff", -1500000, "gold_vnd", "-1,500,000"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := FormatPriceForDisplay(tt.price, tt.category)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
 func TestCategoryCurrency(t *testing.T) {
 	assert.Equal(t, "VND", categoryCurrency("gold_vnd"))
 	assert.Equal(t, "USD", categoryCurrency("gold_usd"))
