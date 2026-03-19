@@ -39,8 +39,13 @@ func NewPushService(subRepo repository.PushSubscriptionRepository) PushService {
 		return &noopPushService{}
 	}
 	if contact == "" {
-		contact = "mailto:admin@congdongvang.com"
+		contact = "admin@congdongvang.com"
 	}
+	// webpush-go auto-prepends "mailto:" to the Subscriber field (the VAPID
+	// JWT "sub" claim).  If the env var already contains the prefix we must
+	// strip it, otherwise the JWT ends up with "mailto:mailto:…" which Apple
+	// strictly rejects with {"reason":"BadJwtToken"}.
+	contact = strings.TrimPrefix(contact, "mailto:")
 
 	return &pushService{
 		subRepo:        subRepo,
@@ -172,12 +177,14 @@ func (s *pushService) handlePushResponse(ctx context.Context, resp *http.Respons
 	case http.StatusForbidden: // 403
 		// Read response body for diagnostics (Apple sometimes includes error details).
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
-		log.Printf("Push endpoint returned HTTP 403 for %s... body=%s", truncated, string(body))
+		bodyStr := string(body)
+		log.Printf("Push endpoint returned HTTP 403 for %s... body=%s", truncated, bodyStr)
 
-		// Apple's push service returns 403 for invalid/expired subscriptions.
-		// Unlike FCM which returns 410, Apple uses 403. Remove these subscriptions
-		// to prevent repeated failures on every broadcast.
-		if strings.Contains(endpoint, "web.push.apple.com") {
+		// Apple returns 403 for both JWT errors (BadJwtToken) and invalid
+		// subscriptions.  Only remove the subscription when Apple confirms
+		// the subscription itself is invalid — NOT when the JWT is rejected,
+		// since that is a server-side configuration issue.
+		if strings.Contains(endpoint, "web.push.apple.com") && !strings.Contains(bodyStr, "BadJwtToken") {
 			log.Printf("Removing invalid Apple push subscription: %s...", truncated)
 			_ = s.subRepo.DeleteByEndpoint(ctx, endpoint)
 		}

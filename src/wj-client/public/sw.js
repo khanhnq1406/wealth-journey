@@ -8,29 +8,25 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("push", (event) => {
-  if (!event.data) return;
-
   let data;
   try {
-    data = event.data.json();
-  } catch {
-    return;
+    data = event.data ? event.data.json() : null;
+  } catch (e) {
+    console.warn("SW: failed to parse push payload", e);
+    data = null;
   }
 
+  const title = (data && data.title) || "congdongvang.com";
   const options = {
-    body: data.body || "",
-    icon: data.icon || "/icons/icon-192x192.png",
+    body: (data && data.body) || "Bạn có thông báo mới",
+    icon: (data && data.icon) || "/icons/icon-192x192.png",
     badge: "/icons/icon-72x72.png",
-    data: { url: data.url || "/dashboard/home" },
-    vibrate: [200, 100, 200],
+    tag: (data && data.tag) || "cdv-default",
+    renotify: true,
+    data: { url: (data && data.url) || "/dashboard/home" },
   };
 
-  event.waitUntil(
-    self.registration.showNotification(
-      data.title || "congdongvang.com",
-      options
-    )
-  );
+  event.waitUntil(self.registration.showNotification(title, options));
 });
 
 self.addEventListener("notificationclick", (event) => {
