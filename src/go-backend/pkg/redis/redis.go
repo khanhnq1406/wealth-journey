@@ -60,6 +60,15 @@ func SessionMetadataKey(sessionID string) string {
 	return fmt.Sprintf("session_meta:%s", sessionID)
 }
 
+// NewFromClient wraps an existing *redis.Client in a RedisClient.
+// This is useful for testing with an in-memory Redis server (e.g. miniredis).
+func NewFromClient(client *redis.Client) *RedisClient {
+	return &RedisClient{
+		client: client,
+		ctx:    context.Background(),
+	}
+}
+
 // New creates a new Redis client
 func New(cfg *config.Config) (*RedisClient, error) {
 	// Parse full Redis URI (supports redis://user:password@host:port/db)
