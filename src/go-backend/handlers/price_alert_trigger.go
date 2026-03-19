@@ -21,11 +21,10 @@ func NewPriceAlertTriggerHandler(priceAlertSvc service.PriceAlertService) *Price
 
 // TriggerCheck manually triggers a price alert check cycle.
 func (h *PriceAlertTriggerHandler) TriggerCheck(c *gin.Context) {
-	if err := h.priceAlertSvc.CheckAndAlert(c.Request.Context()); err != nil {
+	if err := h.priceAlertSvc.ForceCheckAndAlert(c.Request.Context()); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success":   false,
 			"message":   "Price alert check failed",
-			"error":     err.Error(),
 			"timestamp": time.Now().Unix(),
 		})
 		return

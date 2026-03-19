@@ -56,6 +56,24 @@ func NewPriceAlertService(
 }
 
 func (s *priceAlertService) CheckAndAlert(ctx context.Context) error {
+	return s.doCheckAndAlert(ctx, false)
+}
+
+const forceTriggerCooldownKey = "price_alert:force_trigger_cooldown"
+const forceTriggerCooldownDuration = 30 * time.Second
+
+func (s *priceAlertService) ForceCheckAndAlert(ctx context.Context) error {
+	// Rate-limit force triggers to prevent notification spam
+	exists, _ := s.redisClient.GetClient().Exists(ctx, forceTriggerCooldownKey).Result()
+	if exists > 0 {
+		return fmt.Errorf("please wait before triggering again")
+	}
+	s.redisClient.GetClient().Set(ctx, forceTriggerCooldownKey, "1", forceTriggerCooldownDuration)
+
+	return s.doCheckAndAlert(ctx, true)
+}
+
+func (s *priceAlertService) doCheckAndAlert(ctx context.Context, force bool) error {
 	cfg := LoadPriceAlertConfig(ctx, s.redisClient)
 
 	type categoryMovers struct {
@@ -72,7 +90,12 @@ func (s *priceAlertService) CheckAndAlert(ctx context.Context) error {
 	} else {
 		var goldVND, goldUSD []priceMover
 		for _, p := range goldPrices {
-			mover := s.checkPrice(ctx, p.TypeCode, p.Buy)
+			var mover *priceMover
+			if force {
+				mover = s.checkPriceForce(ctx, p.TypeCode, p.Buy)
+			} else {
+				mover = s.checkPrice(ctx, p.TypeCode, p.Buy)
+			}
 			if mover == nil {
 				continue
 			}
@@ -102,7 +125,12 @@ func (s *priceAlertService) CheckAndAlert(ctx context.Context) error {
 	} else {
 		var silverVND, silverUSD []priceMover
 		for _, p := range silverPrices {
-			mover := s.checkPrice(ctx, p.TypeCode, p.Buy)
+			var mover *priceMover
+			if force {
+				mover = s.checkPriceForce(ctx, p.TypeCode, p.Buy)
+			} else {
+				mover = s.checkPrice(ctx, p.TypeCode, p.Buy)
+			}
 			if mover == nil {
 				continue
 			}
@@ -132,22 +160,29 @@ func (s *priceAlertService) CheckAndAlert(ctx context.Context) error {
 			continue
 		}
 
-		// Filter movers that exceed threshold
 		var significant []priceMover
-		for _, m := range cat.movers {
-			if m.ChangePct >= catCfg.ThresholdPct {
-				significant = append(significant, m)
+		if force {
+			// Force mode: include ALL movers regardless of threshold
+			significant = cat.movers
+		} else {
+			// Normal mode: filter movers that exceed threshold
+			for _, m := range cat.movers {
+				if m.ChangePct >= catCfg.ThresholdPct {
+					significant = append(significant, m)
+				}
 			}
 		}
 		if len(significant) == 0 {
 			continue
 		}
 
-		// Check cooldown
+		// Check cooldown (skip in force mode)
 		cooldownKey := fmt.Sprintf("price_alert:cooldown:%s", cat.category)
-		exists, _ := s.redisClient.GetClient().Exists(ctx, cooldownKey).Result()
-		if exists > 0 {
-			continue
+		if !force {
+			exists, _ := s.redisClient.GetClient().Exists(ctx, cooldownKey).Result()
+			if exists > 0 {
+				continue
+			}
 		}
 
 		// Sort by change % descending and take top N
@@ -158,11 +193,32 @@ func (s *priceAlertService) CheckAndAlert(ctx context.Context) error {
 			significant = significant[:cfg.TopMoversCount]
 		}
 
+		// Resolve templates for metadata (used by in-app notification display)
+		topMover := significant[0]
+		placeholders := map[string]string{
+			"moverName":     topMover.Name,
+			"moverCode":     topMover.TypeCode,
+			"direction":     directionSymbol(topMover.Direction),
+			"directionText": directionText(topMover.Direction),
+			"changePct":     fmt.Sprintf("%.1f", topMover.ChangePct),
+			"priceDiff":     FormatWithThousandSeparators(topMover.PriceDiff),
+			"currentPrice":  FormatWithThousandSeparators(topMover.Current),
+			"baselinePrice": FormatWithThousandSeparators(topMover.Baseline),
+			"category":      categoryDisplayName(cat.category),
+			"moverCount":    fmt.Sprintf("%d", len(significant)),
+			"priceUnit":     priceUnitForMover(cat.category, topMover.TypeCode),
+			"currency":      categoryCurrency(cat.category),
+		}
+		resolvedTitle := ResolvePlaceholders(catCfg.TitleTemplate, placeholders)
+		resolvedBody := ResolvePlaceholders(catCfg.BodyTemplate, placeholders)
+
 		// Build metadata
 		metadata := map[string]interface{}{
 			"category":  cat.category,
 			"movers":    significant,
 			"checkTime": time.Now().Unix(),
+			"title":     resolvedTitle,
+			"body":      resolvedBody,
 		}
 		metadataJSON, err := json.Marshal(metadata)
 		if err != nil {
@@ -207,43 +263,62 @@ func (s *priceAlertService) CheckAndAlert(ctx context.Context) error {
 			_ = s.redisClient.Publish(channel, payload)
 		}
 
-		// Push notification — resolve templates
+		// Push notification — reuse already-resolved templates
 		if s.pushSvc != nil {
-			topMover := significant[0]
-			placeholders := map[string]string{
-				"moverName":     topMover.Name,
-				"moverCode":     topMover.TypeCode,
-				"direction":     directionSymbol(topMover.Direction),
-				"directionText": directionText(topMover.Direction),
-				"changePct":     fmt.Sprintf("%.1f", topMover.ChangePct),
-				"priceDiff":     FormatWithThousandSeparators(topMover.PriceDiff),
-				"currentPrice":  FormatWithThousandSeparators(topMover.Current),
-				"baselinePrice": FormatWithThousandSeparators(topMover.Baseline),
-				"category":      categoryDisplayName(cat.category),
-				"moverCount":    fmt.Sprintf("%d", len(significant)),
-				"priceUnit":     priceUnitForMover(cat.category, topMover.TypeCode),
-				"currency":      categoryCurrency(cat.category),
+			_ = s.pushSvc.SendToAll(ctx, resolvedTitle, resolvedBody, "/dashboard/home")
+		}
+
+		if !force {
+			// Set cooldown (skip in force mode to not affect scheduled alerts)
+			cooldownDuration := time.Duration(cfg.CooldownMinutes) * time.Minute
+			s.redisClient.GetClient().Set(ctx, cooldownKey, "1", cooldownDuration)
+
+			// Update baselines (skip in force mode to not affect scheduled alerts)
+			for _, m := range cat.movers {
+				baselineKey := fmt.Sprintf("price_alert:baseline:%s", m.TypeCode)
+				s.redisClient.GetClient().Set(ctx, baselineKey, m.Current, 0)
 			}
-
-			title := ResolvePlaceholders(catCfg.TitleTemplate, placeholders)
-			body := ResolvePlaceholders(catCfg.BodyTemplate, placeholders)
-			_ = s.pushSvc.SendToAll(ctx, title, body, "/dashboard/home")
 		}
 
-		// Set cooldown
-		cooldownDuration := time.Duration(cfg.CooldownMinutes) * time.Minute
-		s.redisClient.GetClient().Set(ctx, cooldownKey, "1", cooldownDuration)
-
-		// Update baselines
-		for _, m := range cat.movers {
-			baselineKey := fmt.Sprintf("price_alert:baseline:%s", m.TypeCode)
-			s.redisClient.GetClient().Set(ctx, baselineKey, m.Current, 0)
-		}
-
-		log.Printf("Price alert: sent %s alert to %d users (%d movers)", cat.category, len(userIDs), len(significant))
+		log.Printf("Price alert: sent %s alert to %d users (%d movers, force=%v)", cat.category, len(userIDs), len(significant), force)
 	}
 
 	return nil
+}
+
+// checkPriceForce returns a priceMover for any valid price, using the baseline
+// if available or the current price as both current and baseline (0% change).
+// Unlike checkPrice, it never returns nil for valid prices and never sets baselines.
+func (s *priceAlertService) checkPriceForce(ctx context.Context, typeCode string, currentBuy int64) *priceMover {
+	if currentBuy <= 0 {
+		return nil
+	}
+
+	baseline := currentBuy // default: same as current (0% change)
+	direction := "up"
+	changePct := 0.0
+
+	baselineKey := fmt.Sprintf("price_alert:baseline:%s", typeCode)
+	baselineStr, err := s.redisClient.GetClient().Get(ctx, baselineKey).Result()
+	if err == nil {
+		if parsed, parseErr := strconv.ParseInt(baselineStr, 10, 64); parseErr == nil && parsed > 0 {
+			baseline = parsed
+			changePct = math.Abs(float64(currentBuy-baseline)) / float64(baseline) * 100
+			changePct = math.Round(changePct*100) / 100
+			if currentBuy < baseline {
+				direction = "down"
+			}
+		}
+	}
+
+	return &priceMover{
+		TypeCode:  typeCode,
+		Direction: direction,
+		ChangePct: changePct,
+		Current:   currentBuy,
+		Baseline:  baseline,
+		PriceDiff: currentBuy - baseline,
+	}
 }
 
 func (s *priceAlertService) checkPrice(ctx context.Context, typeCode string, currentBuy int64) *priceMover {

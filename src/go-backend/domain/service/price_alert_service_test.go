@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
@@ -323,6 +324,20 @@ func TestPriceAlertService_SignificantChange_TriggersAlert(t *testing.T) {
 		assert.Equal(t, "price_alert", n.Type)
 		assert.Nil(t, n.ActorID)
 	}
+
+	// Verify metadata contains resolved title and body (not raw templates)
+	var meta map[string]interface{}
+	err = json.Unmarshal([]byte(notifications[0].Metadata), &meta)
+	assert.NoError(t, err)
+	assert.Contains(t, meta, "title", "metadata must include resolved title")
+	assert.Contains(t, meta, "body", "metadata must include resolved body")
+
+	// Title should be the default template for gold_vnd
+	assert.Equal(t, "Giá vàng biến động mạnh", meta["title"])
+	// Body should contain the resolved mover name, not raw {moverName} placeholder
+	bodyStr, _ := meta["body"].(string)
+	assert.Contains(t, bodyStr, "SJC 1L-10L", "body must contain the resolved mover name")
+	assert.NotContains(t, bodyStr, "{moverName}", "body must not contain unresolved placeholders")
 }
 
 // TestPriceAlertService_BelowThreshold_NoAlert verifies that price changes
@@ -493,4 +508,158 @@ func TestPriceAlertService_NoUsers_NoNotifications(t *testing.T) {
 			assert.Empty(t, notifications, "expected no notifications when user list is empty")
 		}
 	}
+}
+
+// TestPriceAlertService_ForceCheck_AlwaysSendsAlert verifies that
+// ForceCheckAndAlert always sends notifications with current prices,
+// bypassing threshold checks, cooldown, and missing baselines.
+func TestPriceAlertService_ForceCheck_AlwaysSendsAlert(t *testing.T) {
+	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "2.0")
+	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
+
+	goldSvc := new(mockPAGoldPriceSvc)
+	silverSvc := new(mockPASilverPriceSvc)
+	notifRepo := new(mockPANotifRepo)
+	userRepo := new(mockPAUserRepo)
+	pushSvc := new(mockPAPushSvc)
+
+	svc, mr := newPriceAlertServiceWithMiniredis(t, goldSvc, silverSvc, notifRepo, userRepo, pushSvc)
+	ctx := context.Background()
+
+	// Set baseline with only 0.5% change — below threshold for normal check
+	baselinePrice := int64(8_500_000_000)
+	newPrice := int64(8_542_500_000) // 0.5% increase — would NOT trigger CheckAndAlert
+	setBaseline(mr, "SJL1L10", baselinePrice)
+
+	// Also set cooldown — would block normal CheckAndAlert
+	setCooldown(mr, "gold_vnd")
+
+	goldPrices := []*CachedGoldPrice{
+		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: newPrice, Sell: newPrice + 50_000_000, Currency: "VND", UpdateTime: time.Now()},
+	}
+	silverPrices := []*CachedSilverPrice{}
+
+	goldSvc.On("FetchAllPrices", ctx).Return(goldPrices, nil)
+	silverSvc.On("FetchAllPrices", ctx).Return(silverPrices, nil)
+	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1, 2}, nil)
+	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
+	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
+
+	// Force check must always send, regardless of threshold and cooldown
+	err := svc.ForceCheckAndAlert(ctx)
+
+	assert.NoError(t, err)
+	goldSvc.AssertExpectations(t)
+	silverSvc.AssertExpectations(t)
+	notifRepo.AssertExpectations(t)
+	pushSvc.AssertExpectations(t)
+	userRepo.AssertExpectations(t)
+
+	// Verify 2 notifications created (one per user)
+	batchCreateCall := notifRepo.Calls[0]
+	notifications := batchCreateCall.Arguments.Get(1).([]*models.Notification)
+	assert.Len(t, notifications, 2, "expected one notification per user")
+
+	// Verify metadata has current price values
+	var meta map[string]interface{}
+	err = json.Unmarshal([]byte(notifications[0].Metadata), &meta)
+	assert.NoError(t, err)
+	assert.Contains(t, meta, "title")
+	assert.Contains(t, meta, "body")
+
+	// Verify baselines were NOT updated (force check should not affect baselines)
+	baselineKey := fmt.Sprintf("price_alert:baseline:%s", "SJL1L10")
+	val, _ := mr.Get(baselineKey)
+	assert.Equal(t, fmt.Sprintf("%d", baselinePrice), val, "baseline should not be updated by force check")
+}
+
+// TestPriceAlertService_ForceCheck_RateLimit verifies that calling
+// ForceCheckAndAlert twice in rapid succession returns an error on the second call.
+func TestPriceAlertService_ForceCheck_RateLimit(t *testing.T) {
+	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "2.0")
+	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
+
+	goldSvc := new(mockPAGoldPriceSvc)
+	silverSvc := new(mockPASilverPriceSvc)
+	notifRepo := new(mockPANotifRepo)
+	userRepo := new(mockPAUserRepo)
+	pushSvc := new(mockPAPushSvc)
+
+	svc, mr := newPriceAlertServiceWithMiniredis(t, goldSvc, silverSvc, notifRepo, userRepo, pushSvc)
+	ctx := context.Background()
+
+	setBaseline(mr, "SJL1L10", 8_500_000_000)
+
+	goldPrices := []*CachedGoldPrice{
+		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: 8_600_000_000, Sell: 8_700_000_000, Currency: "VND", UpdateTime: time.Now()},
+	}
+	silverPrices := []*CachedSilverPrice{}
+
+	goldSvc.On("FetchAllPrices", ctx).Return(goldPrices, nil)
+	silverSvc.On("FetchAllPrices", ctx).Return(silverPrices, nil)
+	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1}, nil)
+	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
+	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
+
+	// First call should succeed
+	err := svc.ForceCheckAndAlert(ctx)
+	assert.NoError(t, err)
+
+	// Second immediate call should be rate-limited
+	err = svc.ForceCheckAndAlert(ctx)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "please wait")
+}
+
+// TestPriceAlertService_ForceCheck_NoBaseline_StillSendsAlert verifies that
+// ForceCheckAndAlert sends alerts even when there is no baseline (first run),
+// unlike normal CheckAndAlert which only stores baselines on first run.
+func TestPriceAlertService_ForceCheck_NoBaseline_StillSendsAlert(t *testing.T) {
+	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "2.0")
+	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
+
+	goldSvc := new(mockPAGoldPriceSvc)
+	silverSvc := new(mockPASilverPriceSvc)
+	notifRepo := new(mockPANotifRepo)
+	userRepo := new(mockPAUserRepo)
+	pushSvc := new(mockPAPushSvc)
+
+	svc, _ := newPriceAlertServiceWithMiniredis(t, goldSvc, silverSvc, notifRepo, userRepo, pushSvc)
+	ctx := context.Background()
+
+	// NO baseline set — first run scenario
+	goldPrices := []*CachedGoldPrice{
+		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: 8500000000, Sell: 8600000000, Currency: "VND", UpdateTime: time.Now()},
+	}
+	silverPrices := []*CachedSilverPrice{}
+
+	goldSvc.On("FetchAllPrices", ctx).Return(goldPrices, nil)
+	silverSvc.On("FetchAllPrices", ctx).Return(silverPrices, nil)
+	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1}, nil)
+	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
+	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
+
+	// Force check must send even with no baselines
+	err := svc.ForceCheckAndAlert(ctx)
+
+	assert.NoError(t, err)
+	// Must have created notifications — unlike normal CheckAndAlert first run
+	notifRepo.AssertExpectations(t)
+	pushSvc.AssertExpectations(t)
+	userRepo.AssertExpectations(t)
+
+	// Verify metadata
+	batchCreateCall := notifRepo.Calls[0]
+	notifications := batchCreateCall.Arguments.Get(1).([]*models.Notification)
+	assert.Len(t, notifications, 1)
+
+	var meta map[string]interface{}
+	err = json.Unmarshal([]byte(notifications[0].Metadata), &meta)
+	assert.NoError(t, err)
+	// changePct should be 0 since no baseline existed
+	movers, ok := meta["movers"].([]interface{})
+	assert.True(t, ok)
+	assert.Len(t, movers, 1)
+	mover := movers[0].(map[string]interface{})
+	assert.Equal(t, float64(0), mover["changePct"])
 }

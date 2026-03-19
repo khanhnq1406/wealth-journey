@@ -13,6 +13,8 @@ const notificationMessages: Record<string, (actorName: string) => string> = {
 
 interface PriceAlertMetadata {
   category: string;
+  title?: string;
+  body?: string;
   movers: Array<{
     typeCode: string;
     name: string;
@@ -49,8 +51,12 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
   if (notification.type === "price_alert") {
     const meta = parseMetadata<PriceAlertMetadata>(notification.metadata);
     const isGold = meta?.category?.startsWith("gold");
-    const title = isGold ? "Giá vàng biến động mạnh" : "Giá bạc biến động mạnh";
     const topMover = meta?.movers?.[0];
+
+    // Use resolved title/body from metadata (admin-configured templates),
+    // falling back to hardcoded defaults for older notifications without them
+    const title = meta?.title || (isGold ? "Giá vàng biến động mạnh" : "Giá bạc biến động mạnh");
+    const body = meta?.body;
 
     return (
       <button
@@ -77,7 +83,11 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
           <p className="font-vietnam text-sm text-v2-text-primary leading-snug font-medium">
             {title}
           </p>
-          {topMover && (
+          {body ? (
+            <p className="mt-0.5 font-vietnam text-xs text-v2-text-secondary leading-snug">
+              {body}
+            </p>
+          ) : topMover ? (
             <p className="mt-0.5 font-vietnam text-xs leading-snug">
               <span className="text-v2-text-secondary">{topMover.name}</span>
               {" "}
@@ -85,7 +95,7 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
                 {topMover.direction === "up" ? "↑" : "↓"} {topMover.changePct.toFixed(1)}%
               </span>
             </p>
-          )}
+          ) : null}
           <p className="mt-1 font-vietnam text-xs text-v2-text-tertiary">{timeAgo}</p>
         </div>
       </button>

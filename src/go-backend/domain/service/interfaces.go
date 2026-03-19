@@ -316,4 +316,5 @@ type PushService interface {
 // PriceAlertService detects significant price fluctuations and sends alerts.
 type PriceAlertService interface {
 	CheckAndAlert(ctx context.Context) error
+	ForceCheckAndAlert(ctx context.Context) error
 }
