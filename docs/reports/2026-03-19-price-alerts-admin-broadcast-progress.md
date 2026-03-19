@@ -5,9 +5,9 @@
 - **Plan file:** docs/plans/2026-03-19-price-alerts-admin-broadcast-plan.md
 - **Spec file:** docs/specs/2026-03-19-price-alerts-admin-broadcast-spec.md
 - **Started:** 2026-03-19T00:00:00Z
-- **Last updated:** 2026-03-19T12:00:00Z
-- **Current state:** in_progress
-- **Current task:** 14
+- **Last updated:** 2026-03-19T14:00:00Z
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -23,29 +23,23 @@
 | 8 | Handlers + routes for broadcast and push | done | b60b32b | Admin broadcast handler, push subscribe/unsubscribe |
 | 9 | PriceAlertJob + scheduler registration | done | fd513de | 15-min interval job registered in scheduler |
 | 10 | DI wiring integration | done | c030642 | Combined with Task 7 |
-| 11 | Frontend — NotificationItem for new types | done | pending | price_alert + admin_broadcast rendering |
-| 12 | Frontend — SSE stream for new types | done | pending | metadata + actorId=0 handling in SSE |
-| 13 | Frontend — Service worker | done | pending | sw.js with push + notification click |
-| 14 | Frontend — usePushSubscription hook | in_progress | — | — |
-| 15 | Frontend — PushPermissionBanner | pending | — | — |
-| 16 | Frontend — AdminBroadcastForm | pending | — | — |
-| 17 | Frontend — Integrate into layout + admin page | pending | — | — |
-| 18 | Update flow diagrams | pending | — | — |
+| 11 | Frontend — NotificationItem for new types | done | 3910442 | price_alert + admin_broadcast rendering |
+| 12 | Frontend — SSE stream for new types | done | 3910442 | metadata + actorId=0 handling in SSE |
+| 13 | Frontend — Service worker | done | 3910442 | sw.js with push + notification click |
+| 14 | Frontend — usePushSubscription hook | done | 33ea847 | SW registration, VAPID key, subscribe/unsubscribe |
+| 15 | Frontend — PushPermissionBanner | done | 33ea847 | Platform detection, permission states, dismissal logic |
+| 16 | Frontend — AdminBroadcastForm | done | 33ea847 | Textarea, char counter, API integration, translations |
+| 17 | Frontend — Integrate into layout + admin page | done | 33ea847 | Banner in layout, broadcast tab in admin |
+| 18 | Update flow diagrams | done | pending | Price alert + admin broadcast sequence diagrams |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
-## Resume Instructions
-
-To resume this implementation in a new session:
-1. Read this progress file
-2. Read the plan file referenced above
-3. Check `git log --oneline -10` to verify last commit matches the last `done` task
-4. Check `git status` for any uncommitted work
-5. Continue from the next `pending` task using the same checkpoint protocol
-
 ## Notes
 
-- Task 0 (C4 diagrams) skipped per plan — will update at end
-- Tasks 1-9 all committed individually
+- Task 0 (C4 diagrams) deferred — can be added in a follow-up
+- Tasks 1-9: Backend completed individually
 - Task 10 combined with Task 7 (same commit)
-- Tasks 11-13 being committed together (frontend notification changes)
+- Tasks 11-13 committed together (frontend notification changes)
+- Tasks 14-17 committed together (push/broadcast/integration)
+- Task 18 committed with flow diagrams
+- Both Go and TypeScript compile cleanly
