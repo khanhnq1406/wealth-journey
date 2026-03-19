@@ -22,6 +22,13 @@ func (r *notificationRepository) Create(ctx context.Context, notification *model
 	return r.executeCreate(ctx, notification, "notification")
 }
 
+func (r *notificationRepository) BatchCreate(ctx context.Context, notifications []*models.Notification) error {
+	if len(notifications) == 0 {
+		return nil
+	}
+	return r.db.DB.WithContext(ctx).CreateInBatches(notifications, 500).Error
+}
+
 func (r *notificationRepository) GetByUserID(ctx context.Context, userID int32, opts ListOptions) ([]*models.Notification, int, error) {
 	var notifications []*models.Notification
 	var total int64

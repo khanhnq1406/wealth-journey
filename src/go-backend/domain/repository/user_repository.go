@@ -131,6 +131,16 @@ func (r *userRepository) ListWithSearch(ctx context.Context, search string, opts
 	return users, int(total), nil
 }
 
+// GetAllUserIDs returns all user IDs.
+func (r *userRepository) GetAllUserIDs(ctx context.Context) ([]int32, error) {
+	var ids []int32
+	err := r.db.DB.WithContext(ctx).Model(&models.User{}).Pluck("id", &ids).Error
+	if err != nil {
+		return nil, r.handleDBError(err, "user", "get all user IDs")
+	}
+	return ids, nil
+}
+
 // Exists checks if a user exists by email.
 func (r *userRepository) ExistsByEmail(ctx context.Context, email string) (bool, error) {
 	var count int64

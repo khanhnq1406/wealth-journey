@@ -43,6 +43,9 @@ type UserRepository interface {
 
 	// ListWithSearch retrieves users with optional search filter on name/email/username.
 	ListWithSearch(ctx context.Context, search string, opts ListOptions) ([]*models.User, int, error)
+
+	// GetAllUserIDs returns all user IDs.
+	GetAllUserIDs(ctx context.Context) ([]int32, error)
 }
 
 // WalletRepository defines the interface for wallet data operations.
@@ -380,6 +383,7 @@ type ReportRepository interface {
 // NotificationRepository defines the interface for notification data operations.
 type NotificationRepository interface {
 	Create(ctx context.Context, notification *models.Notification) error
+	BatchCreate(ctx context.Context, notifications []*models.Notification) error
 	GetByUserID(ctx context.Context, userID int32, opts ListOptions) ([]*models.Notification, int, error)
 	GetUnreadCount(ctx context.Context, userID int32) (int32, error)
 	MarkAllRead(ctx context.Context, userID int32) error
