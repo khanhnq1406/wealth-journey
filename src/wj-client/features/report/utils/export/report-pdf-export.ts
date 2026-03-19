@@ -11,9 +11,28 @@
  * with brand colors and styling.
  */
 
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { formatCurrency as formatCurrencyUtil } from "@/utils/currency-formatter";
+
+// Use a lightweight type alias for jsPDF instances in internal helpers.
+// The actual jsPDF class is loaded dynamically to avoid SSR bundling issues
+// (fflate, a jspdf dependency, uses Node.js Worker which Turbopack cannot resolve during SSR).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type JsPDFInstance = any;
+
+let cachedModules: { jsPDF: JsPDFInstance; autoTable: JsPDFInstance } | null = null;
+
+async function loadJsPDF(): Promise<{ jsPDF: JsPDFInstance; autoTable: JsPDFInstance }> {
+  if (cachedModules) return cachedModules;
+  if (typeof window === "undefined") {
+    throw new Error("jsPDF can only be loaded in the browser");
+  }
+  const [jspdfModule, autoTableModule] = await Promise.all([
+    import(/* webpackChunkName: "jspdf" */ "jspdf"),
+    import(/* webpackChunkName: "jspdf-autotable" */ "jspdf-autotable"),
+  ]);
+  cachedModules = { jsPDF: jspdfModule.default, autoTable: autoTableModule.default };
+  return cachedModules;
+}
 
 // Re-export types from data-utils for convenience
 export type {
@@ -196,7 +215,7 @@ function formatDateRange(start: Date, end: Date): string {
  * @returns Y position after header
  */
 function addHeader(
-  pdf: jsPDF,
+  pdf: JsPDFInstance,
   period: string,
   dateRange: { start: Date; end: Date },
   translations?: ReportExportTranslations,
@@ -246,7 +265,7 @@ function addHeader(
  * @returns Y position after summary section
  */
 function addSummarySection(
-  pdf: jsPDF,
+  pdf: JsPDFInstance,
   summaryData: SummaryData,
   yPosition: number,
   translations?: ReportExportTranslations,
@@ -321,7 +340,8 @@ function addSummarySection(
  * @returns Y position after table
  */
 function addMonthlyBreakdownTable(
-  pdf: jsPDF,
+  pdf: JsPDFInstance,
+  autoTable: JsPDFInstance,
   trendData: TrendData[],
   currency: string,
   yPosition: number,
@@ -407,7 +427,8 @@ function addMonthlyBreakdownTable(
  * @returns Y position after section
  */
 function addExpenseCategoriesSection(
-  pdf: jsPDF,
+  pdf: JsPDFInstance,
+  autoTable: JsPDFInstance,
   expenseCategories: ExpenseCategoryData[],
   currency: string,
   yPosition: number,
@@ -514,7 +535,8 @@ function addExpenseCategoriesSection(
  * @returns Y position after section
  */
 function addCategoryComparisonSection(
-  pdf: jsPDF,
+  pdf: JsPDFInstance,
+  autoTable: JsPDFInstance,
   comparisonData: CategoryComparisonData[],
   currency: string,
   yPosition: number,
@@ -608,7 +630,7 @@ function addCategoryComparisonSection(
  * @param pdf - jsPDF instance
  * @param translations - Optional translation strings
  */
-function addFooter(pdf: jsPDF, translations?: ReportExportTranslations): void {
+function addFooter(pdf: JsPDFInstance, translations?: ReportExportTranslations): void {
   const pageCount = pdf.internal.pages.length - 1;
   const pageHeight = pdf.internal.pageSize.getHeight();
 
@@ -659,10 +681,10 @@ function addFooter(pdf: jsPDF, translations?: ReportExportTranslations): void {
  * downloadPDF(pdf, generateReportPDFFilename("this-month", startDate, endDate));
  * ```
  */
-export function generateReportPDF(
+export async function generateReportPDF(
   data: ReportExportData,
   options: ReportPDFExportOptions = {},
-): jsPDF {
+): Promise<JsPDFInstance> {
   const {
     summaryData,
     trendData,
@@ -674,8 +696,10 @@ export function generateReportPDF(
     translations,
   } = data;
 
+  const { jsPDF: JsPDF, autoTable } = await loadJsPDF();
+
   // Create new PDF document (A4 size, portrait)
-  const pdf = new jsPDF({
+  const pdf = new JsPDF({
     orientation: "portrait",
     unit: "mm",
     format: "a4",
@@ -684,9 +708,10 @@ export function generateReportPDF(
   // Build PDF sections
   let yPosition = addHeader(pdf, period, dateRange, translations);
   yPosition = addSummarySection(pdf, summaryData, yPosition, translations);
-  yPosition = addMonthlyBreakdownTable(pdf, trendData, currency, yPosition, translations);
+  yPosition = addMonthlyBreakdownTable(pdf, autoTable, trendData, currency, yPosition, translations);
   yPosition = addExpenseCategoriesSection(
     pdf,
+    autoTable,
     expenseCategories,
     currency,
     yPosition,
@@ -697,6 +722,7 @@ export function generateReportPDF(
   if (categoryComparisonData && categoryComparisonData.length > 0) {
     yPosition = addCategoryComparisonSection(
       pdf,
+      autoTable,
       categoryComparisonData,
       currency,
       yPosition,
@@ -763,7 +789,7 @@ export function generateReportPDFFilename(
  * downloadPDF(pdf, "my-report.pdf");
  * ```
  */
-export function downloadPDF(pdf: jsPDF, filename: string): void {
+export function downloadPDF(pdf: JsPDFInstance, filename: string): void {
   pdf.save(filename);
 }
 
@@ -784,15 +810,15 @@ export function downloadPDF(pdf: jsPDF, filename: string): void {
  * });
  * ```
  */
-export function exportReportToPDF(
+export async function exportReportToPDF(
   data: ReportExportData,
   options: ReportPDFExportOptions & {
     period: string;
     startDate: Date;
     endDate: Date;
   },
-): void {
-  const pdf = generateReportPDF(data, options);
+): Promise<void> {
+  const pdf = await generateReportPDF(data, options);
   const filename = generateReportPDFFilename(
     options.period,
     options.startDate,

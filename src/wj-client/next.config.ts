@@ -27,6 +27,10 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  // Exclude jspdf from SSR bundling — fflate (a jspdf dependency) uses
+  // Node.js Worker with eval:true which Turbopack cannot resolve during SSR.
+  serverExternalPackages: ["jspdf", "jspdf-autotable"],
+
   // Performance optimizations
   compiler: {
     // Remove console logs in production

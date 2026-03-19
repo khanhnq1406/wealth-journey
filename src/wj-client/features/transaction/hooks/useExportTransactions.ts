@@ -251,7 +251,7 @@ export function useExportTransactions(options?: UseExportTransactionsOptions) {
               chartImage,
             };
 
-            const pdf = generateTransactionPDF(exportData, pdfOptions);
+            const pdf = await generateTransactionPDF(exportData, pdfOptions);
             const fileName = generatePDFFilename(
               "transactions",
               exportOptions.dateRange,

@@ -1,8 +1,24 @@
 // src/wj-client/utils/export/pdf-export.ts
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { Transaction } from "@/gen/protobuf/v1/transaction";
 import { formatCurrency } from "@/utils/currency-formatter";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type JsPDFInstance = any;
+
+let cachedModules: { jsPDF: JsPDFInstance; autoTable: JsPDFInstance } | null = null;
+
+async function loadJsPDF(): Promise<{ jsPDF: JsPDFInstance; autoTable: JsPDFInstance }> {
+  if (cachedModules) return cachedModules;
+  if (typeof window === "undefined") {
+    throw new Error("jsPDF can only be loaded in the browser");
+  }
+  const [jspdfModule, autoTableModule] = await Promise.all([
+    import(/* webpackChunkName: "jspdf" */ "jspdf"),
+    import(/* webpackChunkName: "jspdf-autotable" */ "jspdf-autotable"),
+  ]);
+  cachedModules = { jsPDF: jspdfModule.default, autoTable: autoTableModule.default };
+  return cachedModules;
+}
 
 export interface TransactionExportData {
   transactions: Transaction[];
@@ -23,11 +39,12 @@ export interface PDFExportOptions {
  * @param options - PDF export options
  * @returns jsPDF document instance
  */
-export function generateTransactionPDF(
+export async function generateTransactionPDF(
   data: TransactionExportData,
   options: PDFExportOptions = { includeCharts: false, customBranding: false },
-): jsPDF {
-  const pdf = new jsPDF();
+): Promise<JsPDFInstance> {
+  const { jsPDF: JsPDF, autoTable } = await loadJsPDF();
+  const pdf = new JsPDF();
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
   const margin = 14; // ~10mm margin
@@ -145,6 +162,6 @@ export function generateExportFilename(
  * @param pdf - jsPDF document instance
  * @param filename - Name for downloaded file
  */
-export function downloadPDF(pdf: jsPDF, filename: string): void {
+export function downloadPDF(pdf: JsPDFInstance, filename: string): void {
   pdf.save(filename);
 }

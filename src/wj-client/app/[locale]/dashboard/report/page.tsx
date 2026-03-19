@@ -385,7 +385,7 @@ export function ReportContent() {
             break;
           case "pdf":
             // Export to PDF using prepared data
-            exportReportToPDF(exportData, {
+            await exportReportToPDF(exportData, {
               period: selectedPeriod,
               startDate: dateRange.start,
               endDate: dateRange.end,

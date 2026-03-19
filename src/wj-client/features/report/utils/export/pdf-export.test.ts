@@ -12,7 +12,8 @@ import { Transaction } from "@/gen/protobuf/v1/transaction";
 // Mock jsPDF and jspdf-autotable at module level
 jest.mock("jspdf", () => {
   return {
-    jsPDF: jest.fn().mockImplementation(() => ({
+    __esModule: true,
+    default: jest.fn().mockImplementation(() => ({
       text: jest.fn(),
       save: jest.fn(),
       addPage: jest.fn(),
@@ -30,7 +31,7 @@ jest.mock("jspdf", () => {
 });
 
 jest.mock("jspdf-autotable", () => {
-  return jest.fn();
+  return { __esModule: true, default: jest.fn() };
 });
 
 describe("generateTransactionPDF", () => {
@@ -41,7 +42,7 @@ describe("generateTransactionPDF", () => {
     jest.clearAllMocks();
   });
 
-  it("should generate PDF with proper title", () => {
+  it("should generate PDF with proper title", async () => {
     const data: TransactionExportData = {
       transactions: [],
       categoryNames: mockCategoryNames,
@@ -54,13 +55,13 @@ describe("generateTransactionPDF", () => {
       customBranding: false,
     };
 
-    const pdf = generateTransactionPDF(data, options);
+    const pdf = await generateTransactionPDF(data, options);
 
     expect(pdf).toBeDefined();
     // Verify PDF document was created with title
   });
 
-  it("should format transaction data in table", () => {
+  it("should format transaction data in table", async () => {
     const transaction: Transaction = {
       id: 1,
       walletId: 1,
@@ -88,13 +89,13 @@ describe("generateTransactionPDF", () => {
       customBranding: false,
     };
 
-    const pdf = generateTransactionPDF(data, options);
+    const pdf = await generateTransactionPDF(data, options);
 
     expect(pdf).toBeDefined();
     // Verify table was called with transaction data
   });
 
-  it("should handle charts when includeCharts is true", () => {
+  it("should handle charts when includeCharts is true", async () => {
     const data: TransactionExportData = {
       transactions: [],
       categoryNames: mockCategoryNames,
@@ -111,7 +112,7 @@ describe("generateTransactionPDF", () => {
       chartImage: minimalPNG,
     };
 
-    const pdf = generateTransactionPDF(data, options);
+    const pdf = await generateTransactionPDF(data, options);
 
     expect(pdf).toBeDefined();
     // Verify chart image was added
