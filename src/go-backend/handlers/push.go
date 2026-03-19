@@ -71,6 +71,9 @@ func (h *PushHandler) Subscribe(c *gin.Context) {
 		return
 	}
 
+	// Delete existing subscription with the same endpoint (upsert behavior)
+	_ = h.pushSubRepo.DeleteByEndpoint(c.Request.Context(), req.Endpoint)
+
 	// Max 5 subscriptions per user
 	count, err := h.pushSubRepo.CountByUserID(c.Request.Context(), userID)
 	if err != nil {

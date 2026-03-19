@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePushSubscription } from "@/features/community/hooks/usePushSubscription";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 
 const DISMISS_KEY = "push_banner_dismissed_at";
 const PERMANENT_DISMISS_KEY = "push_banner_permanent_dismiss";
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+const MAX_AUTO_SUBSCRIBE_ATTEMPTS = 3;
 
 function isDismissed(): boolean {
   if (typeof window === "undefined") return true;
@@ -20,17 +21,24 @@ export function PushPermissionBanner() {
   const { isSubscribed, subscribe, isLoading, error, permissionState } = usePushSubscription();
   const { isInstalled, platform } = usePWAInstall();
   const [dismissed, setDismissed] = useState(true);
+  const autoSubscribeAttempts = useRef(0);
 
   useEffect(() => {
     setDismissed(isDismissed());
   }, []);
 
-  // Auto-subscribe if permission already granted but not subscribed (skip if errored)
+  // Auto-subscribe if permission already granted but not subscribed (retry up to 3 times)
   useEffect(() => {
-    if (permissionState === "granted" && !isSubscribed && !isLoading && !error) {
+    if (
+      permissionState === "granted" &&
+      !isSubscribed &&
+      !isLoading &&
+      autoSubscribeAttempts.current < MAX_AUTO_SUBSCRIBE_ATTEMPTS
+    ) {
+      autoSubscribeAttempts.current += 1;
       subscribe();
     }
-  }, [permissionState, isSubscribed, isLoading, error, subscribe]);
+  }, [permissionState, isSubscribed, isLoading, subscribe]);
 
   // Hide conditions
   if (dismissed) return null;

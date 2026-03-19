@@ -84,7 +84,7 @@ export function usePushSubscription(): UsePushSubscriptionReturn {
   }, []);
 
   const subscribe = useCallback(async () => {
-    if (!isSupported || isLoading || error) return;
+    if (!isSupported || isLoading) return;
     setIsLoading(true);
     setError(null);
 
@@ -124,7 +124,7 @@ export function usePushSubscription(): UsePushSubscriptionReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [isSupported, isLoading, error, getVapidKey]);
+  }, [isSupported, isLoading, getVapidKey]);
 
   const unsubscribe = useCallback(async () => {
     if (!isSupported || isLoading) return;

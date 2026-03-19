@@ -87,6 +87,12 @@ func (s *pushService) SendToUser(ctx context.Context, userID int32, title, body,
 		resp.Body.Close()
 		if resp.StatusCode == http.StatusGone {
 			_ = s.subRepo.DeleteByEndpoint(ctx, sub.Endpoint)
+		} else if resp.StatusCode >= 400 {
+			truncated := sub.Endpoint
+			if len(truncated) > 50 {
+				truncated = truncated[:50]
+			}
+			log.Printf("Push endpoint returned HTTP %d for %s...", resp.StatusCode, truncated)
 		}
 	}
 	return nil
@@ -140,6 +146,12 @@ func (s *pushService) SendToAll(ctx context.Context, title, body, url string) er
 			resp.Body.Close()
 			if resp.StatusCode == http.StatusGone {
 				_ = s.subRepo.DeleteByEndpoint(ctx, endpoint)
+			} else if resp.StatusCode >= 400 {
+				truncated := endpoint
+				if len(truncated) > 50 {
+					truncated = truncated[:50]
+				}
+				log.Printf("Push endpoint returned HTTP %d for %s...", resp.StatusCode, truncated)
 			}
 		}(sub.Endpoint, sub.P256dh, sub.Auth)
 	}
