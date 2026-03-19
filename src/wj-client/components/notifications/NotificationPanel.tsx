@@ -39,7 +39,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
 
     // Route based on notification type
     if (notif.type === "price_alert") {
-      router.push("/dashboard/prices" as Parameters<typeof router.push>[0]);
+      router.push("/dashboard/home" as Parameters<typeof router.push>[0]);
     } else if (notif.type === "admin_broadcast") {
       // No navigation for broadcast — just mark as read
     } else {
