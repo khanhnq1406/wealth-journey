@@ -248,5 +248,17 @@ func ProvideScheduler(
 		scheduler.NewPortfolioSnapshotJob(repos.User, services.PortfolioHistory),
 	)
 
+	// Price alert job — requires Redis for baselines and cooldowns
+	if rdb != nil {
+		goldPriceSvc := service.NewGoldPriceService(rdb.GetClient())
+		silverPriceSvc := service.NewSilverPriceService(rdb.GetClient())
+		priceAlertSvc := service.NewPriceAlertService(
+			goldPriceSvc, silverPriceSvc,
+			repos.Notification, repos.User, rdb,
+			services.Push,
+		)
+		backgroundJobs = append(backgroundJobs, scheduler.NewPriceAlertJob(priceAlertSvc))
+	}
+
 	return scheduler.New(backgroundJobs...)
 }
