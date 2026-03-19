@@ -78,6 +78,24 @@ func RegisterRoutes(
 			admin.PUT("/feedback/:id", h.AdminFeedback.UpdateFeedback)
 			admin.DELETE("/feedback/:id", h.AdminFeedback.DeleteFeedback)
 		}
+		// Admin broadcast
+		if h.AdminBroadcast != nil {
+			admin.POST("/broadcast", h.AdminBroadcast.SendBroadcast)
+		}
+	}
+
+	// Push notification routes
+	push := v1.Group("/push")
+	push.Use(AuthMiddleware(authSrv))
+	if rateLimiter != nil {
+		push.Use(appmiddleware.RateLimitByUser(rateLimiter))
+	}
+	{
+		if h.Push != nil {
+			push.GET("/vapid-key", h.Push.GetVAPIDKey)
+			push.POST("/subscribe", h.Push.Subscribe)
+			push.DELETE("/subscribe", h.Push.Unsubscribe)
+		}
 	}
 
 	// Auth routes (higher rate limit allowed for auth)
