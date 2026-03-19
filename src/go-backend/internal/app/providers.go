@@ -111,6 +111,7 @@ func ProvideRepositories(db *database.Database) *service.Repositories {
 		GoldVoteComment:       repository.NewGoldVoteCommentRepository(db),
 		Feedback:              repository.NewFeedbackRepository(db),
 		SiteSettings:          repository.NewSiteSettingsRepository(db),
+		PushSubscription:      repository.NewPushSubscriptionRepository(db),
 	}
 }
 
