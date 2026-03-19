@@ -1,18 +1,23 @@
 // Minimal push-only service worker — no caching (must not interfere with Next.js)
-self.addEventListener("install", () => {
+self.addEventListener("install", (event) => {
+  console.log("[SW] install, skipWaiting");
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
+  console.log("[SW] activate, claiming clients");
   event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener("push", (event) => {
+  console.log("[SW] push event received, has data:", !!event.data);
+
   let data;
   try {
     data = event.data ? event.data.json() : null;
+    console.log("[SW] parsed payload:", JSON.stringify(data));
   } catch (e) {
-    console.warn("SW: failed to parse push payload", e);
+    console.warn("[SW] failed to parse push payload", e);
     data = null;
   }
 
@@ -26,10 +31,17 @@ self.addEventListener("push", (event) => {
     data: { url: (data && data.url) || "/dashboard/home" },
   };
 
-  event.waitUntil(self.registration.showNotification(title, options));
+  console.log("[SW] showNotification:", title, JSON.stringify(options));
+  event.waitUntil(
+    self.registration
+      .showNotification(title, options)
+      .then(() => console.log("[SW] showNotification resolved OK"))
+      .catch((err) => console.error("[SW] showNotification FAILED:", err))
+  );
 });
 
 self.addEventListener("notificationclick", (event) => {
+  console.log("[SW] notificationclick:", event.notification.tag);
   event.notification.close();
   const url = event.notification.data?.url || "/dashboard/home";
 

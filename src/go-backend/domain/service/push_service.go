@@ -64,6 +64,7 @@ func (s *pushService) SendToUser(ctx context.Context, userID int32, title, body,
 	if err != nil {
 		return err
 	}
+	log.Printf("[push] SendToUser uid=%d subs=%d title=%q", userID, len(subs), title)
 
 	payload, err := json.Marshal(pushPayload{
 		Title: title,
@@ -104,6 +105,7 @@ func (s *pushService) SendToAll(ctx context.Context, title, body, url string) er
 	if err != nil {
 		return err
 	}
+	log.Printf("[push] SendToAll subs=%d title=%q", len(subs), title)
 	if len(subs) == 0 {
 		return nil
 	}
@@ -118,6 +120,7 @@ func (s *pushService) SendToAll(ctx context.Context, title, body, url string) er
 	if err != nil {
 		return err
 	}
+	log.Printf("[push] payload=%s", string(payload))
 
 	sem := make(chan struct{}, 20)
 	var wg sync.WaitGroup
@@ -160,13 +163,14 @@ func (s *pushService) SendToAll(ctx context.Context, title, body, url string) er
 func (s *pushService) handlePushResponse(ctx context.Context, resp *http.Response, endpoint string) {
 	defer func() { _ = resp.Body.Close() }()
 
-	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		return
-	}
-
 	truncated := endpoint
 	if len(truncated) > 50 {
 		truncated = truncated[:50]
+	}
+
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		log.Printf("[push] ✓ delivered to %s... (HTTP %d)", truncated, resp.StatusCode)
+		return
 	}
 
 	switch resp.StatusCode {
