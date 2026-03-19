@@ -36,6 +36,7 @@ C4Component
         Component(admin_user_h, "AdminUser Handler", "handlers/admin_user.go", "Admin-only: list users with search, toggle admin role. Protected by AdminMiddleware. Self-protection: cannot toggle own role.")
         Component(admin_feedback_h, "AdminFeedback Handler", "handlers/admin_feedback.go", "Admin-only: list all feedback with status filter, update feedback (status + admin note), soft-delete feedback. Protected by AdminMiddleware.")
         Component(admin_broadcast_h, "AdminBroadcast Handler", "handlers/admin_broadcast.go", "Admin-only: POST /admin/broadcast. Binds message, delegates to AdminService.Broadcast, returns recipientCount. Protected by AdminMiddleware.")
+        Component(price_alert_config_h, "PriceAlertConfig Handler", "handlers/price_alert_config.go", "Admin-only: GET/PUT /admin/price-alert-config. Loads config from Redis with env var defaults, merges partial updates, sanitizes HTML, validates fields. Protected by AdminMiddleware.")
         Component(push_h, "Push Handler", "handlers/push.go", "GET /push/vapid-key (public key), POST /push/subscribe (validates HTTPS endpoint, base64 keys, max 5 subs/user), DELETE /push/subscribe (by endpoint). Auth required for subscribe/unsubscribe.")
     }
 
@@ -59,7 +60,7 @@ C4Component
         Component(site_settings_svc, "SiteSettings Service", "domain/service", "Validates setting keys against allowlist (17 keys), strips HTML from values, max 5000 chars. Cache-first reads, DB fallback.")
         Component(admin_svc, "Admin Service", "domain/service", "Admin user management (list with search, toggle role with self-protection), feedback management (list with status filter, update status/note with HTML stripping, soft-delete), and broadcast messaging (HTML stripping, rate limiting 10/hr/admin via Redis, batch notification creation, SSE publish, push delivery)")
         Component(push_svc, "Push Service", "domain/service/push_service.go", "Web Push notification delivery via VAPID/webpush-go. Concurrent fan-out with 20-worker semaphore. Returns noopPushService when VAPID keys absent. Auto-removes 410 Gone subscriptions.")
-        Component(price_alert_svc, "Price Alert Service", "domain/service/price_alert_service.go", "Detects significant gold/silver price movements vs Redis baselines across 4 categories (gold_vnd, gold_usd, silver_vnd, silver_usd). Per-category cooldowns (2h). Batch notification creation, SSE publish, push delivery.")
+        Component(price_alert_svc, "Price Alert Service", "domain/service/price_alert_service.go", "Detects significant gold/silver price movements vs Redis baselines across 4 categories. Reads PriceAlertConfig from Redis at runtime (thresholds, cooldown, topMoversCount, templates, enable/disable per category). Uses template resolution for notification title/body. Batch notification creation, SSE publish, push delivery.")
     }
 
     Container_Boundary(repos, "Repository Layer (Data Access)") {
@@ -132,6 +133,7 @@ C4Component
     Rel(gin, admin_feedback_h, "Routes /admin/feedback/*")
     Rel(gin, admin_broadcast_h, "Routes /admin/broadcast")
     Rel(gin, push_h, "Routes /push/*")
+    Rel(gin, price_alert_config_h, "Routes /admin/price-alert-config")
 
     Rel(auth_h, auth_svc, "Delegates auth logic")
     Rel(user_h, user_svc, "Delegates user ops")
@@ -157,6 +159,7 @@ C4Component
     Rel(admin_broadcast_h, admin_svc, "Delegates broadcast")
     Rel(push_h, push_svc, "VAPID key + push delivery")
     Rel(push_h, push_sub_repo, "CRUD subscriptions")
+    Rel(price_alert_config_h, redis, "Loads/saves price alert config")
     Rel(community_h, redis_pubsub, "Subscribes for SSE StreamNotifications")
     Rel(gold_chart_h, redis, "Read/write price history cache")
     Rel(silver_chart_h, redis, "Read/write price history cache")
@@ -319,16 +322,29 @@ Admin → SPA → REST API → Auth MW → Admin MW → AdminBroadcast Handler �
 ### Price Alert Detection Flow
 ```
 Scheduler (every 15min) → PriceAlertService.CheckAndAlert
+                        → Redis GET price_alert:config (LoadPriceAlertConfig)
                         → GoldPriceService.FetchAllPrices
                         → SilverPriceService.FetchAllPrices
+                        → Skip disabled categories (catCfg.Enabled)
                         → Redis GET (baselines per typeCode)
-                        → Calculate % change, filter by threshold
-                        → Redis EXISTS (cooldown check)
+                        → Calculate % change, filter by catCfg.ThresholdPct
+                        → Redis EXISTS (cooldown check, cfg.CooldownMinutes)
                         → UserRepository.GetAllUserIDs
+                        → ResolvePlaceholders(catCfg.TitleTemplate, values)
                         → NotificationRepository.BatchCreate
                         → Redis PUBLISH (SSE per user)
                         → PushService.SendToAll (Web Push)
                         → Redis SET (cooldown + updated baselines)
+```
+
+### Admin Price Alert Config Flow
+```
+Admin → SPA → REST API → Auth MW → Admin MW → PriceAlertConfig Handler
+                                               → GET: LoadPriceAlertConfig(Redis) → defaults fallback
+                                               → PUT: BindJSON → mergeConfig → SanitizePriceAlertConfig
+                                                                             → ValidatePriceAlertConfig
+                                                                             → SavePriceAlertConfig(Redis)
+                                ← config JSON ←
 ```
 
 ### Background Price Update Flow

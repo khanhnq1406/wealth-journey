@@ -6,8 +6,8 @@
 - **Spec file:** docs/specs/2026-03-19-price-alert-admin-config-spec.md
 - **Started:** 2026-03-19T17:00:00Z
 - **Last updated:** 2026-03-19T19:30:00Z
-- **Current state:** in_progress
-- **Current task:** 11
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -22,9 +22,9 @@
 | 7 | Update frontend notification interfaces | done | 95d8461 | Added priceDiff to PriceAlertMetadata, broadcastTitle to BroadcastMetadata |
 | 8 | Add i18n translations for price alert config | done | 95d8461 | Vietnamese + English translations for all config form labels |
 | 9 | Create PriceAlertConfigForm component | done | 3feea33 | Accordion form with global + per-category settings |
-| 10 | Update admin page: rename tab and integrate form | done | pending | Renamed broadcast→notifications tab, integrated both forms |
-| 11 | Update C4 architecture diagrams | pending | — | — |
-| 12 | Update runtime flow diagrams | pending | — | — |
+| 10 | Update admin page: rename tab and integrate form | done | f405775 | Renamed broadcast→notifications tab, integrated both forms |
+| 11 | Update C4 architecture diagrams | done | pending | Added PriceAlertConfigHandler, updated service descriptions |
+| 12 | Update runtime flow diagrams | done | pending | Updated sections 7,8; added section 9 for config admin flow |
 
 ## Resume Instructions
 
