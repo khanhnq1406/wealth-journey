@@ -348,6 +348,11 @@ func (m *MockUserRepository) ListWithSearch(ctx context.Context, search string, 
 	return args.Get(0).([]*models.User), args.Int(1), args.Error(2)
 }
 
+func (m *MockUserRepository) GetAllUserIDs(ctx context.Context) ([]int32, error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]int32), args.Error(1)
+}
+
 type MockFXRateService struct {
 	mock.Mock
 }

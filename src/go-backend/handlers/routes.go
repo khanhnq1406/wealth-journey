@@ -78,6 +78,34 @@ func RegisterRoutes(
 			admin.PUT("/feedback/:id", h.AdminFeedback.UpdateFeedback)
 			admin.DELETE("/feedback/:id", h.AdminFeedback.DeleteFeedback)
 		}
+		// Admin broadcast
+		if h.AdminBroadcast != nil {
+			admin.POST("/broadcast", h.AdminBroadcast.SendBroadcast)
+		}
+		// Price alert configuration
+		if h.PriceAlertConfig != nil {
+			admin.GET("/price-alert-config", h.PriceAlertConfig.GetConfig)
+			admin.PUT("/price-alert-config", h.PriceAlertConfig.UpdateConfig)
+			admin.DELETE("/price-alert-config", h.PriceAlertConfig.ResetConfig)
+		}
+		// Price alert manual trigger
+		if h.PriceAlertTrigger != nil {
+			admin.POST("/price-alert-trigger", h.PriceAlertTrigger.TriggerCheck)
+		}
+	}
+
+	// Push notification routes
+	push := v1.Group("/push")
+	push.Use(AuthMiddleware(authSrv))
+	if rateLimiter != nil {
+		push.Use(appmiddleware.RateLimitByUser(rateLimiter))
+	}
+	{
+		if h.Push != nil {
+			push.GET("/vapid-key", h.Push.GetVAPIDKey)
+			push.POST("/subscribe", h.Push.Subscribe)
+			push.DELETE("/subscribe", h.Push.Unsubscribe)
+		}
 	}
 
 	// Auth routes (higher rate limit allowed for auth)

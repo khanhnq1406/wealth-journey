@@ -6,7 +6,9 @@
       "tabs": {
         "seo": "SEO",
         "users": "Người dùng",
-        "feedback": "Phản hồi"
+        "feedback": "Phản hồi",
+        "broadcast": "Thông báo",
+        "notifications": "Thông báo"
       },
       "loading": "Đang tải cài đặt..."
     },
@@ -97,6 +99,81 @@
         "updateFailed": "Không thể cập nhật phản hồi",
         "deleteSuccess": "Đã xóa phản hồi",
         "deleteFailed": "Không thể xóa phản hồi"
+      }
+    },
+    "broadcast": {
+      "title": "Gửi thông báo đến tất cả người dùng",
+      "form": {
+        "title": "Tiêu đề",
+        "titlePlaceholder": "Tiêu đề thông báo (không bắt buộc)",
+        "titleHelp": "Để trống sẽ dùng tiêu đề mặc định của hệ thống",
+        "message": "Nội dung",
+        "messagePlaceholder": "Nhập nội dung thông báo...",
+        "charLabel": "ký tự",
+        "send": "Gửi thông báo",
+        "sending": "Đang gửi..."
+      },
+      "toast": {
+        "success": "Đã gửi thông báo đến {count} người dùng",
+        "error": "Không thể gửi thông báo"
+      }
+    },
+    "priceAlertTrigger": {
+      "title": "Kích hoạt cảnh báo thủ công",
+      "description": "Chạy kiểm tra cảnh báo giá ngay mà không cần chờ lịch trình 15 phút.",
+      "button": "Chạy kiểm tra cảnh báo giá",
+      "running": "Đang chạy...",
+      "toast": {
+        "success": "Đã chạy kiểm tra cảnh báo giá thành công",
+        "error": "Không thể chạy kiểm tra cảnh báo giá"
+      }
+    },
+    "priceAlertConfig": {
+      "title": "Cấu hình cảnh báo giá",
+      "globalSettings": "Cài đặt chung",
+      "cooldownMinutes": "Thời gian chờ (phút)",
+      "cooldownHelp": "Thời gian tối thiểu giữa các cảnh báo cùng loại",
+      "topMoversCount": "Số lượng biến động hiển thị",
+      "topMoversHelp": "Số lượng sản phẩm biến động mạnh nhất trong thông báo",
+      "categorySettings": "Cài đặt theo loại",
+      "enabled": "Bật cảnh báo",
+      "thresholdPct": "Ngưỡng biến động (%)",
+      "titleTemplate": "Mẫu tiêu đề",
+      "bodyTemplate": "Mẫu nội dung",
+      "preview": "Xem trước",
+      "placeholderGuide": "Biến có thể sử dụng",
+      "placeholders": {
+        "moverName": "Tên sản phẩm (VD: SJC 1L-10L)",
+        "moverCode": "Mã sản phẩm (VD: SJL1L10)",
+        "direction": "Mũi tên (↑ hoặc ↓)",
+        "directionText": "Hướng (tăng hoặc giảm)",
+        "changePct": "% biến động (VD: 2.1)",
+        "priceDiff": "Chênh lệch giá (VD: 1,500,000)",
+        "currentPrice": "Giá hiện tại (VD: 85,500,000)",
+        "baselinePrice": "Giá cơ sở tại lần cảnh báo trước (VD: 84,000,000)",
+        "priceUnit": "Đơn vị giá (VD: lượng, oz, kg)",
+        "currency": "Đơn vị tiền tệ (VD: VND, USD)",
+        "category": "Tên loại (VD: Vàng trong nước)",
+        "moverCount": "Số sản phẩm biến động"
+      },
+      "save": "Lưu cài đặt",
+      "saving": "Đang lưu...",
+      "reset": "Khôi phục mặc định",
+      "resetting": "Đang khôi phục...",
+      "resetConfirmTitle": "Khôi phục mặc định",
+      "resetConfirmMessage": "Bạn có chắc chắn muốn khôi phục tất cả cài đặt cảnh báo giá về giá trị mặc định? Thao tác này không thể hoàn tác.",
+      "resetConfirm": "Khôi phục",
+      "toast": {
+        "success": "Đã cập nhật cấu hình cảnh báo giá",
+        "error": "Không thể cập nhật cấu hình",
+        "resetSuccess": "Đã khôi phục cấu hình cảnh báo giá về mặc định",
+        "resetError": "Không thể khôi phục cấu hình"
+      },
+      "categories": {
+        "gold_vnd": "Vàng trong nước (VND)",
+        "gold_usd": "Vàng thế giới (USD)",
+        "silver_vnd": "Bạc trong nước (VND)",
+        "silver_usd": "Bạc thế giới (USD)"
       }
     },
     "pagination": {

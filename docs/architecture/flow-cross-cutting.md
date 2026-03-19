@@ -10,6 +10,9 @@ Infrastructure-level flows that are referenced by multiple domain flows. Read th
 - [Currency Conversion Logic](#4-currency-conversion-logic)
 - [Market Prices Aggregation Flow](#5-market-prices-aggregation-flow)
 - [Admin Price Override Flow](#6-admin-price-override-flow)
+- [Price Alert Detection Flow](#7-price-alert-detection-flow)
+- [Admin Broadcast Flow](#8-admin-broadcast-flow)
+- [Admin Price Alert Config Flow](#9-admin-price-alert-config-flow)
 
 ---
 
@@ -154,6 +157,7 @@ flowchart LR
     Start --> PS["Portfolio Snapshot\n⏱ 1 hour\n⏳ 10s delay"]
     Start --> SC["Session Cleanup\n⏱ ~6 hours\n⏳ staggered"]
     Start --> FC["File Cleanup\n⏱ ~1 hour\n⏳ staggered"]
+    Start --> PA["Price Alert\n⏱ 15 min\n⏳ 30s delay"]
 
     subgraph PriceUpdate["Price Update Job Detail"]
         PU --> PU1["List all users"]
@@ -191,6 +195,7 @@ flowchart LR
 | Portfolio Snapshot | 1 hour | 10 sec | Always |
 | Session Cleanup | ~6 hours | Staggered | `ENABLE_SESSION_CLEANUP` |
 | File Cleanup | ~1 hour | Staggered | `ENABLE_FILE_CLEANUP` |
+| Price Alert | 15 min | 30 sec | Redis available |
 
 ---
 
@@ -506,3 +511,299 @@ sequenceDiagram
 | Redis SET/DEL failure | 503 Service Unavailable | Client shows error toast |
 | Redis SCAN failure during GetMarketPrices | Original prices returned (no override applied) | Graceful degradation |
 | Delete non-existent override | 200 OK (idempotent) | No-op |
+
+---
+
+## 7. Price Alert Detection Flow
+
+**Trigger:** Scheduler runs `PriceAlertJob` every 15 minutes (30-second startup delay)
+**Source:** `internal/scheduler/price_alert_job.go`, `domain/service/price_alert_service.go`
+
+```mermaid
+sequenceDiagram
+    participant SCH as Scheduler
+    participant PAJ as PriceAlertJob
+    participant PAS as PriceAlertService
+    participant GPS as GoldPriceService
+    participant SPS as SilverPriceService
+    participant R as Redis
+    participant NR as NotificationRepository
+    participant UR as UserRepository
+    participant SSE as SSE Channels
+    participant PUSH as PushService
+
+    SCH->>PAJ: Run(ctx) every 15 min
+    PAJ->>PAS: CheckAndAlert(ctx)
+
+    PAS->>R: GET price_alert:config
+    alt Config exists in Redis
+        R-->>PAS: PriceAlertConfig JSON
+    else No config in Redis
+        Note over PAS: Use DefaultPriceAlertConfig()<br/>(env var fallback)
+    end
+
+    par Fetch gold prices
+        PAS->>GPS: FetchAllPrices(ctx)
+        GPS-->>PAS: []*CachedGoldPrice
+    and Fetch silver prices
+        PAS->>SPS: FetchAllPrices(ctx)
+        SPS-->>PAS: []*CachedSilverPrice
+    end
+
+    loop For each category (gold_vnd, gold_usd, silver_vnd, silver_usd)
+        PAS->>PAS: Check catCfg.Enabled
+        alt Category disabled
+            Note over PAS: Skip this category
+        else Category enabled
+            PAS->>R: GET price_alert:baseline:{category}
+            alt No baseline
+                PAS->>R: SET price_alert:baseline:{category}
+                Note over PAS: First run — set baseline, skip alert
+            else Baseline exists
+                PAS->>PAS: Compare current vs baseline<br/>Calculate % change per item
+                PAS->>PAS: Filter items exceeding catCfg.ThresholdPct<br/>Take top cfg.TopMoversCount movers
+
+                alt Significant movers found
+                    PAS->>R: GET price_alert:cooldown:{category}
+                    alt Cooldown active (< cfg.CooldownMinutes)
+                        Note over PAS: Skip this category
+                    else No cooldown
+                        PAS->>UR: GetAllUserIDs(ctx)
+                        UR-->>PAS: []int32
+
+                        PAS->>PAS: ResolvePlaceholders(catCfg.TitleTemplate, values)<br/>ResolvePlaceholders(catCfg.BodyTemplate, values)
+                        PAS->>PAS: Build notifications with metadata JSON<br/>{category, movers: [{typeCode, name, direction, changePct, priceDiff}]}
+                        PAS->>NR: BatchCreate(ctx, notifications)
+
+                        par SSE delivery
+                            loop Each user
+                                PAS->>R: PUBLISH user:{id}:notifications
+                            end
+                        and Push delivery
+                            PAS->>PUSH: SendToAll(ctx, resolvedTitle, resolvedBody, url)
+                        end
+
+                        PAS->>R: SET price_alert:cooldown:{category} EX (cfg.CooldownMinutes*60)
+                        PAS->>R: SET price_alert:baseline:{category}
+                        Note over PAS: Update baseline after alert
+                    end
+                else No significant changes
+                    Note over PAS: No alert — continue
+                end
+            end
+        end
+    end
+
+    PAS-->>PAJ: nil (or error)
+    PAJ-->>SCH: Done
+```
+
+### Key Invariants
+
+- Each category is checked independently — a gold alert does not affect silver alerts
+- Categories can be individually enabled/disabled via admin config (`catCfg.Enabled`)
+- Baselines are set on first run and updated only after an alert is sent
+- Cooldown period is configurable via admin UI (`cfg.CooldownMinutes`, default 120 min)
+- Thresholds are configurable per category via admin UI (`catCfg.ThresholdPct`), with env var fallback defaults
+- Notification title and body use template resolution with placeholders (`{moverName}`, `{changePct}`, `{direction}`, etc.)
+- Config is loaded from Redis at runtime via `LoadPriceAlertConfig(ctx, rdb)` — falls back to `DefaultPriceAlertConfig()` which reads env vars
+- Push delivery failures are non-fatal — SSE and DB notifications still persist
+- Only the top N movers (`cfg.TopMoversCount`, default 5) are included in notification metadata
+- Notification metadata includes `priceDiff` (absolute price change) in addition to `changePct`
+
+### Error Paths
+
+| Condition | Response | Fallback |
+|-----------|----------|----------|
+| Gold price fetch failure | Skip gold categories | Silver categories still checked |
+| Silver price fetch failure | Skip silver categories | Gold categories still checked |
+| Redis baseline read failure | Skip that category | Other categories still checked |
+| BatchCreate failure | Error logged, alert not sent | Next run retries |
+| SSE publish failure | Non-fatal, logged | DB notification persists |
+| Push delivery failure | Non-fatal, logged | SSE + DB notifications still work |
+| All price fetches fail | Job returns error, scheduler logs it | Next run retries |
+
+---
+
+## 8. Admin Broadcast Flow
+
+**Trigger:** Admin submits broadcast message via `POST /api/v1/admin/broadcast`
+**Source:** `handlers/admin_broadcast.go`, `domain/service/admin_service.go`
+
+```mermaid
+sequenceDiagram
+    participant SPA as Next.js SPA
+    participant AM as AuthMiddleware
+    participant ADM as AdminMiddleware
+    participant ABH as AdminBroadcastHandler
+    participant AS as AdminService
+    participant R as Redis
+    participant UR as UserRepository
+    participant NR as NotificationRepository
+    participant SSE as SSE Channels
+    participant PUSH as PushService
+
+    SPA->>SPA: Admin types message (max 500 chars)<br/>Clicks "Gửi thông báo"
+
+    SPA->>AM: POST /api/v1/admin/broadcast<br/>{message: "..."}<br/>Authorization: Bearer {token}
+
+    AM->>AM: VerifyAuth(token)
+    alt Invalid token
+        AM-->>SPA: 401 Unauthorized
+    end
+
+    AM->>ADM: Next()
+    ADM->>ADM: Check is_admin == true
+    alt Not admin
+        ADM-->>SPA: 403 Forbidden
+    end
+
+    ADM->>ABH: SendBroadcast(ctx)
+    ABH->>ABH: BindJSON → {message}
+    ABH->>AS: Broadcast(ctx, adminUserID, message)
+
+    activate AS
+    AS->>AS: Validate message length (1-500 chars)
+    AS->>AS: Strip HTML tags (regex)
+
+    AS->>R: INCR admin_broadcast:rate:{adminUserID}
+    AS->>R: EXPIRE admin_broadcast:rate:{adminUserID} 3600
+    R-->>AS: count
+
+    alt count > 10
+        AS-->>ABH: Rate limit error (10/hour/admin)
+        ABH-->>SPA: 429 Too Many Requests
+    end
+
+    AS->>UR: GetAllUserIDs(ctx)
+    UR-->>AS: []int32 (all users)
+
+    AS->>R: GET price_alert:config
+    Note over AS: LoadPriceAlertConfig → cfg.BroadcastTitle
+
+    AS->>AS: Build notifications for each user<br/>type="admin_broadcast", actorId=0<br/>metadata={message, adminName, broadcastTitle}
+
+    AS->>NR: BatchCreate(ctx, notifications)
+
+    par SSE delivery
+        loop Each user
+            AS->>R: PUBLISH user:{id}:notifications
+        end
+    and Push delivery
+        AS->>PUSH: SendToAll(ctx, cfg.BroadcastTitle, message, "/dashboard/home")
+    end
+
+    deactivate AS
+    AS-->>ABH: recipientCount
+    ABH-->>SPA: 200 {success: true, recipientCount: N}
+
+    SPA->>SPA: Show success toast<br/>"Đã gửi thông báo đến N người dùng"
+```
+
+### Key Invariants
+
+- Only users with `is_admin = true` can broadcast — enforced by double middleware (Auth + Admin)
+- Rate limit: 10 broadcasts per hour per admin, tracked via Redis INCR with 1-hour TTL
+- HTML tags are stripped from messages to prevent injection — plain text only
+- Message length: minimum 1 character, maximum 500 characters
+- Notifications use `actorId = 0` to indicate system origin (no user avatar)
+- Metadata JSON stores the broadcast message text, admin name, and `broadcastTitle` (from config)
+- Push notification title uses `cfg.BroadcastTitle` from `LoadPriceAlertConfig` — configurable via admin UI
+- SSE and Push delivery are best-effort — DB notifications are the source of truth
+
+### Error Paths
+
+| Condition | Response | Fallback |
+|-----------|----------|----------|
+| Missing/invalid JWT | 401 Unauthorized | Client redirects to login |
+| Non-admin user | 403 Forbidden | Client shows error |
+| Empty message | 400 Bad Request | Client shows validation error |
+| Message > 500 chars | 400 Bad Request | Client-side char counter prevents this |
+| Rate limit exceeded (10/hr) | 429 Too Many Requests | Admin must wait |
+| GetAllUserIDs failure | 500 Internal Server Error | Admin can retry |
+| BatchCreate failure | 500 Internal Server Error | Admin can retry |
+| SSE publish failure | Non-fatal, logged | DB notifications persist |
+| Push delivery failure | Non-fatal, logged | SSE + DB notifications still work |
+
+---
+
+## 9. Admin Price Alert Config Flow
+
+**Trigger:** Admin opens "Notifications" tab on Admin CMS page, views or updates price alert configuration
+**Source:** `handlers/price_alert_config.go`, `domain/service/price_alert_config.go`, `features/admin/components/PriceAlertConfigForm.tsx`
+
+```mermaid
+sequenceDiagram
+    participant SPA as Next.js SPA
+    participant AM as AuthMiddleware
+    participant ADM as AdminMiddleware
+    participant PACH as PriceAlertConfigHandler
+    participant R as Redis
+
+    Note over SPA: Admin navigates to /dashboard/admin?tab=notifications
+
+    SPA->>AM: GET /api/v1/admin/price-alert-config<br/>Authorization: Bearer {token}
+    AM->>AM: VerifyAuth(token)
+    AM->>ADM: Next()
+    ADM->>ADM: Check is_admin == true
+
+    ADM->>PACH: GetConfig(ctx)
+    activate PACH
+    PACH->>R: GET price_alert:config
+    alt Config in Redis
+        R-->>PACH: PriceAlertConfig JSON
+        PACH->>PACH: Merge missing categories from defaults
+    else No config
+        Note over PACH: DefaultPriceAlertConfig()<br/>(reads env vars as fallback)
+    end
+    deactivate PACH
+    PACH-->>SPA: 200 {success: true, config: {...}}
+
+    SPA->>SPA: Render PriceAlertConfigForm<br/>Global settings + per-category accordions
+
+    Note over SPA: Admin modifies settings and clicks Save
+
+    SPA->>AM: PUT /api/v1/admin/price-alert-config<br/>{cooldownMinutes, topMoversCount, broadcastTitle,<br/>categories: {gold_vnd: {...}, ...}}
+    AM->>AM: VerifyAuth(token)
+    AM->>ADM: Next()
+    ADM->>ADM: Check is_admin == true
+
+    ADM->>PACH: UpdateConfig(ctx)
+    activate PACH
+    PACH->>PACH: BindJSON → incoming config
+    PACH->>R: GET price_alert:config
+    R-->>PACH: Current config (or defaults)
+    PACH->>PACH: mergeConfig(current, incoming)<br/>Only update non-zero/non-empty fields
+    PACH->>PACH: SanitizePriceAlertConfig<br/>Strip HTML from all string fields
+    PACH->>PACH: ValidatePriceAlertConfig
+    alt Validation errors
+        PACH-->>SPA: 400 {success: false, errors: {...}}
+    end
+    PACH->>R: SET price_alert:config (no TTL)
+    R-->>PACH: OK
+    deactivate PACH
+    PACH-->>SPA: 200 {success: true, config: {...}}
+
+    SPA->>SPA: Show success toast<br/>"Price alert configuration updated"
+```
+
+### Key Invariants
+
+- Config is stored in Redis under key `price_alert:config` with **no TTL** — persists until explicitly overwritten
+- When no config exists in Redis, `DefaultPriceAlertConfig()` provides defaults from environment variables
+- Missing categories are merged from defaults — adding a new category to defaults auto-fills it for existing configs
+- All string fields are sanitized (HTML stripped) before saving to prevent XSS
+- Validation enforces: cooldownMinutes 1–1440, topMoversCount 1–20, thresholdPct 0.1–50, non-empty templates and broadcastTitle
+- Partial updates: `mergeConfig` only overwrites fields with non-zero/non-empty values from the incoming request
+- Config changes take effect on the **next** scheduler run (no restart needed) — `PriceAlertService.CheckAndAlert` reads config from Redis each invocation
+
+### Error Paths
+
+| Condition | Response | Fallback |
+|-----------|----------|----------|
+| Missing/invalid JWT | 401 Unauthorized | Client redirects to login |
+| Non-admin user | 403 Forbidden | Client shows error |
+| Redis read failure on GET | Returns DefaultPriceAlertConfig() | Transparent fallback |
+| Redis write failure on PUT | 500 Internal Server Error | Admin can retry |
+| Validation error (e.g., cooldown=0) | 400 {errors: {cooldownMinutes: "..."}} | Client shows field-level error |
+| HTML-only template (empty after strip) | 400 validation error | Client shows error |

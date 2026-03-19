@@ -362,6 +362,119 @@ test.describe("Admin Feedback Tab", () => {
   });
 });
 
+const MOCK_BROADCAST_RESPONSE = {
+  success: true,
+  message: "Broadcast sent successfully",
+  recipientCount: 5,
+  timestamp: new Date().toISOString(),
+};
+
+/**
+ * Helper to wait for the Broadcast tab content (textarea) to appear.
+ * Supports both English and Vietnamese locales.
+ */
+async function waitForBroadcastTabContent(page: import("@playwright/test").Page) {
+  await waitForAdminPage(page);
+  // Wait for the broadcast form title or the textarea itself to appear
+  await page.waitForFunction(
+    () => {
+      const body = document.body.innerText;
+      const hasTextarea = !!document.querySelector("textarea#broadcast-message");
+      return (
+        hasTextarea ||
+        body.includes("Send broadcast to all users") ||
+        body.includes("Gửi thông báo đến tất cả người dùng")
+      );
+    },
+    { timeout: 15000 },
+  );
+}
+
+test.describe("Admin Broadcast Tab", () => {
+  test.beforeEach(async ({ page }) => {
+    // Mock auth verify
+    await page.route("**/api/v1/auth/verify**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(AUTH_MOCK),
+      });
+    });
+
+    // Mock site settings
+    await page.route("**/api/v1/public/site-settings**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(MOCK_SETTINGS_RESPONSE),
+      });
+    });
+
+    // Mock wallets (sidebar)
+    await page.route("**/api/v1/wallets**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ success: true, wallets: [], total: 0 }),
+      });
+    });
+
+    // Mock broadcast endpoint
+    await page.route("**/api/v1/admin/broadcast**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(MOCK_BROADCAST_RESPONSE),
+      });
+    });
+
+    // Set auth token
+    await page.goto("/auth/login");
+    await page.evaluate(() => {
+      localStorage.setItem("token", "mock-test-token");
+    });
+  });
+
+  test("should navigate to Broadcast tab and show textarea", async ({ page }) => {
+    await page.goto("/dashboard/admin?tab=broadcast");
+    await waitForBroadcastTabContent(page);
+
+    // The textarea should be visible with the correct id
+    const textarea = page.locator("textarea#broadcast-message");
+    await expect(textarea).toBeVisible({ timeout: 10000 });
+  });
+
+  test("should show character counter", async ({ page }) => {
+    await page.goto("/dashboard/admin?tab=broadcast");
+    await waitForBroadcastTabContent(page);
+
+    const textarea = page.locator("textarea#broadcast-message");
+    await expect(textarea).toBeVisible({ timeout: 10000 });
+
+    // Type some text and verify the character counter updates
+    const testMessage = "Hello world";
+    await textarea.fill(testMessage);
+
+    // Counter should reflect the typed character count (supports both locales)
+    // English: "11/500 characters", Vietnamese: "11/500 ký tự"
+    const counter = page.locator(
+      `text=/${testMessage.length}\\/500/`,
+    );
+    await expect(counter).toBeVisible({ timeout: 10000 });
+  });
+
+  test("should show submit button", async ({ page }) => {
+    await page.goto("/dashboard/admin?tab=broadcast");
+    await waitForBroadcastTabContent(page);
+
+    // Submit button supports both English and Vietnamese
+    const submitButton = page.locator("button").filter({
+      hasText: /Send broadcast|Gửi thông báo/,
+    });
+    await expect(submitButton).toBeVisible({ timeout: 10000 });
+  });
+});
+
 test.describe("Admin Page Mobile", () => {
   test.use({ viewport: { width: 375, height: 667 } });
 

@@ -17,7 +17,7 @@ C4Component
         Component(community_page, "Community Page", "app/dashboard/community", "Social feed with posts, comments, likes, user profiles")
         Component(settings, "Settings Pages", "app/dashboard/settings", "Sessions, import templates, language toggle, security (auth methods, set/change password)")
         Component(feedback_page, "Feedback Page", "app/dashboard/feedback", "Submit feedback form and view personal feedback history with status badges")
-        Component(admin_page, "Admin CMS Page", "app/dashboard/admin", "Tabbed admin dashboard (SEO/Users/Feedback). SEO tab: metadata editor (title, description, keywords, OG tags, Twitter cards, robots directives) and footer editor. Users tab: search users, toggle admin roles with self-protection. Feedback tab: status filter, view/update feedback with admin notes, soft-delete. Admin-only access via AdminGuard.")
+        Component(admin_page, "Admin CMS Page", "app/dashboard/admin", "Tabbed admin dashboard (SEO/Users/Feedback/Notifications). SEO tab: metadata editor (title, description, keywords, OG tags, Twitter cards, robots directives) and footer editor. Users tab: search users, toggle admin roles with self-protection. Feedback tab: status filter, view/update feedback with admin notes, soft-delete. Notifications tab: broadcast form (500 char limit) + price alert config form (global settings, per-category thresholds/templates/enable-disable). Admin-only access via AdminGuard.")
     }
 
     Container_Boundary(features, "Feature Modules (Target State)") {
@@ -29,9 +29,9 @@ C4Component
         Component(import_feat, "Import Feature", "features/import", "Import wizard steps, template management, file upload")
         Component(prices_feat, "Market Prices Feature", "features/market-prices", "Price display tables (gold/silver/currency), symbol lookup; hooks/usePublicMarketTypes.ts — public no-auth hook for landing page type names; CurrencyPriceTable, LandingCurrencyPriceTable components; InlinePriceEdit — inline price editing UI for admin users (click-to-edit with save/cancel); OverrideIndicator — blue dot indicator for overridden prices; hooks/usePriceOverride.ts — usePriceOverrideSet and usePriceOverrideDelete mutation hooks for admin price override CRUD")
         Component(report_feat, "Report Feature", "features/report", "Financial tables, period selectors, CSV/PDF export")
-        Component(community_feat, "Community Feature", "features/community", "Posts, comments, likes, follows, profiles, topic tags; Phase 2 components: SharePostModal, SharedPostEmbed, HashtagLink, SavedPostsView, SuggestedUserCard, SuggestedUsers, TrendingTopics, ProfileView, FollowingView, UserListItem; updated: PostCard (share+save actions, onUserClick), PostBody (hashtag rendering, shared post embed), PostActions (Share/Save buttons), PostEngagement (shareCount), PostHeader (clickable avatar+name via onUserClick), CommunityFeed (onUserClick prop); hooks: useSavedPost, useNotifications (useNotificationCount, useMarkAllRead); utils: hashtag.ts (extractHashtags, tokenizeContent); Phase 3 components: ImageUpload, EditCommentForm, ReplyBubble, ReplyInput, ReplyList, ProfileEditModal, ProfileTabs; Phase 3 hooks: useNotificationStream (SSE-based real-time notifications), useImageUpload (upload progress, preview, Supabase integration)")
+        Component(community_feat, "Community Feature", "features/community", "Posts, comments, likes, follows, profiles, topic tags; Phase 2 components: SharePostModal, SharedPostEmbed, HashtagLink, SavedPostsView, SuggestedUserCard, SuggestedUsers, TrendingTopics, ProfileView, FollowingView, UserListItem; updated: PostCard (share+save actions, onUserClick), PostBody (hashtag rendering, shared post embed), PostActions (Share/Save buttons), PostEngagement (shareCount), PostHeader (clickable avatar+name via onUserClick), CommunityFeed (onUserClick prop); hooks: useSavedPost, useNotifications (useNotificationCount, useMarkAllRead), usePushSubscription (SW registration, VAPID key fetch, subscribe/unsubscribe); utils: hashtag.ts (extractHashtags, tokenizeContent); Phase 3 components: ImageUpload, EditCommentForm, ReplyBubble, ReplyInput, ReplyList, ProfileEditModal, ProfileTabs; Phase 3 hooks: useNotificationStream (SSE-based real-time notifications with metadata + actorId=0 handling), useImageUpload (upload progress, preview, Supabase integration)")
         Component(feedback_feat, "Feedback Feature", "features/feedback", "SubmitFeedbackForm (Zod validation, rate limit handling), StatusBadge (pending/reviewed/resolved), FeedbackItem (expandable card), feedback-schema.ts")
-        Component(admin_feat, "Admin Feature", "features/admin", "AdminGuard component (redirects non-admin users), AdminUsersTab (search, MobileTable, role toggle with self-protection, confirmation dialog), AdminFeedbackTab (status filter, edit panel for status/admin note, delete confirmation), Pagination component, admin-specific hooks and utilities")
+        Component(admin_feat, "Admin Feature", "features/admin", "AdminGuard component (redirects non-admin users), AdminUsersTab (search, MobileTable, role toggle with self-protection, confirmation dialog), AdminFeedbackTab (status filter, edit panel for status/admin note, delete confirmation), AdminBroadcastForm (textarea with 500-char limit, char counter, POST /admin/broadcast), PriceAlertConfigForm (accordion-based config for global settings + per-category thresholds/templates, GET/PUT /admin/price-alert-config), Pagination component, admin-specific hooks and utilities")
     }
 
     Container_Boundary(shared, "Shared Layer") {
@@ -43,7 +43,7 @@ C4Component
         Component(tables, "Table Components", "shared/components/table", "MobileTable, TanStackTable, VirtualizedList")
         Component(loading, "Loading Components", "shared/components/loading", "LoadingSpinner, FullPageLoading, Skeleton variants")
         Component(feedback, "Feedback Components", "shared/components/feedback", "EmptyState, ErrorState, Toast, Notification")
-        Component(notifications, "Notification Components", "shared/components/notifications", "NotificationBell, NotificationPanel, NotificationItem — shared bell+panel widget used in dashboard layout")
+        Component(notifications, "Notification Components", "shared/components/notifications", "NotificationBell, NotificationPanel, NotificationItem (supports price_alert amber + admin_broadcast blue + default community green rendering), PushPermissionBanner (iOS-aware push opt-in with platform detection, install-first logic, 7-day/permanent dismissal) — shared bell+panel widget used in dashboard layout")
         Component(icons, "Icon System", "shared/components/icons", "SVG icon library: actions, finance, navigation, ui")
         Component(hooks, "Shared Hooks", "shared/hooks", "useMobile, useDebounce, useInfiniteScroll, useExchangeRate")
         Component(contexts, "React Contexts", "shared/contexts", "CurrencyContext, NotificationContext")
@@ -83,7 +83,7 @@ C4Component
     Rel(settings, import_feat, "Renders import templates")
     Rel(community_page, community_feat, "Renders social feed and profiles")
     Rel(feedback_page, feedback_feat, "Renders feedback form and history")
-    Rel(admin_page, admin_feat, "Uses AdminGuard, AdminUsersTab, AdminFeedbackTab")
+    Rel(admin_page, admin_feat, "Uses AdminGuard, AdminUsersTab, AdminFeedbackTab, AdminBroadcastForm")
     Rel(admin_page, forms, "Uses FormInput, FormSelect, FormTextarea, FormToggle, TagInput")
     Rel(admin_feat, tables, "Uses MobileTable for user and feedback lists")
     Rel(admin_feat, modals, "Uses ConfirmationDialog for role toggle and feedback deletion")
@@ -99,7 +99,7 @@ C4Component
     Rel(report_feat, charts, "Uses chart components")
     Rel(community_feat, modals, "Uses BaseModal for create/edit post and SharePostModal")
     Rel(community_feat, loading, "Uses LoadingSpinner")
-    Rel(community_feat, notifications, "Feeds notification data to NotificationBell/NotificationPanel")
+    Rel(community_feat, notifications, "Feeds notification data to NotificationBell/NotificationPanel, provides usePushSubscription hook for PushPermissionBanner")
 
     Rel(wallet_feat, gen_hooks, "useQueryListWallets, useMutationCreateWallet, etc.")
     Rel(txn_feat, gen_hooks, "useQueryListTransactions, useMutationCreateTransaction, etc.")

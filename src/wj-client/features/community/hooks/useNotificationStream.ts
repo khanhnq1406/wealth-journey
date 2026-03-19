@@ -52,10 +52,12 @@ export function useNotificationStream() {
             id: data.id || Date.now(),
             type: data.type || "unknown",
             actorId: data.actorId,
+            actorName: data.actorId === 0 ? "" : (data.actorName || ""),
+            actorPicture: data.actorId === 0 ? "" : (data.actorPicture || ""),
             postId: data.postId,
             isRead: false,
             createdAt: Math.floor(Date.now() / 1000),
-            actor: data.actor,
+            metadata: data.metadata || "",
           };
           return {
             ...old,

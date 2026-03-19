@@ -22,7 +22,7 @@ Runtime flows showing how data moves through the system during feature execution
 | [Wallet Flows](flow-wallet.md) | Wallet | 3 | Create with initial balance, fund transfer, delete options |
 | [Transaction Flows](flow-transaction.md) | Transaction | 4 | CRUD operations, bank statement import pipeline |
 | [Investment Flows](flow-investment.md) | Investment | 6 | FIFO sell, buy with lot merge, dividends, price updates, portfolio summary |
-| [Cross-Cutting Flows](flow-cross-cutting.md) | Infrastructure | 7 | FX resolution, API lifecycle, scheduler, currency conversion, market prices aggregation, admin price override (set + delete) |
+| [Cross-Cutting Flows](flow-cross-cutting.md) | Infrastructure | 9 | FX resolution, API lifecycle, scheduler, currency conversion, market prices aggregation, admin price override (set + delete), price alert detection, admin broadcast |
 | [i18n Flows](flow-i18n.md) | Internationalization | 2 | First visit locale detection, language switch in settings |
 | [Community Flows](flow-community.md) | Community | 12 | Create post, feed generation, like/unlike, follow/unfollow, share post, view profile, following/followers list, image upload, edit comment, reply threads, SSE notification stream, get reply list |
 | [Gold Sentiment Flows](flow-gold-sentiment.md) | Gold Sentiment | 3 | Cast vote with upsert, get sentiment with Redis cache, post comment with rate limiting and content sanitization |

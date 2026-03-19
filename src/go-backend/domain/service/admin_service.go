@@ -2,26 +2,43 @@ package service
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
 	"wealthjourney/domain/models"
 	"wealthjourney/domain/repository"
 	apperrors "wealthjourney/pkg/errors"
+	pkgredis "wealthjourney/pkg/redis"
 	"wealthjourney/pkg/types"
 	"wealthjourney/pkg/validator"
 	v1 "wealthjourney/protobuf/v1"
+
+	"gorm.io/datatypes"
 )
 
 type adminService struct {
 	userRepo     repository.UserRepository
 	feedbackRepo repository.FeedbackRepository
+	notifRepo    repository.NotificationRepository
+	redisClient  *pkgredis.RedisClient
+	pushSvc      PushService
 }
 
-func NewAdminService(userRepo repository.UserRepository, feedbackRepo repository.FeedbackRepository) AdminService {
+func NewAdminService(
+	userRepo repository.UserRepository,
+	feedbackRepo repository.FeedbackRepository,
+	notifRepo repository.NotificationRepository,
+	rdb *pkgredis.RedisClient,
+	pushSvc PushService,
+) AdminService {
 	return &adminService{
 		userRepo:     userRepo,
 		feedbackRepo: feedbackRepo,
+		notifRepo:    notifRepo,
+		redisClient:  rdb,
+		pushSvc:      pushSvc,
 	}
 }
 
@@ -196,6 +213,102 @@ func (s *adminService) DeleteFeedback(ctx context.Context, feedbackID int32) (*v
 		Message:   "Feedback deleted successfully",
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
+}
+
+func (s *adminService) Broadcast(ctx context.Context, adminUserID int32, title, message string) (int32, error) {
+	title = strings.TrimSpace(title)
+	message = strings.TrimSpace(message)
+	if message == "" {
+		return 0, apperrors.NewValidationError("message must not be empty")
+	}
+	if len(message) > 500 {
+		return 0, apperrors.NewValidationError("message must be 500 characters or less")
+	}
+	// Strip HTML tags
+	title = htmlTagRegex.ReplaceAllString(title, "")
+	message = htmlTagRegex.ReplaceAllString(message, "")
+
+	// If title is empty, fall back to default
+	if title == "" {
+		title = "Thông báo từ hệ thống"
+	}
+	if len(title) > 200 {
+		return 0, apperrors.NewValidationError("title must be 200 characters or less")
+	}
+
+	// Rate limit: max 10 broadcasts per hour per admin
+	if s.redisClient != nil {
+		rateKey := fmt.Sprintf("admin:broadcast:rate:%d", adminUserID)
+		count, _ := s.redisClient.GetClient().Incr(ctx, rateKey).Result()
+		if count == 1 {
+			s.redisClient.GetClient().Expire(ctx, rateKey, time.Hour)
+		}
+		if count > 10 {
+			return 0, apperrors.NewValidationError("broadcast rate limit exceeded (max 10 per hour)")
+		}
+	}
+
+	// Get admin info for metadata
+	admin, err := s.userRepo.GetByID(ctx, adminUserID)
+	if err != nil {
+		return 0, err
+	}
+
+	// Build metadata
+	metadata := map[string]interface{}{
+		"message":        message,
+		"adminId":        adminUserID,
+		"adminName":      admin.Name,
+		"broadcastTitle": title,
+	}
+	metadataJSON, err := json.Marshal(metadata)
+	if err != nil {
+		return 0, apperrors.NewInternalErrorWithCause("failed to marshal broadcast metadata", err)
+	}
+
+	// Get all user IDs
+	userIDs, err := s.userRepo.GetAllUserIDs(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	// Build notification batch
+	now := time.Now()
+	notifications := make([]*models.Notification, len(userIDs))
+	for i, uid := range userIDs {
+		notifications[i] = &models.Notification{
+			UserID:    uid,
+			Type:      "admin_broadcast",
+			Metadata:  datatypes.JSON(metadataJSON),
+			CreatedAt: now,
+		}
+	}
+
+	// Batch insert
+	if err := s.notifRepo.BatchCreate(ctx, notifications); err != nil {
+		return 0, err
+	}
+
+	// SSE publish to each user
+	if s.redisClient != nil {
+		for _, uid := range userIDs {
+			channel := fmt.Sprintf("user:%d:notifications", uid)
+			payload := map[string]interface{}{
+				"type":     "admin_broadcast",
+				"actorId":  0,
+				"userId":   uid,
+				"metadata": string(metadataJSON),
+			}
+			_ = s.redisClient.Publish(channel, payload)
+		}
+	}
+
+	// Push notification
+	if s.pushSvc != nil {
+		_ = s.pushSvc.SendToAll(ctx, title, message, "")
+	}
+
+	return int32(len(userIDs)), nil
 }
 
 func mapUserToAdminItem(u *models.User) *v1.AdminUserItem {

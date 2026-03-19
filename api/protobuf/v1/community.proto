@@ -276,6 +276,7 @@ message NotificationItem {
   string postPreview = 7 [json_name = "postPreview"];
   bool isRead = 8 [json_name = "isRead"];
   int64 createdAt = 9 [json_name = "createdAt"];
+  string metadata = 10 [json_name = "metadata"];
 }
 
 message GetNotificationsRequest {
@@ -304,6 +305,49 @@ message MarkNotificationsReadRequest {}
 message MarkNotificationsReadResponse {
   bool success = 1 [json_name = "success"];
   string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+// Admin Broadcast
+message AdminBroadcastRequest {
+  string message = 1 [json_name = "message"];
+}
+
+message AdminBroadcastResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  int32 recipientCount = 3 [json_name = "recipientCount"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+// Push Subscription
+message PushSubscribeRequest {
+  string endpoint = 1 [json_name = "endpoint"];
+  string p256dh = 2 [json_name = "p256dh"];
+  string auth = 3 [json_name = "auth"];
+}
+
+message PushSubscribeResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+message PushUnsubscribeRequest {
+  string endpoint = 1 [json_name = "endpoint"];
+}
+
+message PushUnsubscribeResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+message GetVAPIDKeyRequest {}
+
+message GetVAPIDKeyResponse {
+  bool success = 1 [json_name = "success"];
+  string publicKey = 2 [json_name = "publicKey"];
   string timestamp = 3 [json_name = "timestamp"];
 }
 

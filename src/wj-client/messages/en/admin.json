@@ -6,7 +6,9 @@
       "tabs": {
         "seo": "SEO",
         "users": "Users",
-        "feedback": "Feedback"
+        "feedback": "Feedback",
+        "broadcast": "Broadcast",
+        "notifications": "Notifications"
       },
       "loading": "Loading settings..."
     },
@@ -97,6 +99,81 @@
         "updateFailed": "Failed to update feedback",
         "deleteSuccess": "Feedback deleted",
         "deleteFailed": "Failed to delete feedback"
+      }
+    },
+    "broadcast": {
+      "title": "Send broadcast to all users",
+      "form": {
+        "title": "Title",
+        "titlePlaceholder": "Notification title (optional)",
+        "titleHelp": "Leave empty to use the default system title",
+        "message": "Message",
+        "messagePlaceholder": "Type your message...",
+        "charLabel": "characters",
+        "send": "Send broadcast",
+        "sending": "Sending..."
+      },
+      "toast": {
+        "success": "Broadcast sent to {count} users",
+        "error": "Failed to send broadcast"
+      }
+    },
+    "priceAlertTrigger": {
+      "title": "Manual Alert Trigger",
+      "description": "Run a price alert check now without waiting for the 15-minute scheduler.",
+      "button": "Run Price Alert Check",
+      "running": "Running...",
+      "toast": {
+        "success": "Price alert check completed successfully",
+        "error": "Failed to run price alert check"
+      }
+    },
+    "priceAlertConfig": {
+      "title": "Price Alert Settings",
+      "globalSettings": "Global Settings",
+      "cooldownMinutes": "Cooldown (minutes)",
+      "cooldownHelp": "Minimum time between alerts of the same category",
+      "topMoversCount": "Top movers count",
+      "topMoversHelp": "Number of top movers included in notification",
+      "categorySettings": "Per-Category Settings",
+      "enabled": "Enable alerts",
+      "thresholdPct": "Threshold (%)",
+      "titleTemplate": "Title template",
+      "bodyTemplate": "Body template",
+      "preview": "Preview",
+      "placeholderGuide": "Available placeholders",
+      "placeholders": {
+        "moverName": "Product name (e.g. SJC 1L-10L)",
+        "moverCode": "Product code (e.g. SJL1L10)",
+        "direction": "Arrow (↑ or ↓)",
+        "directionText": "Direction text (tăng or giảm)",
+        "changePct": "Change % (e.g. 2.1)",
+        "priceDiff": "Price difference (e.g. 1,500,000)",
+        "currentPrice": "Current price (e.g. 85,500,000)",
+        "baselinePrice": "Baseline price at last alert (e.g. 84,000,000)",
+        "priceUnit": "Price unit (e.g. lượng, oz, kg)",
+        "currency": "Currency code (e.g. VND, USD)",
+        "category": "Category name (e.g. Vàng trong nước)",
+        "moverCount": "Number of movers"
+      },
+      "save": "Save Settings",
+      "saving": "Saving...",
+      "reset": "Reset to Defaults",
+      "resetting": "Resetting...",
+      "resetConfirmTitle": "Reset to Defaults",
+      "resetConfirmMessage": "Are you sure you want to reset all price alert settings to their default values? This cannot be undone.",
+      "resetConfirm": "Reset",
+      "toast": {
+        "success": "Price alert configuration updated",
+        "error": "Failed to update configuration",
+        "resetSuccess": "Price alert configuration reset to defaults",
+        "resetError": "Failed to reset configuration"
+      },
+      "categories": {
+        "gold_vnd": "Domestic Gold (VND)",
+        "gold_usd": "World Gold (USD)",
+        "silver_vnd": "Domestic Silver (VND)",
+        "silver_usd": "World Silver (USD)"
       }
     },
     "pagination": {

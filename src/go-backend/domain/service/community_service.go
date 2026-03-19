@@ -922,7 +922,7 @@ func (s *communityService) createNotification(ctx context.Context, userID, actor
 	}
 	_ = s.notificationRepo.Create(ctx, &models.Notification{
 		UserID:  userID,
-		ActorID: actorID,
+		ActorID: &actorID,
 		Type:    notifType,
 		PostID:  postID,
 	})
@@ -1042,10 +1042,14 @@ func (s *communityService) GetNotifications(ctx context.Context, userID int32, r
 
 	items := make([]*v1.NotificationItem, len(notifications))
 	for i, n := range notifications {
+		var actorID int32
+		if n.ActorID != nil {
+			actorID = *n.ActorID
+		}
 		item := &v1.NotificationItem{
 			Id:        n.ID,
 			Type:      n.Type,
-			ActorId:   n.ActorID,
+			ActorId:   actorID,
 			IsRead:    n.IsRead,
 			CreatedAt: n.CreatedAt.Unix(),
 		}
@@ -1062,6 +1066,9 @@ func (s *communityService) GetNotifications(ctx context.Context, userID int32, r
 				}
 				item.PostPreview = preview
 			}
+		}
+		if len(n.Metadata) > 0 {
+			item.Metadata = string(n.Metadata)
 		}
 		items[i] = item
 	}

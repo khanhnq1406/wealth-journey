@@ -275,6 +275,7 @@ export interface NotificationItem {
   postPreview: string;
   isRead: boolean;
   createdAt: number;
+  metadata: string;
 }
 
 export interface GetNotificationsRequest {
@@ -305,6 +306,50 @@ export interface MarkNotificationsReadRequest {
 export interface MarkNotificationsReadResponse {
   success: boolean;
   message: string;
+  timestamp: string;
+}
+
+/** Admin Broadcast */
+export interface AdminBroadcastRequest {
+  message: string;
+}
+
+export interface AdminBroadcastResponse {
+  success: boolean;
+  message: string;
+  recipientCount: number;
+  timestamp: string;
+}
+
+/** Push Subscription */
+export interface PushSubscribeRequest {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+}
+
+export interface PushSubscribeResponse {
+  success: boolean;
+  message: string;
+  timestamp: string;
+}
+
+export interface PushUnsubscribeRequest {
+  endpoint: string;
+}
+
+export interface PushUnsubscribeResponse {
+  success: boolean;
+  message: string;
+  timestamp: string;
+}
+
+export interface GetVAPIDKeyRequest {
+}
+
+export interface GetVAPIDKeyResponse {
+  success: boolean;
+  publicKey: string;
   timestamp: string;
 }
 
@@ -4163,6 +4208,7 @@ function createBaseNotificationItem(): NotificationItem {
     postPreview: "",
     isRead: false,
     createdAt: 0,
+    metadata: "",
   };
 }
 
@@ -4194,6 +4240,9 @@ export const NotificationItem: MessageFns<NotificationItem> = {
     }
     if (message.createdAt !== 0) {
       writer.uint32(72).int64(message.createdAt);
+    }
+    if (message.metadata !== "") {
+      writer.uint32(82).string(message.metadata);
     }
     return writer;
   },
@@ -4277,6 +4326,14 @@ export const NotificationItem: MessageFns<NotificationItem> = {
           message.createdAt = longToNumber(reader.int64());
           continue;
         }
+        case 10: {
+          if (tag !== 82) {
+            break;
+          }
+
+          message.metadata = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4297,6 +4354,7 @@ export const NotificationItem: MessageFns<NotificationItem> = {
       postPreview: isSet(object.postPreview) ? globalThis.String(object.postPreview) : "",
       isRead: isSet(object.isRead) ? globalThis.Boolean(object.isRead) : false,
       createdAt: isSet(object.createdAt) ? globalThis.Number(object.createdAt) : 0,
+      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : "",
     };
   },
 
@@ -4329,6 +4387,9 @@ export const NotificationItem: MessageFns<NotificationItem> = {
     if (message.createdAt !== 0) {
       obj.createdAt = Math.round(message.createdAt);
     }
+    if (message.metadata !== "") {
+      obj.metadata = message.metadata;
+    }
     return obj;
   },
 
@@ -4346,6 +4407,7 @@ export const NotificationItem: MessageFns<NotificationItem> = {
     message.postPreview = object.postPreview ?? "";
     message.isRead = object.isRead ?? false;
     message.createdAt = object.createdAt ?? 0;
+    message.metadata = object.metadata ?? "";
     return message;
   },
 };
@@ -4819,6 +4881,641 @@ export const MarkNotificationsReadResponse: MessageFns<MarkNotificationsReadResp
     const message = createBaseMarkNotificationsReadResponse();
     message.success = object.success ?? false;
     message.message = object.message ?? "";
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseAdminBroadcastRequest(): AdminBroadcastRequest {
+  return { message: "" };
+}
+
+export const AdminBroadcastRequest: MessageFns<AdminBroadcastRequest> = {
+  encode(message: AdminBroadcastRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.message !== "") {
+      writer.uint32(10).string(message.message);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminBroadcastRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminBroadcastRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminBroadcastRequest {
+    return { message: isSet(object.message) ? globalThis.String(object.message) : "" };
+  },
+
+  toJSON(message: AdminBroadcastRequest): unknown {
+    const obj: any = {};
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminBroadcastRequest>): AdminBroadcastRequest {
+    return AdminBroadcastRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminBroadcastRequest>): AdminBroadcastRequest {
+    const message = createBaseAdminBroadcastRequest();
+    message.message = object.message ?? "";
+    return message;
+  },
+};
+
+function createBaseAdminBroadcastResponse(): AdminBroadcastResponse {
+  return { success: false, message: "", recipientCount: 0, timestamp: "" };
+}
+
+export const AdminBroadcastResponse: MessageFns<AdminBroadcastResponse> = {
+  encode(message: AdminBroadcastResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.recipientCount !== 0) {
+      writer.uint32(24).int32(message.recipientCount);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AdminBroadcastResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAdminBroadcastResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.recipientCount = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AdminBroadcastResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      recipientCount: isSet(object.recipientCount) ? globalThis.Number(object.recipientCount) : 0,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: AdminBroadcastResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.recipientCount !== 0) {
+      obj.recipientCount = Math.round(message.recipientCount);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AdminBroadcastResponse>): AdminBroadcastResponse {
+    return AdminBroadcastResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AdminBroadcastResponse>): AdminBroadcastResponse {
+    const message = createBaseAdminBroadcastResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.recipientCount = object.recipientCount ?? 0;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBasePushSubscribeRequest(): PushSubscribeRequest {
+  return { endpoint: "", p256dh: "", auth: "" };
+}
+
+export const PushSubscribeRequest: MessageFns<PushSubscribeRequest> = {
+  encode(message: PushSubscribeRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.endpoint !== "") {
+      writer.uint32(10).string(message.endpoint);
+    }
+    if (message.p256dh !== "") {
+      writer.uint32(18).string(message.p256dh);
+    }
+    if (message.auth !== "") {
+      writer.uint32(26).string(message.auth);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PushSubscribeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePushSubscribeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.endpoint = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.p256dh = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.auth = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PushSubscribeRequest {
+    return {
+      endpoint: isSet(object.endpoint) ? globalThis.String(object.endpoint) : "",
+      p256dh: isSet(object.p256dh) ? globalThis.String(object.p256dh) : "",
+      auth: isSet(object.auth) ? globalThis.String(object.auth) : "",
+    };
+  },
+
+  toJSON(message: PushSubscribeRequest): unknown {
+    const obj: any = {};
+    if (message.endpoint !== "") {
+      obj.endpoint = message.endpoint;
+    }
+    if (message.p256dh !== "") {
+      obj.p256dh = message.p256dh;
+    }
+    if (message.auth !== "") {
+      obj.auth = message.auth;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<PushSubscribeRequest>): PushSubscribeRequest {
+    return PushSubscribeRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<PushSubscribeRequest>): PushSubscribeRequest {
+    const message = createBasePushSubscribeRequest();
+    message.endpoint = object.endpoint ?? "";
+    message.p256dh = object.p256dh ?? "";
+    message.auth = object.auth ?? "";
+    return message;
+  },
+};
+
+function createBasePushSubscribeResponse(): PushSubscribeResponse {
+  return { success: false, message: "", timestamp: "" };
+}
+
+export const PushSubscribeResponse: MessageFns<PushSubscribeResponse> = {
+  encode(message: PushSubscribeResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(26).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PushSubscribeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePushSubscribeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PushSubscribeResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: PushSubscribeResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<PushSubscribeResponse>): PushSubscribeResponse {
+    return PushSubscribeResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<PushSubscribeResponse>): PushSubscribeResponse {
+    const message = createBasePushSubscribeResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBasePushUnsubscribeRequest(): PushUnsubscribeRequest {
+  return { endpoint: "" };
+}
+
+export const PushUnsubscribeRequest: MessageFns<PushUnsubscribeRequest> = {
+  encode(message: PushUnsubscribeRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.endpoint !== "") {
+      writer.uint32(10).string(message.endpoint);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PushUnsubscribeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePushUnsubscribeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.endpoint = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PushUnsubscribeRequest {
+    return { endpoint: isSet(object.endpoint) ? globalThis.String(object.endpoint) : "" };
+  },
+
+  toJSON(message: PushUnsubscribeRequest): unknown {
+    const obj: any = {};
+    if (message.endpoint !== "") {
+      obj.endpoint = message.endpoint;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<PushUnsubscribeRequest>): PushUnsubscribeRequest {
+    return PushUnsubscribeRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<PushUnsubscribeRequest>): PushUnsubscribeRequest {
+    const message = createBasePushUnsubscribeRequest();
+    message.endpoint = object.endpoint ?? "";
+    return message;
+  },
+};
+
+function createBasePushUnsubscribeResponse(): PushUnsubscribeResponse {
+  return { success: false, message: "", timestamp: "" };
+}
+
+export const PushUnsubscribeResponse: MessageFns<PushUnsubscribeResponse> = {
+  encode(message: PushUnsubscribeResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(26).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PushUnsubscribeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePushUnsubscribeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PushUnsubscribeResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: PushUnsubscribeResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<PushUnsubscribeResponse>): PushUnsubscribeResponse {
+    return PushUnsubscribeResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<PushUnsubscribeResponse>): PushUnsubscribeResponse {
+    const message = createBasePushUnsubscribeResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseGetVAPIDKeyRequest(): GetVAPIDKeyRequest {
+  return {};
+}
+
+export const GetVAPIDKeyRequest: MessageFns<GetVAPIDKeyRequest> = {
+  encode(_: GetVAPIDKeyRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetVAPIDKeyRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetVAPIDKeyRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): GetVAPIDKeyRequest {
+    return {};
+  },
+
+  toJSON(_: GetVAPIDKeyRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetVAPIDKeyRequest>): GetVAPIDKeyRequest {
+    return GetVAPIDKeyRequest.fromPartial(base ?? {});
+  },
+  fromPartial(_: DeepPartial<GetVAPIDKeyRequest>): GetVAPIDKeyRequest {
+    const message = createBaseGetVAPIDKeyRequest();
+    return message;
+  },
+};
+
+function createBaseGetVAPIDKeyResponse(): GetVAPIDKeyResponse {
+  return { success: false, publicKey: "", timestamp: "" };
+}
+
+export const GetVAPIDKeyResponse: MessageFns<GetVAPIDKeyResponse> = {
+  encode(message: GetVAPIDKeyResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.publicKey !== "") {
+      writer.uint32(18).string(message.publicKey);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(26).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetVAPIDKeyResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetVAPIDKeyResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.publicKey = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetVAPIDKeyResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      publicKey: isSet(object.publicKey) ? globalThis.String(object.publicKey) : "",
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: GetVAPIDKeyResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.publicKey !== "") {
+      obj.publicKey = message.publicKey;
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetVAPIDKeyResponse>): GetVAPIDKeyResponse {
+    return GetVAPIDKeyResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetVAPIDKeyResponse>): GetVAPIDKeyResponse {
+    const message = createBaseGetVAPIDKeyResponse();
+    message.success = object.success ?? false;
+    message.publicKey = object.publicKey ?? "";
     message.timestamp = object.timestamp ?? "";
     return message;
   },

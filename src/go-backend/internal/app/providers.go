@@ -111,6 +111,7 @@ func ProvideRepositories(db *database.Database) *service.Repositories {
 		GoldVoteComment:       repository.NewGoldVoteCommentRepository(db),
 		Feedback:              repository.NewFeedbackRepository(db),
 		SiteSettings:          repository.NewSiteSettingsRepository(db),
+		PushSubscription:      repository.NewPushSubscriptionRepository(db),
 	}
 }
 
@@ -246,6 +247,11 @@ func ProvideScheduler(
 		scheduler.NewPriceUpdateJob(services.User, services.Investment),
 		scheduler.NewPortfolioSnapshotJob(repos.User, services.PortfolioHistory),
 	)
+
+	// Price alert job — reuse the PriceAlertService from Services (created in NewServices)
+	if services.PriceAlert != nil {
+		backgroundJobs = append(backgroundJobs, scheduler.NewPriceAlertJob(services.PriceAlert))
+	}
 
 	return scheduler.New(backgroundJobs...)
 }
