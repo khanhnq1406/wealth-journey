@@ -118,6 +118,16 @@
         "error": "Không thể gửi thông báo"
       }
     },
+    "priceAlertTrigger": {
+      "title": "Kích hoạt cảnh báo thủ công",
+      "description": "Chạy kiểm tra cảnh báo giá ngay mà không cần chờ lịch trình 15 phút.",
+      "button": "Chạy kiểm tra cảnh báo giá",
+      "running": "Đang chạy...",
+      "toast": {
+        "success": "Đã chạy kiểm tra cảnh báo giá thành công",
+        "error": "Không thể chạy kiểm tra cảnh báo giá"
+      }
+    },
     "priceAlertConfig": {
       "title": "Cấu hình cảnh báo giá",
       "globalSettings": "Cài đặt chung",

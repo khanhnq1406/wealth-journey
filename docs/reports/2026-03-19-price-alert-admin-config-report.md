@@ -103,6 +103,7 @@ All functional requirements from the spec are implemented:
 - `src/go-backend/handlers/price_alert_config.go` — GET/PUT/DELETE admin handlers
 - `src/go-backend/handlers/price_alert_trigger.go` — POST admin trigger handler (calls `CheckAndAlert()` on demand)
 - `src/wj-client/features/admin/components/PriceAlertConfigForm.tsx` — Admin config form with reset button, live preview, clickable placeholder chips
+- `src/wj-client/features/admin/components/PriceAlertTriggerCard.tsx` — Standalone trigger card with button, loading state, success/error feedback
 
 ### Modified
 - `src/go-backend/domain/service/price_alert_service.go` — Reads config from Redis at runtime, uses templates, respects enable/disable
@@ -112,9 +113,9 @@ All functional requirements from the spec are implemented:
 - `src/go-backend/handlers/routes.go` — Registered admin config routes (GET, PUT, DELETE) + `POST /admin/price-alert-trigger`
 - `src/go-backend/internal/app/providers.go` — Simplified scheduler to reuse `services.PriceAlert` instead of creating duplicate instance
 - `src/wj-client/components/notifications/NotificationItem.tsx` — Added priceDiff and broadcastTitle to metadata interfaces
-- `src/wj-client/messages/en/admin.json` — English translations (including reset, placeholder descriptions)
-- `src/wj-client/messages/vi/admin.json` — Vietnamese translations (including reset, placeholder descriptions)
-- `src/wj-client/app/[locale]/dashboard/admin/page.tsx` — Renamed tab, integrated config form
+- `src/wj-client/messages/en/admin.json` — English translations (including reset, placeholder descriptions, trigger card)
+- `src/wj-client/messages/vi/admin.json` — Vietnamese translations (including reset, placeholder descriptions, trigger card)
+- `src/wj-client/app/[locale]/dashboard/admin/page.tsx` — Renamed tab, integrated config form + trigger card
 - `docs/architecture/c4-component-backend.md` — Added handler, updated service description
 - `docs/architecture/c4-component-frontend.md` — Updated admin page and feature descriptions
 - `docs/architecture/flow-cross-cutting.md` — Updated sections 7, 8; added section 9
@@ -128,6 +129,8 @@ All functional requirements from the spec are implemented:
    - Log in as admin user
    - Navigate to `/dashboard/admin?tab=notifications`
    - Verify broadcast form appears at top
+   - Verify trigger card appears between broadcast and config sections
+   - Click "Run Price Alert Check" → verify loading state, then success/error message
    - Verify price alert config form appears below with accordion categories
    - Modify settings (cooldown, thresholds, enable/disable categories)
    - Save and verify success toast
@@ -157,3 +160,4 @@ All functional requirements from the spec are implemented:
 | 2026-03-19 | Add "Reset to Defaults" button for price alert config. Backend: `DeletePriceAlertConfig()` + `ResetConfig` handler + `DELETE` route (admin-only). Frontend: reset button with `ConfirmationDialog` (danger variant). i18n: en+vi translations. 1 new test (17 total). | Minor | pending |
 | 2026-03-19 | Add admin price alert trigger endpoint (`POST /admin/price-alert-trigger`). Promotes `PriceAlertService` into `Services` struct for shared access. Handler calls `CheckAndAlert()` on demand. Scheduler simplified to reuse `services.PriceAlert` (removes duplicate service creation). | Minor | pending |
 | 2026-03-19 | Add clickable placeholder chips below template inputs. Clicking a chip inserts the placeholder at cursor position. Uses `useRef` per input + `insertAtCursor` helper with `requestAnimationFrame` for cursor restore. Chips show tooltip with placeholder description on hover. | Minor | pending |
+| 2026-03-19 | Add `PriceAlertTriggerCard` frontend component — standalone card with button, loading state, inline success/error feedback. Placed between broadcast form and config form on notifications tab. i18n: en+vi translations. | Minor | pending |

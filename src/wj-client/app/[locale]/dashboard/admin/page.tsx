@@ -20,6 +20,7 @@ import { AdminUsersTab } from "@/features/admin/components/AdminUsersTab";
 import { AdminFeedbackTab } from "@/features/admin/components/AdminFeedbackTab";
 import { AdminBroadcastForm } from "@/features/admin/components/AdminBroadcastForm";
 import { PriceAlertConfigForm } from "@/features/admin/components/PriceAlertConfigForm";
+import { PriceAlertTriggerCard } from "@/features/admin/components/PriceAlertTriggerCard";
 
 interface SiteSetting {
   key: string;
@@ -382,6 +383,8 @@ export default function AdminCMSPage() {
             <AdminBroadcastForm />
             <hr className="border-v2-border-light" />
             <PriceAlertConfigForm />
+            <hr className="border-v2-border-light" />
+            <PriceAlertTriggerCard />
           </div>
         )}
       </div>

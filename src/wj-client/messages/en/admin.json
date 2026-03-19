@@ -118,6 +118,16 @@
         "error": "Failed to send broadcast"
       }
     },
+    "priceAlertTrigger": {
+      "title": "Manual Alert Trigger",
+      "description": "Run a price alert check now without waiting for the 15-minute scheduler.",
+      "button": "Run Price Alert Check",
+      "running": "Running...",
+      "toast": {
+        "success": "Price alert check completed successfully",
+        "error": "Failed to run price alert check"
+      }
+    },
     "priceAlertConfig": {
       "title": "Price Alert Settings",
       "globalSettings": "Global Settings",
