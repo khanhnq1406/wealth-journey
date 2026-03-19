@@ -438,3 +438,13 @@ type FeedbackRepository interface {
 	Update(ctx context.Context, feedback *models.Feedback) error
 	Delete(ctx context.Context, id int32) error
 }
+
+// PushSubscriptionRepository defines the interface for push subscription data operations.
+type PushSubscriptionRepository interface {
+	Create(ctx context.Context, sub *models.PushSubscription) error
+	DeleteByEndpoint(ctx context.Context, endpoint string) error
+	GetByUserID(ctx context.Context, userID int32) ([]*models.PushSubscription, error)
+	GetAll(ctx context.Context) ([]*models.PushSubscription, error)
+	CountByUserID(ctx context.Context, userID int32) (int, error)
+	DeleteByID(ctx context.Context, id int32) error
+}
