@@ -275,3 +275,36 @@ func TestSavePriceAlertConfig_RoundTrip(t *testing.T) {
 	assert.Equal(t, cfg.TopMoversCount, loaded.TopMoversCount)
 	assert.Equal(t, cfg.Categories["gold_usd"].Enabled, loaded.Categories["gold_usd"].Enabled)
 }
+
+func TestDeletePriceAlertConfig(t *testing.T) {
+	rdb, _ := newTestRedis(t)
+	ctx := context.Background()
+
+	// Save a custom config first
+	cfg := PriceAlertConfig{
+		CooldownMinutes: 45,
+		TopMoversCount:  7,
+		Categories: map[string]PriceAlertCategoryConfig{
+			"gold_vnd":   {Enabled: false, ThresholdPct: 9.0, TitleTemplate: "Custom", BodyTemplate: "Custom body"},
+			"gold_usd":   {Enabled: false, ThresholdPct: 9.0, TitleTemplate: "Custom", BodyTemplate: "Custom body"},
+			"silver_vnd": {Enabled: false, ThresholdPct: 9.0, TitleTemplate: "Custom", BodyTemplate: "Custom body"},
+			"silver_usd": {Enabled: false, ThresholdPct: 9.0, TitleTemplate: "Custom", BodyTemplate: "Custom body"},
+		},
+	}
+	require.NoError(t, SavePriceAlertConfig(ctx, rdb, cfg))
+
+	// Verify custom config is active
+	loaded := LoadPriceAlertConfig(ctx, rdb)
+	assert.Equal(t, 45, loaded.CooldownMinutes)
+
+	// Delete config
+	err := DeletePriceAlertConfig(ctx, rdb)
+	require.NoError(t, err)
+
+	// Load again — should return defaults
+	loaded = LoadPriceAlertConfig(ctx, rdb)
+	defaults := DefaultPriceAlertConfig()
+	assert.Equal(t, defaults.CooldownMinutes, loaded.CooldownMinutes)
+	assert.Equal(t, defaults.TopMoversCount, loaded.TopMoversCount)
+	assert.True(t, loaded.Categories["gold_vnd"].Enabled)
+}

@@ -77,6 +77,26 @@ func (h *PriceAlertConfigHandler) UpdateConfig(c *gin.Context) {
 	})
 }
 
+// ResetConfig handles DELETE /api/v1/admin/price-alert-config
+func (h *PriceAlertConfigHandler) ResetConfig(c *gin.Context) {
+	if err := service.DeletePriceAlertConfig(c.Request.Context(), h.redisClient); err != nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{
+			"success": false,
+			"message": "Failed to reset configuration",
+		})
+		return
+	}
+
+	defaults := service.DefaultPriceAlertConfig()
+
+	c.JSON(http.StatusOK, gin.H{
+		"success":   true,
+		"message":   "Price alert configuration reset to defaults",
+		"config":    defaults,
+		"timestamp": time.Now().Format(time.RFC3339),
+	})
+}
+
 // mergeConfig merges a partial update into the current config.
 func mergeConfig(current, update service.PriceAlertConfig) service.PriceAlertConfig {
 	result := current

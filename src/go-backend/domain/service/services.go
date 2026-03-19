@@ -27,6 +27,7 @@ type Services struct {
 	SiteSettings       SiteSettingsService
 	Admin              AdminService
 	Push               PushService
+	PriceAlert         PriceAlertService
 }
 
 // NewServices creates all service instances with proper dependency ordering.
@@ -67,6 +68,12 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	// Phase 1 (cont.): PushService — depends on push subscription repo
 	pushSvc := NewPushService(repos.PushSubscription)
 
+	// Phase 1 (cont.): PriceAlertService — depends on gold/silver price services, notification repo, user repo, Redis, push service
+	var priceAlertSvc PriceAlertService
+	if rdb != nil {
+		priceAlertSvc = NewPriceAlertService(goldPriceSvc, silverPriceSvc, repos.Notification, repos.User, rdb, pushSvc)
+	}
+
 	// Phase 1 (cont.): CommunityService — depends on storage provider for image uploads
 	communitySvc := NewCommunityService(repos.Post, repos.Comment, repos.Like, repos.Follow, repos.Report, repos.User, repos.Notification, repos.SavedPost, repos.Hashtag, communityStorage, rdb)
 
@@ -87,6 +94,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		SiteSettings:     siteSettingsSvc,
 		Admin:            NewAdminService(repos.User, repos.Feedback, repos.Notification, rdb, pushSvc),
 		Push:             pushSvc,
+		PriceAlert:       priceAlertSvc,
 	}
 }
 

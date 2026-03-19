@@ -103,6 +103,11 @@ func SavePriceAlertConfig(ctx context.Context, rdb *pkgredis.RedisClient, cfg Pr
 	return rdb.GetClient().Set(ctx, priceAlertConfigKey, string(data), 0).Err()
 }
 
+// DeletePriceAlertConfig removes the config from Redis so defaults are used.
+func DeletePriceAlertConfig(ctx context.Context, rdb *pkgredis.RedisClient) error {
+	return rdb.GetClient().Del(ctx, priceAlertConfigKey).Err()
+}
+
 var htmlTagRe = regexp.MustCompile(`<[^>]*>`)
 
 // stripHTML removes HTML tags from a string.

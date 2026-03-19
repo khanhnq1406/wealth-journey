@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { apiClient } from "@/utils/api-client";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
 import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
+import { ConfirmationDialog } from "@/components/modals/ConfirmationDialog";
 
 interface CategoryConfig {
   enabled: boolean;
@@ -116,6 +117,29 @@ function resolvePlaceholders(
   );
 }
 
+function insertAtCursor(
+  ref: React.RefObject<HTMLInputElement | HTMLTextAreaElement | null>,
+  text: string,
+  currentValue: string,
+  onChange: (newValue: string) => void,
+) {
+  const el = ref.current;
+  if (!el) {
+    onChange(currentValue + text);
+    return;
+  }
+  const start = el.selectionStart ?? currentValue.length;
+  const end = el.selectionEnd ?? start;
+  const newValue =
+    currentValue.substring(0, start) + text + currentValue.substring(end);
+  onChange(newValue);
+  // Restore cursor position after React re-render
+  requestAnimationFrame(() => {
+    el.selectionStart = el.selectionEnd = start + text.length;
+    el.focus();
+  });
+}
+
 export function PriceAlertConfigForm() {
   const t = useTranslations("admin.priceAlertConfig");
   const [config, setConfig] = useState<PriceAlertConfig | null>(null);
@@ -127,6 +151,10 @@ export function PriceAlertConfigForm() {
     "gold_vnd",
   );
   const [showPlaceholders, setShowPlaceholders] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const titleRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const bodyRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
 
   const fetchConfig = useCallback(async () => {
     try {
@@ -171,6 +199,31 @@ export function PriceAlertConfigForm() {
       setError(err instanceof Error ? err.message : t("toast.error"));
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleReset = async () => {
+    if (isResetting) return;
+    setIsResetting(true);
+    setError(null);
+    setSuccess(null);
+    setShowResetConfirm(false);
+
+    try {
+      const res = await apiClient.delete<ConfigResponse>(
+        "/api/v1/admin/price-alert-config",
+      );
+      const data = res as unknown as ConfigResponse;
+      if (data.success) {
+        setSuccess(t("toast.resetSuccess"));
+        setConfig(data.config);
+      } else {
+        setError(data.message || t("toast.resetError"));
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t("toast.resetError"));
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -349,6 +402,9 @@ export function PriceAlertConfigForm() {
                         {t("titleTemplate")}
                       </label>
                       <input
+                        ref={(el) => {
+                          titleRefs.current[cat] = el;
+                        }}
                         type="text"
                         maxLength={200}
                         value={catConfig.titleTemplate}
@@ -357,8 +413,29 @@ export function PriceAlertConfigForm() {
                         }
                         className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-vietnam text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
                       />
+                      <div className="flex flex-wrap gap-1.5 mt-1.5">
+                        {PLACEHOLDERS.map((p) => (
+                          <button
+                            key={p}
+                            type="button"
+                            title={t(`placeholders.${p}`)}
+                            onClick={() =>
+                              insertAtCursor(
+                                { current: titleRefs.current[cat] ?? null },
+                                `{${p}}`,
+                                catConfig.titleTemplate,
+                                (v) =>
+                                  updateCategory(cat, "titleTemplate", v),
+                              )
+                            }
+                            className="font-mono text-[11px] leading-tight bg-v2-bg-tertiary hover:bg-bg/10 text-v2-text-secondary hover:text-bg px-1.5 py-0.5 rounded border border-v2-border-light transition-colors cursor-pointer"
+                          >
+                            {`{${p}}`}
+                          </button>
+                        ))}
+                      </div>
                       {catConfig.titleTemplate && (
-                        <div className="rounded-md bg-v2-bg-tertiary">
+                        <div className="rounded-md bg-v2-bg-tertiary mt-1.5 px-2 py-1.5">
                           <span className="font-vietnam text-xs font-medium text-v2-text-tertiary">
                             {t("preview")}:
                           </span>
@@ -377,6 +454,9 @@ export function PriceAlertConfigForm() {
                         {t("bodyTemplate")}
                       </label>
                       <textarea
+                        ref={(el) => {
+                          bodyRefs.current[cat] = el;
+                        }}
                         maxLength={500}
                         rows={2}
                         value={catConfig.bodyTemplate}
@@ -385,8 +465,29 @@ export function PriceAlertConfigForm() {
                         }
                         className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-vietnam text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg resize-none"
                       />
+                      <div className="flex flex-wrap gap-1.5 mt-1.5">
+                        {PLACEHOLDERS.map((p) => (
+                          <button
+                            key={p}
+                            type="button"
+                            title={t(`placeholders.${p}`)}
+                            onClick={() =>
+                              insertAtCursor(
+                                { current: bodyRefs.current[cat] ?? null },
+                                `{${p}}`,
+                                catConfig.bodyTemplate,
+                                (v) =>
+                                  updateCategory(cat, "bodyTemplate", v),
+                              )
+                            }
+                            className="font-mono text-[11px] leading-tight bg-v2-bg-tertiary hover:bg-bg/10 text-v2-text-secondary hover:text-bg px-1.5 py-0.5 rounded border border-v2-border-light transition-colors cursor-pointer"
+                          >
+                            {`{${p}}`}
+                          </button>
+                        ))}
+                      </div>
                       {catConfig.bodyTemplate && (
-                        <div className="rounded-md bg-v2-bg-tertiary">
+                        <div className="rounded-md bg-v2-bg-tertiary mt-1.5 px-2 py-1.5">
                           <span className="font-vietnam text-xs font-medium text-v2-text-tertiary">
                             {t("preview")}:
                           </span>
@@ -455,15 +556,36 @@ export function PriceAlertConfigForm() {
           </div>
         )}
 
-        {/* Save Button */}
-        <Button
-          type={ButtonType.PRIMARY}
-          onClick={handleSave}
-          loading={isSaving}
-        >
-          {isSaving ? t("saving") : t("save")}
-        </Button>
+        {/* Action Buttons */}
+        <div className="flex items-center gap-3">
+          <Button
+            type={ButtonType.PRIMARY}
+            onClick={handleSave}
+            loading={isSaving}
+          >
+            {isSaving ? t("saving") : t("save")}
+          </Button>
+          <Button
+            type={ButtonType.SECONDARY}
+            onClick={() => setShowResetConfirm(true)}
+            loading={isResetting}
+          >
+            {isResetting ? t("resetting") : t("reset")}
+          </Button>
+        </div>
       </div>
+
+      {showResetConfirm && (
+        <ConfirmationDialog
+          title={t("resetConfirmTitle")}
+          message={t("resetConfirmMessage")}
+          confirmText={t("resetConfirm")}
+          onConfirm={handleReset}
+          onCancel={() => setShowResetConfirm(false)}
+          isLoading={isResetting}
+          variant="danger"
+        />
+      )}
     </div>
   );
 }

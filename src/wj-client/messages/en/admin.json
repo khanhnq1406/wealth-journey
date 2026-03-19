@@ -148,9 +148,16 @@
       },
       "save": "Save Settings",
       "saving": "Saving...",
+      "reset": "Reset to Defaults",
+      "resetting": "Resetting...",
+      "resetConfirmTitle": "Reset to Defaults",
+      "resetConfirmMessage": "Are you sure you want to reset all price alert settings to their default values? This cannot be undone.",
+      "resetConfirm": "Reset",
       "toast": {
         "success": "Price alert configuration updated",
-        "error": "Failed to update configuration"
+        "error": "Failed to update configuration",
+        "resetSuccess": "Price alert configuration reset to defaults",
+        "resetError": "Failed to reset configuration"
       },
       "categories": {
         "gold_vnd": "Domestic Gold (VND)",

@@ -148,9 +148,16 @@
       },
       "save": "Lưu cài đặt",
       "saving": "Đang lưu...",
+      "reset": "Khôi phục mặc định",
+      "resetting": "Đang khôi phục...",
+      "resetConfirmTitle": "Khôi phục mặc định",
+      "resetConfirmMessage": "Bạn có chắc chắn muốn khôi phục tất cả cài đặt cảnh báo giá về giá trị mặc định? Thao tác này không thể hoàn tác.",
+      "resetConfirm": "Khôi phục",
       "toast": {
         "success": "Đã cập nhật cấu hình cảnh báo giá",
-        "error": "Không thể cập nhật cấu hình"
+        "error": "Không thể cập nhật cấu hình",
+        "resetSuccess": "Đã khôi phục cấu hình cảnh báo giá về mặc định",
+        "resetError": "Không thể khôi phục cấu hình"
       },
       "categories": {
         "gold_vnd": "Vàng trong nước (VND)",

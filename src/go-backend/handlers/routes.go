@@ -86,6 +86,11 @@ func RegisterRoutes(
 		if h.PriceAlertConfig != nil {
 			admin.GET("/price-alert-config", h.PriceAlertConfig.GetConfig)
 			admin.PUT("/price-alert-config", h.PriceAlertConfig.UpdateConfig)
+			admin.DELETE("/price-alert-config", h.PriceAlertConfig.ResetConfig)
+		}
+		// Price alert manual trigger
+		if h.PriceAlertTrigger != nil {
+			admin.POST("/price-alert-trigger", h.PriceAlertTrigger.TriggerCheck)
 		}
 	}
 
