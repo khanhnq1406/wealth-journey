@@ -23,8 +23,8 @@
 | 8 | Add i18n translations for price alert config | done | 95d8461 | Vietnamese + English translations for all config form labels |
 | 9 | Create PriceAlertConfigForm component | done | 3feea33 | Accordion form with global + per-category settings |
 | 10 | Update admin page: rename tab and integrate form | done | f405775 | Renamed broadcast→notifications tab, integrated both forms |
-| 11 | Update C4 architecture diagrams | done | pending | Added PriceAlertConfigHandler, updated service descriptions |
-| 12 | Update runtime flow diagrams | done | pending | Updated sections 7,8; added section 9 for config admin flow |
+| 11 | Update C4 architecture diagrams | done | 0ded183 | Added PriceAlertConfigHandler, updated service descriptions |
+| 12 | Update runtime flow diagrams | done | 0ded183 | Updated sections 7,8; added section 9 for config admin flow |
 
 ## Resume Instructions
 
