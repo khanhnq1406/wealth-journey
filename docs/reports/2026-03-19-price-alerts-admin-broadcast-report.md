@@ -38,20 +38,28 @@ Implemented price fluctuation alerts (gold/silver), admin broadcast messaging, a
 ```
 PriceAlertJob (scheduler, 15min)
   └─► PriceAlertService
+       ├─► LoadPriceAlertConfig(Redis) → env var fallback defaults
        ├─► GoldPriceService / SilverPriceService (price fetch)
-       ├─► Redis (baselines, cooldowns)
+       ├─► Skip disabled categories (catCfg.Enabled)
+       ├─► Redis (baselines, cooldowns with cfg.CooldownMinutes)
+       ├─► ResolvePlaceholders(catCfg.TitleTemplate/BodyTemplate)
        ├─► NotificationRepository.BatchCreate (DB persist)
        ├─► Redis PUBLISH user:{id}:notifications (SSE delivery)
        └─► PushService.SendToAll (Web Push delivery)
 
 AdminBroadcastHandler (POST /api/v1/admin/broadcast)
   └─► AdminService.Broadcast
+       ├─► LoadPriceAlertConfig(Redis) → cfg.BroadcastTitle
        ├─► Validation (500 char max, HTML strip)
        ├─► Rate limiting (10/hr/admin via Redis INCR)
        ├─► UserRepository.GetAllUserIDs
        ├─► NotificationRepository.BatchCreate
        ├─► Redis PUBLISH (SSE)
        └─► PushService.SendToAll (Web Push)
+
+PriceAlertConfigHandler (GET/PUT /api/v1/admin/price-alert-config)
+  ├─► GET: LoadPriceAlertConfig(Redis) → defaults fallback
+  └─► PUT: mergeConfig → SanitizePriceAlertConfig → ValidatePriceAlertConfig → SavePriceAlertConfig(Redis)
 
 PushHandler (3 endpoints)
   ├─► GET  /api/v1/push/vapid-key
@@ -77,8 +85,9 @@ useNotificationStream (SSE)
 usePushSubscription (hook)
   └─► SW registration, VAPID key fetch, subscribe/unsubscribe
 
-Admin Page → Broadcast Tab
-  └─► AdminBroadcastForm (textarea, char counter, API call)
+Admin Page → Notifications Tab
+  ├─► AdminBroadcastForm (textarea, char counter, API call)
+  └─► PriceAlertConfigForm (accordion per-category settings, GET/PUT /admin/price-alert-config)
 ```
 
 ## Security Implementation Summary
@@ -94,7 +103,9 @@ Admin Page → Broadcast Tab
 | Rate limiting (push) | Max 5 subscriptions per user via DB count | Yes — `push.go` handler |
 | Rate limiting (price alerts) | 2-hour cooldown per category via Redis TTL | Yes — `price_alert_service.go` |
 | Secrets | VAPID private key in env vars only, never logged or returned | Yes — only public key exposed |
-| XSS prevention | HTML tags stripped from broadcast messages | Yes — regex in admin_service |
+| XSS prevention | HTML tags stripped from broadcast messages and all config string fields | Yes — regex in admin_service + price_alert_config |
+| Input validation (config) | Server-side: cooldownMinutes 1-1440, topMoversCount 1-20, thresholdPct 0.1-50, non-empty templates | Yes — 14 unit tests |
+| Authorization (config) | GET/PUT config requires `AdminMiddleware` (is_admin=true) | Yes — routes.go admin group |
 
 ## New Backend Files
 
@@ -103,8 +114,11 @@ Admin Page → Broadcast Tab
 | `domain/models/push_subscription.go` | PushSubscription model (user_id, endpoint, p256dh, auth) |
 | `domain/repository/push_subscription_repository.go` | Full CRUD for push subscriptions |
 | `domain/service/push_service.go` | Web Push delivery with webpush-go (20-worker semaphore) |
-| `domain/service/price_alert_service.go` | Price fluctuation detection (4 categories, Redis baselines) |
+| `domain/service/price_alert_service.go` | Price fluctuation detection (4 categories, Redis baselines, runtime config) |
+| `domain/service/price_alert_config.go` | Config model, defaults, validation, sanitization, Redis load/save, template resolution |
+| `domain/service/price_alert_config_test.go` | 14 unit tests for config model and helpers |
 | `handlers/admin_broadcast.go` | POST /api/v1/admin/broadcast handler |
+| `handlers/price_alert_config.go` | GET/PUT /api/v1/admin/price-alert-config handler |
 | `handlers/push.go` | GET/POST/DELETE push subscription handlers |
 | `internal/scheduler/price_alert_job.go` | 15-min scheduler job |
 | `cmd/migrate-price-alerts/main.go` | DB migration (metadata column + push_subscription table) |
@@ -117,6 +131,7 @@ Admin Page → Broadcast Tab
 | `features/community/hooks/usePushSubscription.ts` | SW registration, VAPID key, subscribe/unsubscribe |
 | `components/notifications/PushPermissionBanner.tsx` | Push opt-in banner with platform detection |
 | `features/admin/components/AdminBroadcastForm.tsx` | Admin broadcast form with char counter |
+| `features/admin/components/PriceAlertConfigForm.tsx` | Admin config form with accordion per-category settings |
 
 ## Modified Backend Files
 
@@ -127,11 +142,11 @@ Admin Page → Broadcast Tab
 | `domain/repository/notification_repository.go` | Implemented `BatchCreate` |
 | `domain/repository/user_repository.go` | Implemented `GetAllUserIDs` |
 | `domain/service/interfaces.go` | Added `PushService`, `PriceAlertService` interfaces, `Broadcast` to `AdminService` |
-| `domain/service/admin_service.go` | Added broadcast implementation with rate limiting + HTML stripping |
+| `domain/service/admin_service.go` | Added broadcast implementation with rate limiting + HTML stripping; uses configurable `broadcastTitle` from Redis config |
 | `domain/service/community_service.go` | Added metadata serialization for notifications |
 | `domain/service/services.go` | Added `Push` to Services, `PushSubscription` to Repositories |
-| `handlers/builder.go` | Wired `AdminBroadcast` and `Push` handlers |
-| `handlers/routes.go` | Added admin broadcast and push routes |
+| `handlers/builder.go` | Wired `AdminBroadcast`, `Push`, and `PriceAlertConfig` handlers |
+| `handlers/routes.go` | Added admin broadcast, push, and price-alert-config routes |
 | `internal/app/providers.go` | Added `PushSubscription` repo, `PriceAlertJob` to scheduler |
 | `api/protobuf/v1/community.proto` | Added `metadata` field + broadcast/push messages |
 
@@ -139,19 +154,21 @@ Admin Page → Broadcast Tab
 
 | File | Changes |
 |------|---------|
-| `components/notifications/NotificationItem.tsx` | Added price_alert + admin_broadcast rendering branches |
+| `components/notifications/NotificationItem.tsx` | Added price_alert + admin_broadcast rendering branches; added `priceDiff` to metadata, `broadcastTitle` to broadcast metadata |
 | `components/notifications/NotificationPanel.tsx` | Updated click routing for new notification types |
 | `features/community/hooks/useNotificationStream.ts` | Added metadata + actorId=0 handling in SSE |
-| `app/[locale]/dashboard/admin/page.tsx` | Added broadcast tab |
+| `app/[locale]/dashboard/admin/page.tsx` | Renamed "Broadcast" tab to "Notifications"; integrated PriceAlertConfigForm below AdminBroadcastForm |
 | `app/[locale]/dashboard/layout.tsx` | Added PushPermissionBanner |
-| `messages/en/admin.json` | Added broadcast translations |
-| `messages/vi/admin.json` | Added broadcast translations |
+| `messages/en/admin.json` | Added broadcast + price alert config translations |
+| `messages/vi/admin.json` | Added broadcast + price alert config translations |
 
 ## Documentation Updated
 
 | File | Changes |
 |------|---------|
-| `docs/architecture/flow-cross-cutting.md` | Added Price Alert Detection + Admin Broadcast sequence diagrams, updated scheduler job table |
+| `docs/architecture/flow-cross-cutting.md` | Added Price Alert Detection + Admin Broadcast + Admin Price Alert Config sequence diagrams, updated scheduler job table |
+| `docs/architecture/c4-component-backend.md` | Added PriceAlertConfigHandler, updated PriceAlertService description for runtime Redis config |
+| `docs/architecture/c4-component-frontend.md` | Updated admin page and admin feature descriptions for Notifications tab + PriceAlertConfigForm |
 | `Taskfile.yml` | Added `backend:migrate-price-alerts` task |
 
 ## Build Verification
@@ -174,12 +191,12 @@ Admin Page → Broadcast Tab
 | `VAPID_PUBLIC_KEY` | — | VAPID public key for Web Push |
 | `VAPID_PRIVATE_KEY` | — | VAPID private key (secret) |
 | `VAPID_CONTACT` | — | Contact email for VAPID |
-| `PRICE_ALERT_THRESHOLD_GOLD_VND` | `2.0` | Gold VND % threshold |
-| `PRICE_ALERT_THRESHOLD_GOLD_USD` | `1.5` | Gold USD % threshold |
-| `PRICE_ALERT_THRESHOLD_SILVER_VND` | `3.0` | Silver VND % threshold |
-| `PRICE_ALERT_THRESHOLD_SILVER_USD` | `2.0` | Silver USD % threshold |
-| `PRICE_ALERT_COOLDOWN_MINUTES` | `120` | Cooldown between alerts per category |
-| `PRICE_ALERT_TOP_MOVERS` | `3` | Max movers shown in alert |
+| `PRICE_ALERT_THRESHOLD_GOLD_VND` | `2.0` | Gold VND % threshold (fallback default; overridable via admin UI) |
+| `PRICE_ALERT_THRESHOLD_GOLD_USD` | `1.5` | Gold USD % threshold (fallback default; overridable via admin UI) |
+| `PRICE_ALERT_THRESHOLD_SILVER_VND` | `3.0` | Silver VND % threshold (fallback default; overridable via admin UI) |
+| `PRICE_ALERT_THRESHOLD_SILVER_USD` | `2.0` | Silver USD % threshold (fallback default; overridable via admin UI) |
+| `PRICE_ALERT_COOLDOWN_MINUTES` | `120` | Cooldown between alerts per category (fallback default; overridable via admin UI) |
+| `PRICE_ALERT_TOP_MOVERS` | `3` | Max movers shown in alert (fallback default; overridable via admin UI) |
 
 ## Deployment Steps
 
@@ -200,10 +217,19 @@ Admin Page → Broadcast Tab
 
 ### Admin Broadcast
 1. Log in as an admin user
-2. Navigate to `/dashboard/admin?tab=broadcast`
+2. Navigate to `/dashboard/admin?tab=notifications`
 3. Type a message (max 500 chars), click "Gửi thông báo"
 4. All users should see a blue notification in their notification panel
 5. Verify rate limit: after 10 broadcasts in 1 hour, the 11th should fail
+
+### Admin Price Alert Config
+1. Log in as an admin user
+2. Navigate to `/dashboard/admin?tab=notifications` — scroll below the broadcast form
+3. Config form should load with current settings (or defaults)
+4. Modify settings (cooldown, thresholds, enable/disable categories, templates)
+5. Save and verify success toast
+6. Reload page and verify settings persisted
+7. Backend unit tests: `cd src/go-backend && go test ./domain/service/ -run TestPriceAlertConfig -v`
 
 ### Web Push
 1. Visit any dashboard page — PushPermissionBanner should appear (if not dismissed)
@@ -219,6 +245,8 @@ Admin Page → Broadcast Tab
 3. ~~**E2E tests** not updated for new admin broadcast tab~~ — **FIXED**: Added 3 Playwright tests for broadcast tab (textarea, char counter, submit button)
 4. **VAPID key rotation** not implemented — keys are static once set (operational concern, deferred)
 5. **Push subscription cleanup** for expired/invalid subscriptions happens only on 410 responses during send — no periodic cleanup job (reactive cleanup is sufficient for now)
+6. **Config `stripHTML`** uses regex (`<[^>]*>`) which is adequate for admin-only input but could miss edge cases — consider a proper HTML parser for user-facing input
+7. **No E2E tests** for the admin price alert config form (Playwright)
 
 ## Fix History
 
@@ -237,3 +265,4 @@ Admin Page → Broadcast Tab
 | 2026-03-19 | Fix Apple `BadJwtToken` — the real root cause of push failures on Safari/iPhone: (1) strip `mailto:` prefix from VAPID_CONTACT before passing to webpush-go, which auto-prepends `mailto:` — double prefix `mailto:mailto:...` caused Apple to reject the VAPID JWT, (2) don't delete Apple subscriptions on 403 when body contains `BadJwtToken` (subscription is valid, JWT was broken), (3) update `.env.example` to use plain email without `mailto:` prefix | Minor | (this commit) |
 | 2026-03-19 | Fix push banner never showing on iOS: (1) the `permissionState === "unsupported"` hide check ran before the iOS install check, so on iOS Safari (where push APIs don't exist) the banner returned `null` before reaching the "install as PWA" prompt — moved the iOS install check before the unsupported guard, (2) added "Cài đặt" button to the iOS banner that opens a `BaseModal` with `InstallSteps` showing step-by-step PWA installation instructions (Share → Add to Home Screen), (3) on Android the button triggers `promptInstall()` for native install prompt | Minor | (this commit) |
 | 2026-03-19 | Fix price_alert notification click routing: changed `router.push` from `/dashboard/prices` to `/dashboard/home` in NotificationPanel | Minor | (this commit) |
+| 2026-03-19 | **Admin Price Alert Config UI** — Redis-backed admin configuration for price alerts. Backend: `price_alert_config.go` (config model with defaults/validation/sanitization/Redis load-save), refactored `PriceAlertService` to read config at runtime (thresholds, cooldown, topMoversCount, templates, per-category enable/disable), `AdminService.Broadcast` uses configurable `broadcastTitle`, new `PriceAlertConfigHandler` (GET/PUT `/admin/price-alert-config` with partial merge), 14 unit tests. Frontend: `PriceAlertConfigForm.tsx` (accordion per-category settings), renamed admin "Broadcast" tab to "Notifications" housing both broadcast form and config panel, added `priceDiff` to notification metadata, i18n translations (vi+en). Docs: updated C4 backend/frontend diagrams, added section 9 to flow-cross-cutting.md. | Enhancement | 804287a → a0823de (9 commits) |
