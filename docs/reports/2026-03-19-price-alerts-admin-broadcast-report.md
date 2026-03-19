@@ -221,4 +221,6 @@ Admin Page → Broadcast Tab
 |------|-----|----------|--------|
 | 2026-03-19 | Fix broken test compilation (admin_service_test.go 2→5 args, investment mock missing GetAllUserIDs) + add 6 Broadcast unit tests | Major | 451b405 |
 | 2026-03-19 | Add push_service_test.go (10 tests) + price_alert_service_test.go (6 tests) with miniredis | Major | 8995079 |
-| 2026-03-19 | Update C4 backend/frontend diagrams + README + E2E broadcast tests | Major | (this commit) |
+| 2026-03-19 | Update C4 backend/frontend diagrams + README + E2E broadcast tests | Major | 8498440 |
+| 2026-03-19 | Fix VAPID key fetch infinite loop: add error state to usePushSubscription hook, guard auto-subscribe effect in PushPermissionBanner against error state | Minor | (this commit) |
+| 2026-03-19 | Add VAPID + Price Alert env vars to `.env.example` with generation instructions and documentation | Minor | (this commit) |
