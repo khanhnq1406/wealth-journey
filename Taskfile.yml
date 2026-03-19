@@ -295,6 +295,42 @@ tasks:
     cmds:
       - npm install
 
+  # CI tasks (local)
+  ci:
+    desc: "Run all CI checks locally (backend + frontend + security)"
+    cmds:
+      - ./scripts/ci-local.sh all
+
+  ci:backend:
+    desc: "Run backend CI checks locally (lint + build + test)"
+    cmds:
+      - ./scripts/ci-local.sh backend
+
+  ci:backend-lint:
+    desc: "Run backend lint + build only (no DB needed)"
+    cmds:
+      - ./scripts/ci-local.sh backend-lint
+
+  ci:backend-test:
+    desc: "Run backend tests only (needs Docker for DB + Redis)"
+    cmds:
+      - ./scripts/ci-local.sh backend-test
+
+  ci:frontend:
+    desc: "Run frontend CI checks locally (lint + typecheck + test + build)"
+    cmds:
+      - ./scripts/ci-local.sh frontend
+
+  ci:frontend-e2e:
+    desc: "Run Playwright E2E tests locally"
+    cmds:
+      - ./scripts/ci-local.sh frontend-e2e
+
+  ci:security:
+    desc: "Run security checks locally (govulncheck + npm audit)"
+    cmds:
+      - ./scripts/ci-local.sh security
+
   # Deployment tasks
   deploy:backend:
     desc: "Deploy backend to production (Railway)"
