@@ -21,6 +21,7 @@ import { TransferMoneyForm } from "@/features/wallet/forms/TransferMoneyForm";
 import { CreateWalletForm } from "@/features/wallet/forms/CreateWalletForm";
 import { useSidebarState } from "@/hooks/useSidebarState";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { PushPermissionBanner } from "@/components/notifications/PushPermissionBanner";
 import { SidebarToggle } from "@/components/navigation/SidebarToggle";
 import { NavItem } from "@/components/navigation/NavItem";
 import { NavTooltip } from "@/components/navigation/NavTooltip";
@@ -673,6 +674,7 @@ export default function DashboardLayout({
             </header>
 
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-safe-mobile sm:pb-8 transition-all duration-300 ease-in-out pt-0 sm:pt-0 lg:pt-0">
+              <PushPermissionBanner />
               {children}
             </div>
           </main>

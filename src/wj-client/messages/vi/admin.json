@@ -6,7 +6,8 @@
       "tabs": {
         "seo": "SEO",
         "users": "Người dùng",
-        "feedback": "Phản hồi"
+        "feedback": "Phản hồi",
+        "broadcast": "Thông báo"
       },
       "loading": "Đang tải cài đặt..."
     },
@@ -97,6 +98,20 @@
         "updateFailed": "Không thể cập nhật phản hồi",
         "deleteSuccess": "Đã xóa phản hồi",
         "deleteFailed": "Không thể xóa phản hồi"
+      }
+    },
+    "broadcast": {
+      "title": "Gửi thông báo đến tất cả người dùng",
+      "form": {
+        "message": "Nội dung",
+        "messagePlaceholder": "Nhập nội dung thông báo...",
+        "charLabel": "ký tự",
+        "send": "Gửi thông báo",
+        "sending": "Đang gửi..."
+      },
+      "toast": {
+        "success": "Đã gửi thông báo đến {count} người dùng",
+        "error": "Không thể gửi thông báo"
       }
     },
     "pagination": {

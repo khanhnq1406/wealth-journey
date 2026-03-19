@@ -6,7 +6,8 @@
       "tabs": {
         "seo": "SEO",
         "users": "Users",
-        "feedback": "Feedback"
+        "feedback": "Feedback",
+        "broadcast": "Broadcast"
       },
       "loading": "Loading settings..."
     },
@@ -97,6 +98,20 @@
         "updateFailed": "Failed to update feedback",
         "deleteSuccess": "Feedback deleted",
         "deleteFailed": "Failed to delete feedback"
+      }
+    },
+    "broadcast": {
+      "title": "Send broadcast to all users",
+      "form": {
+        "message": "Message",
+        "messagePlaceholder": "Type your message...",
+        "charLabel": "characters",
+        "send": "Send broadcast",
+        "sending": "Sending..."
+      },
+      "toast": {
+        "success": "Broadcast sent to {count} users",
+        "error": "Failed to send broadcast"
       }
     },
     "pagination": {
