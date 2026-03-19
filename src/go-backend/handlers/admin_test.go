@@ -61,6 +61,10 @@ func (m *mockAdminService) DeleteFeedback(ctx context.Context, feedbackID int32)
 	return nil, nil
 }
 
+func (m *mockAdminService) Broadcast(ctx context.Context, adminUserID int32, message string) (int32, error) {
+	return 0, nil
+}
+
 // --- AdminUserHandler tests ---
 
 func TestAdminUserHandler_ListUsers_Success(t *testing.T) {

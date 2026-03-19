@@ -19,6 +19,7 @@ type pushPayload struct {
 	Body  string `json:"body"`
 	URL   string `json:"url"`
 	Icon  string `json:"icon"`
+	Tag   string `json:"tag"`
 }
 
 type pushService struct {
@@ -64,6 +65,7 @@ func (s *pushService) SendToUser(ctx context.Context, userID int32, title, body,
 		Body:  body,
 		URL:   url,
 		Icon:  "/icons/icon-192x192.png",
+		Tag:   "cdv-" + url,
 	})
 	if err != nil {
 		return err
@@ -81,7 +83,7 @@ func (s *pushService) SendToUser(ctx context.Context, userID int32, title, body,
 			VAPIDPublicKey:  s.vapidPublicKey,
 			VAPIDPrivateKey: s.vapidPrivate,
 			TTL:             86400,
-			Urgency:         webpush.UrgencyNormal,
+			Urgency:         webpush.UrgencyHigh,
 		})
 		if err != nil {
 			log.Printf("Push notification failed for endpoint %s: %v", sub.Endpoint[:min(50, len(sub.Endpoint))], err)
@@ -106,6 +108,7 @@ func (s *pushService) SendToAll(ctx context.Context, title, body, url string) er
 		Body:  body,
 		URL:   url,
 		Icon:  "/icons/icon-192x192.png",
+		Tag:   "cdv-" + url,
 	})
 	if err != nil {
 		return err
@@ -132,7 +135,7 @@ func (s *pushService) SendToAll(ctx context.Context, title, body, url string) er
 				VAPIDPublicKey:  s.vapidPublicKey,
 				VAPIDPrivateKey: s.vapidPrivate,
 				TTL:             86400,
-				Urgency:         webpush.UrgencyNormal,
+				Urgency:         webpush.UrgencyHigh,
 			})
 			if err != nil {
 				log.Printf("Push notification failed: %v", err)
@@ -150,7 +153,7 @@ func (s *pushService) SendToAll(ctx context.Context, title, body, url string) er
 // that persistently return 403 (Forbidden), which typically indicates
 // an invalid or revoked subscription rather than a transient VAPID error.
 func (s *pushService) handlePushResponse(ctx context.Context, resp *http.Response, endpoint string) {
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		return
@@ -161,12 +164,12 @@ func (s *pushService) handlePushResponse(ctx context.Context, resp *http.Respons
 		truncated = truncated[:50]
 	}
 
-	switch {
-	case resp.StatusCode == http.StatusGone: // 410
+	switch resp.StatusCode {
+	case http.StatusGone: // 410
 		log.Printf("Push subscription gone (410), removing: %s...", truncated)
 		_ = s.subRepo.DeleteByEndpoint(ctx, endpoint)
 
-	case resp.StatusCode == http.StatusForbidden: // 403
+	case http.StatusForbidden: // 403
 		// Read response body for diagnostics (Apple sometimes includes error details).
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 512))
 		log.Printf("Push endpoint returned HTTP 403 for %s... body=%s", truncated, string(body))

@@ -212,13 +212,13 @@ func newPriceAlertServiceWithMiniredis(
 // setBaseline seeds a baseline key in miniredis for the given typeCode.
 func setBaseline(mr *miniredis.Miniredis, typeCode string, price int64) {
 	key := fmt.Sprintf("price_alert:baseline:%s", typeCode)
-	mr.Set(key, fmt.Sprintf("%d", price))
+	_ = mr.Set(key, fmt.Sprintf("%d", price))
 }
 
 // setCooldown seeds a cooldown key in miniredis for the given category.
 func setCooldown(mr *miniredis.Miniredis, category string) {
 	key := fmt.Sprintf("price_alert:cooldown:%s", category)
-	mr.Set(key, "1")
+	_ = mr.Set(key, "1")
 }
 
 // baselineExists returns true when a baseline key exists in miniredis.

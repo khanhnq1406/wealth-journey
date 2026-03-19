@@ -159,8 +159,13 @@ Admin Page → Broadcast Tab
 | Check | Result |
 |-------|--------|
 | `go build ./...` | Pass |
+| `golangci-lint run ./...` | Pass |
 | `npx tsc --noEmit` | Pass |
-| Working tree | Clean |
+| `npm run lint` | Pass (0 errors, warnings only) |
+| `npx jest --ci` | Pass |
+| `npm run build` | Pass |
+| `govulncheck ./...` | Pass |
+| `npm audit --audit-level=critical` | Pass |
 
 ## Environment Variables (New)
 
@@ -227,3 +232,5 @@ Admin Page → Broadcast Tab
 | 2026-03-19 | Fix FK violation on `actor_id=0`: make `ActorID` nullable (`*int32`) for system notifications (price_alert, admin_broadcast), add migration to drop NOT NULL + re-add FK with ON DELETE SET NULL | Minor | (this commit) |
 | 2026-03-19 | Fix push notifications not showing as system popups: (1) remove `error` from subscribe() guard that permanently blocked retries after first failure, (2) add retry limit (3 attempts) to auto-subscribe in PushPermissionBanner, (3) add HTTP status logging for failed push deliveries, (4) add endpoint dedup (upsert) to prevent duplicate subscriptions | Minor | (this commit) |
 | 2026-03-19 | Fix Apple Web Push 403 errors: (1) add `Urgency: normal` header to all webpush requests (Apple requires it), (2) auto-remove Apple subscriptions returning 403 (invalid/expired), (3) read+log response body on 403 for diagnostics, (4) extract shared `handlePushResponse` method | Minor | (this commit) |
+| 2026-03-19 | Fix push notifications not showing as system notifications on iPhone PWA, Safari macOS, Chrome: (1) change `UrgencyNormal` → `UrgencyHigh` so Apple APNs delivers immediately instead of deferring (priority 10 vs 5), (2) always show fallback notification in SW even when payload is null/unparseable — Safari suppresses future pushes if SW `push` event doesn't call `showNotification`, (3) add `tag` + `renotify:true` to prevent OS notification suppression from stacking, (4) remove `vibrate` (unsupported on Safari/iOS) | Minor | (this commit) |
+| 2026-03-19 | Fix CI workflow failures: (1) `admin_test.go` — add missing `Broadcast()` to `mockAdminService` interface, (2) `push_service.go` — fix unchecked `resp.Body.Close()` + use tagged switch (errcheck/staticcheck), (3) `push_service_test.go` — replace `os.Setenv` with `t.Setenv` (errcheck), (4) `price_alert_service_test.go` — suppress `mr.Set` errcheck, (5) `PushPermissionBanner.tsx` — replace `setState`-in-effect with `useState` lazy initializer (react-hooks/set-state-in-effect), (6) `npm audit fix` — resolve critical jspdf vulnerability | Minor | (this commit) |

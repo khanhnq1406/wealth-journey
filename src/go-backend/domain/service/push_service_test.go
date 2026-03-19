@@ -65,14 +65,14 @@ func setVAPIDEnv(t *testing.T, pubKey, privKey, contact string) func() {
 	origPriv := os.Getenv("VAPID_PRIVATE_KEY")
 	origContact := os.Getenv("VAPID_CONTACT")
 
-	os.Setenv("VAPID_PUBLIC_KEY", pubKey)
-	os.Setenv("VAPID_PRIVATE_KEY", privKey)
-	os.Setenv("VAPID_CONTACT", contact)
+	t.Setenv("VAPID_PUBLIC_KEY", pubKey)
+	t.Setenv("VAPID_PRIVATE_KEY", privKey)
+	t.Setenv("VAPID_CONTACT", contact)
 
 	return func() {
-		os.Setenv("VAPID_PUBLIC_KEY", origPub)
-		os.Setenv("VAPID_PRIVATE_KEY", origPriv)
-		os.Setenv("VAPID_CONTACT", origContact)
+		t.Setenv("VAPID_PUBLIC_KEY", origPub)
+		t.Setenv("VAPID_PRIVATE_KEY", origPriv)
+		t.Setenv("VAPID_CONTACT", origContact)
 	}
 }
 

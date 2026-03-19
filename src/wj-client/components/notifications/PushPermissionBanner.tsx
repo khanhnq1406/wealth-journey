@@ -9,7 +9,7 @@ const PERMANENT_DISMISS_KEY = "push_banner_permanent_dismiss";
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 const MAX_AUTO_SUBSCRIBE_ATTEMPTS = 3;
 
-function isDismissed(): boolean {
+function getInitialDismissed(): boolean {
   if (typeof window === "undefined") return true;
   if (localStorage.getItem(PERMANENT_DISMISS_KEY) === "true") return true;
   const dismissedAt = localStorage.getItem(DISMISS_KEY);
@@ -20,12 +20,8 @@ function isDismissed(): boolean {
 export function PushPermissionBanner() {
   const { isSubscribed, subscribe, isLoading, error, permissionState } = usePushSubscription();
   const { isInstalled, platform } = usePWAInstall();
-  const [dismissed, setDismissed] = useState(true);
+  const [dismissed, setDismissed] = useState(getInitialDismissed);
   const autoSubscribeAttempts = useRef(0);
-
-  useEffect(() => {
-    setDismissed(isDismissed());
-  }, []);
 
   // Auto-subscribe if permission already granted but not subscribed (retry up to 3 times)
   useEffect(() => {
