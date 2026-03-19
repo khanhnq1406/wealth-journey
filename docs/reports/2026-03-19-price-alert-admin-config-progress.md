@@ -7,7 +7,7 @@
 - **Started:** 2026-03-19T17:00:00Z
 - **Last updated:** 2026-03-19T19:30:00Z
 - **Current state:** in_progress
-- **Current task:** 10
+- **Current task:** 11
 
 ## Task Progress
 
@@ -21,8 +21,8 @@
 | 6 | Backend unit tests for config and refactored service | done | f19ccb1 | 14 unit tests with miniredis |
 | 7 | Update frontend notification interfaces | done | 95d8461 | Added priceDiff to PriceAlertMetadata, broadcastTitle to BroadcastMetadata |
 | 8 | Add i18n translations for price alert config | done | 95d8461 | Vietnamese + English translations for all config form labels |
-| 9 | Create PriceAlertConfigForm component | done | pending | Accordion form with global + per-category settings |
-| 10 | Update admin page: rename tab and integrate form | pending | — | — |
+| 9 | Create PriceAlertConfigForm component | done | 3feea33 | Accordion form with global + per-category settings |
+| 10 | Update admin page: rename tab and integrate form | done | pending | Renamed broadcast→notifications tab, integrated both forms |
 | 11 | Update C4 architecture diagrams | pending | — | — |
 | 12 | Update runtime flow diagrams | pending | — | — |
 

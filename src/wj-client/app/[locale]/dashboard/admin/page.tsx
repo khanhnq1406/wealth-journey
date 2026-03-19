@@ -19,6 +19,7 @@ import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
 import { AdminUsersTab } from "@/features/admin/components/AdminUsersTab";
 import { AdminFeedbackTab } from "@/features/admin/components/AdminFeedbackTab";
 import { AdminBroadcastForm } from "@/features/admin/components/AdminBroadcastForm";
+import { PriceAlertConfigForm } from "@/features/admin/components/PriceAlertConfigForm";
 
 interface SiteSetting {
   key: string;
@@ -321,7 +322,7 @@ function AdminCMSContent() {
   );
 }
 
-type AdminTab = "seo" | "users" | "feedback" | "broadcast";
+type AdminTab = "seo" | "users" | "feedback" | "notifications";
 
 export default function AdminCMSPage() {
   const searchParams = useSearchParams();
@@ -334,7 +335,7 @@ export default function AdminCMSPage() {
     { id: "seo", label: t("page.tabs.seo") },
     { id: "users", label: t("page.tabs.users") },
     { id: "feedback", label: t("page.tabs.feedback") },
-    { id: "broadcast", label: t("page.tabs.broadcast") },
+    { id: "notifications", label: t("page.tabs.notifications") },
   ];
 
   const handleTabChange = (tab: AdminTab) => {
@@ -376,7 +377,13 @@ export default function AdminCMSPage() {
         {activeTab === "seo" && <AdminCMSContent />}
         {activeTab === "users" && <AdminUsersTab />}
         {activeTab === "feedback" && <AdminFeedbackTab />}
-        {activeTab === "broadcast" && <AdminBroadcastForm />}
+        {activeTab === "notifications" && (
+          <div className="space-y-8">
+            <AdminBroadcastForm />
+            <hr className="border-v2-border-light" />
+            <PriceAlertConfigForm />
+          </div>
+        )}
       </div>
     </AdminGuard>
   );
