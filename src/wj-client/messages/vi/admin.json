@@ -7,7 +7,8 @@
         "seo": "SEO",
         "users": "Người dùng",
         "feedback": "Phản hồi",
-        "broadcast": "Thông báo"
+        "broadcast": "Thông báo",
+        "notifications": "Thông báo"
       },
       "loading": "Đang tải cài đặt..."
     },
@@ -112,6 +113,44 @@
       "toast": {
         "success": "Đã gửi thông báo đến {count} người dùng",
         "error": "Không thể gửi thông báo"
+      }
+    },
+    "priceAlertConfig": {
+      "title": "Cấu hình cảnh báo giá",
+      "globalSettings": "Cài đặt chung",
+      "cooldownMinutes": "Thời gian chờ (phút)",
+      "cooldownHelp": "Thời gian tối thiểu giữa các cảnh báo cùng loại",
+      "topMoversCount": "Số lượng biến động hiển thị",
+      "topMoversHelp": "Số lượng sản phẩm biến động mạnh nhất trong thông báo",
+      "broadcastTitle": "Tiêu đề thông báo hệ thống",
+      "broadcastTitleHelp": "Tiêu đề cho thông báo broadcast từ admin",
+      "categorySettings": "Cài đặt theo loại",
+      "enabled": "Bật cảnh báo",
+      "thresholdPct": "Ngưỡng biến động (%)",
+      "titleTemplate": "Mẫu tiêu đề",
+      "bodyTemplate": "Mẫu nội dung",
+      "placeholderGuide": "Biến có thể sử dụng",
+      "placeholders": {
+        "moverName": "Tên sản phẩm (VD: SJC 1L-10L)",
+        "moverCode": "Mã sản phẩm (VD: SJL1L10)",
+        "direction": "Mũi tên (↑ hoặc ↓)",
+        "directionText": "Hướng (tăng hoặc giảm)",
+        "changePct": "% biến động (VD: 2.1)",
+        "priceDiff": "Chênh lệch giá (VD: 1,500,000)",
+        "category": "Tên loại (VD: Vàng trong nước)",
+        "moverCount": "Số sản phẩm biến động"
+      },
+      "save": "Lưu cài đặt",
+      "saving": "Đang lưu...",
+      "toast": {
+        "success": "Đã cập nhật cấu hình cảnh báo giá",
+        "error": "Không thể cập nhật cấu hình"
+      },
+      "categories": {
+        "gold_vnd": "Vàng trong nước (VND)",
+        "gold_usd": "Vàng thế giới (USD)",
+        "silver_vnd": "Bạc trong nước (VND)",
+        "silver_usd": "Bạc thế giới (USD)"
       }
     },
     "pagination": {

@@ -18,12 +18,14 @@ interface PriceAlertMetadata {
     name: string;
     direction: string;
     changePct: number;
+    priceDiff: number;
   }>;
 }
 
 interface BroadcastMetadata {
   message: string;
   adminName?: string;
+  broadcastTitle?: string;
 }
 
 function parseMetadata<T>(metadata?: string): T | null {
@@ -114,7 +116,7 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-vietnam text-sm text-v2-text-primary leading-snug font-medium">
-            Thông báo từ hệ thống
+            {meta?.broadcastTitle || "Thông báo từ hệ thống"}
           </p>
           {meta?.message && (
             <p className="mt-0.5 font-vietnam text-xs text-v2-text-secondary truncate">

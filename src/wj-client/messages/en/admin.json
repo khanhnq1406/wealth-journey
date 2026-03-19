@@ -7,7 +7,8 @@
         "seo": "SEO",
         "users": "Users",
         "feedback": "Feedback",
-        "broadcast": "Broadcast"
+        "broadcast": "Broadcast",
+        "notifications": "Notifications"
       },
       "loading": "Loading settings..."
     },
@@ -112,6 +113,44 @@
       "toast": {
         "success": "Broadcast sent to {count} users",
         "error": "Failed to send broadcast"
+      }
+    },
+    "priceAlertConfig": {
+      "title": "Price Alert Settings",
+      "globalSettings": "Global Settings",
+      "cooldownMinutes": "Cooldown (minutes)",
+      "cooldownHelp": "Minimum time between alerts of the same category",
+      "topMoversCount": "Top movers count",
+      "topMoversHelp": "Number of top movers included in notification",
+      "broadcastTitle": "System notification title",
+      "broadcastTitleHelp": "Title for admin broadcast notifications",
+      "categorySettings": "Per-Category Settings",
+      "enabled": "Enable alerts",
+      "thresholdPct": "Threshold (%)",
+      "titleTemplate": "Title template",
+      "bodyTemplate": "Body template",
+      "placeholderGuide": "Available placeholders",
+      "placeholders": {
+        "moverName": "Product name (e.g. SJC 1L-10L)",
+        "moverCode": "Product code (e.g. SJL1L10)",
+        "direction": "Arrow (↑ or ↓)",
+        "directionText": "Direction text (tăng or giảm)",
+        "changePct": "Change % (e.g. 2.1)",
+        "priceDiff": "Price difference (e.g. 1,500,000)",
+        "category": "Category name (e.g. Vàng trong nước)",
+        "moverCount": "Number of movers"
+      },
+      "save": "Save Settings",
+      "saving": "Saving...",
+      "toast": {
+        "success": "Price alert configuration updated",
+        "error": "Failed to update configuration"
+      },
+      "categories": {
+        "gold_vnd": "Domestic Gold (VND)",
+        "gold_usd": "World Gold (USD)",
+        "silver_vnd": "Domestic Silver (VND)",
+        "silver_usd": "World Silver (USD)"
       }
     },
     "pagination": {
