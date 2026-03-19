@@ -40,6 +40,7 @@ type priceMover struct {
 	ChangePct float64 `json:"changePct"`
 	Current   int64   `json:"current"`
 	Baseline  int64   `json:"baseline"`
+	PriceDiff int64   `json:"priceDiff"` // currentBuy - baseline
 }
 
 func NewPriceAlertService(
@@ -269,6 +270,7 @@ func (s *priceAlertService) checkPrice(ctx context.Context, typeCode string, cur
 		ChangePct: math.Round(changePct*100) / 100,
 		Current:   currentBuy,
 		Baseline:  baseline,
+		PriceDiff: currentBuy - baseline,
 	}
 }
 
