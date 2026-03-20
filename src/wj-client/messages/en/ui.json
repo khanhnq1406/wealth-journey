@@ -340,9 +340,7 @@
       "unitKG": "KG"
     },
     "quickActions": {
-      "addTransaction": "Add Transaction",
-      "transferMoney": "Transfer Money",
-      "createNewWallet": "Create New Wallet"
+      "addInvestment": "Add Investment"
     }
   },
   "symbolAutocomplete": {
