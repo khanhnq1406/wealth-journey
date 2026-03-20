@@ -1,29 +1,21 @@
-import { Plus_Jakarta_Sans, Be_Vietnam_Pro, JetBrains_Mono } from "next/font/google";
+import { Roboto, Roboto_Mono } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { locales } from '@/i18n/request';
 import { Providers } from "./providers";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-jakarta-sans",
-  weight: ["400", "500", "600"],
-  preload: true,
-  adjustFontFallback: false,
-});
-
-const beVietnamPro = Be_Vietnam_Pro({
+const roboto = Roboto({
   subsets: ["latin", "latin-ext", "vietnamese"],
-  variable: "--font-vietnam-pro",
-  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-roboto",
+  weight: ["400", "500", "700", "900"],
   preload: true,
   display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const robotoMono = Roboto_Mono({
   subsets: ["latin", "latin-ext", "vietnamese"],
-  variable: "--font-jetbrains-mono",
+  variable: "--font-roboto-mono",
   weight: ["400", "500", "600", "700"],
   preload: true,
   display: "swap",
@@ -89,7 +81,7 @@ export default async function LocaleLayout({
         <meta name="msapplication-TileColor" content="#d2a74b" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>
-      <body className={`${plusJakartaSans.variable} ${beVietnamPro.variable} ${jetbrainsMono.variable} antialiased h-dvh`}>
+      <body className={`${roboto.variable} ${robotoMono.variable} antialiased h-dvh`}>
         <NextIntlClientProvider messages={messages}>
           <Providers>{children}</Providers>
         </NextIntlClientProvider>

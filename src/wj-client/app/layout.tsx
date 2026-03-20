@@ -27,10 +27,7 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#d2a74b" },
-    { media: "(prefers-color-scheme: dark)", color: "#0F172A" },
-  ],
+  themeColor: "#5F0202",
 };
 
 export default function RootLayout({
