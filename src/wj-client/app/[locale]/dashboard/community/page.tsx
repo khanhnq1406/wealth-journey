@@ -134,7 +134,7 @@ export default function CommunityPage() {
   };
 
   return (
-    <div className="flex flex-col sm:h-full -mx-4 -mt-4 sm:-mx-6 sm:-mt-6 lg:-mx-8 lg:-mt-8">
+    <div className="flex flex-col sm:h-full -mx-4 sm:-mx-6 lg:-mx-8">
       {/* Mobile sub-navigation */}
       <div className="sm:hidden">
         <MobileSubNav
