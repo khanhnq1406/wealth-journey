@@ -8,7 +8,7 @@
 - **Started:** 2026-03-20T00:00:00Z
 - **Last updated:** 2026-03-20T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 8
+- **Current task:** 12
 
 ## Task Progress
 
@@ -22,10 +22,10 @@
 | 5   | Strip dark: Prefixed Classes                 | done    | ddf751d | Removed 1827 dark: classes from 101 files |
 | 6   | Restyle BaseCard Component                   | done    | a7ee88e | Maroon surface bg, gold top border accent, white text |
 | 7   | Restyle Button Component                     | done    | a7ee88e | Gold primary, gold-outlined secondary, gold ghost, gold focus rings |
-| 8   | Restyle Form Components                      | pending | —      | —       |
-| 9   | Restyle Modal, Toast, Feedback Components    | pending | —      | —       |
-| 10  | Restyle Navigation Components                | pending | —      | —       |
-| 11  | Restyle Dashboard Layout                     | pending | —      | —       |
+| 8   | Restyle Form Components                      | done    | 15d659b | 18 form components: dark maroon bg, gold accents, gold focus rings |
+| 9   | Restyle Modal, Toast, Feedback Components    | done    | 391e889 | BaseModal, BottomSheet, Toast, EmptyState, ErrorState, 5 skeletons |
+| 10  | Restyle Navigation Components                | done    | ecc9656 | BottomNav, NavItem, SidebarToggle, ActiveLink, Search, Select |
+| 11  | Restyle Dashboard Layout                     | done    | 9357d16 | Sidebar, mobile header, slide-out menu, top bar, avatars |
 | 12  | Restyle Landing Page Components              | pending | —      | —       |
 | 13  | Restyle Auth Pages                           | pending | —      | —       |
 | 14  | Restyle Dashboard Home Page                  | pending | —      | —       |
