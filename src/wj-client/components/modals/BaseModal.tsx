@@ -268,24 +268,6 @@ export function BaseModal({
 
   // Swipe gesture handlers for mobile with smooth 60fps animations
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    const target = e.target as HTMLElement;
-    const contentDiv = modalContentRef.current?.querySelector('[class*="overflow-y-auto"]');
-
-    // Check if touch started inside scrollable content
-    const isInsideScrollableContent = contentDiv?.contains(target);
-
-    // If inside scrollable content and content can scroll, allow native scroll
-    if (isInsideScrollableContent && contentDiv) {
-      const canScroll = contentDiv.scrollHeight > contentDiv.clientHeight;
-      const isAtTop = contentDiv.scrollTop === 0;
-
-      // Only enable swipe when at top of scroll AND dragging down
-      if (canScroll && !isAtTop) {
-        return; // Let native scroll handle it
-      }
-    }
-
-    // Only enable swipe on mobile (touch) devices
     const touch = e.touches[0];
     startY.current = touch.clientY;
     startX.current = touch.clientX;
@@ -293,7 +275,6 @@ export function BaseModal({
     startTime.current = Date.now();
     setIsDragging(true);
 
-    // Cancel any pending animation frame
     if (rafId.current !== null) {
       cancelAnimationFrame(rafId.current);
       rafId.current = null;
@@ -315,17 +296,8 @@ export function BaseModal({
         return;
       }
 
-      // Check if user is scrolling content
-      const contentDiv = modalContentRef.current?.querySelector('[class*="overflow-y-auto"]');
-      if (contentDiv && contentDiv.scrollTop > 0 && deltaY < 0) {
-        // User is scrolling up inside content, disable swipe
-        setIsDragging(false);
-        return;
-      }
-
-      // Only allow dragging downward (positive delta) AND when at top of scroll
+      // Only allow dragging downward
       if (deltaY > 0) {
-        // Use requestAnimationFrame for smooth 60fps updates
         if (rafId.current === null) {
           rafId.current = requestAnimationFrame(() => {
             setDragY(deltaY);
@@ -333,7 +305,6 @@ export function BaseModal({
           });
         }
 
-        // Prevent default scrolling during drag (only when dragging > 10px)
         if (e.cancelable && deltaY > 10) {
           e.preventDefault();
         }
@@ -513,13 +484,8 @@ export function BaseModal({
               !fullScreenOnMobile &&
               variant !== "full" &&
               "!max-h-[70vh]",
-            // Prevent touch actions like browser zoom/scroll during swipe
-            isDragging && "touch-none",
           )}
           onClick={(e) => e.stopPropagation()}
-          onTouchStart={closeOnSwipe ? handleTouchStart : undefined}
-          onTouchMove={closeOnSwipe ? handleTouchMove : undefined}
-          onTouchEnd={closeOnSwipe ? handleTouchEnd : undefined}
           style={
             isDragging && dragY > 0
               ? {
@@ -536,16 +502,21 @@ export function BaseModal({
         >
           {/* Mobile drag handle indicator - visible only on mobile and bottom sheet mode */}
           {bottomSheetOnMobile && !fullScreenOnMobile && variant !== "full" && (
-            <div className="sm:hidden flex justify-center pt-3 pb-2">
+            <div
+              data-testid="modal-drag-handle"
+              className="sm:hidden flex justify-center items-center min-h-[44px] cursor-grab active:cursor-grabbing touch-none"
+              onTouchStart={closeOnSwipe ? handleTouchStart : undefined}
+              onTouchMove={closeOnSwipe ? handleTouchMove : undefined}
+              onTouchEnd={closeOnSwipe ? handleTouchEnd : undefined}
+            >
               <div
                 className={cn(
                   "w-12 h-1.5 rounded-full transition-colors duration-200",
-                  // Visual feedback during drag
                   isDragging && dragY > 0
                     ? dragY > swipeThreshold
-                      ? "bg-danger-500 dark:bg-danger-600" // Red when close threshold reached
-                      : "bg-v2-red-primary" // Red while dragging
-                    : "bg-neutral-300 dark:bg-dark-border", // Gray at rest
+                      ? "bg-danger-500 dark:bg-danger-600"
+                      : "bg-v2-red-primary"
+                    : "bg-neutral-300 dark:bg-dark-border",
                 )}
               />
             </div>

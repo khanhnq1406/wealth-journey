@@ -162,15 +162,18 @@ export function BottomSheet({
           transform: transformValue,
           willChange: isOpen ? "transform" : "auto",
         }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
         role="dialog"
         aria-modal="true"
         aria-labelledby="bottom-sheet-title"
       >
-        {/* Handle bar - visual indicator for swipe */}
-        <div className="flex justify-center pt-3 pb-2 touch-none">
+        {/* Handle bar - swipe zone for dismissal */}
+        <div
+          data-testid="bottom-sheet-drag-handle"
+          className="flex justify-center items-center min-h-[44px] cursor-grab active:cursor-grabbing touch-none"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <div className="w-12 h-1.5 bg-neutral-300 dark:bg-neutral-600 rounded-full" />
         </div>
 
