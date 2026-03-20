@@ -140,4 +140,14 @@ describe("normalizeDecimalInput", () => {
     // Trailing comma = user starting to type decimal
     expect(normalizeDecimalInput("1000,")).toBe("1000.");
   });
+
+  test("converts non-thousand-separator comma to dot (standalone usage)", () => {
+    // normalizeDecimalInput correctly treats non-thousand-separator commas as decimal.
+    // This is correct for standalone inputs (like ErrorSection) that don't use
+    // thousand-separator formatting. For FormNumberInput, this function should NOT
+    // be used because the component inserts its own thousand-separator commas via
+    // useEffect, which would be misinterpreted by this function.
+    expect(normalizeDecimalInput("1,2345")).toBe("1.2345");
+    expect(normalizeDecimalInput("123,45")).toBe("123.45");
+  });
 });

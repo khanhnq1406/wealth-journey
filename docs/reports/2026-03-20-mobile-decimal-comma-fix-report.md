@@ -73,3 +73,9 @@ Added client-side input normalization that converts comma decimal separators to 
 6. Type a thousand-separated number (e.g., `1,000`)
 7. Verify the comma is preserved as a thousand separator
 8. Test the Import > Error Section amount field similarly
+
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-03-20 | Fix thousand-separator conflict: `normalizeDecimalInput` was called in `FormNumberInput.handleChange`, but the component's `useEffect` also inserts thousand-separator commas. When user typed digits after formatting (e.g., `1,234` → type `5` → browser sends `1,2345`), `normalizeDecimalInput` misinterpreted the formatting comma as a decimal separator → `1.2345`. Fix: replaced `normalizeDecimalInput` with comma-count comparison logic that detects user-typed commas vs formatting-inserted commas. | Minor | pending |
