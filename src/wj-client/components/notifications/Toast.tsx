@@ -3,7 +3,6 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
-import { useTheme } from "@/components/ThemeProvider";
 import { ZIndex } from "@/lib/utils/z-index";
 
 export type ToastVariant = "success" | "error" | "warning" | "info";
@@ -73,7 +72,6 @@ export function Toast({
   isClosing = false,
 }: ToastProps) {
   const t = useTranslations("common");
-  const { resolvedTheme } = useTheme();
   const [progress, setProgress] = useState(100);
   const [isPaused, setIsPaused] = useState(false);
   // Use lazy initialization to avoid Date.now() during render

@@ -8,7 +8,7 @@
 - **Started:** 2026-03-20T00:00:00Z
 - **Last updated:** 2026-03-20T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 4
+- **Current task:** 5
 
 ## Task Progress
 
@@ -18,7 +18,7 @@
 | 1   | Update Tailwind Config — Color Palette       | done    | —      | Migrated v2 colors, chart-v2, legacy aliases, primary scale, shadows to mihong.vn |
 | 2   | Font Migration — Roboto + Roboto Mono        | done    | —      | Replaced Jakarta Sans/Vietnam Pro/JetBrains with Roboto/Roboto Mono |
 | 3   | Update globals.css — Base Styles             | done    | —      | Updated CSS vars, removed dark mode CSS, maroon scrollbar/focus |
-| 4   | Remove ThemeProvider and ThemeToggle          | pending | —      | —       |
+| 4   | Remove ThemeProvider and ThemeToggle          | done    | —      | Deleted ThemeProvider/ThemeToggle, removed from providers.tsx and Toast |
 | 5   | Strip dark: Prefixed Classes                 | pending | —      | —       |
 | 6   | Restyle BaseCard Component                   | pending | —      | —       |
 | 7   | Restyle Button Component                     | pending | —      | —       |
