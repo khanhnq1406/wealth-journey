@@ -58,3 +58,35 @@ export function isValidNumberInput(value: string): boolean {
   const regex = /^-?\d{1,3}(,\d{3})*(\.\d*)?$|^-?\d+(\.\d*)?$/;
   return regex.test(value);
 }
+
+/**
+ * Normalize decimal input by converting comma to dot when the comma
+ * is used as a decimal separator (common on Vietnamese locale keyboards).
+ *
+ * Heuristic: A comma is treated as a thousand separator if it is followed
+ * by exactly 3 digits (and possibly more ",NNN" groups) until end-of-string.
+ * Otherwise it is treated as a decimal separator and converted to a dot.
+ *
+ * If the string already contains a dot, commas are left as-is (they must
+ * be thousand separators).
+ */
+export function normalizeDecimalInput(value: string): string {
+  if (!value) return value;
+
+  // If there's already a dot, commas are thousand separators — leave as-is
+  if (value.includes(".")) return value;
+
+  // If there's no comma, nothing to do
+  if (!value.includes(",")) return value;
+
+  // If the entire string matches a thousand-separated pattern, leave as-is
+  if (/^-?\d{1,3}(,\d{3})*$/.test(value)) {
+    return value;
+  }
+
+  // Otherwise, treat the last comma as a decimal separator
+  const lastCommaIndex = value.lastIndexOf(",");
+  const beforeLastComma = value.substring(0, lastCommaIndex);
+  const afterComma = value.substring(lastCommaIndex + 1);
+  return beforeLastComma + "." + afterComma;
+}

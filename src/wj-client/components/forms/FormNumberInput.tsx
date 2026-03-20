@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils/cn";
 import {
   formatNumberWithCommas,
   parseNumberWithCommas,
-  isValidNumberInput,
 } from "@/lib/utils/number-format";
 import {
   generateRecommendations,
@@ -125,13 +124,33 @@ export const FormNumberInput = ({
 
   // Handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
+    let inputValue = e.target.value;
 
     // Allow empty value
     if (inputValue === "") {
       setDisplayValue("");
       onChange("");
       return;
+    }
+
+    // Detect if the user just typed a comma (vi-VN keyboard decimal separator).
+    // Compare with previous displayValue to find what was inserted.
+    // If the new character is a comma and the input doesn't already have a dot,
+    // treat it as a decimal separator and convert to dot.
+    if (!inputValue.includes(".") && inputValue.includes(",")) {
+      // Count commas in new input vs old display value to detect user-typed comma
+      const oldCommaCount = (displayValue.match(/,/g) || []).length;
+      const newCommaCount = (inputValue.match(/,/g) || []).length;
+
+      if (newCommaCount > oldCommaCount) {
+        // User typed a new comma — treat as decimal separator.
+        // Convert the last comma (the newly typed one) to a dot,
+        // and strip all other commas (thousand separators from formatting).
+        const cursorCommaIdx = inputValue.lastIndexOf(",");
+        const before = inputValue.substring(0, cursorCommaIdx).replace(/,/g, "");
+        const after = inputValue.substring(cursorCommaIdx + 1).replace(/,/g, "");
+        inputValue = before + "." + after;
+      }
     }
 
     // Basic validation: only allow digits, decimal point, comma, and minus

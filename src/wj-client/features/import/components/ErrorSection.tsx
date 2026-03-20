@@ -8,6 +8,7 @@ import { Button } from "@/components/Button";
 import { cn } from "@/lib/utils/cn";
 import { ChevronDownIcon } from "@/components/icons";
 import { formatCurrencyImport } from "@/utils/currency-formatter";
+import { normalizeDecimalInput } from "@/lib/utils/number-format";
 
 export interface ErrorSectionProps {
   transactions: ParsedTransaction[];
@@ -129,11 +130,12 @@ export const ErrorSection = React.memo(function ErrorSection({
                     type="text"
                     inputMode="decimal"
                     value={formatAmount(tx.amount?.amount || 0, tx.amount?.currency || currency)}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const normalized = normalizeDecimalInput(e.target.value);
                       onTransactionUpdate(tx.rowNumber, {
-                        amount: { amount: parseAmount(e.target.value), currency },
-                      })
-                    }
+                        amount: { amount: parseAmount(normalized), currency },
+                      });
+                    }}
                     error={getFieldError(tx.validationErrors, "amount")}
                     placeholder="1,000,000"
                     size="sm"
