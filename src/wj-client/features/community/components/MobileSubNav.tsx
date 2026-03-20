@@ -25,7 +25,7 @@ export function MobileSubNav({ activeView = "feed", onViewChange }: MobileSubNav
   ];
 
   return (
-    <div className="bg-white border-b border-v2-border-light">
+    <div className="sticky top-0 z-[5] bg-white border-b border-v2-border-light">
       <div className="flex justify-around px-2 py-2">
         {tabs.map((tab) => (
           <button
