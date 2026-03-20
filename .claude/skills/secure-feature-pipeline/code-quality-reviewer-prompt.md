@@ -47,13 +47,32 @@ Task tool (general-purpose):
     - [ ] **Images**: Uses `next/image`, `OptimizedImage`, or `Avatar` — NOT plain `<img>` (unless user-uploaded content with unpredictable dimensions)
     - [ ] **Imports**: Direct imports (`import { Button } from "@/components/Button"`) — NOT barrel file imports
     - [ ] **Component reuse**: Shared components from `components/` reused (not recreated) — BaseCard, Button, Form*, Modal, etc.
-    - [ ] **Icons**: SVG from `components/icons/` — NOT emojis
+    - [ ] **Icons**: SVG from `components/icons/` or `lucide-react` — NOT emojis
     - [ ] **Responsive**: Mobile-first styles (unprefixed = mobile), `sm:` breakpoint at 800px, 2-3 breakpoints max per property
     - [ ] **Touch targets**: >= 44x44px on mobile, `cursor-pointer` on interactive elements
     - [ ] **No async waterfalls**: Independent fetches use `Promise.all()`, not sequential await
     - [ ] **Dynamic imports**: Heavy components (charts, large modals) use `next/dynamic`
     - [ ] **Feature modules**: Feature-specific code in `features/<domain>/` — no cross-feature imports
     - [ ] **Contrast**: Text contrast >= 4.5:1, hover/focus states visible
+
+    ### Component Duplication Detection (ACTIVE — go beyond the checklist above)
+
+    **You MUST actively search for duplication, not just check a list.**
+
+    1. **Scan new components** — For each new `.tsx` file created, search `components/` for an existing component with similar name or purpose
+    2. **Scan inline styling patterns** — Look for Tailwind class combinations that match existing component output:
+       - `bg-white rounded-md drop-shadow-round` → Should use `<BaseCard>`
+       - `animate-spin` or custom spinner → Should use `<LoadingSpinner>`
+       - Modal overlay with `fixed inset-0` backdrop → Should use `<BaseModal>`
+       - `<select>` or `<input>` elements → Should use `<FormSelect>`, `<FormInput>`
+       - Empty state messages ("No data", "Nothing here") → Should use `<EmptyState>`
+       - Error display with retry → Should use `<ErrorState>`
+    3. **Check new components in `features/`** — If a new component could serve 2+ features, flag it as candidate for `components/` (shared)
+    4. **Check component extension** — If a new component is 80%+ similar to an existing one, flag: "Should extend existing component with new props instead of duplicating"
+
+    **Report format for duplication findings:**
+    - PASS: No component duplication found
+    - FAIL: [list each duplication with file:line, what existing component should be used, and why]
 
     ### Go Quality (Backend)
     - [ ] Error handling first (early returns)

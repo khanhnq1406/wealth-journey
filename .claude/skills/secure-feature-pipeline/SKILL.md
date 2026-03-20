@@ -293,7 +293,7 @@ Before proposing new components, check what already exists and can be reused:
 | --------------- | ------------------------------------------------------------------- | -------- |
 | [describe need] | [component name or "NEW — create in features/<domain>/components/"] | [path]   |
 
-**Shared components reference** (`components/`): BaseCard, Button, FormInput, FormSelect, FormNumberInput, FormDatePicker, FormToggle, FormTextarea, FormCreatableSelect, FormWizard, BaseModal, ConfirmationDialog, Success, MobileTable, TanStackTable, BarChart, LineChart, DonutChart, Sparkline, EmptyState, ErrorState, Toast, LoadingSpinner, FullPageLoading, Skeleton, BottomNav, ActiveLink, FloatingActionButton, SVG icons (components/icons/)
+**Shared components reference** (`components/`): BaseCard, Button, FormInput, FormSelect, FormNumberInput, FormDatePicker, FormToggle, FormTextarea, FormCreatableSelect, FormWizard, BaseModal, ConfirmationDialog, Success, MobileTable, TanStackTable, BarChart, LineChart, DonutChart, Sparkline, EmptyState, ErrorState, Toast, LoadingSpinner, FullPageLoading, Skeleton, BottomNav, ActiveLink, FloatingActionButton, SVG icons (components/icons/ or lucide-react)
 
 **Image components**: `OptimizedImage` (blur placeholder + fallback), `Avatar` (pre-sized: xs/sm/md/lg/xl/full) — both from `components/OptimizedImage.tsx`. Use `next/image` directly for static assets.
 
@@ -372,12 +372,13 @@ Before proposing new components, check what already exists and can be reused:
 
 1. **Read the spec file completely**
 2. **Explore codebase** — Identify exact files to create/modify
-3. **Break into tasks** — Each task is 2-5 minutes of work
-4. **Order tasks** — Dependencies first, then parallel-safe tasks
-5. **Write security notes per task** — What validation, authorization, or sanitization is needed
-6. **Include C4 diagram updates** — Add a task for updating/creating architecture diagrams per the spec
-7. **Include runtime flow diagram updates** — Add a task for creating/updating flow diagrams per the spec
-8. **Write the plan file**
+3. **Audit existing components (for frontend tasks)** — Run `Glob("src/wj-client/components/**/*.tsx")` and `Grep` for UI keywords matching the feature. Fill the "Component Reuse Inventory" table in the plan. Justify any new components.
+4. **Break into tasks** — Each task is 2-5 minutes of work
+5. **Order tasks** — Dependencies first, then parallel-safe tasks
+6. **Write security notes per task** — What validation, authorization, or sanitization is needed
+7. **Include C4 diagram updates** — Add a task for updating/creating architecture diagrams per the spec
+8. **Include runtime flow diagram updates** — Add a task for creating/updating flow diagrams per the spec
+9. **Write the plan file**
 
 ### GitNexus-Informed Task Ordering (if index available)
 
@@ -411,6 +412,25 @@ Save to: `docs/plans/YYYY-MM-DD-<feature>-plan.md`
 - Authorization: [resource ownership checks]
 - Input validation: [server-side validation strategy]
 - Data sanitization: [XSS, injection prevention]
+
+## Component Reuse Inventory (Frontend Tasks)
+
+**Existing components to reuse:**
+
+| Component | Location | Usage in This Feature |
+|-----------|----------|-----------------------|
+| [e.g. BaseCard] | [e.g. components/cards/] | [e.g. Wrapping dashboard summary cards] |
+| [e.g. FormNumberInput] | [e.g. components/forms/] | [e.g. Amount input in transfer form] |
+| ... | ... | ... |
+
+**New components needed (with justification):**
+
+| Component | Location | Justification |
+|-----------|----------|---------------|
+| [e.g. PriceChart] | [e.g. features/market-prices/components/] | Feature-specific; no existing chart fits XY price-over-time with tooltip |
+| ... | ... | ... |
+
+> **How to fill this table:** During Step 2 (Plan), run `Glob("src/wj-client/components/**/*.tsx")` and `Grep` for keywords matching the feature's UI needs. Read candidate component source to verify props/behavior. Only list a new component if no existing one fits — and explain why.
 
 ## C4 Architecture Diagram Updates
 
@@ -507,15 +527,28 @@ For tasks involving frontend/UI work, include these additional steps:
 
 **Security notes:** [Task-specific security concerns]
 
-**Step 0: Component inventory check**
-Search existing components before creating new ones:
+**Step 0: Component inventory check (MANDATORY — run these commands)**
 
-- [ ] Checked `components/` for reusable shared components
-- [ ] Checked `features/<domain>/components/` for feature components
-- [ ] Checked `components/icons/` for SVG icons (not emojis)
+```bash
+# 1. Scan all shared components
+Glob("src/wj-client/components/**/*.tsx")
+
+# 2. Search for keywords matching this task's UI needs
+Grep("<keyword>") in src/wj-client/components/  # e.g. "card", "modal", "table", "spinner"
+
+# 3. Check feature-level components
+Glob("src/wj-client/features/<domain>/components/**/*.tsx")
+
+# 4. Read source of any candidate match to verify props/behavior
+```
+
+- [ ] Ran Glob on `components/` and `features/<domain>/components/`
+- [ ] Searched for keywords matching UI elements needed
+- [ ] Read source of candidate components to verify fit
+- [ ] Checked `components/icons/` and `lucide-react` for icons (not emojis)
 - [ ] Checked `components/OptimizedImage.tsx` for image needs (OptimizedImage, Avatar)
-- Reusing: [list components to reuse]
-- Creating new: [list with justification]
+- Reusing: [list components to reuse, with import path]
+- Creating new: [list with justification — why no existing component fits]
 
 **Step 1: Write the failing test**
 [Component test with React Testing Library]

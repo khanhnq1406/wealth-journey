@@ -53,22 +53,43 @@ Task tool (general-purpose):
        - Functional `setState` — `setState(prev => ({...prev, field: value}))`
        - `"use client"` only where needed — keep server components where possible
 
-    ### Component Reuse (MANDATORY — Check Before Creating)
+    ### Component Reuse (MANDATORY — Active Search Before Creating)
 
-    **Before creating ANY new component, search the existing codebase:**
+    **BEFORE creating ANY new UI element, you MUST run these searches:**
 
-    1. **Shared components** (`components/`) — 29 subdirectories of reusable UI:
-       - Cards: `BaseCard` | Buttons: `Button`, `FloatingActionButton` | Forms: `FormInput`, `FormSelect`, `FormNumberInput`, `FormDatePicker`, `FormToggle`, `FormTextarea`, `FormCreatableSelect`, `FormWizard` | Modals: `BaseModal`, `ConfirmationDialog`, `Success` | Tables: `MobileTable`, `TanStackTable`, `VirtualizedTransactionList` | Charts: `BarChart`, `LineChart`, `DonutChart`, `Sparkline` | Feedback: `EmptyState`, `ErrorState`, `Toast` | Loading: `LoadingSpinner`, `FullPageLoading`, `Skeleton` | Navigation: `BottomNav`, `ActiveLink`, `SidebarToggle`
-    2. **Feature components** (`features/<domain>/components/`) — Feature-specific components
-    3. **Icons** (`components/icons/`) — Comprehensive SVG library (actions, finance, navigation, ui)
+    1. Run `Glob("src/wj-client/components/**/*.tsx")` — scan ALL shared components
+    2. Run `Grep("<keyword>")` in `src/wj-client/components/` for similar functionality (e.g., search "modal", "card", "spinner", "select", "input", "table", "chart", "loading", "empty", "error")
+    3. Check `features/<domain>/components/` for feature-level reusable pieces
+    4. Read the source of any component that looks like a match — verify props and behavior
+
+    **Known shared components** (`components/`) — 29 subdirectories:
+    - Cards: `BaseCard` | Buttons: `Button`, `FloatingActionButton` | Forms: `FormInput`, `FormSelect`, `FormNumberInput`, `FormDatePicker`, `FormToggle`, `FormTextarea`, `FormCreatableSelect`, `FormWizard` | Modals: `BaseModal`, `ConfirmationDialog`, `Success` | Tables: `MobileTable`, `TanStackTable`, `VirtualizedTransactionList` | Charts: `BarChart`, `LineChart`, `DonutChart`, `Sparkline` | Feedback: `EmptyState`, `ErrorState`, `Toast` | Loading: `LoadingSpinner`, `FullPageLoading`, `Skeleton` | Navigation: `BottomNav`, `ActiveLink`, `SidebarToggle` | Icons: `components/icons/` (project SVG library) or `lucide-react` (general-purpose icons)
+
+    **Anti-patterns — THESE ARE VIOLATIONS (fix immediately if you catch yourself doing them):**
+    - ❌ `<div className="bg-white rounded-md drop-shadow-round">` → Use `<BaseCard>`
+    - ❌ Custom spinner or loading div → Use `<LoadingSpinner>` or `<Skeleton>`
+    - ❌ Hand-rolled modal with overlay + `useState` → Use `<BaseModal>`
+    - ❌ Inline `<select>` or raw `<input>` → Use `<FormSelect>`, `<FormInput>`, `<FormNumberInput>`
+    - ❌ Emoji as icon (📊 💰 ✅) → Use SVG from `components/icons/` or `lucide-react`
+    - ❌ Raw `<img>` tag → Use `next/image` or `<OptimizedImage>` / `<Avatar>`
+    - ❌ Custom empty state message → Use `<EmptyState>`
+    - ❌ Inline error display → Use `<ErrorState>` or project error patterns
+    - ❌ New button component → Use `<Button>` with existing `ButtonType` variants
+    - ❌ Duplicating a component with minor style changes → Extend existing component with new props instead
 
     **Decision flow:**
     - Need a form field? → Use `components/forms/Form*` components
     - Need a modal? → Use `BaseModal` + component-level state pattern
-    - Need an icon? → Use SVG from `components/icons/` (NEVER emojis)
+    - Need an icon? → Use SVG from `components/icons/` or `lucide-react` (NEVER emojis)
     - Need a card layout? → Use `BaseCard`
     - Need loading/empty/error states? → Use `components/loading/` or `components/feedback/`
-    - None of the above fit? → Create in `features/<domain>/components/` (feature-specific) or `components/<category>/` (shared across features)
+    - None of the above fit? → Then decide WHERE to create:
+
+    **When to create a NEW component (and where):**
+    - Needed by **2+ features** → Create in `components/<category>/` (shared)
+    - Needed by **1 feature only** → Create in `features/<domain>/components/` (feature-specific)
+    - It's a **variant** of an existing component → **EXTEND** the existing component by adding props — do NOT duplicate
+    - **Document justification** in your report: why no existing component fits
 
     ### Image Handling (MANDATORY)
 
@@ -96,7 +117,7 @@ Task tool (general-purpose):
     - [ ] Desktop layout works at 1024px+ (using `sm:` breakpoint at 800px)
     - [ ] Color contrast ≥ 4.5:1 for normal text
     - [ ] All interactive elements have `cursor-pointer`
-    - [ ] No emojis used as icons (use SVG from `components/icons/`)
+    - [ ] No emojis used as icons (use SVG from `components/icons/` or `lucide-react`)
     - [ ] Hover/focus states visible
     - [ ] Images use `next/image` or `OptimizedImage`/`Avatar` (not plain `<img>` unless justified)
     - [ ] Direct imports used (not barrel file imports)
