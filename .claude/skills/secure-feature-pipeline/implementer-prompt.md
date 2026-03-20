@@ -162,6 +162,26 @@ Task tool (general-purpose):
     - [ ] No hardcoded secrets or credentials
     - [ ] XSS prevention: user input is escaped before rendering
 
+    ## GitNexus Tools (Available for Dependency Analysis)
+
+    If the GitNexus index is available, use these tools to improve your implementation:
+
+    **During TDD (when debugging test failures):**
+    - `gitnexus_query({query: "<error or symptom>"})` — find related execution flows
+    - `gitnexus_context({name: "<function>"})` — see callers/callees to understand data flow
+
+    **After implementation (before reporting):**
+    - `gitnexus_detect_changes({scope: "staged"})` — verify your changes only affect expected areas
+    - `gitnexus_impact({target: "<changed symbol>", direction: "upstream"})` — check if upstream callers need updates
+
+    **During refactoring:**
+    - `gitnexus_rename({symbol_name: "old", new_name: "new", dry_run: true})` — preview all rename edits
+    - `gitnexus_impact` before any extraction or restructuring
+
+    **Include in your report:** If you used GitNexus tools, add a "Dependency Impact" section showing affected flows and whether they're covered by tests.
+
+    > If GitNexus is not indexed, skip this section. These tools are additive — TDD and security checks remain mandatory regardless.
+
     ## Before Reporting Back: Self-Review
 
     Review your work with fresh eyes:

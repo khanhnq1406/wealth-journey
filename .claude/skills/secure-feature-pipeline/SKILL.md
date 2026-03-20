@@ -103,6 +103,18 @@ Use parallel exploration agents to read:
 - Related frontend pages and components
 - Existing tests for the affected area
 
+### GitNexus Dependency Analysis (if index available)
+
+Before proposing approaches, use GitNexus to understand the execution landscape:
+
+1. `gitnexus_query({query: "<feature domain>"})` — find related execution flows and symbols
+2. `gitnexus_context({name: "<key symbol>"})` — see callers/callees for symbols you plan to modify
+3. `gitnexus_impact({target: "<symbol>", direction: "upstream"})` — map blast radius of planned changes
+
+**Why:** Proposing an approach without understanding downstream dependencies leads to underestimated scope and missed regression risks.
+
+> If GitNexus is not indexed: skip this and note "GitNexus not available" in the spec. Run `npx gitnexus analyze` to index.
+
 ### Question Guidelines
 
 - **One question at a time** — Don't overwhelm
@@ -366,6 +378,16 @@ Before proposing new components, check what already exists and can be reused:
 6. **Include C4 diagram updates** — Add a task for updating/creating architecture diagrams per the spec
 7. **Include runtime flow diagram updates** — Add a task for creating/updating flow diagrams per the spec
 8. **Write the plan file**
+
+### GitNexus-Informed Task Ordering (if index available)
+
+After breaking the feature into tasks, use GitNexus to validate ordering:
+
+1. For each task's target files/symbols: `gitnexus_impact({target: "<symbol>", direction: "upstream"})` — identify d=1 dependents
+2. Tasks that modify symbols with many upstream dependents should come AFTER tasks that modify leaf symbols
+3. Add "Affected flows" to each task's notes in the plan — helps reviewers know what to regression-test
+
+> This is additive — don't skip the existing task breakdown process. GitNexus refines ordering, it doesn't replace planning. If GitNexus is not indexed, skip this subsection.
 
 ### Plan File Structure
 
@@ -811,6 +833,39 @@ Save to: `docs/reports/YYYY-MM-DD-<feature>-report.md`
 
 ## How to Test
 
+### Unit & Integration Tests
+
+[Test commands and expected results]
+
+### Dependency Impact Verification (GitNexus)
+
+Run after implementation to verify blast radius is covered:
+
+1. **Map affected flows:**
+   ```
+   # In the project root (requires GitNexus index)
+   # Use gitnexus_detect_changes({scope: "staged"}) via MCP
+   ```
+   - Lists all execution flows affected by your changes
+   - Each affected flow should have corresponding test coverage
+
+2. **Verify upstream dependents:**
+   ```
+   # For each key changed symbol:
+   # Use gitnexus_impact({target: "<symbol>", direction: "upstream"}) via MCP
+   ```
+   - d=1 dependents (WILL BREAK) must be tested or verified compatible
+   - d=2 dependents (LIKELY AFFECTED) should be regression-tested
+
+3. **Coverage gap check:**
+   | Changed Symbol | d=1 Dependents | Tested? | Notes |
+   |---|---|---|---|
+   | [symbol] | [callers] | Yes/No | [explanation if untested] |
+
+> If GitNexus is not indexed, skip this section and note "GitNexus not available — manual blast radius review performed."
+
+### Manual Testing Steps
+
 [Manual testing steps for verification]
 ```
 
@@ -884,6 +939,12 @@ If a session is lost to context compaction or you're starting a new session to c
    - `docs/architecture/README.md` updated if new flow files were created
    - Mermaid syntax renders correctly
 
+   e. **Dependency Impact Review** (if GitNexus index available) — Use `./impact-reviewer-prompt.md` for automated blast radius verification:
+   - Run `gitnexus_detect_changes({scope: "staged"})` to map all affected execution flows
+   - Run `gitnexus_impact` on each changed symbol to find d=1/d=2 dependents
+   - Cross-reference against tests written — flag untested affected flows
+   - Verify no d=1 callers were missed by the implementation
+
 5. **Compile verdict:**
    - **APPROVED** — All reviews pass, ready for production
    - **ISSUES FOUND** — List specific issues with severity and file:line references
@@ -908,6 +969,10 @@ If a session is lost to context compaction or you're starting a new session to c
 ### Architecture Diagrams: [PASS / FAIL]
 
 [C4 + runtime flow diagram updates]
+
+### Dependency Impact: [PASS / FAIL / SKIPPED — no GitNexus index]
+
+[Blast radius analysis, untested affected flows, missed callers]
 
 ### Issues (if any)
 
@@ -1087,6 +1152,8 @@ Use when ANY of these are true:
 - Storing API keys or secrets in code instead of environment variables
 - Missing audit logging for financial operations
 - No graceful degradation when external services fail
+- Skipping dependency impact analysis when GitNexus index is available ("I already know what my changes affect")
+- Claiming "tests cover everything" without running `gitnexus_detect_changes` to verify blast radius (when index is available)
 - Implementing multi-step business logic without creating/updating runtime flow diagrams
 - Using plain `<img>` tags instead of `next/image` / `OptimizedImage` / `Avatar` without justification
 - Creating new components without checking if `components/` already has a suitable one
@@ -1105,6 +1172,7 @@ Use when ANY of these are true:
 - `./security-checklist.md` — Security analysis checklist for brainstorm step
 - `./security-audit-prompt.md` — Full security audit template for review step
 - `./code-quality-reviewer-prompt.md` — Code quality reviewer template
+- `./impact-reviewer-prompt.md` — Dependency impact reviewer template (GitNexus-powered)
 
 ## Integration
 
@@ -1118,6 +1186,9 @@ Use when ANY of these are true:
 
 - **Any UI/frontend work** → `ui-ux-pro-max` skill (design system, color, typography, accessibility, component patterns) + `responsive-design` skill (mobile-first Tailwind breakpoints, container queries) + `react-best-practices` skill (performance: waterfalls, bundle size, re-renders, next/image)
 - **C4 or architecture diagrams** → `c4-architecture` skill (Mermaid C4 syntax, element types, best practices)
+- **Codebase exploration & dependency analysis** → `gitnexus-exploring` skill (execution flow tracing, cluster analysis, symbol context) + `gitnexus-impact-analysis` skill (blast radius, dependency mapping, pre-commit change detection)
+- **Debugging & refactoring during implementation** → `gitnexus-debugging` skill (error tracing, call chain analysis) + `gitnexus-refactoring` skill (safe rename, extract, split with impact verification)
+- **PR/implementation review** → `gitnexus-pr-review` skill (automated blast radius check, missing caller detection, process flow verification)
 
 **Subagents should follow:**
 

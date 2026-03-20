@@ -10,6 +10,41 @@
       "source": "mindrally/skills",
       "sourceType": "github",
       "computedHash": "16c5f5bafd768c74bbf75b69b2d73c7fe2f2915ce57774ae4c6d7b285fd5d357"
+    },
+    "gitnexus-cli": {
+      "source": "abhigyanpatwari/gitnexus",
+      "sourceType": "github",
+      "computedHash": "d4b03df81c8f30b82a5c9237fee20d0dd5efa456188d47d2e1522afb4f57eaa5"
+    },
+    "gitnexus-debugging": {
+      "source": "abhigyanpatwari/gitnexus",
+      "sourceType": "github",
+      "computedHash": "3b096801e001223de33405962c75fdeee5b6af7e6b42a79644c9f835b0ed7071"
+    },
+    "gitnexus-exploring": {
+      "source": "abhigyanpatwari/gitnexus",
+      "sourceType": "github",
+      "computedHash": "8d3aa1c7e009238e07a77cab1932e6bdb345814f7dbddb2abbe89ac443c49345"
+    },
+    "gitnexus-guide": {
+      "source": "abhigyanpatwari/gitnexus",
+      "sourceType": "github",
+      "computedHash": "0e663671ebbdd476ed97b4086d2736490787c99b30fd61dc8999e6564fdd038b"
+    },
+    "gitnexus-impact-analysis": {
+      "source": "abhigyanpatwari/gitnexus",
+      "sourceType": "github",
+      "computedHash": "15c7f2f6c04e8c1c2687bd4c08635162499f64b1bf257e87866c233504b1e67c"
+    },
+    "gitnexus-pr-review": {
+      "source": "abhigyanpatwari/gitnexus",
+      "sourceType": "github",
+      "computedHash": "99b5242de32fd429e4e98e354e5df88664042d1eecb3b28de92acd905146894b"
+    },
+    "gitnexus-refactoring": {
+      "source": "abhigyanpatwari/gitnexus",
+      "sourceType": "github",
+      "computedHash": "ebc60a8570c754cf2274368c890646c3ce7ef96561051a78d36bfb392514627f"
     }
   }
 }
