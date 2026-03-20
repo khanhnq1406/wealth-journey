@@ -356,7 +356,7 @@ export function PerformanceMonitor({
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {visible ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-2 w-64 text-sm">
+ <div className="bg-white rounded-lg shadow-lg p-4 mb-2 w-64 text-sm">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold">Performance</h3>
             <button
@@ -372,7 +372,7 @@ export function PerformanceMonitor({
           {metrics.score !== undefined && (
             <div className="mb-3">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-gray-600 dark:text-gray-400">Score</span>
+ <span className="text-gray-600">Score</span>
                 <span className="font-bold">{score}</span>
               </div>
               <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -384,7 +384,7 @@ export function PerformanceMonitor({
           <div className="space-y-2">
             {metrics.cls !== undefined && (
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">CLS</span>
+ <span className="text-gray-600">CLS</span>
                 <span className={getRating(metrics.cls, { good: 0.1, needsImprovement: 0.25 }) === "good" ? "text-v2-green-positive" : "text-yellow-600"}>
                   {metrics.cls.toFixed(3)}
                 </span>
@@ -392,7 +392,7 @@ export function PerformanceMonitor({
             )}
             {metrics.inp !== undefined && (
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">INP</span>
+ <span className="text-gray-600">INP</span>
                 <span className={getRating(metrics.inp, { good: 200, needsImprovement: 500 }) === "good" ? "text-v2-green-positive" : "text-yellow-600"}>
                   {metrics.inp.toFixed(0)}ms
                 </span>
@@ -400,7 +400,7 @@ export function PerformanceMonitor({
             )}
             {metrics.lcp !== undefined && (
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">LCP</span>
+ <span className="text-gray-600">LCP</span>
                 <span className={getRating(metrics.lcp, { good: 2500, needsImprovement: 4000 }) === "good" ? "text-v2-green-positive" : "text-yellow-600"}>
                   {(metrics.lcp / 1000).toFixed(2)}s
                 </span>
@@ -408,8 +408,8 @@ export function PerformanceMonitor({
             )}
             {metrics.memoryUsed !== undefined && (
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Memory</span>
-                <span className="text-gray-800 dark:text-gray-200">
+ <span className="text-gray-600">Memory</span>
+ <span className="text-gray-800">
                   {metrics.memoryUsed}MB
                 </span>
               </div>

@@ -80,13 +80,13 @@ const Notification = memo(function Notification({ notification }: NotificationPr
         </h2>
 
         {/* Message */}
-        <p className="text-neutral-900 dark:text-dark-text text-base font-medium">
+ <p className="text-neutral-900 text-base font-medium">
           {notification.message}
         </p>
 
         {/* Sub-message */}
         {notification.submessage && (
-          <p className="text-neutral-600 dark:text-neutral-400 text-sm">
+ <p className="text-neutral-600 text-sm">
             {notification.submessage}
           </p>
         )}

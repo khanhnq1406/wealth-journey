@@ -116,7 +116,7 @@ export function RegisterPasswordForm() {
         />
         {!errors.password && <PasswordStrengthIndicator password={password} />}
         {!errors.password && !password && (
-          <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+ <p className="mt-1 text-xs text-neutral-500">
             {t("passwordRequirements")}
           </p>
         )}
@@ -132,8 +132,8 @@ export function RegisterPasswordForm() {
       />
 
       {serverError && (
-        <div className="p-2.5 bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-800 rounded-xl">
-          <p className="text-sm text-danger-800 dark:text-danger-200">
+ <div className="p-2.5 bg-danger-50 border border-danger-200 rounded-xl">
+ <p className="text-sm text-danger-800">
             {serverError}
           </p>
         </div>

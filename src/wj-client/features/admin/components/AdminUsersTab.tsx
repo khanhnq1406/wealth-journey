@@ -120,7 +120,7 @@ export function AdminUsersTab() {
       header: t("columns.email"),
       showInCollapsed: true,
       cell: ({ row }) => (
-        <span className="text-neutral-600 dark:text-dark-text-secondary text-sm truncate max-w-[200px] inline-block">
+ <span className="text-neutral-600 text-sm truncate max-w-[200px] inline-block">
           {row.email || row.username || "—"}
         </span>
       ),
@@ -146,8 +146,8 @@ export function AdminUsersTab() {
             disabled={isSelf}
             className={`px-2 py-0.5 text-xs font-medium rounded-full transition-colors ${
               row.isAdmin
-                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                : "bg-neutral-100 text-neutral-500 dark:bg-dark-hover dark:text-dark-text-tertiary"
+ ? "bg-green-100 text-green-700"
+ : "bg-neutral-100 text-neutral-500"
             } ${isSelf ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:opacity-80"}`}
             title={
               isSelf
@@ -169,7 +169,7 @@ export function AdminUsersTab() {
       cell: ({ row }) => {
         const date = new Date(row.createdAt * 1000);
         return (
-          <span className="text-sm text-neutral-500 dark:text-dark-text-tertiary">
+ <span className="text-sm text-neutral-500">
             {date.toLocaleDateString()}
           </span>
         );
@@ -193,7 +193,7 @@ export function AdminUsersTab() {
         placeholder={t("searchPlaceholder")}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full px-3 py-2 text-sm border border-neutral-200 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg focus:outline-none focus:ring-2 focus:ring-bg/50 dark:text-dark-text"
+ className="w-full px-3 py-2 text-sm border border-neutral-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-bg/50"
       />
 
       {/* Table */}

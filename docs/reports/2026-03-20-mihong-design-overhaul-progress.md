@@ -8,7 +8,7 @@
 - **Started:** 2026-03-20T00:00:00Z
 - **Last updated:** 2026-03-20T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 5
+- **Current task:** 6
 
 ## Task Progress
 
@@ -19,7 +19,7 @@
 | 2   | Font Migration — Roboto + Roboto Mono        | done    | —      | Replaced Jakarta Sans/Vietnam Pro/JetBrains with Roboto/Roboto Mono |
 | 3   | Update globals.css — Base Styles             | done    | —      | Updated CSS vars, removed dark mode CSS, maroon scrollbar/focus |
 | 4   | Remove ThemeProvider and ThemeToggle          | done    | —      | Deleted ThemeProvider/ThemeToggle, removed from providers.tsx and Toast |
-| 5   | Strip dark: Prefixed Classes                 | pending | —      | —       |
+| 5   | Strip dark: Prefixed Classes                 | done    | ddf751d | Removed 1827 dark: classes from 101 files |
 | 6   | Restyle BaseCard Component                   | pending | —      | —       |
 | 7   | Restyle Button Component                     | pending | —      | —       |
 | 8   | Restyle Form Components                      | pending | —      | —       |

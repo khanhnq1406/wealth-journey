@@ -188,21 +188,21 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
     // State colors
     const getStateClasses = () => {
       if (error) {
-        return "border-red-300 focus:border-red-500 focus:ring-red-500 dark:border-red-700 dark:focus:border-red-500 dark:focus:ring-red-500";
+ return "border-red-300 focus:border-red-500 focus:ring-red-500";
       }
       if (success) {
-        return "border-v2-border focus:border-v2-red-primary focus:ring-v2-red-primary dark:border-green-700 dark:focus:border-v2-red-primary dark:focus:ring-v2-red-primary";
+ return "border-v2-border focus:border-v2-red-primary focus:ring-v2-red-primary";
       }
-      return "border-gray-300 focus:border-v2-red-primary focus:ring-v2-red-primary dark:border-gray-600 dark:focus:border-v2-red-primary dark:focus:ring-v2-red-primary";
+ return "border-gray-300 focus:border-v2-red-primary focus:ring-v2-red-primary";
     };
 
     const inputClasses = cn(
       // Base styles
       "w-full rounded-lg border transition-all duration-200",
-      "bg-white dark:bg-gray-800",
-      "text-gray-900 dark:text-gray-100",
-      "placeholder:text-gray-400 dark:placeholder:text-gray-500",
-      "disabled:bg-gray-100 disabled:cursor-not-allowed dark:disabled:bg-gray-900",
+ "bg-white",
+ "text-gray-900",
+ "placeholder:text-gray-400",
+ "disabled:bg-gray-100 disabled:cursor-not-allowed",
       // Focus styles
       "focus:outline-none focus:ring-2 focus:ring-offset-0",
       // Size
@@ -218,8 +218,8 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
 
     const labelClasses = cn(
       "absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-all duration-200",
-      "bg-white dark:bg-gray-800 px-1",
-      "text-gray-500 dark:text-gray-400",
+ "bg-white px-1",
+ "text-gray-500",
       {
         "text-xs -translate-y-8 top-1/2": showFloatingLabel,
         "text-base": !showFloatingLabel,
@@ -234,12 +234,12 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       containerClassName
     );
 
-    const iconClasses = "absolute top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none";
+ const iconClasses = "absolute top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none";
     const leftIconClasses = cn(iconClasses, "left-3");
     const rightIconClasses = cn(
       iconClasses,
       "right-3",
-      onRightIconClick && "pointer-events-auto cursor-pointer hover:text-gray-600 dark:hover:text-gray-300"
+ onRightIconClick && "pointer-events-auto cursor-pointer hover:text-gray-600"
     );
 
     return (
@@ -250,10 +250,10 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             className={cn(
               "block text-sm font-medium mb-1.5",
               error
-                ? "text-red-600 dark:text-red-400"
+ ? "text-red-600"
                 : success
-                ? "text-v2-green-positive dark:text-green-400"
-                : "text-gray-700 dark:text-gray-300"
+ ? "text-v2-green-positive"
+ : "text-gray-700"
             )}
           >
             {label}
@@ -332,7 +332,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
         {(helperText || error || success) && (
           <div className="mt-1.5 min-h-[20px]">
             {error && (
-              <p id={errorId} className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+ <p id={errorId} className="text-sm text-red-600 flex items-center gap-1">
                 <svg
                   className="w-4 h-4 flex-shrink-0"
                   fill="currentColor"
@@ -348,7 +348,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
               </p>
             )}
             {success && !error && (
-              <p id={successId} className="text-sm text-v2-green-positive dark:text-green-400 flex items-center gap-1">
+ <p id={successId} className="text-sm text-v2-green-positive flex items-center gap-1">
                 <svg
                   className="w-4 h-4 flex-shrink-0"
                   fill="currentColor"
@@ -364,7 +364,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
               </p>
             )}
             {helperText && !error && !success && (
-              <p id={helperId} className="text-sm text-gray-500 dark:text-gray-400">
+ <p id={helperId} className="text-sm text-gray-500">
                 {helperText}
               </p>
             )}

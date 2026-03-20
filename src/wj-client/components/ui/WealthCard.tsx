@@ -58,11 +58,11 @@ export function WealthCard({
   onClick,
 }: WealthCardProps) {
   const variantStyles = {
-    default: "text-gray-900 dark:text-white",
+ default: "text-gray-900",
     success: "text-v2-green-positive",
-    warning: "text-yellow-600 dark:text-yellow-400",
-    danger: "text-red-600 dark:text-red-400",
-    info: "text-primary-600 dark:text-primary-400",
+ warning: "text-yellow-600",
+ danger: "text-red-600",
+ info: "text-primary-600",
   };
 
   const trendColor = trend && trend > 0 ? "text-v2-green-positive" : trend && trend < 0 ? "text-red-600" : "text-gray-500";
@@ -76,13 +76,13 @@ export function WealthCard({
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{title}</p>
+ <p className="text-sm text-gray-500 mb-1">{title}</p>
           <p className={`text-2xl font-bold ${variantStyles[variant]}`}>
             {displayValue}
           </p>
 
           {subtitle && (
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{subtitle}</p>
+ <p className="text-xs text-gray-400 mt-1">{subtitle}</p>
           )}
 
           {trend !== undefined && (
@@ -95,7 +95,7 @@ export function WealthCard({
 
         {icon && (
           <div className="ml-4 flex-shrink-0">
-            <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+ <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
               {icon}
             </div>
           </div>

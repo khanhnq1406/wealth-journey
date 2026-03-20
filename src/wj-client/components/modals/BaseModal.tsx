@@ -383,7 +383,7 @@ export function BaseModal({
           // Light mode backdrop
           "bg-modal",
           // Dark mode backdrop (darker for better contrast)
-          "dark:bg-dark-overlay",
+ "",
           // Backdrop blur
           backdropBlur && "backdrop-blur-sm",
           // Fade backdrop when dragging modal
@@ -433,7 +433,7 @@ export function BaseModal({
             // Light mode
             "bg-white shadow-modal",
             // Dark mode
-            "dark:bg-dark-surface dark:shadow-dark-modal",
+ "",
             "w-full overscroll-contain outline-none",
             // Responsive border radius
             fullScreenOnMobile || variant === "full"
@@ -514,9 +514,9 @@ export function BaseModal({
                   "w-12 h-1.5 rounded-full transition-colors duration-200",
                   isDragging && dragY > 0
                     ? dragY > swipeThreshold
-                      ? "bg-danger-500 dark:bg-danger-600"
+ ? "bg-danger-500"
                       : "bg-v2-red-primary"
-                    : "bg-neutral-300 dark:bg-dark-border",
+ : "bg-neutral-300",
                 )}
               />
             </div>
@@ -541,7 +541,7 @@ export function BaseModal({
             <div className="flex justify-between items-center gap-3 sm:gap-4 mb-4 sm:mb-5">
               <h2
                 id={modalTitleId}
-                className="font-bold text-base sm:text-lg flex-1 pr-2 dark:text-dark-text"
+ className="font-bold text-base sm:text-lg flex-1 pr-2"
               >
                 {title}
               </h2>
@@ -549,12 +549,12 @@ export function BaseModal({
                 <button
                   onClick={onClose}
                   // Touch-friendly minimum size (44x44px per iOS Human Interface Guidelines)
-                  className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-neutral-100 active:bg-neutral-200 dark:hover:bg-dark-surface-hover dark:active:bg-dark-surface-active transition-colors flex-shrink-0"
+ className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-neutral-100 active:bg-neutral-200 transition-colors flex-shrink-0"
                   aria-label={tCommon("close")}
                   type="button"
                 >
                   <svg
-                    className="w-6 h-6 text-neutral-500 dark:text-dark-text-secondary"
+ className="w-6 h-6 text-neutral-500"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -581,7 +581,7 @@ export function BaseModal({
             </div>
 
             {footer ? (
-              <div className="mt-4 sm:mt-5 sticky bottom-0 bg-white dark:bg-dark-surface py-2 -mx-2 px-2 sm:mx-0 sm:px-0 sm:static sm:bg-transparent sm:py-0">
+ <div className="mt-4 sm:mt-5 sticky bottom-0 bg-white py-2 -mx-2 px-2 sm:mx-0 sm:px-0 sm:static sm:bg-transparent sm:py-0">
                 {footer}
               </div>
             ) : null}

@@ -189,21 +189,21 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
     // State colors - unified with design system
     const getStateClasses = () => {
       if (error) {
-        return "border-danger-300 focus:border-danger-500 focus:ring-danger-500 dark:border-danger-700 dark:focus:border-danger-500 dark:focus:ring-danger-500";
+ return "border-danger-300 focus:border-danger-500 focus:ring-danger-500";
       }
       if (success) {
-        return "border-success-300 focus:border-success-500 focus:ring-success-500 dark:border-success-700 dark:focus:border-success-500 dark:focus:ring-success-500";
+ return "border-success-300 focus:border-success-500 focus:ring-success-500";
       }
-      return "border-neutral-300 focus:border-primary-500 focus:ring-primary-500 dark:border-neutral-600 dark:focus:border-primary-500 dark:focus:ring-primary-500";
+ return "border-neutral-300 focus:border-primary-500 focus:ring-primary-500";
     };
 
     const inputClasses = cn(
       // Base styles - unified with design system
       "w-full rounded-lg border transition-all duration-200",
-      "bg-white dark:bg-dark-surface",
-      "text-neutral-900 dark:text-dark-text",
-      "placeholder:text-neutral-400 dark:placeholder:text-dark-text-tertiary",
-      "disabled:bg-neutral-50 disabled:cursor-not-allowed dark:disabled:bg-dark-surface-hover disabled:opacity-50",
+ "bg-white",
+ "text-neutral-900",
+ "placeholder:text-neutral-400",
+ "disabled:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50",
       // Focus styles - single ring (clean, modern)
       "focus:outline-none focus:ring-2 focus:border-transparent",
       // Size
@@ -219,8 +219,8 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
 
     const labelClasses = cn(
       "absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-all duration-200",
-      "bg-white dark:bg-dark-surface px-1",
-      "text-neutral-500 dark:text-dark-text-tertiary",
+ "bg-white px-1",
+ "text-neutral-500",
       {
         "text-xs -translate-y-8 top-1/2": showFloatingLabel,
         "text-base": !showFloatingLabel,
@@ -235,12 +235,12 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       containerClassName
     );
 
-    const iconClasses = "absolute top-1/2 -translate-y-1/2 text-neutral-400 dark:text-dark-text-tertiary pointer-events-none";
+ const iconClasses = "absolute top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none";
     const leftIconClasses = cn(iconClasses, "left-3");
     const rightIconClasses = cn(
       iconClasses,
       "right-3",
-      onRightIconClick && "pointer-events-auto cursor-pointer hover:text-neutral-600 dark:hover:text-dark-text-secondary"
+ onRightIconClick && "pointer-events-auto cursor-pointer hover:text-neutral-600"
     );
 
     return (
@@ -251,14 +251,14 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             className={cn(
               "block text-sm font-medium mb-1.5",
               error
-                ? "text-danger-600 dark:text-danger-400"
+ ? "text-danger-600"
                 : success
-                ? "text-success-600 dark:text-success-400"
-                : "text-neutral-700 dark:text-dark-text-secondary"
+ ? "text-success-600"
+ : "text-neutral-700"
             )}
           >
             {label}
-            {required && <span className="text-danger-600 dark:text-danger-400 ml-1">*</span>}
+ {required && <span className="text-danger-600 ml-1">*</span>}
           </label>
         )}
 
@@ -303,7 +303,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             >
               {loading ? (
                 <svg
-                  className="animate-spin h-5 w-5 text-neutral-400 dark:text-dark-text-tertiary"
+ className="animate-spin h-5 w-5 text-neutral-400"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -333,7 +333,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
         {(helperText || error || success) && (
           <div className="mt-1.5 min-h-[20px]">
             {error && (
-              <p id={errorId} className="text-sm text-danger-600 dark:text-danger-400 flex items-center gap-1">
+ <p id={errorId} className="text-sm text-danger-600 flex items-center gap-1">
                 <svg
                   className="w-4 h-4 flex-shrink-0"
                   fill="currentColor"
@@ -349,7 +349,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
               </p>
             )}
             {success && !error && (
-              <p id={successId} className="text-sm text-success-600 dark:text-success-400 flex items-center gap-1">
+ <p id={successId} className="text-sm text-success-600 flex items-center gap-1">
                 <svg
                   className="w-4 h-4 flex-shrink-0"
                   fill="currentColor"
@@ -365,7 +365,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
               </p>
             )}
             {helperText && !error && !success && (
-              <p id={helperId} className="text-sm text-neutral-500 dark:text-neutral-400">
+ <p id={helperId} className="text-sm text-neutral-500">
                 {helperText}
               </p>
             )}

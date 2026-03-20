@@ -33,11 +33,11 @@ function GroupHeader({ groupLabel, className }: { groupLabel: string; className?
   return (
     <div
       className={cn(
-        "sticky top-0 z-1 bg-gray-50 dark:bg-dark-background px-3 py-2 sm:px-4",
+ "sticky top-0 z-1 bg-gray-50 px-3 py-2 sm:px-4",
         className,
       )}
     >
-      <span className="text-xs font-semibold text-gray-600 dark:text-dark-text-secondary uppercase tracking-wide">
+ <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
         {groupLabel}
       </span>
     </div>
@@ -81,8 +81,8 @@ function TransactionIcon({ isExpense }: { isExpense: boolean }) {
       className={cn(
         "flex items-center justify-center w-10 h-10 rounded-full",
         isExpense
-          ? "bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400"
-          : "bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-400",
+ ? "bg-danger-100 text-danger-600"
+ : "bg-success-100 text-success-600",
       )}
     >
       {Icon}
@@ -231,7 +231,7 @@ export const TransactionCard = memo(function TransactionCard({
       <div
         className={cn(
           "absolute inset-0 rounded-lg flex items-center justify-between px-4 transition-transform duration-200",
-          "bg-gradient-to-r from-v2-red-light to-v2-red-light dark:from-v2-red-primary/20 dark:to-v2-red-primary/10",
+ "bg-gradient-to-r from-v2-red-light to-v2-red-light",
         )}
         aria-hidden="true"
       >
@@ -252,14 +252,14 @@ export const TransactionCard = memo(function TransactionCard({
               />
             </svg>
           </div>
-          <span className="text-sm font-medium text-v2-red-primary dark:text-v2-red-primary/80">
+ <span className="text-sm font-medium text-v2-red-primary">
             {tCommon("edit")}
           </span>
         </div>
 
         {/* Delete Action (Left swipe) */}
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-danger-700 dark:text-danger-300">
+ <span className="text-sm font-medium text-danger-700">
             {tCommon("delete")}
           </span>
           <div className="w-10 h-10 flex items-center justify-center bg-danger-600 text-white rounded-full min-h-[44px] min-w-[44px]">
@@ -283,9 +283,9 @@ export const TransactionCard = memo(function TransactionCard({
       {/* Card Content */}
       <div
         className={cn(
-          "relative bg-white dark:bg-dark-surface rounded-lg shadow-sm",
+ "relative bg-white rounded-lg shadow-sm",
           "transition-transform duration-200",
-          "active:shadow-card-active dark:active:shadow-dark-card-active",
+ "active:shadow-card-active",
         )}
         style={{
           transform: `translateX(${swipeOffset}px)`,
@@ -301,15 +301,15 @@ export const TransactionCard = memo(function TransactionCard({
           {/* Transaction Details */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
-              <h3 className="font-medium text-gray-900 dark:text-dark-text truncate">
+ <h3 className="font-medium text-gray-900 truncate">
                 {categoryName}
               </h3>
               <span
                 className={cn(
                   "text-base font-semibold flex-shrink-0",
                   isExpense
-                    ? "text-danger-600 dark:text-danger-400"
-                    : "text-success-600 dark:text-success-400",
+ ? "text-danger-600"
+ : "text-success-600",
                 )}
               >
                 {isExpense ? "-" : "+"}
@@ -321,10 +321,10 @@ export const TransactionCard = memo(function TransactionCard({
             </div>
 
             <div className="flex items-center justify-between gap-2 mt-1">
-              <p className="text-sm text-gray-500 dark:text-dark-text-secondary truncate">
+ <p className="text-sm text-gray-500 truncate">
                 {transaction.note || walletName}
               </p>
-              <span className="text-xs text-gray-400 dark:text-dark-text-tertiary flex-shrink-0">
+ <span className="text-xs text-gray-400 flex-shrink-0">
                 {formatTime(transaction.date)}
               </span>
             </div>
@@ -333,7 +333,7 @@ export const TransactionCard = memo(function TransactionCard({
             {transaction.note && (
               <div className="flex items-center gap-1 mt-1">
                 <svg
-                  className="w-3 h-3 text-gray-400 dark:text-dark-text-tertiary"
+ className="w-3 h-3 text-gray-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -345,7 +345,7 @@ export const TransactionCard = memo(function TransactionCard({
                     d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
                   />
                 </svg>
-                <span className="text-xs text-gray-400 dark:text-dark-text-tertiary">
+ <span className="text-xs text-gray-400">
                   {walletName}
                 </span>
               </div>
@@ -356,11 +356,11 @@ export const TransactionCard = memo(function TransactionCard({
           <div className="hidden sm:flex items-center gap-1">
             <button
               onClick={handleEdit}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-neutral-100 dark:hover:bg-dark-surface-hover transition-colors"
+ className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-neutral-100 transition-colors"
               aria-label={tCommon("edit")}
             >
               <svg
-                className="w-5 h-5 text-gray-600 dark:text-dark-text-secondary"
+ className="w-5 h-5 text-gray-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -375,11 +375,11 @@ export const TransactionCard = memo(function TransactionCard({
             </button>
             <button
               onClick={handleDelete}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-danger-50 dark:hover:bg-danger-900/20 transition-colors"
+ className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-danger-50 transition-colors"
               aria-label={tCommon("delete")}
             >
               <svg
-                className="w-5 h-5 text-danger-600 dark:text-danger-400"
+ className="w-5 h-5 text-danger-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -398,7 +398,7 @@ export const TransactionCard = memo(function TransactionCard({
         {/* Swipe hint indicator (mobile) */}
         <div className="sm:hidden absolute bottom-1 right-2 opacity-0 group-hover:opacity-50 transition-opacity">
           <svg
-            className="w-4 h-4 text-gray-300 dark:text-dark-text-tertiary"
+ className="w-4 h-4 text-gray-300"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

@@ -324,21 +324,21 @@ export function FormDatePicker({
   // State colors
   const getStateClasses = () => {
     if (error) {
-      return "border-red-300 hover:border-red-400 dark:border-red-700 dark:hover:border-red-600";
+ return "border-red-300 hover:border-red-400";
     }
     if (success) {
-      return "border-v2-border hover:border-v2-border dark:border-green-700 dark:hover:border-green-600";
+ return "border-v2-border hover:border-v2-border";
     }
-    return "border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500";
+ return "border-gray-300 hover:border-gray-400";
   };
 
   const triggerClasses = cn(
     "w-full flex items-center justify-between gap-3",
-    "rounded-lg border bg-white dark:bg-gray-800",
-    "text-gray-900 dark:text-gray-100",
+ "rounded-lg border bg-white",
+ "text-gray-900",
     "transition-all duration-200",
     "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:border-transparent",
-    "disabled:bg-gray-100 disabled:cursor-not-allowed dark:disabled:bg-gray-900",
+ "disabled:bg-gray-100 disabled:cursor-not-allowed",
     sizeClasses[size],
     getStateClasses()
   );
@@ -377,10 +377,10 @@ export function FormDatePicker({
           className={cn(
             "block text-sm font-medium mb-1.5",
             error
-              ? "text-red-600 dark:text-red-400"
+ ? "text-red-600"
               : success
-              ? "text-v2-green-positive dark:text-green-400"
-              : "text-gray-700 dark:text-gray-300"
+ ? "text-v2-green-positive"
+ : "text-gray-700"
           )}
         >
           {label}
@@ -419,7 +419,7 @@ export function FormDatePicker({
                 e.stopPropagation();
                 handleClear();
               }}
-              className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+ className="p-1 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600"
               aria-label={t("clearDate")}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -452,21 +452,21 @@ export function FormDatePicker({
           ref={dropdownRef}
           className={cn(
             "absolute z-50 w-full mt-1 p-4",
-            "bg-white dark:bg-gray-800",
-            "border border-gray-200 dark:border-gray-700",
+ "bg-white",
+ "border border-gray-200",
             "rounded-lg shadow-lg"
           )}
         >
           {/* Presets */}
           {showPresets && presets.length > 0 && (
-            <div className="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+ <div className="mb-4 pb-4 border-b border-gray-200">
               <div className="flex flex-wrap gap-2">
                 {presets.map((preset) => (
                   <button
                     key={preset.label}
                     type="button"
                     onClick={() => handlePresetSelect(preset)}
-                    className="px-3 py-1.5 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+ className="px-3 py-1.5 text-xs font-medium rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
                   >
                     {preset.label}
                   </button>
@@ -481,7 +481,7 @@ export function FormDatePicker({
               <button
                 type="button"
                 onClick={() => navigateMonth(-1)}
-                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+ className="p-1 rounded hover:bg-gray-100"
                 aria-label={t("previousMonth")}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -491,7 +491,7 @@ export function FormDatePicker({
               <button
                 type="button"
                 onClick={() => navigateYear(-1)}
-                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+ className="p-1 rounded hover:bg-gray-100"
                 aria-label={t("previousYear")}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -500,7 +500,7 @@ export function FormDatePicker({
               </button>
             </div>
 
-            <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+ <div className="text-sm font-semibold text-gray-900">
               {new Date(currentYear, currentMonth).toLocaleDateString("en-US", {
                 month: "long",
                 year: "numeric",
@@ -511,7 +511,7 @@ export function FormDatePicker({
               <button
                 type="button"
                 onClick={() => navigateYear(1)}
-                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+ className="p-1 rounded hover:bg-gray-100"
                 aria-label={t("nextYear")}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -521,7 +521,7 @@ export function FormDatePicker({
               <button
                 type="button"
                 onClick={() => navigateMonth(1)}
-                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+ className="p-1 rounded hover:bg-gray-100"
                 aria-label={t("nextMonth")}
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -537,7 +537,7 @@ export function FormDatePicker({
             {adjustedWeekDays.map((day) => (
               <div
                 key={day}
-                className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 py-2"
+ className="text-center text-xs font-medium text-gray-500 py-2"
               >
                 {day.slice(0, 1)}
               </div>
@@ -561,13 +561,13 @@ export function FormDatePicker({
                   onMouseLeave={() => setHoveredDate(null)}
                   className={cn(
                     "aspect-square flex items-center justify-center text-sm rounded-lg transition-all duration-150",
-                    "hover:bg-gray-100 dark:hover:bg-gray-700",
+ "hover:bg-gray-100",
                     "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:ring-inset",
                     {
                       "invisible": isEmpty,
-                      "bg-v2-red-primary text-white hover:bg-v2-red-dark dark:hover:bg-v2-red-dark":
+ "bg-v2-red-primary text-white hover:bg-v2-red-dark":
                         isSelected,
-                      "bg-v2-green-light dark:bg-green-900/30 text-v2-green-positive dark:text-green-400":
+ "bg-v2-green-light text-v2-green-positive":
                         isToday && !isSelected,
                       "font-semibold": isToday,
                       "text-gray-400 cursor-not-allowed": isDisabled,
@@ -591,7 +591,7 @@ export function FormDatePicker({
           {error && (
             <p
               id={errorId}
-              className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
+ className="text-sm text-red-600 flex items-center gap-1"
             >
               <svg
                 className="w-4 h-4 flex-shrink-0"
@@ -611,7 +611,7 @@ export function FormDatePicker({
           {success && !error && (
             <p
               id={successId}
-              className="text-sm text-v2-green-positive dark:text-green-400 flex items-center gap-1"
+ className="text-sm text-v2-green-positive flex items-center gap-1"
             >
               <svg
                 className="w-4 h-4 flex-shrink-0"
@@ -631,7 +631,7 @@ export function FormDatePicker({
           {helperText && !error && !success && (
             <p
               id={helperId}
-              className="text-sm text-gray-500 dark:text-gray-400"
+ className="text-sm text-gray-500"
             >
               {helperText}
             </p>

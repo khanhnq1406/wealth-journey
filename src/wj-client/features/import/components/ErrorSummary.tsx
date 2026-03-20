@@ -70,26 +70,26 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case "error":
-        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800";
+ return "bg-red-100 text-red-800 border-red-200";
       case "warning":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800";
+ return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case "info":
-        return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800";
+ return "bg-blue-100 text-blue-800 border-blue-200";
       default:
-        return "bg-neutral-100 text-neutral-800 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:border-neutral-700";
+ return "bg-neutral-100 text-neutral-800 border-neutral-200";
     }
   };
 
   const getSeverityBadgeColor = (severity: string) => {
     switch (severity) {
       case "error":
-        return "bg-red-600 text-white dark:bg-red-700";
+ return "bg-red-600 text-white";
       case "warning":
-        return "bg-yellow-600 text-white dark:bg-yellow-700";
+ return "bg-yellow-600 text-white";
       case "info":
-        return "bg-blue-600 text-white dark:bg-blue-700";
+ return "bg-blue-600 text-white";
       default:
-        return "bg-neutral-600 text-white dark:bg-neutral-700";
+ return "bg-neutral-600 text-white";
     }
   };
 
@@ -98,8 +98,8 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
       className={cn(
         "border-2 rounded-lg overflow-hidden",
         errorCount > 0
-          ? "border-red-300 dark:border-red-800"
-          : "border-yellow-300 dark:border-yellow-800",
+ ? "border-red-300"
+ : "border-yellow-300",
       )}
     >
       {/* Header */}
@@ -109,16 +109,16 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
           "w-full px-4 py-3 flex items-center justify-between",
           "hover:opacity-90 transition-opacity",
           errorCount > 0
-            ? "bg-red-50 dark:bg-red-950"
-            : "bg-yellow-50 dark:bg-yellow-950",
+ ? "bg-red-50"
+ : "bg-yellow-50",
         )}
       >
         <div className="flex items-center gap-3">
           <AlertCircleIcon
             className={
               errorCount > 0
-                ? "text-red-600 dark:text-red-400"
-                : "text-yellow-600 dark:text-yellow-400"
+ ? "text-red-600"
+ : "text-yellow-600"
             }
           />
           <div className="text-left">
@@ -126,8 +126,8 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
               className={cn(
                 "font-semibold text-base",
                 errorCount > 0
-                  ? "text-red-900 dark:text-red-200"
-                  : "text-yellow-900 dark:text-yellow-200",
+ ? "text-red-900"
+ : "text-yellow-900",
               )}
             >
               {errorCount > 0 ? t("validationErrorsFound") : t("warningsFound")}
@@ -136,8 +136,8 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
               className={cn(
                 "text-sm",
                 errorCount > 0
-                  ? "text-red-700 dark:text-red-300"
-                  : "text-yellow-700 dark:text-yellow-300",
+ ? "text-red-700"
+ : "text-yellow-700",
               )}
             >
               {errorCount > 0 && t(errorCount !== 1 ? "errorCountPlural" : "errorCount", { count: errorCount })}
@@ -154,25 +154,25 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
             "flex-shrink-0",
             isExpanded && "rotate-180",
             errorCount > 0
-              ? "text-red-600 dark:text-red-400"
-              : "text-yellow-600 dark:text-yellow-400",
+ ? "text-red-600"
+ : "text-yellow-600",
           )}
         />
       </button>
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="bg-white dark:bg-dark-surface border-t border-neutral-200 dark:border-dark-border">
+ <div className="bg-white border-t border-neutral-200">
           {/* Severity Filter */}
-          <div className="px-4 py-3 bg-neutral-50 dark:bg-dark-surface-hover border-b border-neutral-200 dark:border-dark-border">
+ <div className="px-4 py-3 bg-neutral-50 border-b border-neutral-200">
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setSeverityFilter("all")}
                 className={cn(
                   "px-3 py-1.5 rounded-md text-sm font-medium transition-colors min-h-[44px] sm:min-h-[36px]",
                   severityFilter === "all"
-                    ? "bg-primary-600 text-white dark:bg-primary-700"
-                    : "bg-white dark:bg-dark-surface text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600 hover:bg-neutral-100 dark:hover:bg-dark-surface-active",
+ ? "bg-primary-600 text-white"
+ : "bg-white text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
                 )}
               >
                 {t("filterAll", { count: allErrors.length })}
@@ -183,8 +183,8 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                   className={cn(
                     "px-3 py-1.5 rounded-md text-sm font-medium transition-colors min-h-[44px] sm:min-h-[36px]",
                     severityFilter === "error"
-                      ? "bg-red-600 text-white dark:bg-red-700"
-                      : "bg-white dark:bg-dark-surface text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600 hover:bg-neutral-100 dark:hover:bg-dark-surface-active",
+ ? "bg-red-600 text-white"
+ : "bg-white text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
                   )}
                 >
                   {t("filterErrors", { count: errorCount })}
@@ -196,8 +196,8 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                   className={cn(
                     "px-3 py-1.5 rounded-md text-sm font-medium transition-colors min-h-[44px] sm:min-h-[36px]",
                     severityFilter === "warning"
-                      ? "bg-yellow-600 text-white dark:bg-yellow-700"
-                      : "bg-white dark:bg-dark-surface text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600 hover:bg-neutral-100 dark:hover:bg-dark-surface-active",
+ ? "bg-yellow-600 text-white"
+ : "bg-white text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
                   )}
                 >
                   {t("filterWarnings", { count: warningCount })}
@@ -209,8 +209,8 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                   className={cn(
                     "px-3 py-1.5 rounded-md text-sm font-medium transition-colors min-h-[44px] sm:min-h-[36px]",
                     severityFilter === "info"
-                      ? "bg-blue-600 text-white dark:bg-blue-700"
-                      : "bg-white dark:bg-dark-surface text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600 hover:bg-neutral-100 dark:hover:bg-dark-surface-active",
+ ? "bg-blue-600 text-white"
+ : "bg-white text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
                   )}
                 >
                   {t("filterInfo", { count: infoCount })}
@@ -224,9 +224,9 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
             {filteredErrors.map((row) => (
               <div
                 key={row.rowNumber}
-                className="px-4 py-3 border-b border-neutral-200 dark:border-dark-border last:border-b-0"
+ className="px-4 py-3 border-b border-neutral-200 last:border-b-0"
               >
-                <div className="font-semibold text-sm text-neutral-900 dark:text-dark-text mb-2">
+ <div className="font-semibold text-sm text-neutral-900 mb-2">
                   {t("row", { n: row.rowNumber })}
                 </div>
                 <div className="space-y-2">

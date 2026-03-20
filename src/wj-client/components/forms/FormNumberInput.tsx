@@ -218,7 +218,7 @@ export const FormNumberInput = ({
       )}
       <div className={cn("relative", label && "mt-1 sm:mt-1.5")}>
         {prefix && (
-          <span className="absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-dark-text-tertiary text-sm sm:text-base pointer-events-none z-10">
+ <span className="absolute left-3 sm:left-3.5 top-1/2 -translate-y-1/2 text-neutral-500 text-sm sm:text-base pointer-events-none z-10">
             {prefix}
           </span>
         )}
@@ -238,18 +238,18 @@ export const FormNumberInput = ({
             "px-3 sm:px-4 py-2.5 sm:py-3",
             "rounded-lg",
             "border transition-all duration-200",
-            "bg-white dark:bg-dark-surface",
-            "text-neutral-900 dark:text-dark-text",
-            "placeholder:text-neutral-400 dark:placeholder:text-dark-text-tertiary",
+ "bg-white",
+ "text-neutral-900",
+ "placeholder:text-neutral-400",
             // Focus states - single ring (clean, modern)
             "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent",
             // Error states
             hasError &&
               "border-danger-500 focus:ring-danger-500 focus:border-transparent",
             !hasError &&
-              "border-neutral-300 dark:border-dark-border hover:border-neutral-400 dark:hover:border-dark-border-hover",
+ "border-neutral-300 hover:border-neutral-400",
             // Disabled states
-            "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-neutral-50 dark:disabled:bg-dark-surface-hover",
+ "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-neutral-50",
             // Spacing for prefix/suffix
             prefix && "pl-8 sm:pl-10",
             suffix && "pr-8 sm:pr-12",
@@ -261,7 +261,7 @@ export const FormNumberInput = ({
           )}
         />
         {suffix && (
-          <span className="absolute right-3 sm:right-3.5 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-dark-text-tertiary text-sm sm:text-base pointer-events-none">
+ <span className="absolute right-3 sm:right-3.5 top-1/2 -translate-y-1/2 text-neutral-500 text-sm sm:text-base pointer-events-none">
             {suffix}
           </span>
         )}
@@ -278,7 +278,7 @@ export const FormNumberInput = ({
       {helperText && !hasError && (
         <p
           id={helperId}
-          className="mt-1.5 text-xs sm:text-sm text-neutral-500 dark:text-dark-text-tertiary"
+ className="mt-1.5 text-xs sm:text-sm text-neutral-500"
         >
           {helperText}
         </p>

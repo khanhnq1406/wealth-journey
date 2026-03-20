@@ -198,9 +198,9 @@ export function FileUploadStep({
     <div className="space-y-4 sm:space-y-6">
       {/* Hero Section */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900 mb-3">
+ <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 mb-3">
           <svg
-            className="w-8 h-8 text-primary-600 dark:text-primary-400"
+ className="w-8 h-8 text-primary-600"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -213,17 +213,17 @@ export function FileUploadStep({
             />
           </svg>
         </div>
-        <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-dark-text">
+ <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">
           {t("title")}
         </h2>
-        <p className="text-sm sm:text-base text-neutral-600 dark:text-dark-text-secondary max-w-lg mx-auto">
+ <p className="text-sm sm:text-base text-neutral-600 max-w-lg mx-auto">
           {t("subtitle")}
         </p>
       </div>
 
       {/* File Type Support Pills */}
       <div className="flex justify-center gap-2 flex-wrap">
-        <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-success-100 text-success-700 dark:bg-success-900 dark:text-success-300">
+ <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-success-100 text-success-700">
           <svg
             className="w-4 h-4 mr-1.5"
             fill="currentColor"
@@ -237,7 +237,7 @@ export function FileUploadStep({
           </svg>
           {t("excelFormat")}
         </span>
-        <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-success-100 text-success-700 dark:bg-success-900 dark:text-success-300">
+ <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-success-100 text-success-700">
           <svg
             className="w-4 h-4 mr-1.5"
             fill="currentColor"
@@ -269,20 +269,20 @@ export function FileUploadStep({
           "min-h-[280px] sm:min-h-[320px] flex flex-col items-center justify-center p-6 sm:p-10",
           isDragOver &&
             !selectedFile && [
-              "border-primary-500 bg-primary-50 dark:bg-primary-950",
-              "scale-[1.02] shadow-lg shadow-primary-200 dark:shadow-primary-900",
+ "border-primary-500 bg-primary-50",
+ "scale-[1.02] shadow-lg shadow-primary-200",
             ],
           selectedFile && [
-            "border-success-400 bg-success-50 dark:bg-success-950",
+ "border-success-400 bg-success-50",
             "shadow-md",
           ],
-          error && ["border-danger-400 bg-danger-50 dark:bg-danger-950"],
+ error && ["border-danger-400 bg-danger-50"],
           !selectedFile &&
             !error &&
             !isDragOver && [
-              "border-neutral-300 dark:border-dark-border",
-              "hover:border-primary-400 dark:hover:border-primary-600",
-              "hover:bg-neutral-50 dark:hover:bg-dark-surface-hover",
+ "border-neutral-300",
+ "hover:border-primary-400",
+ "hover:bg-neutral-50",
               "hover:shadow-md",
             ],
           "cursor-pointer active:scale-[0.99]",
@@ -312,7 +312,7 @@ export function FileUploadStep({
               )}
             >
               <svg
-                className="w-16 h-16 sm:w-20 sm:h-20 mx-auto text-neutral-400 dark:text-dark-text-tertiary"
+ className="w-16 h-16 sm:w-20 sm:h-20 mx-auto text-neutral-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -327,21 +327,21 @@ export function FileUploadStep({
             </div>
 
             <div className="space-y-2">
-              <p className="text-lg sm:text-xl font-semibold text-neutral-700 dark:text-dark-text">
+ <p className="text-lg sm:text-xl font-semibold text-neutral-700">
                 {isDragOver ? (
-                  <span className="text-primary-600 dark:text-primary-400">
+ <span className="text-primary-600">
                     {t("dropHere")}
                   </span>
                 ) : (
                   <>
                     {t("dragAndDrop")}{" "}
-                    <span className="text-primary-600 dark:text-primary-500 hover:text-primary-700 dark:hover:text-primary-400">
+ <span className="text-primary-600 hover:text-primary-700">
                       {t("browse")}
                     </span>
                   </>
                 )}
               </p>
-              <p className="text-xs sm:text-sm text-neutral-500 dark:text-dark-text-tertiary">
+ <p className="text-xs sm:text-sm text-neutral-500">
                 {t("maxSize")}
               </p>
             </div>
@@ -356,18 +356,18 @@ export function FileUploadStep({
 
             {/* File info */}
             <div className="space-y-1">
-              <p className="text-base sm:text-lg font-semibold text-success-700 dark:text-success-400">
+ <p className="text-base sm:text-lg font-semibold text-success-700">
                 {selectedFile.name}
               </p>
-              <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+ <p className="text-sm text-neutral-600">
                 {formatFileSize(selectedFile.size)}
               </p>
             </div>
 
             {/* Success checkmark */}
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-success-100 dark:bg-success-900">
+ <div className="inline-flex items-center px-4 py-2 rounded-full bg-success-100">
               <svg
-                className="w-5 h-5 text-success-600 dark:text-success-400"
+ className="w-5 h-5 text-success-600"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -377,7 +377,7 @@ export function FileUploadStep({
                   clipRule="evenodd"
                 />
               </svg>
-              <span className="ml-2 text-sm font-medium text-success-700 dark:text-success-300">
+ <span className="ml-2 text-sm font-medium text-success-700">
                 {t("readyToUpload")}
               </span>
             </div>
@@ -387,8 +387,8 @@ export function FileUploadStep({
 
       {/* Error Message with improved design */}
       {error && (
-        <div className="flex items-start gap-3 p-4 bg-danger-50 dark:bg-danger-950 border border-danger-300 dark:border-danger-700 rounded-xl animate-in slide-in-from-top duration-300">
-          <div className="flex-shrink-0 w-5 h-5 rounded-full bg-danger-600 dark:bg-danger-700 flex items-center justify-center mt-0.5">
+ <div className="flex items-start gap-3 p-4 bg-danger-50 border border-danger-300 rounded-xl animate-in slide-in-from-top duration-300">
+ <div className="flex-shrink-0 w-5 h-5 rounded-full bg-danger-600 flex items-center justify-center mt-0.5">
             <svg
               className="w-3 h-3 text-white"
               fill="currentColor"
@@ -402,13 +402,13 @@ export function FileUploadStep({
             </svg>
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-danger-800 dark:text-danger-200">
+ <p className="text-sm font-medium text-danger-800">
               {error}
             </p>
           </div>
           <button
             onClick={() => setError("")}
-            className="flex-shrink-0 p-1 rounded-lg text-danger-600 dark:text-danger-400 hover:bg-danger-100 dark:hover:bg-danger-900 transition-colors"
+ className="flex-shrink-0 p-1 rounded-lg text-danger-600 hover:bg-danger-100 transition-colors"
             aria-label={t("dismissErrorAriaLabel")}
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

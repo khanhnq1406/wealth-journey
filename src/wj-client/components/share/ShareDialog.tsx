@@ -229,7 +229,7 @@ export function ShareDialog({
                 )}
               </div>
             </div>
-            <p className="text-xs text-neutral-500 dark:text-dark-text-tertiary mt-2 text-center">
+ <p className="text-xs text-neutral-500 mt-2 text-center">
               {t("previewCaption")}
             </p>
           </div>
@@ -237,7 +237,7 @@ export function ShareDialog({
 
         {/* Share Method Selection */}
         <div>
-          <label className="block text-sm font-medium text-neutral-900 dark:text-dark-text mb-3">
+ <label className="block text-sm font-medium text-neutral-900 mb-3">
             {t("shareMethod")}
           </label>
           <div className="grid grid-cols-2 gap-2">
@@ -252,22 +252,22 @@ export function ShareDialog({
                   onClick={() => setMethod(m)}
                   className={cn(
                     "flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all text-center",
-                    "hover:border-neutral-300 dark:hover:border-dark-border-light",
+ "hover:border-neutral-300",
                     isSelected
-                      ? "border-primary-500 dark:border-primary-600 bg-primary-50 dark:bg-primary-950"
-                      : "border-neutral-200 dark:border-dark-border bg-white dark:bg-dark-surface"
+ ? "border-primary-500 bg-primary-50"
+ : "border-neutral-200 bg-white"
                   )}
                 >
                   <div className={cn(
                     "p-2 rounded-lg",
-                    isSelected ? "text-primary-600 dark:text-primary-400 bg-white dark:bg-dark-surface" : "text-neutral-600 dark:text-dark-text-secondary bg-neutral-100 dark:bg-dark-surface-hover"
+ isSelected ? "text-primary-600 bg-white" : "text-neutral-600 bg-neutral-100"
                   )}>
                     {info.icon}
                   </div>
                   <div>
                     <span className={cn(
                       "block text-xs font-medium",
-                      isSelected ? "text-primary-700 dark:text-primary-400" : "text-neutral-700 dark:text-dark-text-secondary"
+ isSelected ? "text-primary-700" : "text-neutral-700"
                     )}>
                       {info.name}
                     </span>
@@ -282,7 +282,7 @@ export function ShareDialog({
         {method === "link" && (
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-neutral-900 dark:text-dark-text mb-2">
+ <label className="block text-sm font-medium text-neutral-900 mb-2">
                 {t("shareableLink")}
               </label>
               <div className="flex gap-2">
@@ -292,9 +292,9 @@ export function ShareDialog({
                   readOnly
                   className={cn(
                     "flex-1 px-3 py-2 rounded-lg border text-sm",
-                    "bg-neutral-100 dark:bg-dark-surface-hover",
-                    "border-neutral-300 dark:border-dark-border",
-                    "text-neutral-600 dark:text-dark-text-tertiary"
+ "bg-neutral-100",
+ "border-neutral-300",
+ "text-neutral-600"
                   )}
                 />
                 <Button
@@ -327,7 +327,7 @@ export function ShareDialog({
         {method === "email" && (
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-neutral-900 dark:text-dark-text mb-2">
+ <label className="block text-sm font-medium text-neutral-900 mb-2">
                 {t("emailRecipients")}
               </label>
               <input
@@ -338,19 +338,19 @@ export function ShareDialog({
                 className={cn(
                   // IMPORTANT: Font size must be at least 16px (text-base) to prevent iOS auto-zoom
                   "w-full px-3 py-2 rounded-lg border text-base sm:text-sm",
-                  "bg-white dark:bg-dark-surface-hover",
-                  "border-neutral-300 dark:border-dark-border",
-                  "text-neutral-900 dark:text-dark-text",
+ "bg-white",
+ "border-neutral-300",
+ "text-neutral-900",
                   "focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                  "placeholder:text-neutral-400 dark:placeholder:text-dark-text-tertiary"
+ "placeholder:text-neutral-400"
                 )}
               />
-              <p className="mt-1 text-xs text-neutral-500 dark:text-dark-text-tertiary">
+ <p className="mt-1 text-xs text-neutral-500">
                 {t("separateEmails")}
               </p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-900 dark:text-dark-text mb-2">
+ <label className="block text-sm font-medium text-neutral-900 mb-2">
                 {t("customMessage")}
               </label>
               <textarea
@@ -361,11 +361,11 @@ export function ShareDialog({
                 className={cn(
                   // IMPORTANT: Font size must be at least 16px (text-base) to prevent iOS auto-zoom
                   "w-full px-3 py-2 rounded-lg border text-base sm:text-sm resize-none",
-                  "bg-white dark:bg-dark-surface-hover",
-                  "border-neutral-300 dark:border-dark-border",
-                  "text-neutral-900 dark:text-dark-text",
+ "bg-white",
+ "border-neutral-300",
+ "text-neutral-900",
                   "focus:ring-2 focus:ring-primary-500 focus:border-transparent",
-                  "placeholder:text-neutral-400 dark:placeholder:text-dark-text-tertiary"
+ "placeholder:text-neutral-400"
                 )}
               />
             </div>
@@ -375,7 +375,7 @@ export function ShareDialog({
         {method === "pdf" && (
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-neutral-900 dark:text-dark-text mb-3">
+ <label className="block text-sm font-medium text-neutral-900 mb-3">
                 {t("reportFormat")}
               </label>
               <div className="flex gap-2">
@@ -385,8 +385,8 @@ export function ShareDialog({
                   className={cn(
                     "flex-1 px-4 py-2 rounded-lg border text-sm font-medium transition-all",
                     format === "summary"
-                      ? "border-primary-500 dark:border-primary-600 bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-400"
-                      : "border-neutral-200 dark:border-dark-border bg-white dark:bg-dark-surface text-neutral-700 dark:text-dark-text-secondary"
+ ? "border-primary-500 bg-primary-50 text-primary-700"
+ : "border-neutral-200 bg-white text-neutral-700"
                   )}
                 >
                   {t("summary")}
@@ -397,22 +397,22 @@ export function ShareDialog({
                   className={cn(
                     "flex-1 px-4 py-2 rounded-lg border text-sm font-medium transition-all",
                     format === "detailed"
-                      ? "border-primary-500 dark:border-primary-600 bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-400"
-                      : "border-neutral-200 dark:border-dark-border bg-white dark:bg-dark-surface text-neutral-700 dark:text-dark-text-secondary"
+ ? "border-primary-500 bg-primary-50 text-primary-700"
+ : "border-neutral-200 bg-white text-neutral-700"
                   )}
                 >
                   {t("detailed")}
                 </button>
               </div>
             </div>
-            <label className="flex items-center gap-3 p-3 rounded-lg border border-neutral-200 dark:border-dark-border hover:bg-neutral-50 dark:hover:bg-dark-surface-hover cursor-pointer transition-colors">
+ <label className="flex items-center gap-3 p-3 rounded-lg border border-neutral-200 hover:bg-neutral-50 cursor-pointer transition-colors">
               <input
                 type="checkbox"
                 checked={includeCharts}
                 onChange={(e) => setIncludeCharts(e.target.checked)}
-                className="w-4 h-4 rounded border-neutral-300 dark:border-dark-border text-primary-600 dark:text-primary-500 focus:ring-primary-500 dark:focus:ring-primary-600"
+ className="w-4 h-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
               />
-              <span className="text-sm font-medium text-neutral-900 dark:text-dark-text">
+ <span className="text-sm font-medium text-neutral-900">
                 {t("includeCharts")}
               </span>
             </label>
@@ -421,7 +421,7 @@ export function ShareDialog({
 
         {method === "social" && (
           <div className="space-y-3">
-            <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+ <p className="text-sm text-neutral-600">
               {t("shareSocial")}
             </p>
             <div className="grid grid-cols-3 gap-2">
@@ -430,42 +430,42 @@ export function ShareDialog({
                 onClick={() => handleSocialShare("twitter")}
                 className={cn(
                   "flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
-                  "border-neutral-200 dark:border-dark-border bg-white dark:bg-dark-surface",
+ "border-neutral-200 bg-white",
                   "hover:border-[#1DA1F2] hover:bg-[#1DA1F2]/5"
                 )}
               >
                 <svg className="w-6 h-6 text-[#1DA1F2]" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
-                <span className="text-xs font-medium text-neutral-700 dark:text-dark-text-secondary">X / Twitter</span>
+ <span className="text-xs font-medium text-neutral-700">X / Twitter</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleSocialShare("linkedin")}
                 className={cn(
                   "flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
-                  "border-neutral-200 dark:border-dark-border bg-white dark:bg-dark-surface",
+ "border-neutral-200 bg-white",
                   "hover:border-[#0077B5] hover:bg-[#0077B5]/5"
                 )}
               >
                 <svg className="w-6 h-6 text-[#0077B5]" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                 </svg>
-                <span className="text-xs font-medium text-neutral-700 dark:text-dark-text-secondary">LinkedIn</span>
+ <span className="text-xs font-medium text-neutral-700">LinkedIn</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleSocialShare("facebook")}
                 className={cn(
                   "flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
-                  "border-neutral-200 dark:border-dark-border bg-white dark:bg-dark-surface",
+ "border-neutral-200 bg-white",
                   "hover:border-[#4267B2] hover:bg-[#4267B2]/5"
                 )}
               >
                 <svg className="w-6 h-6 text-[#4267B2]" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                 </svg>
-                <span className="text-xs font-medium text-neutral-700 dark:text-dark-text-secondary">Facebook</span>
+ <span className="text-xs font-medium text-neutral-700">Facebook</span>
               </button>
             </div>
           </div>
@@ -473,7 +473,7 @@ export function ShareDialog({
       </div>
 
       {/* Footer Actions */}
-      <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end mt-6 pt-4 border-t border-neutral-200 dark:border-dark-border">
+ <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end mt-6 pt-4 border-t border-neutral-200">
         <Button
           type={ButtonType.SECONDARY}
           onClick={onClose}

@@ -63,7 +63,7 @@ export function SkeletonText({
         <div
           key={index}
           className={cn(
-            "rounded bg-gray-200 dark:bg-gray-700",
+ "rounded bg-gray-200",
             animationClass,
             height,
             index === lines - 1 && width !== "100%" ? "w-[var(--skeleton-width)]" : "w-full"
@@ -177,7 +177,7 @@ export function SkeletonParagraph({
         <div
           key={index}
           className={cn(
-            "h-4 rounded bg-gray-200 dark:bg-gray-700",
+ "h-4 rounded bg-gray-200",
             variant === "shimmer" ? "animate-shimmer" : "animate-pulse"
           )}
           style={{

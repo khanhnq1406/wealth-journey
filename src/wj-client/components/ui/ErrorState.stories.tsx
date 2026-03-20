@@ -73,7 +73,7 @@ export const WithAdditionalActions: Story = {
     retryLabel: "Retry",
     onRetry: () => console.log("Retry clicked"),
     actions: (
-      <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800">
+      <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
         Contact Support
       </button>
     ),

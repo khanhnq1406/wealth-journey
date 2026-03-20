@@ -405,17 +405,17 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
       <div
         ref={searchRef}
         className={cn(
-          "relative w-full max-w-2xl bg-white dark:bg-dark-surface rounded-xl shadow-modal dark:shadow-dark-modal",
-          "border border-neutral-200 dark:border-dark-border",
+ "relative w-full max-w-2xl bg-white rounded-xl shadow-modal",
+ "border border-neutral-200",
           "overflow-hidden",
           "animate-scale-in",
         )}
         style={{ zIndex: ZIndex.globalSearch + 1 }}
       >
         {/* Search Input */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-neutral-200 dark:border-dark-border">
+ <div className="flex items-center gap-3 px-4 py-3 border-b border-neutral-200">
           <svg
-            className="w-5 h-5 text-neutral-400 dark:text-dark-text-tertiary flex-shrink-0"
+ className="w-5 h-5 text-neutral-400 flex-shrink-0"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -437,8 +437,8 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
               placeholder={t("placeholder")}
               className={cn(
                 "w-full bg-transparent outline-none focus-visible:outline-none",
-                "text-neutral-900 dark:text-dark-text",
-                "placeholder:text-neutral-400 dark:placeholder:text-dark-text-tertiary",
+ "text-neutral-900",
+ "placeholder:text-neutral-400",
                 "text-base",
               )}
               autoComplete="off"
@@ -448,7 +448,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           {searchQuery && (
             <button
               onClick={handleClear}
-              className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-full hover:bg-neutral-100 dark:hover:bg-dark-surface-hover transition-colors"
+ className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-full hover:bg-neutral-100 transition-colors"
               aria-label={t("clearSearch")}
               type="button"
             >
@@ -468,8 +468,8 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
             </button>
           )}
 
-          <div className="hidden sm:flex items-center gap-1 text-xs text-neutral-400 dark:text-dark-text-tertiary">
-            <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">
+ <div className="hidden sm:flex items-center gap-1 text-xs text-neutral-400">
+ <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200">
               ESC
             </kbd>
             <span>{t("toClose")}</span>
@@ -481,7 +481,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           {!hasResults && searchQuery.trim() && (
             <div className="py-12 px-4 text-center">
               <svg
-                className="w-12 h-12 mx-auto text-neutral-300 dark:text-dark-text-tertiary mb-4"
+ className="w-12 h-12 mx-auto text-neutral-300 mb-4"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -493,10 +493,10 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
-              <p className="text-neutral-600 dark:text-dark-text-secondary font-medium">
+ <p className="text-neutral-600 font-medium">
                 {t("noResults")}
               </p>
-              <p className="text-sm text-neutral-400 dark:text-dark-text-tertiary mt-1">
+ <p className="text-sm text-neutral-400 mt-1">
                 {t("noResultsHint")}
               </p>
             </div>
@@ -507,7 +507,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
             recentSearches.length === 0 && (
               <div className="py-12 px-4 text-center">
                 <svg
-                  className="w-12 h-12 mx-auto text-neutral-300 dark:text-dark-text-tertiary mb-4"
+ className="w-12 h-12 mx-auto text-neutral-300 mb-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -519,18 +519,18 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                     d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
                   />
                 </svg>
-                <p className="text-neutral-600 dark:text-dark-text-secondary font-medium">
+ <p className="text-neutral-600 font-medium">
                   {t("startSearching")}
                 </p>
-                <p className="text-sm text-neutral-400 dark:text-dark-text-tertiary mt-1">
+ <p className="text-sm text-neutral-400 mt-1">
                   {t("startSearchingHint")}
                 </p>
-                <div className="flex items-center justify-center gap-2 mt-4 text-xs text-neutral-400 dark:text-dark-text-tertiary">
-                  <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">
+ <div className="flex items-center justify-center gap-2 mt-4 text-xs text-neutral-400">
+ <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200">
                     ↑↓
                   </kbd>
                   <span>{t("navigate")}</span>
-                  <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">
+ <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200">
                     Enter
                   </kbd>
                   <span>{t("select")}</span>
@@ -541,7 +541,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           {/* Recent Searches */}
           {!searchQuery.trim() && recentSearches.length > 0 && (
             <div className="p-2">
-              <div className="px-3 py-2 text-xs font-semibold text-neutral-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+ <div className="px-3 py-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider">
                 {t("recentSearches")}
               </div>
               <div className="space-y-1">
@@ -551,10 +551,10 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                     onClick={() => handleSuggestionClick(search)}
                     className={cn(
                       "w-full flex items-center gap-3 px-3 py-2 rounded-lg",
-                      "hover:bg-neutral-100 dark:hover:bg-dark-surface-hover",
+ "hover:bg-neutral-100",
                       "transition-colors text-left",
                       selectedIndex === index &&
-                        "bg-neutral-100 dark:bg-dark-surface-hover",
+ "bg-neutral-100",
                     )}
                   >
                     <svg
@@ -570,7 +570,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <span className="text-sm text-neutral-700 dark:text-dark-text">
+ <span className="text-sm text-neutral-700">
                       {search}
                     </span>
                   </button>
@@ -582,7 +582,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                       localStorage.removeItem(RECENT_SEARCHES_KEY);
                     }
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-danger-600 dark:text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-950 transition-colors text-left"
+ className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-danger-600 hover:bg-danger-50 transition-colors text-left"
                 >
                   <svg
                     className="w-4 h-4"
@@ -606,7 +606,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           {/* Search Results */}
           {results.length > 0 && (
             <div className="p-2">
-              <div className="px-3 py-2 text-xs font-semibold text-neutral-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+ <div className="px-3 py-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider">
                 {t("results", { count: results.length })}
               </div>
               <div className="space-y-1">
@@ -616,50 +616,50 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                     onClick={() => handleResultClick(result)}
                     className={cn(
                       "w-full flex items-center gap-3 px-3 py-3 rounded-lg",
-                      "hover:bg-neutral-100 dark:hover:bg-dark-surface-hover",
+ "hover:bg-neutral-100",
                       "transition-colors text-left group",
                       selectedIndex === index &&
-                        "bg-neutral-100 dark:bg-dark-surface-hover",
+ "bg-neutral-100",
                     )}
                   >
                     <div
                       className={cn(
                         "flex-shrink-0 p-2 rounded-lg",
                         result.type === "wallet" &&
-                          "bg-primary-50 dark:bg-primary-950 text-primary-600 dark:text-primary-400",
+ "bg-primary-50 text-primary-600",
                         result.type === "transaction" &&
-                          "bg-neutral-100 dark:bg-dark-surface-hover text-neutral-600 dark:text-dark-text-secondary",
+ "bg-neutral-100 text-neutral-600",
                         result.type === "investment" &&
-                          "bg-accent-50 dark:bg-accent-950 text-accent-600 dark:text-accent-400",
+ "bg-accent-50 text-accent-600",
                       )}
                     >
                       {result.icon}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-sm font-medium text-neutral-900 dark:text-dark-text truncate">
+ <p className="text-sm font-medium text-neutral-900 truncate">
                           {highlightMatch(result.title, searchQuery)}
                         </p>
                         {result.amount && (
-                          <span className="text-sm font-semibold text-neutral-700 dark:text-dark-text-secondary">
+ <span className="text-sm font-semibold text-neutral-700">
                             {result.amount}
                           </span>
                         )}
                       </div>
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-xs text-neutral-500 dark:text-dark-text-tertiary truncate">
+ <p className="text-xs text-neutral-500 truncate">
                           {result.subtitle &&
                             highlightMatch(result.subtitle, searchQuery)}
                         </p>
                         {result.date && (
-                          <span className="text-xs text-neutral-400 dark:text-dark-text-tertiary flex-shrink-0">
+ <span className="text-xs text-neutral-400 flex-shrink-0">
                             {result.date}
                           </span>
                         )}
                       </div>
                     </div>
                     <svg
-                      className="w-4 h-4 text-neutral-400 dark:text-dark-text-tertiary opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+ className="w-4 h-4 text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -680,7 +680,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
           {/* Suggestions */}
           {suggestions.length > 0 && results.length === 0 && (
             <div className="p-2">
-              <div className="px-3 py-2 text-xs font-semibold text-neutral-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+ <div className="px-3 py-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider">
                 {t("suggestions")}
               </div>
               <div className="space-y-1">
@@ -690,7 +690,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                     onClick={() => handleSuggestionClick(suggestion)}
                     className={cn(
                       "w-full flex items-center gap-3 px-3 py-2 rounded-lg",
-                      "hover:bg-neutral-100 dark:hover:bg-dark-surface-hover",
+ "hover:bg-neutral-100",
                       "transition-colors text-left",
                     )}
                   >
@@ -707,7 +707,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <span className="text-sm text-neutral-700 dark:text-dark-text">
+ <span className="text-sm text-neutral-700">
                       {suggestion}
                     </span>
                   </button>
@@ -718,7 +718,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2 border-t border-neutral-200 dark:border-dark-border flex items-center justify-between text-xs text-neutral-400 dark:text-dark-text-tertiary">
+ <div className="px-4 py-2 border-t border-neutral-200 flex items-center justify-between text-xs text-neutral-400">
           <div className="flex items-center gap-3">
             <span className="hidden sm:inline">{t("searchBy")}</span>
             <div className="flex items-center gap-1">
@@ -726,11 +726,11 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <kbd className="hidden sm:inline px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">
+ <kbd className="hidden sm:inline px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200">
               ↑↓
             </kbd>
             <span>{t("navigate")}</span>
-            <kbd className="hidden sm:inline px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">
+ <kbd className="hidden sm:inline px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200">
               Enter
             </kbd>
             <span>{t("select")}</span>
@@ -759,7 +759,7 @@ function highlightMatch(text: string, query: string): React.ReactNode {
         regex.test(part) ? (
           <mark
             key={index}
-            className="bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-100 rounded px-0.5"
+ className="bg-primary-100 text-primary-900 rounded px-0.5"
           >
             {part}
           </mark>

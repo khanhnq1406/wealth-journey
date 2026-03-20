@@ -168,7 +168,7 @@ export const QuickFilterChips = memo(function QuickFilterChips({
               // Active state
               isActive
                 ? "bg-v2-red-primary text-white shadow-md"
-                : "bg-white dark:bg-dark-surface text-gray-700 dark:text-dark-text border border-gray-300 dark:border-dark-border hover:bg-gray-50 dark:hover:bg-dark-surface-hover active:bg-gray-100 dark:active:bg-dark-surface-active",
+ : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 active:bg-gray-100",
             )}
             aria-pressed={isActive}
             aria-label={tf("filterBy", { label: filter.label.toLowerCase() })}

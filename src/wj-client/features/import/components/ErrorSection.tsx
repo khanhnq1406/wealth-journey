@@ -36,19 +36,19 @@ export const ErrorSection = React.memo(function ErrorSection({
   };
 
   return (
-    <div className="border border-danger-300 dark:border-danger-700 rounded-lg overflow-hidden">
+ <div className="border border-danger-300 rounded-lg overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-4 bg-danger-50 dark:bg-danger-950 hover:bg-danger-100 dark:hover:bg-danger-900 transition-colors"
+ className="w-full flex items-center justify-between p-4 bg-danger-50 hover:bg-danger-100 transition-colors"
       >
         <div className="flex items-center gap-3">
           <span className="text-2xl">⚠️</span>
           <div className="text-left">
-            <h3 className="font-semibold text-base text-danger-700 dark:text-danger-300">
+ <h3 className="font-semibold text-base text-danger-700">
               {t("needFixes", { count: transactions.length })}
             </h3>
-            <p className="text-sm text-danger-600 dark:text-danger-400">
+ <p className="text-sm text-danger-600">
               {t("mustFix")}
             </p>
           </div>
@@ -56,7 +56,7 @@ export const ErrorSection = React.memo(function ErrorSection({
         <ChevronDownIcon
           size="sm"
           className={cn(
-            "transition-transform text-danger-600 dark:text-danger-400",
+ "transition-transform text-danger-600",
             expanded && "rotate-180"
           )}
           decorative
@@ -65,15 +65,15 @@ export const ErrorSection = React.memo(function ErrorSection({
 
       {/* Content */}
       {expanded && (
-        <div className="p-4 space-y-4 bg-white dark:bg-dark-surface">
+ <div className="p-4 space-y-4 bg-white">
           {transactions.map((tx) => (
             <div
               key={tx.rowNumber}
-              className="p-4 bg-danger-50/50 dark:bg-danger-950/30 border border-danger-200 dark:border-danger-800 rounded-lg"
+ className="p-4 bg-danger-50/50 border border-danger-200 rounded-lg"
             >
               {/* Row Header */}
               <div className="flex justify-between items-start mb-3">
-                <h4 className="font-semibold text-sm text-neutral-900 dark:text-dark-text">
+ <h4 className="font-semibold text-sm text-neutral-900">
                   {t("row", { n: tx.rowNumber })}
                 </h4>
                 <div className="flex gap-2">
@@ -81,13 +81,13 @@ export const ErrorSection = React.memo(function ErrorSection({
                     onClick={() =>
                       setEditingRow(editingRow === tx.rowNumber ? null : tx.rowNumber)
                     }
-                    className="text-xs text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
+ className="text-xs text-primary-600 hover:text-primary-700 font-medium"
                   >
                     {editingRow === tx.rowNumber ? t("cancel") : t("fix")}
                   </button>
                   <button
                     onClick={() => onSkip(tx.rowNumber)}
-                    className="text-xs text-neutral-600 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-300 font-medium"
+ className="text-xs text-neutral-600 hover:text-neutral-700 font-medium"
                   >
                     {t("skip")}
                   </button>
@@ -99,9 +99,9 @@ export const ErrorSection = React.memo(function ErrorSection({
                 {tx.validationErrors?.map((error, idx) => (
                   <div
                     key={idx}
-                    className="flex items-start gap-2 text-sm text-danger-700 dark:text-danger-300"
+ className="flex items-start gap-2 text-sm text-danger-700"
                   >
-                    <span className="text-danger-600 dark:text-danger-400">•</span>
+ <span className="text-danger-600">•</span>
                     <span>
                       <strong>{error.field}:</strong> {error.message}
                     </span>
@@ -111,7 +111,7 @@ export const ErrorSection = React.memo(function ErrorSection({
 
               {/* Edit Form */}
               {editingRow === tx.rowNumber ? (
-                <div className="space-y-3 pt-3 border-t border-danger-200 dark:border-danger-800">
+ <div className="space-y-3 pt-3 border-t border-danger-200">
                   <FormInput
                     label={t("date").replace(":", "")}
                     type="text"
@@ -162,7 +162,7 @@ export const ErrorSection = React.memo(function ErrorSection({
                   </Button>
                 </div>
               ) : (
-                <div className="text-sm space-y-1 text-neutral-600 dark:text-dark-text-secondary">
+ <div className="text-sm space-y-1 text-neutral-600">
                   <p>
                     <strong>{t("date")}</strong> {formatDate(tx.date)}
                   </p>
@@ -178,7 +178,7 @@ export const ErrorSection = React.memo(function ErrorSection({
           ))}
 
           {/* Bulk Actions */}
-          <div className="flex gap-2 pt-2 border-t border-danger-200 dark:border-danger-800">
+ <div className="flex gap-2 pt-2 border-t border-danger-200">
             <Button
               variant="secondary"
               onClick={handleSkipAll}

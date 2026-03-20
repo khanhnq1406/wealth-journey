@@ -78,7 +78,7 @@ export const NavTooltip = memo(function NavTooltip({
               zIndex: ZIndex.tooltip,
             }}
           >
-            <div className="bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 text-sm font-medium px-3 py-2 rounded-lg shadow-dropdown whitespace-nowrap animate-fade-in">
+ <div className="bg-neutral-900 text-white text-sm font-medium px-3 py-2 rounded-lg shadow-dropdown whitespace-nowrap animate-fade-in">
               {content}
             </div>
           </div>,

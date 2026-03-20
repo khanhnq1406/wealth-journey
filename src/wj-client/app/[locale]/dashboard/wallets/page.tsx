@@ -126,7 +126,7 @@ export default function WalletsPage() {
       <div className="flex flex-col gap-4">
         {/* Title and Create Button */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 dark:text-dark-text">
+ <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">
             {t("title")}
           </h1>
           <Button
@@ -158,15 +158,15 @@ export default function WalletsPage() {
         {/* Controls Bar - View Toggle & Filters */}
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
           {/* View Mode Toggle */}
-          <div className="flex items-center gap-1 bg-gray-100 dark:bg-dark-surface-hover rounded-lg p-1 self-start">
+ <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1 self-start">
             <button
               type="button"
               onClick={() => setViewMode("grid")}
               className={cn(
                 "px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 min-h-[40px]",
                 viewMode === "grid"
-                  ? "bg-white dark:bg-dark-surface text-gray-900 dark:text-dark-text shadow-sm"
-                  : "text-gray-600 dark:text-dark-text-secondary hover:text-gray-900 dark:hover:text-dark-text",
+ ? "bg-white text-gray-900 shadow-sm"
+ : "text-gray-600 hover:text-gray-900",
               )}
               aria-label={t("viewMode.grid")}
               aria-pressed={viewMode === "grid"}
@@ -191,8 +191,8 @@ export default function WalletsPage() {
               className={cn(
                 "px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 min-h-[40px]",
                 viewMode === "list"
-                  ? "bg-white dark:bg-dark-surface text-gray-900 dark:text-dark-text shadow-sm"
-                  : "text-gray-600 dark:text-dark-text-secondary hover:text-gray-900 dark:hover:text-dark-text",
+ ? "bg-white text-gray-900 shadow-sm"
+ : "text-gray-600 hover:text-gray-900",
               )}
               aria-label={t("viewMode.list")}
               aria-pressed={viewMode === "list"}
@@ -228,7 +228,7 @@ export default function WalletsPage() {
                   "px-4 py-2 rounded-lg text-sm font-medium transition-colors min-h-[40px]",
                   filterType === filter.value
                     ? "bg-v2-red-primary text-white"
-                    : "bg-gray-100 dark:bg-dark-surface-hover text-gray-700 dark:text-dark-text hover:bg-gray-200 dark:hover:bg-dark-surface-active",
+ : "bg-gray-100 text-gray-700 hover:bg-gray-200",
                 )}
                 aria-pressed={filterType === filter.value}
               >
@@ -311,7 +311,7 @@ export default function WalletsPage() {
       {/* Delete Wallet Modal */}
       {modalState?.type === "delete-wallet" && (
         <div className="fixed inset-0 bg-modal flex justify-center items-center z-50">
-          <div className="bg-white dark:bg-dark-surface rounded-lg p-6 max-w-md w-full mx-4">
+ <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <DeleteWalletModal
               wallet={modalState.wallet}
               onSuccess={handleModalSuccess}

@@ -85,7 +85,7 @@ export const FormWizard = memo(function FormWizard({
                         ? "bg-v2-red-primary text-white shadow-md"
                         : isCompleted
                         ? "bg-success-500 text-white"
-                        : "bg-gray-200 dark:bg-dark-surface-hover text-gray-500 dark:text-dark-text-tertiary",
+ : "bg-gray-200 text-gray-500",
                       !isAccessible && !isCurrent && "cursor-not-allowed opacity-50"
                     )}
                     aria-label={t("goToStep", { number: index + 1, title: step.title })}
@@ -110,16 +110,16 @@ export const FormWizard = memo(function FormWizard({
                       className={cn(
                         "text-sm font-medium",
                         isCurrent
-                          ? "text-gray-900 dark:text-dark-text"
+ ? "text-gray-900"
                           : isCompleted
-                          ? "text-success-600 dark:text-success-400"
-                          : "text-gray-500 dark:text-dark-text-tertiary"
+ ? "text-success-600"
+ : "text-gray-500"
                       )}
                     >
                       {step.title}
                     </div>
                     {step.description && (
-                      <div className="text-xs text-gray-500 dark:text-dark-text-tertiary">
+ <div className="text-xs text-gray-500">
                         {step.description}
                       </div>
                     )}
@@ -132,7 +132,7 @@ export const FormWizard = memo(function FormWizard({
                         "flex-1 h-0.5 mx-4",
                         isCompleted
                           ? "bg-success-500"
-                          : "bg-gray-200 dark:bg-dark-border"
+ : "bg-gray-200"
                       )}
                       aria-hidden="true"
                     />
@@ -155,7 +155,7 @@ export const FormWizard = memo(function FormWizard({
                 ? "w-8 bg-v2-red-primary"
                 : index < currentStepIndex
                 ? "w-2 bg-success-500"
-                : "w-2 bg-gray-300 dark:bg-dark-border"
+ : "w-2 bg-gray-300"
             )}
             aria-hidden="true"
           />
@@ -167,10 +167,10 @@ export const FormWizard = memo(function FormWizard({
         <div className="animate-fade-in">
           {/* Mobile step title */}
           <div className="sm:hidden mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-dark-text">
+ <h2 className="text-lg font-semibold text-gray-900">
               {t("stepOf", { current: currentStepIndex + 1, total: steps.length })}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
+ <p className="text-sm text-gray-500">
               {currentStep.title}
             </p>
           </div>
@@ -180,7 +180,7 @@ export const FormWizard = memo(function FormWizard({
       </div>
 
       {/* Navigation */}
-      <div className="mt-6 flex gap-3 pt-4 border-t border-gray-200 dark:border-dark-border">
+ <div className="mt-6 flex gap-3 pt-4 border-t border-gray-200">
         {/* Previous Button */}
         <button
           type="button"
@@ -190,8 +190,8 @@ export const FormWizard = memo(function FormWizard({
             "flex-1 min-h-[48px] px-4 py-3 rounded-lg font-medium transition-all duration-150",
             "focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
             isFirstStep || isPreviousDisabled
-              ? "bg-gray-100 dark:bg-dark-surface-hover text-gray-400 dark:text-dark-text-tertiary cursor-not-allowed"
-              : "bg-white dark:bg-dark-surface text-gray-700 dark:text-dark-text border border-gray-300 dark:border-dark-border hover:bg-gray-50 dark:hover:bg-dark-surface-hover active:bg-gray-100 dark:active:bg-dark-surface-active"
+ ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+ : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 active:bg-gray-100"
           )}
           aria-label={t("previousStepAriaLabel")}
         >
@@ -207,7 +207,7 @@ export const FormWizard = memo(function FormWizard({
             "flex-1 min-h-[48px] px-4 py-3 rounded-lg font-medium transition-all duration-150",
             "focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
             isNextDisabled || currentStep.isValid === false
-              ? "bg-gray-300 dark:bg-dark-surface-hover text-gray-500 dark:text-dark-text-tertiary cursor-not-allowed"
+ ? "bg-gray-300 text-gray-500 cursor-not-allowed"
               : "bg-v2-red-primary text-white hover:bg-v2-red-dark active:bg-v2-red-dark shadow-md hover:shadow-lg",
             isLoading && "opacity-70 cursor-wait"
           )}

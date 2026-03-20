@@ -134,7 +134,7 @@ export function BottomSheet({
       {/* Backdrop */}
       <div
         className={cn(
-          "fixed inset-0 bg-black/50 dark:bg-black/70",
+ "fixed inset-0 bg-black/50",
           "transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0"
         )}
@@ -151,8 +151,8 @@ export function BottomSheet({
         ref={sheetRef}
         className={cn(
           "fixed bottom-0 left-0 right-0 px-safe",
-          "bg-white dark:bg-dark-surface",
-          "rounded-t-3xl shadow-2xl dark:shadow-dark-modal",
+ "bg-white",
+ "rounded-t-3xl shadow-2xl",
           "max-h-[85vh] overflow-hidden",
           "pb-16 sm:pb-0",
           transitionClass
@@ -174,14 +174,14 @@ export function BottomSheet({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          <div className="w-12 h-1.5 bg-neutral-300 dark:bg-neutral-600 rounded-full" />
+ <div className="w-12 h-1.5 bg-neutral-300 rounded-full" />
         </div>
 
         {/* Header */}
-        <div className="px-5 sm:px-6 py-4 border-b border-neutral-200 dark:border-dark-border">
+ <div className="px-5 sm:px-6 py-4 border-b border-neutral-200">
           <h2
             id="bottom-sheet-title"
-            className="text-lg font-semibold text-neutral-900 dark:text-dark-text"
+ className="text-lg font-semibold text-neutral-900"
           >
             {title}
           </h2>

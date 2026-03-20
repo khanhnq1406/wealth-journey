@@ -68,7 +68,7 @@ const TAB_TYPE_COLOR: Record<Tab, string> = {
   gold: "text-v2-gold-dark",
   silver: "text-v2-silver-dark",
   currency: "text-v2-currency-dark",
-  symbol: "text-gray-900 dark:text-dark-text",
+ symbol: "text-gray-900",
 };
 
 function buildTanstackColumns(
@@ -267,7 +267,7 @@ function SymbolLookupTab({
     <div className="space-y-4">
       <div className="flex gap-2 items-end">
         <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-1">
+ <label className="block text-sm font-medium text-gray-700 mb-1">
             {t("symbolLabel")}
           </label>
           <SymbolAutocomplete
@@ -292,10 +292,10 @@ function SymbolLookupTab({
       )}
 
       {priceData && querySymbol && (
-        <div className="p-4 bg-gray-50 dark:bg-dark-surface rounded-lg border border-gray-200 dark:border-dark-border">
+ <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-lg font-bold text-gray-900 dark:text-dark-text">
+ <p className="text-lg font-bold text-gray-900">
                 {querySymbol}
               </p>
               <p className="text-xs text-gray-400 mt-0.5">
@@ -307,7 +307,7 @@ function SymbolLookupTab({
               </p>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold text-gray-900 dark:text-dark-text">
+ <p className="text-2xl font-bold text-gray-900">
                 {priceData.currency === "VND"
                   ? formatPriceValue(priceData.price, "VND")
                   : `$${priceData.priceDecimal.toFixed(2)}`}
@@ -372,7 +372,7 @@ export default function PricesPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-dark-text">
+ <h1 className="text-xl font-bold text-gray-900">
             {t("title")}
           </h1>
           {lastUpdated && (
@@ -411,7 +411,7 @@ export default function PricesPage() {
 
       <BaseCard padding="none">
         {/* Tab bar */}
-        <div className="flex border-b border-gray-200 dark:border-dark-border overflow-x-auto scrollbar-hide">
+ <div className="flex border-b border-gray-200 overflow-x-auto scrollbar-hide">
           {TABS.map((tab) => (
             <button
               key={tab.key}
@@ -419,7 +419,7 @@ export default function PricesPage() {
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === tab.key
                   ? "border-b-2 border-v2-red-primary text-v2-red-primary"
-                  : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-dark-text"
+ : "text-gray-600 hover:text-gray-900"
               }`}
             >
               {tab.label}

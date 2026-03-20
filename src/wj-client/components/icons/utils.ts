@@ -17,9 +17,9 @@ export function getIconSizeForButton(buttonSize: "sm" | "md" | "lg"): IconSize {
  */
 export function getFinanceColor(type: "income" | "expense" | "transfer"): string {
   const colorMap = {
-    income: "text-success-600 dark:text-success-500",
-    expense: "text-danger-600 dark:text-danger-500",
-    transfer: "text-primary-600 dark:text-primary-500",
+ income: "text-success-600",
+ expense: "text-danger-600",
+ transfer: "text-primary-600",
   };
   return colorMap[type];
 }

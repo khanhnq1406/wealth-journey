@@ -33,16 +33,16 @@ const ASSET_THEME = {
   gold: {
     spinnerBorder: "border-v2-gold-primary",
     focusRing: "focus:ring-v2-gold-primary/30 focus:border-v2-gold-primary",
-    accentText: "text-v2-gold-primary hover:text-v2-gold-dark dark:hover:text-v2-gold-accent",
+ accentText: "text-v2-gold-primary hover:text-v2-gold-dark",
     sendButton: "bg-v2-gold-primary hover:bg-v2-gold-dark active:bg-v2-gold-dark",
-    loadMoreText: "text-v2-gold-primary hover:text-v2-gold-dark dark:hover:text-v2-gold-accent",
+ loadMoreText: "text-v2-gold-primary hover:text-v2-gold-dark",
   },
   silver: {
     spinnerBorder: "border-v2-silver-primary",
     focusRing: "focus:ring-v2-silver-primary/30 focus:border-v2-silver-primary",
-    accentText: "text-v2-silver-primary hover:text-v2-silver-dark dark:hover:text-gray-300",
+ accentText: "text-v2-silver-primary hover:text-v2-silver-dark",
     sendButton: "bg-v2-silver-primary hover:bg-v2-silver-dark active:bg-v2-silver-dark",
-    loadMoreText: "text-v2-silver-primary hover:text-v2-silver-dark dark:hover:text-gray-300",
+ loadMoreText: "text-v2-silver-primary hover:text-v2-silver-dark",
   },
 } as const;
 
@@ -214,8 +214,8 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
         <div
           className={`fixed top-4 left-1/2 -translate-x-1/2 z-toast text-white px-4 py-2 rounded-lg shadow-lg text-sm animate-fade-in ${
             toastType === "error"
-              ? "bg-red-600 dark:bg-red-700"
-              : "bg-neutral-800 dark:bg-neutral-700"
+ ? "bg-red-600"
+ : "bg-neutral-800"
           }`}
         >
           {toastMessage}
@@ -223,7 +223,7 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
       )}
 
       {/* Question */}
-      <h3 className="text-sm sm:text-base font-semibold text-v2-text-primary dark:text-dark-text mb-2.5">
+ <h3 className="text-sm sm:text-base font-semibold text-v2-text-primary mb-2.5">
         {t("question")}
       </h3>
 
@@ -236,7 +236,7 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
           className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg min-h-11 px-3 py-2 text-sm font-medium transition-all duration-150 select-none ${
             userVote === VoteDirection.VOTE_DIRECTION_BULLISH
               ? "bg-success-600 text-white shadow-sm"
-              : "bg-success-50 text-success-700 dark:bg-success-900/20 dark:text-success-400 active:bg-success-200 dark:active:bg-success-900/40"
+ : "bg-success-50 text-success-700 active:bg-success-200"
           } disabled:opacity-60 disabled:cursor-not-allowed`}
         >
           <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -255,7 +255,7 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
           className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg min-h-11 px-3 py-2 text-sm font-medium transition-all duration-150 select-none ${
             userVote === VoteDirection.VOTE_DIRECTION_BEARISH
               ? "bg-danger-600 text-white shadow-sm"
-              : "bg-danger-50 text-danger-700 dark:bg-danger-900/20 dark:text-danger-400 active:bg-danger-200 dark:active:bg-danger-900/40"
+ : "bg-danger-50 text-danger-700 active:bg-danger-200"
           } disabled:opacity-60 disabled:cursor-not-allowed`}
         >
           <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -271,7 +271,7 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
       {/* Sentiment bar — visual progress */}
       {totalVotes > 0 && (
         <div className="mb-2">
-          <div className="flex h-1.5 rounded-full overflow-hidden bg-neutral-100 dark:bg-neutral-800">
+ <div className="flex h-1.5 rounded-full overflow-hidden bg-neutral-100">
             <div
               className="bg-success-500 transition-all duration-500 ease-out rounded-l-full"
               style={{ width: `${bullishPct}%` }}
@@ -285,13 +285,13 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
       )}
 
       {/* Summary */}
-      <p className="text-xs text-v2-text-tertiary dark:text-dark-text-secondary mb-2.5">
+ <p className="text-xs text-v2-text-tertiary mb-2.5">
         {getSummaryText()}
       </p>
 
       {/* Login CTA for landing when not authenticated */}
       {!isHome && !isAuthenticated && (
-        <div className="text-center text-sm text-v2-text-secondary dark:text-dark-text-secondary mb-2.5">
+ <div className="text-center text-sm text-v2-text-secondary mb-2.5">
           <Link
             href="/auth/login"
             className={`${theme.accentText} font-medium underline`}
@@ -302,11 +302,11 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
       )}
 
       {/* Divider */}
-      <div className="border-t border-v2-border-light dark:border-dark-border my-2.5" />
+ <div className="border-t border-v2-border-light my-2.5" />
 
       {/* Comments section header */}
       <div className="flex items-baseline justify-between mb-2">
-        <h4 className="text-xs sm:text-sm font-medium text-v2-text-secondary dark:text-dark-text-secondary">
+ <h4 className="text-xs sm:text-sm font-medium text-v2-text-secondary">
           {t("comments")} {totalComments > 0 && <span className="text-v2-text-tertiary">({totalComments})</span>}
         </h4>
       </div>
@@ -319,11 +319,11 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
           </div>
         ) : allComments.length === 0 ? (
           <div className="text-center py-5">
-            <p className="text-sm text-neutral-400 dark:text-dark-text-tertiary">
+ <p className="text-sm text-neutral-400">
               {t("noComments")}
             </p>
             {isHome && (
-              <p className="text-xs text-neutral-300 dark:text-dark-text-tertiary mt-1">
+ <p className="text-xs text-neutral-300 mt-1">
                 {t("beFirstToComment")}
               </p>
             )}
@@ -381,7 +381,7 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
 
       {/* Comment input (home only, authenticated) */}
       {isHome && isAuthenticated && (
-        <div className="mt-2.5 border-t border-v2-border-light dark:border-dark-border pt-2.5">
+ <div className="mt-2.5 border-t border-v2-border-light pt-2.5">
           <div className="flex gap-2 items-end">
             <textarea
               ref={textareaRef}
@@ -393,7 +393,7 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
               placeholder={t("writeComment")}
               maxLength={MAX_COMMENT_LENGTH}
               rows={1}
-              className={`flex-1 resize-none rounded-lg border border-v2-border bg-v2-bg-primary dark:border-dark-border dark:bg-neutral-800 text-sm text-v2-text-primary dark:text-dark-text placeholder-v2-text-tertiary dark:placeholder-dark-text-tertiary px-3 py-2.5 focus:outline-none focus:ring-2 ${theme.focusRing} transition-colors`}
+ className={`flex-1 resize-none rounded-lg border border-v2-border bg-v2-bg-primary text-sm text-v2-text-primary placeholder-v2-text-tertiary px-3 py-2.5 focus:outline-none focus:ring-2 ${theme.focusRing} transition-colors`}
               style={{ minHeight: "2.75rem", maxHeight: "7.5rem" }}
             />
             <button
@@ -416,7 +416,7 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
             </button>
           </div>
           {commentText.length > 0 && (
-            <p className="text-[11px] text-v2-text-tertiary dark:text-dark-text-tertiary mt-1 text-right tabular-nums">
+ <p className="text-[11px] text-v2-text-tertiary mt-1 text-right tabular-nums">
               {commentText.length}/{MAX_COMMENT_LENGTH}
             </p>
           )}
@@ -425,13 +425,13 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
 
       {/* Login prompt for home when not authenticated — for commenting */}
       {isHome && !isAuthenticated && (
-        <div className="mt-2.5 border-t border-v2-border-light dark:border-dark-border pt-2.5 text-center">
+ <div className="mt-2.5 border-t border-v2-border-light pt-2.5 text-center">
           <Link
             href="/auth/login"
             className={`inline-flex items-center gap-1 text-sm font-medium ${theme.accentText}`}
           >
             <span>{t("login")}</span>
-            <span className="text-v2-text-secondary dark:text-dark-text-secondary font-normal">
+ <span className="text-v2-text-secondary font-normal">
               {t("loginToComment")}
             </span>
           </Link>
@@ -470,7 +470,7 @@ function CommentRow({ comment, isHome, onDelete, isDeleting, t }: CommentRowProp
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1 flex-wrap">
-          <span className="text-[13px] font-medium text-v2-text-primary dark:text-dark-text truncate max-w-[120px] sm:max-w-[180px]">
+ <span className="text-[13px] font-medium text-v2-text-primary truncate max-w-[120px] sm:max-w-[180px]">
             {comment.userName}
           </span>
 
@@ -486,12 +486,12 @@ function CommentRow({ comment, isHome, onDelete, isDeleting, t }: CommentRowProp
             </svg>
           )}
 
-          <span className="text-[11px] text-neutral-400 dark:text-dark-text-tertiary whitespace-nowrap">
+ <span className="text-[11px] text-neutral-400 whitespace-nowrap">
             {comment.createdAt ? formatRelativeTime(comment.createdAt, t) : ""}
           </span>
         </div>
 
-        <p className="text-[13px] leading-snug text-v2-text-secondary dark:text-dark-text-secondary mt-0.5 break-words">
+ <p className="text-[13px] leading-snug text-v2-text-secondary mt-0.5 break-words">
           {comment.content}
         </p>
       </div>
@@ -502,7 +502,7 @@ function CommentRow({ comment, isHome, onDelete, isDeleting, t }: CommentRowProp
           type="button"
           onClick={() => onDelete(comment.id)}
           disabled={isDeleting}
-          className="min-w-[32px] min-h-[32px] flex items-center justify-center text-neutral-300 hover:text-danger-500 dark:text-dark-text-tertiary dark:hover:text-danger-400 transition-colors shrink-0 disabled:opacity-50 rounded-md sm:opacity-0 sm:group-hover/comment:opacity-100"
+ className="min-w-[32px] min-h-[32px] flex items-center justify-center text-neutral-300 hover:text-danger-500 transition-colors shrink-0 disabled:opacity-50 rounded-md sm:opacity-0 sm:group-hover/comment:opacity-100"
           style={{ touchAction: "manipulation" }}
           aria-label={t("delete")}
         >

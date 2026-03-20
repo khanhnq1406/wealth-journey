@@ -78,8 +78,8 @@ export function Toast({
 
   const variantStyles = {
     success: "bg-v2-green-positive text-white",
-    error: "bg-red-500 dark:bg-red-600 text-white",
-    warning: "bg-yellow-500 dark:bg-yellow-600 text-white",
+ error: "bg-red-500 text-white",
+ warning: "bg-yellow-500 text-white",
     info: "bg-v2-red-primary text-white",
   };
 

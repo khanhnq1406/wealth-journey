@@ -18,17 +18,17 @@ export function Pagination({ page, totalPages, onPageChange }: PaginationProps) 
       <button
         onClick={() => onPageChange(page - 1)}
         disabled={page <= 1}
-        className="px-3 py-1 text-sm rounded border border-neutral-200 dark:border-dark-border disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-50 dark:hover:bg-dark-hover transition-colors"
+ className="px-3 py-1 text-sm rounded border border-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-50 transition-colors"
       >
         {t("prev")}
       </button>
-      <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+ <span className="text-sm text-neutral-600">
         {page} / {totalPages}
       </span>
       <button
         onClick={() => onPageChange(page + 1)}
         disabled={page >= totalPages}
-        className="px-3 py-1 text-sm rounded border border-neutral-200 dark:border-dark-border disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-50 dark:hover:bg-dark-hover transition-colors"
+ className="px-3 py-1 text-sm rounded border border-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-neutral-50 transition-colors"
       >
         {t("next")}
       </button>

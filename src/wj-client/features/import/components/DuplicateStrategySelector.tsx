@@ -57,14 +57,14 @@ export function DuplicateStrategySelector({
   ];
 
   return (
-    <div className={cn("p-4 bg-warning-50 dark:bg-warning-950 border border-warning-300 dark:border-warning-700 rounded-lg", className)}>
+ <div className={cn("p-4 bg-warning-50 border border-warning-300 rounded-lg", className)}>
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">⚡</span>
         <div>
-          <h3 className="text-sm font-semibold text-warning-700 dark:text-warning-300">
+ <h3 className="text-sm font-semibold text-warning-700">
             {t(duplicateCount !== 1 ? "headingPlural" : "heading", { count: duplicateCount })}
           </h3>
-          <p className="text-xs text-warning-600 dark:text-warning-400">
+ <p className="text-xs text-warning-600">
             {t("subtitle")}
           </p>
         </div>
@@ -78,17 +78,17 @@ export function DuplicateStrategySelector({
             className={cn(
               "p-3 rounded-lg border-2 transition-all text-left",
               selectedStrategy === strategy.value
-                ? "border-primary-600 bg-primary-50 dark:bg-primary-950"
-                : "border-neutral-200 dark:border-dark-border bg-white dark:bg-dark-surface hover:border-neutral-300 dark:hover:border-neutral-600"
+ ? "border-primary-600 bg-primary-50"
+ : "border-neutral-200 bg-white hover:border-neutral-300"
             )}
           >
             <div className="flex items-center gap-2 mb-1">
               <span className="text-lg">{strategy.icon}</span>
-              <span className="text-sm font-semibold text-neutral-900 dark:text-dark-text">
+ <span className="text-sm font-semibold text-neutral-900">
                 {strategy.label}
               </span>
             </div>
-            <p className="text-xs text-neutral-600 dark:text-dark-text-secondary">
+ <p className="text-xs text-neutral-600">
               {strategy.description}
             </p>
           </button>
@@ -96,7 +96,7 @@ export function DuplicateStrategySelector({
       </div>
 
       {selectedStrategy === DuplicateHandlingStrategy.DUPLICATE_STRATEGY_KEEP_ALL && (
-        <div className="mt-3 p-2 bg-warning-100 dark:bg-warning-900/30 rounded text-xs text-warning-800 dark:text-warning-300">
+ <div className="mt-3 p-2 bg-warning-100 rounded text-xs text-warning-800">
           ⚠️ {t(duplicateCount !== 1 ? "keepAllWarningPlural" : "keepAllWarning", { count: duplicateCount })}
         </div>
       )}

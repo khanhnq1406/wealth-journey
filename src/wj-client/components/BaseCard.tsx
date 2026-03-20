@@ -94,16 +94,16 @@ export const BaseCard = memo(function BaseCard({
         // Light mode
         "bg-white",
         // Dark mode
-        "dark:bg-dark-surface",
+ "",
         mobileOptimized ? "rounded-sm sm:rounded-md lg:rounded-lg" : "rounded-lg",
         paddingClasses[padding],
         shadowClasses[shadow],
         // Mobile-specific optimizations
         noMobileMargin ? "" : "mb-2 sm:mb-3 lg:mb-4",
         // Hover effect with transition
-        hover && "hover:shadow-card-hover dark:hover:shadow-dark-card-hover cursor-pointer transition-shadow duration-200",
+ hover && "hover:shadow-card-hover cursor-pointer transition-shadow duration-200",
         // Clickable cards get larger touch target on mobile
-        onClick && "cursor-pointer active:shadow-card-active dark:active:shadow-dark-card-active",
+ onClick && "cursor-pointer active:shadow-card-active",
         // Smooth color transitions for dark mode
         "transition-colors duration-200",
         className
@@ -137,11 +137,11 @@ export const BaseCard = memo(function BaseCard({
                 "text-neutral-500 hover:text-neutral-700",
                 "active:text-neutral-900",
                 // Dark mode colors
-                "dark:text-dark-text-secondary dark:hover:text-dark-text",
-                "dark:active:text-dark-text-tertiary",
+ "",
+ "",
                 "transition-colors duration-150",
                 "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
-                "dark:focus-visible:ring-offset-dark-background",
+ "",
                 "rounded-md",
                 // Hide chevron on desktop when collapsibleOnMobile
                 collapsibleOnMobile && "md:hidden"

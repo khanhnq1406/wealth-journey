@@ -109,10 +109,10 @@ export function FormField({
     labelWidthClasses[labelWidth],
     labelAlignClasses[labelAlign],
     error
-      ? "text-red-600 dark:text-red-400"
+ ? "text-red-600"
       : success
-      ? "text-v2-green-positive dark:text-green-400"
-      : "text-gray-700 dark:text-gray-300",
+ ? "text-v2-green-positive"
+ : "text-gray-700",
     labelClassName
   );
 
@@ -137,7 +137,7 @@ export function FormField({
             {error && (
               <p
                 id={errorId}
-                className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
+ className="text-sm text-red-600 flex items-center gap-1"
               >
                 <svg
                   className="w-4 h-4 flex-shrink-0"
@@ -157,7 +157,7 @@ export function FormField({
             {success && !error && (
               <p
                 id={successId}
-                className="text-sm text-v2-green-positive dark:text-green-400 flex items-center gap-1"
+ className="text-sm text-v2-green-positive flex items-center gap-1"
               >
                 <svg
                   className="w-4 h-4 flex-shrink-0"
@@ -177,7 +177,7 @@ export function FormField({
             {helperText && !error && !success && (
               <p
                 id={helperId}
-                className="text-sm text-gray-500 dark:text-gray-400"
+ className="text-sm text-gray-500"
               >
                 {helperText}
               </p>
@@ -245,7 +245,7 @@ export function FormFieldGroup({
     <div
       className={cn(
         "rounded-lg",
-        bordered && "border border-gray-200 dark:border-gray-700 p-4 sm:p-6",
+ bordered && "border border-gray-200 p-4 sm:p-6",
         !bordered && "space-y-4",
         className
       )}
@@ -254,12 +254,12 @@ export function FormFieldGroup({
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             {title && (
-              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+ <h3 className="text-base font-semibold text-gray-900">
                 {title}
               </h3>
             )}
             {description && (
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+ <p className="mt-1 text-sm text-gray-500">
                 {description}
               </p>
             )}
@@ -268,7 +268,7 @@ export function FormFieldGroup({
             <button
               type="button"
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="flex-shrink-0 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+ className="flex-shrink-0 p-2 rounded-md hover:bg-gray-100 transition-colors"
               aria-expanded={!isCollapsed}
             >
               <svg

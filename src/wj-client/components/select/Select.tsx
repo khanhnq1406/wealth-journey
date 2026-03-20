@@ -289,7 +289,7 @@ export function Select<T extends string = string>({
   };
 
   const dropdownClassName =
-    "absolute z-50 w-full mt-1 bg-white dark:bg-dark-surface border border-neutral-200 dark:border-dark-border rounded-lg shadow-lg overflow-hidden animate-fade-in-scale";
+ "absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg overflow-hidden animate-fade-in-scale";
 
   const defaultRenderOption = (
     option: SelectOption<T>,
@@ -312,12 +312,12 @@ export function Select<T extends string = string>({
         className={cn(
           "w-full px-4 py-3 text-left flex items-center gap-3 cursor-pointer",
           "transition-colors duration-200",
-          "hover:bg-neutral-50 dark:hover:bg-dark-surface-hover/50",
-          "focus:outline-none focus:bg-neutral-100 dark:focus:bg-dark-surface-hover",
+ "hover:bg-neutral-50",
+ "focus:outline-none focus:bg-neutral-100",
           {
-            "bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300":
+ "bg-primary-50 text-primary-700":
               isSelected,
-            "bg-neutral-100 dark:bg-dark-surface-hover": isHighlighted,
+ "bg-neutral-100": isHighlighted,
           },
         )}
       >
@@ -328,7 +328,7 @@ export function Select<T extends string = string>({
 
   const dropdownContent =
     filteredOptions.length === 0 ? (
-      <div className="px-4 py-8 text-center text-sm text-neutral-500 dark:text-neutral-400">No options found</div>
+ <div className="px-4 py-8 text-center text-sm text-neutral-500">No options found</div>
     ) : (
       filteredOptions.map((option, index) => {
         const isSelected = value === option.value;
@@ -374,18 +374,18 @@ export function Select<T extends string = string>({
           autoComplete="off"
           spellCheck={false}
           className={cn(
-            "w-full pr-16 rounded-lg border bg-white dark:bg-dark-surface",
-            "text-neutral-900 dark:text-dark-text",
+ "w-full pr-16 rounded-lg border bg-white",
+ "text-neutral-900",
             "min-h-[44px] sm:min-h-[48px] px-3 sm:px-4 text-base sm:text-base",
             "transition-all duration-200",
             // Focus styles - aligned with FormSelect
             "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent",
             // Border styles
-            "border-neutral-300 dark:border-neutral-600",
+ "border-neutral-300",
             // Disabled styles
-            "disabled:bg-neutral-50 disabled:cursor-not-allowed dark:disabled:bg-dark-surface-hover disabled:opacity-50",
+ "disabled:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50",
             // Dark mode focus
-            "dark:focus:ring-primary-500",
+ "",
             disableInput && "cursor-pointer",
           )}
           role="combobox"
@@ -402,7 +402,7 @@ export function Select<T extends string = string>({
             <button
               type="button"
               onClick={handleClear}
-              className="text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-full p-0.5 transition-colors duration-200"
+ className="text-neutral-400 hover:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-full p-0.5 transition-colors duration-200"
               aria-label={t("clearAriaLabel")}
             >
               <XIcon size="sm" decorative />
@@ -423,7 +423,7 @@ export function Select<T extends string = string>({
                 }
                 inputRef.current?.focus();
               }}
-              className="text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-full p-0.5 transition-colors duration-200"
+ className="text-neutral-400 hover:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-full p-0.5 transition-colors duration-200"
               aria-label={isOpen ? "Close dropdown" : "Open dropdown"}
               aria-expanded={isOpen}
             >

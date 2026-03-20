@@ -107,21 +107,21 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
   };
 
   return (
-    <div className="border border-success-300 dark:border-success-700 rounded-lg overflow-hidden">
+ <div className="border border-success-300 rounded-lg overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-4 bg-success-50 dark:bg-success-950 hover:bg-success-100 dark:hover:bg-success-900 transition-colors"
+ className="w-full flex items-center justify-between p-4 bg-success-50 hover:bg-success-100 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-success-600 dark:bg-success-700 flex items-center justify-center">
+ <div className="w-8 h-8 rounded-full bg-success-600 flex items-center justify-center">
             <CheckIcon size="sm" className="text-white" decorative />
           </div>
           <div className="text-left">
-            <h3 className="font-semibold text-base text-success-700 dark:text-success-300">
+ <h3 className="font-semibold text-base text-success-700">
               {t("heading", { count: selectedCount })}
             </h3>
-            <p className="text-sm text-success-600 dark:text-success-400">
+ <p className="text-sm text-success-600">
               {t("subtitle")}
             </p>
           </div>
@@ -129,7 +129,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
         <ChevronDownIcon
           size="sm"
           className={cn(
-            "transition-transform text-success-600 dark:text-success-400",
+ "transition-transform text-success-600",
             expanded && "rotate-180",
           )}
           decorative
@@ -138,9 +138,9 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
 
       {/* Content */}
       {expanded && (
-        <div className="p-4 space-y-3 bg-white dark:bg-dark-surface">
+ <div className="p-4 space-y-3 bg-white">
           {/* Select All */}
-          <div className="flex items-center justify-between pb-2 border-b border-success-200 dark:border-success-800">
+ <div className="flex items-center justify-between pb-2 border-b border-success-200">
             <div
               className="flex items-center gap-2 cursor-pointer min-h-[44px]"
               onClick={handleSelectAll}
@@ -149,10 +149,10 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                 className={cn(
                   "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors",
                   allSelected
-                    ? "bg-primary-600 border-primary-600 dark:bg-primary-700 dark:border-primary-700"
+ ? "bg-primary-600 border-primary-600"
                     : someSelected
-                      ? "bg-primary-600 border-primary-600 dark:bg-primary-700 dark:border-primary-700"
-                      : "border-neutral-400 dark:border-neutral-500 hover:border-primary-500",
+ ? "bg-primary-600 border-primary-600"
+ : "border-neutral-400 hover:border-primary-500",
                 )}
                 role="checkbox"
                 aria-checked={allSelected ? "true" : someSelected ? "mixed" : "false"}
@@ -164,7 +164,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                   <MinusIcon size="sm" className="text-white" decorative />
                 ) : null}
               </div>
-              <span className="text-sm font-medium text-neutral-900 dark:text-dark-text">
+ <span className="text-sm font-medium text-neutral-900">
                 {t("selectAll", { selected: selectedCount, total: transactions.length })}
               </span>
             </div>
@@ -181,8 +181,8 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                   className={cn(
                     "flex items-start gap-3 p-3 rounded-lg transition-colors",
                     isChecked
-                      ? "bg-white dark:bg-dark-surface border border-neutral-200 dark:border-dark-border"
-                      : "bg-neutral-100 dark:bg-dark-surface-hover opacity-60",
+ ? "bg-white border border-neutral-200"
+ : "bg-neutral-100 opacity-60",
                   )}
                 >
                   <button
@@ -191,8 +191,8 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                     className={cn(
                       "mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 cursor-pointer",
                       isChecked
-                        ? "bg-primary-600 border-primary-600 dark:bg-primary-700 dark:border-primary-700"
-                        : "border-neutral-400 dark:border-neutral-500",
+ ? "bg-primary-600 border-primary-600"
+ : "border-neutral-400",
                     )}
                     aria-label={t("toggleRow", { n: tx.rowNumber })}
                   >
@@ -217,7 +217,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                                 }
                               }}
                               onClick={(e) => e.stopPropagation()}
-                              className="w-full px-2 py-1 text-sm border border-primary-500 rounded focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-dark-surface dark:border-dark-border dark:text-dark-text"
+ className="w-full px-2 py-1 text-sm border border-primary-500 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
                               autoFocus
                             />
                             <div className="flex gap-2">
@@ -235,7 +235,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                                   e.stopPropagation();
                                   handleCancelEdit();
                                 }}
-                                className="flex-1 px-2 py-1 text-xs bg-neutral-300 dark:bg-neutral-700 text-neutral-900 dark:text-dark-text rounded hover:bg-neutral-400 dark:hover:bg-neutral-600"
+ className="flex-1 px-2 py-1 text-xs bg-neutral-300 text-neutral-900 rounded hover:bg-neutral-400"
                               >
                                 {t("cancel")}
                               </button>
@@ -244,7 +244,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                         ) : (
                           <div className="space-y-1">
                             <div className="flex items-center gap-1">
-                              <p className="text-sm font-medium text-neutral-900 dark:text-dark-text truncate">
+ <p className="text-sm font-medium text-neutral-900 truncate">
                                 {tx.description}
                               </p>
                               {onDescriptionChange && (
@@ -253,7 +253,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                                     e.stopPropagation();
                                     handleStartEdit(tx.rowNumber, tx.description);
                                   }}
-                                  className="flex-shrink-0 text-primary-600 hover:text-primary-700 dark:text-primary-400 text-xs"
+ className="flex-shrink-0 text-primary-600 hover:text-primary-700 text-xs"
                                   title={t("editDescription")}
                                 >
                                   ✎
@@ -268,12 +268,12 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                                       e.stopPropagation();
                                       toggleOriginal(tx.rowNumber);
                                     }}
-                                    className="text-xs text-neutral-500 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400"
+ className="text-xs text-neutral-500 hover:text-primary-600"
                                   >
                                     {expandedOriginal.has(tx.rowNumber) ? "▼" : "▶"} {t("original")}
                                   </button>
                                   {expandedOriginal.has(tx.rowNumber) && (
-                                    <div className="text-xs text-neutral-600 dark:text-neutral-400 italic bg-neutral-50 dark:bg-dark-surface-hover p-2 rounded mt-1">
+ <div className="text-xs text-neutral-600 italic bg-neutral-50 p-2 rounded mt-1">
                                       {tx.originalDescription}
                                     </div>
                                   )}
@@ -282,19 +282,19 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                           </div>
                         )}
                       </div>
-                      <p className="text-sm font-semibold text-neutral-900 dark:text-dark-text ml-2 flex-shrink-0">
+ <p className="text-sm font-semibold text-neutral-900 ml-2 flex-shrink-0">
                         {formatCurrencyImport(
                           tx.amount?.amount || 0,
                           tx.amount?.currency || currency,
                         )}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-dark-text-tertiary flex-wrap">
+ <div className="flex items-center gap-2 text-xs text-neutral-500 flex-wrap">
                       <span>{formatDate(tx.date)}</span>
                       {tx.suggestedCategoryId && (
                         <>
                           <span>•</span>
-                          <span className="text-success-600 dark:text-success-400">
+ <span className="text-success-600">
                             {getCategoryName(tx.suggestedCategoryId)} (
                             {tx.categoryConfidence}%)
                           </span>

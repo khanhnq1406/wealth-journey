@@ -185,11 +185,11 @@ export function DuplicateReviewModal({
   // Confidence badge styling
   const getConfidenceBadgeClass = (confidence: number) => {
     if (confidence >= 95) {
-      return "bg-danger-100 text-danger-700 dark:bg-danger-900 dark:text-danger-300";
+ return "bg-danger-100 text-danger-700";
     } else if (confidence >= 70) {
-      return "bg-warning-100 text-warning-700 dark:bg-warning-900 dark:text-warning-300";
+ return "bg-warning-100 text-warning-700";
     } else {
-      return "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300";
+ return "bg-neutral-100 text-neutral-700";
     }
   };
 
@@ -210,11 +210,11 @@ export function DuplicateReviewModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white dark:bg-dark-surface rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+ <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-neutral-200 dark:border-dark-border">
+ <div className="flex items-center justify-between p-6 border-b border-neutral-200">
           <div>
-            <h2 className="text-xl font-semibold text-neutral-900 dark:text-dark-text">
+ <h2 className="text-xl font-semibold text-neutral-900">
               {t("reviewTitle", { current: currentIndex + 1, total: matches.length })}
             </h2>
             <div className="flex items-center gap-2 mt-1">
@@ -226,14 +226,14 @@ export function DuplicateReviewModal({
               >
                 {t("matchPercent", { confidence: currentMatch.confidence })}
               </span>
-              <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+ <span className="text-sm text-neutral-600">
                 {getConfidenceLabel(currentMatch.confidence)}
               </span>
             </div>
           </div>
           <button
             onClick={onCancel}
-            className="p-2 hover:bg-neutral-100 dark:hover:bg-dark-surface-hover rounded-lg transition-colors"
+ className="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
             aria-label={t("closeAriaLabel")}
           >
             <XIcon size="sm" decorative />
@@ -241,7 +241,7 @@ export function DuplicateReviewModal({
         </div>
 
         {/* Progress Dots */}
-        <div className="px-6 py-3 border-b border-neutral-200 dark:border-dark-border">
+ <div className="px-6 py-3 border-b border-neutral-200">
           <div className="flex gap-1 justify-center">
             {matches.map((_, idx) => (
               <div
@@ -252,7 +252,7 @@ export function DuplicateReviewModal({
                     ? "w-8 bg-primary-600"
                     : actions.has(matches[idx].importedTransaction?.rowNumber || 0)
                       ? "w-2 bg-success-600"
-                      : "w-2 bg-neutral-300 dark:bg-neutral-600"
+ : "w-2 bg-neutral-300"
                 )}
               />
             ))}
@@ -262,8 +262,8 @@ export function DuplicateReviewModal({
         {/* Content - Scrollable */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {/* Match Reason */}
-          <div className="p-3 bg-neutral-50 dark:bg-dark-surface-hover rounded-lg">
-            <p className="text-sm text-neutral-700 dark:text-dark-text-secondary">
+ <div className="p-3 bg-neutral-50 rounded-lg">
+ <p className="text-sm text-neutral-700">
               <strong>{t("whyMatched")}</strong> {currentMatch.matchReason}
             </p>
           </div>
@@ -271,34 +271,34 @@ export function DuplicateReviewModal({
           {/* Side-by-Side Comparison */}
           <div className="grid md:grid-cols-2 gap-4">
             {/* Imported Transaction */}
-            <div className="p-4 bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800 rounded-lg">
-              <h3 className="text-sm font-semibold mb-3 text-primary-700 dark:text-primary-300">
+ <div className="p-4 bg-primary-50 border border-primary-200 rounded-lg">
+ <h3 className="text-sm font-semibold mb-3 text-primary-700">
                 {t("importedTransaction")}
               </h3>
               <div className="space-y-2 text-sm">
-                <div className={cn(amountsDiffer && "bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded")}>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("amount")}</strong>
-                  <p className="text-neutral-900 dark:text-dark-text font-medium">
+ <div className={cn(amountsDiffer && "bg-yellow-100 p-2 rounded")}>
+ <strong className="text-neutral-700">{t("amount")}</strong>
+ <p className="text-neutral-900 font-medium">
                     {formatCurrency(imported?.amount?.amount || 0, imported?.amount?.currency || currency)}
                   </p>
                 </div>
-                <div className={cn(datesDiffer && "bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded")}>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("date")}</strong>
-                  <p className="text-neutral-900 dark:text-dark-text">{formatDate(imported?.date, locale)}</p>
+ <div className={cn(datesDiffer && "bg-yellow-100 p-2 rounded")}>
+ <strong className="text-neutral-700">{t("date")}</strong>
+ <p className="text-neutral-900">{formatDate(imported?.date, locale)}</p>
                 </div>
-                <div className={cn(descriptionsDiffer && "bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded")}>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("description")}</strong>
-                  <p className="text-neutral-900 dark:text-dark-text">{imported?.description || t("noValue")}</p>
+ <div className={cn(descriptionsDiffer && "bg-yellow-100 p-2 rounded")}>
+ <strong className="text-neutral-700">{t("description")}</strong>
+ <p className="text-neutral-900">{imported?.description || t("noValue")}</p>
                 </div>
                 {imported?.referenceNumber && (
                   <div>
-                    <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("reference")}</strong>
-                    <p className="text-neutral-900 dark:text-dark-text">{imported.referenceNumber}</p>
+ <strong className="text-neutral-700">{t("reference")}</strong>
+ <p className="text-neutral-900">{imported.referenceNumber}</p>
                   </div>
                 )}
                 <div>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("category")}</strong>
-                  <p className="text-neutral-900 dark:text-dark-text">
+ <strong className="text-neutral-700">{t("category")}</strong>
+ <p className="text-neutral-900">
                     {imported?.suggestedCategoryId ? t("categoryNumber", { id: imported.suggestedCategoryId }) : t("noCategory")}
                   </p>
                 </div>
@@ -306,28 +306,28 @@ export function DuplicateReviewModal({
             </div>
 
             {/* Existing Transaction */}
-            <div className="p-4 bg-neutral-50 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border rounded-lg">
-              <h3 className="text-sm font-semibold mb-3 text-neutral-900 dark:text-dark-text">
+ <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-lg">
+ <h3 className="text-sm font-semibold mb-3 text-neutral-900">
                 {t("existingTransaction")}
               </h3>
               <div className="space-y-2 text-sm">
-                <div className={cn(amountsDiffer && "bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded")}>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("amount")}</strong>
-                  <p className="text-neutral-900 dark:text-dark-text font-medium">
+ <div className={cn(amountsDiffer && "bg-yellow-100 p-2 rounded")}>
+ <strong className="text-neutral-700">{t("amount")}</strong>
+ <p className="text-neutral-900 font-medium">
                     {formatCurrency(existing?.amount?.amount || 0, existing?.amount?.currency || currency)}
                   </p>
                 </div>
-                <div className={cn(datesDiffer && "bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded")}>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("date")}</strong>
-                  <p className="text-neutral-900 dark:text-dark-text">{formatDate(existing?.date, locale)}</p>
+ <div className={cn(datesDiffer && "bg-yellow-100 p-2 rounded")}>
+ <strong className="text-neutral-700">{t("date")}</strong>
+ <p className="text-neutral-900">{formatDate(existing?.date, locale)}</p>
                 </div>
-                <div className={cn(descriptionsDiffer && "bg-yellow-100 dark:bg-yellow-900/30 p-2 rounded")}>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("description")}</strong>
-                  <p className="text-neutral-900 dark:text-dark-text">{existing?.note || t("noValue")}</p>
+ <div className={cn(descriptionsDiffer && "bg-yellow-100 p-2 rounded")}>
+ <strong className="text-neutral-700">{t("description")}</strong>
+ <p className="text-neutral-900">{existing?.note || t("noValue")}</p>
                 </div>
                 <div>
-                  <strong className="text-neutral-700 dark:text-dark-text-secondary">{t("category")}</strong>
-                  <p className="text-neutral-900 dark:text-dark-text">
+ <strong className="text-neutral-700">{t("category")}</strong>
+ <p className="text-neutral-900">
                     {existing?.categoryId ? t("categoryNumber", { id: existing.categoryId }) : t("noCategory")}
                   </p>
                 </div>
@@ -336,15 +336,15 @@ export function DuplicateReviewModal({
           </div>
 
           {/* Keyboard Shortcuts Help */}
-          <div className="p-3 bg-neutral-100 dark:bg-dark-surface-hover rounded-lg">
-            <p className="text-xs text-neutral-600 dark:text-dark-text-tertiary">
+ <div className="p-3 bg-neutral-100 rounded-lg">
+ <p className="text-xs text-neutral-600">
               {t("keyboardShortcuts")}
             </p>
           </div>
         </div>
 
         {/* Footer - Actions */}
-        <div className="p-6 border-t border-neutral-200 dark:border-dark-border space-y-3">
+ <div className="p-6 border-t border-neutral-200 space-y-3">
           {/* Action Buttons */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             <Button
@@ -393,14 +393,14 @@ export function DuplicateReviewModal({
             <button
               onClick={goToPrevious}
               disabled={currentIndex === 0}
-              className="flex-1 px-4 py-2 text-sm bg-neutral-200 dark:bg-dark-surface-hover text-neutral-700 dark:text-dark-text rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-300 dark:hover:bg-dark-surface-active transition-colors"
+ className="flex-1 px-4 py-2 text-sm bg-neutral-200 text-neutral-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-300 transition-colors"
             >
               {t("previous")}
             </button>
             <button
               onClick={goToNext}
               disabled={currentIndex === matches.length - 1}
-              className="flex-1 px-4 py-2 text-sm bg-neutral-200 dark:bg-dark-surface-hover text-neutral-700 dark:text-dark-text rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-300 dark:hover:bg-dark-surface-active transition-colors"
+ className="flex-1 px-4 py-2 text-sm bg-neutral-200 text-neutral-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-300 transition-colors"
             >
               {t("next")}
             </button>

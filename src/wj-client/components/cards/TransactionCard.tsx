@@ -157,9 +157,9 @@ export function TransactionCard({
 
   // Get amount color
   const getAmountColor = () => {
-    if (isIncome) return "text-v2-green-positive dark:text-v2-green-positive";
-    if (isExpense) return "text-gray-900 dark:text-gray-100";
-    return "text-gray-600 dark:text-gray-400";
+ if (isIncome) return "text-v2-green-positive";
+ if (isExpense) return "text-gray-900";
+ return "text-gray-600";
   };
 
   // Get status badge styles
@@ -168,23 +168,23 @@ export function TransactionCard({
 
     const statusConfig = {
       pending: {
-        bg: "bg-yellow-100 dark:bg-yellow-900/30",
-        text: "text-yellow-700 dark:text-yellow-400",
+ bg: "bg-yellow-100",
+ text: "text-yellow-700",
         label: t("status.pending"),
       },
       completed: {
-        bg: "bg-v2-green-light dark:bg-v2-green-positive/30",
-        text: "text-v2-green-positive dark:text-v2-green-positive",
+ bg: "bg-v2-green-light",
+ text: "text-v2-green-positive",
         label: t("status.completed"),
       },
       failed: {
-        bg: "bg-red-100 dark:bg-red-900/30",
-        text: "text-red-700 dark:text-red-400",
+ bg: "bg-red-100",
+ text: "text-red-700",
         label: t("status.failed"),
       },
       cancelled: {
-        bg: "bg-gray-100 dark:bg-gray-700",
-        text: "text-gray-700 dark:text-gray-400",
+ bg: "bg-gray-100",
+ text: "text-gray-700",
         label: t("status.cancelled"),
       },
     };
@@ -204,15 +204,15 @@ export function TransactionCard({
   // Get icon background color
   const getIconBgColor = () => {
     if (color) return color;
-    if (isIncome) return "bg-v2-green-light dark:bg-v2-green-positive/30 text-v2-green-positive dark:text-v2-green-positive";
-    if (isExpense) return "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400";
-    return "bg-v2-red-light dark:bg-v2-red-primary/30 text-v2-red-primary dark:text-v2-red-primary/80";
+ if (isIncome) return "bg-v2-green-light text-v2-green-positive";
+ if (isExpense) return "bg-red-100 text-red-600";
+ return "bg-v2-red-light text-v2-red-primary";
   };
 
   const cardClasses = cn(
-    "group relative bg-white dark:bg-gray-800 rounded-xl border transition-all duration-200",
-    "border-gray-200 dark:border-gray-700",
-    "hover:border-gray-300 dark:hover:border-gray-600",
+ "group relative bg-white rounded-xl border transition-all duration-200",
+ "border-gray-200",
+ "hover:border-gray-300",
     "hover:shadow-md",
     onClick && "cursor-pointer",
     compact ? "p-3 sm:p-4" : "p-4 sm:p-5",
@@ -226,7 +226,7 @@ export function TransactionCard({
       <div className={cn("flex items-center gap-3 sm:gap-4 min-w-0", amountOnRight && "flex-1")}>
         {/* Icon */}
         {loading ? (
-          <div className="animate-pulse flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+ <div className="animate-pulse flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 bg-gray-200 rounded-xl" />
         ) : icon ? (
           <div className={cn(
             "flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center",
@@ -247,9 +247,9 @@ export function TransactionCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             {loading ? (
-              <div className="animate-pulse h-5 bg-gray-200 dark:bg-gray-700 rounded w-32" />
+ <div className="animate-pulse h-5 bg-gray-200 rounded w-32" />
             ) : (
-              <h4 className="font-semibold text-gray-900 dark:text-gray-100 truncate">
+ <h4 className="font-semibold text-gray-900 truncate">
                 {title}
               </h4>
             )}
@@ -258,28 +258,28 @@ export function TransactionCard({
 
           {loading ? (
             <div className="animate-pulse space-y-1">
-              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-24" />
-              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-16" />
+ <div className="h-3 bg-gray-200 rounded w-24" />
+ <div className="h-3 bg-gray-200 rounded w-16" />
             </div>
           ) : (
-            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+ <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
               {category && (
                 <span className="truncate">{category}</span>
               )}
               {category && (date || wallet) && (
-                <span className="text-gray-300 dark:text-gray-600">•</span>
+ <span className="text-gray-300">•</span>
               )}
               {date && (
                 <span>{formatDate(date)}</span>
               )}
               {date && time && (
-                <span className="text-gray-300 dark:text-gray-600">•</span>
+ <span className="text-gray-300">•</span>
               )}
               {time && (
                 <span>{time}</span>
               )}
               {wallet && (date || time) && (
-                <span className="text-gray-300 dark:text-gray-600">•</span>
+ <span className="text-gray-300">•</span>
               )}
               {wallet && (
                 <span className="truncate">{wallet}</span>
@@ -293,7 +293,7 @@ export function TransactionCard({
       {amountOnRight && (
         <div className={cn("flex-shrink-0 text-right", !compact && "flex flex-col items-end justify-center")}>
           {loading ? (
-            <div className="animate-pulse h-6 bg-gray-200 dark:bg-gray-700 rounded w-20" />
+ <div className="animate-pulse h-6 bg-gray-200 rounded w-20" />
           ) : (
             <>
               <p className={cn(
@@ -305,7 +305,7 @@ export function TransactionCard({
                 {currency}{formatAmount(amount)}
               </p>
               {isTransfer && (
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+ <p className="text-xs text-gray-500">
                   {t("transfer")}
                 </p>
               )}
@@ -328,7 +328,7 @@ export function TransactionCard({
                 e.stopPropagation();
                 onEdit();
               }}
-              className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors"
+ className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
               aria-label={t("editAriaLabel")}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -343,7 +343,7 @@ export function TransactionCard({
                 e.stopPropagation();
                 onDelete();
               }}
-              className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 dark:text-red-400 transition-colors"
+ className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-lg hover:bg-red-100 text-red-500 transition-colors"
               aria-label={t("deleteAriaLabel")}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -396,14 +396,14 @@ export function TransactionCardList({
     return (
       <div className={cn("space-y-2 sm:space-y-3", className)}>
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 animate-pulse">
+ <div key={i} className="bg-gray-100 rounded-xl p-4 animate-pulse">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+ <div className="w-12 h-12 bg-gray-200 rounded-xl" />
               <div className="flex-1 space-y-2">
-                <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-32" />
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-24" />
+ <div className="h-5 bg-gray-200 rounded w-32" />
+ <div className="h-3 bg-gray-200 rounded w-24" />
               </div>
-              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-20" />
+ <div className="h-6 bg-gray-200 rounded w-20" />
             </div>
           </div>
         ))}
@@ -415,11 +415,11 @@ export function TransactionCardList({
     return (
       <div className={cn("text-center py-12", className)}>
         {emptyIcon && (
-          <div className="mx-auto w-16 h-16 mb-4 text-gray-400 dark:text-gray-600">
+ <div className="mx-auto w-16 h-16 mb-4 text-gray-400">
             {emptyIcon}
           </div>
         )}
-        <p className="text-gray-500 dark:text-gray-400">{emptyMessage}</p>
+ <p className="text-gray-500">{emptyMessage}</p>
       </div>
     );
   }

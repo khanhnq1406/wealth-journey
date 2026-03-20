@@ -65,7 +65,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-accent-50 via-white to-primary-50 dark:from-dark-background dark:via-dark-surface dark:to-dark-background flex flex-col">
+ <div className="min-h-screen bg-gradient-to-br from-accent-50 via-white to-primary-50 flex flex-col">
       {/* Header with Logo — mobile only */}
       <div className="pt-6 pb-4 px-4 sm:hidden">
         <Link href="/" className="inline-flex items-center gap-2">
@@ -76,7 +76,7 @@ export default function Register() {
             height={48}
             className="w-10 h-10 sm:w-12 sm:h-12 rounded-[10px]"
           />
-          <span className="text-xl sm:text-2xl font-bold text-v2-red-primary dark:text-dark-text">
+ <span className="text-xl sm:text-2xl font-bold text-v2-red-primary">
             congdongvang.com
           </span>
         </Link>
@@ -86,13 +86,13 @@ export default function Register() {
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
         <div className="w-full max-w-md">
           {/* Registration Card */}
-          <div className="bg-white dark:bg-dark-surface rounded-2xl sm:rounded-3xl shadow-card sm:shadow-lg p-6 sm:p-8 md:p-10 animate-fade-in-up">
+ <div className="bg-white rounded-2xl sm:rounded-3xl shadow-card sm:shadow-lg p-6 sm:p-8 md:p-10 animate-fade-in-up">
             {/* Title — compact when password form is open */}
             <div className={`text-center ${showPasswordForm ? "mb-4 sm:mb-6" : "mb-6 sm:mb-8"}`}>
-              <h1 className={`${showPasswordForm ? "text-xl sm:text-2xl" : "text-2xl sm:text-3xl"} font-bold text-neutral-900 dark:text-dark-text mb-1`}>
+ <h1 className={`${showPasswordForm ? "text-xl sm:text-2xl" : "text-2xl sm:text-3xl"} font-bold text-neutral-900 mb-1`}>
                 {t("title")}
               </h1>
-              <p className="text-sm sm:text-base text-neutral-600 dark:text-dark-text-secondary">
+ <p className="text-sm sm:text-base text-neutral-600">
                 {t("subtitle")}
               </p>
             </div>
@@ -128,10 +128,10 @@ export default function Register() {
 
                 {/* Error Message (Google OAuth) */}
                 {error && (
-                  <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-800 rounded-xl animate-fade-in">
+ <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-danger-50 border border-danger-200 rounded-xl animate-fade-in">
                     <div className="flex items-start gap-3">
                       <svg
-                        className="w-5 h-5 text-danger-600 dark:text-danger-400 flex-shrink-0 mt-0.5"
+ className="w-5 h-5 text-danger-600 flex-shrink-0 mt-0.5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -141,7 +141,7 @@ export default function Register() {
                           clipRule="evenodd"
                         />
                       </svg>
-                      <p className="text-sm text-danger-800 dark:text-danger-200">
+ <p className="text-sm text-danger-800">
                         {error}
                       </p>
                     </div>
@@ -151,10 +151,10 @@ export default function Register() {
                 {/* OR Divider */}
                 <div className="my-5 relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-neutral-200 dark:border-dark-border"></div>
+ <div className="w-full border-t border-neutral-200"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-white dark:bg-dark-surface text-neutral-500 dark:text-dark-text-tertiary">
+ <span className="px-4 bg-white text-neutral-500">
                       {t("orDivider")}
                     </span>
                   </div>
@@ -167,7 +167,7 @@ export default function Register() {
               <button
                 type="button"
                 onClick={() => setShowPasswordForm(true)}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-neutral-300 dark:border-dark-border rounded-xl text-sm font-medium text-neutral-700 dark:text-dark-text-secondary hover:bg-neutral-50 dark:hover:bg-dark-border/30 transition-colors"
+ className="w-full flex items-center justify-center gap-2 py-3 px-4 border border-neutral-300 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
               >
                 <svg
                   className="w-4 h-4"
@@ -191,7 +191,7 @@ export default function Register() {
                 <button
                   type="button"
                   onClick={() => setShowPasswordForm(false)}
-                  className="w-full mt-3 flex items-center justify-center gap-2 text-sm text-neutral-500 dark:text-dark-text-tertiary hover:text-neutral-700 dark:hover:text-dark-text-secondary transition-colors"
+ className="w-full mt-3 flex items-center justify-center gap-2 text-sm text-neutral-500 hover:text-neutral-700 transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M11 17l-5-5m0 0l5-5m-5 5h12" />
@@ -204,10 +204,10 @@ export default function Register() {
             {/* Divider */}
             <div className="mt-6 sm:mt-8 relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-neutral-200 dark:border-dark-border"></div>
+ <div className="w-full border-t border-neutral-200"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white dark:bg-dark-surface text-neutral-500 dark:text-dark-text-tertiary">
+ <span className="px-4 bg-white text-neutral-500">
                   {t("alreadyHaveAccount")}
                 </span>
               </div>
@@ -217,7 +217,7 @@ export default function Register() {
             <div className="mt-6 text-center">
               <Link
                 href={routes.login}
-                className="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium transition-colors touch-target-lg rounded-lg"
+ className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium transition-colors touch-target-lg rounded-lg"
               >
                 {t("signInInstead")}
                 <svg
@@ -238,18 +238,18 @@ export default function Register() {
           </div>
 
           {/* Footer Text */}
-          <p className="mt-6 sm:mt-8 text-xs sm:text-sm text-neutral-500 dark:text-dark-text-tertiary text-center">
+ <p className="mt-6 sm:mt-8 text-xs sm:text-sm text-neutral-500 text-center">
             {t("termsAgreement")}{" "}
             <Link
               href="#terms"
-              className="underline hover:text-neutral-700 dark:hover:text-dark-text-secondary transition-colors"
+ className="underline hover:text-neutral-700 transition-colors"
             >
               {t("termsOfService")}
             </Link>{" "}
             {tCommon("and")}{" "}
             <Link
               href="#privacy"
-              className="underline hover:text-neutral-700 dark:hover:text-dark-text-secondary transition-colors"
+ className="underline hover:text-neutral-700 transition-colors"
             >
               {t("privacyPolicy")}
             </Link>

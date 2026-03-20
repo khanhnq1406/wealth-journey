@@ -37,7 +37,7 @@ export const ProgressBar = memo(function ProgressBar({
   return (
     <div className={cn("w-full", className)}>
       {(label || showPercentage) && (
-        <div className="flex items-center justify-between text-xs text-neutral-600 dark:text-neutral-400 mb-1.5">
+ <div className="flex items-center justify-between text-xs text-neutral-600 mb-1.5">
           {label && <span>{label}</span>}
           {showPercentage && (
             <span className="font-medium tabular-nums">
@@ -48,7 +48,7 @@ export const ProgressBar = memo(function ProgressBar({
       )}
       <div
         className={cn(
-          "w-full bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden",
+ "w-full bg-neutral-200 rounded-full overflow-hidden",
           sizeClasses[size]
         )}
         role="progressbar"

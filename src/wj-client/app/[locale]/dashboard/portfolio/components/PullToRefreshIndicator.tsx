@@ -66,7 +66,7 @@ export function PullToRefreshIndicator({
     >
       <div className="relative">
         {/* Main circle container */}
-        <div className="relative w-12 h-12 bg-white dark:bg-dark-surface rounded-full shadow-lg flex items-center justify-center">
+ <div className="relative w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center">
           {/* Center content */}
           <div className="relative flex items-center justify-center">
             {isRefreshing ? (
@@ -90,7 +90,7 @@ export function PullToRefreshIndicator({
             ) : (
               // Pull arrow
               <svg
-                className="w-6 h-6 text-primary-600 dark:text-primary-500 transition-transform duration-200"
+ className="w-6 h-6 text-primary-600 transition-transform duration-200"
                 style={{ transform: `rotate(${rotation}deg)` }}
                 fill="none"
                 viewBox="0 0 24 24"
@@ -110,7 +110,7 @@ export function PullToRefreshIndicator({
         {/* Status text */}
         {!showSuccess && (
           <div className="absolute top-14 left-1/2 -translate-x-1/2 whitespace-nowrap">
-            <p className="text-xs font-medium text-neutral-600 dark:text-neutral-400 bg-white dark:bg-dark-surface px-3 py-1 rounded-full shadow-sm">
+ <p className="text-xs font-medium text-neutral-600 bg-white px-3 py-1 rounded-full shadow-sm">
               {isRefreshing
                 ? t("updating")
                 : progress >= 100

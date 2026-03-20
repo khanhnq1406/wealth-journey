@@ -160,7 +160,7 @@ export function SymbolAutocomplete({
       if (inputValue.length > 0 && inputValue.length < MIN_QUERY_LENGTH) {
         return (
           <div className={props.className}>
-            <div className="px-4 py-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
+ <div className="px-4 py-8 text-center text-sm text-neutral-500">
               {t("minCharsHint", { count: MIN_QUERY_LENGTH })}
             </div>
           </div>
@@ -171,7 +171,7 @@ export function SymbolAutocomplete({
       if (searchQuery.isLoading && debouncedQuery.length >= MIN_QUERY_LENGTH) {
         return (
           <div className={props.className}>
-            <div className="px-4 py-8 text-center text-sm text-neutral-500 dark:text-neutral-400 flex items-center justify-center gap-2">
+ <div className="px-4 py-8 text-center text-sm text-neutral-500 flex items-center justify-center gap-2">
               <svg
                 className="animate-spin h-4 w-4 text-primary-500"
                 xmlns="http://www.w3.org/2000/svg"
@@ -207,7 +207,7 @@ export function SymbolAutocomplete({
       ) {
         return (
           <div className={props.className}>
-            <div className="px-4 py-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
+ <div className="px-4 py-8 text-center text-sm text-neutral-500">
               {t("noResults", { query: debouncedQuery })}
             </div>
           </div>
@@ -248,7 +248,7 @@ export function SymbolAutocomplete({
 
       {/* Error message */}
       {searchError && (
-        <p className="text-sm text-danger-600 dark:text-danger-400 flex items-center gap-1 mt-1.5">
+ <p className="text-sm text-danger-600 flex items-center gap-1 mt-1.5">
           <svg
             className="w-4 h-4 flex-shrink-0"
             fill="currentColor"

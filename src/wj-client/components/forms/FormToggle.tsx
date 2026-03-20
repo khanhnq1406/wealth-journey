@@ -40,14 +40,14 @@ export const FormToggle = ({
       {label && (
         <label
           htmlFor={labelId}
-          className="block text-sm font-medium text-neutral-700 dark:text-dark-text mb-2"
+ className="block text-sm font-medium text-neutral-700 mb-2"
         >
           {label}
           {required && <span className="text-danger-600 ml-1">*</span>}
         </label>
       )}
       <div
-        className="flex gap-2 p-1 bg-neutral-100 dark:bg-dark-surface-hover rounded-lg"
+ className="flex gap-2 p-1 bg-neutral-100 rounded-lg"
         role="radiogroup"
         aria-labelledby={labelId}
         aria-invalid={error ? "true" : "false"}
@@ -65,8 +65,8 @@ export const FormToggle = ({
               "flex-1 min-h-[44px] sm:min-h-[48px] flex items-center justify-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-md text-sm sm:text-base font-medium transition-all duration-200",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
               value === option.value
-                ? "bg-white dark:bg-dark-surface text-primary-600 dark:text-primary-400 shadow-sm"
-                : "text-neutral-600 dark:text-dark-text-secondary hover:text-neutral-900 dark:hover:text-dark-text hover:bg-neutral-200/50 dark:hover:bg-dark-surface-active",
+ ? "bg-white text-primary-600 shadow-sm"
+ : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/50",
               disabled && "opacity-50 cursor-not-allowed pointer-events-none",
             )}
             onClick={() => onChange(option.value)}
@@ -83,7 +83,7 @@ export const FormToggle = ({
       {error && (
         <p
           id={errorId}
-          className="text-danger-600 dark:text-danger-400 text-sm mt-1.5 flex items-center gap-1.5"
+ className="text-danger-600 text-sm mt-1.5 flex items-center gap-1.5"
           role="alert"
         >
           <svg

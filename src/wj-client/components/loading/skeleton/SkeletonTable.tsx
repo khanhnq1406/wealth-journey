@@ -102,7 +102,7 @@ export function SkeletonTable({
   return (
     <div
       className={cn(
-        "bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden",
+ "bg-white rounded-xl border border-gray-200 overflow-hidden",
         className
       )}
       aria-busy="true"
@@ -110,7 +110,7 @@ export function SkeletonTable({
     >
       {/* Header */}
       {showHeader && (
-        <div className="hidden sm:flex bg-gray-50 dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-700">
+ <div className="hidden sm:flex bg-gray-50 border-b border-gray-200">
           {Array.from({ length: columns }).map((_, index) => {
             const colType = columnWidths?.[index] || "auto";
             return (
@@ -122,7 +122,7 @@ export function SkeletonTable({
                 )}
               >
                 <div className={cn(
-                  "h-4 bg-gray-200 dark:bg-gray-600 rounded",
+ "h-4 bg-gray-200 rounded",
                   animationClass
                 )} />
               </div>
@@ -131,7 +131,7 @@ export function SkeletonTable({
           {showActions && (
             <div className="px-4 py-3 col-span-2">
               <div className={cn(
-                "h-4 bg-gray-200 dark:bg-gray-600 rounded",
+ "h-4 bg-gray-200 rounded",
                 animationClass
               )} />
             </div>
@@ -140,7 +140,7 @@ export function SkeletonTable({
       )}
 
       {/* Body */}
-      <div className="divide-y divide-gray-200 dark:divide-gray-700">
+ <div className="divide-y divide-gray-200">
         {Array.from({ length: rows }).map((_, rowIndex) => (
           <div
             key={`row-${rowIndex}`}
@@ -149,11 +149,11 @@ export function SkeletonTable({
             {/* Mobile Row */}
             <div className="sm:hidden px-4 py-3 space-y-2">
               <div className={cn(
-                "h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4",
+ "h-4 bg-gray-200 rounded w-3/4",
                 animationClass
               )} />
               <div className={cn(
-                "h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2",
+ "h-3 bg-gray-200 rounded w-1/2",
                 animationClass
               )} />
             </div>
@@ -170,7 +170,7 @@ export function SkeletonTable({
                   >
                     <div
                       className={cn(
-                        "h-4 bg-gray-200 dark:bg-gray-700 rounded",
+ "h-4 bg-gray-200 rounded",
                         animationClass
                       )}
                       style={{
@@ -185,11 +185,11 @@ export function SkeletonTable({
               {showActions && (
                 <div className="col-span-2 flex items-center gap-2 justify-end">
                   <div className={cn(
-                    "w-8 h-8 rounded bg-gray-200 dark:bg-gray-700",
+ "w-8 h-8 rounded bg-gray-200",
                     animationClass
                   )} />
                   <div className={cn(
-                    "w-8 h-8 rounded bg-gray-200 dark:bg-gray-700",
+ "w-8 h-8 rounded bg-gray-200",
                     animationClass
                   )} />
                 </div>
@@ -201,18 +201,18 @@ export function SkeletonTable({
 
       {/* Footer */}
       {showFooter && (
-        <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+ <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
           <div className={cn(
-            "h-4 bg-gray-200 dark:bg-gray-600 rounded w-1/4",
+ "h-4 bg-gray-200 rounded w-1/4",
             animationClass
           )} />
           <div className="flex items-center gap-2">
             <div className={cn(
-              "w-8 h-8 rounded bg-gray-200 dark:bg-gray-600",
+ "w-8 h-8 rounded bg-gray-200",
               animationClass
             )} />
             <div className={cn(
-              "w-8 h-8 rounded bg-gray-200 dark:bg-gray-600",
+ "w-8 h-8 rounded bg-gray-200",
               animationClass
             )} />
           </div>
@@ -266,18 +266,18 @@ export function SkeletonTableRow({
   return (
     <div
       className={cn(
-        "px-4 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 last:border-b-0",
+ "px-4 py-3 sm:py-4 border-b border-gray-200 last:border-b-0",
         className
       )}
     >
       {/* Mobile */}
       <div className="sm:hidden space-y-2">
         <div className={cn(
-          "h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4",
+ "h-4 bg-gray-200 rounded w-3/4",
           animationClass
         )} />
         <div className={cn(
-          "h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2",
+ "h-3 bg-gray-200 rounded w-1/2",
           animationClass
         )} />
       </div>
@@ -291,7 +291,7 @@ export function SkeletonTableRow({
             <div key={index} className={`col-span-${colSpan}`}>
               <div
                 className={cn(
-                  "h-4 bg-gray-200 dark:bg-gray-700 rounded",
+ "h-4 bg-gray-200 rounded",
                   animationClass
                 )}
               />
@@ -302,11 +302,11 @@ export function SkeletonTableRow({
         {showActions && (
           <div className="col-span-2 flex items-center justify-end gap-2">
             <div className={cn(
-              "w-8 h-8 rounded bg-gray-200 dark:bg-gray-700",
+ "w-8 h-8 rounded bg-gray-200",
               animationClass
             )} />
             <div className={cn(
-              "w-8 h-8 rounded bg-gray-200 dark:bg-gray-700",
+ "w-8 h-8 rounded bg-gray-200",
               animationClass
             )} />
           </div>

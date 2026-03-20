@@ -91,10 +91,10 @@ export const FormTextarea = ({
             className={cn(
               "text-xs ml-2 transition-colors",
               isAtLimit
-                ? "text-danger-600 dark:text-danger-400 font-medium"
+ ? "text-danger-600 font-medium"
                 : isNearLimit
-                ? "text-warning-600 dark:text-warning-400"
-                : "text-neutral-500 dark:text-dark-text-tertiary"
+ ? "text-warning-600"
+ : "text-neutral-500"
             )}
             aria-live="polite"
           >
@@ -120,16 +120,16 @@ export const FormTextarea = ({
             "px-3 sm:px-4 py-2.5 sm:py-3",
             "rounded-lg",
             "border transition-all duration-200",
-            "bg-white dark:bg-dark-surface",
-            "text-neutral-900 dark:text-dark-text",
-            "placeholder:text-neutral-400 dark:placeholder:text-dark-text-tertiary",
+ "bg-white",
+ "text-neutral-900",
+ "placeholder:text-neutral-400",
             // Focus states - single ring (clean, modern)
             "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent",
             // Error states
             hasError && "border-danger-500 focus:ring-danger-500 focus:border-transparent",
-            !hasError && "border-neutral-300 dark:border-dark-border hover:border-neutral-400 dark:hover:border-dark-border-hover",
+ !hasError && "border-neutral-300 hover:border-neutral-400",
             // Disabled states
-            "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-neutral-50 dark:disabled:bg-dark-surface-hover",
+ "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-neutral-50",
             // Resize
             autoResize ? "resize-none overflow-hidden" : "resize-y"
           )}
@@ -147,7 +147,7 @@ export const FormTextarea = ({
       </div>
       {/* Helper text */}
       {helperText && !hasError && (
-        <p id={helperId} className="mt-1.5 text-xs sm:text-sm text-neutral-500 dark:text-dark-text-tertiary">
+ <p id={helperId} className="mt-1.5 text-xs sm:text-sm text-neutral-500">
           {helperText}
         </p>
       )}

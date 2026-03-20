@@ -544,7 +544,7 @@ export function TransactionContent() {
             placeholder={t("searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-neutral-50 rounded-lg px-4 py-2.5 pl-10 pr-10 text-sm drop-shadow-round focus:outline-none focus:ring-2 focus:ring-v2-red-primary placeholder:text-gray-400 dark:bg-dark-surface-hover dark:text-dark-text"
+ className="w-full bg-neutral-50 rounded-lg px-4 py-2.5 pl-10 pr-10 text-sm drop-shadow-round focus:outline-none focus:ring-2 focus:ring-v2-red-primary placeholder:text-gray-400"
           />
           <svg
             className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
@@ -673,7 +673,7 @@ export function TransactionContent() {
                 {Array.from({ length: 5 }).map((_, i) => (
                   <div
                     key={i}
-                    className="bg-white dark:bg-dark-surface rounded-lg p-4 animate-pulse"
+ className="bg-white rounded-lg p-4 animate-pulse"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-gray-200 rounded-full" />
@@ -688,7 +688,7 @@ export function TransactionContent() {
               </div>
             ) : Object.keys(groupedTransactions).length === 0 ? (
               // Empty state
-              <div className="flex flex-col items-center justify-center py-16 text-gray-500 dark:text-dark-text-tertiary">
+ <div className="flex flex-col items-center justify-center py-16 text-gray-500">
                 <svg
                   className="w-16 h-16 mb-4 opacity-50"
                   fill="none"

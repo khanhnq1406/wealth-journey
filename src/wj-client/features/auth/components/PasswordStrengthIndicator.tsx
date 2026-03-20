@@ -36,10 +36,10 @@ const strengthColors: Record<StrengthLevel, string> = {
 };
 
 const strengthTextColors: Record<StrengthLevel, string> = {
-  weak: "text-red-600 dark:text-red-400",
-  medium: "text-orange-600 dark:text-orange-400",
-  strong: "text-yellow-600 dark:text-yellow-400",
-  veryStrong: "text-green-600 dark:text-green-400",
+ weak: "text-red-600",
+ medium: "text-orange-600",
+ strong: "text-yellow-600",
+ veryStrong: "text-green-600",
 };
 
 interface PasswordStrengthIndicatorProps {
@@ -61,7 +61,7 @@ export function PasswordStrengthIndicator({ password }: PasswordStrengthIndicato
             className={`h-1 flex-1 rounded-full transition-colors duration-200 ${
               segment <= score
                 ? strengthColors[level]
-                : "bg-neutral-200 dark:bg-neutral-700"
+ : "bg-neutral-200"
             }`}
           />
         ))}

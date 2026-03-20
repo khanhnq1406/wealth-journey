@@ -164,11 +164,11 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
         spellCheck={false}
         className={cn(
           "min-h-[44px] sm:min-h-[48px] px-3 py-2 w-full pr-10 rounded-lg",
-          "bg-white dark:bg-dark-surface",
-          "text-neutral-900 dark:text-dark-text",
-          "border border-neutral-300 dark:border-neutral-600",
-          "placeholder:text-neutral-400 dark:placeholder:text-neutral-500",
-          "shadow-sm dark:shadow-dark-card",
+ "bg-white",
+ "text-neutral-900",
+ "border border-neutral-300",
+ "placeholder:text-neutral-400",
+ "shadow-sm",
           "disabled:opacity-50 disabled:cursor-not-allowed",
           // Focus styles - single ring (clean, modern) - unified with other inputs
           "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent",
@@ -188,7 +188,7 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
             setIsOpen(!isOpen);
             inputRef.current?.focus();
           }}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-400 cursor-pointer"
+ className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 cursor-pointer"
         >
           <svg
             className={cn(
@@ -235,9 +235,9 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
 
       {/* Dropdown menu */}
       {isOpen && !disabled && (
-        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-dark-surface border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-lg dark:shadow-dark-card max-h-60 overflow-auto animate-fade-in-scale">
+ <div className="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg max-h-60 overflow-auto animate-fade-in-scale">
           {filteredOptions.length === 0 && !canCreateNew ? (
-            <div className="px-3 py-3 text-neutral-500 dark:text-neutral-400 text-sm">
+ <div className="px-3 py-3 text-neutral-500 text-sm">
               No options found
             </div>
           ) : (
@@ -253,8 +253,8 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
                     highlightedIndex === index
                       ? "bg-primary-500 text-white"
                       : value === option.value
-                        ? "bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 font-semibold"
-                        : "hover:bg-neutral-50 dark:hover:bg-dark-surface-hover text-neutral-900 dark:text-dark-text",
+ ? "bg-primary-50 text-primary-700 font-semibold"
+ : "hover:bg-neutral-50 text-neutral-900",
                   )}
                 >
                   <span>{option.label}</span>
@@ -282,11 +282,11 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
                   disabled={isLoading}
                   className={cn(
                     "w-full px-3 py-2.5 min-h-[44px] text-left cursor-pointer text-sm",
-                    "border-t border-neutral-200 dark:border-neutral-700",
+ "border-t border-neutral-200",
                     "flex items-center gap-2 transition-colors duration-200",
                     highlightedIndex === filteredOptions.length
                       ? "bg-primary-500 text-white"
-                      : "hover:bg-neutral-50 dark:hover:bg-dark-surface-hover text-primary-600 dark:text-primary-400 font-semibold",
+ : "hover:bg-neutral-50 text-primary-600 font-semibold",
                     isLoading && "opacity-50 cursor-not-allowed",
                   )}
                 >
