@@ -146,7 +146,7 @@ export default function DashboardLayout({
           className="rounded-2xl border border-v2-border-light p-1.5 flex flex-col gap-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
           style={{
             background:
-              "linear-gradient(180deg, #FFFFFF 0%, #FEF2F233 50%, #FEE2E240 100%)",
+              "linear-gradient(180deg, rgba(95,2,2,1) 0%, rgba(155,1,17,0.15) 50%, rgba(215,139,28,0.08) 100%)",
           }}
         >
           <ActiveLink
@@ -155,7 +155,7 @@ export default function DashboardLayout({
             className={cn(
               "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target animate-stagger-fade-in",
               path === routes.home
-                ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
             )}
           >
@@ -168,7 +168,7 @@ export default function DashboardLayout({
             className={cn(
               "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
               path === routes.portfolio
-                ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
             )}
           >
@@ -181,7 +181,7 @@ export default function DashboardLayout({
             className={cn(
               "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
               path === routes.community && !isProfileView
-                ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
             )}
           >
@@ -194,7 +194,7 @@ export default function DashboardLayout({
             className={cn(
               "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
               isProfileView
-                ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
             )}
           >
@@ -213,7 +213,7 @@ export default function DashboardLayout({
               className={cn(
                 "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
                 path.startsWith(item.href)
-                  ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                  ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                   : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
               )}
             >
@@ -232,7 +232,7 @@ export default function DashboardLayout({
             className={cn(
               "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
               path.startsWith("/dashboard/settings")
-                ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
             )}
           >
@@ -246,7 +246,7 @@ export default function DashboardLayout({
               className={cn(
                 "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
                 path.startsWith(routes.admin)
-                  ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                  ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                   : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
               )}
             >
@@ -274,10 +274,10 @@ export default function DashboardLayout({
         <CurrencyConversionProgress />
 
         <div className="dashboard-container h-dvh bg-v2-bg-primary flex flex-col sm:flex-row overflow-hidden">
-          {/* Desktop Sidebar - V2 White with Crimson accents */}
+          {/* Desktop Sidebar - Maroon with Gold accents */}
           <aside
             className={cn(
-              "hidden sm:flex flex-col bg-white border-r border-v2-border-light min-h-screen fixed left-0 top-0 z-sidebar transition-all duration-300 ease-in-out",
+              "hidden sm:flex flex-col bg-v2-bg-primary border-r border-v2-border-light min-h-screen fixed left-0 top-0 z-sidebar transition-all duration-300 ease-in-out",
               isExpanded ? "sm:w-64 lg:w-72" : "sm:w-20",
             )}
           >
@@ -331,7 +331,7 @@ export default function DashboardLayout({
                   className="rounded-2xl border border-v2-border-light p-1.5 flex flex-col gap-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
                   style={{
                     background:
-                      "linear-gradient(180deg, #FFFFFF 0%, #FEF2F233 50%, #FEE2E240 100%)",
+                      "linear-gradient(180deg, rgba(95,2,2,1) 0%, rgba(155,1,17,0.15) 50%, rgba(215,139,28,0.08) 100%)",
                   }}
                 >
                   <NavItem
@@ -453,7 +453,7 @@ export default function DashboardLayout({
                   isExpanded ? "gap-3 px-2" : "justify-center px-0",
                 )}
               >
-                <div className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden shrink-0 bg-v2-red-primary">
+                <div className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden shrink-0 bg-v2-gold-primary">
                   {user.picture ? (
                     <NextImage
                       src={user.picture}
@@ -515,8 +515,8 @@ export default function DashboardLayout({
 
           {/* V2 Mobile Header */}
           <header className="sm:hidden shrink-0 sticky top-0 z-sticky">
-            {/* Red accent line */}
-            <div className="h-[3px] bg-v2-red-primary w-full" />
+            {/* Gold accent line */}
+            <div className="h-[3px] bg-v2-gold-primary w-full" />
             <div className="bg-v2-bg-primary border-b border-v2-border-light">
               <div className="flex items-center justify-between px-4 py-3">
                 {/* Logo area */}
@@ -537,7 +537,7 @@ export default function DashboardLayout({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setIsSearchOpen(true)}
-                    className="p-2 rounded-lg hover:bg-white/60 transition-colors touch-target"
+                    className="p-2 rounded-lg hover:bg-v2-bg-surface-tint transition-colors touch-target"
                     aria-label="Search"
                   >
                     <Search size={20} className="text-v2-text-secondary" />
@@ -545,7 +545,7 @@ export default function DashboardLayout({
                   <NotificationBell />
                   <button
                     onClick={toggleMobileMenu}
-                    className="p-2 rounded-lg hover:bg-white/60 transition-colors touch-target"
+                    className="p-2 rounded-lg hover:bg-v2-bg-surface-tint transition-colors touch-target"
                     aria-label={t("toggleMenu")}
                     aria-expanded={isMobileMenuOpen}
                   >
@@ -567,7 +567,7 @@ export default function DashboardLayout({
                   style={{ zIndex: ZIndex.modalBackdrop }}
                 />
                 <div
-                  className={`fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-white z-modal sm:hidden flex flex-col ${
+                  className={`fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-v2-bg-surface z-modal sm:hidden flex flex-col ${
                     isClosing
                       ? "animate-slide-out-left"
                       : "animate-slide-in-left"
@@ -607,8 +607,8 @@ export default function DashboardLayout({
 
                   {/* User Info — pinned to bottom */}
                   <div className="p-4 pb-20 border-t border-v2-border-light shrink-0">
-                    <div className="flex items-center gap-3 px-3 py-2 bg-v2-bg-primary rounded-xl">
-                      <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center overflow-hidden">
+                    <div className="flex items-center gap-3 px-3 py-2 bg-v2-bg-dark rounded-xl">
+                      <div className="w-8 h-8 rounded-full bg-v2-gold-primary flex items-center justify-center overflow-hidden">
                         {user.picture ? (
                           <NextImage
                             src={user.picture}
@@ -647,7 +647,7 @@ export default function DashboardLayout({
             )}
           >
             {/* V2 Desktop Top Bar */}
-            <header className="hidden sm:flex items-center justify-between px-8 py-4 border-b border-v2-border-light bg-white h-[68px] shrink-0">
+            <header className="hidden sm:flex items-center justify-between px-8 py-4 border-b border-v2-border-light bg-v2-bg-surface h-[68px] shrink-0">
               {/* Left: Greeting + Date */}
               <div>
                 <h2 className="font-vietnam font-semibold text-[18px] text-v2-text-primary">
