@@ -20,10 +20,7 @@ export const Label = ({
       htmlFor={htmlFor}
       className={cn(
         "text-sm font-medium cursor-pointer",
-        // Light mode
-        "text-neutral-700",
-        // Dark mode
- "",
+        "text-v2-text-secondary",
         className
       )}
     >

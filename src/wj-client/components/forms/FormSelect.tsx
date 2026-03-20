@@ -376,29 +376,29 @@ export function FormSelect({
   // State colors - border only (ring is handled separately via isFocused state)
   const getStateClasses = () => {
     if (error) {
- return "border-danger-300";
+ return "border-v2-red-negative";
     }
     if (success) {
- return "border-success-300";
+ return "border-v2-border-light";
     }
- return "border-neutral-300";
+ return "border-v2-border-light";
   };
 
   const triggerClasses = cn(
     "w-full flex items-center justify-between gap-3 cursor-pointer",
- "rounded-lg border bg-white",
- "text-neutral-900",
+ "rounded-lg border bg-v2-bg-dark",
+ "text-white",
     "transition-all duration-200",
     // Focus styles - single ring (clean, modern)
     "focus:outline-none",
- "disabled:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50",
+ "disabled:opacity-40 disabled:cursor-not-allowed",
     sizeClasses[size],
     getStateClasses(),
     {
       // Apply ring only when focused
-      "ring-2 ring-v2-red-primary border-transparent":
+      "ring-2 ring-v2-gold-primary border-transparent":
         isFocused && !error && !success,
-      "ring-2 ring-danger-500 border-transparent": isFocused && error,
+      "ring-2 ring-v2-red-negative border-transparent": isFocused && error,
       "ring-2 ring-success-500 border-transparent": isFocused && success,
     },
   );
@@ -433,8 +433,8 @@ export function FormSelect({
         className={cn(
           portal ? "fixed" : "absolute",
           "z-50 w-full mt-1",
- "bg-white",
- "border border-neutral-200",
+ "bg-v2-bg-dark",
+ "border border-v2-border-light",
           "rounded-lg shadow-lg",
           "overflow-hidden",
           "animate-fade-in-scale",
@@ -454,14 +454,14 @@ export function FormSelect({
       >
         {/* Search input */}
         {searchable && (
- <div className="p-2 border-b border-neutral-200">
+ <div className="p-2 border-b border-v2-border-light">
             <input
               ref={searchInputRef}
               type="text"
               placeholder={searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
- className="w-full px-3 py-2 text-sm rounded-md border border-neutral-300 bg-white text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:border-transparent transition-all duration-200"
+ className="w-full px-3 py-2 text-sm rounded-md border border-v2-border-light bg-v2-bg-dark text-white placeholder:text-v2-text-tertiary focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent transition-all duration-200"
               autoFocus
             />
           </div>
@@ -475,13 +475,13 @@ export function FormSelect({
           style={{ maxHeight: `${maxVisibleItems * 44}px` }}
         >
           {filteredOptions.length === 0 ? (
- <div className="px-4 py-8 text-center text-sm text-neutral-500">
+ <div className="px-4 py-8 text-center text-sm text-v2-text-tertiary">
               {noResultsMessage}
             </div>
           ) : groupedOptions ? (
             Object.entries(groupedOptions).map(([group, opts]) => (
               <div key={group}>
- <div className="px-4 py-2 text-xs font-semibold text-neutral-500 bg-neutral-50 uppercase tracking-wider">
+ <div className="px-4 py-2 text-xs font-semibold text-v2-text-tertiary bg-v2-bg-surface-tint uppercase tracking-wider">
                   {group}
                 </div>
                 {opts.map((option, idx) => {
@@ -495,13 +495,13 @@ export function FormSelect({
                       className={cn(
                         "w-full px-4 py-3 text-left flex items-center gap-3 cursor-pointer",
                         "transition-colors duration-200",
- "hover:bg-neutral-50",
- "focus:outline-none focus:bg-neutral-100",
+ "hover:bg-v2-bg-surface-tint",
+ "focus:outline-none focus:bg-v2-bg-surface-tint",
                         "disabled:opacity-50 disabled:cursor-not-allowed",
                         {
- "bg-primary-50 text-primary-700":
+ "bg-v2-gold-primary/20 text-v2-gold-primary":
                             isSelected && !option.disabled,
- "text-neutral-400 cursor-not-allowed":
+ "text-v2-text-tertiary cursor-not-allowed":
                             option.disabled,
                         },
                       )}
@@ -517,8 +517,8 @@ export function FormSelect({
                             className={cn(
                               "w-5 h-5 rounded border-2 flex items-center justify-center",
                               isSelected
-                                ? "bg-v2-red-primary border-v2-red-primary"
- : "border-neutral-300",
+                                ? "bg-v2-gold-primary border-v2-gold-primary"
+ : "border-v2-border-light",
                             )}
                           >
                             {isSelected && (
@@ -543,7 +543,7 @@ export function FormSelect({
                       <span
                         className={cn(
                           "flex-1 truncate",
-                          option.disabled && "text-neutral-400",
+                          option.disabled && "text-v2-text-tertiary",
                         )}
                       >
                         {renderOption ? renderOption(option) : option.label}
@@ -565,13 +565,13 @@ export function FormSelect({
                   className={cn(
                     "w-full px-4 py-3 text-left flex items-center gap-3 cursor-pointer",
                     "transition-colors duration-200",
- "hover:bg-neutral-50",
- "focus:outline-none focus:bg-neutral-100",
+ "hover:bg-v2-bg-surface-tint",
+ "focus:outline-none focus:bg-v2-bg-surface-tint",
                     "disabled:opacity-50 disabled:cursor-not-allowed",
                     {
- "bg-primary-50 text-primary-700":
+ "bg-v2-gold-primary/20 text-v2-gold-primary":
                         isSelected && !option.disabled,
- "text-neutral-400 cursor-not-allowed":
+ "text-v2-text-tertiary cursor-not-allowed":
                         option.disabled,
                     },
                   )}
@@ -587,8 +587,8 @@ export function FormSelect({
                         className={cn(
                           "w-5 h-5 rounded border-2 flex items-center justify-center",
                           isSelected
-                            ? "bg-v2-red-primary border-v2-red-primary"
- : "border-neutral-300",
+                            ? "bg-v2-gold-primary border-v2-gold-primary"
+ : "border-v2-border-light",
                         )}
                       >
                         {isSelected && (
@@ -613,7 +613,7 @@ export function FormSelect({
                   <span
                     className={cn(
                       "flex-1 truncate",
-                      option.disabled && "text-neutral-400",
+                      option.disabled && "text-v2-text-tertiary",
                     )}
                   >
                     {renderOption ? renderOption(option) : option.label}
@@ -645,15 +645,15 @@ export function FormSelect({
           className={cn(
             "block text-sm font-medium mb-1.5",
             error
- ? "text-danger-600"
+ ? "text-v2-red-negative"
               : success
  ? "text-success-600"
- : "text-neutral-700",
+ : "text-v2-text-secondary",
           )}
         >
           {label}
           {required && (
- <span className="text-danger-600 ml-1">*</span>
+ <span className="text-v2-red-negative ml-1">*</span>
           )}
         </label>
       )}
@@ -686,14 +686,14 @@ export function FormSelect({
             "truncate flex-1 text-left",
             !selectedOption &&
               !selectedOptions.length &&
- "text-neutral-400",
+ "text-v2-text-tertiary",
           )}
         >
           {getSelectedLabel()}
         </span>
         <svg
           className={cn(
-            "w-5 h-5 flex-shrink-0 text-neutral-400 transition-transform duration-200",
+            "w-5 h-5 flex-shrink-0 text-v2-text-tertiary transition-transform duration-200",
             isOpen && "rotate-180",
           )}
           fill="none"
@@ -718,7 +718,7 @@ export function FormSelect({
           {error && (
             <p
               id={errorId}
- className="text-sm text-danger-600 flex items-center gap-1"
+ className="text-sm text-v2-red-negative flex items-center gap-1"
             >
               <svg
                 className="w-4 h-4 flex-shrink-0"
@@ -756,7 +756,7 @@ export function FormSelect({
           {helperText && !error && !success && (
             <p
               id={helperId}
- className="text-sm text-neutral-500"
+ className="text-sm text-v2-text-tertiary"
             >
               {helperText}
             </p>

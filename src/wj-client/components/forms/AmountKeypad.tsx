@@ -57,11 +57,11 @@ export const AmountKeypad = memo(function AmountKeypad({
   return (
     <div className={cn("flex flex-col gap-3", className)}>
       {/* Display */}
- <div className="bg-gray-100 rounded-lg p-4 text-center">
- <div className="text-sm text-gray-500 mb-1">
+ <div className="bg-v2-bg-dark rounded-lg p-4 text-center">
+ <div className="text-sm text-v2-text-tertiary mb-1">
           Amount
         </div>
- <div className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-1">
+ <div className="text-3xl font-bold text-white flex items-center justify-center gap-1">
           <span className="text-lg">{currency}</span>
           <span>{formatNumberWithCommas(value) || "0"}</span>
         </div>
@@ -77,12 +77,12 @@ export const AmountKeypad = memo(function AmountKeypad({
             className={cn(
               "min-h-[56px] rounded-lg font-semibold text-xl transition-all duration-150",
               "active:scale-95 active:shadow-inner",
-              "focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
+              "focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2",
               // Number keys
               key !== "⌫"
- ? "bg-white text-gray-900 shadow-sm hover:shadow-md border border-gray-200"
+ ? "bg-v2-bg-dark text-white shadow-sm hover:shadow-md border border-v2-border-light"
                 : // Delete key
- "bg-danger-50 text-danger-600 hover:bg-danger-100 border border-danger-200"
+ "bg-v2-red-negative/10 text-v2-red-negative hover:bg-v2-red-negative/20 border border-v2-red-negative/30"
             )}
             aria-label={key === "⌫" ? "Delete" : `Digit ${key}`}
           >
@@ -100,10 +100,10 @@ export const AmountKeypad = memo(function AmountKeypad({
           className={cn(
             "w-full min-h-[52px] rounded-lg font-semibold text-lg transition-all duration-150",
             "active:scale-95 active:shadow-inner",
-            "focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
+            "focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2",
             value && parseFloat(value) > 0
-              ? "bg-v2-red-primary text-white hover:bg-v2-red-dark shadow-md hover:shadow-lg"
- : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              ? "bg-v2-gold-primary text-white hover:bg-v2-gold-primary/80 shadow-md hover:shadow-lg"
+ : "bg-v2-bg-surface-tint text-v2-text-tertiary cursor-not-allowed"
           )}
           aria-label={t("continue")}
         >

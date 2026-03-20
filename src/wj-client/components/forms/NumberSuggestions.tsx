@@ -113,7 +113,7 @@ export function NumberSuggestions({
       aria-label={`Suggested amounts${currency ? ` in ${currency}` : ""}`}
     >
       {/* Label */}
- <div className="text-sm text-gray-600 mb-1">
+ <div className="text-sm text-v2-text-tertiary mb-1">
         Suggestions:
       </div>
 
@@ -134,15 +134,13 @@ export function NumberSuggestions({
               tabIndex={index === 0 ? 0 : -1}
               className="
                 px-3 py-2 min-h-[44px]
-                bg-v2-red-light border border-v2-border
-                text-v2-red-primary font-medium text-sm
+                bg-v2-gold-primary/10 border border-v2-gold-primary/30
+                text-v2-gold-primary font-medium text-sm
                 rounded-md
-                hover:bg-red-100
+                hover:bg-v2-gold-primary/20
                 active:scale-95
-                focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:ring-offset-1
+                focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:ring-offset-1
                 transition-all duration-150
-
-
               "
               aria-label={`Select ${formatted}${currency ? ` ${currency}` : ""}`}
             >

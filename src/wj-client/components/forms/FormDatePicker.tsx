@@ -336,22 +336,22 @@ export function FormDatePicker({
   // State colors - border only
   const getStateClasses = () => {
     if (error) {
- return "border-danger-300 hover:border-danger-400";
+ return "border-v2-red-negative hover:border-v2-red-negative";
     }
     if (success) {
- return "border-success-300 hover:border-success-400";
+ return "border-v2-border-light hover:border-v2-border-light";
     }
- return "border-neutral-300 hover:border-neutral-400";
+ return "border-v2-border-light hover:border-v2-border-light";
   };
 
   const triggerClasses = cn(
     "w-full flex items-center justify-between gap-3",
- "rounded-lg border bg-white",
- "text-neutral-900",
+ "rounded-lg border bg-v2-bg-dark",
+ "text-white",
     "transition-all duration-200",
     // Focus styles - single ring (clean, modern)
-    "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:border-transparent",
- "disabled:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50",
+    "focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent",
+ "disabled:opacity-40 disabled:cursor-not-allowed",
     sizeClasses[size],
     getStateClasses(),
   );
@@ -393,14 +393,14 @@ export function FormDatePicker({
           className={cn(
             "block text-sm font-medium mb-1.5",
             error
- ? "text-danger-600"
+ ? "text-v2-red-negative"
               : success
  ? "text-success-600"
- : "text-neutral-700",
+ : "text-v2-text-secondary",
           )}
         >
           {label}
- {required && <span className="text-danger-600 ml-1">*</span>}
+ {required && <span className="text-v2-red-negative ml-1">*</span>}
         </label>
       )}
 
@@ -437,7 +437,7 @@ export function FormDatePicker({
                 e.stopPropagation();
                 handleClear();
               }}
- className="p-1 rounded hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600"
+ className="p-1 rounded hover:bg-v2-bg-surface-tint text-v2-text-tertiary hover:text-white"
               aria-label={t("clearDate")}
             >
               <svg
@@ -456,7 +456,7 @@ export function FormDatePicker({
             </button>
           )}
           <svg
-            className={cn("w-5 h-5 text-neutral-400", isOpen && "rotate-180")}
+            className={cn("w-5 h-5 text-v2-text-tertiary", isOpen && "rotate-180")}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -477,21 +477,21 @@ export function FormDatePicker({
           ref={dropdownRef}
           className={cn(
             "absolute z-50 w-full mt-1 p-4",
- "bg-white",
- "border border-neutral-200",
+ "bg-v2-bg-dark",
+ "border border-v2-border-light",
             "rounded-lg shadow-lg",
           )}
         >
           {/* Presets */}
           {showPresets && presets.length > 0 && (
- <div className="mb-4 pb-4 border-b border-neutral-200">
+ <div className="mb-4 pb-4 border-b border-v2-border-light">
               <div className="flex flex-wrap gap-2">
                 {presets.map((preset) => (
                   <button
                     key={preset.label}
                     type="button"
                     onClick={() => handlePresetSelect(preset)}
- className="px-3 py-1.5 text-xs font-medium rounded-full bg-neutral-100 text-neutral-700 hover:bg-neutral-200 transition-colors"
+ className="px-3 py-1.5 text-xs font-medium rounded-full bg-v2-bg-surface-tint text-v2-text-secondary hover:bg-v2-gold-primary/20 transition-colors"
                   >
                     {preset.label}
                   </button>
@@ -506,7 +506,7 @@ export function FormDatePicker({
               <button
                 type="button"
                 onClick={() => navigateMonth(-1)}
- className="p-1 rounded hover:bg-neutral-100"
+ className="p-1 rounded hover:bg-v2-bg-surface-tint"
                 aria-label={t("previousMonth")}
               >
                 <svg
@@ -526,7 +526,7 @@ export function FormDatePicker({
               <button
                 type="button"
                 onClick={() => navigateYear(-1)}
- className="p-1 rounded hover:bg-neutral-100"
+ className="p-1 rounded hover:bg-v2-bg-surface-tint"
                 aria-label={t("previousYear")}
               >
                 <svg
@@ -545,7 +545,7 @@ export function FormDatePicker({
               </button>
             </div>
 
- <div className="text-sm font-semibold text-neutral-900">
+ <div className="text-sm font-semibold text-white">
               {new Date(currentYear, currentMonth).toLocaleDateString("en-US", {
                 month: "long",
                 year: "numeric",
@@ -556,7 +556,7 @@ export function FormDatePicker({
               <button
                 type="button"
                 onClick={() => navigateYear(1)}
- className="p-1 rounded hover:bg-neutral-100"
+ className="p-1 rounded hover:bg-v2-bg-surface-tint"
                 aria-label={t("nextYear")}
               >
                 <svg
@@ -576,7 +576,7 @@ export function FormDatePicker({
               <button
                 type="button"
                 onClick={() => navigateMonth(1)}
- className="p-1 rounded hover:bg-neutral-100"
+ className="p-1 rounded hover:bg-v2-bg-surface-tint"
                 aria-label={t("nextMonth")}
               >
                 <svg
@@ -602,7 +602,7 @@ export function FormDatePicker({
             {adjustedWeekDays.map((day) => (
               <div
                 key={day}
- className="text-center text-xs font-medium text-neutral-500 py-2"
+ className="text-center text-xs font-medium text-v2-text-tertiary py-2"
               >
                 {day.slice(0, 1)}
               </div>
@@ -627,16 +627,16 @@ export function FormDatePicker({
                   onMouseLeave={() => setHoveredDate(null)}
                   className={cn(
                     "aspect-square flex items-center justify-center text-sm rounded-lg transition-all duration-150",
- "hover:bg-neutral-100",
-                    "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:ring-inset",
+ "hover:bg-v2-bg-surface-tint",
+                    "focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:ring-inset",
                     {
                       invisible: isEmpty,
- "bg-v2-red-primary text-white hover:bg-v2-red-dark":
+ "bg-v2-gold-primary text-white hover:bg-v2-gold-primary/80":
                         isSelected,
- "bg-primary-50 text-primary-600":
+ "bg-v2-gold-primary/20 text-v2-gold-primary":
                         isToday && !isSelected,
                       "font-semibold": isToday,
-                      "text-neutral-400 cursor-not-allowed": isDisabled,
+                      "text-v2-text-tertiary cursor-not-allowed": isDisabled,
                     },
                   )}
                   aria-label={date ? date.toDateString() : ""}
@@ -657,7 +657,7 @@ export function FormDatePicker({
           {error && (
             <p
               id={errorId}
- className="text-sm text-danger-600 flex items-center gap-1"
+ className="text-sm text-v2-red-negative flex items-center gap-1"
             >
               <svg
                 className="w-4 h-4 flex-shrink-0"
@@ -697,7 +697,7 @@ export function FormDatePicker({
           {helperText && !error && !success && (
             <p
               id={helperId}
- className="text-sm text-neutral-500"
+ className="text-sm text-v2-text-tertiary"
             >
               {helperText}
             </p>

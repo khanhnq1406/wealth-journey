@@ -188,21 +188,21 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
     // State colors
     const getStateClasses = () => {
       if (error) {
- return "border-red-300 focus:border-red-500 focus:ring-red-500";
+ return "border-v2-red-negative focus:border-v2-red-negative focus:ring-v2-red-negative";
       }
       if (success) {
- return "border-v2-border focus:border-v2-red-primary focus:ring-v2-red-primary";
+ return "border-v2-border-light focus:border-v2-gold-primary focus:ring-v2-gold-primary";
       }
- return "border-gray-300 focus:border-v2-red-primary focus:ring-v2-red-primary";
+ return "border-v2-border-light focus:border-v2-gold-primary focus:ring-v2-gold-primary";
     };
 
     const inputClasses = cn(
       // Base styles
       "w-full rounded-lg border transition-all duration-200",
- "bg-white",
- "text-gray-900",
- "placeholder:text-gray-400",
- "disabled:bg-gray-100 disabled:cursor-not-allowed",
+ "bg-v2-bg-dark",
+ "text-white",
+ "placeholder:text-v2-text-tertiary",
+ "disabled:opacity-40 disabled:cursor-not-allowed",
       // Focus styles
       "focus:outline-none focus:ring-2 focus:ring-offset-0",
       // Size
@@ -218,8 +218,8 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
 
     const labelClasses = cn(
       "absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-all duration-200",
- "bg-white px-1",
- "text-gray-500",
+ "bg-v2-bg-dark px-1",
+ "text-v2-text-tertiary",
       {
         "text-xs -translate-y-8 top-1/2": showFloatingLabel,
         "text-base": !showFloatingLabel,
@@ -234,12 +234,12 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       containerClassName
     );
 
- const iconClasses = "absolute top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none";
+ const iconClasses = "absolute top-1/2 -translate-y-1/2 text-v2-text-tertiary pointer-events-none";
     const leftIconClasses = cn(iconClasses, "left-3");
     const rightIconClasses = cn(
       iconClasses,
       "right-3",
- onRightIconClick && "pointer-events-auto cursor-pointer hover:text-gray-600"
+ onRightIconClick && "pointer-events-auto cursor-pointer hover:text-white"
     );
 
     return (
@@ -250,14 +250,14 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             className={cn(
               "block text-sm font-medium mb-1.5",
               error
- ? "text-red-600"
+ ? "text-v2-red-negative"
                 : success
  ? "text-v2-green-positive"
- : "text-gray-700"
+ : "text-v2-text-secondary"
             )}
           >
             {label}
-            {required && <span className="text-red-500 ml-1">*</span>}
+            {required && <span className="text-v2-red-negative ml-1">*</span>}
           </label>
         )}
 
@@ -302,7 +302,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             >
               {loading ? (
                 <svg
-                  className="animate-spin h-5 w-5 text-gray-400"
+                  className="animate-spin h-5 w-5 text-v2-text-tertiary"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -332,7 +332,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
         {(helperText || error || success) && (
           <div className="mt-1.5 min-h-[20px]">
             {error && (
- <p id={errorId} className="text-sm text-red-600 flex items-center gap-1">
+ <p id={errorId} className="text-sm text-v2-red-negative flex items-center gap-1">
                 <svg
                   className="w-4 h-4 flex-shrink-0"
                   fill="currentColor"
@@ -364,7 +364,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
               </p>
             )}
             {helperText && !error && !success && (
- <p id={helperId} className="text-sm text-gray-500">
+ <p id={helperId} className="text-sm text-v2-text-tertiary">
                 {helperText}
               </p>
             )}

@@ -91,10 +91,10 @@ export const FormTextarea = ({
             className={cn(
               "text-xs ml-2 transition-colors",
               isAtLimit
- ? "text-danger-600 font-medium"
+ ? "text-v2-red-negative font-medium"
                 : isNearLimit
  ? "text-warning-600"
- : "text-neutral-500"
+ : "text-v2-text-tertiary"
             )}
             aria-live="polite"
           >
@@ -120,16 +120,16 @@ export const FormTextarea = ({
             "px-3 sm:px-4 py-2.5 sm:py-3",
             "rounded-lg",
             "border transition-all duration-200",
- "bg-white",
- "text-neutral-900",
- "placeholder:text-neutral-400",
+ "bg-v2-bg-dark",
+ "text-white",
+ "placeholder:text-v2-text-tertiary",
             // Focus states - single ring (clean, modern)
-            "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+            "focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent",
             // Error states
-            hasError && "border-danger-500 focus:ring-danger-500 focus:border-transparent",
- !hasError && "border-neutral-300 hover:border-neutral-400",
+            hasError && "border-v2-red-negative focus:ring-v2-red-negative focus:border-transparent",
+ !hasError && "border-v2-border-light hover:border-v2-border-light",
             // Disabled states
- "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-neutral-50",
+ "disabled:opacity-40 disabled:cursor-not-allowed",
             // Resize
             autoResize ? "resize-none overflow-hidden" : "resize-y"
           )}
@@ -147,7 +147,7 @@ export const FormTextarea = ({
       </div>
       {/* Helper text */}
       {helperText && !hasError && (
- <p id={helperId} className="mt-1.5 text-xs sm:text-sm text-neutral-500">
+ <p id={helperId} className="mt-1.5 text-xs sm:text-sm text-v2-text-tertiary">
           {helperText}
         </p>
       )}
