@@ -8,14 +8,14 @@
 - **Started:** 2026-03-20
 - **Last updated:** 2026-03-20
 - **Current state:** in_progress
-- **Current task:** 1
+- **Current task:** 3
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 1 | Update i18n messages | pending | — | — |
-| 2 | Update dashboard layout (FAB + modal) | pending | — | — |
+| 1 | Update i18n messages | done | e14a2c7 | Replaced quickActions EN/VI translations |
+| 2 | Update dashboard layout (FAB + modal) | done | — | Replaced 3 FAB actions with single Add Investment |
 | 3 | Manual verification checklist | pending | — | — |
 
 ## Resume Instructions
