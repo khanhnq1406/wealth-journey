@@ -345,35 +345,35 @@ export default function LandingBankImport() {
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6, delay: 0.5 }}
         >
-          <div className="text-center p-6 bg-white rounded-xl shadow-md">
-            <div className="text-3xl sm:text-4xl font-extrabold text-v2-red-primary mb-2">
+          <div className="text-center p-6 bg-v2-maroon-800 rounded-xl shadow-md border border-v2-gold-primary/20">
+            <div className="text-3xl sm:text-4xl font-extrabold text-v2-gold-primary mb-2">
               10,000
             </div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-v2-cream-100">
               {t("bankImport.maxTransactions")}
             </div>
           </div>
-          <div className="text-center p-6 bg-white rounded-xl shadow-md">
-            <div className="text-3xl sm:text-4xl font-extrabold text-v2-red-primary mb-2">
+          <div className="text-center p-6 bg-v2-maroon-800 rounded-xl shadow-md border border-v2-gold-primary/20">
+            <div className="text-3xl sm:text-4xl font-extrabold text-v2-gold-primary mb-2">
               99%
             </div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-v2-cream-100">
               {t("bankImport.duplicateAccuracy")}
             </div>
           </div>
-          <div className="text-center p-6 bg-white rounded-xl shadow-md">
-            <div className="text-3xl sm:text-4xl font-extrabold text-v2-red-primary mb-2">
+          <div className="text-center p-6 bg-v2-maroon-800 rounded-xl shadow-md border border-v2-gold-primary/20">
+            <div className="text-3xl sm:text-4xl font-extrabold text-v2-gold-primary mb-2">
               &lt;10min
             </div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-v2-cream-100">
               {t("bankImport.importSpeed")}
             </div>
           </div>
-          <div className="text-center p-6 bg-white rounded-xl shadow-md">
-            <div className="text-3xl sm:text-4xl font-extrabold text-v2-red-primary mb-2">
+          <div className="text-center p-6 bg-v2-maroon-800 rounded-xl shadow-md border border-v2-gold-primary/20">
+            <div className="text-3xl sm:text-4xl font-extrabold text-v2-gold-primary mb-2">
               24hrs
             </div>
-            <div className="text-sm text-gray-600">{t("bankImport.undoWindow")}</div>
+            <div className="text-sm text-v2-cream-100">{t("bankImport.undoWindow")}</div>
           </div>
         </motion.div>
 

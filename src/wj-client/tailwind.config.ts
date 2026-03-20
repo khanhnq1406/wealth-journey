@@ -124,6 +124,13 @@ export default {
 
         // V2 mihong.vn Dark Maroon & Gold Design System
         v2: {
+          // Maroon scale (used across 50+ files)
+          "maroon-600": "#6B0303", // Lighter maroon (hover states)
+          "maroon-700": "#5F0202", // Primary background
+          "maroon-800": "#580202", // Surface/card background
+          "maroon-900": "#3D0101", // Input/dropdown background
+          // Cream
+          "cream-100": "#FFF8EC", // Body text alternative
           // Backgrounds
           "bg-primary": "#5F0202", // Deep maroon (page backgrounds)
           "bg-surface": "#580202", // Slightly lighter maroon (card/surface)

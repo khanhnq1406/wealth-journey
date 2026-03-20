@@ -36,14 +36,14 @@ function DashboardPreview() {
   }, []);
 
   return (
-    <div className="relative rounded-lg shadow-2xl overflow-hidden bg-neutral-50">
+    <div className="relative rounded-lg shadow-2xl overflow-hidden bg-v2-maroon-900">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-2">
+      <div className="bg-v2-maroon-800 border-b border-v2-gold-primary/20 px-4 py-3 flex items-center gap-2">
         <div className="w-3 h-3 rounded-full bg-red-400"></div>
         <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
         <div className="w-3 h-3 rounded-full bg-green-400"></div>
-        <div className="flex-1 bg-gray-100 rounded-md h-6 mx-4 flex items-center px-3">
-          <span className="text-xs text-gray-400">
+        <div className="flex-1 bg-v2-maroon-900 rounded-md h-6 mx-4 flex items-center px-3">
+          <span className="text-xs text-v2-text-tertiary">
             {origin ? `${origin}/dashboard/home` : "/dashboard/home"}
           </span>
         </div>

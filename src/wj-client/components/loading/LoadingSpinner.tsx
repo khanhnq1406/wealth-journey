@@ -13,8 +13,8 @@ export const LoadingSpinner = ({ text }: LoadingSpinnerProps) => {
 
   return (
     <div className="flex items-center gap-2">
-      <LoadingSpinnerIcon size="md" className="text-primary-500" />
-      <span className="text-primary-500">{resolvedText}</span>
+      <LoadingSpinnerIcon size="md" className="text-v2-gold-primary" />
+      <span className="text-v2-gold-primary">{resolvedText}</span>
     </div>
   );
 };

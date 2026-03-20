@@ -70,7 +70,7 @@ export default function LandingComparison() {
           animate={isInView ? "visible" : "hidden"}
         >
           {/* Desktop Table View */}
-          <div className="hidden sm:block bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="hidden sm:block bg-v2-maroon-800 rounded-xl shadow-lg overflow-hidden border border-v2-gold-primary/20">
             <table className="w-full">
               <thead>
                 <tr className="bg-v2-red-primary text-white">
@@ -84,20 +84,20 @@ export default function LandingComparison() {
                   <motion.tr
                     key={idx}
                     variants={itemVariants}
-                    className="border-b border-gray-100 hover:bg-v2-red-50/30 transition-colors"
+                    className="border-b border-v2-maroon-700 hover:bg-v2-maroon-700/50 transition-colors"
                   >
-                    <td className="py-4 px-6 font-medium text-gray-900">
+                    <td className="py-4 px-6 font-medium text-v2-gold-accent">
                       {t(`items.${item.key}.feature`)}
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-2">
-                        <span className="text-v2-red-primary flex-shrink-0">
+                        <span className="text-v2-gold-primary flex-shrink-0">
                           {checkIcon}
                         </span>
-                        <span className="text-gray-700">{t(`items.${item.key}.wj`)}</span>
+                        <span className="text-v2-cream-100">{t(`items.${item.key}.wj`)}</span>
                       </div>
                     </td>
-                    <td className="py-4 px-6 text-gray-500">{t(`items.${item.key}.others`)}</td>
+                    <td className="py-4 px-6 text-v2-text-tertiary">{t(`items.${item.key}.others`)}</td>
                   </motion.tr>
                 ))}
               </tbody>
@@ -110,30 +110,30 @@ export default function LandingComparison() {
               <motion.div
                 key={idx}
                 variants={itemVariants}
-                className="bg-white rounded-lg p-5 shadow-md"
+                className="bg-v2-maroon-800 rounded-lg p-5 shadow-md border border-v2-gold-primary/20"
               >
-                <h3 className="font-bold text-gray-900 mb-3 text-base">
+                <h3 className="font-bold text-v2-gold-accent mb-3 text-base">
                   {t(`items.${item.key}.feature`)}
                 </h3>
                 <div className="space-y-2">
                   <div className="flex items-start gap-2">
-                    <span className="text-v2-red-primary flex-shrink-0 mt-0.5">
+                    <span className="text-v2-gold-primary flex-shrink-0 mt-0.5">
                       {checkIcon}
                     </span>
                     <div>
-                      <div className="text-xs font-semibold text-v2-red-primary mb-1">
+                      <div className="text-xs font-semibold text-v2-gold-primary mb-1">
                         congdongvang.com
                       </div>
-                      <div className="text-sm text-gray-700">
+                      <div className="text-sm text-v2-cream-100">
                         {t(`items.${item.key}.wj`)}
                       </div>
                     </div>
                   </div>
-                  <div className="pl-8 pt-2 border-l-2 border-gray-200">
-                    <div className="text-xs font-semibold text-gray-500 mb-1">
+                  <div className="pl-8 pt-2 border-l-2 border-v2-maroon-700">
+                    <div className="text-xs font-semibold text-v2-text-tertiary mb-1">
                       {t("otherApps")}
                     </div>
-                    <div className="text-sm text-gray-500">{t(`items.${item.key}.others`)}</div>
+                    <div className="text-sm text-v2-text-tertiary">{t(`items.${item.key}.others`)}</div>
                   </div>
                 </div>
               </motion.div>

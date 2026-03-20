@@ -26,7 +26,7 @@ export default async function AuthLayout({
           </div>
           <img src="/login-stock.svg" className="w-3/5" alt="Login picture" />
         </div>
-        <div className="bg-neutral-50 h-screen">{children}</div>
+        <div className="bg-v2-maroon-900 h-screen">{children}</div>
       </div>
     </div>
   );
