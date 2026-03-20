@@ -7,8 +7,8 @@
 - **Spec file:** docs/specs/2026-03-20-community-page-ui-fixes-spec.md
 - **Started:** 2026-03-20
 - **Last updated:** 2026-03-20
-- **Current state:** in_progress
-- **Current task:** 4
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -17,7 +17,7 @@
 | 1 | Fix desktop content overlap — remove negative top margins | done | — | Removed -mt-4 sm:-mt-6 lg:-mt-8 from community page container |
 | 2 | Fix mobile sub-nav overlap — make MobileSubNav sticky | done | — | Added sticky top-0 z-20 to MobileSubNav wrapper |
 | 3 | Fix ProfileCard border-radius mismatch | done | — | Removed rounded-t-xl from cover banner |
-| 4 | Visual verification and implementation report | in_progress | — | — |
+| 4 | Visual verification and implementation report | done | — | Wrote implementation report |
 
 ## Resume Instructions
 
