@@ -7,16 +7,16 @@
 - **Spec file:** docs/specs/2026-03-20-fab-add-investment-only-spec.md
 - **Started:** 2026-03-20
 - **Last updated:** 2026-03-20
-- **Current state:** in_progress
-- **Current task:** 3
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
 | 1 | Update i18n messages | done | e14a2c7 | Replaced quickActions EN/VI translations |
-| 2 | Update dashboard layout (FAB + modal) | done | — | Replaced 3 FAB actions with single Add Investment |
-| 3 | Manual verification checklist | pending | — | — |
+| 2 | Update dashboard layout (FAB + modal) | done | aafe027 | Replaced 3 FAB actions with single Add Investment |
+| 3 | Manual verification checklist | done | — | Implementation report written |
 
 ## Resume Instructions
 
