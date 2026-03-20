@@ -102,7 +102,7 @@ export function SkeletonTable({
   return (
     <div
       className={cn(
- "bg-white rounded-xl border border-gray-200 overflow-hidden",
+ "bg-v2-bg-surface rounded-xl border border-v2-border-light overflow-hidden",
         className
       )}
       aria-busy="true"
@@ -110,7 +110,7 @@ export function SkeletonTable({
     >
       {/* Header */}
       {showHeader && (
- <div className="hidden sm:flex bg-gray-50 border-b border-gray-200">
+ <div className="hidden sm:flex bg-v2-bg-surface-tint border-b border-v2-border-light">
           {Array.from({ length: columns }).map((_, index) => {
             const colType = columnWidths?.[index] || "auto";
             return (
@@ -122,7 +122,7 @@ export function SkeletonTable({
                 )}
               >
                 <div className={cn(
- "h-4 bg-gray-200 rounded",
+ "h-4 bg-v2-bg-dark rounded",
                   animationClass
                 )} />
               </div>
@@ -131,7 +131,7 @@ export function SkeletonTable({
           {showActions && (
             <div className="px-4 py-3 col-span-2">
               <div className={cn(
- "h-4 bg-gray-200 rounded",
+ "h-4 bg-v2-bg-dark rounded",
                 animationClass
               )} />
             </div>
@@ -140,7 +140,7 @@ export function SkeletonTable({
       )}
 
       {/* Body */}
- <div className="divide-y divide-gray-200">
+ <div className="divide-y divide-v2-border-light">
         {Array.from({ length: rows }).map((_, rowIndex) => (
           <div
             key={`row-${rowIndex}`}
@@ -149,11 +149,11 @@ export function SkeletonTable({
             {/* Mobile Row */}
             <div className="sm:hidden px-4 py-3 space-y-2">
               <div className={cn(
- "h-4 bg-gray-200 rounded w-3/4",
+ "h-4 bg-v2-bg-dark rounded w-3/4",
                 animationClass
               )} />
               <div className={cn(
- "h-3 bg-gray-200 rounded w-1/2",
+ "h-3 bg-v2-bg-dark rounded w-1/2",
                 animationClass
               )} />
             </div>
@@ -170,7 +170,7 @@ export function SkeletonTable({
                   >
                     <div
                       className={cn(
- "h-4 bg-gray-200 rounded",
+ "h-4 bg-v2-bg-dark rounded",
                         animationClass
                       )}
                       style={{
@@ -185,11 +185,11 @@ export function SkeletonTable({
               {showActions && (
                 <div className="col-span-2 flex items-center gap-2 justify-end">
                   <div className={cn(
- "w-8 h-8 rounded bg-gray-200",
+ "w-8 h-8 rounded bg-v2-bg-dark",
                     animationClass
                   )} />
                   <div className={cn(
- "w-8 h-8 rounded bg-gray-200",
+ "w-8 h-8 rounded bg-v2-bg-dark",
                     animationClass
                   )} />
                 </div>
@@ -201,18 +201,18 @@ export function SkeletonTable({
 
       {/* Footer */}
       {showFooter && (
- <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+ <div className="px-4 py-3 bg-v2-bg-surface-tint border-t border-v2-border-light flex items-center justify-between">
           <div className={cn(
- "h-4 bg-gray-200 rounded w-1/4",
+ "h-4 bg-v2-bg-dark rounded w-1/4",
             animationClass
           )} />
           <div className="flex items-center gap-2">
             <div className={cn(
- "w-8 h-8 rounded bg-gray-200",
+ "w-8 h-8 rounded bg-v2-bg-dark",
               animationClass
             )} />
             <div className={cn(
- "w-8 h-8 rounded bg-gray-200",
+ "w-8 h-8 rounded bg-v2-bg-dark",
               animationClass
             )} />
           </div>
@@ -266,18 +266,18 @@ export function SkeletonTableRow({
   return (
     <div
       className={cn(
- "px-4 py-3 sm:py-4 border-b border-gray-200 last:border-b-0",
+ "px-4 py-3 sm:py-4 border-b border-v2-border-light last:border-b-0",
         className
       )}
     >
       {/* Mobile */}
       <div className="sm:hidden space-y-2">
         <div className={cn(
- "h-4 bg-gray-200 rounded w-3/4",
+ "h-4 bg-v2-bg-dark rounded w-3/4",
           animationClass
         )} />
         <div className={cn(
- "h-3 bg-gray-200 rounded w-1/2",
+ "h-3 bg-v2-bg-dark rounded w-1/2",
           animationClass
         )} />
       </div>
@@ -291,7 +291,7 @@ export function SkeletonTableRow({
             <div key={index} className={`col-span-${colSpan}`}>
               <div
                 className={cn(
- "h-4 bg-gray-200 rounded",
+ "h-4 bg-v2-bg-dark rounded",
                   animationClass
                 )}
               />
@@ -302,11 +302,11 @@ export function SkeletonTableRow({
         {showActions && (
           <div className="col-span-2 flex items-center justify-end gap-2">
             <div className={cn(
- "w-8 h-8 rounded bg-gray-200",
+ "w-8 h-8 rounded bg-v2-bg-dark",
               animationClass
             )} />
             <div className={cn(
- "w-8 h-8 rounded bg-gray-200",
+ "w-8 h-8 rounded bg-v2-bg-dark",
               animationClass
             )} />
           </div>

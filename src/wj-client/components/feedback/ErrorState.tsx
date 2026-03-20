@@ -89,28 +89,28 @@ export function ErrorState({
   const resolvedTitle = title ?? t("somethingWentWrong");
   const severityConfig = {
     error: {
- bg: "bg-red-50",
- border: "border-red-200",
- iconBg: "bg-red-100",
- iconColor: "text-red-600",
- textColor: "text-red-900",
- subtextColor: "text-red-700",
+      bg: "bg-v2-bg-dark",
+      border: "border-v2-border-light",
+      iconBg: "bg-v2-bg-surface-tint",
+      iconColor: "text-v2-red-negative",
+      textColor: "text-white",
+      subtextColor: "text-v2-text-tertiary",
     },
     warning: {
- bg: "bg-yellow-50",
- border: "border-yellow-200",
- iconBg: "bg-yellow-100",
- iconColor: "text-yellow-600",
- textColor: "text-yellow-900",
- subtextColor: "text-yellow-700",
+      bg: "bg-v2-bg-dark",
+      border: "border-v2-border-light",
+      iconBg: "bg-v2-bg-surface-tint",
+      iconColor: "text-yellow-400",
+      textColor: "text-white",
+      subtextColor: "text-v2-text-tertiary",
     },
     critical: {
- bg: "bg-red-100",
- border: "border-red-300",
- iconBg: "bg-red-200",
- iconColor: "text-red-700",
- textColor: "text-red-900",
- subtextColor: "text-red-800",
+      bg: "bg-v2-bg-dark",
+      border: "border-v2-border",
+      iconBg: "bg-v2-bg-surface-tint",
+      iconColor: "text-v2-red-negative",
+      textColor: "text-white",
+      subtextColor: "text-v2-text-tertiary",
     },
   };
 
@@ -223,7 +223,7 @@ export function ErrorState({
             </summary>
             <pre className={cn(
               "mt-2 p-3 rounded-lg text-xs overflow-x-auto",
- "bg-white/50",
+              "bg-v2-bg-surface/50",
               config.textColor
             )}>
               {details}
@@ -250,7 +250,7 @@ export function ErrorState({
                   : "bg-v2-red-primary text-white hover:bg-v2-red-dark",
                 "active:scale-[0.98]",
                 "transition-all duration-200",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2"
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2"
               )}
             >
               {primaryAction.icon && (
@@ -267,7 +267,7 @@ export function ErrorState({
                 "inline-flex items-center justify-center",
                 "px-4 py-2 text-sm font-medium rounded-lg",
                 config.subtextColor,
- "hover:bg-white/50",
+                "hover:bg-v2-bg-surface-tint",
                 "transition-all duration-200"
               )}
             >
@@ -417,7 +417,7 @@ export interface InlineErrorProps {
 export function InlineError({ message, className }: InlineErrorProps) {
   return (
     <div className={cn(
- "flex items-center gap-2 text-sm text-red-600",
+      "flex items-center gap-2 text-sm text-v2-red-negative",
       className
     )}>
       <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -456,12 +456,12 @@ export function WarningState({
   return (
     <div className={cn(
       "p-4 rounded-lg border",
- "bg-yellow-50",
- "border-yellow-200",
+      "bg-v2-bg-dark",
+      "border-v2-border-light",
       className
     )}>
       <div className="flex items-start gap-3">
- <div className="flex-shrink-0 w-5 h-5 text-yellow-600 mt-0.5">
+        <div className="flex-shrink-0 w-5 h-5 text-yellow-400 mt-0.5">
           <svg fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"
@@ -472,18 +472,18 @@ export function WarningState({
         </div>
         <div className="flex-1 min-w-0">
           {title && (
- <h4 className="font-semibold text-yellow-900">
+            <h4 className="font-semibold text-white">
               {title}
             </h4>
           )}
- <p className="text-sm text-yellow-800 mt-1">
+            <p className="text-sm text-v2-text-tertiary mt-1">
             {message}
           </p>
           {action && (
             <button
               type="button"
               onClick={action.onClick}
- className="mt-2 text-sm font-medium text-yellow-700 hover:text-yellow-900 underline"
+              className="mt-2 text-sm font-medium text-v2-gold-primary hover:text-v2-gold-accent underline"
             >
               {action.label}
             </button>
@@ -493,7 +493,7 @@ export function WarningState({
           <button
             type="button"
             onClick={onDismiss}
- className="flex-shrink-0 text-yellow-500 hover:text-yellow-700"
+            className="flex-shrink-0 text-v2-gold-primary hover:text-v2-gold-accent"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path

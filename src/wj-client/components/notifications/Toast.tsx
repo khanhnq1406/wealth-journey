@@ -159,8 +159,8 @@ export function Toast({
     const configs = {
       success: {
         containerClass:
- "bg-white border-l-4 border-success-500",
- iconClass: "text-success-500",
+          "bg-v2-bg-surface border-l-4 border-success-500",
+        iconClass: "text-success-500",
         icon: (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path
@@ -173,8 +173,8 @@ export function Toast({
       },
       error: {
         containerClass:
- "bg-white border-l-4 border-danger-500",
- iconClass: "text-danger-500",
+          "bg-v2-bg-surface border-l-4 border-danger-500",
+        iconClass: "text-danger-500",
         icon: (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path
@@ -187,8 +187,8 @@ export function Toast({
       },
       warning: {
         containerClass:
- "bg-white border-l-4 border-warning-500",
- iconClass: "text-warning-500",
+          "bg-v2-bg-surface border-l-4 border-warning-500",
+        iconClass: "text-warning-500",
         icon: (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path
@@ -201,8 +201,8 @@ export function Toast({
       },
       info: {
         containerClass:
- "bg-white border-l-4 border-primary-500",
- iconClass: "text-primary-500",
+          "bg-v2-bg-surface border-l-4 border-primary-500",
+        iconClass: "text-primary-500",
         icon: (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path
@@ -238,8 +238,8 @@ export function Toast({
       role="alert"
       aria-live="polite"
       className={cn(
- "relative flex items-start gap-3 p-4 rounded-lg shadow-md",
- "border border-neutral-200",
+        "relative flex items-start gap-3 p-4 rounded-lg shadow-lg",
+        "border border-v2-border-light",
         "min-w-[320px] max-w-md w-full",
         "transition-all duration-300 ease-out",
         config.containerClass,
@@ -257,11 +257,11 @@ export function Toast({
       {/* Content */}
       <div className="flex-1 min-w-0">
         {title && (
- <h4 className="text-sm font-semibold text-neutral-900 mb-1">
+          <h4 className="text-sm font-semibold text-white mb-1">
             {title}
           </h4>
         )}
- <p className="text-sm text-neutral-600">
+        <p className="text-sm text-v2-text-tertiary">
           {message}
         </p>
         {action && (
@@ -283,11 +283,11 @@ export function Toast({
         onClick={handleClose}
         className={cn(
           "flex-shrink-0 p-1 rounded-md",
- "text-neutral-400",
- "hover:bg-neutral-100",
- "hover:text-neutral-600",
+          "text-v2-gold-primary",
+          "hover:bg-v2-bg-surface-tint",
+          "hover:text-v2-gold-accent",
           "transition-colors",
- "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:ring-offset-2",
+          "focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:ring-offset-2",
         )}
         aria-label={t("close")}
       >
@@ -302,7 +302,7 @@ export function Toast({
 
       {/* Progress Bar */}
       {/* {showProgress && duration > 0 && (
- <div className="absolute bottom-0 left-0 right-0 h-1 bg-neutral-200 rounded-b-lg overflow-hidden">
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-v2-bg-dark rounded-b-lg overflow-hidden">
           <div
             className={cn(
               "h-full transition-all duration-100 ease-linear",

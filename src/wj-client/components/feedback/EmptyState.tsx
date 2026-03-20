@@ -97,7 +97,7 @@ export function EmptyState({
   const variantClasses = {
     default: "text-center",
     card: cn(
- "bg-white rounded-xl border border-gray-200",
+      "bg-v2-bg-surface rounded-xl border border-v2-border-light",
       "text-center"
     ),
     inline: "flex items-center gap-4 text-left",
@@ -106,7 +106,7 @@ export function EmptyState({
 
   const defaultIcon = (
     <svg
- className="w-full h-full text-gray-400"
+      className="w-full h-full text-v2-gold-primary"
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -142,7 +142,7 @@ export function EmptyState({
       )}>
         {resolvedTitle && (
           <h3 className={cn(
- "font-semibold text-gray-900",
+            "font-semibold text-white",
             sizeClasses[size].title
           )}>
             {resolvedTitle}
@@ -150,7 +150,7 @@ export function EmptyState({
         )}
         {description && (
           <p className={cn(
- "mt-2 text-gray-500 max-w-sm mx-auto",
+            "mt-2 text-v2-text-tertiary max-w-sm mx-auto",
             sizeClasses[size].description,
             variant === "inline" && "mx-0 max-w-none"
           )}>
@@ -183,7 +183,7 @@ export function EmptyState({
                 "hover:bg-v2-red-dark",
                 "active:scale-[0.98]",
                 "transition-all duration-200",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2"
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2"
               )}
             >
               {primaryAction.icon && (
@@ -199,9 +199,9 @@ export function EmptyState({
               className={cn(
                 "inline-flex items-center justify-center",
                 "px-4 py-2 text-sm font-medium rounded-lg",
- "text-gray-700",
- "hover:bg-gray-100",
- "active:bg-gray-200",
+                "text-v2-text-tertiary",
+                "hover:bg-v2-bg-surface-tint",
+                "active:bg-v2-bg-dark",
                 "transition-all duration-200"
               )}
             >

@@ -77,8 +77,8 @@ export function SkeletonListItem({
   return (
     <div
       className={cn(
- "flex items-center gap-3 sm:gap-4 bg-white",
- "border-b border-gray-200 last:border-b-0",
+ "flex items-center gap-3 sm:gap-4 bg-v2-bg-surface",
+ "border-b border-v2-border-light last:border-b-0",
         heightClasses[height],
         className
       )}
@@ -89,7 +89,7 @@ export function SkeletonListItem({
       {showThumbnail && (
         <div
           className={cn(
- "flex-shrink-0 rounded-lg bg-gray-200 animate-shimmer",
+ "flex-shrink-0 rounded-lg bg-v2-bg-dark animate-shimmer",
             thumbnailSize[height]
           )}
         />
@@ -99,7 +99,7 @@ export function SkeletonListItem({
       {showAvatar && !showThumbnail && (
         <div
           className={cn(
- "flex-shrink-0 rounded-full bg-gray-200 animate-shimmer",
+ "flex-shrink-0 rounded-full bg-v2-bg-dark animate-shimmer",
             avatarSize[height]
           )}
         />
@@ -113,8 +113,8 @@ export function SkeletonListItem({
       {/* Actions */}
       {showActions && (
         <div className="flex items-center gap-2 flex-shrink-0">
- <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gray-200 animate-shimmer" />
- <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gray-200 animate-shimmer" />
+ <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-v2-bg-dark animate-shimmer" />
+ <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-v2-bg-dark animate-shimmer" />
         </div>
       )}
 
@@ -171,7 +171,7 @@ export function SkeletonList({
     return (
       <div
         className={cn(
- "bg-white rounded-xl border border-gray-200 overflow-hidden",
+ "bg-v2-bg-surface rounded-xl border border-v2-border-light overflow-hidden",
           className
         )}
         aria-busy="true"
@@ -184,7 +184,7 @@ export function SkeletonList({
 
   return (
     <div
- className={cn("divide-y divide-gray-200", className)}
+ className={cn("divide-y divide-v2-border-light", className)}
       aria-busy="true"
       aria-label={t("loading")}
     >
@@ -238,7 +238,7 @@ export function SkeletonTable({
   return (
     <div
       className={cn(
- "bg-white rounded-xl border border-gray-200 overflow-hidden",
+ "bg-v2-bg-surface rounded-xl border border-v2-border-light overflow-hidden",
         className
       )}
       aria-busy="true"
@@ -246,12 +246,12 @@ export function SkeletonTable({
     >
       {/* Header */}
       {showHeader && (
- <div className="hidden sm:grid grid-cols-12 gap-4 px-4 py-3 bg-gray-50 border-b border-gray-200">
+ <div className="hidden sm:grid grid-cols-12 gap-4 px-4 py-3 bg-v2-bg-surface-tint border-b border-v2-border-light">
           {Array.from({ length: columns }).map((_, index) => (
             <div
               key={index}
               className={cn(
- "h-4 bg-gray-200 rounded animate-shimmer",
+ "h-4 bg-v2-bg-dark rounded animate-shimmer",
                 index === 0 ? "col-span-4" : index === columns - 1 ? "col-span-2" : "col-span-3"
               )}
             />
@@ -260,7 +260,7 @@ export function SkeletonTable({
       )}
 
       {/* Rows */}
- <div className="divide-y divide-gray-200">
+ <div className="divide-y divide-v2-border-light">
         {Array.from({ length: rows }).map((_, rowIndex) => (
           <div
             key={rowIndex}
@@ -268,8 +268,8 @@ export function SkeletonTable({
           >
             {/* Mobile: Show fewer columns */}
             <div className="col-span-12 sm:hidden space-y-2">
- <div className="h-4 bg-gray-200 rounded animate-shimmer w-3/4" />
- <div className="h-3 bg-gray-200 rounded animate-shimmer w-1/2" />
+ <div className="h-4 bg-v2-bg-dark rounded animate-shimmer w-3/4" />
+ <div className="h-3 bg-v2-bg-dark rounded animate-shimmer w-1/2" />
             </div>
 
             {/* Desktop: Show all columns */}
@@ -277,7 +277,7 @@ export function SkeletonTable({
               <div
                 key={colIndex}
                 className={cn(
- "hidden sm:block h-4 bg-gray-200 rounded animate-shimmer",
+ "hidden sm:block h-4 bg-v2-bg-dark rounded animate-shimmer",
                   colIndex === 0 ? "col-span-4" : colIndex === columns - 1 ? "col-span-2" : "col-span-3"
                 )}
                 style={{
