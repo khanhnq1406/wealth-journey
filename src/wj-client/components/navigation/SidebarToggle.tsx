@@ -23,7 +23,7 @@ export const SidebarToggle = memo(function SidebarToggle({
     <button
       onClick={onToggle}
       className={cn(
-        "hidden sm:flex items-center justify-center h-11 rounded-xl bg-v2-bg-primary hover:bg-v2-border-light active:scale-95 transition-all touch-target duration-300 ease-in-out",
+        "hidden sm:flex items-center justify-center h-11 rounded-xl bg-v2-bg-primary hover:bg-v2-bg-surface-tint active:scale-95 transition-all touch-target duration-300 ease-in-out",
         isExpanded ? "w-full" : "w-11",
       )}
       aria-label={isExpanded ? t("collapse") : t("expand")}
@@ -31,9 +31,9 @@ export const SidebarToggle = memo(function SidebarToggle({
       title={isExpanded ? t("collapse") : t("expand")}
     >
       {isExpanded ? (
-        <PanelLeftClose className="w-5 h-5 text-v2-text-tertiary" />
+        <PanelLeftClose className="w-5 h-5 text-v2-gold-primary" />
       ) : (
-        <PanelLeftOpen className="w-5 h-5 text-v2-text-tertiary" />
+        <PanelLeftOpen className="w-5 h-5 text-v2-gold-primary" />
       )}
     </button>
   );

@@ -56,7 +56,7 @@ export const BottomNav = memo(function BottomNav({
     <nav
       className={cn(
         "sm:hidden fixed bottom-0 left-0 right-0",
-        "bg-white border-t border-v2-border-light",
+        "bg-v2-bg-primary border-t border-v2-border",
         "pt-1",
         "shadow-[0_-2px_10px_rgba(0,0,0,0.05)]",
         className
@@ -83,8 +83,8 @@ export const BottomNav = memo(function BottomNav({
                 "transition-all duration-200 ease-out",
                 "text-v2-text-tertiary",
                 isActive
-                  ? "text-v2-red-primary"
-                  : "hover:text-v2-text-secondary active:text-v2-red-dark",
+                  ? "text-v2-gold-primary"
+                  : "hover:text-v2-text-secondary active:text-v2-gold-accent",
                 isActive && "font-medium"
               )}
               aria-current={isActive ? "page" : undefined}
@@ -106,7 +106,7 @@ export const BottomNav = memo(function BottomNav({
                 {/* Active dot indicator */}
                 {isActive && (
                   <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
-                    <div className="w-1 h-1 rounded-full bg-v2-red-primary" />
+                    <div className="w-1 h-1 rounded-full bg-v2-gold-primary" />
                   </div>
                 )}
               </div>
