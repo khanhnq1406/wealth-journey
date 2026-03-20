@@ -15,6 +15,6 @@ describe("MobileSubNav", () => {
     const wrapper = container.firstElementChild;
     expect(wrapper?.className).toContain("sticky");
     expect(wrapper?.className).toContain("top-0");
-    expect(wrapper?.className).toContain("z-20");
+    expect(wrapper?.className).toContain("z-[5]");
   });
 });
