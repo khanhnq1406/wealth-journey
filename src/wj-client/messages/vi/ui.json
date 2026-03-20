@@ -340,9 +340,7 @@
       "unitKG": "KG"
     },
     "quickActions": {
-      "addTransaction": "Thêm giao dịch",
-      "transferMoney": "Chuyển tiền",
-      "createNewWallet": "Tạo ví mới"
+      "addInvestment": "Thêm khoản đầu tư"
     }
   },
   "symbolAutocomplete": {

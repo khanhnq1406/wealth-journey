@@ -16,9 +16,7 @@ import { BottomNav, createNavItems } from "@/components/navigation";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { ZIndex } from "@/lib/utils/z-index";
 import { BaseModal } from "@/components/modals/BaseModal";
-import { AddTransactionForm } from "@/features/transaction/forms/AddTransactionForm";
-import { TransferMoneyForm } from "@/features/wallet/forms/TransferMoneyForm";
-import { CreateWalletForm } from "@/features/wallet/forms/CreateWalletForm";
+import { AddInvestmentForm } from "@/components/lazy/OptimizedComponents";
 import { useSidebarState } from "@/hooks/useSidebarState";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { PushPermissionBanner } from "@/components/notifications/PushPermissionBanner";
@@ -42,6 +40,7 @@ import {
   CircleUser,
   MessageCircle,
   Shield,
+  TrendingUp,
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -693,52 +692,10 @@ export default function DashboardLayout({
         <FloatingActionButton
           actions={[
             {
-              label: tQuickActions("addTransaction"),
-              icon: (
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-              ),
+              label: tQuickActions("addInvestment"),
+              icon: <TrendingUp className="w-6 h-6" />,
               onClick: () => {
-                setModalType(ModalType.ADD_TRANSACTION);
-              },
-            },
-            {
-              label: tQuickActions("transferMoney"),
-              icon: (
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-                  />
-                </svg>
-              ),
-              onClick: () => {
-                setModalType(ModalType.TRANSFER_MONEY);
-              },
-            },
-            {
-              label: tQuickActions("createNewWallet"),
-              icon: <Wallet className="w-6 h-6" />,
-              onClick: () => {
-                setModalType(ModalType.CREATE_WALLET);
+                setModalType(ModalType.ADD_INVESTMENT);
               },
             },
           ]}
@@ -750,22 +707,8 @@ export default function DashboardLayout({
           onClose={() => setModalType(null)}
           title={modalType || ""}
         >
-          {modalType === ModalType.ADD_TRANSACTION && (
-            <AddTransactionForm
-              onSuccess={() => {
-                setModalType(null);
-              }}
-            />
-          )}
-          {modalType === ModalType.TRANSFER_MONEY && (
-            <TransferMoneyForm
-              onSuccess={() => {
-                setModalType(null);
-              }}
-            />
-          )}
-          {modalType === ModalType.CREATE_WALLET && (
-            <CreateWalletForm
+          {modalType === ModalType.ADD_INVESTMENT && (
+            <AddInvestmentForm
               onSuccess={() => {
                 setModalType(null);
               }}
