@@ -9,6 +9,7 @@ import {
   formatNumberWithCommas,
   parseNumberWithCommas,
   isValidNumberInput,
+  normalizeDecimalInput,
 } from "@/lib/utils/number-format";
 import {
   generateRecommendations,
@@ -125,7 +126,7 @@ export const FormNumberInput = ({
 
   // Handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
+    let inputValue = e.target.value;
 
     // Allow empty value
     if (inputValue === "") {
@@ -133,6 +134,9 @@ export const FormNumberInput = ({
       onChange("");
       return;
     }
+
+    // Normalize comma-as-decimal (e.g., vi-VN keyboard types "1000,5")
+    inputValue = normalizeDecimalInput(inputValue);
 
     // Basic validation: only allow digits, decimal point, comma, and minus
     // This prevents letters and special characters while allowing flexible typing
