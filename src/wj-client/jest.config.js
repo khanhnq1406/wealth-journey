@@ -35,7 +35,7 @@ module.exports = async () => {
     ...nextJestConfig,
     transformIgnorePatterns: [
       // Explicitly transform ESM-only packages
-      'node_modules/(?!(?:.pnpm/node_modules/(?:(?:@mswjs|msw)/)|exceljs|jszip|pako|saxes|fast-crc32c|ip-address|next-intl|use-intl|intl-messageformat|@formatjs)/)',
+      'node_modules/(?!(msw|@mswjs|until-async|exceljs|jszip|pako|saxes|fast-crc32c|ip-address|next-intl|use-intl|intl-messageformat|@formatjs)/)',
     ],
   }
 }
