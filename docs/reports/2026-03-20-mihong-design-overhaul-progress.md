@@ -8,14 +8,14 @@
 - **Started:** 2026-03-20T00:00:00Z
 - **Last updated:** 2026-03-20T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 1
+- **Current task:** 2
 
 ## Task Progress
 
 | #   | Task Name                                    | Status  | Commit | Summary |
 | --- | -------------------------------------------- | ------- | ------ | ------- |
 | 0   | Update C4 Architecture Documentation         | done    | —      | Added mihong.vn design system migration note to C4 frontend diagram |
-| 1   | Update Tailwind Config — Color Palette       | pending | —      | —       |
+| 1   | Update Tailwind Config — Color Palette       | done    | —      | Migrated v2 colors, chart-v2, legacy aliases, primary scale, shadows to mihong.vn |
 | 2   | Font Migration — Roboto + Roboto Mono        | pending | —      | —       |
 | 3   | Update globals.css — Base Styles             | pending | —      | —       |
 | 4   | Remove ThemeProvider and ThemeToggle          | pending | —      | —       |
