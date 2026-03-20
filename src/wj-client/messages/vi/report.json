@@ -43,7 +43,14 @@
       "totalExpenses": "Tổng chi tiêu",
       "netSavings": "Tiết kiệm ròng",
       "savingsRate": "Tỷ lệ tiết kiệm",
-      "topExpenseCategory": "Chi tiêu hàng đầu"
+      "topExpenseCategory": "Chi tiêu hàng đầu",
+      "vsLastPeriod": "so với kỳ trước",
+      "positiveCashFlow": "Dòng tiền dương",
+      "negativeCashFlow": "Dòng tiền âm",
+      "excellent": "Xuất sắc!",
+      "good": "Tốt",
+      "needsImprovement": "Cần cải thiện",
+      "ppChange": "pp thay đổi"
     },
     "periods": {
       "thisMonth": "Tháng này",

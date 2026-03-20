@@ -738,8 +738,9 @@ export function ReportContent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.8 }}
+          className="h-full"
         >
-          <BaseCard className="p-3 sm:p-4">
+          <BaseCard className="p-3 sm:p-4 h-full">
             <Dominance availableYears={availableYears} />
           </BaseCard>
         </motion.div>
@@ -748,8 +749,9 @@ export function ReportContent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.9 }}
+          className="h-full"
         >
-          <BaseCard className="p-3 sm:p-4">
+          <BaseCard className="p-3 sm:p-4 h-full">
             <MonthlyDominance availableYears={availableYears} />
           </BaseCard>
         </motion.div>

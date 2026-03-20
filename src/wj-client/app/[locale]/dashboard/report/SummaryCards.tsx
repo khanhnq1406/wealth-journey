@@ -4,7 +4,10 @@ import React, { memo } from "react";
 import { useTranslations } from "next-intl";
 import { BaseCard } from "@/components/BaseCard";
 import { formatCurrency } from "@/utils/currency-formatter";
-import { useAnimatedNumber, useAnimatedPercentage } from "@/components/charts/useAnimatedNumber";
+import {
+  useAnimatedNumber,
+  useAnimatedPercentage,
+} from "@/components/charts/useAnimatedNumber";
 import { Sparkline } from "@/components/charts";
 
 /**
@@ -104,7 +107,9 @@ const SummaryCard = memo(function SummaryCard({
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-neutral-600">{label}</span>
           {icon && (
-            <div className={`w-8 h-8 rounded-full ${colors.icon} flex items-center justify-center`}>
+            <div
+              className={`w-8 h-8 rounded-full ${colors.icon} flex items-center justify-center`}
+            >
               {icon}
             </div>
           )}
@@ -114,15 +119,14 @@ const SummaryCard = memo(function SummaryCard({
         <div className="text-2xl font-bold text-neutral-900">{value}</div>
 
         {/* Subtitle/Change */}
-        {subtitle && (
-          <div className="text-xs text-neutral-500">{subtitle}</div>
-        )}
+        {subtitle && <div className="text-xs text-neutral-500">{subtitle}</div>}
 
         {change !== undefined && (
-          <div className={`text-xs font-medium ${change >= 0 ? "text-v2-green-positive" : "text-red-600"}`}>
+          <div
+            className={`text-xs font-medium ${change >= 0 ? "text-v2-green-positive" : "text-red-600"}`}
+          >
             {change >= 0 ? "+" : ""}
-            {change.toFixed(1)}%
-            {changeLabel && ` ${changeLabel}`}
+            {change.toFixed(1)}%{changeLabel && ` ${changeLabel}`}
           </div>
         )}
 
@@ -243,7 +247,9 @@ const Icons = {
  * - Comparison with previous period
  * - Trend sparklines
  */
-export const SummaryCards = memo(function SummaryCards({ data }: SummaryCardsProps) {
+export const SummaryCards = memo(function SummaryCards({
+  data,
+}: SummaryCardsProps) {
   const t = useTranslations("report.summary");
   const {
     totalIncome,
@@ -265,15 +271,21 @@ export const SummaryCards = memo(function SummaryCards({ data }: SummaryCardsPro
 
   // Calculate changes from previous period
   const incomeChange = previousPeriod
-    ? ((totalIncome - previousPeriod.totalIncome) / previousPeriod.totalIncome) * 100
+    ? ((totalIncome - previousPeriod.totalIncome) /
+        previousPeriod.totalIncome) *
+      100
     : undefined;
 
   const expensesChange = previousPeriod
-    ? ((totalExpenses - previousPeriod.totalExpenses) / previousPeriod.totalExpenses) * 100
+    ? ((totalExpenses - previousPeriod.totalExpenses) /
+        previousPeriod.totalExpenses) *
+      100
     : undefined;
 
   const savingsChange = previousPeriod
-    ? ((netSavings - previousPeriod.netSavings) / Math.abs(previousPeriod.netSavings || 1)) * 100
+    ? ((netSavings - previousPeriod.netSavings) /
+        Math.abs(previousPeriod.netSavings || 1)) *
+      100
     : undefined;
 
   const rateChange = previousPeriod
@@ -282,10 +294,11 @@ export const SummaryCards = memo(function SummaryCards({ data }: SummaryCardsPro
 
   // Prepare sparkline data
   const incomeSparkline = incomeHistory?.map((h) => ({ value: h.value })) || [];
-  const expenseSparkline = expenseHistory?.map((h) => ({ value: h.value })) || [];
+  const expenseSparkline =
+    expenseHistory?.map((h) => ({ value: h.value })) || [];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
       {/* Total Income */}
       <SummaryCard
         label={t("totalIncome")}
@@ -314,7 +327,9 @@ export const SummaryCards = memo(function SummaryCards({ data }: SummaryCardsPro
       <SummaryCard
         label={t("netSavings")}
         value={formatCurrency(animatedSavings, currency)}
-        subtitle={netSavings >= 0 ? t("positiveCashFlow") : t("negativeCashFlow")}
+        subtitle={
+          netSavings >= 0 ? t("positiveCashFlow") : t("negativeCashFlow")
+        }
         color={netSavings >= 0 ? "blue" : "red"}
         icon={<Icons.Savings />}
         change={savingsChange}
@@ -325,7 +340,13 @@ export const SummaryCards = memo(function SummaryCards({ data }: SummaryCardsPro
       <SummaryCard
         label={t("savingsRate")}
         value={`${animatedRate.toFixed(1)}%`}
-        subtitle={savingsRate >= 20 ? t("excellent") : savingsRate >= 10 ? t("good") : t("needsImprovement")}
+        subtitle={
+          savingsRate >= 20
+            ? t("excellent")
+            : savingsRate >= 10
+              ? t("good")
+              : t("needsImprovement")
+        }
         color="neutral"
         icon={<Icons.Percent />}
         change={rateChange}

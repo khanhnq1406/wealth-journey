@@ -43,7 +43,14 @@
       "totalExpenses": "Total Expenses",
       "netSavings": "Net Savings",
       "savingsRate": "Savings Rate",
-      "topExpenseCategory": "Top Expense"
+      "topExpenseCategory": "Top Expense",
+      "vsLastPeriod": "vs last period",
+      "positiveCashFlow": "Positive cash flow",
+      "negativeCashFlow": "Negative cash flow",
+      "excellent": "Excellent!",
+      "good": "Good",
+      "needsImprovement": "Needs improvement",
+      "ppChange": "pp change"
     },
     "periods": {
       "thisMonth": "This Month",
