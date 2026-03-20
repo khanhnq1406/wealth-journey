@@ -91,20 +91,17 @@ export const BaseCard = memo(function BaseCard({
   return (
     <div
       className={cn(
-        // Light mode
-        "bg-white",
-        // Dark mode
- "",
+        "bg-v2-bg-surface text-white",
+        "border border-v2-border-light border-t-2 border-t-v2-gold-primary",
         mobileOptimized ? "rounded-sm sm:rounded-md lg:rounded-lg" : "rounded-lg",
         paddingClasses[padding],
         shadowClasses[shadow],
         // Mobile-specific optimizations
         noMobileMargin ? "" : "mb-2 sm:mb-3 lg:mb-4",
         // Hover effect with transition
- hover && "hover:shadow-card-hover cursor-pointer transition-shadow duration-200",
+        hover && "hover:bg-v2-bg-surface-tint hover:shadow-card-hover cursor-pointer transition-shadow duration-200",
         // Clickable cards get larger touch target on mobile
- onClick && "cursor-pointer active:shadow-card-active",
-        // Smooth color transitions for dark mode
+        onClick && "cursor-pointer active:shadow-card-active",
         "transition-colors duration-200",
         className
       )}
@@ -133,15 +130,10 @@ export const BaseCard = memo(function BaseCard({
               className={cn(
                 "flex items-center justify-center",
                 "min-h-[44px] min-w-[44px]",
-                // Light mode colors
-                "text-neutral-500 hover:text-neutral-700",
-                "active:text-neutral-900",
-                // Dark mode colors
- "",
- "",
+                "text-v2-text-secondary hover:text-v2-gold-primary",
+                "active:text-v2-gold-accent",
                 "transition-colors duration-150",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
- "",
+                "focus:outline-none focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 focus-visible:ring-offset-v2-bg-surface",
                 "rounded-md",
                 // Hide chevron on desktop when collapsibleOnMobile
                 collapsibleOnMobile && "md:hidden"
