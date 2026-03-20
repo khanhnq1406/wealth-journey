@@ -225,7 +225,7 @@ export const PeriodSelector = memo(function PeriodSelector({
       <div className="space-y-4">
         {/* Period Presets */}
         <div>
-          <label className="text-sm font-medium text-neutral-700 mb-2 block">
+          <label className="text-sm font-medium text-v2-text-secondary mb-2 block">
             {tc("period")}
           </label>
           <div className="flex flex-wrap gap-2">
@@ -236,8 +236,8 @@ export const PeriodSelector = memo(function PeriodSelector({
                   onClick={() => handlePeriodSelect(option.value)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     selectedPeriod === option.value
-                      ? "bg-neutral-900 text-white"
-                      : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+                      ? "bg-v2-gold-primary text-white"
+                      : "bg-v2-bg-dark text-v2-text-secondary hover:bg-v2-bg-surface-tint"
                   }`}
                 >
                   {option.label}
@@ -248,8 +248,8 @@ export const PeriodSelector = memo(function PeriodSelector({
               onClick={() => handlePeriodSelect("custom")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 selectedPeriod === "custom"
-                  ? "bg-neutral-900 text-white"
-                  : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+                  ? "bg-v2-gold-primary text-white"
+                  : "bg-v2-bg-dark text-v2-text-secondary hover:bg-v2-bg-surface-tint"
               }`}
             >
               {t("custom")}
@@ -259,10 +259,10 @@ export const PeriodSelector = memo(function PeriodSelector({
 
         {/* Current Range Display with Navigation */}
         {currentRange && (
-          <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-v2-bg-dark rounded-lg">
             <button
               onClick={() => navigatePeriod("prev")}
-              className="p-1 rounded hover:bg-neutral-200 transition-colors"
+              className="p-1 rounded hover:bg-v2-bg-surface-tint transition-colors"
               aria-label={tc("previousPeriod")}
             >
               <Image
@@ -274,13 +274,13 @@ export const PeriodSelector = memo(function PeriodSelector({
             </button>
 
             <div className="text-center">
-              <div className="text-sm text-neutral-600">
+              <div className="text-sm text-v2-text-tertiary">
                 {selectedPeriod === "custom"
                   ? t("custom")
                   : PERIOD_OPTIONS.find((opt) => opt.value === selectedPeriod)
                       ?.label}
               </div>
-              <div className="text-xs text-neutral-500 mt-0.5">
+              <div className="text-xs text-v2-text-tertiary mt-0.5">
                 {formatDate(currentRange.start, locale)} -{" "}
                 {formatDate(currentRange.end, locale)}
               </div>
@@ -288,7 +288,7 @@ export const PeriodSelector = memo(function PeriodSelector({
 
             <button
               onClick={() => navigatePeriod("next")}
-              className="p-1 rounded hover:bg-neutral-200 transition-colors"
+              className="p-1 rounded hover:bg-v2-bg-surface-tint transition-colors"
               aria-label={tc("nextPeriod")}
             >
               <Image
@@ -303,10 +303,10 @@ export const PeriodSelector = memo(function PeriodSelector({
 
         {/* Custom Date Range Picker */}
         {showCustomPicker && (
-          <div className="p-4 bg-neutral-50 rounded-lg space-y-3">
+          <div className="p-4 bg-v2-bg-dark rounded-lg space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-medium text-neutral-600 mb-1 block">
+                <label className="text-xs font-medium text-v2-text-tertiary mb-1 block">
                   {t("startDate")}
                 </label>
                 <input
@@ -315,11 +315,11 @@ export const PeriodSelector = memo(function PeriodSelector({
                   onChange={(e) => setTempStartDate(e.target.value)}
                   min={minDate?.toISOString().split("T")[0]}
                   max={maxDate?.toISOString().split("T")[0]}
- className="w-full px-3 sm:px-4 rounded-lg border min-h-[44px] sm:min-h-[48px] text-sm sm:text-base border-neutral-300 bg-white text-neutral-900 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+ className="w-full px-3 sm:px-4 rounded-lg border min-h-[44px] sm:min-h-[48px] text-sm sm:text-base border-v2-border-light bg-v2-bg-surface text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-neutral-600 mb-1 block">
+                <label className="text-xs font-medium text-v2-text-tertiary mb-1 block">
                   {t("endDate")}
                 </label>
                 <input
@@ -328,7 +328,7 @@ export const PeriodSelector = memo(function PeriodSelector({
                   onChange={(e) => setTempEndDate(e.target.value)}
                   min={minDate?.toISOString().split("T")[0]}
                   max={maxDate?.toISOString().split("T")[0]}
- className="w-full px-3 sm:px-4 rounded-lg border min-h-[44px] sm:min-h-[48px] text-sm sm:text-base border-neutral-300 bg-white text-neutral-900 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+ className="w-full px-3 sm:px-4 rounded-lg border min-h-[44px] sm:min-h-[48px] text-sm sm:text-base border-v2-border-light bg-v2-bg-surface text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -354,14 +354,14 @@ export const PeriodSelector = memo(function PeriodSelector({
 
         {/* Compare Toggle */}
         {showCompare && onCompareChange && (
-          <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
-            <span className="text-sm text-neutral-700">
+          <div className="flex items-center justify-between p-3 bg-v2-bg-dark rounded-lg">
+            <span className="text-sm text-v2-text-secondary">
               {tr("compareWithPrevious")}
             </span>
             <button
               onClick={() => onCompareChange(!compareWithPrevious)}
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                compareWithPrevious ? "bg-neutral-900" : "bg-neutral-300"
+                compareWithPrevious ? "bg-v2-gold-primary" : "bg-v2-bg-dark"
               }`}
               role="switch"
               aria-checked={compareWithPrevious}

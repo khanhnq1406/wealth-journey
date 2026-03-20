@@ -40,7 +40,7 @@ function SessionItem({ session, onRevoke, isRevoking, t }: SessionItemProps) {
   };
 
   return (
-    <div className="border rounded-lg p-4 mb-3">
+    <div className="border border-v2-border-light rounded-lg p-4 mb-3">
       <div className="flex justify-between items-start">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
@@ -54,10 +54,10 @@ function SessionItem({ session, onRevoke, isRevoking, t }: SessionItemProps) {
                   </span>
                 )}
               </h3>
-              <p className="text-sm text-gray-500">{session.ipAddress}</p>
+              <p className="text-sm text-v2-text-tertiary">{session.ipAddress}</p>
             </div>
           </div>
-          <div className="text-xs text-gray-600 space-y-1">
+          <div className="text-xs text-v2-text-secondary space-y-1">
             <p>{t("lastActive", { date: formatDate(session.lastActiveAt) })}</p>
             <p>{t("created", { date: formatDate(session.createdAt) })}</p>
             <p>{t("expires", { date: formatDate(session.expiresAt) })}</p>
@@ -139,7 +139,7 @@ export default function SessionsPage() {
           <div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-2xl font-bold">{t("title")}</h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-v2-text-secondary mt-1">
                 {t("description")}
               </p>
             </div>
@@ -155,7 +155,7 @@ export default function SessionsPage() {
           </div>
 
           {sessions.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">{t("noActiveSessions")}</p>
+            <p className="text-v2-text-tertiary text-center py-8">{t("noActiveSessions")}</p>
           ) : (
             <div>
               {sessions.map((session: any) => (

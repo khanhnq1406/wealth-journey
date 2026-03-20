@@ -110,14 +110,14 @@ export function AdminBroadcastForm() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2">
-            <p className="font-vietnam text-sm text-red-700">{error}</p>
+          <div className="bg-v2-bg-dark border border-v2-red-negative/30 rounded-lg px-4 py-2">
+            <p className="font-vietnam text-sm text-v2-red-negative">{error}</p>
           </div>
         )}
 
         {success && (
-          <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2">
-            <p className="font-vietnam text-sm text-green-700">{success}</p>
+          <div className="bg-v2-bg-dark border border-v2-green-positive/30 rounded-lg px-4 py-2">
+            <p className="font-vietnam text-sm text-v2-green-positive">{success}</p>
           </div>
         )}
 

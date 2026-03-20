@@ -39,7 +39,7 @@ export function FollowingView({ currentUser, targetUserId, onUserClick, initialT
   ];
 
   return (
-    <div className="bg-white sm:rounded-2xl border-b sm:border border-v2-border-light overflow-hidden">
+    <div className="bg-v2-maroon-800 sm:rounded-2xl border-b sm:border border-v2-border-light overflow-hidden">
       {/* Back button — only when viewing another user's following/followers */}
       {onBack && (
         <div className="px-4 pt-3 pb-1">

@@ -156,11 +156,11 @@ export const WalletListView = memo(function WalletListView({
               <div
                 key={wallet.id}
                 className={cn(
- "bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200",
+ "bg-v2-maroon-800 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200",
                   "border-2",
                   isSelected
                     ? "border-v2-red-primary"
- : "border-transparent hover:border-gray-200",
+ : "border-transparent hover:border-v2-maroon-600",
                 )}
               >
                 <div className="flex items-center gap-3 p-3 sm:p-4">

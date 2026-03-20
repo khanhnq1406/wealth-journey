@@ -158,15 +158,15 @@ export default function WalletsPage() {
         {/* Controls Bar - View Toggle & Filters */}
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
           {/* View Mode Toggle */}
- <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1 self-start">
+ <div className="flex items-center gap-1 bg-v2-maroon-700 rounded-lg p-1 self-start">
             <button
               type="button"
               onClick={() => setViewMode("grid")}
               className={cn(
                 "px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 min-h-[40px]",
                 viewMode === "grid"
- ? "bg-white text-gray-900 shadow-sm"
- : "text-gray-600 hover:text-gray-900",
+ ? "bg-v2-maroon-800 text-white shadow-sm"
+ : "text-v2-cream-100 hover:text-white",
               )}
               aria-label={t("viewMode.grid")}
               aria-pressed={viewMode === "grid"}
@@ -191,8 +191,8 @@ export default function WalletsPage() {
               className={cn(
                 "px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 min-h-[40px]",
                 viewMode === "list"
- ? "bg-white text-gray-900 shadow-sm"
- : "text-gray-600 hover:text-gray-900",
+ ? "bg-v2-maroon-800 text-white shadow-sm"
+ : "text-v2-cream-100 hover:text-white",
               )}
               aria-label={t("viewMode.list")}
               aria-pressed={viewMode === "list"}
@@ -311,7 +311,7 @@ export default function WalletsPage() {
       {/* Delete Wallet Modal */}
       {modalState?.type === "delete-wallet" && (
         <div className="fixed inset-0 bg-modal flex justify-center items-center z-50">
- <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+ <div className="bg-v2-maroon-800 rounded-lg p-6 max-w-md w-full mx-4">
             <DeleteWalletModal
               wallet={modalState.wallet}
               onSuccess={handleModalSuccess}

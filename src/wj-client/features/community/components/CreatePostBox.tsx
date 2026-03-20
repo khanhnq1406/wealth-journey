@@ -16,7 +16,7 @@ export function CreatePostBox({ currentUser, onPostCreated }: CreatePostBoxProps
 
   return (
     <>
-      <div className="bg-white sm:rounded-2xl border-b sm:border border-v2-border-light p-4">
+      <div className="bg-v2-maroon-800 sm:rounded-2xl border-b sm:border border-v2-border-light p-4">
         <div className="flex items-center gap-3">
           <Avatar
             name={currentUser.name}

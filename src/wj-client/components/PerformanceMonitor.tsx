@@ -356,12 +356,12 @@ export function PerformanceMonitor({
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {visible ? (
- <div className="bg-white rounded-lg shadow-lg p-4 mb-2 w-64 text-sm">
+ <div className="bg-v2-maroon-800 rounded-lg shadow-lg p-4 mb-2 w-64 text-sm">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold">Performance</h3>
             <button
               onClick={() => setVisible(false)}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-v2-cream-100 hover:text-white"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -372,10 +372,10 @@ export function PerformanceMonitor({
           {metrics.score !== undefined && (
             <div className="mb-3">
               <div className="flex items-center justify-between mb-1">
- <span className="text-gray-600">Score</span>
+ <span className="text-v2-cream-100">Score</span>
                 <span className="font-bold">{score}</span>
               </div>
-              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-2 bg-v2-maroon-700 rounded-full overflow-hidden">
                 <div className={`h-full ${scoreColor}`} style={{ width: `${score}%` }} />
               </div>
             </div>
@@ -384,7 +384,7 @@ export function PerformanceMonitor({
           <div className="space-y-2">
             {metrics.cls !== undefined && (
               <div className="flex justify-between">
- <span className="text-gray-600">CLS</span>
+ <span className="text-v2-cream-100">CLS</span>
                 <span className={getRating(metrics.cls, { good: 0.1, needsImprovement: 0.25 }) === "good" ? "text-v2-green-positive" : "text-yellow-600"}>
                   {metrics.cls.toFixed(3)}
                 </span>
@@ -392,7 +392,7 @@ export function PerformanceMonitor({
             )}
             {metrics.inp !== undefined && (
               <div className="flex justify-between">
- <span className="text-gray-600">INP</span>
+ <span className="text-v2-cream-100">INP</span>
                 <span className={getRating(metrics.inp, { good: 200, needsImprovement: 500 }) === "good" ? "text-v2-green-positive" : "text-yellow-600"}>
                   {metrics.inp.toFixed(0)}ms
                 </span>
@@ -400,7 +400,7 @@ export function PerformanceMonitor({
             )}
             {metrics.lcp !== undefined && (
               <div className="flex justify-between">
- <span className="text-gray-600">LCP</span>
+ <span className="text-v2-cream-100">LCP</span>
                 <span className={getRating(metrics.lcp, { good: 2500, needsImprovement: 4000 }) === "good" ? "text-v2-green-positive" : "text-yellow-600"}>
                   {(metrics.lcp / 1000).toFixed(2)}s
                 </span>
@@ -408,8 +408,8 @@ export function PerformanceMonitor({
             )}
             {metrics.memoryUsed !== undefined && (
               <div className="flex justify-between">
- <span className="text-gray-600">Memory</span>
- <span className="text-gray-800">
+ <span className="text-v2-cream-100">Memory</span>
+ <span className="text-white">
                   {metrics.memoryUsed}MB
                 </span>
               </div>

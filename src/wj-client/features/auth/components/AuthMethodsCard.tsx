@@ -24,8 +24,8 @@ function StatusBadge({ linked }: { linked: boolean }) {
     <span
       className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${
         linked
- ? "bg-success-50 text-success-700"
- : "bg-neutral-100 text-neutral-500"
+          ? "bg-green-500/20 text-green-400"
+          : "bg-v2-bg-dark text-v2-text-tertiary"
       }`}
     >
       {linked && (
@@ -163,17 +163,17 @@ export function AuthMethodsCard({
 
   return (
     <BaseCard padding="none">
- <h2 className="px-4 pt-4 pb-3 sm:px-6 sm:pt-5 text-base font-semibold text-neutral-900">
+      <h2 className="px-4 pt-4 pb-3 sm:px-6 sm:pt-5 text-base font-semibold text-white">
         {t("authMethods")}
       </h2>
 
       {/* Google OAuth Row */}
- <div className="px-4 py-3 sm:px-6 border-t border-neutral-100">
+      <div className="px-4 py-3 sm:px-6 border-t border-v2-border-light">
         <div className="flex items-center gap-3">
- <div className="flex-shrink-0 w-9 h-9 rounded-full bg-neutral-50 flex items-center justify-center">
+          <div className="flex-shrink-0 w-9 h-9 rounded-full bg-v2-bg-dark flex items-center justify-center">
             <GoogleIcon />
           </div>
- <span className="text-sm font-medium text-neutral-900 flex-1 min-w-0">
+          <span className="text-sm font-medium text-white flex-1 min-w-0">
             {t("googleLinked")}
           </span>
           <StatusBadge linked={!!methods?.hasGoogle} />
@@ -189,8 +189,8 @@ export function AuthMethodsCard({
         )}
 
         {linkGoogleError && (
- <div className="mt-2 ml-12 p-2.5 bg-danger-50 border border-danger-200 rounded-lg">
- <p className="text-xs text-danger-700">
+          <div className="mt-2 ml-12 p-2.5 bg-v2-bg-dark border border-v2-red-negative/30 rounded-lg">
+            <p className="text-xs text-v2-red-negative">
               {linkGoogleError}
             </p>
           </div>
@@ -198,11 +198,11 @@ export function AuthMethodsCard({
       </div>
 
       {/* Password Row */}
- <div className="px-4 py-3 sm:px-6 border-t border-neutral-100">
+      <div className="px-4 py-3 sm:px-6 border-t border-v2-border-light">
         <div className="flex items-center gap-3">
- <div className="flex-shrink-0 w-9 h-9 rounded-full bg-neutral-50 flex items-center justify-center">
+          <div className="flex-shrink-0 w-9 h-9 rounded-full bg-v2-bg-dark flex items-center justify-center">
             <svg
- className="w-5 h-5 text-neutral-500"
+              className="w-5 h-5 text-v2-text-tertiary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -212,7 +212,7 @@ export function AuthMethodsCard({
               <path d="M7 11V7a5 5 0 0110 0v4" />
             </svg>
           </div>
- <span className="text-sm font-medium text-neutral-900 flex-1 min-w-0">
+          <span className="text-sm font-medium text-white flex-1 min-w-0">
             {t("passwordSet")}
           </span>
           <StatusBadge linked={!!methods?.hasPassword} />
@@ -222,7 +222,7 @@ export function AuthMethodsCard({
           {methods?.hasPassword ? (
             <button
               onClick={onChangePassword}
- className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800 transition-colors py-1"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-v2-gold-primary hover:text-v2-text-secondary active:text-v2-gold-accent transition-colors py-1"
             >
               <svg
                 className="w-4 h-4"
@@ -242,7 +242,7 @@ export function AuthMethodsCard({
           ) : (
             <button
               onClick={onSetPassword}
- className="inline-flex items-center gap-1.5 text-sm font-medium text-primary-600 hover:text-primary-700 active:text-primary-800 transition-colors py-1"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-v2-gold-primary hover:text-v2-text-secondary active:text-v2-gold-accent transition-colors py-1"
             >
               <svg
                 className="w-4 h-4"
@@ -265,11 +265,11 @@ export function AuthMethodsCard({
 
       {/* Username Row */}
       {methods?.username && (
- <div className="px-4 py-3 sm:px-6 border-t border-neutral-100">
+        <div className="px-4 py-3 sm:px-6 border-t border-v2-border-light">
           <div className="flex items-center gap-3">
- <div className="flex-shrink-0 w-9 h-9 rounded-full bg-neutral-50 flex items-center justify-center">
+            <div className="flex-shrink-0 w-9 h-9 rounded-full bg-v2-bg-dark flex items-center justify-center">
               <svg
- className="w-5 h-5 text-neutral-500"
+                className="w-5 h-5 text-v2-text-tertiary"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -282,10 +282,10 @@ export function AuthMethodsCard({
                 />
               </svg>
             </div>
- <span className="text-sm text-neutral-500">
+            <span className="text-sm text-v2-text-tertiary">
               {t("username")}
             </span>
- <span className="text-sm font-mono font-medium text-neutral-900 ml-auto">
+            <span className="text-sm font-mono font-medium text-white ml-auto">
               @{methods.username}
             </span>
           </div>

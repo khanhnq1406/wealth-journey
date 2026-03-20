@@ -62,15 +62,15 @@ export function StatCard({
 
   return (
     <div
- className={`bg-white rounded-lg p-4 shadow-sm transition-all hover:shadow-md ${
+ className={`bg-v2-maroon-800 rounded-lg p-4 shadow-sm transition-all hover:shadow-md ${
         onClick ? "cursor-pointer" : ""
       } ${className}`}
       onClick={onClick}
     >
       <div className="flex items-center justify-between">
         <div className="flex-1">
- <p className="text-sm text-gray-500">{label}</p>
- <p className={`font-semibold ${sizeStyles[size]} text-gray-900 mt-1`}>
+ <p className="text-sm text-v2-cream-100">{label}</p>
+ <p className={`font-semibold ${sizeStyles[size]} text-white mt-1`}>
             {typeof value === "number" ? value.toLocaleString() : value}
           </p>
 
@@ -84,7 +84,7 @@ export function StatCard({
 
         {icon && (
           <div className="ml-3">
- <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+ <div className="w-8 h-8 rounded-lg bg-v2-maroon-700 flex items-center justify-center">
               {icon}
             </div>
           </div>

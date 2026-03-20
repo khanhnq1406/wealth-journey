@@ -325,7 +325,7 @@ export default function PortfolioPageEnhanced() {
           <div className="h-10 w-40 bg-neutral-200 rounded animate-pulse" />
         </div>
         <StatsCardSkeleton cards={4} />
-        <div className="bg-white rounded-lg shadow-card p-4 sm:p-6">
+        <div className="bg-v2-maroon-800 rounded-lg shadow-card p-4 sm:p-6">
           <div className="h-6 w-32 bg-neutral-200 rounded animate-pulse mb-4" />
           <TableSkeleton rows={5} showAvatar={false} />
         </div>

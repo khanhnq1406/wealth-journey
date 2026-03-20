@@ -16,7 +16,7 @@ export function SuggestedUsers() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-v2-border-light p-4">
+    <div className="bg-v2-maroon-800 rounded-2xl border border-v2-border-light p-4">
       <div className="flex items-center gap-2 mb-3">
         <Users size={14} className="text-v2-text-tertiary" />
         <p className="font-vietnam text-xs font-semibold text-v2-text-tertiary uppercase tracking-wider">

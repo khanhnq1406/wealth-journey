@@ -199,7 +199,7 @@ export default function LandingBankImport() {
   return (
     <section
       id="bank-import"
-      className="py-16 sm:py-20 bg-gradient-to-br from-v2-red-50 via-white to-v2-red-50 [scroll-margin-top:5rem]"
+      className="py-16 sm:py-20 bg-gradient-to-br from-v2-bg-dark via-v2-bg-primary to-v2-bg-dark [scroll-margin-top:5rem]"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -210,14 +210,14 @@ export default function LandingBankImport() {
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center justify-center px-4 py-2 mb-4 text-sm font-medium text-v2-red-primary bg-v2-red-100 rounded-full">
+          <div className="inline-flex items-center justify-center px-4 py-2 mb-4 text-sm font-medium text-v2-gold-primary bg-v2-gold-primary/10 rounded-full">
             <span className="mr-2">⚡</span>
             {t("bankImport.bulkImport")}
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             {t("bankImport.stopTyping")}
           </h2>
-          <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto px-4">
+          <p className="text-base sm:text-lg text-v2-text-tertiary max-w-3xl mx-auto px-4">
             {t("bankImport.stopTypingDesc")}
           </p>
         </motion.div>
@@ -234,14 +234,14 @@ export default function LandingBankImport() {
           {supportedFormats.map((format, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300 text-center"
+              className="bg-v2-bg-surface rounded-xl p-6 shadow-card hover:shadow-lg transition-shadow duration-300 text-center"
             >
               <div className="text-4xl mb-2">{format.icon}</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              <h3 className="text-lg font-semibold text-white mb-1">
                 {format.format}
               </h3>
-              <p className="text-sm text-gray-600 mb-1">{format.description}</p>
-              <p className="text-xs text-v2-red-primary font-medium">
+              <p className="text-sm text-v2-text-tertiary mb-1">{format.description}</p>
+              <p className="text-xs text-v2-gold-primary font-medium">
                 {t("bankImport.maxSize", { size: format.maxSize })}
               </p>
             </div>
@@ -288,15 +288,15 @@ export default function LandingBankImport() {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300"
+              className="bg-v2-bg-surface rounded-lg p-6 shadow-card hover:shadow-xl transition-shadow duration-300"
             >
-              <div className="w-12 h-12 bg-v2-red-primary/10 rounded-lg flex items-center justify-center text-v2-red-primary mb-4">
+              <div className="w-12 h-12 bg-v2-gold-primary/10 rounded-lg flex items-center justify-center text-v2-gold-primary mb-4">
                 {feature.icon}
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-white mb-2">
                 {feature.title}
               </h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
+              <p className="text-sm text-v2-text-tertiary leading-relaxed">
                 {feature.description}
               </p>
             </motion.div>
@@ -305,7 +305,7 @@ export default function LandingBankImport() {
 
         {/* How It Works Steps */}
         <motion.div
-          className="bg-gradient-to-br from-v2-red-primary via-v2-red-dark to-v2-red-dark rounded-2xl p-8 sm:p-12 text-white"
+          className="bg-gradient-to-br from-v2-bg-dark via-v2-bg-primary to-v2-bg-surface rounded-2xl p-8 sm:p-12 text-white border border-v2-border-light"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={
             isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }

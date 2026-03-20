@@ -48,15 +48,15 @@ export function WalletSelectionStep({
   if (isLoading) {
     return (
       <div className="space-y-4 sm:space-y-6 py-8">
- <div className="flex flex-col items-center justify-center text-center rounded-2xl bg-neutral-50 p-8 sm:p-12">
+ <div className="flex flex-col items-center justify-center text-center rounded-2xl bg-v2-bg-dark p-8 sm:p-12">
           <div className="relative w-16 h-16 mb-4">
- <div className="absolute inset-0 rounded-full border-4 border-primary-200"></div>
- <div className="absolute inset-0 rounded-full border-4 border-primary-600 border-t-transparent animate-spin"></div>
+ <div className="absolute inset-0 rounded-full border-4 border-v2-gold-primary/30"></div>
+ <div className="absolute inset-0 rounded-full border-4 border-v2-gold-primary border-t-transparent animate-spin"></div>
           </div>
- <p className="text-lg font-medium text-neutral-900">
+ <p className="text-lg font-medium text-white">
             {t("loadingWallets")}
           </p>
- <p className="mt-2 text-sm text-neutral-600">
+ <p className="mt-2 text-sm text-v2-text-secondary">
             {t("loadingMoment")}
           </p>
         </div>
@@ -68,13 +68,13 @@ export function WalletSelectionStep({
     return (
       <div className="space-y-4 sm:space-y-6">
  <div className="flex flex-col items-center justify-center text-center rounded-2xl bg-danger-50 border-2 border-danger-200 p-8 sm:p-12">
- <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
- <ExclamationCircleIcon className="w-8 h-8 text-red-600" />
+ <div className="w-16 h-16 rounded-full bg-v2-bg-dark flex items-center justify-center mb-4">
+ <ExclamationCircleIcon className="w-8 h-8 text-v2-red-negative" />
           </div>
- <h3 className="text-lg font-semibold text-red-900">
+ <h3 className="text-lg font-semibold text-v2-red-negative">
             {t("failedToLoad")}
           </h3>
- <p className="mt-2 text-sm text-red-700">
+ <p className="mt-2 text-sm text-v2-red-negative">
             {error?.message || t("unexpectedError")}
           </p>
         </div>
@@ -96,13 +96,13 @@ export function WalletSelectionStep({
     return (
       <div className="space-y-4 sm:space-y-6">
  <div className="flex flex-col items-center justify-center text-center rounded-2xl bg-warning-50 border-2 border-warning-200 p-8 sm:p-12">
- <div className="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center mb-4">
- <WalletIcon className="w-8 h-8 text-yellow-600" />
+ <div className="w-16 h-16 rounded-full bg-v2-bg-dark flex items-center justify-center mb-4">
+ <WalletIcon className="w-8 h-8 text-yellow-400" />
           </div>
- <h3 className="text-lg font-semibold text-yellow-900">
+ <h3 className="text-lg font-semibold text-yellow-400">
             {t("noWalletsFound")}
           </h3>
- <p className="mt-2 text-sm text-yellow-700 max-w-md">
+ <p className="mt-2 text-sm text-yellow-400 max-w-md">
             {t("noWalletsDesc")}
           </p>
         </div>
@@ -124,22 +124,22 @@ export function WalletSelectionStep({
     <div className="space-y-4 sm:space-y-6">
       {/* Hero Section */}
       <div className="text-center space-y-3">
- <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 mb-2">
- <WalletIcon className="w-8 h-8 text-primary-600" />
+ <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-v2-bg-dark mb-2">
+ <WalletIcon className="w-8 h-8 text-v2-gold-primary" />
         </div>
- <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">
+ <h2 className="text-xl sm:text-2xl font-bold text-white">
           {t("title")}
         </h2>
- <p className="text-sm sm:text-base text-neutral-600 max-w-lg mx-auto">
+ <p className="text-sm sm:text-base text-v2-text-secondary max-w-lg mx-auto">
           {t("subtitle")}
         </p>
       </div>
 
       {/* Wallet Count Badge */}
       <div className="flex items-center justify-center">
- <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-100">
- <WalletIcon className="w-4 h-4 text-neutral-600" />
- <span className="text-sm font-medium text-neutral-700">
+ <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-v2-bg-dark">
+ <WalletIcon className="w-4 h-4 text-v2-text-secondary" />
+ <span className="text-sm font-medium text-v2-text-secondary">
             {wallets.length !== 1 ? t("walletsAvailablePlural", { count: wallets.length }) : t("walletsAvailable", { count: wallets.length })}
           </span>
         </div>
@@ -159,16 +159,16 @@ export function WalletSelectionStep({
                 "relative min-h-[120px] p-5 rounded-2xl border-2 transition-all duration-200",
                 "flex flex-col justify-between text-left",
                 "hover:shadow-lg active:scale-[0.98]",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2",
                 isSelected
- ? "border-primary-500 bg-gradient-to-br from-primary-50 to-primary-100 shadow-lg"
- : "border-neutral-200 bg-white hover:border-primary-300",
+ ? "border-v2-gold-primary bg-v2-bg-dark shadow-lg"
+ : "border-v2-border-light bg-v2-bg-surface hover:border-v2-gold-primary/60",
               )}
             >
               {/* Selection Indicator */}
               {isSelected && (
                 <div className="absolute top-3 right-3">
- <div className="w-6 h-6 rounded-full bg-primary-600 flex items-center justify-center shadow-md">
+ <div className="w-6 h-6 rounded-full bg-v2-gold-primary flex items-center justify-center shadow-md">
                     <CheckCircleIcon className="w-5 h-5 text-white" />
                   </div>
                 </div>
@@ -179,16 +179,16 @@ export function WalletSelectionStep({
                 className={cn(
                   "w-10 h-10 rounded-lg flex items-center justify-center mb-3",
                   isSelected
- ? "bg-primary-200"
- : "bg-neutral-100",
+ ? "bg-v2-bg-surface-tint"
+ : "bg-v2-bg-dark",
                 )}
               >
                 <WalletIcon
                   className={cn(
                     "w-6 h-6",
                     isSelected
- ? "text-primary-700"
- : "text-neutral-600",
+ ? "text-v2-gold-primary"
+ : "text-v2-text-secondary",
                   )}
                 />
               </div>
@@ -199,8 +199,8 @@ export function WalletSelectionStep({
                   className={cn(
                     "font-semibold text-base line-clamp-1",
                     isSelected
- ? "text-primary-900"
- : "text-neutral-900",
+ ? "text-white"
+ : "text-white",
                   )}
                 >
                   {wallet.walletName}
@@ -209,8 +209,8 @@ export function WalletSelectionStep({
                   className={cn(
                     "text-sm font-medium",
                     isSelected
- ? "text-primary-700"
- : "text-neutral-600",
+ ? "text-v2-gold-primary"
+ : "text-v2-text-secondary",
                   )}
                 >
                   {formatCurrency(

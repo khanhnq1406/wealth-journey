@@ -95,7 +95,7 @@ export function QuickActions({
         // Spacing and padding
         "gap-3 px-4 py-3",
         // Background
-        "bg-white",
+        "bg-v2-maroon-800",
         // Bottom border for visual separation
         "border-b border-neutral-200",
         className,
@@ -122,7 +122,7 @@ export function QuickActions({
             // Rounded corners
             "rounded-lg",
             // Background and border
-            "bg-white border border-neutral-200",
+            "bg-v2-maroon-800 border border-v2-maroon-600",
             // Hover state
             "hover:bg-neutral-50 hover:border-neutral-300",
             // Active state (touch feedback)

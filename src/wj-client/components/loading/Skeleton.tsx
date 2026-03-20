@@ -86,7 +86,7 @@ export const CardSkeleton = React.memo(({
   return (
     <div
       className={cn(
-        "bg-white rounded-lg",
+        "bg-v2-maroon-800 rounded-lg",
         paddingClasses[padding],
         shadowClasses[shadow],
         "space-y-4",
@@ -167,7 +167,7 @@ export const TableSkeleton = React.memo(({
         {Array.from({ length: rows }).map((_, i) => (
           <div
             key={i}
-            className="bg-white rounded-lg shadow-card p-4 space-y-3"
+            className="bg-v2-maroon-800 rounded-lg shadow-card p-4 space-y-3"
           >
             {showAvatar && (
               <div className="flex items-center gap-3">
@@ -383,7 +383,7 @@ export const StatsCardSkeleton = React.memo(({
       {Array.from({ length: cards }).map((_, i) => (
         <div
           key={i}
-          className="bg-white rounded-lg shadow-card p-4 space-y-3"
+          className="bg-v2-maroon-800 rounded-lg shadow-card p-4 space-y-3"
         >
           {/* Label */}
           <Skeleton className="h-4 w-24" />
@@ -437,7 +437,7 @@ export const ChartSkeleton = React.memo(({
   if (variant === "pie") {
     return (
       <div
-        className={cn("bg-white rounded-lg shadow-card p-4 sm:p-6", className)}
+        className={cn("bg-v2-maroon-800 rounded-lg shadow-card p-4 sm:p-6", className)}
         role="status"
         aria-label={t("loading")}
       >
@@ -466,7 +466,7 @@ export const ChartSkeleton = React.memo(({
 
   return (
     <div
-      className={cn("bg-white rounded-lg shadow-card p-4 sm:p-6", className)}
+      className={cn("bg-v2-maroon-800 rounded-lg shadow-card p-4 sm:p-6", className)}
       role="status"
       aria-label={t("loading")}
     >
@@ -747,7 +747,7 @@ export const PortfolioSkeleton = React.memo(({
       <StatsCardSkeleton cards={4} />
 
       {/* Holdings section */}
-      <div className="bg-white rounded-lg shadow-card p-4 sm:p-6 space-y-4">
+      <div className="bg-v2-maroon-800 rounded-lg shadow-card p-4 sm:p-6 space-y-4">
         <div className="flex justify-between items-center">
           <Skeleton className="h-7 w-24" />
           <div className="flex gap-2">
@@ -791,7 +791,7 @@ export const TransactionSkeleton = React.memo(({
   const t = useTranslations("skeleton");
   return (
     <div
-      className={cn("bg-white rounded-lg shadow-card p-4 sm:p-6", className)}
+      className={cn("bg-v2-maroon-800 rounded-lg shadow-card p-4 sm:p-6", className)}
       role="status"
       aria-label={t("loading")}
     >
@@ -872,7 +872,7 @@ export const WalletCardSkeleton = React.memo(({
       {Array.from({ length: cards }).map((_, i) => (
         <div
           key={i}
-          className="bg-white rounded-lg shadow-card p-4 space-y-4"
+          className="bg-v2-maroon-800 rounded-lg shadow-card p-4 space-y-4"
         >
           {/* Wallet type indicator */}
           <div className="flex items-center justify-between">
@@ -917,7 +917,7 @@ export const ModalSkeleton = React.memo(({
   const t = useTranslations("skeleton");
   return (
     <div
-      className={cn("bg-white rounded-lg shadow-modal p-6 space-y-4", className)}
+      className={cn("bg-v2-maroon-800 rounded-lg shadow-modal p-6 space-y-4", className)}
       role="status"
       aria-label={t("loading")}
     >

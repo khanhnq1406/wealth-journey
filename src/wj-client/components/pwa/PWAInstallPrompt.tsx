@@ -104,7 +104,7 @@ export function PWAInstallPrompt({
         aria-modal="true"
         aria-labelledby="pwa-prompt-title"
       >
-        <div className="bg-white rounded-t-2xl shadow-v2-card max-w-2xl mx-auto">
+        <div className="bg-v2-maroon-800 rounded-t-2xl shadow-v2-card max-w-2xl mx-auto">
           {/* Header */}
           <div className="px-6 pt-6 pb-4 border-b border-v2-border-light">
             <div className="flex items-start justify-between">

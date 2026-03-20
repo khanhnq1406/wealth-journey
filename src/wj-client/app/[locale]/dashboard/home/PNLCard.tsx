@@ -199,7 +199,7 @@ export function PNLCard({ currency }: PNLCardProps) {
             showTooltip={true}
             yAxisFormatter={yFormatter}
             animate={true}
-            gridColor="#f3f4f6"
+            gridColor="rgba(241, 189, 97, 0.1)"
           />
         )}
       </div>

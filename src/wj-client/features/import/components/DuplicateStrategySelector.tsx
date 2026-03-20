@@ -79,7 +79,7 @@ export function DuplicateStrategySelector({
               "p-3 rounded-lg border-2 transition-all text-left",
               selectedStrategy === strategy.value
  ? "border-primary-600 bg-primary-50"
- : "border-neutral-200 bg-white hover:border-neutral-300"
+ : "border-neutral-200 bg-v2-maroon-800 hover:border-neutral-300"
             )}
           >
             <div className="flex items-center gap-2 mb-1">

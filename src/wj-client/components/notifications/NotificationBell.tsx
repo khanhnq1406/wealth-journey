@@ -53,7 +53,7 @@ export function NotificationBell() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-lg border border-v2-border-light z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-80 bg-v2-maroon-800 rounded-2xl shadow-lg border border-v2-border-light z-50 overflow-hidden">
           <NotificationPanel onClose={() => setIsOpen(false)} />
         </div>
       )}

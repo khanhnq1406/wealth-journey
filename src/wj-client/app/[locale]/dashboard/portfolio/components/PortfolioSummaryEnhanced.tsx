@@ -390,7 +390,7 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
                 onClick={() => onPeriodChange(opt.key)}
                 className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
                   selectedPeriod === opt.key
-                    ? "bg-white text-neutral-900 shadow-sm"
+                    ? "bg-v2-maroon-800 text-neutral-900 shadow-sm"
                     : "text-neutral-500 hover:text-neutral-700"
                 }`}
               >

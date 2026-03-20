@@ -210,7 +210,7 @@ export function DuplicateReviewModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
- <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+ <div className="bg-v2-maroon-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
  <div className="flex items-center justify-between p-6 border-b border-neutral-200">
           <div>

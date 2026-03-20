@@ -257,9 +257,9 @@ export function ColumnMappingStep({
     return (
       <div className="space-y-4">
         <div className="animate-pulse space-y-3">
- <div className="h-4 bg-neutral-200 rounded w-3/4"></div>
- <div className="h-4 bg-neutral-200 rounded w-1/2"></div>
- <div className="h-32 bg-neutral-200 rounded"></div>
+ <div className="h-4 bg-v2-bg-dark rounded w-3/4"></div>
+ <div className="h-4 bg-v2-bg-dark rounded w-1/2"></div>
+ <div className="h-32 bg-v2-bg-dark rounded"></div>
         </div>
       </div>
     );
@@ -268,8 +268,8 @@ export function ColumnMappingStep({
   if (error && !preview) {
     return (
       <div className="space-y-4">
- <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
- <p className="text-red-700">{error}</p>
+ <div className="p-4 bg-v2-bg-dark border border-v2-red-negative/30 rounded-lg">
+ <p className="text-v2-red-negative">{error}</p>
         </div>
         <Button variant="secondary" onClick={onBack}>
           {t("back")}
@@ -281,51 +281,51 @@ export function ColumnMappingStep({
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Instructions */}
- <div className="text-sm sm:text-base text-neutral-600">
+ <div className="text-sm sm:text-base text-v2-text-secondary">
         <p className="mb-2">
           {t("instructions")}
         </p>
- <p className="text-xs sm:text-sm text-neutral-500">
+ <p className="text-xs sm:text-sm text-v2-text-tertiary">
           {t("autoDetected")}
         </p>
       </div>
 
       {/* Error Message */}
       {error && (
- <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
- <p className="text-sm text-red-700">{error}</p>
+ <div className="p-3 bg-v2-bg-dark border border-v2-red-negative/30 rounded-lg">
+ <p className="text-sm text-v2-red-negative">{error}</p>
         </div>
       )}
 
       {/* CSV Preview */}
       {preview && (
- <div className="border border-neutral-200 rounded-lg overflow-hidden">
- <div className="bg-neutral-50 px-4 py-2 border-b border-neutral-200">
- <h3 className="text-sm font-semibold text-neutral-900">
+ <div className="border border-v2-border-light rounded-lg overflow-hidden">
+ <div className="bg-v2-bg-dark px-4 py-2 border-b border-v2-border-light">
+ <h3 className="text-sm font-semibold text-white">
               {t("filePreview")}
             </h3>
           </div>
           <div className="overflow-x-auto">
- <table className="min-w-full divide-y divide-neutral-200">
- <thead className="bg-neutral-100">
+ <table className="min-w-full divide-y divide-v2-border-light">
+ <thead className="bg-v2-bg-dark">
                 <tr>
                   {preview.headers.map((header, idx) => (
                     <th
                       key={idx}
- className="px-4 py-2 text-left text-xs font-medium text-neutral-700 uppercase tracking-wider"
+ className="px-4 py-2 text-left text-xs font-medium text-v2-text-secondary uppercase tracking-wider"
                     >
                       {header}
                     </th>
                   ))}
                 </tr>
               </thead>
- <tbody className="bg-white divide-y divide-neutral-200">
+ <tbody className="bg-v2-bg-surface divide-y divide-v2-border-light">
                 {preview.sampleRows.map((row, rowIdx) => (
                   <tr key={rowIdx}>
                     {row.map((cell, cellIdx) => (
                       <td
                         key={cellIdx}
- className="px-4 py-2 text-sm text-neutral-900 whitespace-nowrap"
+ className="px-4 py-2 text-sm text-white whitespace-nowrap"
                       >
                         {cell}
                       </td>
@@ -340,7 +340,7 @@ export function ColumnMappingStep({
 
       {/* Column Mapping Form */}
       <div className="space-y-4">
- <h3 className="text-base font-semibold text-neutral-900">
+ <h3 className="text-base font-semibold text-white">
           {t("columnMappingTitle")}
         </h3>
 
@@ -412,23 +412,23 @@ export function ColumnMappingStep({
       </div>
 
       {/* Save as Template Option */}
- <div className="border border-neutral-200 rounded-lg p-4 space-y-3">
+ <div className="border border-v2-border-light rounded-lg p-4 space-y-3">
         <div className="flex items-start gap-3">
           <input
             type="checkbox"
             id="saveAsTemplate"
             checked={saveAsTemplate}
             onChange={(e) => setSaveAsTemplate(e.target.checked)}
- className="mt-1 h-4 w-4 rounded border-neutral-300 text-primary focus:ring-primary"
+ className="mt-1 h-4 w-4 rounded border-v2-border-light text-v2-gold-primary focus:ring-v2-gold-primary"
           />
           <div className="flex-1">
             <label
               htmlFor="saveAsTemplate"
- className="text-sm font-medium text-neutral-900 cursor-pointer"
+ className="text-sm font-medium text-white cursor-pointer"
             >
               {t("saveAsTemplate")}
             </label>
- <p className="text-xs text-neutral-500 mt-1">
+ <p className="text-xs text-v2-text-tertiary mt-1">
               {t("saveAsTemplateDesc")}
             </p>
           </div>

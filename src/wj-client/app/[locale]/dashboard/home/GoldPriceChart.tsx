@@ -26,7 +26,7 @@ export function GoldPriceChart() {
           symbol="TVC:GOLD"
           height={500}
           locale={locale}
-          theme="light"
+          theme="dark"
         />
       </div>
     </BaseCard>

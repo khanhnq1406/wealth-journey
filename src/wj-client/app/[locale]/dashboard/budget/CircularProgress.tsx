@@ -35,7 +35,7 @@ export function CircularProgress({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="#d9d9d9"
+          stroke="rgba(255,255,255,0.15)"
           strokeWidth={strokeWidth}
           fill="none"
         />
@@ -57,10 +57,10 @@ export function CircularProgress({
       {/* Center text showing percentage */}
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold text-white">
             {Math.round(normalizedPercentage)}%
           </div>
-          <div className="text-xs text-gray-500">{t("card.spent")}</div>
+          <div className="text-xs text-v2-text-tertiary">{t("card.spent")}</div>
         </div>
       </div>
     </div>

@@ -26,7 +26,7 @@ export function LandingGoldPriceChart() {
           symbol="TVC:GOLD"
           height={430}
           locale={locale}
-          theme="light"
+          theme="dark"
           allowSymbolChange={false}
         />
       </div>

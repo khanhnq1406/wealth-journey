@@ -41,7 +41,7 @@ export function CommunityFeed({ currentUser, hashtag, onHashtagClick, onUserClic
 
   if (error) {
     return (
-      <div className="bg-white rounded-2xl border border-v2-border-light p-8 text-center">
+      <div className="bg-v2-maroon-800 rounded-2xl border border-v2-border-light p-8 text-center">
         <p className="font-vietnam text-sm text-v2-text-tertiary">
           Could not load feed. Please try again.
         </p>

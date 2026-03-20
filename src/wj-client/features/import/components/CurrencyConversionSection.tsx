@@ -60,14 +60,14 @@ export function CurrencyConversionSection({
       case "fallback":
  return "text-warning-600";
       default:
- return "text-neutral-600";
+ return "text-v2-text-secondary";
     }
   };
 
   return (
- <div className="border border-neutral-200 rounded-lg p-4 bg-white">
+ <div className="border border-v2-border-light rounded-lg p-4 bg-v2-bg-surface">
       <div className="flex items-center justify-between mb-4">
- <h3 className="flex items-center gap-2 text-lg font-semibold text-neutral-900">
+ <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
           <span className="text-2xl">💱</span>
           {totalTransactionCount !== 1
             ? t("titlePlural", { count: totalTransactionCount })
@@ -79,16 +79,16 @@ export function CurrencyConversionSection({
         {conversions.map((conversion) => (
           <div
             key={`${conversion.fromCurrency}-${conversion.toCurrency}`}
- className="border border-neutral-200 rounded-lg p-4 bg-neutral-50"
+ className="border border-v2-border-light rounded-lg p-4 bg-v2-bg-dark"
           >
             <div className="space-y-3">
               {/* Conversion Header */}
               <div className="flex items-start justify-between">
                 <div>
- <div className="text-base font-semibold text-neutral-900">
+ <div className="text-base font-semibold text-white">
                     {conversion.fromCurrency} → {conversion.toCurrency}
                   </div>
- <div className="text-sm text-neutral-600 mt-1">
+ <div className="text-sm text-v2-text-secondary mt-1">
                     Rate: 1 {conversion.fromCurrency} ={" "}
                     {formatExchangeRate(conversion.exchangeRate, conversion.toCurrency)}{" "}
                     {conversion.toCurrency}
@@ -111,7 +111,7 @@ export function CurrencyConversionSection({
               {/* Conversion Metadata */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
                 <div>
- <span className="text-neutral-600">
+ <span className="text-v2-text-secondary">
                     {t("source")}{" "}
                   </span>
                   <span
@@ -123,30 +123,30 @@ export function CurrencyConversionSection({
                   </span>
                 </div>
                 <div>
- <span className="text-neutral-600">
+ <span className="text-v2-text-secondary">
                     {t("date")}{" "}
                   </span>
- <span className="font-medium text-neutral-900">
+ <span className="font-medium text-white">
                     {formatDate(conversion.rateDate)}
                   </span>
                 </div>
                 <div>
- <span className="text-neutral-600">
+ <span className="text-v2-text-secondary">
                     {t("transactions")}{" "}
                   </span>
- <span className="font-medium text-neutral-900">
+ <span className="font-medium text-white">
                     {conversion.transactionCount}
                   </span>
                 </div>
               </div>
 
               {/* Conversion Totals */}
- <div className="pt-3 border-t border-neutral-200">
+ <div className="pt-3 border-t border-v2-border-light">
                 <div className="flex items-center justify-between text-sm">
- <span className="text-neutral-600">
+ <span className="text-v2-text-secondary">
                     {t("total")}
                   </span>
- <div className="font-semibold text-neutral-900">
+ <div className="font-semibold text-white">
                     {conversion.totalOriginal &&
                       formatCurrency(
                         conversion.totalOriginal.amount,
@@ -167,8 +167,8 @@ export function CurrencyConversionSection({
       </div>
 
       {/* Info Note */}
- <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
- <p className="text-sm text-blue-700">
+ <div className="mt-4 p-3 bg-v2-bg-dark border border-blue-400/30 rounded-lg">
+ <p className="text-sm text-blue-400">
           <strong>Note:</strong> {t("note")}
         </p>
       </div>

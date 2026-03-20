@@ -101,8 +101,8 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
       />
 
       {serverError && (
- <div className="p-3 bg-danger-50 border border-danger-200 rounded-xl">
- <p className="text-sm text-danger-800">{serverError}</p>
+        <div className="p-3 bg-v2-bg-dark border border-v2-red-negative/30 rounded-xl">
+          <p className="text-sm text-v2-red-negative">{serverError}</p>
         </div>
       )}
 

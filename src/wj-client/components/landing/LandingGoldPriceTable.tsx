@@ -86,7 +86,7 @@ export function LandingGoldPriceTable({
             {filteredTypes.map((item, index) => (
               <tr
                 key={item.code}
-                className={`border-b border-v2-border-light ${index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"}`}
+                className={`border-b border-v2-border-light ${index % 2 === 0 ? "bg-v2-bg-dark" : "bg-v2-bg-surface-tint"}`}
               >
                 <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-gold-dark border-x border-v2-border-light first:border-l-0">
                   {item.displayName}

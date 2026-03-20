@@ -99,14 +99,14 @@ export const TablePagination = memo(({
   );
 
   return (
-    <div className="flex items-center justify-between p-4 border-t border-gray-200">
-      <p className="text-gray-900 text-base font-light">
+    <div className="flex items-center justify-between p-4 border-t border-v2-maroon-600">
+      <p className="text-white text-base font-light">
         Showing {startRecord} to {endRecord} of {totalCount} results
       </p>
       <div className="flex items-center gap-4">
         {onPageSizeChange && (
           <>
-            <span className="text-gray-900 text-base font-light">Rows</span>
+            <span className="text-white text-base font-light">Rows</span>
             <div className="relative">
               <select
                 name="rows-per-page"
@@ -136,17 +136,17 @@ export const TablePagination = memo(({
             <button
               onClick={handlePreviousPage}
               disabled={currentPage === 1}
-              className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              className="px-3 py-1 rounded border border-v2-maroon-600 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-v2-maroon-700"
             >
               Previous
             </button>
-            <span className="text-gray-900 text-sm font-light">
+            <span className="text-white text-sm font-light">
               Page {currentPage} of {totalPages}
             </span>
             <button
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 rounded border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              className="px-3 py-1 rounded border border-v2-maroon-600 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-v2-maroon-700"
             >
               Next
             </button>
@@ -294,13 +294,13 @@ export const TanStackTable = memo(function TanStackTable<T>({
   const loadingSkeleton = useMemo(() => (
     <div className={cn("overflow-x-auto", className)}>
       <table className="w-full">
-        <thead className="sticky top-0 bg-white z-10 border-b-2 border-gray-200">
+        <thead className="sticky top-0 bg-v2-maroon-800 z-10 border-b-2 border-v2-maroon-600">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="text-left py-3 px-4 text-gray-900 text-base font-bold"
+                  className="text-left py-3 px-4 text-white text-base font-bold"
                 >
                   {header.isPlaceholder
                     ? null
@@ -315,10 +315,10 @@ export const TanStackTable = memo(function TanStackTable<T>({
         </thead>
         <tbody>
           {Array.from({ length: loadingRowCount }).map((_, index) => (
-            <tr key={`loading-${index}`} className="border-b border-gray-200">
+            <tr key={`loading-${index}`} className="border-b border-v2-maroon-600">
               {columns.map((_, cellIndex) => (
                 <td key={`loading-cell-${cellIndex}`} className="py-3 px-4">
-                  <div className="h-4 bg-gray-200 rounded animate-pulse" />
+                  <div className="h-4 bg-v2-maroon-600 rounded animate-pulse" />
                 </td>
               ))}
             </tr>
@@ -334,7 +334,7 @@ export const TanStackTable = memo(function TanStackTable<T>({
       className={cn("flex flex-col items-center justify-center py-12", className)}
     >
       <svg
-        className="w-16 h-16 mb-4 text-gray-400"
+        className="w-16 h-16 mb-4 text-v2-cream-100"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -347,8 +347,8 @@ export const TanStackTable = memo(function TanStackTable<T>({
           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
         />
       </svg>
-      <p className="text-lg font-medium text-gray-900">{emptyMessage}</p>
-      <p className="text-sm text-gray-400">{emptyDescription}</p>
+      <p className="text-lg font-medium text-white">{emptyMessage}</p>
+      <p className="text-sm text-v2-cream-100">{emptyDescription}</p>
     </div>
   ), [className, emptyMessage, emptyDescription]);
 
@@ -364,13 +364,13 @@ export const TanStackTable = memo(function TanStackTable<T>({
   return (
     <div className={cn("overflow-x-auto", className)}>
       <table className="w-full">
-        <thead className="sticky top-0 bg-white z-10 border-b-2 border-gray-200">
+        <thead className="sticky top-0 bg-v2-maroon-800 z-10 border-b-2 border-v2-maroon-600">
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="border-b-2 border-gray-200">
+            <tr key={headerGroup.id} className="border-b-2 border-v2-maroon-600">
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="text-left py-3 px-4 text-gray-900 text-base font-bold cursor-pointer hover:bg-gray-50 select-none"
+                  className="text-left py-3 px-4 text-white text-base font-bold cursor-pointer hover:bg-v2-maroon-700 select-none"
                   onClick={header.column.getToggleSortingHandler()}
                 >
                   {header.isPlaceholder
@@ -403,7 +403,7 @@ export const TanStackTable = memo(function TanStackTable<T>({
               <React.Fragment key={row.id}>
                 <tr
                   className={cn(
-                    index < table.getRowModel().rows.length - 1 && "border-b border-gray-200",
+                    index < table.getRowModel().rows.length - 1 && "border-b border-v2-maroon-600",
                     showExpandable && "cursor-pointer hover:bg-neutral-50 transition-colors duration-150"
                   )}
                   onClick={() => showExpandable && toggleRowExpansion(row.id)}
@@ -412,7 +412,7 @@ export const TanStackTable = memo(function TanStackTable<T>({
                   {row.getVisibleCells().slice(0, visibleColumnCount).map((cell) => (
                     <td
                       key={cell.id}
-                      className="py-3 px-4 text-gray-900 text-base font-light"
+                      className="py-3 px-4 text-white text-base font-light"
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>

@@ -126,13 +126,13 @@ export function ChangeRateModal({
       >
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Current Rate Info */}
- <div className="bg-neutral-50 p-3 rounded-md border border-neutral-200">
+ <div className="bg-v2-bg-dark p-3 rounded-md border border-v2-border-light">
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
- <span className="text-neutral-600">
+ <span className="text-v2-text-secondary">
                 {t("currentRate")}
               </span>
- <span className="font-semibold text-neutral-900">
+ <span className="font-semibold text-white">
                 1 {conversion.fromCurrency} ={" "}
                 {formatExchangeRate(
                   conversion.exchangeRate,
@@ -142,10 +142,10 @@ export function ChangeRateModal({
               </span>
             </div>
             <div className="flex justify-between">
- <span className="text-neutral-600">
+ <span className="text-v2-text-secondary">
                 {t("source")}
               </span>
- <span className="font-medium text-neutral-900">
+ <span className="font-medium text-white">
                 {conversion.rateSource === "auto"
                   ? t("sourceAuto")
                   : conversion.rateSource === "manual"
@@ -154,18 +154,18 @@ export function ChangeRateModal({
               </span>
             </div>
             <div className="flex justify-between">
- <span className="text-neutral-600">
+ <span className="text-v2-text-secondary">
                 {t("transactions")}
               </span>
- <span className="font-medium text-neutral-900">
+ <span className="font-medium text-white">
                 {conversion.transactionCount}
               </span>
             </div>
             <div className="flex justify-between">
- <span className="text-neutral-600">
+ <span className="text-v2-text-secondary">
                 {t("currentTotal")}
               </span>
- <span className="font-semibold text-neutral-900">
+ <span className="font-semibold text-white">
                 {conversion.totalOriginal &&
                   formatCurrency(
                     conversion.totalOriginal.amount,
@@ -254,8 +254,8 @@ export function ChangeRateModal({
 
         {/* Error Message */}
         {error && (
- <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
- <p className="text-sm text-red-700">{error}</p>
+ <div className="p-3 bg-v2-bg-dark border border-v2-red-negative/30 rounded-lg">
+ <p className="text-sm text-v2-red-negative">{error}</p>
           </div>
         )}
 

@@ -266,7 +266,7 @@ export function ExportDialog({
  "hover:border-neutral-300",
                     isSelected
  ? "border-primary-500 bg-primary-50"
- : "border-neutral-200 bg-white",
+ : "border-v2-maroon-600 bg-v2-maroon-800",
                   )}
                 >
                   <div
@@ -323,7 +323,7 @@ export function ExportDialog({
  "hover:border-neutral-300",
                     isSelected
  ? "border-primary-500 bg-primary-50 text-primary-700"
- : "border-neutral-200 bg-white text-neutral-700",
+ : "border-v2-maroon-600 bg-v2-maroon-800 text-v2-cream-100",
                   )}
                 >
                   {range.label}
@@ -346,7 +346,7 @@ export function ExportDialog({
                   className={cn(
                     "w-full px-3 sm:px-4 rounded-lg border text-sm sm:text-base",
                     "min-h-[44px] sm:min-h-[48px]",
- "bg-white",
+ "bg-v2-maroon-900",
  "border-neutral-300",
  "text-neutral-900",
                     "transition-all duration-200",
@@ -366,7 +366,7 @@ export function ExportDialog({
                   className={cn(
                     "w-full px-3 sm:px-4 rounded-lg border text-sm sm:text-base",
                     "min-h-[44px] sm:min-h-[48px]",
- "bg-white",
+ "bg-v2-maroon-900",
  "border-neutral-300",
  "text-neutral-900",
                     "transition-all duration-200",
@@ -496,7 +496,7 @@ export function ExportDialog({
               placeholder={t("fileNamePlaceholder")}
               className={cn(
                 "w-full px-3 py-2 rounded-lg border text-sm",
- "bg-white",
+ "bg-v2-maroon-900",
  "border-neutral-300",
  "text-neutral-900",
                 "focus:ring-2 focus:ring-v2-red-primary focus:border-transparent",

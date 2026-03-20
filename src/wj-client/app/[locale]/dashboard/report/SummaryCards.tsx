@@ -82,19 +82,19 @@ const SummaryCard = memo(function SummaryCard({
       icon: "bg-v2-green-light",
     },
     red: {
-      bg: "bg-red-50",
-      text: "text-red-700",
-      icon: "bg-red-100",
+      bg: "bg-v2-bg-dark",
+      text: "text-v2-red-negative",
+      icon: "bg-v2-bg-dark",
     },
     blue: {
-      bg: "bg-primary-50",
-      text: "text-primary-700",
-      icon: "bg-primary-100",
+      bg: "bg-v2-bg-dark",
+      text: "text-v2-text-secondary",
+      icon: "bg-v2-bg-dark",
     },
     neutral: {
-      bg: "bg-neutral-50",
-      text: "text-neutral-700",
-      icon: "bg-neutral-100",
+      bg: "bg-v2-bg-dark",
+      text: "text-v2-text-secondary",
+      icon: "bg-v2-bg-dark",
     },
   };
 
@@ -105,7 +105,7 @@ const SummaryCard = memo(function SummaryCard({
       <div className="space-y-3">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-neutral-600">{label}</span>
+          <span className="text-sm font-medium text-v2-text-tertiary">{label}</span>
           {icon && (
             <div
               className={`w-8 h-8 rounded-full ${colors.icon} flex items-center justify-center`}
@@ -116,14 +116,14 @@ const SummaryCard = memo(function SummaryCard({
         </div>
 
         {/* Value */}
-        <div className="text-2xl font-bold text-neutral-900">{value}</div>
+        <div className="text-2xl font-bold text-white">{value}</div>
 
         {/* Subtitle/Change */}
-        {subtitle && <div className="text-xs text-neutral-500">{subtitle}</div>}
+        {subtitle && <div className="text-xs text-v2-text-tertiary">{subtitle}</div>}
 
         {change !== undefined && (
           <div
-            className={`text-xs font-medium ${change >= 0 ? "text-v2-green-positive" : "text-red-600"}`}
+            className={`text-xs font-medium ${change >= 0 ? "text-v2-green-positive" : "text-v2-red-negative"}`}
           >
             {change >= 0 ? "+" : ""}
             {change.toFixed(1)}%{changeLabel && ` ${changeLabel}`}
@@ -173,7 +173,7 @@ const Icons = {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="text-red-600"
+      className="text-v2-red-negative"
     >
       <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
       <polyline points="17 18 23 18 23 12" />
@@ -207,7 +207,7 @@ const Icons = {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="text-neutral-600"
+      className="text-v2-text-tertiary"
     >
       <line x1="19" y1="5" x2="5" y2="19" />
       <circle cx="6.5" cy="6.5" r="2.5" />
@@ -225,7 +225,7 @@ const Icons = {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="text-neutral-600"
+      className="text-v2-text-tertiary"
     >
       <rect x="3" y="3" width="7" height="7" />
       <rect x="14" y="3" width="7" height="7" />

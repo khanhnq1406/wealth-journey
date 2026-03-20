@@ -138,7 +138,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
 
       {/* Content */}
       {expanded && (
- <div className="p-4 space-y-3 bg-white">
+ <div className="p-4 space-y-3 bg-v2-maroon-800">
           {/* Select All */}
  <div className="flex items-center justify-between pb-2 border-b border-success-200">
             <div
@@ -181,7 +181,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                   className={cn(
                     "flex items-start gap-3 p-3 rounded-lg transition-colors",
                     isChecked
- ? "bg-white border border-neutral-200"
+ ? "bg-v2-maroon-800 border border-v2-maroon-600"
  : "bg-neutral-100 opacity-60",
                   )}
                 >

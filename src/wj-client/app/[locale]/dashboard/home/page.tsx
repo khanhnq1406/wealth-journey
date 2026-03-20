@@ -37,6 +37,7 @@ import { DollarIndexChart } from "./DollarIndexChart";
 import { WalletsSection } from "./WalletsSection";
 import { BaseCard } from "@/components/BaseCard";
 import { SentimentCard } from "@/components/GoldSentimentCard";
+import { OrnateDivider } from "@/components/decorative/OrnateDivider";
 
 type ModalType = "add-transaction" | "transfer-money" | "create-wallet" | null;
 
@@ -178,6 +179,8 @@ export default function Home() {
         {/* 2. PNL Card */}
         <PNLCard currency={currency} />
 
+        <OrnateDivider variant="diamond" className="my-4" />
+
         {/* 3. Gold Price Table */}
         <GoldPriceTable prices={goldPrices} updatedTime={goldUpdatedTime} isAdmin={isAdmin} isLoading={marketPricesLoading} />
 
@@ -206,6 +209,8 @@ export default function Home() {
 
         {/* 10. Dollar Index Chart */}
         <DollarIndexChart />
+
+        <OrnateDivider variant="diamond" className="my-4" />
 
         {/* 11. Wallets */}
         <WalletsSection wallets={wallets} isLoading={walletsLoading} />
@@ -246,6 +251,8 @@ export default function Home() {
             </BaseCard>
           </div>
         </div>
+
+        <OrnateDivider variant="diamond" className="my-6" />
 
         {/* Row 3: Gold Table + Gold Chart */}
         <div className="grid grid-cols-2 gap-6">

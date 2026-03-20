@@ -66,7 +66,7 @@ export function FloatingActionButton({ actions }: FABProps) {
                 key={index}
                 onClick={(event) => handleActionClick(event, action)}
                 className={cn(
-                  "flex items-center gap-3 bg-white shadow-floating rounded-full",
+                  "flex items-center gap-3 bg-v2-maroon-800 shadow-floating rounded-full",
                   "px-4 py-3 min-h-[56px]",
                   "hover:shadow-xl active:scale-95",
                   "transition-all duration-200",
@@ -81,7 +81,7 @@ export function FloatingActionButton({ actions }: FABProps) {
                 <div className="flex-shrink-0 w-6 h-6 text-v2-red-primary">
                   {action.icon}
                 </div>
-                <span className="font-medium text-neutral-900 whitespace-nowrap pr-2">
+                <span className="font-medium text-white whitespace-nowrap pr-2">
                   {action.label}
                 </span>
               </button>

@@ -503,19 +503,19 @@ export function TransactionContent() {
   return (
     <div className="h-full flex flex-col">
       {/* Header with Balance */}
-      <div className="flex-shrink-0 bg-v2-red-primary rounded-md sm:bg-transparent border-b sm:border-b-gray-300">
+      <div className="flex-shrink-0 bg-v2-red-primary rounded-md sm:bg-v2-bg-surface border-b sm:border-b-v2-border-light">
         <div className="p-3 sm:p-4 md:px-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3 sm:mb-0">
-            <h1 className="text-white sm:text-gray-900 text-2xl sm:text-3xl lg:text-4xl font-bold">
+            <h1 className="text-white text-2xl sm:text-3xl lg:text-4xl font-bold">
               {t("title")}
             </h1>
 
             <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
               <div className="flex flex-col items-start sm:items-center">
-                <p className="text-white sm:text-gray-400 text-xs sm:text-sm font-medium">
+                <p className="text-white sm:text-v2-text-tertiary text-xs sm:text-sm font-medium">
                   {t("totalBalance")}
                 </p>
-                <p className="text-white sm:text-gray-900 text-lg sm:text-xl lg:text-2xl font-semibold">
+                <p className="text-white sm:text-v2-text-secondary text-lg sm:text-xl lg:text-2xl font-semibold">
                   {isHideBalance ? "*****" : formattedBalance}
                 </p>
               </div>
@@ -525,7 +525,7 @@ export function TransactionContent() {
                 aria-label={t("filter.toggleBalanceVisibility")}
                 onClick={handleHideBalance}
               >
-                <div className="text-black">
+                <div className="text-white">
                   {isHideBalance ? <EyeOffIcon /> : <EyeIcon />}
                 </div>
               </button>
@@ -544,10 +544,10 @@ export function TransactionContent() {
             placeholder={t("searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
- className="w-full bg-neutral-50 rounded-lg px-4 py-2.5 pl-10 pr-10 text-sm drop-shadow-round focus:outline-none focus:ring-2 focus:ring-v2-red-primary placeholder:text-gray-400"
+ className="w-full bg-v2-bg-dark rounded-lg px-4 py-2.5 pl-10 pr-10 text-sm text-white shadow-card focus:outline-none focus:ring-2 focus:ring-v2-gold-primary placeholder:text-v2-text-tertiary"
           />
           <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-v2-text-tertiary pointer-events-none"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -563,7 +563,7 @@ export function TransactionContent() {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-v2-text-tertiary hover:text-white transition-colors"
               aria-label={t("filter.clearSearch")}
             >
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -673,22 +673,22 @@ export function TransactionContent() {
                 {Array.from({ length: 5 }).map((_, i) => (
                   <div
                     key={i}
- className="bg-white rounded-lg p-4 animate-pulse"
+ className="bg-v2-bg-surface rounded-lg p-4 animate-pulse"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gray-200 rounded-full" />
+                      <div className="w-10 h-10 bg-v2-bg-dark rounded-full" />
                       <div className="flex-1 space-y-2">
-                        <div className="h-4 bg-gray-200 rounded w-1/3" />
-                        <div className="h-3 bg-gray-200 rounded w-1/2" />
+                        <div className="h-4 bg-v2-bg-dark rounded w-1/3" />
+                        <div className="h-3 bg-v2-bg-dark rounded w-1/2" />
                       </div>
-                      <div className="h-6 bg-gray-200 rounded w-20" />
+                      <div className="h-6 bg-v2-bg-dark rounded w-20" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : Object.keys(groupedTransactions).length === 0 ? (
               // Empty state
- <div className="flex flex-col items-center justify-center py-16 text-gray-500">
+ <div className="flex flex-col items-center justify-center py-16 text-v2-text-tertiary">
                 <svg
                   className="w-16 h-16 mb-4 opacity-50"
                   fill="none"

@@ -87,7 +87,7 @@ export function InlinePriceEdit({ item, category }: InlinePriceEditProps) {
           type="number"
           value={buyValue}
           onChange={(e) => setBuyValue(e.target.value)}
- className="w-24 px-1.5 py-0.5 text-sm border border-gray-300 rounded bg-white text-gray-900"
+ className="w-24 px-1.5 py-0.5 text-sm border border-v2-border-light rounded bg-v2-bg-dark text-white placeholder-v2-text-tertiary focus:border-v2-gold-primary focus:outline-none"
           placeholder={t("buy")}
           disabled={isPending}
         />
@@ -95,14 +95,14 @@ export function InlinePriceEdit({ item, category }: InlinePriceEditProps) {
           type="number"
           value={sellValue}
           onChange={(e) => setSellValue(e.target.value)}
- className="w-24 px-1.5 py-0.5 text-sm border border-gray-300 rounded bg-white text-gray-900"
+ className="w-24 px-1.5 py-0.5 text-sm border border-v2-border-light rounded bg-v2-bg-dark text-white placeholder-v2-text-tertiary focus:border-v2-gold-primary focus:outline-none"
           placeholder={t("sell")}
           disabled={isPending}
         />
         <button
           onClick={handleSave}
           disabled={isPending}
-          className="p-1 text-green-600 hover:text-green-700 disabled:opacity-50"
+          className="p-1 text-v2-green-positive hover:text-v2-green-positive/80 disabled:opacity-50"
           title={t("save")}
         >
           {isPending ? (
@@ -119,7 +119,7 @@ export function InlinePriceEdit({ item, category }: InlinePriceEditProps) {
         <button
           onClick={handleCancel}
           disabled={isPending}
-          className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+          className="p-1 text-v2-text-tertiary hover:text-white disabled:opacity-50"
           title={t("cancel")}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -127,7 +127,7 @@ export function InlinePriceEdit({ item, category }: InlinePriceEditProps) {
           </svg>
         </button>
         {toast && (
-          <span className={`text-xs ${toast.type === "error" ? "text-lred" : "text-green-600"}`}>
+          <span className={`text-xs ${toast.type === "error" ? "text-v2-red-negative" : "text-v2-green-positive"}`}>
             {toast.message}
           </span>
         )}
@@ -141,14 +141,14 @@ export function InlinePriceEdit({ item, category }: InlinePriceEditProps) {
         <button
           onClick={handleRemoveOverride}
           disabled={isPending}
-          className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 hover:bg-blue-600 disabled:opacity-50 cursor-pointer"
+          className="w-2 h-2 rounded-full bg-v2-gold-primary flex-shrink-0 hover:bg-v2-gold-dark disabled:opacity-50 cursor-pointer"
           title={t("removeOverride")}
         />
       )}
       <button
         onClick={handleEdit}
         disabled={isPending}
- className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+ className="p-1 text-v2-text-tertiary hover:text-v2-text-secondary disabled:opacity-50"
         title={t("edit")}
       >
         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -156,7 +156,7 @@ export function InlinePriceEdit({ item, category }: InlinePriceEditProps) {
         </svg>
       </button>
       {toast && (
-        <span className={`text-xs ${toast.type === "error" ? "text-lred" : "text-green-600"}`}>
+        <span className={`text-xs ${toast.type === "error" ? "text-v2-red-negative" : "text-v2-green-positive"}`}>
           {toast.message}
         </span>
       )}
@@ -169,7 +169,7 @@ export function OverrideIndicator({ item, category, isAdmin }: { item: PriceItem
   if (!item.isOverridden) return null;
   if (!isAdmin) {
     // Non-admin: just show a subtle indicator, no interaction
-    return <span className="inline-block w-1.5 h-1.5 rounded-full bg-blue-400 ml-1" title="Overridden" />;
+    return <span className="inline-block w-1.5 h-1.5 rounded-full bg-v2-gold-primary ml-1" title="Overridden" />;
   }
   // Admin: the InlinePriceEdit component handles the override indicator
   return null;

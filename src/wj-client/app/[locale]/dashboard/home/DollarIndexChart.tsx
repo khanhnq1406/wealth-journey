@@ -26,7 +26,7 @@ export function DollarIndexChart() {
           symbol="DXY"
           height={950}
           locale={locale}
-          theme="light"
+          theme="dark"
         />
       </div>
     </BaseCard>

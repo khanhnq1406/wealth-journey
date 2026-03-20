@@ -89,7 +89,7 @@ export function ChartWrapper({
         <div className="text-sm mb-2">
           {yearSelector && (
             <select
-              className="border-solid border rounded-md p-1 m-2"
+              className="border-solid border border-v2-gold-primary/30 rounded-md p-1 m-2 bg-v2-maroon-900 text-v2-cream-100"
               value={yearSelector.value}
               onChange={(e) => yearSelector.onChange(parseInt(e.target.value))}
             >
@@ -102,7 +102,7 @@ export function ChartWrapper({
           )}
           {walletSelector && (
             <select
-              className="border-solid border rounded-md p-1"
+              className="border-solid border border-v2-gold-primary/30 rounded-md p-1 bg-v2-maroon-900 text-v2-cream-100"
               value={walletSelector.value ?? ""}
               onChange={(e) =>
                 walletSelector.onChange(

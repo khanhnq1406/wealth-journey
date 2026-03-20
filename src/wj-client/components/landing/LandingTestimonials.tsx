@@ -56,19 +56,19 @@ function TestimonialCard({
     <motion.div
       variants={itemVariants}
       whileHover={{ y: -8 }}
-      className="bg-white rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow"
+      className="bg-v2-bg-surface rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow"
     >
       <div className="flex items-center gap-4 mb-4">
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white font-semibold">
+        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-v2-gold-primary to-v2-text-secondary flex items-center justify-center text-v2-bg-dark font-semibold">
           {avatar}
         </div>
         <div>
-          <h4 className="font-semibold text-gray-900">{name}</h4>
-          <p className="text-sm text-gray-500">{role}</p>
+          <h4 className="font-semibold text-white">{name}</h4>
+          <p className="text-sm text-v2-text-tertiary">{role}</p>
         </div>
       </div>
       <StarRating rating={5} />
-      <p className="mt-4 text-gray-600 leading-relaxed">
+      <p className="mt-4 text-v2-text-tertiary leading-relaxed">
         {content}
       </p>
     </motion.div>
@@ -82,7 +82,7 @@ export function LandingTestimonials() {
   const avatars = ["NA", "TB", "LC"];
 
   return (
-    <section className="py-16 sm:py-20 bg-gray-50">
+    <section className="py-16 sm:py-20 bg-v2-bg-primary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -91,10 +91,10 @@ export function LandingTestimonials() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             {t("sectionTitle")}
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-v2-text-tertiary max-w-2xl mx-auto">
             {t("sectionSubtitle")}
           </p>
         </motion.div>

@@ -99,16 +99,29 @@ function TradingViewChartInner({
           symbol,
           interval,
           timezone: "Asia/Ho_Chi_Minh",
-          theme: theme === "dark" ? "dark" : "light",
+          theme: "dark",
           style: "1",
           locale: tvLocale,
-          toolbar_bg: "#f1f3f6",
+          toolbar_bg: "#3D0101",
           enable_publishing: false,
           allow_symbol_change: allowSymbolChange,
           hide_side_toolbar: true,
           save_image: false,
           calendar: false,
           studies: [],
+          overrides: {
+            "paneProperties.background": "#580202",
+            "paneProperties.backgroundType": "solid",
+            "scalesProperties.backgroundColor": "#580202",
+            "scalesProperties.lineColor": "rgba(215, 139, 28, 0.2)",
+            "scalesProperties.textColor": "#FFF8EC",
+            "mainSeriesProperties.candleStyle.upColor": "#D78B1C",
+            "mainSeriesProperties.candleStyle.downColor": "#9B0111",
+            "mainSeriesProperties.candleStyle.borderUpColor": "#D78B1C",
+            "mainSeriesProperties.candleStyle.borderDownColor": "#9B0111",
+            "mainSeriesProperties.candleStyle.wickUpColor": "#D78B1C",
+            "mainSeriesProperties.candleStyle.wickDownColor": "#9B0111",
+          },
         });
 
         // Wait for iframe to render
@@ -139,13 +152,13 @@ function TradingViewChartInner({
         aria-label={`TradingView chart for ${symbol}`}
       />
       {status === "loading" && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-bg" />
+        <div className="absolute inset-0 flex items-center justify-center bg-v2-maroon-800 z-10">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-v2-maroon-900 border-t-v2-gold-primary" />
         </div>
       )}
       {status === "error" && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">
-          <p className="text-sm text-gray-500">Chart unavailable</p>
+        <div className="absolute inset-0 flex items-center justify-center bg-v2-maroon-900 z-10">
+          <p className="text-sm text-v2-cream-100/60">Chart unavailable</p>
         </div>
       )}
     </div>

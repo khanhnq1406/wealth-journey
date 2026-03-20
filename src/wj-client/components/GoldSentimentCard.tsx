@@ -214,8 +214,8 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
         <div
           className={`fixed top-4 left-1/2 -translate-x-1/2 z-toast text-white px-4 py-2 rounded-lg shadow-lg text-sm animate-fade-in ${
             toastType === "error"
- ? "bg-red-600"
- : "bg-neutral-800"
+ ? "bg-v2-red-negative"
+ : "bg-v2-bg-dark"
           }`}
         >
           {toastMessage}
@@ -236,7 +236,7 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
           className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg min-h-11 px-3 py-2 text-sm font-medium transition-all duration-150 select-none ${
             userVote === VoteDirection.VOTE_DIRECTION_BULLISH
               ? "bg-success-600 text-white shadow-sm"
- : "bg-success-50 text-success-700 active:bg-success-200"
+ : "bg-v2-green-light text-v2-green-positive active:bg-success-600/30"
           } disabled:opacity-60 disabled:cursor-not-allowed`}
         >
           <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -255,7 +255,7 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
           className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg min-h-11 px-3 py-2 text-sm font-medium transition-all duration-150 select-none ${
             userVote === VoteDirection.VOTE_DIRECTION_BEARISH
               ? "bg-danger-600 text-white shadow-sm"
- : "bg-danger-50 text-danger-700 active:bg-danger-200"
+ : "bg-v2-red-light text-v2-red-negative active:bg-danger-600/30"
           } disabled:opacity-60 disabled:cursor-not-allowed`}
         >
           <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -271,13 +271,13 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
       {/* Sentiment bar — visual progress */}
       {totalVotes > 0 && (
         <div className="mb-2">
- <div className="flex h-1.5 rounded-full overflow-hidden bg-neutral-100">
+ <div className="flex h-1.5 rounded-full overflow-hidden bg-v2-bg-dark">
             <div
-              className="bg-success-500 transition-all duration-500 ease-out rounded-l-full"
+              className="bg-v2-green-positive transition-all duration-500 ease-out rounded-l-full"
               style={{ width: `${bullishPct}%` }}
             />
             <div
-              className="bg-danger-500 transition-all duration-500 ease-out rounded-r-full"
+              className="bg-v2-red-negative transition-all duration-500 ease-out rounded-r-full"
               style={{ width: `${bearishPct}%` }}
             />
           </div>
@@ -319,11 +319,11 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
           </div>
         ) : allComments.length === 0 ? (
           <div className="text-center py-5">
- <p className="text-sm text-neutral-400">
+ <p className="text-sm text-v2-text-tertiary">
               {t("noComments")}
             </p>
             {isHome && (
- <p className="text-xs text-neutral-300 mt-1">
+ <p className="text-xs text-v2-text-tertiary mt-1">
                 {t("beFirstToComment")}
               </p>
             )}
@@ -476,17 +476,17 @@ function CommentRow({ comment, isHome, onDelete, isDeleting, t }: CommentRowProp
 
           {/* Vote direction badge */}
           {isBullish && (
-            <svg className="w-3 h-3 text-success-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3 h-3 text-v2-green-positive shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" />
             </svg>
           )}
           {isBearish && (
-            <svg className="w-3 h-3 text-danger-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3 h-3 text-v2-red-negative shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
             </svg>
           )}
 
- <span className="text-[11px] text-neutral-400 whitespace-nowrap">
+ <span className="text-[11px] text-v2-text-tertiary whitespace-nowrap">
             {comment.createdAt ? formatRelativeTime(comment.createdAt, t) : ""}
           </span>
         </div>
@@ -502,7 +502,7 @@ function CommentRow({ comment, isHome, onDelete, isDeleting, t }: CommentRowProp
           type="button"
           onClick={() => onDelete(comment.id)}
           disabled={isDeleting}
- className="min-w-[32px] min-h-[32px] flex items-center justify-center text-neutral-300 hover:text-danger-500 transition-colors shrink-0 disabled:opacity-50 rounded-md sm:opacity-0 sm:group-hover/comment:opacity-100"
+ className="min-w-[32px] min-h-[32px] flex items-center justify-center text-v2-text-tertiary hover:text-v2-red-negative transition-colors shrink-0 disabled:opacity-50 rounded-md sm:opacity-0 sm:group-hover/comment:opacity-100"
           style={{ touchAction: "manipulation" }}
           aria-label={t("delete")}
         >

@@ -376,8 +376,8 @@ export function Tour({
         ref={containerRef}
         className={cn(
           "absolute pointer-events-auto transition-all duration-300 ease-out",
- "bg-white rounded-xl shadow-modal",
- "border border-neutral-200",
+ "bg-v2-maroon-800 rounded-xl shadow-modal",
+ "border border-v2-maroon-600",
           "max-w-sm sm:max-w-md w-full",
           isCenterStep
             ? "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-scale-in"
@@ -473,7 +473,7 @@ export function Tour({
         {!isCenterStep && step.placement !== "center" && (
           <div
             className={cn(
- "absolute w-3 h-3 bg-white border border-neutral-200 rotate-45",
+ "absolute w-3 h-3 bg-v2-maroon-800 border border-v2-maroon-600 rotate-45",
               step.placement === "top" && "bottom-[-7px] left-1/2 -translate-x-1/2 border-b-0 border-r-0",
               step.placement === "bottom" && "top-[-7px] left-1/2 -translate-x-1/2 border-t-0 border-l-0",
               step.placement === "left" && "right-[-7px] top-1/2 -translate-y-1/2 border-t-0 border-r-0",

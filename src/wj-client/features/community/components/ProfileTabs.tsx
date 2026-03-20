@@ -63,7 +63,7 @@ export function ProfileTabs({ userId, currentUser, onUserClick, onHashtagClick }
   return (
     <div>
       {/* Tab bar */}
-      <div className="flex border-b border-v2-border-light bg-white sm:rounded-t-2xl overflow-hidden">
+      <div className="flex border-b border-v2-border-light bg-v2-maroon-800 sm:rounded-t-2xl overflow-hidden">
         {tabs.map((tab) => (
           <button
             key={tab.key}

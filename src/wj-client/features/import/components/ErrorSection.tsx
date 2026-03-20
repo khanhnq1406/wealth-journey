@@ -65,7 +65,7 @@ export const ErrorSection = React.memo(function ErrorSection({
 
       {/* Content */}
       {expanded && (
- <div className="p-4 space-y-4 bg-white">
+ <div className="p-4 space-y-4 bg-v2-maroon-800">
           {transactions.map((tx) => (
             <div
               key={tx.rowNumber}

@@ -21,6 +21,7 @@ import {
   OverrideIndicator,
 } from "@/features/market-prices/components/InlinePriceEdit";
 import { SentimentCard } from "@/components/GoldSentimentCard";
+import { OrnateHeading } from "@/components/decorative/OrnateHeading";
 
 type Tab = "gold" | "silver" | "currency" | "symbol";
 
@@ -35,11 +36,11 @@ function ChangeCell({
   currency: string;
   divide?: boolean;
 }) {
-  if (!value) return <span className="text-gray-400">—</span>;
+  if (!value) return <span className="text-v2-text-tertiary">—</span>;
   const isUp = value > 0;
   return (
     <span
-      className={`flex items-center gap-0.5 ${isUp ? "text-v2-green-positive" : "text-lred"}`}
+      className={`flex items-center gap-0.5 ${isUp ? "text-v2-green-positive" : "text-v2-red-negative"}`}
     >
       <svg
         aria-hidden="true"
@@ -55,7 +56,7 @@ function ChangeCell({
           d={isUp ? "M5 10l7-7m0 0l7 7m-7-7v18" : "M19 14l-7 7m0 0l-7-7m7 7V3"}
         />
       </svg>
-      <span>{formatChangeValue(value, currency, { divide })}</span>
+      <span className="tabular-nums">{formatChangeValue(value, currency, { divide })}</span>
     </span>
   );
 }
@@ -65,10 +66,10 @@ function ChangeCell({
 const columnHelper = createColumnHelper<PriceItem>();
 
 const TAB_TYPE_COLOR: Record<Tab, string> = {
-  gold: "text-v2-gold-dark",
-  silver: "text-v2-silver-dark",
-  currency: "text-v2-currency-dark",
- symbol: "text-gray-900",
+  gold: "text-v2-gold-primary",
+  silver: "text-v2-silver-primary",
+  currency: "text-v2-currency-primary",
+  symbol: "text-white",
 };
 
 function buildTanstackColumns(
@@ -88,7 +89,7 @@ function buildTanstackColumns(
           <span className={`font-medium ${typeColor}`}>
             {row.original.name || row.original.typeCode}
           </span>
-          <span className="ml-1.5 text-xs text-gray-400">
+          <span className="ml-1.5 text-xs text-v2-text-tertiary">
             {row.original.currency}
           </span>
           <OverrideIndicator
@@ -103,11 +104,11 @@ function buildTanstackColumns(
       header: () => (
         <div>
           <span className="text-base font-bold">{t("table.buy")}</span>
-          {showUnitLabel && <div className="font-normal text-[10px] text-gray-400">{t("table.buyUnit")}</div>}
+          {showUnitLabel && <div className="font-normal text-[10px] text-v2-text-tertiary">{t("table.buyUnit")}</div>}
         </div>
       ),
       cell: ({ row }) => (
-        <span className="font-medium text-lred">
+        <span className="font-medium text-v2-red-negative">
           {formatPriceValue(row.original.buy, row.original.currency, { divide: divideValues })}
         </span>
       ),
@@ -116,7 +117,7 @@ function buildTanstackColumns(
       header: () => (
         <div>
           <span className="text-base font-bold">{t("table.sell")}</span>
-          {showUnitLabel && <div className="font-normal text-[10px] text-gray-400">{t("table.sellUnit")}</div>}
+          {showUnitLabel && <div className="font-normal text-[10px] text-v2-text-tertiary">{t("table.sellUnit")}</div>}
         </div>
       ),
       cell: ({ row }) => (
@@ -171,7 +172,7 @@ function buildMobileColumns(
           <span className={`font-medium ${typeColor}`}>
             {row.name || row.typeCode}
           </span>
-          <span className="ml-1.5 text-xs text-gray-400">{row.currency}</span>
+          <span className="ml-1.5 text-xs text-v2-text-tertiary">{row.currency}</span>
           <OverrideIndicator item={row} category={tab} isAdmin={isAdmin} />
         </div>
       ),
@@ -181,11 +182,11 @@ function buildMobileColumns(
       header: (
         <div>
           <span className="text-base">{t("table.buy")}</span>
-          {showUnitLabel && <span className="text-[10px] text-gray-400 ml-1">{t("table.buyUnit")}</span>}
+          {showUnitLabel && <span className="text-[10px] text-v2-text-tertiary ml-1">{t("table.buyUnit")}</span>}
         </div>
       ),
       cell: ({ row }) => (
-        <span className="font-medium text-lred">
+        <span className="font-medium text-v2-red-negative">
           {formatPriceValue(row.buy, row.currency, { divide: divideValues })}
         </span>
       ),
@@ -195,7 +196,7 @@ function buildMobileColumns(
       header: (
         <div>
           <span className="text-base">{t("table.sell")}</span>
-          {showUnitLabel && <span className="text-[10px] text-gray-400 ml-1">{t("table.sellUnit")}</span>}
+          {showUnitLabel && <span className="text-[10px] text-v2-text-tertiary ml-1">{t("table.sellUnit")}</span>}
         </div>
       ),
       cell: ({ row }) => (
@@ -267,7 +268,7 @@ function SymbolLookupTab({
     <div className="space-y-4">
       <div className="flex gap-2 items-end">
         <div className="flex-1">
- <label className="block text-sm font-medium text-gray-700 mb-1">
+ <label className="block text-sm font-medium text-v2-text-secondary mb-1">
             {t("symbolLabel")}
           </label>
           <SymbolAutocomplete
@@ -288,17 +289,17 @@ function SymbolLookupTab({
       </div>
 
       {(isError || (priceResp && !priceResp.success)) && (
-        <p className="text-lred text-sm">{t("failedToFetch")}</p>
+        <p className="text-v2-red-negative text-sm">{t("failedToFetch")}</p>
       )}
 
       {priceData && querySymbol && (
- <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+ <div className="p-4 bg-v2-bg-dark rounded-lg border border-v2-border-light">
           <div className="flex items-start justify-between gap-4">
             <div>
- <p className="text-lg font-bold text-gray-900">
+ <p className="text-lg font-bold text-white">
                 {querySymbol}
               </p>
-              <p className="text-xs text-gray-400 mt-0.5">
+              <p className="text-xs text-v2-text-tertiary mt-0.5">
                 {priceData.timestamp
                   ? new Date(priceData.timestamp * 1000).toLocaleTimeString(
                       locale,
@@ -307,19 +308,19 @@ function SymbolLookupTab({
               </p>
             </div>
             <div className="text-right">
- <p className="text-2xl font-bold text-gray-900">
+ <p className="text-2xl font-bold text-white">
                 {priceData.currency === "VND"
                   ? formatPriceValue(priceData.price, "VND")
                   : `$${priceData.priceDecimal.toFixed(2)}`}
               </p>
-              <p className="text-xs text-gray-400">{priceData.currency}</p>
+              <p className="text-xs text-v2-text-tertiary">{priceData.currency}</p>
             </div>
           </div>
         </div>
       )}
 
       {!querySymbol && (
-        <p className="text-center text-gray-400 py-8 text-sm">
+        <p className="text-center text-v2-text-tertiary py-8 text-sm">
           {t("emptyState")}
         </p>
       )}
@@ -372,11 +373,9 @@ export default function PricesPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
- <h1 className="text-xl font-bold text-gray-900">
-            {t("title")}
-          </h1>
+          <OrnateHeading size="lg">{t("title")}</OrnateHeading>
           {lastUpdated && (
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-v2-text-tertiary mt-1 text-center">
               {t("lastUpdated", { time: lastUpdated })}
             </p>
           )}
@@ -411,7 +410,7 @@ export default function PricesPage() {
 
       <BaseCard padding="none">
         {/* Tab bar */}
- <div className="flex border-b border-gray-200 overflow-x-auto scrollbar-hide">
+ <div className="flex border-b border-v2-border-light overflow-x-auto scrollbar-hide">
           {TABS.map((tab) => (
             <button
               key={tab.key}
@@ -419,7 +418,7 @@ export default function PricesPage() {
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === tab.key
                   ? "border-b-2 border-v2-red-primary text-v2-red-primary"
- : "text-gray-600 hover:text-gray-900"
+ : "text-v2-text-tertiary hover:text-v2-text-secondary"
               }`}
             >
               {tab.label}
@@ -431,7 +430,7 @@ export default function PricesPage() {
           {activeTab === "gold" && (
             <>
               {isError && (
-                <p className="text-lred text-sm text-center py-4">
+                <p className="text-v2-red-negative text-sm text-center py-4">
                   {t("gold.failedToLoad")}
                 </p>
               )}
@@ -470,7 +469,7 @@ export default function PricesPage() {
           {activeTab === "silver" && (
             <>
               {isError && (
-                <p className="text-lred text-sm text-center py-4">
+                <p className="text-v2-red-negative text-sm text-center py-4">
                   {t("silver.failedToLoad")}
                 </p>
               )}
@@ -509,7 +508,7 @@ export default function PricesPage() {
           {activeTab === "currency" && (
             <>
               {isError && (
-                <p className="text-lred text-sm text-center py-4">
+                <p className="text-v2-red-negative text-sm text-center py-4">
                   {t("currency.failedToLoad")}
                 </p>
               )}

@@ -57,7 +57,7 @@ export function ProfileEditModal({ profile, onClose }: ProfileEditModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="bg-v2-maroon-800 rounded-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-4 py-3 border-b border-v2-border-light">
           <h2 className="font-semibold text-v2-text-primary">Edit Profile</h2>
           <button

@@ -56,7 +56,7 @@ export function ProfileCard({ currentUser }: ProfileCardProps) {
   ];
 
   return (
-    <div className="bg-white rounded-2xl border border-v2-border-light overflow-hidden">
+    <div className="bg-v2-maroon-800 rounded-2xl border border-v2-border-light overflow-hidden">
       {/* Cover photo mini banner */}
       <div
         className="w-full h-16"

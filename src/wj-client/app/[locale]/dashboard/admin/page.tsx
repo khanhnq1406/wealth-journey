@@ -157,7 +157,7 @@ function AdminCMSContent() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* SEO Metadata */}
       <BaseCard padding="lg">
- <h2 className="text-lg font-semibold text-neutral-900 mb-4">
+ <h2 className="text-lg font-semibold text-white mb-4">
           {t("cms.seoMetadata")}
         </h2>
 
@@ -188,8 +188,8 @@ function AdminCMSContent() {
           />
 
           {/* Open Graph */}
- <div className="border-t border-neutral-200 pt-4 mt-4">
- <h3 className="text-sm font-medium text-neutral-700 mb-3">
+ <div className="border-t border-v2-border-light pt-4 mt-4">
+ <h3 className="text-sm font-medium text-v2-text-secondary mb-3">
               Open Graph
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
@@ -217,8 +217,8 @@ function AdminCMSContent() {
           </div>
 
           {/* Twitter Card */}
- <div className="border-t border-neutral-200 pt-4 mt-4">
- <h3 className="text-sm font-medium text-neutral-700 mb-3">
+ <div className="border-t border-v2-border-light pt-4 mt-4">
+ <h3 className="text-sm font-medium text-v2-text-secondary mb-3">
               Twitter Card
             </h3>
             <FormToggle
@@ -250,8 +250,8 @@ function AdminCMSContent() {
           </div>
 
           {/* Robots & Canonical */}
- <div className="border-t border-neutral-200 pt-4 mt-4">
- <h3 className="text-sm font-medium text-neutral-700 mb-3">
+ <div className="border-t border-v2-border-light pt-4 mt-4">
+ <h3 className="text-sm font-medium text-v2-text-secondary mb-3">
               Robots & Canonical
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
@@ -285,7 +285,7 @@ function AdminCMSContent() {
 
       {/* Footer Content */}
       <BaseCard padding="lg">
- <h2 className="text-lg font-semibold text-neutral-900 mb-4">
+ <h2 className="text-lg font-semibold text-white mb-4">
           {t("cms.footerContent")}
         </h2>
 
@@ -349,16 +349,16 @@ export default function AdminCMSPage() {
     <AdminGuard>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="mb-6">
- <h1 className="text-2xl font-bold text-neutral-900">
+ <h1 className="text-2xl font-bold text-white">
             {t("page.title")}
           </h1>
- <p className="text-sm text-neutral-500 mt-1">
+ <p className="text-sm text-v2-text-tertiary mt-1">
             {t("page.subtitle")}
           </p>
         </div>
 
         {/* Tabs */}
- <div className="flex gap-1 border-b border-neutral-200 mb-6">
+ <div className="flex gap-1 border-b border-v2-border-light mb-6">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -366,7 +366,7 @@ export default function AdminCMSPage() {
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.id
                   ? "border-bg text-bg"
- : "border-transparent text-neutral-500 hover:text-neutral-700"
+ : "border-transparent text-v2-text-tertiary hover:text-v2-text-secondary"
               }`}
             >
               {tab.label}

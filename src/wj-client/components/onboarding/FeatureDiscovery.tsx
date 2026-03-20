@@ -310,7 +310,7 @@ export function FeatureDiscovery({
         <div
           className={cn(
             "rounded-lg shadow-lg border p-4",
- "bg-white",
+ "bg-v2-maroon-800",
  "border-neutral-200",
             typeStyles.bgColor,
             typeStyles.borderColor
@@ -409,7 +409,7 @@ export function FeatureDiscovery({
           onClick={() => setIsVideoOpen(false)}
         >
           <div
- className="bg-white rounded-xl shadow-modal max-w-3xl w-full overflow-hidden animate-scale-in"
+ className="bg-v2-maroon-800 rounded-xl shadow-modal max-w-3xl w-full overflow-hidden animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
  <div className="p-4 border-b border-neutral-200 flex items-center justify-between">
@@ -499,7 +499,7 @@ export function WhatsNewPanel({
           key={feature.id}
           className={cn(
             "p-4 rounded-lg border",
- "bg-white",
+ "bg-v2-maroon-800",
  "border-neutral-200"
           )}
         >

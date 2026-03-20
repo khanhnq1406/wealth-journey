@@ -149,7 +149,7 @@ export const QuickFilterChips = memo(function QuickFilterChips({
   return (
     <div
       className={cn(
-        "flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent sm:pb-0",
+        "flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-v2-border-light scrollbar-track-transparent sm:pb-0",
         "snap-x snap-mandatory",
         className,
       )}
@@ -167,8 +167,8 @@ export const QuickFilterChips = memo(function QuickFilterChips({
               "min-h-[44px] focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
               // Active state
               isActive
-                ? "bg-v2-red-primary text-white shadow-md"
- : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 active:bg-gray-100",
+                ? "bg-v2-gold-primary text-v2-bg-dark shadow-md"
+ : "bg-v2-bg-dark text-white border border-v2-border-light hover:bg-v2-bg-surface-tint active:bg-v2-bg-surface-tint",
             )}
             aria-pressed={isActive}
             aria-label={tf("filterBy", { label: filter.label.toLowerCase() })}

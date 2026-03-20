@@ -26,7 +26,7 @@ export function LandingDollarIndexChart() {
           symbol="DXY"
           height={950}
           locale={locale}
-          theme="light"
+          theme="dark"
           allowSymbolChange={false}
         />
       </div>

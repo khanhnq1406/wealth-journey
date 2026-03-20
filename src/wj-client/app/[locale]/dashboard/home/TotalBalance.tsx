@@ -67,14 +67,14 @@ export const TotalBalance = memo(function TotalBalance() {
       <BaseCard className="mt-2 sm:mt-3 lg:mt-4">
         <div className="flex items-center justify-between py-5 flex-wrap px-5">
           <div className="flex-1">
-            <div className="text-[#99A3A5] font-semibold mb-2">
+            <div className="text-v2-text-secondary font-semibold mb-2">
               {t("totalNetWorth")}
             </div>
-            <div className="font-bold text-2xl break-all mb-3">
+            <div className="font-bold text-2xl break-all mb-3 text-white">
               {isHide ? "*****" : displayBalance}
             </div>
             {!isHide && (
-              <div className="flex justify-between text-sm text-gray-600 mt-2">
+              <div className="flex justify-between text-sm text-v2-text-tertiary mt-2">
                 <span>{t("cashLabel", { amount: balanceData.totalCash })}</span>
                 <span>{t("investmentsLabel", { amount: balanceData.totalInvestments })}</span>
               </div>

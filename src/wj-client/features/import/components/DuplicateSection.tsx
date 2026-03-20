@@ -111,7 +111,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
 
       {/* Content */}
       {expanded && (
- <div className="p-4 space-y-4 bg-white">
+ <div className="p-4 space-y-4 bg-v2-maroon-800">
           {/* Progress */}
           <div className="flex items-center justify-between text-sm">
  <p className="text-neutral-600">

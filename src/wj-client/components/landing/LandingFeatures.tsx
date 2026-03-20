@@ -301,7 +301,7 @@ export default function LandingFeatures() {
   return (
     <section
       id="features"
-      className="py-16 sm:py-20 bg-white [scroll-margin-top:5rem]"
+      className="py-16 sm:py-20 bg-v2-bg-dark [scroll-margin-top:5rem]"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -311,10 +311,10 @@ export default function LandingFeatures() {
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             {t("features.allInOnePlatform")}
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto px-4">
+          <p className="text-lg text-v2-text-tertiary max-w-3xl mx-auto px-4">
             {t("features.allInOnePlatformDesc")}
           </p>
         </motion.div>
@@ -330,15 +330,15 @@ export default function LandingFeatures() {
               key={feature.name}
               variants={itemVariants}
               whileHover={{ y: -5 }}
-              className="p-6 bg-neutral-50 rounded-lg hover:shadow-lg transition-shadow duration-200"
+              className="p-6 bg-v2-bg-surface rounded-lg hover:shadow-lg transition-shadow duration-200"
             >
-              <div className="w-14 h-14 bg-v2-red-primary/10 rounded-lg flex items-center justify-center text-v2-red-primary mb-4">
+              <div className="w-14 h-14 bg-v2-gold-primary/10 rounded-lg flex items-center justify-center text-v2-gold-primary mb-4">
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-white mb-2">
                 {feature.name}
               </h3>
-              <p className="text-gray-600">{feature.description}</p>
+              <p className="text-v2-text-tertiary">{feature.description}</p>
             </motion.div>
           ))}
         </motion.div>

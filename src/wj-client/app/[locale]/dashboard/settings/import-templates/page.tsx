@@ -69,7 +69,7 @@ export default function ImportTemplatesPage() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">{t("title")}</h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-v2-text-secondary mt-1">
             {t("description")}
           </p>
         </div>
@@ -78,7 +78,7 @@ export default function ImportTemplatesPage() {
       {templates.length === 0 ? (
         <BaseCard>
           <div className="p-8 text-center">
-            <p className="text-gray-500 mb-4">
+            <p className="text-v2-text-tertiary mb-4">
               {t("noTemplates")}
             </p>
           </div>
@@ -88,7 +88,7 @@ export default function ImportTemplatesPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b">
+                <tr className="border-b border-v2-border-light">
                   <th className="text-left p-4 font-semibold">{t("tableHeaders.templateName")}</th>
                   <th className="text-left p-4 font-semibold">{t("tableHeaders.fileFormats")}</th>
                   <th className="text-left p-4 font-semibold">{t("tableHeaders.currency")}</th>
@@ -99,7 +99,7 @@ export default function ImportTemplatesPage() {
               </thead>
               <tbody>
                 {templates.map((template) => (
-                  <tr key={template.id} className="border-b hover:bg-gray-50">
+                  <tr key={template.id} className="border-b border-v2-border-light hover:bg-v2-bg-surface-tint">
                     <td className="p-4">
                       <div className="font-medium">{template.name}</div>
                     </td>
@@ -108,11 +108,11 @@ export default function ImportTemplatesPage() {
                     </td>
                     <td className="p-4">{template.currency}</td>
                     <td className="p-4">
-                      <code className="text-sm bg-gray-100 px-2 py-1 rounded">
+                      <code className="text-sm bg-v2-bg-dark px-2 py-1 rounded">
                         {template.dateFormat}
                       </code>
                     </td>
-                    <td className="p-4 text-sm text-gray-600">
+                    <td className="p-4 text-sm text-v2-text-secondary">
                       {formatDate(Number(template.createdAt))}
                     </td>
                     <td className="p-4">

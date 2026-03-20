@@ -100,7 +100,7 @@ const gradientClasses = {
  purple: "bg-gradient-to-br from-purple-500 to-purple-600",
  orange: "bg-gradient-to-br from-orange-500 to-orange-600",
  red: "bg-gradient-to-br from-red-500 to-red-600",
- none: "bg-white border border-gray-200",
+ none: "bg-v2-maroon-800 border border-v2-maroon-600",
 };
 
 const sizeClasses = {
@@ -142,11 +142,11 @@ export function WealthCard({
 
   const textClasses = isGradient
     ? "text-white"
- : "text-gray-900";
+ : "text-white";
 
   const subtitleClasses = isGradient
     ? "text-white/80"
- : "text-gray-500";
+ : "text-v2-cream-100";
 
   const trendClasses = cn(
     "inline-flex items-center gap-1 text-sm font-medium",
@@ -204,7 +204,7 @@ export function WealthCard({
             <div className="min-w-0 flex-1">
               <h3 className={cn(
                 "font-semibold truncate",
- isGradient ? "text-white/90" : "text-gray-700"
+ isGradient ? "text-white/90" : "text-v2-cream-100"
               )}>
                 {title}
               </h3>
@@ -306,7 +306,7 @@ export function WealthCard({
         {footer && (
           <div className={cn(
             "pt-3 mt-3 border-t",
- isGradient ? "border-white/20" : "border-gray-200"
+ isGradient ? "border-white/20" : "border-v2-maroon-600"
           )}>
             {footer}
           </div>
@@ -361,7 +361,7 @@ export function StatCard({
   return (
     <div
       className={cn(
- "bg-white rounded-xl shadow-md border border-gray-200",
+ "bg-v2-maroon-800 rounded-xl shadow-md border border-v2-maroon-600",
         "transition-all duration-200",
         onClick && "cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]",
         loading && "opacity-70",
@@ -374,15 +374,15 @@ export function StatCard({
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
- <p className="text-sm text-gray-500 mb-1">
+ <p className="text-sm text-v2-cream-100 mb-1">
             {label}
           </p>
           {loading ? (
             <div className="animate-pulse">
- <div className="h-7 bg-gray-200 rounded w-24" />
+ <div className="h-7 bg-v2-maroon-600 rounded w-24" />
             </div>
           ) : (
- <p className="text-2xl sm:text-3xl font-bold text-gray-900">
+ <p className="text-2xl sm:text-3xl font-bold text-white">
               {typeof value === "number" ? value.toLocaleString() : value}
             </p>
           )}
@@ -409,7 +409,7 @@ export function StatCard({
               </svg>
               <span>{Math.abs(change)}%</span>
               {changeLabel && (
- <span className="text-gray-500 ml-1">
+ <span className="text-v2-cream-100 ml-1">
                   {changeLabel}
                 </span>
               )}

@@ -172,7 +172,7 @@ export function TransactionReviewTable({
                 </th>
               </tr>
             </thead>
- <tbody className="bg-white divide-y divide-neutral-200">
+ <tbody className="bg-v2-maroon-800 divide-y divide-neutral-200">
               {transactions.map((transaction) => {
                 const isSelected = selectedRows.has(transaction.rowNumber);
                 const isDisabled = !transaction.isValid;

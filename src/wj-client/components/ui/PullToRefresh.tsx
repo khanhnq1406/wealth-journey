@@ -118,7 +118,7 @@ export const PullToRefresh = memo(function PullToRefresh({
         <div
           className={cn(
             "flex items-center justify-center w-10 h-10 rounded-full",
- "bg-white shadow-sm",
+ "bg-v2-maroon-800 shadow-sm",
             "transition-transform duration-200",
           )}
           style={{

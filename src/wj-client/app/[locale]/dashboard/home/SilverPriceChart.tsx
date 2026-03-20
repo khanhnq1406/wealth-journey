@@ -26,7 +26,7 @@ export function SilverPriceChart() {
           symbol="TVC:SILVER"
           height={500}
           locale={locale}
-          theme="light"
+          theme="dark"
         />
       </div>
     </BaseCard>

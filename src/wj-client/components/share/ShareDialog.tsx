@@ -255,12 +255,12 @@ export function ShareDialog({
  "hover:border-neutral-300",
                     isSelected
  ? "border-primary-500 bg-primary-50"
- : "border-neutral-200 bg-white"
+ : "border-v2-maroon-600 bg-v2-maroon-800"
                   )}
                 >
                   <div className={cn(
                     "p-2 rounded-lg",
- isSelected ? "text-primary-600 bg-white" : "text-neutral-600 bg-neutral-100"
+ isSelected ? "text-v2-gold-accent bg-v2-maroon-700" : "text-v2-cream-100 bg-v2-maroon-700"
                   )}>
                     {info.icon}
                   </div>
@@ -338,7 +338,7 @@ export function ShareDialog({
                 className={cn(
                   // IMPORTANT: Font size must be at least 16px (text-base) to prevent iOS auto-zoom
                   "w-full px-3 py-2 rounded-lg border text-base sm:text-sm",
- "bg-white",
+ "bg-v2-maroon-900",
  "border-neutral-300",
  "text-neutral-900",
                   "focus:ring-2 focus:ring-primary-500 focus:border-transparent",
@@ -361,7 +361,7 @@ export function ShareDialog({
                 className={cn(
                   // IMPORTANT: Font size must be at least 16px (text-base) to prevent iOS auto-zoom
                   "w-full px-3 py-2 rounded-lg border text-base sm:text-sm resize-none",
- "bg-white",
+ "bg-v2-maroon-900",
  "border-neutral-300",
  "text-neutral-900",
                   "focus:ring-2 focus:ring-primary-500 focus:border-transparent",
@@ -386,7 +386,7 @@ export function ShareDialog({
                     "flex-1 px-4 py-2 rounded-lg border text-sm font-medium transition-all",
                     format === "summary"
  ? "border-primary-500 bg-primary-50 text-primary-700"
- : "border-neutral-200 bg-white text-neutral-700"
+ : "border-v2-maroon-600 bg-v2-maroon-800 text-v2-cream-100"
                   )}
                 >
                   {t("summary")}
@@ -398,7 +398,7 @@ export function ShareDialog({
                     "flex-1 px-4 py-2 rounded-lg border text-sm font-medium transition-all",
                     format === "detailed"
  ? "border-primary-500 bg-primary-50 text-primary-700"
- : "border-neutral-200 bg-white text-neutral-700"
+ : "border-v2-maroon-600 bg-v2-maroon-800 text-v2-cream-100"
                   )}
                 >
                   {t("detailed")}
@@ -430,7 +430,7 @@ export function ShareDialog({
                 onClick={() => handleSocialShare("twitter")}
                 className={cn(
                   "flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
- "border-neutral-200 bg-white",
+ "border-v2-maroon-600 bg-v2-maroon-800",
                   "hover:border-[#1DA1F2] hover:bg-[#1DA1F2]/5"
                 )}
               >
@@ -444,7 +444,7 @@ export function ShareDialog({
                 onClick={() => handleSocialShare("linkedin")}
                 className={cn(
                   "flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
- "border-neutral-200 bg-white",
+ "border-v2-maroon-600 bg-v2-maroon-800",
                   "hover:border-[#0077B5] hover:bg-[#0077B5]/5"
                 )}
               >
@@ -458,7 +458,7 @@ export function ShareDialog({
                 onClick={() => handleSocialShare("facebook")}
                 className={cn(
                   "flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
- "border-neutral-200 bg-white",
+ "border-v2-maroon-600 bg-v2-maroon-800",
                   "hover:border-[#4267B2] hover:bg-[#4267B2]/5"
                 )}
               >

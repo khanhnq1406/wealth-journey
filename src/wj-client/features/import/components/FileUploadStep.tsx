@@ -198,9 +198,9 @@ export function FileUploadStep({
     <div className="space-y-4 sm:space-y-6">
       {/* Hero Section */}
       <div className="text-center space-y-2">
- <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 mb-3">
+ <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-v2-bg-dark mb-3">
           <svg
- className="w-8 h-8 text-primary-600"
+ className="w-8 h-8 text-v2-gold-primary"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -213,10 +213,10 @@ export function FileUploadStep({
             />
           </svg>
         </div>
- <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">
+ <h2 className="text-xl sm:text-2xl font-bold text-white">
           {t("title")}
         </h2>
- <p className="text-sm sm:text-base text-neutral-600 max-w-lg mx-auto">
+ <p className="text-sm sm:text-base text-v2-text-secondary max-w-lg mx-auto">
           {t("subtitle")}
         </p>
       </div>
@@ -269,8 +269,8 @@ export function FileUploadStep({
           "min-h-[280px] sm:min-h-[320px] flex flex-col items-center justify-center p-6 sm:p-10",
           isDragOver &&
             !selectedFile && [
- "border-primary-500 bg-primary-50",
- "scale-[1.02] shadow-lg shadow-primary-200",
+ "border-v2-gold-primary bg-v2-bg-dark",
+ "scale-[1.02] shadow-lg shadow-v2-gold-primary/20",
             ],
           selectedFile && [
  "border-success-400 bg-success-50",
@@ -280,9 +280,9 @@ export function FileUploadStep({
           !selectedFile &&
             !error &&
             !isDragOver && [
- "border-neutral-300",
- "hover:border-primary-400",
- "hover:bg-neutral-50",
+ "border-v2-border-light",
+ "hover:border-v2-gold-primary",
+ "hover:bg-v2-bg-surface-tint",
               "hover:shadow-md",
             ],
           "cursor-pointer active:scale-[0.99]",
@@ -312,7 +312,7 @@ export function FileUploadStep({
               )}
             >
               <svg
- className="w-16 h-16 sm:w-20 sm:h-20 mx-auto text-neutral-400"
+ className="w-16 h-16 sm:w-20 sm:h-20 mx-auto text-v2-text-tertiary"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -327,21 +327,21 @@ export function FileUploadStep({
             </div>
 
             <div className="space-y-2">
- <p className="text-lg sm:text-xl font-semibold text-neutral-700">
+ <p className="text-lg sm:text-xl font-semibold text-v2-text-secondary">
                 {isDragOver ? (
- <span className="text-primary-600">
+ <span className="text-v2-gold-primary">
                     {t("dropHere")}
                   </span>
                 ) : (
                   <>
                     {t("dragAndDrop")}{" "}
- <span className="text-primary-600 hover:text-primary-700">
+ <span className="text-v2-gold-primary hover:text-primary-700">
                       {t("browse")}
                     </span>
                   </>
                 )}
               </p>
- <p className="text-xs sm:text-sm text-neutral-500">
+ <p className="text-xs sm:text-sm text-v2-text-tertiary">
                 {t("maxSize")}
               </p>
             </div>
@@ -359,7 +359,7 @@ export function FileUploadStep({
  <p className="text-base sm:text-lg font-semibold text-success-700">
                 {selectedFile.name}
               </p>
- <p className="text-sm text-neutral-600">
+ <p className="text-sm text-v2-text-secondary">
                 {formatFileSize(selectedFile.size)}
               </p>
             </div>

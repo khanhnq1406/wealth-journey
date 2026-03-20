@@ -75,7 +75,7 @@ const CircularProgress = memo(function CircularProgress({
       <svg width={size} height={size} className="transform -rotate-90">
         {/* Background circle */}
         <circle
-          stroke="#e5e7eb"
+          stroke="rgba(255,255,255,0.15)"
           fill="transparent"
           strokeWidth={strokeWidth}
           r={normalizedRadius}
@@ -135,7 +135,7 @@ const AnimatedProgressBar = memo(function AnimatedProgressBar({
     <div className="w-full">
       {label && (
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-neutral-700">{label}</span>
+          <span className="text-sm font-medium text-v2-text-secondary">{label}</span>
           <span
             className={`text-sm font-bold ${progress > 100 ? "text-red-600" : progress > 80 ? "text-amber-600" : "text-v2-green-positive"}`}
           >
@@ -144,7 +144,7 @@ const AnimatedProgressBar = memo(function AnimatedProgressBar({
         </div>
       )}
       <div
-        className="w-full bg-neutral-200 rounded-full overflow-hidden"
+        className="w-full bg-v2-bg-dark rounded-full overflow-hidden"
         style={{ height: `${height}px` }}
       >
         <motion.div
@@ -219,12 +219,12 @@ export const BudgetProgressCard = memo(function BudgetProgressCard({
       >
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <div className="text-sm font-medium text-neutral-700 mb-1">
+            <div className="text-sm font-medium text-v2-text-secondary mb-1">
               {periodName}
             </div>
             <AnimatedProgressBar progress={percentage} height={8} />
             <div className="flex justify-between mt-2 text-xs">
-              <span className="text-neutral-600">
+              <span className="text-v2-text-tertiary">
                 {t("card.spent")}: {formatCurrency(totalSpent, currency)}
               </span>
               <span className={statusColor}>
@@ -249,9 +249,9 @@ export const BudgetProgressCard = memo(function BudgetProgressCard({
         </div>
 
         {daysRemaining !== undefined && (
-          <div className="mt-3 pt-2 border-t border-neutral-100">
+          <div className="mt-3 pt-2 border-t border-v2-border-light">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-neutral-500">{t("card.timeRemaining")}</span>
+              <span className="text-xs text-v2-text-tertiary">{t("card.timeRemaining")}</span>
               <span
                 className={`text-xs font-semibold px-2 py-1 rounded-full ${statusBg} ${statusColor}`}
               >
@@ -281,7 +281,7 @@ export const BudgetProgressCard = memo(function BudgetProgressCard({
               <div className={`text-2xl sm:text-3xl font-bold ${statusColor}`}>
                 {animatedPercentage.toFixed(0)}%
               </div>
-              <div className="text-xs text-neutral-500 mt-1">
+              <div className="text-xs text-v2-text-tertiary mt-1">
                 {isOverBudget ? t("card.overBudget") : t("card.spent")}
               </div>
             </div>
@@ -292,9 +292,9 @@ export const BudgetProgressCard = memo(function BudgetProgressCard({
         <div className="flex-1 space-y-3">
           {/* Header */}
           <div>
-            <h3 className="text-lg font-bold text-neutral-900">{periodName}</h3>
+            <h3 className="text-lg font-bold text-white">{periodName}</h3>
             {itemCount !== undefined && itemCount > 0 && (
-              <p className="text-sm text-neutral-600 mt-1">
+              <p className="text-sm text-v2-text-tertiary mt-1">
                 {t("card.categories", { count: itemCount })}
               </p>
             )}
@@ -310,19 +310,19 @@ export const BudgetProgressCard = memo(function BudgetProgressCard({
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 py-2">
             <div>
-              <div className="text-xs text-neutral-500 mb-1">{t("title")}</div>
-              <div className="text-sm font-semibold text-neutral-900">
+              <div className="text-xs text-v2-text-tertiary mb-1">{t("title")}</div>
+              <div className="text-sm font-semibold text-white">
                 {formatCurrency(totalBudget, currency)}
               </div>
             </div>
             <div>
-              <div className="text-xs text-neutral-500 mb-1">{t("card.spent")}</div>
-              <div className="text-sm font-semibold text-neutral-900">
+              <div className="text-xs text-v2-text-tertiary mb-1">{t("card.spent")}</div>
+              <div className="text-sm font-semibold text-white">
                 {formatCurrency(totalSpent, currency)}
               </div>
             </div>
             <div>
-              <div className="text-xs text-neutral-500 mb-1">{t("card.remaining")}</div>
+              <div className="text-xs text-v2-text-tertiary mb-1">{t("card.remaining")}</div>
               <div className={`text-sm font-bold ${statusColor}`}>
                 {isOverBudget ? "-" : ""}
                 {formatCurrency(Math.abs(remaining), currency)}
@@ -332,8 +332,8 @@ export const BudgetProgressCard = memo(function BudgetProgressCard({
 
           {/* Days Remaining Badge */}
           {daysRemaining !== undefined && (
-            <div className="flex items-center justify-between pt-2 border-t border-neutral-100">
-              <span className="text-sm text-neutral-600">{t("card.daysRemaining")}</span>
+            <div className="flex items-center justify-between pt-2 border-t border-v2-border-light">
+              <span className="text-sm text-v2-text-tertiary">{t("card.daysRemaining")}</span>
               <span
                 className={`px-3 py-1 rounded-full text-sm font-semibold ${statusBg} ${statusColor}`}
               >

@@ -44,7 +44,7 @@ function CircularProgress({
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="transform -rotate-90">
         <circle
-          stroke="rgb(229 231 235)"
+          stroke="rgba(255,255,255,0.15)"
           fill="transparent"
           strokeWidth={strokeWidth}
           r={radius}
@@ -75,7 +75,7 @@ function CircularProgress({
         <div className={`text-3xl font-bold ${statusColor} leading-none`}>
           {Math.round(Math.min(percentage, 100))}
         </div>
-        <div className="text-xs text-gray-500 mt-0.5">%</div>
+        <div className="text-xs text-v2-text-tertiary mt-0.5">%</div>
       </div>
     </div>
   );
@@ -100,12 +100,12 @@ function StatCard({
   return (
     <div
       className={`flex-1 px-3 py-2.5 rounded-xl border ring-1 ${
-        highlight ? statusBorder : "border-gray-200 bg-gray-50 ring-transparent"
+        highlight ? statusBorder : "border-v2-border-light bg-v2-bg-dark ring-transparent"
       } transition-all duration-200`}
     >
-      <div className="text-xs text-gray-500 mb-1">{label}</div>
+      <div className="text-xs text-v2-text-tertiary mb-1">{label}</div>
       <div
-        className={`text-sm font-semibold truncate ${highlight ? statusColor : "text-gray-900"}`}
+        className={`text-sm font-semibold truncate ${highlight ? statusColor : "text-white"}`}
         title={value}
       >
         {value}
@@ -223,9 +223,9 @@ export function BudgetCard({
       >
         <BaseCard className="overflow-hidden h-full flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4 border-b border-gray-100">
+          <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4 border-b border-v2-border-light">
             <div className="flex-1 min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
+              <h3 className="text-base sm:text-lg font-semibold text-white truncate">
                 {budget.name}
               </h3>
               <div className="flex items-center gap-2 mt-1">
@@ -247,14 +247,14 @@ export function BudgetCard({
                 type={ButtonType.IMG}
                 src={`${resources}/editing.svg`}
                 onClick={() => onEditBudget(budget)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-v2-bg-surface-tint rounded-lg transition-colors"
               />
               <Button
                 type={ButtonType.IMG}
                 src={`${resources}/remove.svg`}
                 onClick={handleDeleteBudget}
                 disabled={deleteBudgetMutation.isPending}
-                className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                className="p-2 hover:bg-v2-bg-surface-tint rounded-lg transition-colors"
               />
             </div>
           </div>
@@ -296,14 +296,14 @@ export function BudgetCard({
             {/* Progress Bar */}
             <div className="mt-4 sm:mt-5">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-medium text-gray-700">
+                <span className="text-xs font-medium text-v2-text-secondary">
                   {t("card.budgetUsage")}
                 </span>
                 <span className={`text-xs font-bold ${statusColor}`}>
                   {percentage.toFixed(1)}%
                 </span>
               </div>
-              <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-v2-bg-dark rounded-full h-2 overflow-hidden">
                 <motion.div
                   className={`h-full rounded-full ${progressColor}`}
                   initial={{ width: 0 }}
@@ -314,16 +314,16 @@ export function BudgetCard({
             </div>
 
             {/* Budget Items Section */}
-            <div className="mt-4 sm:mt-5 pt-4 border-t border-gray-100 flex-1 flex flex-col min-h-0">
+            <div className="mt-4 sm:mt-5 pt-4 border-t border-v2-border-light flex-1 flex flex-col min-h-0">
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="w-full flex items-center justify-between py-2.5 px-3  rounded-lg hover:bg-gray-50 transition-colors group"
+                className="w-full flex items-center justify-between py-2.5 px-3  rounded-lg hover:bg-v2-bg-surface-tint transition-colors group"
               >
                 <div className="flex items-center gap-2">
-                  <h4 className="text-sm font-medium text-gray-700">
+                  <h4 className="text-sm font-medium text-v2-text-secondary">
                     Budget Items
                   </h4>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-v2-text-tertiary">
                     {budgetItems.length > 0 && (
                       <>
                         {budgetItems.filter((i) => i.checked).length}/
@@ -347,7 +347,7 @@ export function BudgetCard({
                     transition={{ duration: 0.2 }}
                   >
                     <svg
-                      className="w-4 h-4 text-gray-400"
+                      className="w-4 h-4 text-v2-text-tertiary"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -367,11 +367,11 @@ export function BudgetCard({
               {isExpanded && (
                 <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 transition-opacity duration-200 opacity-100">
                   {getBudgetItems.isLoading ? (
-                    <div className="text-center py-8 text-sm text-gray-500">
+                    <div className="text-center py-8 text-sm text-v2-text-tertiary">
                       Loading items...
                     </div>
                   ) : budgetItems.length === 0 ? (
-                    <div className="text-center py-8 text-sm text-gray-500">
+                    <div className="text-center py-8 text-sm text-v2-text-tertiary">
                       {t("noBudgetsYet")}
                     </div>
                   ) : (
@@ -403,7 +403,7 @@ export function BudgetCard({
           message={
             <div className="flex flex-col gap-1.5">
               <p>{`${tModals("confirmation.areYouSure")} "${budget.name}"?`}</p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-v2-text-tertiary">
                 {tModals("confirmation.thisActionCannotBeUndone")}
               </p>
             </div>

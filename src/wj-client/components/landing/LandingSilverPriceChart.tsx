@@ -26,7 +26,7 @@ export function LandingSilverPriceChart() {
           symbol="TVC:SILVER"
           height={500}
           locale={locale}
-          theme="light"
+          theme="dark"
           allowSymbolChange={false}
         />
       </div>

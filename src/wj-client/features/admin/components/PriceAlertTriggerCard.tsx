@@ -64,8 +64,8 @@ export function PriceAlertTriggerCard() {
             <div
               className={`mt-2 rounded-md px-3 py-1.5 text-sm font-vietnam ${
                 result.type === "success"
-                  ? "bg-green-50 text-green-700 border border-green-200"
-                  : "bg-red-50 text-red-700 border border-red-200"
+                  ? "bg-v2-bg-dark text-v2-green-positive border border-v2-green-positive/30"
+                  : "bg-v2-bg-dark text-v2-red-negative border border-v2-red-negative/30"
               }`}
             >
               {result.message}

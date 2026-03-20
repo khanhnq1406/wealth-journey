@@ -66,7 +66,7 @@ export function PullToRefreshIndicator({
     >
       <div className="relative">
         {/* Main circle container */}
- <div className="relative w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center">
+ <div className="relative w-12 h-12 bg-v2-maroon-800 rounded-full shadow-lg flex items-center justify-center">
           {/* Center content */}
           <div className="relative flex items-center justify-center">
             {isRefreshing ? (
@@ -110,7 +110,7 @@ export function PullToRefreshIndicator({
         {/* Status text */}
         {!showSuccess && (
           <div className="absolute top-14 left-1/2 -translate-x-1/2 whitespace-nowrap">
- <p className="text-xs font-medium text-neutral-600 bg-white px-3 py-1 rounded-full shadow-sm">
+ <p className="text-xs font-medium text-neutral-600 bg-v2-maroon-800 px-3 py-1 rounded-full shadow-sm">
               {isRefreshing
                 ? t("updating")
                 : progress >= 100

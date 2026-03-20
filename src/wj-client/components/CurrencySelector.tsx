@@ -110,8 +110,8 @@ export function CurrencySelector() {
           }}
           className={cn(
             "flex items-center gap-2 rounded-lg transition-all duration-200",
- "bg-white",
- "border border-neutral-200",
+ "bg-v2-maroon-800",
+ "border border-v2-maroon-600",
  "shadow-sm",
             // Mobile-first: touch-friendly padding
             "px-3 py-3 min-h-[44px]",
@@ -119,7 +119,7 @@ export function CurrencySelector() {
             "sm:py-2 sm:min-h-[40px]",
             isDisabled
               ? "opacity-60 cursor-not-allowed"
- : "hover:bg-neutral-50 cursor-pointer hover:shadow-md active:scale-95"
+ : "hover:bg-v2-maroon-700 cursor-pointer hover:shadow-md active:scale-95"
           )}
           style={{
             touchAction: "manipulation",
@@ -187,9 +187,9 @@ export function CurrencySelector() {
             ref={dropdownRef}
             className={cn(
               "absolute right-0 sm:top-auto sm:bottom-full sm:mt-0 sm:mb-2",
- "bg-white",
+ "bg-v2-maroon-900",
  "rounded-lg shadow-lg",
- "border border-neutral-200",
+ "border border-v2-maroon-600",
               "py-2 hidden group-hover:block min-w-[200px]"
             )}
             style={{ zIndex: ZIndex.dropdown }}

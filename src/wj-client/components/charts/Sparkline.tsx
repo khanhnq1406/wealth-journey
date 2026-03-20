@@ -83,10 +83,10 @@ export const Sparkline = memo(function Sparkline({
   const trendColor =
     color ??
     (() => {
-      if (data.length < 2) return "#10b981"; // Default green
+      if (data.length < 2) return "#D78B1C"; // Default gold
       const first = parseAmount(data[0].value);
       const last = parseAmount(data[data.length - 1].value);
-      return last >= first ? "#10b981" : "#ef4444"; // Green if up, red if down
+      return last >= first ? "#D78B1C" : "#9B0111"; // Gold if up, red if down
     })();
 
   if (!data || data.length <= 1) {

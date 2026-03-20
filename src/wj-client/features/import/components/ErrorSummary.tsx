@@ -162,7 +162,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
 
       {/* Expanded Content */}
       {isExpanded && (
- <div className="bg-white border-t border-neutral-200">
+ <div className="bg-v2-maroon-800 border-t border-neutral-200">
           {/* Severity Filter */}
  <div className="px-4 py-3 bg-neutral-50 border-b border-neutral-200">
             <div className="flex flex-wrap gap-2">
@@ -172,7 +172,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                   "px-3 py-1.5 rounded-md text-sm font-medium transition-colors min-h-[44px] sm:min-h-[36px]",
                   severityFilter === "all"
  ? "bg-primary-600 text-white"
- : "bg-white text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
+ : "bg-v2-maroon-800 text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
                 )}
               >
                 {t("filterAll", { count: allErrors.length })}
@@ -184,7 +184,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                     "px-3 py-1.5 rounded-md text-sm font-medium transition-colors min-h-[44px] sm:min-h-[36px]",
                     severityFilter === "error"
  ? "bg-red-600 text-white"
- : "bg-white text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
+ : "bg-v2-maroon-800 text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
                   )}
                 >
                   {t("filterErrors", { count: errorCount })}
@@ -197,7 +197,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                     "px-3 py-1.5 rounded-md text-sm font-medium transition-colors min-h-[44px] sm:min-h-[36px]",
                     severityFilter === "warning"
  ? "bg-yellow-600 text-white"
- : "bg-white text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
+ : "bg-v2-maroon-800 text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
                   )}
                 >
                   {t("filterWarnings", { count: warningCount })}
@@ -210,7 +210,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                     "px-3 py-1.5 rounded-md text-sm font-medium transition-colors min-h-[44px] sm:min-h-[36px]",
                     severityFilter === "info"
  ? "bg-blue-600 text-white"
- : "bg-white text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
+ : "bg-v2-maroon-800 text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
                   )}
                 >
                   {t("filterInfo", { count: infoCount })}
