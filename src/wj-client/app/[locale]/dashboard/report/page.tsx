@@ -33,11 +33,7 @@ import { AccountBalance } from "./AccountBalance";
 import { Dominance } from "./Dominance";
 import { MonthlyDominance } from "./MonthlyDominance";
 import { exportFinancialReportToCSV } from "@/utils/csv-export";
-import {
-  exportReportToPDF,
-  exportReportToExcel,
-  type ReportExportData,
-} from "@/features/report/utils/export";
+import type { ReportExportData } from "@/features/report/utils/export";
 import { prepareReportExportData } from "./export-utils";
 import { PeriodSelector, PeriodType, DateRange } from "./PeriodSelector";
 import { SummaryCards, FinancialSummaryData } from "./SummaryCards";
@@ -383,8 +379,11 @@ export function ReportContent() {
               exportFinancialReportToCSV(reportData, reportYear, currency);
             }
             break;
-          case "pdf":
-            // Export to PDF using prepared data
+          case "pdf": {
+            // Dynamic import to avoid SSR bundling of jspdf/fflate
+            const { exportReportToPDF } = await import(
+              "@/features/report/utils/export/report-pdf-export"
+            );
             await exportReportToPDF(exportData, {
               period: selectedPeriod,
               startDate: dateRange.start,
@@ -393,8 +392,12 @@ export function ReportContent() {
               customFileName: options.fileName,
             });
             break;
-          case "excel":
-            // Export to Excel using prepared data
+          }
+          case "excel": {
+            // Dynamic import to avoid SSR bundling of exceljs
+            const { exportReportToExcel } = await import(
+              "@/features/report/utils/export/report-excel-export"
+            );
             await exportReportToExcel(exportData, {
               period: selectedPeriod,
               startDate: dateRange.start,
@@ -402,6 +405,7 @@ export function ReportContent() {
               customFileName: options.fileName,
             });
             break;
+          }
         }
       } catch (error) {
         console.error("Export error:", error);

@@ -1,5 +1,5 @@
 // MSW handlers for API testing
-import { rest } from "msw";
+import { http, HttpResponse } from "msw";
 import { Transaction } from "@/gen/protobuf/v1/transaction";
 
 const mockTransactions: Transaction[] = [
@@ -49,8 +49,8 @@ const mockTransactions: Transaction[] = [
 
 export const handlers = [
   // List transactions endpoint
-  rest.get("/api/v1/transactions", (req, res, ctx) => {
-    const url = new URL(req.url);
+  http.get("/api/v1/transactions", ({ request }) => {
+    const url = new URL(request.url);
     const filterParam = url.searchParams.get("filter");
 
     let filteredTransactions = [...mockTransactions];
@@ -74,65 +74,56 @@ export const handlers = [
       }
     }
 
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
-        message: "Transactions retrieved successfully",
-        transactions: filteredTransactions,
-        pagination: {
-          page: 1,
-          pageSize: 10000,
-          totalCount: filteredTransactions.length,
-          totalPages: 1,
-        },
-        timestamp: new Date().toISOString(),
-      })
-    );
+    return HttpResponse.json({
+      success: true,
+      message: "Transactions retrieved successfully",
+      transactions: filteredTransactions,
+      pagination: {
+        page: 1,
+        pageSize: 10000,
+        totalCount: filteredTransactions.length,
+        totalPages: 1,
+      },
+      timestamp: new Date().toISOString(),
+    });
   }),
 
   // List categories endpoint
-  rest.get("/api/v1/categories", (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
-        message: "Categories retrieved successfully",
-        categories: [
-          { id: 1, userId: 1, name: "Food", type: 2, createdAt: Date.now() / 1000, updatedAt: Date.now() / 1000 },
-          { id: 2, userId: 1, name: "Salary", type: 1, createdAt: Date.now() / 1000, updatedAt: Date.now() / 1000 },
-          { id: 3, userId: 1, name: "Transport", type: 2, createdAt: Date.now() / 1000, updatedAt: Date.now() / 1000 },
-        ],
-        pagination: {
-          page: 1,
-          pageSize: 100,
-          totalCount: 3,
-          totalPages: 1,
-        },
-        timestamp: new Date().toISOString(),
-      })
-    );
+  http.get("/api/v1/categories", () => {
+    return HttpResponse.json({
+      success: true,
+      message: "Categories retrieved successfully",
+      categories: [
+        { id: 1, userId: 1, name: "Food", type: 2, createdAt: Date.now() / 1000, updatedAt: Date.now() / 1000 },
+        { id: 2, userId: 1, name: "Salary", type: 1, createdAt: Date.now() / 1000, updatedAt: Date.now() / 1000 },
+        { id: 3, userId: 1, name: "Transport", type: 2, createdAt: Date.now() / 1000, updatedAt: Date.now() / 1000 },
+      ],
+      pagination: {
+        page: 1,
+        pageSize: 100,
+        totalCount: 3,
+        totalPages: 1,
+      },
+      timestamp: new Date().toISOString(),
+    });
   }),
 
   // List wallets endpoint
-  rest.get("/api/v1/wallets", (req, res, ctx) => {
-    return res(
-      ctx.status(200),
-      ctx.json({
-        success: true,
-        message: "Wallets retrieved successfully",
-        wallets: [
-          { id: 1, userId: 1, walletName: "Cash", balance: 1000000, currency: "VND", type: 0, createdAt: Date.now() / 1000, updatedAt: Date.now() / 1000 },
-          { id: 2, userId: 1, walletName: "Bank Account", balance: 5000000, currency: "VND", type: 0, createdAt: Date.now() / 1000, updatedAt: Date.now() / 1000 },
-        ],
-        pagination: {
-          page: 1,
-          pageSize: 100,
-          totalCount: 2,
-          totalPages: 1,
-        },
-        timestamp: new Date().toISOString(),
-      })
-    );
+  http.get("/api/v1/wallets", () => {
+    return HttpResponse.json({
+      success: true,
+      message: "Wallets retrieved successfully",
+      wallets: [
+        { id: 1, userId: 1, walletName: "Cash", balance: 1000000, currency: "VND", type: 0, createdAt: Date.now() / 1000, updatedAt: Date.now() / 1000 },
+        { id: 2, userId: 1, walletName: "Bank Account", balance: 5000000, currency: "VND", type: 0, createdAt: Date.now() / 1000, updatedAt: Date.now() / 1000 },
+      ],
+      pagination: {
+        page: 1,
+        pageSize: 100,
+        totalCount: 2,
+        totalPages: 1,
+      },
+      timestamp: new Date().toISOString(),
+    });
   }),
 ];

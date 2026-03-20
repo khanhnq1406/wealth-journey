@@ -5,7 +5,7 @@
  * Transforms the page state into the format expected by the export utilities.
  */
 
-import {
+import type {
   ReportExportData,
   SummaryData,
   TrendData,

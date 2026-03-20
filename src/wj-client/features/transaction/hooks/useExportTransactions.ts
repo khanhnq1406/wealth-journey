@@ -9,17 +9,7 @@ import {
   downloadCSV,
   type TransactionExportData,
 } from "@/features/report/utils/export/transaction-export";
-import {
-  generateTransactionPDF,
-  generateExportFilename as generatePDFFilename,
-  downloadPDF,
-  type PDFExportOptions,
-} from "@/features/report/utils/export/pdf-export";
-import {
-  generateTransactionExcel,
-  generateExportFilename as generateExcelFilename,
-  downloadExcel,
-} from "@/features/report/utils/export/excel-export";
+import type { PDFExportOptions } from "@/features/report/utils/export/pdf-export";
 
 // API configuration
 const API_BASE_URL =
@@ -239,6 +229,13 @@ export function useExportTransactions(options?: UseExportTransactionsOptions) {
           }
 
           case "pdf": {
+            // Dynamic import to avoid SSR bundling of jspdf/fflate
+            const {
+              generateTransactionPDF,
+              generateExportFilename: generatePDFFilename,
+              downloadPDF,
+            } = await import("@/features/report/utils/export/pdf-export");
+
             // Capture chart if requested
             let chartImage: string | undefined;
             if (exportOptions.includeCharts) {
@@ -264,6 +261,13 @@ export function useExportTransactions(options?: UseExportTransactionsOptions) {
           }
 
           case "excel": {
+            // Dynamic import to avoid SSR bundling of exceljs
+            const {
+              generateTransactionExcel,
+              generateExportFilename: generateExcelFilename,
+              downloadExcel,
+            } = await import("@/features/report/utils/export/excel-export");
+
             const workbook = await generateTransactionExcel(exportData);
             const fileName = generateExcelFilename(
               "transactions",
