@@ -7,16 +7,16 @@
 - **Spec file:** docs/specs/2026-03-20-modal-swipe-scroll-fix-spec.md
 - **Started:** 2026-03-20
 - **Last updated:** 2026-03-20
-- **Current state:** in_progress
-- **Current task:** 3
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | # | Task Name | Status | Commit | Summary |
 |---|-----------|--------|--------|---------|
-| 1 | Fix BaseModal swipe-to-close to drag handle only | done | see below | Moved touch handlers from modalContentRef to drag handle div, simplified touch start/move logic |
-| 2 | Fix BottomSheet swipe-to-close to drag handle only | done | see below | Moved touch handlers from sheetRef to drag handle div |
-| 3 | Run all tests and verify no regressions | in_progress | — | — |
+| 1 | Fix BaseModal swipe-to-close to drag handle only | done | 044001b | Moved touch handlers from modalContentRef to drag handle div, simplified touch start/move logic |
+| 2 | Fix BottomSheet swipe-to-close to drag handle only | done | 044001b | Moved touch handlers from sheetRef to drag handle div |
+| 3 | Run all tests and verify no regressions | done | — | 23/23 test suites pass, 258 tests pass, 0 lint errors |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
