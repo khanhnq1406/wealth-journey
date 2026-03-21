@@ -131,6 +131,8 @@ export default {
           "maroon-900": "#3D0101", // Input/dropdown background
           // Cream
           "cream-100": "#FFF8EC", // Body text alternative
+          "cream-200": "#F5E6C8", // Warm parchment (price table rows)
+          "cream-300": "#EDD9B5", // Slightly darker cream (alternating rows)
           // Backgrounds
           "bg-primary": "#5F0202", // Deep maroon (page backgrounds)
           "bg-surface": "#580202", // Slightly lighter maroon (card/surface)

@@ -66,11 +66,12 @@ function ChangeCell({
 const columnHelper = createColumnHelper<PriceItem>();
 
 const TAB_TYPE_COLOR: Record<Tab, string> = {
-  gold: "text-v2-gold-primary",
-  silver: "text-v2-silver-primary",
-  currency: "text-v2-currency-primary",
+  gold: "text-v2-maroon-900",
+  silver: "text-v2-maroon-900",
+  currency: "text-v2-maroon-900",
   symbol: "text-white",
 };
+
 
 function buildTanstackColumns(
   t: (key: string) => string,
@@ -86,10 +87,10 @@ function buildTanstackColumns(
       header: t("table.type"),
       cell: ({ row }) => (
         <div className="flex items-center">
-          <span className={`font-medium ${typeColor}`}>
+          <span className={`font-bold ${typeColor}`}>
             {row.original.name || row.original.typeCode}
           </span>
-          <span className="ml-1.5 text-xs text-v2-text-tertiary">
+          <span className="ml-1.5 text-xs text-v2-maroon-800/60">
             {row.original.currency}
           </span>
           <OverrideIndicator
@@ -103,12 +104,12 @@ function buildTanstackColumns(
     columnHelper.accessor("buy", {
       header: () => (
         <div>
-          <span className="text-base font-bold">{t("table.buy")}</span>
-          {showUnitLabel && <div className="font-normal text-[10px] text-v2-text-tertiary">{t("table.buyUnit")}</div>}
+          <span className="text-base font-black uppercase tracking-[1px]">{t("table.buy")}</span>
+          {showUnitLabel && <div className="font-normal text-[10px] opacity-70">{t("table.buyUnit")}</div>}
         </div>
       ),
       cell: ({ row }) => (
-        <span className="font-medium text-v2-red-negative">
+        <span className="font-bold text-red-700 tabular-nums">
           {formatPriceValue(row.original.buy, row.original.currency, { divide: divideValues })}
         </span>
       ),
@@ -116,12 +117,12 @@ function buildTanstackColumns(
     columnHelper.accessor("sell", {
       header: () => (
         <div>
-          <span className="text-base font-bold">{t("table.sell")}</span>
-          {showUnitLabel && <div className="font-normal text-[10px] text-v2-text-tertiary">{t("table.sellUnit")}</div>}
+          <span className="text-base font-black uppercase tracking-[1px]">{t("table.sell")}</span>
+          {showUnitLabel && <div className="font-normal text-[10px] opacity-70">{t("table.sellUnit")}</div>}
         </div>
       ),
       cell: ({ row }) => (
-        <span className="font-medium text-v2-green-positive">
+        <span className="font-bold text-green-700 tabular-nums">
           {formatPriceValue(row.original.sell, row.original.currency, { divide: divideValues })}
         </span>
       ),
@@ -169,10 +170,10 @@ function buildMobileColumns(
       header: t("table.type"),
       cell: ({ row }) => (
         <div className="flex items-center">
-          <span className={`font-medium ${typeColor}`}>
+          <span className={`font-bold ${typeColor}`}>
             {row.name || row.typeCode}
           </span>
-          <span className="ml-1.5 text-xs text-v2-text-tertiary">{row.currency}</span>
+          <span className="ml-1.5 text-xs text-v2-maroon-800/60">{row.currency}</span>
           <OverrideIndicator item={row} category={tab} isAdmin={isAdmin} />
         </div>
       ),
@@ -181,12 +182,12 @@ function buildMobileColumns(
       id: "buy",
       header: (
         <div>
-          <span className="text-base">{t("table.buy")}</span>
-          {showUnitLabel && <span className="text-[10px] text-v2-text-tertiary ml-1">{t("table.buyUnit")}</span>}
+          <span className="text-base font-bold">{t("table.buy")}</span>
+          {showUnitLabel && <span className="text-[10px] text-v2-maroon-800/60 ml-1">{t("table.buyUnit")}</span>}
         </div>
       ),
       cell: ({ row }) => (
-        <span className="font-medium text-v2-red-negative">
+        <span className="font-bold text-red-700 tabular-nums">
           {formatPriceValue(row.buy, row.currency, { divide: divideValues })}
         </span>
       ),
@@ -195,12 +196,12 @@ function buildMobileColumns(
       id: "sell",
       header: (
         <div>
-          <span className="text-base">{t("table.sell")}</span>
-          {showUnitLabel && <span className="text-[10px] text-v2-text-tertiary ml-1">{t("table.sellUnit")}</span>}
+          <span className="text-base font-bold">{t("table.sell")}</span>
+          {showUnitLabel && <span className="text-[10px] text-v2-maroon-800/60 ml-1">{t("table.sellUnit")}</span>}
         </div>
       ),
       cell: ({ row }) => (
-        <span className="font-medium text-v2-green-positive">
+        <span className="font-bold text-green-700 tabular-nums">
           {formatPriceValue(row.sell, row.currency, { divide: divideValues })}
         </span>
       ),
@@ -434,7 +435,7 @@ export default function PricesPage() {
                   {t("gold.failedToLoad")}
                 </p>
               )}
-              {/* Desktop: TanStack Table */}
+              {/* Desktop: TanStack Table with cream parchment style */}
               <div className="hidden md:block">
                 <TanStackTable<PriceItem>
                   data={data?.gold ?? []}
@@ -444,6 +445,7 @@ export default function PricesPage() {
                   emptyMessage={t("gold.emptyMessage")}
                   emptyDescription={t("gold.emptyDescription")}
                   enableMobileExpansion={false}
+                  className="price-table-override"
                 />
               </div>
               {/* Mobile: card-based list */}
@@ -473,7 +475,7 @@ export default function PricesPage() {
                   {t("silver.failedToLoad")}
                 </p>
               )}
-              {/* Desktop: TanStack Table */}
+              {/* Desktop: TanStack Table with cream parchment style */}
               <div className="hidden md:block">
                 <TanStackTable<PriceItem>
                   data={data?.silver ?? []}
@@ -483,6 +485,7 @@ export default function PricesPage() {
                   emptyMessage={t("silver.emptyMessage")}
                   emptyDescription={t("silver.emptyDescription")}
                   enableMobileExpansion={false}
+                  className="price-table-override price-table-silver"
                 />
               </div>
               {/* Mobile: card-based list */}
@@ -512,7 +515,7 @@ export default function PricesPage() {
                   {t("currency.failedToLoad")}
                 </p>
               )}
-              {/* Desktop: TanStack Table */}
+              {/* Desktop: TanStack Table with cream parchment style */}
               <div className="hidden md:block">
                 <TanStackTable<PriceItem>
                   data={data?.currency ?? []}
@@ -522,6 +525,7 @@ export default function PricesPage() {
                   emptyMessage={t("currency.emptyMessage")}
                   emptyDescription={t("currency.emptyDescription")}
                   enableMobileExpansion={false}
+                  className="price-table-override price-table-currency"
                 />
               </div>
               {/* Mobile: card-based list */}
