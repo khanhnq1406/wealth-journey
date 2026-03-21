@@ -64,23 +64,23 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
         className={cn(
           "w-full flex items-start gap-3 px-4 py-3 text-left transition-colors",
           notification.isRead
-            ? "hover:bg-v2-bg-primary"
-            : "bg-amber-50 hover:bg-amber-100"
+            ? "hover:bg-v2-maroon-900"
+            : "bg-v2-maroon-900/80 hover:bg-v2-maroon-900"
         )}
       >
         <div className="relative flex-shrink-0">
           <div className={cn(
             "w-8 h-8 rounded-full flex items-center justify-center text-sm",
-            isGold ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-700"
+            isGold ? "bg-v2-gold-primary/20 text-v2-gold-accent" : "bg-v2-cream-100/15 text-v2-cream-100"
           )}>
             {topMover?.direction === "up" ? "↑" : "↓"}
           </div>
           {!notification.isRead && (
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-bg rounded-full" />
+            <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-v2-gold-primary rounded-full ring-2 ring-v2-maroon-800" />
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-roboto text-sm text-v2-text-primary leading-snug font-medium">
+          <p className="font-roboto text-sm text-v2-gold-accent leading-snug font-medium">
             {title}
           </p>
           {body ? (
@@ -91,7 +91,7 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
             <p className="mt-0.5 font-roboto text-xs leading-snug">
               <span className="text-v2-text-secondary">{topMover.name}</span>
               {" "}
-              <span className={topMover.direction === "up" ? "text-green-600" : "text-red-600"}>
+              <span className={topMover.direction === "up" ? "text-v2-green-positive" : "text-v2-red-negative"}>
                 {topMover.direction === "up" ? "↑" : "↓"} {topMover.changePct.toFixed(1)}%
               </span>
             </p>
@@ -112,20 +112,20 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
         className={cn(
           "w-full flex items-start gap-3 px-4 py-3 text-left transition-colors",
           notification.isRead
-            ? "hover:bg-v2-bg-primary"
-            : "bg-blue-50 hover:bg-blue-100"
+            ? "hover:bg-v2-maroon-900"
+            : "bg-v2-maroon-900/80 hover:bg-v2-maroon-900"
         )}
       >
         <div className="relative flex-shrink-0">
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm bg-blue-100 text-blue-700">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm bg-v2-red-primary/20 text-v2-red-negative">
             !
           </div>
           {!notification.isRead && (
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-bg rounded-full" />
+            <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-v2-gold-primary rounded-full ring-2 ring-v2-maroon-800" />
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-roboto text-sm text-v2-text-primary leading-snug font-medium">
+          <p className="font-roboto text-sm text-v2-gold-accent leading-snug font-medium">
             {meta?.broadcastTitle || "Thông báo từ hệ thống"}
           </p>
           {meta?.message && (
@@ -151,8 +151,8 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
       className={cn(
         "w-full flex items-start gap-3 px-4 py-3 text-left transition-colors",
         notification.isRead
-          ? "hover:bg-v2-bg-primary"
-          : "bg-green-50 hover:bg-green-100"
+          ? "hover:bg-v2-maroon-900"
+          : "bg-v2-maroon-900/80 hover:bg-v2-maroon-900"
       )}
     >
       <div className="relative flex-shrink-0">
@@ -162,7 +162,7 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
           size="sm"
         />
         {!notification.isRead && (
-          <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-bg rounded-full" />
+          <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-v2-gold-primary rounded-full ring-2 ring-v2-maroon-800" />
         )}
       </div>
       <div className="flex-1 min-w-0">
