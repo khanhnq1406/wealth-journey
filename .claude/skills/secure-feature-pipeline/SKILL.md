@@ -70,6 +70,19 @@ Skipping the step file is the same as skipping the spec — it leads to wrong ou
 
 ---
 
+## Context Compaction Guard
+
+**Problem:** Long implementation sessions trigger auto-compaction, which drops skill instructions from context. The orchestrator then stops following the protocol.
+
+**Prevention:** The progress file (created in Step 3) contains a `Skill Recovery` section that lists all skill files to re-read. After compaction, the orchestrator reads the progress file first, which tells it to reload the skill instructions.
+
+**If you notice yourself unsure about the protocol (review stages, checkpoint steps, template paths):**
+1. Read the progress file: `docs/reports/YYYY-MM-DD-<feature>-progress.md`
+2. Follow its `Skill Recovery` section — re-read all listed skill files
+3. Cite the three-stage review order and checkpoint protocol before continuing
+
+**This is NOT optional.** Proceeding without the full protocol leads to skipped reviews, missing commits, and security gaps.
+
 ## Red Flags — STOP and Reassess
 
 - Starting work on a step without citing the step file's process and output path (proof of reading)
@@ -106,6 +119,8 @@ Skipping the step file is the same as skipping the spec — it leads to wrong ou
 - Proceeding to the next task without showing the user a summary
 - Not initializing the progress file before starting the first task
 - Leaving the progress file out of task commits
+- Continuing implementation after context compaction without re-reading the skill files (progress file has the list)
+- Being unsure about the three-stage review order or checkpoint protocol but proceeding anyway
 
 ## Prompt Templates
 
