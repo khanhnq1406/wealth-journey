@@ -72,7 +72,7 @@ export function ActiveFilterChips({
       {/* Clear All button */}
       <button
         onClick={onClearAll}
-        className="flex-shrink-0 text-sm font-medium text-red-600 hover:text-red-700 active:text-red-800 transition-colors min-h-[36px] px-2 focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 rounded"
+        className="flex-shrink-0 text-sm font-medium text-v2-red-negative hover:text-v2-red-primary active:text-v2-red-primary transition-colors min-h-[36px] px-2 focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 rounded"
         aria-label={t("clearAll")}
       >
         {t("clearAll")}

@@ -56,13 +56,13 @@ export const TransactionItem = ({
 
   return (
     <>
-    <div className="flex items-center justify-between px-3 py-3 hover:bg-gray-50 rounded-lg transition-colors">
+    <div className="flex items-center justify-between px-3 py-3 hover:bg-v2-maroon-800 rounded-lg transition-colors">
       {/* Left side - Icon and details */}
       <div className="flex items-center gap-3 flex-1">
         {/* Category Icon */}
         <div
           className={`w-10 h-10 rounded-full flex items-center justify-center ${
-            isIncome ? "bg-v2-green-light" : "bg-red-100"
+            isIncome ? "bg-v2-green-light" : "bg-v2-red-primary/20"
           }`}
         >
           <Image
@@ -76,11 +76,11 @@ export const TransactionItem = ({
         {/* Transaction Details */}
         <div className="flex-1 min-w-0">
           {/* Category Name - using note as fallback */}
-          <div className="font-medium text-gray-900 truncate">
+          <div className="font-medium text-v2-gold-accent truncate">
             {transaction.note || tTransaction("defaultLabel")}
           </div>
           {/* Date and Note */}
-          <div className="text-sm text-gray-500 flex items-center gap-2">
+          <div className="text-sm text-v2-text-tertiary flex items-center gap-2">
             <span>{formatDateTime(transaction.date)}</span>
             {transaction.note && (
               <>
@@ -99,7 +99,7 @@ export const TransactionItem = ({
         {/* Amount */}
         <div
           className={`font-semibold text-lg ${
-            isIncome ? "text-v2-green-positive" : "text-red-600"
+            isIncome ? "text-v2-green-positive" : "text-v2-red-negative"
           }`}
         >
           {isIncome ? "+" : "-"}
