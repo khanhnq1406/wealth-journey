@@ -45,12 +45,12 @@ export function WalletsSection({ wallets, isLoading = false }: WalletsSectionPro
     <div className="flex flex-col h-full">
       {/* Section header */}
       <div className="flex items-center justify-between mb-4 shrink-0">
-        <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
+        <h3 className="font-roboto font-semibold text-[16px] text-v2-text-primary">
           {t("wallets")}
         </h3>
         <Link
           href={routes.wallets}
-          className="flex items-center gap-1 font-vietnam font-medium text-[13px] text-v2-red-primary hover:text-v2-red-dark transition-colors"
+          className="flex items-center gap-1 font-roboto font-medium text-[13px] text-v2-red-primary hover:text-v2-red-dark transition-colors"
         >
           {t("seeAll")}
           <ChevronRight size={16} />
@@ -73,11 +73,11 @@ export function WalletsSection({ wallets, isLoading = false }: WalletsSectionPro
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-vietnam font-medium text-[14px] text-v2-text-primary truncate">
+              <p className="font-roboto font-medium text-[14px] text-v2-text-primary truncate">
                 {wallet.walletName}
               </p>
             </div>
-            <p className="font-jetbrains font-semibold text-[14px] text-v2-text-primary shrink-0">
+            <p className="font-roboto font-semibold text-[14px] text-v2-text-primary shrink-0">
               {formatBalance(wallet.balance, wallet.currency)}
             </p>
           </BaseCard>
@@ -88,12 +88,12 @@ export function WalletsSection({ wallets, isLoading = false }: WalletsSectionPro
             {isLoading ? (
               <div className="flex items-center justify-center gap-2">
                 <div className="w-4 h-4 border-2 border-v2-red-primary border-t-transparent rounded-full animate-spin" />
-                <p className="font-vietnam text-[13px] text-v2-text-tertiary">
+                <p className="font-roboto text-[13px] text-v2-text-tertiary">
                   {t("loading")}
                 </p>
               </div>
             ) : (
-              <p className="font-vietnam text-[13px] text-v2-text-tertiary">
+              <p className="font-roboto text-[13px] text-v2-text-tertiary">
                 {t("noData")}
               </p>
             )}

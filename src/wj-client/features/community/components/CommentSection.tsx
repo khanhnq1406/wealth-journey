@@ -72,7 +72,7 @@ export function CommentSection({ postId, currentUser, onCommentAdded, onCommentD
       {/* Comments list */}
       <div className="flex flex-col gap-3 mb-3">
         {isLoading && (
-          <p className="text-xs text-v2-text-tertiary font-vietnam text-center py-2">
+          <p className="text-xs text-v2-text-tertiary font-roboto text-center py-2">
             Loading...
           </p>
         )}
@@ -105,7 +105,7 @@ export function CommentSection({ postId, currentUser, onCommentAdded, onCommentD
         {hasMore && (
           <button
             onClick={() => setPage((p) => p + 1)}
-            className="text-xs font-vietnam font-medium text-v2-red-primary hover:text-v2-red-dark transition-colors py-1"
+            className="text-xs font-roboto font-medium text-v2-red-primary hover:text-v2-red-dark transition-colors py-1"
           >
             Xem thêm bình luận
           </button>
@@ -127,7 +127,7 @@ export function CommentSection({ postId, currentUser, onCommentAdded, onCommentD
             onKeyDown={handleKeyDown}
             placeholder="Viết bình luận..."
             maxLength={500}
-            className="flex-1 bg-transparent font-vietnam text-[13px] text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none"
+            className="flex-1 bg-transparent font-roboto text-[13px] text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none"
           />
           <button
             onClick={handleSubmit}

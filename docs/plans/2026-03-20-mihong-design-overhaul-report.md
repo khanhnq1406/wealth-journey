@@ -247,6 +247,7 @@ Fix issues and re-review. Issue #1 (missing color tokens) is critical — dozens
 | 2026-03-20 | Replaced `bg-white` + `text-gray-*` with maroon/gold theme classes in 5 landing components (`LandingHowItWorks`, `LandingComparison`, `LandingInvestmentFeatures`, `LandingBankImport`, `LandingHero`) | Major | 5 landing component files |
 | 2026-03-20 | Changed `LoadingSpinner` from `text-primary-500` (red) to `text-v2-gold-primary` per FR-9 spec | Minor | `LoadingSpinner.tsx` |
 | 2026-03-20 | Changed auth layout wrapper from `bg-neutral-50` to `bg-v2-maroon-900` | Minor | `app/[locale]/auth/layout.tsx` |
+| 2026-03-21 | Consolidated all fonts to Roboto only — removed `Roboto_Mono` import, deleted `font-vietnam`/`font-jakarta`/`font-jetbrains`/`font-roboto-mono` aliases from Tailwind config, replaced all 53 component file references with `font-roboto`, updated `v2-data-*` CSS classes to use `--font-roboto` | Minor | `tailwind.config.ts`, `layout.tsx`, `globals.css` + 53 component files |
 
 **Build verification:** `next build` passes with zero errors on all 21 routes after fixes.
 **Security review:** APPROVED — all changes are CSS-only class replacements, no security impact.

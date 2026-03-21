@@ -50,12 +50,12 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-between px-4 py-3 border-b border-v2-border-light">
-        <h3 className="font-vietnam font-semibold text-v2-text-primary">Thông báo</h3>
+        <h3 className="font-roboto font-semibold text-v2-text-primary">Thông báo</h3>
         {notifications.some((n) => !n.isRead) && (
           <button
             onClick={markAllRead}
             disabled={isMarkingRead}
-            className="font-vietnam text-xs text-bg hover:underline disabled:opacity-50"
+            className="font-roboto text-xs text-bg hover:underline disabled:opacity-50"
           >
             Đánh dấu tất cả đã đọc
           </button>
@@ -69,7 +69,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
           </div>
         ) : notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 gap-2">
-            <p className="font-vietnam text-sm text-v2-text-tertiary">Chưa có thông báo</p>
+            <p className="font-roboto text-sm text-v2-text-tertiary">Chưa có thông báo</p>
           </div>
         ) : (
           <div className="divide-y divide-v2-border-light">

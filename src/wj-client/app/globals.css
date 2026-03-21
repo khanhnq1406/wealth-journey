@@ -348,10 +348,10 @@ body:has(.landing-scroll-container) {
 .v2-heading-md { font-family: var(--font-roboto); font-weight: 700; letter-spacing: -0.5px; }
 .v2-heading-sm { font-family: var(--font-roboto); font-weight: 500; letter-spacing: -0.3px; }
 .v2-body { font-family: var(--font-roboto); font-weight: 400; }
-.v2-data-bold { font-family: var(--font-roboto-mono); font-weight: 700; letter-spacing: 0.5px; }
-.v2-data-semibold { font-family: var(--font-roboto-mono); font-weight: 600; letter-spacing: 1px; }
-.v2-data-medium { font-family: var(--font-roboto-mono); font-weight: 500; letter-spacing: 0.5px; }
-.v2-data-regular { font-family: var(--font-roboto-mono); font-weight: 400; letter-spacing: 0.5px; }
+.v2-data-bold { font-family: var(--font-roboto); font-weight: 700; letter-spacing: 0.5px; }
+.v2-data-semibold { font-family: var(--font-roboto); font-weight: 600; letter-spacing: 1px; }
+.v2-data-medium { font-family: var(--font-roboto); font-weight: 500; letter-spacing: 0.5px; }
+.v2-data-regular { font-family: var(--font-roboto); font-weight: 400; letter-spacing: 0.5px; }
 
 /* Safe area bottom padding for mobile bottom navigation */
 .pb-safe-bottom {

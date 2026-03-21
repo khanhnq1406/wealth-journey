@@ -59,7 +59,7 @@ export function ReplyBubble({ reply, currentUserId, onDelete }: ReplyBubbleProps
       <div className="flex-1">
         <div className="bg-[#FAF9F7] rounded-2xl px-3 py-2">
           <div className="flex items-start justify-between gap-2">
-            <span className="font-vietnam text-[13px] font-semibold text-v2-text-primary">{authorName}</span>
+            <span className="font-roboto text-[13px] font-semibold text-v2-text-primary">{authorName}</span>
             {isOwnReply && !isEditing && (
               <ReplyMenu
                 onEdit={() => setIsEditing(true)}
@@ -82,7 +82,7 @@ export function ReplyBubble({ reply, currentUserId, onDelete }: ReplyBubbleProps
           )}
         </div>
         <div className="flex items-center gap-2 ml-3 mt-0.5">
-          <span className="font-jetbrains text-[11px] text-v2-text-tertiary">
+          <span className="font-roboto text-[11px] text-v2-text-tertiary">
             {formatRelativeTime(reply.createdAt)}
           </span>
           {reply.isEdited && (

@@ -39,7 +39,7 @@ export function MobileSubNav({ activeView = "feed", onViewChange }: MobileSubNav
             )}
           >
             {tab.icon}
-            <span className="font-vietnam text-[10px] font-medium">
+            <span className="font-roboto text-[10px] font-medium">
               {tab.label}
             </span>
           </button>

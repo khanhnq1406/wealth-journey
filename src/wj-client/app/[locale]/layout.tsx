@@ -1,4 +1,4 @@
-import { Roboto, Roboto_Mono } from "next/font/google";
+import { Roboto } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -13,13 +13,6 @@ const roboto = Roboto({
   display: "swap",
 });
 
-const robotoMono = Roboto_Mono({
-  subsets: ["latin", "latin-ext", "vietnamese"],
-  variable: "--font-roboto-mono",
-  weight: ["400", "500", "600", "700"],
-  preload: true,
-  display: "swap",
-});
 
 export default async function LocaleLayout({
   children,
@@ -81,7 +74,7 @@ export default async function LocaleLayout({
         <meta name="msapplication-TileColor" content="#d2a74b" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>
-      <body className={`${roboto.variable} ${robotoMono.variable} antialiased h-dvh`}>
+      <body className={`${roboto.variable} antialiased h-dvh`}>
         <NextIntlClientProvider messages={messages}>
           <Providers>{children}</Providers>
         </NextIntlClientProvider>

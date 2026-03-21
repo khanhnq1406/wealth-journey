@@ -53,16 +53,16 @@ export function PriceAlertTriggerCard() {
       <div className="flex items-start gap-3">
         <Zap className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" />
         <div className="flex-1 min-w-0">
-          <h4 className="font-vietnam font-semibold text-sm text-v2-text-primary">
+          <h4 className="font-roboto font-semibold text-sm text-v2-text-primary">
             {t("title")}
           </h4>
-          <p className="font-vietnam text-xs text-v2-text-tertiary mt-0.5">
+          <p className="font-roboto text-xs text-v2-text-tertiary mt-0.5">
             {t("description")}
           </p>
 
           {result && (
             <div
-              className={`mt-2 rounded-md px-3 py-1.5 text-sm font-vietnam ${
+              className={`mt-2 rounded-md px-3 py-1.5 text-sm font-roboto ${
                 result.type === "success"
                   ? "bg-v2-bg-dark text-v2-green-positive border border-v2-green-positive/30"
                   : "bg-v2-bg-dark text-v2-red-negative border border-v2-red-negative/30"

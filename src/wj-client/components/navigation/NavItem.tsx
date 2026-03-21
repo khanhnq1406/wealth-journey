@@ -37,7 +37,7 @@ export const NavItem = memo(function NavItem({
         href={href}
         disableBuiltInActive
         className={cn(
-          "flex items-center py-2.5 rounded-[10px] font-vietnam text-[14px] transition-all duration-300 ease-in-out touch-target",
+          "flex items-center py-2.5 rounded-[10px] font-roboto text-[14px] transition-all duration-300 ease-in-out touch-target",
           isExpanded
             ? cn(
                 "gap-3 px-3",

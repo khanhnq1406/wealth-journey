@@ -169,13 +169,9 @@ export default {
         },
       },
 
-      // Font Families (mihong.vn — Roboto)
+      // Font Family (mihong.vn — Roboto only)
       fontFamily: {
-        vietnam: ["var(--font-roboto)", "system-ui", "sans-serif"], // Migration alias
-        jetbrains: ["var(--font-roboto-mono)", "ui-monospace", "monospace"], // Migration alias
-        jakarta: ["var(--font-roboto)", "system-ui", "sans-serif"], // Migration alias
         roboto: ["var(--font-roboto)", "system-ui", "sans-serif"],
-        "roboto-mono": ["var(--font-roboto-mono)", "ui-monospace", "monospace"],
       },
 
       // Typography Scale

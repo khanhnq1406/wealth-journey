@@ -19,12 +19,12 @@ export function PostEngagement({
     <div className="flex items-center justify-between mt-3 px-1">
       <div className="flex items-center gap-3">
         {likeCount > 0 && (
-          <span className="font-jetbrains text-xs text-v2-text-tertiary">
+          <span className="font-roboto text-xs text-v2-text-tertiary">
             {likeCount} lượt thích
           </span>
         )}
         {shareCount != null && shareCount > 0 && (
-          <span className="font-jetbrains text-xs text-v2-text-tertiary">
+          <span className="font-roboto text-xs text-v2-text-tertiary">
             {shareCount} chia sẻ
           </span>
         )}
@@ -32,7 +32,7 @@ export function PostEngagement({
       {commentCount > 0 && (
         <button
           onClick={onCommentsClick}
-          className="font-jetbrains text-xs text-v2-text-tertiary hover:text-v2-text-secondary transition-colors"
+          className="font-roboto text-xs text-v2-text-tertiary hover:text-v2-text-secondary transition-colors"
         >
           {commentCount} bình luận
         </button>

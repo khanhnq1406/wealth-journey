@@ -19,19 +19,19 @@ export function SuggestedUserCard({ user, onDismiss }: SuggestedUserCardProps) {
         size="sm"
       />
       <div className="flex-1 min-w-0">
-        <p className="font-vietnam text-sm font-medium text-v2-text-primary truncate">
+        <p className="font-roboto text-sm font-medium text-v2-text-primary truncate">
           {user.userName}
         </p>
         {user.mutualFollowCount > 0 ? (
-          <p className="font-vietnam text-xs text-v2-text-tertiary">
+          <p className="font-roboto text-xs text-v2-text-tertiary">
             {user.mutualFollowCount} bạn chung
           </p>
         ) : user.followerCount > 0 ? (
-          <p className="font-vietnam text-xs text-v2-text-tertiary">
+          <p className="font-roboto text-xs text-v2-text-tertiary">
             {user.followerCount} người theo dõi
           </p>
         ) : user.bioSnippet ? (
-          <p className="font-vietnam text-xs text-v2-text-tertiary truncate">
+          <p className="font-roboto text-xs text-v2-text-tertiary truncate">
             {user.bioSnippet}
           </p>
         ) : null}

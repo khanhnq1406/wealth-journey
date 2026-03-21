@@ -10,10 +10,10 @@ export function FeedEmpty() {
           <MessageCircle size={24} className="text-v2-red-primary" />
         </div>
       </div>
-      <p className="font-vietnam text-lg font-semibold text-v2-text-primary mb-1">
+      <p className="font-roboto text-lg font-semibold text-v2-text-primary mb-1">
         Chưa có bài viết nào
       </p>
-      <p className="font-vietnam text-sm text-v2-text-tertiary">
+      <p className="font-roboto text-sm text-v2-text-tertiary">
         Hãy là người đầu tiên chia sẻ với cộng đồng!
       </p>
     </div>

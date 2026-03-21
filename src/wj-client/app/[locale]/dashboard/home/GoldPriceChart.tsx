@@ -15,7 +15,7 @@ export function GoldPriceChart() {
     >
       {/* Header */}
       <div className="px-5 pt-5 pb-2">
-        <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
+        <h3 className="font-roboto font-semibold text-[16px] text-v2-text-primary">
           {t("goldChartTitle")}
         </h3>
       </div>

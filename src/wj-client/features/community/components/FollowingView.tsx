@@ -49,7 +49,7 @@ export function FollowingView({ currentUser, targetUserId, onUserClick, initialT
             className="flex items-center gap-1.5 text-sm text-v2-text-secondary hover:text-v2-text-primary transition-colors"
           >
             <ArrowLeft size={16} />
-            <span className="font-vietnam">Quay lại</span>
+            <span className="font-roboto">Quay lại</span>
           </button>
         </div>
       )}
@@ -60,7 +60,7 @@ export function FollowingView({ currentUser, targetUserId, onUserClick, initialT
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={cn(
-              "flex-1 py-3 font-vietnam text-sm font-medium transition-colors relative",
+              "flex-1 py-3 font-roboto text-sm font-medium transition-colors relative",
               activeTab === tab.key
                 ? "text-v2-red-primary"
                 : "text-v2-text-tertiary hover:text-v2-text-secondary"
@@ -85,10 +85,10 @@ export function FollowingView({ currentUser, targetUserId, onUserClick, initialT
       ) : users.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 gap-3">
           <Users size={40} className="text-v2-text-tertiary" />
-          <p className="font-vietnam text-sm text-v2-text-tertiary">
+          <p className="font-roboto text-sm text-v2-text-tertiary">
             {activeTab === "following" ? "Chưa theo dõi ai" : "Chưa có người theo dõi"}
           </p>
-          <p className="font-vietnam text-xs text-v2-text-tertiary text-center max-w-xs">
+          <p className="font-roboto text-xs text-v2-text-tertiary text-center max-w-xs">
             {activeTab === "following"
               ? "Hãy khám phá cộng đồng và theo dõi những người bạn quan tâm."
               : "Chia sẻ bài viết và tương tác để thu hút người theo dõi."}

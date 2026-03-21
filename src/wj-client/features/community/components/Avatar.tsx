@@ -50,7 +50,7 @@ export function Avatar({ name, imageUrl, size = "md", className, priority = fals
         className
       )}
     >
-      <span className="text-white font-vietnam font-semibold">{initial}</span>
+      <span className="text-white font-roboto font-semibold">{initial}</span>
     </div>
   );
 }

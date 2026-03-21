@@ -42,12 +42,12 @@ export default function LandingPage() {
           {/* Error state */}
           {isError && (
             <div className="px-4 sm:px-8 py-8 text-center">
-              <p className="font-vietnam text-v2-text-secondary mb-3">
+              <p className="font-roboto text-v2-text-secondary mb-3">
                 {t("errorLoadingTypes")}
               </p>
               <button
                 onClick={() => refetch()}
-                className="px-4 py-2 bg-v2-red-primary text-white rounded-lg font-vietnam text-[13px] hover:bg-v2-red-dark transition-colors"
+                className="px-4 py-2 bg-v2-red-primary text-white rounded-lg font-roboto text-[13px] hover:bg-v2-red-dark transition-colors"
               >
                 {t("retry")}
               </button>

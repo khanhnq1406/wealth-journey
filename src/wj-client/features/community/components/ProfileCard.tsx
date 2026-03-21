@@ -85,7 +85,7 @@ export function ProfileCard({ currentUser }: ProfileCardProps) {
         </div>
 
         {/* Name */}
-        <p className="font-vietnam text-lg font-bold text-v2-text-primary">
+        <p className="font-roboto text-lg font-bold text-v2-text-primary">
           {profile?.userName || currentUser.name}
         </p>
 
@@ -97,11 +97,11 @@ export function ProfileCard({ currentUser }: ProfileCardProps) {
               onChange={(e) => setBioText(e.target.value)}
               maxLength={200}
               rows={2}
-              className="w-full font-vietnam text-[13px] text-v2-text-primary bg-[#FAF9F7] rounded-lg px-3 py-2 border border-v2-border-light focus:outline-none focus:border-v2-red-primary resize-none"
+              className="w-full font-roboto text-[13px] text-v2-text-primary bg-[#FAF9F7] rounded-lg px-3 py-2 border border-v2-border-light focus:outline-none focus:border-v2-red-primary resize-none"
               placeholder="Viết giới thiệu..."
             />
             <div className="flex items-center justify-between mt-1">
-              <span className="font-jetbrains text-[11px] text-v2-text-tertiary">
+              <span className="font-roboto text-[11px] text-v2-text-tertiary">
                 {bioText.length}/200
               </span>
               <div className="flex gap-1">
@@ -123,7 +123,7 @@ export function ProfileCard({ currentUser }: ProfileCardProps) {
           </div>
         ) : (
           <div className="mt-1 flex items-start gap-1">
-            <p className="font-vietnam text-[13px] text-v2-text-secondary flex-1">
+            <p className="font-roboto text-[13px] text-v2-text-secondary flex-1">
               {profile?.bio || "Chưa có giới thiệu"}
             </p>
             <button
@@ -142,10 +142,10 @@ export function ProfileCard({ currentUser }: ProfileCardProps) {
           <div className="flex justify-around">
             {stats.map((stat) => (
               <div key={stat.label} className="text-center">
-                <p className="font-jetbrains text-xl font-bold text-v2-text-primary">
+                <p className="font-roboto text-xl font-bold text-v2-text-primary">
                   {stat.value}
                 </p>
-                <p className="font-vietnam text-xs text-v2-text-tertiary">
+                <p className="font-roboto text-xs text-v2-text-tertiary">
                   {stat.label}
                 </p>
               </div>

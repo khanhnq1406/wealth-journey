@@ -34,7 +34,7 @@ export function PostActions({
         disabled={isLikeLoading}
         className={cn(
           "flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors flex-1 justify-center",
-          "font-vietnam text-sm font-medium",
+          "font-roboto text-sm font-medium",
           isLiked
             ? "text-[#DC2626] hover:bg-red-50"
             : "text-v2-text-secondary hover:bg-v2-bg-primary"
@@ -53,7 +53,7 @@ export function PostActions({
 
       <button
         onClick={onCommentClick}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-vietnam text-sm font-medium text-v2-text-secondary hover:bg-v2-bg-primary flex-1 justify-center"
+        className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-roboto text-sm font-medium text-v2-text-secondary hover:bg-v2-bg-primary flex-1 justify-center"
         aria-label="Comment"
       >
         <MessageCircle size={18} />
@@ -63,7 +63,7 @@ export function PostActions({
       {onShareClick && (
         <button
           onClick={onShareClick}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-vietnam text-sm font-medium text-v2-text-secondary hover:bg-v2-bg-primary flex-1 justify-center"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-roboto text-sm font-medium text-v2-text-secondary hover:bg-v2-bg-primary flex-1 justify-center"
           aria-label="Share"
         >
           <Share2 size={18} />
@@ -76,7 +76,7 @@ export function PostActions({
           onClick={onSaveToggle}
           disabled={isSaveLoading}
           className={cn(
-            "flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-vietnam text-sm font-medium flex-1 justify-center",
+            "flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-roboto text-sm font-medium flex-1 justify-center",
             isSaved
               ? "text-bg hover:bg-green-50"
               : "text-v2-text-secondary hover:bg-v2-bg-primary"
@@ -93,7 +93,7 @@ export function PostActions({
 
       <button
         onClick={() => toast.info("Tính năng Tặng sao sẽ sớm được ra mắt!")}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-vietnam text-sm font-medium text-v2-text-secondary hover:bg-v2-bg-primary flex-1 justify-center"
+        className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-roboto text-sm font-medium text-v2-text-secondary hover:bg-v2-bg-primary flex-1 justify-center"
         aria-label="Donate stars"
       >
         <Star size={18} />

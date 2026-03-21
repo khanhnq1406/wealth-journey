@@ -78,7 +78,7 @@ export function CommentBubble({
       <div className="flex-1 min-w-0">
         <div className="bg-[#FAF9F7] rounded-xl px-3 py-2">
           <div className="flex items-center justify-between">
-            <p className="font-vietnam text-[13px] font-semibold text-v2-text-primary">
+            <p className="font-roboto text-[13px] font-semibold text-v2-text-primary">
               {authorName}
             </p>
             {isOwnComment && !isEditing && (
@@ -103,7 +103,7 @@ export function CommentBubble({
           )}
         </div>
         <div className="flex items-center gap-1 ml-3 mt-0.5">
-          <span className="font-jetbrains text-[11px] text-v2-text-tertiary inline-block">
+          <span className="font-roboto text-[11px] text-v2-text-tertiary inline-block">
             {formatRelativeTime(createdAt)}
           </span>
           {isEdited && (

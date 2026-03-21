@@ -38,16 +38,16 @@ function PnlValue({ percent, amount, label, currency }: PnlValueProps) {
   return (
     <div className="text-center">
       <p
-        className={`font-jetbrains font-bold text-[14px] ${isPositive ? "text-v2-green-positive" : "text-v2-red-negative"}`}
+        className={`font-roboto font-bold text-[14px] ${isPositive ? "text-v2-green-positive" : "text-v2-red-negative"}`}
       >
         {formatAmount(amount)} {currency}
       </p>
       <p
-        className={`font-jetbrains font-bold text-[14px] ${isPositive ? "text-v2-green-positive" : "text-v2-red-negative"}`}
+        className={`font-roboto font-bold text-[14px] ${isPositive ? "text-v2-green-positive" : "text-v2-red-negative"}`}
       >
         {formatPercent(percent)}
       </p>
-      <p className="font-jetbrains font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
+      <p className="font-roboto font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
         {label}
       </p>
     </div>
@@ -88,24 +88,24 @@ export function NetWorthDisplay({
     <div>
       {/* Mobile version */}
       <div className="sm:hidden">
-        <p className="font-vietnam font-medium text-v2-text-secondary text-[15px]">
+        <p className="font-roboto font-medium text-v2-text-secondary text-[15px]">
           {greeting}
           {userName ? `, ${userName}` : ""}
         </p>
-        <p className="font-jetbrains font-semibold text-[11px] tracking-[2px] text-v2-text-tertiary mt-3">
+        <p className="font-roboto font-semibold text-[11px] tracking-[2px] text-v2-text-tertiary mt-3">
           {t("totalNetWorthLabel")}
         </p>
         <div className="flex items-baseline gap-2 mt-1">
-          <p className="font-vietnam font-extrabold text-[32px] tracking-[-1.5px] text-v2-text-primary">
+          <p className="font-roboto font-extrabold text-[32px] tracking-[-1.5px] text-v2-text-primary">
             {formatAmount(totalNetWorth)}
           </p>
-          <span className="font-jetbrains text-[12px] font-medium text-v2-text-tertiary bg-v2-bg-primary rounded-md px-1.5 py-0.5">
+          <span className="font-roboto text-[12px] font-medium text-v2-text-tertiary bg-v2-bg-primary rounded-md px-1.5 py-0.5">
             {currency}
           </span>
         </div>
         {monthPnlPercent !== 0 && (
           <div
-            className={`inline-flex items-center gap-1 mt-2 px-2 py-1 rounded-lg text-[12px] font-jetbrains font-medium ${
+            className={`inline-flex items-center gap-1 mt-2 px-2 py-1 rounded-lg text-[12px] font-roboto font-medium ${
               monthPnlPercent >= 0
                 ? "bg-v2-green-light text-v2-green-positive"
                 : "bg-v2-red-light text-v2-red-negative"
@@ -124,14 +124,14 @@ export function NetWorthDisplay({
       {/* Desktop version */}
       <BaseCard padding="none" className="hidden sm:flex items-center justify-between rounded-[20px] border border-v2-border-light shadow-v2-card p-6">
         <div>
-          <p className="font-jetbrains font-semibold text-[11px] tracking-[2px] text-v2-text-tertiary">
+          <p className="font-roboto font-semibold text-[11px] tracking-[2px] text-v2-text-tertiary">
             {t("totalNetWorthLabel")}
           </p>
           <div className="flex items-baseline gap-3 mt-1">
-            <p className="font-vietnam font-bold text-[42px] tracking-[-1.5px] text-v2-text-primary">
+            <p className="font-roboto font-bold text-[42px] tracking-[-1.5px] text-v2-text-primary">
               {formatAmount(totalNetWorth)}
             </p>
-            <span className="font-jetbrains text-[14px] font-medium text-v2-text-tertiary">
+            <span className="font-roboto text-[14px] font-medium text-v2-text-tertiary">
               {currency}
             </span>
           </div>

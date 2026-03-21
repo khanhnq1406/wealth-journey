@@ -41,14 +41,14 @@ export default function FeedbackPage() {
     <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 max-w-2xl mx-auto">
       {/* Submit Feedback Form */}
       <BaseCard noMobileMargin className="mb-4 sm:mb-6">
-        <h2 className="text-base sm:text-lg font-bold font-vietnam text-v2-text-primary mb-3">
+        <h2 className="text-base sm:text-lg font-bold font-roboto text-v2-text-primary mb-3">
           {t("sendFeedback")}
         </h2>
         <SubmitFeedbackForm onSuccess={handleFormSuccess} />
       </BaseCard>
 
       {/* Feedback History */}
-      <h2 className="text-base sm:text-lg font-bold font-vietnam text-v2-text-primary mb-3">
+      <h2 className="text-base sm:text-lg font-bold font-roboto text-v2-text-primary mb-3">
         {t("myFeedback")}
       </h2>
 
@@ -86,7 +86,7 @@ export default function FeedbackPage() {
           )}
 
           {!hasMore && feedbackItems.length > 0 && (
-            <p className="text-center text-sm text-v2-text-tertiary font-vietnam py-2">
+            <p className="text-center text-sm text-v2-text-tertiary font-roboto py-2">
               {t("noMore")}
             </p>
           )}

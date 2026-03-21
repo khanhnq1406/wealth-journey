@@ -80,15 +80,15 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-vietnam text-sm text-v2-text-primary leading-snug font-medium">
+          <p className="font-roboto text-sm text-v2-text-primary leading-snug font-medium">
             {title}
           </p>
           {body ? (
-            <p className="mt-0.5 font-vietnam text-xs text-v2-text-secondary leading-snug">
+            <p className="mt-0.5 font-roboto text-xs text-v2-text-secondary leading-snug">
               {body}
             </p>
           ) : topMover ? (
-            <p className="mt-0.5 font-vietnam text-xs leading-snug">
+            <p className="mt-0.5 font-roboto text-xs leading-snug">
               <span className="text-v2-text-secondary">{topMover.name}</span>
               {" "}
               <span className={topMover.direction === "up" ? "text-green-600" : "text-red-600"}>
@@ -96,7 +96,7 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
               </span>
             </p>
           ) : null}
-          <p className="mt-1 font-vietnam text-xs text-v2-text-tertiary">{timeAgo}</p>
+          <p className="mt-1 font-roboto text-xs text-v2-text-tertiary">{timeAgo}</p>
         </div>
       </button>
     );
@@ -125,15 +125,15 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-vietnam text-sm text-v2-text-primary leading-snug font-medium">
+          <p className="font-roboto text-sm text-v2-text-primary leading-snug font-medium">
             {meta?.broadcastTitle || "Thông báo từ hệ thống"}
           </p>
           {meta?.message && (
-            <p className="mt-0.5 font-vietnam text-xs text-v2-text-secondary truncate">
+            <p className="mt-0.5 font-roboto text-xs text-v2-text-secondary truncate">
               {meta.message}
             </p>
           )}
-          <p className="mt-1 font-vietnam text-xs text-v2-text-tertiary">{timeAgo}</p>
+          <p className="mt-1 font-roboto text-xs text-v2-text-tertiary">{timeAgo}</p>
         </div>
       </button>
     );
@@ -166,15 +166,15 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-vietnam text-sm text-v2-text-primary leading-snug">
+        <p className="font-roboto text-sm text-v2-text-primary leading-snug">
           {message}
         </p>
         {notification.postPreview && (
-          <p className="mt-0.5 font-vietnam text-xs text-v2-text-tertiary truncate">
+          <p className="mt-0.5 font-roboto text-xs text-v2-text-tertiary truncate">
             {notification.postPreview}
           </p>
         )}
-        <p className="mt-1 font-vietnam text-xs text-v2-text-tertiary">{timeAgo}</p>
+        <p className="mt-1 font-roboto text-xs text-v2-text-tertiary">{timeAgo}</p>
       </div>
     </button>
   );

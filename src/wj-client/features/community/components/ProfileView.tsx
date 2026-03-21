@@ -109,13 +109,13 @@ export function ProfileView({
           </div>
 
           {/* Name */}
-          <p className="font-vietnam text-lg font-bold text-v2-text-primary">
+          <p className="font-roboto text-lg font-bold text-v2-text-primary">
             {profile?.userName || currentUser.name}
           </p>
 
           {/* Bio */}
           {profile?.bio && (
-            <p className="mt-1 font-vietnam text-[13px] text-v2-text-secondary">
+            <p className="mt-1 font-roboto text-[13px] text-v2-text-secondary">
               {profile.bio}
             </p>
           )}
@@ -145,28 +145,28 @@ export function ProfileView({
           <div className="border-t border-[#EDE8E1] mt-3 pt-3">
             <div className="flex justify-around">
               <div className="text-center">
-                <p className="font-jetbrains text-xl font-bold text-v2-text-primary">
+                <p className="font-roboto text-xl font-bold text-v2-text-primary">
                   {profile?.postCount ?? 0}
                 </p>
-                <p className="font-vietnam text-xs text-v2-text-tertiary">Bài viết</p>
+                <p className="font-roboto text-xs text-v2-text-tertiary">Bài viết</p>
               </div>
               <button
                 onClick={() => onFollowingClick?.("followers")}
                 className="text-center hover:opacity-70 transition-opacity"
               >
-                <p className="font-jetbrains text-xl font-bold text-v2-text-primary">
+                <p className="font-roboto text-xl font-bold text-v2-text-primary">
                   {profile?.followerCount ?? 0}
                 </p>
-                <p className="font-vietnam text-xs text-v2-text-tertiary">Người theo dõi</p>
+                <p className="font-roboto text-xs text-v2-text-tertiary">Người theo dõi</p>
               </button>
               <button
                 onClick={() => onFollowingClick?.("following")}
                 className="text-center hover:opacity-70 transition-opacity"
               >
-                <p className="font-jetbrains text-xl font-bold text-v2-text-primary">
+                <p className="font-roboto text-xl font-bold text-v2-text-primary">
                   {profile?.followingCount ?? 0}
                 </p>
-                <p className="font-vietnam text-xs text-v2-text-tertiary">Đang theo dõi</p>
+                <p className="font-roboto text-xs text-v2-text-tertiary">Đang theo dõi</p>
               </button>
             </div>
           </div>

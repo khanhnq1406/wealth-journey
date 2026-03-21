@@ -153,7 +153,7 @@ export default function DashboardLayout({
             href={routes.home}
             disableBuiltInActive
             className={cn(
-              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target animate-stagger-fade-in",
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] transition-colors duration-200 touch-target animate-stagger-fade-in",
               path === routes.home
                 ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
@@ -166,7 +166,7 @@ export default function DashboardLayout({
             href={routes.portfolio}
             disableBuiltInActive
             className={cn(
-              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] transition-colors duration-200 touch-target",
               path === routes.portfolio
                 ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
@@ -179,7 +179,7 @@ export default function DashboardLayout({
             href={routes.community}
             disableBuiltInActive
             className={cn(
-              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] transition-colors duration-200 touch-target",
               path === routes.community && !isProfileView
                 ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
@@ -192,7 +192,7 @@ export default function DashboardLayout({
             href={routes.communityProfile}
             disableBuiltInActive
             className={cn(
-              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] transition-colors duration-200 touch-target",
               isProfileView
                 ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
@@ -211,7 +211,7 @@ export default function DashboardLayout({
               href={item.href}
               disableBuiltInActive
               className={cn(
-                "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+                "flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] transition-colors duration-200 touch-target",
                 path.startsWith(item.href)
                   ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                   : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
@@ -230,7 +230,7 @@ export default function DashboardLayout({
             href="/dashboard/settings"
             disableBuiltInActive
             className={cn(
-              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] transition-colors duration-200 touch-target",
               path.startsWith("/dashboard/settings")
                 ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
@@ -244,7 +244,7 @@ export default function DashboardLayout({
               href={routes.admin}
               disableBuiltInActive
               className={cn(
-                "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+                "flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] transition-colors duration-200 touch-target",
                 path.startsWith(routes.admin)
                   ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                   : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
@@ -256,7 +256,7 @@ export default function DashboardLayout({
           )}
           <button
             onClick={logout}
-            className="flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target w-full text-left"
+            className="flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target w-full text-left"
             aria-label={t("logout")}
           >
             <LogOut size={22} />
@@ -304,7 +304,7 @@ export default function DashboardLayout({
                     height={38}
                     className="rounded-[10px]"
                   />
-                  <h1 className="text-v2-text-primary font-vietnam font-bold text-[16px]">
+                  <h1 className="text-v2-text-primary font-roboto font-bold text-[16px]">
                     congdongvang.com
                   </h1>
                 </div>
@@ -463,7 +463,7 @@ export default function DashboardLayout({
                       className="rounded-full"
                     />
                   ) : (
-                    <span className="font-vietnam text-[13px] font-medium text-white">
+                    <span className="font-roboto text-[13px] font-medium text-white">
                       {(user.fullname || "U").charAt(0)}
                     </span>
                   )}
@@ -479,10 +479,10 @@ export default function DashboardLayout({
                     transitionDelay: isExpanded ? "100ms" : "0ms",
                   }}
                 >
-                  <p className="font-vietnam text-[13px] font-medium text-v2-text-primary truncate">
+                  <p className="font-roboto text-[13px] font-medium text-v2-text-primary truncate">
                     {user.fullname || "User"}
                   </p>
-                  <p className="font-jetbrains text-[11px] text-v2-text-tertiary truncate">
+                  <p className="font-roboto text-[11px] text-v2-text-tertiary truncate">
                     {user.email || (user.username ? `@${user.username}` : "")}
                   </p>
                 </div>
@@ -492,7 +492,7 @@ export default function DashboardLayout({
                 <button
                   onClick={logout}
                   className={cn(
-                    "flex items-center w-full py-2.5 rounded-xl font-vietnam text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-all duration-300 ease-in-out mt-1",
+                    "flex items-center w-full py-2.5 rounded-xl font-roboto text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-all duration-300 ease-in-out mt-1",
                     isExpanded ? "gap-3 px-3" : "justify-center px-0",
                   )}
                   aria-label={t("logout")}
@@ -528,7 +528,7 @@ export default function DashboardLayout({
                     height={32}
                     className="rounded-[8px]"
                   />
-                  <span className="font-vietnam font-bold text-[14px] text-v2-text-primary">
+                  <span className="font-roboto font-bold text-[14px] text-v2-text-primary">
                     congdongvang.com
                   </span>
                 </div>
@@ -584,7 +584,7 @@ export default function DashboardLayout({
                         height={38}
                         className="rounded-[10px]"
                       />
-                      <span className="text-v2-text-primary font-vietnam font-bold text-lg">
+                      <span className="text-v2-text-primary font-roboto font-bold text-lg">
                         congdongvang.com
                       </span>
                     </div>
@@ -618,16 +618,16 @@ export default function DashboardLayout({
                             className="rounded-full"
                           />
                         ) : (
-                          <span className="font-vietnam text-[13px] font-medium text-v2-text-secondary">
+                          <span className="font-roboto text-[13px] font-medium text-v2-text-secondary">
                             {(user.fullname || "U").charAt(0)}
                           </span>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-vietnam text-[13px] font-medium text-v2-text-primary truncate">
+                        <p className="font-roboto text-[13px] font-medium text-v2-text-primary truncate">
                           {user.fullname || "User"}
                         </p>
-                        <p className="font-jetbrains text-[11px] text-v2-text-tertiary truncate">
+                        <p className="font-roboto text-[11px] text-v2-text-tertiary truncate">
                           {user.email ||
                             (user.username ? `@${user.username}` : "")}
                         </p>
@@ -650,11 +650,11 @@ export default function DashboardLayout({
             <header className="hidden sm:flex items-center justify-between px-8 py-4 border-b border-v2-border-light bg-v2-bg-surface h-[68px] shrink-0">
               {/* Left: Greeting + Date */}
               <div>
-                <h2 className="font-vietnam font-semibold text-[18px] text-v2-text-primary">
+                <h2 className="font-roboto font-semibold text-[18px] text-v2-text-primary">
                   {greeting}
                   {user.fullname ? `, ${user.fullname}` : ""}
                 </h2>
-                <p className="font-jetbrains text-[12px] text-v2-text-tertiary">
+                <p className="font-roboto text-[12px] text-v2-text-tertiary">
                   {formattedDate}
                 </p>
               </div>
@@ -663,7 +663,7 @@ export default function DashboardLayout({
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setIsSearchOpen(true)}
-                  className="flex items-center gap-2 w-fit bg-v2-bg-primary border border-v2-border rounded-xl px-4 py-2 text-v2-text-tertiary text-[13px] font-vietnam hover:border-v2-text-tertiary transition-colors"
+                  className="flex items-center gap-2 w-fit bg-v2-bg-primary border border-v2-border rounded-xl px-4 py-2 text-v2-text-tertiary text-[13px] font-roboto hover:border-v2-text-tertiary transition-colors"
                 >
                   <Search size={16} />
                   <span>{tSearch("placeholder")}</span>
