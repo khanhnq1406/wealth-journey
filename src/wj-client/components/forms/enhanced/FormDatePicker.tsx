@@ -335,7 +335,7 @@ export function FormDatePicker({
   const triggerClasses = cn(
     "w-full flex items-center justify-between gap-3",
  "rounded-lg border bg-v2-bg-dark",
- "text-white",
+ "text-v2-gold-accent",
     "transition-all duration-200",
     "focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent",
  "disabled:opacity-40 disabled:cursor-not-allowed",
@@ -419,7 +419,7 @@ export function FormDatePicker({
                 e.stopPropagation();
                 handleClear();
               }}
- className="p-1 rounded hover:bg-v2-bg-surface-tint text-v2-text-tertiary hover:text-white"
+ className="p-1 rounded hover:bg-v2-bg-surface-tint text-v2-text-tertiary hover:text-v2-gold-accent"
               aria-label={t("clearDate")}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -500,7 +500,7 @@ export function FormDatePicker({
               </button>
             </div>
 
- <div className="text-sm font-semibold text-white">
+ <div className="text-sm font-semibold text-v2-gold-accent">
               {new Date(currentYear, currentMonth).toLocaleDateString("en-US", {
                 month: "long",
                 year: "numeric",

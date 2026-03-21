@@ -158,7 +158,7 @@ export const BarChart = memo(function BarChart({
               style={{ backgroundColor: entry.color }}
             />
             <span className="text-v2-cream-100/70">{entry.name}:</span>
-            <span className="font-semibold text-white">
+            <span className="font-semibold text-v2-gold-accent">
               {tooltipFormatter
                 ? tooltipFormatter(entry.value, entry.name, entry.payload)[0]
                 : yAxisFormatter(entry.value)}

@@ -89,7 +89,7 @@ export default function Register() {
           <div className="bg-v2-bg-surface border border-v2-border-light border-t-2 border-t-v2-gold-primary rounded-2xl sm:rounded-3xl shadow-lg p-6 sm:p-8 md:p-10 animate-fade-in-up">
             {/* Title — compact when password form is open */}
             <div className={`text-center ${showPasswordForm ? "mb-4 sm:mb-6" : "mb-6 sm:mb-8"}`}>
-              <h1 className={`${showPasswordForm ? "text-xl sm:text-2xl" : "text-2xl sm:text-3xl"} font-bold text-white mb-1`}>
+              <h1 className={`${showPasswordForm ? "text-xl sm:text-2xl" : "text-2xl sm:text-3xl"} font-bold text-v2-gold-accent mb-1`}>
                 {t("title")}
               </h1>
               <p className="text-sm sm:text-base text-v2-text-secondary">

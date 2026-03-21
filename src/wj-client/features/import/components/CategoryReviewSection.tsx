@@ -84,7 +84,7 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
         <div className="flex items-center gap-3">
           <span className="text-2xl">🏷️</span>
           <div className="text-left">
- <h3 className="font-semibold text-base text-white">
+ <h3 className="font-semibold text-base text-v2-gold-accent">
               {t("heading", { count: transactions.length })}
             </h3>
  <p className="text-sm text-v2-text-secondary">
@@ -141,10 +141,10 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
                   {/* Transaction Info */}
                   <div className="space-y-2">
                     <div className="flex justify-between items-start gap-3">
- <p className="text-sm font-medium text-white flex-1">
+ <p className="text-sm font-medium text-v2-gold-accent flex-1">
                         {tx.description}
                       </p>
- <p className="text-base font-bold text-white">
+ <p className="text-base font-bold text-v2-gold-accent">
                         {formatCurrencyImport(
                           tx.amount?.amount || 0,
                           tx.amount?.currency || currency,
@@ -168,7 +168,7 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
                           {t("suggested")}
                         </span>
                         <div className="flex items-center gap-2">
- <span className="text-xs font-medium text-white">
+ <span className="text-xs font-medium text-v2-gold-accent">
                             {getCategoryName(tx.suggestedCategoryId)}
                           </span>
                           <span

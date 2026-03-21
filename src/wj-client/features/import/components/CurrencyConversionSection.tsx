@@ -67,7 +67,7 @@ export function CurrencyConversionSection({
   return (
  <div className="border border-v2-border-light rounded-lg p-4 bg-v2-bg-surface">
       <div className="flex items-center justify-between mb-4">
- <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
+ <h3 className="flex items-center gap-2 text-lg font-semibold text-v2-gold-accent">
           <span className="text-2xl">💱</span>
           {totalTransactionCount !== 1
             ? t("titlePlural", { count: totalTransactionCount })
@@ -85,7 +85,7 @@ export function CurrencyConversionSection({
               {/* Conversion Header */}
               <div className="flex items-start justify-between">
                 <div>
- <div className="text-base font-semibold text-white">
+ <div className="text-base font-semibold text-v2-gold-accent">
                     {conversion.fromCurrency} → {conversion.toCurrency}
                   </div>
  <div className="text-sm text-v2-text-secondary mt-1">
@@ -126,7 +126,7 @@ export function CurrencyConversionSection({
  <span className="text-v2-text-secondary">
                     {t("date")}{" "}
                   </span>
- <span className="font-medium text-white">
+ <span className="font-medium text-v2-gold-accent">
                     {formatDate(conversion.rateDate)}
                   </span>
                 </div>
@@ -134,7 +134,7 @@ export function CurrencyConversionSection({
  <span className="text-v2-text-secondary">
                     {t("transactions")}{" "}
                   </span>
- <span className="font-medium text-white">
+ <span className="font-medium text-v2-gold-accent">
                     {conversion.transactionCount}
                   </span>
                 </div>
@@ -146,7 +146,7 @@ export function CurrencyConversionSection({
  <span className="text-v2-text-secondary">
                     {t("total")}
                   </span>
- <div className="font-semibold text-white">
+ <div className="font-semibold text-v2-gold-accent">
                     {conversion.totalOriginal &&
                       formatCurrency(
                         conversion.totalOriginal.amount,

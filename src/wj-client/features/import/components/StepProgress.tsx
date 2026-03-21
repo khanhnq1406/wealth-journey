@@ -51,7 +51,7 @@ export const StepProgress: FC<StepProgressProps> = ({
           <span className="text-v2-text-secondary font-medium">
             {t("stepOf", { current: currentStepIndex + 1, total: totalSteps })}
           </span>
-          <span className="text-sm text-white font-semibold">
+          <span className="text-sm text-v2-gold-accent font-semibold">
             {currentStepData?.label}
           </span>
         </div>

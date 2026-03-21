@@ -87,7 +87,7 @@ export function InlinePriceEdit({ item, category }: InlinePriceEditProps) {
           type="number"
           value={buyValue}
           onChange={(e) => setBuyValue(e.target.value)}
- className="w-24 px-1.5 py-0.5 text-sm border border-v2-border-light rounded bg-v2-bg-dark text-white placeholder-v2-text-tertiary focus:border-v2-gold-primary focus:outline-none"
+ className="w-24 px-1.5 py-0.5 text-sm border border-v2-border-light rounded bg-v2-bg-dark text-v2-gold-accent placeholder-v2-text-tertiary focus:border-v2-gold-primary focus:outline-none"
           placeholder={t("buy")}
           disabled={isPending}
         />
@@ -95,7 +95,7 @@ export function InlinePriceEdit({ item, category }: InlinePriceEditProps) {
           type="number"
           value={sellValue}
           onChange={(e) => setSellValue(e.target.value)}
- className="w-24 px-1.5 py-0.5 text-sm border border-v2-border-light rounded bg-v2-bg-dark text-white placeholder-v2-text-tertiary focus:border-v2-gold-primary focus:outline-none"
+ className="w-24 px-1.5 py-0.5 text-sm border border-v2-border-light rounded bg-v2-bg-dark text-v2-gold-accent placeholder-v2-text-tertiary focus:border-v2-gold-primary focus:outline-none"
           placeholder={t("sell")}
           disabled={isPending}
         />
@@ -119,7 +119,7 @@ export function InlinePriceEdit({ item, category }: InlinePriceEditProps) {
         <button
           onClick={handleCancel}
           disabled={isPending}
-          className="p-1 text-v2-text-tertiary hover:text-white disabled:opacity-50"
+          className="p-1 text-v2-text-tertiary hover:text-v2-gold-accent disabled:opacity-50"
           title={t("cancel")}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -57,7 +57,7 @@ export function CircularProgress({
       {/* Center text showing percentage */}
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-2xl font-bold text-white">
+          <div className="text-2xl font-bold text-v2-gold-accent">
             {Math.round(normalizedPercentage)}%
           </div>
           <div className="text-xs text-v2-text-tertiary">{t("card.spent")}</div>

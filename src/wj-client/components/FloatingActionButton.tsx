@@ -81,7 +81,7 @@ export function FloatingActionButton({ actions }: FABProps) {
                 <div className="flex-shrink-0 w-6 h-6 text-v2-red-primary">
                   {action.icon}
                 </div>
-                <span className="font-medium text-white whitespace-nowrap pr-2">
+                <span className="font-medium text-v2-gold-accent whitespace-nowrap pr-2">
                   {action.label}
                 </span>
               </button>

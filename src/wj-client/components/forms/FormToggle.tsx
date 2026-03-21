@@ -66,7 +66,7 @@ export const FormToggle = ({
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2",
               value === option.value
  ? "bg-v2-gold-primary text-white shadow-sm"
- : "text-v2-text-tertiary hover:text-white hover:bg-v2-bg-surface-tint",
+ : "text-v2-text-tertiary hover:text-v2-gold-accent hover:bg-v2-bg-surface-tint",
               disabled && "opacity-50 cursor-not-allowed pointer-events-none",
             )}
             onClick={() => onChange(option.value)}

@@ -309,7 +309,7 @@ export const DonutChartSVG = memo(function DonutChartSVG({
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-2">
                 <div className="flex flex-col items-center justify-center text-center">
                   {centerLabel && (
-                    <div className="text-base sm:text-lg lg:text-xl font-bold text-white leading-tight">
+                    <div className="text-base sm:text-lg lg:text-xl font-bold text-v2-gold-accent leading-tight">
                       {centerLabel}
                     </div>
                   )}

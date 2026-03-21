@@ -66,10 +66,10 @@ const WalletItem = memo(function WalletItem({
             />
           </svg>
         )}
-        <div className="font-semibold text-white">{wallet.walletName}</div>
+        <div className="font-semibold text-v2-gold-accent">{wallet.walletName}</div>
       </div>
       <div className="text-right">
-        <div className="font-semibold text-white">
+        <div className="font-semibold text-v2-gold-accent">
           {formatCurrency(displayValue, currency)}
         </div>
         {isInvestmentWallet && (

@@ -137,7 +137,7 @@ export function BankTemplateStep({
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
- <h3 className="font-semibold text-base text-white">
+ <h3 className="font-semibold text-base text-v2-gold-accent">
                             {template.name}
                           </h3>
  <p className="text-sm text-v2-text-secondary mt-1">
@@ -176,7 +176,7 @@ export function BankTemplateStep({
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
- <h3 className="font-semibold text-base text-white">
+ <h3 className="font-semibold text-base text-v2-gold-accent">
                         {template.name}
                       </h3>
  <p className="text-sm text-v2-text-secondary mt-1">
@@ -217,7 +217,7 @@ export function BankTemplateStep({
           >
             <div className="flex items-center justify-between">
               <div className="flex-1">
- <h3 className="font-semibold text-base text-white">
+ <h3 className="font-semibold text-base text-v2-gold-accent">
                   {t("customFormat")}
                 </h3>
  <p className="text-sm text-v2-text-secondary mt-1">

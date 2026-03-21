@@ -301,7 +301,7 @@ export const TransactionCard = memo(function TransactionCard({
           {/* Transaction Details */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
- <h3 className="font-medium text-white truncate">
+ <h3 className="font-medium text-v2-gold-accent truncate">
                 {categoryName}
               </h3>
               <span

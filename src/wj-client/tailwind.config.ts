@@ -142,10 +142,10 @@ export default {
           "border-light": "rgba(155, 1, 17, 0.2)", // Subtle borders
           border: "#9B0111", // Standard red border
           // Text
-          "text-primary": "#FFFFFF", // White (primary text on dark bg)
+          "text-primary": "#F1BD61", // Gold (primary text on dark bg)
           "text-secondary": "#F1BD61", // Gold (labels, secondary text)
-          "text-tertiary": "#ADB5BD", // Light gray (muted text)
-          "text-on-dark": "#FFFFFF", // White text
+          "text-tertiary": "#fcf2e0", // Light gray (muted text)
+          "text-on-dark": "#F1BD61", // Gold text on dark bg
           // Red brand
           "red-primary": "#9B0111", // mihong red
           "red-dark": "#5F0202", // Deep maroon (hover/pressed)

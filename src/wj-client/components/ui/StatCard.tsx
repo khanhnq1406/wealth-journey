@@ -70,7 +70,7 @@ export function StatCard({
       <div className="flex items-center justify-between">
         <div className="flex-1">
  <p className="text-sm text-v2-cream-100">{label}</p>
- <p className={`font-semibold ${sizeStyles[size]} text-white mt-1`}>
+ <p className={`font-semibold ${sizeStyles[size]} text-v2-gold-accent mt-1`}>
             {typeof value === "number" ? value.toLocaleString() : value}
           </p>
 

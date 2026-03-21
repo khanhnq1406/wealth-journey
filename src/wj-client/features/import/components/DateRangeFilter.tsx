@@ -63,7 +63,7 @@ export const DateRangeFilter = React.memo(function DateRangeFilter({
         <div className="flex items-center gap-3">
           <span className="text-xl">📅</span>
           <div className="text-left">
- <h3 className="font-semibold text-sm text-white">
+ <h3 className="font-semibold text-sm text-v2-gold-accent">
               Date Range Filter
             </h3>
             {isFiltered ? (
@@ -120,7 +120,7 @@ export const DateRangeFilter = React.memo(function DateRangeFilter({
                 onChange={(e) =>
                   onChange(e.target.value ? new Date(e.target.value) : null, endDate)
                 }
- className="px-3 py-2 text-sm border border-v2-border-light rounded-lg bg-v2-bg-surface text-white"
+ className="px-3 py-2 text-sm border border-v2-border-light rounded-lg bg-v2-bg-surface text-v2-gold-accent"
               />
               <input
                 type="date"
@@ -128,7 +128,7 @@ export const DateRangeFilter = React.memo(function DateRangeFilter({
                 onChange={(e) =>
                   onChange(startDate, e.target.value ? new Date(e.target.value) : null)
                 }
- className="px-3 py-2 text-sm border border-v2-border-light rounded-lg bg-v2-bg-surface text-white"
+ className="px-3 py-2 text-sm border border-v2-border-light rounded-lg bg-v2-bg-surface text-v2-gold-accent"
               />
             </div>
           </div>

@@ -132,7 +132,7 @@ export function ChangeRateModal({
  <span className="text-v2-text-secondary">
                 {t("currentRate")}
               </span>
- <span className="font-semibold text-white">
+ <span className="font-semibold text-v2-gold-accent">
                 1 {conversion.fromCurrency} ={" "}
                 {formatExchangeRate(
                   conversion.exchangeRate,
@@ -145,7 +145,7 @@ export function ChangeRateModal({
  <span className="text-v2-text-secondary">
                 {t("source")}
               </span>
- <span className="font-medium text-white">
+ <span className="font-medium text-v2-gold-accent">
                 {conversion.rateSource === "auto"
                   ? t("sourceAuto")
                   : conversion.rateSource === "manual"
@@ -157,7 +157,7 @@ export function ChangeRateModal({
  <span className="text-v2-text-secondary">
                 {t("transactions")}
               </span>
- <span className="font-medium text-white">
+ <span className="font-medium text-v2-gold-accent">
                 {conversion.transactionCount}
               </span>
             </div>
@@ -165,7 +165,7 @@ export function ChangeRateModal({
  <span className="text-v2-text-secondary">
                 {t("currentTotal")}
               </span>
- <span className="font-semibold text-white">
+ <span className="font-semibold text-v2-gold-accent">
                 {conversion.totalOriginal &&
                   formatCurrency(
                     conversion.totalOriginal.amount,

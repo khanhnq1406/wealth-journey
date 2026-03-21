@@ -214,7 +214,7 @@ export default function LandingBankImport() {
             <span className="mr-2">⚡</span>
             {t("bankImport.bulkImport")}
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-v2-gold-accent mb-4">
             {t("bankImport.stopTyping")}
           </h2>
           <p className="text-base sm:text-lg text-v2-text-tertiary max-w-3xl mx-auto px-4">
@@ -237,7 +237,7 @@ export default function LandingBankImport() {
               className="bg-v2-bg-surface rounded-xl p-6 shadow-card hover:shadow-lg transition-shadow duration-300 text-center"
             >
               <div className="text-4xl mb-2">{format.icon}</div>
-              <h3 className="text-lg font-semibold text-white mb-1">
+              <h3 className="text-lg font-semibold text-v2-gold-accent mb-1">
                 {format.format}
               </h3>
               <p className="text-sm text-v2-text-tertiary mb-1">{format.description}</p>
@@ -293,7 +293,7 @@ export default function LandingBankImport() {
               <div className="w-12 h-12 bg-v2-gold-primary/10 rounded-lg flex items-center justify-center text-v2-gold-primary mb-4">
                 {feature.icon}
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">
+              <h3 className="text-lg font-semibold text-v2-gold-accent mb-2">
                 {feature.title}
               </h3>
               <p className="text-sm text-v2-text-tertiary leading-relaxed">
@@ -305,7 +305,7 @@ export default function LandingBankImport() {
 
         {/* How It Works Steps */}
         <motion.div
-          className="bg-gradient-to-br from-v2-bg-dark via-v2-bg-primary to-v2-bg-surface rounded-2xl p-8 sm:p-12 text-white border border-v2-border-light"
+          className="bg-gradient-to-br from-v2-bg-dark via-v2-bg-primary to-v2-bg-surface rounded-2xl p-8 sm:p-12 text-v2-gold-accent border border-v2-border-light"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={
             isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }

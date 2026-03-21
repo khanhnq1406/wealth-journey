@@ -61,7 +61,7 @@ export const AmountKeypad = memo(function AmountKeypad({
  <div className="text-sm text-v2-text-tertiary mb-1">
           Amount
         </div>
- <div className="text-3xl font-bold text-white flex items-center justify-center gap-1">
+ <div className="text-3xl font-bold text-v2-gold-accent flex items-center justify-center gap-1">
           <span className="text-lg">{currency}</span>
           <span>{formatNumberWithCommas(value) || "0"}</span>
         </div>
@@ -80,7 +80,7 @@ export const AmountKeypad = memo(function AmountKeypad({
               "focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2",
               // Number keys
               key !== "⌫"
- ? "bg-v2-bg-dark text-white shadow-sm hover:shadow-md border border-v2-border-light"
+ ? "bg-v2-bg-dark text-v2-gold-accent shadow-sm hover:shadow-md border border-v2-border-light"
                 : // Delete key
  "bg-v2-red-negative/10 text-v2-red-negative hover:bg-v2-red-negative/20 border border-v2-red-negative/30"
             )}

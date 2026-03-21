@@ -292,7 +292,7 @@ export const BudgetProgressCard = memo(function BudgetProgressCard({
         <div className="flex-1 space-y-3">
           {/* Header */}
           <div>
-            <h3 className="text-lg font-bold text-white">{periodName}</h3>
+            <h3 className="text-lg font-bold text-v2-gold-accent">{periodName}</h3>
             {itemCount !== undefined && itemCount > 0 && (
               <p className="text-sm text-v2-text-tertiary mt-1">
                 {t("card.categories", { count: itemCount })}
@@ -311,13 +311,13 @@ export const BudgetProgressCard = memo(function BudgetProgressCard({
           <div className="grid grid-cols-3 gap-4 py-2">
             <div>
               <div className="text-xs text-v2-text-tertiary mb-1">{t("title")}</div>
-              <div className="text-sm font-semibold text-white">
+              <div className="text-sm font-semibold text-v2-gold-accent">
                 {formatCurrency(totalBudget, currency)}
               </div>
             </div>
             <div>
               <div className="text-xs text-v2-text-tertiary mb-1">{t("card.spent")}</div>
-              <div className="text-sm font-semibold text-white">
+              <div className="text-sm font-semibold text-v2-gold-accent">
                 {formatCurrency(totalSpent, currency)}
               </div>
             </div>

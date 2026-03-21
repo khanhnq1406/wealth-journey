@@ -69,7 +69,7 @@ const TAB_TYPE_COLOR: Record<Tab, string> = {
   gold: "text-v2-maroon-900",
   silver: "text-v2-maroon-900",
   currency: "text-v2-maroon-900",
-  symbol: "text-white",
+  symbol: "text-v2-gold-accent",
 };
 
 
@@ -297,7 +297,7 @@ function SymbolLookupTab({
  <div className="p-4 bg-v2-bg-dark rounded-lg border border-v2-border-light">
           <div className="flex items-start justify-between gap-4">
             <div>
- <p className="text-lg font-bold text-white">
+ <p className="text-lg font-bold text-v2-gold-accent">
                 {querySymbol}
               </p>
               <p className="text-xs text-v2-text-tertiary mt-0.5">
@@ -309,7 +309,7 @@ function SymbolLookupTab({
               </p>
             </div>
             <div className="text-right">
- <p className="text-2xl font-bold text-white">
+ <p className="text-2xl font-bold text-v2-gold-accent">
                 {priceData.currency === "VND"
                   ? formatPriceValue(priceData.price, "VND")
                   : `$${priceData.priceDecimal.toFixed(2)}`}

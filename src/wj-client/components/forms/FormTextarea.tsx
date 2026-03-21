@@ -121,7 +121,7 @@ export const FormTextarea = ({
             "rounded-lg",
             "border transition-all duration-200",
  "bg-v2-bg-dark",
- "text-white",
+ "text-v2-gold-accent",
  "placeholder:text-v2-text-tertiary",
             // Focus states - single ring (clean, modern)
             "focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent",

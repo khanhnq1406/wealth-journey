@@ -93,7 +93,7 @@ export function ErrorState({
       border: "border-v2-border-light",
       iconBg: "bg-v2-bg-surface-tint",
       iconColor: "text-v2-red-negative",
-      textColor: "text-white",
+      textColor: "text-v2-gold-accent",
       subtextColor: "text-v2-text-tertiary",
     },
     warning: {
@@ -101,7 +101,7 @@ export function ErrorState({
       border: "border-v2-border-light",
       iconBg: "bg-v2-bg-surface-tint",
       iconColor: "text-yellow-400",
-      textColor: "text-white",
+      textColor: "text-v2-gold-accent",
       subtextColor: "text-v2-text-tertiary",
     },
     critical: {
@@ -109,7 +109,7 @@ export function ErrorState({
       border: "border-v2-border",
       iconBg: "bg-v2-bg-surface-tint",
       iconColor: "text-v2-red-negative",
-      textColor: "text-white",
+      textColor: "text-v2-gold-accent",
       subtextColor: "text-v2-text-tertiary",
     },
   };
@@ -472,7 +472,7 @@ export function WarningState({
         </div>
         <div className="flex-1 min-w-0">
           {title && (
-            <h4 className="font-semibold text-white">
+            <h4 className="font-semibold text-v2-gold-accent">
               {title}
             </h4>
           )}

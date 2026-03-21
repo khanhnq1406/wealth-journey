@@ -33,7 +33,7 @@ function FilterSection({
  className="w-full flex items-center justify-between py-2.5 sm:py-3 px-3 sm:px-4 text-left hover:bg-v2-bg-surface-tint transition-colors"
         aria-expanded={expanded}
       >
- <span className="font-medium text-white">
+ <span className="font-medium text-v2-gold-accent">
           {title}
         </span>
         <svg
@@ -523,7 +523,7 @@ export function TransactionFilterModal({
                     "min-h-[44px]",
                     dateRangeType === option.value
                       ? undefined
- : "bg-v2-bg-dark text-white hover:bg-v2-bg-surface-tint",
+ : "bg-v2-bg-dark text-v2-gold-accent hover:bg-v2-bg-surface-tint",
                   )}
                 >
                   {option.label}

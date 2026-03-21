@@ -110,7 +110,7 @@ export const FormWizard = memo(function FormWizard({
                       className={cn(
                         "text-sm font-medium",
                         isCurrent
- ? "text-white"
+ ? "text-v2-gold-accent"
                           : isCompleted
  ? "text-success-600"
  : "text-v2-text-tertiary"
@@ -167,7 +167,7 @@ export const FormWizard = memo(function FormWizard({
         <div className="animate-fade-in">
           {/* Mobile step title */}
           <div className="sm:hidden mb-4">
- <h2 className="text-lg font-semibold text-white">
+ <h2 className="text-lg font-semibold text-v2-gold-accent">
               {t("stepOf", { current: currentStepIndex + 1, total: steps.length })}
             </h2>
  <p className="text-sm text-v2-text-tertiary">

@@ -96,7 +96,7 @@ function EditPanel({ item, onSave, onDelete, onClose, isSaving }: EditPanelProps
   return (
     <BaseCard padding="lg">
       <div className="flex items-center justify-between mb-4">
- <h3 className="text-sm font-semibold text-white">
+ <h3 className="text-sm font-semibold text-v2-gold-accent">
           {t("editPanel.title", { id: item.id })}
         </h3>
         <button
@@ -115,7 +115,7 @@ function EditPanel({ item, onSave, onDelete, onClose, isSaving }: EditPanelProps
  <p className="text-xs font-medium text-v2-text-tertiary mb-1">
             {t("editPanel.subject")}
           </p>
- <p className="text-sm font-medium text-white">
+ <p className="text-sm font-medium text-v2-gold-accent">
             {item.subject}
           </p>
         </div>

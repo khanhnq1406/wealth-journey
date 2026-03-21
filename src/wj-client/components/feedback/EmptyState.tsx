@@ -142,7 +142,7 @@ export function EmptyState({
       )}>
         {resolvedTitle && (
           <h3 className={cn(
-            "font-semibold text-white",
+            "font-semibold text-v2-gold-accent",
             sizeClasses[size].title
           )}>
             {resolvedTitle}

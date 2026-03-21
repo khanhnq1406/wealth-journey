@@ -209,7 +209,7 @@ function ResultItem({ result, searchQuery, isSelected, onClick, onHover, typeCon
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
- <p className="text-sm font-medium text-white truncate">
+ <p className="text-sm font-medium text-v2-gold-accent truncate">
             <HighlightedText text={result.title} query={searchQuery} />
           </p>
           {result.amount && (
@@ -317,7 +317,7 @@ function EmptyState({ searchQuery }: EmptyStateProps) {
         </svg>
       </div>
 
- <h3 className="text-base font-semibold text-white mb-1">
+ <h3 className="text-base font-semibold text-v2-gold-accent mb-1">
         {searchQuery ? "No results found" : "Start searching"}
       </h3>
 
@@ -337,7 +337,7 @@ function EmptyState({ searchQuery }: EmptyStateProps) {
               className={cn(
                 "px-3 py-1.5 text-xs font-medium rounded-full",
  "bg-v2-bg-dark",
- "text-white",
+ "text-v2-gold-accent",
  "hover:bg-v2-bg-surface-tint",
                 "transition-colors"
               )}
@@ -391,7 +391,7 @@ export function SearchQuickAction({
   variant?: "default" | "primary" | "danger";
 }) {
   const variantStyles = {
- default: "bg-v2-bg-dark text-white hover:bg-v2-bg-surface-tint",
+ default: "bg-v2-bg-dark text-v2-gold-accent hover:bg-v2-bg-surface-tint",
  primary: "bg-v2-gold-primary/10 text-v2-gold-primary hover:bg-v2-gold-primary/20",
  danger: "bg-danger-50 text-danger-700 hover:bg-danger-100",
   };

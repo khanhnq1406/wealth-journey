@@ -126,7 +126,7 @@ export function TagInput({
           className={cn(
             "flex-1 min-w-[80px] text-base sm:text-base py-0.5",
             "bg-transparent border-none outline-none",
- "text-white",
+ "text-v2-gold-accent",
  "placeholder:text-v2-text-tertiary"
           )}
           aria-invalid={hasError ? "true" : "false"}

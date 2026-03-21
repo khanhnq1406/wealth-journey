@@ -163,7 +163,7 @@ export function AuthMethodsCard({
 
   return (
     <BaseCard padding="none">
-      <h2 className="px-4 pt-4 pb-3 sm:px-6 sm:pt-5 text-base font-semibold text-white">
+      <h2 className="px-4 pt-4 pb-3 sm:px-6 sm:pt-5 text-base font-semibold text-v2-gold-accent">
         {t("authMethods")}
       </h2>
 
@@ -173,7 +173,7 @@ export function AuthMethodsCard({
           <div className="flex-shrink-0 w-9 h-9 rounded-full bg-v2-bg-dark flex items-center justify-center">
             <GoogleIcon />
           </div>
-          <span className="text-sm font-medium text-white flex-1 min-w-0">
+          <span className="text-sm font-medium text-v2-gold-accent flex-1 min-w-0">
             {t("googleLinked")}
           </span>
           <StatusBadge linked={!!methods?.hasGoogle} />
@@ -212,7 +212,7 @@ export function AuthMethodsCard({
               <path d="M7 11V7a5 5 0 0110 0v4" />
             </svg>
           </div>
-          <span className="text-sm font-medium text-white flex-1 min-w-0">
+          <span className="text-sm font-medium text-v2-gold-accent flex-1 min-w-0">
             {t("passwordSet")}
           </span>
           <StatusBadge linked={!!methods?.hasPassword} />
@@ -285,7 +285,7 @@ export function AuthMethodsCard({
             <span className="text-sm text-v2-text-tertiary">
               {t("username")}
             </span>
-            <span className="text-sm font-mono font-medium text-white ml-auto">
+            <span className="text-sm font-mono font-medium text-v2-gold-accent ml-auto">
               @{methods.username}
             </span>
           </div>

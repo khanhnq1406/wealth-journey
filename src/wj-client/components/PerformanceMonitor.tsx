@@ -361,7 +361,7 @@ export function PerformanceMonitor({
             <h3 className="font-semibold">Performance</h3>
             <button
               onClick={() => setVisible(false)}
-              className="text-v2-cream-100 hover:text-white"
+              className="text-v2-cream-100 hover:text-v2-gold-accent"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -409,7 +409,7 @@ export function PerformanceMonitor({
             {metrics.memoryUsed !== undefined && (
               <div className="flex justify-between">
  <span className="text-v2-cream-100">Memory</span>
- <span className="text-white">
+ <span className="text-v2-gold-accent">
                   {metrics.memoryUsed}MB
                 </span>
               </div>

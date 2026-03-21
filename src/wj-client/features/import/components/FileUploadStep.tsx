@@ -213,7 +213,7 @@ export function FileUploadStep({
             />
           </svg>
         </div>
- <h2 className="text-xl sm:text-2xl font-bold text-white">
+ <h2 className="text-xl sm:text-2xl font-bold text-v2-gold-accent">
           {t("title")}
         </h2>
  <p className="text-sm sm:text-base text-v2-text-secondary max-w-lg mx-auto">

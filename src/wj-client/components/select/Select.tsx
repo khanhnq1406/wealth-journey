@@ -375,7 +375,7 @@ export function Select<T extends string = string>({
           spellCheck={false}
           className={cn(
  "w-full pr-16 rounded-lg border bg-v2-bg-dark",
- "text-white",
+ "text-v2-gold-accent",
             "min-h-[44px] sm:min-h-[48px] px-3 sm:px-4 text-base sm:text-base",
             "transition-all duration-200",
             // Focus styles - aligned with FormSelect
@@ -400,7 +400,7 @@ export function Select<T extends string = string>({
             <button
               type="button"
               onClick={handleClear}
- className="text-v2-text-tertiary hover:text-white focus:outline-none focus:ring-2 focus:ring-v2-gold-primary rounded-full p-0.5 transition-colors duration-200"
+ className="text-v2-text-tertiary hover:text-v2-gold-accent focus:outline-none focus:ring-2 focus:ring-v2-gold-primary rounded-full p-0.5 transition-colors duration-200"
               aria-label={t("clearAriaLabel")}
             >
               <XIcon size="sm" decorative />
@@ -421,7 +421,7 @@ export function Select<T extends string = string>({
                 }
                 inputRef.current?.focus();
               }}
- className="text-v2-text-tertiary hover:text-white focus:outline-none focus:ring-2 focus:ring-v2-gold-primary rounded-full p-0.5 transition-colors duration-200"
+ className="text-v2-text-tertiary hover:text-v2-gold-accent focus:outline-none focus:ring-2 focus:ring-v2-gold-primary rounded-full p-0.5 transition-colors duration-200"
               aria-label={isOpen ? "Close dropdown" : "Open dropdown"}
               aria-expanded={isOpen}
             >

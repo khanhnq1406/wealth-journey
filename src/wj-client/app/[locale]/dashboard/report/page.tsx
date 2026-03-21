@@ -437,7 +437,7 @@ export function ReportContent() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 px-6">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-white mb-2">
+          <h2 className="text-xl font-semibold text-v2-gold-accent mb-2">
             {t("failedToLoad")}
           </h2>
           <p className="text-v2-text-tertiary mb-4">
@@ -465,7 +465,7 @@ export function ReportContent() {
     <div className="flex flex-col gap-4 px-3 sm:px-6 py-3 sm:py-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-v2-gold-accent">
           {t("title")}
         </h1>
         <ExportButton
@@ -514,7 +514,7 @@ export function ReportContent() {
                   d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                 />
               </svg>
-              <h3 className="text-lg font-semibold text-white mb-2">
+              <h3 className="text-lg font-semibold text-v2-gold-accent mb-2">
                 {t("noDataAvailable")}
               </h3>
               <p className="text-v2-text-tertiary">
@@ -533,7 +533,7 @@ export function ReportContent() {
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           <BaseCard className="p-3 sm:p-4">
-            <h3 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4">
+            <h3 className="text-base sm:text-lg font-bold text-v2-gold-accent mb-3 sm:mb-4">
               {t("expenseBreakdown")}
             </h3>
             <DonutChartSVG
@@ -553,7 +553,7 @@ export function ReportContent() {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <BaseCard className="p-3 sm:p-4">
-            <h3 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4">
+            <h3 className="text-base sm:text-lg font-bold text-v2-gold-accent mb-3 sm:mb-4">
               {t("categoryComparison")}
               {compareWithPrevious && (
                 <span className="text-xs sm:text-sm font-normal text-v2-text-tertiary ml-2">
@@ -600,7 +600,7 @@ export function ReportContent() {
         transition={{ duration: 0.5, delay: 0.3 }}
       >
         <BaseCard className="p-3 sm:p-4">
-          <h3 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4">
+          <h3 className="text-base sm:text-lg font-bold text-v2-gold-accent mb-3 sm:mb-4">
             {t("incomeVsExpensesTrend")}
           </h3>
           <LineChart
@@ -647,7 +647,7 @@ export function ReportContent() {
         transition={{ duration: 0.5, delay: 0.4 }}
       >
         <BaseCard className="p-3 sm:p-4">
-          <h3 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4">
+          <h3 className="text-base sm:text-lg font-bold text-v2-gold-accent mb-3 sm:mb-4">
             {t("monthlySummary")}
           </h3>
           <div className="overflow-x-auto">
@@ -677,7 +677,7 @@ export function ReportContent() {
                     key={index}
                     className="border-b border-v2-border-light hover:bg-v2-bg-surface-tint"
                   >
-                    <td className="py-2 sm:py-3 px-2 sm:px-4 font-medium text-white">
+                    <td className="py-2 sm:py-3 px-2 sm:px-4 font-medium text-v2-gold-accent">
                       {row.month}
                     </td>
                     <td className="py-2 sm:py-3 px-2 sm:px-4 text-right text-success-600 font-medium">
@@ -708,7 +708,7 @@ export function ReportContent() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.5 }}
       >
-        <h2 className="text-xl sm:text-2xl font-bold text-white">
+        <h2 className="text-xl sm:text-2xl font-bold text-v2-gold-accent">
           {t("walletAnalytics")}
         </h2>
       </motion.div>

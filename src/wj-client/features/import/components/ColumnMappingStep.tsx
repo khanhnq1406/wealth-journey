@@ -301,7 +301,7 @@ export function ColumnMappingStep({
       {preview && (
  <div className="border border-v2-border-light rounded-lg overflow-hidden">
  <div className="bg-v2-bg-dark px-4 py-2 border-b border-v2-border-light">
- <h3 className="text-sm font-semibold text-white">
+ <h3 className="text-sm font-semibold text-v2-gold-accent">
               {t("filePreview")}
             </h3>
           </div>
@@ -325,7 +325,7 @@ export function ColumnMappingStep({
                     {row.map((cell, cellIdx) => (
                       <td
                         key={cellIdx}
- className="px-4 py-2 text-sm text-white whitespace-nowrap"
+ className="px-4 py-2 text-sm text-v2-gold-accent whitespace-nowrap"
                       >
                         {cell}
                       </td>
@@ -340,7 +340,7 @@ export function ColumnMappingStep({
 
       {/* Column Mapping Form */}
       <div className="space-y-4">
- <h3 className="text-base font-semibold text-white">
+ <h3 className="text-base font-semibold text-v2-gold-accent">
           {t("columnMappingTitle")}
         </h3>
 
@@ -424,7 +424,7 @@ export function ColumnMappingStep({
           <div className="flex-1">
             <label
               htmlFor="saveAsTemplate"
- className="text-sm font-medium text-white cursor-pointer"
+ className="text-sm font-medium text-v2-gold-accent cursor-pointer"
             >
               {t("saveAsTemplate")}
             </label>

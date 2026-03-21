@@ -23,7 +23,7 @@ export default function SecuritySettingsPage() {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6">
- <h1 className="text-xl font-semibold text-white">
+ <h1 className="text-xl font-semibold text-v2-gold-accent">
         {t("title")}
       </h1>
 
@@ -36,7 +36,7 @@ export default function SecuritySettingsPage() {
         <BaseCard padding="none">
  <div className="px-4 pt-4 pb-2 sm:px-6 sm:pt-5 sm:pb-3 border-b border-v2-border-light">
             <div className="flex items-center justify-between">
- <h2 className="text-base font-semibold text-white">
+ <h2 className="text-base font-semibold text-v2-gold-accent">
                 {t("setPassword")}
               </h2>
               <button
@@ -60,7 +60,7 @@ export default function SecuritySettingsPage() {
         <BaseCard padding="none">
  <div className="px-4 pt-4 pb-2 sm:px-6 sm:pt-5 sm:pb-3 border-b border-v2-border-light">
             <div className="flex items-center justify-between">
- <h2 className="text-base font-semibold text-white">
+ <h2 className="text-base font-semibold text-v2-gold-accent">
                 {t("changePassword")}
               </h2>
               <button

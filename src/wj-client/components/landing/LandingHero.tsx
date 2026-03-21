@@ -155,7 +155,7 @@ export default function LandingHero() {
                 />
               </svg>
               <div className="text-left">
-                <div className="text-xs font-semibold text-white">
+                <div className="text-xs font-semibold text-v2-gold-accent">
                   {t("hero.installAsApp")}
                 </div>
                 <div className="text-[10px] text-v2-text-tertiary">

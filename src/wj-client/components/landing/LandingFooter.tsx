@@ -45,10 +45,10 @@ export default function LandingFooter() {
         <p className="text-amber-200 text-lg sm:text-xl font-semibold mb-2">
           {footer.brandName}
         </p>
-        <p className="text-white text-sm sm:text-base mb-2">
+        <p className="text-v2-gold-accent text-sm sm:text-base mb-2">
           {footer.tagline}
         </p>
-        <p className="text-white text-sm whitespace-nowrap">
+        <p className="text-v2-gold-accent text-sm whitespace-nowrap">
           {footer.contactInfo}
         </p>
       </div>

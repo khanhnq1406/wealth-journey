@@ -71,7 +71,7 @@ export function FinanceTabBar({ activeTab, onTabChange }: FinanceTabBarProps) {
               "min-h-[44px]",
               activeTab === tab
                 ? "text-bg font-semibold"
- : "text-v2-cream-100 hover:text-white"
+ : "text-v2-cream-100 hover:text-v2-gold-accent"
             )}
           >
             {t(tab)}

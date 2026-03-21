@@ -63,7 +63,7 @@ function TestimonialCard({
           {avatar}
         </div>
         <div>
-          <h4 className="font-semibold text-white">{name}</h4>
+          <h4 className="font-semibold text-v2-gold-accent">{name}</h4>
           <p className="text-sm text-v2-text-tertiary">{role}</p>
         </div>
       </div>
@@ -91,7 +91,7 @@ export function LandingTestimonials() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-v2-gold-accent mb-4">
             {t("sectionTitle")}
           </h2>
           <p className="text-lg text-v2-text-tertiary max-w-2xl mx-auto">

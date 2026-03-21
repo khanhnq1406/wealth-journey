@@ -116,7 +116,7 @@ const SummaryCard = memo(function SummaryCard({
         </div>
 
         {/* Value */}
-        <div className="text-2xl font-bold text-white">{value}</div>
+        <div className="text-2xl font-bold text-v2-gold-accent">{value}</div>
 
         {/* Subtitle/Change */}
         {subtitle && <div className="text-xs text-v2-text-tertiary">{subtitle}</div>}

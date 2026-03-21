@@ -70,7 +70,7 @@ export const TotalBalance = memo(function TotalBalance() {
             <div className="text-v2-text-secondary font-semibold mb-2">
               {t("totalNetWorth")}
             </div>
-            <div className="font-bold text-2xl break-all mb-3 text-white">
+            <div className="font-bold text-2xl break-all mb-3 text-v2-gold-accent">
               {isHide ? "*****" : displayBalance}
             </div>
             {!isHide && (

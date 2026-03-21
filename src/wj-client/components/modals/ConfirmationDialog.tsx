@@ -36,7 +36,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       <div className="bg-v2-maroon-800 rounded-lg p-6">
         {resolvedTitle && (
           <div className="flex justify-between items-center mb-4">
-            <div className="font-bold text-lg text-white">{resolvedTitle}</div>
+            <div className="font-bold text-lg text-v2-gold-accent">{resolvedTitle}</div>
           </div>
         )}
         <div className="text-center mb-6 text-v2-cream-100">{message}</div>

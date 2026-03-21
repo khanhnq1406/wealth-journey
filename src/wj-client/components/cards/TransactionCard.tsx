@@ -158,7 +158,7 @@ export function TransactionCard({
   // Get amount color
   const getAmountColor = () => {
  if (isIncome) return "text-v2-green-positive";
- if (isExpense) return "text-white";
+ if (isExpense) return "text-v2-gold-accent";
  return "text-v2-cream-100";
   };
 
@@ -249,7 +249,7 @@ export function TransactionCard({
             {loading ? (
  <div className="animate-pulse h-5 bg-v2-maroon-600 rounded w-32" />
             ) : (
- <h4 className="font-semibold text-white truncate">
+ <h4 className="font-semibold text-v2-gold-accent truncate">
                 {title}
               </h4>
             )}

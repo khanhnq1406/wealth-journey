@@ -116,7 +116,7 @@ export function BudgetItemCard({
         <div className="flex-1 min-w-0">
           <div
             className={`text-sm font-medium truncate transition-colors ${
-              isChecked ? "text-v2-text-tertiary line-through" : "text-white"
+              isChecked ? "text-v2-text-tertiary line-through" : "text-v2-gold-accent"
             }`}
           >
             {item.name}

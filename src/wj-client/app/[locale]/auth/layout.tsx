@@ -19,7 +19,7 @@ export default async function AuthLayout({
               height={80}
               className="rounded-md"
             />
-            <div className="text-white">
+            <div className="text-v2-gold-accent">
               <p className="font-extrabold text-[30px]">congdongvang.com</p>
               <p>{t("tagline")}</p>
             </div>

@@ -91,7 +91,7 @@ export const BaseCard = memo(function BaseCard({
   return (
     <div
       className={cn(
-        "bg-v2-bg-surface text-white",
+        "bg-v2-bg-surface text-v2-gold-accent",
         "border border-v2-border-light border-t-2 border-t-v2-gold-primary",
         mobileOptimized ? "rounded-sm sm:rounded-md lg:rounded-lg" : "rounded-lg",
         paddingClasses[padding],

@@ -315,7 +315,7 @@ export const PeriodSelector = memo(function PeriodSelector({
                   onChange={(e) => setTempStartDate(e.target.value)}
                   min={minDate?.toISOString().split("T")[0]}
                   max={maxDate?.toISOString().split("T")[0]}
- className="w-full px-3 sm:px-4 rounded-lg border min-h-[44px] sm:min-h-[48px] text-sm sm:text-base border-v2-border-light bg-v2-bg-surface text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+ className="w-full px-3 sm:px-4 rounded-lg border min-h-[44px] sm:min-h-[48px] text-sm sm:text-base border-v2-border-light bg-v2-bg-surface text-v2-gold-accent transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
               <div>
@@ -328,7 +328,7 @@ export const PeriodSelector = memo(function PeriodSelector({
                   onChange={(e) => setTempEndDate(e.target.value)}
                   min={minDate?.toISOString().split("T")[0]}
                   max={maxDate?.toISOString().split("T")[0]}
- className="w-full px-3 sm:px-4 rounded-lg border min-h-[44px] sm:min-h-[48px] text-sm sm:text-base border-v2-border-light bg-v2-bg-surface text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+ className="w-full px-3 sm:px-4 rounded-lg border min-h-[44px] sm:min-h-[48px] text-sm sm:text-base border-v2-border-light bg-v2-bg-surface text-v2-gold-accent transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>
             </div>

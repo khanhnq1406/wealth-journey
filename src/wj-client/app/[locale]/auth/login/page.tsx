@@ -92,7 +92,7 @@ export default function Login() {
           <div className="bg-v2-bg-surface border border-v2-border-light border-t-2 border-t-v2-gold-primary rounded-2xl sm:rounded-3xl shadow-lg p-6 sm:p-8 md:p-10 animate-fade-in-up">
             {/* Title */}
             <div className="text-center mb-6 sm:mb-8">
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-v2-gold-accent mb-2">
                 {t("title")}
               </h1>
               <p className="text-sm sm:text-base text-v2-text-secondary">

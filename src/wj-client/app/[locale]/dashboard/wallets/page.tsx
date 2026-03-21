@@ -166,7 +166,7 @@ export default function WalletsPage() {
                 "px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 min-h-[40px]",
                 viewMode === "grid"
  ? "bg-v2-maroon-800 text-white shadow-sm"
- : "text-v2-cream-100 hover:text-white",
+ : "text-v2-cream-100 hover:text-v2-gold-accent",
               )}
               aria-label={t("viewMode.grid")}
               aria-pressed={viewMode === "grid"}
@@ -192,7 +192,7 @@ export default function WalletsPage() {
                 "px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 min-h-[40px]",
                 viewMode === "list"
  ? "bg-v2-maroon-800 text-white shadow-sm"
- : "text-v2-cream-100 hover:text-white",
+ : "text-v2-cream-100 hover:text-v2-gold-accent",
               )}
               aria-label={t("viewMode.list")}
               aria-pressed={viewMode === "list"}

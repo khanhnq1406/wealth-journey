@@ -39,7 +39,7 @@ export function SilverPriceTable({
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto rounded-b-lg">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-300/60">

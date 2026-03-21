@@ -105,7 +105,7 @@ function StatCard({
     >
       <div className="text-xs text-v2-text-tertiary mb-1">{label}</div>
       <div
-        className={`text-sm font-semibold truncate ${highlight ? statusColor : "text-white"}`}
+        className={`text-sm font-semibold truncate ${highlight ? statusColor : "text-v2-gold-accent"}`}
         title={value}
       >
         {value}
@@ -225,7 +225,7 @@ export function BudgetCard({
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-4 border-b border-v2-border-light">
             <div className="flex-1 min-w-0">
-              <h3 className="text-base sm:text-lg font-semibold text-white truncate">
+              <h3 className="text-base sm:text-lg font-semibold text-v2-gold-accent truncate">
                 {budget.name}
               </h3>
               <div className="flex items-center gap-2 mt-1">

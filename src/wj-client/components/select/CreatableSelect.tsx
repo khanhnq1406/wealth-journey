@@ -165,7 +165,7 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
         className={cn(
           "min-h-[44px] sm:min-h-[48px] px-3 py-2 w-full pr-10 rounded-lg",
  "bg-v2-bg-dark",
- "text-white",
+ "text-v2-gold-accent",
  "border border-v2-border-light",
  "placeholder:text-v2-text-tertiary",
           "disabled:opacity-50 disabled:cursor-not-allowed",
@@ -187,7 +187,7 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
             setIsOpen(!isOpen);
             inputRef.current?.focus();
           }}
- className="absolute right-2 top-1/2 -translate-y-1/2 text-v2-text-tertiary hover:text-white cursor-pointer"
+ className="absolute right-2 top-1/2 -translate-y-1/2 text-v2-text-tertiary hover:text-v2-gold-accent cursor-pointer"
         >
           <svg
             className={cn(
@@ -253,7 +253,7 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
                       ? "bg-v2-bg-surface-tint text-v2-gold-primary"
                       : value === option.value
  ? "text-v2-gold-primary font-semibold"
- : "hover:bg-v2-bg-surface-tint text-white",
+ : "hover:bg-v2-bg-surface-tint text-v2-gold-accent",
                   )}
                 >
                   <span>{option.label}</span>

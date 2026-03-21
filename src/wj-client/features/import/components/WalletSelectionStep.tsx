@@ -53,7 +53,7 @@ export function WalletSelectionStep({
  <div className="absolute inset-0 rounded-full border-4 border-v2-gold-primary/30"></div>
  <div className="absolute inset-0 rounded-full border-4 border-v2-gold-primary border-t-transparent animate-spin"></div>
           </div>
- <p className="text-lg font-medium text-white">
+ <p className="text-lg font-medium text-v2-gold-accent">
             {t("loadingWallets")}
           </p>
  <p className="mt-2 text-sm text-v2-text-secondary">
@@ -127,7 +127,7 @@ export function WalletSelectionStep({
  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-v2-bg-dark mb-2">
  <WalletIcon className="w-8 h-8 text-v2-gold-primary" />
         </div>
- <h2 className="text-xl sm:text-2xl font-bold text-white">
+ <h2 className="text-xl sm:text-2xl font-bold text-v2-gold-accent">
           {t("title")}
         </h2>
  <p className="text-sm sm:text-base text-v2-text-secondary max-w-lg mx-auto">
@@ -199,8 +199,8 @@ export function WalletSelectionStep({
                   className={cn(
                     "font-semibold text-base line-clamp-1",
                     isSelected
- ? "text-white"
- : "text-white",
+ ? "text-v2-gold-accent"
+ : "text-v2-gold-accent",
                   )}
                 >
                   {wallet.walletName}

@@ -200,7 +200,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       // Base styles
       "w-full rounded-lg border transition-all duration-200",
  "bg-v2-bg-dark",
- "text-white",
+ "text-v2-gold-accent",
  "placeholder:text-v2-text-tertiary",
  "disabled:opacity-40 disabled:cursor-not-allowed",
       // Focus styles
@@ -239,7 +239,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
     const rightIconClasses = cn(
       iconClasses,
       "right-3",
- onRightIconClick && "pointer-events-auto cursor-pointer hover:text-white"
+ onRightIconClick && "pointer-events-auto cursor-pointer hover:text-v2-gold-accent"
     );
 
     return (

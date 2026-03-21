@@ -254,7 +254,7 @@ export function FormFieldGroup({
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             {title && (
- <h3 className="text-base font-semibold text-white">
+ <h3 className="text-base font-semibold text-v2-gold-accent">
                 {title}
               </h3>
             )}

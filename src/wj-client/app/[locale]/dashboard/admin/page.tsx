@@ -157,7 +157,7 @@ function AdminCMSContent() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* SEO Metadata */}
       <BaseCard padding="lg">
- <h2 className="text-lg font-semibold text-white mb-4">
+ <h2 className="text-lg font-semibold text-v2-gold-accent mb-4">
           {t("cms.seoMetadata")}
         </h2>
 
@@ -285,7 +285,7 @@ function AdminCMSContent() {
 
       {/* Footer Content */}
       <BaseCard padding="lg">
- <h2 className="text-lg font-semibold text-white mb-4">
+ <h2 className="text-lg font-semibold text-v2-gold-accent mb-4">
           {t("cms.footerContent")}
         </h2>
 
@@ -349,7 +349,7 @@ export default function AdminCMSPage() {
     <AdminGuard>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="mb-6">
- <h1 className="text-2xl font-bold text-white">
+ <h1 className="text-2xl font-bold text-v2-gold-accent">
             {t("page.title")}
           </h1>
  <p className="text-sm text-v2-text-tertiary mt-1">

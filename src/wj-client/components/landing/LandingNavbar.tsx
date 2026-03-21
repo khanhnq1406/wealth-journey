@@ -103,7 +103,7 @@ export default function LandingNavbar() {
               <div className="flex items-center space-x-4">
                 <Link
                   href="/auth/login"
-                  className="text-white hover:text-v2-gold-primary transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 rounded-md px-2 py-1 min-h-[44px] flex items-center"
+                  className="text-v2-gold-accent hover:text-v2-gold-primary transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 rounded-md px-2 py-1 min-h-[44px] flex items-center"
                 >
                   {t("navbar.signIn")}
                 </Link>
@@ -125,7 +125,7 @@ export default function LandingNavbar() {
             aria-expanded={isMobileMenuOpen}
           >
             <motion.svg
-              className="w-6 h-6 text-white"
+              className="w-6 h-6 text-v2-gold-accent"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -186,7 +186,7 @@ export default function LandingNavbar() {
                     >
                       <Link
                         href="/auth/login"
-                        className="text-white hover:text-v2-gold-primary transition-colors duration-200 font-medium px-3 py-2 focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 rounded-md min-h-[44px] flex items-center"
+                        className="text-v2-gold-accent hover:text-v2-gold-primary transition-colors duration-200 font-medium px-3 py-2 focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 rounded-md min-h-[44px] flex items-center"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {t("navbar.signIn")}

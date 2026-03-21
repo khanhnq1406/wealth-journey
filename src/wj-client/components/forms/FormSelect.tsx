@@ -387,7 +387,7 @@ export function FormSelect({
   const triggerClasses = cn(
     "w-full flex items-center justify-between gap-3 cursor-pointer",
  "rounded-lg border bg-v2-bg-dark",
- "text-white",
+ "text-v2-gold-accent",
     "transition-all duration-200",
     // Focus styles - single ring (clean, modern)
     "focus:outline-none",
@@ -461,7 +461,7 @@ export function FormSelect({
               placeholder={searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
- className="w-full px-3 py-2 text-sm rounded-md border border-v2-border-light bg-v2-bg-dark text-white placeholder:text-v2-text-tertiary focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent transition-all duration-200"
+ className="w-full px-3 py-2 text-sm rounded-md border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent placeholder:text-v2-text-tertiary focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent transition-all duration-200"
               autoFocus
             />
           </div>

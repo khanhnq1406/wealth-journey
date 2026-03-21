@@ -40,7 +40,7 @@ export function CurrencyPriceTable({
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto rounded-b-lg">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-v2-currency-accent/30">

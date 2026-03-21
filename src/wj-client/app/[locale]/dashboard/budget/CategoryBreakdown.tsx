@@ -86,7 +86,7 @@ const CategoryItem = memo(function CategoryItem({
               </div>
             )}
             <div>
-              <h4 className="font-semibold text-white">{name}</h4>
+              <h4 className="font-semibold text-v2-gold-accent">{name}</h4>
               {transactionCount !== undefined && (
                 <p className="text-xs text-v2-text-tertiary">
                   {t("card.transactions", { count: transactionCount })}
@@ -142,13 +142,13 @@ const CategoryItem = memo(function CategoryItem({
         <div className="flex justify-between items-center py-2 border-t border-v2-border-light">
           <div className="text-center">
             <div className="text-xs text-v2-text-tertiary">{t("title")}</div>
-            <div className="text-sm font-semibold text-white">
+            <div className="text-sm font-semibold text-v2-gold-accent">
               {formatCurrency(budget, currency)}
             </div>
           </div>
           <div className="text-center">
             <div className="text-xs text-v2-text-tertiary">{t("card.spent")}</div>
-            <div className="text-sm font-semibold text-white">
+            <div className="text-sm font-semibold text-v2-gold-accent">
               {formatCurrency(spent, currency)}
             </div>
           </div>
@@ -278,7 +278,7 @@ export const CategoryBreakdown = memo(function CategoryBreakdown({
             transition={{ duration: 0.2 }}
           >
             <BaseCard className="p-4">
-              <h3 className="text-lg font-bold text-white mb-4">{t("categoryComparison")}</h3>
+              <h3 className="text-lg font-bold text-v2-gold-accent mb-4">{t("categoryComparison")}</h3>
               <div className="h-80">
                 <BarChart
                   data={chartData}

@@ -41,7 +41,7 @@ export default function LandingCTA() {
         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
         transition={{ duration: 0.6 }}
       >
-        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+        <h2 className="text-3xl sm:text-4xl font-bold text-v2-gold-accent mb-6">
           {t("cta.startJourney")}
         </h2>
         <p className="text-lg text-v2-text-tertiary mb-10 max-w-2xl mx-auto">

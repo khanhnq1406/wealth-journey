@@ -142,7 +142,7 @@ export function WealthCard({
 
   const textClasses = isGradient
     ? "text-white"
- : "text-white";
+ : "text-v2-gold-accent";
 
   const subtitleClasses = isGradient
     ? "text-white/80"
@@ -382,7 +382,7 @@ export function StatCard({
  <div className="h-7 bg-v2-maroon-600 rounded w-24" />
             </div>
           ) : (
- <p className="text-2xl sm:text-3xl font-bold text-white">
+ <p className="text-2xl sm:text-3xl font-bold text-v2-gold-accent">
               {typeof value === "number" ? value.toLocaleString() : value}
             </p>
           )}

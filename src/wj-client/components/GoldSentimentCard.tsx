@@ -212,7 +212,7 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
       {/* Toast notification */}
       {toastMessage && (
         <div
-          className={`fixed top-4 left-1/2 -translate-x-1/2 z-toast text-white px-4 py-2 rounded-lg shadow-lg text-sm animate-fade-in ${
+          className={`fixed top-4 left-1/2 -translate-x-1/2 z-toast text-v2-gold-accent px-4 py-2 rounded-lg shadow-lg text-sm animate-fade-in ${
             toastType === "error"
  ? "bg-v2-red-negative"
  : "bg-v2-bg-dark"

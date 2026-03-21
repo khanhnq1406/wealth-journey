@@ -193,7 +193,7 @@ export const DonutChart = memo(function DonutChart({
           style={{ transform: `translateY(${legendPosition === "top" ? "25%" : legendPosition === "bottom" ? "-25%" : "0"})` }}
         >
           {centerLabel && (
-            <div className="text-xl sm:text-2xl font-bold text-white">
+            <div className="text-xl sm:text-2xl font-bold text-v2-gold-accent">
               {centerLabel}
             </div>
           )}

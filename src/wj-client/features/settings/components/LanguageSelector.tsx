@@ -42,7 +42,7 @@ export function LanguageSelector() {
   return (
     <div className="space-y-4">
       <div>
- <h3 className="font-medium text-white">
+ <h3 className="font-medium text-v2-gold-accent">
           {t("title")}
         </h3>
  <p className="text-sm text-v2-text-tertiary">
