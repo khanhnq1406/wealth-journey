@@ -4,8 +4,15 @@ import { useTranslations } from "next-intl";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import Image from "next/image";
 
-const textShadow = "0 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.2)";
-const textShadowLg = "0 2px 6px rgba(0,0,0,0.5), 0 0 12px rgba(0,0,0,0.25)";
+const textShadow = "0 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.25)";
+const textShadowLg =
+  "0 2px 8px rgba(0,0,0,0.5), 0 0 16px rgba(0,0,0,0.3)";
+
+const goldGradient =
+  "linear-gradient(135deg, #B8862D 0%, #D4A843 20%, #F5D38E 40%, #E8C36A 55%, #D4A843 70%, #B8862D 85%, #9A7023 100%)";
+
+const lightEffect =
+  "radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 40%, transparent 70%)";
 
 interface NetWorthDisplayProps {
   totalNetWorth: number;
@@ -40,23 +47,22 @@ function PnlValue({ percent, amount, label, currency }: PnlValueProps) {
   return (
     <div
       className={`text-center rounded-xl px-4 py-2 ${
-        isPositive ? "bg-green-500/20" : "bg-red-500/20"
+        isPositive ? "bg-v2-maroon-900/15" : "bg-red-800/20"
       }`}
     >
       <p
-        className={`font-roboto font-bold text-[14px] ${isPositive ? "text-v2-text-tertiary" : "text-v2-text-tertiary"}`}
+        className="font-roboto font-bold text-[14px] text-v2-text-tertiary"
         style={{ textShadow }}
       >
         {formatAmount(amount)} {currency}
       </p>
       <p
-        className={`font-roboto font-bold text-[14px] ${isPositive ? "text-v2-text-tertiary" : "text-v2-text-tertiary"}`}
-        style={{ textShadow }}
+        className={`font-roboto font-bold text-[14px] ${isPositive ? "text-green-800" : "text-red-800"}`}
       >
         {formatPercent(percent)}
       </p>
       <p
-        className="font-roboto font-medium text-[11px] text-white/70 tracking-[1px] mt-1"
+        className="font-roboto font-medium text-[11px] text-v2-text-tertiary/60 tracking-[1px] mt-1"
         style={{ textShadow }}
       >
         {label}
@@ -98,17 +104,15 @@ export function NetWorthDisplay({
 
   // PnL bar shared between mobile and desktop
   const pnlBar = monthPnlPercent !== 0 && (
-    <div className="relative z-10 flex items-center justify-between px-5 py-3 bg-black/20">
+    <div className="relative z-10 flex items-center justify-between px-5 py-3 bg-v2-maroon-900/15">
       <div className="flex items-center gap-2">
         {isMonthPositive ? (
-          <TrendingUp size={16} className="text-white/80" />
+          <TrendingUp size={16} className="text-v2-text-tertiary/70" />
         ) : (
-          <TrendingDown size={16} className="text-white/80" />
+          <TrendingDown size={16} className="text-v2-text-tertiary/70" />
         )}
         <span
-          className={`font-roboto font-bold text-[15px] ${
-            isMonthPositive ? "text-v2-text-tertiary" : "text-v2-text-tertiary"
-          }`}
+          className="font-roboto font-bold text-[15px] text-v2-text-tertiary"
           style={{ textShadow }}
         >
           {formatAmount(monthPnl)} {currency}
@@ -117,10 +121,9 @@ export function NetWorthDisplay({
       <span
         className={`font-roboto font-bold text-[13px] px-3 py-1 rounded-full ${
           isMonthPositive
-            ? "bg-green-500/20 text-v2-text-tertiary"
-            : "bg-red-500/20 text-v2-text-tertiary"
+            ? "bg-green-800/15 text-green-800"
+            : "bg-red-800/15 text-red-800"
         }`}
-        style={{ textShadow }}
       >
         {formatPercent(monthPnlPercent)}
       </span>
@@ -128,47 +131,69 @@ export function NetWorthDisplay({
   );
 
   return (
-    <div>
-      {/* Mobile version — SJC gold bar card with embossed dragon */}
+    <div className="relative z-0 isolate">
+      {/* Mobile version — gold gradient card with transparent dragon */}
       <div
         className="sm:hidden relative overflow-hidden rounded-2xl"
         style={{
+          background: goldGradient,
           boxShadow:
-            "0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+            "0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3)",
         }}
       >
-        <Image
-          src="/dragon-gold-mobile-flat.webp"
-          alt=""
-          fill
-          className="object-cover"
+        {/* Gradient light effect overlay */}
+        <div
+          className="absolute inset-0 z-[1]"
+          style={{ background: lightEffect }}
           aria-hidden="true"
-          priority
+        />
+
+        {/* Dragon watermark — right side */}
+        <div className="absolute z-[2] pointer-events-none w-full h-full">
+          <Image
+            src="/dragon1.webp"
+            alt=""
+            width={300}
+            height={110}
+            className="object-contain w-full h-full opacity-70"
+            aria-hidden="true"
+            priority
+          />
+        </div>
+
+        {/* Dark transparent overlay to highlight text */}
+        <div
+          className="absolute inset-0 z-[3]"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.05) 100%)",
+          }}
+          aria-hidden="true"
         />
 
         <div className="relative z-10 p-5 pb-0">
           <p
-            className="font-roboto font-medium text-white text-[15px]"
+            className="font-roboto font-medium text-v2-text-tertiary text-[15px]"
             style={{ textShadow }}
           >
             {greeting}
             {userName ? `, ${userName}` : ""}
           </p>
           <p
-            className="font-roboto font-semibold text-[11px] tracking-[2px] text-white/80 mt-3"
+            className="font-roboto font-semibold text-[11px] tracking-[2px] text-v2-text-tertiary mt-3"
             style={{ textShadow }}
           >
             {t("totalNetWorthLabel")}
           </p>
           <div className="flex items-baseline gap-2 mt-1">
             <p
-              className="font-roboto font-extrabold text-[32px] tracking-[-1.5px] text-white"
+              className="font-roboto font-extrabold text-[32px] tracking-[-1.5px] text-v2-text-tertiary"
               style={{ textShadow: textShadowLg }}
             >
               {formatAmount(totalNetWorth)}
             </p>
             <span
-              className="font-roboto text-[13px] font-bold text-white/80"
+              className="font-roboto text-[13px] font-bold text-v2-text-tertiary"
               style={{ textShadow }}
             >
               {currency}
@@ -179,40 +204,62 @@ export function NetWorthDisplay({
         <div className="mt-3">{pnlBar}</div>
       </div>
 
-      {/* Desktop version — SJC gold bar card with embossed dragon */}
+      {/* Desktop version — gold gradient card with transparent dragon */}
       <div
         className="hidden sm:block relative overflow-hidden rounded-2xl"
         style={{
+          background: goldGradient,
           boxShadow:
-            "0 4px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+            "0 4px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3)",
         }}
       >
-        <Image
-          src="/dragon-gold-mobile-flat.webp"
-          alt=""
-          fill
-          className="object-cover"
+        {/* Gradient light effect overlay */}
+        <div
+          className="absolute inset-0 z-[1]"
+          style={{ background: lightEffect }}
           aria-hidden="true"
-          priority
+        />
+
+        {/* Dragon watermark — right side */}
+        <div className="absolute right-1/2 top-1/2 -translate-y-1/2 z-[2] pointer-events-none opacity-80">
+          <Image
+            src="/dragon1.webp"
+            alt=""
+            width={320}
+            height={130}
+            className="object-contain h-32"
+            aria-hidden="true"
+            priority
+          />
+        </div>
+
+        {/* Dark transparent overlay to highlight text */}
+        <div
+          className="absolute inset-0 z-[3]"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 50%, rgba(0,0,0,0.05) 100%)",
+          }}
+          aria-hidden="true"
         />
 
         <div className="relative z-10 flex items-center justify-between p-6">
           <div>
             <p
-              className="font-roboto font-semibold text-[11px] tracking-[2px] text-white/80"
+              className="font-roboto font-semibold text-[11px] tracking-[2px] text-v2-text-tertiary/70"
               style={{ textShadow }}
             >
               {t("totalNetWorthLabel")}
             </p>
             <div className="flex items-baseline gap-3 mt-1">
               <p
-                className="font-roboto font-bold text-[42px] tracking-[-1.5px] text-white"
+                className="font-roboto font-bold text-[42px] tracking-[-1.5px] text-v2-text-tertiary"
                 style={{ textShadow: textShadowLg }}
               >
                 {formatAmount(totalNetWorth)}
               </p>
               <span
-                className="font-roboto text-[15px] font-bold text-white/80"
+                className="font-roboto text-[15px] font-bold text-v2-text-tertiary/70"
                 style={{ textShadow }}
               >
                 {currency}
