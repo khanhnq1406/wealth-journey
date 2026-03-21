@@ -148,13 +148,13 @@ const StatCard = memo(function StatCard({
   const colorClasses = {
     green: "text-v2-green-positive",
     red: "text-red-600",
-    neutral: "text-neutral-900",
+    neutral: "text-v2-gold-accent",
   };
 
   return (
     <BaseCard className="p-3 sm:p-4 hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start mb-2">
-        <div className="text-sm text-neutral-600">{label}</div>
+        <div className="text-sm text-v2-text-secondary">{label}</div>
         {icon && <div className="flex-shrink-0">{icon}</div>}
       </div>
 
@@ -165,7 +165,7 @@ const StatCard = memo(function StatCard({
       </div>
 
       {subtitle && (
-        <div className="text-xs text-neutral-500 mt-1">{subtitle}</div>
+        <div className="text-xs text-v2-text-tertiary mt-1">{subtitle}</div>
       )}
 
       {trend !== undefined && (
@@ -382,16 +382,16 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
       {/* Period Pill Selector */}
       {onPeriodChange && (
         <div className="flex items-center gap-2">
-          <span className="text-sm text-neutral-500">{t("summary.periodLabel")}:</span>
-          <div className="flex gap-1 bg-neutral-100 rounded-xl p-1">
+          <span className="text-sm text-v2-text-tertiary">{t("summary.periodLabel")}:</span>
+          <div className="flex gap-1 bg-v2-maroon-900 rounded-xl p-1">
             {periodOptions.map((opt) => (
               <button
                 key={opt.key}
                 onClick={() => onPeriodChange(opt.key)}
                 className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
                   selectedPeriod === opt.key
-                    ? "bg-v2-maroon-800 text-neutral-900 shadow-sm"
-                    : "text-neutral-500 hover:text-neutral-700"
+                    ? "bg-v2-maroon-800 text-v2-gold-accent shadow-sm"
+                    : "text-v2-text-tertiary hover:text-v2-gold-accent"
                 }`}
               >
                 {opt.label}
@@ -443,10 +443,10 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
         <BaseCard className="p-3 sm:p-4 md:p-6 ">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
             <div>
-              <h3 className="text-base sm:text-lg font-bold text-neutral-900">
+              <h3 className="text-base sm:text-lg font-bold text-v2-gold-accent">
                 {t("summary.assetAllocation")}
               </h3>
-              <p className="text-xs sm:text-sm text-neutral-600 mt-0.5 sm:mt-1">
+              <p className="text-xs sm:text-sm text-v2-text-secondary mt-0.5 sm:mt-1">
                 {t("summary.distributionByType")}
               </p>
             </div>

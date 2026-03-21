@@ -61,7 +61,7 @@ const SimplePnlChart = memo(function SimplePnlChart({
   return (
     <div className="space-y-2">
       <div className="flex justify-between text-sm">
-        <span className="text-neutral-600">{totalPnlLabel}</span>
+        <span className="text-v2-text-secondary">{totalPnlLabel}</span>
         <span
           className={`font-semibold ${
             isPositive ? "text-v2-green-positive" : "text-red-600"
@@ -71,7 +71,7 @@ const SimplePnlChart = memo(function SimplePnlChart({
           {pnlPercent.toFixed(2)}%
         </span>
       </div>
-      <div className="w-full bg-neutral-200 rounded-full h-4 overflow-hidden">
+      <div className="w-full bg-v2-maroon-800 rounded-full h-4 overflow-hidden">
         <div
           className={`h-full rounded-full transition-all duration-500 ${
             isPositive ? "bg-v2-green-positive" : "bg-red-500"
@@ -112,14 +112,14 @@ const PerformanceList = memo(function PerformanceList({
 
   return (
     <div>
-      <h4 className="text-sm font-semibold text-neutral-700 mb-2">{title}</h4>
+      <h4 className="text-sm font-semibold text-v2-gold-accent mb-2">{title}</h4>
       <div className="space-y-2">
         {performers.map((p) => (
           <div
             key={p.symbol}
-            className="flex justify-between items-center py-2 px-3 bg-neutral-50 rounded"
+            className="flex justify-between items-center py-2 px-3 bg-v2-maroon-900 rounded"
           >
-            <span className="font-medium text-neutral-900">{p.symbol}</span>
+            <span className="font-medium text-v2-gold-accent">{p.symbol}</span>
             <div className="text-right">
               <div
                 className={`text-sm font-semibold ${
@@ -129,7 +129,7 @@ const PerformanceList = memo(function PerformanceList({
                 {p.pnlPercent >= 0 ? "+" : ""}
                 {p.pnlPercent.toFixed(2)}%
               </div>
-              <div className="text-xs text-neutral-600">
+              <div className="text-xs text-v2-text-secondary">
                 {formatCurrency(Math.abs(p.pnl), userCurrency)}
               </div>
             </div>
@@ -170,7 +170,7 @@ export const PortfolioAnalytics = memo(function PortfolioAnalytics({
     <BaseCard className="p-4">
       {/* Header with collapse toggle */}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg sm:text-xl font-bold text-neutral-800">
+        <h2 className="text-lg sm:text-xl font-bold text-v2-gold-accent">
           {tAnalytics("portfolioAnalytics")}
         </h2>
         <button
@@ -219,8 +219,8 @@ export const PortfolioAnalytics = memo(function PortfolioAnalytics({
         )}
 
         {/* Portfolio Health Indicator */}
-        <div className="pt-4 border-t border-neutral-200">
-          <h4 className="text-sm font-semibold text-neutral-700 mb-2">
+        <div className="pt-4 border-t border-v2-border-light">
+          <h4 className="text-sm font-semibold text-v2-gold-accent mb-2">
             {tAnalytics("portfolioHealth")}
           </h4>
           <div className="flex items-center gap-3">
@@ -229,13 +229,13 @@ export const PortfolioAnalytics = memo(function PortfolioAnalytics({
                 pnlPercent >= 0 ? "bg-v2-green-positive" : "bg-red-500"
               }`}
             />
-            <span className="text-sm text-neutral-600">
+            <span className="text-sm text-v2-text-secondary">
               {pnlPercent >= 0
                 ? tAnalytics("inProfit")
                 : tAnalytics("atLoss")}
             </span>
           </div>
-          <div className="mt-2 text-xs text-neutral-500">
+          <div className="mt-2 text-xs text-v2-text-tertiary">
             {tAnalytics("totalInvested", { amount: formatCurrency(displayCost, displayCurrency) })}
           </div>
         </div>
@@ -245,7 +245,7 @@ export const PortfolioAnalytics = memo(function PortfolioAnalytics({
       <div className="sm:hidden mt-3 text-center">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-xs text-neutral-500 hover:text-neutral-700"
+          className="text-xs text-v2-text-tertiary hover:text-v2-gold-accent"
         >
           {isExpanded ? "▲" : "▼"} {isExpanded ? tAnalytics("lessDetails") : tAnalytics("moreDetails")}
         </button>

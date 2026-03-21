@@ -23,10 +23,10 @@ export const EmptyWalletsState = memo(function EmptyWalletsState({
   return (
     <div className="flex flex-col items-center justify-center h-full gap-4">
       <div className="text-center">
-        <p className="text-xl sm:text-2xl font-bold text-neutral-800">
+        <p className="text-xl sm:text-2xl font-bold text-v2-gold-accent">
           {t("emptyWallets.title")}
         </p>
-        <p className="text-base text-neutral-600 mt-2">
+        <p className="text-base text-v2-text-secondary mt-2">
           {t("emptyWallets.description")}
         </p>
       </div>

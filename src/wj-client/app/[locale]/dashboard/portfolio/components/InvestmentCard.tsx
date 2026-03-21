@@ -114,13 +114,13 @@ export const InvestmentCard = memo(function InvestmentCard({
       {/* Header row with symbol and type */}
       <div className="flex justify-between items-start mb-3">
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-neutral-900 truncate">
+          <h3 className="text-lg font-semibold text-v2-gold-accent truncate">
             {symbol}
           </h3>
-          <p className="text-sm text-neutral-600 truncate">{name}</p>
+          <p className="text-sm text-v2-text-secondary truncate">{name}</p>
         </div>
         <div className="ml-2 flex-shrink-0">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-800">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-v2-maroon-900 text-v2-gold-accent">
             {getInvestmentTypeLabel(type, t as (key: string) => string)}
           </span>
         </div>
@@ -129,31 +129,31 @@ export const InvestmentCard = memo(function InvestmentCard({
       {/* Wallet name (conditional) */}
       {showWallet && walletName && (
         <div className="mb-2">
-          <span className="text-xs text-neutral-500">
+          <span className="text-xs text-v2-text-tertiary">
             {t("form.walletLabel")}: {walletName}
           </span>
         </div>
       )}
 
       {/* Quantity row */}
-      <div className="flex justify-between items-center py-2 border-b border-neutral-200">
-        <span className="text-sm text-neutral-600">{t("detail.quantityLabel")}</span>
-        <span className="text-sm font-medium text-neutral-900">
+      <div className="flex justify-between items-center py-2 border-b border-v2-border-light">
+        <span className="text-sm text-v2-text-secondary">{t("detail.quantityLabel")}</span>
+        <span className="text-sm font-medium text-v2-gold-accent">
           {formatQuantity(quantity, type, purchaseUnit)}
         </span>
       </div>
 
       {/* Prices section */}
-      <div className="py-2 space-y-2 border-b border-neutral-200">
+      <div className="py-2 space-y-2 border-b border-v2-border-light">
         {/* Average Cost */}
         <div className="flex justify-between items-center">
-          <span className="text-sm text-neutral-600">{t("detail.avgCost")}</span>
+          <span className="text-sm text-v2-text-secondary">{t("detail.avgCost")}</span>
           <div className="text-right">
-            <div className="text-sm font-medium text-neutral-900">
+            <div className="text-sm font-medium text-v2-gold-accent">
               {formatPrice(averageCost || 0, type, nativeCurrency, purchaseUnit, symbol)}
             </div>
             {displayAverageCost && displayCurrency && (
-              <div className="text-xs text-neutral-500">
+              <div className="text-xs text-v2-text-tertiary">
                 ≈ {formatPrice(displayAverageCost.amount || 0, type, displayCcy, purchaseUnit, symbol)}
               </div>
             )}
@@ -162,13 +162,13 @@ export const InvestmentCard = memo(function InvestmentCard({
 
         {/* Current Price */}
         <div className="flex justify-between items-center">
-          <span className="text-sm text-neutral-600">{t("detail.currentPrice")}</span>
+          <span className="text-sm text-v2-text-secondary">{t("detail.currentPrice")}</span>
           <div className="text-right">
-            <div className="text-sm font-medium text-neutral-900">
+            <div className="text-sm font-medium text-v2-gold-accent">
               {formatPrice(currentPrice || 0, type, nativeCurrency, purchaseUnit, symbol)}
             </div>
             {displayCurrentPrice && displayCurrency && (
-              <div className="text-xs text-neutral-500">
+              <div className="text-xs text-v2-text-tertiary">
                 ≈ {formatPrice(displayCurrentPrice.amount || 0, type, displayCcy, purchaseUnit, symbol)}
               </div>
             )}
@@ -180,13 +180,13 @@ export const InvestmentCard = memo(function InvestmentCard({
       <div className="pt-2 space-y-2">
         {/* Current Value */}
         <div className="flex justify-between items-center">
-          <span className="text-sm text-neutral-600">{t("detail.currentValue")}</span>
+          <span className="text-sm text-v2-text-secondary">{t("detail.currentValue")}</span>
           <div className="text-right">
-            <div className="text-base font-semibold text-neutral-900">
+            <div className="text-base font-semibold text-v2-gold-accent">
               {formatCurrency(currentValue || 0, nativeCurrency)}
             </div>
             {displayCurrentValue && displayCurrency && (
-              <div className="text-xs text-neutral-500">
+              <div className="text-xs text-v2-text-tertiary">
                 ≈ {formatCurrency(displayCurrentValue.amount || 0, displayCcy)}
               </div>
             )}
@@ -195,7 +195,7 @@ export const InvestmentCard = memo(function InvestmentCard({
 
         {/* PNL */}
         <div className="flex justify-between items-center">
-          <span className="text-sm text-neutral-600">{t("table.pnl")}</span>
+          <span className="text-sm text-v2-text-secondary">{t("table.pnl")}</span>
           <div className="text-right">
             <div
               className={`text-base font-semibold ${
@@ -204,7 +204,7 @@ export const InvestmentCard = memo(function InvestmentCard({
             >
               {formatCurrency(pnl, nativeCurrency)}
               {displayUnrealizedPnl && displayCurrency && (
-                <span className="text-xs text-neutral-500 ml-1">
+                <span className="text-xs text-v2-text-tertiary ml-1">
                   (≈ {formatCurrency(displayUnrealizedPnl.amount || 0, displayCcy)})
                 </span>
               )}
@@ -222,9 +222,9 @@ export const InvestmentCard = memo(function InvestmentCard({
 
       {/* Last Updated */}
       {updatedAt && (
-        <div className="mt-3 pt-2 border-t border-neutral-200">
+        <div className="mt-3 pt-2 border-t border-v2-border-light">
           <div className="flex justify-between items-center">
-            <span className="text-xs text-neutral-500">{t("table.lastUpdated")}</span>
+            <span className="text-xs text-v2-text-tertiary">{t("table.lastUpdated")}</span>
             <div className="flex items-center gap-1">
               {updatedAt && (
                 <>

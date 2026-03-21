@@ -215,7 +215,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
         <div className="flex justify-between items-start mb-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className="text-lg font-bold text-neutral-900 truncate">
+              <h3 className="text-lg font-bold text-v2-gold-accent truncate">
                 {symbol}
               </h3>
               {isCustom && (
@@ -233,7 +233,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
                 </div>
               )}
             </div>
-            <p className="text-sm text-neutral-600 truncate">{name}</p>
+            <p className="text-sm text-v2-text-secondary truncate">{name}</p>
             {isCustom && (
               <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
                 <span>💡</span>
@@ -242,7 +242,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
             )}
           </div>
           <div className="flex flex-col items-end gap-2">
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-neutral-100 text-neutral-800">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-v2-maroon-900 text-v2-gold-accent">
               {getInvestmentTypeLabel(type, t as (key: string) => string)}
             </span>
             {!isCustom && (
@@ -258,7 +258,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
 
         {showWallet && walletName && (
           <div className="mb-2">
-            <span className="text-xs text-neutral-500">
+            <span className="text-xs text-v2-text-tertiary">
               {t("form.walletLabel")}: {walletName}
             </span>
           </div>
@@ -266,19 +266,19 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
 
         <div className="flex justify-between items-end">
           <div>
-            <div className="text-xs text-neutral-500 mb-1">{t("detail.currentValue")}</div>
-            <div className="text-xl font-bold text-neutral-900">
+            <div className="text-xs text-v2-text-tertiary mb-1">{t("detail.currentValue")}</div>
+            <div className="text-xl font-bold text-v2-gold-accent">
               {formatCurrency(currentValue || 0, nativeCurrency)}
             </div>
             {displayCurrentValue && displayCurrency && (
-              <div className="text-xs text-neutral-500">
+              <div className="text-xs text-v2-text-tertiary">
                 ≈ {formatCurrency(displayCurrentValue.amount || 0, displayCcy)}
               </div>
             )}
           </div>
 
           <div className={`px-3 py-2 rounded-lg ${pnlBgColor}`}>
-            <div className="text-xs text-neutral-600 mb-1">{t("analytics.totalPnl")}</div>
+            <div className="text-xs text-v2-text-secondary mb-1">{t("analytics.totalPnl")}</div>
             <div className={`text-sm font-bold ${pnlDisplay.colorClass}`}>
               {isCustom ? (
                 "N/A"
@@ -293,12 +293,12 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
         </div>
 
         {updatedAt && (
-          <div className="flex items-center justify-between pt-2 border-t border-neutral-100">
+          <div className="flex items-center justify-between pt-2 border-t border-v2-border-light">
             <div className="flex items-center gap-1">
               <div
                 className={`w-2 h-2 rounded-full ${isRecent ? "bg-v2-green-positive animate-pulse" : "bg-gray-400"}`}
               />
-              <span className="text-xs text-neutral-500">
+              <span className="text-xs text-v2-text-tertiary">
                 {formatTimeAgo(updatedAt, t as any, locale).text}
               </span>
             </div>
@@ -308,7 +308,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
               transition={{ duration: 0.2 }}
             >
               <svg
-                className="w-5 h-5 text-neutral-400"
+                className="w-5 h-5 text-v2-text-tertiary"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -334,13 +334,13 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4 border-t border-neutral-100">
+            <div className="px-4 pb-4 border-t border-v2-border-light">
               <div className="grid grid-cols-2 gap-4 py-3">
                 <div>
-                  <div className="text-xs text-neutral-500 mb-1">
+                  <div className="text-xs text-v2-text-tertiary mb-1">
                     {t("detail.avgCost")}
                   </div>
-                  <div className="text-sm font-semibold text-neutral-900">
+                  <div className="text-sm font-semibold text-v2-gold-accent">
                     {formatPrice(
                       averageCost || 0,
                       type,
@@ -350,7 +350,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
                     )}
                   </div>
                   {displayAverageCost && displayCurrency && (
-                    <div className="text-xs text-neutral-500">
+                    <div className="text-xs text-v2-text-tertiary">
                       ≈{" "}
                       {formatPrice(
                         displayAverageCost.amount || 0,
@@ -364,10 +364,10 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
                 </div>
 
                 <div>
-                  <div className="text-xs text-neutral-500 mb-1">
+                  <div className="text-xs text-v2-text-tertiary mb-1">
                     {t("detail.currentPrice")}
                   </div>
-                  <div className="text-sm font-semibold text-neutral-900">
+                  <div className="text-sm font-semibold text-v2-gold-accent">
                     {isCustom
                       ? formatInvestmentPrice(
                           currentPrice || 0,
@@ -384,7 +384,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
                         )}
                   </div>
                   {!isCustom && displayCurrentPrice && displayCurrency && (
-                    <div className="text-xs text-neutral-500">
+                    <div className="text-xs text-v2-text-tertiary">
                       ≈{" "}
                       {formatPrice(
                         displayCurrentPrice.amount || 0,
@@ -398,16 +398,16 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
                 </div>
               </div>
 
-              <div className="py-2 border-t border-neutral-100">
+              <div className="py-2 border-t border-v2-border-light">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-neutral-600">{t("detail.quantityLabel")}</span>
-                  <span className="text-sm font-semibold text-neutral-900">
+                  <span className="text-sm text-v2-text-secondary">{t("detail.quantityLabel")}</span>
+                  <span className="text-sm font-semibold text-v2-gold-accent">
                     {formatQuantity(quantity, type, purchaseUnit)}
                   </span>
                 </div>
               </div>
 
-              <div className="flex gap-2 pt-3 border-t border-neutral-100 ">
+              <div className="flex gap-2 pt-3 border-t border-v2-border-light ">
                 <QuickActionButton
                   icon={<PlusIcon />}
                   label={t("modal.addInvestment")}
