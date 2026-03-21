@@ -4,6 +4,9 @@ import { useTranslations } from "next-intl";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import Image from "next/image";
 
+const textShadow = "0 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.2)";
+const textShadowLg = "0 2px 6px rgba(0,0,0,0.5), 0 0 12px rgba(0,0,0,0.25)";
+
 interface NetWorthDisplayProps {
   totalNetWorth: number;
   currency: string;
@@ -16,7 +19,6 @@ interface NetWorthDisplayProps {
   userName?: string;
 }
 
-// PnL Value component - defined outside to prevent re-renders
 interface PnlValueProps {
   percent: number;
   amount: number;
@@ -36,18 +38,27 @@ function PnlValue({ percent, amount, label, currency }: PnlValueProps) {
   };
 
   return (
-    <div className="text-center">
+    <div
+      className={`text-center rounded-xl px-4 py-2 ${
+        isPositive ? "bg-green-500/20" : "bg-red-500/20"
+      }`}
+    >
       <p
-        className={`font-roboto font-bold text-[14px] ${isPositive ? "text-emerald-700" : "text-red-800"}`}
+        className={`font-roboto font-bold text-[14px] ${isPositive ? "text-v2-text-tertiary" : "text-v2-text-tertiary"}`}
+        style={{ textShadow }}
       >
         {formatAmount(amount)} {currency}
       </p>
       <p
-        className={`font-roboto font-bold text-[14px] ${isPositive ? "text-emerald-700" : "text-red-800"}`}
+        className={`font-roboto font-bold text-[14px] ${isPositive ? "text-v2-text-tertiary" : "text-v2-text-tertiary"}`}
+        style={{ textShadow }}
       >
         {formatPercent(percent)}
       </p>
-      <p className="font-roboto font-medium text-[11px] text-[#8B6914] tracking-[1px] mt-1">
+      <p
+        className="font-roboto font-medium text-[11px] text-white/70 tracking-[1px] mt-1"
+        style={{ textShadow }}
+      >
         {label}
       </p>
     </div>
@@ -67,7 +78,6 @@ export function NetWorthDisplay({
 }: NetWorthDisplayProps) {
   const t = useTranslations("dashboard.home");
 
-  // Greeting logic
   const greeting = (() => {
     const hour = new Date().getHours();
     if (hour < 12) return t("greeting.morning");
@@ -86,102 +96,125 @@ export function NetWorthDisplay({
 
   const isMonthPositive = monthPnlPercent >= 0;
 
+  // PnL bar shared between mobile and desktop
+  const pnlBar = monthPnlPercent !== 0 && (
+    <div className="relative z-10 flex items-center justify-between px-5 py-3 bg-black/20">
+      <div className="flex items-center gap-2">
+        {isMonthPositive ? (
+          <TrendingUp size={16} className="text-white/80" />
+        ) : (
+          <TrendingDown size={16} className="text-white/80" />
+        )}
+        <span
+          className={`font-roboto font-bold text-[15px] ${
+            isMonthPositive ? "text-v2-text-tertiary" : "text-v2-text-tertiary"
+          }`}
+          style={{ textShadow }}
+        >
+          {formatAmount(monthPnl)} {currency}
+        </span>
+      </div>
+      <span
+        className={`font-roboto font-bold text-[13px] px-3 py-1 rounded-full ${
+          isMonthPositive
+            ? "bg-green-500/20 text-v2-text-tertiary"
+            : "bg-red-500/20 text-v2-text-tertiary"
+        }`}
+        style={{ textShadow }}
+      >
+        {formatPercent(monthPnlPercent)}
+      </span>
+    </div>
+  );
+
   return (
     <div>
-      {/* Mobile version — gold gradient card with dragon watermark */}
+      {/* Mobile version — SJC gold bar card with embossed dragon */}
       <div
-        className="sm:hidden relative overflow-hidden rounded-2xl p-5 pb-4"
+        className="sm:hidden relative overflow-hidden rounded-2xl"
         style={{
-          background:
-            "linear-gradient(135deg, #F5D38E 0%, #D4A245 30%, #C5923A 60%, #B8862D 100%)",
           boxShadow:
             "0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
         }}
       >
-        {/* Dragon watermark background */}
-        <div className="absolute top-0 right-0 w-[65%] h-full pointer-events-none opacity-40">
-          <Image
-            src="/dragon-watermark.svg"
-            alt=""
-            fill
-            className="object-cover object-right"
-            aria-hidden="true"
-            priority
-          />
-        </div>
+        <Image
+          src="/dragon-gold-mobile-flat.webp"
+          alt=""
+          fill
+          className="object-cover"
+          aria-hidden="true"
+          priority
+        />
 
-        {/* Content layer */}
-        <div className="relative z-10">
-          <p className="font-roboto font-medium text-[#5C3D0E] text-[15px]">
+        <div className="relative z-10 p-5 pb-0">
+          <p
+            className="font-roboto font-medium text-white text-[15px]"
+            style={{ textShadow }}
+          >
             {greeting}
             {userName ? `, ${userName}` : ""}
           </p>
-          <p className="font-roboto font-semibold text-[11px] tracking-[2px] text-[#8B6914] mt-3">
+          <p
+            className="font-roboto font-semibold text-[11px] tracking-[2px] text-white/80 mt-3"
+            style={{ textShadow }}
+          >
             {t("totalNetWorthLabel")}
           </p>
           <div className="flex items-baseline gap-2 mt-1">
-            <p className="font-roboto font-extrabold text-[32px] tracking-[-1.5px] text-[#3D2600]">
+            <p
+              className="font-roboto font-extrabold text-[32px] tracking-[-1.5px] text-white"
+              style={{ textShadow: textShadowLg }}
+            >
               {formatAmount(totalNetWorth)}
             </p>
-            <span className="font-roboto text-[13px] font-bold text-[#5C3D0E]">
+            <span
+              className="font-roboto text-[13px] font-bold text-white/80"
+              style={{ textShadow }}
+            >
               {currency}
             </span>
           </div>
-          {monthPnlPercent !== 0 && (
-            <div
-              className={`inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-full text-[13px] font-roboto font-bold ${
-                isMonthPositive
-                  ? "bg-emerald-900/20 text-emerald-800"
-                  : "bg-red-900/20 text-red-900"
-              }`}
-              style={{
-                backdropFilter: "blur(4px)",
-              }}
-            >
-              {isMonthPositive ? (
-                <TrendingUp size={15} />
-              ) : (
-                <TrendingDown size={15} />
-              )}
-              {formatPercent(monthPnlPercent)} 30D
-            </div>
-          )}
         </div>
+
+        <div className="mt-3">{pnlBar}</div>
       </div>
 
-      {/* Desktop version — gold gradient card with dragon watermark */}
+      {/* Desktop version — SJC gold bar card with embossed dragon */}
       <div
-        className="hidden sm:block relative overflow-hidden rounded-2xl p-6"
+        className="hidden sm:block relative overflow-hidden rounded-2xl"
         style={{
-          background:
-            "linear-gradient(135deg, #F5D38E 0%, #D4A245 30%, #C5923A 60%, #B8862D 100%)",
           boxShadow:
             "0 4px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
         }}
       >
-        {/* Dragon watermark background */}
-        <div className="absolute top-0 right-0 w-[50%] h-full pointer-events-none opacity-40">
-          <Image
-            src="/dragon-watermark.svg"
-            alt=""
-            fill
-            className="object-cover object-right"
-            aria-hidden="true"
-            priority
-          />
-        </div>
+        <Image
+          src="/dragon-gold-mobile-flat.webp"
+          alt=""
+          fill
+          className="object-cover"
+          aria-hidden="true"
+          priority
+        />
 
-        {/* Content layer */}
-        <div className="relative z-10 flex items-center justify-between">
+        <div className="relative z-10 flex items-center justify-between p-6">
           <div>
-            <p className="font-roboto font-semibold text-[11px] tracking-[2px] text-[#8B6914]">
+            <p
+              className="font-roboto font-semibold text-[11px] tracking-[2px] text-white/80"
+              style={{ textShadow }}
+            >
               {t("totalNetWorthLabel")}
             </p>
             <div className="flex items-baseline gap-3 mt-1">
-              <p className="font-roboto font-bold text-[42px] tracking-[-1.5px] text-[#3D2600]">
+              <p
+                className="font-roboto font-bold text-[42px] tracking-[-1.5px] text-white"
+                style={{ textShadow: textShadowLg }}
+              >
                 {formatAmount(totalNetWorth)}
               </p>
-              <span className="font-roboto text-[15px] font-bold text-[#5C3D0E]">
+              <span
+                className="font-roboto text-[15px] font-bold text-white/80"
+                style={{ textShadow }}
+              >
                 {currency}
               </span>
             </div>
