@@ -1,0 +1,47 @@
+{
+  "version": "2.9",
+  "children": [
+    {
+      "type": "frame",
+      "id": "bi8Au",
+      "x": 0,
+      "y": 0,
+      "name": "Frame",
+      "clip": true,
+      "width": 800,
+      "height": 600,
+      "fill": "#FFFFFF",
+      "layout": "none"
+    },
+    {
+      "type": "frame",
+      "id": "r9Ruj",
+      "x": 0,
+      "y": 0,
+      "name": "Dragon Blue Screen",
+      "width": 1400,
+      "height": 768,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./images/generated-1774063913502.png",
+        "mode": "fill"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "U5AWb",
+      "x": 0,
+      "y": 850,
+      "name": "Dragon Blue BG v2",
+      "width": 1400,
+      "height": 768,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./images/generated-1774063952187.png",
+        "mode": "fill"
+      }
+    }
+  ]
+}

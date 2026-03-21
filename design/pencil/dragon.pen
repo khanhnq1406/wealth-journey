@@ -102,6 +102,102 @@
         "url": "./images/generated-1774061261180.png",
         "mode": "fill"
       }
+    },
+    {
+      "type": "frame",
+      "id": "pDeUL",
+      "x": 0,
+      "y": 2450,
+      "name": "Dragon True Transparent",
+      "width": 800,
+      "height": 440,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./images/generated-1774061684496.png",
+        "mode": "fill"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "DIPqK",
+      "x": 900,
+      "y": 2450,
+      "name": "Dragon V2 Transparent",
+      "width": 800,
+      "height": 440,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./images/generated-1774061753963.png",
+        "mode": "fill"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "Wg7gn",
+      "x": 0,
+      "y": 2950,
+      "name": "Dragon Stock",
+      "metadata": {
+        "type": "unsplash",
+        "username": "maxchen2k",
+        "link": "https://unsplash.com/@maxchen2k",
+        "author": "Max Chen"
+      },
+      "width": 800,
+      "height": 440,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "https://images.unsplash.com/photo-1646318897168-a6630badeca1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzQwNjIwMTl8&ixlib=rb-4.1.0&q=80&w=1080",
+        "mode": "fill"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "EsLMd",
+      "x": 0,
+      "y": 3450,
+      "name": "Dragon Green Screen",
+      "width": 800,
+      "height": 440,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./images/generated-1774062740741.png",
+        "mode": "fill"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "g3EcM",
+      "x": 0,
+      "y": 3450,
+      "name": "Dragon Green Screen",
+      "width": 800,
+      "height": 440,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./images/generated-1774062765270.png",
+        "mode": "fill"
+      }
+    },
+    {
+      "type": "frame",
+      "id": "jAZln",
+      "x": 900,
+      "y": 3450,
+      "name": "Dragon Blue BG",
+      "width": 800,
+      "height": 440,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "./images/generated-1774062799214.png",
+        "mode": "fill"
+      }
     }
   ]
 }
