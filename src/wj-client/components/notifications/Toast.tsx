@@ -159,7 +159,7 @@ export function Toast({
     const configs = {
       success: {
         containerClass:
-          "bg-v2-bg-surface border-l-4 border-success-500",
+          "bg-v2-bg-surface border-l-4 border-v2-green-positive",
         iconClass: "text-success-500",
         icon: (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -187,7 +187,7 @@ export function Toast({
       },
       warning: {
         containerClass:
-          "bg-v2-bg-surface border-l-4 border-warning-500",
+          "bg-v2-bg-surface border-l-4 border-v2-gold-accent",
         iconClass: "text-warning-500",
         icon: (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -201,7 +201,7 @@ export function Toast({
       },
       info: {
         containerClass:
-          "bg-v2-bg-surface border-l-4 border-primary-500",
+          "bg-v2-bg-surface border-l-4 border-v2-gold-primary",
         iconClass: "text-primary-500",
         icon: (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

@@ -107,7 +107,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
   };
 
   return (
- <div className="border border-success-300 rounded-lg overflow-hidden">
+ <div className="border border-v2-green-positive/40 rounded-lg overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
@@ -140,7 +140,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
       {expanded && (
  <div className="p-4 space-y-3 bg-v2-maroon-800">
           {/* Select All */}
- <div className="flex items-center justify-between pb-2 border-b border-success-200">
+ <div className="flex items-center justify-between pb-2 border-b border-v2-green-positive/30">
             <div
               className="flex items-center gap-2 cursor-pointer min-h-[44px]"
               onClick={handleSelectAll}
@@ -149,10 +149,10 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                 className={cn(
                   "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors",
                   allSelected
- ? "bg-primary-600 border-primary-600"
+ ? "bg-primary-600 border-v2-gold-primary"
                     : someSelected
- ? "bg-primary-600 border-primary-600"
- : "border-neutral-400 hover:border-primary-500",
+ ? "bg-primary-600 border-v2-gold-primary"
+ : "border-v2-gold-primary/40 hover:border-v2-gold-primary",
                 )}
                 role="checkbox"
                 aria-checked={allSelected ? "true" : someSelected ? "mixed" : "false"}
@@ -191,8 +191,8 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                     className={cn(
                       "mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 cursor-pointer",
                       isChecked
- ? "bg-primary-600 border-primary-600"
- : "border-neutral-400",
+ ? "bg-primary-600 border-v2-gold-primary"
+ : "border-v2-gold-primary/40",
                     )}
                     aria-label={t("toggleRow", { n: tx.rowNumber })}
                   >
@@ -217,7 +217,7 @@ export const ReadyToImportSection = React.memo(function ReadyToImportSection({
                                 }
                               }}
                               onClick={(e) => e.stopPropagation()}
- className="w-full px-2 py-1 text-sm border border-primary-500 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+ className="w-full px-2 py-1 text-sm border border-v2-gold-primary rounded focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
                               autoFocus
                             />
                             <div className="flex gap-2">

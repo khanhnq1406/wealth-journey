@@ -214,7 +214,7 @@ export const WalletCardEnhanced = memo(function WalletCardEnhanced({
                 "w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center",
                 "bg-white/10 hover:bg-white/20 backdrop-blur-sm",
                 "transition-colors duration-200",
-                "focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-600",
+                "focus-visible:ring-2 focus-visible:ring-v2-gold-accent focus-visible:ring-offset-2 focus-visible:ring-offset-v2-gold-primary",
               )}
               aria-label={isBalanceVisible ? t("hideBalance") : t("showBalance")}
             >
@@ -316,7 +316,7 @@ export const WalletCardEnhanced = memo(function WalletCardEnhanced({
             isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0",
           )}
         >
-          <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-2 border-t border-white/10">
+          <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-2 border-t border-v2-gold-primary/10">
             {/* Investment breakdown for investment wallets */}
             {isInvestmentWallet && (
               <div className="mb-4">
@@ -354,7 +354,7 @@ export const WalletCardEnhanced = memo(function WalletCardEnhanced({
                     "bg-white/10 hover:bg-white/20 backdrop-blur-sm",
                     "flex items-center justify-center gap-2 text-sm font-medium",
                     "transition-colors duration-200",
-                    "focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-600",
+                    "focus-visible:ring-2 focus-visible:ring-v2-gold-accent focus-visible:ring-offset-2 focus-visible:ring-offset-v2-gold-primary",
                   )}
                 >
                   <svg
@@ -387,7 +387,7 @@ export const WalletCardEnhanced = memo(function WalletCardEnhanced({
                     "bg-white/10 hover:bg-white/20 backdrop-blur-sm",
                     "flex items-center justify-center gap-2 text-sm font-medium",
                     "transition-colors duration-200",
-                    "focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary-600",
+                    "focus-visible:ring-2 focus-visible:ring-v2-gold-accent focus-visible:ring-offset-2 focus-visible:ring-offset-v2-gold-primary",
                   )}
                 >
                   <svg
@@ -419,7 +419,7 @@ export const WalletCardEnhanced = memo(function WalletCardEnhanced({
                     "bg-red-500/20 hover:bg-red-500/30 backdrop-blur-sm",
                     "flex items-center justify-center gap-2 text-sm font-medium text-red-200",
                     "transition-colors duration-200",
-                    "focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-primary-600",
+                    "focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 focus-visible:ring-offset-v2-gold-primary",
                   )}
                 >
                   <svg

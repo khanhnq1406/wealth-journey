@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { TrendingUp, TrendingDown } from "lucide-react";
-import { BaseCard } from "@/components/BaseCard";
+import Image from "next/image";
 
 interface NetWorthDisplayProps {
   totalNetWorth: number;
@@ -38,16 +38,16 @@ function PnlValue({ percent, amount, label, currency }: PnlValueProps) {
   return (
     <div className="text-center">
       <p
-        className={`font-roboto font-bold text-[14px] ${isPositive ? "text-v2-green-positive" : "text-v2-red-negative"}`}
+        className={`font-roboto font-bold text-[14px] ${isPositive ? "text-emerald-700" : "text-red-800"}`}
       >
         {formatAmount(amount)} {currency}
       </p>
       <p
-        className={`font-roboto font-bold text-[14px] ${isPositive ? "text-v2-green-positive" : "text-v2-red-negative"}`}
+        className={`font-roboto font-bold text-[14px] ${isPositive ? "text-emerald-700" : "text-red-800"}`}
       >
         {formatPercent(percent)}
       </p>
-      <p className="font-roboto font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
+      <p className="font-roboto font-medium text-[11px] text-[#8B6914] tracking-[1px] mt-1">
         {label}
       </p>
     </div>
@@ -84,79 +84,130 @@ export function NetWorthDisplay({
     return `${sign}${percent.toFixed(2)}%`;
   };
 
+  const isMonthPositive = monthPnlPercent >= 0;
+
   return (
     <div>
-      {/* Mobile version */}
-      <div className="sm:hidden">
-        <p className="font-roboto font-medium text-v2-text-secondary text-[15px]">
-          {greeting}
-          {userName ? `, ${userName}` : ""}
-        </p>
-        <p className="font-roboto font-semibold text-[11px] tracking-[2px] text-v2-text-tertiary mt-3">
-          {t("totalNetWorthLabel")}
-        </p>
-        <div className="flex items-baseline gap-2 mt-1">
-          <p className="font-roboto font-extrabold text-[32px] tracking-[-1.5px] text-v2-text-primary">
-            {formatAmount(totalNetWorth)}
-          </p>
-          <span className="font-roboto text-[12px] font-medium text-v2-text-tertiary bg-v2-bg-primary rounded-md px-1.5 py-0.5">
-            {currency}
-          </span>
+      {/* Mobile version — gold gradient card with dragon watermark */}
+      <div
+        className="sm:hidden relative overflow-hidden rounded-2xl p-5 pb-4"
+        style={{
+          background:
+            "linear-gradient(135deg, #F5D38E 0%, #D4A245 30%, #C5923A 60%, #B8862D 100%)",
+          boxShadow:
+            "0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+        }}
+      >
+        {/* Dragon watermark background */}
+        <div className="absolute top-0 right-0 w-[65%] h-full pointer-events-none opacity-40">
+          <Image
+            src="/dragon-watermark.svg"
+            alt=""
+            fill
+            className="object-cover object-right"
+            aria-hidden="true"
+            priority
+          />
         </div>
-        {monthPnlPercent !== 0 && (
-          <div
-            className={`inline-flex items-center gap-1 mt-2 px-2 py-1 rounded-lg text-[12px] font-roboto font-medium ${
-              monthPnlPercent >= 0
-                ? "bg-v2-green-light text-v2-green-positive"
-                : "bg-v2-red-light text-v2-red-negative"
-            }`}
-          >
-            {monthPnlPercent >= 0 ? (
-              <TrendingUp size={14} />
-            ) : (
-              <TrendingDown size={14} />
-            )}
-            {formatPercent(monthPnlPercent)} 30D
-          </div>
-        )}
-      </div>
 
-      {/* Desktop version */}
-      <BaseCard padding="none" className="hidden sm:flex items-center justify-between rounded-[20px] border border-v2-border-light shadow-v2-card p-6">
-        <div>
-          <p className="font-roboto font-semibold text-[11px] tracking-[2px] text-v2-text-tertiary">
+        {/* Content layer */}
+        <div className="relative z-10">
+          <p className="font-roboto font-medium text-[#5C3D0E] text-[15px]">
+            {greeting}
+            {userName ? `, ${userName}` : ""}
+          </p>
+          <p className="font-roboto font-semibold text-[11px] tracking-[2px] text-[#8B6914] mt-3">
             {t("totalNetWorthLabel")}
           </p>
-          <div className="flex items-baseline gap-3 mt-1">
-            <p className="font-roboto font-bold text-[42px] tracking-[-1.5px] text-v2-text-primary">
+          <div className="flex items-baseline gap-2 mt-1">
+            <p className="font-roboto font-extrabold text-[32px] tracking-[-1.5px] text-[#3D2600]">
               {formatAmount(totalNetWorth)}
             </p>
-            <span className="font-roboto text-[14px] font-medium text-v2-text-tertiary">
+            <span className="font-roboto text-[13px] font-bold text-[#5C3D0E]">
               {currency}
             </span>
           </div>
+          {monthPnlPercent !== 0 && (
+            <div
+              className={`inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-full text-[13px] font-roboto font-bold ${
+                isMonthPositive
+                  ? "bg-emerald-900/20 text-emerald-800"
+                  : "bg-red-900/20 text-red-900"
+              }`}
+              style={{
+                backdropFilter: "blur(4px)",
+              }}
+            >
+              {isMonthPositive ? (
+                <TrendingUp size={15} />
+              ) : (
+                <TrendingDown size={15} />
+              )}
+              {formatPercent(monthPnlPercent)} 30D
+            </div>
+          )}
         </div>
-        <div className="flex items-center gap-8">
-          <PnlValue
-            percent={todayPnlPercent}
-            amount={todayPnl}
-            label={t("pnlToday")}
-            currency={currency}
-          />
-          <PnlValue
-            percent={weekPnlPercent}
-            amount={weekPnl}
-            label={t("pnl7d")}
-            currency={currency}
-          />
-          <PnlValue
-            percent={monthPnlPercent}
-            amount={monthPnl}
-            label={t("pnl30d")}
-            currency={currency}
+      </div>
+
+      {/* Desktop version — gold gradient card with dragon watermark */}
+      <div
+        className="hidden sm:block relative overflow-hidden rounded-2xl p-6"
+        style={{
+          background:
+            "linear-gradient(135deg, #F5D38E 0%, #D4A245 30%, #C5923A 60%, #B8862D 100%)",
+          boxShadow:
+            "0 4px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)",
+        }}
+      >
+        {/* Dragon watermark background */}
+        <div className="absolute top-0 right-0 w-[50%] h-full pointer-events-none opacity-40">
+          <Image
+            src="/dragon-watermark.svg"
+            alt=""
+            fill
+            className="object-cover object-right"
+            aria-hidden="true"
+            priority
           />
         </div>
-      </BaseCard>
+
+        {/* Content layer */}
+        <div className="relative z-10 flex items-center justify-between">
+          <div>
+            <p className="font-roboto font-semibold text-[11px] tracking-[2px] text-[#8B6914]">
+              {t("totalNetWorthLabel")}
+            </p>
+            <div className="flex items-baseline gap-3 mt-1">
+              <p className="font-roboto font-bold text-[42px] tracking-[-1.5px] text-[#3D2600]">
+                {formatAmount(totalNetWorth)}
+              </p>
+              <span className="font-roboto text-[15px] font-bold text-[#5C3D0E]">
+                {currency}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-8">
+            <PnlValue
+              percent={todayPnlPercent}
+              amount={todayPnl}
+              label={t("pnlToday")}
+              currency={currency}
+            />
+            <PnlValue
+              percent={weekPnlPercent}
+              amount={weekPnl}
+              label={t("pnl7d")}
+              currency={currency}
+            />
+            <PnlValue
+              percent={monthPnlPercent}
+              amount={monthPnl}
+              label={t("pnl30d")}
+              currency={currency}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

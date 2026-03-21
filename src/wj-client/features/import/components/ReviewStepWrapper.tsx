@@ -296,7 +296,7 @@ export function ReviewStepWrapper({
     return (
       <div className="space-y-4 py-8">
         <div className="flex flex-col items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-v2-gold-primary"></div>
  <p className="mt-4 text-neutral-600">
             Parsing file...
           </p>
@@ -308,7 +308,7 @@ export function ReviewStepWrapper({
   if (error) {
     return (
       <div className="space-y-4">
- <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+ <div className="p-4 bg-red-50 border border-v2-red-negative/30 rounded-lg">
  <p className="text-red-700">{error}</p>
         </div>
         <Button variant="secondary" onClick={onBack}>

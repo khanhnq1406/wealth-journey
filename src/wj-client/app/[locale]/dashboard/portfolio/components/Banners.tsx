@@ -9,7 +9,7 @@ import { useTranslations } from "next-intl";
 export const UpdateProgressBanner = memo(function UpdateProgressBanner() {
   const t = useTranslations("investment");
   return (
-    <div className="bg-primary-50 border border-primary-200 rounded-lg p-4 flex items-center gap-3 animate-fade-in">
+    <div className="bg-primary-50 border border-v2-gold-primary/30 rounded-lg p-4 flex items-center gap-3 animate-fade-in">
       <svg
         className="animate-spin h-5 w-5 text-primary-600"
         xmlns="http://www.w3.org/2000/svg"

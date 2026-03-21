@@ -34,7 +34,7 @@ function CommentMenu({ onEdit, onDelete }: { onEdit: () => void; onDelete: () =>
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-6 z-20 bg-v2-maroon-800 border border-gray-100 rounded-lg shadow-lg py-1 min-w-[100px]">
+          <div className="absolute right-0 top-6 z-20 bg-v2-maroon-800 border border-v2-gold-primary/20 rounded-lg shadow-lg py-1 min-w-[100px]">
             <button
               onClick={() => { setOpen(false); onEdit(); }}
               className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"

@@ -80,7 +80,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
   };
 
   return (
- <div className="border border-warning-300 rounded-lg overflow-hidden">
+ <div className="border border-v2-gold-accent/40 rounded-lg overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
@@ -152,7 +152,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
           {/* Side-by-Side Comparison */}
           <div className="space-y-4 sm:grid sm:grid-cols-2 sm:gap-4 sm:space-y-0">
             {/* Imported Transaction */}
- <div className="p-4 bg-gradient-to-br from-primary-50 to-primary-100 border border-primary-200 rounded-xl">
+ <div className="p-4 bg-gradient-to-br from-primary-50 to-primary-100 border border-v2-gold-primary/30 rounded-xl">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">📥</span>
@@ -164,7 +164,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
                   {t("new")}
                 </span>
               </div>
- <div className="space-y-0 text-sm text-neutral-900 divide-y divide-primary-200">
+ <div className="space-y-0 text-sm text-neutral-900 divide-y divide-v2-gold-primary/20">
                 <div className="flex justify-between py-2">
                   <span className="font-medium">{t("amount")}</span>
                   <span className="font-bold">
@@ -197,7 +197,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
             </div>
 
             {/* Existing Transaction */}
- <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-xl">
+ <div className="p-4 bg-neutral-50 border border-v2-gold-primary/20 rounded-xl">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">💾</span>
@@ -209,7 +209,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
                   {t("existing")}
                 </span>
               </div>
- <div className="space-y-0 text-sm text-neutral-900 divide-y divide-neutral-200">
+ <div className="space-y-0 text-sm text-neutral-900 divide-y divide-v2-gold-primary/20">
                 <div className="flex justify-between py-2">
                   <span className="font-medium">{t("amount")}</span>
                   <span className="font-bold">
@@ -292,7 +292,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
 
           {/* Auto-Merge High Confidence */}
           {highConfidenceCount > 0 && (
- <div className="pt-3 border-t border-warning-200">
+ <div className="pt-3 border-t border-v2-gold-accent/30">
               <Button
                 variant="primary"
                 onClick={handleAutoMergeAll}

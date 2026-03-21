@@ -65,7 +65,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
       <div className="overflow-y-auto max-h-[400px]">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="w-5 h-5 border-2 border-bg border-t-transparent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-v2-gold-primary border-t-transparent rounded-full animate-spin" />
           </div>
         ) : notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 gap-2">

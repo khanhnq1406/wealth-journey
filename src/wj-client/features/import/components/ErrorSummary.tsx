@@ -70,13 +70,13 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case "error":
- return "bg-red-100 text-red-800 border-red-200";
+ return "bg-red-100 text-red-800 border-v2-red-negative/30";
       case "warning":
- return "bg-yellow-100 text-yellow-800 border-yellow-200";
+ return "bg-yellow-100 text-yellow-800 border-v2-gold-accent/30";
       case "info":
- return "bg-blue-100 text-blue-800 border-blue-200";
+ return "bg-blue-100 text-blue-800 border-v2-gold-primary/30";
       default:
- return "bg-neutral-100 text-neutral-800 border-neutral-200";
+ return "bg-neutral-100 text-neutral-800 border-v2-gold-primary/20";
     }
   };
 
@@ -98,8 +98,8 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
       className={cn(
         "border-2 rounded-lg overflow-hidden",
         errorCount > 0
- ? "border-red-300"
- : "border-yellow-300",
+ ? "border-v2-red-negative/40"
+ : "border-v2-gold-accent/40",
       )}
     >
       {/* Header */}
@@ -162,9 +162,9 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
 
       {/* Expanded Content */}
       {isExpanded && (
- <div className="bg-v2-maroon-800 border-t border-neutral-200">
+ <div className="bg-v2-maroon-800 border-t border-v2-gold-primary/20">
           {/* Severity Filter */}
- <div className="px-4 py-3 bg-neutral-50 border-b border-neutral-200">
+ <div className="px-4 py-3 bg-neutral-50 border-b border-v2-gold-primary/20">
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setSeverityFilter("all")}
@@ -172,7 +172,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                   "px-3 py-1.5 rounded-md text-sm font-medium transition-colors min-h-[44px] sm:min-h-[36px]",
                   severityFilter === "all"
  ? "bg-primary-600 text-white"
- : "bg-v2-maroon-800 text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
+ : "bg-v2-maroon-800 text-neutral-700 border border-v2-gold-primary/30 hover:bg-neutral-100",
                 )}
               >
                 {t("filterAll", { count: allErrors.length })}
@@ -184,7 +184,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                     "px-3 py-1.5 rounded-md text-sm font-medium transition-colors min-h-[44px] sm:min-h-[36px]",
                     severityFilter === "error"
  ? "bg-red-600 text-white"
- : "bg-v2-maroon-800 text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
+ : "bg-v2-maroon-800 text-neutral-700 border border-v2-gold-primary/30 hover:bg-neutral-100",
                   )}
                 >
                   {t("filterErrors", { count: errorCount })}
@@ -197,7 +197,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                     "px-3 py-1.5 rounded-md text-sm font-medium transition-colors min-h-[44px] sm:min-h-[36px]",
                     severityFilter === "warning"
  ? "bg-yellow-600 text-white"
- : "bg-v2-maroon-800 text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
+ : "bg-v2-maroon-800 text-neutral-700 border border-v2-gold-primary/30 hover:bg-neutral-100",
                   )}
                 >
                   {t("filterWarnings", { count: warningCount })}
@@ -210,7 +210,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
                     "px-3 py-1.5 rounded-md text-sm font-medium transition-colors min-h-[44px] sm:min-h-[36px]",
                     severityFilter === "info"
  ? "bg-blue-600 text-white"
- : "bg-v2-maroon-800 text-neutral-700 border border-neutral-300 hover:bg-neutral-100",
+ : "bg-v2-maroon-800 text-neutral-700 border border-v2-gold-primary/30 hover:bg-neutral-100",
                   )}
                 >
                   {t("filterInfo", { count: infoCount })}
@@ -224,7 +224,7 @@ export function ErrorSummary({ errors }: ErrorSummaryProps) {
             {filteredErrors.map((row) => (
               <div
                 key={row.rowNumber}
- className="px-4 py-3 border-b border-neutral-200 last:border-b-0"
+ className="px-4 py-3 border-b border-v2-gold-primary/20 last:border-b-0"
               >
  <div className="font-semibold text-sm text-neutral-900 mb-2">
                   {t("row", { n: row.rowNumber })}

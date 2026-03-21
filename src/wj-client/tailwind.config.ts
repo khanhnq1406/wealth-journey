@@ -138,9 +138,9 @@ export default {
           "bg-surface": "#580202", // Slightly lighter maroon (card/surface)
           "bg-surface-tint": "#5A0A0A", // Maroon with slight tint
           "bg-dark": "#3A0101", // Darkest maroon (footer, deep surfaces)
-          // Borders
-          "border-light": "rgba(155, 1, 17, 0.2)", // Subtle borders
-          border: "#9B0111", // Standard red border
+          // Borders (gold — mihong.vn theme)
+          "border-light": "rgba(215, 139, 28, 0.3)", // Subtle gold borders
+          border: "#D78B1C", // Standard gold border
           // Text
           "text-primary": "#F1BD61", // Gold (primary text on dark bg)
           "text-secondary": "#F1BD61", // Gold (labels, secondary text)

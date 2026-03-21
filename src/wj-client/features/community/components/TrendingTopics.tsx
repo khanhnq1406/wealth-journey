@@ -22,7 +22,7 @@ export function TrendingTopics({ onHashtagClick }: TrendingTopicsProps) {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-4">
-          <div className="w-4 h-4 border-2 border-bg border-t-transparent rounded-full animate-spin" />
+          <div className="w-4 h-4 border-2 border-v2-gold-primary border-t-transparent rounded-full animate-spin" />
         </div>
       ) : topics.length === 0 ? (
         <p className="font-roboto text-sm text-v2-text-tertiary text-center py-4">

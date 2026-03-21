@@ -128,7 +128,7 @@ export function BankTemplateStep({
                       onClick={() => handleSelectTemplate(`user-${template.id}`)}
                       className={cn(
                         "w-full p-4 rounded-lg border-2 text-left transition-all duration-200",
- "hover:border-primary-400 hover:bg-v2-bg-surface-tint",
+ "hover:border-v2-gold-primary hover:bg-v2-bg-surface-tint",
                         "active:scale-[0.99]",
                         selectedTemplate === `user-${template.id}`
  ? "border-v2-gold-primary bg-v2-bg-dark"
@@ -167,7 +167,7 @@ export function BankTemplateStep({
                   onClick={() => handleSelectTemplate(template.id)}
                   className={cn(
                     "w-full p-4 rounded-lg border-2 text-left transition-all duration-200",
- "hover:border-primary-400 hover:bg-v2-bg-surface-tint",
+ "hover:border-v2-gold-primary hover:bg-v2-bg-surface-tint",
                     "active:scale-[0.99]",
                     selectedTemplate === template.id
  ? "border-v2-gold-primary bg-v2-bg-dark"
@@ -208,7 +208,7 @@ export function BankTemplateStep({
             onClick={handleCustomFormat}
             className={cn(
               "w-full p-4 rounded-lg border-2 text-left transition-all duration-200",
- "hover:border-primary-400 hover:bg-v2-bg-surface-tint",
+ "hover:border-v2-gold-primary hover:bg-v2-bg-surface-tint",
               "active:scale-[0.99]",
               selectedTemplate === CUSTOM_TEMPLATE_ID
  ? "border-v2-gold-primary bg-v2-bg-dark"

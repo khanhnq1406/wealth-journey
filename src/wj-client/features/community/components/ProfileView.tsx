@@ -38,7 +38,7 @@ export function ProfileView({
   if (profileLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-6 h-6 border-2 border-bg border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-v2-gold-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -90,12 +90,12 @@ export function ProfileView({
               imageUrl={profile?.userPicture || currentUser.picture}
               size="lg"
               priority
-              className="!w-20 !h-20 !text-2xl ring-[3px] ring-white"
+              className="!w-20 !h-20 !text-2xl ring-[3px] ring-v2-gold-accent"
             />
             {isOwnProfile ? (
               <button
                 onClick={() => setShowEditModal(true)}
-                className="text-sm px-4 py-1.5 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors font-medium text-v2-text-primary"
+                className="text-sm px-4 py-1.5 border border-v2-gold-primary/30 rounded-full hover:bg-gray-100 transition-colors font-medium text-v2-text-primary"
               >
                 Edit Profile
               </button>
@@ -142,7 +142,7 @@ export function ProfileView({
           )}
 
           {/* Stats */}
-          <div className="border-t border-[#EDE8E1] mt-3 pt-3">
+          <div className="border-t border-v2-gold-primary/30 mt-3 pt-3">
             <div className="flex justify-around">
               <div className="text-center">
                 <p className="font-roboto text-xl font-bold text-v2-text-primary">

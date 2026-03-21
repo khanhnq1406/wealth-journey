@@ -263,9 +263,9 @@ export function ExportDialog({
                   onClick={() => setFormat(fmt)}
                   className={cn(
                     "relative flex flex-col items-start gap-2 p-4 rounded-lg border-2 transition-all text-left",
- "hover:border-neutral-300",
+ "hover:border-v2-gold-primary/30",
                     isSelected
- ? "border-primary-500 bg-primary-50"
+ ? "border-v2-gold-primary bg-primary-50"
  : "border-v2-maroon-600 bg-v2-maroon-800",
                   )}
                 >
@@ -320,9 +320,9 @@ export function ExportDialog({
                   onClick={() => setDateRange(range.value)}
                   className={cn(
                     "px-4 py-2 rounded-lg border text-sm font-medium transition-all",
- "hover:border-neutral-300",
+ "hover:border-v2-gold-primary/30",
                     isSelected
- ? "border-primary-500 bg-primary-50 text-primary-700"
+ ? "border-v2-gold-primary bg-primary-50 text-primary-700"
  : "border-v2-maroon-600 bg-v2-maroon-800 text-v2-cream-100",
                   )}
                 >
@@ -347,7 +347,7 @@ export function ExportDialog({
                     "w-full px-3 sm:px-4 rounded-lg border text-sm sm:text-base",
                     "min-h-[44px] sm:min-h-[48px]",
  "bg-v2-maroon-900",
- "border-neutral-300",
+ "border-v2-gold-primary/30",
  "text-neutral-900",
                     "transition-all duration-200",
                     "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:border-transparent",
@@ -367,7 +367,7 @@ export function ExportDialog({
                     "w-full px-3 sm:px-4 rounded-lg border text-sm sm:text-base",
                     "min-h-[44px] sm:min-h-[48px]",
  "bg-v2-maroon-900",
- "border-neutral-300",
+ "border-v2-gold-primary/30",
  "text-neutral-900",
                     "transition-all duration-200",
                     "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:border-transparent",
@@ -407,7 +407,7 @@ export function ExportDialog({
                 </button>
               </div>
             </div>
- <div className="max-h-40 overflow-y-auto border border-neutral-200 rounded-lg p-2 space-y-1">
+ <div className="max-h-40 overflow-y-auto border border-v2-gold-primary/20 rounded-lg p-2 space-y-1">
               {categories.map((category) => {
                 const isSelected = selectedCategories.includes(category.id);
 
@@ -425,7 +425,7 @@ export function ExportDialog({
                       type="checkbox"
                       checked={isSelected}
                       onChange={() => toggleCategory(category.id)}
- className="w-4 h-4 rounded border-neutral-300 text-v2-red-primary focus:ring-v2-red-primary"
+ className="w-4 h-4 rounded border-v2-gold-primary/30 text-v2-red-primary focus:ring-v2-red-primary"
                     />
  <span className="text-sm text-neutral-700">
                       {category.name}
@@ -448,12 +448,12 @@ export function ExportDialog({
         <div className="space-y-3">
           {/* Include Charts (only for PDF) */}
           {/* {format === "pdf" && (
- <label className="flex items-center gap-3 p-3 rounded-lg border border-neutral-200 hover:bg-neutral-50 cursor-pointer transition-colors">
+ <label className="flex items-center gap-3 p-3 rounded-lg border border-v2-gold-primary/20 hover:bg-neutral-50 cursor-pointer transition-colors">
               <input
                 type="checkbox"
                 checked={includeCharts}
                 onChange={(e) => setIncludeCharts(e.target.checked)}
- className="w-4 h-4 rounded border-neutral-300 text-v2-red-primary focus:ring-v2-red-primary"
+ className="w-4 h-4 rounded border-v2-gold-primary/30 text-v2-red-primary focus:ring-v2-red-primary"
               />
               <div className="flex-1">
  <span className="text-sm font-medium text-neutral-900">
@@ -467,12 +467,12 @@ export function ExportDialog({
           )} */}
 
           {/* Custom Branding */}
- {/* <label className="flex items-center gap-3 p-3 rounded-lg border border-neutral-200 hover:bg-neutral-50 cursor-pointer transition-colors">
+ {/* <label className="flex items-center gap-3 p-3 rounded-lg border border-v2-gold-primary/20 hover:bg-neutral-50 cursor-pointer transition-colors">
             <input
               type="checkbox"
               checked={customBranding}
               onChange={(e) => setCustomBranding(e.target.checked)}
- className="w-4 h-4 rounded border-neutral-300 text-v2-red-primary focus:ring-v2-red-primary"
+ className="w-4 h-4 rounded border-v2-gold-primary/30 text-v2-red-primary focus:ring-v2-red-primary"
             />
             <div className="flex-1">
  <span className="text-sm font-medium text-neutral-900">
@@ -497,7 +497,7 @@ export function ExportDialog({
               className={cn(
                 "w-full px-3 py-2 rounded-lg border text-sm",
  "bg-v2-maroon-900",
- "border-neutral-300",
+ "border-v2-gold-primary/30",
  "text-neutral-900",
                 "focus:ring-2 focus:ring-v2-red-primary focus:border-transparent",
  "placeholder:text-neutral-400",
@@ -536,7 +536,7 @@ export function ExportDialog({
 
         {/* Preview */}
         {showPreview && (
- <div className="p-4 bg-neutral-100 rounded-lg border border-neutral-200">
+ <div className="p-4 bg-neutral-100 rounded-lg border border-v2-gold-primary/20">
  <h4 className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-3">
               {t("exportSummary")}
             </h4>
@@ -592,7 +592,7 @@ export function ExportDialog({
       </div>
 
       {/* Footer Actions */}
- <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end mt-6 pt-4 border-t border-neutral-200">
+ <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end mt-6 pt-4 border-t border-v2-gold-primary/20">
         <Button
           type={ButtonType.SECONDARY}
           onClick={onClose}

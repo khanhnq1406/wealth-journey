@@ -57,7 +57,7 @@ export function DuplicateStrategySelector({
   ];
 
   return (
- <div className={cn("p-4 bg-warning-50 border border-warning-300 rounded-lg", className)}>
+ <div className={cn("p-4 bg-warning-50 border border-v2-gold-accent/40 rounded-lg", className)}>
       <div className="flex items-center gap-2 mb-3">
         <span className="text-xl">⚡</span>
         <div>
@@ -78,8 +78,8 @@ export function DuplicateStrategySelector({
             className={cn(
               "p-3 rounded-lg border-2 transition-all text-left",
               selectedStrategy === strategy.value
- ? "border-primary-600 bg-primary-50"
- : "border-neutral-200 bg-v2-maroon-800 hover:border-neutral-300"
+ ? "border-v2-gold-primary bg-primary-50"
+ : "border-v2-gold-primary/20 bg-v2-maroon-800 hover:border-v2-gold-primary/30"
             )}
           >
             <div className="flex items-center gap-2 mb-1">

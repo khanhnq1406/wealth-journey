@@ -407,7 +407,7 @@ export function SentimentCard({ variant, asset = "gold" }: SentimentCardProps) {
               aria-label={t("send")}
             >
               {postCommentMutation.isPending ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-v2-gold-accent border-t-transparent rounded-full animate-spin" />
               ) : (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19V5m0 0l-7 7m7-7l7 7" />

@@ -77,7 +77,7 @@ export function AdminBroadcastForm() {
             onChange={(e) => setTitle(e.target.value)}
             maxLength={MAX_TITLE_LENGTH}
             placeholder={t("form.titlePlaceholder")}
-            className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
+            className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
           />
           <p className="mt-1 font-roboto text-xs text-v2-text-tertiary">
             {t("form.titleHelp")}
@@ -98,7 +98,7 @@ export function AdminBroadcastForm() {
             maxLength={MAX_MESSAGE_LENGTH}
             rows={4}
             placeholder={t("form.messagePlaceholder")}
-            className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg resize-none"
+            className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary resize-none"
           />
           <p
             className={`mt-1 font-roboto text-xs ${

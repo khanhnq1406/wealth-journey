@@ -203,8 +203,8 @@ export function ChangeRateModal({
           <div
             className={`p-3 rounded-md border ${
               Math.abs(rateDifference) > 10
- ? "bg-warning-50 border-warning-200"
- : "bg-blue-50 border-blue-200"
+ ? "bg-warning-50 border-v2-gold-accent/30"
+ : "bg-blue-50 border-v2-gold-primary/30"
             }`}
           >
             <div className="flex items-start gap-2">
@@ -234,7 +234,7 @@ export function ChangeRateModal({
 
         {/* Preview Total */}
         {previewTotal && (
- <div className="bg-success-50 p-3 rounded-md border border-success-200">
+ <div className="bg-success-50 p-3 rounded-md border border-v2-green-positive/30">
             <div className="text-sm">
  <span className="text-success-700">
                 <strong>{t("newTotal")}</strong>

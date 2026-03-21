@@ -83,7 +83,7 @@ export function ImportSuccess({
         </div>
 
         {/* Confirmation Message */}
- <div className="p-4 bg-red-50 border border-red-200 rounded-2xl">
+ <div className="p-4 bg-red-50 border border-v2-red-negative/30 rounded-2xl">
  <p className="text-sm text-red-700 font-medium">
             {t("undoCannotReverse")}
           </p>
@@ -167,7 +167,7 @@ export function ImportSuccess({
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 gap-3">
- <div className="p-4 sm:p-5 bg-success-50 rounded-xl border border-success-200 hover:shadow-md transition-all">
+ <div className="p-4 sm:p-5 bg-success-50 rounded-xl border border-v2-green-positive/30 hover:shadow-md transition-all">
           <div className="flex items-center gap-2 mb-2">
             <svg
  className="w-4 h-4 text-success-600"
@@ -190,7 +190,7 @@ export function ImportSuccess({
             {formatCurrency(totalIncome, currency)}
           </p>
         </div>
- <div className="p-4 sm:p-5 bg-danger-50 rounded-xl border border-danger-200 hover:shadow-md transition-all">
+ <div className="p-4 sm:p-5 bg-danger-50 rounded-xl border border-v2-red-negative/30 hover:shadow-md transition-all">
           <div className="flex items-center gap-2 mb-2">
             <svg
  className="w-4 h-4 text-danger-600"
@@ -213,7 +213,7 @@ export function ImportSuccess({
             {formatCurrency(Math.abs(totalExpenses), currency)}
           </p>
         </div>
- <div className="p-4 sm:p-5 bg-neutral-50 rounded-xl border border-neutral-200 hover:shadow-md transition-all">
+ <div className="p-4 sm:p-5 bg-neutral-50 rounded-xl border border-v2-gold-primary/20 hover:shadow-md transition-all">
           <div className="flex items-center gap-2 mb-2">
             <svg
  className="w-4 h-4 text-neutral-600"
@@ -243,7 +243,7 @@ export function ImportSuccess({
             {formatCurrency(netChange, currency)}
           </p>
         </div>
- <div className="p-4 sm:p-5 bg-neutral-50 rounded-xl border border-neutral-200 hover:shadow-md transition-all">
+ <div className="p-4 sm:p-5 bg-neutral-50 rounded-xl border border-v2-gold-primary/20 hover:shadow-md transition-all">
           <div className="flex items-center gap-2 mb-2">
             <svg
  className="w-4 h-4 text-neutral-600"
@@ -270,7 +270,7 @@ export function ImportSuccess({
 
       {/* Duplicate Info */}
       {(summary.duplicatesMerged > 0 || summary.duplicatesSkipped > 0) && (
- <div className="p-4 sm:p-5 bg-blue-50 border border-blue-200 rounded-xl">
+ <div className="p-4 sm:p-5 bg-blue-50 border border-v2-gold-primary/30 rounded-xl">
           <div className="flex items-start gap-3">
             <svg
  className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
@@ -295,7 +295,7 @@ export function ImportSuccess({
       )}
 
       {/* Undo Notice */}
- <div className="p-4 sm:p-5 bg-warning-50 border border-warning-200 rounded-xl">
+ <div className="p-4 sm:p-5 bg-warning-50 border border-v2-gold-accent/30 rounded-xl">
         <div className="flex items-start gap-3">
           <svg
  className="w-5 h-5 text-warning-600 flex-shrink-0 mt-0.5"

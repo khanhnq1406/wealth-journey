@@ -365,7 +365,7 @@ export default function AdminCMSPage() {
               onClick={() => handleTabChange(tab.id)}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.id
-                  ? "border-bg text-bg"
+                  ? "border-v2-gold-primary text-bg"
  : "border-transparent text-v2-text-tertiary hover:text-v2-text-secondary"
               }`}
             >

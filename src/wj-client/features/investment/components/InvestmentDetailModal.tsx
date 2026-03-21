@@ -518,12 +518,12 @@ export function InvestmentDetailModal({
       ) : investment ? (
         <div className="space-y-4">
           {/* Tabs */}
-          <div className="flex border-b border-gray-200 overflow-x-auto scrollbar-hide">
+          <div className="flex border-b border-v2-gold-primary/20 overflow-x-auto scrollbar-hide">
             <button
               onClick={() => setActiveTab("overview")}
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === "overview"
-                  ? "border-b-2 border-primary-500 text-primary-500"
+                  ? "border-b-2 border-v2-gold-primary text-primary-500"
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
@@ -533,7 +533,7 @@ export function InvestmentDetailModal({
               onClick={() => setActiveTab("transactions")}
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === "transactions"
-                  ? "border-b-2 border-primary-500 text-primary-500"
+                  ? "border-b-2 border-v2-gold-primary text-primary-500"
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
@@ -543,7 +543,7 @@ export function InvestmentDetailModal({
               onClick={() => setActiveTab("add-transaction")}
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === "add-transaction"
-                  ? "border-b-2 border-primary-500 text-primary-500"
+                  ? "border-b-2 border-v2-gold-primary text-primary-500"
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
@@ -553,7 +553,7 @@ export function InvestmentDetailModal({
               onClick={() => setActiveTab("set-price")}
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === "set-price"
-                  ? "border-b-2 border-primary-500 text-primary-500"
+                  ? "border-b-2 border-v2-gold-primary text-primary-500"
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
@@ -566,7 +566,7 @@ export function InvestmentDetailModal({
             <div className="space-y-3">
               {/* Investment header with custom badge */}
               {isCustom && (
-                <div className="mb-4 p-3 bg-blue-50 rounded-md border border-blue-200 flex items-center gap-2">
+                <div className="mb-4 p-3 bg-blue-50 rounded-md border border-v2-gold-primary/30 flex items-center gap-2">
                   <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded font-medium">
                     {t("detail.customInvestment")}
                   </span>
@@ -721,7 +721,7 @@ export function InvestmentDetailModal({
               {/* Show warning message for custom investments without price */}
               {isCustomInvestment(investment) &&
                 investment.currentPrice === 0 && (
-                  <div className="mb-4 p-3 bg-yellow-50 rounded-md border border-yellow-200">
+                  <div className="mb-4 p-3 bg-yellow-50 rounded-md border border-v2-gold-accent/30">
                     <p className="text-sm text-yellow-800">
                       {t("detail.customNoPriceWarning")}
                     </p>
@@ -867,7 +867,7 @@ export function InvestmentDetailModal({
               <div className="border-t pt-4 mt-4">
                 <button
                   onClick={() => setShowDeleteInvestment(true)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded-md transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 border border-v2-red-negative/30 rounded-md transition-colors"
                 >
                   <svg
                     className="w-4 h-4"

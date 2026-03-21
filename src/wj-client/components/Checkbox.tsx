@@ -45,9 +45,9 @@ export function Checkbox({
       onChange={handleChange}
       disabled={disabled}
       className={cn(
- "rounded border-neutral-300",
+ "rounded border-v2-gold-primary/30",
  "text-primary-500",
-        "focus:ring-2 focus:ring-primary-500 focus:ring-offset-0",
+        "focus:ring-2 focus:ring-v2-gold-primary focus:ring-offset-0",
  "",
         "disabled:opacity-50 disabled:cursor-not-allowed",
         "cursor-pointer transition-colors duration-200",

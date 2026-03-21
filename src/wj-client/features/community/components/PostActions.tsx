@@ -28,7 +28,7 @@ export function PostActions({
   const { toast } = useNotification();
 
   return (
-    <div className="flex items-center gap-1 mt-2 pt-2 border-t border-[#EDE8E1]">
+    <div className="flex items-center gap-1 mt-2 pt-2 border-t border-v2-gold-primary/30">
       <button
         onClick={onLikeToggle}
         disabled={isLikeLoading}

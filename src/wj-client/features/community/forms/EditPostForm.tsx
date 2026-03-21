@@ -84,7 +84,7 @@ export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
 
       {/* Error message */}
       {errorMessage && (
-        <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+        <div className="p-3 rounded-lg bg-red-50 border border-v2-red-negative/30">
           <p className="text-xs text-red-600 font-roboto">{errorMessage}</p>
         </div>
       )}

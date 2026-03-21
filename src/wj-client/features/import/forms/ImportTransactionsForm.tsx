@@ -360,14 +360,14 @@ export function ImportTransactionsForm({
     >
       {/* Step Progress Indicator - Show on steps 1, 2, 5 only */}
       {(currentStep === 1 || currentStep === 2 || currentStep === 5) && (
-        <div className="mb-6 pb-6 border-b border-gray-200 pt-1">
+        <div className="mb-6 pb-6 border-b border-v2-gold-primary/20 pt-1">
           <StepProgress steps={translatedSteps} currentStep={currentStep} />
         </div>
       )}
 
       {/* Error Message Display */}
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+        <div className="mb-4 p-4 bg-red-50 border border-v2-red-negative/30 rounded-md">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <svg
@@ -389,7 +389,7 @@ export function ImportTransactionsForm({
             <div className="ml-auto pl-3">
               <button
                 onClick={() => setError(null)}
-                className="inline-flex rounded-md bg-red-50 p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-red-50"
+                className="inline-flex rounded-md bg-red-50 p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:ring-offset-2 focus:ring-offset-red-50"
               >
                 <span className="sr-only">Dismiss</span>
                 <svg

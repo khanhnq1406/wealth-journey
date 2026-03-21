@@ -112,7 +112,7 @@ export const TablePagination = memo(({
                 name="rows-per-page"
                 value={pageSize.toString()}
                 onChange={handlePageSizeChange}
-                className="appearance-none bg-neutral-50 border-2 border-black/50 rounded px-3 py-1 pr-8 text-gray-900 text-sm font-bold cursor-pointer focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus:border-primary-600"
+                className="appearance-none bg-neutral-50 border-2 border-black/50 rounded px-3 py-1 pr-8 text-gray-900 text-sm font-bold cursor-pointer focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 focus:border-v2-gold-primary"
               >
                 {memoizedPageSizeOptions.map((size) => (
                   <option key={size} value={size}>
@@ -198,7 +198,7 @@ const MobileExpandedRow = memo(function MobileExpandedRow<T>({
   return (
     <tr className="sm:hidden">
       <td colSpan={999} className="p-0 border-0">
-        <div className="p-4 bg-neutral-50 border-t border-neutral-200 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="p-4 bg-neutral-50 border-t border-v2-gold-primary/20 animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="space-y-3">
             {allCells.slice(startIndex).map((cell, cellIndex) => {
               const column = cell.column;

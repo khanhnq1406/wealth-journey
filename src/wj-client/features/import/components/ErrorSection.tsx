@@ -36,7 +36,7 @@ export const ErrorSection = React.memo(function ErrorSection({
   };
 
   return (
- <div className="border border-danger-300 rounded-lg overflow-hidden">
+ <div className="border border-v2-red-negative/40 rounded-lg overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
@@ -69,7 +69,7 @@ export const ErrorSection = React.memo(function ErrorSection({
           {transactions.map((tx) => (
             <div
               key={tx.rowNumber}
- className="p-4 bg-danger-50/50 border border-danger-200 rounded-lg"
+ className="p-4 bg-danger-50/50 border border-v2-red-negative/30 rounded-lg"
             >
               {/* Row Header */}
               <div className="flex justify-between items-start mb-3">
@@ -111,7 +111,7 @@ export const ErrorSection = React.memo(function ErrorSection({
 
               {/* Edit Form */}
               {editingRow === tx.rowNumber ? (
- <div className="space-y-3 pt-3 border-t border-danger-200">
+ <div className="space-y-3 pt-3 border-t border-v2-red-negative/30">
                   <FormInput
                     label={t("date").replace(":", "")}
                     type="text"
@@ -178,7 +178,7 @@ export const ErrorSection = React.memo(function ErrorSection({
           ))}
 
           {/* Bulk Actions */}
- <div className="flex gap-2 pt-2 border-t border-danger-200">
+ <div className="flex gap-2 pt-2 border-t border-v2-red-negative/30">
             <Button
               variant="secondary"
               onClick={handleSkipAll}

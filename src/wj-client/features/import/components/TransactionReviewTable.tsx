@@ -130,7 +130,7 @@ export function TransactionReviewTable({
   return (
     <div className="space-y-4">
       {/* Desktop Table */}
- <div className="hidden sm:block border border-neutral-200 rounded-lg overflow-hidden">
+ <div className="hidden sm:block border border-v2-gold-primary/20 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
  <thead className="bg-neutral-100">
@@ -141,10 +141,10 @@ export function TransactionReviewTable({
                     className={cn(
                       "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors",
                       allSelected
- ? "bg-primary-600 border-primary-600"
+ ? "bg-primary-600 border-v2-gold-primary"
                         : someSelected
- ? "bg-primary-600 border-primary-600"
- : "border-neutral-400 hover:border-primary-500",
+ ? "bg-primary-600 border-v2-gold-primary"
+ : "border-v2-gold-primary/40 hover:border-v2-gold-primary",
                     )}
                     aria-label={t("toggleAllRows")}
                   >
@@ -172,7 +172,7 @@ export function TransactionReviewTable({
                 </th>
               </tr>
             </thead>
- <tbody className="bg-v2-maroon-800 divide-y divide-neutral-200">
+ <tbody className="bg-v2-maroon-800 divide-y divide-v2-gold-primary/20">
               {transactions.map((transaction) => {
                 const isSelected = selectedRows.has(transaction.rowNumber);
                 const isDisabled = !transaction.isValid;
@@ -192,8 +192,8 @@ export function TransactionReviewTable({
                         className={cn(
                           "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors",
                           isSelected
- ? "bg-primary-600 border-primary-600"
- : "border-neutral-400 hover:border-primary-500",
+ ? "bg-primary-600 border-v2-gold-primary"
+ : "border-v2-gold-primary/40 hover:border-v2-gold-primary",
                           isDisabled && "cursor-not-allowed opacity-50",
                         )}
                         aria-label={t("toggleRow", { n: transaction.rowNumber })}
@@ -221,7 +221,7 @@ export function TransactionReviewTable({
                                 handleCancelEdit();
                               }
                             }}
- className="flex-1 px-2 py-1 border border-primary-500 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+ className="flex-1 px-2 py-1 border border-v2-gold-primary rounded focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
                             autoFocus
                           />
                           <button
@@ -307,10 +307,10 @@ export function TransactionReviewTable({
               className={cn(
                 "w-6 h-6 rounded border-2 flex items-center justify-center transition-colors",
                 allSelected
- ? "bg-primary-600 border-primary-600"
+ ? "bg-primary-600 border-v2-gold-primary"
                   : someSelected
- ? "bg-primary-600 border-primary-600"
- : "border-neutral-400",
+ ? "bg-primary-600 border-v2-gold-primary"
+ : "border-v2-gold-primary/40",
               )}
             >
               {allSelected ? (
@@ -336,7 +336,7 @@ export function TransactionReviewTable({
             <div
               key={transaction.rowNumber}
               className={cn(
- "border border-neutral-200 rounded-lg overflow-hidden",
+ "border border-v2-gold-primary/20 rounded-lg overflow-hidden",
                 isDisabled && "opacity-50",
               )}
             >
@@ -351,8 +351,8 @@ export function TransactionReviewTable({
                       className={cn(
                         "w-6 h-6 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0",
                         isSelected
- ? "bg-primary-600 border-primary-600"
- : "border-neutral-400",
+ ? "bg-primary-600 border-v2-gold-primary"
+ : "border-v2-gold-primary/40",
                         isDisabled && "cursor-not-allowed opacity-50",
                       )}
                     >
@@ -376,7 +376,7 @@ export function TransactionReviewTable({
                               }
                             }}
                             onClick={(e) => e.stopPropagation()}
- className="w-full px-3 py-2 border border-primary-500 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+ className="w-full px-3 py-2 border border-v2-gold-primary rounded focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
                             autoFocus
                           />
                           <div className="flex gap-2">
@@ -445,7 +445,7 @@ export function TransactionReviewTable({
                   {getStatusBadge(transaction)}
                 </div>
 
- <div className="flex items-center justify-between pt-2 border-t border-neutral-200">
+ <div className="flex items-center justify-between pt-2 border-t border-v2-gold-primary/20">
  <span className="text-sm text-neutral-600">
                     {formatDate(transaction.date)}
                   </span>

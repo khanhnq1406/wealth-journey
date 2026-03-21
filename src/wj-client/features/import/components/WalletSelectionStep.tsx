@@ -67,7 +67,7 @@ export function WalletSelectionStep({
   if (isError) {
     return (
       <div className="space-y-4 sm:space-y-6">
- <div className="flex flex-col items-center justify-center text-center rounded-2xl bg-danger-50 border-2 border-danger-200 p-8 sm:p-12">
+ <div className="flex flex-col items-center justify-center text-center rounded-2xl bg-danger-50 border-2 border-v2-red-negative/30 p-8 sm:p-12">
  <div className="w-16 h-16 rounded-full bg-v2-bg-dark flex items-center justify-center mb-4">
  <ExclamationCircleIcon className="w-8 h-8 text-v2-red-negative" />
           </div>
@@ -95,7 +95,7 @@ export function WalletSelectionStep({
   if (wallets.length === 0) {
     return (
       <div className="space-y-4 sm:space-y-6">
- <div className="flex flex-col items-center justify-center text-center rounded-2xl bg-warning-50 border-2 border-warning-200 p-8 sm:p-12">
+ <div className="flex flex-col items-center justify-center text-center rounded-2xl bg-warning-50 border-2 border-v2-gold-accent/30 p-8 sm:p-12">
  <div className="w-16 h-16 rounded-full bg-v2-bg-dark flex items-center justify-center mb-4">
  <WalletIcon className="w-8 h-8 text-yellow-400" />
           </div>

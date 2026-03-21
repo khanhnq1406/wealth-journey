@@ -306,7 +306,7 @@ export function WealthCard({
         {footer && (
           <div className={cn(
             "pt-3 mt-3 border-t",
- isGradient ? "border-white/20" : "border-v2-maroon-600"
+ isGradient ? "border-v2-gold-primary/20" : "border-v2-maroon-600"
           )}>
             {footer}
           </div>

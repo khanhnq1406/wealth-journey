@@ -264,7 +264,7 @@ export function CurrencySelector() {
  "bg-primary-50 font-semibold",
                     // Add border separator except for last item
                     index < SUPPORTED_CURRENCIES.length - 1 &&
- "border-b border-neutral-100"
+ "border-b border-v2-gold-primary/20"
                   )}
                   style={{
                     touchAction: "manipulation",

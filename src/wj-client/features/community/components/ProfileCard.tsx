@@ -80,7 +80,7 @@ export function ProfileCard({ currentUser }: ProfileCardProps) {
             imageUrl={profile?.userPicture || currentUser.picture}
             size="lg"
             priority
-            className="!w-[72px] !h-[72px] !text-xl ring-[3px] ring-white"
+            className="!w-[72px] !h-[72px] !text-xl ring-[3px] ring-v2-gold-accent"
           />
         </div>
 
@@ -137,7 +137,7 @@ export function ProfileCard({ currentUser }: ProfileCardProps) {
         )}
 
         {/* Divider */}
-        <div className="border-t border-[#EDE8E1] mt-3 pt-3">
+        <div className="border-t border-v2-gold-primary/30 mt-3 pt-3">
           {/* Stats row */}
           <div className="flex justify-around">
             {stats.map((stat) => (

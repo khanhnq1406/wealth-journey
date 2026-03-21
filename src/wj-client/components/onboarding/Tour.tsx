@@ -457,13 +457,13 @@ export function Tour({
 
           {/* Keyboard hint */}
           {keyboardNavigation && (
- <div className="mt-4 pt-3 border-t border-neutral-200 flex items-center justify-center gap-3 text-xs text-neutral-400">
+ <div className="mt-4 pt-3 border-t border-v2-gold-primary/20 flex items-center justify-center gap-3 text-xs text-neutral-400">
               <div className="flex items-center gap-1">
- <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200">←</kbd>
- <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200">→</kbd>
+ <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-v2-gold-primary/20">←</kbd>
+ <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-v2-gold-primary/20">→</kbd>
                 <span>to navigate</span>
               </div>
- <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200">ESC</kbd>
+ <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-v2-gold-primary/20">ESC</kbd>
               <span>to skip</span>
             </div>
           )}

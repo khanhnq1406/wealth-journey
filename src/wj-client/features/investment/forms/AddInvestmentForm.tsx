@@ -552,7 +552,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
 
       {/* Custom Investment Toggle - shown for non-gold, non-silver, non-cash/forex */}
       {!isGoldInvestment && !isSilverInvestment && !isCashOrForeignCurrency && (
-        <div className="mb-4 p-3 bg-gray-50 rounded-md border border-gray-200">
+        <div className="mb-4 p-3 bg-gray-50 rounded-md border border-v2-gold-primary/20">
           <label className="flex items-center space-x-3 cursor-pointer">
             <input
               type="checkbox"
@@ -569,7 +569,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
                   setSelectedCurrency("USD");
                 }
               }}
-              className="w-4 h-4 text-v2-red-primary border-gray-300 rounded focus:ring-v2-red-primary"
+              className="w-4 h-4 text-v2-red-primary border-v2-gold-primary/30 rounded focus:ring-v2-red-primary"
             />
             <div className="flex-1">
               <span className="font-medium text-gray-900">
@@ -636,7 +636,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
                 {t("form.customSymbolInfo")}
               </p>
               {/* Info box for custom investments */}
-              <div className="mt-2 p-3 bg-blue-50 rounded-md border border-blue-200">
+              <div className="mt-2 p-3 bg-blue-50 rounded-md border border-v2-gold-primary/30">
                 <p className="text-sm text-blue-800">
                   {t("form.customPriceNote")}
                 </p>
@@ -956,7 +956,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
                 else if (isStandardWithSymbol) standardPriceQuery.refetch();
               }}
               disabled={isRefreshing}
-              className="px-3 py-2 text-sm font-medium text-bg bg-red-50 border border-bg rounded-md hover:bg-red-100 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap h-[44px] sm:h-[48px]"
+              className="px-3 py-2 text-sm font-medium text-bg bg-red-50 border border-v2-gold-primary rounded-md hover:bg-red-100 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap h-[44px] sm:h-[48px]"
             >
               {isRefreshing
                 ? t("form.refreshingPrice")
@@ -1007,7 +1007,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
 
       {/* Error message */}
       {errorMessage && (
-        <div className="bg-red-50 border border-danger-600 text-danger-600 px-4 py-3 rounded">
+        <div className="bg-red-50 border border-v2-red-negative text-danger-600 px-4 py-3 rounded">
           {errorMessage}
         </div>
       )}

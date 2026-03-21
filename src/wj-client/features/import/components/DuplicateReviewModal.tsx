@@ -212,7 +212,7 @@ export function DuplicateReviewModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
  <div className="bg-v2-maroon-800 rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
- <div className="flex items-center justify-between p-6 border-b border-neutral-200">
+ <div className="flex items-center justify-between p-6 border-b border-v2-gold-primary/20">
           <div>
  <h2 className="text-xl font-semibold text-neutral-900">
               {t("reviewTitle", { current: currentIndex + 1, total: matches.length })}
@@ -241,7 +241,7 @@ export function DuplicateReviewModal({
         </div>
 
         {/* Progress Dots */}
- <div className="px-6 py-3 border-b border-neutral-200">
+ <div className="px-6 py-3 border-b border-v2-gold-primary/20">
           <div className="flex gap-1 justify-center">
             {matches.map((_, idx) => (
               <div
@@ -271,7 +271,7 @@ export function DuplicateReviewModal({
           {/* Side-by-Side Comparison */}
           <div className="grid md:grid-cols-2 gap-4">
             {/* Imported Transaction */}
- <div className="p-4 bg-primary-50 border border-primary-200 rounded-lg">
+ <div className="p-4 bg-primary-50 border border-v2-gold-primary/30 rounded-lg">
  <h3 className="text-sm font-semibold mb-3 text-primary-700">
                 {t("importedTransaction")}
               </h3>
@@ -306,7 +306,7 @@ export function DuplicateReviewModal({
             </div>
 
             {/* Existing Transaction */}
- <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-lg">
+ <div className="p-4 bg-neutral-50 border border-v2-gold-primary/20 rounded-lg">
  <h3 className="text-sm font-semibold mb-3 text-neutral-900">
                 {t("existingTransaction")}
               </h3>
@@ -344,7 +344,7 @@ export function DuplicateReviewModal({
         </div>
 
         {/* Footer - Actions */}
- <div className="p-6 border-t border-neutral-200 space-y-3">
+ <div className="p-6 border-t border-v2-gold-primary/20 space-y-3">
           {/* Action Buttons */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             <Button

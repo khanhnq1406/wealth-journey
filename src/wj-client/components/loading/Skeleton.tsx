@@ -22,7 +22,7 @@ export const Skeleton = React.memo(({ className = "", style }: SkeletonProps) =>
     <div
       className={cn(
         "skeleton-shimmer rounded",
-        "bg-neutral-200",
+        "bg-v2-maroon-900",
         "relative overflow-hidden",
         className
       )}
@@ -31,7 +31,7 @@ export const Skeleton = React.memo(({ className = "", style }: SkeletonProps) =>
       role="status"
       aria-label={t("loading")}
     >
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-v2-gold-primary/20 to-transparent" />
     </div>
   );
 });
@@ -197,7 +197,7 @@ export const TableSkeleton = React.memo(({
       aria-label={t("loading")}
     >
       {showHeader && (
-        <div className="flex items-center gap-4 py-2 border-b border-neutral-200">
+        <div className="flex items-center gap-4 py-2 border-b border-v2-gold-primary/20">
           {showAvatar && <Skeleton className="h-12 w-12 rounded-full" />}
           {Array.from({ length: columns }).map((_, i) => (
             <Skeleton
@@ -211,7 +211,7 @@ export const TableSkeleton = React.memo(({
         </div>
       )}
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="flex items-center gap-4 py-2 border-b border-neutral-100 last:border-0">
+        <div key={i} className="flex items-center gap-4 py-2 border-b border-v2-gold-primary/20 last:border-0">
           {showAvatar && <Skeleton className="h-12 w-12 rounded-full flex-shrink-0" />}
           {Array.from({ length: columns }).map((_, j) => (
             <Skeleton
@@ -450,7 +450,7 @@ export const ChartSkeleton = React.memo(({
             <Skeleton className="h-48 w-48 rounded-full" />
           </div>
           {showLegend && (
-            <div className="flex flex-wrap gap-3 justify-center pt-4 border-t border-neutral-200">
+            <div className="flex flex-wrap gap-3 justify-center pt-4 border-t border-v2-gold-primary/20">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <Skeleton className="h-3 w-3 rounded-sm" />
@@ -489,7 +489,7 @@ export const ChartSkeleton = React.memo(({
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
-                className="text-neutral-200 opacity-50"
+                className="text-v2-gold-primary/30"
               />
             </svg>
             <div className="absolute inset-0 flex items-end">
@@ -512,7 +512,7 @@ export const ChartSkeleton = React.memo(({
         )}
 
         {showLegend && (
-          <div className="flex items-center justify-between pt-2 border-t border-neutral-200">
+          <div className="flex items-center justify-between pt-2 border-t border-v2-gold-primary/20">
             {Array.from({ length: bars }).map((_, i) => (
               <Skeleton key={i} className="h-3 w-6" />
             ))}
@@ -812,7 +812,7 @@ export const TransactionSkeleton = React.memo(({
         {/* Transaction list */}
         <div className="space-y-3">
           {Array.from({ length: transactions }).map((_, i) => (
-            <div key={i} className="flex items-center gap-4 py-3 border-b border-neutral-100 last:border-0">
+            <div key={i} className="flex items-center gap-4 py-3 border-b border-v2-gold-primary/20 last:border-0">
               {/* Category icon */}
               {showCategory && <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />}
               {/* Wallet indicator */}
@@ -988,7 +988,7 @@ export const ModalSkeleton = React.memo(({
           </div>
 
           {/* Warning box */}
-          <div className="bg-danger-50 border border-danger-200 rounded-lg p-4 space-y-2">
+          <div className="bg-v2-red-light border border-v2-red-negative/30 rounded-lg p-4 space-y-2">
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-4 w-full" />
           </div>

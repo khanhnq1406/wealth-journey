@@ -173,7 +173,7 @@ export const WalletListView = memo(function WalletListView({
                         "flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-colors",
                         isSelected
                           ? "bg-v2-red-primary border-v2-red-primary"
- : "border-gray-300 hover:border-v2-red-primary",
+ : "border-v2-gold-primary/30 hover:border-v2-red-primary",
                       )}
                       aria-label={
                         isSelected ? t("deselectWallet") : t("selectWallet")

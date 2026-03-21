@@ -54,7 +54,7 @@ export function FollowingView({ currentUser, targetUserId, onUserClick, initialT
         </div>
       )}
       {/* Tabs */}
-      <div className="flex border-b border-[#EDE8E1]">
+      <div className="flex border-b border-v2-gold-primary/30">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -80,7 +80,7 @@ export function FollowingView({ currentUser, targetUserId, onUserClick, initialT
       {/* Content */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-6 h-6 border-2 border-bg border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-v2-gold-primary border-t-transparent rounded-full animate-spin" />
         </div>
       ) : users.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 gap-3">
@@ -95,7 +95,7 @@ export function FollowingView({ currentUser, targetUserId, onUserClick, initialT
           </p>
         </div>
       ) : (
-        <div className="divide-y divide-[#EDE8E1]">
+        <div className="divide-y divide-v2-gold-primary/20">
           {users.map((user) => (
             <UserListItem
               key={user.userId}

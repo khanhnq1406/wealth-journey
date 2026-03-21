@@ -68,7 +68,7 @@ export function CommentSection({ postId, currentUser, onCommentAdded, onCommentD
   const hasMore = pagination ? pagination.page < pagination.totalPages : false;
 
   return (
-    <div className="mt-3 pt-3 border-t border-[#EDE8E1]">
+    <div className="mt-3 pt-3 border-t border-v2-gold-primary/30">
       {/* Comments list */}
       <div className="flex flex-col gap-3 mb-3">
         {isLoading && (

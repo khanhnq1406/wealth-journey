@@ -20,7 +20,7 @@ export function SavedPostsView({ currentUser, onHashtagClick }: SavedPostsViewPr
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-6 h-6 border-2 border-bg border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-v2-gold-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }

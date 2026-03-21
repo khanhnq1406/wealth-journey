@@ -247,7 +247,7 @@ export function FeatureDiscovery({
     const styles = {
       tip: {
  bgColor: "bg-primary-50",
- borderColor: "border-primary-200",
+ borderColor: "border-v2-gold-primary/30",
  textColor: "text-primary-800",
         icon: (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -267,7 +267,7 @@ export function FeatureDiscovery({
       },
       update: {
  bgColor: "bg-secondary-50",
- borderColor: "border-secondary-200",
+ borderColor: "border-v2-gold-primary/30",
  textColor: "text-secondary-800",
         icon: (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -277,7 +277,7 @@ export function FeatureDiscovery({
       },
       announcement: {
  bgColor: "bg-warning-50",
- borderColor: "border-warning-200",
+ borderColor: "border-v2-gold-accent/30",
  textColor: "text-warning-800",
         icon: (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -311,7 +311,7 @@ export function FeatureDiscovery({
           className={cn(
             "rounded-lg shadow-lg border p-4",
  "bg-v2-maroon-800",
- "border-neutral-200",
+ "border-v2-gold-primary/20",
             typeStyles.bgColor,
             typeStyles.borderColor
           )}
@@ -412,7 +412,7 @@ export function FeatureDiscovery({
  className="bg-v2-maroon-800 rounded-xl shadow-modal max-w-3xl w-full overflow-hidden animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
- <div className="p-4 border-b border-neutral-200 flex items-center justify-between">
+ <div className="p-4 border-b border-v2-gold-primary/20 flex items-center justify-between">
  <h3 className="font-semibold text-neutral-900">
                 {currentTip.title}
               </h3>
@@ -500,7 +500,7 @@ export function WhatsNewPanel({
           className={cn(
             "p-4 rounded-lg border",
  "bg-v2-maroon-800",
- "border-neutral-200"
+ "border-v2-gold-primary/20"
           )}
         >
           <div className="flex items-start justify-between gap-3">

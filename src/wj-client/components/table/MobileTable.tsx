@@ -182,7 +182,7 @@ const MobileTableRow = memo(function MobileTableRow<T>({
         <React.Fragment key={column.id || cellIndex}>
           {renderColumn(column, cellIndex)}
           {cellIndex < collapsedColumns.length - 1 && (
-            <div className="border-t border-gray-200" />
+            <div className="border-t border-v2-gold-primary/20" />
           )}
         </React.Fragment>
       ))}
@@ -190,7 +190,7 @@ const MobileTableRow = memo(function MobileTableRow<T>({
       {/* Expand/Collapse button */}
       {hasExpandableContent && (
         <>
-          <div className="border-t border-gray-200" />
+          <div className="border-t border-v2-gold-primary/20" />
           <div className="flex justify-end">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
@@ -208,7 +208,7 @@ const MobileTableRow = memo(function MobileTableRow<T>({
       {hasExpandableContent && isExpanded && (
         <div
           className={cn(
-            "pt-3 border-t border-gray-200 space-y-2",
+            "pt-3 border-t border-v2-gold-primary/20 space-y-2",
             "animate-in fade-in slide-in-from-top-2 duration-200"
           )}
         >
@@ -216,7 +216,7 @@ const MobileTableRow = memo(function MobileTableRow<T>({
             <React.Fragment key={column.id || cellIndex}>
               {renderColumn(column, cellIndex)}
               {cellIndex < expandedOnlyColumns.length - 1 && (
-                <div className="border-t border-gray-200" />
+                <div className="border-t border-v2-gold-primary/20" />
               )}
             </React.Fragment>
           ))}
@@ -226,7 +226,7 @@ const MobileTableRow = memo(function MobileTableRow<T>({
       {/* Inline Actions section */}
       {renderActions && actionsPosition === "inline" && (
         <>
-          <div className="border-t border-gray-200" />
+          <div className="border-t border-v2-gold-primary/20" />
           <div className="flex justify-between items-center">
             <p className="text-gray-900 text-sm font-bold">Actions</p>
             <div className="flex gap-1 -mr-2">{renderActions(row)}</div>
@@ -286,13 +286,13 @@ export const MobileTable = memo(function MobileTable<T>({
                     </div>
                   </div>
                   {cellIndex < columnsToShow.length - 1 && (
-                    <div className="border-t border-gray-200" />
+                    <div className="border-t border-v2-gold-primary/20" />
                   )}
                 </React.Fragment>
               ))}
               {expandable && (
                 <>
-                  <div className="border-t border-gray-200" />
+                  <div className="border-t border-v2-gold-primary/20" />
                   <div className="flex justify-end">
                     <div className="h-6 w-16 bg-gray-200 rounded animate-pulse" />
                   </div>

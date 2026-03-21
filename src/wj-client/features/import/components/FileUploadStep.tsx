@@ -273,10 +273,10 @@ export function FileUploadStep({
  "scale-[1.02] shadow-lg shadow-v2-gold-primary/20",
             ],
           selectedFile && [
- "border-success-400 bg-success-50",
+ "border-v2-green-positive/50 bg-success-50",
             "shadow-md",
           ],
- error && ["border-danger-400 bg-danger-50"],
+ error && ["border-v2-red-negative/50 bg-danger-50"],
           !selectedFile &&
             !error &&
             !isDragOver && [
@@ -387,7 +387,7 @@ export function FileUploadStep({
 
       {/* Error Message with improved design */}
       {error && (
- <div className="flex items-start gap-3 p-4 bg-danger-50 border border-danger-300 rounded-xl animate-in slide-in-from-top duration-300">
+ <div className="flex items-start gap-3 p-4 bg-danger-50 border border-v2-red-negative/40 rounded-xl animate-in slide-in-from-top duration-300">
  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-danger-600 flex items-center justify-center mt-0.5">
             <svg
               className="w-3 h-3 text-white"

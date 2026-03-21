@@ -187,10 +187,10 @@ export function BudgetCard({
       : "bg-v2-green-light";
 
   const statusBorder = isOverBudget
-    ? "border-red-200 ring-red-100"
+    ? "border-v2-red-negative/30 ring-v2-gold-primary/20"
     : isNearLimit
-      ? "border-amber-200 ring-amber-100"
-      : "border-v2-border ring-green-100";
+      ? "border-v2-gold-accent/30 ring-v2-gold-accent/20"
+      : "border-v2-border ring-v2-green-positive/20";
 
   const progressColor = isOverBudget
     ? "bg-red-500"

@@ -191,7 +191,7 @@ export function DeleteWalletModal({
       </div>
 
       {error && (
-        <div className="mb-4 p-2 bg-red-50 border border-red-200 rounded text-red-600 text-sm" role="alert">
+        <div className="mb-4 p-2 bg-red-50 border border-v2-red-negative/30 rounded text-red-600 text-sm" role="alert">
           {error}
         </div>
       )}

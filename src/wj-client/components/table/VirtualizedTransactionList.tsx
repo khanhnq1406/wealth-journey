@@ -143,7 +143,7 @@ function Row(props: {
       {...ariaAttributes}
       style={style}
       className={cn(
-        "flex items-center justify-between p-3 border-b border-neutral-200 hover:bg-neutral-50 transition-colors",
+        "flex items-center justify-between p-3 border-b border-v2-gold-primary/20 hover:bg-neutral-50 transition-colors",
         "sm:grid sm:grid-cols-12 sm:gap-3"
       )}
     >

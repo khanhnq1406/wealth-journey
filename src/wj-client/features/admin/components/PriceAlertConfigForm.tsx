@@ -295,7 +295,7 @@ export function PriceAlertConfigForm() {
                 onChange={(e) =>
                   updateGlobal("cooldownMinutes", parseInt(e.target.value) || 1)
                 }
-                className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
+                className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
               />
               <p className="mt-1 font-roboto text-xs text-v2-text-tertiary">
                 {t("cooldownHelp")}
@@ -314,7 +314,7 @@ export function PriceAlertConfigForm() {
                 onChange={(e) =>
                   updateGlobal("topMoversCount", parseInt(e.target.value) || 1)
                 }
-                className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
+                className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
               />
               <p className="mt-1 font-roboto text-xs text-v2-text-tertiary">
                 {t("topMoversHelp")}
@@ -393,7 +393,7 @@ export function PriceAlertConfigForm() {
                             parseFloat(e.target.value) || 0.1,
                           )
                         }
-                        className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
+                        className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
                       />
                     </div>
 
@@ -411,7 +411,7 @@ export function PriceAlertConfigForm() {
                         onChange={(e) =>
                           updateCategory(cat, "titleTemplate", e.target.value)
                         }
-                        className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
+                        className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
                       />
                       <div className="flex flex-wrap gap-1.5 mt-1.5">
                         {PLACEHOLDERS.map((p) => (
@@ -463,7 +463,7 @@ export function PriceAlertConfigForm() {
                         onChange={(e) =>
                           updateCategory(cat, "bodyTemplate", e.target.value)
                         }
-                        className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg resize-none"
+                        className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary resize-none"
                       />
                       <div className="flex flex-wrap gap-1.5 mt-1.5">
                         {PLACEHOLDERS.map((p) => (

@@ -252,9 +252,9 @@ export function ShareDialog({
                   onClick={() => setMethod(m)}
                   className={cn(
                     "flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all text-center",
- "hover:border-neutral-300",
+ "hover:border-v2-gold-primary/30",
                     isSelected
- ? "border-primary-500 bg-primary-50"
+ ? "border-v2-gold-primary bg-primary-50"
  : "border-v2-maroon-600 bg-v2-maroon-800"
                   )}
                 >
@@ -293,7 +293,7 @@ export function ShareDialog({
                   className={cn(
                     "flex-1 px-3 py-2 rounded-lg border text-sm",
  "bg-neutral-100",
- "border-neutral-300",
+ "border-v2-gold-primary/30",
  "text-neutral-600"
                   )}
                 />
@@ -339,9 +339,9 @@ export function ShareDialog({
                   // IMPORTANT: Font size must be at least 16px (text-base) to prevent iOS auto-zoom
                   "w-full px-3 py-2 rounded-lg border text-base sm:text-sm",
  "bg-v2-maroon-900",
- "border-neutral-300",
+ "border-v2-gold-primary/30",
  "text-neutral-900",
-                  "focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                  "focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent",
  "placeholder:text-neutral-400"
                 )}
               />
@@ -362,9 +362,9 @@ export function ShareDialog({
                   // IMPORTANT: Font size must be at least 16px (text-base) to prevent iOS auto-zoom
                   "w-full px-3 py-2 rounded-lg border text-base sm:text-sm resize-none",
  "bg-v2-maroon-900",
- "border-neutral-300",
+ "border-v2-gold-primary/30",
  "text-neutral-900",
-                  "focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+                  "focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent",
  "placeholder:text-neutral-400"
                 )}
               />
@@ -385,7 +385,7 @@ export function ShareDialog({
                   className={cn(
                     "flex-1 px-4 py-2 rounded-lg border text-sm font-medium transition-all",
                     format === "summary"
- ? "border-primary-500 bg-primary-50 text-primary-700"
+ ? "border-v2-gold-primary bg-primary-50 text-primary-700"
  : "border-v2-maroon-600 bg-v2-maroon-800 text-v2-cream-100"
                   )}
                 >
@@ -397,7 +397,7 @@ export function ShareDialog({
                   className={cn(
                     "flex-1 px-4 py-2 rounded-lg border text-sm font-medium transition-all",
                     format === "detailed"
- ? "border-primary-500 bg-primary-50 text-primary-700"
+ ? "border-v2-gold-primary bg-primary-50 text-primary-700"
  : "border-v2-maroon-600 bg-v2-maroon-800 text-v2-cream-100"
                   )}
                 >
@@ -405,12 +405,12 @@ export function ShareDialog({
                 </button>
               </div>
             </div>
- <label className="flex items-center gap-3 p-3 rounded-lg border border-neutral-200 hover:bg-neutral-50 cursor-pointer transition-colors">
+ <label className="flex items-center gap-3 p-3 rounded-lg border border-v2-gold-primary/20 hover:bg-neutral-50 cursor-pointer transition-colors">
               <input
                 type="checkbox"
                 checked={includeCharts}
                 onChange={(e) => setIncludeCharts(e.target.checked)}
- className="w-4 h-4 rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
+ className="w-4 h-4 rounded border-v2-gold-primary/30 text-primary-600 focus:ring-v2-gold-primary"
               />
  <span className="text-sm font-medium text-neutral-900">
                 {t("includeCharts")}
@@ -473,7 +473,7 @@ export function ShareDialog({
       </div>
 
       {/* Footer Actions */}
- <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end mt-6 pt-4 border-t border-neutral-200">
+ <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end mt-6 pt-4 border-t border-v2-gold-primary/20">
         <Button
           type={ButtonType.SECONDARY}
           onClick={onClose}
