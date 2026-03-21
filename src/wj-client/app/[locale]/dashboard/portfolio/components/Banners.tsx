@@ -9,9 +9,9 @@ import { useTranslations } from "next-intl";
 export const UpdateProgressBanner = memo(function UpdateProgressBanner() {
   const t = useTranslations("investment");
   return (
-    <div className="bg-primary-50 border border-v2-gold-primary/30 rounded-lg p-4 flex items-center gap-3 animate-fade-in">
+    <div className="bg-v2-maroon-900/80 border border-v2-gold-primary/30 rounded-lg p-4 flex items-center gap-3 animate-fade-in">
       <svg
-        className="animate-spin h-5 w-5 text-primary-600"
+        className="animate-spin h-5 w-5 text-v2-gold-primary"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -31,10 +31,10 @@ export const UpdateProgressBanner = memo(function UpdateProgressBanner() {
         />
       </svg>
       <div className="flex-1">
-        <p className="text-sm font-medium text-primary-900">
+        <p className="text-sm font-medium text-v2-gold-accent">
           {t("updateBanner.progressTitle")}
         </p>
-        <p className="text-xs text-primary-700">
+        <p className="text-xs text-v2-text-secondary">
           {t("updateBanner.progressDescription")}
         </p>
       </div>

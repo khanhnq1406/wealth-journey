@@ -77,13 +77,13 @@ export function PushPermissionBanner() {
   if (isIosNotInstalled) {
     return (
       <>
-        <div className="bg-amber-50 border border-v2-gold-accent/30 rounded-lg p-4 mx-4 mt-3 mb-1">
+        <div className="bg-v2-maroon-900/80 border border-v2-gold-accent/30 rounded-lg p-4 mx-4 mt-3 mb-1">
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 text-sm">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-v2-gold-primary/20 flex items-center justify-center text-v2-gold-primary text-sm">
               !
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-roboto text-sm font-medium text-v2-text-primary">
+              <p className="font-roboto text-sm font-medium text-v2-gold-accent">
                 Cài đặt ứng dụng
               </p>
               <p className="font-roboto text-xs text-v2-text-secondary mt-0.5">
@@ -93,7 +93,7 @@ export function PushPermissionBanner() {
               <div className="flex gap-3 mt-2">
                 <button
                   onClick={handleInstall}
-                  className="font-roboto text-xs font-medium text-white bg-bg px-3 py-1.5 rounded-md hover:opacity-90"
+                  className="font-roboto text-xs font-medium text-v2-maroon-900 bg-v2-gold-primary px-3 py-1.5 rounded-md hover:bg-v2-gold-accent"
                 >
                   Cài đặt
                 </button>
@@ -126,13 +126,13 @@ export function PushPermissionBanner() {
 
   // Default: ask to enable push
   return (
-    <div className="bg-amber-50 border border-v2-gold-accent/30 rounded-lg p-4 mx-4 mt-3 mb-1">
+    <div className="bg-v2-maroon-900/80 border border-v2-gold-accent/30 rounded-lg p-4 mx-4 mt-3 mb-1">
       <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 text-sm">
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-v2-gold-primary/20 flex items-center justify-center text-v2-gold-primary text-sm">
           !
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-roboto text-sm font-medium text-v2-text-primary">
+          <p className="font-roboto text-sm font-medium text-v2-gold-accent">
             Bật thông báo
           </p>
           <p className="font-roboto text-xs text-v2-text-secondary mt-0.5">
@@ -142,7 +142,7 @@ export function PushPermissionBanner() {
             <button
               onClick={handleEnable}
               disabled={isLoading}
-              className="font-roboto text-xs font-medium text-white bg-bg px-3 py-1.5 rounded-md hover:opacity-90 disabled:opacity-50"
+              className="font-roboto text-xs font-medium text-v2-maroon-900 bg-v2-gold-primary px-3 py-1.5 rounded-md hover:bg-v2-gold-accent disabled:opacity-50"
             >
               {isLoading ? "Đang xử lý..." : "Bật"}
             </button>
