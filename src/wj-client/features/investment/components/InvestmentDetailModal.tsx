@@ -139,7 +139,7 @@ export function InvestmentDetailModal({
         investment.currency || "USD",
         isCustom,
       )
-    : { text: "N/A", colorClass: "text-gray-500" };
+    : { text: "N/A", colorClass: "text-v2-text-tertiary" };
 
   // Mutation for updating investment prices
   const updatePricesMutation = useMutationUpdatePrices({
@@ -253,11 +253,11 @@ export function InvestmentDetailModal({
               className={`font-medium ${
                 type ===
                 InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_BUY
-                  ? "text-primary-600"
+                  ? "text-v2-green-positive"
                   : type ===
                       InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_SELL
-                    ? "text-red-600"
-                    : "text-secondary-600"
+                    ? "text-v2-red-negative"
+                    : "text-v2-gold-accent"
               }`}
             >
               {getTransactionTypeLabel(type)}
@@ -295,7 +295,7 @@ export function InvestmentDetailModal({
                 )}
               </span>
               {row.original.displayPrice && row.original.displayCurrency && (
-                <span className="text-xs text-gray-500 block">
+                <span className="text-xs text-v2-text-tertiary block">
                   ≈{" "}
                   {formatPrice(
                     row.original.displayPrice.amount || 0,
@@ -323,7 +323,7 @@ export function InvestmentDetailModal({
                 {formatCurrency(fees, nativeCurrency)}
               </span>
               {row.original.displayFees && row.original.displayCurrency && (
-                <span className="text-xs text-gray-500 block">
+                <span className="text-xs text-v2-text-tertiary block">
                   ≈{" "}
                   {formatCurrency(
                     row.original.displayFees.amount || 0,
@@ -348,7 +348,7 @@ export function InvestmentDetailModal({
                 {formatCurrency(cost, nativeCurrency)}
               </span>
               {row.original.displayCost && row.original.displayCurrency && (
-                <span className="text-xs text-gray-500 block">
+                <span className="text-xs text-v2-text-tertiary block">
                   ≈{" "}
                   {formatCurrency(
                     row.original.displayCost.amount || 0,
@@ -375,7 +375,7 @@ export function InvestmentDetailModal({
               e.stopPropagation();
               setDeletingTransactionId(row.original.id);
             }}
-            className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+            className="p-1 text-v2-text-tertiary hover:text-v2-red-negative transition-colors"
             title={t("transactionTable.deleteTransaction")}
             aria-label={t("transactionTable.deleteTransaction")}
           >
@@ -413,11 +413,11 @@ export function InvestmentDetailModal({
               className={`font-medium ${
                 type ===
                 InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_BUY
-                  ? "text-primary-600"
+                  ? "text-v2-green-positive"
                   : type ===
                       InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_SELL
-                    ? "text-red-600"
-                    : "text-secondary-600"
+                    ? "text-v2-red-negative"
+                    : "text-v2-gold-accent"
               }`}
             >
               {getTransactionTypeLabel(type)}
@@ -470,7 +470,7 @@ export function InvestmentDetailModal({
         accessorFn: (row) => (
           <button
             onClick={() => setDeletingTransactionId(row.id)}
-            className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+            className="p-2 text-v2-text-tertiary hover:text-v2-red-negative transition-colors"
             title={t("transactionTable.deleteTransaction")}
             aria-label={t("transactionTable.deleteTransaction")}
           >
@@ -523,8 +523,8 @@ export function InvestmentDetailModal({
               onClick={() => setActiveTab("overview")}
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === "overview"
-                  ? "border-b-2 border-v2-gold-primary text-primary-500"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "border-b-2 border-v2-gold-primary text-v2-gold-primary"
+                  : "text-v2-text-secondary hover:text-v2-gold-accent"
               }`}
             >
               {t("detail.overview")}
@@ -533,8 +533,8 @@ export function InvestmentDetailModal({
               onClick={() => setActiveTab("transactions")}
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === "transactions"
-                  ? "border-b-2 border-v2-gold-primary text-primary-500"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "border-b-2 border-v2-gold-primary text-v2-gold-primary"
+                  : "text-v2-text-secondary hover:text-v2-gold-accent"
               }`}
             >
               {t("detail.transactions")}
@@ -543,8 +543,8 @@ export function InvestmentDetailModal({
               onClick={() => setActiveTab("add-transaction")}
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === "add-transaction"
-                  ? "border-b-2 border-v2-gold-primary text-primary-500"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "border-b-2 border-v2-gold-primary text-v2-gold-primary"
+                  : "text-v2-text-secondary hover:text-v2-gold-accent"
               }`}
             >
               {t("detail.addTransaction")}
@@ -553,8 +553,8 @@ export function InvestmentDetailModal({
               onClick={() => setActiveTab("set-price")}
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === "set-price"
-                  ? "border-b-2 border-v2-gold-primary text-primary-500"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "border-b-2 border-v2-gold-primary text-v2-gold-primary"
+                  : "text-v2-text-secondary hover:text-v2-gold-accent"
               }`}
             >
               {t("detail.setPrice")}
@@ -566,32 +566,32 @@ export function InvestmentDetailModal({
             <div className="space-y-3">
               {/* Investment header with custom badge */}
               {isCustom && (
-                <div className="mb-4 p-3 bg-blue-50 rounded-md border border-v2-gold-primary/30 flex items-center gap-2">
-                  <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded font-medium">
+                <div className="mb-4 p-3 bg-v2-maroon-900 rounded-md border border-v2-gold-primary/30 flex items-center gap-2">
+                  <span className="px-2 py-1 text-xs bg-v2-gold-primary/20 text-v2-gold-accent rounded font-medium">
                     {t("detail.customInvestment")}
                   </span>
-                  <span className="text-sm text-blue-700">
+                  <span className="text-sm text-v2-text-secondary">
                     {t("detail.noMarketData")}
                   </span>
                 </div>
               )}
 
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">{t("detail.symbolLabel")}</span>
+                <span className="text-v2-text-secondary">{t("detail.symbolLabel")}</span>
                 <span className="font-semibold">{investment.symbol}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">{t("detail.nameLabel")}</span>
+                <span className="text-v2-text-secondary">{t("detail.nameLabel")}</span>
                 <span>{investment.name}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">{t("detail.currencyLabel")}</span>
+                <span className="text-v2-text-secondary">{t("detail.currencyLabel")}</span>
                 <span className="font-medium">
                   {investment.currency || "USD"}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">{t("detail.quantityLabel")}</span>
+                <span className="text-v2-text-secondary">{t("detail.quantityLabel")}</span>
                 <span className="font-medium">
                   {formatQuantity(
                     investment.quantity,
@@ -601,7 +601,7 @@ export function InvestmentDetailModal({
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">{t("detail.avgCost")}</span>
+                <span className="text-v2-text-secondary">{t("detail.avgCost")}</span>
                 <span>
                   {formatPrice(
                     investment.averageCost || 0,
@@ -614,7 +614,7 @@ export function InvestmentDetailModal({
               </div>
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-600">{t("detail.currentPrice")}</span>
+                  <span className="text-v2-text-secondary">{t("detail.currentPrice")}</span>
                   {!isCustomInvestment(investment) && (
                     <button
                       onClick={() =>
@@ -624,11 +624,11 @@ export function InvestmentDetailModal({
                         })
                       }
                       disabled={updatePricesMutation.isPending}
-                      className="p-1 hover:bg-gray-100 rounded disabled:opacity-50 transition-colors"
+                      className="p-1 hover:bg-v2-maroon-800 rounded disabled:opacity-50 transition-colors"
                       title={t("detail.refreshPrice")}
                     >
                       <svg
-                        className={`w-4 h-4 text-gray-500 ${updatePricesMutation.isPending ? "animate-spin" : ""}`}
+                        className={`w-4 h-4 text-v2-text-tertiary ${updatePricesMutation.isPending ? "animate-spin" : ""}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -644,11 +644,11 @@ export function InvestmentDetailModal({
                   )}
                   <button
                     onClick={() => setActiveTab("set-price")}
-                    className="p-1 hover:bg-gray-100 rounded transition-colors"
+                    className="p-1 hover:bg-v2-maroon-800 rounded transition-colors"
                     title={t("detail.setPriceManually")}
                   >
                     <svg
-                      className="w-4 h-4 text-gray-500"
+                      className="w-4 h-4 text-v2-text-tertiary"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -690,22 +690,22 @@ export function InvestmentDetailModal({
 
                       if (diffMins < 1) {
                         text = t("detail.justNow");
-                        colorClass = "text-primary-600";
+                        colorClass = "text-v2-green-positive";
                       } else if (diffMins < 5) {
                         text = t("detail.minutesAgo", { minutes: diffMins });
-                        colorClass = "text-primary-600";
+                        colorClass = "text-v2-green-positive";
                       } else if (diffMins < 15) {
                         text = t("detail.minutesAgo", { minutes: diffMins });
-                        colorClass = "text-primary-600";
+                        colorClass = "text-v2-green-positive";
                       } else if (diffMins < 60) {
                         text = t("detail.minutesAgo", { minutes: diffMins });
-                        colorClass = "text-yellow-600";
+                        colorClass = "text-v2-gold-accent";
                       } else if (diffMins < 1440) {
                         text = t("detail.hoursAgo", { hours: Math.floor(diffMins / 60) });
-                        colorClass = "text-orange-600";
+                        colorClass = "text-v2-gold-primary";
                       } else {
                         text = date.toLocaleDateString();
-                        colorClass = "text-red-600";
+                        colorClass = "text-v2-red-negative";
                       }
 
                       return (
@@ -721,14 +721,14 @@ export function InvestmentDetailModal({
               {/* Show warning message for custom investments without price */}
               {isCustomInvestment(investment) &&
                 investment.currentPrice === 0 && (
-                  <div className="mb-4 p-3 bg-yellow-50 rounded-md border border-v2-gold-accent/30">
-                    <p className="text-sm text-yellow-800">
+                  <div className="mb-4 p-3 bg-v2-maroon-900 rounded-md border border-v2-gold-accent/30">
+                    <p className="text-sm text-v2-gold-accent">
                       {t("detail.customNoPriceWarning")}
                     </p>
                   </div>
                 )}
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">{t("detail.totalCost")}</span>
+                <span className="text-v2-text-secondary">{t("detail.totalCost")}</span>
                 <div className="text-right">
                   <span>
                     {formatCurrency(
@@ -738,7 +738,7 @@ export function InvestmentDetailModal({
                   </span>
                   {investment.displayTotalCost &&
                     investment.displayCurrency && (
-                      <span className="text-xs text-gray-500 block">
+                      <span className="text-xs text-v2-text-tertiary block">
                         ≈{" "}
                         {formatCurrency(
                           investment.displayTotalCost.amount || 0,
@@ -749,7 +749,7 @@ export function InvestmentDetailModal({
                 </div>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">{t("detail.currentValue")}</span>
+                <span className="text-v2-text-secondary">{t("detail.currentValue")}</span>
                 <div className="text-right">
                   <span className="font-semibold">
                     {formatCurrency(
@@ -759,7 +759,7 @@ export function InvestmentDetailModal({
                   </span>
                   {investment.displayCurrentValue &&
                     investment.displayCurrency && (
-                      <span className="text-xs text-gray-500 block">
+                      <span className="text-xs text-v2-text-tertiary block">
                         ≈{" "}
                         {formatCurrency(
                           investment.displayCurrentValue.amount || 0,
@@ -775,13 +775,13 @@ export function InvestmentDetailModal({
                   investment.currentPrice > 0) && (
                   <>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">{t("detail.unrealizedPnl")}</span>
+                      <span className="text-v2-text-secondary">{t("detail.unrealizedPnl")}</span>
                       <div className="text-right">
                         <span
                           className={`font-semibold ${
                             (investment.unrealizedPnl || 0) >= 0
-                              ? "text-primary-600"
-                              : "text-red-600"
+                              ? "text-v2-green-positive"
+                              : "text-v2-red-negative"
                           }`}
                         >
                           {formatCurrency(
@@ -791,7 +791,7 @@ export function InvestmentDetailModal({
                         </span>
                         {investment.displayUnrealizedPnl &&
                           investment.displayCurrency && (
-                            <span className="text-xs text-gray-500 block">
+                            <span className="text-xs text-v2-text-tertiary block">
                               ≈{" "}
                               {formatCurrency(
                                 investment.displayUnrealizedPnl.amount || 0,
@@ -802,12 +802,12 @@ export function InvestmentDetailModal({
                       </div>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">{t("detail.unrealizedPnlPercent")}</span>
+                      <span className="text-v2-text-secondary">{t("detail.unrealizedPnlPercent")}</span>
                       <span
                         className={`font-semibold ${
                           (investment.unrealizedPnlPercent || 0) >= 0
-                            ? "text-primary-600"
-                            : "text-red-600"
+                            ? "text-v2-green-positive"
+                            : "text-v2-red-negative"
                         }`}
                       >
                         {(investment.unrealizedPnlPercent || 0) >= 0 ? "+" : ""}
@@ -821,18 +821,18 @@ export function InvestmentDetailModal({
                 {isCustomInvestment(investment) &&
                   investment.currentPrice === 0 && (
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">{t("detail.unrealizedPnl")}</span>
-                      <span className="text-gray-500">{t("detail.pnlNotAvailable")}</span>
+                      <span className="text-v2-text-secondary">{t("detail.unrealizedPnl")}</span>
+                      <span className="text-v2-text-tertiary">{t("detail.pnlNotAvailable")}</span>
                     </div>
                   )}
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">{t("detail.realizedPnl")}</span>
+                  <span className="text-v2-text-secondary">{t("detail.realizedPnl")}</span>
                   <div className="text-right">
                     <span
                       className={`font-semibold ${
                         (investment.realizedPnl || 0) >= 0
-                          ? "text-primary-600"
-                          : "text-red-600"
+                          ? "text-v2-green-positive"
+                          : "text-v2-red-negative"
                       }`}
                     >
                       {formatCurrency(
@@ -842,7 +842,7 @@ export function InvestmentDetailModal({
                     </span>
                     {investment.displayRealizedPnl &&
                       investment.displayCurrency && (
-                        <span className="text-xs text-gray-500 block">
+                        <span className="text-xs text-v2-text-tertiary block">
                           ≈{" "}
                           {formatCurrency(
                             investment.displayRealizedPnl.amount || 0,
@@ -853,8 +853,8 @@ export function InvestmentDetailModal({
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">{t("detail.totalDividends")}</span>
-                  <span className="font-semibold text-primary-600">
+                  <span className="text-v2-text-secondary">{t("detail.totalDividends")}</span>
+                  <span className="font-semibold text-v2-green-positive">
                     {formatCurrency(
                       investment.totalDividends || 0,
                       investment.currency || "USD",
@@ -867,7 +867,7 @@ export function InvestmentDetailModal({
               <div className="border-t pt-4 mt-4">
                 <button
                   onClick={() => setShowDeleteInvestment(true)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 border border-v2-red-negative/30 rounded-md transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 text-v2-red-negative bg-v2-maroon-900 hover:bg-v2-maroon-800 border border-v2-red-negative/30 rounded-md transition-colors"
                 >
                   <svg
                     className="w-4 h-4"
@@ -982,7 +982,7 @@ export function InvestmentDetailModal({
           )}
         </div>
       ) : (
-        <div className="text-center text-danger-600">{t("detail.investmentNotFound")}</div>
+        <div className="text-center text-v2-red-negative">{t("detail.investmentNotFound")}</div>
       )}
 
       {/* Delete Transaction Confirmation Dialog */}
@@ -992,11 +992,11 @@ export function InvestmentDetailModal({
           message={
             <div>
               <p>{t("detail.deleteTransactionConfirm")}</p>
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm text-v2-text-tertiary mt-2">
                 {t("detail.deleteTransactionRecalc")}
               </p>
               {deleteError && (
-                <p className="text-sm text-red-600 mt-2">{deleteError}</p>
+                <p className="text-sm text-v2-red-negative mt-2">{deleteError}</p>
               )}
             </div>
           }
@@ -1022,7 +1022,7 @@ export function InvestmentDetailModal({
                 {t("detail.deleteInvestmentConfirm", { symbol: investment?.symbol || "" })}
               </p>
               {(investment?.quantity || 0) > 0 ? (
-                <p className="text-sm text-red-600 mt-2">
+                <p className="text-sm text-v2-red-negative mt-2">
                   {t("detail.deleteInvestmentHoldings", {
                     quantity: formatQuantity(
                       investment?.quantity || 0,
@@ -1032,12 +1032,12 @@ export function InvestmentDetailModal({
                   })}
                 </p>
               ) : (
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-v2-text-tertiary mt-2">
                   {t("detail.deleteInvestmentHistory")}
                 </p>
               )}
               {deleteInvestmentError && (
-                <p className="text-sm text-red-600 mt-2">
+                <p className="text-sm text-v2-red-negative mt-2">
                   {deleteInvestmentError}
                 </p>
               )}
