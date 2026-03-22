@@ -31,30 +31,6 @@ services:
       timeout: 5s
       retries: 5
 
-  go-backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: wealthjourney_go_backend
-    ports:
-      - "50051:50051"
-    environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: wealthjourney
-      DB_PASSWORD: password
-      DB_NAME: wealthjourney
-      REDIS_URL: redis:6379
-      GRPC_SERVER_PORT: 50051
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - .:/app
-    working_dir: /app
-
 volumes:
   postgres_data:
   redis_data:

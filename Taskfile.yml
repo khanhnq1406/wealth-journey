@@ -178,6 +178,56 @@ tasks:
     cmds:
       - go run cmd/set-admin/main.go -email={{.CLI_ARGS}} -revoke
 
+  # Docker tasks (local Postgres + Redis)
+  docker:up:
+    desc: "Start local Postgres and Redis containers"
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - docker compose up -d
+      - echo "Waiting for Postgres to be ready..."
+      - docker compose exec postgres pg_isready -U wealthjourney --timeout=30
+      - echo "Postgres and Redis are running!"
+
+  docker:down:
+    desc: "Stop local Postgres and Redis containers"
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - docker compose down
+
+  docker:reset:
+    desc: "Stop containers and remove all data volumes"
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - docker compose down -v
+      - echo "Containers stopped and volumes removed."
+
+  docker:logs:
+    desc: "Show logs from Postgres and Redis containers"
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - docker compose logs -f
+    interactive: true
+
+  docker:status:
+    desc: "Show status of local containers"
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - docker compose ps
+
+  docker:psql:
+    desc: "Open psql shell in the local Postgres container"
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - docker compose exec postgres psql -U wealthjourney -d wealthjourney
+    interactive: true
+
+  docker:redis:
+    desc: "Open redis-cli shell in the local Redis container"
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - docker compose exec redis redis-cli
+    interactive: true
+
   # Frontend tasks
   frontend:dev:
     desc: "Start frontend in development mode"
@@ -246,16 +296,18 @@ tasks:
 
   # Combined tasks
   dev:
-    desc: "Start both backend and frontend in development mode"
+    desc: "Start Docker, backend, and frontend in development mode"
     cmds:
+      - task: docker:up
       - echo "Starting backend and frontend in development mode..."
       - task: backend:dev &
       - task: frontend:dev
     interactive: true
 
   dev:backend:
-    desc: "Start only backend in development mode"
+    desc: "Start Docker and backend in development mode"
     cmds:
+      - task: docker:up
       - task: backend:dev
     interactive: true
 
