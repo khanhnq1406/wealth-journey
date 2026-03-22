@@ -166,6 +166,60 @@ tasks:
     cmds:
       - go run cmd/migrate-price-alerts/main.go
 
+  backend:migrate-all:
+    desc: "Run all migrations in order (safe for fresh or existing databases)"
+    dir: "{{.BACKEND_DIR}}"
+    cmds:
+      - echo "=== Running all migrations ==="
+      # Schema migrations (column additions, table creation)
+      - echo "[1/20] migrate-categories..."
+      - go run ./cmd/migrate-default-categories
+      - echo "[2/20] migrate-category-idx..."
+      - go run ./cmd/migrate-category-idx
+      - echo "[3/20] migrate-site-settings..."
+      - go run cmd/migrate-site-settings/main.go
+      - echo "[4/20] migrate-sessions..."
+      - go run cmd/migrate-sessions/main.go
+      - echo "[5/20] migrate-add-is-custom..."
+      - go run cmd/migrate-add-is-custom/main.go
+      - echo "[6/20] migrate-wallet-type..."
+      - go run cmd/migrate-wallet-type/main.go --dry-run=false
+      - echo "[7/20] migrate-gold-silver-types..."
+      - go run cmd/migrate-gold-silver-types/main.go
+      - echo "[8/20] migrate-i18n-language..."
+      - go run cmd/migrate-i18n-language/main.go
+      # Community
+      - echo "[9/20] migrate-community..."
+      - go run cmd/migrate-community/main.go
+      - echo "[10/20] migrate-drop-topic..."
+      - go run cmd/migrate-drop-topic/main.go
+      - echo "[11/20] migrate-community-phase3..."
+      - go run cmd/migrate-community-phase3/main.go
+      - echo "[12/20] migrate-profile-url-size..."
+      - go run cmd/migrate-profile-url-size/main.go
+      # Gold & sentiment
+      - echo "[13/20] migrate-gold-sentiment..."
+      - go run cmd/migrate-gold-sentiment/main.go
+      # Auth enhancements
+      - echo "[14/20] migrate-password-auth..."
+      - go run cmd/migrate-password-auth/main.go
+      - echo "[15/20] migrate-email-nullable..."
+      - go run cmd/migrate-email-nullable/main.go
+      - echo "[16/20] migrate-admin..."
+      - go run cmd/migrate-admin/main.go
+      # Investment ownership
+      - echo "[17/20] migrate-investment-user-ownership..."
+      - go run cmd/migrate-investment-user-ownership/main.go --dry-run=false
+      # Feedback
+      - echo "[18/20] migrate-feedback..."
+      - go run cmd/migrate-feedback/main.go
+      - echo "[19/20] migrate-feedback-admin-note..."
+      - go run cmd/migrate-feedback-admin-note/main.go
+      # Notifications
+      - echo "[20/20] migrate-price-alerts..."
+      - go run cmd/migrate-price-alerts/main.go
+      - echo "=== All migrations completed ==="
+
   backend:set-admin:
     desc: "Grant or revoke admin access for a user by email"
     dir: src/go-backend
