@@ -9,6 +9,8 @@ import { usePathname } from "@/lib/navigation";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { FloatingActionButton } from "@/components/FloatingActionButton";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/utils/api-client";
 import NextImage from "next/image";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { CurrencyConversionProgress } from "@/components/CurrencyConversionProgress";
@@ -62,6 +64,28 @@ export default function DashboardLayout({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [modalType, setModalType] = useState<string | null>(null);
   const { isExpanded, toggle } = useSidebarState();
+
+  const fabSettings = useQuery({
+    queryKey: ["fab-settings"],
+    queryFn: () =>
+      apiClient.get<{ settings: { key: string; value: string }[] }>(
+        "/api/v1/public/site-settings",
+      ),
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  const fabIntroContent = useMemo(() => {
+    const settings = fabSettings.data?.data?.settings;
+    if (!settings) return undefined;
+    const map: Record<string, string> = {};
+    for (const s of settings) map[s.key] = s.value;
+    if (map["fab.enabled"] === "false") return undefined;
+    const text = map["fab.intro_text"];
+    const contactInfo = map["fab.contact_info"];
+    if (!text && !contactInfo) return undefined;
+    return { text: text || "", contactInfo: contactInfo || "" };
+  }, [fabSettings.data]);
 
   store.subscribe(() => {
     if (!user.picture) {
@@ -699,6 +723,8 @@ export default function DashboardLayout({
               },
             },
           ]}
+          autoOpen={path === routes.home}
+          introContent={fabIntroContent}
         />
 
         {/* Global Modals */}
