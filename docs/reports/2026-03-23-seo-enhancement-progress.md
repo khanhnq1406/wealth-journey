@@ -8,7 +8,7 @@
 - **Started:** 2026-03-23
 - **Last updated:** 2026-03-23
 - **Current state:** in_progress
-- **Current task:** 3
+- **Current task:** 5
 
 ## Task Progress
 
@@ -16,8 +16,8 @@
 | --- | ------------------------------------------------ | ------- | ------ | ------- |
 | 1   | Create robots.ts                                 | done    | TBD    | Created app/robots.ts with locale-aware disallow rules |
 | 2   | Create sitemap.ts                                | done    | TBD    | Created app/sitemap.ts with 3 public URLs |
-| 3   | Fix title, description, canonical URL to Vietnamese | pending | —      | —       |
-| 4   | Add hreflang tags                                | pending | —      | —       |
+| 3   | Fix title, description, canonical URL to Vietnamese | done    | TBD    | Vietnamese metadata, www canonical, Vietnamese keywords |
+| 4   | Add hreflang tags                                | done    | TBD    | vi/en/x-default hreflang in fallback and dynamic metadata |
 | 5   | Create JSON-LD structured data component         | pending | —      | —       |
 | 6   | Create OG image                                  | pending | —      | —       |
 | 7   | Add noindex to dashboard and auth pages          | pending | —      | —       |

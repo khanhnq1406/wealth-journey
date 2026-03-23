@@ -1,14 +1,22 @@
 import { Metadata } from "next";
 
 const FALLBACK_METADATA: Metadata = {
-  title: "congdongvang.com - Track Gold & Silver Prices | Personal Finance Dashboard",
-  description: "Monitor live gold and silver prices including SJC, DOJI, and world gold (XAU/USD). Track investments, manage wallets, and build wealth with congdongvang.com's all-in-one personal finance platform.",
+  title: "Giá Vàng Hôm Nay | Cộng Đồng Vàng - Quản Lý Tài Chính Cá Nhân",
+  description:
+    "Theo dõi giá vàng SJC, DOJI, giá bạc, ngoại tệ trực tiếp. Quản lý tài chính cá nhân, theo dõi danh mục đầu tư vàng, cổ phiếu, crypto miễn phí tại congdongvang.com",
   keywords: [
+    "giá vàng hôm nay",
+    "cộng đồng vàng",
+    "cộng đồng đầu tư",
+    "quản lý tài chính cá nhân",
+    "giá vàng SJC",
+    "giá bạc",
+    "đầu tư vàng",
+    "theo dõi danh mục đầu tư",
     "gold price tracker",
     "silver price tracker",
     "SJC gold price",
     "vàng SJC",
-    "giá vàng hôm nay",
     "giá bạc hôm nay",
     "Vietnamese gold investment",
     "gold investment tracking",
@@ -27,24 +35,26 @@ const FALLBACK_METADATA: Metadata = {
   ],
   authors: [{ name: "congdongvang.com" }],
   openGraph: {
-    title: "congdongvang.com - Track Gold & Silver Prices | Personal Finance Dashboard",
-    description: "Monitor live gold and silver prices including SJC, DOJI, and world gold. Track investments, manage wallets, and build wealth with congdongvang.com.",
+    title: "Giá Vàng Hôm Nay | Cộng Đồng Vàng - Quản Lý Tài Chính Cá Nhân",
+    description:
+      "Theo dõi giá vàng SJC, DOJI, giá bạc, ngoại tệ trực tiếp. Quản lý tài chính cá nhân, theo dõi danh mục đầu tư vàng, cổ phiếu, crypto miễn phí tại congdongvang.com",
     type: "website",
-    url: "https://congdongvang.com",
+    url: "https://www.congdongvang.com",
     siteName: "congdongvang.com",
     images: [
       {
         url: "/og-image.svg",
         width: 1200,
         height: 630,
-        alt: "congdongvang.com Gold & Silver Price Dashboard",
+        alt: "Cộng Đồng Vàng - Giá vàng hôm nay và quản lý tài chính cá nhân",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "congdongvang.com - Track Gold & Silver Prices | Personal Finance Dashboard",
-    description: "Monitor live gold and silver prices including SJC, DOJI, and world gold. Track investments, manage wallets, and build wealth with congdongvang.com.",
+    title: "Giá Vàng Hôm Nay | Cộng Đồng Vàng - Quản Lý Tài Chính Cá Nhân",
+    description:
+      "Theo dõi giá vàng SJC, DOJI, giá bạc, ngoại tệ trực tiếp. Quản lý tài chính cá nhân, theo dõi danh mục đầu tư vàng, cổ phiếu, crypto miễn phí tại congdongvang.com",
     images: ["/og-image.svg"],
     creator: "@congdongvang",
   },
@@ -60,7 +70,12 @@ const FALLBACK_METADATA: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://congdongvang.com",
+    canonical: "https://www.congdongvang.com/vi/landing",
+    languages: {
+      vi: "https://www.congdongvang.com/vi/landing",
+      en: "https://www.congdongvang.com/en/landing",
+      "x-default": "https://www.congdongvang.com/vi/landing",
+    },
   },
 };
 
@@ -109,7 +124,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: settings["seo.og_title"] || settings["seo.title"] || (FALLBACK_METADATA.openGraph as any)?.title,
       description: settings["seo.og_description"] || settings["seo.description"] || (FALLBACK_METADATA.openGraph as any)?.description,
       type: "website",
-      url: settings["seo.og_url"] || "https://congdongvang.com",
+      url: settings["seo.og_url"] || "https://www.congdongvang.com",
       siteName: "congdongvang.com",
       images: [
         {
@@ -139,7 +154,12 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     },
     alternates: {
-      canonical: settings["seo.canonical"] || "https://congdongvang.com",
+      canonical: settings["seo.canonical"] || "https://www.congdongvang.com/vi/landing",
+      languages: {
+        vi: "https://www.congdongvang.com/vi/landing",
+        en: "https://www.congdongvang.com/en/landing",
+        "x-default": "https://www.congdongvang.com/vi/landing",
+      },
     },
   };
 }
