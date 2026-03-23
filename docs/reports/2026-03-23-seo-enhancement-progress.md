@@ -8,7 +8,7 @@
 - **Started:** 2026-03-23
 - **Last updated:** 2026-03-23
 - **Current state:** in_progress
-- **Current task:** 8
+- **Current task:** 9
 
 ## Task Progress
 
@@ -21,7 +21,7 @@
 | 5   | Create JSON-LD structured data component         | done    | TBD    | JsonLd component + 5 schema types in landing layout |
 | 6   | Create OG image                                  | done    | TBD    | Branded SVG OG image with gold/red colors and Vietnamese text |
 | 7   | Add noindex to dashboard and auth pages          | done    | TBD    | noindex on auth layout, split dashboard layout for server metadata |
-| 8   | Convert landing page to SSR with ISR             | pending | —      | —       |
+| 8   | Convert landing page to SSR with ISR             | done    | TBD    | Server page with ISR fetch, LandingContent client component |
 | 9   | Update H1 text in i18n messages                  | pending | —      | —       |
 | 10  | Improve image alt texts                          | pending | —      | —       |
 | 11  | Add preconnect to API domain                     | pending | —      | —       |
