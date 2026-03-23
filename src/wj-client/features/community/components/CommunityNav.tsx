@@ -35,7 +35,7 @@ export function CommunityNav({ activeView = "feed", onViewChange }: CommunityNav
             className={cn(
               "flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors font-roboto text-[14px]",
               activeView === item.view
-                ? "bg-v2-red-light text-v2-red-primary font-semibold"
+                ? "bg-v2-gold-primary/20 text-v2-gold-primary font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-maroon-600"
             )}
           >

@@ -18,7 +18,7 @@ function ReplyMenu({ onEdit, onDelete }: { onEdit: () => void; onDelete: () => v
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="text-gray-400 hover:text-gray-600 text-lg leading-none px-1"
+        className="text-v2-text-tertiary hover:text-v2-gold-accent text-lg leading-none px-1"
       >
         ⋯
       </button>
@@ -28,13 +28,13 @@ function ReplyMenu({ onEdit, onDelete }: { onEdit: () => void; onDelete: () => v
           <div className="absolute right-0 top-6 z-20 bg-v2-maroon-800 border border-v2-gold-primary/20 rounded-lg shadow-lg py-1 min-w-[100px]">
             <button
               onClick={() => { setOpen(false); onEdit(); }}
-              className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+              className="w-full text-left px-3 py-2 text-sm text-v2-gold-accent hover:bg-v2-maroon-700"
             >
               Edit
             </button>
             <button
               onClick={() => { setOpen(false); onDelete(); }}
-              className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-gray-50"
+              className="w-full text-left px-3 py-2 text-sm text-v2-red-negative hover:bg-v2-maroon-700"
             >
               Delete
             </button>
@@ -57,7 +57,7 @@ export function ReplyBubble({ reply, currentUserId, onDelete }: ReplyBubbleProps
     <div className="flex gap-2 ml-8 mt-2">
       <Avatar name={authorName} imageUrl={authorPicture} size="sm" />
       <div className="flex-1">
-        <div className="bg-[#FAF9F7] rounded-2xl px-3 py-2">
+        <div className="bg-v2-maroon-900 rounded-2xl px-3 py-2">
           <div className="flex items-start justify-between gap-2">
             <span className="font-roboto text-[13px] font-semibold text-v2-text-primary">{authorName}</span>
             {isOwnReply && !isEditing && (
@@ -78,7 +78,7 @@ export function ReplyBubble({ reply, currentUserId, onDelete }: ReplyBubbleProps
               onCancel={() => setIsEditing(false)}
             />
           ) : (
-            <p className="text-sm break-words whitespace-pre-wrap mt-0.5">{currentContent}</p>
+            <p className="text-sm text-v2-gold-accent break-words whitespace-pre-wrap mt-0.5">{currentContent}</p>
           )}
         </div>
         <div className="flex items-center gap-2 ml-3 mt-0.5">
@@ -86,7 +86,7 @@ export function ReplyBubble({ reply, currentUserId, onDelete }: ReplyBubbleProps
             {formatRelativeTime(reply.createdAt)}
           </span>
           {reply.isEdited && (
-            <span className="text-xs text-gray-400">(edited)</span>
+            <span className="text-xs text-v2-text-tertiary">(edited)</span>
           )}
         </div>
       </div>

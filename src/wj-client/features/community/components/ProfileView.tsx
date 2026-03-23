@@ -25,15 +25,16 @@ export function ProfileView({
   onHashtagClick,
   onFollowingClick,
 }: ProfileViewProps) {
-  const { data: profileData, isLoading: profileLoading } = useQueryGetCommunityProfile(
-    { userId: targetUserId },
-    { enabled: targetUserId > 0, refetchOnMount: "always" }
-  );
+  const { data: profileData, isLoading: profileLoading } =
+    useQueryGetCommunityProfile(
+      { userId: targetUserId },
+      { enabled: targetUserId > 0, refetchOnMount: "always" },
+    );
   const profile = profileData?.data;
 
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const isOwnProfile = profile?.isOwnProfile ?? (targetUserId === currentUser.id);
+  const isOwnProfile = profile?.isOwnProfile ?? targetUserId === currentUser.id;
 
   if (profileLoading) {
     return (
@@ -70,7 +71,7 @@ export function ProfileView({
               <ArrowLeft size={18} />
             </button>
           )}
-          {isOwnProfile && (
+          {/* {isOwnProfile && (
             <button
               type="button"
               onClick={() => setShowEditModal(true)}
@@ -78,7 +79,7 @@ export function ProfileView({
             >
               Edit cover
             </button>
-          )}
+          )} */}
         </div>
 
         {/* Profile info */}
@@ -148,7 +149,9 @@ export function ProfileView({
                 <p className="font-roboto text-xl font-bold text-v2-text-primary">
                   {profile?.postCount ?? 0}
                 </p>
-                <p className="font-roboto text-xs text-v2-text-tertiary">Bài viết</p>
+                <p className="font-roboto text-xs text-v2-text-tertiary">
+                  Bài viết
+                </p>
               </div>
               <button
                 onClick={() => onFollowingClick?.("followers")}
@@ -157,7 +160,9 @@ export function ProfileView({
                 <p className="font-roboto text-xl font-bold text-v2-text-primary">
                   {profile?.followerCount ?? 0}
                 </p>
-                <p className="font-roboto text-xs text-v2-text-tertiary">Người theo dõi</p>
+                <p className="font-roboto text-xs text-v2-text-tertiary">
+                  Người theo dõi
+                </p>
               </button>
               <button
                 onClick={() => onFollowingClick?.("following")}
@@ -166,7 +171,9 @@ export function ProfileView({
                 <p className="font-roboto text-xl font-bold text-v2-text-primary">
                   {profile?.followingCount ?? 0}
                 </p>
-                <p className="font-roboto text-xs text-v2-text-tertiary">Đang theo dõi</p>
+                <p className="font-roboto text-xs text-v2-text-tertiary">
+                  Đang theo dõi
+                </p>
               </button>
             </div>
           </div>
