@@ -146,6 +146,31 @@ export const Sparkline = memo(function Sparkline({
   }
   const valueRange = maxValue - minValue || 1; // Avoid division by zero
 
+  if (parsed.length === 0) {
+    const flatGradientId = `sparkline-flat-gradient-${uniqueId.replace(/:/g, '-')}`;
+    const lineY = Math.round(height * 0.4);
+    return (
+      <div ref={containerRef} className={className} style={{ width: "100%", height: `${height}px` }}>
+        {width > 0 && (
+          <svg width={width} height={height} style={{ display: "block" }}>
+            {showGradient && (
+              <defs>
+                <linearGradient id={flatGradientId} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={trendColor} stopOpacity={0.3} />
+                  <stop offset="100%" stopColor={trendColor} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+            )}
+            {showGradient && (
+              <rect x="0" y={lineY} width="100%" height={height - lineY} fill={`url(#${flatGradientId})`} />
+            )}
+            <line x1="0" y1={lineY} x2="100%" y2={lineY} stroke={trendColor} strokeWidth={strokeWidth} />
+          </svg>
+        )}
+      </div>
+    );
+  }
+
   const points = parsed.map((point, index) => {
     const x = padding + (chartWidth * index) / (parsed.length - 1 || 1);
     const y =
