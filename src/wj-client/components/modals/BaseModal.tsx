@@ -564,11 +564,11 @@ export function BaseModal({
 
             <div
               className={cn(
-                "overflow-y-auto overflow-x-hidden -mx-1 px-1 transition-all duration-300",
-                // Dynamic max-height based on keyboard visibility
+                "overflow-y-auto overflow-x-hidden -mx-1 px-1 pb-4",
+                // Dynamic max-height: account for header (~70px), padding (~32px), and safe areas
                 isKeyboardVisible
-                  ? "max-h-[calc(70vh-200px)]"
-                  : "max-h-[calc(100vh-250px)] sm:max-h-[calc(90vh-150px)]",
+                  ? "max-h-[calc(70vh-120px)]"
+                  : "max-h-[calc(85vh-120px)] sm:max-h-[calc(90vh-120px)]",
               )}
             >
               {children}

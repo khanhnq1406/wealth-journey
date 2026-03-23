@@ -676,8 +676,8 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
                 {t("form.customSymbolInfo")}
               </p>
               {/* Info box for custom investments */}
-              <div className="mt-2 p-3 bg-blue-50 rounded-md border border-v2-gold-primary/30">
-                <p className="text-sm text-blue-800">
+              <div className="mt-2 p-3 bg-v2-maroon-900 rounded-md border border-v2-gold-primary/30">
+                <p className="text-sm text-v2-gold-accent">
                   {t("form.customPriceNote")}
                 </p>
               </div>
