@@ -4,10 +4,12 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gin-gonic/gin"
+
 	"wealthjourney/domain/models"
 	"wealthjourney/domain/service"
-
-	"github.com/gin-gonic/gin"
+	apperrors "wealthjourney/pkg/errors"
+	"wealthjourney/pkg/handler"
 )
 
 // SiteSettingsHandler handles site settings API requests.
@@ -38,7 +40,7 @@ func toSiteSettingDTOs(settings []*models.SiteSetting) []SiteSettingDTO {
 func (h *SiteSettingsHandler) GetSiteSettings(c *gin.Context) {
 	settings, err := h.service.GetAll(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to fetch settings"})
+		handler.InternalErrorWithCode(c, apperrors.Codes.SettingsFetchFailed, "Failed to fetch settings")
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
@@ -58,12 +60,12 @@ type updateSiteSettingsRequest struct {
 func (h *SiteSettingsHandler) UpdateSiteSettings(c *gin.Context) {
 	var req updateSiteSettingsRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid request body"})
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.SettingsRequestInvalid, "Invalid request body"))
 		return
 	}
 
 	if len(req.Settings) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "No settings provided"})
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.SettingsEmpty, "No settings provided"))
 		return
 	}
 
@@ -88,10 +90,10 @@ func (h *SiteSettingsHandler) UpdateSiteSettings(c *gin.Context) {
 			strings.HasPrefix(errMsg, "setting value exceeds") ||
 			strings.HasPrefix(errMsg, "seo.") ||
 			strings.HasPrefix(errMsg, "no settings provided") {
-			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": errMsg})
+			handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.SettingsRequestInvalid, errMsg))
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Failed to update settings"})
+		handler.InternalErrorWithCode(c, apperrors.Codes.SettingsUpdateFailed, "Failed to update settings")
 		return
 	}
 

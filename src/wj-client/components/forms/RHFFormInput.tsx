@@ -1,7 +1,9 @@
 "use client";
 
 import { useController, UseControllerProps } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import { FormInput, FormInputProps } from "./FormInput";
+import { translateValidationMessage } from "@/lib/utils/error-translator";
 
 interface RHFFormInputProps
   extends Omit<FormInputProps, "error" | "value" | "onChange" | "onBlur" | "name" | "defaultValue">,
@@ -12,6 +14,7 @@ interface RHFFormInputProps
 /**
  * React Hook Form compatible wrapper for FormInput
  * Uses useController to integrate with react-hook-form
+ * Translates Zod validation error messages via the 'validation' namespace
  */
 export const RHFFormInput = ({
   control,
@@ -22,6 +25,7 @@ export const RHFFormInput = ({
   disabled,
   ...inputProps
 }: RHFFormInputProps) => {
+  const tValidation = useTranslations("validation");
   const {
     field: { onChange, onBlur, value, ref },
     fieldState: { error },
@@ -34,6 +38,8 @@ export const RHFFormInput = ({
     disabled,
   });
 
+  const translatedError = translateValidationMessage(tValidation, error?.message);
+
   return (
     <FormInput
       {...inputProps}
@@ -42,7 +48,7 @@ export const RHFFormInput = ({
       value={value}
       onChange={onChange}
       onBlur={onBlur}
-      error={error?.message}
+      error={translatedError}
       disabled={disabled}
     />
   );

@@ -32,6 +32,7 @@ import { toDateTimeLocal, fromDateTimeLocal } from "@/lib/utils/date";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { formatCurrency } from "@/utils/currency-formatter";
 import { amountToSmallestUnit } from "@/lib/utils/units";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface EditTransactionFormProps {
   transactionId: number;
@@ -48,6 +49,7 @@ export function EditTransactionForm({
   onSuccess,
 }: EditTransactionFormProps) {
   const t = useTranslations("transaction.form");
+  const tErrors = useTranslations();
   const { currency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
@@ -183,9 +185,7 @@ export function EditTransactionForm({
           setErrorMessage("");
         },
         onError: (error: any) => {
-          setErrorMessage(
-            error.message || t("failedToUpdate"),
-          );
+          setErrorMessage(getTranslatedError(error, tErrors));
         },
       },
     );

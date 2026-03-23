@@ -18,6 +18,7 @@ import { Success } from "@/components/modals/Success";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { amountToSmallestUnit } from "@/lib/utils/units";
 import { useTranslations } from "next-intl";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface EditBudgetFormProps {
   budget: Budget;
@@ -32,6 +33,7 @@ interface EditBudgetFormProps {
 export function EditBudgetForm({ budget, onSuccess }: EditBudgetFormProps) {
   const { currency } = useCurrency();
   const t = useTranslations("budget.form");
+  const tErrors = useTranslations();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [showSuccess, setShowSuccess] = useState(false);
@@ -44,9 +46,7 @@ export function EditBudgetForm({ budget, onSuccess }: EditBudgetFormProps) {
       setErrorMessage("");
     },
     onError: (error: any) => {
-      setErrorMessage(
-        error.message || t("failedToUpdate"),
-      );
+      setErrorMessage(getTranslatedError(error, tErrors));
     },
   });
 

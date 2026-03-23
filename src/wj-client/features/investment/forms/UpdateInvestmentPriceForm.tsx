@@ -8,6 +8,7 @@ import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
 import { FormInput } from "@/components/forms/FormInput";
 import { Success } from "@/components/modals/Success";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface UpdateInvestmentPriceFormProps {
   investmentId: number;
@@ -29,6 +30,7 @@ export function UpdateInvestmentPriceForm({
   onSuccess,
 }: UpdateInvestmentPriceFormProps) {
   const t = useTranslations("investmentPrice.form");
+  const tErrors = useTranslations();
   // Currencies with no decimal places (0 decimals)
   const zeroDecimalCurrencies = ["VND", "JPY", "KRW"];
   const hasDecimals = !zeroDecimalCurrencies.includes(currency);
@@ -50,7 +52,7 @@ export function UpdateInvestmentPriceForm({
       setShowSuccess(true);
     },
     onError: (error: any) => {
-      setErrorMessage(error.message || t("failedToUpdate"));
+      setErrorMessage(getTranslatedError(error, tErrors));
     },
   });
 

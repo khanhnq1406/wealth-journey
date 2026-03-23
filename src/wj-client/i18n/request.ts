@@ -23,6 +23,9 @@ const messageGroups = [
                  // pullToRefresh, pwa, search, select, datePicker, currencySelector,
                  // dashboard, symbolAutocomplete, connectionStatus, dataFreshness,
                  // quickActions, featureDiscovery, landingErrorBoundary
+  'errors',      // error code translations for i18n error display
+  'community',   // community.profile (edit profile, bio, etc.)
+  'validation',  // Zod validation message translations
 ] as const;
 
 export default getRequestConfig(async ({ requestLocale }) => {

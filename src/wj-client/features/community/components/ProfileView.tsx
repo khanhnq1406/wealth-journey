@@ -7,6 +7,7 @@ import { FollowButton } from "./FollowButton";
 import { ArrowLeft, MapPin, Link2 } from "lucide-react";
 import { ProfileTabs } from "./ProfileTabs";
 import { ProfileEditModal } from "./ProfileEditModal";
+import { useTranslations } from "next-intl";
 
 interface ProfileViewProps {
   targetUserId: number;
@@ -25,15 +26,17 @@ export function ProfileView({
   onHashtagClick,
   onFollowingClick,
 }: ProfileViewProps) {
-  const { data: profileData, isLoading: profileLoading } = useQueryGetCommunityProfile(
-    { userId: targetUserId },
-    { enabled: targetUserId > 0, refetchOnMount: "always" }
-  );
+  const { data: profileData, isLoading: profileLoading } =
+    useQueryGetCommunityProfile(
+      { userId: targetUserId },
+      { enabled: targetUserId > 0, refetchOnMount: "always" },
+    );
   const profile = profileData?.data;
 
+  const t = useTranslations();
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const isOwnProfile = profile?.isOwnProfile ?? (targetUserId === currentUser.id);
+  const isOwnProfile = profile?.isOwnProfile ?? targetUserId === currentUser.id;
 
   if (profileLoading) {
     return (
@@ -70,7 +73,7 @@ export function ProfileView({
               <ArrowLeft size={18} />
             </button>
           )}
-          {isOwnProfile && (
+          {/* {isOwnProfile && (
             <button
               type="button"
               onClick={() => setShowEditModal(true)}
@@ -78,7 +81,7 @@ export function ProfileView({
             >
               Edit cover
             </button>
-          )}
+          )} */}
         </div>
 
         {/* Profile info */}
@@ -95,9 +98,9 @@ export function ProfileView({
             {isOwnProfile ? (
               <button
                 onClick={() => setShowEditModal(true)}
-                className="text-sm px-4 py-1.5 border border-v2-gold-primary/30 rounded-full hover:bg-gray-100 transition-colors font-medium text-v2-text-primary"
+                className="text-sm px-4 py-1.5 border border-v2-gold-primary/30 rounded-full hover:bg-v2-maroon-700 transition-colors font-medium text-v2-text-primary"
               >
-                Edit Profile
+                {t("profile.editProfile")}
               </button>
             ) : (
               <FollowButton
@@ -122,7 +125,7 @@ export function ProfileView({
 
           {/* Location */}
           {profile?.location && (
-            <div className="flex items-center gap-1 text-sm text-gray-500 mt-1">
+            <div className="flex items-center gap-1 text-sm text-v2-text-tertiary mt-1">
               <MapPin size={13} className="shrink-0" />
               <span>{profile.location}</span>
             </div>
@@ -134,7 +137,7 @@ export function ProfileView({
               href={profile.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-sm text-bg hover:underline mt-1"
+              className="flex items-center gap-1 text-sm text-v2-gold-primary hover:text-v2-gold-accent hover:underline mt-1"
             >
               <Link2 size={13} className="shrink-0" />
               <span>{profile.website}</span>
@@ -148,7 +151,9 @@ export function ProfileView({
                 <p className="font-roboto text-xl font-bold text-v2-text-primary">
                   {profile?.postCount ?? 0}
                 </p>
-                <p className="font-roboto text-xs text-v2-text-tertiary">Bài viết</p>
+                <p className="font-roboto text-xs text-v2-text-tertiary">
+                  Bài viết
+                </p>
               </div>
               <button
                 onClick={() => onFollowingClick?.("followers")}
@@ -157,7 +162,9 @@ export function ProfileView({
                 <p className="font-roboto text-xl font-bold text-v2-text-primary">
                   {profile?.followerCount ?? 0}
                 </p>
-                <p className="font-roboto text-xs text-v2-text-tertiary">Người theo dõi</p>
+                <p className="font-roboto text-xs text-v2-text-tertiary">
+                  Người theo dõi
+                </p>
               </button>
               <button
                 onClick={() => onFollowingClick?.("following")}
@@ -166,7 +173,9 @@ export function ProfileView({
                 <p className="font-roboto text-xl font-bold text-v2-text-primary">
                   {profile?.followingCount ?? 0}
                 </p>
-                <p className="font-roboto text-xs text-v2-text-tertiary">Đang theo dõi</p>
+                <p className="font-roboto text-xs text-v2-text-tertiary">
+                  Đang theo dõi
+                </p>
               </button>
             </div>
           </div>

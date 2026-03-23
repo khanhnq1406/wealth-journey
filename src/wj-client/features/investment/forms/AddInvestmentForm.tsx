@@ -36,6 +36,7 @@ import { getQuantityInputConfig } from "@/lib/utils/units";
 import { Label } from "@/components/forms/Label";
 import { ErrorMessage } from "@/components/forms/ErrorMessage";
 import { CurrencyBadge } from "@/components/forms/CurrencyBadge";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 import {
   isGoldType,
   getGoldTypeOptions,
@@ -63,6 +64,7 @@ interface AddInvestmentFormProps {
 
 export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
   const t = useTranslations("investment");
+  const tErrors = useTranslations();
   const queryClient = useQueryClient();
   const { currency: userCurrency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -164,54 +166,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
       });
     },
     onError: (error: any) => {
-      // Parse error message and provide user-friendly alternatives
-      let errorMsg = error.message || t("errors.failedToCreate");
-
-      // Check currency mismatch BEFORE generic duplicate — both contain "already exists"
-      const currencyMismatchMatch = errorMsg.match(
-        /Investment\s+(\S+)\s+already exists with currency\s+(\S+)/i
-      );
-      if (currencyMismatchMatch) {
-        errorMsg = t("errors.currencyMismatch", {
-          symbol: currencyMismatchMatch[1],
-          currency: currencyMismatchMatch[2],
-        });
-      } else if (
-        errorMsg.toLowerCase().includes("duplicate") ||
-        errorMsg.toLowerCase().includes("already exists")
-      ) {
-        errorMsg = t("errors.duplicateSymbol");
-      } else if (errorMsg.toLowerCase().includes("currency")) {
-        errorMsg = t("errors.invalidCurrency");
-      } else if (
-        errorMsg.toLowerCase().includes("balance") ||
-        errorMsg.toLowerCase().includes("insufficient")
-      ) {
-        errorMsg = t("errors.insufficientBalance");
-      } else if (errorMsg.toLowerCase().includes("symbol")) {
-        errorMsg = t("errors.invalidSymbol");
-      } else if (errorMsg.toLowerCase().includes("quantity")) {
-        errorMsg = t("errors.invalidQuantity");
-      } else if (
-        errorMsg.toLowerCase().includes("cost") ||
-        errorMsg.toLowerCase().includes("price")
-      ) {
-        errorMsg = t("errors.invalidCost");
-      } else if (errorMsg.toLowerCase().includes("wallet")) {
-        errorMsg = t("errors.invalidWallet");
-      } else if (
-        errorMsg.toLowerCase().includes("not found") ||
-        errorMsg.toLowerCase().includes("404")
-      ) {
-        errorMsg = t("errors.resourceNotFound");
-      } else if (
-        errorMsg.toLowerCase().includes("unauthorized") ||
-        errorMsg.toLowerCase().includes("403")
-      ) {
-        errorMsg = t("errors.unauthorized");
-      }
-
-      setErrorMessage(errorMsg);
+      setErrorMessage(getTranslatedError(error, tErrors));
     },
   });
 

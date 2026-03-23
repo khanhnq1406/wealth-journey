@@ -156,7 +156,7 @@ func NewImportService(
 func (s *importService) validateImportRequest(ctx context.Context, userID int32, req *v1.ExecuteImportRequest) error {
 	// Check max transactions per import
 	if len(req.Transactions) > 10000 {
-		return apperrors.NewValidationError("exceeded maximum transactions per import (10,000)")
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportMaxTransactionsExceeded, "exceeded maximum transactions per import (10,000)")
 	}
 
 	// Validate date range
@@ -169,12 +169,12 @@ func (s *importService) validateImportRequest(ctx context.Context, userID int32,
 
 		// Check for future dates
 		if txDate.After(oneDayAhead) {
-			return apperrors.NewValidationError("transaction date cannot be in the future")
+			return apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTxDateFuture, "transaction date cannot be in the future")
 		}
 
 		// Check for dates too old
 		if txDate.Before(tenYearsAgo) {
-			return apperrors.NewValidationError("transaction date too old (max 10 years)")
+			return apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTxDateTooOld, "transaction date too old (max 10 years)")
 		}
 	}
 
@@ -371,7 +371,7 @@ func (s *importService) ExecuteImport(ctx context.Context, userID int32, req *v1
 	}
 
 	if len(validTransactions) == 0 {
-		err := apperrors.NewValidationError("No valid transactions to import")
+		err := apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportNoValidTransactions, "No valid transactions to import")
 		logger.LogImportError(ctx, userID, "execute:no_valid_transactions", err, map[string]interface{}{
 			"wallet_id":       req.WalletId,
 			"file_id":         req.FileId,
@@ -740,7 +740,7 @@ func (s *importService) ExecuteImport(ctx context.Context, userID int32, req *v1
 			"total_expenses":         totalExpenses,
 		})
 		// This is a critical data integrity issue - return error
-		return nil, apperrors.NewInternalErrorWithCause("wallet balance update verification failed", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.ImportBalanceVerificationFailed, "wallet balance update verification failed", err)
 	}
 
 	// Use the verified wallet for response
@@ -800,22 +800,22 @@ func (s *importService) UndoImport(ctx context.Context, userID int32, importID s
 
 	// Verify ownership
 	if batch.UserID != userID {
-		return nil, apperrors.NewNotFoundError("import batch")
+		return nil, apperrors.NewNotFoundErrorWithCode(apperrors.Codes.ImportBatchNotFound, "import batch not found")
 	}
 
 	// Check if undo is allowed
 	if !batch.CanUndo {
-		return nil, apperrors.NewValidationError("This import cannot be undone")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportUndoNotAllowed, "This import cannot be undone")
 	}
 
 	// Check if already undone
 	if batch.UndoneAt != nil {
-		return nil, apperrors.NewValidationError("This import has already been undone")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportAlreadyUndone, "This import has already been undone")
 	}
 
 	// Check if undo window has expired
 	if time.Now().After(batch.UndoExpiresAt) {
-		return nil, apperrors.NewValidationError("Undo window has expired (24 hours)")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportUndoExpired, "Undo window has expired (24 hours)")
 	}
 
 	// Get transactions for this import
@@ -1062,7 +1062,7 @@ func (s *importService) ConvertCurrency(ctx context.Context, userID int32, req *
 		} else {
 			// Fetch automatic rate (use latest rate for all transactions)
 			if s.fxService == nil {
-				return nil, apperrors.NewValidationError("currency conversion service not available")
+				return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportCurrencyConversionUnavailable, "currency conversion service not available")
 			}
 
 			rate, err := s.fxService.GetRate(ctx, currency, walletCurrency)
@@ -1133,20 +1133,20 @@ func (s *importService) ConvertCurrency(ctx context.Context, userID int32, req *
 func (s *importService) ListExcelSheets(ctx context.Context, userID int32, fileID string) (*v1.ListExcelSheetsResponse, error) {
 	// Validate file ID
 	if fileID == "" {
-		return nil, apperrors.NewValidationError("fileId is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportFileIdRequired, "fileId is required")
 	}
 
 	// Get file path from upload directory
 	matches, err := filepath.Glob(filepath.Join(fileupload.UploadDir, fileID+".*"))
 	if err != nil || len(matches) == 0 {
-		return nil, apperrors.NewNotFoundError("uploaded file not found")
+		return nil, apperrors.NewNotFoundErrorWithCode(apperrors.Codes.ImportFileNotFound, "uploaded file not found")
 	}
 	filePath := matches[0]
 	fileExt := filepath.Ext(filePath)
 
 	// Validate it's an Excel file
 	if fileExt != ".xlsx" && fileExt != ".xls" {
-		return nil, apperrors.NewValidationError("file is not an Excel file (.xlsx or .xls)")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportFileNotExcel, "file is not an Excel file (.xlsx or .xls)")
 	}
 
 	// Create Excel parser
@@ -1160,7 +1160,7 @@ func (s *importService) ListExcelSheets(ctx context.Context, userID int32, fileI
 	}
 
 	if len(sheets) == 0 {
-		return nil, apperrors.NewValidationError("no visible sheets found in Excel file")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportNoSheets, "no visible sheets found in Excel file")
 	}
 
 	// Auto-detect best sheet
@@ -1170,7 +1170,7 @@ func (s *importService) ListExcelSheets(ctx context.Context, userID int32, fileI
 		if len(sheets) > 0 {
 			defaultSheet = sheets[0]
 		} else {
-			return nil, apperrors.NewValidationError("no sheets available for detection")
+			return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportNoSheets, "no sheets available for detection")
 		}
 	}
 
@@ -1208,31 +1208,31 @@ func (s *importService) CreateUserTemplate(ctx context.Context, userID int32, re
 	}
 
 	if req.TemplateName == "" {
-		return nil, apperrors.NewValidationError("template name is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateNameRequired, "template name is required")
 	}
 
 	if req.ColumnMapping == nil {
-		return nil, apperrors.NewValidationError("column mapping is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateColumnMappingRequired, "column mapping is required")
 	}
 
 	if req.DateFormat == "" {
-		return nil, apperrors.NewValidationError("date format is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateDateFormatRequired, "date format is required")
 	}
 
 	if req.Currency == "" {
-		return nil, apperrors.NewValidationError("currency is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateCurrencyRequired, "currency is required")
 	}
 
 	// Serialize column mapping to JSON
 	mappingJSON, err := json.Marshal(req.ColumnMapping)
 	if err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("invalid column mapping: %v", err))
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateColumnMappingInvalid, fmt.Sprintf("invalid column mapping: %v", err))
 	}
 
 	// Serialize file formats to JSON
 	fileFormatsJSON, err := json.Marshal(req.FileFormats)
 	if err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("invalid file formats: %v", err))
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateFileFormatsInvalid, fmt.Sprintf("invalid file formats: %v", err))
 	}
 
 	// Create default amount format (matches bank template structure)
@@ -1315,7 +1315,7 @@ func (s *importService) GetUserTemplate(ctx context.Context, userID int32, templ
 	}
 
 	if err := validator.ID(templateID); err != nil {
-		return nil, apperrors.NewValidationError("invalid template ID")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateIdInvalid, "invalid template ID")
 	}
 
 	// Get template from repository
@@ -1346,7 +1346,7 @@ func (s *importService) UpdateUserTemplate(ctx context.Context, userID int32, re
 	}
 
 	if err := validator.ID(req.TemplateId); err != nil {
-		return nil, apperrors.NewValidationError("invalid template ID")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateIdInvalid, "invalid template ID")
 	}
 
 	// Get existing template to verify ownership
@@ -1357,31 +1357,31 @@ func (s *importService) UpdateUserTemplate(ctx context.Context, userID int32, re
 
 	// Validate request fields
 	if req.TemplateName == "" {
-		return nil, apperrors.NewValidationError("template name is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateNameRequired, "template name is required")
 	}
 
 	if req.ColumnMapping == nil {
-		return nil, apperrors.NewValidationError("column mapping is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateColumnMappingRequired, "column mapping is required")
 	}
 
 	if req.DateFormat == "" {
-		return nil, apperrors.NewValidationError("date format is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateDateFormatRequired, "date format is required")
 	}
 
 	if req.Currency == "" {
-		return nil, apperrors.NewValidationError("currency is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateCurrencyRequired, "currency is required")
 	}
 
 	// Serialize column mapping to JSON
 	mappingJSON, err := json.Marshal(req.ColumnMapping)
 	if err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("invalid column mapping: %v", err))
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateColumnMappingInvalid, fmt.Sprintf("invalid column mapping: %v", err))
 	}
 
 	// Serialize file formats to JSON
 	fileFormatsJSON, err := json.Marshal(req.FileFormats)
 	if err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("invalid file formats: %v", err))
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateFileFormatsInvalid, fmt.Sprintf("invalid file formats: %v", err))
 	}
 
 	// Update template fields
@@ -1418,7 +1418,7 @@ func (s *importService) DeleteUserTemplate(ctx context.Context, userID int32, te
 	}
 
 	if err := validator.ID(templateID); err != nil {
-		return nil, apperrors.NewValidationError("invalid template ID")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateIdInvalid, "invalid template ID")
 	}
 
 	// Delete template
@@ -1438,7 +1438,7 @@ func (s *importService) userTemplateToProto(template *models.UserTemplate) (*v1.
 	// Deserialize column mapping
 	var columnMapping v1.ColumnMapping
 	if err := json.Unmarshal(template.ColumnMapping, &columnMapping); err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("invalid column mapping format: %v", err))
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateColumnMappingInvalid, fmt.Sprintf("invalid column mapping format: %v", err))
 	}
 
 	// Deserialize file formats
@@ -1473,7 +1473,7 @@ func (s *importService) GetJobStatus(ctx context.Context, userID int32, jobID st
 	}
 
 	if jobID == "" {
-		return nil, apperrors.NewValidationError("job ID is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportJobIdRequired, "job ID is required")
 	}
 
 	// Get job from queue
@@ -1483,7 +1483,7 @@ func (s *importService) GetJobStatus(ctx context.Context, userID int32, jobID st
 	}
 
 	if jobInterface == nil {
-		return nil, apperrors.NewNotFoundError("job")
+		return nil, apperrors.NewNotFoundErrorWithCode(apperrors.Codes.ImportJobNotFound, "job not found")
 	}
 
 	// Type assert to ImportJobData
@@ -1494,7 +1494,7 @@ func (s *importService) GetJobStatus(ctx context.Context, userID int32, jobID st
 
 	// Verify ownership
 	if job.UserID != userID {
-		return nil, apperrors.NewNotFoundError("job")
+		return nil, apperrors.NewNotFoundErrorWithCode(apperrors.Codes.ImportJobNotFound, "job not found")
 	}
 
 	// Convert to protobuf format
@@ -1516,7 +1516,7 @@ func (s *importService) CancelJob(ctx context.Context, userID int32, jobID strin
 	}
 
 	if jobID == "" {
-		return nil, apperrors.NewValidationError("job ID is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportJobIdRequired, "job ID is required")
 	}
 
 	// Get job to verify ownership
@@ -1526,7 +1526,7 @@ func (s *importService) CancelJob(ctx context.Context, userID int32, jobID strin
 	}
 
 	if jobData == nil {
-		return nil, apperrors.NewNotFoundError("job")
+		return nil, apperrors.NewNotFoundErrorWithCode(apperrors.Codes.ImportJobNotFound, "job not found")
 	}
 
 	// Type assert to ImportJobData
@@ -1537,7 +1537,7 @@ func (s *importService) CancelJob(ctx context.Context, userID int32, jobID strin
 
 	// Verify ownership
 	if job.UserID != userID {
-		return nil, apperrors.NewNotFoundError("job")
+		return nil, apperrors.NewNotFoundErrorWithCode(apperrors.Codes.ImportJobNotFound, "job not found")
 	}
 
 	// Cancel job

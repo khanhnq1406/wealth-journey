@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -45,11 +44,7 @@ func NewImportHandler(importRepo repository.ImportRepository, importService serv
 func (h *ImportHandler) ListBankTemplates(c *gin.Context) {
 	response, err := h.importService.ListBankTemplates(c.Request.Context())
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "Failed to fetch bank templates",
-			"error":   err.Error(),
-		})
+		handler.InternalErrorWithCode(c, apperrors.Codes.ImportTemplatesFetchFailed, "Failed to fetch bank templates")
 		return
 	}
 
@@ -86,12 +81,12 @@ func (h *ImportHandler) UploadFile(c *gin.Context) {
 
 	// Validate required fields
 	if len(req.FileData) == 0 {
-		handler.BadRequest(c, apperrors.NewValidationError("file is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportFileRequired, "file is required"))
 		return
 	}
 
 	if req.FileName == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("fileName is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportFilenameRequired, "fileName is required"))
 		return
 	}
 
@@ -109,7 +104,7 @@ func (h *ImportHandler) UploadFile(c *gin.Context) {
 	// Validate file type
 	fileType, err := fileupload.ValidateFileType(sanitizedName)
 	if err != nil {
-		handler.BadRequest(c, apperrors.NewValidationError(err.Error()))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportFileTypeUnsupported, err.Error()))
 		return
 	}
 
@@ -120,7 +115,7 @@ func (h *ImportHandler) UploadFile(c *gin.Context) {
 			"declared_size":  req.FileSize,
 			"actual_size":    len(req.FileData),
 		})
-		handler.BadRequest(c, apperrors.NewValidationError(err.Error()))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportFileRequired, err.Error()))
 		return
 	}
 
@@ -131,7 +126,7 @@ func (h *ImportHandler) UploadFile(c *gin.Context) {
 			"file_size": req.FileSize,
 			"file_type": string(fileType),
 		})
-		handler.BadRequest(c, apperrors.NewValidationError(err.Error()))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportFileRequired, err.Error()))
 		return
 	}
 
@@ -237,7 +232,7 @@ func (h *ImportHandler) ParseFile(c *gin.Context) {
 
 	// Validate required fields
 	if req.FileId == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("fileId is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportFileIdRequired, "fileId is required"))
 		return
 	}
 
@@ -247,7 +242,7 @@ func (h *ImportHandler) ParseFile(c *gin.Context) {
 	fileURL, fileExt, err := fileupload.GetFileURL(c.Request.Context(), req.FileId)
 	if err != nil {
 		fmt.Printf("[DEBUG] ParseFile: GetFileURL failed: %v\n", err)
-		handler.BadRequest(c, apperrors.NewValidationError("uploaded file not found"))
+		handler.BadRequest(c, apperrors.NewNotFoundErrorWithCode(apperrors.Codes.ImportFileNotFound, "uploaded file not found"))
 		return
 	}
 
@@ -255,7 +250,7 @@ func (h *ImportHandler) ParseFile(c *gin.Context) {
 
 	// Validate file type — only Excel and PDF are supported
 	if fileExt != ".pdf" && fileExt != ".xlsx" && fileExt != ".xls" {
-		handler.BadRequest(c, apperrors.NewValidationError(fmt.Sprintf("unsupported file type: %s. Supported: Excel (.xlsx, .xls), PDF", fileExt)))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportFileTypeUnsupported, fmt.Sprintf("unsupported file type: %s. Supported: Excel (.xlsx, .xls), PDF", fileExt)))
 		return
 	}
 
@@ -499,12 +494,12 @@ func (h *ImportHandler) DetectDuplicates(c *gin.Context) {
 
 	// Validate required fields
 	if req.WalletId == 0 {
-		handler.BadRequest(c, apperrors.NewValidationError("walletId is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportWalletIdRequired, "walletId is required"))
 		return
 	}
 
 	if len(req.Transactions) == 0 {
-		handler.BadRequest(c, apperrors.NewValidationError("transactions list cannot be empty"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTransactionsEmpty, "transactions list cannot be empty"))
 		return
 	}
 
@@ -546,12 +541,12 @@ func (h *ImportHandler) ConvertCurrency(c *gin.Context) {
 
 	// Validate required fields
 	if req.WalletId == 0 {
-		handler.BadRequest(c, apperrors.NewValidationError("walletId is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportWalletIdRequired, "walletId is required"))
 		return
 	}
 
 	if len(req.Transactions) == 0 {
-		handler.BadRequest(c, apperrors.NewValidationError("transactions list cannot be empty"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTransactionsEmpty, "transactions list cannot be empty"))
 		return
 	}
 
@@ -593,12 +588,12 @@ func (h *ImportHandler) ConfirmImport(c *gin.Context) {
 
 	// Validate required fields
 	if req.WalletId == 0 {
-		handler.BadRequest(c, apperrors.NewValidationError("walletId is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportWalletIdRequired, "walletId is required"))
 		return
 	}
 
 	if len(req.Transactions) == 0 {
-		handler.BadRequest(c, apperrors.NewValidationError("transactions list cannot be empty"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTransactionsEmpty, "transactions list cannot be empty"))
 		return
 	}
 
@@ -702,7 +697,7 @@ func (h *ImportHandler) GetImportBatch(c *gin.Context) {
 	// Get import ID from path parameter
 	importID := c.Param("id")
 	if importID == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("import batch ID is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportBatchIdRequired, "import batch ID is required"))
 		return
 	}
 
@@ -776,7 +771,7 @@ func (h *ImportHandler) UndoImport(c *gin.Context) {
 	// Get import ID from path parameter
 	importID := c.Param("id")
 	if importID == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("import batch ID is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportBatchIdRequired, "import batch ID is required"))
 		return
 	}
 
@@ -849,7 +844,7 @@ func (h *ImportHandler) ListExcelSheets(c *gin.Context) {
 	// Get file ID from path parameter
 	fileID := c.Param("file_id")
 	if fileID == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("file ID is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportFileIdRequired, "file ID is required"))
 		return
 	}
 
@@ -948,7 +943,7 @@ func (h *ImportHandler) GetUserTemplate(c *gin.Context) {
 	templateIDStr := c.Param("template_id")
 	templateID, err := strconv.ParseInt(templateIDStr, 10, 32)
 	if err != nil {
-		handler.BadRequest(c, apperrors.NewValidationError("invalid template ID"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateIdInvalid, "invalid template ID"))
 		return
 	}
 
@@ -987,7 +982,7 @@ func (h *ImportHandler) UpdateUserTemplate(c *gin.Context) {
 	templateIDStr := c.Param("template_id")
 	templateID, err := strconv.ParseInt(templateIDStr, 10, 32)
 	if err != nil {
-		handler.BadRequest(c, apperrors.NewValidationError("invalid template ID"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateIdInvalid, "invalid template ID"))
 		return
 	}
 
@@ -1034,7 +1029,7 @@ func (h *ImportHandler) DeleteUserTemplate(c *gin.Context) {
 	templateIDStr := c.Param("template_id")
 	templateID, err := strconv.ParseInt(templateIDStr, 10, 32)
 	if err != nil {
-		handler.BadRequest(c, apperrors.NewValidationError("invalid template ID"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportTemplateIdInvalid, "invalid template ID"))
 		return
 	}
 
@@ -1070,7 +1065,7 @@ func (h *ImportHandler) GetJobStatus(c *gin.Context) {
 	// Get job ID from path parameter
 	jobID := c.Param("job_id")
 	if jobID == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("job ID is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportJobIdRequired, "job ID is required"))
 		return
 	}
 
@@ -1106,7 +1101,7 @@ func (h *ImportHandler) CancelJob(c *gin.Context) {
 	// Get job ID from path parameter
 	jobID := c.Param("job_id")
 	if jobID == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("job ID is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ImportJobIdRequired, "job ID is required"))
 		return
 	}
 

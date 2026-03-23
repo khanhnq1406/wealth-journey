@@ -24,6 +24,7 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { formatCurrency } from "@/utils/currency-formatter";
 import { amountToSmallestUnit } from "@/lib/utils/units";
 import { useTranslations } from "next-intl";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface TransferMoneyFormProps {
   onSuccess?: () => void;
@@ -36,6 +37,7 @@ interface TransferMoneyFormProps {
  */
 export function TransferMoneyForm({ onSuccess }: TransferMoneyFormProps) {
   const t = useTranslations("transfer.form");
+  const tErrors = useTranslations();
   const { currency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
@@ -118,9 +120,7 @@ export function TransferMoneyForm({ onSuccess }: TransferMoneyFormProps) {
           setErrorMessage("");
         },
         onError: (error: any) => {
-          setErrorMessage(
-            error.message || t("failedToTransfer"),
-          );
+          setErrorMessage(getTranslatedError(error, tErrors));
         },
       },
     );

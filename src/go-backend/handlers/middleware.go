@@ -1,11 +1,11 @@
 package handlers
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 
 	"wealthjourney/domain/auth"
+	apperrors "wealthjourney/pkg/errors"
+	"wealthjourney/pkg/handler"
 )
 
 // AuthMiddleware validates JWT tokens from Redis whitelist.
@@ -23,10 +23,7 @@ func AuthMiddleware(authSrv *auth.Server) gin.HandlerFunc {
 		result, err := authSrv.VerifyAuth(token)
 
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error":   "unauthorized",
-				"message": "Invalid or expired token",
-			})
+			handler.UnauthorizedWithCode(c, apperrors.Codes.AuthTokenExpired, "Invalid or expired token")
 			c.Abort()
 			return
 		}
@@ -47,10 +44,7 @@ func AdminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		isAdmin, exists := c.Get("is_admin")
 		if !exists || !isAdmin.(bool) {
-			c.JSON(http.StatusForbidden, gin.H{
-				"success": false,
-				"message": "Admin access required",
-			})
+			handler.ForbiddenWithCode(c, apperrors.Codes.AuthAdminRequired, "Admin access required")
 			c.Abort()
 			return
 		}

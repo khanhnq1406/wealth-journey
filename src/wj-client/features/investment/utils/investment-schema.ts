@@ -22,27 +22,27 @@ export const createInvestmentSchema = z
   .object({
     symbol: z
       .string()
-      .min(1, "Symbol is required")
-      .max(50, "Symbol must be 50 characters or less"),
+      .min(1, "INVESTMENT_SYMBOL_REQUIRED")
+      .max(50, "INVESTMENT_SYMBOL_MAX"),
     name: z
       .string()
-      .min(1, "Name is required")
-      .max(100, "Name must be 100 characters or less"),
+      .min(1, "INVESTMENT_NAME_REQUIRED")
+      .max(100, "INVESTMENT_NAME_MAX"),
     type: z.nativeEnum(InvestmentType),
-    initialQuantity: z.number().min(0.00000001, "Quantity must be positive"),
-    initialCost: z.number().min(0, "Initial cost must be 0 or greater"),
-    pricePerUnit: z.number().min(0, "Price per unit must be 0 or greater"),
-    purchaseDate: z.string().min(1, "Purchase date is required"),
+    initialQuantity: z.number({ message: "INVESTMENT_QUANTITY_POSITIVE" }).min(0.00000001, "INVESTMENT_QUANTITY_POSITIVE"),
+    initialCost: z.number({ message: "INVESTMENT_COST_MIN" }).min(0, "INVESTMENT_COST_MIN"),
+    pricePerUnit: z.number({ message: "INVESTMENT_PRICE_MIN" }).min(0, "INVESTMENT_PRICE_MIN"),
+    purchaseDate: z.string().min(1, "INVESTMENT_DATE_REQUIRED"),
     currency: z
       .string()
-      .length(3, "Currency must be a 3-letter ISO code")
-      .regex(/^[A-Z]{3}$/, "Currency must be 3 uppercase letters"),
+      .length(3, "INVESTMENT_CURRENCY_LENGTH")
+      .regex(/^[A-Z]{3}$/, "INVESTMENT_CURRENCY_FORMAT"),
   })
   .refine(
     (data) => {
       return data.initialQuantity > 0;
     },
-    { message: "Quantity must be greater than 0", path: ["initialQuantity"] },
+    { message: "INVESTMENT_QUANTITY_GT_ZERO", path: ["initialQuantity"] },
   )
   .refine(
     (data) => {
@@ -51,7 +51,7 @@ export const createInvestmentSchema = z
       return /^[A-Za-z0-9._-]+$/.test(data.symbol);
     },
     {
-      message: "Symbol should contain only letters, numbers, dots, underscores, and hyphens",
+      message: "INVESTMENT_SYMBOL_FORMAT",
       path: ["symbol"],
     },
   );
@@ -59,10 +59,10 @@ export const createInvestmentSchema = z
 // Dynamic validation schema based on investment type (crypto vs others)
 export const addTransactionSchema = z.object({
   type: z.nativeEnum(InvestmentTransactionType),
-  quantity: z.number().min(0.00000001, "Quantity must be greater than 0"),
-  price: z.number().min(0, "Price must be non-negative"),
-  fees: z.number().min(0, "Fees must be non-negative"),
-  transactionDate: z.string().min(1, "Transaction date is required"),
+  quantity: z.number({ message: "INVESTMENT_QUANTITY_GT_ZERO" }).min(0.00000001, "INVESTMENT_QUANTITY_GT_ZERO"),
+  price: z.number({ message: "INVESTMENT_PRICE_NON_NEGATIVE" }).min(0, "INVESTMENT_PRICE_NON_NEGATIVE"),
+  fees: z.number({ message: "INVESTMENT_FEES_NON_NEGATIVE" }).min(0, "INVESTMENT_FEES_NON_NEGATIVE"),
+  transactionDate: z.string().min(1, "INVESTMENT_TX_DATE_REQUIRED"),
 });
 
 export type CreateInvestmentFormInput = z.infer<typeof createInvestmentSchema>;

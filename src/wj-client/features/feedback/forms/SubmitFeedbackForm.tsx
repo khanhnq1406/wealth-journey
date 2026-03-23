@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 import { RHFFormInput as FormInput } from "@/components/forms/RHFFormInput";
 import { FormTextarea } from "@/components/forms/FormTextarea";
 import { Button } from "@/components/Button";
@@ -21,6 +22,7 @@ interface SubmitFeedbackFormProps {
 
 export function SubmitFeedbackForm({ onSuccess }: SubmitFeedbackFormProps) {
   const t = useTranslations("feedback");
+  const tErrors = useTranslations();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -47,7 +49,7 @@ export function SubmitFeedbackForm({ onSuccess }: SubmitFeedbackFormProps) {
           if (error?.statusCode === 429) {
             setErrorMessage(t("form.rateLimited"));
           } else {
-            setErrorMessage(error.message || t("form.failedToSubmit"));
+            setErrorMessage(getTranslatedError(error, tErrors));
           }
         },
       }

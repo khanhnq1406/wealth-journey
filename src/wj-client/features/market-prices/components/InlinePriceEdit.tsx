@@ -8,6 +8,7 @@ import {
 } from "../hooks/usePriceOverride";
 import type { PriceItem } from "@/gen/protobuf/v1/investment";
 import { formatPriceValue } from "@/app/[locale]/dashboard/prices/helpers";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface InlinePriceEditProps {
   item: PriceItem;
@@ -16,6 +17,7 @@ interface InlinePriceEditProps {
 
 export function InlinePriceEdit({ item, category }: InlinePriceEditProps) {
   const t = useTranslations("prices.override");
+  const tErrors = useTranslations();
   const [isEditing, setIsEditing] = useState(false);
   const [buyValue, setBuyValue] = useState("");
   const [sellValue, setSellValue] = useState("");
@@ -38,7 +40,7 @@ export function InlinePriceEdit({ item, category }: InlinePriceEditProps) {
       setIsEditing(false);
     },
     onError: (err) => {
-      showToast(err.message || t("saveFailed"), "error");
+      showToast(getTranslatedError(err, tErrors), "error");
     },
   });
 
@@ -47,7 +49,7 @@ export function InlinePriceEdit({ item, category }: InlinePriceEditProps) {
       showToast(t("removed"));
     },
     onError: (err) => {
-      showToast(err.message || t("removeFailed"), "error");
+      showToast(getTranslatedError(err, tErrors), "error");
     },
   });
 

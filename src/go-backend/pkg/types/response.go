@@ -92,10 +92,11 @@ func NewErrorResponse(err APIError) APIResponse {
 
 // APIError represents detailed error information.
 type APIError struct {
-	Code       string `json:"code"`              // Application-specific error code
-	Message    string `json:"message"`           // User-friendly error message
-	Details    string `json:"details,omitempty"` // Additional error details (optional)
-	StatusCode int    `json:"-"`                 // HTTP status code (not serialized)
+	Code       string            `json:"code"`              // Application-specific error code
+	Message    string            `json:"message"`           // User-friendly error message
+	Details    string            `json:"details,omitempty"` // Additional error details (optional)
+	Params     map[string]string `json:"params,omitempty"`  // Interpolation params for i18n translations
+	StatusCode int               `json:"-"`                 // HTTP status code (not serialized)
 }
 
 // Error implements the error interface.

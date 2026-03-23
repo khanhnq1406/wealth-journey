@@ -99,10 +99,10 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		return nil, err
 	}
 	if req.Symbol == "" {
-		return nil, apperrors.NewValidationError("symbol is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentSymbolRequired, "symbol is required")
 	}
 	if req.Name == "" {
-		return nil, apperrors.NewValidationError("name is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentNameRequired, "name is required")
 	}
 	if err := validator.Currency(req.Currency); err != nil {
 		return nil, err
@@ -134,17 +134,17 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 
 	// Validate the converted values
 	if initialQuantity <= 0 {
-		return nil, apperrors.NewValidationError("initialQuantity must be positive")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentQuantityPositive, "initialQuantity must be positive")
 	}
 	if initialCost <= 0 {
-		return nil, apperrors.NewValidationError("initialCost must be positive")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentPricePositive, "initialCost must be positive")
 	}
 
 	// Validate purchase_date if provided
 	if req.PurchaseDate > 0 {
 		purchaseTime := time.Unix(req.PurchaseDate, 0)
 		if purchaseTime.After(time.Now()) {
-			return nil, apperrors.NewValidationError("purchase date cannot be in the future")
+			return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentTxDateFuture, "purchase date cannot be in the future")
 		}
 	}
 
@@ -153,8 +153,10 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 	if err == nil && existing != nil {
 		// Validate currency matches existing investment
 		if req.Currency != existing.Currency {
-			return nil, apperrors.NewValidationError(
+			return nil, apperrors.NewConflictErrorWithCodeAndParams(
+				apperrors.Codes.InvestmentDuplicate,
 				fmt.Sprintf("Investment %s already exists with currency %s", req.Symbol, existing.Currency),
+				map[string]string{"symbol": req.Symbol, "currency": existing.Currency},
 			)
 		}
 
@@ -563,18 +565,18 @@ func (s *investmentService) AddTransaction(ctx context.Context, userID int32, re
 		return nil, err
 	}
 	if req.Quantity <= 0 {
-		return nil, apperrors.NewValidationError("quantity must be positive")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentQuantityPositive, "quantity must be positive")
 	}
 	if req.Price <= 0 {
-		return nil, apperrors.NewValidationError("price must be positive")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentPricePositive, "price must be positive")
 	}
 	if req.Type == v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_UNSPECIFIED {
-		return nil, apperrors.NewValidationError("transaction type must be specified")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentTxTypeRequired, "transaction type must be specified")
 	}
 	// Validate transaction date is not in the future
 	transactionTime := time.Unix(req.TransactionDate, 0)
 	if transactionTime.After(time.Now()) {
-		return nil, apperrors.NewValidationError("transaction date cannot be in the future")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentTxDateFuture, "transaction date cannot be in the future")
 	}
 
 	// 2. Get investment and verify ownership
@@ -624,7 +626,7 @@ func (s *investmentService) AddTransaction(ctx context.Context, userID int32, re
 		}, nil
 
 	default:
-		return nil, apperrors.NewValidationError("unsupported transaction type")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentTxTypeRequired, "unsupported transaction type")
 	}
 
 	// Invalidate and repopulate currency cache
@@ -771,7 +773,7 @@ func (s *investmentService) processBuyTransaction(ctx context.Context, investmen
 func (s *investmentService) processSellTransaction(ctx context.Context, investment *models.Investment, req *v1.AddTransactionRequest) (*models.Investment, error) {
 	// Validate sufficient quantity
 	if investment.Quantity < req.Quantity {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("insufficient quantity: owned %d, trying to sell %d", investment.Quantity, req.Quantity))
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentQuantityPositive, fmt.Sprintf("insufficient quantity: owned %d, trying to sell %d", investment.Quantity, req.Quantity))
 	}
 
 	// Get open lots (FIFO order by purchased_at ASC)
@@ -781,7 +783,7 @@ func (s *investmentService) processSellTransaction(ctx context.Context, investme
 	}
 
 	if len(openLots) == 0 {
-		return nil, apperrors.NewValidationError("no open lots available for selling")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentQuantityPositive, "no open lots available for selling")
 	}
 
 	// Calculate total available quantity
@@ -791,7 +793,7 @@ func (s *investmentService) processSellTransaction(ctx context.Context, investme
 	}
 
 	if totalAvailable < req.Quantity {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("insufficient quantity in lots: available %d, trying to sell %d", totalAvailable, req.Quantity))
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentQuantityPositive, fmt.Sprintf("insufficient quantity in lots: available %d, trying to sell %d", totalAvailable, req.Quantity))
 	}
 
 	// FIFO: Consume from oldest lots first
@@ -1513,7 +1515,7 @@ func (s *investmentService) UpdatePrices(ctx context.Context, userID int32, req 
 func (s *investmentService) SearchSymbols(ctx context.Context, query string, limit int) (*v1.SearchSymbolsResponse, error) {
 	// 1. Validate query
 	if strings.TrimSpace(query) == "" {
-		return nil, apperrors.NewValidationError("query is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentQueryRequired, "query is required")
 	}
 
 	// 2. Call Yahoo Finance search

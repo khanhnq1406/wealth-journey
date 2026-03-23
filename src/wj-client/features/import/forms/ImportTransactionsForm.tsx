@@ -21,6 +21,7 @@ import {
 } from "@/utils/generated/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 import { EVENT_TransactionListTransactions } from "@/utils/generated/hooks";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 // Import step definitions
 const IMPORT_STEPS = [
@@ -129,6 +130,7 @@ export function ImportTransactionsForm({
   onSuccess,
 }: ImportTransactionsFormProps) {
   const t = useTranslations("import.steps");
+  const tErrors = useTranslations();
   const queryClient = useQueryClient();
   const translatedSteps = useMemo(() => IMPORT_STEPS.map((step, i) => {
     const labels = [t("upload"), t("selectWallet"), t("review"), t("complete")];
@@ -163,7 +165,7 @@ export function ImportTransactionsForm({
       }
     },
     onError: (err: any) => {
-      setError(err.message || "Failed to upload file");
+      setError(getTranslatedError(err, tErrors));
     },
   });
 
@@ -191,43 +193,22 @@ export function ImportTransactionsForm({
    * Handle import errors with user-friendly messages and recovery logic
    */
   const handleImportError = (error: any) => {
-    // Parse error message
-    const errorMsg = error?.message || "Import failed";
-
     // Clear any existing errors first
     setError(null);
 
-    // Recoverable errors - guide user to fix and retry
-    if (errorMsg.includes("insufficient balance")) {
-      setError(
-        "Wallet has insufficient balance for these transactions. Please adjust the transactions or choose a different wallet.",
-      );
-      // Go back to review step when it's implemented (Task 10)
-      // For now, stay on current step
-    } else if (errorMsg.includes("exceeded maximum transactions per import")) {
-      setError(
-        "File contains too many transactions (max 10,000). Please split into smaller files.",
-      );
+    // Use translated error message
+    const translatedMsg = getTranslatedError(error, tErrors);
+    setError(translatedMsg);
+
+    // Determine if we need to navigate back based on error type
+    const errorMsg = error?.message || "";
+    if (
+      errorMsg.includes("exceeded maximum transactions per import") ||
+      errorMsg.includes("transaction date cannot be in the future") ||
+      errorMsg.includes("transaction date too old") ||
+      errorMsg.includes("No valid transactions to import")
+    ) {
       setCurrentStep(1); // Go back to file upload
-    } else if (errorMsg.includes("transaction date cannot be in the future")) {
-      setError(
-        "Some transactions have future dates. Please check your file and ensure all dates are valid.",
-      );
-      setCurrentStep(1); // Go back to file upload
-    } else if (errorMsg.includes("transaction date too old")) {
-      setError(
-        "Some transactions are older than 10 years. Please remove old transactions and try again.",
-      );
-      setCurrentStep(1); // Go back to file upload
-    } else if (errorMsg.includes("No valid transactions to import")) {
-      setError(
-        "No valid transactions found. Please check your file format and try again.",
-      );
-      setCurrentStep(1); // Go back to file upload
-    } else {
-      setError(
-        "Import failed. Please try again or contact support if the problem persists.",
-      );
     }
   };
 

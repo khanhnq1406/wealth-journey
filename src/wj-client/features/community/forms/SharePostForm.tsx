@@ -9,6 +9,8 @@ import type { PostItem } from "@/gen/protobuf/v1/community";
 import { SharedPostEmbed } from "../components/SharedPostEmbed";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
+import { useTranslations } from "next-intl";
+import { getTranslatedError, translateValidationMessage } from "@/lib/utils/error-translator";
 
 interface SharePostFormProps {
   post: PostItem;
@@ -17,6 +19,8 @@ interface SharePostFormProps {
 }
 
 export function SharePostForm({ post, onSuccess, onCancel }: SharePostFormProps) {
+  const t = useTranslations();
+  const tValidation = useTranslations("validation");
   const [errorMessage, setErrorMessage] = useState<string>();
 
   const {
@@ -33,7 +37,7 @@ export function SharePostForm({ post, onSuccess, onCancel }: SharePostFormProps)
       onSuccess?.();
     },
     onError: (error: any) => {
-      setErrorMessage(error.message || "Failed to share post");
+      setErrorMessage(getTranslatedError(error, t));
     },
   });
 
@@ -53,15 +57,15 @@ export function SharePostForm({ post, onSuccess, onCancel }: SharePostFormProps)
           {...register("content")}
           placeholder="Thêm bình luận... (không bắt buộc)"
           rows={3}
-          className="w-full px-3 py-2 font-roboto text-sm rounded-xl border border-v2-border-light bg-v2-bg-primary focus:outline-none focus:ring-2 focus:ring-bg/30 resize-none"
+          className="w-full px-3 py-2 font-roboto text-sm rounded-xl border border-v2-gold-primary/20 bg-v2-maroon-900 text-v2-gold-accent placeholder:text-v2-text-tertiary focus:outline-none focus:border-v2-gold-primary resize-none"
         />
         {errors.content && (
-          <p className="mt-1 text-xs text-lred">{errors.content.message}</p>
+          <p className="mt-1 text-xs text-v2-red-negative">{translateValidationMessage(tValidation, errors.content.message)}</p>
         )}
       </div>
 
       {errorMessage && (
-        <p className="text-xs text-lred">{errorMessage}</p>
+        <p className="text-xs text-v2-red-negative">{errorMessage}</p>
       )}
 
       <div className="flex gap-2 justify-end">

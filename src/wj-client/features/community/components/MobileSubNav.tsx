@@ -34,7 +34,7 @@ export function MobileSubNav({ activeView = "feed", onViewChange }: MobileSubNav
             className={cn(
               "flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg transition-colors min-w-[56px]",
               activeView === tab.view
-                ? "text-v2-red-primary"
+                ? "text-v2-gold-primary"
                 : "text-v2-text-tertiary hover:text-v2-text-secondary"
             )}
           >

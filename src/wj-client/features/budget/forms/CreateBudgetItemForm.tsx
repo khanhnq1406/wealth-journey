@@ -16,6 +16,7 @@ import {
 import { Success } from "@/components/modals/Success";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { amountToSmallestUnit } from "@/lib/utils/units";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface CreateBudgetItemFormProps {
   budgetId: number;
@@ -32,6 +33,7 @@ export function CreateBudgetItemForm({
   onSuccess,
 }: CreateBudgetItemFormProps) {
   const t = useTranslations("budget.form");
+  const tErrors = useTranslations();
   const { currency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
@@ -69,9 +71,7 @@ export function CreateBudgetItemForm({
           setErrorMessage("");
         },
         onError: (error: any) => {
-          setErrorMessage(
-            error.message || t("failedToCreateItem"),
-          );
+          setErrorMessage(getTranslatedError(error, tErrors));
         },
       },
     );

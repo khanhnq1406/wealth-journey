@@ -27,7 +27,7 @@ function CommentMenu({ onEdit, onDelete }: { onEdit: () => void; onDelete: () =>
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="text-gray-400 hover:text-gray-600 text-lg leading-none px-1"
+        className="text-v2-text-tertiary hover:text-v2-gold-accent text-lg leading-none px-1"
       >
         ⋯
       </button>
@@ -37,13 +37,13 @@ function CommentMenu({ onEdit, onDelete }: { onEdit: () => void; onDelete: () =>
           <div className="absolute right-0 top-6 z-20 bg-v2-maroon-800 border border-v2-gold-primary/20 rounded-lg shadow-lg py-1 min-w-[100px]">
             <button
               onClick={() => { setOpen(false); onEdit(); }}
-              className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+              className="w-full text-left px-3 py-2 text-sm text-v2-gold-accent hover:bg-v2-maroon-700"
             >
               Edit
             </button>
             <button
               onClick={() => { setOpen(false); onDelete(); }}
-              className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-gray-50"
+              className="w-full text-left px-3 py-2 text-sm text-v2-red-negative hover:bg-v2-maroon-700"
             >
               Delete
             </button>
@@ -76,7 +76,7 @@ export function CommentBubble({
     <div className="flex items-start gap-2">
       <Avatar name={authorName} imageUrl={authorPicture} size="sm" />
       <div className="flex-1 min-w-0">
-        <div className="bg-[#FAF9F7] rounded-xl px-3 py-2">
+        <div className="bg-v2-maroon-900 rounded-xl px-3 py-2">
           <div className="flex items-center justify-between">
             <p className="font-roboto text-[13px] font-semibold text-v2-text-primary">
               {authorName}
@@ -99,7 +99,7 @@ export function CommentBubble({
               onCancel={() => setIsEditing(false)}
             />
           ) : (
-            <p className="text-sm break-words whitespace-pre-wrap">{currentContent}</p>
+            <p className="text-sm text-v2-gold-accent break-words whitespace-pre-wrap">{currentContent}</p>
           )}
         </div>
         <div className="flex items-center gap-1 ml-3 mt-0.5">
@@ -107,12 +107,12 @@ export function CommentBubble({
             {formatRelativeTime(createdAt)}
           </span>
           {isEdited && (
-            <span className="text-xs text-gray-400 ml-1">(edited)</span>
+            <span className="text-xs text-v2-text-tertiary ml-1">(edited)</span>
           )}
           {!isReply && currentUser && postId !== undefined && (
             <button
               onClick={() => setShowReplyInput(!showReplyInput)}
-              className="text-xs text-gray-500 hover:text-bg ml-2"
+              className="text-xs text-v2-text-secondary hover:text-v2-gold-primary ml-2"
             >
               Reply
             </button>

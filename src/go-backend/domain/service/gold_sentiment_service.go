@@ -86,7 +86,7 @@ func (s *goldSentimentService) GetSentiment(ctx context.Context, userID int32, a
 	// Cache miss — query DB
 	bullish, bearish, err := s.voteRepo.CountByDate(ctx, today, category)
 	if err != nil {
-		return nil, apperrors.NewInternalErrorWithCause("failed to get vote counts", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.SentimentVoteCountFailed, "failed to get vote counts", err)
 	}
 
 	total := bullish + bearish
@@ -128,7 +128,7 @@ func (s *goldSentimentService) populateUserVote(ctx context.Context, resp *v1.Ge
 func (s *goldSentimentService) CastVote(ctx context.Context, userID int32, anonymousID string, req *v1.CastGoldVoteRequest) (*v1.CastGoldVoteResponse, error) {
 	// Validate direction
 	if req.Direction != v1.VoteDirection_VOTE_DIRECTION_BULLISH && req.Direction != v1.VoteDirection_VOTE_DIRECTION_BEARISH {
-		return nil, apperrors.NewValidationError("direction must be BULLISH (1) or BEARISH (2)")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.SentimentDirectionInvalid, "direction must be BULLISH (1) or BEARISH (2)")
 	}
 
 	category := validateCategory(int32(req.Category))
@@ -175,7 +175,7 @@ func (s *goldSentimentService) CastVote(ctx context.Context, userID int32, anony
 	// Get updated counts
 	bullish, bearish, err := s.voteRepo.CountByDate(ctx, today, category)
 	if err != nil {
-		return nil, apperrors.NewInternalErrorWithCause("failed to get updated counts", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.SentimentVoteCountFailed, "failed to get updated counts", err)
 	}
 
 	total := bullish + bearish
@@ -273,10 +273,10 @@ func (s *goldSentimentService) PostComment(ctx context.Context, userID int32, re
 	// Validate content
 	content := strings.TrimSpace(req.Content)
 	if len(content) == 0 {
-		return nil, apperrors.NewValidationError("comment content is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.SentimentCommentRequired, "comment content is required")
 	}
 	if len(content) > maxCommentLength {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("comment content must be at most %d characters", maxCommentLength))
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.SentimentCommentTooLong, fmt.Sprintf("comment content must be at most %d characters", maxCommentLength))
 	}
 
 	// HTML-escape for XSS prevention
@@ -291,7 +291,7 @@ func (s *goldSentimentService) PostComment(ctx context.Context, userID int32, re
 		return nil, err
 	}
 	if count >= maxCommentsPerDay {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("maximum %d comments per day reached", maxCommentsPerDay))
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.SentimentCommentLimitReached, fmt.Sprintf("maximum %d comments per day reached", maxCommentsPerDay))
 	}
 
 	comment := &models.GoldVoteComment{
@@ -340,7 +340,7 @@ func (s *goldSentimentService) DeleteComment(ctx context.Context, userID int32, 
 	}
 
 	if comment.UserID != userID {
-		return apperrors.NewForbiddenError("you can only delete your own comments")
+		return apperrors.NewForbiddenErrorWithCode(apperrors.Codes.CommunityDeleteOwnCommentOnly, "you can only delete your own comments")
 	}
 
 	return s.commentRepo.Delete(ctx, commentID)

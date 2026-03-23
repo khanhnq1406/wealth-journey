@@ -62,10 +62,10 @@ export function CommunityFeed({ currentUser, hashtag, onHashtagClick, onUserClic
           <span className="font-roboto text-sm text-v2-text-secondary">Lọc theo:</span>
           <button
             onClick={() => onHashtagClick?.("")}
-            className="flex items-center gap-1 px-3 py-1 rounded-full bg-v2-bg-primary border border-v2-border-light font-roboto text-sm text-bg hover:bg-green-50 transition-colors"
+            className="flex items-center gap-1 px-3 py-1 rounded-full bg-v2-maroon-900 border border-v2-border-light font-roboto text-sm text-v2-gold-primary hover:bg-v2-maroon-800 transition-colors"
           >
             #{hashtag}
-            <span className="text-v2-text-tertiary ml-1">×</span>
+            <span className="text-v2-gold-accent ml-1">×</span>
           </button>
         </div>
       )}

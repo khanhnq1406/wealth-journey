@@ -6,6 +6,7 @@ import { formatCurrency } from "@/utils/currency-formatter";
 import { ImportSummary } from "@/gen/protobuf/v1/import";
 import { useMutationUndoImport } from "@/utils/generated/hooks";
 import { useState } from "react";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 export interface ImportSuccessProps {
   summary: ImportSummary;
@@ -21,6 +22,7 @@ export function ImportSuccess({
   onUndoSuccess,
 }: ImportSuccessProps) {
   const t = useTranslations("import.success");
+  const tErrors = useTranslations();
   const [showUndoConfirm, setShowUndoConfirm] = useState(false);
 
   const undoMutation = useMutationUndoImport({
@@ -28,7 +30,7 @@ export function ImportSuccess({
       onUndoSuccess?.();
     },
     onError: (error: any) => {
-      alert(`Failed to undo import: ${error.message || "Unknown error"}`);
+      alert(getTranslatedError(error, tErrors));
     },
   });
 

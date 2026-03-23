@@ -70,8 +70,8 @@ export function ProfileTabs({ userId, currentUser, onUserClick, onHashtagClick }
             onClick={() => setActiveTab(tab.key)}
             className={`flex-1 py-3 text-sm font-medium transition-colors ${
               activeTab === tab.key
-                ? "text-bg border-b-2 border-v2-gold-primary"
-                : "text-gray-500 hover:text-v2-text-primary"
+                ? "text-v2-gold-primary border-b-2 border-v2-gold-primary"
+                : "text-v2-text-tertiary hover:text-v2-text-primary"
             }`}
           >
             {tab.label}
@@ -86,7 +86,7 @@ export function ProfileTabs({ userId, currentUser, onUserClick, onHashtagClick }
             <div className="w-6 h-6 border-2 border-v2-gold-primary border-t-transparent rounded-full animate-spin mx-auto" />
           </div>
         ) : currentPosts.length === 0 ? (
-          <div className="p-8 text-center text-sm text-gray-400">
+          <div className="p-8 text-center text-sm text-v2-text-tertiary">
             {activeTab === "posts"
               ? "No posts yet"
               : activeTab === "likes"

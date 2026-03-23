@@ -220,15 +220,15 @@ func (s *fxRateService) fetchAndCacheRate(ctx context.Context, fromCurrency, toC
 // validateCurrencies validates that both currencies are supported
 func (s *fxRateService) validateCurrencies(fromCurrency, toCurrency string) error {
 	if fromCurrency == "" || toCurrency == "" {
-		return apperrors.NewValidationError("currency codes cannot be empty")
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.FxCurrencyEmpty, "currency codes cannot be empty")
 	}
 
 	if !s.IsSupportedCurrency(fromCurrency) {
-		return apperrors.NewValidationError(fmt.Sprintf("unsupported from currency: %s", fromCurrency))
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.FxFromCurrencyUnsupported, fmt.Sprintf("unsupported from currency: %s", fromCurrency))
 	}
 
 	if !s.IsSupportedCurrency(toCurrency) {
-		return apperrors.NewValidationError(fmt.Sprintf("unsupported to currency: %s", toCurrency))
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.FxToCurrencyUnsupported, fmt.Sprintf("unsupported to currency: %s", toCurrency))
 	}
 
 	return nil

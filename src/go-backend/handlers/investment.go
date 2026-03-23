@@ -60,19 +60,19 @@ func (h *InvestmentHandlers) CreateInvestment(c *gin.Context) {
 
 	// Validate wallet ID: 0 means no wallet association, positive means explicit
 	if req.WalletId < 0 {
-		handler.BadRequest(c, apperrors.NewValidationError("invalid wallet ID"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletIdInvalid, "invalid wallet ID"))
 		return
 	}
 
 	// Validate symbol
 	if req.Symbol == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("symbol is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentSymbolRequired, "symbol is required"))
 		return
 	}
 
 	// Validate investment type
 	if req.Type == investmentv1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED {
-		handler.BadRequest(c, apperrors.NewValidationError("investment type is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentTypeRequired, "investment type is required"))
 		return
 	}
 
@@ -179,7 +179,7 @@ func (h *InvestmentHandlers) ListInvestments(c *gin.Context) {
 	if typeFilterStr := c.Query("typeFilter"); typeFilterStr != "" {
 		typeFilter, err := strconv.ParseInt(typeFilterStr, 10, 32)
 		if err != nil {
-			handler.BadRequest(c, apperrors.NewValidationError("invalid typeFilter parameter"))
+			handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentTypeFilterInvalid, "invalid typeFilter parameter"))
 			return
 		}
 		req.TypeFilter = investmentv1.InvestmentType(typeFilter)
@@ -236,7 +236,7 @@ func (h *InvestmentHandlers) UpdateInvestment(c *gin.Context) {
 
 	// Validate name if provided
 	if req.Name == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("name is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentNameRequired, "name is required"))
 		return
 	}
 
@@ -327,25 +327,25 @@ func (h *InvestmentHandlers) AddTransaction(c *gin.Context) {
 
 	// Validate transaction type
 	if req.Type == investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_UNSPECIFIED {
-		handler.BadRequest(c, apperrors.NewValidationError("transaction type is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentTxTypeRequired, "transaction type is required"))
 		return
 	}
 
 	// Validate quantity
 	if req.Quantity <= 0 {
-		handler.BadRequest(c, apperrors.NewValidationError("quantity must be positive"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentQuantityPositive, "quantity must be positive"))
 		return
 	}
 
 	// Validate price
 	if req.Price <= 0 {
-		handler.BadRequest(c, apperrors.NewValidationError("price must be positive"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentPricePositive, "price must be positive"))
 		return
 	}
 
 	// Validate fees
 	if req.Fees < 0 {
-		handler.BadRequest(c, apperrors.NewValidationError("fees cannot be negative"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentFeesNegative, "fees cannot be negative"))
 		return
 	}
 
@@ -411,7 +411,7 @@ func (h *InvestmentHandlers) ListTransactions(c *gin.Context) {
 	if typeFilterStr := c.Query("typeFilter"); typeFilterStr != "" {
 		typeFilter, err := strconv.ParseInt(typeFilterStr, 10, 32)
 		if err != nil {
-			handler.BadRequest(c, apperrors.NewValidationError("invalid typeFilter parameter"))
+			handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentTypeFilterInvalid, "invalid typeFilter parameter"))
 			return
 		}
 		req.TypeFilter = investmentv1.InvestmentTransactionType(typeFilter)
@@ -468,19 +468,19 @@ func (h *InvestmentHandlers) EditTransaction(c *gin.Context) {
 
 	// Validate quantity
 	if req.Quantity <= 0 {
-		handler.BadRequest(c, apperrors.NewValidationError("quantity must be positive"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentQuantityPositive, "quantity must be positive"))
 		return
 	}
 
 	// Validate price
 	if req.Price <= 0 {
-		handler.BadRequest(c, apperrors.NewValidationError("price must be positive"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentPricePositive, "price must be positive"))
 		return
 	}
 
 	// Validate fees
 	if req.Fees < 0 {
-		handler.BadRequest(c, apperrors.NewValidationError("fees cannot be negative"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentFeesNegative, "fees cannot be negative"))
 		return
 	}
 
@@ -640,7 +640,7 @@ func (h *InvestmentHandlers) SearchSymbols(c *gin.Context) {
 	// Get query parameter
 	query := c.Query("query")
 	if query == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("query parameter is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentQueryRequired, "query parameter is required"))
 		return
 	}
 
@@ -707,7 +707,7 @@ func (h *InvestmentHandlers) ListUserInvestments(c *gin.Context) {
 	if walletIDStr != "" {
 		walletID, err := strconv.ParseInt(walletIDStr, 10, 32)
 		if err != nil {
-			handler.BadRequest(c, apperrors.NewValidationError("invalid walletId parameter"))
+			handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletIdInvalid, "invalid walletId parameter"))
 			return
 		}
 		req.WalletId = int32(walletID)
@@ -721,7 +721,7 @@ func (h *InvestmentHandlers) ListUserInvestments(c *gin.Context) {
 	if typeFilterStr != "" {
 		typeFilter, err := strconv.ParseInt(typeFilterStr, 10, 32)
 		if err != nil {
-			handler.BadRequest(c, apperrors.NewValidationError("invalid typeFilter parameter"))
+			handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentTypeFilterInvalid, "invalid typeFilter parameter"))
 			return
 		}
 		req.TypeFilter = investmentv1.InvestmentType(typeFilter)
@@ -767,7 +767,7 @@ func (h *InvestmentHandlers) GetAggregatedPortfolioSummary(c *gin.Context) {
 	if walletIDStr != "" {
 		walletID, err := strconv.ParseInt(walletIDStr, 10, 32)
 		if err != nil {
-			handler.BadRequest(c, apperrors.NewValidationError("invalid walletId parameter"))
+			handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletIdInvalid, "invalid walletId parameter"))
 			return
 		}
 		req.WalletId = int32(walletID)
@@ -781,7 +781,7 @@ func (h *InvestmentHandlers) GetAggregatedPortfolioSummary(c *gin.Context) {
 	if typeFilterStr != "" {
 		typeFilter, err := strconv.ParseInt(typeFilterStr, 10, 32)
 		if err != nil {
-			handler.BadRequest(c, apperrors.NewValidationError("invalid typeFilter parameter"))
+			handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentTypeFilterInvalid, "invalid typeFilter parameter"))
 			return
 		}
 		req.TypeFilter = investmentv1.InvestmentType(typeFilter)
@@ -842,7 +842,7 @@ func (h *InvestmentHandlers) GetHistoricalPortfolioValues(c *gin.Context) {
 	if walletIDStr != "" {
 		walletID, err := strconv.ParseInt(walletIDStr, 10, 32)
 		if err != nil {
-			handler.BadRequest(c, apperrors.NewValidationError("invalid walletId parameter"))
+			handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletIdInvalid, "invalid walletId parameter"))
 			return
 		}
 		req.WalletId = int32(walletID)
@@ -901,7 +901,7 @@ func (h *InvestmentHandlers) GetMarketPrice(c *gin.Context) {
 
 	// Validate required parameters
 	if symbol == "" || currency == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("symbol and currency are required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentSymbolCurrencyRequired, "symbol and currency are required"))
 		return
 	}
 
@@ -910,7 +910,7 @@ func (h *InvestmentHandlers) GetMarketPrice(c *gin.Context) {
 	if typeStr != "" {
 		typeInt, err := strconv.ParseInt(typeStr, 10, 32)
 		if err != nil {
-			handler.BadRequest(c, apperrors.NewValidationError("invalid type parameter"))
+			handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentTypeInvalid, "invalid type parameter"))
 			return
 		}
 		investmentType = investmentv1.InvestmentType(typeInt)

@@ -13,7 +13,7 @@ interface UserListItemProps {
 export function UserListItem({ user, currentUserId, onUserClick }: UserListItemProps) {
   return (
     <div
-      className="flex items-center gap-3 px-4 py-3 hover:bg-[#FAF9F7] transition-colors cursor-pointer"
+      className="flex items-center gap-3 px-4 py-3 hover:bg-v2-maroon-600 transition-colors cursor-pointer"
       onClick={() => onUserClick?.(user.userId)}
     >
       <Avatar

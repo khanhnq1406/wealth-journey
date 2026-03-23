@@ -97,7 +97,7 @@ export function ProfileCard({ currentUser }: ProfileCardProps) {
               onChange={(e) => setBioText(e.target.value)}
               maxLength={200}
               rows={2}
-              className="w-full font-roboto text-[13px] text-v2-text-primary bg-[#FAF9F7] rounded-lg px-3 py-2 border border-v2-border-light focus:outline-none focus:border-v2-red-primary resize-none"
+              className="w-full font-roboto text-[13px] text-v2-gold-accent bg-v2-maroon-900 rounded-lg px-3 py-2 border border-v2-border-light focus:outline-none focus:border-v2-gold-primary placeholder:text-v2-text-tertiary resize-none"
               placeholder="Viết giới thiệu..."
             />
             <div className="flex items-center justify-between mt-1">
@@ -107,14 +107,14 @@ export function ProfileCard({ currentUser }: ProfileCardProps) {
               <div className="flex gap-1">
                 <button
                   onClick={handleCancelBio}
-                  className="p-1 rounded-full text-v2-text-tertiary hover:bg-gray-100 transition-colors"
+                  className="p-1 rounded-full text-v2-text-tertiary hover:bg-v2-maroon-700 transition-colors"
                 >
                   <X size={14} />
                 </button>
                 <button
                   onClick={handleSaveBio}
                   disabled={updateProfileMutation.isPending}
-                  className="p-1 rounded-full text-v2-red-primary hover:bg-v2-red-light transition-colors"
+                  className="p-1 rounded-full text-v2-gold-primary hover:bg-v2-maroon-700 transition-colors"
                 >
                   <Check size={14} />
                 </button>
@@ -128,7 +128,7 @@ export function ProfileCard({ currentUser }: ProfileCardProps) {
             </p>
             <button
               onClick={handleEditBio}
-              className="p-1 rounded-full text-v2-text-tertiary hover:bg-gray-100 transition-colors shrink-0"
+              className="p-1 rounded-full text-v2-text-tertiary hover:bg-v2-maroon-700 transition-colors shrink-0"
               aria-label="Edit bio"
             >
               <Pencil size={12} />

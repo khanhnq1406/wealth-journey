@@ -1,0 +1,16 @@
+{
+  "profile": {
+    "editProfile": "Chỉnh sửa hồ sơ",
+    "editTitle": "Chỉnh sửa hồ sơ",
+    "coverPhoto": "Ảnh bìa",
+    "uploadCoverPhoto": "Tải ảnh bìa lên",
+    "profilePhoto": "Ảnh đại diện",
+    "uploadProfilePhoto": "Tải ảnh đại diện lên",
+    "bio": "Giới thiệu",
+    "bioPlaceholder": "Giới thiệu về bản thân...",
+    "location": "Vị trí",
+    "locationPlaceholder": "Bạn đang ở đâu?",
+    "website": "Website",
+    "saving": "Đang lưu..."
+  }
+}

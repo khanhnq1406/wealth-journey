@@ -49,6 +49,7 @@ C4Component
         Component(contexts, "React Contexts", "shared/contexts", "CurrencyContext, NotificationContext")
         Component(gold_sentiment_card, "SentimentCard", "shared/components", "Daily asset sentiment vote & comments with landing/home variants and asset prop (gold/silver); per-asset theming, bullish/bearish vote buttons, comment list, auth-gated interaction. Exported as both SentimentCard and GoldSentimentCard (backward compat).")
         Component(utils, "Shared Utilities", "shared/utils", "cn, date, number-format, z-index, error-sanitizer")
+        Component(errTranslation, "Error Translation", "TypeScript", "Maps error codes to i18n translation keys")
     }
 
     Container_Boundary(api_layer, "API Layer") {
@@ -113,6 +114,9 @@ C4Component
     Rel(feedback_feat, feedback, "Uses EmptyState")
     Rel(admin_feat, redux, "Reads isAdmin from auth state")
     Rel(admin_feat, gen_hooks, "useQueryGetSiteSettings, useMutationUpdateSiteSettings")
+
+    Rel(gen_api, errTranslation, "Passes error codes from API responses")
+    Rel(errTranslation, intl_catalogs, "Resolves i18n translation keys")
 
     Rel(gen_hooks, gen_api, "Wraps API calls")
     Rel(gen_api, gen_types, "Uses request/response types")

@@ -62,7 +62,7 @@ export function FollowingView({ currentUser, targetUserId, onUserClick, initialT
             className={cn(
               "flex-1 py-3 font-roboto text-sm font-medium transition-colors relative",
               activeTab === tab.key
-                ? "text-v2-red-primary"
+                ? "text-v2-gold-primary"
                 : "text-v2-text-tertiary hover:text-v2-text-secondary"
             )}
           >
@@ -71,7 +71,7 @@ export function FollowingView({ currentUser, targetUserId, onUserClick, initialT
               <span className="ml-1 text-xs">({tab.count})</span>
             )}
             {activeTab === tab.key && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-v2-red-primary" />
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-v2-gold-primary" />
             )}
           </button>
         ))}

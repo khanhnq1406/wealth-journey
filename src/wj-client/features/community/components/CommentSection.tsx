@@ -119,7 +119,7 @@ export function CommentSection({ postId, currentUser, onCommentAdded, onCommentD
           imageUrl={currentUser.picture}
           size="sm"
         />
-        <div className="flex-1 flex items-center gap-2 bg-[#FAF9F7] rounded-full px-3 py-1.5">
+        <div className="flex-1 flex items-center gap-2 bg-v2-maroon-900 rounded-full px-3 py-1.5">
           <input
             type="text"
             value={commentText}
@@ -127,7 +127,7 @@ export function CommentSection({ postId, currentUser, onCommentAdded, onCommentD
             onKeyDown={handleKeyDown}
             placeholder="Viết bình luận..."
             maxLength={500}
-            className="flex-1 bg-transparent font-roboto text-[13px] text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none"
+            className="flex-1 bg-transparent font-roboto text-[13px] text-v2-gold-accent placeholder:text-v2-text-tertiary focus:outline-none"
           />
           <button
             onClick={handleSubmit}
@@ -135,7 +135,7 @@ export function CommentSection({ postId, currentUser, onCommentAdded, onCommentD
             className={cn(
               "p-1 rounded-full transition-colors",
               commentText.trim() && !createCommentMutation.isPending
-                ? "text-v2-red-primary hover:bg-v2-red-light"
+                ? "text-v2-gold-primary hover:bg-v2-maroon-800"
                 : "text-v2-text-tertiary"
             )}
             aria-label="Send comment"

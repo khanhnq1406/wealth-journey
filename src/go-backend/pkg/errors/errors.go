@@ -16,6 +16,12 @@ type AppError interface {
 	Code() string
 }
 
+// ParamError extends AppError with interpolation params for i18n translations.
+type ParamError interface {
+	AppError
+	Params() map[string]string
+}
+
 // BaseError implements the AppError interface.
 type BaseError struct {
 	code       string
@@ -233,6 +239,18 @@ func GetErrorMessage(err error) string {
 	return "An unexpected error occurred"
 }
 
+// GetErrorParams returns interpolation params from a ParamError, or nil.
+func GetErrorParams(err error) map[string]string {
+	if err == nil {
+		return nil
+	}
+	var paramErr ParamError
+	if errors.As(err, &paramErr) {
+		return paramErr.Params()
+	}
+	return nil
+}
+
 // Auth-specific error types for security
 
 // InvalidCredentialsError represents a failed authentication attempt.
@@ -244,7 +262,7 @@ type InvalidCredentialsError struct {
 // NewInvalidCredentialsError creates an error for authentication failures.
 func NewInvalidCredentialsError() InvalidCredentialsError {
 	return InvalidCredentialsError{
-		BaseError: NewError("INVALID_CREDENTIALS", "invalid credentials", http.StatusUnauthorized),
+		BaseError: NewError(Codes.AuthInvalidCredentials, "invalid credentials", http.StatusUnauthorized),
 	}
 }
 
@@ -257,14 +275,14 @@ type TokenError struct {
 // operation: "verification", "generation", "extraction", etc.
 func NewTokenError(operation string) TokenError {
 	return TokenError{
-		BaseError: NewError("TOKEN_ERROR", fmt.Sprintf("token %s failed", operation), http.StatusUnauthorized),
+		BaseError: NewError(Codes.AuthTokenFailed, fmt.Sprintf("token %s failed", operation), http.StatusUnauthorized),
 	}
 }
 
 // NewTokenErrorWithCause wraps an underlying token error with a safe message.
 func NewTokenErrorWithCause(operation string, cause error) TokenError {
 	return TokenError{
-		BaseError: WrapError("TOKEN_ERROR", fmt.Sprintf("token %s failed", operation), http.StatusUnauthorized, cause),
+		BaseError: WrapError(Codes.AuthTokenFailed, fmt.Sprintf("token %s failed", operation), http.StatusUnauthorized, cause),
 	}
 }
 
@@ -277,7 +295,7 @@ type RegistrationError struct {
 // The cause is logged server-side but not exposed to client.
 func NewRegistrationErrorWithCause(cause error) RegistrationError {
 	return RegistrationError{
-		BaseError: WrapError("REGISTRATION_FAILED", "registration failed", http.StatusInternalServerError, cause),
+		BaseError: WrapError(Codes.AuthRegistrationFailed, "registration failed", http.StatusInternalServerError, cause),
 	}
 }
 
@@ -289,7 +307,7 @@ type LoginError struct {
 // NewLoginErrorWithCause creates a safe error for login failures.
 func NewLoginErrorWithCause(cause error) LoginError {
 	return LoginError{
-		BaseError: WrapError("LOGIN_FAILED", "login failed", http.StatusInternalServerError, cause),
+		BaseError: WrapError(Codes.AuthLoginFailed, "login failed", http.StatusInternalServerError, cause),
 	}
 }
 
@@ -301,7 +319,7 @@ type LogoutError struct {
 // NewLogoutErrorWithCause creates a safe error for logout failures.
 func NewLogoutErrorWithCause(cause error) LogoutError {
 	return LogoutError{
-		BaseError: WrapError("LOGOUT_FAILED", "logout failed", http.StatusInternalServerError, cause),
+		BaseError: WrapError(Codes.AuthLogoutFailed, "logout failed", http.StatusInternalServerError, cause),
 	}
 }
 
@@ -322,5 +340,91 @@ func NewRateLimitErrorWithRetry(message string, retryAfter int) RateLimitError {
 	fullMessage := fmt.Sprintf("%s. Retry after %d seconds", message, retryAfter)
 	return RateLimitError{
 		BaseError: NewError("RATE_LIMIT_EXCEEDED", fullMessage, http.StatusTooManyRequests),
+	}
+}
+
+// WithCode constructors — use granular error codes from codes.go instead of generic categories.
+
+// NewValidationErrorWithCode creates a validation error with a granular error code.
+func NewValidationErrorWithCode(code, message string) ValidationError {
+	return ValidationError{
+		BaseError: NewError(code, message, http.StatusBadRequest),
+	}
+}
+
+// NewNotFoundErrorWithCode creates a not found error with a granular error code.
+func NewNotFoundErrorWithCode(code, message string) NotFoundError {
+	return NotFoundError{
+		BaseError: NewError(code, message, http.StatusNotFound),
+	}
+}
+
+// NewConflictErrorWithCode creates a conflict error with a granular error code.
+func NewConflictErrorWithCode(code, message string) ConflictError {
+	return ConflictError{
+		BaseError: NewError(code, message, http.StatusConflict),
+	}
+}
+
+// ConflictErrorWithParams is a conflict error that carries i18n interpolation params.
+type ConflictErrorWithParams struct {
+	ConflictError
+	params map[string]string
+}
+
+// Params returns the interpolation params.
+func (e ConflictErrorWithParams) Params() map[string]string {
+	return e.params
+}
+
+// NewConflictErrorWithCodeAndParams creates a conflict error with a granular code and i18n params.
+func NewConflictErrorWithCodeAndParams(code, message string, params map[string]string) ConflictErrorWithParams {
+	return ConflictErrorWithParams{
+		ConflictError: ConflictError{
+			BaseError: NewError(code, message, http.StatusConflict),
+		},
+		params: params,
+	}
+}
+
+// NewInternalErrorWithCode creates an internal error with a granular error code.
+func NewInternalErrorWithCode(code, message string) InternalError {
+	return InternalError{
+		BaseError: NewError(code, message, http.StatusInternalServerError),
+	}
+}
+
+// NewInternalErrorWithCodeAndCause creates an internal error with a granular code and cause.
+func NewInternalErrorWithCodeAndCause(code, message string, cause error) InternalError {
+	return InternalError{
+		BaseError: WrapError(code, message, http.StatusInternalServerError, cause),
+	}
+}
+
+// NewForbiddenErrorWithCode creates a forbidden error with a granular error code.
+func NewForbiddenErrorWithCode(code, message string) ForbiddenError {
+	return ForbiddenError{
+		BaseError: NewError(code, message, http.StatusForbidden),
+	}
+}
+
+// NewUnauthorizedErrorWithCode creates an unauthorized error with a granular error code.
+func NewUnauthorizedErrorWithCode(code, message string) UnauthorizedError {
+	return UnauthorizedError{
+		BaseError: NewError(code, message, http.StatusUnauthorized),
+	}
+}
+
+// NewServiceUnavailableErrorWithCode creates a service unavailable error with a granular error code.
+func NewServiceUnavailableErrorWithCode(code, message string) ServiceUnavailableError {
+	return ServiceUnavailableError{
+		BaseError: NewError(code, message, http.StatusServiceUnavailable),
+	}
+}
+
+// NewRateLimitErrorWithCode creates a rate limit error with a granular error code.
+func NewRateLimitErrorWithCode(code, message string) RateLimitError {
+	return RateLimitError{
+		BaseError: NewError(code, message, http.StatusTooManyRequests),
 	}
 }

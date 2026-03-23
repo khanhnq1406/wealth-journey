@@ -34,9 +34,9 @@ export function TrendingTopics({ onHashtagClick }: TrendingTopicsProps) {
             <button
               key={topic.hashtag}
               onClick={() => onHashtagClick?.(topic.hashtag)}
-              className="flex items-center justify-between py-1.5 px-1 rounded-lg hover:bg-v2-bg-primary transition-colors text-left w-full group"
+              className="flex items-center justify-between py-1.5 px-1 rounded-lg hover:bg-v2-maroon-600 transition-colors text-left w-full group"
             >
-              <span className="font-roboto text-sm font-medium text-bg group-hover:underline">
+              <span className="font-roboto text-sm font-medium text-v2-gold-primary group-hover:underline">
                 #{topic.hashtag}
               </span>
               <span className="font-roboto text-xs text-v2-text-tertiary">

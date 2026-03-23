@@ -50,7 +50,7 @@ func (h *BudgetHandlers) CreateBudget(c *gin.Context) {
 
 	// Validate budget name
 	if req.Name == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("budget name is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.BudgetNameRequired, "budget name is required"))
 		return
 	}
 
@@ -185,7 +185,7 @@ func (h *BudgetHandlers) UpdateBudget(c *gin.Context) {
 
 	// Validate budget name
 	if req.Name == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("budget name is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.BudgetNameRequired, "budget name is required"))
 		return
 	}
 
@@ -314,7 +314,7 @@ func (h *BudgetHandlers) CreateBudgetItem(c *gin.Context) {
 
 	// Validate item name
 	if req.Name == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("budget item name is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.BudgetItemNameRequired, "budget item name is required"))
 		return
 	}
 
@@ -382,7 +382,7 @@ func (h *BudgetHandlers) UpdateBudgetItem(c *gin.Context) {
 
 	// Validate item name
 	if req.Name == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("budget item name is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.BudgetItemNameRequired, "budget item name is required"))
 		return
 	}
 

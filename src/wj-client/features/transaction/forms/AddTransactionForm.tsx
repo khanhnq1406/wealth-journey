@@ -36,6 +36,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { formatCurrency } from "@/utils/currency-formatter";
 import { amountToSmallestUnit } from "@/lib/utils/units";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface AddTransactionFormProps {
   onSuccess?: () => void;
@@ -48,6 +49,7 @@ interface AddTransactionFormProps {
  */
 export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
   const t = useTranslations("transaction.form");
+  const tErrors = useTranslations();
   const queryClient = useQueryClient();
   const { currency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -167,9 +169,7 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
           setErrorMessage("");
         },
         onError: (error: any) => {
-          setErrorMessage(
-            error.message || t("failedToAdd"),
-          );
+          setErrorMessage(getTranslatedError(error, tErrors));
         },
       },
     );

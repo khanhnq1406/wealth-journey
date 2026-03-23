@@ -48,7 +48,7 @@ func NewTransactionService(
 func (s *transactionService) CreateTransaction(ctx context.Context, userID int32, req *v1.CreateTransactionRequest) (*v1.CreateTransactionResponse, error) {
 	// Validate amount is provided
 	if req.Amount == nil {
-		return nil, apperrors.NewValidationError("amount is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.TransactionAmountRequired, "amount is required")
 	}
 
 	// Validate wallet belongs to user
@@ -72,7 +72,7 @@ func (s *transactionService) CreateTransaction(ctx context.Context, userID int32
 	// Check if balance would go negative
 	newBalance := wallet.Balance + balanceDelta
 	if newBalance < 0 {
-		return nil, apperrors.NewValidationError("Insufficient balance for this transaction")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.TransactionInsufficientBalance, "Insufficient balance for this transaction")
 	}
 
 	// Create transaction
@@ -219,7 +219,7 @@ func (s *transactionService) ListTransactions(ctx context.Context, userID int32,
 func (s *transactionService) UpdateTransaction(ctx context.Context, transactionID int32, userID int32, req *v1.UpdateTransactionRequest) (*v1.UpdateTransactionResponse, error) {
 	// Validate amount is provided
 	if req.Amount == nil {
-		return nil, apperrors.NewValidationError("amount is required")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.TransactionAmountRequired, "amount is required")
 	}
 
 	// Get existing transaction
@@ -268,7 +268,7 @@ func (s *transactionService) UpdateTransaction(ctx context.Context, transactionI
 		// Check if new wallet would have sufficient balance
 		newWalletBalance := wallet.Balance + newBalanceDelta
 		if newWalletBalance < 0 {
-			return nil, apperrors.NewValidationError("Insufficient balance in target wallet")
+			return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.TransactionTargetInsufficient, "Insufficient balance in target wallet")
 		}
 
 		// Update both wallets
@@ -289,7 +289,7 @@ func (s *transactionService) UpdateTransaction(ctx context.Context, transactionI
 		// Check if balance would go negative
 		newBalance := wallet.Balance + totalDelta
 		if newBalance < 0 {
-			return nil, apperrors.NewValidationError("Insufficient balance for this transaction update")
+			return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.TransactionUpdateInsufficient, "Insufficient balance for this transaction update")
 		}
 
 		// Update wallet balance
@@ -427,7 +427,7 @@ func (s *transactionService) GetAvailableYears(ctx context.Context, userID int32
 func (s *transactionService) GetFinancialReport(ctx context.Context, userID int32, req *v1.GetFinancialReportRequest) (*v1.GetFinancialReportResponse, error) {
 	// Validate year
 	if req.Year <= 0 {
-		return nil, apperrors.NewValidationError("Invalid year")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.TransactionYearInvalid, "Invalid year")
 	}
 
 	// Calculate date range for the requested year
@@ -627,13 +627,13 @@ func (s *transactionService) GetFinancialReport(ctx context.Context, userID int3
 func (s *transactionService) GetCategoryBreakdown(ctx context.Context, userID int32, req *v1.GetCategoryBreakdownRequest) (*v1.GetCategoryBreakdownResponse, error) {
 	// Validate date range
 	if req.StartDate <= 0 {
-		return nil, apperrors.NewValidationError("start_date must be greater than 0")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.TransactionStartDatePositive, "start_date must be greater than 0")
 	}
 	if req.EndDate <= 0 {
-		return nil, apperrors.NewValidationError("end_date must be greater than 0")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.TransactionEndDatePositive, "end_date must be greater than 0")
 	}
 	if req.StartDate > req.EndDate {
-		return nil, apperrors.NewValidationError("start_date must be less than or equal to end_date")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.TransactionDateRangeInvalid, "start_date must be less than or equal to end_date")
 	}
 
 	// Convert Unix timestamps to time.Time

@@ -51,12 +51,12 @@ func (h *CategoryHandlers) CreateCategory(c *gin.Context) {
 
 	// Validate required fields
 	if req.Name == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("name is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.CategoryNameRequired, "name is required"))
 		return
 	}
 
 	if req.Type == transactionv1.CategoryType_CATEGORY_TYPE_UNSPECIFIED {
-		handler.BadRequest(c, apperrors.NewValidationError("type is required (Income or Expense)"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.TransactionTypeRequired, "type is required (Income or Expense)"))
 		return
 	}
 
@@ -181,7 +181,7 @@ func (h *CategoryHandlers) UpdateCategory(c *gin.Context) {
 
 	// Validate required fields
 	if req.Name == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("name is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.CategoryNameRequired, "name is required"))
 		return
 	}
 

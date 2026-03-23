@@ -13,6 +13,7 @@ import { Button } from "@/components/Button";
 import { ButtonType, LOCAL_STORAGE_TOKEN_NAME, routes } from "@/app/constants";
 import { useMutationRegisterWithPassword } from "@/utils/generated/hooks";
 import { mapRegisterError } from "@/features/auth/utils/error-mapper";
+import { getTranslatedError, translateValidationMessage } from "@/lib/utils/error-translator";
 import { store } from "@/features/auth/store/store";
 import { setAuth } from "@/features/auth/store/actions";
 import { updateAuthTokenCache } from "@/utils/api-client";
@@ -21,15 +22,15 @@ const registerSchema = z
   .object({
     username: z
       .string()
-      .min(3, "Min 3 characters")
-      .max(30, "Max 30 characters")
-      .regex(/^[a-zA-Z0-9_]+$/, "Letters, numbers, and underscores only"),
-    displayName: z.string().min(1, "Required").max(100),
-    password: z.string().min(10, "Min 10 characters").max(72, "Max 72 characters"),
-    confirmPassword: z.string().min(1, "Required"),
+      .min(3, "AUTH_USERNAME_MIN")
+      .max(30, "AUTH_USERNAME_MAX")
+      .regex(/^[a-zA-Z0-9_]+$/, "AUTH_USERNAME_FORMAT"),
+    displayName: z.string().min(1, "AUTH_FIELD_REQUIRED").max(100, "AUTH_DISPLAY_NAME_MAX"),
+    password: z.string().min(10, "AUTH_PASSWORD_MIN").max(72, "AUTH_PASSWORD_MAX"),
+    confirmPassword: z.string().min(1, "AUTH_FIELD_REQUIRED"),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: "AUTH_PASSWORD_MATCH",
     path: ["confirmPassword"],
   });
 
@@ -37,6 +38,8 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 
 export function RegisterPasswordForm() {
   const t = useTranslations("auth.register");
+  const tErrors = useTranslations();
+  const tValidation = useTranslations("validation");
   const router = useRouter();
   const [serverError, setServerError] = useState("");
 
@@ -71,8 +74,7 @@ export function RegisterPasswordForm() {
       }
     },
     onError(error: any) {
-      const key = mapRegisterError(error.message);
-      setServerError(key ? t(`errors.${key}`) : t("registrationFailed"));
+      setServerError(getTranslatedError(error, tErrors));
     },
   });
 
@@ -92,7 +94,7 @@ export function RegisterPasswordForm() {
         placeholder={t("usernamePlaceholder")}
         autoComplete="username"
         required
-        error={errors.username?.message}
+        error={translateValidationMessage(tValidation, errors.username?.message)}
         {...register("username")}
       />
 
@@ -101,7 +103,7 @@ export function RegisterPasswordForm() {
         placeholder={t("displayNamePlaceholder")}
         autoComplete="name"
         required
-        error={errors.displayName?.message}
+        error={translateValidationMessage(tValidation, errors.displayName?.message)}
         {...register("displayName")}
       />
 
@@ -111,7 +113,7 @@ export function RegisterPasswordForm() {
           placeholder={t("passwordPlaceholder")}
           autoComplete="new-password"
           required
-          error={errors.password?.message}
+          error={translateValidationMessage(tValidation, errors.password?.message)}
           {...register("password")}
         />
         {!errors.password && <PasswordStrengthIndicator password={password} />}
@@ -127,7 +129,7 @@ export function RegisterPasswordForm() {
         placeholder={t("confirmPasswordPlaceholder")}
         autoComplete="new-password"
         required
-        error={errors.confirmPassword?.message}
+        error={translateValidationMessage(tValidation, errors.confirmPassword?.message)}
         {...register("confirmPassword")}
       />
 

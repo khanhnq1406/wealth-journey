@@ -56,7 +56,7 @@ func (h *SessionHandlers) ListSessions(c *gin.Context) {
 	sessionIDs, err := h.rdb.GetUserSessions(userID)
 	if err != nil {
 		log.Printf("[SESSION] Failed to get sessions: %v", err)
-		handler.HandleError(c, apperrors.NewInternalError("Failed to retrieve sessions"))
+		handler.HandleError(c, apperrors.NewInternalErrorWithCode(apperrors.Codes.SessionListFailed, "Failed to retrieve sessions"))
 		return
 	}
 
@@ -95,7 +95,7 @@ func (h *SessionHandlers) ListSessions(c *gin.Context) {
 func (h *SessionHandlers) RevokeSession(c *gin.Context) {
 	sessionID := c.Param("session_id")
 	if sessionID == "" {
-		handler.BadRequest(c, apperrors.NewValidationError("session_id is required"))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.SessionIdRequired, "session_id is required"))
 		return
 	}
 
@@ -123,7 +123,7 @@ func (h *SessionHandlers) RevokeSession(c *gin.Context) {
 
 	// Prevent revoking current session (use logout instead)
 	if sessionID == currentSessionID {
-		handler.BadRequest(c, apperrors.NewValidationError("Cannot revoke current session. Use logout instead."))
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.SessionRevokeCurrent, "Cannot revoke current session. Use logout instead."))
 		return
 	}
 
@@ -131,19 +131,19 @@ func (h *SessionHandlers) RevokeSession(c *gin.Context) {
 	exists, err := h.rdb.SessionExists(userID, sessionID)
 	if err != nil {
 		log.Printf("[SESSION] Error checking session: %v", err)
-		handler.HandleError(c, apperrors.NewInternalError("Failed to verify session"))
+		handler.HandleError(c, apperrors.NewInternalErrorWithCode(apperrors.Codes.SessionVerifyFailed, "Failed to verify session"))
 		return
 	}
 
 	if !exists {
-		handler.NotFoundWithPath(c, "Session not found")
+		handler.NotFoundWithCode(c, apperrors.Codes.SessionNotFound, "Session not found")
 		return
 	}
 
 	// Revoke session (keyed by userID)
 	if err := h.rdb.RemoveSession(userID, sessionID); err != nil {
 		log.Printf("[SESSION] Failed to revoke session: %v", err)
-		handler.HandleError(c, apperrors.NewInternalError("Failed to revoke session"))
+		handler.HandleError(c, apperrors.NewInternalErrorWithCode(apperrors.Codes.SessionRevokeFailed, "Failed to revoke session"))
 		return
 	}
 
@@ -184,7 +184,7 @@ func (h *SessionHandlers) RevokeAllSessions(c *gin.Context) {
 	sessionIDs, err := h.rdb.GetUserSessions(userID)
 	if err != nil {
 		log.Printf("[SESSION] Failed to get sessions: %v", err)
-		handler.HandleError(c, apperrors.NewInternalError("Failed to retrieve sessions"))
+		handler.HandleError(c, apperrors.NewInternalErrorWithCode(apperrors.Codes.SessionListFailed, "Failed to retrieve sessions"))
 		return
 	}
 
