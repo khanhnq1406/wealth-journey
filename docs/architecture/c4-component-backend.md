@@ -103,6 +103,10 @@ C4Component
         Component(giabac_client, "giabac.vn API", "direct HTTP", "Domestic silver price history")
     }
 
+    Container_Boundary(shared_pkg, "Shared Packages") {
+        Component(errCodes, "ErrorCodes Registry", "Go Constants", "Centralized error code definitions (DOMAIN_ACTION_REASON pattern)")
+    }
+
     Container_Boundary(infra, "Infrastructure") {
         ComponentDb(postgres, "PostgreSQL 16", "Supabase", "All domain tables")
         ComponentDb(redis, "Redis 7", "Cache/Queue", "Sessions, prices, queues")
@@ -163,6 +167,19 @@ C4Component
     Rel(community_h, redis_pubsub, "Subscribes for SSE StreamNotifications")
     Rel(gold_chart_h, redis, "Read/write price history cache")
     Rel(silver_chart_h, redis, "Read/write price history cache")
+
+    Rel(auth_h, errCodes, "Uses error codes")
+    Rel(wallet_h, errCodes, "Uses error codes")
+    Rel(txn_h, errCodes, "Uses error codes")
+    Rel(invest_h, errCodes, "Uses error codes")
+    Rel(budget_h, errCodes, "Uses error codes")
+    Rel(import_h, errCodes, "Uses error codes")
+    Rel(auth_svc, errCodes, "Uses error codes")
+    Rel(wallet_svc, errCodes, "Uses error codes")
+    Rel(txn_svc, errCodes, "Uses error codes")
+    Rel(invest_svc, errCodes, "Uses error codes")
+    Rel(budget_svc, errCodes, "Uses error codes")
+    Rel(import_svc, errCodes, "Uses error codes")
 
     Rel(wallet_svc, wallet_repo, "Persists wallets")
     Rel(wallet_svc, fx_svc, "Currency conversion")

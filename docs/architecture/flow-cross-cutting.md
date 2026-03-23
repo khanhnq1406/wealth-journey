@@ -13,6 +13,7 @@ Infrastructure-level flows that are referenced by multiple domain flows. Read th
 - [Price Alert Detection Flow](#7-price-alert-detection-flow)
 - [Admin Broadcast Flow](#8-admin-broadcast-flow)
 - [Admin Price Alert Config Flow](#9-admin-price-alert-config-flow)
+- [Error Code Translation Flow](#10-error-code-translation-flow)
 
 ---
 
@@ -807,3 +808,56 @@ sequenceDiagram
 | Redis write failure on PUT | 500 Internal Server Error | Admin can retry |
 | Validation error (e.g., cooldown=0) | 400 {errors: {cooldownMinutes: "..."}} | Client shows field-level error |
 | HTML-only template (empty after strip) | 400 validation error | Client shows error |
+
+---
+
+## 10. Error Code Translation Flow
+
+**Trigger:** Any API call returns an error response with a granular `code` field
+**Source:** `pkg/apperrors/codes.go` (backend registry), `lib/utils/error-translation.ts` (frontend mapper), `messages/en.json` + `messages/vi.json` (i18n catalogs)
+
+```mermaid
+sequenceDiagram
+    participant UI as React Component
+    participant Hook as React Query Hook
+    participant API as API Client
+    participant GIN as Gin Handler
+    participant SVC as Service Layer
+    participant ERR as ErrorCodes Registry<br/>(pkg/apperrors/codes.go)
+
+    UI->>Hook: mutate(request)
+    Hook->>API: POST /api/v1/wallets
+    API->>GIN: HTTP Request
+
+    GIN->>SVC: CreateWallet(ctx, req)
+    SVC->>SVC: Business validation fails
+    SVC->>ERR: apperrors.NewValidationErrorWithCode(<br/>"duplicate name", codes.WalletCreateDuplicate)
+    ERR-->>SVC: AppError{code: "WALLET_CREATE_DUPLICATE", ...}
+    SVC-->>GIN: AppError
+
+    GIN->>GIN: response.ErrorWithCode(c, err)<br/>Extracts code from AppError
+    GIN-->>API: 409 {success: false,<br/>message: "duplicate name",<br/>code: "WALLET_CREATE_DUPLICATE"}
+
+    API-->>Hook: Error response
+    Hook-->>UI: onError(error)
+
+    UI->>UI: translateApiError(error, t)<br/>1. Extract error.code<br/>2. Build i18n key: "errors.WALLET_CREATE_DUPLICATE"<br/>3. Look up in translation catalog<br/>4. Fallback: error.message → generic message
+
+    alt Translation key exists
+        UI->>UI: t("errors.WALLET_CREATE_DUPLICATE")<br/>→ "A wallet with this name already exists"
+    else Key missing
+        UI->>UI: Fallback to error.message<br/>→ "duplicate name"
+    end
+
+    UI->>UI: Display localized error to user
+```
+
+### Key Invariants
+
+- Error codes follow the `DOMAIN_ACTION_REASON` pattern (e.g., `WALLET_CREATE_DUPLICATE`, `AUTH_LOGIN_INVALID_CREDENTIALS`)
+- All error codes are defined as constants in `pkg/apperrors/codes.go` — the single source of truth for the backend
+- Frontend translation keys mirror error codes under the `errors.*` namespace in `messages/en.json` and `messages/vi.json`
+- The `translateApiError` utility gracefully falls back: i18n key → raw `error.message` → generic fallback message
+- Error codes are optional — legacy error responses without a `code` field still work via the `message` fallback
+- The HTTP status code is determined by the error type (validation → 400, not found → 404, conflict → 409), not by the error code
+- Error codes are stable strings (not enums) — safe for frontend to match against without tight coupling to backend releases

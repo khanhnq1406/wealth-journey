@@ -7,14 +7,14 @@
 - **Spec file:** docs/specs/2026-03-23-i18n-error-codes-spec.md
 - **Started:** 2026-03-23T10:00:00Z
 - **Last updated:** 2026-03-23T10:00:00Z
-- **Current state:** in_progress
-- **Current task:** 0
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | #   | Task Name                                    | Status  | Commit | Summary |
 | --- | -------------------------------------------- | ------- | ------ | ------- |
-| 0   | Update C4 Architecture Diagrams              | pending | —      | —       |
+| 0   | Update C4 Architecture Diagrams              | done    | TBD    | Updated backend/frontend L3 + cross-cutting flow diagram |
 | 1   | Create Granular Error Code Registry           | done    | TBD    | Created codes.go with ~150 error codes + codes_test.go |
 | 2   | Add WithCode Constructors to errors.go       | done    | TBD    | Added 9 WithCode constructors + tests |
 | 13  | Add WithCode Variants to handler/response.go | done    | TBD    | Added 5 WithCode handler funcs + updated HandleError |
@@ -31,9 +31,9 @@
 | 14  | Create Frontend Error Translation Utility    | done    | TBD    | Created error-translator.ts with getTranslatedError() |
 | 15  | Create Error Translation Files (en + vi)     | done    | TBD    | Created en/errors.json + vi/errors.json (~150 codes each) |
 | 16  | Integrate Error Translation in Forms         | done    | TBD    | Updated 29 form files with getTranslatedError() |
-| 17  | Create Runtime Flow Diagrams                 | pending | —      | —       |
-| 18  | Backend Build Verification                   | pending | —      | —       |
-| 19  | Frontend Build Verification                  | pending | —      | —       |
+| 17  | Create Runtime Flow Diagrams                 | done    | TBD    | Added error translation sequence diagram |
+| 18  | Backend Build Verification                   | done    | TBD    | go build + go test all pass |
+| 19  | Frontend Build Verification                  | done    | TBD    | npm run build passes cleanly |
 
 ## Skill Recovery
 
