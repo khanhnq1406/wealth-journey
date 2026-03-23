@@ -74,6 +74,17 @@ export interface MobileTableProps<T> {
    * Label for the collapse button
    */
   collapseButtonLabel?: string;
+  /**
+   * Layout mode for each field row.
+   * - "stacked": header on its own line above the value (default)
+   * - "inline": header and value on the same line (header left, value right)
+   */
+  layout?: "stacked" | "inline";
+  /**
+   * Horizontal alignment of the expand/collapse button.
+   * Defaults to "right".
+   */
+  expandButtonAlign?: "left" | "center" | "right";
 }
 
 /**
@@ -121,6 +132,8 @@ const MobileTableRow = memo(function MobileTableRow<T>({
   expandable,
   expandButtonLabel,
   collapseButtonLabel,
+  layout = "inline",
+  expandButtonAlign = "center",
 }: {
   row: T;
   rowIndex: number;
@@ -131,12 +144,18 @@ const MobileTableRow = memo(function MobileTableRow<T>({
   expandable?: boolean;
   expandButtonLabel: string;
   collapseButtonLabel: string;
+  layout?: "stacked" | "inline";
+  expandButtonAlign?: "left" | "center" | "right";
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Separate columns into collapsed and expanded views
-  const collapsedColumns = columns.filter((col) => col.showInCollapsed !== false);
-  const expandedOnlyColumns = columns.filter((col) => col.showInCollapsed === false);
+  const collapsedColumns = columns.filter(
+    (col) => col.showInCollapsed !== false,
+  );
+  const expandedOnlyColumns = columns.filter(
+    (col) => col.showInCollapsed === false,
+  );
 
   const hasExpandableContent = expandable && expandedOnlyColumns.length > 0;
 
@@ -158,6 +177,21 @@ const MobileTableRow = memo(function MobileTableRow<T>({
       : column.cell
         ? column.cell({ getValue: () => cellValue, row })
         : cellValue;
+
+    if (layout === "inline") {
+      return (
+        <React.Fragment key={column.id || cellIndex}>
+          <div className="flex justify-between items-center gap-2">
+            <p className="text-v2-gold-accent text-sm font-bold shrink-0">
+              {headerContent}
+            </p>
+            <p className="text-v2-gold-accent text-sm font-light text-right min-w-0">
+              {displayValue ?? "-"}
+            </p>
+          </div>
+        </React.Fragment>
+      );
+    }
 
     return (
       <React.Fragment key={column.id || cellIndex}>
@@ -191,7 +225,13 @@ const MobileTableRow = memo(function MobileTableRow<T>({
       {hasExpandableContent && (
         <>
           <div className="border-t border-v2-gold-primary/20" />
-          <div className="flex justify-end">
+          <div
+            className={cn("flex", {
+              "justify-start": expandButtonAlign === "left",
+              "justify-center": expandButtonAlign === "center",
+              "justify-end": expandButtonAlign === "right",
+            })}
+          >
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="text-sm font-medium text-v2-gold-primary hover:text-v2-gold-accent transition-colors duration-200 py-1 px-2 rounded hover:bg-v2-maroon-900"
@@ -209,7 +249,7 @@ const MobileTableRow = memo(function MobileTableRow<T>({
         <div
           className={cn(
             "pt-3 border-t border-v2-gold-primary/20 space-y-2",
-            "animate-in fade-in slide-in-from-top-2 duration-200"
+            "animate-in fade-in slide-in-from-top-2 duration-200",
           )}
         >
           {expandedOnlyColumns.map((column, cellIndex) => (
@@ -245,6 +285,8 @@ const MobileTableRow = memo(function MobileTableRow<T>({
   expandable?: boolean;
   expandButtonLabel: string;
   collapseButtonLabel: string;
+  layout?: "stacked" | "inline";
+  expandButtonAlign?: "left" | "center" | "right";
 }) => React.ReactElement;
 
 export const MobileTable = memo(function MobileTable<T>({
@@ -266,10 +308,14 @@ export const MobileTable = memo(function MobileTable<T>({
   expandable = false,
   expandButtonLabel = "Details",
   collapseButtonLabel = "Less",
+  layout = "inline",
+  expandButtonAlign = "center",
 }: MobileTableProps<T>) {
   // Memoize loading skeleton to avoid recreating on every render
   const loadingSkeleton = useMemo(() => {
-    const collapsedColumns = columns.filter((col) => col.showInCollapsed !== false);
+    const collapsedColumns = columns.filter(
+      (col) => col.showInCollapsed !== false,
+    );
     const columnsToShow = expandable ? collapsedColumns : columns;
 
     return (
@@ -324,7 +370,9 @@ export const MobileTable = memo(function MobileTable<T>({
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <p className="text-lg font-medium text-v2-gold-accent">{emptyMessage}</p>
+          <p className="text-lg font-medium text-v2-gold-accent">
+            {emptyMessage}
+          </p>
           <p className="text-sm text-v2-text-secondary">{emptyDescription}</p>
         </div>
       </BaseCard>
@@ -359,6 +407,8 @@ export const MobileTable = memo(function MobileTable<T>({
               expandable={expandable}
               expandButtonLabel={expandButtonLabel}
               collapseButtonLabel={collapseButtonLabel}
+              layout={layout}
+              expandButtonAlign={expandButtonAlign}
             />
           </BaseCard>
         );

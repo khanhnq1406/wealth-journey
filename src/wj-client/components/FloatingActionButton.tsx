@@ -140,7 +140,6 @@ export function FloatingActionButton({
             "hover:bg-v2-red-dark hover:shadow-xl",
             "active:scale-95",
             "transition-all duration-200",
-            isOpen && "rotate-45",
           )}
           style={{
             minWidth: "56px",
@@ -156,7 +155,11 @@ export function FloatingActionButton({
             className="flex-shrink-0 h-8"
             style={{ minWidth: "24px", minHeight: "24px" }}
           >
-            <PlusIcon size="xl" className="text-white" decorative />
+            {isOpen ? (
+              <XIcon size="xl" className="text-white" decorative />
+            ) : (
+              <PlusIcon size="xl" className="text-white" decorative />
+            )}
           </div>
         </button>
       </div>
