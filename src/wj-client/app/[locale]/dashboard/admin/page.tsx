@@ -50,6 +50,9 @@ interface FormValues {
   footer_brand_name: string;
   footer_tagline: string;
   footer_contact_info: string;
+  fab_intro_text: string;
+  fab_contact_info: string;
+  fab_enabled: string;
 }
 
 const QUERY_KEY = "admin-site-settings";
@@ -85,6 +88,12 @@ function settingsToForm(settings: SiteSetting[]): FormValues {
     footer_brand_name: map["footer.brand_name"] || "",
     footer_tagline: map["footer.tagline"] || "",
     footer_contact_info: map["footer.contact_info"] || "",
+    fab_intro_text:
+      map["fab.intro_text"] ||
+      "San choi giao luu, trao doi, kien thuc ve thi truong dau tu tai chinh",
+    fab_contact_info:
+      map["fab.contact_info"] || "Lien he quang cao: 076.897.2512",
+    fab_enabled: map["fab.enabled"] || "true",
   };
 }
 
@@ -107,6 +116,9 @@ function formToSettings(values: FormValues): SiteSetting[] {
     { key: "footer.brand_name", value: values.footer_brand_name },
     { key: "footer.tagline", value: values.footer_tagline },
     { key: "footer.contact_info", value: values.footer_contact_info },
+    { key: "fab.intro_text", value: values.fab_intro_text },
+    { key: "fab.contact_info", value: values.fab_contact_info },
+    { key: "fab.enabled", value: values.fab_enabled },
   ];
 }
 
@@ -304,6 +316,39 @@ function AdminCMSContent() {
             label="Contact Info"
             placeholder="Liên hệ quảng cáo : 076.897.2512"
             {...register("footer_contact_info")}
+          />
+        </div>
+      </BaseCard>
+
+      {/* FAB / Welcome */}
+      <BaseCard padding="lg">
+        <h2 className="text-lg font-semibold text-v2-gold-accent mb-4">
+          FAB / Welcome
+        </h2>
+
+        <div className="space-y-1">
+          <FormToggle
+            name="fab_enabled"
+            control={control}
+            label="Enabled"
+            options={[
+              { value: "true", label: "Enabled" },
+              { value: "false", label: "Disabled" },
+            ]}
+          />
+          <FormTextarea
+            name="fab_intro_text"
+            control={control}
+            label="Introduction Text"
+            placeholder="San choi giao luu, trao doi..."
+            rows={3}
+            maxLength={500}
+            showCharacterCount
+          />
+          <FormInput
+            label="Contact Info"
+            placeholder="Lien he quang cao: 076.897.2512"
+            {...register("fab_contact_info")}
           />
         </div>
       </BaseCard>
