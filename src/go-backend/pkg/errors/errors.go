@@ -324,3 +324,68 @@ func NewRateLimitErrorWithRetry(message string, retryAfter int) RateLimitError {
 		BaseError: NewError("RATE_LIMIT_EXCEEDED", fullMessage, http.StatusTooManyRequests),
 	}
 }
+
+// WithCode constructors — use granular error codes from codes.go instead of generic categories.
+
+// NewValidationErrorWithCode creates a validation error with a granular error code.
+func NewValidationErrorWithCode(code, message string) ValidationError {
+	return ValidationError{
+		BaseError: NewError(code, message, http.StatusBadRequest),
+	}
+}
+
+// NewNotFoundErrorWithCode creates a not found error with a granular error code.
+func NewNotFoundErrorWithCode(code, message string) NotFoundError {
+	return NotFoundError{
+		BaseError: NewError(code, message, http.StatusNotFound),
+	}
+}
+
+// NewConflictErrorWithCode creates a conflict error with a granular error code.
+func NewConflictErrorWithCode(code, message string) ConflictError {
+	return ConflictError{
+		BaseError: NewError(code, message, http.StatusConflict),
+	}
+}
+
+// NewInternalErrorWithCode creates an internal error with a granular error code.
+func NewInternalErrorWithCode(code, message string) InternalError {
+	return InternalError{
+		BaseError: NewError(code, message, http.StatusInternalServerError),
+	}
+}
+
+// NewInternalErrorWithCodeAndCause creates an internal error with a granular code and cause.
+func NewInternalErrorWithCodeAndCause(code, message string, cause error) InternalError {
+	return InternalError{
+		BaseError: WrapError(code, message, http.StatusInternalServerError, cause),
+	}
+}
+
+// NewForbiddenErrorWithCode creates a forbidden error with a granular error code.
+func NewForbiddenErrorWithCode(code, message string) ForbiddenError {
+	return ForbiddenError{
+		BaseError: NewError(code, message, http.StatusForbidden),
+	}
+}
+
+// NewUnauthorizedErrorWithCode creates an unauthorized error with a granular error code.
+func NewUnauthorizedErrorWithCode(code, message string) UnauthorizedError {
+	return UnauthorizedError{
+		BaseError: NewError(code, message, http.StatusUnauthorized),
+	}
+}
+
+// NewServiceUnavailableErrorWithCode creates a service unavailable error with a granular error code.
+func NewServiceUnavailableErrorWithCode(code, message string) ServiceUnavailableError {
+	return ServiceUnavailableError{
+		BaseError: NewError(code, message, http.StatusServiceUnavailable),
+	}
+}
+
+// NewRateLimitErrorWithCode creates a rate limit error with a granular error code.
+func NewRateLimitErrorWithCode(code, message string) RateLimitError {
+	return RateLimitError{
+		BaseError: NewError(code, message, http.StatusTooManyRequests),
+	}
+}

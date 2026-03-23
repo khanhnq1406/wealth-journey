@@ -158,24 +158,35 @@ func InternalError(c *gin.Context, err error) {
 }
 
 // HandleError handles any error and sends the appropriate response.
+// It preserves granular error codes from AppError types.
 func HandleError(c *gin.Context, err error) {
 	if err == nil {
 		Success(c, nil)
 		return
 	}
 
+	// Extract code from AppError if available
+	code := apperrors.GetErrorCode(err)
+	message := apperrors.GetErrorMessage(err)
 	statusCode := apperrors.GetStatusCode(err)
+
 	switch statusCode {
 	case http.StatusBadRequest:
 		BadRequest(c, err)
 	case http.StatusUnauthorized:
-		Unauthorized(c, apperrors.GetErrorMessage(err))
+		UnauthorizedWithCode(c, code, message)
 	case http.StatusForbidden:
-		Forbidden(c, apperrors.GetErrorMessage(err))
+		ForbiddenWithCode(c, code, message)
 	case http.StatusNotFound:
-		NotFound(c, apperrors.GetErrorMessage(err))
+		NotFoundWithCode(c, code, message)
 	case http.StatusConflict:
-		Conflict(c, apperrors.GetErrorMessage(err))
+		ConflictWithCode(c, code, message)
+	case http.StatusTooManyRequests:
+		c.JSON(http.StatusTooManyRequests, types.NewErrorResponse(types.APIError{
+			Code:       code,
+			Message:    message,
+			StatusCode: http.StatusTooManyRequests,
+		}))
 	default:
 		InternalError(c, err)
 	}
@@ -245,6 +256,53 @@ func UnauthorizedWithPath(c *gin.Context, message string) {
 		Message:    message,
 		StatusCode: http.StatusUnauthorized,
 	}, c.Request.URL.Path))
+}
+
+// WithCode variants — use granular error codes for middleware and handlers.
+
+// UnauthorizedWithCode sends a 401 unauthorized response with a granular error code.
+func UnauthorizedWithCode(c *gin.Context, code, message string) {
+	c.JSON(http.StatusUnauthorized, types.NewErrorResponse(types.APIError{
+		Code:       code,
+		Message:    message,
+		StatusCode: http.StatusUnauthorized,
+	}))
+}
+
+// ForbiddenWithCode sends a 403 forbidden response with a granular error code.
+func ForbiddenWithCode(c *gin.Context, code, message string) {
+	c.JSON(http.StatusForbidden, types.NewErrorResponse(types.APIError{
+		Code:       code,
+		Message:    message,
+		StatusCode: http.StatusForbidden,
+	}))
+}
+
+// NotFoundWithCode sends a 404 not found response with a granular error code.
+func NotFoundWithCode(c *gin.Context, code, message string) {
+	c.JSON(http.StatusNotFound, types.NewErrorResponse(types.APIError{
+		Code:       code,
+		Message:    message,
+		StatusCode: http.StatusNotFound,
+	}))
+}
+
+// ConflictWithCode sends a 409 conflict response with a granular error code.
+func ConflictWithCode(c *gin.Context, code, message string) {
+	c.JSON(http.StatusConflict, types.NewErrorResponse(types.APIError{
+		Code:       code,
+		Message:    message,
+		StatusCode: http.StatusConflict,
+	}))
+}
+
+// InternalErrorWithCode sends a 500 internal server error response with a granular error code.
+func InternalErrorWithCode(c *gin.Context, code, message string) {
+	c.JSON(http.StatusInternalServerError, types.NewErrorResponse(types.APIError{
+		Code:       code,
+		Message:    message,
+		StatusCode: http.StatusInternalServerError,
+	}))
 }
 
 // NotFoundWithPath sends a 404 not found response with path.

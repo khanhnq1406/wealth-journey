@@ -64,6 +64,73 @@ func TestAuthenticationErrors(t *testing.T) {
 	})
 }
 
+func TestWithCodeConstructors(t *testing.T) {
+	t.Run("NewValidationErrorWithCode", func(t *testing.T) {
+		err := NewValidationErrorWithCode("WALLET_ID_REQUIRED", "wallet_id is required")
+		assert.Equal(t, "WALLET_ID_REQUIRED", err.Code())
+		assert.Equal(t, "wallet_id is required", err.Error())
+		assert.Equal(t, 400, err.StatusCode())
+	})
+
+	t.Run("NewNotFoundErrorWithCode", func(t *testing.T) {
+		err := NewNotFoundErrorWithCode("WALLET_NOT_FOUND", "wallet not found")
+		assert.Equal(t, "WALLET_NOT_FOUND", err.Code())
+		assert.Equal(t, "wallet not found", err.Error())
+		assert.Equal(t, 404, err.StatusCode())
+	})
+
+	t.Run("NewConflictErrorWithCode", func(t *testing.T) {
+		err := NewConflictErrorWithCode("USER_EMAIL_EXISTS", "user with this email already exists")
+		assert.Equal(t, "USER_EMAIL_EXISTS", err.Code())
+		assert.Equal(t, "user with this email already exists", err.Error())
+		assert.Equal(t, 409, err.StatusCode())
+	})
+
+	t.Run("NewInternalErrorWithCode", func(t *testing.T) {
+		err := NewInternalErrorWithCode("SESSION_LIST_FAILED", "Failed to retrieve sessions")
+		assert.Equal(t, "SESSION_LIST_FAILED", err.Code())
+		assert.Equal(t, "Failed to retrieve sessions", err.Error())
+		assert.Equal(t, 500, err.StatusCode())
+	})
+
+	t.Run("NewInternalErrorWithCodeAndCause", func(t *testing.T) {
+		cause := errors.New("db connection failed")
+		err := NewInternalErrorWithCodeAndCause("SESSION_LIST_FAILED", "Failed to retrieve sessions", cause)
+		assert.Equal(t, "SESSION_LIST_FAILED", err.Code())
+		assert.Contains(t, err.Error(), "Failed to retrieve sessions")
+		assert.Equal(t, 500, err.StatusCode())
+		assert.Equal(t, cause, errors.Unwrap(err))
+	})
+
+	t.Run("NewForbiddenErrorWithCode", func(t *testing.T) {
+		err := NewForbiddenErrorWithCode("AUTH_ADMIN_REQUIRED", "Admin access required")
+		assert.Equal(t, "AUTH_ADMIN_REQUIRED", err.Code())
+		assert.Equal(t, "Admin access required", err.Error())
+		assert.Equal(t, 403, err.StatusCode())
+	})
+
+	t.Run("NewUnauthorizedErrorWithCode", func(t *testing.T) {
+		err := NewUnauthorizedErrorWithCode("AUTH_TOKEN_EXPIRED", "Invalid or expired token")
+		assert.Equal(t, "AUTH_TOKEN_EXPIRED", err.Code())
+		assert.Equal(t, "Invalid or expired token", err.Error())
+		assert.Equal(t, 401, err.StatusCode())
+	})
+
+	t.Run("NewServiceUnavailableErrorWithCode", func(t *testing.T) {
+		err := NewServiceUnavailableErrorWithCode("AUTH_SERVICE_UNAVAILABLE", "auth service unavailable")
+		assert.Equal(t, "AUTH_SERVICE_UNAVAILABLE", err.Code())
+		assert.Equal(t, "auth service unavailable", err.Error())
+		assert.Equal(t, 503, err.StatusCode())
+	})
+
+	t.Run("NewRateLimitErrorWithCode", func(t *testing.T) {
+		err := NewRateLimitErrorWithCode("FEEDBACK_RATE_LIMITED", "Maximum 10 feedback submissions per hour")
+		assert.Equal(t, "FEEDBACK_RATE_LIMITED", err.Code())
+		assert.Equal(t, "Maximum 10 feedback submissions per hour", err.Error())
+		assert.Equal(t, 429, err.StatusCode())
+	})
+}
+
 func TestGetErrorMessage(t *testing.T) {
 	t.Run("AppError returns safe message", func(t *testing.T) {
 		err := NewInvalidCredentialsError()
