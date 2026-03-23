@@ -73,7 +73,7 @@ export function LandingCurrencyPriceTable({
                 <td className="px-5 py-3.5 font-roboto font-bold text-[14px] text-v2-maroon-900 border-r border-v2-currency-primary/10">
                   {item.name || item.code}
                 </td>
-                <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-red-700 border-r border-v2-currency-primary/10">
+                <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-green-700 border-r border-v2-currency-primary/10">
                   {t.rich("loginPrompt", {
                     loginLink: (chunks) => (
                       <Link

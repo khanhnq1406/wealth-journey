@@ -57,6 +57,7 @@ function PnlValue({ percent, amount, label, currency }: PnlValueProps) {
       </p>
       <p
         className={`font-roboto font-bold text-[14px] ${isPositive ? "text-green-400" : "text-red-400"}`}
+        style={{ textShadow }}
       >
         {formatPercent(percent)}
       </p>
@@ -123,6 +124,7 @@ export function NetWorthDisplay({
             ? "bg-green-500/15 text-green-400"
             : "bg-red-400/15 text-red-400"
         }`}
+        style={{ textShadow }}
       >
         {formatPercent(monthPnlPercent)}
       </span>

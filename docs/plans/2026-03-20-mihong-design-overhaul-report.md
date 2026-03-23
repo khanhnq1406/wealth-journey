@@ -276,5 +276,9 @@ Fix issues and re-review. Issue #1 (missing color tokens) is critical — dozens
 
 | 2026-03-23 | Lightened PnL indicator colors on NetWorthDisplay gold card — PnlValue card bg: `bg-v2-maroon-900/15`/`bg-red-800/20` → `bg-green-500/15`/`bg-red-400/15`, percent text: `text-green-800`/`text-red-800` → `text-green-400`/`text-red-400`, pnlBar badge: same pattern. Colors were too dark and appeared sunken on gold gradient surface. | Minor | `NetWorthDisplay.tsx` (1 file) |
 
+| 2026-03-23 | Switched TradingView chart to light theme — `theme: "dark"` → `"light"`, background from dark maroon `#580202` to white `#FFFFFF`, candle colors from gold/red to standard green `#22AB94` / red `#F23645`, toolbar/scales updated for light surface, loading/error overlays changed to white bg. | Minor | `TradingViewChart.tsx` (1 file) |
+
+| 2026-03-23 | Fixed landing page buy column login prompt color — changed buy column `td` text from `text-red-700` to `text-green-700` to match sell column color. Login link remains `text-v2-red-primary` (red highlight) in both columns. Applied to all 3 landing price tables. | Minor | `LandingGoldPriceTable.tsx`, `LandingSilverPriceTable.tsx`, `LandingCurrencyPriceTable.tsx` (3 files) |
+
 **Build verification:** `next build` passes with zero errors on all 21 routes after fixes.
 **Security review:** APPROVED — all changes are CSS-only class replacements, no security impact.
