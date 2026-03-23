@@ -55,7 +55,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
           <button
             onClick={markAllRead}
             disabled={isMarkingRead}
-            className="font-roboto text-xs text-bg hover:underline disabled:opacity-50"
+            className="font-roboto text-xs text-v2-gold-primary hover:text-v2-gold-accent hover:underline disabled:opacity-50"
           >
             Đánh dấu tất cả đã đọc
           </button>
