@@ -21,10 +21,9 @@ export function LandingDollarIndexChart() {
       </div>
 
       {/* TradingView Chart — fully interactive, no login wall */}
-      <div className="px-2 pb-2">
+      <div className="px-2 pb-2" style={{ height: 950 }}>
         <TradingViewChart
           symbol="DXY"
-          height={950}
           locale={locale}
           theme="dark"
           allowSymbolChange={false}

@@ -12,7 +12,7 @@ declare global {
 
 interface TradingViewChartProps {
   symbol: string;
-  height?: number;
+  height?: number | string;
   locale?: string;
   theme?: "light" | "dark";
   interval?: string;
@@ -45,7 +45,7 @@ type ChartStatus = "loading" | "ready" | "error";
 
 function TradingViewChartInner({
   symbol,
-  height = 400,
+  height = "100%",
   locale = "en",
   theme = "light",
   interval = "D",
@@ -142,7 +142,7 @@ function TradingViewChartInner({
 
   return (
     <div
-      className={`relative ${className ?? ""}`}
+      className={`relative rounded-lg overflow-hidden ${className ?? ""}`}
       style={{ height, width: "100%" }}
     >
       <div

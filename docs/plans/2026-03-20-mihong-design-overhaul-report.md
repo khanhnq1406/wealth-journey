@@ -280,5 +280,7 @@ Fix issues and re-review. Issue #1 (missing color tokens) is critical — dozens
 
 | 2026-03-23 | Fixed landing page buy column login prompt color — changed buy column `td` text from `text-red-700` to `text-green-700` to match sell column color. Login link remains `text-v2-red-primary` (red highlight) in both columns. Applied to all 3 landing price tables. | Minor | `LandingGoldPriceTable.tsx`, `LandingSilverPriceTable.tsx`, `LandingCurrencyPriceTable.tsx` (3 files) |
 
+| 2026-03-23 | Made TradingView charts height 100% with rounded borders — changed `TradingViewChart` `height` prop type from `number` to `number | string`, default from `400` to `"100%"`. Added `rounded-lg overflow-hidden` to outer container for border radius clipping. Moved fixed pixel heights from chart prop to parent wrapper `div` via inline style in all 6 chart wrapper components (3 dashboard + 3 landing). | Minor | `TradingViewChart.tsx`, `GoldPriceChart.tsx`, `SilverPriceChart.tsx`, `DollarIndexChart.tsx`, `LandingGoldPriceChart.tsx`, `LandingSilverPriceChart.tsx`, `LandingDollarIndexChart.tsx` (7 files) |
+
 **Build verification:** `next build` passes with zero errors on all 21 routes after fixes.
 **Security review:** APPROVED — all changes are CSS-only class replacements, no security impact.

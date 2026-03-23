@@ -21,10 +21,9 @@ export function DollarIndexChart() {
       </div>
 
       {/* TradingView Chart */}
-      <div className="px-2 pb-2">
+      <div className="px-2 pb-2" style={{ height: 950 }}>
         <TradingViewChart
           symbol="DXY"
-          height={950}
           locale={locale}
           theme="dark"
         />

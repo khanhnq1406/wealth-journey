@@ -21,10 +21,9 @@ export function SilverPriceChart() {
       </div>
 
       {/* TradingView Chart */}
-      <div className="px-2 pb-2">
+      <div className="px-2 pb-2" style={{ height: 500 }}>
         <TradingViewChart
           symbol="TVC:SILVER"
-          height={500}
           locale={locale}
           theme="dark"
         />
