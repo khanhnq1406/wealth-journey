@@ -402,19 +402,19 @@ export const PortfolioSummaryEnhanced = memo(function PortfolioSummaryEnhanced({
       )}
 
       {/* Main Summary Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <StatCard
+          label={t("summary.totalCost")}
+          value={formatCurrency(animatedCost, displayCurrency)}
+          color="neutral"
+        />
+
         <StatCard
           label={t("summary.totalValue")}
           value={formatCurrency(animatedValue, displayCurrency)}
           color="neutral"
           sparklineData={sparklineData}
           showSparkline
-        />
-
-        <StatCard
-          label={t("summary.totalCost")}
-          value={formatCurrency(animatedCost, displayCurrency)}
-          color="neutral"
         />
 
         <StatCard

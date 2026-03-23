@@ -284,5 +284,19 @@ Fix issues and re-review. Issue #1 (missing color tokens) is critical — dozens
 
 | 2026-03-23 | Fixed PNLCard chart Y-axis showing full range (0M-100M) instead of focusing on data changes — computed Y-axis domain from `Math.min`/`Math.max` of data points with 10% padding, passed as `yAxisDomain` prop to `LineChart`. Widened `yAxisDomain` TypeScript type to accept `"dataMin"`, `"dataMax"`, and callback functions (Recharts-native values). | Minor | `PNLCard.tsx`, `LineChart.tsx` (2 files) |
 
-**Build verification:** `next build` passes with zero errors on all 21 routes after fixes.
-**Security review:** APPROVED — all changes are CSS-only class replacements, no security impact.
+| 2026-03-23 | Reordered portfolio TYPE_FILTER_KEYS to match AddInvestmentForm order (Gold, Silver, Cash, Foreign Currency, Stock, Crypto, ETF, Bond, Commodity, Mutual Fund, Other). Removed separate Gold USD and Silver USD filter entries. | Minor | `portfolio/page.tsx` (1 file) |
+
+| 2026-03-23 | Relayouted PortfolioSummaryEnhanced stat cards — desktop: Cost → Value → PNL → Investments. Mobile: 2-col grid (Cost\|Value, PNL\|Investments) instead of 1-col stack. | Minor | `PortfolioSummaryEnhanced.tsx` (1 file) |
+
+| 2026-03-23 | Removed world gold (XAU/USD), world silver (XAG/USD), and SJC TD from investment form type selection. `getGoldTypeOptions()`/`getSilverTypeOptions()` now return VND-only options by default. | Minor | `gold-calculator.ts`, `silver-calculator.ts`, `gold-calculator.test.ts` (3 files) |
+
+| 2026-03-23 | Changed gold/silver dropdown placeholders from technical codes (SJC, XAU, AG_VND, XAG) to Vietnamese brand names (SJC, BTMC, Doji, Mi Hồng / Phú Quý, DOJI, SBJ). | Minor | `messages/en/investment.json`, `messages/vi/investment.json` (2 files) |
+
+| 2026-03-23 | Added dynamic price per unit label showing currency/unit — e.g., "Đơn giá (đ/lượng)" for gold VND, "Đơn giá (đ/lượng)" for silver tael, "Đơn giá (đ/kg)" for silver kg. Generic "Đơn giá" for stocks/other. | Minor | `AddInvestmentForm.tsx` (1 file) |
+
+| 2026-03-23 | Replaced all `text-gray-*`, `bg-gray-*`, `bg-red-50/100`, `text-danger-600` with mihong v2 theme tokens in AddInvestmentForm — labels: `text-v2-gold-accent`, helper text: `text-v2-text-secondary`, muted: `text-v2-text-tertiary`, custom toggle container: `bg-v2-maroon-900`, currency badge: `bg-v2-maroon-900 text-v2-gold-accent`, refresh button: `text-v2-gold-primary bg-v2-maroon-900 hover:bg-v2-maroon-800`, error box: `bg-v2-red-primary/10 text-v2-red-negative`. | Minor | `AddInvestmentForm.tsx` (1 file) |
+
+| 2026-03-23 | Fixed hardcoded "Add Investment" submit button text in AddInvestmentForm — replaced with `t("form.addInvestment")` so it translates to Vietnamese ("Thêm khoản đầu tư"). Translation keys already existed in both EN and VI message files. | Minor | `AddInvestmentForm.tsx` (1 file) |
+
+**Build verification:** `next build` passes with zero errors on all routes after fixes.
+**Security review:** APPROVED — all changes are UI-only (Tailwind class replacements), no security impact.

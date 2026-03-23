@@ -55,18 +55,30 @@ const ModalType = {
 const TYPE_FILTER_KEYS = [
   { value: "0", key: "typeOptions.allTypes" },
   {
-    value: String(InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY),
-    key: "typeOptions.cryptocurrency",
+    value: String(InvestmentType.INVESTMENT_TYPE_GOLD_VND),
+    key: "typeOptions.goldVietnam",
+  },
+  {
+    value: String(InvestmentType.INVESTMENT_TYPE_SILVER_VND),
+    key: "typeOptions.silverVietnam",
+  },
+  {
+    value: String(InvestmentType.INVESTMENT_TYPE_CASH),
+    key: "typeOptions.cash",
+  },
+  {
+    value: String(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY),
+    key: "typeOptions.foreignCurrency",
   },
   {
     value: String(InvestmentType.INVESTMENT_TYPE_STOCK),
     key: "typeOptions.stock",
   },
-  { value: String(InvestmentType.INVESTMENT_TYPE_ETF), key: "typeOptions.etf" },
   {
-    value: String(InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND),
-    key: "typeOptions.mutualFund",
+    value: String(InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY),
+    key: "typeOptions.cryptocurrency",
   },
+  { value: String(InvestmentType.INVESTMENT_TYPE_ETF), key: "typeOptions.etf" },
   {
     value: String(InvestmentType.INVESTMENT_TYPE_BOND),
     key: "typeOptions.bond",
@@ -76,20 +88,8 @@ const TYPE_FILTER_KEYS = [
     key: "typeOptions.commodity",
   },
   {
-    value: String(InvestmentType.INVESTMENT_TYPE_GOLD_VND),
-    key: "typeOptions.goldVietnam",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_GOLD_USD),
-    key: "typeOptions.goldWorld",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_CASH),
-    key: "typeOptions.cash",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY),
-    key: "typeOptions.foreignCurrency",
+    value: String(InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND),
+    key: "typeOptions.mutualFund",
   },
   {
     value: String(InvestmentType.INVESTMENT_TYPE_OTHER),

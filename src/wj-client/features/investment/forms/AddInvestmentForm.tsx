@@ -301,6 +301,41 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
     return getSilverTypeOptions(); // No currency filter
   }, [isSilverInvestment]);
 
+  // Dynamic price per unit label: "Đơn giá (đ/lượng)" for gold VND, etc.
+  const pricePerUnitLabel = useMemo(() => {
+    const baseLabel = t("form.pricePerUnitLabel");
+    const currencySymbol =
+      currency === "VND" ? "đ" : currency === "USD" ? "$" : currency || "";
+
+    if (isGoldInvestment && selectedGoldType) {
+      // Gold VND prices are per lượng (tael), Gold USD prices are per oz
+      const unitLabel =
+        selectedGoldType.currency === "USD" ? "oz" : t("form.taelUnitLong");
+      return `${baseLabel} (${currencySymbol}/${unitLabel})`;
+    }
+    if (isSilverInvestment && selectedSilverType) {
+      // Silver unit matches the quantity unit for pricing
+      const unitLabel =
+        silverQuantityUnit === "tael"
+          ? t("form.taelUnitLong")
+          : silverQuantityUnit === "kg"
+            ? t("form.kgUnit")
+            : silverQuantityUnit === "oz"
+              ? "oz"
+              : t("form.gramUnit");
+      return `${baseLabel} (${currencySymbol}/${unitLabel})`;
+    }
+    return baseLabel;
+  }, [
+    t,
+    currency,
+    isGoldInvestment,
+    isSilverInvestment,
+    selectedGoldType,
+    selectedSilverType,
+    silverQuantityUnit,
+  ]);
+
   // Update gold quantity unit based on selected gold type
   useEffect(() => {
     if (selectedGoldType) {
@@ -552,7 +587,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
 
       {/* Custom Investment Toggle - shown for non-gold, non-silver, non-cash/forex */}
       {!isGoldInvestment && !isSilverInvestment && !isCashOrForeignCurrency && (
-        <div className="mb-4 p-3 bg-gray-50 rounded-md border border-v2-gold-primary/20">
+        <div className="mb-4 p-3 bg-v2-maroon-900 rounded-md border border-v2-gold-primary/20">
           <label className="flex items-center space-x-3 cursor-pointer">
             <input
               type="checkbox"
@@ -572,10 +607,10 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
               className="w-4 h-4 text-v2-red-primary border-v2-gold-primary/30 rounded focus:ring-v2-red-primary"
             />
             <div className="flex-1">
-              <span className="font-medium text-gray-900">
+              <span className="font-medium text-v2-gold-accent">
                 {t("form.isCustom")}
               </span>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-v2-text-secondary">
                 {t("form.customInvestmentDescription")}
               </p>
             </div>
@@ -605,7 +640,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
               )}
               {/* Market price display for standard investments */}
               {isStandardWithSymbol && standardPriceQuery.isLoading && (
-                <p className="text-xs text-gray-400 mt-2 ml-1">
+                <p className="text-xs text-v2-text-tertiary mt-2 ml-1">
                   {t("form.loadingPrice")}
                 </p>
               )}
@@ -632,7 +667,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
                   {errors.symbol.message}
                 </ErrorMessage>
               )}
-              <p className="text-xs text-gray-500 mt-1 ml-1">
+              <p className="text-xs text-v2-text-secondary mt-1 ml-1">
                 {t("form.customSymbolInfo")}
               </p>
               {/* Info box for custom investments */}
@@ -687,7 +722,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
           />
           {selectedGoldType && (
             <div className="mt-2 space-y-1">
-              <p className="text-xs text-gray-500 ml-1">
+              <p className="text-xs text-v2-text-secondary ml-1">
                 {t("form.goldUnitCurrencyInfo", {
                   unit:
                     selectedGoldType.unit === "mace"
@@ -700,7 +735,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
               </p>
               {/* Market Price Display */}
               {goldPriceQuery.isLoading && (
-                <p className="text-xs text-gray-400 ml-1">
+                <p className="text-xs text-v2-text-tertiary ml-1">
                   {t("form.loadingPrice")}
                 </p>
               )}
@@ -747,14 +782,14 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
           />
           {selectedSilverType && (
             <div className="mt-2 space-y-1">
-              <p className="text-xs text-gray-500 ml-1">
+              <p className="text-xs text-v2-text-secondary ml-1">
                 {t("form.silverCurrencyInfo", {
                   currency: selectedSilverType.currency,
                 })}
               </p>
               {/* Market Price Display */}
               {silverPriceQuery.isLoading && (
-                <p className="text-xs text-gray-400 ml-1">
+                <p className="text-xs text-v2-text-tertiary ml-1">
                   {t("form.loadingPrice")}
                 </p>
               )}
@@ -788,7 +823,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
               step="0.01"
               showRecommendations={false}
             />
-            <p className="text-xs text-gray-500 -mt-2 ml-1">
+            <p className="text-xs text-v2-text-secondary -mt-2 ml-1">
               {t("form.amountOfGold", {
                 unit:
                   goldQuantityUnit === "mace"
@@ -817,7 +852,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
                 className="mt-1"
                 showRecommendations={false}
               />
-              <p className="text-xs text-gray-500 -mt-2 ml-1">
+              <p className="text-xs text-v2-text-secondary -mt-2 ml-1">
                 {t("form.amountOfSilver", {
                   unit:
                     silverQuantityUnit === "tael"
@@ -872,7 +907,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
               min={0}
               step={quantityConfig.step}
             />
-            <p className="text-xs text-gray-500 mt-1 -mb-3 ml-1">
+            <p className="text-xs text-v2-text-secondary mt-1 -mb-3 ml-1">
               {t("form.quantityHint")}
             </p>
           </>
@@ -915,7 +950,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
       <div>
         <div className="flex items-center gap-2 mb-1">
           <Label htmlFor="pricePerUnit" required>
-            {t("form.pricePerUnitLabel")}
+            {pricePerUnitLabel}
           </Label>
           {/* CurrencyBadge - hidden for custom investments (manual select above) */}
           {!isCustomInvestment && (
@@ -927,7 +962,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
           )}
           {/* Display only badge for custom investments */}
           {isCustomInvestment && (
-            <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded">
+            <span className="px-2 py-1 text-xs font-medium bg-v2-maroon-900 text-v2-gold-accent rounded">
               {currency || "USD"}
             </span>
           )}
@@ -956,7 +991,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
                 else if (isStandardWithSymbol) standardPriceQuery.refetch();
               }}
               disabled={isRefreshing}
-              className="px-3 py-2 text-sm font-medium text-bg bg-red-50 border border-v2-gold-primary rounded-md hover:bg-red-100 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap h-[44px] sm:h-[48px]"
+              className="px-3 py-2 text-sm font-medium text-v2-gold-primary bg-v2-maroon-900 border border-v2-gold-primary rounded-md hover:bg-v2-maroon-800 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap h-[44px] sm:h-[48px]"
             >
               {isRefreshing
                 ? t("form.refreshingPrice")
@@ -967,7 +1002,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
         {/* Total cost summary — pricePerUnit is human-readable, so totalCost is too */}
         {watchedQuantity > 0 && pricePerUnit > 0 && (
           <div className="mt-2">
-            <p className="text-sm font-medium text-gray-700">
+            <p className="text-sm font-medium text-v2-gold-accent">
               {t("form.totalCostSummary", {
                 amount: new Intl.NumberFormat("en-US", {
                   style: "currency",
@@ -984,7 +1019,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
               })}
             </p>
             {needsCurrencyConversion && exchangeRate && (
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-xs text-v2-text-secondary mt-0.5">
                 {t("form.totalCostConverted", {
                   amount: new Intl.NumberFormat("en-US", {
                     style: "currency",
@@ -1007,7 +1042,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
 
       {/* Error message */}
       {errorMessage && (
-        <div className="bg-red-50 border border-v2-red-negative text-danger-600 px-4 py-3 rounded">
+        <div className="bg-v2-red-primary/10 border border-v2-red-negative text-v2-red-negative px-4 py-3 rounded">
           {errorMessage}
         </div>
       )}
@@ -1019,7 +1054,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
         className="w-full"
         htmlType="submit"
       >
-        Add Investment
+        {t("form.addInvestment")}
       </Button>
     </form>
   );
