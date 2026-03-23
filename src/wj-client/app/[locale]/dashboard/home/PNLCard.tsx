@@ -82,6 +82,17 @@ export function PNLCard({ currency }: PNLCardProps) {
   const yFormatter = (value: number) =>
     `${(value / 1_000_000).toLocaleString("vi-VN", { maximumFractionDigits: 1 })}M`;
 
+  // Compute Y-axis domain focused on data range with 10% padding
+  const chartYDomain = (() => {
+    if (chartPoints.length === 0) return undefined;
+    const values = chartPoints.map((p) => p.value);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const range = max - min;
+    const padding = range > 0 ? range * 0.1 : max * 0.05;
+    return [Math.max(0, min - padding), max + padding] as [number, number];
+  })();
+
   const formatAmount = (amount: number) => {
     const value = Number(amount);
     const sign = value >= 0 ? "+" : "";
@@ -198,6 +209,7 @@ export function PNLCard({ currency }: PNLCardProps) {
             showLegend={false}
             showTooltip={true}
             yAxisFormatter={yFormatter}
+            yAxisDomain={chartYDomain}
             animate={true}
             gridColor="rgba(241, 189, 97, 0.1)"
           />

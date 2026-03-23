@@ -86,8 +86,8 @@ export interface LineChartProps {
   ) => [string, string];
   /** Background color for grid (default: transparent) */
   gridColor?: string;
-  /** Y-axis domain (min, max values) */
-  yAxisDomain?: [number | "auto", number | "auto"];
+  /** Y-axis domain (min, max values). Supports "auto", "dataMin", "dataMax" or numbers */
+  yAxisDomain?: [number | "auto" | "dataMin" | "dataMax" | ((value: number) => number), number | "auto" | "dataMin" | "dataMax" | ((value: number) => number)];
   /** Whether to animate on load (default: true) */
   animate?: boolean;
 }

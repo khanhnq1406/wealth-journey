@@ -282,5 +282,7 @@ Fix issues and re-review. Issue #1 (missing color tokens) is critical — dozens
 
 | 2026-03-23 | Made TradingView charts height 100% with rounded borders — changed `TradingViewChart` `height` prop type from `number` to `number | string`, default from `400` to `"100%"`. Added `rounded-lg overflow-hidden` to outer container for border radius clipping. Moved fixed pixel heights from chart prop to parent wrapper `div` via inline style in all 6 chart wrapper components (3 dashboard + 3 landing). | Minor | `TradingViewChart.tsx`, `GoldPriceChart.tsx`, `SilverPriceChart.tsx`, `DollarIndexChart.tsx`, `LandingGoldPriceChart.tsx`, `LandingSilverPriceChart.tsx`, `LandingDollarIndexChart.tsx` (7 files) |
 
+| 2026-03-23 | Fixed PNLCard chart Y-axis showing full range (0M-100M) instead of focusing on data changes — computed Y-axis domain from `Math.min`/`Math.max` of data points with 10% padding, passed as `yAxisDomain` prop to `LineChart`. Widened `yAxisDomain` TypeScript type to accept `"dataMin"`, `"dataMax"`, and callback functions (Recharts-native values). | Minor | `PNLCard.tsx`, `LineChart.tsx` (2 files) |
+
 **Build verification:** `next build` passes with zero errors on all 21 routes after fixes.
 **Security review:** APPROVED — all changes are CSS-only class replacements, no security impact.
