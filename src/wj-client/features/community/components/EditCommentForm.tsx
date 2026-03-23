@@ -53,23 +53,23 @@ export function EditCommentForm({
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-1 mt-1">
       <textarea
         {...register("content")}
-        className="w-full text-sm border border-v2-gold-primary/20 rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-v2-gold-primary"
+        className="w-full text-sm border border-v2-gold-primary/20 rounded-lg px-3 py-2 bg-v2-maroon-900 text-v2-gold-accent placeholder:text-v2-text-tertiary resize-none focus:outline-none focus:border-v2-gold-primary"
         rows={3}
         autoFocus
       />
       {errors.content && (
-        <p className="text-xs text-red-500">{errors.content.message}</p>
+        <p className="text-xs text-v2-red-negative">{errors.content.message}</p>
       )}
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-v2-red-negative">{error}</p>}
       <div className="flex items-center justify-between">
-        <span className={`text-xs ${remainingChars < 50 ? "text-red-500" : "text-gray-400"}`}>
+        <span className={`text-xs ${remainingChars < 50 ? "text-v2-red-negative" : "text-v2-text-tertiary"}`}>
           {remainingChars}
         </span>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={onCancel}
-            className="text-xs text-gray-500 hover:text-gray-700 px-2 py-1"
+            className="text-xs text-v2-text-secondary hover:text-v2-gold-accent px-2 py-1"
             disabled={updateCommentMutation.isPending}
           >
             Cancel
@@ -77,7 +77,7 @@ export function EditCommentForm({
           <button
             type="submit"
             disabled={updateCommentMutation.isPending || !content?.trim()}
-            className="text-xs bg-bg text-white px-3 py-1 rounded-md hover:bg-hgreen disabled:opacity-50"
+            className="text-xs bg-v2-gold-primary text-v2-maroon-900 px-3 py-1 rounded-md hover:bg-v2-gold-accent disabled:opacity-50"
           >
             {updateCommentMutation.isPending ? "Saving..." : "Save"}
           </button>

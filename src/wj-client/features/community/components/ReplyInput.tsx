@@ -61,7 +61,7 @@ export function ReplyInput({
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Reply..."
-          className="w-full text-sm border border-v2-gold-primary/20 rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-v2-gold-primary"
+          className="w-full text-sm border border-v2-gold-primary/20 rounded-lg px-3 py-2 bg-v2-maroon-900 text-v2-gold-accent placeholder:text-v2-text-tertiary resize-none focus:outline-none focus:border-v2-gold-primary"
           rows={2}
           maxLength={500}
         />
@@ -69,7 +69,7 @@ export function ReplyInput({
           <button
             type="button"
             onClick={onCancel}
-            className="text-xs text-gray-500 hover:text-gray-700 px-2 py-1"
+            className="text-xs text-v2-text-secondary hover:text-v2-gold-accent px-2 py-1"
           >
             Cancel
           </button>
@@ -77,7 +77,7 @@ export function ReplyInput({
             type="button"
             onClick={handleSubmit}
             disabled={!content.trim() || createCommentMutation.isPending}
-            className="text-xs bg-bg text-white px-3 py-1 rounded-md hover:bg-hgreen disabled:opacity-50"
+            className="text-xs bg-v2-gold-primary text-v2-maroon-900 px-3 py-1 rounded-md hover:bg-v2-gold-accent disabled:opacity-50"
           >
             {createCommentMutation.isPending ? "Replying..." : "Reply"}
           </button>

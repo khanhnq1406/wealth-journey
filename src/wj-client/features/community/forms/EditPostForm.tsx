@@ -63,12 +63,12 @@ export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
       <div>
         <textarea
           {...register("content")}
-          className="w-full min-h-[120px] resize-none border border-v2-border-light rounded-xl p-3 font-roboto text-sm text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none focus:border-v2-red-primary transition-colors"
+          className="w-full min-h-[120px] resize-none border border-v2-gold-primary/20 rounded-xl p-3 bg-v2-maroon-900 font-roboto text-sm text-v2-gold-accent placeholder:text-v2-text-tertiary focus:outline-none focus:border-v2-gold-primary transition-colors"
           maxLength={2000}
         />
         <div className="flex justify-between items-center mt-1">
           {errors.content && (
-            <p className="text-xs text-red-500 font-roboto">{errors.content.message}</p>
+            <p className="text-xs text-v2-red-negative font-roboto">{errors.content.message}</p>
           )}
           <p className="text-xs text-v2-text-tertiary font-roboto ml-auto">
             {content.length} / 2.000
@@ -87,8 +87,8 @@ export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
 
       {/* Error message */}
       {errorMessage && (
-        <div className="p-3 rounded-lg bg-red-50 border border-v2-red-negative/30">
-          <p className="text-xs text-red-600 font-roboto">{errorMessage}</p>
+        <div className="p-3 rounded-lg bg-v2-red-primary/10 border border-v2-red-negative/30">
+          <p className="text-xs text-v2-red-negative font-roboto">{errorMessage}</p>
         </div>
       )}
 

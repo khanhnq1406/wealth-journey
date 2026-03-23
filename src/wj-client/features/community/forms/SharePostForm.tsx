@@ -56,15 +56,15 @@ export function SharePostForm({ post, onSuccess, onCancel }: SharePostFormProps)
           {...register("content")}
           placeholder="Thêm bình luận... (không bắt buộc)"
           rows={3}
-          className="w-full px-3 py-2 font-roboto text-sm rounded-xl border border-v2-border-light bg-v2-bg-primary focus:outline-none focus:ring-2 focus:ring-bg/30 resize-none"
+          className="w-full px-3 py-2 font-roboto text-sm rounded-xl border border-v2-gold-primary/20 bg-v2-maroon-900 text-v2-gold-accent placeholder:text-v2-text-tertiary focus:outline-none focus:border-v2-gold-primary resize-none"
         />
         {errors.content && (
-          <p className="mt-1 text-xs text-lred">{errors.content.message}</p>
+          <p className="mt-1 text-xs text-v2-red-negative">{errors.content.message}</p>
         )}
       </div>
 
       {errorMessage && (
-        <p className="text-xs text-lred">{errorMessage}</p>
+        <p className="text-xs text-v2-red-negative">{errorMessage}</p>
       )}
 
       <div className="flex gap-2 justify-end">

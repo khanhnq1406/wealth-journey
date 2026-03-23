@@ -36,8 +36,8 @@ export function PostActions({
           "flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors flex-1 justify-center",
           "font-roboto text-sm font-medium",
           isLiked
-            ? "text-[#DC2626] hover:bg-red-50"
-            : "text-v2-text-secondary hover:bg-v2-bg-primary"
+            ? "text-v2-red-negative hover:bg-v2-red-light"
+            : "text-v2-text-secondary hover:bg-v2-maroon-600"
         )}
         aria-label={isLiked ? "Unlike" : "Like"}
       >
@@ -45,7 +45,7 @@ export function PostActions({
           size={18}
           className={cn(
             "transition-transform",
-            isLiked ? "fill-[#DC2626] scale-110" : "fill-none"
+            isLiked ? "fill-v2-red-negative scale-110" : "fill-none"
           )}
         />
         <span className="hidden sm:inline">{isLiked ? "Đã thích" : "Thích"}</span>
@@ -53,7 +53,7 @@ export function PostActions({
 
       <button
         onClick={onCommentClick}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-roboto text-sm font-medium text-v2-text-secondary hover:bg-v2-bg-primary flex-1 justify-center"
+        className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-roboto text-sm font-medium text-v2-text-secondary hover:bg-v2-maroon-600 flex-1 justify-center"
         aria-label="Comment"
       >
         <MessageCircle size={18} />
@@ -63,7 +63,7 @@ export function PostActions({
       {onShareClick && (
         <button
           onClick={onShareClick}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-roboto text-sm font-medium text-v2-text-secondary hover:bg-v2-bg-primary flex-1 justify-center"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-roboto text-sm font-medium text-v2-text-secondary hover:bg-v2-maroon-600 flex-1 justify-center"
           aria-label="Share"
         >
           <Share2 size={18} />
@@ -78,14 +78,14 @@ export function PostActions({
           className={cn(
             "flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-roboto text-sm font-medium flex-1 justify-center",
             isSaved
-              ? "text-bg hover:bg-green-50"
-              : "text-v2-text-secondary hover:bg-v2-bg-primary"
+              ? "text-v2-gold-primary hover:bg-v2-maroon-600"
+              : "text-v2-text-secondary hover:bg-v2-maroon-600"
           )}
           aria-label={isSaved ? "Unsave" : "Save"}
         >
           <Bookmark
             size={18}
-            className={cn(isSaved ? "fill-bg" : "fill-none")}
+            className={cn(isSaved ? "fill-v2-gold-primary" : "fill-none")}
           />
           <span className="hidden sm:inline">{isSaved ? "Đã lưu" : "Lưu"}</span>
         </button>
@@ -93,7 +93,7 @@ export function PostActions({
 
       <button
         onClick={() => toast.info("Tính năng Tặng sao sẽ sớm được ra mắt!")}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-roboto text-sm font-medium text-v2-text-secondary hover:bg-v2-bg-primary flex-1 justify-center"
+        className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-roboto text-sm font-medium text-v2-text-secondary hover:bg-v2-maroon-600 flex-1 justify-center"
         aria-label="Donate stars"
       >
         <Star size={18} />
