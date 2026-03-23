@@ -153,9 +153,10 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 	if err == nil && existing != nil {
 		// Validate currency matches existing investment
 		if req.Currency != existing.Currency {
-			return nil, apperrors.NewConflictErrorWithCode(
+			return nil, apperrors.NewConflictErrorWithCodeAndParams(
 				apperrors.Codes.InvestmentDuplicate,
 				fmt.Sprintf("Investment %s already exists with currency %s", req.Symbol, existing.Currency),
+				map[string]string{"symbol": req.Symbol, "currency": existing.Currency},
 			)
 		}
 

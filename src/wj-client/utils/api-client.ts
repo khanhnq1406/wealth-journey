@@ -20,7 +20,8 @@ export class ApiRequestError extends Error {
     public statusCode: number,
     public message: string,
     public code?: string,
-    public details?: string
+    public details?: string,
+    public params?: Record<string, string>
   ) {
     super(message);
     this.name = "ApiRequestError";
@@ -101,6 +102,7 @@ async function handleErrorResponse(response: Response): Promise<never> {
   let errorMessage = "An unexpected error occurred";
   let errorCode: string | undefined;
   let errorDetails: string | undefined;
+  let errorParams: Record<string, string> | undefined;
 
   // Check if response has content before trying to parse JSON
   const contentType = response.headers.get("content-type");
@@ -115,6 +117,7 @@ async function handleErrorResponse(response: Response): Promise<never> {
         errorMessage = errorData.error.message || errorMessage;
         errorCode = errorData.error.code;
         errorDetails = errorData.error.details;
+        errorParams = errorData.error.params;
       }
       // Handle flat error format with error code string and message
       else if (errorData.error && typeof errorData.error === "string") {
@@ -142,7 +145,8 @@ async function handleErrorResponse(response: Response): Promise<never> {
     response.status,
     errorMessage,
     errorCode,
-    errorDetails
+    errorDetails,
+    errorParams
   );
 }
 

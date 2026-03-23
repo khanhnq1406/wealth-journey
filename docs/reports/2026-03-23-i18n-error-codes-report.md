@@ -72,7 +72,7 @@ Replaced generic error codes (e.g., `VALIDATION_ERROR`, `NOT_FOUND`) with ~150 g
 ## Known Issues / Technical Debt
 
 1. **Remaining generic `NewValidationError()` calls**: ~70 calls in validator.go, admin_service.go, community handler generics, auth domain, and repository layers still use generic codes. These were intentionally out of scope (not mapped in the spec catalog). A follow-up ticket can address them.
-2. **No dynamic parameter interpolation**: Error codes like `INVESTMENT_DUPLICATE` have a static translation. The spec explicitly deferred the `params` field for dynamic interpolation. Users see the translated message for the code, falling back to the English message with embedded values.
+2. **Limited dynamic parameter interpolation**: The `params` field and ICU message format are now supported end-to-end (backend `ParamError` → API `params` field → frontend `getTranslatedError` → next-intl `t(key, params)`). Currently only `INVESTMENT_DUPLICATE` uses it. Other error codes with embedded values can be migrated incrementally.
 3. **No CI check for missing translations**: A follow-up can add a test verifying all codes in `codes.go` have corresponding entries in both translation files.
 
 ## Files Changed
@@ -112,3 +112,9 @@ cd src/wj-client && npm run build
 4. Switch to English, trigger same error
 5. Verify error message displays in English
 6. Trigger an error for a code not in translations — verify fallback to English message
+
+## Fix History
+
+| Date       | Fix                                                                                                  | Severity | Commit        |
+| ---------- | ---------------------------------------------------------------------------------------------------- | -------- | ------------- |
+| 2026-03-23 | Added i18n param interpolation for INVESTMENT_DUPLICATE — symbol & currency now translated in en/vi | Minor    | pending       |

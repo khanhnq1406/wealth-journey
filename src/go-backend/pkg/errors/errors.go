@@ -16,6 +16,12 @@ type AppError interface {
 	Code() string
 }
 
+// ParamError extends AppError with interpolation params for i18n translations.
+type ParamError interface {
+	AppError
+	Params() map[string]string
+}
+
 // BaseError implements the AppError interface.
 type BaseError struct {
 	code       string
@@ -233,6 +239,18 @@ func GetErrorMessage(err error) string {
 	return "An unexpected error occurred"
 }
 
+// GetErrorParams returns interpolation params from a ParamError, or nil.
+func GetErrorParams(err error) map[string]string {
+	if err == nil {
+		return nil
+	}
+	var paramErr ParamError
+	if errors.As(err, &paramErr) {
+		return paramErr.Params()
+	}
+	return nil
+}
+
 // Auth-specific error types for security
 
 // InvalidCredentialsError represents a failed authentication attempt.
@@ -345,6 +363,27 @@ func NewNotFoundErrorWithCode(code, message string) NotFoundError {
 func NewConflictErrorWithCode(code, message string) ConflictError {
 	return ConflictError{
 		BaseError: NewError(code, message, http.StatusConflict),
+	}
+}
+
+// ConflictErrorWithParams is a conflict error that carries i18n interpolation params.
+type ConflictErrorWithParams struct {
+	ConflictError
+	params map[string]string
+}
+
+// Params returns the interpolation params.
+func (e ConflictErrorWithParams) Params() map[string]string {
+	return e.params
+}
+
+// NewConflictErrorWithCodeAndParams creates a conflict error with a granular code and i18n params.
+func NewConflictErrorWithCodeAndParams(code, message string, params map[string]string) ConflictErrorWithParams {
+	return ConflictErrorWithParams{
+		ConflictError: ConflictError{
+			BaseError: NewError(code, message, http.StatusConflict),
+		},
+		params: params,
 	}
 }
 

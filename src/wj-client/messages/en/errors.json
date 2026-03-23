@@ -59,7 +59,7 @@
     "INVESTMENT_FEES_NEGATIVE": "Fees cannot be negative.",
     "INVESTMENT_TX_TYPE_REQUIRED": "Please select a transaction type.",
     "INVESTMENT_TX_DATE_FUTURE": "Transaction date cannot be in the future.",
-    "INVESTMENT_DUPLICATE": "This investment already exists in your wallet.",
+    "INVESTMENT_DUPLICATE": "Investment {symbol} already exists with currency {currency}.",
     "INVESTMENT_QUERY_REQUIRED": "Please enter a search query.",
     "INVESTMENT_QUERY_TOO_LONG": "Search query must be 100 characters or less.",
     "INVESTMENT_SYMBOL_CURRENCY_REQUIRED": "Symbol and currency are required.",

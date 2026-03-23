@@ -59,7 +59,7 @@
     "INVESTMENT_FEES_NEGATIVE": "Phí không thể âm.",
     "INVESTMENT_TX_TYPE_REQUIRED": "Vui lòng chọn loại giao dịch.",
     "INVESTMENT_TX_DATE_FUTURE": "Ngày giao dịch không thể ở tương lai.",
-    "INVESTMENT_DUPLICATE": "Khoản đầu tư này đã tồn tại trong ví.",
+    "INVESTMENT_DUPLICATE": "Khoản đầu tư {symbol} đã tồn tại với tiền tệ {currency}.",
     "INVESTMENT_QUERY_REQUIRED": "Vui lòng nhập từ khóa tìm kiếm.",
     "INVESTMENT_QUERY_TOO_LONG": "Từ khóa tìm kiếm phải dưới 100 ký tự.",
     "INVESTMENT_SYMBOL_CURRENCY_REQUIRED": "Mã và tiền tệ là bắt buộc.",

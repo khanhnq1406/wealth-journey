@@ -169,6 +169,7 @@ func HandleError(c *gin.Context, err error) {
 	code := apperrors.GetErrorCode(err)
 	message := apperrors.GetErrorMessage(err)
 	statusCode := apperrors.GetStatusCode(err)
+	params := apperrors.GetErrorParams(err)
 
 	switch statusCode {
 	case http.StatusBadRequest:
@@ -180,7 +181,12 @@ func HandleError(c *gin.Context, err error) {
 	case http.StatusNotFound:
 		NotFoundWithCode(c, code, message)
 	case http.StatusConflict:
-		ConflictWithCode(c, code, message)
+		c.JSON(http.StatusConflict, types.NewErrorResponse(types.APIError{
+			Code:       code,
+			Message:    message,
+			Params:     params,
+			StatusCode: http.StatusConflict,
+		}))
 	case http.StatusTooManyRequests:
 		c.JSON(http.StatusTooManyRequests, types.NewErrorResponse(types.APIError{
 			Code:       code,
