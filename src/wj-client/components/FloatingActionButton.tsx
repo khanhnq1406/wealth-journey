@@ -13,7 +13,7 @@ interface FABAction {
 
 interface FABProps {
   actions: FABAction[];
-  introContent?: { text: string; contactInfo: string };
+  introContent?: { title: string; text: string; contactInfo: string };
   autoOpen?: boolean;
 }
 
@@ -75,11 +75,19 @@ export function FloatingActionButton({
         >
           <div
             className="bg-v2-maroon-800 border-2 border-v2-gold-primary rounded-2xl overflow-hidden"
-            style={{ boxShadow: "0 0 20px rgba(212, 175, 55, 0.3), 0 8px 32px rgba(0, 0, 0, 0.4)" }}
+            style={{
+              boxShadow:
+                "0 0 20px rgba(212, 175, 55, 0.3), 0 8px 32px rgba(0, 0, 0, 0.4)",
+            }}
           >
             {/* Intro section */}
             {isOpen && introContent && (
               <div className="px-5 pt-4 pb-3">
+                {introContent.title && (
+                  <h3 className="text-v2-gold-primary font-bold text-base mb-2">
+                    {introContent.title}
+                  </h3>
+                )}
                 <p className="text-v2-gold-accent text-sm leading-relaxed">
                   {introContent.text}
                 </p>
@@ -93,29 +101,27 @@ export function FloatingActionButton({
 
             {/* Action buttons */}
             {isOpen && (
-              <div className="flex flex-col gap-0">
+              <div className="flex flex-col gap-2 px-4 pb-4 pt-2">
                 {actions.map((action, index) => (
                   <button
                     key={index}
                     onClick={(event) => handleActionClick(event, action)}
                     className={cn(
-                      "flex items-center gap-3 w-full text-left",
-                      "px-5 py-3 min-h-[52px]",
-                      "hover:bg-white/5 active:scale-[0.98]",
+                      "flex items-center justify-center gap-2 w-full",
+                      "bg-v2-gold-primary rounded-lg",
+                      "px-4 py-3 min-h-[44px]",
+                      "hover:bg-v2-gold-accent active:scale-[0.98]",
                       "transition-all duration-200",
-                      introContent || index > 0
-                        ? "border-t border-v2-gold-primary/10"
-                        : "",
                     )}
                     style={{
                       transitionDelay: isOpen ? `${index * 50}ms` : "0ms",
                     }}
                     aria-label={action.label}
                   >
-                    <div className="flex-shrink-0 w-6 h-6 text-v2-red-primary">
+                    <div className="flex-shrink-0 w-5 h-5 text-v2-maroon-800">
                       {action.icon}
                     </div>
-                    <span className="font-medium text-v2-gold-accent whitespace-nowrap">
+                    <span className="font-semibold text-v2-maroon-800 whitespace-nowrap">
                       {action.label}
                     </span>
                   </button>
@@ -129,14 +135,20 @@ export function FloatingActionButton({
         <button
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
-            "w-14 h-14 bg-v2-red-primary text-white rounded-full shadow-floating",
+            "w-14 h-14 bg-v2-red-primary text-white rounded-full border-2 border-v2-gold-primary",
             "flex items-center justify-center",
             "hover:bg-v2-red-dark hover:shadow-xl",
             "active:scale-95",
             "transition-all duration-200",
             isOpen && "rotate-45",
           )}
-          style={{ minWidth: "56px", minHeight: "56px" }}
+          style={{
+            minWidth: "56px",
+            minHeight: "56px",
+            boxShadow: isOpen
+              ? "0 0 16px rgba(212, 175, 55, 0.4), 0 0 32px rgba(212, 175, 55, 0.15)"
+              : "0 0 12px rgba(220, 38, 38, 0.4)",
+          }}
           aria-label={isOpen ? "Close quick actions" : "Open quick actions"}
           aria-expanded={isOpen}
         >
@@ -144,11 +156,7 @@ export function FloatingActionButton({
             className="flex-shrink-0 h-8"
             style={{ minWidth: "24px", minHeight: "24px" }}
           >
-            {isOpen ? (
-              <XIcon size="xl" className="text-white" decorative />
-            ) : (
-              <PlusIcon size="xl" className="text-white" decorative />
-            )}
+            <PlusIcon size="xl" className="text-white" decorative />
           </div>
         </button>
       </div>

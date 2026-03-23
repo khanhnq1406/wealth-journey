@@ -106,4 +106,5 @@ GitNexus not available — manual blast radius review performed. Changes are iso
 
 | Date       | Fix                             | Severity | Commit        |
 | ---------- | ------------------------------- | -------- | ------------- |
-| 2026-03-23 | Unified intro card and action buttons into single card container with shared background; increased backdrop opacity (20%→60%), upgraded to full-opacity gold border-2, added gold glow box-shadow for visual prominence | Minor    | pending |
+| 2026-03-23 | Unified intro card and action buttons into single card container with shared background; increased backdrop opacity (20%→60%), upgraded to full-opacity gold border-2, added gold glow box-shadow for visual prominence | Minor    | 5c9476e |
+| 2026-03-23 | Added `fab.title` field across full stack: backend whitelist + seed, FAB component renders title as bold h3, layout wires it from settings, admin page gets Title input field. FAB button gets gold border + red/gold glow. Action buttons restyled as full-width gold CTA buttons with dark text | Minor    | pending |

@@ -19,7 +19,7 @@ var validSettingKeys = map[string]bool{
 	"seo.twitter_card": true, "seo.twitter_title": true, "seo.twitter_description": true, "seo.twitter_creator": true,
 	"seo.robots_index": true, "seo.robots_follow": true, "seo.canonical": true,
 	"footer.brand_name": true, "footer.tagline": true, "footer.contact_info": true,
-	"fab.intro_text": true, "fab.contact_info": true, "fab.enabled": true,
+	"fab.title": true, "fab.intro_text": true, "fab.contact_info": true, "fab.enabled": true,
 }
 
 var validTwitterCards = map[string]bool{

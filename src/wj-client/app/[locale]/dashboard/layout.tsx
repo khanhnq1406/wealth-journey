@@ -81,10 +81,11 @@ export default function DashboardLayout({
     const map: Record<string, string> = {};
     for (const s of settings) map[s.key] = s.value;
     if (map["fab.enabled"] === "false") return undefined;
+    const title = map["fab.title"];
     const text = map["fab.intro_text"];
     const contactInfo = map["fab.contact_info"];
-    if (!text && !contactInfo) return undefined;
-    return { text: text || "", contactInfo: contactInfo || "" };
+    if (!title && !text && !contactInfo) return undefined;
+    return { title: title || "", text: text || "", contactInfo: contactInfo || "" };
   }, [fabSettings.data]);
 
   store.subscribe(() => {
