@@ -21,7 +21,7 @@ export function LandingSilverPriceChart() {
       </div>
 
       {/* TradingView Chart — fully interactive, no login wall */}
-      <div className="px-2 pb-2 flex-1 min-h-[500px]">
+      <div className="px-2 pb-2 h-[400px] sm:h-auto sm:flex-1 sm:min-h-[500px]">
         <TradingViewChart
           symbol="TVC:SILVER"
           locale={locale}
