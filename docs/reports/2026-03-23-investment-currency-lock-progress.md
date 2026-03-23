@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-23-investment-currency-lock-plan.md
 - **Spec file:** docs/specs/2026-03-23-investment-currency-lock-spec.md
 - **Started:** 2026-03-23T00:00:00Z
-- **Last updated:** 2026-03-23T01:00:00Z
-- **Current state:** in_progress
-- **Current task:** 3
+- **Last updated:** 2026-03-23T02:00:00Z
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -16,7 +16,7 @@
 | --- | ------------------------------------------------------ | ----------- | ------ | ------- |
 | 0   | Backend — Currency mismatch validation in CreateInvestment | done | 3a4faae | Added currency check in duplicate detection block; 2 tests |
 | 1   | Frontend — Lock CurrencyBadge when symbol selected     | done     | 332d1cb | Added isSymbolSelected state to lock CurrencyBadge |
-| 3   | Update runtime flow diagram                            | pending     | —      | —       |
+| 3   | Update runtime flow diagram                            | done     | 2af0a81 | Added currency validation decision node to flow diagram |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
