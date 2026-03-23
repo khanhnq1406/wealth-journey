@@ -1,7 +1,9 @@
 "use client";
 
 import { useController, UseControllerProps } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import { FormSelect, FormSelectProps } from "./FormSelect";
+import { translateValidationMessage } from "@/lib/utils/error-translator";
 
 interface RHFFormSelectProps
   extends Omit<FormSelectProps, "error" | "value" | "onChange" | "name" | "defaultValue">,
@@ -16,6 +18,7 @@ interface RHFFormSelectProps
 /**
  * React Hook Form compatible wrapper for FormSelect
  * Uses useController to integrate with react-hook-form
+ * Translates Zod validation error messages via the 'validation' namespace
  */
 export const RHFFormSelect = ({
   control,
@@ -27,6 +30,7 @@ export const RHFFormSelect = ({
   parseAsNumber = false,
   ...selectProps
 }: RHFFormSelectProps) => {
+  const tValidation = useTranslations("validation");
   const {
     field: { onChange, value },
     fieldState: { error },
@@ -45,12 +49,14 @@ export const RHFFormSelect = ({
     onChange(parsedValue);
   };
 
+  const translatedError = translateValidationMessage(tValidation, error?.message);
+
   return (
     <FormSelect
       {...selectProps}
       value={String(value)}
       onChange={handleChange}
-      error={error?.message}
+      error={translatedError}
       disabled={disabled}
     />
   );

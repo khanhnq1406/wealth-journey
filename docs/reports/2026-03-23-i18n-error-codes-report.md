@@ -118,3 +118,4 @@ cd src/wj-client && npm run build
 | Date       | Fix                                                                                                  | Severity | Commit        |
 | ---------- | ---------------------------------------------------------------------------------------------------- | -------- | ------------- |
 | 2026-03-23 | Added i18n param interpolation for INVESTMENT_DUPLICATE — symbol & currency now translated in en/vi | Minor    | pending       |
+| 2026-03-23 | Translated ~70 Zod validation messages via domain-specific keys (DOMAIN_ACTION_REASON pattern) in en/vi. Updated RHF wrappers to translate at display time. | Major    | pending       |

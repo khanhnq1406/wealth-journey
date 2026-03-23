@@ -13,14 +13,14 @@ export const createWalletSchemaWithExisting = (existingWalletNames: string[]) =>
     walletName: nameSchema.refine(
       (name) => !existingWalletNames.includes(name),
       {
-        message: "A wallet with this name already exists",
+        message: "WALLET_NAME_EXISTS",
       },
     ),
     initialBalance: z.number(),
     // Accept string from select component, validate it's a valid wallet type string
     type: z.string().refine(
       (val) => val === String(WalletType.BASIC) || val === String(WalletType.INVESTMENT),
-      { message: "Invalid wallet type" }
+      { message: "WALLET_TYPE_INVALID" }
     ),
   });
 
@@ -45,7 +45,7 @@ export const updateWalletSchema = (
             existingName === name && existingName !== currentWalletName,
         ),
       {
-        message: "A wallet with this name already exists",
+        message: "WALLET_NAME_EXISTS",
       },
     ),
   });
@@ -62,15 +62,15 @@ export type UpdateWalletFormOutput = z.infer<
 export const adjustBalanceSchema = z.object({
   adjustmentAmount: z
     .number({
-      message: "Amount must be a number",
+      message: "WALLET_ADJUST_AMOUNT_NUMBER",
     })
-    .min(0.01, { message: "Adjustment amount must be at least 0.01" }),
+    .min(0.01, { message: "WALLET_ADJUST_AMOUNT_MIN" }),
   adjustmentType: z.enum(["add", "remove"], {
-    message: "Please select whether to add or remove funds",
+    message: "WALLET_ADJUST_TYPE",
   }),
   reason: z
     .string()
-    .max(200, "Reason must be less than 200 characters")
+    .max(200, "WALLET_ADJUST_REASON_MAX")
     .optional(),
 });
 

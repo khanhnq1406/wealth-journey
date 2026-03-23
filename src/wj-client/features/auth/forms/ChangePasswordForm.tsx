@@ -12,16 +12,16 @@ import { ButtonType } from "@/app/constants";
 import { useMutationChangePassword } from "@/utils/generated/hooks";
 import { mapChangePasswordError } from "@/features/auth/utils/error-mapper";
 import { Success } from "@/components/modals/Success";
-import { getTranslatedError } from "@/lib/utils/error-translator";
+import { getTranslatedError, translateValidationMessage } from "@/lib/utils/error-translator";
 
 const changePasswordSchema = z
   .object({
-    currentPassword: z.string().min(1, "Required"),
-    newPassword: z.string().min(10, "Min 10 characters").max(72, "Max 72 characters"),
-    confirmNewPassword: z.string().min(1, "Required"),
+    currentPassword: z.string().min(1, "AUTH_FIELD_REQUIRED"),
+    newPassword: z.string().min(10, "AUTH_PASSWORD_MIN").max(72, "AUTH_PASSWORD_MAX"),
+    confirmNewPassword: z.string().min(1, "AUTH_FIELD_REQUIRED"),
   })
   .refine((data) => data.newPassword === data.confirmNewPassword, {
-    message: "Passwords do not match",
+    message: "AUTH_PASSWORD_MATCH",
     path: ["confirmNewPassword"],
   });
 
@@ -34,6 +34,7 @@ interface ChangePasswordFormProps {
 export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
   const t = useTranslations("settings.security");
   const tErrors = useTranslations();
+  const tValidation = useTranslations("validation");
   const [serverError, setServerError] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -76,7 +77,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
         placeholder={t("currentPasswordPlaceholder")}
         autoComplete="current-password"
         required
-        error={errors.currentPassword?.message}
+        error={translateValidationMessage(tValidation, errors.currentPassword?.message)}
         {...register("currentPassword")}
       />
 
@@ -86,7 +87,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
           placeholder={t("newPasswordPlaceholder")}
           autoComplete="new-password"
           required
-          error={errors.newPassword?.message}
+          error={translateValidationMessage(tValidation, errors.newPassword?.message)}
           {...register("newPassword")}
         />
         <PasswordStrengthIndicator password={newPassword} />
@@ -97,7 +98,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
         placeholder={t("confirmNewPasswordPlaceholder")}
         autoComplete="new-password"
         required
-        error={errors.confirmNewPassword?.message}
+        error={translateValidationMessage(tValidation, errors.confirmNewPassword?.message)}
         {...register("confirmNewPassword")}
       />
 

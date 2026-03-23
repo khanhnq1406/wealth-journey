@@ -11,14 +11,14 @@ import { PasswordInput } from "@/features/auth/components/PasswordInput";
 import { Button } from "@/components/Button";
 import { ButtonType, LOCAL_STORAGE_TOKEN_NAME, routes } from "@/app/constants";
 import { useMutationLoginWithPassword } from "@/utils/generated/hooks";
-import { getTranslatedError } from "@/lib/utils/error-translator";
+import { getTranslatedError, translateValidationMessage } from "@/lib/utils/error-translator";
 import { store } from "@/features/auth/store/store";
 import { setAuth } from "@/features/auth/store/actions";
 import { updateAuthTokenCache } from "@/utils/api-client";
 
 const loginSchema = z.object({
-  identifier: z.string().min(1, "Required"),
-  password: z.string().min(1, "Required"),
+  identifier: z.string().min(1, "AUTH_FIELD_REQUIRED"),
+  password: z.string().min(1, "AUTH_FIELD_REQUIRED"),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -26,6 +26,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export function LoginPasswordForm() {
   const t = useTranslations("auth.login");
   const tErrors = useTranslations();
+  const tValidation = useTranslations("validation");
   const router = useRouter();
   const [serverError, setServerError] = useState("");
 
@@ -76,7 +77,7 @@ export function LoginPasswordForm() {
         placeholder={t("emailOrUsernamePlaceholder")}
         autoComplete="username"
         required
-        error={errors.identifier?.message}
+        error={translateValidationMessage(tValidation, errors.identifier?.message)}
         {...register("identifier")}
       />
 
@@ -85,7 +86,7 @@ export function LoginPasswordForm() {
         placeholder={t("passwordPlaceholder")}
         autoComplete="current-password"
         required
-        error={errors.password?.message}
+        error={translateValidationMessage(tValidation, errors.password?.message)}
         {...register("password")}
       />
 

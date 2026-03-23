@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useController, UseControllerProps } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import { Label } from "./Label";
 import { ErrorMessage } from "./ErrorMessage";
+import { translateValidationMessage } from "@/lib/utils/error-translator";
 import { cn } from "@/lib/utils/cn";
 import {
   formatNumberWithCommas,
@@ -72,6 +74,7 @@ export const FormNumberInput = ({
   onRecommendationSelect,
   ...props
 }: FormNumberInputProps) => {
+  const tValidation = useTranslations("validation");
   const {
     field: { onChange, onBlur, value, ref },
     fieldState: { error },
@@ -283,7 +286,7 @@ export const FormNumberInput = ({
           {helperText}
         </p>
       )}
-      {error && <ErrorMessage id={errorId}>{error.message}</ErrorMessage>}
+      {error && <ErrorMessage id={errorId}>{translateValidationMessage(tValidation, error.message)}</ErrorMessage>}
     </div>
   );
 };

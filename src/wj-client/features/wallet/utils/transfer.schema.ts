@@ -13,13 +13,13 @@ export const transferMoneySchemaWithBalances = (
       amount: amountSchema,
       fromWalletId: z
         .number()
-        .or(z.string().min(1, "Source wallet is required")),
-      toWalletId: z.number().or(z.string().min(1, "Source wallet is required")),
+        .or(z.string().min(1, "TRANSFER_SOURCE_REQUIRED")),
+      toWalletId: z.number().or(z.string().min(1, "TRANSFER_SOURCE_REQUIRED")),
       datetime: z.string().optional(),
       note: optionalNoteSchema,
     })
     .refine((data) => data.fromWalletId !== data.toWalletId, {
-      message: "Source and destination wallets must be different",
+      message: "TRANSFER_SAME_WALLET",
       path: ["toWalletId"],
     })
     .refine(
@@ -31,7 +31,7 @@ export const transferMoneySchemaWithBalances = (
         return fromWallet.balance >= data.amount;
       },
       {
-        message: "Insufficient balance in source wallet",
+        message: "TRANSFER_INSUFFICIENT",
         path: ["amount"],
       },
     );

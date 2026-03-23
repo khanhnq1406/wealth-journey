@@ -22,3 +22,20 @@ export function getTranslatedError(
 
   return error.message;
 }
+
+/**
+ * Translates a Zod validation error message key using the 'validation' namespace.
+ * Falls back to the raw message if no translation is found.
+ * Use this in form components that render errors directly (not via RHF wrappers).
+ */
+export function translateValidationMessage(
+  tValidation: (key: never) => string,
+  message?: string
+): string | undefined {
+  if (!message) return undefined;
+  try {
+    return tValidation(message as never);
+  } catch {
+    return message;
+  }
+}

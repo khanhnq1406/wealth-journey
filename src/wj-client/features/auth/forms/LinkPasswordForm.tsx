@@ -13,20 +13,20 @@ import { ButtonType } from "@/app/constants";
 import { useMutationLinkPassword } from "@/utils/generated/hooks";
 import { mapLinkPasswordError } from "@/features/auth/utils/error-mapper";
 import { Success } from "@/components/modals/Success";
-import { getTranslatedError } from "@/lib/utils/error-translator";
+import { getTranslatedError, translateValidationMessage } from "@/lib/utils/error-translator";
 
 const linkPasswordSchema = z
   .object({
     username: z
       .string()
-      .min(3, "Min 3 characters")
-      .max(30, "Max 30 characters")
-      .regex(/^[a-zA-Z0-9_]+$/, "Letters, numbers, and underscores only"),
-    password: z.string().min(10, "Min 10 characters").max(72, "Max 72 characters"),
-    confirmPassword: z.string().min(1, "Required"),
+      .min(3, "AUTH_USERNAME_MIN")
+      .max(30, "AUTH_USERNAME_MAX")
+      .regex(/^[a-zA-Z0-9_]+$/, "AUTH_USERNAME_FORMAT"),
+    password: z.string().min(10, "AUTH_PASSWORD_MIN").max(72, "AUTH_PASSWORD_MAX"),
+    confirmPassword: z.string().min(1, "AUTH_FIELD_REQUIRED"),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: "AUTH_PASSWORD_MATCH",
     path: ["confirmPassword"],
   });
 
@@ -39,6 +39,7 @@ interface LinkPasswordFormProps {
 export function LinkPasswordForm({ onSuccess }: LinkPasswordFormProps) {
   const t = useTranslations("settings.security");
   const tErrors = useTranslations();
+  const tValidation = useTranslations("validation");
   const [serverError, setServerError] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -81,7 +82,7 @@ export function LinkPasswordForm({ onSuccess }: LinkPasswordFormProps) {
         placeholder={t("usernamePlaceholder")}
         autoComplete="username"
         required
-        error={errors.username?.message}
+        error={translateValidationMessage(tValidation, errors.username?.message)}
         {...register("username")}
       />
 
@@ -91,7 +92,7 @@ export function LinkPasswordForm({ onSuccess }: LinkPasswordFormProps) {
           placeholder={t("passwordPlaceholder")}
           autoComplete="new-password"
           required
-          error={errors.password?.message}
+          error={translateValidationMessage(tValidation, errors.password?.message)}
           {...register("password")}
         />
         <PasswordStrengthIndicator password={password} />
@@ -102,7 +103,7 @@ export function LinkPasswordForm({ onSuccess }: LinkPasswordFormProps) {
         placeholder={t("confirmPasswordPlaceholder")}
         autoComplete="new-password"
         required
-        error={errors.confirmPassword?.message}
+        error={translateValidationMessage(tValidation, errors.confirmPassword?.message)}
         {...register("confirmPassword")}
       />
 
