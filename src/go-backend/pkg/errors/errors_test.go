@@ -12,14 +12,14 @@ func TestAuthenticationErrors(t *testing.T) {
 		err := NewInvalidCredentialsError()
 		assert.Equal(t, "invalid credentials", err.Error())
 		assert.Equal(t, 401, err.StatusCode())
-		assert.Equal(t, "INVALID_CREDENTIALS", err.Code())
+		assert.Equal(t, "AUTH_INVALID_CREDENTIALS", err.Code())
 	})
 
 	t.Run("TokenError returns safe message", func(t *testing.T) {
 		err := NewTokenError("verification")
 		assert.Equal(t, "token verification failed", err.Error())
 		assert.Equal(t, 401, err.StatusCode())
-		assert.Equal(t, "TOKEN_ERROR", err.Code())
+		assert.Equal(t, "AUTH_TOKEN_FAILED", err.Code())
 	})
 
 	t.Run("TokenError with cause hides internal details", func(t *testing.T) {
@@ -42,7 +42,7 @@ func TestAuthenticationErrors(t *testing.T) {
 		// Safe message only (with cause appended)
 		assert.Contains(t, err.Error(), "registration failed")
 		assert.Equal(t, 500, err.StatusCode())
-		assert.Equal(t, "REGISTRATION_FAILED", err.Code())
+		assert.Equal(t, "AUTH_REGISTRATION_FAILED", err.Code())
 	})
 
 	t.Run("LoginError returns safe message", func(t *testing.T) {
@@ -51,7 +51,7 @@ func TestAuthenticationErrors(t *testing.T) {
 
 		assert.Contains(t, err.Error(), "login failed")
 		assert.Equal(t, 500, err.StatusCode())
-		assert.Equal(t, "LOGIN_FAILED", err.Code())
+		assert.Equal(t, "AUTH_LOGIN_FAILED", err.Code())
 	})
 
 	t.Run("LogoutError returns safe message", func(t *testing.T) {
@@ -60,7 +60,7 @@ func TestAuthenticationErrors(t *testing.T) {
 
 		assert.Contains(t, err.Error(), "logout failed")
 		assert.Equal(t, 500, err.StatusCode())
-		assert.Equal(t, "LOGOUT_FAILED", err.Code())
+		assert.Equal(t, "AUTH_LOGOUT_FAILED", err.Code())
 	})
 }
 

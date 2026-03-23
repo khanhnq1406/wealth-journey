@@ -149,7 +149,7 @@ func (s *userService) CreateUser(ctx context.Context, email, name, picture strin
 		return nil, err
 	}
 	if exists {
-		return nil, apperrors.NewConflictError("user with this email already exists")
+		return nil, apperrors.NewConflictErrorWithCode(apperrors.Codes.UserEmailExists, "user with this email already exists")
 	}
 
 	// Create user model
@@ -207,7 +207,7 @@ func (s *userService) UpdateUser(ctx context.Context, userID int32, email, name,
 			return nil, err
 		}
 		if exists {
-			return nil, apperrors.NewConflictError("email already in use")
+			return nil, apperrors.NewConflictErrorWithCode(apperrors.Codes.UserEmailInUse, "email already in use")
 		}
 		user.Email = &email
 	}
@@ -271,7 +271,7 @@ func (s *userService) UpdateUserPreferences(ctx context.Context, userID int32, p
 
 	// Validate the new currency
 	if preferredCurrency != "" && !s.fxRateSvc.IsSupportedCurrency(preferredCurrency) {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("unsupported currency: %s", preferredCurrency))
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.UserCurrencyUnsupported, fmt.Sprintf("unsupported currency: %s", preferredCurrency))
 	}
 
 	// Get existing user
@@ -293,16 +293,16 @@ func (s *userService) UpdateUserPreferences(ctx context.Context, userID int32, p
 
 	// Check if a conversion is already in progress
 	if user.ConversionInProgress {
-		return nil, apperrors.NewConflictError("currency conversion already in progress")
+		return nil, apperrors.NewConflictErrorWithCode(apperrors.Codes.UserCurrencyConversionProgress, "currency conversion already in progress")
 	}
 
 	// Validate that we can get the FX rate for this pair
 	rate, err := s.fxRateSvc.GetRate(ctx, oldCurrency, preferredCurrency)
 	if err != nil {
-		return nil, apperrors.NewValidationError(fmt.Sprintf("cannot get exchange rate from %s to %s: %v", oldCurrency, preferredCurrency, err))
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.UserCurrencyConversionFailed, fmt.Sprintf("cannot get exchange rate from %s to %s: %v", oldCurrency, preferredCurrency, err))
 	}
 	if rate == 0 {
-		return nil, apperrors.NewValidationError("invalid exchange rate returned")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.UserExchangeRateInvalid, "invalid exchange rate returned")
 	}
 
 	// Update user's preferred currency and set conversion flag
@@ -642,10 +642,10 @@ func (s *userService) UpdatePreferences(ctx context.Context, userID int32, req *
 	// Validate language if provided
 	if language != "" {
 		if len(language) > 5 {
-			return nil, apperrors.NewValidationError("unsupported language; valid values: en, vi")
+			return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.UserLanguageUnsupported, "unsupported language; valid values: en, vi")
 		}
 		if !supportedLanguages[language] {
-			return nil, apperrors.NewValidationError("unsupported language; valid values: en, vi")
+			return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.UserLanguageUnsupported, "unsupported language; valid values: en, vi")
 		}
 	}
 

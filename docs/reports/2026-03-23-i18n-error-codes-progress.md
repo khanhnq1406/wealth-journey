@@ -8,7 +8,7 @@
 - **Started:** 2026-03-23T10:00:00Z
 - **Last updated:** 2026-03-23T10:00:00Z
 - **Current state:** in_progress
-- **Current task:** 1
+- **Current task:** 14
 
 ## Task Progress
 
@@ -18,16 +18,16 @@
 | 1   | Create Granular Error Code Registry           | done    | TBD    | Created codes.go with ~150 error codes + codes_test.go |
 | 2   | Add WithCode Constructors to errors.go       | done    | TBD    | Added 9 WithCode constructors + tests |
 | 13  | Add WithCode Variants to handler/response.go | done    | TBD    | Added 5 WithCode handler funcs + updated HandleError |
-| 3   | Migrate Wallet Domain Errors                 | pending | —      | —       |
-| 4   | Migrate Transaction Domain Errors            | pending | —      | —       |
-| 5   | Migrate Category Domain Errors               | pending | —      | —       |
-| 6   | Migrate Budget Domain Errors                 | pending | —      | —       |
-| 7   | Migrate Investment Domain Errors             | pending | —      | —       |
-| 8   | Migrate Import Domain Errors                 | pending | —      | —       |
-| 9   | Migrate Session/User/FX/Analysis Errors      | pending | —      | —       |
-| 10  | Migrate Auth Domain Errors                   | pending | —      | —       |
-| 11  | Migrate Community & Sentiment Errors         | pending | —      | —       |
-| 12  | Normalize Inconsistent gin.H{} Responses     | pending | —      | —       |
+| 3   | Migrate Wallet Domain Errors                 | done    | TBD    | 27 error calls migrated in wallet_v2.go + wallet_service.go |
+| 4   | Migrate Transaction Domain Errors            | done    | TBD    | 21 error calls migrated in transaction.go + transaction_service.go |
+| 5   | Migrate Category Domain Errors               | done    | TBD    | 8 error calls migrated in category.go + category_service.go |
+| 6   | Migrate Budget Domain Errors                 | done    | TBD    | 12 error calls migrated in budget.go + budget_service.go |
+| 7   | Migrate Investment Domain Errors             | done    | TBD    | 32 error calls migrated in investment.go + investment_service.go |
+| 8   | Migrate Import Domain Errors                 | done    | TBD    | 43 error calls migrated in import.go + import_service.go |
+| 9   | Migrate Session/User/FX/Analysis Errors      | done    | TBD    | 17 error calls migrated across 4 files |
+| 10  | Migrate Auth Domain Errors                   | done    | TBD    | 9 error calls migrated in auth.go + errors.go auth constructors |
+| 11  | Migrate Community & Sentiment Errors         | done    | TBD    | 14 error calls migrated in community + sentiment services |
+| 12  | Normalize Inconsistent gin.H{} Responses     | done    | TBD    | 28 gin.H{} responses replaced in 7 files + middleware |
 | 14  | Create Frontend Error Translation Utility    | pending | —      | —       |
 | 15  | Create Error Translation Files (en + vi)     | pending | —      | —       |
 | 16  | Integrate Error Translation in Forms         | pending | —      | —       |

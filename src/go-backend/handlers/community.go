@@ -871,25 +871,25 @@ func (h *CommunityHandler) StreamNotifications(c *gin.Context) {
 	// Validate token from query parameter (EventSource API limitation)
 	token := c.Query("token")
 	if token == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "missing token"})
+		handler.UnauthorizedWithCode(c, apperrors.Codes.AuthMissingToken, "missing token")
 		return
 	}
 
 	if h.authSrv == nil {
-		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "auth service unavailable"})
+		handler.HandleError(c, apperrors.NewServiceUnavailableErrorWithCode(apperrors.Codes.AuthServiceUnavailable, "auth service unavailable"))
 		return
 	}
 
 	// Parse and validate the JWT to extract the user ID
 	claims, err := h.authSrv.ParseToken(token)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		handler.UnauthorizedWithCode(c, apperrors.Codes.AuthInvalidToken, "invalid token")
 		return
 	}
 	userID := claims.UserID
 
 	if h.redisClient == nil {
-		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "streaming not available"})
+		handler.HandleError(c, apperrors.NewServiceUnavailableErrorWithCode(apperrors.Codes.StreamingUnavailable, "streaming not available"))
 		return
 	}
 

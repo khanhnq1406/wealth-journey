@@ -477,7 +477,7 @@ func (h *WalletHandlers) GetBalanceHistory(c *gin.Context) {
 	if walletIdStr := c.Query("walletId"); walletIdStr != "" {
 		walletId, err := strconv.ParseInt(walletIdStr, 10, 32)
 		if err != nil {
-			handler.BadRequest(c, apperrors.NewValidationError("Invalid walletId parameter"))
+			handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletIdInvalid, "Invalid walletId parameter"))
 			return
 		}
 		req.WalletId = int32(walletId)
@@ -487,7 +487,7 @@ func (h *WalletHandlers) GetBalanceHistory(c *gin.Context) {
 	if yearStr := c.Query("year"); yearStr != "" {
 		year, err := strconv.ParseInt(yearStr, 10, 32)
 		if err != nil {
-			handler.BadRequest(c, apperrors.NewValidationError("Invalid year parameter"))
+			handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.AnalysisYearInvalid, "Invalid year parameter"))
 			return
 		}
 		req.Year = int32(year)
@@ -497,11 +497,11 @@ func (h *WalletHandlers) GetBalanceHistory(c *gin.Context) {
 	if monthStr := c.Query("month"); monthStr != "" {
 		month, err := strconv.ParseInt(monthStr, 10, 32)
 		if err != nil {
-			handler.BadRequest(c, apperrors.NewValidationError("Invalid month parameter"))
+			handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.AnalysisMonthInvalid, "Invalid month parameter"))
 			return
 		}
 		if month < 0 || month > 12 {
-			handler.BadRequest(c, apperrors.NewValidationError("Month must be between 0 and 12 (0 for not specified)"))
+			handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.AnalysisMonthRange, "Month must be between 0 and 12 (0 for not specified)"))
 			return
 		}
 		req.Month = int32(month)
@@ -544,7 +544,7 @@ func (h *WalletHandlers) GetMonthlyDominance(c *gin.Context) {
 	if yearStr := c.Query("year"); yearStr != "" {
 		year, err := strconv.ParseInt(yearStr, 10, 32)
 		if err != nil {
-			handler.BadRequest(c, apperrors.NewValidationError("Invalid year parameter"))
+			handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.AnalysisYearInvalid, "Invalid year parameter"))
 			return
 		}
 		req.Year = int32(year)
@@ -565,7 +565,7 @@ func parseIDParam(c *gin.Context, param string) (int32, error) {
 	idStr := c.Param(param)
 	id, err := strconv.ParseInt(idStr, 10, 32)
 	if err != nil {
-		return 0, apperrors.NewValidationError("invalid " + param + " parameter")
+		return 0, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletIdInvalid, "invalid "+param+" parameter")
 	}
 	return int32(id), nil
 }

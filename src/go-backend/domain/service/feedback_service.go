@@ -55,7 +55,7 @@ func (s *feedbackService) SubmitFeedback(ctx context.Context, userID int32, req 
 		return nil, err
 	}
 	if count >= maxFeedbackPerHour {
-		return nil, apperrors.NewRateLimitError("Maximum 10 feedback submissions per hour. Please try again later.")
+		return nil, apperrors.NewRateLimitErrorWithCode(apperrors.Codes.FeedbackRateLimited, "Maximum 10 feedback submissions per hour. Please try again later.")
 	}
 
 	feedback := &models.Feedback{

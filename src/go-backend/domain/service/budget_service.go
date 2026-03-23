@@ -129,7 +129,7 @@ func (s *budgetService) CreateBudget(ctx context.Context, userID int32, req *bud
 		return nil, err
 	}
 	if user == nil {
-		return nil, apperrors.NewNotFoundError("user")
+		return nil, apperrors.NewNotFoundErrorWithCode(apperrors.Codes.UserNotFound, "user not found")
 	}
 
 	// Create budget model
@@ -173,7 +173,7 @@ func (s *budgetService) CreateBudget(ctx context.Context, userID int32, req *bud
 			}
 
 			if err := s.budgetItemRepo.Create(ctx, item); err != nil {
-				return nil, apperrors.NewInternalErrorWithCause("failed to create budget item", err)
+				return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.BudgetItemCreateFailed, "failed to create budget item", err)
 			}
 		}
 	}
@@ -268,7 +268,7 @@ func (s *budgetService) DeleteBudget(ctx context.Context, budgetID int32, userID
 
 	// Delete all budget items first
 	if err := s.budgetItemRepo.DeleteByBudgetID(ctx, budgetID); err != nil {
-		return nil, apperrors.NewInternalErrorWithCause("failed to delete budget items", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.BudgetItemsDeleteFailed, "failed to delete budget items", err)
 	}
 
 	// Delete budget
@@ -504,10 +504,10 @@ func (s *budgetService) DeleteBudgetItem(ctx context.Context, budgetID int32, it
 // validateBudgetName validates budget name constraints.
 func validateBudgetName(name string) error {
 	if name == "" {
-		return apperrors.NewValidationError("budget name is required")
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.BudgetNameRequired, "budget name is required")
 	}
 	if len(name) > 100 {
-		return apperrors.NewValidationError("budget name cannot exceed 100 characters")
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.BudgetNameTooLong, "budget name cannot exceed 100 characters")
 	}
 	return nil
 }
@@ -515,10 +515,10 @@ func validateBudgetName(name string) error {
 // validateBudgetItemName validates budget item name constraints.
 func validateBudgetItemName(name string) error {
 	if name == "" {
-		return apperrors.NewValidationError("budget item name is required")
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.BudgetItemNameRequired, "budget item name is required")
 	}
 	if len(name) > 100 {
-		return apperrors.NewValidationError("budget item name cannot exceed 100 characters")
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.BudgetItemNameTooLong, "budget item name cannot exceed 100 characters")
 	}
 	return nil
 }
@@ -527,7 +527,7 @@ func validateBudgetItemName(name string) error {
 // validateNonNegativeAmount validates that an amount is non-negative.
 func validateNonNegativeAmount(amount int64) error {
 	if amount < 0 {
-		return apperrors.NewValidationError("amount cannot be negative")
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.BudgetAmountNegative, "amount cannot be negative")
 	}
 	return nil
 }
@@ -538,7 +538,7 @@ func validateMoneyAmount(money *budgetv1.Money) error {
 		return nil // nil is treated as zero
 	}
 	if money.Amount < 0 {
-		return apperrors.NewValidationError("amount cannot be negative")
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.BudgetAmountNegative, "amount cannot be negative")
 	}
 	return nil
 }

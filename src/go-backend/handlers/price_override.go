@@ -8,6 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"wealthjourney/pkg/cache"
+	apperrors "wealthjourney/pkg/errors"
+	"wealthjourney/pkg/handler"
 )
 
 var validCategories = map[string]bool{
@@ -36,37 +38,37 @@ type setPriceOverrideRequest struct {
 func (h *PriceOverrideHandler) SetPriceOverride(c *gin.Context) {
 	var req setPriceOverrideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid request: " + err.Error()})
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.PriceOverrideRequestInvalid, "Invalid request body"))
 		return
 	}
 
 	// Validate category
 	if !validCategories[req.Category] {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid category. Must be one of: gold, silver, currency, stock"})
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.PriceOverrideCategoryInvalid, "Invalid category. Must be one of: gold, silver, currency, stock"))
 		return
 	}
 
 	// Validate typeCode length
 	if len(req.TypeCode) > 50 {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "TypeCode must be 50 characters or less"})
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.PriceOverrideTypeCodeTooLong, "TypeCode must be 50 characters or less"))
 		return
 	}
 
 	// Validate currency format
 	if !currencyRegex.MatchString(req.Currency) {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Currency must be a valid 3-letter ISO 4217 code"})
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.PriceOverrideCurrencyInvalid, "Currency must be a valid 3-letter ISO 4217 code"))
 		return
 	}
 
 	// Validate buy/sell positive
 	if req.Buy <= 0 || req.Sell <= 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Buy and sell must be positive values"})
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.PriceOverridePricePositive, "Buy and sell must be positive values"))
 		return
 	}
 
 	// Validate name length
 	if len(req.Name) > 100 {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Name must be 100 characters or less"})
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.PriceOverrideNameTooLong, "Name must be 100 characters or less"))
 		return
 	}
 
@@ -84,7 +86,7 @@ func (h *PriceOverrideHandler) SetPriceOverride(c *gin.Context) {
 	}
 
 	if err := h.cache.Set(c.Request.Context(), override); err != nil {
-		c.JSON(http.StatusServiceUnavailable, gin.H{"success": false, "message": "Failed to save price override"})
+		handler.InternalErrorWithCode(c, apperrors.Codes.PriceOverrideSaveFailed, "Failed to save price override")
 		return
 	}
 
@@ -104,7 +106,7 @@ func (h *PriceOverrideHandler) ListPriceOverrides(c *gin.Context) {
 
 	if category != "" {
 		if !validCategories[category] {
-			c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid category filter"})
+			handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.PriceOverrideFilterInvalid, "Invalid category filter"))
 			return
 		}
 		overrides, err = h.cache.GetAllByCategory(ctx, category)
@@ -113,7 +115,7 @@ func (h *PriceOverrideHandler) ListPriceOverrides(c *gin.Context) {
 	}
 
 	if err != nil {
-		c.JSON(http.StatusServiceUnavailable, gin.H{"success": false, "message": "Failed to list price overrides"})
+		handler.InternalErrorWithCode(c, apperrors.Codes.PriceOverrideListFailed, "Failed to list price overrides")
 		return
 	}
 
@@ -136,12 +138,12 @@ type deletePriceOverrideRequest struct {
 func (h *PriceOverrideHandler) DeletePriceOverride(c *gin.Context) {
 	var req deletePriceOverrideRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "Invalid request: " + err.Error()})
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.PriceOverrideRequestInvalid, "Invalid request body"))
 		return
 	}
 
 	if err := h.cache.Delete(c.Request.Context(), req.Category, req.TypeCode, req.Currency); err != nil {
-		c.JSON(http.StatusServiceUnavailable, gin.H{"success": false, "message": "Failed to delete price override"})
+		handler.InternalErrorWithCode(c, apperrors.Codes.PriceOverrideDeleteFailed, "Failed to delete price override")
 		return
 	}
 

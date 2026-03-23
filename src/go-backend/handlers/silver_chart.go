@@ -13,6 +13,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 
+	apperrors "wealthjourney/pkg/errors"
+	"wealthjourney/pkg/handler"
 	"wealthjourney/pkg/yahoo"
 )
 
@@ -57,19 +59,19 @@ func (h *SilverChartHandler) GetSilverChart(c *gin.Context) {
 
 	// Allowlist validation
 	if !validSilverMarkets[market] {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "invalid market parameter"})
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ChartMarketInvalid, "invalid market parameter"))
 		return
 	}
 
 	days, err := strconv.Atoi(daysStr)
 	if err != nil || !validSilverDays[days] {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "invalid days parameter"})
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ChartDaysInvalid, "invalid days parameter"))
 		return
 	}
 
 	// type param only relevant for domestic
 	if market == "domestic" && !validSilverTypes[silverType] {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "invalid type parameter"})
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ChartTypeInvalid, "invalid type parameter"))
 		return
 	}
 	if market == "global" {
@@ -104,10 +106,7 @@ func (h *SilverChartHandler) GetSilverChart(c *gin.Context) {
 				return
 			}
 		}
-		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"success": false,
-			"message": "Failed to fetch silver chart data",
-		})
+		handler.HandleError(c, apperrors.NewServiceUnavailableErrorWithCode(apperrors.Codes.InternalError, "Failed to fetch silver chart data"))
 		return
 	}
 

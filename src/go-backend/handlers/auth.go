@@ -78,7 +78,7 @@ func (h *AuthHandlers) Logout(c *gin.Context) {
 			Token string `json:"token"`
 		}
 		if err := c.ShouldBindJSON(&req); err != nil {
-			handler.HandleError(c, apperrors.NewValidationError("invalid request body"))
+			handler.HandleError(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.RequestBodyInvalid, "invalid request body"))
 			return
 		}
 		token = req.Token
@@ -118,7 +118,7 @@ func (h *AuthHandlers) VerifyAuth(c *gin.Context) {
 	}
 
 	if !ok {
-		handler.Unauthorized(c, "No token provided")
+		handler.UnauthorizedWithCode(c, apperrors.Codes.AuthNoToken, "No token provided")
 		return
 	}
 
@@ -216,7 +216,7 @@ func (h *AuthHandlers) ChangePassword(c *gin.Context) {
 	}
 	claims, err := h.authSrv.ParseToken(token)
 	if err != nil {
-		handler.HandleError(c, apperrors.NewUnauthorizedError("invalid token"))
+		handler.HandleError(c, apperrors.NewUnauthorizedErrorWithCode(apperrors.Codes.AuthInvalidToken, "invalid token"))
 		return
 	}
 

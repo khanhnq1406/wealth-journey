@@ -220,21 +220,21 @@ func BindAndValidate(c *gin.Context, obj interface{}) error {
 		// Use protojson for protobuf messages (respects json_name)
 		body, err := io.ReadAll(c.Request.Body)
 		if err != nil {
-			return apperrors.NewValidationErrorWithCause("failed to read request body", err)
+			return apperrors.NewValidationErrorWithCode(apperrors.Codes.RequestBodyReadFailed, "failed to read request body")
 		}
 		opts := protojson.UnmarshalOptions{
 			AllowPartial:   false,
 			DiscardUnknown: false,
 		}
 		if err := opts.Unmarshal(body, pm); err != nil {
-			return apperrors.NewValidationErrorWithCause("invalid request body format", err)
+			return apperrors.NewValidationErrorWithCode(apperrors.Codes.RequestBodyFormatInvalid, "invalid request body format")
 		}
 		return nil
 	}
 
 	// For non-protobuf objects, use standard JSON binding
 	if err := c.ShouldBindJSON(obj); err != nil {
-		return apperrors.NewValidationErrorWithCause("invalid request body", err)
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.RequestBodyInvalid, "invalid request body")
 	}
 	return nil
 }

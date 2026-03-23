@@ -244,7 +244,7 @@ type InvalidCredentialsError struct {
 // NewInvalidCredentialsError creates an error for authentication failures.
 func NewInvalidCredentialsError() InvalidCredentialsError {
 	return InvalidCredentialsError{
-		BaseError: NewError("INVALID_CREDENTIALS", "invalid credentials", http.StatusUnauthorized),
+		BaseError: NewError(Codes.AuthInvalidCredentials, "invalid credentials", http.StatusUnauthorized),
 	}
 }
 
@@ -257,14 +257,14 @@ type TokenError struct {
 // operation: "verification", "generation", "extraction", etc.
 func NewTokenError(operation string) TokenError {
 	return TokenError{
-		BaseError: NewError("TOKEN_ERROR", fmt.Sprintf("token %s failed", operation), http.StatusUnauthorized),
+		BaseError: NewError(Codes.AuthTokenFailed, fmt.Sprintf("token %s failed", operation), http.StatusUnauthorized),
 	}
 }
 
 // NewTokenErrorWithCause wraps an underlying token error with a safe message.
 func NewTokenErrorWithCause(operation string, cause error) TokenError {
 	return TokenError{
-		BaseError: WrapError("TOKEN_ERROR", fmt.Sprintf("token %s failed", operation), http.StatusUnauthorized, cause),
+		BaseError: WrapError(Codes.AuthTokenFailed, fmt.Sprintf("token %s failed", operation), http.StatusUnauthorized, cause),
 	}
 }
 
@@ -277,7 +277,7 @@ type RegistrationError struct {
 // The cause is logged server-side but not exposed to client.
 func NewRegistrationErrorWithCause(cause error) RegistrationError {
 	return RegistrationError{
-		BaseError: WrapError("REGISTRATION_FAILED", "registration failed", http.StatusInternalServerError, cause),
+		BaseError: WrapError(Codes.AuthRegistrationFailed, "registration failed", http.StatusInternalServerError, cause),
 	}
 }
 
@@ -289,7 +289,7 @@ type LoginError struct {
 // NewLoginErrorWithCause creates a safe error for login failures.
 func NewLoginErrorWithCause(cause error) LoginError {
 	return LoginError{
-		BaseError: WrapError("LOGIN_FAILED", "login failed", http.StatusInternalServerError, cause),
+		BaseError: WrapError(Codes.AuthLoginFailed, "login failed", http.StatusInternalServerError, cause),
 	}
 }
 
@@ -301,7 +301,7 @@ type LogoutError struct {
 // NewLogoutErrorWithCause creates a safe error for logout failures.
 func NewLogoutErrorWithCause(cause error) LogoutError {
 	return LogoutError{
-		BaseError: WrapError("LOGOUT_FAILED", "logout failed", http.StatusInternalServerError, cause),
+		BaseError: WrapError(Codes.AuthLogoutFailed, "logout failed", http.StatusInternalServerError, cause),
 	}
 }
 

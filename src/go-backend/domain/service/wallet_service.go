@@ -74,7 +74,7 @@ func (s *walletService) CreateWallet(ctx context.Context, userID int32, req *v1.
 		return nil, err
 	}
 	if user == nil {
-		return nil, apperrors.NewNotFoundError("user")
+		return nil, apperrors.NewNotFoundErrorWithCode(apperrors.Codes.UserNotFound, "user not found")
 	}
 
 	// Validate initial balance
@@ -84,7 +84,7 @@ func (s *walletService) CreateWallet(ctx context.Context, userID int32, req *v1.
 		initialBalance = req.InitialBalance.Amount
 		currency = req.InitialBalance.Currency
 		if initialBalance < 0 {
-			return nil, apperrors.NewValidationError("initial balance cannot be negative")
+			return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletInitialBalanceNegative, "initial balance cannot be negative")
 		}
 	}
 
@@ -108,7 +108,7 @@ func (s *walletService) CreateWallet(ctx context.Context, userID int32, req *v1.
 		if err != nil {
 			// Rollback wallet creation on failure
 			_ = s.walletRepo.Delete(ctx, wallet.ID)
-			return nil, apperrors.NewInternalErrorWithCause("failed to get initial balance category", err)
+			return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.WalletCreateInitialTxFailed, "failed to get initial balance category", err)
 		}
 
 		// Create initial balance transaction
@@ -123,7 +123,7 @@ func (s *walletService) CreateWallet(ctx context.Context, userID int32, req *v1.
 		if err := s.txRepo.Create(ctx, initialBalanceTx); err != nil {
 			// Rollback wallet creation on failure
 			_ = s.walletRepo.Delete(ctx, wallet.ID)
-			return nil, apperrors.NewInternalErrorWithCause("failed to create initial balance transaction", err)
+			return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.WalletCreateInitialTxFailed, "failed to create initial balance transaction", err)
 		}
 
 		// Update wallet balance to reflect the initial balance
@@ -132,7 +132,7 @@ func (s *walletService) CreateWallet(ctx context.Context, userID int32, req *v1.
 			// Rollback: delete transaction and wallet
 			_ = s.txRepo.Delete(ctx, initialBalanceTx.ID)
 			_ = s.walletRepo.Delete(ctx, wallet.ID)
-			return nil, apperrors.NewInternalErrorWithCause("failed to update wallet balance", err)
+			return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.WalletBalanceUpdateFailed, "failed to update wallet balance", err)
 		}
 
 		wallet = updatedWallet
@@ -296,7 +296,7 @@ func (s *walletService) DeleteWallet(ctx context.Context, walletID int32, userID
 	// Get transaction count for response
 	txCount, err := s.txRepo.CountByWalletID(ctx, walletID)
 	if err != nil {
-		return nil, apperrors.NewInternalErrorWithCause("failed to count transactions", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.InternalError, "failed to count transactions", err)
 	}
 
 	// Handle based on deletion option
@@ -319,7 +319,7 @@ func (s *walletService) DeleteWallet(ctx context.Context, walletID int32, userID
 	case v1.WalletDeletionOption_WALLET_DELETION_OPTION_TRANSFER:
 		// Transfer transactions to another wallet
 		if req.TargetWalletId == 0 {
-			return nil, apperrors.NewValidationError("target wallet required for transfer option")
+			return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletDeleteTargetRequired, "target wallet required for transfer option")
 		}
 
 		// Validate target wallet
@@ -330,14 +330,14 @@ func (s *walletService) DeleteWallet(ctx context.Context, walletID int32, userID
 
 		// Check currency match
 		if targetWallet.Currency != wallet.Currency {
-			return nil, apperrors.NewValidationError("target wallet must have same currency")
+			return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletDeleteCurrencyMismatch, "target wallet must have same currency")
 		}
 
 		// Get the sum of transaction amounts from source wallet before transfer
 		// Since transactions are signed (+income, -expense), this gives us the net balance change
 		txSum, err := s.txRepo.GetSumAmounts(ctx, walletID)
 		if err != nil {
-			return nil, apperrors.NewInternalErrorWithCause("failed to calculate transaction sum", err)
+			return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.InternalError, "failed to calculate transaction sum", err)
 		}
 
 		// Transfer all transactions
@@ -352,7 +352,7 @@ func (s *walletService) DeleteWallet(ctx context.Context, walletID int32, userID
 			if err != nil {
 				// Rollback: reverse the transfer
 				_ = s.txRepo.TransferToWallet(ctx, req.TargetWalletId, walletID)
-				return nil, apperrors.NewInternalErrorWithCause("failed to update target wallet balance", err)
+				return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.WalletBalanceUpdateFailed, "failed to update target wallet balance", err)
 			}
 		}
 
@@ -387,7 +387,7 @@ func (s *walletService) DeleteWallet(ctx context.Context, walletID int32, userID
 		}, nil
 
 	default:
-		return nil, apperrors.NewValidationError("invalid deletion option")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletDeleteOptionInvalid, "invalid deletion option")
 	}
 }
 
@@ -408,10 +408,10 @@ func (s *walletService) AddFunds(ctx context.Context, walletID int32, userID int
 
 	// Validate amount
 	if req.Amount == nil || req.Amount.Amount <= 0 {
-		return nil, apperrors.NewValidationError("amount must be positive")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletAmountPositive, "amount must be positive")
 	}
 	if req.Amount.Currency != wallet.Currency {
-		return nil, apperrors.NewValidationError("currency mismatch")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletCurrencyMismatch, "currency mismatch")
 	}
 
 	// Update balance
@@ -457,15 +457,15 @@ func (s *walletService) WithdrawFunds(ctx context.Context, walletID int32, userI
 
 	// Validate amount
 	if req.Amount == nil || req.Amount.Amount <= 0 {
-		return nil, apperrors.NewValidationError("amount must be positive")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletAmountPositive, "amount must be positive")
 	}
 	if req.Amount.Currency != wallet.Currency {
-		return nil, apperrors.NewValidationError("currency mismatch")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletCurrencyMismatch, "currency mismatch")
 	}
 
 	// Check sufficient balance
 	if wallet.Balance < req.Amount.Amount {
-		return nil, apperrors.NewValidationError("Insufficient balance")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletInsufficientBalance, "Insufficient balance")
 	}
 
 	// Update balance (negative delta for withdrawal)
@@ -501,7 +501,7 @@ func (s *walletService) TransferFunds(ctx context.Context, userID int32, req *v1
 		return nil, err
 	}
 	if req.FromWalletId == req.ToWalletId {
-		return nil, apperrors.NewValidationError("source and destination wallets cannot be the same")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletTransferSame, "source and destination wallets cannot be the same")
 	}
 
 	// Verify both wallets exist and belong to user
@@ -517,30 +517,30 @@ func (s *walletService) TransferFunds(ctx context.Context, userID int32, req *v1
 
 	// Validate amount
 	if req.Amount == nil || req.Amount.Amount <= 0 {
-		return nil, apperrors.NewValidationError("amount must be positive")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletAmountPositive, "amount must be positive")
 	}
 	if req.Amount.Currency != fromWallet.Currency {
-		return nil, apperrors.NewValidationError("currency mismatch with source wallet")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletCurrencyMismatch, "currency mismatch with source wallet")
 	}
 	if toWallet.Currency != fromWallet.Currency {
-		return nil, apperrors.NewValidationError("wallets must have the same currency")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletCurrencyMismatch, "wallets must have the same currency")
 	}
 
 	// Check sufficient balance
 	if fromWallet.Balance < req.Amount.Amount {
-		return nil, apperrors.NewValidationError("Insufficient balance")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletInsufficientBalance, "Insufficient balance")
 	}
 
 	// Find or create "Outgoing Transfer" category (expense)
 	outgoingCategory, err := s.categoryRepo.GetByNameAndType(ctx, userID, "Outgoing Transfer", v1.CategoryType_CATEGORY_TYPE_EXPENSE)
 	if err != nil {
-		return nil, apperrors.NewInternalErrorWithCause("failed to get outgoing transfer category", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.WalletTransferCategoryFailed, "failed to get outgoing transfer category", err)
 	}
 
 	// Find or create "Incoming Transfer" category (income)
 	incomingCategory, err := s.categoryRepo.GetByNameAndType(ctx, userID, "Incoming Transfer", v1.CategoryType_CATEGORY_TYPE_INCOME)
 	if err != nil {
-		return nil, apperrors.NewInternalErrorWithCause("failed to get incoming transfer category", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.WalletTransferCategoryFailed, "failed to get incoming transfer category", err)
 	}
 
 	// Create outgoing transaction (expense) for source wallet - negative amount
@@ -563,13 +563,13 @@ func (s *walletService) TransferFunds(ctx context.Context, userID int32, req *v1
 
 	// Create both transactions
 	if err := s.txRepo.Create(ctx, outgoingTx); err != nil {
-		return nil, apperrors.NewInternalErrorWithCause("failed to create outgoing transaction", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.WalletTransferTxFailed, "failed to create outgoing transaction", err)
 	}
 
 	if err := s.txRepo.Create(ctx, incomingTx); err != nil {
 		// Attempt to rollback by deleting the outgoing transaction
 		_ = s.txRepo.Delete(ctx, outgoingTx.ID)
-		return nil, apperrors.NewInternalErrorWithCause("failed to create incoming transaction", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.WalletTransferTxFailed, "failed to create incoming transaction", err)
 	}
 
 	// Withdraw from source
@@ -623,15 +623,15 @@ func (s *walletService) AdjustBalance(ctx context.Context, walletID int32, userI
 
 	// Validate amount
 	if req.Amount == nil || req.Amount.Amount <= 0 {
-		return nil, apperrors.NewValidationError("adjustment amount must be positive")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletAdjustAmountPositive, "adjustment amount must be positive")
 	}
 	if req.Amount.Currency != wallet.Currency {
-		return nil, apperrors.NewValidationError("currency mismatch")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletCurrencyMismatch, "currency mismatch")
 	}
 
 	// Validate adjustment type
 	if req.AdjustmentType == v1.AdjustmentType_ADJUSTMENT_TYPE_UNSPECIFIED {
-		return nil, apperrors.NewValidationError("adjustment type must be specified")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletAdjustTypeRequired, "adjustment type must be specified")
 	}
 
 	// Determine if this is an add (income) or remove (expense) operation
@@ -639,13 +639,13 @@ func (s *walletService) AdjustBalance(ctx context.Context, walletID int32, userI
 
 	// Check sufficient balance for remove operations
 	if !isAddOperation && wallet.Balance < req.Amount.Amount {
-		return nil, apperrors.NewValidationError("Insufficient balance for this adjustment")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.WalletAdjustInsufficient, "Insufficient balance for this adjustment")
 	}
 
 	// Get or create balance adjustment category using CategoryService
 	category, err := s.categoryService.GetOrCreateBalanceAdjustmentCategory(ctx, userID, isAddOperation)
 	if err != nil {
-		return nil, apperrors.NewInternalErrorWithCause("failed to get balance adjustment category", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.WalletAdjustCategoryFailed, "failed to get balance adjustment category", err)
 	}
 
 	// Calculate the signed amount based on adjustment type
@@ -665,7 +665,7 @@ func (s *walletService) AdjustBalance(ctx context.Context, walletID int32, userI
 	}
 
 	if err := s.txRepo.Create(ctx, adjustmentTx); err != nil {
-		return nil, apperrors.NewInternalErrorWithCause("failed to create adjustment transaction", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.WalletAdjustTxFailed, "failed to create adjustment transaction", err)
 	}
 
 	// Update wallet balance using signed amount
@@ -705,7 +705,7 @@ func (s *walletService) GetTotalBalance(ctx context.Context, userID int32) (*v1.
 	// Get user to determine preferred currency
 	user, err := s.userRepo.GetByID(ctx, userID)
 	if err != nil || user == nil {
-		return nil, apperrors.NewNotFoundError("user")
+		return nil, apperrors.NewNotFoundErrorWithCode(apperrors.Codes.UserNotFound, "user not found")
 	}
 
 	// Get all active wallets for the user
@@ -890,7 +890,7 @@ func (s *walletService) GetBalanceHistory(ctx context.Context, userID int32, req
 		Order:   "asc",
 	})
 	if err != nil {
-		return nil, apperrors.NewInternalErrorWithCause("failed to fetch transactions", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.InternalError, "failed to fetch transactions", err)
 	}
 
 	// Get initial balance before the period
@@ -1012,7 +1012,7 @@ func (s *walletService) GetMonthlyDominance(ctx context.Context, userID int32, r
 		Limit: 1000,
 	})
 	if err != nil {
-		return nil, apperrors.NewInternalErrorWithCause("failed to fetch wallets", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.InternalError, "failed to fetch wallets", err)
 	}
 
 	if len(wallets) == 0 {
@@ -1047,7 +1047,7 @@ func (s *walletService) GetMonthlyDominance(ctx context.Context, userID int32, r
 		Order:   "asc",
 	})
 	if err != nil {
-		return nil, apperrors.NewInternalErrorWithCause("failed to fetch transactions", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.InternalError, "failed to fetch transactions", err)
 	}
 
 	// Calculate initial balance for each wallet before the period

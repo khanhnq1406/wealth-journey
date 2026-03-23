@@ -123,7 +123,7 @@ func (s *communityService) UpdatePost(ctx context.Context, userID int32, req *v1
 
 	// Authorization: only post owner can update
 	if post.UserID != userID {
-		return nil, apperrors.NewForbiddenError("you can only edit your own posts")
+		return nil, apperrors.NewForbiddenErrorWithCode(apperrors.Codes.CommunityEditOwnPostOnly, "you can only edit your own posts")
 	}
 
 	// Validate content
@@ -167,7 +167,7 @@ func (s *communityService) DeletePost(ctx context.Context, userID int32, postID 
 	}
 
 	if post.UserID != userID {
-		return apperrors.NewForbiddenError("you can only delete your own posts")
+		return apperrors.NewForbiddenErrorWithCode(apperrors.Codes.CommunityDeleteOwnPostOnly, "you can only delete your own posts")
 	}
 
 	if err := s.postRepo.SoftDelete(ctx, postID); err != nil {
@@ -368,7 +368,7 @@ func (s *communityService) LikePost(ctx context.Context, userID int32, postID in
 		return err
 	}
 	if exists {
-		return apperrors.NewConflictError("post already liked")
+		return apperrors.NewConflictErrorWithCode(apperrors.Codes.CommunityPostAlreadyLiked, "post already liked")
 	}
 
 	like := &models.PostLike{
@@ -478,7 +478,7 @@ func (s *communityService) DeleteComment(ctx context.Context, userID int32, comm
 	}
 
 	if comment.UserID != userID {
-		return apperrors.NewForbiddenError("you can only delete your own comments")
+		return apperrors.NewForbiddenErrorWithCode(apperrors.Codes.CommunityDeleteOwnCommentOnly, "you can only delete your own comments")
 	}
 
 	if err := s.commentRepo.SoftDelete(ctx, commentID); err != nil {
@@ -584,7 +584,7 @@ func (s *communityService) FollowUser(ctx context.Context, followerID int32, fol
 		return err
 	}
 	if exists {
-		return apperrors.NewConflictError("already following this user")
+		return apperrors.NewConflictErrorWithCode(apperrors.Codes.CommunityAlreadyFollowing, "already following this user")
 	}
 
 	follow := &models.UserFollow{
@@ -691,7 +691,7 @@ func (s *communityService) ReportContent(ctx context.Context, userID int32, req 
 		return err
 	}
 	if exists {
-		return apperrors.NewConflictError("you have already reported this content")
+		return apperrors.NewConflictErrorWithCode(apperrors.Codes.CommunityAlreadyReported, "you have already reported this content")
 	}
 
 	// Sanitize details
@@ -828,7 +828,7 @@ func (s *communityService) UpdateComment(ctx context.Context, userID int32, req 
 
 	// Authorization: only comment owner can edit
 	if comment.UserID != userID {
-		return nil, apperrors.NewForbiddenError("you can only edit your own comments")
+		return nil, apperrors.NewForbiddenErrorWithCode(apperrors.Codes.CommunityEditOwnCommentOnly, "you can only edit your own comments")
 	}
 
 	// Validate content

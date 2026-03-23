@@ -10,6 +10,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
+
+	apperrors "wealthjourney/pkg/errors"
+	"wealthjourney/pkg/handler"
 )
 
 // Allowlists for query parameter validation
@@ -53,16 +56,16 @@ func (h *GoldChartHandler) GetGoldChart(c *gin.Context) {
 
 	// Allowlist validation
 	if !validGoldMarkets[market] {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "invalid market parameter"})
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ChartMarketInvalid, "invalid market parameter"))
 		return
 	}
 	if !validGoldPeriods[period] {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "invalid period parameter"})
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ChartPeriodInvalid, "invalid period parameter"))
 		return
 	}
 	// goldCode only relevant for domestic; for global we fix it to ""
 	if market == "domestic" && !validGoldCodes[goldCode] {
-		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "invalid goldCode parameter"})
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.ChartGoldCodeInvalid, "invalid goldCode parameter"))
 		return
 	}
 	if market == "global" {
@@ -91,10 +94,7 @@ func (h *GoldChartHandler) GetGoldChart(c *gin.Context) {
 				return
 			}
 		}
-		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"success": false,
-			"message": "Failed to fetch gold chart data",
-		})
+		handler.HandleError(c, apperrors.NewServiceUnavailableErrorWithCode(apperrors.Codes.InternalError, "Failed to fetch gold chart data"))
 		return
 	}
 

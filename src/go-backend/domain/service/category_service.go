@@ -192,7 +192,7 @@ func (s *categoryService) GetOrCreateBalanceAdjustmentCategory(ctx context.Conte
 	}
 
 	if err := s.categoryRepo.Create(ctx, newCategory); err != nil {
-		return nil, apperrors.NewInternalErrorWithCause("failed to create balance adjustment category", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.InternalError, "failed to create balance adjustment category", err)
 	}
 
 	return newCategory, nil
@@ -217,7 +217,7 @@ func (s *categoryService) GetOrCreateInitialBalanceCategory(ctx context.Context,
 	}
 
 	if err := s.categoryRepo.Create(ctx, newCategory); err != nil {
-		return nil, apperrors.NewInternalErrorWithCause("failed to create initial balance category", err)
+		return nil, apperrors.NewInternalErrorWithCodeAndCause(apperrors.Codes.InternalError, "failed to create initial balance category", err)
 	}
 
 	return newCategory, nil
@@ -229,10 +229,10 @@ func (s *categoryService) GetOrCreateInitialBalanceCategory(ctx context.Context,
 func (s *categoryService) validateCategoryName(name string) error {
 	name = strings.TrimSpace(name)
 	if name == "" {
-		return apperrors.NewValidationError("category name is required")
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.CategoryNameRequired, "category name is required")
 	}
 	if len(name) > 100 {
-		return apperrors.NewValidationError("category name must be 100 characters or less")
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.CategoryNameTooLong, "category name must be 100 characters or less")
 	}
 	return nil
 }
@@ -243,7 +243,7 @@ func (s *categoryService) validateCategoryType(categoryType v1.CategoryType) err
 	case v1.CategoryType_CATEGORY_TYPE_INCOME, v1.CategoryType_CATEGORY_TYPE_EXPENSE:
 		return nil
 	default:
-		return apperrors.NewValidationError("invalid category type")
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.CategoryTypeInvalid, "invalid category type")
 	}
 }
 
