@@ -2,7 +2,8 @@ import { Metadata } from "next";
 import { JsonLd } from "@/components/seo/JsonLd";
 
 const FALLBACK_METADATA: Metadata = {
-  title: "Giá Vàng Hôm Nay | Cộng Đồng Vàng - Quản Lý Tài Chính Cá Nhân",
+  title:
+    "Giá Vàng Hôm Nay | congdongvang.com - Sân chơi giao lưu, trao đổi, kiến thức về thị trường đầu tư tài chính.",
   description:
     "Theo dõi giá vàng SJC, DOJI, giá bạc, ngoại tệ trực tiếp. Quản lý tài chính cá nhân, theo dõi danh mục đầu tư vàng, cổ phiếu, crypto miễn phí tại congdongvang.com",
   keywords: [
@@ -36,7 +37,8 @@ const FALLBACK_METADATA: Metadata = {
   ],
   authors: [{ name: "congdongvang.com" }],
   openGraph: {
-    title: "Giá Vàng Hôm Nay | Cộng Đồng Vàng - Quản Lý Tài Chính Cá Nhân",
+    title:
+      "Giá Vàng Hôm Nay | congdongvang.com - Sân chơi giao lưu, trao đổi, kiến thức về thị trường đầu tư tài chính.",
     description:
       "Theo dõi giá vàng SJC, DOJI, giá bạc, ngoại tệ trực tiếp. Quản lý tài chính cá nhân, theo dõi danh mục đầu tư vàng, cổ phiếu, crypto miễn phí tại congdongvang.com",
     type: "website",
@@ -47,13 +49,14 @@ const FALLBACK_METADATA: Metadata = {
         url: "/og-image.svg",
         width: 1200,
         height: 630,
-        alt: "Cộng Đồng Vàng - Giá vàng hôm nay và quản lý tài chính cá nhân",
+        alt: "congdongvang.com - Sân chơi giao lưu, trao đổi, kiến thức về thị trường đầu tư tài chính.",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Giá Vàng Hôm Nay | Cộng Đồng Vàng - Quản Lý Tài Chính Cá Nhân",
+    title:
+      "Giá Vàng Hôm Nay | congdongvang.com - Sân chơi giao lưu, trao đổi, kiến thức về thị trường đầu tư tài chính.",
     description:
       "Theo dõi giá vàng SJC, DOJI, giá bạc, ngoại tệ trực tiếp. Quản lý tài chính cá nhân, theo dõi danh mục đầu tư vàng, cổ phiếu, crypto miễn phí tại congdongvang.com",
     images: ["/og-image.svg"],
@@ -118,12 +121,19 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: settings["seo.title"] || FALLBACK_METADATA.title,
-    description: settings["seo.description"] || (FALLBACK_METADATA.description as string),
+    description:
+      settings["seo.description"] || (FALLBACK_METADATA.description as string),
     keywords: keywords.length > 0 ? keywords : FALLBACK_METADATA.keywords,
     authors: [{ name: "congdongvang.com" }],
     openGraph: {
-      title: settings["seo.og_title"] || settings["seo.title"] || (FALLBACK_METADATA.openGraph as any)?.title,
-      description: settings["seo.og_description"] || settings["seo.description"] || (FALLBACK_METADATA.openGraph as any)?.description,
+      title:
+        settings["seo.og_title"] ||
+        settings["seo.title"] ||
+        (FALLBACK_METADATA.openGraph as any)?.title,
+      description:
+        settings["seo.og_description"] ||
+        settings["seo.description"] ||
+        (FALLBACK_METADATA.openGraph as any)?.description,
       type: "website",
       url: settings["seo.og_url"] || "https://www.congdongvang.com",
       siteName: "congdongvang.com",
@@ -137,9 +147,17 @@ export async function generateMetadata(): Promise<Metadata> {
       ],
     },
     twitter: {
-      card: (settings["seo.twitter_card"] as "summary" | "summary_large_image") || "summary_large_image",
-      title: settings["seo.twitter_title"] || settings["seo.title"] || (FALLBACK_METADATA.twitter as any)?.title,
-      description: settings["seo.twitter_description"] || settings["seo.description"] || (FALLBACK_METADATA.twitter as any)?.description,
+      card:
+        (settings["seo.twitter_card"] as "summary" | "summary_large_image") ||
+        "summary_large_image",
+      title:
+        settings["seo.twitter_title"] ||
+        settings["seo.title"] ||
+        (FALLBACK_METADATA.twitter as any)?.title,
+      description:
+        settings["seo.twitter_description"] ||
+        settings["seo.description"] ||
+        (FALLBACK_METADATA.twitter as any)?.description,
       images: [settings["seo.og_image"] || "/og-image.svg"],
       creator: settings["seo.twitter_creator"] || "@congdongvang",
     },
@@ -155,7 +173,8 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     },
     alternates: {
-      canonical: settings["seo.canonical"] || "https://www.congdongvang.com/vi/landing",
+      canonical:
+        settings["seo.canonical"] || "https://www.congdongvang.com/vi/landing",
       languages: {
         vi: "https://www.congdongvang.com/vi/landing",
         en: "https://www.congdongvang.com/en/landing",
@@ -184,7 +203,7 @@ const landingSchemas: Record<string, unknown>[] = [
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "Cộng Đồng Vàng - Quản Lý Tài Chính Cá Nhân",
+    name: "Cộng Đồng Vàng - Sân chơi giao lưu, trao đổi, kiến thức về thị trường đầu tư tài chính",
     applicationCategory: "FinanceApplication",
     operatingSystem: "Web",
     url: "https://www.congdongvang.com",
