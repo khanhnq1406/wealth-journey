@@ -153,6 +153,24 @@ type ErrorCodes struct {
 	CommunityPostAlreadyLiked     string
 	CommunityAlreadyFollowing     string
 	CommunityAlreadyReported      string
+	CommunityParentCommentNotFound    string
+	CommunityParentCommentWrongPost   string
+	CommunityFollowSelf               string
+	CommunityReportTargetTypeInvalid  string
+	CommunityReportReasonInvalid      string
+	CommunityReportOwnContent         string
+	CommunityImagePurposeInvalid      string
+	CommunityImageInvalid             string
+	CommunityImageTooLarge            string
+	CommunityImageProcessFailed       string
+	CommunityShareOwnPost             string
+	CommunityPostNotFound             string
+	CommunityWebsiteInvalid           string
+	CommunityCommentIdInvalid         string
+	CommunityUserIdInvalid            string
+	CommunityFileRequired             string
+	CommunityFileReadFailed           string
+	CommunityRequestBodyInvalid       string
 
 	// Gold Sentiment Domain
 	SentimentDirectionInvalid  string
@@ -375,6 +393,24 @@ var Codes = ErrorCodes{
 	CommunityPostAlreadyLiked:     "COMMUNITY_POST_ALREADY_LIKED",
 	CommunityAlreadyFollowing:     "COMMUNITY_ALREADY_FOLLOWING",
 	CommunityAlreadyReported:      "COMMUNITY_ALREADY_REPORTED",
+	CommunityParentCommentNotFound:    "COMMUNITY_PARENT_COMMENT_NOT_FOUND",
+	CommunityParentCommentWrongPost:   "COMMUNITY_PARENT_COMMENT_WRONG_POST",
+	CommunityFollowSelf:               "COMMUNITY_FOLLOW_SELF",
+	CommunityReportTargetTypeInvalid:  "COMMUNITY_REPORT_TARGET_TYPE_INVALID",
+	CommunityReportReasonInvalid:      "COMMUNITY_REPORT_REASON_INVALID",
+	CommunityReportOwnContent:         "COMMUNITY_REPORT_OWN_CONTENT",
+	CommunityImagePurposeInvalid:      "COMMUNITY_IMAGE_PURPOSE_INVALID",
+	CommunityImageInvalid:             "COMMUNITY_IMAGE_INVALID",
+	CommunityImageTooLarge:            "COMMUNITY_IMAGE_TOO_LARGE",
+	CommunityImageProcessFailed:       "COMMUNITY_IMAGE_PROCESS_FAILED",
+	CommunityShareOwnPost:             "COMMUNITY_SHARE_OWN_POST",
+	CommunityPostNotFound:             "COMMUNITY_POST_NOT_FOUND",
+	CommunityWebsiteInvalid:           "COMMUNITY_WEBSITE_INVALID",
+	CommunityCommentIdInvalid:         "COMMUNITY_COMMENT_ID_INVALID",
+	CommunityUserIdInvalid:            "COMMUNITY_USER_ID_INVALID",
+	CommunityFileRequired:             "COMMUNITY_FILE_REQUIRED",
+	CommunityFileReadFailed:           "COMMUNITY_FILE_READ_FAILED",
+	CommunityRequestBodyInvalid:       "COMMUNITY_REQUEST_BODY_INVALID",
 
 	// Gold Sentiment Domain
 	SentimentDirectionInvalid:    "SENTIMENT_DIRECTION_INVALID",

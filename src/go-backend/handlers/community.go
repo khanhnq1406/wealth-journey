@@ -316,13 +316,13 @@ func (h *CommunityHandler) UpdateComment(c *gin.Context) {
 	commentIDStr := c.Param("comment_id")
 	commentID, err := strconv.ParseInt(commentIDStr, 10, 32)
 	if err != nil {
-		handler.HandleError(c, apperrors.NewValidationError("invalid comment ID"))
+		handler.HandleError(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityCommentIdInvalid, "invalid comment ID"))
 		return
 	}
 
 	var req v1.UpdateCommentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handler.HandleError(c, apperrors.NewValidationError(err.Error()))
+		handler.HandleError(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityRequestBodyInvalid, "invalid request body"))
 		return
 	}
 	req.CommentId = int32(commentID)
@@ -485,7 +485,7 @@ func (h *CommunityHandler) UploadImage(c *gin.Context) {
 
 	file, fileHeader, err := c.Request.FormFile("file")
 	if err != nil {
-		handler.HandleError(c, apperrors.NewValidationError("missing file field"))
+		handler.HandleError(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityFileRequired, "missing file field"))
 		return
 	}
 	defer func() { _ = file.Close() }()
@@ -493,7 +493,7 @@ func (h *CommunityHandler) UploadImage(c *gin.Context) {
 	// Read file bytes
 	fileData := make([]byte, fileHeader.Size)
 	if _, err := file.Read(fileData); err != nil {
-		handler.HandleError(c, apperrors.NewValidationError("failed to read file"))
+		handler.HandleError(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityFileReadFailed, "failed to read file"))
 		return
 	}
 
@@ -805,7 +805,7 @@ func (h *CommunityHandler) GetLikedPosts(c *gin.Context) {
 
 	targetUserID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
-		handler.HandleError(c, apperrors.NewValidationError("invalid user ID"))
+		handler.HandleError(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityUserIdInvalid, "invalid user ID"))
 		return
 	}
 
@@ -840,7 +840,7 @@ func (h *CommunityHandler) GetReplies(c *gin.Context) {
 	commentIDStr := c.Param("comment_id")
 	commentID, err := strconv.ParseInt(commentIDStr, 10, 32)
 	if err != nil {
-		handler.HandleError(c, apperrors.NewValidationError("invalid comment ID"))
+		handler.HandleError(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityCommentIdInvalid, "invalid comment ID"))
 		return
 	}
 

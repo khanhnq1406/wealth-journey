@@ -423,11 +423,11 @@ func (s *communityService) CreateComment(ctx context.Context, userID int32, req 
 	if req.ParentCommentId > 0 {
 		parentComment, err := s.commentRepo.GetByID(ctx, req.ParentCommentId)
 		if err != nil {
-			return nil, apperrors.NewValidationError("parent comment not found")
+			return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityParentCommentNotFound, "parent comment not found")
 		}
 		// Validate parent belongs to same post
 		if parentComment.PostID != req.PostId {
-			return nil, apperrors.NewValidationError("parent comment does not belong to this post")
+			return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityParentCommentWrongPost, "parent comment does not belong to this post")
 		}
 		// Flatten nesting: if parent is itself a reply, use its parent
 		actualParentID := parentComment.ID
@@ -570,7 +570,7 @@ func (s *communityService) GetReplies(ctx context.Context, viewerUserID int32, c
 
 func (s *communityService) FollowUser(ctx context.Context, followerID int32, followingID int32) error {
 	if followerID == followingID {
-		return apperrors.NewValidationError("you cannot follow yourself")
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityFollowSelf, "you cannot follow yourself")
 	}
 
 	// Check target user exists
@@ -658,12 +658,12 @@ func (s *communityService) ReportContent(ctx context.Context, userID int32, req 
 	// Validate target type
 	targetType := strings.ToLower(req.TargetType)
 	if targetType != "post" && targetType != "comment" {
-		return apperrors.NewValidationError("target type must be 'post' or 'comment'")
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityReportTargetTypeInvalid, "target type must be 'post' or 'comment'")
 	}
 
 	// Validate reason
 	if !AllowedReportReasons[req.Reason] {
-		return apperrors.NewValidationError("invalid report reason")
+		return apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityReportReasonInvalid, "invalid report reason")
 	}
 
 	// Check target exists and user is not reporting own content
@@ -673,7 +673,7 @@ func (s *communityService) ReportContent(ctx context.Context, userID int32, req 
 			return err
 		}
 		if post.UserID == userID {
-			return apperrors.NewValidationError("you cannot report your own content")
+			return apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityReportOwnContent, "you cannot report your own content")
 		}
 	} else {
 		comment, err := s.commentRepo.GetByID(ctx, req.TargetId)
@@ -681,7 +681,7 @@ func (s *communityService) ReportContent(ctx context.Context, userID int32, req 
 			return err
 		}
 		if comment.UserID == userID {
-			return apperrors.NewValidationError("you cannot report your own content")
+			return apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityReportOwnContent, "you cannot report your own content")
 		}
 	}
 
@@ -715,18 +715,18 @@ func (s *communityService) UploadImage(ctx context.Context, userID int32, fileDa
 	// Validate purpose whitelist
 	validPurposes := map[string]bool{"post": true, "avatar": true, "cover": true}
 	if !validPurposes[purpose] {
-		return "", apperrors.NewValidationError("invalid purpose: must be 'post', 'avatar', or 'cover'")
+		return "", apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityImagePurposeInvalid, "invalid purpose: must be 'post', 'avatar', or 'cover'")
 	}
 
 	// Validate magic bytes
 	mimeType, err := imaging.ValidateMagicBytes(fileData)
 	if err != nil {
-		return "", apperrors.NewValidationError("invalid image: " + err.Error())
+		return "", apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityImageInvalid, "invalid image")
 	}
 
 	// Validate size (5MB max)
 	if len(fileData) > 5*1024*1024 {
-		return "", apperrors.NewValidationError("image too large: maximum size is 5MB")
+		return "", apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityImageTooLarge, "image too large: maximum size is 5MB")
 	}
 
 	// Determine max width by purpose
@@ -739,7 +739,7 @@ func (s *communityService) UploadImage(ctx context.Context, userID int32, fileDa
 	// Resize and strip EXIF
 	processed, err := imaging.ResizeImage(fileData, mimeType, maxWidth)
 	if err != nil {
-		return "", apperrors.NewValidationError("failed to process image: " + err.Error())
+		return "", apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityImageProcessFailed, "failed to process image")
 	}
 
 	// Check storage provider is available
@@ -952,12 +952,12 @@ func (s *communityService) SharePost(ctx context.Context, userID int32, req *v1.
 	// Get original post
 	originalPost, err := s.postRepo.GetByID(ctx, req.PostId)
 	if err != nil || originalPost == nil {
-		return nil, apperrors.NewNotFoundError("post")
+		return nil, apperrors.NewNotFoundErrorWithCode(apperrors.Codes.CommunityPostNotFound, "post not found")
 	}
 
 	// Cannot share own post
 	if originalPost.UserID == userID {
-		return nil, apperrors.NewValidationError("cannot share your own post")
+		return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityShareOwnPost, "cannot share your own post")
 	}
 
 	// Resolve to root original (prevent recursive embedding)
@@ -1113,7 +1113,7 @@ func (s *communityService) MarkNotificationsRead(ctx context.Context, userID int
 func (s *communityService) SavePost(ctx context.Context, userID int32, postID int32) error {
 	// Validate post exists
 	if _, err := s.postRepo.GetByID(ctx, postID); err != nil {
-		return apperrors.NewNotFoundError("post")
+		return apperrors.NewNotFoundErrorWithCode(apperrors.Codes.CommunityPostNotFound, "post not found")
 	}
 
 	savedPost := &models.SavedPost{
@@ -1459,7 +1459,7 @@ func (s *communityService) UpdateProfile(ctx context.Context, userID int32, req 
 			return nil, err
 		}
 		if !isValidURL(website) {
-			return nil, apperrors.NewValidationError("website must be a valid URL (http:// or https://)")
+			return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.CommunityWebsiteInvalid, "website must be a valid URL (http:// or https://)")
 		}
 		user.Website = website
 	}
