@@ -9,6 +9,8 @@ import type { PostItem } from "@/gen/protobuf/v1/community";
 import { SharedPostEmbed } from "../components/SharedPostEmbed";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
+import { useTranslations } from "next-intl";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface SharePostFormProps {
   post: PostItem;
@@ -17,6 +19,7 @@ interface SharePostFormProps {
 }
 
 export function SharePostForm({ post, onSuccess, onCancel }: SharePostFormProps) {
+  const t = useTranslations();
   const [errorMessage, setErrorMessage] = useState<string>();
 
   const {
@@ -33,7 +36,7 @@ export function SharePostForm({ post, onSuccess, onCancel }: SharePostFormProps)
       onSuccess?.();
     },
     onError: (error: any) => {
-      setErrorMessage(error.message || "Failed to share post");
+      setErrorMessage(getTranslatedError(error, t));
     },
   });
 

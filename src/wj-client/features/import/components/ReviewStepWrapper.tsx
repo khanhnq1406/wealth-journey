@@ -5,6 +5,8 @@ import { ReviewStep } from "./ReviewStep";
 import { ColumnMapping } from "./ColumnMappingStep";
 import { ParsedTransaction, DuplicateHandlingStrategy, ImportSummary, DuplicateMatch, CurrencyConversion, CurrencyInfo, DuplicateAction } from "@/gen/protobuf/v1/import";
 import { Button } from "@/components/Button";
+import { useTranslations } from "next-intl";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 import { useMutationExecuteImport, useMutationParseStatement, useMutationDetectDuplicates, useMutationConvertCurrency, useQueryListCategories } from "@/utils/generated/hooks";
 import { DuplicateReviewModal } from "./DuplicateReviewModal";
 
@@ -33,6 +35,7 @@ export function ReviewStepWrapper({
   onBack,
   onError,
 }: ReviewStepWrapperProps) {
+  const t = useTranslations();
   const [transactions, setTransactions] = useState<ParsedTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +90,7 @@ export function ReviewStepWrapper({
       }
     },
     onError: (err: any) => {
-      setError(err.message || "Failed to parse file");
+      setError(getTranslatedError(err, t));
       setLoading(false);
     },
   });

@@ -28,6 +28,7 @@ import { InvestmentTransactionType } from "@/gen/protobuf/v1/investment";
 import { AddInvestmentTransactionForm } from "@/features/investment/forms/AddInvestmentTransactionForm";
 import { UpdateInvestmentPriceForm } from "@/features/investment/forms/UpdateInvestmentPriceForm";
 import { formatCurrency } from "@/lib/utils/units";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 import {
   formatQuantity,
   formatPrice,
@@ -83,6 +84,7 @@ export function InvestmentDetailModal({
 }: InvestmentDetailModalProps) {
   const t = useTranslations("investment");
   const tCommon = useTranslations("common");
+  const tErrors = useTranslations();
   const [activeTab, setActiveTab] = useState<TabType>(
     activeTabProp || "overview",
   );
@@ -185,7 +187,7 @@ export function InvestmentDetailModal({
       setDeleteError(null);
     },
     onError: (error: any) => {
-      setDeleteError(error.message || t("detail.failedToDeleteTransaction"));
+      setDeleteError(getTranslatedError(error, tErrors));
     },
   });
 
@@ -214,7 +216,7 @@ export function InvestmentDetailModal({
       onClose();
     },
     onError: (error: any) => {
-      setDeleteInvestmentError(error.message || t("detail.failedToDeleteInvestment"));
+      setDeleteInvestmentError(getTranslatedError(error, tErrors));
     },
   });
 

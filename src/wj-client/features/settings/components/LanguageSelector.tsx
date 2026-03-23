@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useMutationUpdatePreferences } from "@/utils/generated/hooks";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 const SUPPORTED_LANGUAGES = [
   { code: "en", nativeLabel: "English" },
@@ -14,6 +15,7 @@ const SUPPORTED_LANGUAGES = [
 
 export function LanguageSelector() {
   const t = useTranslations("settings.language");
+  const tErrors = useTranslations();
   const currentLocale = useLocale();
   const [selected, setSelected] = useState(currentLocale);
   const [error, setError] = useState<string>();
@@ -26,7 +28,7 @@ export function LanguageSelector() {
       router.replace(pathname, { locale: selected });
     },
     onError: (err: any) => {
-      setError(err.message || t("failedToUpdate"));
+      setError(getTranslatedError(err, tErrors));
     },
   });
 

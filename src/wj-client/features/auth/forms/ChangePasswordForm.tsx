@@ -12,6 +12,7 @@ import { ButtonType } from "@/app/constants";
 import { useMutationChangePassword } from "@/utils/generated/hooks";
 import { mapChangePasswordError } from "@/features/auth/utils/error-mapper";
 import { Success } from "@/components/modals/Success";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 const changePasswordSchema = z
   .object({
@@ -32,6 +33,7 @@ interface ChangePasswordFormProps {
 
 export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
   const t = useTranslations("settings.security");
+  const tErrors = useTranslations();
   const [serverError, setServerError] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -51,8 +53,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
       setShowSuccess(true);
     },
     onError(error: any) {
-      const key = mapChangePasswordError(error.message);
-      setServerError(key ? t(`errors.${key}`) : t("errors.changePasswordFailed"));
+      setServerError(getTranslatedError(error, tErrors));
     },
   });
 

@@ -24,6 +24,7 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { formatCurrency } from "@/utils/currency-formatter";
 import { amountToSmallestUnit } from "@/lib/utils/units";
 import { useTranslations } from "next-intl";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface EditWalletFormProps {
   wallet: Wallet;
@@ -39,6 +40,7 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
   const tForm = useTranslations("wallet.form");
   const tEdit = useTranslations("wallet.edit");
   const tCommon = useTranslations("common");
+  const tErrors = useTranslations();
   const { currency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [showAdjustment, setShowAdjustment] = useState(false);
@@ -47,17 +49,13 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
 
   const updateWalletMutation = useMutationUpdateWallet({
     onError: (error: any) => {
-      setErrorMessage(
-        error.message || tForm("failedToUpdate"),
-      );
+      setErrorMessage(getTranslatedError(error, tErrors));
     },
   });
 
   const adjustBalanceMutation = useMutationAdjustBalance({
     onError: (error: any) => {
-      setErrorMessage(
-        error.message || tEdit("failedToAdjust"),
-      );
+      setErrorMessage(getTranslatedError(error, tErrors));
     },
   });
 

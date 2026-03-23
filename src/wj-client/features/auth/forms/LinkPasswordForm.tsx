@@ -13,6 +13,7 @@ import { ButtonType } from "@/app/constants";
 import { useMutationLinkPassword } from "@/utils/generated/hooks";
 import { mapLinkPasswordError } from "@/features/auth/utils/error-mapper";
 import { Success } from "@/components/modals/Success";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 const linkPasswordSchema = z
   .object({
@@ -37,6 +38,7 @@ interface LinkPasswordFormProps {
 
 export function LinkPasswordForm({ onSuccess }: LinkPasswordFormProps) {
   const t = useTranslations("settings.security");
+  const tErrors = useTranslations();
   const [serverError, setServerError] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -56,8 +58,7 @@ export function LinkPasswordForm({ onSuccess }: LinkPasswordFormProps) {
       setShowSuccess(true);
     },
     onError(error: any) {
-      const key = mapLinkPasswordError(error.message);
-      setServerError(key ? t(`errors.${key}`) : t("errors.linkPasswordFailed"));
+      setServerError(getTranslatedError(error, tErrors));
     },
   });
 

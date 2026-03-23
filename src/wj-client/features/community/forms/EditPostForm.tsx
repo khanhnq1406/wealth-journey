@@ -9,6 +9,8 @@ import { editPostSchema, type EditPostFormData } from "../utils/community.schema
 import { ImageUpload } from "../components/ImageUpload";
 import { cn } from "@/lib/utils/cn";
 import type { PostItem } from "@/gen/protobuf/v1/community";
+import { useTranslations } from "next-intl";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface EditPostFormProps {
   post: PostItem;
@@ -16,6 +18,7 @@ interface EditPostFormProps {
 }
 
 export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
+  const t = useTranslations();
   const [errorMessage, setErrorMessage] = useState<string>();
   const queryClient = useQueryClient();
 
@@ -41,7 +44,7 @@ export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
       onSuccess?.();
     },
     onError: (error: any) => {
-      setErrorMessage(error.message || "Failed to update post");
+      setErrorMessage(getTranslatedError(error, t));
     },
   });
 

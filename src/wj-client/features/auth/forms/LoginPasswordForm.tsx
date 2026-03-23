@@ -11,6 +11,7 @@ import { PasswordInput } from "@/features/auth/components/PasswordInput";
 import { Button } from "@/components/Button";
 import { ButtonType, LOCAL_STORAGE_TOKEN_NAME, routes } from "@/app/constants";
 import { useMutationLoginWithPassword } from "@/utils/generated/hooks";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 import { store } from "@/features/auth/store/store";
 import { setAuth } from "@/features/auth/store/actions";
 import { updateAuthTokenCache } from "@/utils/api-client";
@@ -24,6 +25,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginPasswordForm() {
   const t = useTranslations("auth.login");
+  const tErrors = useTranslations();
   const router = useRouter();
   const [serverError, setServerError] = useState("");
 
@@ -54,8 +56,8 @@ export function LoginPasswordForm() {
         router.push(routes.home);
       }
     },
-    onError() {
-      setServerError(t("invalidCredentials"));
+    onError(error: any) {
+      setServerError(getTranslatedError(error, tErrors));
     },
   });
 

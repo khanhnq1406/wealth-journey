@@ -9,6 +9,7 @@ import {
 import { Wallet, WalletDeletionOption } from "@/gen/protobuf/v1/wallet";
 import { Success } from "@/components/modals/Success";
 import { formatCurrency } from "@/utils/currency-formatter";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface DeleteWalletModalProps {
   wallet: Wallet;
@@ -27,6 +28,7 @@ export function DeleteWalletModal({
 }: DeleteWalletModalProps) {
   const t = useTranslations("wallet.delete");
   const tCommon = useTranslations("common");
+  const tErrors = useTranslations();
   const [option, setOption] = useState<DeletionOption>("archive");
   const [targetWalletId, setTargetWalletId] = useState<number>(0);
   const [error, setError] = useState<string>("");
@@ -47,7 +49,7 @@ export function DeleteWalletModal({
       setError("");
     },
     onError: (err: any) => {
-      setError(err.message || t("failedToProcess"));
+      setError(getTranslatedError(err, tErrors));
     },
   });
 

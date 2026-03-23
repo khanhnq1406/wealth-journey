@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutationUpdateComment } from "@/utils/generated/hooks";
 import { editCommentSchema, type EditCommentFormData } from "../utils/community.schema";
+import { useTranslations } from "next-intl";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface EditCommentFormProps {
   commentId: number;
@@ -19,6 +21,7 @@ export function EditCommentForm({
   onSuccess,
   onCancel,
 }: EditCommentFormProps) {
+  const t = useTranslations();
   const [error, setError] = useState<string | null>(null);
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm<EditCommentFormData>({
@@ -34,7 +37,7 @@ export function EditCommentForm({
       onSuccess(content);
     },
     onError: (err: any) => {
-      setError(err?.message || "Failed to update comment");
+      setError(getTranslatedError(err, t));
     },
   });
 

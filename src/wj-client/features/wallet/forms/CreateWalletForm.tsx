@@ -21,6 +21,7 @@ import { useMemo } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { amountToSmallestUnit } from "@/lib/utils/units";
 import { useTranslations } from "next-intl";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface CreateWalletFormProps {
   onSuccess?: () => void;
@@ -36,6 +37,7 @@ export function CreateWalletForm({
 }: CreateWalletFormProps) {
   const t = useTranslations("wallet");
   const tForm = useTranslations("wallet.form");
+  const tErrors = useTranslations();
   const createWallet = useMutationCreateWallet();
   const { currency } = useCurrency();
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -82,9 +84,7 @@ export function CreateWalletForm({
           setErrorMessage("");
         },
         onError: (error: any) => {
-          setErrorMessage(
-            error.message || tForm("failedToCreate"),
-          );
+          setErrorMessage(getTranslatedError(error, tErrors));
         },
       },
     );

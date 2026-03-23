@@ -47,6 +47,7 @@ import {
   type SilverUnit,
 } from "@/features/investment/utils/silver-calculator";
 import { SuccessAnimation } from "@/components/success/SuccessAnimation";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface AddInvestmentTransactionFormProps {
   investmentId: number;
@@ -72,6 +73,7 @@ export function AddInvestmentTransactionForm({
 }: AddInvestmentTransactionFormProps) {
   const t = useTranslations("investment");
   const tCommon = useTranslations("common");
+  const tErrors = useTranslations();
   const queryClient = useQueryClient();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [successMessage, setSuccessMessage] = useState<string>("");
@@ -118,7 +120,7 @@ export function AddInvestmentTransactionForm({
       queryClient.invalidateQueries({ queryKey: [EVENT_WalletGetWallet] });
     },
     onError: (error: any) => {
-      setErrorMessage(error.message || t("transaction.failedToAdd"));
+      setErrorMessage(getTranslatedError(error, tErrors));
     },
   });
 

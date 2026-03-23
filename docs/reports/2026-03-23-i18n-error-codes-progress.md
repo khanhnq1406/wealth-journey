@@ -8,7 +8,7 @@
 - **Started:** 2026-03-23T10:00:00Z
 - **Last updated:** 2026-03-23T10:00:00Z
 - **Current state:** in_progress
-- **Current task:** 14
+- **Current task:** 0
 
 ## Task Progress
 
@@ -28,9 +28,9 @@
 | 10  | Migrate Auth Domain Errors                   | done    | TBD    | 9 error calls migrated in auth.go + errors.go auth constructors |
 | 11  | Migrate Community & Sentiment Errors         | done    | TBD    | 14 error calls migrated in community + sentiment services |
 | 12  | Normalize Inconsistent gin.H{} Responses     | done    | TBD    | 28 gin.H{} responses replaced in 7 files + middleware |
-| 14  | Create Frontend Error Translation Utility    | pending | —      | —       |
-| 15  | Create Error Translation Files (en + vi)     | pending | —      | —       |
-| 16  | Integrate Error Translation in Forms         | pending | —      | —       |
+| 14  | Create Frontend Error Translation Utility    | done    | TBD    | Created error-translator.ts with getTranslatedError() |
+| 15  | Create Error Translation Files (en + vi)     | done    | TBD    | Created en/errors.json + vi/errors.json (~150 codes each) |
+| 16  | Integrate Error Translation in Forms         | done    | TBD    | Updated 29 form files with getTranslatedError() |
 | 17  | Create Runtime Flow Diagrams                 | pending | —      | —       |
 | 18  | Backend Build Verification                   | pending | —      | —       |
 | 19  | Frontend Build Verification                  | pending | —      | —       |

@@ -23,6 +23,7 @@ const messageGroups = [
                  // pullToRefresh, pwa, search, select, datePicker, currencySelector,
                  // dashboard, symbolAutocomplete, connectionStatus, dataFreshness,
                  // quickActions, featureDiscovery, landingErrorBoundary
+  'errors',      // error code translations for i18n error display
 ] as const;
 
 export default getRequestConfig(async ({ requestLocale }) => {

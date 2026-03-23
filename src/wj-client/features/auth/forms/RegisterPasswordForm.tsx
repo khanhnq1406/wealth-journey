@@ -13,6 +13,7 @@ import { Button } from "@/components/Button";
 import { ButtonType, LOCAL_STORAGE_TOKEN_NAME, routes } from "@/app/constants";
 import { useMutationRegisterWithPassword } from "@/utils/generated/hooks";
 import { mapRegisterError } from "@/features/auth/utils/error-mapper";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 import { store } from "@/features/auth/store/store";
 import { setAuth } from "@/features/auth/store/actions";
 import { updateAuthTokenCache } from "@/utils/api-client";
@@ -37,6 +38,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 
 export function RegisterPasswordForm() {
   const t = useTranslations("auth.register");
+  const tErrors = useTranslations();
   const router = useRouter();
   const [serverError, setServerError] = useState("");
 
@@ -71,8 +73,7 @@ export function RegisterPasswordForm() {
       }
     },
     onError(error: any) {
-      const key = mapRegisterError(error.message);
-      setServerError(key ? t(`errors.${key}`) : t("registrationFailed"));
+      setServerError(getTranslatedError(error, tErrors));
     },
   });
 

@@ -10,6 +10,8 @@ import { Avatar } from "../components/Avatar";
 import { ImageUpload } from "../components/ImageUpload";
 import { cn } from "@/lib/utils/cn";
 import { ImageIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface CreatePostFormProps {
   currentUser: { id: number; name: string; picture: string };
@@ -17,6 +19,7 @@ interface CreatePostFormProps {
 }
 
 export function CreatePostForm({ currentUser, onSuccess }: CreatePostFormProps) {
+  const t = useTranslations();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [showImageInput, setShowImageInput] = useState(false);
   const queryClient = useQueryClient();
@@ -43,7 +46,7 @@ export function CreatePostForm({ currentUser, onSuccess }: CreatePostFormProps) 
       onSuccess?.();
     },
     onError: (error: any) => {
-      setErrorMessage(error.message || "Failed to create post");
+      setErrorMessage(getTranslatedError(error, t));
     },
   });
 

@@ -8,6 +8,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { editProfileSchema, type EditProfileFormData } from "../utils/community.schema";
 import { ImageUpload } from "./ImageUpload";
 import type { CommunityProfile } from "@/gen/protobuf/v1/community";
+import { useTranslations } from "next-intl";
+import { getTranslatedError } from "@/lib/utils/error-translator";
 
 interface ProfileEditModalProps {
   profile: CommunityProfile;
@@ -15,6 +17,7 @@ interface ProfileEditModalProps {
 }
 
 export function ProfileEditModal({ profile, onClose }: ProfileEditModalProps) {
+  const t = useTranslations();
   const [error, setError] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState(profile.userPicture || "");
   const [coverUrl, setCoverUrl] = useState(profile.coverPhotoUrl || "");
@@ -40,7 +43,7 @@ export function ProfileEditModal({ profile, onClose }: ProfileEditModalProps) {
       onClose();
     },
     onError: (err: any) => {
-      setError(err?.message || "Failed to update profile");
+      setError(getTranslatedError(err, t));
     },
   });
 
