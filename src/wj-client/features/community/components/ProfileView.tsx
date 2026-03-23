@@ -125,7 +125,7 @@ export function ProfileView({
 
           {/* Location */}
           {profile?.location && (
-            <div className="flex items-center gap-1 text-sm text-gray-500 mt-1">
+            <div className="flex items-center gap-1 text-sm text-v2-text-tertiary mt-1">
               <MapPin size={13} className="shrink-0" />
               <span>{profile.location}</span>
             </div>
@@ -137,7 +137,7 @@ export function ProfileView({
               href={profile.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-sm text-bg hover:underline mt-1"
+              className="flex items-center gap-1 text-sm text-v2-gold-primary hover:text-v2-gold-accent hover:underline mt-1"
             >
               <Link2 size={13} className="shrink-0" />
               <span>{profile.website}</span>
