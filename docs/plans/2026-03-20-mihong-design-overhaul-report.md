@@ -324,5 +324,7 @@ Fix issues and re-review. Issue #1 (missing color tokens) is critical — dozens
 
 | 2026-03-23 | Aligned community comment bubbles with mihong color pattern — CommentBubble + ReplyBubble: replaced light beige bubble bg `bg-[#FAF9F7]` with `bg-v2-maroon-900`, menu button `text-gray-400 hover:text-gray-600` → `text-v2-text-tertiary hover:text-v2-gold-accent`, menu items `hover:bg-gray-50` → `hover:bg-v2-maroon-700` with `text-v2-gold-accent` (Edit) / `text-v2-red-negative` (Delete), comment body text → `text-v2-gold-accent`, "(edited)" label `text-gray-400` → `text-v2-text-tertiary`, Reply button `text-gray-500 hover:text-bg` → `text-v2-text-secondary hover:text-v2-gold-primary`. | Minor | `CommentBubble.tsx`, `ReplyBubble.tsx` (2 files) |
 
+| 2026-03-23 | Aligned community nav active state with mihong gold pattern — CommunityNav: `bg-v2-red-light text-v2-red-primary` → `bg-v2-gold-primary/20 text-v2-gold-primary`. MobileSubNav: `text-v2-red-primary` → `text-v2-gold-primary`. | Minor | `CommunityNav.tsx`, `MobileSubNav.tsx` (2 files) |
+
 **Build verification:** `next build` passes with zero errors on all routes after fixes.
 **Security review:** APPROVED — all changes are UI-only (Tailwind class replacements), no security impact.
