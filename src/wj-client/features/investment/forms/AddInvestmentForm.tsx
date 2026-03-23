@@ -167,7 +167,16 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
       // Parse error message and provide user-friendly alternatives
       let errorMsg = error.message || t("errors.failedToCreate");
 
-      if (
+      // Check currency mismatch BEFORE generic duplicate — both contain "already exists"
+      const currencyMismatchMatch = errorMsg.match(
+        /Investment\s+(\S+)\s+already exists with currency\s+(\S+)/i
+      );
+      if (currencyMismatchMatch) {
+        errorMsg = t("errors.currencyMismatch", {
+          symbol: currencyMismatchMatch[1],
+          currency: currencyMismatchMatch[2],
+        });
+      } else if (
         errorMsg.toLowerCase().includes("duplicate") ||
         errorMsg.toLowerCase().includes("already exists")
       ) {

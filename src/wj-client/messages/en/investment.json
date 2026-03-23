@@ -292,6 +292,7 @@
       "createdSuccessfully": "Investment created successfully",
       "failedToCreate": "Failed to create investment",
       "duplicateSymbol": "An investment with this symbol already exists in this wallet",
+      "currencyMismatch": "{symbol} already exists with currency {currency}",
       "invalidCurrency": "Invalid currency code. Please select a valid currency",
       "insufficientBalance": "Insufficient wallet balance for this investment",
       "invalidSymbol": "Invalid symbol format. Please check and try again",

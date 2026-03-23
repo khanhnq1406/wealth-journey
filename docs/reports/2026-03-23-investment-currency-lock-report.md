@@ -83,3 +83,19 @@ GitNexus not available — manual blast radius review performed.
 6. Toggle "Custom Investment" off — verify currency badge reappears
 7. Select gold type — verify currency still locks to VND/USD (no regression)
 8. API test: Send POST /api/v1/investments with a duplicate symbol but different currency — expect 400 error
+
+## Fix History
+
+| Date       | Fix                                                                                         | Severity | Files Changed |
+| ---------- | ------------------------------------------------------------------------------------------- | -------- | ------------- |
+| 2026-03-23 | Surface backend currency mismatch detail in UI instead of generic "duplicate symbol" message | Minor    | `AddInvestmentForm.tsx`, `en/investment.json`, `vi/investment.json` |
+
+### Fix Details — Currency Mismatch Error Display
+
+**Root Cause:** The error handler in `AddInvestmentForm.tsx` checked for `"already exists"` before checking for `"already exists with currency"`. Since the currency mismatch message contains both substrings, the generic duplicate check matched first, replacing the detailed message with a generic one.
+
+**Fix:** Added a regex match for the specific currency mismatch pattern (`/Investment\s+(\S+)\s+already exists with currency\s+(\S+)/i`) BEFORE the generic duplicate check. Extracted symbol and currency are passed as i18n interpolation params to a new `currencyMismatch` key.
+
+**New i18n keys:**
+- EN: `"{symbol} already exists with currency {currency}"`
+- VI: `"Mã {symbol} đã tồn tại với tiền tệ {currency}"`
