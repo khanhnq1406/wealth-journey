@@ -78,7 +78,7 @@ export function LandingCurrencyPriceTable({
                     loginLink: (chunks) => (
                       <Link
                         href="/auth/login"
-                        className="font-semibold text-v2-red-primary hover:underline"
+                        className="font-semibold text-v2-red-primary underline sm:no-underline sm:hover:underline"
                       >
                         {chunks}
                       </Link>
@@ -90,7 +90,7 @@ export function LandingCurrencyPriceTable({
                     loginLink: (chunks) => (
                       <Link
                         href="/auth/login"
-                        className="font-semibold text-v2-red-primary hover:underline"
+                        className="font-semibold text-v2-red-primary underline sm:no-underline sm:hover:underline"
                       >
                         {chunks}
                       </Link>

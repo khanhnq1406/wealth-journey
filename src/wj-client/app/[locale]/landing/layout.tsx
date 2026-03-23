@@ -1,14 +1,24 @@
 import { Metadata } from "next";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 const FALLBACK_METADATA: Metadata = {
-  title: "congdongvang.com - Track Gold & Silver Prices | Personal Finance Dashboard",
-  description: "Monitor live gold and silver prices including SJC, DOJI, and world gold (XAU/USD). Track investments, manage wallets, and build wealth with congdongvang.com's all-in-one personal finance platform.",
+  title:
+    "Giá Vàng Hôm Nay | congdongvang.com - Sân chơi giao lưu, trao đổi, kiến thức về thị trường đầu tư tài chính.",
+  description:
+    "Theo dõi giá vàng SJC, DOJI, giá bạc, ngoại tệ trực tiếp. Quản lý tài chính cá nhân, theo dõi danh mục đầu tư vàng, cổ phiếu, crypto miễn phí tại congdongvang.com",
   keywords: [
+    "giá vàng hôm nay",
+    "cộng đồng vàng",
+    "cộng đồng đầu tư",
+    "quản lý tài chính cá nhân",
+    "giá vàng SJC",
+    "giá bạc",
+    "đầu tư vàng",
+    "theo dõi danh mục đầu tư",
     "gold price tracker",
     "silver price tracker",
     "SJC gold price",
     "vàng SJC",
-    "giá vàng hôm nay",
     "giá bạc hôm nay",
     "Vietnamese gold investment",
     "gold investment tracking",
@@ -27,24 +37,28 @@ const FALLBACK_METADATA: Metadata = {
   ],
   authors: [{ name: "congdongvang.com" }],
   openGraph: {
-    title: "congdongvang.com - Track Gold & Silver Prices | Personal Finance Dashboard",
-    description: "Monitor live gold and silver prices including SJC, DOJI, and world gold. Track investments, manage wallets, and build wealth with congdongvang.com.",
+    title:
+      "Giá Vàng Hôm Nay | congdongvang.com - Sân chơi giao lưu, trao đổi, kiến thức về thị trường đầu tư tài chính.",
+    description:
+      "Theo dõi giá vàng SJC, DOJI, giá bạc, ngoại tệ trực tiếp. Quản lý tài chính cá nhân, theo dõi danh mục đầu tư vàng, cổ phiếu, crypto miễn phí tại congdongvang.com",
     type: "website",
-    url: "https://congdongvang.com",
+    url: "https://www.congdongvang.com",
     siteName: "congdongvang.com",
     images: [
       {
         url: "/og-image.svg",
         width: 1200,
         height: 630,
-        alt: "congdongvang.com Gold & Silver Price Dashboard",
+        alt: "congdongvang.com - Sân chơi giao lưu, trao đổi, kiến thức về thị trường đầu tư tài chính.",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "congdongvang.com - Track Gold & Silver Prices | Personal Finance Dashboard",
-    description: "Monitor live gold and silver prices including SJC, DOJI, and world gold. Track investments, manage wallets, and build wealth with congdongvang.com.",
+    title:
+      "Giá Vàng Hôm Nay | congdongvang.com - Sân chơi giao lưu, trao đổi, kiến thức về thị trường đầu tư tài chính.",
+    description:
+      "Theo dõi giá vàng SJC, DOJI, giá bạc, ngoại tệ trực tiếp. Quản lý tài chính cá nhân, theo dõi danh mục đầu tư vàng, cổ phiếu, crypto miễn phí tại congdongvang.com",
     images: ["/og-image.svg"],
     creator: "@congdongvang",
   },
@@ -60,7 +74,12 @@ const FALLBACK_METADATA: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://congdongvang.com",
+    canonical: "https://www.congdongvang.com/vi/landing",
+    languages: {
+      vi: "https://www.congdongvang.com/vi/landing",
+      en: "https://www.congdongvang.com/en/landing",
+      "x-default": "https://www.congdongvang.com/vi/landing",
+    },
   },
 };
 
@@ -102,14 +121,21 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: settings["seo.title"] || FALLBACK_METADATA.title,
-    description: settings["seo.description"] || (FALLBACK_METADATA.description as string),
+    description:
+      settings["seo.description"] || (FALLBACK_METADATA.description as string),
     keywords: keywords.length > 0 ? keywords : FALLBACK_METADATA.keywords,
     authors: [{ name: "congdongvang.com" }],
     openGraph: {
-      title: settings["seo.og_title"] || settings["seo.title"] || (FALLBACK_METADATA.openGraph as any)?.title,
-      description: settings["seo.og_description"] || settings["seo.description"] || (FALLBACK_METADATA.openGraph as any)?.description,
+      title:
+        settings["seo.og_title"] ||
+        settings["seo.title"] ||
+        (FALLBACK_METADATA.openGraph as any)?.title,
+      description:
+        settings["seo.og_description"] ||
+        settings["seo.description"] ||
+        (FALLBACK_METADATA.openGraph as any)?.description,
       type: "website",
-      url: settings["seo.og_url"] || "https://congdongvang.com",
+      url: settings["seo.og_url"] || "https://www.congdongvang.com",
       siteName: "congdongvang.com",
       images: [
         {
@@ -121,9 +147,17 @@ export async function generateMetadata(): Promise<Metadata> {
       ],
     },
     twitter: {
-      card: (settings["seo.twitter_card"] as "summary" | "summary_large_image") || "summary_large_image",
-      title: settings["seo.twitter_title"] || settings["seo.title"] || (FALLBACK_METADATA.twitter as any)?.title,
-      description: settings["seo.twitter_description"] || settings["seo.description"] || (FALLBACK_METADATA.twitter as any)?.description,
+      card:
+        (settings["seo.twitter_card"] as "summary" | "summary_large_image") ||
+        "summary_large_image",
+      title:
+        settings["seo.twitter_title"] ||
+        settings["seo.title"] ||
+        (FALLBACK_METADATA.twitter as any)?.title,
+      description:
+        settings["seo.twitter_description"] ||
+        settings["seo.description"] ||
+        (FALLBACK_METADATA.twitter as any)?.description,
       images: [settings["seo.og_image"] || "/og-image.svg"],
       creator: settings["seo.twitter_creator"] || "@congdongvang",
     },
@@ -139,11 +173,87 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     },
     alternates: {
-      canonical: settings["seo.canonical"] || "https://congdongvang.com",
+      canonical:
+        settings["seo.canonical"] || "https://www.congdongvang.com/vi/landing",
+      languages: {
+        vi: "https://www.congdongvang.com/vi/landing",
+        en: "https://www.congdongvang.com/en/landing",
+        "x-default": "https://www.congdongvang.com/vi/landing",
+      },
     },
   };
 }
 
+const landingSchemas: Record<string, unknown>[] = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Cộng Đồng Vàng",
+    url: "https://www.congdongvang.com",
+    logo: "https://www.congdongvang.com/logo.svg",
+    sameAs: [],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "congdongvang.com",
+    url: "https://www.congdongvang.com",
+    inLanguage: "vi",
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Cộng Đồng Vàng - Sân chơi giao lưu, trao đổi, kiến thức về thị trường đầu tư tài chính",
+    applicationCategory: "FinanceApplication",
+    operatingSystem: "Web",
+    url: "https://www.congdongvang.com",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "VND",
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Tại sao chọn congdongvang.com?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "congdongvang.com cung cấp nền tảng tích hợp theo dõi cổ phiếu, ETF, crypto, vàng, bạc và ngân sách trong một ứng dụng miễn phí với kế toán FIFO và dữ liệu thị trường thời gian thực.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "congdongvang.com có miễn phí không?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Có, congdongvang.com hoàn toàn miễn phí, không có chi phí ẩn hay gói đăng ký trả phí.",
+        },
+      },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FinancialProduct",
+    name: "Theo dõi giá vàng và bạc trực tiếp",
+    description:
+      "Theo dõi giá vàng SJC, DOJI, vàng thế giới (XAU/USD), giá bạc và ngoại tệ trực tiếp tại congdongvang.com",
+    url: "https://www.congdongvang.com/vi/landing",
+    provider: {
+      "@type": "Organization",
+      name: "Cộng Đồng Vàng",
+    },
+  },
+];
+
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <JsonLd data={landingSchemas} />
+      {children}
+    </>
+  );
 }

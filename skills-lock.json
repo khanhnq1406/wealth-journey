@@ -45,6 +45,11 @@
       "source": "abhigyanpatwari/gitnexus",
       "sourceType": "github",
       "computedHash": "ebc60a8570c754cf2274368c890646c3ce7ef96561051a78d36bfb392514627f"
+    },
+    "seo-audit": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "ec3109d213dde1747614ad1112ef0e498e04b24e464538968e156dfbfadb2121"
     }
   }
 }
