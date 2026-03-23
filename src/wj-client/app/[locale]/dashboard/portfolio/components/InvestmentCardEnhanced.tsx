@@ -19,7 +19,7 @@ import { resources } from "@/app/constants";
 import Image from "next/image";
 import { Sparkline } from "@/components/charts";
 import { motion, AnimatePresence } from "framer-motion";
-import { IconProps, PlusIcon } from "@/components/icons";
+import { IconProps, PlusIcon, InfoIcon } from "@/components/icons";
 import { cn } from "@/lib/utils/cn";
 
 /**
@@ -163,20 +163,20 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
 
   const isProfit = pnl >= 0;
   const pnlColor = isCustom
-    ? "text-gray-500"
+    ? "text-v2-text-secondary"
     : isProfit
       ? "text-v2-green-positive"
-      : "text-red-600";
+      : "text-v2-red-negative";
   const pnlBgColor = isCustom
-    ? "bg-gray-50"
+    ? "bg-v2-maroon-900"
     : isProfit
-      ? "bg-v2-green-light"
-      : "bg-red-50";
+      ? "bg-v2-green-positive/10"
+      : "bg-v2-red-negative/10";
   const pnlBadgeColor = isCustom
-    ? "bg-gray-100 text-gray-800"
+    ? "bg-v2-maroon-900 text-v2-text-secondary"
     : isProfit
-      ? "bg-v2-green-light text-v2-green-positive"
-      : "bg-red-100 text-red-800";
+      ? "bg-v2-green-positive/10 text-v2-green-positive"
+      : "bg-v2-red-negative/10 text-v2-red-negative";
 
   const sparklineData = priceHistory
     ? priceHistory.map((p) => ({ value: p.value }))
@@ -219,7 +219,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
                 {symbol}
               </h3>
               {isCustom && (
-                <span className="inline-block px-2 py-0.5 text-xs bg-purple-100 text-purple-800 rounded">
+                <span className="inline-block px-2 py-0.5 text-xs bg-v2-gold-primary/20 text-v2-gold-primary rounded">
                   {t("detail.customInvestment")}
                 </span>
               )}
@@ -233,10 +233,10 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
                 </div>
               )}
             </div>
-            <p className="text-sm text-v2-text-secondary truncate">{name}</p>
+            <p className="text-sm text-v2-text-tertiary truncate">{name}</p>
             {isCustom && (
-              <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                <span>💡</span>
+              <div className="text-xs text-v2-text-tertiary mt-1 flex items-center gap-1">
+                <InfoIcon size="xs" className="text-v2-text-tertiary" decorative />
                 <span>{t("detail.noMarketData")}</span>
               </div>
             )}
@@ -266,7 +266,9 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
 
         <div className="flex justify-between items-end">
           <div>
-            <div className="text-xs text-v2-text-tertiary mb-1">{t("detail.currentValue")}</div>
+            <div className="text-xs text-v2-text-tertiary mb-1">
+              {t("detail.currentValue")}
+            </div>
             <div className="text-xl font-bold text-v2-gold-accent">
               {formatCurrency(currentValue || 0, nativeCurrency)}
             </div>
@@ -278,7 +280,9 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
           </div>
 
           <div className={`px-3 py-2 rounded-lg ${pnlBgColor}`}>
-            <div className="text-xs text-v2-text-secondary mb-1">{t("analytics.totalPnl")}</div>
+            <div className="text-xs text-v2-text-secondary mb-1">
+              {t("analytics.totalPnl")}
+            </div>
             <div className={`text-sm font-bold ${pnlDisplay.colorClass}`}>
               {isCustom ? (
                 "N/A"
@@ -296,7 +300,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
           <div className="flex items-center justify-between pt-2 border-t border-v2-border-light">
             <div className="flex items-center gap-1">
               <div
-                className={`w-2 h-2 rounded-full ${isRecent ? "bg-v2-green-positive animate-pulse" : "bg-gray-400"}`}
+                className={`w-2 h-2 rounded-full ${isRecent ? "bg-v2-green-positive animate-pulse" : "bg-v2-text-tertiary"}`}
               />
               <span className="text-xs text-v2-text-tertiary">
                 {formatTimeAgo(updatedAt, t as any, locale).text}
@@ -400,7 +404,9 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
 
               <div className="py-2 border-t border-v2-border-light">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-v2-text-secondary">{t("detail.quantityLabel")}</span>
+                  <span className="text-sm text-v2-text-secondary">
+                    {t("detail.quantityLabel")}
+                  </span>
                   <span className="text-sm font-semibold text-v2-gold-accent">
                     {formatQuantity(quantity, type, purchaseUnit)}
                   </span>
