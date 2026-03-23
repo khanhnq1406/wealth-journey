@@ -47,7 +47,16 @@ sequenceDiagram
         IS->>IS: Validate purchaseDate ≤ now<br/>(reject future dates)
     end
 
-    IS->>IS: Validate symbol not already owned by user
+    IS->>IR: GetByUserAndSymbol(userID, symbol)
+    alt Symbol already exists (duplicate detection)
+        IR-->>IS: Existing investment
+        alt req.Currency != existing.Currency
+            IS-->>H: 400 Validation Error<br/>"Investment {symbol} already exists<br/>with currency {existingCurrency}"
+        else Currency matches
+            IS->>IS: Auto-create BUY transaction<br/>on existing investment
+            IS-->>H: 200 OK (transaction added)
+        end
+    end
 
     Note over IS,Units: Unit conversion for gold/silver
     IS->>Units: QuantityToStorage(quantity, type)
@@ -106,7 +115,8 @@ sequenceDiagram
 | Condition | Response | Rollback |
 |-----------|----------|----------|
 | Wallet not found or not owned (when walletId > 0) | 404 | None |
-| Symbol already exists for user | 400 Validation | None |
+| Duplicate symbol + currency mismatch | 400 Validation: "Investment {symbol} already exists with currency {currency}" | None |
+| Duplicate symbol + currency match | 200 OK: auto-creates BUY transaction on existing investment | None |
 | Transaction creation fails | 500 | Delete investment |
 | Lot creation fails | 500 | Delete tx + investment |
 
