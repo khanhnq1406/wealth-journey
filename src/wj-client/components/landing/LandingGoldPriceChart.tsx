@@ -11,7 +11,7 @@ export function LandingGoldPriceChart() {
   return (
     <BaseCard
       padding="none"
-      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
+      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden h-full flex flex-col"
     >
       {/* Header */}
       <div className="px-5 pt-5 pb-2">
@@ -21,7 +21,7 @@ export function LandingGoldPriceChart() {
       </div>
 
       {/* TradingView Chart — fully interactive, no login wall */}
-      <div className="px-2 pb-2" style={{ height: 430 }}>
+      <div className="px-2 pb-2 flex-1 min-h-[430px]">
         <TradingViewChart
           symbol="TVC:GOLD"
           locale={locale}
