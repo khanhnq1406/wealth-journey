@@ -15,11 +15,11 @@ export const ErrorMessage = ({
   severity = "error",
   className,
 }: ErrorMessageProps) => {
-  // Severity-based styling
+  // Severity-based styling — mihong v2 maroon/gold theme
   const styles = {
-    error: "bg-danger-50 border-v2-red-negative/30 text-danger-700",
-    warning: "bg-secondary-50 border-v2-gold-primary/30 text-secondary-700",
-    info: "bg-primary-50 border-v2-gold-primary/30 text-primary-700",
+    error: "bg-v2-bg-dark border-v2-red-negative/30 text-v2-red-negative",
+    warning: "bg-v2-bg-dark border-v2-border-light text-v2-gold-accent",
+    info: "bg-v2-bg-dark border-v2-border-light text-v2-text-tertiary",
   };
 
   // Icons for each severity level
