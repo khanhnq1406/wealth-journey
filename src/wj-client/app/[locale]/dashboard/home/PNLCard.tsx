@@ -174,7 +174,7 @@ export function PNLCard({ currency }: PNLCardProps) {
             </p>
             <Link
               href={routes.portfolio}
-              className="font-roboto text-[13px] font-medium text-v2-red-primary underline underline-offset-2"
+              className="font-roboto text-[13px] font-medium text-v2-text-primary underline underline-offset-2"
             >
               {t("pnlGoToPortfolio")}
             </Link>

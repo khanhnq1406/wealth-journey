@@ -274,5 +274,7 @@ Fix issues and re-review. Issue #1 (missing color tokens) is critical — dozens
 
 | 2026-03-21 | Restyled NetWorthDisplay text to tertiary pattern with contrast enhancements — changed all text from dark maroon (`text-v2-maroon-900`) to light cream (`text-v2-text-tertiary` #fcf2e0) across mobile, desktop, PnlValue, and pnlBar. Added dark text shadows (`textShadow` / `textShadowLg`) to all text elements except PnL percentage. Added semi-transparent black gradient overlay (`z-[3]`, `rgba(0,0,0,0.35)` → `rgba(0,0,0,0.05)`) on both mobile and desktop cards to darken the gold surface behind text. Fixed z-index overlap with mobile slide-out menu by adding `isolate z-0` to outermost wrapper, containing internal stacking contexts (`z-[1]`–`z-10`) below the menu's `z-50`. | Minor | `NetWorthDisplay.tsx` (1 file) |
 
+| 2026-03-23 | Lightened PnL indicator colors on NetWorthDisplay gold card — PnlValue card bg: `bg-v2-maroon-900/15`/`bg-red-800/20` → `bg-green-500/15`/`bg-red-400/15`, percent text: `text-green-800`/`text-red-800` → `text-green-400`/`text-red-400`, pnlBar badge: same pattern. Colors were too dark and appeared sunken on gold gradient surface. | Minor | `NetWorthDisplay.tsx` (1 file) |
+
 **Build verification:** `next build` passes with zero errors on all 21 routes after fixes.
 **Security review:** APPROVED — all changes are CSS-only class replacements, no security impact.

@@ -46,7 +46,7 @@ function PnlValue({ percent, amount, label, currency }: PnlValueProps) {
   return (
     <div
       className={`text-center rounded-xl px-4 py-2 ${
-        isPositive ? "bg-v2-maroon-900/15" : "bg-red-800/20"
+        isPositive ? "bg-green-500/15" : "bg-red-400/15"
       }`}
     >
       <p
@@ -56,7 +56,7 @@ function PnlValue({ percent, amount, label, currency }: PnlValueProps) {
         {formatAmount(amount)} {currency}
       </p>
       <p
-        className={`font-roboto font-bold text-[14px] ${isPositive ? "text-green-800" : "text-red-800"}`}
+        className={`font-roboto font-bold text-[14px] ${isPositive ? "text-green-400" : "text-red-400"}`}
       >
         {formatPercent(percent)}
       </p>
@@ -102,7 +102,7 @@ export function NetWorthDisplay({
   const isMonthPositive = monthPnlPercent >= 0;
 
   // PnL bar shared between mobile and desktop
-  const pnlBar = monthPnlPercent !== 0 && (
+  const pnlBar = (
     <div className="relative z-10 flex items-center justify-between px-5 py-3 bg-v2-maroon-900/15">
       <div className="flex items-center gap-2">
         {isMonthPositive ? (
@@ -120,8 +120,8 @@ export function NetWorthDisplay({
       <span
         className={`font-roboto font-bold text-[13px] px-3 py-1 rounded-full ${
           isMonthPositive
-            ? "bg-green-800/15 text-green-800"
-            : "bg-red-800/15 text-red-800"
+            ? "bg-green-500/15 text-green-400"
+            : "bg-red-400/15 text-red-400"
         }`}
       >
         {formatPercent(monthPnlPercent)}
