@@ -8,7 +8,7 @@
 - **Started:** 2026-03-23
 - **Last updated:** 2026-03-23
 - **Current state:** in_progress
-- **Current task:** 9
+- **Current task:** 12
 
 ## Task Progress
 
@@ -22,9 +22,9 @@
 | 6   | Create OG image                                  | done    | TBD    | Branded SVG OG image with gold/red colors and Vietnamese text |
 | 7   | Add noindex to dashboard and auth pages          | done    | TBD    | noindex on auth layout, split dashboard layout for server metadata |
 | 8   | Convert landing page to SSR with ISR             | done    | TBD    | Server page with ISR fetch, LandingContent client component |
-| 9   | Update H1 text in i18n messages                  | pending | —      | —       |
-| 10  | Improve image alt texts                          | pending | —      | —       |
-| 11  | Add preconnect to API domain                     | pending | —      | —       |
+| 9   | Update H1 text in i18n messages                  | done    | TBD    | SEO-optimized Vietnamese/English H1 titles |
+| 10  | Improve image alt texts                          | done    | TBD    | Descriptive Vietnamese alt texts for navbar, hero, auth images |
+| 11  | Add preconnect to API domain                     | done    | TBD    | Preconnect link in locale layout head |
 | 12  | Phase 4 documentation verification               | pending | —      | —       |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`

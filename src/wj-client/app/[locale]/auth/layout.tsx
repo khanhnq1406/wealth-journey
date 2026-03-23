@@ -22,7 +22,7 @@ export default async function AuthLayout({
           <div className="flex gap-2 items-center px-5">
             <Image
               src="/logo.svg"
-              alt="Logo"
+              alt="Logo congdongvang.com - Cộng đồng đầu tư tài chính"
               width={80}
               height={80}
               className="rounded-md"
@@ -32,7 +32,7 @@ export default async function AuthLayout({
               <p>{t("tagline")}</p>
             </div>
           </div>
-          <img src="/login-stock.svg" className="w-3/5" alt="Login picture" />
+          <img src="/login-stock.svg" className="w-3/5" alt="Minh họa đăng nhập congdongvang.com" />
         </div>
         <div className="bg-v2-maroon-900 h-screen">{children}</div>
       </div>

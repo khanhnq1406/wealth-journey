@@ -56,7 +56,7 @@ function DashboardPreview() {
         )}
         <Image
           src={"/dashboard.svg"}
-          alt="dashboard"
+          alt="Bảng điều khiển quản lý tài chính congdongvang.com"
           width={0}
           height={0}
           sizes="100vw"

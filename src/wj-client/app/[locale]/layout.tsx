@@ -34,6 +34,11 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className="h-dvh">
       <head>
+        {/* Preconnect to API domain for faster initial requests */}
+        {process.env.NEXT_PUBLIC_API_URL && (
+          <link rel="preconnect" href={process.env.NEXT_PUBLIC_API_URL} />
+        )}
+
         {/* PWA Meta Tags */}
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />

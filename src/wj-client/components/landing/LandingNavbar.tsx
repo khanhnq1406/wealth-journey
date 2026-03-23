@@ -80,7 +80,7 @@ export default function LandingNavbar() {
           <Link href="/" className="flex items-center space-x-2">
             <Image
               src="/logo.svg"
-              alt="congdongvang.com"
+              alt="Logo congdongvang.com - Cộng đồng đầu tư tài chính"
               width={28}
               height={28}
               className="sm:w-8 sm:h-8"
