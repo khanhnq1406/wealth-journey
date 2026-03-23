@@ -326,5 +326,7 @@ Fix issues and re-review. Issue #1 (missing color tokens) is critical — dozens
 
 | 2026-03-23 | Aligned community nav active state with mihong gold pattern — CommunityNav: `bg-v2-red-light text-v2-red-primary` → `bg-v2-gold-primary/20 text-v2-gold-primary`. MobileSubNav: `text-v2-red-primary` → `text-v2-gold-primary`. | Minor | `CommunityNav.tsx`, `MobileSubNav.tsx` (2 files) |
 
+| 2026-03-23 | Aligned TrendingTopics component with mihong color pattern — replaced undefined `hover:bg-v2-bg-primary` (no CSS output) with `hover:bg-v2-maroon-600` for hover state, replaced `text-bg` (#9B0111 red) with `text-v2-gold-primary` for hashtag text color. | Minor | `TrendingTopics.tsx` (1 file) |
+
 **Build verification:** `next build` passes with zero errors on all routes after fixes.
 **Security review:** APPROVED — all changes are UI-only (Tailwind class replacements), no security impact.
