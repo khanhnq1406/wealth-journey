@@ -418,8 +418,8 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
                   icon={<PlusIcon />}
                   label={t("modal.addInvestment")}
                   onClick={handleBuyMore}
-                  bgColor="bg-v2-green-light"
-                  textColor="text-v2-green-positive"
+                  bgColor="bg-v2-gold-primary/20"
+                  textColor="text-v2-gold-primary"
                   className="w-full"
                 />
                 {/* <QuickActionButton

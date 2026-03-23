@@ -306,5 +306,7 @@ Fix issues and re-review. Issue #1 (missing color tokens) is critical — dozens
 
 | 2026-03-23 | Fixed non-theme colors in InvestmentCardEnhanced for `isCustom` PNL display — replaced `bg-gray-50`/`bg-gray-100`/`text-gray-500`/`text-gray-800` with `bg-v2-maroon-900`/`text-v2-text-secondary`, replaced `bg-red-50`/`bg-red-100`/`text-red-600`/`text-red-800` with `bg-v2-red-negative/10`/`text-v2-red-negative`, replaced `bg-purple-100 text-purple-800` custom badge with `bg-v2-gold-primary/20 text-v2-gold-primary`, replaced stale indicator `bg-gray-400` with `bg-v2-text-tertiary`. Also updated profit PNL bg from `bg-v2-green-light` to `bg-v2-green-positive/10` for consistency. | Minor | `InvestmentCardEnhanced.tsx` (1 file) |
 
+| 2026-03-23 | Fixed QuickActionButton "Add Investment" in InvestmentCardEnhanced using undefined `bg-v2-green-light` token (no CSS output) and `text-v2-green-positive` — replaced with `bg-v2-gold-primary/20 text-v2-gold-primary` to match mihong gold theme pattern. | Minor | `InvestmentCardEnhanced.tsx` (1 file) |
+
 **Build verification:** `next build` passes with zero errors on all routes after fixes.
 **Security review:** APPROVED — all changes are UI-only (Tailwind class replacements), no security impact.
