@@ -72,6 +72,13 @@
               "position": 1
             }
           ]
+        },
+        {
+          "type": "image",
+          "opacity": 0.15,
+          "enabled": true,
+          "url": "./images/sjc3d-trans.png",
+          "mode": "fit"
         }
       ],
       "cornerRadius": 12,
@@ -401,6 +408,13 @@
               "position": 1
             }
           ]
+        },
+        {
+          "type": "image",
+          "opacity": 0.15,
+          "enabled": true,
+          "url": "./images/sjc3d-trans.png",
+          "mode": "fit"
         }
       ],
       "cornerRadius": 12,
@@ -834,6 +848,13 @@
               "position": 1
             }
           ]
+        },
+        {
+          "type": "image",
+          "opacity": 0.15,
+          "enabled": true,
+          "url": "./images/sjc3d-trans.png",
+          "mode": "fit"
         }
       ],
       "cornerRadius": 12,
@@ -1163,6 +1184,13 @@
               "position": 1
             }
           ]
+        },
+        {
+          "type": "image",
+          "opacity": 0.15,
+          "enabled": true,
+          "url": "./images/sjc3d-trans.png",
+          "mode": "fit"
         }
       ],
       "cornerRadius": 12,

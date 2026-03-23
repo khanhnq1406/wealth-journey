@@ -5,8 +5,7 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import Image from "next/image";
 
 const textShadow = "0 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.25)";
-const textShadowLg =
-  "0 2px 8px rgba(0,0,0,0.5), 0 0 16px rgba(0,0,0,0.3)";
+const textShadowLg = "0 2px 8px rgba(0,0,0,0.5), 0 0 16px rgba(0,0,0,0.3)";
 
 const goldGradient =
   "linear-gradient(135deg, #B8862D 0%, #D4A843 20%, #F5D38E 40%, #E8C36A 55%, #D4A843 70%, #B8862D 85%, #9A7023 100%)";
@@ -149,13 +148,13 @@ export function NetWorthDisplay({
         />
 
         {/* Dragon watermark — right side */}
-        <div className="absolute z-[2] pointer-events-none w-full h-full">
+        <div className="absolute z-[2] right-4 pointer-events-none h-full">
           <Image
-            src="/dragon1.webp"
-            alt=""
+            src="/sjc3d.webp"
+            alt="sjc"
             width={300}
             height={110}
-            className="object-contain w-full h-full opacity-70"
+            className="object-contain w-full h-full opacity-80"
             aria-hidden="true"
             priority
           />
@@ -221,13 +220,13 @@ export function NetWorthDisplay({
         />
 
         {/* Dragon watermark — right side */}
-        <div className="absolute right-1/2 top-1/2 -translate-y-1/2 z-[2] pointer-events-none opacity-80">
+        <div className="absolute top-1/2 -translate-y-1/2 z-[2] pointer-events-none opacity-80 w-full">
           <Image
-            src="/dragon1.webp"
-            alt=""
+            src="/sjc3d.webp"
+            alt="sjc"
             width={320}
             height={130}
-            className="object-contain h-32"
+            className="object-contain h-32 w-full"
             aria-hidden="true"
             priority
           />
