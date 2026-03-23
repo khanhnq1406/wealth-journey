@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3D0101"/>
+      <stop offset="100%" stop-color="#5F0202"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f0d078"/>
+      <stop offset="50%" stop-color="#d2a74b"/>
+      <stop offset="100%" stop-color="#b8862d"/>
+    </linearGradient>
+    <linearGradient id="goldLine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#d2a74b" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#d2a74b" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#d2a74b" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle pattern overlay -->
+  <rect width="1200" height="630" fill="none" stroke="#d2a74b" stroke-opacity="0.03" stroke-width="1">
+    <animate attributeName="stroke-opacity" values="0.03;0.05;0.03" dur="4s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- Top gold accent line -->
+  <rect x="0" y="0" width="1200" height="4" fill="url(#gold)"/>
+
+  <!-- Bottom gold accent line -->
+  <rect x="0" y="626" width="1200" height="4" fill="url(#gold)"/>
+
+  <!-- Decorative corner elements -->
+  <path d="M 40 40 L 120 40 L 120 44 L 44 44 L 44 120 L 40 120 Z" fill="#d2a74b" opacity="0.4"/>
+  <path d="M 1160 40 L 1080 40 L 1080 44 L 1156 44 L 1156 120 L 1160 120 Z" fill="#d2a74b" opacity="0.4"/>
+  <path d="M 40 590 L 120 590 L 120 586 L 44 586 L 44 510 L 40 510 Z" fill="#d2a74b" opacity="0.4"/>
+  <path d="M 1160 590 L 1080 590 L 1080 586 L 1156 586 L 1156 510 L 1160 510 Z" fill="#d2a74b" opacity="0.4"/>
+
+  <!-- Main content area -->
+  <!-- Brand name -->
+  <text x="600" y="200" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="bold" fill="url(#gold)" letter-spacing="2">
+    congdongvang.com
+  </text>
+
+  <!-- Decorative divider -->
+  <line x1="350" y1="240" x2="850" y2="240" stroke="url(#goldLine)" stroke-width="1.5"/>
+  <circle cx="600" cy="240" r="4" fill="#d2a74b"/>
+  <circle cx="560" cy="240" r="2" fill="#d2a74b" opacity="0.6"/>
+  <circle cx="640" cy="240" r="2" fill="#d2a74b" opacity="0.6"/>
+
+  <!-- Tagline -->
+  <text x="600" y="300" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="36" fill="#f0d078" letter-spacing="1">
+    Cộng Đồng Vàng
+  </text>
+
+  <!-- Subtitle -->
+  <text x="600" y="360" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" fill="#e8c880" opacity="0.85">
+    Quản Lý Tài Chính Cá Nhân
+  </text>
+
+  <!-- Feature badges -->
+  <g transform="translate(600, 440)" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#d2a74b" opacity="0.7">
+    <!-- Badges row -->
+    <text x="-320" y="0">Giá Vàng</text>
+    <circle cx="-220" cy="-5" r="2" fill="#d2a74b" opacity="0.5"/>
+    <text x="-140" y="0">Giá Bạc</text>
+    <circle cx="-50" cy="-5" r="2" fill="#d2a74b" opacity="0.5"/>
+    <text x="30" y="0">Ngoại Tệ</text>
+    <circle cx="110" cy="-5" r="2" fill="#d2a74b" opacity="0.5"/>
+    <text x="200" y="0">Đầu Tư</text>
+    <circle cx="270" cy="-5" r="2" fill="#d2a74b" opacity="0.5"/>
+    <text x="360" y="0">Miễn Phí</text>
+  </g>
+
+  <!-- Bottom tagline -->
+  <text x="600" y="530" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#c9a04a" opacity="0.5" letter-spacing="4">
+    www.congdongvang.com
+  </text>
+</svg>
