@@ -101,3 +101,9 @@ All tasks pass code quality review. One critical layout issue found during Task 
 GitNexus not available — manual blast radius review performed. Changes are isolated to:
 - Backend: site settings service (whitelist + validation) — no other services affected
 - Frontend: FAB component (new optional props, backward compatible), layout (new query), admin page (new form section)
+
+## Fix History
+
+| Date       | Fix                             | Severity | Commit        |
+| ---------- | ------------------------------- | -------- | ------------- |
+| 2026-03-23 | Unified intro card and action buttons into single card container with shared background; increased backdrop opacity (20%→60%), upgraded to full-opacity gold border-2, added gold glow box-shadow for visual prominence | Minor    | pending |
