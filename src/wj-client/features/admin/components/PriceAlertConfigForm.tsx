@@ -295,7 +295,7 @@ export function PriceAlertConfigForm() {
                 onChange={(e) =>
                   updateGlobal("cooldownMinutes", parseInt(e.target.value) || 1)
                 }
-                className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
+                className="w-full rounded-lg border border-v2-border-light bg-v2-maroon-900 px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
               />
               <p className="mt-1 font-roboto text-xs text-v2-text-tertiary">
                 {t("cooldownHelp")}
@@ -314,7 +314,7 @@ export function PriceAlertConfigForm() {
                 onChange={(e) =>
                   updateGlobal("topMoversCount", parseInt(e.target.value) || 1)
                 }
-                className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
+                className="w-full rounded-lg border border-v2-border-light bg-v2-maroon-900 px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
               />
               <p className="mt-1 font-roboto text-xs text-v2-text-tertiary">
                 {t("topMoversHelp")}
@@ -342,7 +342,7 @@ export function PriceAlertConfigForm() {
                 <button
                   type="button"
                   onClick={() => setExpandedCategory(isExpanded ? null : cat)}
-                  className="w-full flex items-center justify-between px-4 py-3 bg-v2-bg-secondary hover:bg-v2-bg-tertiary transition-colors"
+                  className="w-full flex items-center justify-between px-4 py-3 bg-v2-bg-secondary hover:bg-v2-maroon-900 transition-colors"
                 >
                   <span className="font-roboto text-sm font-medium text-v2-text-primary">
                     {t(`categories.${cat}`)}
@@ -393,7 +393,7 @@ export function PriceAlertConfigForm() {
                             parseFloat(e.target.value) || 0.1,
                           )
                         }
-                        className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
+                        className="w-full rounded-lg border border-v2-border-light bg-v2-maroon-900 px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
                       />
                     </div>
 
@@ -411,7 +411,7 @@ export function PriceAlertConfigForm() {
                         onChange={(e) =>
                           updateCategory(cat, "titleTemplate", e.target.value)
                         }
-                        className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
+                        className="w-full rounded-lg border border-v2-border-light bg-v2-maroon-900 px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
                       />
                       <div className="flex flex-wrap gap-1.5 mt-1.5">
                         {PLACEHOLDERS.map((p) => (
@@ -428,14 +428,14 @@ export function PriceAlertConfigForm() {
                                   updateCategory(cat, "titleTemplate", v),
                               )
                             }
-                            className="font-mono text-[11px] leading-tight bg-v2-bg-tertiary hover:bg-bg/10 text-v2-text-secondary hover:text-bg px-1.5 py-0.5 rounded border border-v2-border-light transition-colors cursor-pointer"
+                            className="font-mono text-[11px] leading-tight bg-v2-maroon-900 hover:bg-v2-maroon-800 text-v2-text-secondary hover:text-v2-gold-primary px-1.5 py-0.5 rounded border border-v2-border-light transition-colors cursor-pointer"
                           >
                             {`{${p}}`}
                           </button>
                         ))}
                       </div>
                       {catConfig.titleTemplate && (
-                        <div className="rounded-md bg-v2-bg-tertiary mt-1.5 px-2 py-1.5">
+                        <div className="rounded-md bg-v2-maroon-900 mt-1.5 px-2 py-1.5">
                           <span className="font-roboto text-xs font-medium text-v2-text-tertiary">
                             {t("preview")}:
                           </span>
@@ -463,7 +463,7 @@ export function PriceAlertConfigForm() {
                         onChange={(e) =>
                           updateCategory(cat, "bodyTemplate", e.target.value)
                         }
-                        className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary resize-none"
+                        className="w-full rounded-lg border border-v2-border-light bg-v2-maroon-900 px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary resize-none"
                       />
                       <div className="flex flex-wrap gap-1.5 mt-1.5">
                         {PLACEHOLDERS.map((p) => (
@@ -480,14 +480,14 @@ export function PriceAlertConfigForm() {
                                   updateCategory(cat, "bodyTemplate", v),
                               )
                             }
-                            className="font-mono text-[11px] leading-tight bg-v2-bg-tertiary hover:bg-bg/10 text-v2-text-secondary hover:text-bg px-1.5 py-0.5 rounded border border-v2-border-light transition-colors cursor-pointer"
+                            className="font-mono text-[11px] leading-tight bg-v2-maroon-900 hover:bg-v2-maroon-800 text-v2-text-secondary hover:text-v2-gold-primary px-1.5 py-0.5 rounded border border-v2-border-light transition-colors cursor-pointer"
                           >
                             {`{${p}}`}
                           </button>
                         ))}
                       </div>
                       {catConfig.bodyTemplate && (
-                        <div className="rounded-md bg-v2-bg-tertiary mt-1.5 px-2 py-1.5">
+                        <div className="rounded-md bg-v2-maroon-900 mt-1.5 px-2 py-1.5">
                           <span className="font-roboto text-xs font-medium text-v2-text-tertiary">
                             {t("preview")}:
                           </span>
@@ -512,7 +512,7 @@ export function PriceAlertConfigForm() {
           <button
             type="button"
             onClick={() => setShowPlaceholders(!showPlaceholders)}
-            className="w-full flex items-center justify-between px-4 py-3 bg-v2-bg-secondary hover:bg-v2-bg-tertiary transition-colors"
+            className="w-full flex items-center justify-between px-4 py-3 bg-v2-bg-secondary hover:bg-v2-maroon-900 transition-colors"
           >
             <span className="font-roboto text-sm font-medium text-v2-text-secondary">
               {t("placeholderGuide")}
@@ -530,7 +530,7 @@ export function PriceAlertConfigForm() {
               <div className="space-y-1.5">
                 {PLACEHOLDERS.map((p) => (
                   <div key={p} className="flex gap-2">
-                    <code className="font-mono text-xs bg-v2-bg-tertiary px-1.5 py-0.5 rounded text-bg whitespace-nowrap">
+                    <code className="font-mono text-xs bg-v2-maroon-900 px-1.5 py-0.5 rounded text-v2-gold-primary whitespace-nowrap">
                       {`{${p}}`}
                     </code>
                     <span className="font-roboto text-xs text-v2-text-tertiary">
