@@ -22,17 +22,17 @@ const WalletCardSkeleton = memo(function WalletCardSkeleton() {
       <div className="flex flex-col gap-3">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gray-200 rounded animate-pulse" />
-            <div className="h-6 w-32 bg-gray-200 rounded animate-pulse" />
+            <div className="w-8 h-8 bg-v2-maroon-900 rounded animate-pulse" />
+            <div className="h-6 w-32 bg-v2-maroon-900 rounded animate-pulse" />
           </div>
           <div className="flex gap-2">
-            <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
-            <div className="w-5 h-5 bg-gray-200 rounded animate-pulse" />
+            <div className="w-5 h-5 bg-v2-maroon-900 rounded animate-pulse" />
+            <div className="w-5 h-5 bg-v2-maroon-900 rounded animate-pulse" />
           </div>
         </div>
         <div className="text-right">
-          <div className="h-4 w-20 bg-gray-200 rounded animate-pulse ml-auto" />
-          <div className="h-8 w-40 bg-gray-200 rounded animate-pulse ml-auto mt-1" />
+          <div className="h-4 w-20 bg-v2-maroon-900 rounded animate-pulse ml-auto" />
+          <div className="h-8 w-40 bg-v2-maroon-900 rounded animate-pulse ml-auto mt-1" />
         </div>
       </div>
     </BaseCard>
@@ -52,8 +52,8 @@ const EmptyWalletsState = memo(function EmptyWalletsState() {
           height={64}
           className="opacity-50"
         />
-        <div className="text-gray-500 text-lg">{tFeedback("noWalletsFound")}</div>
-        <div className="text-gray-400">
+        <div className="text-v2-text-secondary text-lg">{tFeedback("noWalletsFound")}</div>
+        <div className="text-v2-text-tertiary">
           {tFeedback("noWalletsDescription")}
         </div>
       </div>

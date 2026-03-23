@@ -91,8 +91,8 @@ export default function WalletsPage() {
     return (
       <div className="flex flex-col gap-3 sm:gap-4 px-3 sm:px-4 md:px-6 py-3 sm:py-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-          <div className="h-8 w-32 bg-neutral-200 rounded animate-pulse" />
-          <div className="h-10 w-40 bg-neutral-200 rounded animate-pulse" />
+          <div className="h-8 w-32 bg-v2-maroon-900 rounded animate-pulse" />
+          <div className="h-10 w-40 bg-v2-maroon-900 rounded animate-pulse" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <CardSkeleton lines={4} showAction={true} />
@@ -126,7 +126,7 @@ export default function WalletsPage() {
       <div className="flex flex-col gap-4">
         {/* Title and Create Button */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
- <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">
+ <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-v2-gold-accent">
             {t("title")}
           </h1>
           <Button
@@ -228,7 +228,7 @@ export default function WalletsPage() {
                   "px-4 py-2 rounded-lg text-sm font-medium transition-colors min-h-[40px]",
                   filterType === filter.value
                     ? "bg-v2-red-primary text-white"
- : "bg-gray-100 text-gray-700 hover:bg-gray-200",
+ : "bg-v2-maroon-900 text-v2-gold-accent hover:bg-v2-maroon-800",
                 )}
                 aria-pressed={filterType === filter.value}
               >

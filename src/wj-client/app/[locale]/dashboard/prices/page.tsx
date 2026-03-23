@@ -459,6 +459,8 @@ export default function PricesPage() {
                   emptyMessage={t("gold.emptyMessage")}
                   emptyDescription={t("gold.emptyDescription")}
                   expandable
+                  expandButtonLabel={tc("showDetails")}
+                  collapseButtonLabel={tc("hideDetails")}
                 />
               </div>
               {/* Gold Sentiment */}
@@ -499,6 +501,8 @@ export default function PricesPage() {
                   emptyMessage={t("silver.emptyMessage")}
                   emptyDescription={t("silver.emptyDescription")}
                   expandable
+                  expandButtonLabel={tc("showDetails")}
+                  collapseButtonLabel={tc("hideDetails")}
                 />
               </div>
               {/* Silver Sentiment */}
@@ -539,6 +543,8 @@ export default function PricesPage() {
                   emptyMessage={t("currency.emptyMessage")}
                   emptyDescription={t("currency.emptyDescription")}
                   expandable
+                  expandButtonLabel={tc("showDetails")}
+                  collapseButtonLabel={tc("hideDetails")}
                 />
               </div>
             </>

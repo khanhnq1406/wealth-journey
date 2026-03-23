@@ -76,10 +76,10 @@ export const WalletCard = memo(function WalletCard({
 
         {/* Balance display */}
         <div className="text-right">
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-v2-text-tertiary">
             {isInvestmentWallet ? "Total Value" : tCommon("balance")}
           </div>
-          <div className="text-2xl font-bold text-primary-600">
+          <div className="text-2xl font-bold text-v2-gold-primary">
             {formatCurrency(totalValue, displayCurrency)}
           </div>
         </div>
@@ -91,7 +91,7 @@ export const WalletCard = memo(function WalletCard({
               percentage={cashPercentage}
               label={`${cashPercentage}% cash`}
             />
-            <div className="flex justify-between text-xs text-gray-600 mt-2">
+            <div className="flex justify-between text-xs text-v2-text-secondary mt-2">
               <span>{tCommon("cash")}: {formatCurrency(balance, displayCurrency)}</span>
               <span>{tCommon("investment")}: {formatCurrency(investmentValue, displayCurrency)}</span>
             </div>

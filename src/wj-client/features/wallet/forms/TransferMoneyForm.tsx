@@ -91,7 +91,7 @@ export function TransferMoneyForm({ onSuccess }: TransferMoneyFormProps) {
     return (
       <span>
         {option.label}{" "}
-        <span className="text-neutral-500">
+        <span className="text-v2-text-tertiary">
           ({formatCurrency(balance, currency)})
         </span>
       </span>
@@ -134,7 +134,7 @@ export function TransferMoneyForm({ onSuccess }: TransferMoneyFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       {errorMessage && (
-        <div className="bg-red-50 text-danger-600 p-3 rounded mb-4">
+        <div className="bg-v2-red-primary/10 text-v2-red-negative p-3 rounded mb-4">
           {errorMessage}
         </div>
       )}

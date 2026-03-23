@@ -37,6 +37,7 @@ export function AdminUsersTab() {
   const { toast } = useNotification();
   const auth = useSelector((state: any) => state.setAuthReducer);
   const t = useTranslations("admin.users");
+  const tc = useTranslations("common");
 
   const [users, setUsers] = useState<AdminUserItem[]>([]);
   const [page, setPage] = useState(1);
@@ -204,6 +205,8 @@ export function AdminUsersTab() {
         isLoading={isLoading}
         emptyMessage={t("noUsers")}
         expandable
+        expandButtonLabel={tc("showDetails")}
+        collapseButtonLabel={tc("hideDetails")}
       />
 
       {/* Pagination */}

@@ -200,6 +200,7 @@ export function AdminFeedbackTab() {
   const { toast } = useNotification();
   const t = useTranslations("admin.feedback");
   const tFilter = useTranslations("admin.feedback.statusFilter");
+  const tc = useTranslations("common");
 
   const STATUS_OPTIONS = STATUS_VALUES.map((s) => ({
     value: s.value,
@@ -402,6 +403,8 @@ export function AdminFeedbackTab() {
         isLoading={isLoading}
         emptyMessage={t("noFeedback")}
         expandable
+        expandButtonLabel={tc("showDetails")}
+        collapseButtonLabel={tc("hideDetails")}
       />
 
       {/* Pagination */}

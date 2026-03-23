@@ -163,10 +163,10 @@ const MobileTableRow = memo(function MobileTableRow<T>({
       <React.Fragment key={column.id || cellIndex}>
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <p className="text-gray-900 text-sm font-bold mb-1">
+            <p className="text-v2-gold-accent text-sm font-bold mb-1">
               {headerContent}
             </p>
-            <p className="text-gray-900 text-sm font-light text-right">
+            <p className="text-v2-gold-accent text-sm font-light text-right">
               {displayValue ?? "-"}
             </p>
           </div>
@@ -194,7 +194,7 @@ const MobileTableRow = memo(function MobileTableRow<T>({
           <div className="flex justify-end">
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-sm font-medium text-v2-red-primary hover:text-v2-red-dark transition-colors duration-200 py-1 px-2 rounded hover:bg-v2-red-light"
+              className="text-sm font-medium text-v2-gold-primary hover:text-v2-gold-accent transition-colors duration-200 py-1 px-2 rounded hover:bg-v2-maroon-900"
               aria-expanded={isExpanded}
               aria-label={isExpanded ? collapseButtonLabel : expandButtonLabel}
             >
@@ -228,7 +228,7 @@ const MobileTableRow = memo(function MobileTableRow<T>({
         <>
           <div className="border-t border-v2-gold-primary/20" />
           <div className="flex justify-between items-center">
-            <p className="text-gray-900 text-sm font-bold">Actions</p>
+            <p className="text-v2-gold-accent text-sm font-bold">Actions</p>
             <div className="flex gap-1 -mr-2">{renderActions(row)}</div>
           </div>
         </>
@@ -281,8 +281,8 @@ export const MobileTable = memo(function MobileTable<T>({
                 <React.Fragment key={`loading-cell-${cellIndex}`}>
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <div className="h-4 bg-gray-200 rounded animate-pulse mb-2 w-24" />
-                      <div className="h-3 bg-gray-100 rounded animate-pulse w-full" />
+                      <div className="h-4 bg-v2-maroon-900 rounded animate-pulse mb-2 w-24" />
+                      <div className="h-3 bg-v2-maroon-900/70 rounded animate-pulse w-full" />
                     </div>
                   </div>
                   {cellIndex < columnsToShow.length - 1 && (
@@ -294,7 +294,7 @@ export const MobileTable = memo(function MobileTable<T>({
                 <>
                   <div className="border-t border-v2-gold-primary/20" />
                   <div className="flex justify-end">
-                    <div className="h-6 w-16 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-6 w-16 bg-v2-maroon-900 rounded animate-pulse" />
                   </div>
                 </>
               )}
@@ -311,7 +311,7 @@ export const MobileTable = memo(function MobileTable<T>({
       <BaseCard>
         <div className="flex flex-col items-center justify-center py-12">
           <svg
-            className="w-16 h-16 mb-4 text-gray-400"
+            className="w-16 h-16 mb-4 text-v2-text-secondary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -324,8 +324,8 @@ export const MobileTable = memo(function MobileTable<T>({
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <p className="text-lg font-medium text-gray-900">{emptyMessage}</p>
-          <p className="text-sm text-gray-400">{emptyDescription}</p>
+          <p className="text-lg font-medium text-v2-gold-accent">{emptyMessage}</p>
+          <p className="text-sm text-v2-text-secondary">{emptyDescription}</p>
         </div>
       </BaseCard>
     ),
@@ -394,7 +394,7 @@ export const MobileTable = memo(function MobileTable<T>({
 
         {/* Scroll indicator */}
         {showScrollIndicator && (
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-v2-maroon-700 to-transparent pointer-events-none" />
         )}
       </div>
     );

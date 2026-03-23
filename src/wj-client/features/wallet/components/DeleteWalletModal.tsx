@@ -105,12 +105,12 @@ export function DeleteWalletModal({
     <>
       <h2 className="text-xl font-bold mb-4">{t("title")}</h2>
 
-      <p className="text-gray-600 mb-4">
+      <p className="text-v2-text-secondary mb-4">
         {t("description", { walletName: wallet.walletName })}
       </p>
 
       <div className="space-y-3 mb-6">
-        <label className="flex items-start p-3 border rounded cursor-pointer hover:bg-gray-50">
+        <label className="flex items-start p-3 border rounded cursor-pointer hover:bg-v2-maroon-700">
           <input
             type="radio"
             name="option"
@@ -121,13 +121,13 @@ export function DeleteWalletModal({
           />
           <div>
             <div className="font-medium">{t("archiveOption")}</div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-v2-text-tertiary">
               {t("archiveDescription")}
             </div>
           </div>
         </label>
 
-        <label className="flex items-start p-3 border rounded cursor-pointer hover:bg-gray-50">
+        <label className="flex items-start p-3 border rounded cursor-pointer hover:bg-v2-maroon-700">
           <input
             type="radio"
             name="option"
@@ -140,7 +140,7 @@ export function DeleteWalletModal({
             <div className="font-medium">
               {t("transferOption")}
             </div>
-            <div className="text-sm text-gray-500 mb-2">
+            <div className="text-sm text-v2-text-tertiary mb-2">
               {t("transferDescription")}
             </div>
             {option === "transfer" && (
@@ -169,7 +169,7 @@ export function DeleteWalletModal({
           </div>
         </label>
 
-        <label className="flex items-start p-3 border rounded cursor-pointer hover:bg-gray-50">
+        <label className="flex items-start p-3 border rounded cursor-pointer hover:bg-v2-maroon-700">
           <input
             type="radio"
             name="option"
@@ -179,10 +179,10 @@ export function DeleteWalletModal({
             disabled={isLoading}
           />
           <div>
-            <div className="font-medium text-red-600">
+            <div className="font-medium text-v2-red-negative">
               {t("deleteOnlyOption")}
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-v2-text-tertiary">
               {t("deleteOnlyDescription")}{" "}
               <strong>{t("notRecommended")}</strong>
             </div>
@@ -191,7 +191,7 @@ export function DeleteWalletModal({
       </div>
 
       {error && (
-        <div className="mb-4 p-2 bg-red-50 border border-v2-red-negative/30 rounded text-red-600 text-sm" role="alert">
+        <div className="mb-4 p-2 bg-v2-red-primary/10 border border-v2-red-negative/30 rounded text-v2-red-negative text-sm" role="alert">
           {error}
         </div>
       )}
@@ -199,7 +199,7 @@ export function DeleteWalletModal({
       <div className="flex justify-end space-x-3">
         <button
           onClick={onCancel}
-          className="px-4 py-2 border rounded hover:bg-gray-50 disabled:opacity-50"
+          className="px-4 py-2 border rounded hover:bg-v2-maroon-700 disabled:opacity-50"
           disabled={isLoading}
         >
           {tCommon("cancel")}
