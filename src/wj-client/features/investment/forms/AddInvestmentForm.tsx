@@ -129,6 +129,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
 
   // State for tracking selected symbol and currency (for market price display)
   const [selectedSymbol, setSelectedSymbol] = useState<string>("");
+  const [isSymbolSelected, setIsSymbolSelected] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<string>("USD");
 
   // Custom investment toggle state
@@ -459,6 +460,9 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
     if (result?.currency) {
       setValue("currency", result.currency);
       setSelectedCurrency(result.currency);
+      setIsSymbolSelected(true);
+    } else {
+      setIsSymbolSelected(false);
     }
   };
 
@@ -598,6 +602,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
                 if (e.target.checked) {
                   setValue("symbol", "");
                   setSelectedSymbol("");
+                  setIsSymbolSelected(false);
                 } else {
                   // Reset to default when unchecked
                   setValue("currency", "USD");
@@ -957,7 +962,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
             <CurrencyBadge
               value={currency}
               onChange={(newCurrency) => setValue("currency", newCurrency)}
-              disabled={isSubmitting || isGoldInvestment || isSilverInvestment}
+              disabled={isSubmitting || isGoldInvestment || isSilverInvestment || isSymbolSelected}
             />
           )}
           {/* Display only badge for custom investments */}
