@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils/cn";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { ZIndex } from "@/lib/utils/z-index";
 import { XIcon, PlusIcon } from "@/components/icons";
 
@@ -13,10 +13,23 @@ interface FABAction {
 
 interface FABProps {
   actions: FABAction[];
+  introContent?: { text: string; contactInfo: string };
+  autoOpen?: boolean;
 }
 
-export function FloatingActionButton({ actions }: FABProps) {
+export function FloatingActionButton({
+  actions,
+  introContent,
+  autoOpen,
+}: FABProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (autoOpen) {
+      const timer = setTimeout(() => setIsOpen(true), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [autoOpen]);
 
   const handleActionClick = useCallback(
     (
@@ -45,12 +58,26 @@ export function FloatingActionButton({ actions }: FABProps) {
 
       {/* FAB Container */}
       <div
-        className="fixed right-3 sm:right-6 sm:!bottom-6 flex items-end"
+        className="fixed right-3 sm:right-6 sm:!bottom-6 flex flex-col items-end"
         style={{
           zIndex: ZIndex.floating + 1,
           bottom: "calc(env(safe-area-inset-bottom, 0px) + 70px)",
         }}
       >
+        {/* Intro card (above action buttons) */}
+        {isOpen && introContent && (
+          <div className="bg-v2-maroon-800 border border-v2-gold-primary/30 rounded-2xl px-5 py-4 mb-1">
+            <p className="text-v2-gold-accent text-sm leading-relaxed">
+              {introContent.text}
+            </p>
+            <div className="border-t border-v2-gold-primary/20 mt-3 pt-3">
+              <p className="text-v2-text-tertiary text-xs">
+                {introContent.contactInfo}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Action buttons (expand upward) */}
         <div
           className={cn(
