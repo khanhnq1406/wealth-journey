@@ -263,28 +263,28 @@ export function PriceAlertConfigForm() {
 
   if (!config) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-        <p className="font-vietnam text-sm text-red-700">{t("toast.error")}</p>
+      <div className="bg-v2-bg-dark border border-v2-red-negative/30 rounded-lg px-4 py-3">
+        <p className="font-roboto text-sm text-v2-red-negative">{t("toast.error")}</p>
       </div>
     );
   }
 
   return (
     <div className="max-w-2xl">
-      <h3 className="font-vietnam font-semibold text-lg text-v2-text-primary mb-4">
+      <h3 className="font-roboto font-semibold text-lg text-v2-text-primary mb-4">
         {t("title")}
       </h3>
 
       <div className="space-y-6">
         {/* Global Settings */}
         <div className="space-y-4">
-          <h4 className="font-vietnam font-medium text-sm text-v2-text-secondary uppercase tracking-wide">
+          <h4 className="font-roboto font-medium text-sm text-v2-text-secondary uppercase tracking-wide">
             {t("globalSettings")}
           </h4>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block font-vietnam text-sm font-medium text-v2-text-secondary mb-1">
+              <label className="block font-roboto text-sm font-medium text-v2-text-secondary mb-1">
                 {t("cooldownMinutes")}
               </label>
               <input
@@ -295,15 +295,15 @@ export function PriceAlertConfigForm() {
                 onChange={(e) =>
                   updateGlobal("cooldownMinutes", parseInt(e.target.value) || 1)
                 }
-                className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-vietnam text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
+                className="w-full rounded-lg border border-v2-border-light bg-v2-maroon-900 px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
               />
-              <p className="mt-1 font-vietnam text-xs text-v2-text-tertiary">
+              <p className="mt-1 font-roboto text-xs text-v2-text-tertiary">
                 {t("cooldownHelp")}
               </p>
             </div>
 
             <div>
-              <label className="block font-vietnam text-sm font-medium text-v2-text-secondary mb-1">
+              <label className="block font-roboto text-sm font-medium text-v2-text-secondary mb-1">
                 {t("topMoversCount")}
               </label>
               <input
@@ -314,9 +314,9 @@ export function PriceAlertConfigForm() {
                 onChange={(e) =>
                   updateGlobal("topMoversCount", parseInt(e.target.value) || 1)
                 }
-                className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-vietnam text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
+                className="w-full rounded-lg border border-v2-border-light bg-v2-maroon-900 px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
               />
-              <p className="mt-1 font-vietnam text-xs text-v2-text-tertiary">
+              <p className="mt-1 font-roboto text-xs text-v2-text-tertiary">
                 {t("topMoversHelp")}
               </p>
             </div>
@@ -325,7 +325,7 @@ export function PriceAlertConfigForm() {
 
         {/* Per-Category Settings */}
         <div className="space-y-3">
-          <h4 className="font-vietnam font-medium text-sm text-v2-text-secondary uppercase tracking-wide">
+          <h4 className="font-roboto font-medium text-sm text-v2-text-secondary uppercase tracking-wide">
             {t("categorySettings")}
           </h4>
 
@@ -342,9 +342,9 @@ export function PriceAlertConfigForm() {
                 <button
                   type="button"
                   onClick={() => setExpandedCategory(isExpanded ? null : cat)}
-                  className="w-full flex items-center justify-between px-4 py-3 bg-v2-bg-secondary hover:bg-v2-bg-tertiary transition-colors"
+                  className="w-full flex items-center justify-between px-4 py-3 bg-v2-bg-secondary hover:bg-v2-maroon-900 transition-colors"
                 >
-                  <span className="font-vietnam text-sm font-medium text-v2-text-primary">
+                  <span className="font-roboto text-sm font-medium text-v2-text-primary">
                     {t(`categories.${cat}`)}
                   </span>
                   <div className="flex items-center gap-3">
@@ -360,7 +360,7 @@ export function PriceAlertConfigForm() {
                         }
                         className="rounded border-v2-border-light text-bg focus:ring-bg/30"
                       />
-                      <span className="font-vietnam text-xs text-v2-text-secondary">
+                      <span className="font-roboto text-xs text-v2-text-secondary">
                         {t("enabled")}
                       </span>
                     </label>
@@ -377,7 +377,7 @@ export function PriceAlertConfigForm() {
                 {isExpanded && (
                   <div className="px-4 py-4 space-y-3 border-t border-v2-border-light">
                     <div>
-                      <label className="block font-vietnam text-sm font-medium text-v2-text-secondary mb-1">
+                      <label className="block font-roboto text-sm font-medium text-v2-text-secondary mb-1">
                         {t("thresholdPct")}
                       </label>
                       <input
@@ -393,12 +393,12 @@ export function PriceAlertConfigForm() {
                             parseFloat(e.target.value) || 0.1,
                           )
                         }
-                        className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-vietnam text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
+                        className="w-full rounded-lg border border-v2-border-light bg-v2-maroon-900 px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
                       />
                     </div>
 
                     <div>
-                      <label className="block font-vietnam text-sm font-medium text-v2-text-secondary mb-1">
+                      <label className="block font-roboto text-sm font-medium text-v2-text-secondary mb-1">
                         {t("titleTemplate")}
                       </label>
                       <input
@@ -411,7 +411,7 @@ export function PriceAlertConfigForm() {
                         onChange={(e) =>
                           updateCategory(cat, "titleTemplate", e.target.value)
                         }
-                        className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-vietnam text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
+                        className="w-full rounded-lg border border-v2-border-light bg-v2-maroon-900 px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
                       />
                       <div className="flex flex-wrap gap-1.5 mt-1.5">
                         {PLACEHOLDERS.map((p) => (
@@ -428,18 +428,18 @@ export function PriceAlertConfigForm() {
                                   updateCategory(cat, "titleTemplate", v),
                               )
                             }
-                            className="font-mono text-[11px] leading-tight bg-v2-bg-tertiary hover:bg-bg/10 text-v2-text-secondary hover:text-bg px-1.5 py-0.5 rounded border border-v2-border-light transition-colors cursor-pointer"
+                            className="font-mono text-[11px] leading-tight bg-v2-maroon-900 hover:bg-v2-maroon-800 text-v2-text-secondary hover:text-v2-gold-primary px-1.5 py-0.5 rounded border border-v2-border-light transition-colors cursor-pointer"
                           >
                             {`{${p}}`}
                           </button>
                         ))}
                       </div>
                       {catConfig.titleTemplate && (
-                        <div className="rounded-md bg-v2-bg-tertiary mt-1.5 px-2 py-1.5">
-                          <span className="font-vietnam text-xs font-medium text-v2-text-tertiary">
+                        <div className="rounded-md bg-v2-maroon-900 mt-1.5 px-2 py-1.5">
+                          <span className="font-roboto text-xs font-medium text-v2-text-tertiary">
                             {t("preview")}:
                           </span>
-                          <p className="font-vietnam text-sm text-v2-text-primary mt-0.5">
+                          <p className="font-roboto text-sm text-v2-text-primary mt-0.5">
                             {resolvePlaceholders(
                               catConfig.titleTemplate,
                               SAMPLE_VALUES[cat] ?? SAMPLE_VALUES.gold_vnd,
@@ -450,7 +450,7 @@ export function PriceAlertConfigForm() {
                     </div>
 
                     <div>
-                      <label className="block font-vietnam text-sm font-medium text-v2-text-secondary mb-1">
+                      <label className="block font-roboto text-sm font-medium text-v2-text-secondary mb-1">
                         {t("bodyTemplate")}
                       </label>
                       <textarea
@@ -463,7 +463,7 @@ export function PriceAlertConfigForm() {
                         onChange={(e) =>
                           updateCategory(cat, "bodyTemplate", e.target.value)
                         }
-                        className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-vietnam text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg resize-none"
+                        className="w-full rounded-lg border border-v2-border-light bg-v2-maroon-900 px-3 py-2 font-roboto text-sm text-v2-text-primary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary resize-none"
                       />
                       <div className="flex flex-wrap gap-1.5 mt-1.5">
                         {PLACEHOLDERS.map((p) => (
@@ -480,18 +480,18 @@ export function PriceAlertConfigForm() {
                                   updateCategory(cat, "bodyTemplate", v),
                               )
                             }
-                            className="font-mono text-[11px] leading-tight bg-v2-bg-tertiary hover:bg-bg/10 text-v2-text-secondary hover:text-bg px-1.5 py-0.5 rounded border border-v2-border-light transition-colors cursor-pointer"
+                            className="font-mono text-[11px] leading-tight bg-v2-maroon-900 hover:bg-v2-maroon-800 text-v2-text-secondary hover:text-v2-gold-primary px-1.5 py-0.5 rounded border border-v2-border-light transition-colors cursor-pointer"
                           >
                             {`{${p}}`}
                           </button>
                         ))}
                       </div>
                       {catConfig.bodyTemplate && (
-                        <div className="rounded-md bg-v2-bg-tertiary mt-1.5 px-2 py-1.5">
-                          <span className="font-vietnam text-xs font-medium text-v2-text-tertiary">
+                        <div className="rounded-md bg-v2-maroon-900 mt-1.5 px-2 py-1.5">
+                          <span className="font-roboto text-xs font-medium text-v2-text-tertiary">
                             {t("preview")}:
                           </span>
-                          <p className="font-vietnam text-sm text-v2-text-primary mt-0.5 whitespace-pre-wrap">
+                          <p className="font-roboto text-sm text-v2-text-primary mt-0.5 whitespace-pre-wrap">
                             {resolvePlaceholders(
                               catConfig.bodyTemplate,
                               SAMPLE_VALUES[cat] ?? SAMPLE_VALUES.gold_vnd,
@@ -512,9 +512,9 @@ export function PriceAlertConfigForm() {
           <button
             type="button"
             onClick={() => setShowPlaceholders(!showPlaceholders)}
-            className="w-full flex items-center justify-between px-4 py-3 bg-v2-bg-secondary hover:bg-v2-bg-tertiary transition-colors"
+            className="w-full flex items-center justify-between px-4 py-3 bg-v2-bg-secondary hover:bg-v2-maroon-900 transition-colors"
           >
-            <span className="font-vietnam text-sm font-medium text-v2-text-secondary">
+            <span className="font-roboto text-sm font-medium text-v2-text-secondary">
               {t("placeholderGuide")}
             </span>
             <span
@@ -530,10 +530,10 @@ export function PriceAlertConfigForm() {
               <div className="space-y-1.5">
                 {PLACEHOLDERS.map((p) => (
                   <div key={p} className="flex gap-2">
-                    <code className="font-mono text-xs bg-v2-bg-tertiary px-1.5 py-0.5 rounded text-bg whitespace-nowrap">
+                    <code className="font-mono text-xs bg-v2-maroon-900 px-1.5 py-0.5 rounded text-v2-gold-primary whitespace-nowrap">
                       {`{${p}}`}
                     </code>
-                    <span className="font-vietnam text-xs text-v2-text-tertiary">
+                    <span className="font-roboto text-xs text-v2-text-tertiary">
                       {t(`placeholders.${p}`)}
                     </span>
                   </div>
@@ -545,14 +545,14 @@ export function PriceAlertConfigForm() {
 
         {/* Error/Success */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2">
-            <p className="font-vietnam text-sm text-red-700">{error}</p>
+          <div className="bg-v2-bg-dark border border-v2-red-negative/30 rounded-lg px-4 py-2">
+            <p className="font-roboto text-sm text-v2-red-negative">{error}</p>
           </div>
         )}
 
         {success && (
-          <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2">
-            <p className="font-vietnam text-sm text-green-700">{success}</p>
+          <div className="bg-v2-bg-dark border border-v2-green-positive/30 rounded-lg px-4 py-2">
+            <p className="font-roboto text-sm text-v2-green-positive">{success}</p>
           </div>
         )}
 

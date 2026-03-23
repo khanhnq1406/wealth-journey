@@ -67,21 +67,47 @@ func New(cfg *config.Config) (*Database, error) {
 
 	// Auto migrate schemas
 	err = db.AutoMigrate(
+		// Core
 		&models.User{},
 		&models.Wallet{},
 		&models.Category{},
+		&models.CategoryKeyword{},
+		&models.UserCategoryMapping{},
 		&models.Transaction{},
 		&models.Budget{},
 		&models.BudgetItem{},
+		// Investment
 		&models.Investment{},
 		&models.InvestmentTransaction{},
 		&models.InvestmentLot{},
 		&models.MarketData{},
 		&models.PortfolioHistory{},
-		&models.Session{},
+		&models.ExchangeRate{},
 		&models.FXRate{},
+		// Auth & sessions
+		&models.Session{},
+		// Import
 		&models.ImportBatch{},
-		&models.UserCategoryMapping{},
+		&models.BankTemplate{},
+		&models.UserTemplate{},
+		&models.MerchantCategoryRule{},
+		// Community
+		&models.Post{},
+		&models.PostHashtag{},
+		&models.PostLike{},
+		&models.SavedPost{},
+		&models.Comment{},
+		&models.UserFollow{},
+		&models.ContentReport{},
+		// Gold sentiment
+		&models.GoldVote{},
+		&models.GoldVoteComment{},
+		// Notifications
+		&models.Notification{},
+		&models.PushSubscription{},
+		// Admin & settings
+		&models.SiteSetting{},
+		&models.Feedback{},
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to migrate database: %w", err)

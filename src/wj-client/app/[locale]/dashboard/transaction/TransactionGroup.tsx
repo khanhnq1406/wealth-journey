@@ -34,12 +34,12 @@ export const TransactionGroup = ({
     <div>
       {/* Date Header */}
       <div className="flex justify-between items-center mb-2 px-3">
-        <div className="font-semibold text-gray-700">
+        <div className="font-semibold text-v2-gold-accent">
           {formatDateFriendly(date)}
         </div>
         <div
           className={`font-semibold ${
-            dailyTotal >= 0 ? "text-v2-green-positive" : "text-red-600"
+            dailyTotal >= 0 ? "text-v2-green-positive" : "text-v2-red-negative"
           }`}
         >
           {dailyTotal >= 0 ? "+" : ""}

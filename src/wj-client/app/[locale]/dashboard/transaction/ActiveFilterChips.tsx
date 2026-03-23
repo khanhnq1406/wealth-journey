@@ -37,15 +37,15 @@ export function ActiveFilterChips({
   }
 
   return (
-    <div className="flex items-center gap-3 px-3 sm:px-4 md:px-6 py-2 border-b border-gray-200">
+    <div className="flex items-center gap-3 px-3 sm:px-4 md:px-6 py-2 border-b border-v2-border-light">
       {/* Horizontal scrollable chips */}
-      <div className="flex-1 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+      <div className="flex-1 overflow-x-auto scrollbar-thin scrollbar-thumb-v2-border-light scrollbar-track-transparent">
         <div className="flex gap-2 flex-nowrap">
           {activeFilters.map((filter) => (
             <button
               key={filter.key}
               onClick={() => onRemoveFilter(filter.key as keyof TransactionFilters)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-50 text-primary-700 rounded-full text-sm font-medium whitespace-nowrap hover:bg-primary-100 active:bg-primary-200 transition-colors min-h-[36px] focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-v2-bg-dark text-v2-text-secondary rounded-full text-sm font-medium whitespace-nowrap hover:bg-v2-bg-surface-tint active:bg-v2-bg-surface-tint transition-colors min-h-[36px] focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2"
               aria-label={tf("removeFilter", { label: filter.label })}
             >
               <span>{filter.label}:</span>
@@ -72,7 +72,7 @@ export function ActiveFilterChips({
       {/* Clear All button */}
       <button
         onClick={onClearAll}
-        className="flex-shrink-0 text-sm font-medium text-red-600 hover:text-red-700 active:text-red-800 transition-colors min-h-[36px] px-2 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 rounded"
+        className="flex-shrink-0 text-sm font-medium text-v2-red-negative hover:text-v2-red-primary active:text-v2-red-primary transition-colors min-h-[36px] px-2 focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 rounded"
         aria-label={t("clearAll")}
       >
         {t("clearAll")}

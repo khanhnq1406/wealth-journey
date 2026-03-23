@@ -95,9 +95,9 @@ export function QuickActions({
         // Spacing and padding
         "gap-3 px-4 py-3",
         // Background
-        "bg-white",
+        "bg-v2-maroon-800",
         // Bottom border for visual separation
-        "border-b border-neutral-200",
+        "border-b border-v2-gold-primary/20",
         className,
       )}
       role="navigation"
@@ -122,13 +122,13 @@ export function QuickActions({
             // Rounded corners
             "rounded-lg",
             // Background and border
-            "bg-white border border-neutral-200",
+            "bg-v2-maroon-800 border border-v2-maroon-600",
             // Hover state
-            "hover:bg-neutral-50 hover:border-neutral-300",
+            "hover:bg-neutral-50 hover:border-v2-gold-primary/30",
             // Active state (touch feedback)
             "active:bg-neutral-100 active:scale-95",
             // Focus state for keyboard navigation
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2",
             // Transitions
             "transition-all duration-200",
             // Disabled state

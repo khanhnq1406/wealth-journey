@@ -21,7 +21,7 @@ interface BalanceCardProps {
 
 const VerifiedBadge = memo(function VerifiedBadge() {
   return (
-    <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-white/10 border border-white/20 rounded text-xs font-medium text-white">
+    <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-white/10 border border-v2-gold-primary/20 rounded text-xs font-medium text-white">
       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
         <path
           fillRule="evenodd"
@@ -185,7 +185,7 @@ export const BalanceCard = memo(function BalanceCard({
 
       {/* Last Updated Timestamp */}
       {lastUpdated && (
-        <div className="mt-4 pt-4 border-t border-white/10">
+        <div className="mt-4 pt-4 border-t border-v2-gold-primary/10">
           <DataFreshnessIndicator lastUpdated={lastUpdated} />
         </div>
       )}

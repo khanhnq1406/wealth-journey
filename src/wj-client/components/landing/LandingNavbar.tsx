@@ -60,8 +60,8 @@ export default function LandingNavbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-white/80 backdrop-blur-md shadow-lg border-b border-gray-200/50"
-          : "bg-white/10"
+          ? "bg-v2-bg-dark/90 backdrop-blur-md shadow-lg border-b border-v2-border-light"
+          : "bg-v2-bg-primary/10"
       }`}
       style={{
         backdropFilter: isScrolled ? "blur(12px)" : "none",
@@ -85,7 +85,7 @@ export default function LandingNavbar() {
               height={28}
               className="sm:w-8 sm:h-8"
             />
-            <span className="text-base sm:text-lg md:text-xl font-semibold text-v2-red-primary">
+            <span className="text-base sm:text-lg md:text-xl font-semibold text-v2-gold-primary">
               congdongvang.com
             </span>
           </Link>
@@ -95,7 +95,7 @@ export default function LandingNavbar() {
             {isAuthenticated ? (
               <Link
                 href="/dashboard/home"
-                className="px-4 py-2 bg-v2-red-primary text-white rounded-md hover:bg-v2-red-dark transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 min-h-[44px] flex items-center"
+                className="px-4 py-2 bg-v2-gold-primary text-v2-bg-dark rounded-md hover:bg-v2-text-secondary transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 min-h-[44px] flex items-center"
               >
                 {t("navbar.dashboard")}
               </Link>
@@ -103,13 +103,13 @@ export default function LandingNavbar() {
               <div className="flex items-center space-x-4">
                 <Link
                   href="/auth/login"
-                  className="text-gray-700 hover:text-v2-red-primary transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 rounded-md px-2 py-1 min-h-[44px] flex items-center"
+                  className="text-v2-gold-accent hover:text-v2-gold-primary transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 rounded-md px-2 py-1 min-h-[44px] flex items-center"
                 >
                   {t("navbar.signIn")}
                 </Link>
                 <Link
                   href="/auth/register"
-                  className="px-4 py-2 bg-v2-red-primary text-white rounded-md hover:bg-v2-red-dark transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 min-h-[44px] flex items-center"
+                  className="px-4 py-2 bg-v2-gold-primary text-v2-bg-dark rounded-md hover:bg-v2-text-secondary transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 min-h-[44px] flex items-center"
                 >
                   {t("navbar.getStarted")}
                 </Link>
@@ -120,12 +120,12 @@ export default function LandingNavbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2"
+            className="md:hidden p-2 rounded-md hover:bg-v2-bg-surface-tint transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2"
             aria-label={t("navbar.toggleMenu")}
             aria-expanded={isMobileMenuOpen}
           >
             <motion.svg
-              className="w-6 h-6 text-gray-700"
+              className="w-6 h-6 text-v2-gold-accent"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -149,7 +149,7 @@ export default function LandingNavbar() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            className="md:hidden border-t border-gray-200 overflow-hidden bg-white"
+            className="md:hidden border-t border-v2-border-light overflow-hidden bg-v2-bg-dark"
             variants={mobileMenuVariants}
             initial="closed"
             animate="open"
@@ -168,7 +168,7 @@ export default function LandingNavbar() {
                   >
                     <Link
                       href="/dashboard/home"
-                      className="px-4 py-3 bg-v2-red-primary text-white rounded-md hover:bg-v2-red-dark transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center"
+                      className="px-4 py-3 bg-v2-gold-primary text-v2-bg-dark rounded-md hover:bg-v2-text-secondary transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {t("navbar.dashboard")}
@@ -186,7 +186,7 @@ export default function LandingNavbar() {
                     >
                       <Link
                         href="/auth/login"
-                        className="text-gray-700 hover:text-v2-red-primary transition-colors duration-200 font-medium px-3 py-2 focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 rounded-md min-h-[44px] flex items-center"
+                        className="text-v2-gold-accent hover:text-v2-gold-primary transition-colors duration-200 font-medium px-3 py-2 focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 rounded-md min-h-[44px] flex items-center"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {t("navbar.signIn")}
@@ -202,7 +202,7 @@ export default function LandingNavbar() {
                     >
                       <Link
                         href="/auth/register"
-                        className="px-4 py-3 bg-v2-red-primary text-white rounded-md hover:bg-v2-red-dark transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center mx-3"
+                        className="px-4 py-3 bg-v2-gold-primary text-v2-bg-dark rounded-md hover:bg-v2-text-secondary transition-colors duration-200 font-medium text-center focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 min-h-[44px] flex items-center justify-center mx-3"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         {t("navbar.getStarted")}

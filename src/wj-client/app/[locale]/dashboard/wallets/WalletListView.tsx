@@ -121,7 +121,7 @@ export const WalletListView = memo(function WalletListView({
       {/* Wallet List */}
       <div className="space-y-2">
         {processedWallets.length === 0 ? (
-          <div className="text-center py-12 text-gray-500 dark:text-dark-text-tertiary">
+ <div className="text-center py-12 text-v2-text-secondary">
             <svg
               className="w-16 h-16 mx-auto mb-4 opacity-50"
               fill="none"
@@ -156,11 +156,11 @@ export const WalletListView = memo(function WalletListView({
               <div
                 key={wallet.id}
                 className={cn(
-                  "bg-white dark:bg-dark-surface rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200",
+ "bg-v2-maroon-800 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200",
                   "border-2",
                   isSelected
                     ? "border-v2-red-primary"
-                    : "border-transparent hover:border-gray-200 dark:hover:border-dark-border",
+ : "border-transparent hover:border-v2-maroon-600",
                 )}
               >
                 <div className="flex items-center gap-3 p-3 sm:p-4">
@@ -173,7 +173,7 @@ export const WalletListView = memo(function WalletListView({
                         "flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-colors",
                         isSelected
                           ? "bg-v2-red-primary border-v2-red-primary"
-                          : "border-gray-300 dark:border-dark-border hover:border-v2-red-primary",
+ : "border-v2-gold-primary/30 hover:border-v2-red-primary",
                       )}
                       aria-label={
                         isSelected ? t("deselectWallet") : t("selectWallet")
@@ -197,10 +197,10 @@ export const WalletListView = memo(function WalletListView({
                   )}
 
                   {/* Wallet Icon */}
-                  <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-v2-green-light to-v2-border dark:from-v2-red-primary/20 dark:to-v2-red-dark/20 flex items-center justify-center">
+ <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-v2-green-light to-v2-border flex items-center justify-center">
                     {isInvestment ? (
                       <svg
-                        className="w-5 h-5 sm:w-6 sm:h-6 text-v2-red-primary dark:text-v2-red-primary"
+ className="w-5 h-5 sm:w-6 sm:h-6 text-v2-red-primary"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -232,23 +232,23 @@ export const WalletListView = memo(function WalletListView({
                   {/* Wallet Details */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-gray-900 dark:text-dark-text truncate">
+ <h3 className="font-semibold text-v2-gold-accent truncate">
                         {wallet.walletName}
                       </h3>
                       {isInvestment && (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
+ <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-v2-gold-primary/20 text-v2-gold-primary">
                           {tCommon("investment")}
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
+ <p className="text-sm text-v2-text-tertiary">
                       {wallet.currency}
                     </p>
                   </div>
 
                   {/* Balance */}
                   <div className="flex-shrink-0 text-right">
-                    <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-dark-text">
+ <p className="text-lg sm:text-xl font-bold text-v2-gold-accent">
                       {formatCurrency(balance, currency)}
                     </p>
                   </div>
@@ -260,11 +260,11 @@ export const WalletListView = memo(function WalletListView({
                         type="button"
                         variant="ghost"
                         onClick={() => handleTransfer(wallet)}
-                        className="min-h-[44px] min-w-[44px] p-2 rounded-lg hover:bg-v2-green-light dark:hover:bg-v2-red-primary/20 transition-colors"
+ className="min-h-[44px] min-w-[44px] p-2 rounded-lg hover:bg-v2-green-light transition-colors"
                         aria-label={t("transferFrom", { name: wallet.walletName })}
                       >
                         <svg
-                          className="w-5 h-5 text-v2-red-primary dark:text-v2-red-primary"
+ className="w-5 h-5 text-v2-red-primary"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -283,11 +283,11 @@ export const WalletListView = memo(function WalletListView({
                       variant="ghost"
                       type="button"
                       onClick={() => onEdit(wallet)}
-                      className="min-h-[44px] min-w-[44px] p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-surface-hover transition-colors"
+ className="min-h-[44px] min-w-[44px] p-2 rounded-lg hover:bg-v2-maroon-700 transition-colors"
                       aria-label={tCommon("edit") + " " + wallet.walletName}
                     >
                       <svg
-                        className="w-5 h-5 text-gray-600 dark:text-dark-text-secondary"
+ className="w-5 h-5 text-v2-text-secondary"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -305,11 +305,11 @@ export const WalletListView = memo(function WalletListView({
                       variant="ghost"
                       type="button"
                       onClick={() => onDelete(wallet)}
-                      className="min-h-[44px] min-w-[44px] p-2 rounded-lg hover:bg-danger-50 dark:hover:bg-danger-900/20 transition-colors"
+ className="min-h-[44px] min-w-[44px] p-2 rounded-lg hover:bg-v2-red-primary/10 transition-colors"
                       aria-label={t("deleteWallet", { name: wallet.walletName })}
                     >
                       <svg
-                        className="w-5 h-5 text-danger-600 dark:text-danger-400"
+ className="w-5 h-5 text-v2-red-negative"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"

@@ -20,7 +20,7 @@ export function SavedPostsView({ currentUser, onHashtagClick }: SavedPostsViewPr
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-6 h-6 border-2 border-bg border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-v2-gold-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -29,8 +29,8 @@ export function SavedPostsView({ currentUser, onHashtagClick }: SavedPostsViewPr
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3">
         <Bookmark size={40} className="text-v2-text-tertiary" />
-        <p className="font-vietnam text-sm text-v2-text-tertiary">Chưa có bài viết đã lưu</p>
-        <p className="font-vietnam text-xs text-v2-text-tertiary text-center max-w-xs">
+        <p className="font-roboto text-sm text-v2-text-tertiary">Chưa có bài viết đã lưu</p>
+        <p className="font-roboto text-xs text-v2-text-tertiary text-center max-w-xs">
           Lưu bài viết để xem lại sau bằng cách nhấn nút &quot;Lưu&quot; ở mỗi bài viết.
         </p>
       </div>
@@ -40,7 +40,7 @@ export function SavedPostsView({ currentUser, onHashtagClick }: SavedPostsViewPr
   return (
     <div className="flex flex-col gap-3">
       <div className="px-4 sm:px-0">
-        <h2 className="font-vietnam font-semibold text-v2-text-primary">
+        <h2 className="font-roboto font-semibold text-v2-text-primary">
           Bài viết đã lưu ({posts.length})
         </h2>
       </div>

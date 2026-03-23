@@ -93,44 +93,44 @@ export const routes = {
 
 export const resources = "/resources/icons/";
 
-// Green-based fintech chart colors - professional pastel palette
+// Maroon & Gold chart colors - mihong.vn dark theme palette
 export const chartColors = [
-  "#22C55E", // Primary green (success, growth)
-  "#14B8A6", // Teal accent (modern, tech-forward)
-  "#86EFAC", // Light green (optimistic)
-  "#5EEAD4", // Mint fresh (clean)
-  "#10B981", // Emerald green (wealth)
-  "#2DD4BF", // Sea green (calm)
-  "#A7F3D0", // Sage green (natural)
-  "#6EE7B7", // Pale green (subtle)
-  "#84CC16", // Lime accent (energetic)
-  "#06B6D4", // Cyan highlight (balance)
+  "#D78B1C", // Gold primary
+  "#F1BD61", // Gold accent
+  "#F5D38E", // Gold light
+  "#9B0111", // Red primary
+  "#FFF8EC", // Cream
+  "#E8A535", // Gold warm
+  "#C0392B", // Red accent
+  "#F7DC6F", // Gold pale
+  "#7B0A0E", // Dark red
+  "#DBA944", // Gold mid
 ];
 
-// Pie chart colors - harmonized with green theme
+// Pie chart colors - maroon/gold/cream palette
 export const pieChartColors = [
-  "#22C55E", // Primary green
-  "#14B8A6", // Teal
-  "#10B981", // Emerald
-  "#84CC16", // Lime
-  "#06B6D4", // Cyan
-  "#DC2626", // Red (expenses/losses - contrast)
-  "#F59E0B", // Orange (warning)
-  "#8B5CF6", // Purple (alternative category)
-  "#EC4899", // Pink (another category)
-  "#6366F1", // Indigo (final category)
+  "#D78B1C", // Gold primary
+  "#9B0111", // Red primary
+  "#F1BD61", // Gold accent
+  "#FFF8EC", // Cream
+  "#F5D38E", // Gold light
+  "#7B0A0E", // Dark red
+  "#E8A535", // Gold warm
+  "#C0392B", // Red accent
+  "#F7DC6F", // Gold pale
+  "#3D0101", // Dark maroon surface
 ];
 
-// V2 chart colors - Crimson & Gold palette
+// V2 chart colors - Maroon & Gold palette
 export const v2ChartColors = [
-  "#B8860B", // Gold primary
-  "#B91C1C", // Red primary
-  "#15803D", // Green positive
-  "#D4A017", // Gold accent
-  "#8B929E", // Silver primary
-  "#374151", // Silver dark
-  "#92710C", // Gold dark
-  "#7F1D1D", // Red dark
+  "#D78B1C", // Gold primary
+  "#9B0111", // Red primary
+  "#F1BD61", // Gold accent
+  "#F5D38E", // Gold light
+  "#FFF8EC", // Cream
+  "#7B0A0E", // Dark red
+  "#E8A535", // Gold warm
+  "#3D0101", // Dark maroon surface
 ];
 
 export const ButtonType = {

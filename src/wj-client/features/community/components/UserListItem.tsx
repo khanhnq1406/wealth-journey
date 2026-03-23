@@ -22,11 +22,11 @@ export function UserListItem({ user, currentUserId, onUserClick }: UserListItemP
         size="md"
       />
       <div className="flex-1 min-w-0">
-        <p className="font-vietnam text-sm font-medium text-v2-text-primary truncate">
+        <p className="font-roboto text-sm font-medium text-v2-text-primary truncate">
           {user.userName}
         </p>
         {user.bioSnippet && (
-          <p className="font-vietnam text-xs text-v2-text-tertiary truncate">
+          <p className="font-roboto text-xs text-v2-text-tertiary truncate">
             {user.bioSnippet}
           </p>
         )}

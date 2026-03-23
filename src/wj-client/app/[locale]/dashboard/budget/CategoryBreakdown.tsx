@@ -81,14 +81,14 @@ const CategoryItem = memo(function CategoryItem({
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             {icon && (
-              <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center text-lg">
+              <div className="w-10 h-10 rounded-full bg-v2-bg-dark flex items-center justify-center text-lg">
                 {icon}
               </div>
             )}
             <div>
-              <h4 className="font-semibold text-neutral-900">{name}</h4>
+              <h4 className="font-semibold text-v2-gold-accent">{name}</h4>
               {transactionCount !== undefined && (
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-v2-text-tertiary">
                   {t("card.transactions", { count: transactionCount })}
                 </p>
               )}
@@ -112,7 +112,7 @@ const CategoryItem = memo(function CategoryItem({
                 e.stopPropagation();
                 onEditBudget?.(id);
               }}
-              className="p-1.5 rounded-md hover:bg-primary-100 text-primary-600 transition-colors"
+              className="p-1.5 rounded-md hover:bg-v2-bg-surface-tint text-v2-text-secondary transition-colors"
               title={t("card.editBudget")}
             >
               <Image src={`${resources}/editing.svg`} alt="Edit" width={16} height={16} />
@@ -123,12 +123,12 @@ const CategoryItem = memo(function CategoryItem({
         {/* Progress Bar */}
         <div>
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs text-neutral-600">{t("card.budgetUsage")}</span>
+            <span className="text-xs text-v2-text-tertiary">{t("card.budgetUsage")}</span>
             <span className={`text-xs font-bold ${statusColor}`}>
               {percentage.toFixed(1)}%
             </span>
           </div>
-          <div className="w-full bg-neutral-200 rounded-full overflow-hidden h-2">
+          <div className="w-full bg-v2-bg-dark rounded-full overflow-hidden h-2">
             <motion.div
               className={`h-full ${barColor} transition-all duration-800 ease-out`}
               initial={{ width: 0 }}
@@ -139,21 +139,21 @@ const CategoryItem = memo(function CategoryItem({
         </div>
 
         {/* Amounts */}
-        <div className="flex justify-between items-center py-2 border-t border-neutral-100">
+        <div className="flex justify-between items-center py-2 border-t border-v2-border-light">
           <div className="text-center">
-            <div className="text-xs text-neutral-500">{t("title")}</div>
-            <div className="text-sm font-semibold text-neutral-900">
+            <div className="text-xs text-v2-text-tertiary">{t("title")}</div>
+            <div className="text-sm font-semibold text-v2-gold-accent">
               {formatCurrency(budget, currency)}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-neutral-500">{t("card.spent")}</div>
-            <div className="text-sm font-semibold text-neutral-900">
+            <div className="text-xs text-v2-text-tertiary">{t("card.spent")}</div>
+            <div className="text-sm font-semibold text-v2-gold-accent">
               {formatCurrency(spent, currency)}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-neutral-500">{t("card.remaining")}</div>
+            <div className="text-xs text-v2-text-tertiary">{t("card.remaining")}</div>
             <div className={`text-sm font-bold ${statusColor}`}>
               {isOverBudget ? "-" : ""}
               {formatCurrency(Math.abs(remaining), currency)}
@@ -226,7 +226,7 @@ export const CategoryBreakdown = memo(function CategoryBreakdown({
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               currentView === "list"
                 ? "bg-neutral-900 text-white"
-                : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+                : "bg-v2-bg-dark text-v2-text-secondary hover:bg-v2-bg-dark"
             }`}
           >
             List View
@@ -236,7 +236,7 @@ export const CategoryBreakdown = memo(function CategoryBreakdown({
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               currentView === "chart"
                 ? "bg-neutral-900 text-white"
-                : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+                : "bg-v2-bg-dark text-v2-text-secondary hover:bg-v2-bg-dark"
             }`}
           >
             Chart View
@@ -244,7 +244,7 @@ export const CategoryBreakdown = memo(function CategoryBreakdown({
         </div>
 
         {/* Summary Badge */}
-        <div className="text-sm text-neutral-600">
+        <div className="text-sm text-v2-text-tertiary">
           Total: {formatCurrency(totals.spent, categories[0]?.currency || "USD")} / {formatCurrency(totals.budget, categories[0]?.currency || "USD")}
         </div>
       </div>
@@ -278,7 +278,7 @@ export const CategoryBreakdown = memo(function CategoryBreakdown({
             transition={{ duration: 0.2 }}
           >
             <BaseCard className="p-4">
-              <h3 className="text-lg font-bold text-neutral-900 mb-4">{t("categoryComparison")}</h3>
+              <h3 className="text-lg font-bold text-v2-gold-accent mb-4">{t("categoryComparison")}</h3>
               <div className="h-80">
                 <BarChart
                   data={chartData}

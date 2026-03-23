@@ -38,7 +38,7 @@ export function ProfileView({
   if (profileLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-6 h-6 border-2 border-bg border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-v2-gold-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -46,7 +46,7 @@ export function ProfileView({
   return (
     <div className="flex flex-col gap-4">
       {/* Profile Header Card */}
-      <div className="bg-white sm:rounded-2xl border-b sm:border border-v2-border-light overflow-hidden isolate">
+      <div className="bg-v2-maroon-800 sm:rounded-2xl border-b sm:border border-v2-border-light overflow-hidden isolate">
         {/* Cover photo banner */}
         <div
           className="w-full h-32 sm:h-40 relative"
@@ -90,12 +90,12 @@ export function ProfileView({
               imageUrl={profile?.userPicture || currentUser.picture}
               size="lg"
               priority
-              className="!w-20 !h-20 !text-2xl ring-[3px] ring-white"
+              className="!w-20 !h-20 !text-2xl ring-[3px] ring-v2-gold-accent"
             />
             {isOwnProfile ? (
               <button
                 onClick={() => setShowEditModal(true)}
-                className="text-sm px-4 py-1.5 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors font-medium text-v2-text-primary"
+                className="text-sm px-4 py-1.5 border border-v2-gold-primary/30 rounded-full hover:bg-gray-100 transition-colors font-medium text-v2-text-primary"
               >
                 Edit Profile
               </button>
@@ -109,13 +109,13 @@ export function ProfileView({
           </div>
 
           {/* Name */}
-          <p className="font-vietnam text-lg font-bold text-v2-text-primary">
+          <p className="font-roboto text-lg font-bold text-v2-text-primary">
             {profile?.userName || currentUser.name}
           </p>
 
           {/* Bio */}
           {profile?.bio && (
-            <p className="mt-1 font-vietnam text-[13px] text-v2-text-secondary">
+            <p className="mt-1 font-roboto text-[13px] text-v2-text-secondary">
               {profile.bio}
             </p>
           )}
@@ -142,31 +142,31 @@ export function ProfileView({
           )}
 
           {/* Stats */}
-          <div className="border-t border-[#EDE8E1] mt-3 pt-3">
+          <div className="border-t border-v2-gold-primary/30 mt-3 pt-3">
             <div className="flex justify-around">
               <div className="text-center">
-                <p className="font-jetbrains text-xl font-bold text-v2-text-primary">
+                <p className="font-roboto text-xl font-bold text-v2-text-primary">
                   {profile?.postCount ?? 0}
                 </p>
-                <p className="font-vietnam text-xs text-v2-text-tertiary">Bài viết</p>
+                <p className="font-roboto text-xs text-v2-text-tertiary">Bài viết</p>
               </div>
               <button
                 onClick={() => onFollowingClick?.("followers")}
                 className="text-center hover:opacity-70 transition-opacity"
               >
-                <p className="font-jetbrains text-xl font-bold text-v2-text-primary">
+                <p className="font-roboto text-xl font-bold text-v2-text-primary">
                   {profile?.followerCount ?? 0}
                 </p>
-                <p className="font-vietnam text-xs text-v2-text-tertiary">Người theo dõi</p>
+                <p className="font-roboto text-xs text-v2-text-tertiary">Người theo dõi</p>
               </button>
               <button
                 onClick={() => onFollowingClick?.("following")}
                 className="text-center hover:opacity-70 transition-opacity"
               >
-                <p className="font-jetbrains text-xl font-bold text-v2-text-primary">
+                <p className="font-roboto text-xl font-bold text-v2-text-primary">
                   {profile?.followingCount ?? 0}
                 </p>
-                <p className="font-vietnam text-xs text-v2-text-tertiary">Đang theo dõi</p>
+                <p className="font-roboto text-xs text-v2-text-tertiary">Đang theo dõi</p>
               </button>
             </div>
           </div>

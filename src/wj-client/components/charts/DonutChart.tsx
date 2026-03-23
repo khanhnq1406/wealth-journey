@@ -56,7 +56,7 @@ export interface DonutChartProps {
 }
 
 /**
- * Default color palette - using green fintech palette from constants
+ * Default color palette - using maroon/gold palette from constants
  */
 const DEFAULT_COLORS = pieChartColors;
 
@@ -145,7 +145,7 @@ export const DonutChart = memo(function DonutChart({
               <Cell
                 key={`cell-${index}`}
                 fill={entry.color}
-                stroke="white"
+                stroke="#3D0101"
                 strokeWidth={2}
               />
             ))}
@@ -154,11 +154,12 @@ export const DonutChart = memo(function DonutChart({
           {showTooltip && (
             <Tooltip
               contentStyle={{
-                backgroundColor: "rgba(255, 255, 255, 0.95)",
-                border: "1px solid #e5e7eb",
+                backgroundColor: "rgba(61, 1, 1, 0.95)",
+                border: "1px solid #D78B1C",
                 borderRadius: "6px",
                 fontSize: "12px",
                 padding: "8px 12px",
+                color: "#FFFFFF",
               }}
               formatter={(value: number | undefined, name?: string) => {
                 if (tooltipFormatter) {
@@ -192,12 +193,12 @@ export const DonutChart = memo(function DonutChart({
           style={{ transform: `translateY(${legendPosition === "top" ? "25%" : legendPosition === "bottom" ? "-25%" : "0"})` }}
         >
           {centerLabel && (
-            <div className="text-xl sm:text-2xl font-bold text-neutral-900">
+            <div className="text-xl sm:text-2xl font-bold text-v2-gold-accent">
               {centerLabel}
             </div>
           )}
           {centerSubLabel && (
-            <div className="text-xs sm:text-sm text-neutral-600 mt-1">
+            <div className="text-xs sm:text-sm text-v2-cream-100/70 mt-1">
               {centerSubLabel}
             </div>
           )}

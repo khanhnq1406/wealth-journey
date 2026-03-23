@@ -11,22 +11,21 @@ export function LandingGoldPriceChart() {
   return (
     <BaseCard
       padding="none"
-      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
+      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden h-full flex flex-col"
     >
       {/* Header */}
       <div className="px-5 pt-5 pb-2">
-        <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
+        <h3 className="font-roboto font-semibold text-[16px] text-v2-text-primary">
           {t("goldChartTitle")}
         </h3>
       </div>
 
       {/* TradingView Chart — fully interactive, no login wall */}
-      <div className="px-2 pb-2">
+      <div className="px-2 pb-2 h-[400px] sm:h-auto sm:flex-1 sm:min-h-[430px]">
         <TradingViewChart
           symbol="TVC:GOLD"
-          height={430}
           locale={locale}
-          theme="light"
+          theme="dark"
           allowSymbolChange={false}
         />
       </div>

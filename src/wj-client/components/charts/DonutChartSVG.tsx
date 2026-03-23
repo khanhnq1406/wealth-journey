@@ -49,17 +49,17 @@ export interface DonutChartSVGProps {
 }
 
 /**
- * Default color palette - using green fintech palette
+ * Default color palette - using maroon/gold palette
  */
 const DEFAULT_COLORS = [
-  "#10b981", // green-500
-  "#3b82f6", // blue-500
-  "#f59e0b", // amber-500
-  "#8b5cf6", // violet-500
-  "#ec4899", // pink-500
-  "#06b6d4", // cyan-500
-  "#f97316", // orange-500
-  "#84cc16", // lime-500
+  "#D78B1C", // Gold primary
+  "#9B0111", // Red primary
+  "#F1BD61", // Gold accent
+  "#FFF8EC", // Cream
+  "#F5D38E", // Gold light
+  "#7B0A0E", // Dark red
+  "#E8A535", // Gold warm
+  "#C0392B", // Red accent
 ];
 
 /**
@@ -256,7 +256,7 @@ export const DonutChartSVG = memo(function DonutChartSVG({
                       <text
                         x={slice.labelX}
                         y={slice.labelY}
-                        fill={labelPosition === "inside" ? "white" : "#374151"}
+                        fill={labelPosition === "inside" ? "white" : "#FFF8EC"}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         className="text-sm font-medium pointer-events-none"
@@ -291,7 +291,7 @@ export const DonutChartSVG = memo(function DonutChartSVG({
                     <text
                       x={slice.labelX}
                       y={slice.labelY}
-                      fill={labelPosition === "inside" ? "white" : "#374151"}
+                      fill={labelPosition === "inside" ? "white" : "#FFF8EC"}
                       textAnchor="middle"
                       dominantBaseline="middle"
                       className="text-sm font-medium pointer-events-none"
@@ -309,12 +309,12 @@ export const DonutChartSVG = memo(function DonutChartSVG({
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none px-2">
                 <div className="flex flex-col items-center justify-center text-center">
                   {centerLabel && (
-                    <div className="text-base sm:text-lg lg:text-xl font-bold text-neutral-900 leading-tight">
+                    <div className="text-base sm:text-lg lg:text-xl font-bold text-v2-gold-accent leading-tight">
                       {centerLabel}
                     </div>
                   )}
                   {centerSubLabel && (
-                    <div className="text-[10px] sm:text-xs text-neutral-600 mt-0.5">
+                    <div className="text-[10px] sm:text-xs text-v2-cream-100/70 mt-0.5">
                       {centerSubLabel}
                     </div>
                   )}
@@ -335,8 +335,8 @@ export const DonutChartSVG = memo(function DonutChartSVG({
                     className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex-shrink-0"
                     style={{ backgroundColor: item.color }}
                   />
-                  <span className="font-medium text-neutral-700 truncate min-w-0 flex-1">{item.name}</span>
-                  <span className="text-neutral-500 flex-shrink-0 tabular-nums text-right">{percentage}%</span>
+                  <span className="font-medium text-v2-cream-100 truncate min-w-0 flex-1">{item.name}</span>
+                  <span className="text-v2-cream-100/60 flex-shrink-0 tabular-nums text-right">{percentage}%</span>
                 </div>
               );
             })}

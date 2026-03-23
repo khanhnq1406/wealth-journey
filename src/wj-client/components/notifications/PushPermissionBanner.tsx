@@ -77,29 +77,29 @@ export function PushPermissionBanner() {
   if (isIosNotInstalled) {
     return (
       <>
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mx-4 mt-3 mb-1">
+        <div className="bg-v2-maroon-900/80 border border-v2-gold-accent/30 rounded-lg p-4 mx-4 mt-3 mb-1">
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 text-sm">
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-v2-gold-primary/20 flex items-center justify-center text-v2-gold-primary text-sm">
               !
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-vietnam text-sm font-medium text-v2-text-primary">
+              <p className="font-roboto text-sm font-medium text-v2-gold-accent">
                 Cài đặt ứng dụng
               </p>
-              <p className="font-vietnam text-xs text-v2-text-secondary mt-0.5">
+              <p className="font-roboto text-xs text-v2-text-secondary mt-0.5">
                 Cài đặt ứng dụng để nhận thông báo giá vàng và bạc ngay trên
                 iPhone
               </p>
               <div className="flex gap-3 mt-2">
                 <button
                   onClick={handleInstall}
-                  className="font-vietnam text-xs font-medium text-white bg-bg px-3 py-1.5 rounded-md hover:opacity-90"
+                  className="font-roboto text-xs font-medium text-v2-maroon-900 bg-v2-gold-primary px-3 py-1.5 rounded-md hover:bg-v2-gold-accent"
                 >
                   Cài đặt
                 </button>
                 <button
                   onClick={handleDismissTemporary}
-                  className="font-vietnam text-xs text-v2-text-tertiary hover:text-v2-text-secondary"
+                  className="font-roboto text-xs text-v2-text-tertiary hover:text-v2-text-secondary"
                 >
                   Để sau
                 </button>
@@ -114,7 +114,7 @@ export function PushPermissionBanner() {
           title="Cài đặt ứng dụng"
         >
           <div className="p-4">
-            <p className="font-vietnam text-sm text-v2-text-secondary mb-4">
+            <p className="font-roboto text-sm text-v2-text-secondary mb-4">
               Làm theo các bước sau để cài đặt ứng dụng trên iPhone:
             </p>
             <InstallSteps platform={platform} />
@@ -126,29 +126,29 @@ export function PushPermissionBanner() {
 
   // Default: ask to enable push
   return (
-    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mx-4 mt-3 mb-1">
+    <div className="bg-v2-maroon-900/80 border border-v2-gold-accent/30 rounded-lg p-4 mx-4 mt-3 mb-1">
       <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 text-sm">
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-v2-gold-primary/20 flex items-center justify-center text-v2-gold-primary text-sm">
           !
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-vietnam text-sm font-medium text-v2-text-primary">
+          <p className="font-roboto text-sm font-medium text-v2-gold-accent">
             Bật thông báo
           </p>
-          <p className="font-vietnam text-xs text-v2-text-secondary mt-0.5">
+          <p className="font-roboto text-xs text-v2-text-secondary mt-0.5">
             Bật thông báo để nhận cảnh báo giá vàng và bạc ngay trên điện thoại
           </p>
           <div className="flex gap-3 mt-2">
             <button
               onClick={handleEnable}
               disabled={isLoading}
-              className="font-vietnam text-xs font-medium text-white bg-bg px-3 py-1.5 rounded-md hover:opacity-90 disabled:opacity-50"
+              className="font-roboto text-xs font-medium text-v2-maroon-900 bg-v2-gold-primary px-3 py-1.5 rounded-md hover:bg-v2-gold-accent disabled:opacity-50"
             >
               {isLoading ? "Đang xử lý..." : "Bật"}
             </button>
             <button
               onClick={handleDismissTemporary}
-              className="font-vietnam text-xs text-v2-text-tertiary hover:text-v2-text-secondary"
+              className="font-roboto text-xs text-v2-text-tertiary hover:text-v2-text-secondary"
             >
               Để sau
             </button>

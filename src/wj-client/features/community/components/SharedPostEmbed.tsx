@@ -21,11 +21,11 @@ export function SharedPostEmbed({ sharedPost, onHashtagClick }: SharedPostEmbedP
           imageUrl={sharedPost.userPicture}
           size="sm"
         />
-        <span className="font-vietnam text-sm font-medium text-v2-text-primary">
+        <span className="font-roboto text-sm font-medium text-v2-text-primary">
           {sharedPost.userName}
         </span>
       </div>
-      <p className="font-vietnam text-sm leading-relaxed text-v2-text-secondary whitespace-pre-wrap break-words">
+      <p className="font-roboto text-sm leading-relaxed text-v2-text-secondary whitespace-pre-wrap break-words">
         {tokens.map((token, i) =>
           token.type === "hashtag" ? (
             <HashtagLink

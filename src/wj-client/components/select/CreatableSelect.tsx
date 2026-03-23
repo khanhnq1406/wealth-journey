@@ -164,14 +164,13 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
         spellCheck={false}
         className={cn(
           "min-h-[44px] sm:min-h-[48px] px-3 py-2 w-full pr-10 rounded-lg",
-          "bg-white dark:bg-dark-surface",
-          "text-neutral-900 dark:text-dark-text",
-          "border border-neutral-300 dark:border-neutral-600",
-          "placeholder:text-neutral-400 dark:placeholder:text-neutral-500",
-          "shadow-sm dark:shadow-dark-card",
+ "bg-v2-bg-dark",
+ "text-v2-gold-accent",
+ "border border-v2-border-light",
+ "placeholder:text-v2-text-tertiary",
           "disabled:opacity-50 disabled:cursor-not-allowed",
           // Focus styles - single ring (clean, modern) - unified with other inputs
-          "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent",
+          "focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent",
           "transition-all duration-200",
         )}
         role="combobox"
@@ -188,7 +187,7 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
             setIsOpen(!isOpen);
             inputRef.current?.focus();
           }}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 hover:text-neutral-600 dark:hover:text-neutral-400 cursor-pointer"
+ className="absolute right-2 top-1/2 -translate-y-1/2 text-v2-text-tertiary hover:text-v2-gold-accent cursor-pointer"
         >
           <svg
             className={cn(
@@ -211,7 +210,7 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
       {isLoading && (
         <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
           <svg
-            className="animate-spin h-4 w-4 text-primary-500"
+            className="animate-spin h-4 w-4 text-v2-gold-primary"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -235,9 +234,9 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
 
       {/* Dropdown menu */}
       {isOpen && !disabled && (
-        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-dark-surface border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-lg dark:shadow-dark-card max-h-60 overflow-auto animate-fade-in-scale">
+ <div className="absolute z-50 w-full mt-1 bg-v2-bg-surface border border-v2-border-light rounded-lg shadow-lg max-h-60 overflow-auto animate-fade-in-scale">
           {filteredOptions.length === 0 && !canCreateNew ? (
-            <div className="px-3 py-3 text-neutral-500 dark:text-neutral-400 text-sm">
+ <div className="px-3 py-3 text-v2-text-tertiary text-sm">
               No options found
             </div>
           ) : (
@@ -251,10 +250,10 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
                     "w-full px-3 py-2.5 min-h-[44px] text-left cursor-pointer text-sm transition-colors duration-200",
                     "flex items-center justify-between",
                     highlightedIndex === index
-                      ? "bg-primary-500 text-white"
+                      ? "bg-v2-bg-surface-tint text-v2-gold-primary"
                       : value === option.value
-                        ? "bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 font-semibold"
-                        : "hover:bg-neutral-50 dark:hover:bg-dark-surface-hover text-neutral-900 dark:text-dark-text",
+ ? "text-v2-gold-primary font-semibold"
+ : "hover:bg-v2-bg-surface-tint text-v2-gold-accent",
                   )}
                 >
                   <span>{option.label}</span>
@@ -282,11 +281,11 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
                   disabled={isLoading}
                   className={cn(
                     "w-full px-3 py-2.5 min-h-[44px] text-left cursor-pointer text-sm",
-                    "border-t border-neutral-200 dark:border-neutral-700",
+ "border-t border-v2-border-light",
                     "flex items-center gap-2 transition-colors duration-200",
                     highlightedIndex === filteredOptions.length
-                      ? "bg-primary-500 text-white"
-                      : "hover:bg-neutral-50 dark:hover:bg-dark-surface-hover text-primary-600 dark:text-primary-400 font-semibold",
+                      ? "bg-v2-bg-surface-tint text-v2-gold-primary"
+ : "hover:bg-v2-bg-surface-tint text-v2-gold-primary font-semibold",
                     isLoading && "opacity-50 cursor-not-allowed",
                   )}
                 >

@@ -225,7 +225,7 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
       {errorMessage && (
-        <div className="bg-red-50 text-danger-600 p-3 rounded mb-4">
+        <div className="bg-v2-red-primary/10 text-v2-red-negative p-3 rounded mb-4">
           {errorMessage}
         </div>
       )}
@@ -250,7 +250,7 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
           <button
             type="button"
             onClick={() => setShowAdjustment(!showAdjustment)}
-            className="text-sm text-gray-600 hover:text-gray-900"
+            className="text-sm text-v2-text-secondary hover:text-v2-gold-accent"
             disabled={isLoading}
           >
             {showAdjustment ? tCommon("cancel") : tEdit("adjustBalance")}
@@ -258,14 +258,14 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
         </div>
 
         {showAdjustment && (
-          <div className="space-y-3 bg-gray-50 p-4 rounded-md">
-            <div className="text-sm text-gray-600 mb-2">
+          <div className="space-y-3 bg-v2-maroon-900 p-4 rounded-md">
+            <div className="text-sm text-v2-text-secondary mb-2">
               {tEdit("currentBalance", { amount: formatCurrency(currentBalance, currency) })}
             </div>
 
             {/* Adjustment Type Radio Buttons */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-v2-text-secondary mb-2">
                 {tEdit("adjustmentType")} <span className="text-red-500">*</span>
               </label>
               <div className="flex gap-4">
@@ -301,13 +301,13 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
               min={0}
               disabled={isLoading}
             />
-            <div className="text-xs text-gray-500 ml-1 -mt-1">
+            <div className="text-xs text-v2-text-tertiary ml-1 -mt-1">
               {tEdit("adjustmentAmountHelp")}
             </div>
 
             {adjustmentAmount !== 0 && adjustmentAmount !== undefined && (
               <div className="text-sm">
-                <span className="text-gray-600">{tEdit("projectedBalance")}</span>
+                <span className="text-v2-text-secondary">{tEdit("projectedBalance")}</span>
                 <span
                   className={`font-medium ${projectedBalance < 0 ? "text-red-600" : "text-v2-green-positive"}`}
                 >
@@ -324,7 +324,7 @@ export function EditWalletForm({ wallet, onSuccess }: EditWalletFormProps) {
               disabled={isLoading}
             />
 
-            <div className="text-xs text-gray-500 mt-2">
+            <div className="text-xs text-v2-text-tertiary mt-2">
               {tEdit("auditNote")}
             </div>
           </div>

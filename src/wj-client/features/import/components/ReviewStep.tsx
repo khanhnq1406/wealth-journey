@@ -452,10 +452,10 @@ export function ReviewStep(props: ReviewStepProps) {
       <div className="space-y-4 sm:space-y-6">
         {/* Header Summary */}
         <div>
-          <h2 className="text-xl font-bold text-neutral-900 dark:text-dark-text mb-2">
+ <h2 className="text-xl font-bold text-neutral-900 mb-2">
             {t("title")}
           </h2>
-          <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+ <p className="text-sm text-neutral-600">
             {transactionsState.length !== 1
               ? t("fromStatementPlural", { count: transactionsState.length })
               : t("fromStatement", { count: transactionsState.length })}
@@ -546,21 +546,21 @@ export function ReviewStep(props: ReviewStepProps) {
         </div>
 
         {/* Summary Stats */}
-        <div className="p-4 bg-neutral-100 dark:bg-dark-surface-hover rounded-lg">
+ <div className="p-4 bg-neutral-100 rounded-lg">
           <div className="grid grid-cols-2 gap-4 text-center">
             <div>
-              <p className="text-neutral-600 dark:text-dark-text-secondary text-sm mb-1">
+ <p className="text-neutral-600 text-sm mb-1">
                 {t("readyToImport")}
               </p>
-              <p className="text-2xl font-bold text-success-600 dark:text-success-400">
+ <p className="text-2xl font-bold text-success-600">
                 {importableCount}
               </p>
             </div>
             <div>
-              <p className="text-neutral-600 dark:text-dark-text-secondary text-sm mb-1">
+ <p className="text-neutral-600 text-sm mb-1">
                 {t("needAttention")}
               </p>
-              <p className="text-2xl font-bold text-warning-600 dark:text-warning-400">
+ <p className="text-2xl font-bold text-warning-600">
                 {blockedCount}
               </p>
             </div>
@@ -603,11 +603,11 @@ export function ReviewStep(props: ReviewStepProps) {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Instructions */}
-      <div className="text-sm sm:text-base text-neutral-600 dark:text-dark-text-secondary">
+ <div className="text-sm sm:text-base text-neutral-600">
         <p className="mb-2">
           {t("reviewInstructions")}
         </p>
-        <p className="text-xs sm:text-sm text-neutral-500 dark:text-dark-text-tertiary">
+ <p className="text-xs sm:text-sm text-neutral-500">
           {t("reviewInstructionsDetail")}
         </p>
       </div>

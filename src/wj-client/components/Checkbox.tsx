@@ -45,13 +45,13 @@ export function Checkbox({
       onChange={handleChange}
       disabled={disabled}
       className={cn(
-        "rounded border-neutral-300 dark:border-neutral-600",
-        "text-primary-500 dark:text-primary-400",
-        "focus:ring-2 focus:ring-primary-500 focus:ring-offset-0",
-        "dark:focus:ring-primary-400 dark:focus:ring-offset-dark-background",
+ "rounded border-v2-gold-primary/30",
+ "text-primary-500",
+        "focus:ring-2 focus:ring-v2-gold-primary focus:ring-offset-0",
+ "",
         "disabled:opacity-50 disabled:cursor-not-allowed",
         "cursor-pointer transition-colors duration-200",
-        "dark:bg-dark-surface dark:checked:bg-primary-500",
+ "",
         sizeClasses[size],
         className
       )}
@@ -72,13 +72,13 @@ export function Checkbox({
       >
         <div className="flex-shrink-0 pt-0.5">{checkbox}</div>
         <div className="flex-1">
-          <span className="text-sm font-medium text-neutral-900 dark:text-dark-text">
+ <span className="text-sm font-medium text-neutral-900">
             {label}
           </span>
           {description && (
             <p
               id={`${id}-description`}
-              className="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5"
+ className="text-xs text-neutral-500 mt-0.5"
             >
               {description}
             </p>

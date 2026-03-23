@@ -25,7 +25,7 @@ function ReplyMenu({ onEdit, onDelete }: { onEdit: () => void; onDelete: () => v
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-6 z-20 bg-white border border-gray-100 rounded-lg shadow-lg py-1 min-w-[100px]">
+          <div className="absolute right-0 top-6 z-20 bg-v2-maroon-800 border border-v2-gold-primary/20 rounded-lg shadow-lg py-1 min-w-[100px]">
             <button
               onClick={() => { setOpen(false); onEdit(); }}
               className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
@@ -59,7 +59,7 @@ export function ReplyBubble({ reply, currentUserId, onDelete }: ReplyBubbleProps
       <div className="flex-1">
         <div className="bg-[#FAF9F7] rounded-2xl px-3 py-2">
           <div className="flex items-start justify-between gap-2">
-            <span className="font-vietnam text-[13px] font-semibold text-v2-text-primary">{authorName}</span>
+            <span className="font-roboto text-[13px] font-semibold text-v2-text-primary">{authorName}</span>
             {isOwnReply && !isEditing && (
               <ReplyMenu
                 onEdit={() => setIsEditing(true)}
@@ -82,7 +82,7 @@ export function ReplyBubble({ reply, currentUserId, onDelete }: ReplyBubbleProps
           )}
         </div>
         <div className="flex items-center gap-2 ml-3 mt-0.5">
-          <span className="font-jetbrains text-[11px] text-v2-text-tertiary">
+          <span className="font-roboto text-[11px] text-v2-text-tertiary">
             {formatRelativeTime(reply.createdAt)}
           </span>
           {reply.isEdited && (

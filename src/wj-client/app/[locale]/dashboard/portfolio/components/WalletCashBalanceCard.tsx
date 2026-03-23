@@ -60,24 +60,24 @@ export const WalletCashBalanceCard = memo(function WalletCashBalanceCard({
     <BaseCard className="p-4 mb-4">
       <div className="flex justify-between items-center">
         <div>
-          <div className="text-sm text-neutral-600">
+          <div className="text-sm text-v2-text-secondary">
             {t("cashBalance.availableCash")}
           </div>
           <div className="text-lg sm:text-xl font-semibold text-primary-600">
             {formatCurrency(availableCash, availableCashCurrency)}
           </div>
-          <div className="text-xs text-neutral-500 mt-1">
+          <div className="text-xs text-v2-text-tertiary mt-1">
             {t("cashBalance.readyToInvest")}
           </div>
         </div>
         <div>
-          <div className="text-sm text-neutral-600">
+          <div className="text-sm text-v2-text-secondary">
             {t("cashBalance.totalWalletValue")}
           </div>
           <div className="text-lg sm:text-xl font-semibold">
             {formatCurrency(totalValue, totalValueCurrency)}
           </div>
-          <div className="text-xs text-neutral-500 mt-1">
+          <div className="text-xs text-v2-text-tertiary mt-1">
             {t("cashBalance.cashAndInvestments")}
           </div>
         </div>

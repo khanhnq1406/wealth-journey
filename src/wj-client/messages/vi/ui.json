@@ -280,9 +280,9 @@
       "transfer": "Chuyển khoản",
       "newWallet": "Ví mới",
       "greeting": {
-        "morning": "Chào buổi sáng",
-        "afternoon": "Chào buổi chiều",
-        "evening": "Chào buổi tối"
+        "morning": "Chào sếp",
+        "afternoon": "Chào sếp",
+        "evening": "Chào sếp"
       },
       "totalNetWorthLabel": "TỔNG TÀI SẢN RÒNG",
       "pnlTitle": "Tài sản ròng",

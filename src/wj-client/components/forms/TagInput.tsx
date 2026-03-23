@@ -81,22 +81,22 @@ export function TagInput({
           "mt-1 sm:mt-1.5 flex flex-wrap items-center gap-1.5",
           "min-h-[44px] sm:min-h-[48px] px-3 sm:px-4 py-2",
           "rounded-lg border transition-all duration-200",
-          "bg-white dark:bg-dark-surface",
-          "focus-within:outline-none focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-transparent",
-          hasError && "border-danger-500 focus-within:ring-danger-500 focus-within:border-transparent",
-          !hasError && "border-neutral-300 dark:border-dark-border hover:border-neutral-400 dark:hover:border-dark-border-hover"
+ "bg-v2-bg-dark",
+          "focus-within:outline-none focus-within:ring-2 focus-within:ring-v2-gold-primary focus-within:border-transparent",
+          hasError && "border-v2-red-negative focus-within:ring-v2-red-negative focus-within:border-transparent",
+ !hasError && "border-v2-border-light hover:border-v2-border-light"
         )}
       >
         {tags.map((tag, index) => (
           <span
             key={`${tag}-${index}`}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-sm font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300"
+ className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-sm font-medium bg-v2-gold-primary/20 text-v2-gold-primary"
           >
             {tag}
             <button
               type="button"
               onClick={() => removeTag(index)}
-              className="ml-0.5 rounded-full p-0.5 hover:bg-primary-200 dark:hover:bg-primary-800/50 transition-colors"
+ className="ml-0.5 rounded-full p-0.5 hover:bg-v2-gold-primary/30 transition-colors"
               aria-label={`Remove ${tag}`}
             >
               <svg
@@ -126,8 +126,8 @@ export function TagInput({
           className={cn(
             "flex-1 min-w-[80px] text-base sm:text-base py-0.5",
             "bg-transparent border-none outline-none",
-            "text-neutral-900 dark:text-dark-text",
-            "placeholder:text-neutral-400 dark:placeholder:text-dark-text-tertiary"
+ "text-v2-gold-accent",
+ "placeholder:text-v2-text-tertiary"
           )}
           aria-invalid={hasError ? "true" : "false"}
           aria-describedby={cn(
@@ -139,7 +139,7 @@ export function TagInput({
       {helperText && !hasError && (
         <p
           id={helperId}
-          className="mt-1.5 text-xs sm:text-sm text-neutral-500 dark:text-dark-text-tertiary"
+ className="mt-1.5 text-xs sm:text-sm text-v2-text-tertiary"
         >
           {helperText}
         </p>

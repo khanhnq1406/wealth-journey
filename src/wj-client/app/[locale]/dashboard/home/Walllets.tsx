@@ -66,14 +66,14 @@ const WalletItem = memo(function WalletItem({
             />
           </svg>
         )}
-        <div className="font-semibold">{wallet.walletName}</div>
+        <div className="font-semibold text-v2-gold-accent">{wallet.walletName}</div>
       </div>
       <div className="text-right">
-        <div className="font-semibold">
+        <div className="font-semibold text-v2-gold-accent">
           {formatCurrency(displayValue, currency)}
         </div>
         {isInvestmentWallet && (
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-v2-text-tertiary">
             {t("cash")}: {formatCurrency(cashBalance, currency)}
           </div>
         )}
@@ -86,7 +86,7 @@ const WalletItem = memo(function WalletItem({
 const EmptyWalletsState = memo(function EmptyWalletsState() {
   const tFeedback = useTranslations("uiFeedback.emptyState");
   return (
-    <div className="flex items-center justify-center py-8 text-gray-400">
+    <div className="flex items-center justify-center py-8 text-v2-text-tertiary">
       {tFeedback("noWalletsFound")}. {tFeedback("noWalletsDescription")}
     </div>
   );

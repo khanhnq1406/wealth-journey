@@ -110,16 +110,16 @@ export function CurrencySelector() {
           }}
           className={cn(
             "flex items-center gap-2 rounded-lg transition-all duration-200",
-            "bg-white dark:bg-dark-surface",
-            "border border-neutral-200 dark:border-neutral-700",
-            "shadow-sm dark:shadow-dark-card",
+ "bg-v2-maroon-800",
+ "border border-v2-maroon-600",
+ "shadow-sm",
             // Mobile-first: touch-friendly padding
             "px-3 py-3 min-h-[44px]",
             // Desktop: slightly smaller
             "sm:py-2 sm:min-h-[40px]",
             isDisabled
               ? "opacity-60 cursor-not-allowed"
-              : "hover:bg-neutral-50 dark:hover:bg-dark-surface-hover cursor-pointer hover:shadow-md active:scale-95"
+ : "hover:bg-v2-maroon-700 cursor-pointer hover:shadow-md active:scale-95"
           )}
           style={{
             touchAction: "manipulation",
@@ -157,16 +157,16 @@ export function CurrencySelector() {
               />
             </svg>
           ) : (
-            <span className="text-lg font-semibold text-neutral-900 dark:text-dark-text">
+ <span className="text-lg font-semibold text-neutral-900">
               {currentCurrency?.symbol || currency}
             </span>
           )}
-          <span className="text-sm text-neutral-600 dark:text-neutral-400">
+ <span className="text-sm text-neutral-600">
             {currency}
           </span>
           {!isConverting && (
             <svg
-              className="w-4 h-4 text-neutral-500 dark:text-neutral-400"
+ className="w-4 h-4 text-neutral-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -187,9 +187,9 @@ export function CurrencySelector() {
             ref={dropdownRef}
             className={cn(
               "absolute right-0 sm:top-auto sm:bottom-full sm:mt-0 sm:mb-2",
-              "bg-white dark:bg-dark-surface",
-              "rounded-lg shadow-lg dark:shadow-dark-card",
-              "border border-neutral-200 dark:border-neutral-700",
+ "bg-v2-maroon-900",
+ "rounded-lg shadow-lg",
+ "border border-v2-maroon-600",
               "py-2 hidden group-hover:block min-w-[200px]"
             )}
             style={{ zIndex: ZIndex.dropdown }}
@@ -203,11 +203,11 @@ export function CurrencySelector() {
                 onKeyDown={(e) => handleKeyDown(e, curr.code, index)}
                 className={cn(
                   "w-full px-4 py-2 text-left transition-colors flex items-center gap-3",
-                  "hover:bg-neutral-100 dark:hover:bg-dark-surface-hover",
-                  "text-neutral-900 dark:text-dark-text",
+ "hover:bg-neutral-100",
+ "text-neutral-900",
                   "cursor-pointer",
                   curr.code === currency &&
-                    "bg-primary-50 dark:bg-primary-900/20 font-semibold"
+ "bg-primary-50 font-semibold"
                 )}
                 role="menuitem"
                 tabIndex={0}
@@ -215,13 +215,13 @@ export function CurrencySelector() {
                 <span className="text-lg w-6">{curr.symbol}</span>
                 <div className="flex flex-col">
                   <span className="text-sm">{curr.code}</span>
-                  <span className="text-xs text-neutral-500 dark:text-neutral-400">
+ <span className="text-xs text-neutral-500">
                     {curr.name}
                   </span>
                 </div>
                 {curr.code === currency && (
                   <svg
-                    className="w-4 h-4 text-primary-500 dark:text-primary-400 ml-auto"
+ className="w-4 h-4 text-primary-500 ml-auto"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -256,15 +256,15 @@ export function CurrencySelector() {
                     "w-full px-6 py-4 text-left flex items-center gap-4",
                     // Mobile-first: touch-friendly sizing
                     "min-h-[56px]",
-                    "active:bg-neutral-100 dark:active:bg-dark-surface-hover",
-                    "text-neutral-900 dark:text-dark-text",
+ "active:bg-neutral-100",
+ "text-neutral-900",
                     "active:scale-[0.98]",
                     "transition-transform",
                     curr.code === currency &&
-                      "bg-primary-50 dark:bg-primary-900/20 font-semibold",
+ "bg-primary-50 font-semibold",
                     // Add border separator except for last item
                     index < SUPPORTED_CURRENCIES.length - 1 &&
-                      "border-b border-neutral-100 dark:border-neutral-800"
+ "border-b border-v2-gold-primary/20"
                   )}
                   style={{
                     touchAction: "manipulation",
@@ -274,13 +274,13 @@ export function CurrencySelector() {
                   <span className="text-2xl w-8">{curr.symbol}</span>
                   <div className="flex flex-col flex-1 min-w-0">
                     <span className="text-base font-medium">{curr.code}</span>
-                    <span className="text-sm text-neutral-500 dark:text-neutral-400 truncate">
+ <span className="text-sm text-neutral-500 truncate">
                       {curr.name}
                     </span>
                   </div>
                   {curr.code === currency && (
                     <svg
-                      className="w-5 h-5 text-primary-500 dark:text-primary-400 flex-shrink-0"
+ className="w-5 h-5 text-primary-500 flex-shrink-0"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >

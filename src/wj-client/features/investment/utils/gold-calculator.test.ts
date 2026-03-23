@@ -197,9 +197,9 @@ describe('Gold Calculator - Utility Functions', () => {
       expect(options.every(opt => opt.currency === 'USD'));
     });
 
-    it('should return all options when no filter', () => {
+    it('should return VND options when no filter', () => {
       const options = getGoldTypeOptions();
-      expect(options.length).toBe(GOLD_VND_OPTIONS.length + GOLD_USD_OPTIONS.length);
+      expect(options).toEqual(GOLD_VND_OPTIONS);
     });
   });
 

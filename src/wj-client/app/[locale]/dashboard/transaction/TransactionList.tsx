@@ -113,7 +113,7 @@ export const TransactionList = ({
     transactionsData.transactions.length === 0
   ) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+      <div className="flex flex-col items-center justify-center py-12 text-v2-text-tertiary">
         <svg
           className="w-16 h-16 mb-4"
           fill="none"

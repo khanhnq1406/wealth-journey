@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { BaseCard } from "@/components/BaseCard";
 import type { MarketTypeItem } from "@/features/market-prices/hooks/usePublicMarketTypes";
 import { GOLD_TABLE_FILTER } from "@/features/market-prices/constants/gold-filter";
 
@@ -29,35 +28,29 @@ export function LandingGoldPriceTable({
 
   if (isLoading) {
     return (
-      <BaseCard
-        padding="none"
-        className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
-      >
-        <div className="px-5 py-3">
-          <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
+      <div className="rounded-lg border-2 border-v2-gold-primary/30 overflow-hidden shadow-v2-card">
+        <div className="bg-gradient-to-r from-v2-gold-primary via-v2-gold-light to-v2-gold-primary px-5 py-3">
+          <h3 className="font-roboto font-bold text-[16px] text-v2-maroon-900">
             {t("goldTableTitle")}
           </h3>
         </div>
-        <div className="px-5 py-8 text-center font-vietnam text-[13px] text-v2-text-tertiary animate-pulse">
+        <div className="bg-v2-cream-200 px-5 py-8 text-center font-roboto text-[13px] text-v2-maroon-800 animate-pulse">
           {t("loadingTypes")}
         </div>
-      </BaseCard>
+      </div>
     );
   }
 
   return (
-    <BaseCard
-      padding="none"
-      className="rounded-[20px] border border-v2-border-light shadow-v2-card overflow-hidden"
-    >
-      {/* Header */}
-      <div className="px-5 py-3">
+    <div className="rounded-lg border-2 border-v2-gold-primary/30 overflow-hidden shadow-v2-card">
+      {/* Gold gradient header bar */}
+      <div className="bg-gradient-to-r from-v2-gold-primary via-v2-gold-light to-v2-gold-primary px-5 py-3">
         <div className="flex items-center justify-between">
-          <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
+          <h3 className="font-roboto font-bold text-[16px] text-v2-maroon-900">
             {t("goldTableTitle")}
           </h3>
           {updatedTime && (
-            <span className="font-jetbrains text-[11px] text-v2-text-tertiary">
+            <span className="font-roboto text-[11px] text-v2-maroon-800/70">
               {t("updatedTime", { time: updatedTime })}
             </span>
           )}
@@ -65,18 +58,18 @@ export function LandingGoldPriceTable({
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto rounded-b-lg">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-v2-gold-light">
-              <th className="text-left px-5 py-3.5 font-vietnam font-bold text-[14px] tracking-normal text-v2-gold-dark border-x border-white/30 first:border-l-0">
+            <tr className="bg-v2-gold-accent">
+              <th className="text-left px-5 py-3.5 font-roboto font-bold text-[14px] tracking-normal text-v2-maroon-900 border-r border-v2-gold-primary/20">
                 {t("goldType")}
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-gold-dark border-x border-white/30">
+              <th className="text-right px-5 py-3.5 font-roboto font-black text-[15px] uppercase tracking-[1px] text-v2-maroon-900 border-r border-v2-gold-primary/20">
                 <div>{t("buy")}</div>
                 <div className="font-normal text-[10px] tracking-normal opacity-70">{t("buyUnit")}</div>
               </th>
-              <th className="text-right px-5 py-3.5 font-jetbrains font-black text-[15px] uppercase tracking-[1px] text-v2-gold-dark border-x border-white/30 last:border-r-0">
+              <th className="text-right px-5 py-3.5 font-roboto font-black text-[15px] uppercase tracking-[1px] text-v2-maroon-900">
                 <div>{t("sell")}</div>
                 <div className="font-normal text-[10px] tracking-normal opacity-70">{t("sellUnit")}</div>
               </th>
@@ -86,12 +79,12 @@ export function LandingGoldPriceTable({
             {filteredTypes.map((item, index) => (
               <tr
                 key={item.code}
-                className={`border-b border-v2-border-light ${index % 2 === 0 ? "bg-white" : "bg-v2-bg-surface-tint"}`}
+                className={`border-b border-v2-gold-primary/10 ${index % 2 === 0 ? "bg-v2-cream-200" : "bg-v2-cream-300"}`}
               >
-                <td className="px-5 py-3 font-vietnam font-bold text-[14px] text-v2-gold-dark border-x border-v2-border-light first:border-l-0">
+                <td className="px-5 py-3.5 font-roboto font-bold text-[14px] text-v2-maroon-900 border-r border-v2-gold-primary/10">
                   {item.displayName}
                 </td>
-                <td className="px-5 py-3 text-right font-vietnam text-[12px] text-v2-text-secondary border-x border-v2-border-light">
+                <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-green-700 border-r border-v2-gold-primary/10">
                   {t.rich("loginPrompt", {
                     loginLink: (chunks) => (
                       <Link
@@ -103,7 +96,7 @@ export function LandingGoldPriceTable({
                     ),
                   })}
                 </td>
-                <td className="px-5 py-3 text-right font-vietnam text-[12px] text-v2-text-secondary border-x border-v2-border-light last:border-r-0">
+                <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-green-700">
                   {t.rich("loginPrompt", {
                     loginLink: (chunks) => (
                       <Link
@@ -121,7 +114,7 @@ export function LandingGoldPriceTable({
               <tr>
                 <td
                   colSpan={3}
-                  className="px-5 py-8 text-center font-vietnam text-[13px] text-v2-text-tertiary"
+                  className="px-5 py-8 text-center font-roboto text-[13px] text-v2-maroon-800 bg-v2-cream-200"
                 >
                   {t("noData")}
                 </td>
@@ -130,6 +123,6 @@ export function LandingGoldPriceTable({
           </tbody>
         </table>
       </div>
-    </BaseCard>
+    </div>
   );
 }

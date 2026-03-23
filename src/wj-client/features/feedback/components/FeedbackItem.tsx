@@ -37,7 +37,7 @@ export function FeedbackItem({
         aria-expanded={expanded}
       >
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-vietnam text-sm font-semibold text-v2-text-primary truncate flex-1">
+          <h3 className="font-roboto text-sm font-semibold text-v2-text-primary truncate flex-1">
             {subject}
           </h3>
           <div className="flex items-center gap-2 shrink-0">
@@ -51,18 +51,18 @@ export function FeedbackItem({
             />
           </div>
         </div>
-        <div className="flex items-center gap-2 text-xs text-v2-text-tertiary font-vietnam">
+        <div className="flex items-center gap-2 text-xs text-v2-text-tertiary font-roboto">
           <span>{formattedDate}</span>
         </div>
         {!expanded && (
-          <p className="text-sm text-v2-text-secondary font-vietnam line-clamp-2">
+          <p className="text-sm text-v2-text-secondary font-roboto line-clamp-2">
             {preview}
           </p>
         )}
       </button>
       {expanded && (
         <div className="px-4 pb-4 border-t border-v2-border-light pt-3">
-          <p className="text-sm text-v2-text-secondary font-vietnam whitespace-pre-wrap">
+          <p className="text-sm text-v2-text-secondary font-roboto whitespace-pre-wrap">
             {message}
           </p>
         </div>

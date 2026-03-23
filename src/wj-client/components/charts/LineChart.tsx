@@ -86,14 +86,14 @@ export interface LineChartProps {
   ) => [string, string];
   /** Background color for grid (default: transparent) */
   gridColor?: string;
-  /** Y-axis domain (min, max values) */
-  yAxisDomain?: [number | "auto", number | "auto"];
+  /** Y-axis domain (min, max values). Supports "auto", "dataMin", "dataMax" or numbers */
+  yAxisDomain?: [number | "auto" | "dataMin" | "dataMax" | ((value: number) => number), number | "auto" | "dataMin" | "dataMax" | ((value: number) => number)];
   /** Whether to animate on load (default: true) */
   animate?: boolean;
 }
 
 /**
- * Default colors for series - using green fintech palette
+ * Default colors for series - using maroon/gold palette
  */
 const DEFAULT_SERIES_COLORS = chartColors;
 
@@ -131,7 +131,7 @@ export const LineChart = memo(function LineChart({
   xAxisFormatter,
   yAxisFormatter = (value) => value.toLocaleString(),
   tooltipFormatter,
-  gridColor = "#f1f5f9",
+  gridColor = "rgba(61, 1, 1, 0.4)",
   yAxisDomain,
   animate = true,
 }: LineChartProps) {
@@ -187,8 +187,8 @@ export const LineChart = memo(function LineChart({
     if (!active || !payload || !payload.length) return null;
 
     return (
-      <div className="bg-white/95 backdrop-blur-sm border border-neutral-200 rounded-lg shadow-lg p-3">
-        <p className="text-sm font-medium text-neutral-700 mb-2">
+      <div className="bg-v2-maroon-900/95 backdrop-blur-sm border border-v2-gold-primary rounded-lg shadow-lg p-3">
+        <p className="text-sm font-medium text-v2-gold-light mb-2">
           {xAxisFormatter ? xAxisFormatter(label) : label}
         </p>
         {payload.map((entry: any, index: number) => (
@@ -197,8 +197,8 @@ export const LineChart = memo(function LineChart({
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: entry.color }}
             />
-            <span className="text-neutral-600">{entry.name}:</span>
-            <span className="font-semibold text-neutral-900">
+            <span className="text-v2-cream-100/70">{entry.name}:</span>
+            <span className="font-semibold text-v2-gold-accent">
               {tooltipFormatter
                 ? tooltipFormatter(entry.value, entry.name, entry.payload)[0]
                 : yAxisFormatter(entry.value)}
@@ -228,7 +228,7 @@ export const LineChart = memo(function LineChart({
                 className="w-3 h-3 rounded-full flex-shrink-0"
                 style={{ backgroundColor: color }}
               />
-              <span className="text-xs font-medium text-neutral-700 whitespace-nowrap">
+              <span className="text-xs font-medium text-v2-cream-100 whitespace-nowrap">
                 {s.name}
               </span>
             </div>
@@ -272,14 +272,14 @@ export const LineChart = memo(function LineChart({
 
           <XAxis
             dataKey={xAxisKey}
-            tick={{ fontSize: 12, fill: "#6b7280" }}
+            tick={{ fontSize: 12, fill: "#FFF8EC" }}
             tickLine={false}
-            axisLine={{ stroke: "#e5e7eb", strokeWidth: 1 }}
+            axisLine={{ stroke: "rgba(215, 139, 28, 0.3)", strokeWidth: 1 }}
             tickFormatter={xAxisFormatter}
           />
 
           <YAxis
-            tick={{ fontSize: 12, fill: "#6b7280" }}
+            tick={{ fontSize: 12, fill: "#FFF8EC" }}
             tickLine={false}
             axisLine={false}
             domain={yAxisDomain}
@@ -315,7 +315,7 @@ export const LineChart = memo(function LineChart({
                           className="w-3 h-3 rounded-full"
                           style={{ backgroundColor: entry.color }}
                         />
-                        <span className="text-xs font-medium text-neutral-700">
+                        <span className="text-xs font-medium text-v2-cream-100">
                           {entry.value}
                         </span>
                       </div>
@@ -362,14 +362,14 @@ export const LineChart = memo(function LineChart({
                   type={s.curveType ?? "monotone"}
                   dot={
                     s.showDots
-                      ? { r: 4, fill: color, strokeWidth: 2, stroke: "white" }
+                      ? { r: 4, fill: color, strokeWidth: 2, stroke: "#3D0101" }
                       : false
                   }
                   activeDot={{
                     r: 5,
                     fill: color,
                     strokeWidth: 2,
-                    stroke: "white",
+                    stroke: "#3D0101",
                   }}
                   isAnimationActive={animate}
                   animationBegin={index * 100}
@@ -396,14 +396,14 @@ export const LineChart = memo(function LineChart({
                   stackId={s.stackId}
                   dot={
                     s.showDots
-                      ? { r: 4, fill: color, strokeWidth: 2, stroke: "white" }
+                      ? { r: 4, fill: color, strokeWidth: 2, stroke: "#3D0101" }
                       : false
                   }
                   activeDot={{
                     r: 5,
                     fill: color,
                     strokeWidth: 2,
-                    stroke: "white",
+                    stroke: "#3D0101",
                   }}
                   isAnimationActive={animate}
                   animationBegin={index * 100}

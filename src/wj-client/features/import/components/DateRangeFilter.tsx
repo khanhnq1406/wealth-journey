@@ -55,24 +55,24 @@ export const DateRangeFilter = React.memo(function DateRangeFilter({
   const isFiltered = startDate !== null || endDate !== null;
 
   return (
-    <div className="border border-neutral-200 dark:border-dark-border rounded-lg">
+ <div className="border border-v2-border-light rounded-lg">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-4 hover:bg-neutral-50 dark:hover:bg-dark-surface-hover transition-colors rounded-lg"
+ className="w-full flex items-center justify-between p-4 hover:bg-v2-bg-surface-tint transition-colors rounded-lg"
       >
         <div className="flex items-center gap-3">
           <span className="text-xl">📅</span>
           <div className="text-left">
-            <h3 className="font-semibold text-sm text-neutral-900 dark:text-dark-text">
+ <h3 className="font-semibold text-sm text-v2-gold-accent">
               Date Range Filter
             </h3>
             {isFiltered ? (
-              <p className="text-xs text-primary-600 dark:text-primary-400">
+ <p className="text-xs text-v2-gold-primary">
                 {startDate?.toLocaleDateString("vi-VN")} -{" "}
                 {endDate?.toLocaleDateString("vi-VN")}
               </p>
             ) : (
-              <p className="text-xs text-neutral-500 dark:text-dark-text-tertiary">
+ <p className="text-xs text-v2-text-tertiary">
                 All dates ({transactionCount} transactions)
               </p>
             )}
@@ -81,7 +81,7 @@ export const DateRangeFilter = React.memo(function DateRangeFilter({
         <ChevronDownIcon
           size="sm"
           className={cn(
-            "transition-transform text-neutral-600 dark:text-neutral-400",
+ "transition-transform text-v2-text-secondary",
             expanded && "rotate-180"
           )}
           decorative
@@ -89,10 +89,10 @@ export const DateRangeFilter = React.memo(function DateRangeFilter({
       </button>
 
       {expanded && (
-        <div className="p-4 border-t border-neutral-200 dark:border-dark-border space-y-4">
+ <div className="p-4 border-t border-v2-border-light space-y-4">
           {/* Quick Filters */}
           <div className="space-y-2">
-            <p className="text-xs font-medium text-neutral-700 dark:text-dark-text">
+ <p className="text-xs font-medium text-v2-text-secondary">
               Quick Filters
             </p>
             <div className="grid grid-cols-2 gap-2">
@@ -100,7 +100,7 @@ export const DateRangeFilter = React.memo(function DateRangeFilter({
                 <button
                   key={filter.label}
                   onClick={() => handleQuickFilter(filter)}
-                  className="px-3 py-2 text-xs bg-neutral-100 dark:bg-dark-surface-hover text-neutral-700 dark:text-dark-text rounded-lg hover:bg-neutral-200 dark:hover:bg-dark-surface-active transition-colors"
+ className="px-3 py-2 text-xs bg-v2-bg-dark text-v2-text-secondary rounded-lg hover:bg-v2-bg-surface-tint transition-colors"
                 >
                   {filter.label}
                 </button>
@@ -110,7 +110,7 @@ export const DateRangeFilter = React.memo(function DateRangeFilter({
 
           {/* Custom Date Range */}
           <div className="space-y-2">
-            <p className="text-xs font-medium text-neutral-700 dark:text-dark-text">
+ <p className="text-xs font-medium text-v2-text-secondary">
               Custom Range
             </p>
             <div className="grid grid-cols-2 gap-2">
@@ -120,7 +120,7 @@ export const DateRangeFilter = React.memo(function DateRangeFilter({
                 onChange={(e) =>
                   onChange(e.target.value ? new Date(e.target.value) : null, endDate)
                 }
-                className="px-3 py-2 text-sm border border-neutral-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-surface text-neutral-900 dark:text-dark-text"
+ className="px-3 py-2 text-sm border border-v2-border-light rounded-lg bg-v2-bg-surface text-v2-gold-accent"
               />
               <input
                 type="date"
@@ -128,7 +128,7 @@ export const DateRangeFilter = React.memo(function DateRangeFilter({
                 onChange={(e) =>
                   onChange(startDate, e.target.value ? new Date(e.target.value) : null)
                 }
-                className="px-3 py-2 text-sm border border-neutral-300 dark:border-dark-border rounded-lg bg-white dark:bg-dark-surface text-neutral-900 dark:text-dark-text"
+ className="px-3 py-2 text-sm border border-v2-border-light rounded-lg bg-v2-bg-surface text-v2-gold-accent"
               />
             </div>
           </div>

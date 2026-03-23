@@ -32,7 +32,6 @@ export interface GoldTypeOption {
 // Vietnamese gold type options — aligned with GOLD_TABLE_FILTER (price table display)
 export const GOLD_VND_OPTIONS: GoldTypeOption[] = [
   { value: "SJC", label: "SJC", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
-  { value: "SJC TD", label: "SJC Tự Do", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
   { value: "Vàng nhẫn SJC", label: "Nhẫn SJC 9999", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
   { value: "Doji_24K", label: "Nhẫn Doji 9999", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
   { value: "Mi hồng", label: "SJC Mi Hồng", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
@@ -367,12 +366,10 @@ export function formatGoldPriceDisplay(
  * @returns Array of gold type options
  */
 export function getGoldTypeOptions(currency?: string): GoldTypeOption[] {
-  if (currency === 'VND') {
-    return GOLD_VND_OPTIONS;
-  } else if (currency === 'USD') {
+  if (currency === 'USD') {
     return GOLD_USD_OPTIONS;
   }
-  return [...GOLD_VND_OPTIONS, ...GOLD_USD_OPTIONS];
+  return GOLD_VND_OPTIONS;
 }
 
 /**

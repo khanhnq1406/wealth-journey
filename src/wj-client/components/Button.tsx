@@ -75,8 +75,8 @@ export const Button = React.memo(function Button({
   // Base classes for all buttons
   const baseClasses = cn(
     "font-semibold rounded-lg cursor-pointer",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
-    "disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 focus-visible:ring-offset-v2-bg-primary",
+    "disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none",
     "flex items-center justify-center gap-2 sm:gap-3",
     "transition-all duration-200 ease-in-out",
     "active:scale-[0.98]",
@@ -86,25 +86,22 @@ export const Button = React.memo(function Button({
   // Variant-specific classes (using semantic design system colors)
   const variantClasses = {
     primary: cn(
-      "bg-v2-red-primary text-white",
-      "hover:bg-v2-red-dark hover:shadow-md",
-      "active:bg-primary-800",
-      "dark:bg-v2-red-primary dark:hover:bg-v2-red-dark dark:active:bg-primary-800",
+      "bg-v2-gold-primary text-v2-bg-dark",
+      "hover:bg-v2-gold-dark hover:shadow-md",
+      "active:bg-v2-gold-accent",
     ),
     secondary: cn(
-      "bg-white text-primary-600 border-2 border-primary-600",
-      "hover:bg-primary-50 hover:shadow-md",
-      "active:bg-primary-100",
-      "dark:bg-dark-surface dark:text-primary-500 dark:border-primary-500",
-      "dark:hover:bg-dark-surface-hover dark:active:bg-dark-surface-active",
+      "bg-transparent text-v2-gold-primary border-2 border-v2-gold-primary",
+      "hover:bg-v2-gold-primary/10 hover:shadow-md",
+      "active:bg-v2-gold-primary/20",
     ),
     ghost: cn(
-      "bg-transparent text-neutral-700 dark:text-neutral-300",
-      "hover:bg-neutral-100 dark:hover:bg-dark-surface-hover",
-      "active:bg-neutral-200 dark:active:bg-dark-surface-active",
+      "bg-transparent text-v2-gold-accent",
+      "hover:bg-v2-bg-surface-tint",
+      "active:bg-v2-bg-surface",
     ),
     link: cn(
-      "bg-transparent text-primary-600 dark:text-primary-500",
+      "bg-transparent text-v2-gold-primary",
       "hover:underline",
       "hover:bg-transparent",
       "p-0 min-h-0",
@@ -113,13 +110,11 @@ export const Button = React.memo(function Button({
       "bg-danger-600 text-white",
       "hover:bg-danger-700 hover:shadow-md",
       "active:bg-danger-800",
-      "dark:bg-danger-600 dark:hover:bg-danger-700 dark:active:bg-danger-800",
     ),
     success: cn(
       "bg-success-600 text-white",
       "hover:bg-success-700 hover:shadow-md",
       "active:bg-success-800",
-      "dark:bg-success-600 dark:hover:bg-success-700 dark:active:bg-success-800",
     ),
   };
 
@@ -176,9 +171,9 @@ export const Button = React.memo(function Button({
         className={cn(
           "!p-2.5 sm:!p-2 !min-h-[44px] sm:!min-h-[48px] !min-w-[44px] sm:!min-w-[48px] !w-auto",
           "bg-transparent",
-          "hover:bg-neutral-100 dark:hover:bg-dark-surface-hover",
+          "hover:bg-v2-bg-surface-tint",
           "rounded-full",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 focus-visible:ring-offset-v2-bg-primary",
           "transition-all duration-200 ease-in-out",
           "active:scale-[0.95]",
           "flex items-center justify-center",
@@ -191,7 +186,7 @@ export const Button = React.memo(function Button({
         aria-busy={loading}
       >
         {loading ? (
-          <LoadingSpinnerIcon size="md" className="text-v2-red-primary" />
+          <LoadingSpinnerIcon size="md" className="text-v2-gold-primary" />
         ) : src ? (
           <img src={src} alt="" className="w-5 h-5" />
         ) : null}

@@ -55,18 +55,30 @@ const ModalType = {
 const TYPE_FILTER_KEYS = [
   { value: "0", key: "typeOptions.allTypes" },
   {
-    value: String(InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY),
-    key: "typeOptions.cryptocurrency",
+    value: String(InvestmentType.INVESTMENT_TYPE_GOLD_VND),
+    key: "typeOptions.goldVietnam",
+  },
+  {
+    value: String(InvestmentType.INVESTMENT_TYPE_SILVER_VND),
+    key: "typeOptions.silverVietnam",
+  },
+  {
+    value: String(InvestmentType.INVESTMENT_TYPE_CASH),
+    key: "typeOptions.cash",
+  },
+  {
+    value: String(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY),
+    key: "typeOptions.foreignCurrency",
   },
   {
     value: String(InvestmentType.INVESTMENT_TYPE_STOCK),
     key: "typeOptions.stock",
   },
-  { value: String(InvestmentType.INVESTMENT_TYPE_ETF), key: "typeOptions.etf" },
   {
-    value: String(InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND),
-    key: "typeOptions.mutualFund",
+    value: String(InvestmentType.INVESTMENT_TYPE_CRYPTOCURRENCY),
+    key: "typeOptions.cryptocurrency",
   },
+  { value: String(InvestmentType.INVESTMENT_TYPE_ETF), key: "typeOptions.etf" },
   {
     value: String(InvestmentType.INVESTMENT_TYPE_BOND),
     key: "typeOptions.bond",
@@ -76,20 +88,8 @@ const TYPE_FILTER_KEYS = [
     key: "typeOptions.commodity",
   },
   {
-    value: String(InvestmentType.INVESTMENT_TYPE_GOLD_VND),
-    key: "typeOptions.goldVietnam",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_GOLD_USD),
-    key: "typeOptions.goldWorld",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_CASH),
-    key: "typeOptions.cash",
-  },
-  {
-    value: String(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY),
-    key: "typeOptions.foreignCurrency",
+    value: String(InvestmentType.INVESTMENT_TYPE_MUTUAL_FUND),
+    key: "typeOptions.mutualFund",
   },
   {
     value: String(InvestmentType.INVESTMENT_TYPE_OTHER),
@@ -321,12 +321,12 @@ export default function PortfolioPageEnhanced() {
     return (
       <div className="flex flex-col gap-6 px-3 sm:px-4 md:px-6 py-3 sm:py-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-          <div className="h-8 w-48 bg-neutral-200 rounded animate-pulse" />
-          <div className="h-10 w-40 bg-neutral-200 rounded animate-pulse" />
+          <div className="h-8 w-48 bg-v2-maroon-800 rounded animate-pulse" />
+          <div className="h-10 w-40 bg-v2-maroon-800 rounded animate-pulse" />
         </div>
         <StatsCardSkeleton cards={4} />
-        <div className="bg-white rounded-lg shadow-card p-4 sm:p-6">
-          <div className="h-6 w-32 bg-neutral-200 rounded animate-pulse mb-4" />
+        <div className="bg-v2-maroon-800 rounded-lg shadow-card p-4 sm:p-6">
+          <div className="h-6 w-32 bg-v2-maroon-800 rounded animate-pulse mb-4" />
           <TableSkeleton rows={5} showAvatar={false} />
         </div>
       </div>
@@ -354,7 +354,7 @@ export default function PortfolioPageEnhanced() {
         <div className="w-full max-w-7xl space-y-3 sm:space-y-4">
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 sm:gap-4 py-2">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-v2-gold-accent">
               {t("page.title")}
             </h1>
 
@@ -410,7 +410,7 @@ export default function PortfolioPageEnhanced() {
           {/* Holdings - Mobile Card View */}
           <BaseCard className="p-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl sm:text-2xl font-bold text-neutral-800">
+              <h2 className="text-xl sm:text-2xl font-bold text-v2-gold-accent">
                 {t("page.holdings")}
               </h2>
             </div>

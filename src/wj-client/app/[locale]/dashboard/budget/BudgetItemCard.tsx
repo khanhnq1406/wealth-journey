@@ -100,8 +100,8 @@ export function BudgetItemCard({
         transition={{ duration: 0.2 }}
         className={`group flex items-center gap-3 py-2.5 px-3 rounded-lg border transition-all duration-200 ${
           isChecked
-            ? "bg-gray-50 border-gray-200"
-            : "bg-white border-gray-200 hover:border-primary-600 hover:bg-gray-50/50"
+            ? "bg-v2-bg-dark border-v2-border-light"
+            : "bg-v2-bg-surface border-v2-border-light hover:border-v2-gold-primary hover:bg-v2-bg-surface-tint"
         }`}
       >
         {/* Checkbox */}
@@ -116,14 +116,14 @@ export function BudgetItemCard({
         <div className="flex-1 min-w-0">
           <div
             className={`text-sm font-medium truncate transition-colors ${
-              isChecked ? "text-gray-400 line-through" : "text-gray-900"
+              isChecked ? "text-v2-text-tertiary line-through" : "text-v2-gold-accent"
             }`}
           >
             {item.name}
           </div>
           <div
             className={`text-xs mt-0.5 transition-colors ${
-              isChecked ? "text-gray-400" : "text-gray-500"
+              isChecked ? "text-v2-text-tertiary" : "text-v2-text-tertiary"
             }`}
           >
             {formatCurrency(itemAmount, currency)}
@@ -137,14 +137,14 @@ export function BudgetItemCard({
             src={`${resources}/editing.svg`}
             onClick={() => onEditItem(budgetId, item)}
             disabled={isPending}
-            className="p-1.5 hover:bg-primary-50 rounded-md transition-colors"
+            className="p-1.5 hover:bg-v2-bg-surface-tint rounded-md transition-colors"
           />
           <Button
             type={ButtonType.IMG}
             src={`${resources}/remove.svg`}
             onClick={handleDeleteItem}
             disabled={isPending}
-            className="p-1.5 hover:bg-red-50 rounded-md transition-colors"
+            className="p-1.5 hover:bg-v2-bg-surface-tint rounded-md transition-colors"
           />
         </div>
       </motion.div>
@@ -155,7 +155,7 @@ export function BudgetItemCard({
           message={
             <div className="flex flex-col gap-1.5">
               <p>{`${tModals("confirmation.areYouSure")} "${item.name}"?`}</p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-v2-text-tertiary">
                 {tModals("confirmation.thisActionCannotBeUndone")}
               </p>
             </div>

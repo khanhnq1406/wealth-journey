@@ -32,7 +32,7 @@ export default function TestRecommendationsPage() {
           Type a number to see recommendations (e.g., &quot;12&quot;, &quot;1&quot;, &quot;123&quot;)
         </p>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-v2-maroon-800 rounded-lg shadow p-6">
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* Test: Default (recommendations enabled) */}
             <FormNumberInput
@@ -70,7 +70,7 @@ export default function TestRecommendationsPage() {
         </div>
 
         {/* Test cases */}
-        <div className="mt-8 bg-white rounded-lg shadow p-6">
+        <div className="mt-8 bg-v2-maroon-800 rounded-lg shadow p-6">
           <h2 className="text-xl font-bold mb-4">Test Cases</h2>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between border-b pb-2">
@@ -116,10 +116,10 @@ export default function TestRecommendationsPage() {
         <div className="mt-4 bg-yellow-50 rounded-lg shadow p-6">
           <h3 className="font-semibold mb-2">Keyboard Navigation:</h3>
           <ul className="text-sm space-y-1 list-disc list-inside">
-            <li><kbd className="px-2 py-1 bg-white rounded border">Tab</kbd> - Move to first chip</li>
-            <li><kbd className="px-2 py-1 bg-white rounded border">Arrow keys</kbd> - Navigate between chips</li>
-            <li><kbd className="px-2 py-1 bg-white rounded border">Enter</kbd> or <kbd className="px-2 py-1 bg-white rounded border">Space</kbd> - Select chip</li>
-            <li><kbd className="px-2 py-1 bg-white rounded border">Escape</kbd> - Hide recommendations</li>
+            <li><kbd className="px-2 py-1 bg-v2-maroon-800 rounded border">Tab</kbd> - Move to first chip</li>
+            <li><kbd className="px-2 py-1 bg-v2-maroon-800 rounded border">Arrow keys</kbd> - Navigate between chips</li>
+            <li><kbd className="px-2 py-1 bg-v2-maroon-800 rounded border">Enter</kbd> or <kbd className="px-2 py-1 bg-v2-maroon-800 rounded border">Space</kbd> - Select chip</li>
+            <li><kbd className="px-2 py-1 bg-v2-maroon-800 rounded border">Escape</kbd> - Hide recommendations</li>
           </ul>
         </div>
       </div>

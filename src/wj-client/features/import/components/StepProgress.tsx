@@ -48,15 +48,15 @@ export const StepProgress: FC<StepProgressProps> = ({
       {/* Mobile view: Simple progress bar with step indicator */}
       <div className="sm:hidden">
         <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="text-gray-600 font-medium">
+          <span className="text-v2-text-secondary font-medium">
             {t("stepOf", { current: currentStepIndex + 1, total: totalSteps })}
           </span>
-          <span className="text-sm text-gray-900 font-semibold">
+          <span className="text-sm text-v2-gold-accent font-semibold">
             {currentStepData?.label}
           </span>
         </div>
         <div
-          className="w-full bg-gray-200 rounded-full h-2 overflow-hidden"
+          className="w-full bg-v2-bg-dark rounded-full h-2 overflow-hidden"
           role="progressbar"
           aria-valuenow={currentStep}
           aria-valuemin={1}
@@ -94,8 +94,8 @@ export const StepProgress: FC<StepProgressProps> = ({
                         isCompleted
                           ? "bg-v2-red-primary border-v2-red-primary"
                           : isCurrent
-                            ? "bg-white border-v2-red-primary ring-4 ring-v2-red-primary/10"
-                            : "bg-white border-gray-300"
+                            ? "bg-v2-maroon-800 border-v2-red-primary ring-4 ring-v2-red-primary/10"
+                            : "bg-v2-bg-surface border-v2-border-light"
                       }
                     `}
                     {...(isCurrent && { "aria-current": "step" })}
@@ -119,7 +119,7 @@ export const StepProgress: FC<StepProgressProps> = ({
                       // Icon for current and upcoming steps
                       <div
                         className={`w-5 h-5 ${
-                          isCurrent ? "text-v2-red-primary" : "text-gray-400"
+                          isCurrent ? "text-v2-red-primary" : "text-v2-text-tertiary"
                         }`}
                       >
                         {step.icon}
@@ -128,7 +128,7 @@ export const StepProgress: FC<StepProgressProps> = ({
                       // Fallback to step number if no icon
                       <span
                         className={`text-sm font-semibold ${
-                          isCurrent ? "text-v2-red-primary" : "text-gray-400"
+                          isCurrent ? "text-v2-red-primary" : "text-v2-text-tertiary"
                         }`}
                       >
                         {step.number}
@@ -144,8 +144,8 @@ export const StepProgress: FC<StepProgressProps> = ({
                         isCurrent
                           ? "text-v2-red-primary"
                           : isCompleted
-                            ? "text-gray-700"
-                            : "text-gray-400"
+                            ? "text-v2-text-secondary"
+                            : "text-v2-text-tertiary"
                       }
                     `}
                   >
@@ -159,7 +159,7 @@ export const StepProgress: FC<StepProgressProps> = ({
                     <div
                       className={`
                         w-full h-full transition-all duration-300
-                        ${isCompleted ? "bg-v2-red-primary" : "bg-gray-300"}
+                        ${isCompleted ? "bg-v2-red-primary" : "bg-v2-border-light"}
                       `}
                     />
                   </div>

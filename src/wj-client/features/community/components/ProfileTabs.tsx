@@ -63,14 +63,14 @@ export function ProfileTabs({ userId, currentUser, onUserClick, onHashtagClick }
   return (
     <div>
       {/* Tab bar */}
-      <div className="flex border-b border-v2-border-light bg-white sm:rounded-t-2xl overflow-hidden">
+      <div className="flex border-b border-v2-border-light bg-v2-maroon-800 sm:rounded-t-2xl overflow-hidden">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`flex-1 py-3 text-sm font-medium transition-colors ${
               activeTab === tab.key
-                ? "text-bg border-b-2 border-bg"
+                ? "text-bg border-b-2 border-v2-gold-primary"
                 : "text-gray-500 hover:text-v2-text-primary"
             }`}
           >
@@ -83,7 +83,7 @@ export function ProfileTabs({ userId, currentUser, onUserClick, onHashtagClick }
       <div className="mt-2">
         {isLoading ? (
           <div className="p-8 text-center">
-            <div className="w-6 h-6 border-2 border-bg border-t-transparent rounded-full animate-spin mx-auto" />
+            <div className="w-6 h-6 border-2 border-v2-gold-primary border-t-transparent rounded-full animate-spin mx-auto" />
           </div>
         ) : currentPosts.length === 0 ? (
           <div className="p-8 text-center text-sm text-gray-400">

@@ -101,22 +101,22 @@ export default function LandingInvestmentFeatures() {
             <motion.div
               key={feature.title}
               variants={itemVariants}
-              className="bg-white rounded-xl p-6 sm:p-8 shadow-md hover:shadow-xl transition-shadow duration-300"
+              className="bg-v2-maroon-800 rounded-xl p-6 sm:p-8 shadow-md hover:shadow-xl transition-shadow duration-300 border border-v2-gold-primary/20"
             >
-              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+              <h3 className="text-xl sm:text-2xl font-bold text-v2-gold-accent mb-2">
                 {feature.title}
               </h3>
-              <p className="text-sm sm:text-base text-gray-600 mb-6">
+              <p className="text-sm sm:text-base text-v2-cream-100 mb-6">
                 {feature.description}
               </p>
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 {feature.items.map((item, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 p-2 sm:p-3 bg-neutral-50 rounded-lg hover:bg-v2-red-50 transition-colors duration-200"
+                    className="flex items-center gap-2 p-2 sm:p-3 bg-v2-maroon-900 rounded-lg hover:bg-v2-maroon-700 transition-colors duration-200"
                   >
                     <span className="text-lg sm:text-xl">{item.icon}</span>
-                    <span className="text-xs sm:text-sm font-medium text-gray-700">
+                    <span className="text-xs sm:text-sm font-medium text-v2-cream-100">
                       {item.label}
                     </span>
                   </div>

@@ -60,14 +60,14 @@ export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
       <div>
         <textarea
           {...register("content")}
-          className="w-full min-h-[120px] resize-none border border-v2-border-light rounded-xl p-3 font-vietnam text-sm text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none focus:border-v2-red-primary transition-colors"
+          className="w-full min-h-[120px] resize-none border border-v2-border-light rounded-xl p-3 font-roboto text-sm text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none focus:border-v2-red-primary transition-colors"
           maxLength={2000}
         />
         <div className="flex justify-between items-center mt-1">
           {errors.content && (
-            <p className="text-xs text-red-500 font-vietnam">{errors.content.message}</p>
+            <p className="text-xs text-red-500 font-roboto">{errors.content.message}</p>
           )}
-          <p className="text-xs text-v2-text-tertiary font-jetbrains ml-auto">
+          <p className="text-xs text-v2-text-tertiary font-roboto ml-auto">
             {content.length} / 2.000
           </p>
         </div>
@@ -84,8 +84,8 @@ export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
 
       {/* Error message */}
       {errorMessage && (
-        <div className="p-3 rounded-lg bg-red-50 border border-red-200">
-          <p className="text-xs text-red-600 font-vietnam">{errorMessage}</p>
+        <div className="p-3 rounded-lg bg-red-50 border border-v2-red-negative/30">
+          <p className="text-xs text-red-600 font-roboto">{errorMessage}</p>
         </div>
       )}
 
@@ -95,7 +95,7 @@ export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
           type="submit"
           disabled={updatePostMutation.isPending}
           className={cn(
-            "px-6 py-2 rounded-xl font-vietnam text-sm font-semibold transition-colors",
+            "px-6 py-2 rounded-xl font-roboto text-sm font-semibold transition-colors",
             updatePostMutation.isPending
               ? "bg-v2-border-light text-v2-text-tertiary cursor-not-allowed"
               : "bg-v2-red-primary text-white hover:bg-v2-red-dark"

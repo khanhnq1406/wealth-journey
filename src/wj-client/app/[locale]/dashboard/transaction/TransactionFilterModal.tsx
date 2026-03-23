@@ -26,19 +26,19 @@ function FilterSection({
   onToggle,
 }: FilterSectionProps) {
   return (
-    <div className="border-b border-gray-200 dark:border-dark-border last:border-0">
+ <div className="border-b border-v2-border-light last:border-0">
       <button
         type="button"
         onClick={() => onToggle(section)}
-        className="w-full flex items-center justify-between py-2.5 sm:py-3 px-3 sm:px-4 text-left hover:bg-neutral-50 dark:hover:bg-dark-surface-hover transition-colors"
+ className="w-full flex items-center justify-between py-2.5 sm:py-3 px-3 sm:px-4 text-left hover:bg-v2-bg-surface-tint transition-colors"
         aria-expanded={expanded}
       >
-        <span className="font-medium text-gray-900 dark:text-dark-text">
+ <span className="font-medium text-v2-gold-accent">
           {title}
         </span>
         <svg
           className={cn(
-            "w-5 h-5 text-gray-500 dark:text-dark-text-secondary transition-transform duration-200 flex-shrink-0",
+ "w-5 h-5 text-v2-text-tertiary transition-transform duration-200 flex-shrink-0",
             expanded ? "rotate-180" : "rotate-0",
           )}
           fill="none"
@@ -342,9 +342,9 @@ export function TransactionFilterModal({
       fullScreenOnMobile={false}
     >
       {activeFilterCount > 0 && (
-        <div className="mb-3 sm:mb-4 flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
+ <div className="mb-3 sm:mb-4 flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-v2-bg-dark rounded-lg">
           <svg
-            className="w-4 h-4 text-primary-600 dark:text-primary-400 flex-shrink-0"
+ className="w-4 h-4 text-v2-gold-primary flex-shrink-0"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -356,12 +356,12 @@ export function TransactionFilterModal({
               d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span className="text-sm text-primary-700 dark:text-primary-300">
+ <span className="text-sm text-v2-text-secondary">
             {activeFilterCount} active filter{activeFilterCount !== 1 ? "s" : ""}
           </span>
         </div>
       )}
-      <div className="space-y-0 sm:space-y-4 divide-y divide-gray-200 dark:divide-dark-border">
+ <div className="space-y-0 sm:space-y-4 divide-y divide-v2-border-light">
         {/* Search Input - Always visible */}
         <FilterSection
           title={tCommon("search")}
@@ -424,7 +424,7 @@ export function TransactionFilterModal({
           expanded={isExpanded("filters")}
           onToggle={toggleSection}
         >
-          <div className="">
+          <div>
             {/* Wallet Filter */}
             <FormSelect
               id="filter-wallet"
@@ -523,7 +523,7 @@ export function TransactionFilterModal({
                     "min-h-[44px]",
                     dateRangeType === option.value
                       ? undefined
-                      : "bg-neutral-100 dark:bg-dark-surface-hover text-gray-700 dark:text-dark-text hover:bg-neutral-200 dark:hover:bg-dark-surface-active",
+ : "bg-v2-bg-dark text-v2-gold-accent hover:bg-v2-bg-surface-tint",
                   )}
                 >
                   {option.label}

@@ -17,7 +17,7 @@ export function PostBody({ content, imageUrl, sharedPost, onHashtagClick }: Post
 
   return (
     <div className="mt-3">
-      <p className="font-vietnam text-sm leading-relaxed text-v2-text-primary whitespace-pre-wrap break-words">
+      <p className="font-roboto text-sm leading-relaxed text-v2-text-primary whitespace-pre-wrap break-words">
         {tokens.map((token, i) =>
           token.type === "hashtag" ? (
             <HashtagLink

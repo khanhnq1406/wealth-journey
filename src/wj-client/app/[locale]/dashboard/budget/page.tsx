@@ -147,10 +147,10 @@ export function BudgetContent() {
       {budgets.length === 0 ? (
         <BaseCard className="p-6 sm:p-8">
           <div className="flex flex-col items-center justify-center gap-4 py-8 sm:py-12">
-            <div className="text-gray-500 text-base sm:text-lg">
+            <div className="text-v2-text-tertiary text-base sm:text-lg">
               {t("noBudgetsYet")}
             </div>
-            <div className="text-gray-400 text-sm sm:text-base text-center">
+            <div className="text-v2-text-tertiary text-sm sm:text-base text-center">
               {t("createFirstBudget")}
             </div>
           </div>

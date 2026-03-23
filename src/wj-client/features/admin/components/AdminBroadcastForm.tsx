@@ -58,7 +58,7 @@ export function AdminBroadcastForm() {
 
   return (
     <div className="max-w-2xl">
-      <h3 className="font-vietnam font-semibold text-lg text-v2-text-primary mb-4">
+      <h3 className="font-roboto font-semibold text-lg text-v2-text-primary mb-4">
         {t("title")}
       </h3>
 
@@ -66,7 +66,7 @@ export function AdminBroadcastForm() {
         <div>
           <label
             htmlFor="broadcast-title"
-            className="block font-vietnam text-sm font-medium text-v2-text-secondary mb-1"
+            className="block font-roboto text-sm font-medium text-v2-text-secondary mb-1"
           >
             {t("form.title")}
           </label>
@@ -77,9 +77,9 @@ export function AdminBroadcastForm() {
             onChange={(e) => setTitle(e.target.value)}
             maxLength={MAX_TITLE_LENGTH}
             placeholder={t("form.titlePlaceholder")}
-            className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-vietnam text-sm text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg"
+            className="w-full rounded-lg border border-v2-border-light bg-v2-maroon-900 px-3 py-2 font-roboto text-sm text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary"
           />
-          <p className="mt-1 font-vietnam text-xs text-v2-text-tertiary">
+          <p className="mt-1 font-roboto text-xs text-v2-text-tertiary">
             {t("form.titleHelp")}
           </p>
         </div>
@@ -87,7 +87,7 @@ export function AdminBroadcastForm() {
         <div>
           <label
             htmlFor="broadcast-message"
-            className="block font-vietnam text-sm font-medium text-v2-text-secondary mb-1"
+            className="block font-roboto text-sm font-medium text-v2-text-secondary mb-1"
           >
             {t("form.message")}
           </label>
@@ -98,10 +98,10 @@ export function AdminBroadcastForm() {
             maxLength={MAX_MESSAGE_LENGTH}
             rows={4}
             placeholder={t("form.messagePlaceholder")}
-            className="w-full rounded-lg border border-v2-border-light px-3 py-2 font-vietnam text-sm text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-bg resize-none"
+            className="w-full rounded-lg border border-v2-border-light bg-v2-maroon-900 px-3 py-2 font-roboto text-sm text-v2-text-primary placeholder:text-v2-text-tertiary focus:outline-none focus:ring-2 focus:ring-bg/30 focus:border-v2-gold-primary resize-none"
           />
           <p
-            className={`mt-1 font-vietnam text-xs ${
+            className={`mt-1 font-roboto text-xs ${
               charCount > MAX_MESSAGE_LENGTH ? "text-lred" : "text-v2-text-tertiary"
             }`}
           >
@@ -110,14 +110,14 @@ export function AdminBroadcastForm() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2">
-            <p className="font-vietnam text-sm text-red-700">{error}</p>
+          <div className="bg-v2-bg-dark border border-v2-red-negative/30 rounded-lg px-4 py-2">
+            <p className="font-roboto text-sm text-v2-red-negative">{error}</p>
           </div>
         )}
 
         {success && (
-          <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-2">
-            <p className="font-vietnam text-sm text-green-700">{success}</p>
+          <div className="bg-v2-bg-dark border border-v2-green-positive/30 rounded-lg px-4 py-2">
+            <p className="font-roboto text-sm text-v2-green-positive">{success}</p>
           </div>
         )}
 

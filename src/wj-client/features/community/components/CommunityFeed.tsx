@@ -41,8 +41,8 @@ export function CommunityFeed({ currentUser, hashtag, onHashtagClick, onUserClic
 
   if (error) {
     return (
-      <div className="bg-white rounded-2xl border border-v2-border-light p-8 text-center">
-        <p className="font-vietnam text-sm text-v2-text-tertiary">
+      <div className="bg-v2-maroon-800 rounded-2xl border border-v2-border-light p-8 text-center">
+        <p className="font-roboto text-sm text-v2-text-tertiary">
           Could not load feed. Please try again.
         </p>
       </div>
@@ -59,10 +59,10 @@ export function CommunityFeed({ currentUser, hashtag, onHashtagClick, onUserClic
     <div className="flex flex-col gap-4">
       {hashtag && (
         <div className="flex items-center gap-2 px-4 sm:px-0">
-          <span className="font-vietnam text-sm text-v2-text-secondary">Lọc theo:</span>
+          <span className="font-roboto text-sm text-v2-text-secondary">Lọc theo:</span>
           <button
             onClick={() => onHashtagClick?.("")}
-            className="flex items-center gap-1 px-3 py-1 rounded-full bg-v2-bg-primary border border-v2-border-light font-vietnam text-sm text-bg hover:bg-green-50 transition-colors"
+            className="flex items-center gap-1 px-3 py-1 rounded-full bg-v2-bg-primary border border-v2-border-light font-roboto text-sm text-bg hover:bg-green-50 transition-colors"
           >
             #{hashtag}
             <span className="text-v2-text-tertiary ml-1">×</span>
@@ -83,7 +83,7 @@ export function CommunityFeed({ currentUser, hashtag, onHashtagClick, onUserClic
       {data?.pagination && data.pagination.page < data.pagination.totalPages && (
         <button
           onClick={() => setPage((p) => p + 1)}
-          className="py-3 text-center font-vietnam text-sm font-medium text-v2-red-primary hover:text-v2-red-dark transition-colors"
+          className="py-3 text-center font-roboto text-sm font-medium text-v2-red-primary hover:text-v2-red-dark transition-colors"
         >
           Load more
         </button>

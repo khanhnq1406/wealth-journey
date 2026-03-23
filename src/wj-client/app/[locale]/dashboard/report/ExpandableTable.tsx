@@ -88,20 +88,20 @@ export const ExpandableTable = memo(function ExpandableTable({
             ))}
             <col className="w-[120px]" />
           </colgroup>
-          <thead className="sticky top-0 bg-white z-10 shadow-sm">
-            <tr className="border-b-2 border-gray-200">
-              <th className="text-left py-2 px-2 sm:py-3 sm:px-4 font-semibold text-xs sm:text-sm text-gray-700 whitespace-nowrap">
+          <thead className="sticky top-0 bg-v2-bg-surface z-10 shadow-sm">
+            <tr className="border-b-2 border-v2-border-light">
+              <th className="text-left py-2 px-2 sm:py-3 sm:px-4 font-semibold text-xs sm:text-sm text-v2-text-secondary whitespace-nowrap">
                 {t("wallet")}
               </th>
               {months.map((month) => (
                 <th
                   key={month}
-                  className="text-center py-2 px-1 sm:py-3 sm:px-2 font-semibold text-xs sm:text-sm text-gray-700 min-w-[60px] sm:min-w-[80px] whitespace-nowrap"
+                  className="text-center py-2 px-1 sm:py-3 sm:px-2 font-semibold text-xs sm:text-sm text-v2-text-secondary min-w-[60px] sm:min-w-[80px] whitespace-nowrap"
                 >
                   {month}
                 </th>
               ))}
-              <th className="text-center py-2 px-2 sm:py-3 sm:px-4 font-semibold text-xs sm:text-sm text-gray-700 whitespace-nowrap">
+              <th className="text-center py-2 px-2 sm:py-3 sm:px-4 font-semibold text-xs sm:text-sm text-v2-text-secondary whitespace-nowrap">
                 {t("total")}
               </th>
             </tr>
@@ -110,7 +110,7 @@ export const ExpandableTable = memo(function ExpandableTable({
             {wallets.map((wallet) => (
               <Fragment key={wallet.id}>
                 <tr
-                  className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+                  className="border-b border-v2-border-light hover:bg-v2-bg-surface-tint cursor-pointer"
                   onClick={() => onToggleWallet(wallet.id)}
                 >
                   <td className="py-2 px-2 sm:py-3 sm:px-4">
@@ -133,7 +133,7 @@ export const ExpandableTable = memo(function ExpandableTable({
                           >
                             <path
                               d="M7.41 15.41L12 10.83L16.59 15.41L18 14L12 8L6 14L7.41 15.41Z"
-                              fill="#333333"
+                              fill="#F1BD61"
                             />
                           </svg>
                         ) : (
@@ -146,7 +146,7 @@ export const ExpandableTable = memo(function ExpandableTable({
                           >
                             <path
                               d="M7.41 8.59L12 13.17L16.59 8.59L18 10L12 16L6 10L7.41 8.59Z"
-                              fill="#333333"
+                              fill="#F1BD61"
                             />
                           </svg>
                         )}
@@ -159,7 +159,7 @@ export const ExpandableTable = memo(function ExpandableTable({
                   {wallet.monthlyData.map((data, index) => (
                     <td
                       key={index}
-                      className="text-center py-2 px-1 sm:py-3 sm:px-2 text-xs sm:text-sm text-gray-600 whitespace-nowrap"
+                      className="text-center py-2 px-1 sm:py-3 sm:px-2 text-xs sm:text-sm text-v2-text-tertiary whitespace-nowrap"
                     >
                       {data.balance}
                     </td>
@@ -170,9 +170,9 @@ export const ExpandableTable = memo(function ExpandableTable({
                 </tr>
 
                 {wallet.isExpanded && (
-                  <tr className="bg-gray-50">
+                  <tr className="bg-v2-bg-dark">
                     <td className="py-1.5 px-2 sm:py-2 sm:px-4">
-                      <div className="pl-4 sm:pl-6 text-xs text-gray-500">
+                      <div className="pl-4 sm:pl-6 text-xs text-v2-text-tertiary">
                         {t("income")}
                       </div>
                     </td>
@@ -195,21 +195,21 @@ export const ExpandableTable = memo(function ExpandableTable({
                   </tr>
                 )}
                 {wallet.isExpanded && (
-                  <tr className="bg-gray-50 border-b border-gray-200">
+                  <tr className="bg-v2-bg-dark border-b border-v2-border-light">
                     <td className="py-1.5 px-2 sm:py-2 sm:px-4">
-                      <div className="pl-4 sm:pl-6 text-xs text-gray-500">
+                      <div className="pl-4 sm:pl-6 text-xs text-v2-text-tertiary">
                         {t("expense")}
                       </div>
                     </td>
                     {wallet.monthlyData.map((data, index) => (
                       <td
                         key={`expense-${index}`}
-                        className="text-center py-1.5 px-1 sm:py-2 sm:px-2 text-xs text-red-600 whitespace-nowrap"
+                        className="text-center py-1.5 px-1 sm:py-2 sm:px-2 text-xs text-v2-red-negative whitespace-nowrap"
                       >
                         {data.expense > 0 ? formatCurrency(data.expense) : "-"}
                       </td>
                     ))}
-                    <td className="text-center py-1.5 px-2 sm:py-2 sm:px-4 text-xs font-semibold text-red-600 whitespace-nowrap">
+                    <td className="text-center py-1.5 px-2 sm:py-2 sm:px-4 text-xs font-semibold text-v2-red-negative whitespace-nowrap">
                       {formatCurrency(
                         wallet.monthlyData.reduce(
                           (sum, m) => sum + m.expense,
@@ -228,7 +228,7 @@ export const ExpandableTable = memo(function ExpandableTable({
       {/* Fixed Totals Row at bottom */}
       <div
         ref={footerRef}
-        className="flex-shrink-0 border-t-2 border-gray-300 bg-gray-100 shadow-[0_-2px_4px_rgba(0,0,0,0.1)] overflow-x-auto overflow-y-hidden scrollbar-hide"
+        className="flex-shrink-0 border-t-2 border-v2-border-light bg-v2-bg-dark shadow-[0_-2px_4px_rgba(0,0,0,0.1)] overflow-x-auto overflow-y-hidden scrollbar-hide"
       >
         <table className="w-full border-collapse">
           <colgroup>

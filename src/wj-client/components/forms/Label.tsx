@@ -20,16 +20,13 @@ export const Label = ({
       htmlFor={htmlFor}
       className={cn(
         "text-sm font-medium cursor-pointer",
-        // Light mode
-        "text-neutral-700",
-        // Dark mode
-        "dark:text-dark-text-secondary",
+        "text-v2-text-secondary",
         className
       )}
     >
       {children}
       {required ? (
-        <span className="required dark:text-danger-400" aria-label="required">
+ <span className="required" aria-label="required">
           *
         </span>
       ) : null}

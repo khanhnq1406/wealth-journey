@@ -71,30 +71,30 @@ export const DuplicateSection = React.memo(function DuplicateSection({
 
   const getConfidenceBadgeClass = (confidence: number) => {
     if (confidence >= 90) {
-      return "bg-danger-100 text-danger-700 dark:bg-danger-900 dark:text-danger-300";
+ return "bg-danger-100 text-danger-700";
     } else if (confidence >= 70) {
-      return "bg-warning-100 text-warning-700 dark:bg-warning-900 dark:text-warning-300";
+ return "bg-warning-100 text-warning-700";
     } else {
-      return "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300";
+ return "bg-neutral-100 text-neutral-700";
     }
   };
 
   return (
-    <div className="border border-warning-300 dark:border-warning-700 rounded-lg overflow-hidden">
+ <div className="border border-v2-gold-accent/40 rounded-lg overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-4 bg-warning-50 dark:bg-warning-950 hover:bg-warning-100 dark:hover:bg-warning-900 transition-colors"
+ className="w-full flex items-center justify-between p-4 bg-warning-50 hover:bg-warning-100 transition-colors"
       >
         <div className="flex items-center gap-3">
           <span className="text-2xl">⚡</span>
           <div className="text-left">
-            <h3 className="font-semibold text-base text-warning-700 dark:text-warning-300">
+ <h3 className="font-semibold text-base text-warning-700">
               {matches.length !== 1
                 ? t("potentialDuplicatesPlural", { count: matches.length })
                 : t("potentialDuplicates", { count: matches.length })}
             </h3>
-            <p className="text-sm text-warning-600 dark:text-warning-400">
+ <p className="text-sm text-warning-600">
               {t("reviewToAvoid")}
             </p>
           </div>
@@ -102,7 +102,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
         <ChevronDownIcon
           size="sm"
           className={cn(
-            "transition-transform text-warning-600 dark:text-warning-400",
+ "transition-transform text-warning-600",
             expanded && "rotate-180"
           )}
           decorative
@@ -111,10 +111,10 @@ export const DuplicateSection = React.memo(function DuplicateSection({
 
       {/* Content */}
       {expanded && (
-        <div className="p-4 space-y-4 bg-white dark:bg-dark-surface">
+ <div className="p-4 space-y-4 bg-v2-maroon-800">
           {/* Progress */}
           <div className="flex items-center justify-between text-sm">
-            <p className="text-neutral-600 dark:text-dark-text-secondary">
+ <p className="text-neutral-600">
               {t("matchOf", { current: safeIndex + 1, total: matches.length })}
             </p>
             <div className="flex gap-1">
@@ -127,7 +127,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
                       ? "bg-primary-600"
                       : idx < safeIndex
                         ? "bg-success-600"
-                        : "bg-neutral-300 dark:bg-neutral-600"
+ : "bg-neutral-300"
                   )}
                 />
               ))}
@@ -144,7 +144,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
             >
               {currentMatch.confidence}% Match
             </span>
-            <span className="text-xs text-neutral-500 dark:text-dark-text-tertiary">
+ <span className="text-xs text-neutral-500">
               {currentMatch.matchReason}
             </span>
           </div>
@@ -152,11 +152,11 @@ export const DuplicateSection = React.memo(function DuplicateSection({
           {/* Side-by-Side Comparison */}
           <div className="space-y-4 sm:grid sm:grid-cols-2 sm:gap-4 sm:space-y-0">
             {/* Imported Transaction */}
-            <div className="p-4 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-950 dark:to-primary-900 border border-primary-200 dark:border-primary-800 rounded-xl">
+ <div className="p-4 bg-gradient-to-br from-primary-50 to-primary-100 border border-v2-gold-primary/30 rounded-xl">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">📥</span>
-                  <h4 className="text-sm font-semibold text-primary-700 dark:text-primary-300">
+ <h4 className="text-sm font-semibold text-primary-700">
                     {t("importedTransaction")}
                   </h4>
                 </div>
@@ -164,7 +164,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
                   {t("new")}
                 </span>
               </div>
-              <div className="space-y-0 text-sm text-neutral-900 dark:text-dark-text divide-y divide-primary-200 dark:divide-primary-800">
+ <div className="space-y-0 text-sm text-neutral-900 divide-y divide-v2-gold-primary/20">
                 <div className="flex justify-between py-2">
                   <span className="font-medium">{t("amount")}</span>
                   <span className="font-bold">
@@ -190,18 +190,18 @@ export const DuplicateSection = React.memo(function DuplicateSection({
                   {imported?.suggestedCategoryId ? (
                     <span>{t("categoryNumber", { id: imported.suggestedCategoryId })}</span>
                   ) : (
-                    <span className="text-neutral-500 dark:text-neutral-400 italic">{t("noCategory2")}</span>
+ <span className="text-neutral-500 italic">{t("noCategory2")}</span>
                   )}
                 </div>
               </div>
             </div>
 
             {/* Existing Transaction */}
-            <div className="p-4 bg-neutral-50 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border rounded-xl">
+ <div className="p-4 bg-neutral-50 border border-v2-gold-primary/20 rounded-xl">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-lg">💾</span>
-                  <h4 className="text-sm font-semibold text-neutral-900 dark:text-dark-text">
+ <h4 className="text-sm font-semibold text-neutral-900">
                     {t("existingTransaction")}
                   </h4>
                 </div>
@@ -209,7 +209,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
                   {t("existing")}
                 </span>
               </div>
-              <div className="space-y-0 text-sm text-neutral-900 dark:text-dark-text divide-y divide-neutral-200 dark:divide-dark-border">
+ <div className="space-y-0 text-sm text-neutral-900 divide-y divide-v2-gold-primary/20">
                 <div className="flex justify-between py-2">
                   <span className="font-medium">{t("amount")}</span>
                   <span className="font-bold">
@@ -229,7 +229,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
                   {existing?.categoryId ? (
                     <span>{t("categoryNumber", { id: existing.categoryId })}</span>
                   ) : (
-                    <span className="text-neutral-500 dark:text-neutral-400 italic">{t("noCategory2")}</span>
+ <span className="text-neutral-500 italic">{t("noCategory2")}</span>
                   )}
                 </div>
               </div>
@@ -275,7 +275,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
             <button
               onClick={() => setCurrentIndex(Math.max(0, safeIndex - 1))}
               disabled={safeIndex === 0}
-              className="flex-1 px-4 py-2 text-sm bg-neutral-200 dark:bg-dark-surface-hover text-neutral-700 dark:text-dark-text rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-300 dark:hover:bg-dark-surface-active transition-colors"
+ className="flex-1 px-4 py-2 text-sm bg-neutral-200 text-neutral-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-300 transition-colors"
             >
               {t("previous")}
             </button>
@@ -284,7 +284,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
                 setCurrentIndex(Math.min(matches.length - 1, safeIndex + 1))
               }
               disabled={safeIndex === matches.length - 1}
-              className="flex-1 px-4 py-2 text-sm bg-neutral-200 dark:bg-dark-surface-hover text-neutral-700 dark:text-dark-text rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-300 dark:hover:bg-dark-surface-active transition-colors"
+ className="flex-1 px-4 py-2 text-sm bg-neutral-200 text-neutral-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-neutral-300 transition-colors"
             >
               {t("next")}
             </button>
@@ -292,7 +292,7 @@ export const DuplicateSection = React.memo(function DuplicateSection({
 
           {/* Auto-Merge High Confidence */}
           {highConfidenceCount > 0 && (
-            <div className="pt-3 border-t border-warning-200 dark:border-warning-800">
+ <div className="pt-3 border-t border-v2-gold-accent/30">
               <Button
                 variant="primary"
                 onClick={handleAutoMergeAll}

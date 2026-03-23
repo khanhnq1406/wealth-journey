@@ -14,7 +14,7 @@ export function ConnectionStatus() {
 
   if (!isSecure) {
     return (
-      <div className="flex items-center gap-2 px-3 py-1.5 bg-danger-50 border border-danger-200 rounded-lg">
+      <div className="flex items-center gap-2 px-3 py-1.5 bg-danger-50 border border-v2-red-negative/30 rounded-lg">
         <svg
           className="w-4 h-4 text-danger-600"
           fill="currentColor"
@@ -36,7 +36,7 @@ export function ConnectionStatus() {
   }
 
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 bg-success-50 border border-success-200 rounded-lg">
+    <div className="flex items-center gap-2 px-3 py-1.5 bg-success-50 border border-v2-green-positive/30 rounded-lg">
       <svg
         className="w-4 h-4 text-success-600"
         fill="currentColor"

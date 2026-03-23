@@ -27,7 +27,7 @@ export const TransactionFilter = ({
           className={`px-4 py-2 rounded-lg font-medium transition-colors focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 ${
             filterType === "all"
               ? "bg-v2-red-primary text-white"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              : "bg-v2-maroon-900 text-v2-gold-accent hover:bg-v2-maroon-800"
           }`}
         >
           {t("quickFilters.all")}
@@ -39,7 +39,7 @@ export const TransactionFilter = ({
           className={`px-4 py-2 rounded-lg font-medium transition-colors focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 ${
             filterType === "income"
               ? "bg-v2-green-positive text-white"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              : "bg-v2-maroon-900 text-v2-gold-accent hover:bg-v2-maroon-800"
           }`}
         >
           {t("quickFilters.income")}
@@ -50,8 +50,8 @@ export const TransactionFilter = ({
           aria-selected={filterType === "expense"}
           className={`px-4 py-2 rounded-lg font-medium transition-colors focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 ${
             filterType === "expense"
-              ? "bg-red-500 text-white"
-              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              ? "bg-v2-red-negative text-white"
+              : "bg-v2-maroon-900 text-v2-gold-accent hover:bg-v2-maroon-800"
           }`}
         >
           {t("quickFilters.expense")}
@@ -65,10 +65,10 @@ export const TransactionFilter = ({
           placeholder={t("searchPlaceholder")}
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full px-4 py-2 pl-10 border-2 border-gray-200 rounded-lg focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 focus:border-v2-red-primary"
+          className="w-full px-4 py-2 pl-10 bg-v2-maroon-900 text-v2-gold-accent border-2 border-v2-gold-primary/20 rounded-lg focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2 focus:border-v2-red-primary placeholder:text-v2-text-tertiary"
         />
         <svg
-          className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
+          className="absolute left-3 top-2.5 w-5 h-5 text-v2-text-tertiary"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

@@ -55,7 +55,7 @@ function FinancePageInner() {
   return (
     <div className="flex flex-col">
       <div className="px-4 sm:px-6 pt-4 pb-2">
-        <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+ <h1 className="text-lg sm:text-xl font-bold text-v2-gold-accent">
           {t("financePageTitle")}
         </h1>
       </div>

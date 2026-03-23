@@ -13,6 +13,7 @@ import { SentimentCard } from "@/components/GoldSentimentCard";
 import { usePublicMarketTypes } from "@/features/market-prices/hooks/usePublicMarketTypes";
 import { formatUpdateTimestamp } from "@/features/market-prices/utils/format-update-time";
 import { useTranslations } from "next-intl";
+import { OrnateDivider } from "@/components/decorative/OrnateDivider";
 
 export default function LandingPage() {
   const { data, isLoading, isError, refetch } = usePublicMarketTypes();
@@ -35,18 +36,18 @@ export default function LandingPage() {
 
   return (
     <LandingErrorBoundary>
-      <div className="landing-scroll-container min-h-screen bg-neutral-50">
+      <div className="landing-scroll-container min-h-screen bg-v2-bg-primary">
         <LandingNavbar />
         <main id="main-content" className="pt-14 sm:pt-16">
           {/* Error state */}
           {isError && (
             <div className="px-4 sm:px-8 py-8 text-center">
-              <p className="font-vietnam text-v2-text-secondary mb-3">
+              <p className="font-roboto text-v2-text-secondary mb-3">
                 {t("errorLoadingTypes")}
               </p>
               <button
                 onClick={() => refetch()}
-                className="px-4 py-2 bg-v2-red-primary text-white rounded-lg font-vietnam text-[13px] hover:bg-v2-red-dark transition-colors"
+                className="px-4 py-2 bg-v2-red-primary text-white rounded-lg font-roboto text-[13px] hover:bg-v2-red-dark transition-colors"
               >
                 {t("retry")}
               </button>
@@ -58,9 +59,11 @@ export default function LandingPage() {
             <LandingGoldPriceTable types={goldTypes} isLoading={isLoading} updatedTime={goldUpdatedTime} />
             <LandingGoldPriceChart />
             <SentimentCard variant="landing" asset="gold" />
+            <OrnateDivider variant="ornate" className="my-6" />
             <LandingSilverPriceTable types={silverTypes} isLoading={isLoading} updatedTime={silverUpdatedTime} />
             <LandingSilverPriceChart />
             <SentimentCard variant="landing" asset="silver" />
+            <OrnateDivider variant="ornate" className="my-6" />
             <LandingCurrencyPriceTable types={currencyTypes} isLoading={isLoading} updatedTime={currencyUpdatedTime} />
             <LandingDollarIndexChart />
           </div>
@@ -74,6 +77,7 @@ export default function LandingPage() {
             </div>
             {/* Gold Sentiment Survey */}
             <SentimentCard variant="landing" asset="gold" />
+            <OrnateDivider variant="ornate" className="my-6" />
             {/* Row 2: Silver Table + Silver Chart */}
             <div className="grid grid-cols-2 gap-6 [&>*]:!mb-0">
               <LandingSilverPriceTable
@@ -85,6 +89,7 @@ export default function LandingPage() {
             </div>
             {/* Silver Sentiment Survey */}
             <SentimentCard variant="landing" asset="silver" />
+            <OrnateDivider variant="ornate" className="my-6" />
             {/* Row 3: Currency Table + Dollar Index Chart */}
             <div className="grid grid-cols-2 gap-6 [&>*]:!mb-0">
               <LandingCurrencyPriceTable types={currencyTypes} isLoading={isLoading} updatedTime={currencyUpdatedTime} />

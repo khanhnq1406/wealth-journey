@@ -126,13 +126,13 @@ export function ChangeRateModal({
       >
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Current Rate Info */}
-        <div className="bg-neutral-50 dark:bg-dark-surface-hover p-3 rounded-md border border-neutral-200 dark:border-dark-border">
+ <div className="bg-v2-bg-dark p-3 rounded-md border border-v2-border-light">
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-neutral-600 dark:text-dark-text-secondary">
+ <span className="text-v2-text-secondary">
                 {t("currentRate")}
               </span>
-              <span className="font-semibold text-neutral-900 dark:text-dark-text">
+ <span className="font-semibold text-v2-gold-accent">
                 1 {conversion.fromCurrency} ={" "}
                 {formatExchangeRate(
                   conversion.exchangeRate,
@@ -142,10 +142,10 @@ export function ChangeRateModal({
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-neutral-600 dark:text-dark-text-secondary">
+ <span className="text-v2-text-secondary">
                 {t("source")}
               </span>
-              <span className="font-medium text-neutral-900 dark:text-dark-text">
+ <span className="font-medium text-v2-gold-accent">
                 {conversion.rateSource === "auto"
                   ? t("sourceAuto")
                   : conversion.rateSource === "manual"
@@ -154,18 +154,18 @@ export function ChangeRateModal({
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-neutral-600 dark:text-dark-text-secondary">
+ <span className="text-v2-text-secondary">
                 {t("transactions")}
               </span>
-              <span className="font-medium text-neutral-900 dark:text-dark-text">
+ <span className="font-medium text-v2-gold-accent">
                 {conversion.transactionCount}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-neutral-600 dark:text-dark-text-secondary">
+ <span className="text-v2-text-secondary">
                 {t("currentTotal")}
               </span>
-              <span className="font-semibold text-neutral-900 dark:text-dark-text">
+ <span className="font-semibold text-v2-gold-accent">
                 {conversion.totalOriginal &&
                   formatCurrency(
                     conversion.totalOriginal.amount,
@@ -203,8 +203,8 @@ export function ChangeRateModal({
           <div
             className={`p-3 rounded-md border ${
               Math.abs(rateDifference) > 10
-                ? "bg-warning-50 dark:bg-warning-950 border-warning-200 dark:border-warning-800"
-                : "bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800"
+ ? "bg-warning-50 border-v2-gold-accent/30"
+ : "bg-blue-50 border-v2-gold-primary/30"
             }`}
           >
             <div className="flex items-start gap-2">
@@ -215,15 +215,15 @@ export function ChangeRateModal({
                 <p
                   className={
                     Math.abs(rateDifference) > 10
-                      ? "text-warning-700 dark:text-warning-300"
-                      : "text-blue-700 dark:text-blue-300"
+ ? "text-warning-700"
+ : "text-blue-700"
                   }
                 >
                   {rateDifference > 0 ? "+" : ""}
                   {rateDifference.toFixed(2)}{t("fromAutoRate")}
                 </p>
                 {Math.abs(rateDifference) > 10 && (
-                  <p className="text-warning-600 dark:text-warning-400 mt-1">
+ <p className="text-warning-600 mt-1">
                     {t("warningSignificant")}
                   </p>
                 )}
@@ -234,12 +234,12 @@ export function ChangeRateModal({
 
         {/* Preview Total */}
         {previewTotal && (
-          <div className="bg-success-50 dark:bg-success-950 p-3 rounded-md border border-success-200 dark:border-success-800">
+ <div className="bg-success-50 p-3 rounded-md border border-v2-green-positive/30">
             <div className="text-sm">
-              <span className="text-success-700 dark:text-success-300">
+ <span className="text-success-700">
                 <strong>{t("newTotal")}</strong>
               </span>
-              <div className="mt-1 font-semibold text-success-800 dark:text-success-200">
+ <div className="mt-1 font-semibold text-success-800">
                 {conversion.totalOriginal &&
                   formatCurrency(
                     conversion.totalOriginal.amount,
@@ -254,8 +254,8 @@ export function ChangeRateModal({
 
         {/* Error Message */}
         {error && (
-          <div className="p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
-            <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+ <div className="p-3 bg-v2-bg-dark border border-v2-red-negative/30 rounded-lg">
+ <p className="text-sm text-v2-red-negative">{error}</p>
           </div>
         )}
 

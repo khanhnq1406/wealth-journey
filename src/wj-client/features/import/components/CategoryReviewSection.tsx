@@ -66,28 +66,28 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
 
   const getConfidenceBadgeClass = (confidence: number) => {
     if (confidence >= 80) {
-      return "bg-success-100 text-success-700 dark:bg-success-900 dark:text-success-300";
+ return "bg-success-100 text-success-700";
     } else if (confidence >= 60) {
-      return "bg-warning-100 text-warning-700 dark:bg-warning-900 dark:text-warning-300";
+ return "bg-warning-100 text-warning-700";
     } else {
-      return "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300";
+ return "bg-v2-bg-dark text-v2-text-secondary";
     }
   };
 
   return (
-    <div className="border border-neutral-200 dark:border-dark-border rounded-lg overflow-hidden">
+ <div className="border border-v2-border-light rounded-lg overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-4 bg-neutral-50 dark:bg-dark-surface-hover hover:bg-neutral-100 dark:hover:bg-dark-surface-active transition-colors"
+ className="w-full flex items-center justify-between p-4 bg-v2-bg-dark hover:bg-v2-bg-dark transition-colors"
       >
         <div className="flex items-center gap-3">
           <span className="text-2xl">🏷️</span>
           <div className="text-left">
-            <h3 className="font-semibold text-base text-neutral-900 dark:text-dark-text">
+ <h3 className="font-semibold text-base text-v2-gold-accent">
               {t("heading", { count: transactions.length })}
             </h3>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+ <p className="text-sm text-v2-text-secondary">
               {t("subtitle")}
             </p>
           </div>
@@ -95,7 +95,7 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
         <ChevronDownIcon
           size="sm"
           className={cn(
-            "transition-transform text-neutral-600 dark:text-neutral-400",
+ "transition-transform text-v2-text-secondary",
             expanded && "rotate-180",
           )}
           decorative
@@ -104,9 +104,9 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
 
       {/* Content */}
       {expanded && (
-        <div className="bg-white dark:bg-dark-surface">
+ <div className="bg-v2-bg-surface">
           {/* Bulk Actions - Sticky on mobile */}
-          <div className="sticky top-0 z-10 backdrop-blur-sm bg-white/95 dark:bg-dark-surface/95 p-4 pb-3 border-b border-neutral-200 dark:border-dark-border">
+ <div className="sticky top-0 z-10 backdrop-blur-sm bg-v2-bg-surface/95 p-4 pb-3 border-b border-v2-border-light">
             <div className="flex gap-2">
               <Button
                 variant="primary"
@@ -136,23 +136,23 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
               return (
                 <div
                   key={tx.rowNumber}
-                  className="p-4 bg-neutral-50 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border rounded-xl space-y-2"
+ className="p-4 bg-v2-bg-dark border border-v2-border-light rounded-xl space-y-2"
                 >
                   {/* Transaction Info */}
                   <div className="space-y-2">
                     <div className="flex justify-between items-start gap-3">
-                      <p className="text-sm font-medium text-neutral-900 dark:text-dark-text flex-1">
+ <p className="text-sm font-medium text-v2-gold-accent flex-1">
                         {tx.description}
                       </p>
-                      <p className="text-base font-bold text-neutral-900 dark:text-dark-text">
+ <p className="text-base font-bold text-v2-gold-accent">
                         {formatCurrencyImport(
                           tx.amount?.amount || 0,
                           tx.amount?.currency || currency,
                         )}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-dark-text-tertiary">
-                      <span className="inline-flex px-2 py-1 rounded-full bg-neutral-200 dark:bg-neutral-700">
+ <div className="flex items-center gap-2 text-xs text-v2-text-tertiary">
+ <span className="inline-flex px-2 py-1 rounded-full bg-v2-bg-surface-tint">
                         {t("row", { n: tx.rowNumber })}
                       </span>
                       <span>•</span>
@@ -162,13 +162,13 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
 
                   {/* Suggested Category (if any) */}
                   {tx.suggestedCategoryId && (
-                    <div className="p-3 bg-white dark:bg-dark-surface rounded-lg border border-neutral-200 dark:border-dark-border">
+ <div className="p-3 bg-v2-bg-surface rounded-lg border border-v2-border-light">
                       <div className="flex items-center justify-between flex-wrap gap-2">
-                        <span className="text-xs text-neutral-600 dark:text-neutral-400">
+ <span className="text-xs text-v2-text-secondary">
                           {t("suggested")}
                         </span>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-medium text-neutral-900 dark:text-dark-text">
+ <span className="text-xs font-medium text-v2-gold-accent">
                             {getCategoryName(tx.suggestedCategoryId)}
                           </span>
                           <span
@@ -186,7 +186,7 @@ export const CategoryReviewSection = React.memo(function CategoryReviewSection({
 
                   {/* Category Selector */}
                   <div>
-                    <label className="block text-xs font-medium text-neutral-700 dark:text-dark-text-secondary mb-1">
+ <label className="block text-xs font-medium text-v2-text-secondary mb-1">
                       {t("selectCategory")}
                     </label>
                     <FormSelect

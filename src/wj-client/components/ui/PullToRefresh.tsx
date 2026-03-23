@@ -107,7 +107,7 @@ export const PullToRefresh = memo(function PullToRefresh({
       <div
         className={cn(
           "absolute left-0 right-0 flex items-center justify-center transition-transform duration-200 pointer-events-none",
-          "bg-gradient-to-b from-primary-50 to-transparent dark:from-primary-900/10",
+ "bg-gradient-to-b from-primary-50 to-transparent",
         )}
         style={{
           transform: `translateY(${-Math.max(0, pullDistance - 70)}px)`,
@@ -118,7 +118,7 @@ export const PullToRefresh = memo(function PullToRefresh({
         <div
           className={cn(
             "flex items-center justify-center w-10 h-10 rounded-full",
-            "bg-white dark:bg-dark-surface shadow-sm",
+ "bg-v2-maroon-800 shadow-sm",
             "transition-transform duration-200",
           )}
           style={{

@@ -39,7 +39,7 @@ export function FollowingView({ currentUser, targetUserId, onUserClick, initialT
   ];
 
   return (
-    <div className="bg-white sm:rounded-2xl border-b sm:border border-v2-border-light overflow-hidden">
+    <div className="bg-v2-maroon-800 sm:rounded-2xl border-b sm:border border-v2-border-light overflow-hidden">
       {/* Back button — only when viewing another user's following/followers */}
       {onBack && (
         <div className="px-4 pt-3 pb-1">
@@ -49,18 +49,18 @@ export function FollowingView({ currentUser, targetUserId, onUserClick, initialT
             className="flex items-center gap-1.5 text-sm text-v2-text-secondary hover:text-v2-text-primary transition-colors"
           >
             <ArrowLeft size={16} />
-            <span className="font-vietnam">Quay lại</span>
+            <span className="font-roboto">Quay lại</span>
           </button>
         </div>
       )}
       {/* Tabs */}
-      <div className="flex border-b border-[#EDE8E1]">
+      <div className="flex border-b border-v2-gold-primary/30">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={cn(
-              "flex-1 py-3 font-vietnam text-sm font-medium transition-colors relative",
+              "flex-1 py-3 font-roboto text-sm font-medium transition-colors relative",
               activeTab === tab.key
                 ? "text-v2-red-primary"
                 : "text-v2-text-tertiary hover:text-v2-text-secondary"
@@ -80,22 +80,22 @@ export function FollowingView({ currentUser, targetUserId, onUserClick, initialT
       {/* Content */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-6 h-6 border-2 border-bg border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-v2-gold-primary border-t-transparent rounded-full animate-spin" />
         </div>
       ) : users.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 gap-3">
           <Users size={40} className="text-v2-text-tertiary" />
-          <p className="font-vietnam text-sm text-v2-text-tertiary">
+          <p className="font-roboto text-sm text-v2-text-tertiary">
             {activeTab === "following" ? "Chưa theo dõi ai" : "Chưa có người theo dõi"}
           </p>
-          <p className="font-vietnam text-xs text-v2-text-tertiary text-center max-w-xs">
+          <p className="font-roboto text-xs text-v2-text-tertiary text-center max-w-xs">
             {activeTab === "following"
               ? "Hãy khám phá cộng đồng và theo dõi những người bạn quan tâm."
               : "Chia sẻ bài viết và tương tác để thu hút người theo dõi."}
           </p>
         </div>
       ) : (
-        <div className="divide-y divide-[#EDE8E1]">
+        <div className="divide-y divide-v2-gold-primary/20">
           {users.map((user) => (
             <UserListItem
               key={user.userId}

@@ -46,7 +46,7 @@ export function PostCard({
   );
 
   return (
-    <article className="bg-white sm:rounded-2xl border-b sm:border border-v2-border-light p-4">
+    <article className="bg-v2-maroon-800 sm:rounded-2xl border-b sm:border border-v2-border-light p-4">
       <PostHeader
         authorId={post.userId ?? 0}
         authorName={post.userName ?? ""}

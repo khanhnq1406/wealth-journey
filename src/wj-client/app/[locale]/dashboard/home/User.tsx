@@ -24,8 +24,8 @@ export const User = memo(function User() {
         height={40}
       />
       <p className="truncate">
-        <p className="text-lg font-bold truncate">{user.fullname}</p>
-        <p className="text-sm break-all truncate">{user.email}</p>
+        <p className="text-lg font-bold truncate text-v2-gold-accent">{user.fullname}</p>
+        <p className="text-sm break-all truncate text-v2-text-tertiary">{user.email}</p>
       </p>
       <div>
         <Button

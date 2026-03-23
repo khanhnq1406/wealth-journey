@@ -55,21 +55,21 @@ export const PortfolioSummary = memo(function PortfolioSummary({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       <BaseCard className="p-3 sm:p-4">
-        <div className="text-sm text-neutral-600">{t("summary.totalValue")}</div>
-        <div className="text-lg sm:text-xl lg:text-2xl font-semibold text-neutral-900 mt-1">
+        <div className="text-sm text-v2-text-secondary">{t("summary.totalValue")}</div>
+        <div className="text-lg sm:text-xl lg:text-2xl font-semibold text-v2-gold-accent mt-1">
           {formatCurrency(displayValue, displayCurrency)}
         </div>
       </BaseCard>
 
       <BaseCard className="p-3 sm:p-4">
-        <div className="text-sm text-neutral-600">{t("summary.totalCost")}</div>
-        <div className="text-lg sm:text-xl lg:text-2xl font-semibold text-neutral-900 mt-1">
+        <div className="text-sm text-v2-text-secondary">{t("summary.totalCost")}</div>
+        <div className="text-lg sm:text-xl lg:text-2xl font-semibold text-v2-gold-accent mt-1">
           {formatCurrency(displayCost, displayCurrency)}
         </div>
       </BaseCard>
 
       <BaseCard className="p-3 sm:p-4">
-        <div className="text-sm text-neutral-600">{t("summary.totalPnl")}</div>
+        <div className="text-sm text-v2-text-secondary">{t("summary.totalPnl")}</div>
         <div
           className={`text-lg sm:text-xl lg:text-2xl font-semibold mt-1 ${
             displayPnl >= 0 ? "text-v2-green-positive" : "text-red-600"
@@ -80,8 +80,8 @@ export const PortfolioSummary = memo(function PortfolioSummary({
       </BaseCard>
 
       <BaseCard className="p-3 sm:p-4">
-        <div className="text-sm text-neutral-600">{t("summary.holdings")}</div>
-        <div className="text-lg sm:text-xl lg:text-2xl font-semibold text-neutral-900 mt-1">
+        <div className="text-sm text-v2-text-secondary">{t("summary.holdings")}</div>
+        <div className="text-lg sm:text-xl lg:text-2xl font-semibold text-v2-gold-accent mt-1">
           {portfolioSummary.totalInvestments || 0}
         </div>
       </BaseCard>

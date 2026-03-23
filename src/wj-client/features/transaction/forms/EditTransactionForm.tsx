@@ -207,7 +207,7 @@ export function EditTransactionForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       {errorMessage && (
-        <div className="bg-red-50 text-danger-600 p-3 rounded mb-4">
+        <div className="bg-v2-red-primary/10 text-v2-red-negative p-3 rounded mb-4">
           {errorMessage}
         </div>
       )}
@@ -224,7 +224,7 @@ export function EditTransactionForm({
           {
             value: "expense",
             label: t("expense"),
-            className: "bg-red-500 text-white",
+            className: "bg-v2-red-negative text-white",
           },
         ]}
       />

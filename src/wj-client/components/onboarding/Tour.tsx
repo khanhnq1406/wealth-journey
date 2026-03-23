@@ -376,8 +376,8 @@ export function Tour({
         ref={containerRef}
         className={cn(
           "absolute pointer-events-auto transition-all duration-300 ease-out",
-          "bg-white dark:bg-dark-surface rounded-xl shadow-modal dark:shadow-dark-modal",
-          "border border-neutral-200 dark:border-dark-border",
+ "bg-v2-maroon-800 rounded-xl shadow-modal",
+ "border border-v2-maroon-600",
           "max-w-sm sm:max-w-md w-full",
           isCenterStep
             ? "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-scale-in"
@@ -387,7 +387,7 @@ export function Tour({
       >
         {/* Progress Bar */}
         {showProgress && (
-          <div className="h-1 bg-neutral-200 dark:bg-dark-border rounded-t-xl overflow-hidden">
+ <div className="h-1 bg-neutral-200 rounded-t-xl overflow-hidden">
             <div
               className="h-full bg-v2-red-primary transition-all duration-300"
               style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
@@ -398,13 +398,13 @@ export function Tour({
         <div className="p-5">
           {/* Header */}
           <div className="flex items-start justify-between gap-3 mb-3">
-            <h3 className="text-lg font-semibold text-neutral-900 dark:text-dark-text pr-4">
+ <h3 className="text-lg font-semibold text-neutral-900 pr-4">
               {step.title}
             </h3>
             {showSkipButton && !isCenterStep && (
               <button
                 onClick={handleSkip}
-                className="text-sm text-neutral-500 dark:text-dark-text-tertiary hover:text-neutral-700 dark:hover:text-dark-text-secondary transition-colors flex-shrink-0"
+ className="text-sm text-neutral-500 hover:text-neutral-700 transition-colors flex-shrink-0"
               >
                 Skip
               </button>
@@ -412,7 +412,7 @@ export function Tour({
           </div>
 
           {/* Content */}
-          <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-4">
+ <p className="text-sm text-neutral-600 mb-4">
             {step.content}
           </p>
 
@@ -423,7 +423,7 @@ export function Tour({
                 step.action?.onClick();
                 handleNext();
               }}
-              className="w-full mb-4 px-4 py-2 bg-v2-red-light dark:bg-primary-950 text-v2-red-primary dark:text-primary-400 rounded-lg text-sm font-medium hover:bg-v2-red-light dark:hover:bg-primary-900 transition-colors"
+ className="w-full mb-4 px-4 py-2 bg-v2-red-light text-v2-red-primary rounded-lg text-sm font-medium hover:bg-v2-red-light transition-colors"
             >
               {step.action.label}
             </button>
@@ -431,7 +431,7 @@ export function Tour({
 
           {/* Footer */}
           <div className="flex items-center justify-between gap-3">
-            <div className="text-xs text-neutral-400 dark:text-dark-text-tertiary">
+ <div className="text-xs text-neutral-400">
               Step {currentStep + 1} of {steps.length}
             </div>
 
@@ -457,13 +457,13 @@ export function Tour({
 
           {/* Keyboard hint */}
           {keyboardNavigation && (
-            <div className="mt-4 pt-3 border-t border-neutral-200 dark:border-dark-border flex items-center justify-center gap-3 text-xs text-neutral-400 dark:text-dark-text-tertiary">
+ <div className="mt-4 pt-3 border-t border-v2-gold-primary/20 flex items-center justify-center gap-3 text-xs text-neutral-400">
               <div className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">←</kbd>
-                <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">→</kbd>
+ <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-v2-gold-primary/20">←</kbd>
+ <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-v2-gold-primary/20">→</kbd>
                 <span>to navigate</span>
               </div>
-              <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 dark:bg-dark-surface-hover border border-neutral-200 dark:border-dark-border">ESC</kbd>
+ <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-v2-gold-primary/20">ESC</kbd>
               <span>to skip</span>
             </div>
           )}
@@ -473,7 +473,7 @@ export function Tour({
         {!isCenterStep && step.placement !== "center" && (
           <div
             className={cn(
-              "absolute w-3 h-3 bg-white dark:bg-dark-surface border border-neutral-200 dark:border-dark-border rotate-45",
+ "absolute w-3 h-3 bg-v2-maroon-800 border border-v2-maroon-600 rotate-45",
               step.placement === "top" && "bottom-[-7px] left-1/2 -translate-x-1/2 border-b-0 border-r-0",
               step.placement === "bottom" && "top-[-7px] left-1/2 -translate-x-1/2 border-t-0 border-l-0",
               step.placement === "left" && "right-[-7px] top-1/2 -translate-y-1/2 border-t-0 border-r-0",

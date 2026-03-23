@@ -129,6 +129,17 @@ C4Component
     Rel(landing, prices_feat, "usePublicMarketTypes hook — fetches gold/silver/currency type names (no auth)")
 ```
 
+## Design System Migration
+
+**March 2026:** The frontend visual design has been migrated from the **V2 Crimson & Gold light theme** (warm off-white backgrounds, dark text) to the **mihong.vn dark maroon theme** (deep maroon backgrounds `#5F0202`, gold accents `#D78B1C`, white text). This is a CSS/Tailwind-only change — no structural, API, or data model changes.
+
+Key changes:
+- **Color palette:** All `v2-*` color tokens updated in `tailwind.config.ts` to dark maroon/gold values
+- **Typography:** Migrated from Plus Jakarta Sans / Be Vietnam Pro / JetBrains Mono to Roboto / Roboto Mono
+- **Dark mode removed:** The app is permanently dark-themed (maroon). `ThemeProvider`, `ThemeToggle`, and all `dark:` Tailwind classes removed
+- **Decorative components:** New `OrnateHeading` and `OrnateDivider` components in `components/decorative/` for mihong.vn-style gold ornamental elements
+- **Reference:** See `docs/specs/2026-03-20-mihong-design-overhaul-spec.md` for full specification
+
 ## Feature Module Structure
 
 Each feature module follows this internal structure:

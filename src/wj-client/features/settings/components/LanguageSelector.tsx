@@ -42,10 +42,10 @@ export function LanguageSelector() {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="font-medium text-gray-900 dark:text-gray-100">
+ <h3 className="font-medium text-v2-gold-accent">
           {t("title")}
         </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+ <p className="text-sm text-v2-text-tertiary">
           {t("subtitle")}
         </p>
       </div>
@@ -56,8 +56,8 @@ export function LanguageSelector() {
             key={lang.code}
             className={`flex items-center gap-3 p-3 rounded-md border cursor-pointer transition-colors ${
               selected === lang.code
-                ? "border-v2-red-primary bg-v2-red-light dark:bg-v2-red-primary/20"
-                : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+ ? "border-v2-red-primary bg-v2-red-light"
+ : "border-v2-border-light hover:bg-v2-bg-surface-tint"
             }`}
           >
             <input
@@ -73,7 +73,7 @@ export function LanguageSelector() {
         ))}
       </div>
 
-      {error && <p className="text-red-600 text-sm">{error}</p>}
+      {error && <p className="text-v2-red-negative text-sm">{error}</p>}
 
       <Button
         type={ButtonType.PRIMARY}

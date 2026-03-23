@@ -61,7 +61,7 @@ export function ReplyInput({
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Reply..."
-          className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-bg"
+          className="w-full text-sm border border-v2-gold-primary/20 rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-v2-gold-primary"
           rows={2}
           maxLength={500}
         />

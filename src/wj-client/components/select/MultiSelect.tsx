@@ -128,7 +128,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
     <div ref={containerRef} className={cn("relative", className)}>
       <div
         className={cn(
-          "p-2 rounded-lg w-full min-h-[42px] flex flex-wrap gap-2 border border-v2-border focus-within:border-v2-red-primary focus-within:ring-2 focus-within:ring-v2-red-primary focus-within:ring-offset-2 bg-white",
+          "p-2 rounded-lg w-full min-h-[42px] flex flex-wrap gap-2 border border-v2-border focus-within:border-v2-red-primary focus-within:ring-2 focus-within:ring-v2-red-primary focus-within:ring-offset-2 bg-v2-maroon-900",
           disabled && "opacity-50 cursor-not-allowed",
           scrollOnOverflow && "overflow-y-auto"
         )}
@@ -204,7 +204,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
 
       {/* Dropdown menu */}
       {isOpen && !disabled && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-v2-border-light rounded-lg shadow-v2-card max-h-60 overflow-auto">
+        <div className="absolute z-50 w-full mt-1 bg-v2-maroon-900 border border-v2-border-light rounded-lg shadow-v2-card max-h-60 overflow-auto">
           {filteredOptions.length === 0 ? (
             <div className="p-2 text-v2-text-tertiary text-base sm:text-sm">No options found</div>
           ) : (

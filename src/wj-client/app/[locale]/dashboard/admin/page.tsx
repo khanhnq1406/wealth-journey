@@ -50,6 +50,10 @@ interface FormValues {
   footer_brand_name: string;
   footer_tagline: string;
   footer_contact_info: string;
+  fab_title: string;
+  fab_intro_text: string;
+  fab_contact_info: string;
+  fab_enabled: string;
 }
 
 const QUERY_KEY = "admin-site-settings";
@@ -85,6 +89,13 @@ function settingsToForm(settings: SiteSetting[]): FormValues {
     footer_brand_name: map["footer.brand_name"] || "",
     footer_tagline: map["footer.tagline"] || "",
     footer_contact_info: map["footer.contact_info"] || "",
+    fab_title: map["fab.title"] || "congdongvang.com",
+    fab_intro_text:
+      map["fab.intro_text"] ||
+      "Sân chơi giao lưu, trao đổi, kiến thức về thị trường đầu tư tài chính",
+    fab_contact_info:
+      map["fab.contact_info"] || "Liên hệ quảng cáo : 076.897.2512",
+    fab_enabled: map["fab.enabled"] || "true",
   };
 }
 
@@ -107,6 +118,10 @@ function formToSettings(values: FormValues): SiteSetting[] {
     { key: "footer.brand_name", value: values.footer_brand_name },
     { key: "footer.tagline", value: values.footer_tagline },
     { key: "footer.contact_info", value: values.footer_contact_info },
+    { key: "fab.title", value: values.fab_title },
+    { key: "fab.intro_text", value: values.fab_intro_text },
+    { key: "fab.contact_info", value: values.fab_contact_info },
+    { key: "fab.enabled", value: values.fab_enabled },
   ];
 }
 
@@ -116,7 +131,8 @@ function AdminCMSContent() {
   const t = useTranslations("admin");
   const { data, isLoading } = useQuery({
     queryKey: [QUERY_KEY],
-    queryFn: () => apiClient.get<SiteSettingsResponse>("/api/v1/public/site-settings"),
+    queryFn: () =>
+      apiClient.get<SiteSettingsResponse>("/api/v1/public/site-settings"),
   });
 
   const { register, handleSubmit, control, reset } = useForm<FormValues>();
@@ -157,7 +173,7 @@ function AdminCMSContent() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* SEO Metadata */}
       <BaseCard padding="lg">
-        <h2 className="text-lg font-semibold text-neutral-900 dark:text-dark-text mb-4">
+        <h2 className="text-lg font-semibold text-v2-gold-accent mb-4">
           {t("cms.seoMetadata")}
         </h2>
 
@@ -188,8 +204,8 @@ function AdminCMSContent() {
           />
 
           {/* Open Graph */}
-          <div className="border-t border-neutral-200 dark:border-dark-border pt-4 mt-4">
-            <h3 className="text-sm font-medium text-neutral-700 dark:text-dark-text-secondary mb-3">
+          <div className="border-t border-v2-border-light pt-4 mt-4">
+            <h3 className="text-sm font-medium text-v2-text-secondary mb-3">
               Open Graph
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
@@ -217,8 +233,8 @@ function AdminCMSContent() {
           </div>
 
           {/* Twitter Card */}
-          <div className="border-t border-neutral-200 dark:border-dark-border pt-4 mt-4">
-            <h3 className="text-sm font-medium text-neutral-700 dark:text-dark-text-secondary mb-3">
+          <div className="border-t border-v2-border-light pt-4 mt-4">
+            <h3 className="text-sm font-medium text-v2-text-secondary mb-3">
               Twitter Card
             </h3>
             <FormToggle
@@ -250,8 +266,8 @@ function AdminCMSContent() {
           </div>
 
           {/* Robots & Canonical */}
-          <div className="border-t border-neutral-200 dark:border-dark-border pt-4 mt-4">
-            <h3 className="text-sm font-medium text-neutral-700 dark:text-dark-text-secondary mb-3">
+          <div className="border-t border-v2-border-light pt-4 mt-4">
+            <h3 className="text-sm font-medium text-v2-text-secondary mb-3">
               Robots & Canonical
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
@@ -285,7 +301,7 @@ function AdminCMSContent() {
 
       {/* Footer Content */}
       <BaseCard padding="lg">
-        <h2 className="text-lg font-semibold text-neutral-900 dark:text-dark-text mb-4">
+        <h2 className="text-lg font-semibold text-v2-gold-accent mb-4">
           {t("cms.footerContent")}
         </h2>
 
@@ -304,6 +320,44 @@ function AdminCMSContent() {
             label="Contact Info"
             placeholder="Liên hệ quảng cáo : 076.897.2512"
             {...register("footer_contact_info")}
+          />
+        </div>
+      </BaseCard>
+
+      {/* FAB / Welcome */}
+      <BaseCard padding="lg">
+        <h2 className="text-lg font-semibold text-v2-gold-accent mb-4">
+          FAB / Welcome
+        </h2>
+
+        <div className="space-y-1">
+          <FormToggle
+            name="fab_enabled"
+            control={control}
+            label="Enabled"
+            options={[
+              { value: "true", label: "Enabled" },
+              { value: "false", label: "Disabled" },
+            ]}
+          />
+          <FormInput
+            label="Title"
+            placeholder="congdongvang.com"
+            {...register("fab_title")}
+          />
+          <FormTextarea
+            name="fab_intro_text"
+            control={control}
+            label="Introduction Text"
+            placeholder="Sân chơi giao lưu, trao đổi..."
+            rows={3}
+            maxLength={500}
+            showCharacterCount
+          />
+          <FormInput
+            label="Contact Info"
+            placeholder="Liên hệ quảng cáo : 076.897.2512"
+            {...register("fab_contact_info")}
           />
         </div>
       </BaseCard>
@@ -349,24 +403,24 @@ export default function AdminCMSPage() {
     <AdminGuard>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-neutral-900 dark:text-dark-text">
+          <h1 className="text-2xl font-bold text-v2-gold-accent">
             {t("page.title")}
           </h1>
-          <p className="text-sm text-neutral-500 dark:text-dark-text-tertiary mt-1">
+          <p className="text-sm text-v2-text-tertiary mt-1">
             {t("page.subtitle")}
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 border-b border-neutral-200 dark:border-dark-border mb-6">
+        <div className="flex gap-1 border-b border-v2-border-light mb-6">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id)}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.id
-                  ? "border-bg text-bg"
-                  : "border-transparent text-neutral-500 hover:text-neutral-700 dark:text-dark-text-tertiary dark:hover:text-dark-text-secondary"
+                  ? "border-v2-gold-primary text-bg"
+                  : "border-transparent text-v2-text-tertiary hover:text-v2-text-secondary"
               }`}
             >
               {tab.label}

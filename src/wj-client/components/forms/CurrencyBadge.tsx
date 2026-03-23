@@ -77,8 +77,8 @@ export function CurrencyBadge({
           border transition-all duration-150
           ${
             disabled
-              ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
-              : "bg-primary-50 text-primary-700 border-primary-200 hover:bg-primary-100 hover:border-primary-300 cursor-pointer"
+              ? "bg-v2-maroon-700 text-v2-cream-100 border-v2-maroon-600 cursor-not-allowed"
+              : "bg-v2-gold-primary/10 text-v2-gold-accent border-v2-gold-primary/20 hover:bg-v2-gold-primary/20 hover:border-v2-gold-primary/30 cursor-pointer"
           }
         `}
         aria-label={t("changeCurrency")}
@@ -107,7 +107,7 @@ export function CurrencyBadge({
       {/* Dropdown */}
       {isOpen && (
         <div
-          className="absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 min-w-[180px] max-h-[240px] overflow-y-auto"
+          className="absolute left-0 top-full mt-1 bg-v2-maroon-900 rounded-lg shadow-lg border border-v2-maroon-600 py-1 z-50 min-w-[180px] max-h-[240px] overflow-y-auto"
           role="listbox"
           aria-label={t("selectCurrency")}
         >
@@ -120,8 +120,8 @@ export function CurrencyBadge({
                 w-full px-3 py-2 text-left text-sm flex items-center gap-2 transition-colors
                 ${
                   curr.code === value
-                    ? "bg-primary-50 text-primary-700 font-medium"
-                    : "hover:bg-gray-50 text-gray-700"
+                    ? "bg-v2-gold-primary/10 text-v2-gold-accent font-medium"
+                    : "hover:bg-v2-maroon-700 text-v2-cream-100"
                 }
               `}
               role="option"

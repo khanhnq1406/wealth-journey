@@ -36,15 +36,33 @@
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
+## Skill Recovery
+
+**MANDATORY: Re-read these files before continuing work (context compaction drops them):**
+
+1. `.claude/skills/secure-feature-pipeline/step-3-implement.md` — orchestration protocol, three-stage review, checkpoint protocol
+2. `.claude/skills/secure-feature-pipeline/implementer-prompt.md` — implementer agent template
+3. `.claude/skills/secure-feature-pipeline/spec-reviewer-prompt.md` — spec compliance review template
+4. `.claude/skills/secure-feature-pipeline/security-reviewer-prompt.md` — security review template
+5. `.claude/skills/secure-feature-pipeline/code-quality-reviewer-prompt.md` — code quality review template
+
+**After re-reading, verify you can answer:**
+- What are the three review stages and their order?
+- What are the 4 steps of the commit checkpoint protocol?
+- What is the next pending task?
+
 ## Resume Instructions
 
-To resume this implementation in a new session:
+To resume this implementation after context compaction or in a new session:
 
-1. Read this progress file
-2. Read the plan file referenced above
-3. Check `git log --oneline -10` to verify last commit matches the last `done` task
-4. Check `git status` for any uncommitted work
-5. Continue from the next `pending` task using the same checkpoint protocol
+1. Read this progress file completely (including the Skill Recovery section above)
+2. **Re-read ALL skill files listed in Skill Recovery section above** — this is NON-NEGOTIABLE
+3. Read the plan file referenced in Metadata
+4. Read the spec file referenced in Metadata
+5. Check `git log --oneline -10` to verify last commit matches the last `done` task
+6. Check `git status` for any uncommitted work
+7. Cite the three-stage review order and checkpoint protocol (proves context is recovered)
+8. Continue from the next `pending` task using the same checkpoint protocol
 
 ## Notes
 
@@ -174,6 +192,15 @@ Present a clear summary to the user:
 - The user can interrupt at any time if they need to course-correct
 - Only pause to ask the user if you encounter a blocker, ambiguity, or error
 
+**Step 0 (before EACH task): Context integrity check**
+
+Before starting each new task, quickly verify you still know:
+- The three-stage review order (spec → security → code quality)
+- The template file paths for each reviewer
+- The commit checkpoint protocol (4 steps)
+
+If you can't recall any of these, **STOP and run the Context Compaction Recovery protocol** (see section above) before proceeding. This takes 30 seconds but prevents an entire task from being done wrong.
+
 **Why this matters:** Context compaction can happen at any time. By committing after each task and persisting progress to disk, the worst case is losing in-progress work on one task — all completed tasks are safely committed and the progress file tells the next session exactly where to resume. Implementation runs continuously — the user can interrupt at any time but doesn't need to manually trigger each task.
 
 ### Parallel Execution
@@ -287,6 +314,28 @@ Run after implementation to verify blast radius is covered:
 [Manual testing steps for verification]
 ```
 
+### Context Compaction Recovery (CRITICAL)
+
+**Problem:** During long implementation sessions, auto-compaction drops skill instructions from context. The orchestrator then stops following the three-stage review, checkpoint protocol, and progress file updates.
+
+**Detection — you may have lost context if ANY of these are true:**
+- You can't recall the three-stage review order (spec → security → code quality)
+- You can't recall the commit checkpoint protocol (4 steps)
+- You don't remember the prompt template file paths
+- You're about to dispatch a reviewer but aren't sure what template to use
+- You're about to proceed to the next task but aren't sure about the checkpoint steps
+
+**Recovery protocol — MANDATORY before continuing any task:**
+
+1. **Re-read this skill file:** Use `Read` tool on `.claude/skills/secure-feature-pipeline/step-3-implement.md`
+2. **Re-read the progress file** to know where you are
+3. **Verify you can cite these from memory before proceeding:**
+   - Three-stage review order and template file paths
+   - Commit checkpoint protocol (4 steps)
+   - Progress file update rules
+
+**The progress file includes a `## Skill Recovery` section (see template below) that lists the exact files to re-read.** This section survives compaction because it's on disk, not in context.
+
 ### Resuming from Progress File
 
 If a session is lost to context compaction or you're starting a new session to continue an in-progress implementation:
@@ -295,18 +344,30 @@ If a session is lost to context compaction or you're starting a new session to c
 
 1. **Read the progress file** — `docs/reports/YYYY-MM-DD-<feature>-progress.md`
    - Identify `Current state`, `Current task`, and which tasks are `done` vs `pending`
-2. **Read the plan file** — referenced in the progress file's `Metadata` section
+   - **Read the `Skill Recovery` section** — it lists the skill files you must re-read
+2. **Re-read skill instructions** — listed in the progress file's `Skill Recovery` section:
+   - `.claude/skills/secure-feature-pipeline/step-3-implement.md` (orchestration protocol)
+   - `.claude/skills/secure-feature-pipeline/implementer-prompt.md` (implementer template)
+   - `.claude/skills/secure-feature-pipeline/spec-reviewer-prompt.md` (spec review template)
+   - `.claude/skills/secure-feature-pipeline/security-reviewer-prompt.md` (security review template)
+   - `.claude/skills/secure-feature-pipeline/code-quality-reviewer-prompt.md` (quality review template)
+3. **Read the plan file** — referenced in the progress file's `Metadata` section
    - Understand the full task list, dependencies, and security notes
-3. **Verify git state:**
+4. **Read the spec file** — referenced in the progress file's `Metadata` section
+   - Needed for spec compliance reviews
+5. **Verify git state:**
    - `git log --oneline -10` — confirm the last commit matches the last `done` task in the progress file
    - `git status` — check for uncommitted work (if any, investigate before proceeding)
    - `git diff` — review any uncommitted changes
-4. **Recreate TaskCreate list** from the plan:
+6. **Recreate TaskCreate list** from the plan:
    - Create all tasks via TaskCreate
    - Mark tasks as `completed` per the progress file (use TaskUpdate)
    - The first `pending` task becomes your next work item
-5. **Continue from the next pending task** — follow the same implement → review → checkpoint protocol
-6. **Follow the same Commit Checkpoint Protocol** — commit after each task, show summary, auto-proceed to next task
+7. **Cite the protocol before continuing** — prove you've recovered context:
+   - State the three-stage review order
+   - State the commit checkpoint protocol steps
+   - State the next task to work on
+8. **Continue from the next pending task** — follow the same implement → review → checkpoint protocol
 
 **Key rule:** The **progress file is the source of truth**, not TaskList state. TaskList is ephemeral (lives in conversation context only). If there's a conflict between the progress file and TaskList state, trust the progress file.
 

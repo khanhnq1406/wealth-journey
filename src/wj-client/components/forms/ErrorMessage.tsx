@@ -17,9 +17,9 @@ export const ErrorMessage = ({
 }: ErrorMessageProps) => {
   // Severity-based styling
   const styles = {
-    error: "bg-danger-50 border-danger-200 text-danger-700",
-    warning: "bg-secondary-50 border-secondary-200 text-secondary-700",
-    info: "bg-primary-50 border-primary-200 text-primary-700",
+    error: "bg-danger-50 border-v2-red-negative/30 text-danger-700",
+    warning: "bg-secondary-50 border-v2-gold-primary/30 text-secondary-700",
+    info: "bg-primary-50 border-v2-gold-primary/30 text-primary-700",
   };
 
   // Icons for each severity level

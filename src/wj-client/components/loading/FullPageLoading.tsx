@@ -11,10 +11,10 @@ export const FullPageLoading = ({ text }: FullPageLoadingProps) => {
   const resolvedText = text ?? t("loadingText");
 
   return (
-    <div className="flex items-center justify-center h-screen bg-neutral-50">
+    <div className="flex items-center justify-center h-screen bg-v2-maroon-700">
       <div className="flex flex-col items-center gap-4">
         <svg
-          className="animate-spin h-12 w-12 text-primary-500"
+          className="animate-spin h-12 w-12 text-v2-gold-primary"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -33,7 +33,7 @@ export const FullPageLoading = ({ text }: FullPageLoadingProps) => {
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
           ></path>
         </svg>
-        <p className="text-primary-500 font-semibold text-lg">{resolvedText}</p>
+        <p className="text-v2-gold-primary font-semibold text-lg">{resolvedText}</p>
       </div>
     </div>
   );

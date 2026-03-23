@@ -26,14 +26,14 @@ export function CommunityNav({ activeView = "feed", onViewChange }: CommunityNav
   ];
 
   return (
-    <div className="bg-white rounded-2xl border border-v2-border-light p-3">
+    <div className="bg-v2-maroon-800 rounded-2xl border border-v2-border-light p-3">
       <nav className="flex flex-col gap-0.5">
         {navItems.map((item) => (
           <button
             key={item.label}
             onClick={() => onViewChange?.(item.view)}
             className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors font-vietnam text-[14px]",
+              "flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-colors font-roboto text-[14px]",
               activeView === item.view
                 ? "bg-v2-red-light text-v2-red-primary font-semibold"
                 : "text-v2-text-secondary hover:bg-[#FAF9F7]"

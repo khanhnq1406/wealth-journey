@@ -78,14 +78,14 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
 
   const getDefaultColor = useCallback((id: string | number): string => {
     const colors = [
-      "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
-      "bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400",
-      "bg-v2-green-light text-v2-green-positive dark:bg-green-900/30 dark:text-green-400",
-      "bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400",
-      "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400",
-      "bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400",
-      "bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400",
-      "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",
+ "bg-red-100 text-red-600",
+ "bg-primary-100 text-primary-600",
+ "bg-v2-green-light text-v2-green-positive",
+ "bg-yellow-100 text-yellow-600",
+ "bg-purple-100 text-purple-600",
+ "bg-pink-100 text-pink-600",
+ "bg-indigo-100 text-indigo-600",
+ "bg-orange-100 text-orange-600",
     ];
 
     const index = Math.abs(Number(id)) % colors.length;
@@ -130,10 +130,10 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
               onClick={() => handleCategorySelect(category.id)}
               className={cn(
                 "flex flex-col items-center gap-1 p-3 rounded-lg transition-all duration-150",
-                "min-h-[88px] focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
+                "min-h-[88px] focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2",
                 isSelected
-                  ? "bg-v2-red-primary text-white shadow-md scale-105"
-                  : "bg-white dark:bg-dark-surface text-gray-700 dark:text-dark-text border border-gray-200 dark:border-dark-border hover:bg-gray-50 dark:hover:bg-dark-surface-hover active:scale-95"
+                  ? "bg-v2-gold-primary text-white shadow-md scale-105"
+ : "bg-v2-bg-dark text-v2-text-secondary border border-v2-border-light hover:bg-v2-bg-surface-tint active:scale-95"
               )}
               aria-label={`Select ${category.name}`}
               aria-pressed={isSelected}
@@ -153,8 +153,8 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
             onClick={() => setIsCreating(true)}
             className={cn(
               "flex flex-col items-center justify-center gap-1 p-3 rounded-lg transition-all duration-150",
-              "min-h-[88px] focus-visible:ring-2 focus-visible:ring-v2-red-primary focus-visible:ring-offset-2",
-              "bg-gray-100 dark:bg-dark-surface-hover text-gray-500 dark:text-dark-text-tertiary border-2 border-dashed border-gray-300 dark:border-dark-border hover:bg-gray-200 dark:hover:bg-dark-surface-active"
+              "min-h-[88px] focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2",
+ "bg-v2-bg-dark text-v2-text-tertiary border-2 border-dashed border-v2-border-light hover:bg-v2-bg-surface-tint"
             )}
             aria-label={t("createNewCategory")}
           >
@@ -168,8 +168,8 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
 
       {/* Create Category Modal/Inline Form */}
       {isCreating && onCreateCategory && (
-        <div className="mt-3 p-4 bg-gray-50 dark:bg-dark-surface-hover rounded-lg border border-gray-200 dark:border-dark-border">
-          <label className="block text-sm font-medium text-gray-700 dark:text-dark-text-secondary mb-2">
+ <div className="mt-3 p-4 bg-v2-bg-dark rounded-lg border border-v2-border-light">
+ <label className="block text-sm font-medium text-v2-text-secondary mb-2">
             New Category Name
           </label>
           <div className="flex gap-2">
@@ -178,14 +178,14 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               placeholder={t("newCategoryPlaceholder")}
-              className="flex-1 px-3 py-2 text-sm bg-white dark:bg-dark-surface border border-gray-300 dark:border-dark-border rounded-lg focus:outline-none focus:ring-2 focus:ring-v2-red-primary dark:text-dark-text"
+ className="flex-1 px-3 py-2 text-sm bg-v2-bg-dark text-v2-gold-accent border border-v2-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-v2-gold-primary placeholder:text-v2-text-tertiary"
               autoFocus
             />
             <button
               type="button"
               onClick={handleCreateCategory}
               disabled={!newCategoryName.trim()}
-              className="px-4 py-2 bg-v2-red-primary text-white rounded-lg font-medium hover:bg-v2-red-dark disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
+              className="px-4 py-2 bg-v2-gold-primary text-white rounded-lg font-medium hover:bg-v2-gold-primary/80 disabled:opacity-40 disabled:cursor-not-allowed min-h-[44px]"
             >
               Add
             </button>
@@ -195,7 +195,7 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
                 setIsCreating(false);
                 setNewCategoryName("");
               }}
-              className="px-4 py-2 bg-white dark:bg-dark-surface text-gray-700 dark:text-dark-text border border-gray-300 dark:border-dark-border rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-dark-surface-hover min-h-[44px]"
+ className="px-4 py-2 bg-v2-bg-dark text-v2-text-secondary border border-v2-border-light rounded-lg font-medium hover:bg-v2-bg-surface-tint min-h-[44px]"
             >
               Cancel
             </button>

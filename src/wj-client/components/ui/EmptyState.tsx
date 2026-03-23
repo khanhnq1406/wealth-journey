@@ -125,7 +125,7 @@ export function EmptyState({
         <div
           className={cn(
             "mb-4 sm:mb-6 flex items-center justify-center",
-            "text-neutral-400 dark:text-dark-text-tertiary"
+ "text-neutral-400"
           )}
         >
           {imageSrc ? (
@@ -144,7 +144,7 @@ export function EmptyState({
       {/* Title */}
       <h3
         className={cn(
-          "font-semibold text-neutral-700 dark:text-dark-text-secondary mb-2",
+ "font-semibold text-neutral-700 mb-2",
           styles.title
         )}
       >
@@ -155,7 +155,7 @@ export function EmptyState({
       {description && (
         <p
           className={cn(
-            "text-neutral-500 dark:text-dark-text-tertiary max-w-md mx-auto mb-4 sm:mb-6",
+ "text-neutral-500 max-w-md mx-auto mb-4 sm:mb-6",
             styles.description
           )}
         >

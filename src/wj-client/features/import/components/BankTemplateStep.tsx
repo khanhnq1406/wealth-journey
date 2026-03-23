@@ -21,7 +21,7 @@ function CheckIcon({ className }: { className?: string }) {
   return (
     <svg
       className={cn(
-        "w-6 h-6 text-primary-600 dark:text-primary-500 flex-shrink-0 ml-3",
+ "w-6 h-6 text-v2-gold-primary flex-shrink-0 ml-3",
         className,
       )}
       fill="currentColor"
@@ -73,11 +73,11 @@ export function BankTemplateStep({
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Instructions */}
-      <div className="text-sm sm:text-base text-neutral-600 dark:text-dark-text-secondary">
+ <div className="text-sm sm:text-base text-v2-text-secondary">
         <p className="mb-2">
           {t("selectBankInstructions")}
         </p>
-        <p className="text-xs sm:text-sm text-neutral-500 dark:text-dark-text-tertiary">
+ <p className="text-xs sm:text-sm text-v2-text-tertiary">
           {t("customFormatHint")}
         </p>
       </div>
@@ -88,7 +88,7 @@ export function BankTemplateStep({
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-16 bg-neutral-100 dark:bg-dark-surface-hover rounded-lg animate-pulse"
+ className="h-16 bg-v2-bg-dark rounded-lg animate-pulse"
             />
           ))}
         </div>
@@ -96,8 +96,8 @@ export function BankTemplateStep({
 
       {/* Error State */}
       {isError && (
-        <div className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-red-700 dark:text-red-300 mb-3">
+ <div className="p-4 bg-v2-bg-dark border border-v2-red-negative/30 rounded-lg">
+ <p className="text-v2-red-negative mb-3">
             {t("loadError")}{" "}
             {error?.message || "Please try again."}
           </p>
@@ -118,7 +118,7 @@ export function BankTemplateStep({
           {userTemplatesData?.templates &&
             userTemplatesData.templates.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold text-neutral-700 dark:text-dark-text-secondary mb-2 px-1">
+ <h3 className="text-sm font-semibold text-v2-text-secondary mb-2 px-1">
                   {t("yourTemplates")}
                 </h3>
                 <div className="space-y-2 max-h-[25vh] overflow-y-auto -mx-1 px-1">
@@ -128,19 +128,19 @@ export function BankTemplateStep({
                       onClick={() => handleSelectTemplate(`user-${template.id}`)}
                       className={cn(
                         "w-full p-4 rounded-lg border-2 text-left transition-all duration-200",
-                        "hover:border-primary-400 hover:bg-neutral-50 dark:hover:bg-dark-surface-hover",
+ "hover:border-v2-gold-primary hover:bg-v2-bg-surface-tint",
                         "active:scale-[0.99]",
                         selectedTemplate === `user-${template.id}`
-                          ? "border-primary-600 bg-primary-50 dark:bg-primary-950 dark:border-primary-600"
-                          : "border-neutral-200 dark:border-dark-border bg-white dark:bg-dark-surface",
+ ? "border-v2-gold-primary bg-v2-bg-dark"
+ : "border-v2-border-light bg-v2-bg-surface",
                       )}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <h3 className="font-semibold text-base text-neutral-900 dark:text-dark-text">
+ <h3 className="font-semibold text-base text-v2-gold-accent">
                             {template.name}
                           </h3>
-                          <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mt-1">
+ <p className="text-sm text-v2-text-secondary mt-1">
                             {template.currency} • {template.dateFormat} •{" "}
                             {template.fileFormats?.join(", ") || "CSV"}
                           </p>
@@ -157,7 +157,7 @@ export function BankTemplateStep({
 
           {/* Bank Templates Section */}
           <div>
-            <h3 className="text-sm font-semibold text-neutral-700 dark:text-dark-text-secondary mb-2 px-1">
+ <h3 className="text-sm font-semibold text-v2-text-secondary mb-2 px-1">
               {t("bankTemplates")}
             </h3>
             <div className="space-y-2 max-h-[25vh] overflow-y-auto -mx-1 px-1">
@@ -167,19 +167,19 @@ export function BankTemplateStep({
                   onClick={() => handleSelectTemplate(template.id)}
                   className={cn(
                     "w-full p-4 rounded-lg border-2 text-left transition-all duration-200",
-                    "hover:border-primary-400 hover:bg-neutral-50 dark:hover:bg-dark-surface-hover",
+ "hover:border-v2-gold-primary hover:bg-v2-bg-surface-tint",
                     "active:scale-[0.99]",
                     selectedTemplate === template.id
-                      ? "border-primary-600 bg-primary-50 dark:bg-primary-950 dark:border-primary-600"
-                      : "border-neutral-200 dark:border-dark-border bg-white dark:bg-dark-surface",
+ ? "border-v2-gold-primary bg-v2-bg-dark"
+ : "border-v2-border-light bg-v2-bg-surface",
                   )}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <h3 className="font-semibold text-base text-neutral-900 dark:text-dark-text">
+ <h3 className="font-semibold text-base text-v2-gold-accent">
                         {template.name}
                       </h3>
-                      <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mt-1">
+ <p className="text-sm text-v2-text-secondary mt-1">
                         {template.bankCode} • {template.statementType} •{" "}
                         {template.fileFormats.join(", ")}
                       </p>
@@ -191,7 +191,7 @@ export function BankTemplateStep({
 
               {/* Empty State */}
               {templatesData?.templates?.length === 0 && (
-                <div className="text-center py-8 px-4 text-neutral-500 dark:text-neutral-400">
+ <div className="text-center py-8 px-4 text-v2-text-tertiary">
                   <p className="text-base mb-2">
                     {t("noTemplatesAvailable")}
                   </p>
@@ -208,19 +208,19 @@ export function BankTemplateStep({
             onClick={handleCustomFormat}
             className={cn(
               "w-full p-4 rounded-lg border-2 text-left transition-all duration-200",
-              "hover:border-primary-400 hover:bg-neutral-50 dark:hover:bg-dark-surface-hover",
+ "hover:border-v2-gold-primary hover:bg-v2-bg-surface-tint",
               "active:scale-[0.99]",
               selectedTemplate === CUSTOM_TEMPLATE_ID
-                ? "border-primary-600 bg-primary-50 dark:bg-primary-950 dark:border-primary-600"
-                : "border-neutral-200 dark:border-dark-border bg-white dark:bg-dark-surface",
+ ? "border-v2-gold-primary bg-v2-bg-dark"
+ : "border-v2-border-light bg-v2-bg-surface",
             )}
           >
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <h3 className="font-semibold text-base text-neutral-900 dark:text-dark-text">
+ <h3 className="font-semibold text-base text-v2-gold-accent">
                   {t("customFormat")}
                 </h3>
-                <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mt-1">
+ <p className="text-sm text-v2-text-secondary mt-1">
                   {t("customFormatDesc")}
                 </p>
               </div>

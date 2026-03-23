@@ -437,10 +437,10 @@ export function ReportContent() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4 px-6">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-neutral-900 mb-2">
+          <h2 className="text-xl font-semibold text-v2-gold-accent mb-2">
             {t("failedToLoad")}
           </h2>
-          <p className="text-neutral-600 mb-4">
+          <p className="text-v2-text-tertiary mb-4">
             {error instanceof Error
               ? error.message
               : t("failedToLoad")}
@@ -465,7 +465,7 @@ export function ReportContent() {
     <div className="flex flex-col gap-4 px-3 sm:px-6 py-3 sm:py-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-v2-gold-accent">
           {t("title")}
         </h1>
         <ExportButton
@@ -502,7 +502,7 @@ export function ReportContent() {
           <BaseCard className="p-8">
             <div className="text-center py-12">
               <svg
-                className="w-16 h-16 mx-auto text-neutral-400 mb-4"
+                className="w-16 h-16 mx-auto text-v2-text-tertiary mb-4"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -514,10 +514,10 @@ export function ReportContent() {
                   d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                 />
               </svg>
-              <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+              <h3 className="text-lg font-semibold text-v2-gold-accent mb-2">
                 {t("noDataAvailable")}
               </h3>
-              <p className="text-neutral-600">
+              <p className="text-v2-text-tertiary">
                 {t("noDataDescription")}
               </p>
             </div>
@@ -533,7 +533,7 @@ export function ReportContent() {
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           <BaseCard className="p-3 sm:p-4">
-            <h3 className="text-base sm:text-lg font-bold text-neutral-900 mb-3 sm:mb-4">
+            <h3 className="text-base sm:text-lg font-bold text-v2-gold-accent mb-3 sm:mb-4">
               {t("expenseBreakdown")}
             </h3>
             <DonutChartSVG
@@ -553,10 +553,10 @@ export function ReportContent() {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <BaseCard className="p-3 sm:p-4">
-            <h3 className="text-base sm:text-lg font-bold text-neutral-900 mb-3 sm:mb-4">
+            <h3 className="text-base sm:text-lg font-bold text-v2-gold-accent mb-3 sm:mb-4">
               {t("categoryComparison")}
               {compareWithPrevious && (
-                <span className="text-xs sm:text-sm font-normal text-neutral-600 ml-2">
+                <span className="text-xs sm:text-sm font-normal text-v2-text-tertiary ml-2">
                   {t("vsPreviousPeriod")}
                 </span>
               )}
@@ -600,7 +600,7 @@ export function ReportContent() {
         transition={{ duration: 0.5, delay: 0.3 }}
       >
         <BaseCard className="p-3 sm:p-4">
-          <h3 className="text-base sm:text-lg font-bold text-neutral-900 mb-3 sm:mb-4">
+          <h3 className="text-base sm:text-lg font-bold text-v2-gold-accent mb-3 sm:mb-4">
             {t("incomeVsExpensesTrend")}
           </h3>
           <LineChart
@@ -647,26 +647,26 @@ export function ReportContent() {
         transition={{ duration: 0.5, delay: 0.4 }}
       >
         <BaseCard className="p-3 sm:p-4">
-          <h3 className="text-base sm:text-lg font-bold text-neutral-900 mb-3 sm:mb-4">
+          <h3 className="text-base sm:text-lg font-bold text-v2-gold-accent mb-3 sm:mb-4">
             {t("monthlySummary")}
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-xs sm:text-sm">
               <thead>
-                <tr className="border-b border-neutral-200">
-                  <th className="text-left py-2 sm:py-3 px-2 sm:px-4 font-semibold text-neutral-700">
+                <tr className="border-b border-v2-border-light">
+                  <th className="text-left py-2 sm:py-3 px-2 sm:px-4 font-semibold text-v2-text-secondary">
                     {t("tableHeaders.month")}
                   </th>
-                  <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-neutral-700">
+                  <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-v2-text-secondary">
                     {t("tableHeaders.income")}
                   </th>
-                  <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-neutral-700">
+                  <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-v2-text-secondary">
                     {t("tableHeaders.expenses")}
                   </th>
-                  <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-neutral-700">
+                  <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-v2-text-secondary">
                     {t("tableHeaders.netSavings")}
                   </th>
-                  <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-neutral-700">
+                  <th className="text-right py-2 sm:py-3 px-2 sm:px-4 font-semibold text-v2-text-secondary">
                     {t("tableHeaders.savingsRate")}
                   </th>
                 </tr>
@@ -675,9 +675,9 @@ export function ReportContent() {
                 {trendData.map((row, index) => (
                   <tr
                     key={index}
-                    className="border-b border-neutral-100 hover:bg-neutral-50"
+                    className="border-b border-v2-border-light hover:bg-v2-bg-surface-tint"
                   >
-                    <td className="py-2 sm:py-3 px-2 sm:px-4 font-medium text-neutral-900">
+                    <td className="py-2 sm:py-3 px-2 sm:px-4 font-medium text-v2-gold-accent">
                       {row.month}
                     </td>
                     <td className="py-2 sm:py-3 px-2 sm:px-4 text-right text-success-600 font-medium">
@@ -686,10 +686,10 @@ export function ReportContent() {
                     <td className="py-2 sm:py-3 px-2 sm:px-4 text-right text-danger-600 font-medium">
                       {formatCurrency(row.expenses, currency)}
                     </td>
-                    <td className="py-2 sm:py-3 px-2 sm:px-4 text-right text-primary-900 font-medium">
+                    <td className="py-2 sm:py-3 px-2 sm:px-4 text-right text-v2-text-secondary font-medium">
                       {formatCurrency(row.net, currency)}
                     </td>
-                    <td className="py-2 sm:py-3 px-2 sm:px-4 text-right text-neutral-600">
+                    <td className="py-2 sm:py-3 px-2 sm:px-4 text-right text-v2-text-tertiary">
                       {row.income > 0
                         ? `${((row.net / row.income) * 100).toFixed(1)}%`
                         : "0.0%"}
@@ -708,7 +708,7 @@ export function ReportContent() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.5 }}
       >
-        <h2 className="text-xl sm:text-2xl font-bold text-neutral-900">
+        <h2 className="text-xl sm:text-2xl font-bold text-v2-gold-accent">
           {t("walletAnalytics")}
         </h2>
       </motion.div>

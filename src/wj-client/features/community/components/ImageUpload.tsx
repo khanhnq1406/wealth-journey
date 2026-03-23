@@ -100,8 +100,8 @@ export function ImageUpload({
             hasFixedHeight ? "h-full p-3" : "p-6"
           } ${
             isDragging
-              ? "border-bg bg-green-50"
-              : "border-gray-300 hover:border-bg hover:bg-gray-50"
+              ? "border-v2-gold-primary bg-green-50"
+              : "border-v2-gold-primary/30 hover:border-v2-gold-primary hover:bg-gray-50"
           }`}
           onDragOver={(e) => {
             e.preventDefault();

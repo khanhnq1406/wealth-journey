@@ -103,9 +103,7 @@ export function AddInvestmentTransactionForm({
 
   const addTransactionMutation = useMutationAddInvestmentTransaction({
     onSuccess: (data) => {
-      setSuccessMessage(
-        data.message || t("transaction.transactionAddedMessage"),
-      );
+      setSuccessMessage(t("transaction.transactionAddedMessage"));
       setShowSuccess(true);
       setErrorMessage("");
       // Invalidate investment queries
@@ -309,7 +307,7 @@ export function AddInvestmentTransactionForm({
         <h3 className="text-lg font-semibold">
           {t("transaction.transactionAddedSuccess")}
         </h3>
-        <p className="text-gray-600 mb-6">{successMessage}</p>
+        <p className="text-v2-text-secondary mb-6">{successMessage}</p>
         <Button type={ButtonType.PRIMARY} onClick={onSuccess}>
           {tCommon("done")}
         </Button>
@@ -370,7 +368,7 @@ export function AddInvestmentTransactionForm({
       {/* Price + Refresh Button */}
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-v2-gold-accent">
             {isGoldInvestment
               ? `Price per ${getInvestmentUnitLabelFull(goldDisplayUnit || "oz", investmentType)} (${investmentCurrency})`
               : isSilverInvestment && silverDisplayUnit
@@ -399,7 +397,7 @@ export function AddInvestmentTransactionForm({
               type="button"
               onClick={() => priceQuery.refetch()}
               disabled={isRefreshing}
-              className="px-3 py-2 text-sm font-medium text-bg bg-red-50 border border-bg rounded-md hover:bg-red-100 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap h-[50px]"
+              className="px-3 py-2 text-sm font-medium text-v2-gold-primary bg-v2-maroon-900 border border-v2-gold-primary rounded-md hover:bg-v2-maroon-800 disabled:opacity-50 flex items-center gap-1 whitespace-nowrap h-[50px]"
             >
               {isRefreshing
                 ? t("transaction.refreshingPrice")

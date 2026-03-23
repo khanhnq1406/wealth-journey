@@ -13,35 +13,27 @@ html {
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #0F172A;
-  --btn-green: #B91C1C; /* aliased to v2-red-primary */
-  --btn-green-hover: #7F1D1D; /* aliased to v2-red-dark */
+  --background: #5F0202;
+  --foreground: #F1BD61;
+  --btn-green: #D78B1C; /* Gold primary CTA */
+  --btn-green-hover: #B8860B; /* Gold hover */
   --white: #ffffff;
-  --primary-green: #B91C1C; /* aliased to v2-red-primary */
-  --accent-green: #B91C1C; /* aliased to v2-red-primary */
-  --teal-accent: #14B8A6;
-  /* V2 Crimson & Gold */
-  --v2-bg-primary: #FAF9F7;
-  --v2-bg-surface: #FFFFFF;
-  --v2-red-primary: #B91C1C;
-  --v2-red-dark: #7F1D1D;
-  --v2-gold-primary: #B8860B;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #020617;
-    --foreground: #F8FAFC;
-  }
+  --primary-green: #9B0111; /* mihong red */
+  --accent-green: #D78B1C; /* Gold accent */
+  --teal-accent: #F1BD61; /* Light gold */
+  /* V2 mihong.vn */
+  --v2-bg-primary: #5F0202;
+  --v2-bg-surface: #580202;
+  --v2-red-primary: #9B0111;
+ --v2-red-dark: #5F0202;
+  --v2-gold-primary: #D78B1C;
 }
 
 body {
-  /* color: var(--foreground); */
   background: var(--background);
-  font-family: var(--font-jakarta-sans);
+  color: var(--foreground);
+  font-family: var(--font-roboto);
   touch-action: manipulation;
-  /* Prevent iOS from resizing when virtual keyboard appears */
   position: relative;
   min-height: 100vh;
 }
@@ -67,62 +59,23 @@ body:has(.landing-scroll-container) {
   }
 }
 
-/* Dark mode styles */
-.dark {
-  color-scheme: dark;
-}
-
-/* Smooth color transitions for theme switching */
-* {
-  transition-property: color, background-color, border-color;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 200ms;
-}
-
-/* Disable transitions for theme toggle button and animations to avoid conflicts */
-.theme-toggle,
-.theme-toggle *,
-.animate-spin,
-.animate-spin * {
-  transition: none !important;
-}
-
-/* Custom scrollbar styling for dark mode */
-.dark ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: #0F172A;
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: #1E293B;
-  border-radius: 4px;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
-}
-
-/* Light mode scrollbar */
+/* Scrollbar styling for maroon theme */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #3A0101;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #6B0303;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #9B0111;
 }
 
 .custom-input {
@@ -134,15 +87,9 @@ body:has(.landing-scroll-container) {
   margin-bottom: 10px;
 }
 
-.dark .custom-input {
-  background-color: #1E293B;
-  color: #F8FAFC;
-  border: 1px solid #334155;
-}
-
 .custom-btn {
   background-color: var(--btn-green);
-  color: var(--white);
+  color: #3A0101;
   padding: 10px;
   border-radius: 5px;
   font-weight: 600;
@@ -173,12 +120,8 @@ body:has(.landing-scroll-container) {
 }
 
 .required {
-  color: #DC2626;
-  font-size: 0.9em;
-}
-
-.dark .required {
   color: #F87171;
+  font-size: 0.9em;
 }
 
 /* Screen reader only utility */
@@ -399,16 +342,16 @@ body:has(.landing-scroll-container) {
   letter-spacing: -0.02em;
 }
 
-/* V2 Typography Utilities */
-.v2-heading-hero { font-family: var(--font-vietnam-pro); font-weight: 800; letter-spacing: -1.5px; }
-.v2-heading-lg { font-family: var(--font-vietnam-pro); font-weight: 700; letter-spacing: -1px; }
-.v2-heading-md { font-family: var(--font-vietnam-pro); font-weight: 600; letter-spacing: -0.5px; }
-.v2-heading-sm { font-family: var(--font-vietnam-pro); font-weight: 500; letter-spacing: -0.3px; }
-.v2-body { font-family: var(--font-vietnam-pro); font-weight: 400; }
-.v2-data-bold { font-family: var(--font-jetbrains-mono); font-weight: 700; letter-spacing: 0.5px; }
-.v2-data-semibold { font-family: var(--font-jetbrains-mono); font-weight: 600; letter-spacing: 1px; }
-.v2-data-medium { font-family: var(--font-jetbrains-mono); font-weight: 500; letter-spacing: 0.5px; }
-.v2-data-regular { font-family: var(--font-jetbrains-mono); font-weight: 400; letter-spacing: 0.5px; }
+/* V2 Typography Utilities (mihong.vn — Roboto) */
+.v2-heading-hero { font-family: var(--font-roboto); font-weight: 900; letter-spacing: -1.5px; }
+.v2-heading-lg { font-family: var(--font-roboto); font-weight: 700; letter-spacing: -1px; }
+.v2-heading-md { font-family: var(--font-roboto); font-weight: 700; letter-spacing: -0.5px; }
+.v2-heading-sm { font-family: var(--font-roboto); font-weight: 500; letter-spacing: -0.3px; }
+.v2-body { font-family: var(--font-roboto); font-weight: 400; }
+.v2-data-bold { font-family: var(--font-roboto); font-weight: 700; letter-spacing: 0.5px; }
+.v2-data-semibold { font-family: var(--font-roboto); font-weight: 600; letter-spacing: 1px; }
+.v2-data-medium { font-family: var(--font-roboto); font-weight: 500; letter-spacing: 0.5px; }
+.v2-data-regular { font-family: var(--font-roboto); font-weight: 400; letter-spacing: 0.5px; }
 
 /* Safe area bottom padding for mobile bottom navigation */
 .pb-safe-bottom {
@@ -446,9 +389,9 @@ body:has(.landing-scroll-container) {
   min-width: 48px;
 }
 
-/* V2 focus ring for accessibility */
+/* V2 focus ring for accessibility — gold on maroon */
 *:focus-visible {
-  outline: 2px solid #B91C1C;
+  outline: 2px solid #D78B1C;
   outline-offset: 2px;
 }
 
@@ -491,4 +434,49 @@ svg {
   .pb-safe {
     padding-bottom: max(env(safe-area-inset-bottom), 8px);
   }
+}
+
+/* Price table cream/parchment style overrides (mihong.vn gold shop aesthetic) */
+.price-table-override thead {
+  background: linear-gradient(to right, #D78B1C, #FDE68A, #D78B1C) !important;
+}
+.price-table-override thead th {
+  color: #3D0101 !important;
+  font-weight: 900 !important;
+  border-right: 1px solid rgba(215, 139, 28, 0.2);
+}
+.price-table-override thead th:last-child {
+  border-right: none;
+}
+.price-table-override tbody tr {
+  border-bottom: 1px solid rgba(215, 139, 28, 0.1) !important;
+}
+.price-table-override tbody tr:nth-child(odd) {
+  background-color: #F5E6C8 !important;
+}
+.price-table-override tbody tr:nth-child(even) {
+  background-color: #EDD9B5 !important;
+}
+.price-table-override tbody td {
+  border-right: 1px solid rgba(215, 139, 28, 0.1);
+}
+.price-table-override tbody td:last-child {
+  border-right: none;
+}
+
+/* Silver variant header for price tables */
+.price-table-silver thead {
+  background: linear-gradient(to right, #8B929E, #CBD5E1, #8B929E) !important;
+}
+.price-table-silver thead th {
+  border-right-color: rgba(139, 146, 158, 0.2);
+}
+
+/* Currency variant header for price tables */
+.price-table-currency thead {
+  background: linear-gradient(to right, #60A5FA, #93C5FD, #60A5FA) !important;
+}
+.price-table-currency thead th {
+  color: white !important;
+  border-right-color: rgba(96, 165, 250, 0.2);
 }

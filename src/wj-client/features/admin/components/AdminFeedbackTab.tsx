@@ -50,24 +50,24 @@ function StatusBadge({ status }: { status: number }) {
     1: {
       labelKey: "pending",
       className:
-        "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+ "bg-yellow-900/30 text-yellow-400",
     },
     2: {
       labelKey: "reviewed",
       className:
-        "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+ "bg-blue-900/30 text-blue-400",
     },
     3: {
       labelKey: "resolved",
       className:
-        "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+ "bg-green-900/30 text-green-400",
     },
   };
 
   const { labelKey, className } = config[status] || {
     labelKey: "unknown",
     className:
-      "bg-neutral-100 text-neutral-500 dark:bg-dark-hover dark:text-dark-text-tertiary",
+ "bg-v2-bg-dark text-v2-text-tertiary",
   };
 
   return (
@@ -96,12 +96,12 @@ function EditPanel({ item, onSave, onDelete, onClose, isSaving }: EditPanelProps
   return (
     <BaseCard padding="lg">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-neutral-900 dark:text-dark-text">
+ <h3 className="text-sm font-semibold text-v2-gold-accent">
           {t("editPanel.title", { id: item.id })}
         </h3>
         <button
           onClick={onClose}
-          className="text-neutral-400 hover:text-neutral-600 dark:hover:text-dark-text-secondary transition-colors"
+ className="text-v2-text-tertiary hover:text-v2-text-secondary transition-colors"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -112,43 +112,43 @@ function EditPanel({ item, onSave, onDelete, onClose, isSaving }: EditPanelProps
       <div className="space-y-3">
         {/* Subject */}
         <div>
-          <p className="text-xs font-medium text-neutral-500 dark:text-dark-text-tertiary mb-1">
+ <p className="text-xs font-medium text-v2-text-tertiary mb-1">
             {t("editPanel.subject")}
           </p>
-          <p className="text-sm font-medium text-neutral-900 dark:text-dark-text">
+ <p className="text-sm font-medium text-v2-gold-accent">
             {item.subject}
           </p>
         </div>
 
         {/* User */}
         <div>
-          <p className="text-xs font-medium text-neutral-500 dark:text-dark-text-tertiary mb-1">
+ <p className="text-xs font-medium text-v2-text-tertiary mb-1">
             {t("editPanel.from")}
           </p>
-          <p className="text-sm text-neutral-700 dark:text-dark-text-secondary">
+ <p className="text-sm text-v2-text-secondary">
             {item.userName} ({item.userEmail})
           </p>
         </div>
 
         {/* Message */}
         <div>
-          <p className="text-xs font-medium text-neutral-500 dark:text-dark-text-tertiary mb-1">
+ <p className="text-xs font-medium text-v2-text-tertiary mb-1">
             {t("editPanel.message")}
           </p>
-          <p className="text-sm text-neutral-700 dark:text-dark-text-secondary whitespace-pre-wrap bg-neutral-50 dark:bg-dark-hover rounded-lg p-3">
+ <p className="text-sm text-v2-text-secondary whitespace-pre-wrap bg-v2-bg-dark rounded-lg p-3">
             {item.message}
           </p>
         </div>
 
         {/* Status dropdown */}
         <div>
-          <label className="block text-xs font-medium text-neutral-500 dark:text-dark-text-tertiary mb-1">
+ <label className="block text-xs font-medium text-v2-text-tertiary mb-1">
             {t("editPanel.status")}
           </label>
           <select
             value={status}
             onChange={(e) => setStatus(Number(e.target.value))}
-            className="w-full sm:w-48 px-3 py-1.5 text-sm border border-neutral-200 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg focus:outline-none focus:ring-2 focus:ring-bg/50 dark:text-dark-text"
+ className="w-full sm:w-48 px-3 py-1.5 text-sm border border-v2-border-light rounded-lg bg-v2-bg-surface focus:outline-none focus:ring-2 focus:ring-v2-gold-primary/30"
           >
             <option value={1}>{tFilter("pending")}</option>
             <option value={2}>{tFilter("reviewed")}</option>
@@ -158,7 +158,7 @@ function EditPanel({ item, onSave, onDelete, onClose, isSaving }: EditPanelProps
 
         {/* Admin note */}
         <div>
-          <label className="block text-xs font-medium text-neutral-500 dark:text-dark-text-tertiary mb-1">
+ <label className="block text-xs font-medium text-v2-text-tertiary mb-1">
             {t("editPanel.adminNote")}
           </label>
           <textarea
@@ -167,9 +167,9 @@ function EditPanel({ item, onSave, onDelete, onClose, isSaving }: EditPanelProps
             maxLength={2000}
             rows={3}
             placeholder={t("editPanel.notePlaceholder")}
-            className="w-full px-3 py-2 text-sm border border-neutral-200 dark:border-dark-border rounded-lg bg-white dark:bg-dark-bg focus:outline-none focus:ring-2 focus:ring-bg/50 dark:text-dark-text resize-none"
+ className="w-full px-3 py-2 text-sm border border-v2-border-light rounded-lg bg-v2-bg-surface focus:outline-none focus:ring-2 focus:ring-v2-gold-primary/30 resize-none"
           />
-          <p className="text-xs text-neutral-400 dark:text-dark-text-tertiary mt-0.5 text-right">
+ <p className="text-xs text-v2-text-tertiary mt-0.5 text-right">
             {note.length}/2000
           </p>
         </div>
@@ -186,7 +186,7 @@ function EditPanel({ item, onSave, onDelete, onClose, isSaving }: EditPanelProps
           </Button>
           <button
             onClick={() => onDelete(item)}
-            className="px-3 py-1.5 text-sm text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+ className="px-3 py-1.5 text-sm text-v2-red-negative border border-v2-red-negative/30 rounded-lg hover:bg-v2-bg-dark transition-colors"
           >
             {t("editPanel.delete")}
           </button>
@@ -200,6 +200,7 @@ export function AdminFeedbackTab() {
   const { toast } = useNotification();
   const t = useTranslations("admin.feedback");
   const tFilter = useTranslations("admin.feedback.statusFilter");
+  const tc = useTranslations("common");
 
   const STATUS_OPTIONS = STATUS_VALUES.map((s) => ({
     value: s.value,
@@ -314,7 +315,7 @@ export function AdminFeedbackTab() {
       header: t("columns.user"),
       showInCollapsed: true,
       cell: ({ row }) => (
-        <span className="text-neutral-600 dark:text-dark-text-secondary text-sm truncate max-w-[150px] inline-block">
+ <span className="text-v2-text-secondary text-sm truncate max-w-[150px] inline-block">
           {row.userName || "—"}
         </span>
       ),
@@ -330,7 +331,7 @@ export function AdminFeedbackTab() {
       header: t("columns.message"),
       showInCollapsed: false,
       cell: ({ row }) => (
-        <p className="text-sm text-neutral-600 dark:text-dark-text-secondary line-clamp-3">
+ <p className="text-sm text-v2-text-secondary line-clamp-3">
           {row.message}
         </p>
       ),
@@ -342,7 +343,7 @@ export function AdminFeedbackTab() {
       cell: ({ row }) => {
         const date = new Date(row.createdAt * 1000);
         return (
-          <span className="text-sm text-neutral-500 dark:text-dark-text-tertiary">
+ <span className="text-sm text-v2-text-tertiary">
             {date.toLocaleDateString()}
           </span>
         );
@@ -362,7 +363,7 @@ export function AdminFeedbackTab() {
     <div className="space-y-4">
       {/* Status filter */}
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+ <span className="text-sm text-v2-text-secondary">
           {t("statusLabel")}
         </span>
         <div className="flex gap-1 flex-wrap">
@@ -373,7 +374,7 @@ export function AdminFeedbackTab() {
               className={`px-3 py-1 text-sm rounded-full transition-colors ${
                 statusFilter === option.value
                   ? "bg-bg text-white"
-                  : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-dark-hover dark:text-dark-text-secondary dark:hover:bg-dark-border"
+ : "bg-v2-bg-dark text-v2-text-secondary hover:bg-v2-bg-surface-tint"
               }`}
             >
               {option.label}
@@ -402,6 +403,8 @@ export function AdminFeedbackTab() {
         isLoading={isLoading}
         emptyMessage={t("noFeedback")}
         expandable
+        expandButtonLabel={tc("showDetails")}
+        collapseButtonLabel={tc("hideDetails")}
       />
 
       {/* Pagination */}

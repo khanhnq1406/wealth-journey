@@ -37,19 +37,19 @@ export const NavItem = memo(function NavItem({
         href={href}
         disableBuiltInActive
         className={cn(
-          "flex items-center py-2.5 rounded-[10px] font-vietnam text-[14px] transition-all duration-300 ease-in-out touch-target",
+          "flex items-center py-2.5 rounded-[10px] font-roboto text-[14px] transition-all duration-300 ease-in-out touch-target",
           isExpanded
             ? cn(
                 "gap-3 px-3",
                 isActive
-                  ? "text-v2-red-primary bg-v2-red-light font-semibold"
-                  : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
+                  ? "text-v2-gold-primary bg-v2-bg-surface-tint font-semibold border-l-3 border-v2-gold-primary"
+                  : "text-v2-gold-accent/70 hover:bg-v2-bg-surface-tint font-medium",
               )
             : cn(
                 "justify-center px-0 gap-0",
                 isActive
-                  ? "text-v2-red-primary font-semibold"
-                  : "text-v2-text-secondary font-medium hover:bg-v2-bg-primary",
+                  ? "text-v2-gold-primary font-semibold"
+                  : "text-v2-gold-accent/70 font-medium hover:bg-v2-bg-surface-tint",
               ),
         )}
       >
@@ -61,7 +61,7 @@ export const NavItem = memo(function NavItem({
           <div
             className={cn(
               "w-11 h-11 flex items-center justify-center rounded-xl flex-shrink-0",
-              isPremium && !isActive && "bg-v2-red-light/5",
+              isPremium && !isActive && "bg-v2-bg-surface-tint/30",
               // Standard items (not premium): no bg, no border — hover handled by parent link
             )}
           >

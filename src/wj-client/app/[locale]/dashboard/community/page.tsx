@@ -79,7 +79,7 @@ export default function CommunityPage() {
     }
     if (view === "notifications") {
       return (
-        <div className="bg-white sm:rounded-2xl border-b sm:border border-v2-border-light overflow-hidden">
+        <div className="bg-v2-maroon-800 sm:rounded-2xl border-b sm:border border-v2-border-light overflow-hidden">
           <NotificationPanel />
         </div>
       );

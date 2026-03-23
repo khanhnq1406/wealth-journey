@@ -246,9 +246,9 @@ export function FeatureDiscovery({
 
     const styles = {
       tip: {
-        bgColor: "bg-primary-50 dark:bg-primary-950",
-        borderColor: "border-primary-200 dark:border-primary-800",
-        textColor: "text-primary-800 dark:text-primary-200",
+ bgColor: "bg-primary-50",
+ borderColor: "border-v2-gold-primary/30",
+ textColor: "text-primary-800",
         icon: (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
@@ -256,9 +256,9 @@ export function FeatureDiscovery({
         ),
       },
       new: {
-        bgColor: "bg-accent-50 dark:bg-accent-950",
-        borderColor: "border-accent-200 dark:border-accent-800",
-        textColor: "text-accent-800 dark:text-accent-200",
+ bgColor: "bg-accent-50",
+ borderColor: "border-accent-200",
+ textColor: "text-accent-800",
         icon: (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -266,9 +266,9 @@ export function FeatureDiscovery({
         ),
       },
       update: {
-        bgColor: "bg-secondary-50 dark:bg-secondary-950",
-        borderColor: "border-secondary-200 dark:border-secondary-800",
-        textColor: "text-secondary-800 dark:text-secondary-200",
+ bgColor: "bg-secondary-50",
+ borderColor: "border-v2-gold-primary/30",
+ textColor: "text-secondary-800",
         icon: (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
@@ -276,9 +276,9 @@ export function FeatureDiscovery({
         ),
       },
       announcement: {
-        bgColor: "bg-warning-50 dark:bg-warning-950",
-        borderColor: "border-warning-200 dark:border-warning-800",
-        textColor: "text-warning-800 dark:text-warning-200",
+ bgColor: "bg-warning-50",
+ borderColor: "border-v2-gold-accent/30",
+ textColor: "text-warning-800",
         icon: (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M18 3a1 1 0 00-1.447-.894L8.763 6H5a3 3 0 000 6h.28l1.771 5.316A1 1 0 008 18h1a1 1 0 001-1v-4.382l6.553 3.276A1 1 0 0018 15V3z" clipRule="evenodd" />
@@ -310,8 +310,8 @@ export function FeatureDiscovery({
         <div
           className={cn(
             "rounded-lg shadow-lg border p-4",
-            "bg-white dark:bg-dark-surface",
-            "border-neutral-200 dark:border-dark-border",
+ "bg-v2-maroon-800",
+ "border-v2-gold-primary/20",
             typeStyles.bgColor,
             typeStyles.borderColor
           )}
@@ -329,9 +329,9 @@ export function FeatureDiscovery({
                 {currentTip.type !== "tip" && (
                   <span className={cn(
                     "px-1.5 py-0.5 rounded text-xs font-medium",
-                    currentTip.type === "new" && "bg-accent-100 dark:bg-accent-900 text-accent-700 dark:text-accent-300",
-                    currentTip.type === "update" && "bg-secondary-100 dark:bg-secondary-900 text-secondary-700 dark:text-secondary-300",
-                    currentTip.type === "announcement" && "bg-warning-100 dark:bg-warning-900 text-warning-700 dark:text-warning-300"
+ currentTip.type === "new" && "bg-accent-100 text-accent-700",
+ currentTip.type === "update" && "bg-secondary-100 text-secondary-700",
+ currentTip.type === "announcement" && "bg-warning-100 text-warning-700"
                   )}>
                     {currentTip.type === "new" && "New"}
                     {currentTip.type === "update" && "Updated"}
@@ -342,7 +342,7 @@ export function FeatureDiscovery({
             </div>
             <button
               onClick={handleDismiss}
-              className="flex-shrink-0 text-neutral-400 dark:text-dark-text-tertiary hover:text-neutral-600 dark:hover:text-dark-text-secondary transition-colors"
+ className="flex-shrink-0 text-neutral-400 hover:text-neutral-600 transition-colors"
               aria-label={t("dismissAriaLabel")}
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -352,7 +352,7 @@ export function FeatureDiscovery({
           </div>
 
           {/* Content */}
-          <p className="text-sm text-neutral-600 dark:text-dark-text-secondary mb-3">
+ <p className="text-sm text-neutral-600 mb-3">
             {currentTip.description}
           </p>
 
@@ -375,9 +375,9 @@ export function FeatureDiscovery({
                 onClick={() => setIsVideoOpen(true)}
                 className={cn(
                   "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
-                  "bg-neutral-100 dark:bg-dark-surface-hover",
-                  "text-neutral-700 dark:text-dark-text-secondary",
-                  "hover:bg-neutral-200 dark:hover:bg-dark-surface-active"
+ "bg-neutral-100",
+ "text-neutral-700",
+ "hover:bg-neutral-200"
                 )}
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -392,8 +392,8 @@ export function FeatureDiscovery({
               className={cn(
                 "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
                 "bg-transparent",
-                "text-neutral-500 dark:text-dark-text-tertiary",
-                "hover:bg-neutral-100 dark:hover:bg-dark-surface-hover"
+ "text-neutral-500",
+ "hover:bg-neutral-100"
               )}
             >
               Dismiss
@@ -409,16 +409,16 @@ export function FeatureDiscovery({
           onClick={() => setIsVideoOpen(false)}
         >
           <div
-            className="bg-white dark:bg-dark-surface rounded-xl shadow-modal dark:shadow-dark-modal max-w-3xl w-full overflow-hidden animate-scale-in"
+ className="bg-v2-maroon-800 rounded-xl shadow-modal max-w-3xl w-full overflow-hidden animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-4 border-b border-neutral-200 dark:border-dark-border flex items-center justify-between">
-              <h3 className="font-semibold text-neutral-900 dark:text-dark-text">
+ <div className="p-4 border-b border-v2-gold-primary/20 flex items-center justify-between">
+ <h3 className="font-semibold text-neutral-900">
                 {currentTip.title}
               </h3>
               <button
                 onClick={() => setIsVideoOpen(false)}
-                className="text-neutral-400 dark:text-dark-text-tertiary hover:text-neutral-600 dark:hover:text-dark-text-secondary"
+ className="text-neutral-400 hover:text-neutral-600"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -483,11 +483,11 @@ export function WhatsNewPanel({
   if (visibleFeatures.length === 0) {
     return (
       <div className="text-center py-8">
-        <svg className="w-12 h-12 mx-auto text-neutral-300 dark:text-dark-text-tertiary mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+ <svg className="w-12 h-12 mx-auto text-neutral-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <p className="text-neutral-600 dark:text-dark-text-secondary">You&apos;re all caught up!</p>
-        <p className="text-sm text-neutral-400 dark:text-dark-text-tertiary">Check back later for new features and updates.</p>
+ <p className="text-neutral-600">You&apos;re all caught up!</p>
+ <p className="text-sm text-neutral-400">Check back later for new features and updates.</p>
       </div>
     );
   }
@@ -499,22 +499,22 @@ export function WhatsNewPanel({
           key={feature.id}
           className={cn(
             "p-4 rounded-lg border",
-            "bg-white dark:bg-dark-surface",
-            "border-neutral-200 dark:border-dark-border"
+ "bg-v2-maroon-800",
+ "border-v2-gold-primary/20"
           )}
         >
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <h4 className="font-medium text-neutral-900 dark:text-dark-text">
+ <h4 className="font-medium text-neutral-900">
                   {feature.title}
                 </h4>
                 {feature.type !== "tip" && (
                   <span className={cn(
                     "px-2 py-0.5 rounded text-xs font-medium",
-                    feature.type === "new" && "bg-accent-100 dark:bg-accent-900 text-accent-700 dark:text-accent-300",
-                    feature.type === "update" && "bg-secondary-100 dark:bg-secondary-900 text-secondary-700 dark:text-secondary-300",
-                    feature.type === "announcement" && "bg-warning-100 dark:bg-warning-900 text-warning-700 dark:text-warning-300"
+ feature.type === "new" && "bg-accent-100 text-accent-700",
+ feature.type === "update" && "bg-secondary-100 text-secondary-700",
+ feature.type === "announcement" && "bg-warning-100 text-warning-700"
                   )}>
                     {feature.type === "new" && "New"}
                     {feature.type === "update" && "Updated"}
@@ -522,7 +522,7 @@ export function WhatsNewPanel({
                   </span>
                 )}
               </div>
-              <p className="text-sm text-neutral-600 dark:text-dark-text-secondary">
+ <p className="text-sm text-neutral-600">
                 {feature.description}
               </p>
               {feature.action && (
@@ -531,7 +531,7 @@ export function WhatsNewPanel({
                     feature.action?.onClick();
                     handleDismiss(feature.id);
                   }}
-                  className="mt-2 text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline"
+ className="mt-2 text-sm font-medium text-primary-600 hover:underline"
                 >
                   {feature.action.label} →
                 </button>
@@ -539,7 +539,7 @@ export function WhatsNewPanel({
             </div>
             <button
               onClick={() => handleDismiss(feature.id)}
-              className="flex-shrink-0 text-neutral-400 dark:text-dark-text-tertiary hover:text-neutral-600 dark:hover:text-dark-text-secondary"
+ className="flex-shrink-0 text-neutral-400 hover:text-neutral-600"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />

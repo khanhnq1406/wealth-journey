@@ -40,7 +40,7 @@ export function PostHeader({
           <div className="flex items-center gap-2">
             <button
               onClick={() => onUserClick?.(authorId)}
-              className="font-vietnam text-sm font-semibold text-v2-text-primary truncate hover:underline text-left"
+              className="font-roboto text-sm font-semibold text-v2-text-primary truncate hover:underline text-left"
               type="button"
             >
               {authorName}
@@ -54,7 +54,7 @@ export function PostHeader({
             )}
           </div>
           <div className="flex items-center gap-1.5 text-v2-text-tertiary">
-            <span className="font-jetbrains text-xs">
+            <span className="font-roboto text-xs">
               {formatRelativeTime(createdAt)}
             </span>
           </div>

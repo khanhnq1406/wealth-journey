@@ -82,6 +82,17 @@ export function PNLCard({ currency }: PNLCardProps) {
   const yFormatter = (value: number) =>
     `${(value / 1_000_000).toLocaleString("vi-VN", { maximumFractionDigits: 1 })}M`;
 
+  // Compute Y-axis domain focused on data range with 10% padding
+  const chartYDomain = (() => {
+    if (chartPoints.length === 0) return undefined;
+    const values = chartPoints.map((p) => p.value);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const range = max - min;
+    const padding = range > 0 ? range * 0.1 : max * 0.05;
+    return [Math.max(0, min - padding), max + padding] as [number, number];
+  })();
+
   const formatAmount = (amount: number) => {
     const value = Number(amount);
     const sign = value >= 0 ? "+" : "";
@@ -112,7 +123,7 @@ export function PNLCard({ currency }: PNLCardProps) {
       {/* Header */}
       <div className="p-5 pb-4">
         <div className="flex items-center justify-between">
-          <h3 className="font-vietnam font-semibold text-[16px] text-v2-text-primary">
+          <h3 className="font-roboto font-semibold text-[16px] text-v2-text-primary">
             {t("pnlTitle")}
           </h3>
           {/* Period tabs */}
@@ -121,7 +132,7 @@ export function PNLCard({ currency }: PNLCardProps) {
               <button
                 key={period.key}
                 onClick={() => setSelectedPeriod(period.key)}
-                className={`px-3 py-1.5 rounded-[10px] text-[12px] font-vietnam font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-[10px] text-[12px] font-roboto font-medium transition-colors ${
                   selectedPeriod === period.key
                     ? "bg-v2-red-primary text-white"
                     : "text-v2-text-secondary hover:text-v2-text-primary"
@@ -136,24 +147,24 @@ export function PNLCard({ currency }: PNLCardProps) {
         {/* PnL display */}
         <div className="mt-4">
           <p
-            className={`font-jetbrains font-bold text-[24px] ${
+            className={`font-roboto font-bold text-[24px] ${
               isPositive ? "text-v2-green-positive" : "text-v2-red-negative"
             }`}
           >
             {formatAmount(periodPnl)} {currency}
           </p>
           <p
-            className={`font-jetbrains font-bold text-[24px] ${
+            className={`font-roboto font-bold text-[24px] ${
               isPositive ? "text-v2-green-positive" : "text-v2-red-negative"
             }`}
           >
             {formatPercent(periodPnlPercent)}
           </p>
-          <p className="font-jetbrains font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
+          <p className="font-roboto font-medium text-[11px] text-v2-text-tertiary tracking-[1px] mt-1">
             {t(pnlLabelKey[selectedPeriod] as any)}
           </p>
           {isApproximate && selectedPeriod !== "all" && (
-            <p className="font-vietnam text-[10px] text-v2-text-tertiary mt-1">
+            <p className="font-roboto text-[10px] text-v2-text-tertiary mt-1">
               {t("pnlApproximate")}
             </p>
           )}
@@ -169,12 +180,12 @@ export function PNLCard({ currency }: PNLCardProps) {
         )}
         {!histLoading && chartPoints.length === 0 && (
           <div className="h-[200px] bg-v2-bg-surface-tint rounded-xl flex flex-col items-center justify-center gap-3">
-            <p className="font-vietnam text-[13px] text-v2-text-tertiary text-center px-4">
+            <p className="font-roboto text-[13px] text-v2-text-tertiary text-center px-4">
               {t("pnlNoData")}
             </p>
             <Link
               href={routes.portfolio}
-              className="font-vietnam text-[13px] font-medium text-v2-red-primary underline underline-offset-2"
+              className="font-roboto text-[13px] font-medium text-v2-text-primary underline underline-offset-2"
             >
               {t("pnlGoToPortfolio")}
             </Link>
@@ -198,8 +209,9 @@ export function PNLCard({ currency }: PNLCardProps) {
             showLegend={false}
             showTooltip={true}
             yAxisFormatter={yFormatter}
+            yAxisDomain={chartYDomain}
             animate={true}
-            gridColor="#f3f4f6"
+            gridColor="rgba(241, 189, 97, 0.1)"
           />
         )}
       </div>

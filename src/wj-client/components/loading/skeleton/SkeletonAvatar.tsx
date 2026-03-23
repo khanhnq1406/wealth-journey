@@ -61,7 +61,7 @@ export function SkeletonAvatar({
   return (
     <div
       className={cn(
-        "flex-shrink-0 bg-gray-200 dark:bg-gray-700",
+ "flex-shrink-0 bg-v2-bg-dark",
         sizeClasses[size],
         shapeClasses[shape],
         animationClass,
@@ -137,7 +137,7 @@ export function SkeletonAvatarGroup({
             key={index}
             size={size}
             variant={variant}
-            className="ring-2 ring-white dark:ring-gray-800"
+ className="ring-2 ring-v2-bg-surface"
           />
         ))}
       </div>
@@ -147,7 +147,7 @@ export function SkeletonAvatarGroup({
         <div
           className={cn(
             "ml-2 flex items-center justify-center",
-            "bg-gray-200 dark:bg-gray-700 rounded-full",
+ "bg-v2-bg-dark rounded-full",
             variant === "shimmer" ? "animate-shimmer" : "animate-pulse",
             size === "xs" && "w-5 h-5 text-xs",
             size === "sm" && "w-6 h-6 text-xs",
@@ -155,7 +155,7 @@ export function SkeletonAvatarGroup({
             size === "lg" && "w-10 h-10 text-base"
           )}
         >
-          <span className="text-gray-500 dark:text-gray-400 font-medium">
+ <span className="text-v2-text-tertiary font-medium">
             +{count - max}
           </span>
         </div>
@@ -226,14 +226,14 @@ export function SkeletonProfile({
         <div className="flex-1 space-y-2 w-full">
           <div
             className={cn(
-              "h-5 bg-gray-200 dark:bg-gray-700 rounded animate-shimmer w-3/4 sm:w-1/2"
+ "h-5 bg-v2-bg-dark rounded animate-shimmer w-3/4 sm:w-1/2"
             )}
           />
           {Array.from({ length: infoLines }).map((_, index) => (
             <div
               key={index}
               className={cn(
-                "h-4 bg-gray-200 dark:bg-gray-700 rounded animate-shimmer",
+ "h-4 bg-v2-bg-dark rounded animate-shimmer",
                 index === infoLines - 1 ? "w-1/2" : "w-full"
               )}
             />

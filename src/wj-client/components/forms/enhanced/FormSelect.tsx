@@ -335,26 +335,26 @@ export function FormSelect({
   // State colors
   const getStateClasses = () => {
     if (error) {
-      return "border-red-300 hover:border-red-400 dark:border-red-700 dark:hover:border-red-600";
+ return "border-v2-red-negative hover:border-v2-red-negative";
     }
     if (success) {
-      return "border-v2-border hover:border-v2-border dark:border-green-700 dark:hover:border-green-600";
+ return "border-v2-border-light hover:border-v2-border-light";
     }
-    return "border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500";
+ return "border-v2-border-light hover:border-v2-border-light";
   };
 
   const triggerClasses = cn(
     "w-full flex items-center justify-between gap-3",
-    "rounded-lg border bg-white dark:bg-gray-800",
-    "text-gray-900 dark:text-gray-100",
+ "rounded-lg border bg-v2-bg-dark",
+ "text-v2-gold-accent",
     "transition-all duration-200",
-    "focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:border-transparent",
-    "disabled:bg-gray-100 disabled:cursor-not-allowed dark:disabled:bg-gray-900",
+    "focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent",
+ "disabled:opacity-40 disabled:cursor-not-allowed",
     sizeClasses[size],
     getStateClasses(),
     {
-      "ring-2 ring-v2-red-primary border-transparent": isFocused && !error,
-      "ring-2 ring-red-500 border-transparent": isFocused && error,
+      "ring-2 ring-v2-gold-primary border-transparent": isFocused && !error,
+      "ring-2 ring-v2-red-negative border-transparent": isFocused && error,
       "opacity-50 cursor-not-allowed": disabled,
     }
   );
@@ -390,14 +390,14 @@ export function FormSelect({
           className={cn(
             "block text-sm font-medium mb-1.5",
             error
-              ? "text-red-600 dark:text-red-400"
+ ? "text-v2-red-negative"
               : success
-              ? "text-v2-green-positive dark:text-green-400"
-              : "text-gray-700 dark:text-gray-300"
+ ? "text-v2-green-positive"
+ : "text-v2-text-secondary"
           )}
         >
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span className="text-v2-red-negative ml-1">*</span>}
         </label>
       )}
 
@@ -427,7 +427,7 @@ export function FormSelect({
         </span>
         <svg
           className={cn(
-            "w-5 h-5 flex-shrink-0 text-gray-400 transition-transform duration-200",
+            "w-5 h-5 flex-shrink-0 text-v2-text-tertiary transition-transform duration-200",
             isOpen && "rotate-180"
           )}
           fill="none"
@@ -449,8 +449,8 @@ export function FormSelect({
           ref={dropdownRef}
           className={cn(
             "absolute z-50 w-full mt-1",
-            "bg-white dark:bg-gray-800",
-            "border border-gray-200 dark:border-gray-700",
+ "bg-v2-bg-dark",
+ "border border-v2-border-light",
             "rounded-lg shadow-lg",
             "overflow-hidden"
           )}
@@ -460,14 +460,14 @@ export function FormSelect({
         >
           {/* Search input */}
           {searchable && (
-            <div className="p-2 border-b border-gray-200 dark:border-gray-700">
+ <div className="p-2 border-b border-v2-border-light">
               <input
                 ref={searchInputRef}
                 type="text"
                 placeholder={searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-v2-red-primary focus:border-transparent"
+ className="w-full px-3 py-2 text-sm rounded-md border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent placeholder:text-v2-text-tertiary focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent"
                 autoFocus
               />
             </div>
@@ -481,13 +481,13 @@ export function FormSelect({
             style={{ maxHeight: `${maxVisibleItems * 44}px` }}
           >
             {filteredOptions.length === 0 ? (
-              <div className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+ <div className="px-4 py-8 text-center text-sm text-v2-text-tertiary">
                 {noResultsMessage}
               </div>
             ) : groupedOptions ? (
               Object.entries(groupedOptions).map(([group, opts]) => (
                 <div key={group}>
-                  <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 uppercase tracking-wider">
+ <div className="px-4 py-2 text-xs font-semibold text-v2-text-tertiary bg-v2-bg-surface-tint uppercase tracking-wider">
                     {group}
                   </div>
                   {opts.map((option, idx) => {
@@ -501,13 +501,13 @@ export function FormSelect({
                         className={cn(
                           "w-full px-4 py-3 text-left flex items-center gap-3",
                           "transition-colors duration-150",
-                          "hover:bg-gray-100 dark:hover:bg-gray-700",
-                          "focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700",
+ "hover:bg-v2-bg-surface-tint",
+ "focus:outline-none focus:bg-v2-bg-surface-tint",
                           "disabled:opacity-50 disabled:cursor-not-allowed",
                           {
-                            "bg-v2-green-light dark:bg-green-900/20":
+ "bg-v2-gold-primary/20 text-v2-gold-primary":
                               isSelected && !option.disabled,
-                            "text-gray-400 cursor-not-allowed":
+                            "text-v2-text-tertiary cursor-not-allowed":
                               option.disabled,
                           }
                         )}
@@ -523,8 +523,8 @@ export function FormSelect({
                               className={cn(
                                 "w-5 h-5 rounded border-2 flex items-center justify-center",
                                 isSelected
-                                  ? "bg-v2-red-primary border-v2-red-primary"
-                                  : "border-gray-300 dark:border-gray-600"
+                                  ? "bg-v2-gold-primary border-v2-gold-primary"
+ : "border-v2-border-light"
                               )}
                             >
                               {isSelected && (
@@ -549,7 +549,7 @@ export function FormSelect({
                         <span
                           className={cn(
                             "flex-1 truncate",
-                            option.disabled && "text-gray-400"
+                            option.disabled && "text-v2-text-tertiary"
                           )}
                         >
                           {renderOption ? renderOption(option) : option.label}
@@ -571,13 +571,13 @@ export function FormSelect({
                     className={cn(
                       "w-full px-4 py-3 text-left flex items-center gap-3",
                       "transition-colors duration-150",
-                      "hover:bg-gray-100 dark:hover:bg-gray-700",
-                      "focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700",
+ "hover:bg-v2-bg-surface-tint",
+ "focus:outline-none focus:bg-v2-bg-surface-tint",
                       "disabled:opacity-50 disabled:cursor-not-allowed",
                       {
-                        "bg-v2-green-light dark:bg-green-900/20":
+ "bg-v2-gold-primary/20 text-v2-gold-primary":
                           isSelected && !option.disabled,
-                        "text-gray-400 cursor-not-allowed": option.disabled,
+                        "text-v2-text-tertiary cursor-not-allowed": option.disabled,
                       }
                     )}
                     onClick={() => handleSelect(option)}
@@ -592,8 +592,8 @@ export function FormSelect({
                           className={cn(
                             "w-5 h-5 rounded border-2 flex items-center justify-center",
                             isSelected
-                              ? "bg-v2-red-primary border-v2-red-primary"
-                              : "border-gray-300 dark:border-gray-600"
+                              ? "bg-v2-gold-primary border-v2-gold-primary"
+ : "border-v2-border-light"
                           )}
                         >
                           {isSelected && (
@@ -618,7 +618,7 @@ export function FormSelect({
                     <span
                       className={cn(
                         "flex-1 truncate",
-                        option.disabled && "text-gray-400"
+                        option.disabled && "text-v2-text-tertiary"
                       )}
                     >
                       {renderOption ? renderOption(option) : option.label}
@@ -637,7 +637,7 @@ export function FormSelect({
           {error && (
             <p
               id={errorId}
-              className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
+ className="text-sm text-v2-red-negative flex items-center gap-1"
             >
               <svg
                 className="w-4 h-4 flex-shrink-0"
@@ -656,7 +656,7 @@ export function FormSelect({
           {success && !error && (
             <p
               id={successId}
-              className="text-sm text-v2-green-positive dark:text-green-400 flex items-center gap-1"
+ className="text-sm text-v2-green-positive flex items-center gap-1"
             >
               <svg
                 className="w-4 h-4 flex-shrink-0"
@@ -675,7 +675,7 @@ export function FormSelect({
           {helperText && !error && !success && (
             <p
               id={helperId}
-              className="text-sm text-gray-500 dark:text-gray-400"
+ className="text-sm text-v2-text-tertiary"
             >
               {helperText}
             </p>

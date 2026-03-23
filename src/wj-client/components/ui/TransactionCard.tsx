@@ -63,7 +63,7 @@ export function TransactionCard({
   onClick,
 }: TransactionCardProps) {
   const isIncome = type === "income";
-  const amountColor = isIncome ? "text-v2-green-positive" : "text-red-600 dark:text-red-400";
+ const amountColor = isIncome ? "text-v2-green-positive" : "text-red-600";
   const amountPrefix = isIncome ? "+" : "-";
 
   const formatDate = (dateInput: string | Date | undefined) => {
@@ -81,28 +81,28 @@ export function TransactionCard({
         <div className="flex items-center flex-1 min-w-0">
           {icon && (
             <div className="flex-shrink-0 mr-3">
-              <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+ <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                 {icon}
               </div>
             </div>
           )}
 
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{name}</p>
+ <p className="text-sm font-medium text-gray-900 truncate">{name}</p>
 
             <div className="flex items-center gap-2 mt-1">
               {category && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+ <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
                   {category}
                 </span>
               )}
 
               {date && (
-                <span className="text-xs text-gray-500 dark:text-gray-500">{formatDate(date)}</span>
+ <span className="text-xs text-gray-500">{formatDate(date)}</span>
               )}
 
               {wallet && (
-                <span className="text-xs text-gray-400 dark:text-gray-600">• {wallet}</span>
+ <span className="text-xs text-gray-400">• {wallet}</span>
               )}
             </div>
           </div>

@@ -95,12 +95,12 @@ export interface WealthCardProps {
 }
 
 const gradientClasses = {
-  green: "bg-gradient-to-br from-v2-green-positive to-v2-green-positive dark:from-v2-green-positive dark:to-v2-green-positive",
-  primary: "bg-gradient-to-br from-v2-red-primary to-v2-red-primary dark:from-v2-red-primary dark:to-v2-red-primary",
-  purple: "bg-gradient-to-br from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700",
-  orange: "bg-gradient-to-br from-orange-500 to-orange-600 dark:from-orange-600 dark:to-orange-700",
-  red: "bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700",
-  none: "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700",
+ green: "bg-gradient-to-br from-v2-green-positive to-v2-green-positive",
+ primary: "bg-gradient-to-br from-v2-red-primary to-v2-red-primary",
+ purple: "bg-gradient-to-br from-purple-500 to-purple-600",
+ orange: "bg-gradient-to-br from-orange-500 to-orange-600",
+ red: "bg-gradient-to-br from-red-500 to-red-600",
+ none: "bg-v2-maroon-800 border border-v2-maroon-600",
 };
 
 const sizeClasses = {
@@ -142,21 +142,21 @@ export function WealthCard({
 
   const textClasses = isGradient
     ? "text-white"
-    : "text-gray-900 dark:text-gray-100";
+ : "text-v2-gold-accent";
 
   const subtitleClasses = isGradient
     ? "text-white/80"
-    : "text-gray-500 dark:text-gray-400";
+ : "text-v2-cream-100";
 
   const trendClasses = cn(
     "inline-flex items-center gap-1 text-sm font-medium",
     isPositive
       ? isGradient
         ? "text-white"
-        : "text-v2-green-positive dark:text-v2-green-positive"
+ : "text-v2-green-positive"
       : isGradient
       ? "text-white"
-      : "text-red-600 dark:text-red-400"
+ : "text-red-600"
   );
 
   // Generate sparkline SVG path
@@ -204,7 +204,7 @@ export function WealthCard({
             <div className="min-w-0 flex-1">
               <h3 className={cn(
                 "font-semibold truncate",
-                isGradient ? "text-white/90" : "text-gray-700 dark:text-gray-300"
+ isGradient ? "text-white/90" : "text-v2-cream-100"
               )}>
                 {title}
               </h3>
@@ -306,7 +306,7 @@ export function WealthCard({
         {footer && (
           <div className={cn(
             "pt-3 mt-3 border-t",
-            isGradient ? "border-white/20" : "border-gray-200 dark:border-gray-700"
+ isGradient ? "border-v2-gold-primary/20" : "border-v2-maroon-600"
           )}>
             {footer}
           </div>
@@ -345,11 +345,11 @@ export function StatCard({
   className,
 }: StatCardProps) {
   const colorClasses = {
-    green: "text-v2-green-positive bg-v2-green-light dark:text-v2-green-positive dark:bg-v2-green-positive/20",
-    primary: "text-v2-red-primary bg-v2-red-light dark:text-v2-red-primary/80 dark:bg-v2-red-primary/20",
-    purple: "text-purple-600 bg-purple-50 dark:text-purple-400 dark:bg-purple-900/20",
-    orange: "text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-900/20",
-    red: "text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/20",
+ green: "text-v2-green-positive bg-v2-green-light",
+ primary: "text-v2-red-primary bg-v2-red-light",
+ purple: "text-purple-600 bg-purple-50",
+ orange: "text-orange-600 bg-orange-50",
+ red: "text-red-600 bg-red-50",
   };
 
   const cardSizeClasses = {
@@ -361,7 +361,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700",
+ "bg-v2-maroon-800 rounded-xl shadow-md border border-v2-maroon-600",
         "transition-all duration-200",
         onClick && "cursor-pointer hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]",
         loading && "opacity-70",
@@ -374,15 +374,15 @@ export function StatCard({
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+ <p className="text-sm text-v2-cream-100 mb-1">
             {label}
           </p>
           {loading ? (
             <div className="animate-pulse">
-              <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded w-24" />
+ <div className="h-7 bg-v2-maroon-600 rounded w-24" />
             </div>
           ) : (
-            <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+ <p className="text-2xl sm:text-3xl font-bold text-v2-gold-accent">
               {typeof value === "number" ? value.toLocaleString() : value}
             </p>
           )}
@@ -390,8 +390,8 @@ export function StatCard({
             <div className={cn(
               "inline-flex items-center gap-1 mt-2 text-sm font-medium",
               change >= 0
-                ? "text-v2-green-positive dark:text-v2-green-positive"
-                : "text-red-600 dark:text-red-400"
+ ? "text-v2-green-positive"
+ : "text-red-600"
             )}>
               <svg
                 className={cn(
@@ -409,7 +409,7 @@ export function StatCard({
               </svg>
               <span>{Math.abs(change)}%</span>
               {changeLabel && (
-                <span className="text-gray-500 dark:text-gray-400 ml-1">
+ <span className="text-v2-cream-100 ml-1">
                   {changeLabel}
                 </span>
               )}

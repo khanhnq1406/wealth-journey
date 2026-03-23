@@ -9,6 +9,8 @@ import { usePathname } from "@/lib/navigation";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { FloatingActionButton } from "@/components/FloatingActionButton";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/utils/api-client";
 import NextImage from "next/image";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { CurrencyConversionProgress } from "@/components/CurrencyConversionProgress";
@@ -62,6 +64,29 @@ export default function DashboardLayout({
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [modalType, setModalType] = useState<string | null>(null);
   const { isExpanded, toggle } = useSidebarState();
+
+  const fabSettings = useQuery({
+    queryKey: ["fab-settings"],
+    queryFn: () =>
+      apiClient.get<{ settings: { key: string; value: string }[] }>(
+        "/api/v1/public/site-settings",
+      ),
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  const fabIntroContent = useMemo(() => {
+    const settings = fabSettings.data?.data?.settings;
+    if (!settings) return undefined;
+    const map: Record<string, string> = {};
+    for (const s of settings) map[s.key] = s.value;
+    if (map["fab.enabled"] === "false") return undefined;
+    const title = map["fab.title"];
+    const text = map["fab.intro_text"];
+    const contactInfo = map["fab.contact_info"];
+    if (!title && !text && !contactInfo) return undefined;
+    return { title: title || "", text: text || "", contactInfo: contactInfo || "" };
+  }, [fabSettings.data]);
 
   store.subscribe(() => {
     if (!user.picture) {
@@ -146,16 +171,16 @@ export default function DashboardLayout({
           className="rounded-2xl border border-v2-border-light p-1.5 flex flex-col gap-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
           style={{
             background:
-              "linear-gradient(180deg, #FFFFFF 0%, #FEF2F233 50%, #FEE2E240 100%)",
+              "linear-gradient(180deg, rgba(95,2,2,1) 0%, rgba(155,1,17,0.15) 50%, rgba(215,139,28,0.08) 100%)",
           }}
         >
           <ActiveLink
             href={routes.home}
             disableBuiltInActive
             className={cn(
-              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target animate-stagger-fade-in",
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] transition-colors duration-200 touch-target animate-stagger-fade-in",
               path === routes.home
-                ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
             )}
           >
@@ -166,9 +191,9 @@ export default function DashboardLayout({
             href={routes.portfolio}
             disableBuiltInActive
             className={cn(
-              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] transition-colors duration-200 touch-target",
               path === routes.portfolio
-                ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
             )}
           >
@@ -179,9 +204,9 @@ export default function DashboardLayout({
             href={routes.community}
             disableBuiltInActive
             className={cn(
-              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] transition-colors duration-200 touch-target",
               path === routes.community && !isProfileView
-                ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
             )}
           >
@@ -192,9 +217,9 @@ export default function DashboardLayout({
             href={routes.communityProfile}
             disableBuiltInActive
             className={cn(
-              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] transition-colors duration-200 touch-target",
               isProfileView
-                ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
             )}
           >
@@ -211,9 +236,9 @@ export default function DashboardLayout({
               href={item.href}
               disableBuiltInActive
               className={cn(
-                "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+                "flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] transition-colors duration-200 touch-target",
                 path.startsWith(item.href)
-                  ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                  ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                   : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
               )}
             >
@@ -230,9 +255,9 @@ export default function DashboardLayout({
             href="/dashboard/settings"
             disableBuiltInActive
             className={cn(
-              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+              "flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] transition-colors duration-200 touch-target",
               path.startsWith("/dashboard/settings")
-                ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                 : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
             )}
           >
@@ -244,9 +269,9 @@ export default function DashboardLayout({
               href={routes.admin}
               disableBuiltInActive
               className={cn(
-                "flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] transition-colors duration-200 touch-target",
+                "flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] transition-colors duration-200 touch-target",
                 path.startsWith(routes.admin)
-                  ? "text-v2-red-primary bg-v2-red-light font-semibold"
+                  ? "text-v2-gold-primary bg-v2-gold-primary/10 font-semibold"
                   : "text-v2-text-secondary hover:bg-v2-bg-primary font-medium",
               )}
             >
@@ -256,7 +281,7 @@ export default function DashboardLayout({
           )}
           <button
             onClick={logout}
-            className="flex items-center gap-3 py-3 px-3.5 rounded-xl font-vietnam text-[15px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target w-full text-left"
+            className="flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target w-full text-left"
             aria-label={t("logout")}
           >
             <LogOut size={22} />
@@ -274,10 +299,10 @@ export default function DashboardLayout({
         <CurrencyConversionProgress />
 
         <div className="dashboard-container h-dvh bg-v2-bg-primary flex flex-col sm:flex-row overflow-hidden">
-          {/* Desktop Sidebar - V2 White with Crimson accents */}
+          {/* Desktop Sidebar - Maroon with Gold accents */}
           <aside
             className={cn(
-              "hidden sm:flex flex-col bg-white border-r border-v2-border-light min-h-screen fixed left-0 top-0 z-sidebar transition-all duration-300 ease-in-out",
+              "hidden sm:flex flex-col bg-v2-bg-primary border-r border-v2-border-light min-h-screen fixed left-0 top-0 z-sidebar transition-all duration-300 ease-in-out",
               isExpanded ? "sm:w-64 lg:w-72" : "sm:w-20",
             )}
           >
@@ -304,7 +329,7 @@ export default function DashboardLayout({
                     height={38}
                     className="rounded-[10px]"
                   />
-                  <h1 className="text-v2-text-primary font-vietnam font-bold text-[16px]">
+                  <h1 className="text-v2-text-primary font-roboto font-bold text-[16px]">
                     congdongvang.com
                   </h1>
                 </div>
@@ -331,7 +356,7 @@ export default function DashboardLayout({
                   className="rounded-2xl border border-v2-border-light p-1.5 flex flex-col gap-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
                   style={{
                     background:
-                      "linear-gradient(180deg, #FFFFFF 0%, #FEF2F233 50%, #FEE2E240 100%)",
+                      "linear-gradient(180deg, rgba(95,2,2,1) 0%, rgba(155,1,17,0.15) 50%, rgba(215,139,28,0.08) 100%)",
                   }}
                 >
                   <NavItem
@@ -453,7 +478,7 @@ export default function DashboardLayout({
                   isExpanded ? "gap-3 px-2" : "justify-center px-0",
                 )}
               >
-                <div className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden shrink-0 bg-v2-red-primary">
+                <div className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden shrink-0 bg-v2-gold-primary">
                   {user.picture ? (
                     <NextImage
                       src={user.picture}
@@ -463,7 +488,7 @@ export default function DashboardLayout({
                       className="rounded-full"
                     />
                   ) : (
-                    <span className="font-vietnam text-[13px] font-medium text-white">
+                    <span className="font-roboto text-[13px] font-medium text-white">
                       {(user.fullname || "U").charAt(0)}
                     </span>
                   )}
@@ -479,10 +504,10 @@ export default function DashboardLayout({
                     transitionDelay: isExpanded ? "100ms" : "0ms",
                   }}
                 >
-                  <p className="font-vietnam text-[13px] font-medium text-v2-text-primary truncate">
+                  <p className="font-roboto text-[13px] font-medium text-v2-text-primary truncate">
                     {user.fullname || "User"}
                   </p>
-                  <p className="font-jetbrains text-[11px] text-v2-text-tertiary truncate">
+                  <p className="font-roboto text-[11px] text-v2-text-tertiary truncate">
                     {user.email || (user.username ? `@${user.username}` : "")}
                   </p>
                 </div>
@@ -492,7 +517,7 @@ export default function DashboardLayout({
                 <button
                   onClick={logout}
                   className={cn(
-                    "flex items-center w-full py-2.5 rounded-xl font-vietnam text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-all duration-300 ease-in-out mt-1",
+                    "flex items-center w-full py-2.5 rounded-xl font-roboto text-[14px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-all duration-300 ease-in-out mt-1",
                     isExpanded ? "gap-3 px-3" : "justify-center px-0",
                   )}
                   aria-label={t("logout")}
@@ -515,8 +540,8 @@ export default function DashboardLayout({
 
           {/* V2 Mobile Header */}
           <header className="sm:hidden shrink-0 sticky top-0 z-sticky">
-            {/* Red accent line */}
-            <div className="h-[3px] bg-v2-red-primary w-full" />
+            {/* Gold accent line */}
+            <div className="h-[3px] bg-v2-gold-primary w-full" />
             <div className="bg-v2-bg-primary border-b border-v2-border-light">
               <div className="flex items-center justify-between px-4 py-3">
                 {/* Logo area */}
@@ -528,7 +553,7 @@ export default function DashboardLayout({
                     height={32}
                     className="rounded-[8px]"
                   />
-                  <span className="font-vietnam font-bold text-[14px] text-v2-text-primary">
+                  <span className="font-roboto font-bold text-[14px] text-v2-text-primary">
                     congdongvang.com
                   </span>
                 </div>
@@ -537,7 +562,7 @@ export default function DashboardLayout({
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setIsSearchOpen(true)}
-                    className="p-2 rounded-lg hover:bg-white/60 transition-colors touch-target"
+                    className="p-2 rounded-lg hover:bg-v2-bg-surface-tint transition-colors touch-target"
                     aria-label="Search"
                   >
                     <Search size={20} className="text-v2-text-secondary" />
@@ -545,7 +570,7 @@ export default function DashboardLayout({
                   <NotificationBell />
                   <button
                     onClick={toggleMobileMenu}
-                    className="p-2 rounded-lg hover:bg-white/60 transition-colors touch-target"
+                    className="p-2 rounded-lg hover:bg-v2-bg-surface-tint transition-colors touch-target"
                     aria-label={t("toggleMenu")}
                     aria-expanded={isMobileMenuOpen}
                   >
@@ -567,7 +592,7 @@ export default function DashboardLayout({
                   style={{ zIndex: ZIndex.modalBackdrop }}
                 />
                 <div
-                  className={`fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-white z-modal sm:hidden flex flex-col ${
+                  className={`fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-v2-bg-surface z-modal sm:hidden flex flex-col ${
                     isClosing
                       ? "animate-slide-out-left"
                       : "animate-slide-in-left"
@@ -584,7 +609,7 @@ export default function DashboardLayout({
                         height={38}
                         className="rounded-[10px]"
                       />
-                      <span className="text-v2-text-primary font-vietnam font-bold text-lg">
+                      <span className="text-v2-text-primary font-roboto font-bold text-lg">
                         congdongvang.com
                       </span>
                     </div>
@@ -607,8 +632,8 @@ export default function DashboardLayout({
 
                   {/* User Info — pinned to bottom */}
                   <div className="p-4 pb-20 border-t border-v2-border-light shrink-0">
-                    <div className="flex items-center gap-3 px-3 py-2 bg-v2-bg-primary rounded-xl">
-                      <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center overflow-hidden">
+                    <div className="flex items-center gap-3 px-3 py-2 bg-v2-bg-dark rounded-xl">
+                      <div className="w-8 h-8 rounded-full bg-v2-gold-primary flex items-center justify-center overflow-hidden">
                         {user.picture ? (
                           <NextImage
                             src={user.picture}
@@ -618,16 +643,16 @@ export default function DashboardLayout({
                             className="rounded-full"
                           />
                         ) : (
-                          <span className="font-vietnam text-[13px] font-medium text-v2-text-secondary">
+                          <span className="font-roboto text-[13px] font-medium text-v2-text-secondary">
                             {(user.fullname || "U").charAt(0)}
                           </span>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-vietnam text-[13px] font-medium text-v2-text-primary truncate">
+                        <p className="font-roboto text-[13px] font-medium text-v2-text-primary truncate">
                           {user.fullname || "User"}
                         </p>
-                        <p className="font-jetbrains text-[11px] text-v2-text-tertiary truncate">
+                        <p className="font-roboto text-[11px] text-v2-text-tertiary truncate">
                           {user.email ||
                             (user.username ? `@${user.username}` : "")}
                         </p>
@@ -647,14 +672,14 @@ export default function DashboardLayout({
             )}
           >
             {/* V2 Desktop Top Bar */}
-            <header className="hidden sm:flex items-center justify-between px-8 py-4 border-b border-v2-border-light bg-white h-[68px] shrink-0">
+            <header className="hidden sm:flex items-center justify-between px-8 py-4 border-b border-v2-border-light bg-v2-bg-surface h-[68px] shrink-0">
               {/* Left: Greeting + Date */}
               <div>
-                <h2 className="font-vietnam font-semibold text-[18px] text-v2-text-primary">
+                <h2 className="font-roboto font-semibold text-[18px] text-v2-text-primary">
                   {greeting}
                   {user.fullname ? `, ${user.fullname}` : ""}
                 </h2>
-                <p className="font-jetbrains text-[12px] text-v2-text-tertiary">
+                <p className="font-roboto text-[12px] text-v2-text-tertiary">
                   {formattedDate}
                 </p>
               </div>
@@ -663,7 +688,7 @@ export default function DashboardLayout({
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setIsSearchOpen(true)}
-                  className="flex items-center gap-2 w-fit bg-v2-bg-primary border border-v2-border rounded-xl px-4 py-2 text-v2-text-tertiary text-[13px] font-vietnam hover:border-v2-text-tertiary transition-colors"
+                  className="flex items-center gap-2 w-fit bg-v2-bg-primary border border-v2-border rounded-xl px-4 py-2 text-v2-text-tertiary text-[13px] font-roboto hover:border-v2-text-tertiary transition-colors"
                 >
                   <Search size={16} />
                   <span>{tSearch("placeholder")}</span>
@@ -699,6 +724,8 @@ export default function DashboardLayout({
               },
             },
           ]}
+          autoOpen={path === routes.home}
+          introContent={fabIntroContent}
         />
 
         {/* Global Modals */}

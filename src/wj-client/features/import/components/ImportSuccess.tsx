@@ -59,9 +59,9 @@ export function ImportSuccess({
       <div className="space-y-6">
         {/* Warning Icon */}
         <div className="flex flex-col items-center text-center">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center mb-4">
+ <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-yellow-100 flex items-center justify-center mb-4">
             <svg
-              className="w-10 h-10 sm:w-12 sm:h-12 text-yellow-600 dark:text-yellow-400"
+ className="w-10 h-10 sm:w-12 sm:h-12 text-yellow-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -74,17 +74,17 @@ export function ImportSuccess({
               />
             </svg>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-dark-text mb-2">
+ <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 mb-2">
             {t("undoTitle")}
           </h2>
-          <p className="text-sm sm:text-base text-neutral-600 dark:text-dark-text-secondary">
+ <p className="text-sm sm:text-base text-neutral-600">
             {t("undoDesc", { count: summary.totalImported })}
           </p>
         </div>
 
         {/* Confirmation Message */}
-        <div className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-2xl">
-          <p className="text-sm text-red-700 dark:text-red-300 font-medium">
+ <div className="p-4 bg-red-50 border border-v2-red-negative/30 rounded-2xl">
+ <p className="text-sm text-red-700 font-medium">
             {t("undoCannotReverse")}
           </p>
         </div>
@@ -142,9 +142,9 @@ export function ImportSuccess({
     <div className="space-y-6">
       {/* Celebration Header */}
       <div className="flex flex-col items-center text-center">
-        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-success-100 to-success-200 dark:from-success-900 dark:to-success-800 flex items-center justify-center mb-4 animate-in zoom-in duration-500 shadow-lg">
+ <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-success-100 to-success-200 flex items-center justify-center mb-4 animate-in zoom-in duration-500 shadow-lg">
           <svg
-            className="w-12 h-12 sm:w-14 sm:h-14 text-success-600 dark:text-success-400"
+ className="w-12 h-12 sm:w-14 sm:h-14 text-success-600"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -157,20 +157,20 @@ export function ImportSuccess({
             />
           </svg>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 dark:text-dark-text mb-2">
+ <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 mb-2">
           {t("title")}
         </h2>
-        <p className="text-sm sm:text-base text-neutral-600 dark:text-dark-text-secondary">
+ <p className="text-sm sm:text-base text-neutral-600">
           {summary.totalImported !== 1 ? t("transactionsImportedPlural", { count: summary.totalImported || 0 }) : t("transactionsImported", { count: summary.totalImported || 0 })}{summary.totalSkipped > 0 && ` ${t("skipped", { count: summary.totalSkipped })}`}
         </p>
       </div>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="p-4 sm:p-5 bg-success-50 dark:bg-success-950 rounded-xl border border-success-200 dark:border-success-800 hover:shadow-md transition-all">
+ <div className="p-4 sm:p-5 bg-success-50 rounded-xl border border-v2-green-positive/30 hover:shadow-md transition-all">
           <div className="flex items-center gap-2 mb-2">
             <svg
-              className="w-4 h-4 text-success-600 dark:text-success-400"
+ className="w-4 h-4 text-success-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -182,18 +182,18 @@ export function ImportSuccess({
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            <p className="text-xs font-medium text-success-600 dark:text-success-400">
+ <p className="text-xs font-medium text-success-600">
               {t("income")}
             </p>
           </div>
-          <p className="text-xl sm:text-2xl font-bold text-success-700 dark:text-success-300">
+ <p className="text-xl sm:text-2xl font-bold text-success-700">
             {formatCurrency(totalIncome, currency)}
           </p>
         </div>
-        <div className="p-4 sm:p-5 bg-danger-50 dark:bg-danger-950 rounded-xl border border-danger-200 dark:border-danger-800 hover:shadow-md transition-all">
+ <div className="p-4 sm:p-5 bg-danger-50 rounded-xl border border-v2-red-negative/30 hover:shadow-md transition-all">
           <div className="flex items-center gap-2 mb-2">
             <svg
-              className="w-4 h-4 text-danger-600 dark:text-danger-400"
+ className="w-4 h-4 text-danger-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -205,18 +205,18 @@ export function ImportSuccess({
                 d="M20 12H4"
               />
             </svg>
-            <p className="text-xs font-medium text-danger-600 dark:text-danger-400">
+ <p className="text-xs font-medium text-danger-600">
               {t("expenses")}
             </p>
           </div>
-          <p className="text-xl sm:text-2xl font-bold text-danger-700 dark:text-danger-300">
+ <p className="text-xl sm:text-2xl font-bold text-danger-700">
             {formatCurrency(Math.abs(totalExpenses), currency)}
           </p>
         </div>
-        <div className="p-4 sm:p-5 bg-neutral-50 dark:bg-dark-surface-hover rounded-xl border border-neutral-200 dark:border-dark-border hover:shadow-md transition-all">
+ <div className="p-4 sm:p-5 bg-neutral-50 rounded-xl border border-v2-gold-primary/20 hover:shadow-md transition-all">
           <div className="flex items-center gap-2 mb-2">
             <svg
-              className="w-4 h-4 text-neutral-600 dark:text-dark-text-secondary"
+ className="w-4 h-4 text-neutral-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -228,25 +228,25 @@ export function ImportSuccess({
                 d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
               />
             </svg>
-            <p className="text-xs font-medium text-neutral-600 dark:text-dark-text-secondary">
+ <p className="text-xs font-medium text-neutral-600">
               {t("netChange")}
             </p>
           </div>
           <p
             className={`text-xl sm:text-2xl font-bold ${
               netChange >= 0
-                ? "text-success-700 dark:text-success-300"
-                : "text-danger-700 dark:text-danger-300"
+ ? "text-success-700"
+ : "text-danger-700"
             }`}
           >
             {netChange >= 0 ? "+" : ""}
             {formatCurrency(netChange, currency)}
           </p>
         </div>
-        <div className="p-4 sm:p-5 bg-neutral-50 dark:bg-dark-surface-hover rounded-xl border border-neutral-200 dark:border-dark-border hover:shadow-md transition-all">
+ <div className="p-4 sm:p-5 bg-neutral-50 rounded-xl border border-v2-gold-primary/20 hover:shadow-md transition-all">
           <div className="flex items-center gap-2 mb-2">
             <svg
-              className="w-4 h-4 text-neutral-600 dark:text-dark-text-secondary"
+ className="w-4 h-4 text-neutral-600"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -258,11 +258,11 @@ export function ImportSuccess({
                 d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
               />
             </svg>
-            <p className="text-xs font-medium text-neutral-600 dark:text-dark-text-secondary">
+ <p className="text-xs font-medium text-neutral-600">
               {t("newBalance")}
             </p>
           </div>
-          <p className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-dark-text">
+ <p className="text-xl sm:text-2xl font-bold text-neutral-900">
             {formatCurrency(newBalance, currency)}
           </p>
         </div>
@@ -270,10 +270,10 @@ export function ImportSuccess({
 
       {/* Duplicate Info */}
       {(summary.duplicatesMerged > 0 || summary.duplicatesSkipped > 0) && (
-        <div className="p-4 sm:p-5 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-xl">
+ <div className="p-4 sm:p-5 bg-blue-50 border border-v2-gold-primary/30 rounded-xl">
           <div className="flex items-start gap-3">
             <svg
-              className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"
+ className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -284,7 +284,7 @@ export function ImportSuccess({
               />
             </svg>
             <div>
-              <p className="text-sm font-medium text-blue-800 dark:text-blue-300">
+ <p className="text-sm font-medium text-blue-800">
                 {summary.duplicatesSkipped > 0 && (summary.duplicatesSkipped !== 1 ? t("duplicatesSkippedPlural", { count: summary.duplicatesSkipped }) : t("duplicatesSkipped", { count: summary.duplicatesSkipped }))}
                 {summary.duplicatesMerged > 0 && summary.duplicatesSkipped > 0 && ", "}
                 {summary.duplicatesMerged > 0 && (summary.duplicatesMerged !== 1 ? t("duplicatesMergedPlural", { count: summary.duplicatesMerged }) : t("duplicatesMerged", { count: summary.duplicatesMerged }))}
@@ -295,10 +295,10 @@ export function ImportSuccess({
       )}
 
       {/* Undo Notice */}
-      <div className="p-4 sm:p-5 bg-warning-50 dark:bg-warning-950 border border-warning-200 dark:border-warning-800 rounded-xl">
+ <div className="p-4 sm:p-5 bg-warning-50 border border-v2-gold-accent/30 rounded-xl">
         <div className="flex items-start gap-3">
           <svg
-            className="w-5 h-5 text-warning-600 dark:text-warning-400 flex-shrink-0 mt-0.5"
+ className="w-5 h-5 text-warning-600 flex-shrink-0 mt-0.5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -311,10 +311,10 @@ export function ImportSuccess({
             />
           </svg>
           <div>
-            <p className="text-sm font-medium text-warning-800 dark:text-warning-300">
+ <p className="text-sm font-medium text-warning-800">
               {t("undoNotice")}
             </p>
-            <p className="text-xs text-warning-700 dark:text-warning-400 mt-1">
+ <p className="text-xs text-warning-700 mt-1">
               {t("undoNoticeDesc")}
             </p>
           </div>

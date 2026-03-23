@@ -11,7 +11,7 @@ export function VerifiedBadge({
 }: VerifiedBadgeProps) {
   return (
     <div
-      className={`inline-flex items-center gap-1 px-2 py-1 bg-primary-50 border border-primary-200 rounded text-xs font-medium text-primary-700 ${className}`}
+      className={`inline-flex items-center gap-1 px-2 py-1 bg-primary-50 border border-v2-gold-primary/30 rounded text-xs font-medium text-primary-700 ${className}`}
     >
       <svg
         className="w-3.5 h-3.5"

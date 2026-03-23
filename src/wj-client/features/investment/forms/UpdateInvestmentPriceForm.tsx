@@ -107,14 +107,14 @@ export function UpdateInvestmentPriceForm({
         helperText={t("pricePerUnit", { currency })}
       />
 
-      <div className="bg-blue-50 p-3 rounded-md border border-blue-200">
+      <div className="bg-blue-50 p-3 rounded-md border border-v2-gold-primary/30">
         <p className="text-sm text-blue-800">
           💡 <strong>Tip:</strong> {t("tip")}
         </p>
       </div>
 
       {errorMessage && (
-        <div className="bg-red-50 p-3 rounded-md border border-red-200">
+        <div className="bg-red-50 p-3 rounded-md border border-v2-red-negative/30">
           <p className="text-sm text-red-800">{errorMessage}</p>
         </div>
       )}

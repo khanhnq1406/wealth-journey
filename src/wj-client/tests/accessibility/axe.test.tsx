@@ -23,7 +23,6 @@ import { BaseCard } from "../../components/BaseCard";
 import { FormInput } from "../../components/forms/FormInput";
 import { FormSelect } from "../../components/forms/FormSelect";
 import { Select } from "../../components/select/Select";
-import { ThemeToggle } from "../../components/ThemeToggle";
 
 describe("Accessibility Tests", () => {
   describe("Button Component", () => {
@@ -225,22 +224,6 @@ describe("Accessibility Tests", () => {
 
       const combobox = screen.getByRole("combobox");
       expect(combobox).toHaveAttribute("aria-expanded", "false");
-    });
-  });
-
-  describe("ThemeToggle Component", () => {
-    it("should not have accessibility violations", async () => {
-      const { container } = render(<ThemeToggle />);
-
-      const results = await axe(container);
-      expect(results).toHaveNoViolations();
-    });
-
-    it("should have accessible label", () => {
-      render(<ThemeToggle />);
-
-      const button = screen.getByRole("button", { name: /toggle theme|switch theme|dark mode|light mode/i });
-      expect(button).toBeInTheDocument();
     });
   });
 

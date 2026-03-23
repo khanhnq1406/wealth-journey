@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
-  darkMode: "class",
+  // darkMode removed — permanent dark maroon theme (mihong.vn)
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -11,30 +11,29 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Legacy compatibility (will be phased out)
+        // Legacy compatibility (mihong.vn maroon/gold theme)
         background: "var(--background)",
         foreground: "var(--foreground)",
-        bg: "#B91C1C", // aliased to v2-red-primary (V2 migration)
-        fg: "#F8FAFC", // Mapped to neutral-50
-        hgreen: "#7F1D1D", // aliased to v2-red-dark (V2 migration)
-        lred: "#DC2626", // Mapped to danger-600
-        hover: "#E2E8F0", // Mapped to neutral-200
-        modal: "rgba(0, 0, 0, 0.5)",
+        bg: "#9B0111", // mihong red (primary brand)
+        fg: "#5F0202", // Deep maroon (background)
+        hgreen: "#5F0202", // Hover state (maroon)
+        lred: "#F87171", // Error (bright red for dark bg)
+        hover: "#6B0303", // Hover state on dark
+        modal: "rgba(0, 0, 0, 0.7)", // Darker modal backdrop
 
-        // PRIMARY - V2 Crimson (aliased to V2 red scale for migration)
+        // PRIMARY - mihong.vn maroon/red scale
         primary: {
-          50: "#FEF2F2", // V2 red-50
-          100: "#FEE2E2", // V2 red-100
-          200: "#FECACA", // V2 red-200
-          300: "#FCA5A5", // V2 red-300
-          400: "#F87171", // V2 red-400
-          500: "#B91C1C", // V2 red-primary (was: #22C55E)
-          600: "#B91C1C", // V2 red-primary (was: #008148)
-          700: "#7F1D1D", // V2 red-dark (was: #006638)
-          800: "#7F1D1D", // V2 red-dark
-          900: "#450A0A", // Very dark red
-          // Dark mode variants
-          950: "#1C0101", // Almost black red
+          50: "rgba(155, 1, 17, 0.15)",
+          100: "rgba(155, 1, 17, 0.25)",
+          200: "rgba(155, 1, 17, 0.35)",
+          300: "#9B0111",
+          400: "#9B0111",
+          500: "#9B0111", // Primary brand
+          600: "#9B0111",
+          700: "#5F0202", // Darker
+          800: "#3A0101", // Darkest
+          900: "#2A0101",
+          950: "#1A0101",
         },
 
         // SECONDARY - Teal/Cyan (modern, tech-forward)
@@ -95,27 +94,7 @@ export default {
           950: "#020617",
         },
 
-        // DARK MODE - Specific dark theme colors
-        dark: {
-          // Background layers (darkest to lightest)
-          background: "#020617", // Main dark background
-          surface: "#0F172A", // Card/surface background
-          "surface-hover": "#1E293B", // Hover state
-          "surface-active": "#334155", // Active state
-
-          // Text colors (lightest to darkest)
-          text: "#F8FAFC", // Primary text
-          "text-secondary": "#94A3B8", // Secondary text
-          "text-tertiary": "#64748B", // Tertiary text
-
-          // Borders and dividers
-          border: "#1E293B", // Border color
-          "border-light": "#334155", // Light border
-
-          // Overlay colors
-          overlay: "rgba(0, 0, 0, 0.7)", // Modal/overlay backdrop
-          "overlay-light": "rgba(0, 0, 0, 0.5)",
-        },
+        // DARK MODE - Removed (permanent dark maroon theme via v2 tokens)
 
         // CHART COLORS - Green-based Data Visualization Palette
         chart: {
@@ -135,51 +114,66 @@ export default {
           "spring-green": "#4ADE80", // Spring green
         },
 
-        // V2 CHART COLORS - Crimson & Gold
+        // V2 CHART COLORS - mihong.vn maroon & gold
         "chart-v2": {
-          gold: "#B8860B",
-          red: "#B91C1C",
-          "gold-area": "#B8860B33",
-          silver: "#4B5563",
+          gold: "#D78B1C",
+          red: "#9B0111",
+          "gold-area": "rgba(215, 139, 28, 0.2)",
+          silver: "#8B929E",
         },
 
-        // V2 Crimson & Gold Design System
+        // V2 mihong.vn Dark Maroon & Gold Design System
         v2: {
-          "bg-primary": "#FAF9F7",
-          "bg-surface": "#FFFFFF",
-          "bg-surface-tint": "#FDF6EE",
-          "bg-dark": "#1C1917",
-          "border-light": "#EDE8E1",
-          border: "#DDD8D0",
-          "text-primary": "#1C1917",
-          "text-secondary": "#57534E",
-          "text-tertiary": "#78716C",
-          "text-on-dark": "#FAF9F7",
-          "red-primary": "#B91C1C",
-          "red-dark": "#7F1D1D",
-          "red-light": "#FEF2F2",
-          "red-negative": "#DC2626",
-          "gold-primary": "#B8860B",
-          "gold-dark": "#92710C",
-          "gold-light": "#FBF3E0",
-          "gold-accent": "#D4A017",
-          "green-positive": "#15803D",
-          "green-light": "#F0FDF4",
+          // Maroon scale (used across 50+ files)
+          "maroon-600": "#6B0303", // Lighter maroon (hover states)
+          "maroon-700": "#5F0202", // Primary background
+          "maroon-800": "#580202", // Surface/card background
+          "maroon-900": "#3D0101", // Input/dropdown background
+          // Cream
+          "cream-100": "#FFF8EC", // Body text alternative
+          "cream-200": "#F5E6C8", // Warm parchment (price table rows)
+          "cream-300": "#EDD9B5", // Slightly darker cream (alternating rows)
+          // Backgrounds
+          "bg-primary": "#5F0202", // Deep maroon (page backgrounds)
+          "bg-surface": "#580202", // Slightly lighter maroon (card/surface)
+          "bg-surface-tint": "#5A0A0A", // Maroon with slight tint
+          "bg-dark": "#3A0101", // Darkest maroon (footer, deep surfaces)
+          // Borders (gold — mihong.vn theme)
+          "border-light": "rgba(215, 139, 28, 0.3)", // Subtle gold borders
+          border: "#D78B1C", // Standard gold border
+          // Text
+          "text-primary": "#F1BD61", // Gold (primary text on dark bg)
+          "text-secondary": "#F1BD61", // Gold (labels, secondary text)
+          "text-tertiary": "#fcf2e0", // Light gray (muted text)
+          "text-on-dark": "#F1BD61", // Gold text on dark bg
+          // Red brand
+          "red-primary": "#9B0111", // mihong red
+          "red-dark": "#5F0202", // Deep maroon (hover/pressed)
+          "red-light": "rgba(155, 1, 17, 0.15)", // Red tint bg
+          "red-negative": "#F87171", // Bright red for errors (visible on dark)
+          // Gold
+          "gold-primary": "#D78B1C", // mihong gold accent
+          "gold-dark": "#B8860B", // Darker gold (hover)
+          "gold-light": "#FDE68A", // Bright gold (highlights)
+          "gold-accent": "#F1BD61", // Light gold (labels/headings)
+          // Green
+          "green-positive": "#4ADE80", // Bright green (gains on dark bg)
+          "green-light": "rgba(74, 222, 128, 0.15)", // Green bg tint
+          // Silver
           "silver-primary": "#8B929E",
-          "silver-dark": "#374151",
-          "silver-light": "#EEF0F3",
-          "currency-primary": "#1E40AF",
-          "currency-dark": "#1E3A8A",
-          "currency-light": "#EFF6FF",
-          "currency-accent": "#3B82F6",
+          "silver-dark": "#6B7280",
+          "silver-light": "rgba(139, 146, 158, 0.15)",
+          // Currency
+          "currency-primary": "#60A5FA",
+          "currency-dark": "#3B82F6",
+          "currency-light": "rgba(96, 165, 250, 0.15)",
+          "currency-accent": "#93C5FD",
         },
       },
 
-      // V2 Font Families
+      // Font Family (mihong.vn — Roboto only)
       fontFamily: {
-        vietnam: ["var(--font-vietnam-pro)", "system-ui", "sans-serif"],
-        jetbrains: ["var(--font-jetbrains-mono)", "ui-monospace", "monospace"],
-        jakarta: ["var(--font-jakarta-sans)", "system-ui", "sans-serif"],
+        roboto: ["var(--font-roboto)", "system-ui", "sans-serif"],
       },
 
       // Typography Scale
@@ -233,29 +227,19 @@ export default {
         "desktop-xl": "3rem",
       },
 
-      // Box Shadow System - Light and Dark mode
+      // Box Shadow System - Dark maroon theme
       boxShadow: {
-        // Light mode shadows
-        card: "0 2px 8px rgba(0, 129, 72, 0.08)", // Green-tinted shadow
-        "card-hover": "0 4px 12px rgba(0, 129, 72, 0.12)",
-        "card-active": "0 1px 4px rgba(0, 129, 72, 0.06)",
-        modal: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        card: "0 2px 8px rgba(0, 0, 0, 0.3)",
+        "card-hover": "0 4px 12px rgba(0, 0, 0, 0.4)",
+        "card-active": "0 1px 4px rgba(0, 0, 0, 0.2)",
+        modal: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
         dropdown:
-          "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-        floating: "0 8px 16px rgba(0, 129, 72, 0.12)", // Green-tinted
-        focus: "0 0 0 3px rgba(0, 129, 72, 0.4)", // Green focus ring
-
-        // Dark mode shadows (subtle, use darker colors)
-        "dark-card": "0 2px 8px rgba(0, 0, 0, 0.3)",
-        "dark-card-hover": "0 4px 12px rgba(0, 0, 0, 0.4)",
-        "dark-card-active": "0 1px 4px rgba(0, 0, 0, 0.2)",
-        "dark-modal": "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
-        "dark-dropdown":
           "0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3)",
-        "dark-floating": "0 8px 16px rgba(0, 0, 0, 0.4)",
+        floating: "0 8px 16px rgba(0, 0, 0, 0.4)",
+        focus: "0 0 0 3px rgba(215, 139, 28, 0.4)", // Gold focus ring
 
         // V2 shadows
-        "v2-card": "0 2px 12px rgba(0, 0, 0, 0.047)",
+        "v2-card": "0 2px 12px rgba(0, 0, 0, 0.2)",
       },
 
       // Keep legacy dropShadow for backward compatibility

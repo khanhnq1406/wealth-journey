@@ -19,14 +19,14 @@ export default async function AuthLayout({
               height={80}
               className="rounded-md"
             />
-            <div className="text-white">
+            <div className="text-v2-gold-accent">
               <p className="font-extrabold text-[30px]">congdongvang.com</p>
               <p>{t("tagline")}</p>
             </div>
           </div>
           <img src="/login-stock.svg" className="w-3/5" alt="Login picture" />
         </div>
-        <div className="bg-neutral-50 h-screen">{children}</div>
+        <div className="bg-v2-maroon-900 h-screen">{children}</div>
       </div>
     </div>
   );

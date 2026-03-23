@@ -88,16 +88,16 @@ export default function LandingHowItWorks() {
             <motion.div
               key={step.number}
               variants={itemVariants}
-              className="flex flex-col sm:flex-row items-start gap-6 bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
+              className="flex flex-col sm:flex-row items-start gap-6 bg-v2-maroon-800 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow border border-v2-gold-primary/20"
             >
               <div className="flex-shrink-0 w-16 h-16 bg-v2-red-primary text-white rounded-full flex items-center justify-center text-xl font-bold shadow-lg">
                 {step.number}
               </div>
               <div className="flex-1 pt-1">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-xl font-semibold text-v2-gold-accent mb-2">
                   {step.name}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">{step.description}</p>
+                <p className="text-v2-cream-100 leading-relaxed">{step.description}</p>
               </div>
             </motion.div>
           ))}

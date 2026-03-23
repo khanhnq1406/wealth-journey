@@ -12,7 +12,7 @@ declare global {
 
 interface TradingViewChartProps {
   symbol: string;
-  height?: number;
+  height?: number | string;
   locale?: string;
   theme?: "light" | "dark";
   interval?: string;
@@ -45,7 +45,7 @@ type ChartStatus = "loading" | "ready" | "error";
 
 function TradingViewChartInner({
   symbol,
-  height = 400,
+  height = "100%",
   locale = "en",
   theme = "light",
   interval = "D",
@@ -99,16 +99,29 @@ function TradingViewChartInner({
           symbol,
           interval,
           timezone: "Asia/Ho_Chi_Minh",
-          theme: theme === "dark" ? "dark" : "light",
+          theme: "light",
           style: "1",
           locale: tvLocale,
-          toolbar_bg: "#f1f3f6",
+          toolbar_bg: "#FFFFFF",
           enable_publishing: false,
           allow_symbol_change: allowSymbolChange,
           hide_side_toolbar: true,
           save_image: false,
           calendar: false,
           studies: [],
+          overrides: {
+            "paneProperties.background": "#FFFFFF",
+            "paneProperties.backgroundType": "solid",
+            "scalesProperties.backgroundColor": "#FFFFFF",
+            "scalesProperties.lineColor": "rgba(0, 0, 0, 0.06)",
+            "scalesProperties.textColor": "#555555",
+            "mainSeriesProperties.candleStyle.upColor": "#22AB94",
+            "mainSeriesProperties.candleStyle.downColor": "#F23645",
+            "mainSeriesProperties.candleStyle.borderUpColor": "#22AB94",
+            "mainSeriesProperties.candleStyle.borderDownColor": "#F23645",
+            "mainSeriesProperties.candleStyle.wickUpColor": "#22AB94",
+            "mainSeriesProperties.candleStyle.wickDownColor": "#F23645",
+          },
         });
 
         // Wait for iframe to render
@@ -129,7 +142,7 @@ function TradingViewChartInner({
 
   return (
     <div
-      className={`relative ${className ?? ""}`}
+      className={`relative rounded-lg overflow-hidden ${className ?? ""}`}
       style={{ height, width: "100%" }}
     >
       <div
@@ -140,12 +153,12 @@ function TradingViewChartInner({
       />
       {status === "loading" && (
         <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-bg" />
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-v2-gold-primary" />
         </div>
       )}
       {status === "error" && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">
-          <p className="text-sm text-gray-500">Chart unavailable</p>
+        <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+          <p className="text-sm text-gray-400">Chart unavailable</p>
         </div>
       )}
     </div>

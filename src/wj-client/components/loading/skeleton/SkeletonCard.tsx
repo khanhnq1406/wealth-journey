@@ -78,7 +78,7 @@ export function SkeletonCard({
   return (
     <div
       className={cn(
-        "bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700",
+ "bg-v2-bg-surface rounded-xl border border-v2-border-light",
         sizeClasses[size],
         className
       )}
@@ -88,7 +88,7 @@ export function SkeletonCard({
       {/* Image/Aspect Ratio placeholder */}
       {aspectRatio && (
         <div
-          className="w-full bg-gray-200 dark:bg-gray-700 rounded-lg mb-4 animate-shimmer"
+ className="w-full bg-v2-bg-dark rounded-lg mb-4 animate-shimmer"
           style={{ aspectRatio }}
         />
       )}
@@ -99,7 +99,7 @@ export function SkeletonCard({
           {showAvatar && (
             <div
               className={cn(
-                "flex-shrink-0 rounded-full bg-gray-200 dark:bg-gray-700 animate-shimmer",
+ "flex-shrink-0 rounded-full bg-v2-bg-dark animate-shimmer",
                 avatarSize[size]
               )}
             />
@@ -116,10 +116,10 @@ export function SkeletonCard({
 
       {/* Footer */}
       {showFooter && (
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+ <div className="mt-4 pt-4 border-t border-v2-border-light">
           <div className="flex items-center justify-between">
             <SkeletonText lines={1} width="30%" height="h-4" variant={variant} />
-            <div className="w-20 h-8 rounded-lg bg-gray-200 dark:bg-gray-700 animate-shimmer" />
+ <div className="w-20 h-8 rounded-lg bg-v2-bg-dark animate-shimmer" />
           </div>
         </div>
       )}
