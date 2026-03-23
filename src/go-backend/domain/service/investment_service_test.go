@@ -1356,3 +1356,126 @@ func TestInvestmentService_DeleteInvestment_Success(t *testing.T) {
 	mockInvestmentRepo.AssertExpectations(t)
 	mockTxRepo.AssertExpectations(t)
 }
+
+// Test CreateInvestment - Duplicate symbol with currency mismatch should fail
+func TestCreateInvestment_DuplicateSymbol_CurrencyMismatch(t *testing.T) {
+	// Setup
+	mockWalletRepo := new(MockWalletRepository)
+	mockInvestmentRepo := new(MockInvestmentRepository)
+	mockTxRepo := new(MockInvestmentTransactionRepository)
+	mockMarketDataService := new(MockMarketDataService)
+	mockUserRepo := new(MockUserRepository)
+	mockFXRateSvc := new(MockFXRateService)
+
+	service := NewInvestmentService(
+		mockInvestmentRepo,
+		mockWalletRepo,
+		mockTxRepo,
+		mockMarketDataService,
+		mockUserRepo,
+		mockFXRateSvc,
+		nil,
+		new(MockWalletService),
+		nil,
+	).(*investmentService)
+
+	ctx := context.Background()
+	userID := int32(1)
+	walletID := int32(1)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
+	// Existing investment has Currency: "USD" (set by createTestInvestment)
+	existingInvestment := createTestInvestment(1, walletID, "AAPL", 10000, 1500000, 15000000000)
+
+	req := &v1.CreateInvestmentRequest{
+		WalletId:        walletID,
+		Symbol:          "AAPL",
+		Name:            "Apple Inc.",
+		Type:            v1.InvestmentType_INVESTMENT_TYPE_STOCK,
+		InitialQuantity: 10000,
+		InitialCost:     15000000000,
+		Currency:        "VND", // Different from existing "USD"
+	}
+
+	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
+	mockInvestmentRepo.On("GetByUserAndSymbol", ctx, userID, "AAPL").Return(existingInvestment, nil)
+
+	// Execute
+	response, err := service.CreateInvestment(ctx, userID, req)
+
+	// Assert — should fail with validation error about currency mismatch
+	assert.Error(t, err)
+	assert.Nil(t, response)
+	assert.Contains(t, err.Error(), "already exists with currency")
+
+	mockWalletRepo.AssertExpectations(t)
+	mockInvestmentRepo.AssertExpectations(t)
+}
+
+// Test CreateInvestment - Duplicate symbol with same currency should succeed (regression)
+func TestCreateInvestment_DuplicateSymbol_SameCurrency(t *testing.T) {
+	// Setup
+	mockWalletRepo := new(MockWalletRepository)
+	mockInvestmentRepo := new(MockInvestmentRepository)
+	mockTxRepo := new(MockInvestmentTransactionRepository)
+	mockMarketDataService := new(MockMarketDataService)
+	mockUserRepo := new(MockUserRepository)
+	mockFXRateSvc := new(MockFXRateService)
+
+	service := NewInvestmentService(
+		mockInvestmentRepo,
+		mockWalletRepo,
+		mockTxRepo,
+		mockMarketDataService,
+		mockUserRepo,
+		mockFXRateSvc,
+		nil,
+		new(MockWalletService),
+		nil,
+	).(*investmentService)
+
+	ctx := context.Background()
+	userID := int32(1)
+	walletID := int32(1)
+	investmentID := int32(1)
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
+	existingInvestment := createTestInvestment(investmentID, walletID, "AAPL", 10000, 1500000, 15000000000)
+
+	req := &v1.CreateInvestmentRequest{
+		WalletId:        walletID,
+		Symbol:          "AAPL",
+		Name:            "Apple Inc.",
+		Type:            v1.InvestmentType_INVESTMENT_TYPE_STOCK,
+		InitialQuantity: 10000,
+		InitialCost:     15000000000,
+		Currency:        "USD", // Same as existing
+	}
+
+	// CreateInvestment finds duplicate with same currency → delegates to AddTransaction
+	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
+	mockInvestmentRepo.On("GetByUserAndSymbol", ctx, userID, "AAPL").Return(existingInvestment, nil)
+	// AddTransaction internally fetches the investment and wallet again
+	mockInvestmentRepo.On("GetByIDForUser", ctx, investmentID, userID).Return(existingInvestment, nil)
+	mockInvestmentRepo.On("GetByID", ctx, investmentID).Return(existingInvestment, nil)
+	// processBuyTransaction: no recent lots → creates new lot
+	mockTxRepo.On("GetOpenLots", ctx, investmentID).Return([]*models.InvestmentLot{}, nil)
+	mockTxRepo.On("CreateLot", ctx, mock.AnythingOfType("*models.InvestmentLot")).Return(nil)
+	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
+	mockInvestmentRepo.On("Update", ctx, mock.AnythingOfType("*models.Investment")).Return(nil)
+	// Post-transaction: list transactions for response
+	mockTxRepo.On("ListByInvestmentID", ctx, investmentID, (*v1.InvestmentTransactionType)(nil), mock.Anything).Return([]*models.InvestmentTransaction{}, 0, nil)
+	// enrichInvestmentProto calls GetByID for user's preferred currency
+	mockUserRepo.On("GetByID", ctx, userID).Return(&models.User{ID: userID, PreferredCurrency: "USD"}, nil)
+
+	// Execute
+	response, err := service.CreateInvestment(ctx, userID, req)
+
+	// Assert — same currency should succeed
+	assert.NoError(t, err)
+	assert.NotNil(t, response)
+	assert.True(t, response.Success)
+	assert.Equal(t, "Transaction added to existing investment", response.Message)
+
+	mockWalletRepo.AssertExpectations(t)
+	mockInvestmentRepo.AssertExpectations(t)
+	mockTxRepo.AssertExpectations(t)
+}

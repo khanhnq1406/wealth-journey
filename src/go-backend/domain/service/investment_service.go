@@ -151,6 +151,13 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 	// 3. Check for duplicate symbol for user — auto-add as BUY transaction if exists
 	existing, err := s.investmentRepo.GetByUserAndSymbol(ctx, userID, req.Symbol)
 	if err == nil && existing != nil {
+		// Validate currency matches existing investment
+		if req.Currency != existing.Currency {
+			return nil, apperrors.NewValidationError(
+				fmt.Sprintf("Investment %s already exists with currency %s", req.Symbol, existing.Currency),
+			)
+		}
+
 		// Calculate per-unit price for the AddTransaction request
 		var perUnitPrice int64
 		if initialQuantity > 0 {
