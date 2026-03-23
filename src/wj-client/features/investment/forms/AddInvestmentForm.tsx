@@ -146,7 +146,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
 
   const createInvestmentMutation = useMutationCreateInvestment({
     onSuccess: (data) => {
-      setSuccessMessage(data.message || t("errors.createdSuccessfully"));
+      setSuccessMessage(t("errors.createdSuccessfully"));
       setShowSuccess(true);
       // Invalidate queries (both old and new aggregated endpoints)
       queryClient.invalidateQueries({

@@ -103,9 +103,7 @@ export function AddInvestmentTransactionForm({
 
   const addTransactionMutation = useMutationAddInvestmentTransaction({
     onSuccess: (data) => {
-      setSuccessMessage(
-        data.message || t("transaction.transactionAddedMessage"),
-      );
+      setSuccessMessage(t("transaction.transactionAddedMessage"));
       setShowSuccess(true);
       setErrorMessage("");
       // Invalidate investment queries

@@ -300,5 +300,9 @@ Fix issues and re-review. Issue #1 (missing color tokens) is critical — dozens
 
 | 2026-03-23 | Fixed TradingView chart white gap on desktop when price tables load — chart containers used fixed `style={{ height: N }}` which didn't grow when sibling table expanded after data load. Changed to `flex-1 min-h-[Npx]` with `h-full flex flex-col` on parent BaseCard so charts stretch to fill grid cell height. TradingView `autosize: true` handles the resize. | Minor | `GoldPriceChart.tsx`, `SilverPriceChart.tsx`, `DollarIndexChart.tsx`, `LandingGoldPriceChart.tsx`, `LandingSilverPriceChart.tsx`, `LandingDollarIndexChart.tsx` (6 files) |
 
+| 2026-03-23 | Restyled custom investment info box in AddInvestmentForm to mihong theme — replaced `bg-blue-50` with `bg-v2-maroon-900` and `text-blue-800` with `text-v2-gold-accent` | Minor | `AddInvestmentForm.tsx` (1 file) |
+
+| 2026-03-23 | Fixed investment form success messages not translating to Vietnamese — `AddInvestmentForm` and `AddInvestmentTransactionForm` were using `data.message` (hardcoded English from backend API) instead of i18n translation keys. Changed to always use `t("errors.createdSuccessfully")` and `t("transaction.transactionAddedMessage")` respectively, which have proper EN/VI translations. | Minor | `AddInvestmentForm.tsx`, `AddInvestmentTransactionForm.tsx` (2 files) |
+
 **Build verification:** `next build` passes with zero errors on all routes after fixes.
 **Security review:** APPROVED — all changes are UI-only (Tailwind class replacements), no security impact.
