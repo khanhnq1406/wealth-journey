@@ -67,11 +67,15 @@ export function LandingGoldPriceTable({
               </th>
               <th className="text-right px-5 py-3.5 font-roboto font-black text-[15px] uppercase tracking-[1px] text-v2-maroon-900 border-r border-v2-gold-primary/20">
                 <div>{t("buy")}</div>
-                <div className="font-normal text-[10px] tracking-normal opacity-70">{t("buyUnit")}</div>
+                <div className="font-normal text-[10px] tracking-normal opacity-70">
+                  {t("buyUnit")}
+                </div>
               </th>
               <th className="text-right px-5 py-3.5 font-roboto font-black text-[15px] uppercase tracking-[1px] text-v2-maroon-900">
                 <div>{t("sell")}</div>
-                <div className="font-normal text-[10px] tracking-normal opacity-70">{t("sellUnit")}</div>
+                <div className="font-normal text-[10px] tracking-normal opacity-70">
+                  {t("sellUnit")}
+                </div>
               </th>
             </tr>
           </thead>
@@ -89,7 +93,7 @@ export function LandingGoldPriceTable({
                     loginLink: (chunks) => (
                       <Link
                         href="/auth/login"
-                        className="font-semibold text-v2-red-primary hover:underline"
+                        className="font-semibold text-v2-red-primary underline sm:no-underline sm:hover:underline"
                       >
                         {chunks}
                       </Link>
@@ -101,7 +105,7 @@ export function LandingGoldPriceTable({
                     loginLink: (chunks) => (
                       <Link
                         href="/auth/login"
-                        className="font-semibold text-v2-red-primary hover:underline"
+                        className="font-semibold text-v2-red-primary underline sm:no-underline sm:hover:underline"
                       >
                         {chunks}
                       </Link>
