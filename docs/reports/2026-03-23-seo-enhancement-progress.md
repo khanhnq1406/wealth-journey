@@ -7,8 +7,8 @@
 - **Spec file:** docs/specs/2026-03-23-seo-enhancement-spec.md
 - **Started:** 2026-03-23
 - **Last updated:** 2026-03-23
-- **Current state:** in_progress
-- **Current task:** 12
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -25,7 +25,7 @@
 | 9   | Update H1 text in i18n messages                  | done    | TBD    | SEO-optimized Vietnamese/English H1 titles |
 | 10  | Improve image alt texts                          | done    | TBD    | Descriptive Vietnamese alt texts for navbar, hero, auth images |
 | 11  | Add preconnect to API domain                     | done    | TBD    | Preconnect link in locale layout head |
-| 12  | Phase 4 documentation verification               | pending | —      | —       |
+| 12  | Phase 4 documentation verification               | done    | —      | Verified P4-1 through P4-6 in spec, no code changes |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
