@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 const FALLBACK_METADATA: Metadata = {
   title: "Giá Vàng Hôm Nay | Cộng Đồng Vàng - Quản Lý Tài Chính Cá Nhân",
@@ -164,6 +165,76 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+const landingSchemas: Record<string, unknown>[] = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Cộng Đồng Vàng",
+    url: "https://www.congdongvang.com",
+    logo: "https://www.congdongvang.com/logo.svg",
+    sameAs: [],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "congdongvang.com",
+    url: "https://www.congdongvang.com",
+    inLanguage: "vi",
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Cộng Đồng Vàng - Quản Lý Tài Chính Cá Nhân",
+    applicationCategory: "FinanceApplication",
+    operatingSystem: "Web",
+    url: "https://www.congdongvang.com",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "VND",
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Tại sao chọn congdongvang.com?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "congdongvang.com cung cấp nền tảng tích hợp theo dõi cổ phiếu, ETF, crypto, vàng, bạc và ngân sách trong một ứng dụng miễn phí với kế toán FIFO và dữ liệu thị trường thời gian thực.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "congdongvang.com có miễn phí không?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Có, congdongvang.com hoàn toàn miễn phí, không có chi phí ẩn hay gói đăng ký trả phí.",
+        },
+      },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FinancialProduct",
+    name: "Theo dõi giá vàng và bạc trực tiếp",
+    description:
+      "Theo dõi giá vàng SJC, DOJI, vàng thế giới (XAU/USD), giá bạc và ngoại tệ trực tiếp tại congdongvang.com",
+    url: "https://www.congdongvang.com/vi/landing",
+    provider: {
+      "@type": "Organization",
+      name: "Cộng Đồng Vàng",
+    },
+  },
+];
+
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <JsonLd data={landingSchemas} />
+      {children}
+    </>
+  );
 }
