@@ -8,7 +8,7 @@
 - **Started:** 2026-03-23
 - **Last updated:** 2026-03-23
 - **Current state:** in_progress
-- **Current task:** 7
+- **Current task:** 8
 
 ## Task Progress
 
@@ -20,7 +20,7 @@
 | 4   | Add hreflang tags                                | done    | TBD    | vi/en/x-default hreflang in fallback and dynamic metadata |
 | 5   | Create JSON-LD structured data component         | done    | TBD    | JsonLd component + 5 schema types in landing layout |
 | 6   | Create OG image                                  | done    | TBD    | Branded SVG OG image with gold/red colors and Vietnamese text |
-| 7   | Add noindex to dashboard and auth pages          | pending | —      | —       |
+| 7   | Add noindex to dashboard and auth pages          | done    | TBD    | noindex on auth layout, split dashboard layout for server metadata |
 | 8   | Convert landing page to SSR with ISR             | pending | —      | —       |
 | 9   | Update H1 text in i18n messages                  | pending | —      | —       |
 | 10  | Improve image alt texts                          | pending | —      | —       |
