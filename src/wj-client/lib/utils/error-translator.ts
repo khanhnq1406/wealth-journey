@@ -24,8 +24,16 @@ export function getTranslatedError(
 }
 
 /**
+ * Checks if a string looks like a translation key (UPPER_SNAKE_CASE).
+ * Zod default messages like "Invalid input: expected number, received string"
+ * should NOT be passed to next-intl as they will cause MISSING_MESSAGE errors.
+ */
+const TRANSLATION_KEY_PATTERN = /^[A-Z][A-Z0-9_]+$/;
+
+/**
  * Translates a Zod validation error message key using the 'validation' namespace.
  * Falls back to the raw message if no translation is found.
+ * Only attempts translation if the message looks like a translation key (UPPER_SNAKE_CASE).
  * Use this in form components that render errors directly (not via RHF wrappers).
  */
 export function translateValidationMessage(
@@ -33,6 +41,7 @@ export function translateValidationMessage(
   message?: string
 ): string | undefined {
   if (!message) return undefined;
+  if (!TRANSLATION_KEY_PATTERN.test(message)) return message;
   try {
     return tValidation(message as never);
   } catch {

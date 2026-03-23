@@ -29,9 +29,9 @@ export const createInvestmentSchema = z
       .min(1, "INVESTMENT_NAME_REQUIRED")
       .max(100, "INVESTMENT_NAME_MAX"),
     type: z.nativeEnum(InvestmentType),
-    initialQuantity: z.number().min(0.00000001, "INVESTMENT_QUANTITY_POSITIVE"),
-    initialCost: z.number().min(0, "INVESTMENT_COST_MIN"),
-    pricePerUnit: z.number().min(0, "INVESTMENT_PRICE_MIN"),
+    initialQuantity: z.number({ message: "INVESTMENT_QUANTITY_POSITIVE" }).min(0.00000001, "INVESTMENT_QUANTITY_POSITIVE"),
+    initialCost: z.number({ message: "INVESTMENT_COST_MIN" }).min(0, "INVESTMENT_COST_MIN"),
+    pricePerUnit: z.number({ message: "INVESTMENT_PRICE_MIN" }).min(0, "INVESTMENT_PRICE_MIN"),
     purchaseDate: z.string().min(1, "INVESTMENT_DATE_REQUIRED"),
     currency: z
       .string()
@@ -59,9 +59,9 @@ export const createInvestmentSchema = z
 // Dynamic validation schema based on investment type (crypto vs others)
 export const addTransactionSchema = z.object({
   type: z.nativeEnum(InvestmentTransactionType),
-  quantity: z.number().min(0.00000001, "INVESTMENT_QUANTITY_GT_ZERO"),
-  price: z.number().min(0, "INVESTMENT_PRICE_NON_NEGATIVE"),
-  fees: z.number().min(0, "INVESTMENT_FEES_NON_NEGATIVE"),
+  quantity: z.number({ message: "INVESTMENT_QUANTITY_GT_ZERO" }).min(0.00000001, "INVESTMENT_QUANTITY_GT_ZERO"),
+  price: z.number({ message: "INVESTMENT_PRICE_NON_NEGATIVE" }).min(0, "INVESTMENT_PRICE_NON_NEGATIVE"),
+  fees: z.number({ message: "INVESTMENT_FEES_NON_NEGATIVE" }).min(0, "INVESTMENT_FEES_NON_NEGATIVE"),
   transactionDate: z.string().min(1, "INVESTMENT_TX_DATE_REQUIRED"),
 });
 

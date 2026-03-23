@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutationUpdateComment } from "@/utils/generated/hooks";
 import { editCommentSchema, type EditCommentFormData } from "../utils/community.schema";
 import { useTranslations } from "next-intl";
-import { getTranslatedError } from "@/lib/utils/error-translator";
+import { getTranslatedError, translateValidationMessage } from "@/lib/utils/error-translator";
 
 interface EditCommentFormProps {
   commentId: number;
@@ -22,6 +22,7 @@ export function EditCommentForm({
   onCancel,
 }: EditCommentFormProps) {
   const t = useTranslations();
+  const tValidation = useTranslations("validation");
   const [error, setError] = useState<string | null>(null);
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm<EditCommentFormData>({
@@ -58,7 +59,7 @@ export function EditCommentForm({
         autoFocus
       />
       {errors.content && (
-        <p className="text-xs text-v2-red-negative">{errors.content.message}</p>
+        <p className="text-xs text-v2-red-negative">{translateValidationMessage(tValidation, errors.content.message)}</p>
       )}
       {error && <p className="text-xs text-v2-red-negative">{error}</p>}
       <div className="flex items-center justify-between">

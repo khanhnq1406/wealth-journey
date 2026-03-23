@@ -11,7 +11,7 @@ import { ImageUpload } from "../components/ImageUpload";
 import { cn } from "@/lib/utils/cn";
 import { ImageIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { getTranslatedError } from "@/lib/utils/error-translator";
+import { getTranslatedError, translateValidationMessage } from "@/lib/utils/error-translator";
 
 interface CreatePostFormProps {
   currentUser: { id: number; name: string; picture: string };
@@ -20,6 +20,7 @@ interface CreatePostFormProps {
 
 export function CreatePostForm({ currentUser, onSuccess }: CreatePostFormProps) {
   const t = useTranslations();
+  const tValidation = useTranslations("validation");
   const [errorMessage, setErrorMessage] = useState<string>();
   const [showImageInput, setShowImageInput] = useState(false);
   const queryClient = useQueryClient();
@@ -87,7 +88,7 @@ export function CreatePostForm({ currentUser, onSuccess }: CreatePostFormProps) 
         />
         <div className="flex justify-between items-center mt-1">
           {errors.content && (
-            <p className="text-xs text-v2-red-negative font-roboto">{errors.content.message}</p>
+            <p className="text-xs text-v2-red-negative font-roboto">{translateValidationMessage(tValidation, errors.content.message)}</p>
           )}
           <p className="text-xs text-v2-text-tertiary font-roboto ml-auto">
             {content.length} / 2.000

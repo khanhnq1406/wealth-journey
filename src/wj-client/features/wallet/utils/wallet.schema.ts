@@ -16,7 +16,7 @@ export const createWalletSchemaWithExisting = (existingWalletNames: string[]) =>
         message: "WALLET_NAME_EXISTS",
       },
     ),
-    initialBalance: z.number(),
+    initialBalance: z.number({ message: "COMMON_AMOUNT_NUMBER" }),
     // Accept string from select component, validate it's a valid wallet type string
     type: z.string().refine(
       (val) => val === String(WalletType.BASIC) || val === String(WalletType.INVESTMENT),

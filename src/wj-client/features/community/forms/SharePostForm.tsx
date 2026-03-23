@@ -10,7 +10,7 @@ import { SharedPostEmbed } from "../components/SharedPostEmbed";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
 import { useTranslations } from "next-intl";
-import { getTranslatedError } from "@/lib/utils/error-translator";
+import { getTranslatedError, translateValidationMessage } from "@/lib/utils/error-translator";
 
 interface SharePostFormProps {
   post: PostItem;
@@ -20,6 +20,7 @@ interface SharePostFormProps {
 
 export function SharePostForm({ post, onSuccess, onCancel }: SharePostFormProps) {
   const t = useTranslations();
+  const tValidation = useTranslations("validation");
   const [errorMessage, setErrorMessage] = useState<string>();
 
   const {
@@ -59,7 +60,7 @@ export function SharePostForm({ post, onSuccess, onCancel }: SharePostFormProps)
           className="w-full px-3 py-2 font-roboto text-sm rounded-xl border border-v2-gold-primary/20 bg-v2-maroon-900 text-v2-gold-accent placeholder:text-v2-text-tertiary focus:outline-none focus:border-v2-gold-primary resize-none"
         />
         {errors.content && (
-          <p className="mt-1 text-xs text-v2-red-negative">{errors.content.message}</p>
+          <p className="mt-1 text-xs text-v2-red-negative">{translateValidationMessage(tValidation, errors.content.message)}</p>
         )}
       </div>
 

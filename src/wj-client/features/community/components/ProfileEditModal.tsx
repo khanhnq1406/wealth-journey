@@ -9,7 +9,7 @@ import { editProfileSchema, type EditProfileFormData } from "../utils/community.
 import { ImageUpload } from "./ImageUpload";
 import type { CommunityProfile } from "@/gen/protobuf/v1/community";
 import { useTranslations } from "next-intl";
-import { getTranslatedError } from "@/lib/utils/error-translator";
+import { getTranslatedError, translateValidationMessage } from "@/lib/utils/error-translator";
 
 interface ProfileEditModalProps {
   profile: CommunityProfile;
@@ -18,6 +18,7 @@ interface ProfileEditModalProps {
 
 export function ProfileEditModal({ profile, onClose }: ProfileEditModalProps) {
   const t = useTranslations();
+  const tValidation = useTranslations("validation");
   const [error, setError] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState(profile.userPicture || "");
   const [coverUrl, setCoverUrl] = useState(profile.coverPhotoUrl || "");
@@ -110,7 +111,7 @@ export function ProfileEditModal({ profile, onClose }: ProfileEditModalProps) {
             />
             <div className="flex justify-between">
               {errors.bio && (
-                <p className="text-xs text-v2-red-negative">{errors.bio.message}</p>
+                <p className="text-xs text-v2-red-negative">{translateValidationMessage(tValidation, errors.bio.message)}</p>
               )}
               <span className="text-xs text-v2-text-tertiary ml-auto">
                 {200 - (watch("bio")?.length || 0)}
@@ -129,7 +130,7 @@ export function ProfileEditModal({ profile, onClose }: ProfileEditModalProps) {
               className="w-full text-sm bg-v2-maroon-900 text-v2-gold-accent border border-v2-gold-primary/20 rounded-lg px-3 py-2 focus:outline-none focus:border-v2-gold-primary placeholder:text-v2-text-tertiary transition-colors"
             />
             {errors.location && (
-              <p className="text-xs text-v2-red-negative">{errors.location.message}</p>
+              <p className="text-xs text-v2-red-negative">{translateValidationMessage(tValidation, errors.location.message)}</p>
             )}
           </div>
 
@@ -144,7 +145,7 @@ export function ProfileEditModal({ profile, onClose }: ProfileEditModalProps) {
               className="w-full text-sm bg-v2-maroon-900 text-v2-gold-accent border border-v2-gold-primary/20 rounded-lg px-3 py-2 focus:outline-none focus:border-v2-gold-primary placeholder:text-v2-text-tertiary transition-colors"
             />
             {errors.website && (
-              <p className="text-xs text-v2-red-negative">{errors.website.message}</p>
+              <p className="text-xs text-v2-red-negative">{translateValidationMessage(tValidation, errors.website.message)}</p>
             )}
           </div>
 

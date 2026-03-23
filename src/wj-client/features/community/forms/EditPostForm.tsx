@@ -10,7 +10,7 @@ import { ImageUpload } from "../components/ImageUpload";
 import { cn } from "@/lib/utils/cn";
 import type { PostItem } from "@/gen/protobuf/v1/community";
 import { useTranslations } from "next-intl";
-import { getTranslatedError } from "@/lib/utils/error-translator";
+import { getTranslatedError, translateValidationMessage } from "@/lib/utils/error-translator";
 
 interface EditPostFormProps {
   post: PostItem;
@@ -19,6 +19,7 @@ interface EditPostFormProps {
 
 export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
   const t = useTranslations();
+  const tValidation = useTranslations("validation");
   const [errorMessage, setErrorMessage] = useState<string>();
   const queryClient = useQueryClient();
 
@@ -68,7 +69,7 @@ export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
         />
         <div className="flex justify-between items-center mt-1">
           {errors.content && (
-            <p className="text-xs text-v2-red-negative font-roboto">{errors.content.message}</p>
+            <p className="text-xs text-v2-red-negative font-roboto">{translateValidationMessage(tValidation, errors.content.message)}</p>
           )}
           <p className="text-xs text-v2-text-tertiary font-roboto ml-auto">
             {content.length} / 2.000
