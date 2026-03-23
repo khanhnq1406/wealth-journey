@@ -56,6 +56,9 @@ func migrateSiteSettings(db *gorm.DB) error {
 		{Key: "footer.brand_name", Value: "congdongvang.com"},
 		{Key: "footer.tagline", Value: "Sân chơi giao lưu, trao đổi, kiến thức về thị trường đầu tư tài chính"},
 		{Key: "footer.contact_info", Value: "Liên hệ quảng cáo : 076.897.2512"},
+		{Key: "fab.intro_text", Value: "San choi giao luu, trao doi, kien thuc ve thi truong dau tu tai chinh"},
+		{Key: "fab.contact_info", Value: "Lien he quang cao: 076.897.2512"},
+		{Key: "fab.enabled", Value: "true"},
 	}
 
 	for _, seed := range seeds {
