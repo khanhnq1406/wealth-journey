@@ -24,6 +24,7 @@ const messageGroups = [
                  // dashboard, symbolAutocomplete, connectionStatus, dataFreshness,
                  // quickActions, featureDiscovery, landingErrorBoundary
   'errors',      // error code translations for i18n error display
+  'community',   // community.profile (edit profile, bio, etc.)
 ] as const;
 
 export default getRequestConfig(async ({ requestLocale }) => {

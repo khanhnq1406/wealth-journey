@@ -7,6 +7,7 @@ import { FollowButton } from "./FollowButton";
 import { ArrowLeft, MapPin, Link2 } from "lucide-react";
 import { ProfileTabs } from "./ProfileTabs";
 import { ProfileEditModal } from "./ProfileEditModal";
+import { useTranslations } from "next-intl";
 
 interface ProfileViewProps {
   targetUserId: number;
@@ -32,6 +33,7 @@ export function ProfileView({
     );
   const profile = profileData?.data;
 
+  const t = useTranslations();
   const [showEditModal, setShowEditModal] = useState(false);
 
   const isOwnProfile = profile?.isOwnProfile ?? targetUserId === currentUser.id;
@@ -96,9 +98,9 @@ export function ProfileView({
             {isOwnProfile ? (
               <button
                 onClick={() => setShowEditModal(true)}
-                className="text-sm px-4 py-1.5 border border-v2-gold-primary/30 rounded-full hover:bg-gray-100 transition-colors font-medium text-v2-text-primary"
+                className="text-sm px-4 py-1.5 border border-v2-gold-primary/30 rounded-full hover:bg-v2-maroon-700 transition-colors font-medium text-v2-text-primary"
               >
-                Edit Profile
+                {t("profile.editProfile")}
               </button>
             ) : (
               <FollowButton

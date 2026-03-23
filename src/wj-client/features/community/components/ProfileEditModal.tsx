@@ -62,7 +62,7 @@ export function ProfileEditModal({ profile, onClose }: ProfileEditModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="bg-v2-maroon-800 rounded-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-4 py-3 border-b border-v2-border-light">
-          <h2 className="font-semibold text-v2-text-primary">Chỉnh sửa hồ sơ</h2>
+          <h2 className="font-semibold text-v2-text-primary">{t("profile.editTitle")}</h2>
           <button
             onClick={onClose}
             className="text-v2-text-tertiary hover:text-v2-gold-primary text-xl leading-none transition-colors"
@@ -74,38 +74,38 @@ export function ProfileEditModal({ profile, onClose }: ProfileEditModalProps) {
         <form onSubmit={handleSubmit(onSubmit)} className="p-4 flex flex-col gap-4">
           {/* Cover photo */}
           <div>
-            <label className="text-xs font-medium text-v2-text-secondary mb-1 block">Ảnh bìa</label>
+            <label className="text-xs font-medium text-v2-text-secondary mb-1 block">{t("profile.coverPhoto")}</label>
             <ImageUpload
               purpose="cover"
               onUpload={setCoverUrl}
               onRemove={() => setCoverUrl("")}
               currentImageUrl={coverUrl || undefined}
-              label="Tải ảnh bìa lên"
+              label={t("profile.uploadCoverPhoto")}
               className="h-24"
             />
           </div>
 
           {/* Avatar */}
           <div>
-            <label className="text-xs font-medium text-v2-text-secondary mb-1 block">Ảnh đại diện</label>
+            <label className="text-xs font-medium text-v2-text-secondary mb-1 block">{t("profile.profilePhoto")}</label>
             <ImageUpload
               purpose="avatar"
               onUpload={setAvatarUrl}
               onRemove={() => setAvatarUrl("")}
               currentImageUrl={avatarUrl || undefined}
-              label="Tải ảnh đại diện lên"
+              label={t("profile.uploadProfilePhoto")}
               className="h-24"
             />
           </div>
 
           {/* Bio */}
           <div>
-            <label className="text-xs font-medium text-v2-text-secondary mb-1 block">Giới thiệu</label>
+            <label className="text-xs font-medium text-v2-text-secondary mb-1 block">{t("profile.bio")}</label>
             <textarea
               {...register("bio")}
               rows={3}
               maxLength={200}
-              placeholder="Giới thiệu về bản thân..."
+              placeholder={t("profile.bioPlaceholder")}
               className="w-full text-sm bg-v2-maroon-900 text-v2-gold-accent border border-v2-gold-primary/20 rounded-lg px-3 py-2 resize-none focus:outline-none focus:border-v2-gold-primary placeholder:text-v2-text-tertiary transition-colors"
             />
             <div className="flex justify-between">
@@ -120,12 +120,12 @@ export function ProfileEditModal({ profile, onClose }: ProfileEditModalProps) {
 
           {/* Location */}
           <div>
-            <label className="text-xs font-medium text-v2-text-secondary mb-1 block">Vị trí</label>
+            <label className="text-xs font-medium text-v2-text-secondary mb-1 block">{t("profile.location")}</label>
             <input
               {...register("location")}
               type="text"
               maxLength={100}
-              placeholder="Bạn đang ở đâu?"
+              placeholder={t("profile.locationPlaceholder")}
               className="w-full text-sm bg-v2-maroon-900 text-v2-gold-accent border border-v2-gold-primary/20 rounded-lg px-3 py-2 focus:outline-none focus:border-v2-gold-primary placeholder:text-v2-text-tertiary transition-colors"
             />
             {errors.location && (
@@ -135,7 +135,7 @@ export function ProfileEditModal({ profile, onClose }: ProfileEditModalProps) {
 
           {/* Website */}
           <div>
-            <label className="text-xs font-medium text-v2-text-secondary mb-1 block">Website</label>
+            <label className="text-xs font-medium text-v2-text-secondary mb-1 block">{t("profile.website")}</label>
             <input
               {...register("website")}
               type="url"
@@ -156,14 +156,14 @@ export function ProfileEditModal({ profile, onClose }: ProfileEditModalProps) {
               onClick={onClose}
               className="flex-1 py-2 text-sm text-v2-text-secondary border border-v2-gold-primary/20 rounded-lg hover:bg-v2-maroon-700 transition-colors"
             >
-              Hủy
+              {t("common.cancel")}
             </button>
             <button
               type="submit"
               disabled={updateProfileMutation.isPending}
               className="flex-1 py-2 text-sm bg-v2-gold-primary text-v2-maroon-900 font-medium rounded-lg hover:bg-v2-gold-accent disabled:opacity-50 transition-colors"
             >
-              {updateProfileMutation.isPending ? "Đang lưu..." : "Lưu"}
+              {updateProfileMutation.isPending ? t("profile.saving") : t("common.save")}
             </button>
           </div>
         </form>

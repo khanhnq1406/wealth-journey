@@ -1,0 +1,16 @@
+{
+  "profile": {
+    "editProfile": "Edit Profile",
+    "editTitle": "Edit Profile",
+    "coverPhoto": "Cover Photo",
+    "uploadCoverPhoto": "Upload cover photo",
+    "profilePhoto": "Profile Photo",
+    "uploadProfilePhoto": "Upload profile photo",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell people about yourself...",
+    "location": "Location",
+    "locationPlaceholder": "Where are you based?",
+    "website": "Website",
+    "saving": "Saving..."
+  }
+}
