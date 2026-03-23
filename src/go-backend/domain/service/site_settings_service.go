@@ -19,6 +19,7 @@ var validSettingKeys = map[string]bool{
 	"seo.twitter_card": true, "seo.twitter_title": true, "seo.twitter_description": true, "seo.twitter_creator": true,
 	"seo.robots_index": true, "seo.robots_follow": true, "seo.canonical": true,
 	"footer.brand_name": true, "footer.tagline": true, "footer.contact_info": true,
+	"fab.intro_text": true, "fab.contact_info": true, "fab.enabled": true,
 }
 
 var validTwitterCards = map[string]bool{
@@ -132,6 +133,10 @@ func validateSettingValue(key, value string) error {
 	case "seo.twitter_card":
 		if !validTwitterCards[value] {
 			return fmt.Errorf("seo.twitter_card must be 'summary' or 'summary_large_image'")
+		}
+	case "fab.enabled":
+		if value != "true" && value != "false" {
+			return fmt.Errorf("%s must be 'true' or 'false'", key)
 		}
 	}
 	return nil
