@@ -6,7 +6,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { useQueryClient } from "@tanstack/react-query";
 import { BaseCard } from "@/components/BaseCard";
 import { Button } from "@/components/Button";
-import { ButtonType } from "@/app/constants";
+import { ButtonType, ModalType } from "@/app/constants";
 import { BaseModal } from "@/components/modals/BaseModal";
 import { TanStackTable } from "@/components/table/TanStackTable";
 import { MobileTable, MobileColumnDef } from "@/components/table/MobileTable";
@@ -31,6 +31,8 @@ import { SentimentCard } from "@/components/GoldSentimentCard";
 import { OrnateHeading } from "@/components/decorative/OrnateHeading";
 import { WatchlistTab } from "@/features/watchlist/components/WatchlistTab";
 import { AddToWatchlistForm } from "@/features/watchlist/forms/AddToWatchlistForm";
+import { CreatePriceAlertForm } from "@/features/price-alert/forms/CreatePriceAlertForm";
+import type { AssetCategory } from "@/features/price-alert/forms/CreatePriceAlertForm";
 
 type Tab = "watchlist" | "gold" | "silver" | "currency" | "symbol";
 
@@ -195,6 +197,50 @@ function StarToggleButton({
   );
 }
 
+// ─── Price Alert Target state shape ───────────────────────────────────────────
+
+interface PriceAlertTarget {
+  category: AssetCategory;
+  symbol: string;
+  name: string;
+  assetType: number;
+  currency: string;
+}
+
+// ─── Bell Icon Button ──────────────────────────────────────────────────────────
+
+function BellButton({
+  onClick,
+  ariaLabel,
+}: {
+  onClick: () => void;
+  ariaLabel: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={ariaLabel}
+      className="flex items-center justify-center min-w-[44px] min-h-[44px] rounded transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary text-v2-text-tertiary hover:text-v2-gold-primary"
+    >
+      <svg
+        aria-hidden="true"
+        className="w-4 h-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={1.8}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+        />
+      </svg>
+    </button>
+  );
+}
+
 // ─── TanStack Table columns (desktop) ─────────────────────────────────────────
 
 const columnHelper = createColumnHelper<PriceItem>();
@@ -224,6 +270,7 @@ function buildTanstackColumns(
   watchedSymbolToId?: Map<string, number>,
   onStarAddSuccess?: () => void,
   onStarRemoveSuccess?: () => void,
+  onSetAlert?: (target: PriceAlertTarget) => void,
 ) {
   const typeColor = TAB_TYPE_COLOR_DESKTOP[tab];
   const showUnitLabel = tab !== "currency";
@@ -343,6 +390,35 @@ function buildTanstackColumns(
     );
   }
 
+  if ((tab === "gold" || tab === "silver") && onSetAlert) {
+    const category: AssetCategory = tab === "gold" ? "gold" : "silver";
+    const assetType =
+      tab === "gold"
+        ? InvestmentType.INVESTMENT_TYPE_GOLD_VND
+        : InvestmentType.INVESTMENT_TYPE_SILVER_VND;
+
+    cols.push(
+      columnHelper.display({
+        id: "bell",
+        header: "",
+        cell: ({ row }) => (
+          <BellButton
+            ariaLabel={t("setAlert")}
+            onClick={() =>
+              onSetAlert({
+                category,
+                symbol: row.original.typeCode,
+                name: row.original.name || row.original.typeCode,
+                assetType,
+                currency: row.original.currency,
+              })
+            }
+          />
+        ),
+      }),
+    );
+  }
+
   return cols;
 }
 
@@ -355,6 +431,7 @@ function buildMobileColumns(
   watchedSymbolToId?: Map<string, number>,
   onStarAddSuccess?: () => void,
   onStarRemoveSuccess?: () => void,
+  onSetAlert?: (target: PriceAlertTarget) => void,
 ): MobileColumnDef<PriceItem>[] {
   const typeColor = TAB_TYPE_COLOR_MOBILE[tab];
   const showUnitLabel = tab !== "currency";
@@ -458,6 +535,34 @@ function buildMobileColumns(
     });
   }
 
+  if ((tab === "gold" || tab === "silver") && onSetAlert) {
+    const category: AssetCategory = tab === "gold" ? "gold" : "silver";
+    const assetType =
+      tab === "gold"
+        ? InvestmentType.INVESTMENT_TYPE_GOLD_VND
+        : InvestmentType.INVESTMENT_TYPE_SILVER_VND;
+
+    cols.push({
+      id: "bell",
+      header: "",
+      showInCollapsed: true,
+      cell: ({ row }) => (
+        <BellButton
+          ariaLabel={t("setAlert")}
+          onClick={() =>
+            onSetAlert({
+              category,
+              symbol: row.typeCode,
+              name: row.name || row.typeCode,
+              assetType,
+              currency: row.currency,
+            })
+          }
+        />
+      ),
+    });
+  }
+
   return cols;
 }
 
@@ -486,6 +591,7 @@ interface SymbolLookupTabProps {
   querySymbol: string;
   onSearch: (sym: string) => void;
   onWatchlistAdded: () => void;
+  onSetAlert?: (target: PriceAlertTarget) => void;
 }
 
 function SymbolLookupTab({
@@ -494,6 +600,7 @@ function SymbolLookupTab({
   querySymbol,
   onSearch,
   onWatchlistAdded,
+  onSetAlert,
 }: SymbolLookupTabProps) {
   const t = useTranslations("prices.symbolLookup");
   const tp = useTranslations("prices");
@@ -626,47 +733,88 @@ function SymbolLookupTab({
             </div>
           </div>
           <div className="mt-3 pt-3 border-t border-v2-border-light space-y-2">
-            {addedToWatchlist ? (
-              <p className="text-sm text-v2-green-positive flex items-center gap-1">
-                <svg
-                  className="w-4 h-4 flex-shrink-0"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                {tp("watchlistAddedSuccess")}
-              </p>
-            ) : (
-              <Button
-                type={ButtonType.PRIMARY}
-                onClick={handleAddToWatchlist}
-                loading={addToWatchlistMutation.isPending}
-                fullWidth={false}
-                leftIcon={
+            <div className="flex flex-wrap gap-2">
+              {addedToWatchlist ? (
+                <p className="text-sm text-v2-green-positive flex items-center gap-1">
                   <svg
-                    aria-hidden="true"
-                    className="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
+                    className="w-4 h-4 flex-shrink-0"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
                   >
                     <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 4v16m8-8H4"
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
                     />
                   </svg>
-                }
-              >
-                {tp("addToWatchlist")}
-              </Button>
-            )}
+                  {tp("watchlistAddedSuccess")}
+                </p>
+              ) : (
+                <Button
+                  type={ButtonType.PRIMARY}
+                  onClick={handleAddToWatchlist}
+                  loading={addToWatchlistMutation.isPending}
+                  fullWidth={false}
+                  leftIcon={
+                    <svg
+                      aria-hidden="true"
+                      className="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                  }
+                >
+                  {tp("addToWatchlist")}
+                </Button>
+              )}
+              {onSetAlert && (
+                <Button
+                  type={ButtonType.SECONDARY}
+                  onClick={() =>
+                    onSetAlert({
+                      category: "other",
+                      symbol: querySymbol,
+                      name: symbolMeta?.name || querySymbol,
+                      assetType:
+                        symbolMeta
+                          ? mapQuoteTypeToInvestmentTypeLocal(
+                              symbolMeta.type || "",
+                            )
+                          : InvestmentType.INVESTMENT_TYPE_OTHER,
+                      currency:
+                        symbolMeta?.currency || priceData?.currency || "USD",
+                    })
+                  }
+                  fullWidth={false}
+                  leftIcon={
+                    <svg
+                      aria-hidden="true"
+                      className="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.8}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                      />
+                    </svg>
+                  }
+                >
+                  {tp("setAlert")}
+                </Button>
+              )}
+            </div>
             {watchlistError && (
               <p className="text-sm text-v2-red-negative flex items-center gap-1">
                 <svg
@@ -704,7 +852,14 @@ export default function PricesPage() {
   const isAdmin = user?.isAdmin ?? false;
   const [activeTab, setActiveTab] = useState<Tab>("watchlist");
   const [modalType, setModalType] = useState<string | null>(null);
+  const [selectedPriceAlert, setSelectedPriceAlert] =
+    useState<PriceAlertTarget | null>(null);
   const queryClient = useQueryClient();
+
+  const handleSetAlert = useCallback((target: PriceAlertTarget) => {
+    setSelectedPriceAlert(target);
+    setModalType(ModalType.CREATE_PRICE_ALERT);
+  }, []);
 
   // Watchlist state for star toggles — single query shared across all tabs
   // React Query deduplicates this with WatchlistTab's own useQueryListWatchlist call
@@ -731,8 +886,9 @@ export default function PricesPage() {
         watchedSymbolToId,
         handleStarSuccess,
         handleStarSuccess,
+        handleSetAlert,
       ),
-    [t, activeTab, isAdmin, watchedSymbolToId, handleStarSuccess],
+    [t, activeTab, isAdmin, watchedSymbolToId, handleStarSuccess, handleSetAlert],
   );
   const mobileColumns = useMemo(
     () =>
@@ -743,8 +899,9 @@ export default function PricesPage() {
         watchedSymbolToId,
         handleStarSuccess,
         handleStarSuccess,
+        handleSetAlert,
       ),
-    [t, activeTab, isAdmin, watchedSymbolToId, handleStarSuccess],
+    [t, activeTab, isAdmin, watchedSymbolToId, handleStarSuccess, handleSetAlert],
   );
   const [symbolInput, setSymbolInput] = useState("");
   const [querySymbol, setQuerySymbol] = useState("");
@@ -757,7 +914,10 @@ export default function PricesPage() {
     { key: "symbol", label: t("tabs.symbolLookup") },
   ];
 
-  const handleCloseModal = () => setModalType(null);
+  const handleCloseModal = useCallback(() => {
+    setModalType(null);
+    setSelectedPriceAlert(null);
+  }, []);
 
   const handleWatchlistSuccess = () => {
     queryClient.invalidateQueries({ queryKey: [EVENT_WatchlistListWatchlist] });
@@ -974,6 +1134,7 @@ export default function PricesPage() {
                   queryKey: [EVENT_WatchlistListWatchlist],
                 })
               }
+              onSetAlert={handleSetAlert}
             />
           )}
         </div>
@@ -982,10 +1143,24 @@ export default function PricesPage() {
       <BaseModal
         isOpen={modalType !== null}
         onClose={handleCloseModal}
-        title={t("tabs.watchlist")}
+        title={
+          modalType === ModalType.CREATE_PRICE_ALERT
+            ? t("createPriceAlert")
+            : t("tabs.watchlist")
+        }
       >
         {modalType === "add-watchlist" && (
           <AddToWatchlistForm onSuccess={handleWatchlistSuccess} />
+        )}
+        {modalType === ModalType.CREATE_PRICE_ALERT && selectedPriceAlert && (
+          <CreatePriceAlertForm
+            onSuccess={handleCloseModal}
+            defaultCategory={selectedPriceAlert.category}
+            defaultSymbol={selectedPriceAlert.symbol}
+            defaultName={selectedPriceAlert.name}
+            defaultAssetType={selectedPriceAlert.assetType}
+            defaultCurrency={selectedPriceAlert.currency}
+          />
         )}
       </BaseModal>
     </div>

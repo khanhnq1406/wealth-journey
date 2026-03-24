@@ -318,6 +318,8 @@
     "watchlistAlreadyAdded": "Already in your watchlist",
     "watchlistLimitReached": "Maximum of 50 items reached",
     "watchlistFailedToAdd": "Failed to add to watchlist",
+    "setAlert": "Set Alert",
+    "createPriceAlert": "Create Price Alert",
     "watchlist": {
       "symbolsTracked": "{count, plural, one {# symbol tracked} other {# symbols tracked}}",
       "addSymbol": "Add Symbol",

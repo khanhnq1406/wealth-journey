@@ -318,6 +318,8 @@
     "watchlistAlreadyAdded": "Mã đã có trong danh sách theo dõi",
     "watchlistLimitReached": "Đã đạt tối đa 50 mục",
     "watchlistFailedToAdd": "Không thể thêm vào danh sách theo dõi",
+    "setAlert": "Đặt Cảnh Báo",
+    "createPriceAlert": "Tạo Cảnh Báo Giá",
     "watchlist": {
       "symbolsTracked": "Đang theo dõi {count} mã",
       "addSymbol": "Thêm mã",
