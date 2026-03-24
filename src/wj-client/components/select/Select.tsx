@@ -7,6 +7,7 @@ import React, {
   KeyboardEvent,
   useCallback,
 } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils/cn";
 import { XIcon, ChevronDownIcon, LoadingSpinnerIcon } from "@/components/icons";
 import { useTranslations } from "next-intl";
@@ -73,6 +74,8 @@ export interface SelectProps<T extends string = string> {
   onOpen?: () => void;
   /** Optional callback when dropdown closes */
   onClose?: () => void;
+  /** Render the dropdown via a portal to escape overflow:hidden containers (e.g. modals) */
+  usePortal?: boolean;
 }
 
 /**
@@ -132,6 +135,7 @@ export function Select<T extends string = string>({
   renderOption,
   onOpen,
   onClose,
+  usePortal = false,
 }: SelectProps<T>) {
   const t = useTranslations("select");
   const [isOpen, setIsOpen] = useState(false);
@@ -139,9 +143,11 @@ export function Select<T extends string = string>({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const portalRef = useRef<HTMLDivElement>(null);
 
   const selectedOption = options.find((opt) => opt.value === value);
   const [isFocused, setIsFocused] = useState(false);
+  const [portalStyle, setPortalStyle] = useState<React.CSSProperties>({});
 
   // Update input value when selection changes externally (but not when focused/typing)
   useEffect(() => {
@@ -162,10 +168,10 @@ export function Select<T extends string = string>({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      const target = event.target as Node;
+      const inContainer = containerRef.current?.contains(target);
+      const inPortal = portalRef.current?.contains(target);
+      if (!inContainer && !inPortal) {
         if (isOpen) {
           setIsOpen(false);
           setHighlightedIndex(-1);
@@ -177,6 +183,19 @@ export function Select<T extends string = string>({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, onClose]);
+
+  // Compute portal dropdown position anchored to the container
+  useEffect(() => {
+    if (!usePortal || !isOpen || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setPortalStyle({
+      position: "fixed",
+      top: rect.bottom + 4,
+      left: rect.left,
+      width: rect.width,
+      zIndex: 9999,
+    });
+  }, [usePortal, isOpen]);
 
   const filteredOptions = disableFilter
     ? options
@@ -351,7 +370,9 @@ export function Select<T extends string = string>({
     );
 
   const defaultDropdown = (
-    <div className={dropdownClassName}>{dropdownContent}</div>
+    <div className={dropdownClassName}>
+      <div className="max-h-60 overflow-y-auto">{dropdownContent}</div>
+    </div>
   );
 
   return (
@@ -375,7 +396,7 @@ export function Select<T extends string = string>({
           spellCheck={false}
           className={cn(
  "w-full pr-16 rounded-lg border bg-v2-bg-dark",
- "text-v2-gold-accent",
+ "text-v2-gold-accent placeholder:text-v2-text-placeholder",
             "min-h-[44px] sm:min-h-[48px] px-3 sm:px-4 text-base sm:text-base",
             "transition-all duration-200",
             // Focus styles - aligned with FormSelect
@@ -443,16 +464,19 @@ export function Select<T extends string = string>({
       </div>
 
       {/* Dropdown menu */}
-      {isOpen && !disabled && (
-        <>
-          {renderDropdown
-            ? renderDropdown({
-                children: dropdownContent,
-                className: dropdownClassName,
-              })
-            : defaultDropdown}
-        </>
-      )}
+      {isOpen && !disabled && (() => {
+        const dropdownNode = renderDropdown
+          ? renderDropdown({ children: dropdownContent, className: dropdownClassName })
+          : defaultDropdown;
+
+        if (usePortal && typeof document !== "undefined") {
+          return createPortal(
+            <div ref={portalRef} style={portalStyle}>{dropdownNode}</div>,
+            document.body,
+          );
+        }
+        return <>{dropdownNode}</>;
+      })()}
     </div>
   );
 }

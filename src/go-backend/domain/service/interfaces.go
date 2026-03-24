@@ -318,3 +318,13 @@ type PriceAlertService interface {
 	CheckAndAlert(ctx context.Context) error
 	ForceCheckAndAlert(ctx context.Context) error
 }
+
+// WatchlistService defines the interface for watchlist business logic.
+type WatchlistService interface {
+	CreateItem(ctx context.Context, userID int32, req *v1.CreateWatchlistItemRequest) (*v1.CreateWatchlistItemResponse, error)
+	ListItems(ctx context.Context, userID int32) (*v1.ListWatchlistResponse, error)
+	UpdateItem(ctx context.Context, itemID int32, userID int32, req *v1.UpdateWatchlistItemRequest) (*v1.UpdateWatchlistItemResponse, error)
+	DeleteItem(ctx context.Context, itemID int32, userID int32) (*v1.DeleteWatchlistItemResponse, error)
+	ReorderItems(ctx context.Context, userID int32, req *v1.ReorderWatchlistRequest) (*v1.ReorderWatchlistResponse, error)
+	CheckItem(ctx context.Context, userID int32, symbol string) (*v1.CheckWatchlistItemResponse, error)
+}

@@ -461,7 +461,7 @@ export function FormSelect({
               placeholder={searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
- className="w-full px-3 py-2 text-sm rounded-md border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent placeholder:text-v2-text-tertiary focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent transition-all duration-200"
+ className="w-full px-3 py-2 text-sm rounded-md border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent placeholder:text-v2-text-placeholder focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent transition-all duration-200"
               autoFocus
             />
           </div>
@@ -686,7 +686,7 @@ export function FormSelect({
             "truncate flex-1 text-left",
             !selectedOption &&
               !selectedOptions.length &&
- "text-v2-text-tertiary",
+ "text-v2-text-placeholder",
           )}
         >
           {getSelectedLabel()}

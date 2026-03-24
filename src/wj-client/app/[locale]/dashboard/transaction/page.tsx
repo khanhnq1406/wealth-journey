@@ -544,7 +544,7 @@ export function TransactionContent() {
             placeholder={t("searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
- className="w-full bg-v2-bg-dark rounded-lg px-4 py-2.5 pl-10 pr-10 text-sm text-v2-gold-accent shadow-card focus:outline-none focus:ring-2 focus:ring-v2-gold-primary placeholder:text-v2-text-tertiary"
+ className="w-full bg-v2-bg-dark rounded-lg px-4 py-2.5 pl-10 pr-10 text-sm text-v2-gold-accent shadow-card focus:outline-none focus:ring-2 focus:ring-v2-gold-primary placeholder:text-v2-text-placeholder"
           />
           <svg
             className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-v2-text-tertiary pointer-events-none"

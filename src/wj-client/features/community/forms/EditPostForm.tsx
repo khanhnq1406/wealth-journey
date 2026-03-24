@@ -64,7 +64,7 @@ export function EditPostForm({ post, onSuccess }: EditPostFormProps) {
       <div>
         <textarea
           {...register("content")}
-          className="w-full min-h-[120px] resize-none border border-v2-gold-primary/20 rounded-xl p-3 bg-v2-maroon-900 font-roboto text-sm text-v2-gold-accent placeholder:text-v2-text-tertiary focus:outline-none focus:border-v2-gold-primary transition-colors"
+          className="w-full min-h-[120px] resize-none border border-v2-gold-primary/20 rounded-xl p-3 bg-v2-maroon-900 font-roboto text-sm text-v2-gold-accent placeholder:text-v2-text-placeholder focus:outline-none focus:border-v2-gold-primary transition-colors"
           maxLength={2000}
         />
         <div className="flex justify-between items-center mt-1">

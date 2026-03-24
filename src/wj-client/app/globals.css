@@ -464,12 +464,22 @@ svg {
   border-right: none;
 }
 
+/* Gold header hover */
+.price-table-override thead th:hover {
+  background-color: rgba(215, 139, 28, 0.25);
+  cursor: default;
+}
+
 /* Silver variant header for price tables */
 .price-table-silver thead {
   background: linear-gradient(to right, #8B929E, #CBD5E1, #8B929E) !important;
 }
 .price-table-silver thead th {
   border-right-color: rgba(139, 146, 158, 0.2);
+}
+.price-table-silver thead th:hover {
+  background-color: rgba(139, 146, 158, 0.25);
+  cursor: default;
 }
 
 /* Currency variant header for price tables */
@@ -479,4 +489,8 @@ svg {
 .price-table-currency thead th {
   color: white !important;
   border-right-color: rgba(96, 165, 250, 0.2);
+}
+.price-table-currency thead th:hover {
+  background-color: rgba(96, 165, 250, 0.25);
+  cursor: default;
 }

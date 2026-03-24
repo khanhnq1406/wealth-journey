@@ -44,6 +44,14 @@ func NewGoldPriceService(redisClient *redis.Client) GoldPriceService {
 	}
 }
 
+// NewGoldPriceServiceWithCache creates a gold price service with an injected cache (for testing).
+func NewGoldPriceServiceWithCache(redisClient *redis.Client, goldCache *cache.GoldPriceCache) GoldPriceService {
+	return &goldPriceService{
+		client: vnprice.NewClient(10 * time.Second),
+		cache:  goldCache,
+	}
+}
+
 // FetchPriceForSymbol fetches price for a specific gold symbol
 func (s *goldPriceService) FetchPriceForSymbol(ctx context.Context, symbol string) (*CachedGoldPrice, error) {
 	// Try cache first
@@ -115,14 +123,37 @@ func (s *goldPriceService) FetchPriceForSymbol(ctx context.Context, symbol strin
 	return price, nil
 }
 
-// FetchAllPrices fetches all gold prices
+// FetchAllPrices fetches all gold prices, reading from the aggregate Redis cache
+// before hitting the external API. The aggregate cache is written with a 5-minute TTL
+// so repeated page reloads do not exhaust the external API rate limit.
 func (s *goldPriceService) FetchAllPrices(ctx context.Context) ([]*CachedGoldPrice, error) {
+	// Check aggregate cache first
+	cachedAll, err := s.cache.GetAll(ctx)
+	if err == nil && cachedAll != nil {
+		result := make([]*CachedGoldPrice, len(cachedAll))
+		for i, c := range cachedAll {
+			result[i] = &CachedGoldPrice{
+				TypeCode:   c.TypeCode,
+				Name:       c.Name,
+				Buy:        c.Buy,
+				Sell:       c.Sell,
+				ChangeBuy:  c.ChangeBuy,
+				ChangeSell: c.ChangeSell,
+				Currency:   c.Currency,
+				UpdateTime: time.Unix(c.UpdateTime, 0),
+			}
+		}
+		return result, nil
+	}
+
+	// Cache miss — fetch from external API
 	pricesResp, err := s.client.FetchPrices(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("fetch prices from vang247 API: %w", err)
 	}
 
 	prices := make([]*CachedGoldPrice, 0, len(pricesResp.GoldPrices))
+	cacheList := make([]*cache.CachedGoldPrice, 0, len(pricesResp.GoldPrices))
 
 	for _, apiPrice := range pricesResp.GoldPrices {
 		var buy, sell, changeBuy, changeSell int64
@@ -151,22 +182,32 @@ func (s *goldPriceService) FetchAllPrices(ctx context.Context) ([]*CachedGoldPri
 		}
 		prices = append(prices, price)
 
-		go func(p *CachedGoldPrice) {
-			cachedPrice := &cache.CachedGoldPrice{
-				TypeCode:   p.TypeCode,
-				Name:       p.Name,
-				Buy:        p.Buy,
-				Sell:       p.Sell,
-				ChangeBuy:  p.ChangeBuy,
-				ChangeSell: p.ChangeSell,
-				Currency:   p.Currency,
-				UpdateTime: p.UpdateTime.Unix(),
-			}
-			if err := s.cache.Set(context.Background(), p.TypeCode, cachedPrice, cache.GoldPriceCacheTTL); err != nil {
+		cp := &cache.CachedGoldPrice{
+			TypeCode:   price.TypeCode,
+			Name:       price.Name,
+			Buy:        price.Buy,
+			Sell:       price.Sell,
+			ChangeBuy:  price.ChangeBuy,
+			ChangeSell: price.ChangeSell,
+			Currency:   price.Currency,
+			UpdateTime: price.UpdateTime.Unix(),
+		}
+		cacheList = append(cacheList, cp)
+
+		// Also write per-symbol cache (non-blocking, keeps existing behavior)
+		go func(p *cache.CachedGoldPrice) {
+			if err := s.cache.Set(context.Background(), p.TypeCode, p, cache.GoldPriceCacheTTL); err != nil {
 				log.Printf("Warning: failed to cache gold price for %s: %v", p.TypeCode, err)
 			}
-		}(price)
+		}(cp)
 	}
+
+	// Write aggregate cache (non-blocking)
+	go func(list []*cache.CachedGoldPrice) {
+		if err := s.cache.SetAll(context.Background(), list, cache.AllGoldPricesCacheTTL); err != nil {
+			log.Printf("Warning: failed to set aggregate gold price cache: %v", err)
+		}
+	}(cacheList)
 
 	return prices, nil
 }

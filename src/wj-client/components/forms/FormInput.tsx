@@ -202,7 +202,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       "w-full rounded-lg border transition-all duration-200",
  "bg-v2-bg-dark",
  "text-v2-gold-accent",
- "placeholder:text-v2-text-tertiary",
+ "placeholder:text-v2-text-placeholder",
  "disabled:opacity-40 disabled:cursor-not-allowed",
       // Focus styles - single ring (clean, modern)
       "focus:outline-none focus:ring-2 focus:border-transparent",

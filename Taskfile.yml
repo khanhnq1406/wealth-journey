@@ -166,6 +166,12 @@ tasks:
     cmds:
       - go run cmd/migrate-price-alerts/main.go
 
+  backend:migrate-watchlist:
+    desc: "Create watchlist table for symbol watchlist feature"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-watchlist/main.go
+
   backend:migrate-all:
     desc: "Run all migrations in order (safe for fresh or existing databases)"
     dir: "{{.BACKEND_DIR}}"

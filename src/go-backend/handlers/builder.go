@@ -37,6 +37,7 @@ type AllHandlers struct {
 	PriceAlertConfig   *PriceAlertConfigHandler
 	PriceAlertTrigger  *PriceAlertTriggerHandler
 	Push               *PushHandler
+	Watchlist          *WatchlistHandler
 }
 
 // HandlerDeps holds the infrastructure dependencies needed by NewHandlers.
@@ -145,6 +146,12 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 		Push: func() *PushHandler {
 			if services.Push != nil {
 				return NewPushHandler(services.Push, repos.PushSubscription)
+			}
+			return nil
+		}(),
+		Watchlist: func() *WatchlistHandler {
+			if services.Watchlist != nil {
+				return NewWatchlistHandler(services.Watchlist)
 			}
 			return nil
 		}(),

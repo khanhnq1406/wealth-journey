@@ -12,8 +12,12 @@ import (
 const (
 	// GoldPriceKeyPrefix is the prefix for gold price cache keys
 	GoldPriceKeyPrefix = "gold_price"
-	// GoldPriceCacheTTL is the time-to-live for gold price cache entries
+	// GoldPriceCacheTTL is the time-to-live for individual gold price cache entries
 	GoldPriceCacheTTL = 15 * time.Minute
+	// AllGoldPricesCacheTTL is the time-to-live for the aggregate gold prices cache
+	AllGoldPricesCacheTTL = 5 * time.Minute
+
+	goldAllKey = "gold_price:all"
 )
 
 // GoldPriceCache handles caching of gold prices from vang.today in Redis
@@ -80,4 +84,30 @@ func (c *GoldPriceCache) Get(ctx context.Context, symbol string) (*CachedGoldPri
 func (c *GoldPriceCache) Delete(ctx context.Context, symbol string) error {
 	key := c.buildKey(symbol)
 	return c.client.Del(ctx, key).Err()
+}
+
+// SetAll stores the full list of gold prices under the aggregate cache key.
+func (c *GoldPriceCache) SetAll(ctx context.Context, prices []*CachedGoldPrice, ttl time.Duration) error {
+	data, err := json.Marshal(prices)
+	if err != nil {
+		return fmt.Errorf("marshal gold prices: %w", err)
+	}
+	return c.client.Set(ctx, goldAllKey, data, ttl).Err()
+}
+
+// GetAll retrieves the full list of gold prices from the aggregate cache key.
+// Returns nil, nil on cache miss.
+func (c *GoldPriceCache) GetAll(ctx context.Context) ([]*CachedGoldPrice, error) {
+	data, err := c.client.Get(ctx, goldAllKey).Bytes()
+	if err != nil {
+		if err == redis.Nil {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("get all gold prices from cache: %w", err)
+	}
+	var prices []*CachedGoldPrice
+	if err := json.Unmarshal(data, &prices); err != nil {
+		return nil, fmt.Errorf("unmarshal gold prices: %w", err)
+	}
+	return prices, nil
 }

@@ -22,6 +22,8 @@ export interface SymbolAutocompleteProps {
   disabled?: boolean;
   /** Placeholder text when no value is selected */
   placeholder?: string;
+  /** Render the dropdown via a portal to escape overflow:hidden containers (e.g. modals) */
+  usePortal?: boolean;
 }
 
 /**
@@ -65,6 +67,7 @@ export function SymbolAutocomplete({
   className = "",
   disabled = false,
   placeholder = "Search for stocks, ETFs, crypto...",
+  usePortal = false,
 }: SymbolAutocompleteProps) {
   const t = useTranslations("symbolAutocomplete");
   const [inputValue, setInputValue] = useState("");
@@ -112,19 +115,19 @@ export function SymbolAutocomplete({
       label: result.symbol,
       render: () => (
         <div className="flex flex-col gap-0.5">
-          {/* First row: Symbol (green/bold) | Type | Exchange (right) */}
+          {/* First row: Symbol (gold/bold) | Type | Exchange (right) */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-primary-600 font-bold">{result.symbol}</span>
-              <span className="text-gray-500 text-xs">•</span>
-              <span className="text-gray-600 text-sm">{result.type}</span>
+              <span className="text-v2-gold-accent font-bold">{result.symbol}</span>
+              <span className="text-v2-text-tertiary text-xs">•</span>
+              <span className="text-v2-text-secondary text-sm">{result.type}</span>
             </div>
-            <span className="text-gray-500 text-xs">
+            <span className="text-v2-text-tertiary text-xs">
               {result.exchDisp || result.exchange}
             </span>
           </div>
           {/* Second row: Full company name */}
-          <div className="text-gray-600 text-xs truncate">{result.name}</div>
+          <div className="text-v2-text-secondary text-xs truncate">{result.name}</div>
         </div>
       ),
     }));
@@ -160,7 +163,7 @@ export function SymbolAutocomplete({
       if (inputValue.length > 0 && inputValue.length < MIN_QUERY_LENGTH) {
         return (
           <div className={props.className}>
- <div className="px-4 py-8 text-center text-sm text-neutral-500">
+            <div className="px-4 py-8 text-center text-sm text-v2-text-tertiary">
               {t("minCharsHint", { count: MIN_QUERY_LENGTH })}
             </div>
           </div>
@@ -171,9 +174,9 @@ export function SymbolAutocomplete({
       if (searchQuery.isLoading && debouncedQuery.length >= MIN_QUERY_LENGTH) {
         return (
           <div className={props.className}>
- <div className="px-4 py-8 text-center text-sm text-neutral-500 flex items-center justify-center gap-2">
+            <div className="px-4 py-8 text-center text-sm text-v2-text-tertiary flex items-center justify-center gap-2">
               <svg
-                className="animate-spin h-4 w-4 text-primary-500"
+                className="animate-spin h-4 w-4 text-v2-gold-primary"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -207,7 +210,7 @@ export function SymbolAutocomplete({
       ) {
         return (
           <div className={props.className}>
- <div className="px-4 py-8 text-center text-sm text-neutral-500">
+            <div className="px-4 py-8 text-center text-sm text-v2-text-tertiary">
               {t("noResults", { query: debouncedQuery })}
             </div>
           </div>
@@ -244,11 +247,12 @@ export function SymbolAutocomplete({
         clearable={true}
         disableFilter={true}
         renderDropdown={renderDropdown}
+        usePortal={usePortal}
       />
 
       {/* Error message */}
       {searchError && (
- <p className="text-sm text-danger-600 flex items-center gap-1 mt-1.5">
+        <p className="text-sm text-v2-red-negative flex items-center gap-1 mt-1.5">
           <svg
             className="w-4 h-4 flex-shrink-0"
             fill="currentColor"

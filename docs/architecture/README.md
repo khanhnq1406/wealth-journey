@@ -27,6 +27,7 @@ Runtime flows showing how data moves through the system during feature execution
 | [Community Flows](flow-community.md) | Community | 12 | Create post, feed generation, like/unlike, follow/unfollow, share post, view profile, following/followers list, image upload, edit comment, reply threads, SSE notification stream, get reply list |
 | [Gold Sentiment Flows](flow-gold-sentiment.md) | Gold Sentiment | 3 | Cast vote with upsert, get sentiment with Redis cache, post comment with rate limiting and content sanitization |
 | [Admin CMS Flows](flow-admin.md) | Admin CMS | 2 | Public site settings fetch (cache-first), admin update with validation and cache invalidation |
+| [Watchlist Flows](flow-watchlist.md) | Watchlist | 4 | Add symbol with duplicate/limit checks, list with parallel price enrichment, optimistic drag-and-drop reorder, check presence and soft delete |
 
 ## Supporting Documents
 

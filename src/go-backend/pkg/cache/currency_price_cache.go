@@ -12,8 +12,12 @@ import (
 const (
 	// CurrencyPriceKeyPrefix is the prefix for currency price cache keys
 	CurrencyPriceKeyPrefix = "currency_price"
-	// CurrencyPriceCacheTTL is the time-to-live for currency price cache entries
+	// CurrencyPriceCacheTTL is the time-to-live for individual currency price cache entries
 	CurrencyPriceCacheTTL = 15 * time.Minute
+	// AllCurrencyPricesCacheTTL is the time-to-live for the aggregate currency prices cache
+	AllCurrencyPricesCacheTTL = 5 * time.Minute
+
+	currencyAllKey = "currency_price:all"
 )
 
 // CurrencyPriceCache handles caching of currency prices in Redis
@@ -80,4 +84,30 @@ func (c *CurrencyPriceCache) Get(ctx context.Context, symbol string) (*CachedCur
 func (c *CurrencyPriceCache) Delete(ctx context.Context, symbol string) error {
 	key := c.buildKey(symbol)
 	return c.client.Del(ctx, key).Err()
+}
+
+// SetAll stores the full list of currency prices under the aggregate cache key.
+func (c *CurrencyPriceCache) SetAll(ctx context.Context, prices []*CachedCurrencyPrice, ttl time.Duration) error {
+	data, err := json.Marshal(prices)
+	if err != nil {
+		return fmt.Errorf("marshal currency prices: %w", err)
+	}
+	return c.client.Set(ctx, currencyAllKey, data, ttl).Err()
+}
+
+// GetAll retrieves the full list of currency prices from the aggregate cache key.
+// Returns nil, nil on cache miss.
+func (c *CurrencyPriceCache) GetAll(ctx context.Context) ([]*CachedCurrencyPrice, error) {
+	data, err := c.client.Get(ctx, currencyAllKey).Bytes()
+	if err != nil {
+		if err == redis.Nil {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("get all currency prices from cache: %w", err)
+	}
+	var prices []*CachedCurrencyPrice
+	if err := json.Unmarshal(data, &prices); err != nil {
+		return nil, fmt.Errorf("unmarshal currency prices: %w", err)
+	}
+	return prices, nil
 }

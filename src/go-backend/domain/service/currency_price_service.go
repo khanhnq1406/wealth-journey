@@ -43,14 +43,45 @@ func NewCurrencyPriceService(redisClient *redis.Client) CurrencyPriceService {
 	}
 }
 
-// FetchAllPrices fetches all foreign currency prices from vangsaigon API
+// NewCurrencyPriceServiceWithCache creates a currency price service with an injected cache (for testing).
+func NewCurrencyPriceServiceWithCache(redisClient *redis.Client, currCache *cache.CurrencyPriceCache) CurrencyPriceService {
+	return &currencyPriceService{
+		client: vnprice.NewClient(10 * time.Second),
+		cache:  currCache,
+	}
+}
+
+// FetchAllPrices fetches all foreign currency prices from vangsaigon API, reading
+// from the aggregate Redis cache before hitting the external API to limit external
+// API calls when users reload the Prices page.
 func (s *currencyPriceService) FetchAllPrices(ctx context.Context) ([]*CachedCurrencyPrice, error) {
+	// Check aggregate cache first
+	cachedAll, err := s.cache.GetAll(ctx)
+	if err == nil && cachedAll != nil {
+		result := make([]*CachedCurrencyPrice, len(cachedAll))
+		for i, c := range cachedAll {
+			result[i] = &CachedCurrencyPrice{
+				TypeCode:   c.TypeCode,
+				Name:       c.Name,
+				Buy:        c.Buy,
+				Sell:       c.Sell,
+				ChangeBuy:  c.ChangeBuy,
+				ChangeSell: c.ChangeSell,
+				Currency:   c.Currency,
+				UpdateTime: time.Unix(c.UpdateTime, 0),
+			}
+		}
+		return result, nil
+	}
+
+	// Cache miss — fetch from external API
 	pricesResp, err := s.client.FetchPrices(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("fetch prices from vangsaigon API: %w", err)
 	}
 
 	prices := make([]*CachedCurrencyPrice, 0, len(pricesResp.CurrencyPrices))
+	cacheList := make([]*cache.CachedCurrencyPrice, 0, len(pricesResp.CurrencyPrices))
 
 	for _, apiPrice := range pricesResp.CurrencyPrices {
 		// Currency prices from vangsaigon are already in raw VND — no multiplication needed
@@ -71,23 +102,32 @@ func (s *currencyPriceService) FetchAllPrices(ctx context.Context) ([]*CachedCur
 		}
 		prices = append(prices, price)
 
-		// Cache each price (non-blocking)
-		go func(p *CachedCurrencyPrice) {
-			cachedPrice := &cache.CachedCurrencyPrice{
-				TypeCode:   p.TypeCode,
-				Name:       p.Name,
-				Buy:        p.Buy,
-				Sell:       p.Sell,
-				ChangeBuy:  p.ChangeBuy,
-				ChangeSell: p.ChangeSell,
-				Currency:   p.Currency,
-				UpdateTime: p.UpdateTime.Unix(),
-			}
-			if err := s.cache.Set(context.Background(), p.TypeCode, cachedPrice, cache.CurrencyPriceCacheTTL); err != nil {
+		cp := &cache.CachedCurrencyPrice{
+			TypeCode:   price.TypeCode,
+			Name:       price.Name,
+			Buy:        price.Buy,
+			Sell:       price.Sell,
+			ChangeBuy:  price.ChangeBuy,
+			ChangeSell: price.ChangeSell,
+			Currency:   price.Currency,
+			UpdateTime: price.UpdateTime.Unix(),
+		}
+		cacheList = append(cacheList, cp)
+
+		// Also write per-symbol cache (non-blocking, keeps existing behavior)
+		go func(p *cache.CachedCurrencyPrice) {
+			if err := s.cache.Set(context.Background(), p.TypeCode, p, cache.CurrencyPriceCacheTTL); err != nil {
 				log.Printf("Warning: failed to cache currency price for %s: %v", p.TypeCode, err)
 			}
-		}(price)
+		}(cp)
 	}
+
+	// Write aggregate cache (non-blocking)
+	go func(list []*cache.CachedCurrencyPrice) {
+		if err := s.cache.SetAll(context.Background(), list, cache.AllCurrencyPricesCacheTTL); err != nil {
+			log.Printf("Warning: failed to set aggregate currency price cache: %v", err)
+		}
+	}(cacheList)
 
 	return prices, nil
 }

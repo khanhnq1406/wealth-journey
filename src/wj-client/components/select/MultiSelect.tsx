@@ -172,7 +172,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
           autoComplete="off"
           spellCheck={false}
           // IMPORTANT: Font size must be at least 16px (text-base) to prevent iOS auto-zoom
-          className="flex-1 min-w-[120px] outline-none bg-transparent text-base"
+          className="flex-1 min-w-[120px] outline-none bg-transparent text-base placeholder:text-v2-text-placeholder"
         />
       </div>
 

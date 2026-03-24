@@ -112,6 +112,7 @@ func ProvideRepositories(db *database.Database) *service.Repositories {
 		Feedback:              repository.NewFeedbackRepository(db),
 		SiteSettings:          repository.NewSiteSettingsRepository(db),
 		PushSubscription:      repository.NewPushSubscriptionRepository(db),
+		Watchlist:             repository.NewWatchlistRepository(db),
 	}
 }
 

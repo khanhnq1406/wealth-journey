@@ -145,6 +145,7 @@ export default {
           "text-primary": "#F1BD61", // Gold (primary text on dark bg)
           "text-secondary": "#F1BD61", // Gold (labels, secondary text)
           "text-tertiary": "#fcf2e0", // Light gray (muted text)
+          "text-placeholder": "rgba(241, 189, 97, 0.45)", // Faded gold — clearly muted hint text
           "text-on-dark": "#F1BD61", // Gold text on dark bg
           // Red brand
           "red-primary": "#9B0111", // mihong red
