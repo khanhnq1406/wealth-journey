@@ -378,6 +378,7 @@ func (s *userPriceAlertService) EvaluateAlerts(ctx context.Context) error {
 			"targetPrice":  alert.TargetPrice,
 			"currentPrice": currentPrice,
 			"priceSide":    alert.PriceSide,
+			"currency":     alert.Currency,
 		}
 		metadataJSON, err := json.Marshal(metadata)
 		if err != nil {

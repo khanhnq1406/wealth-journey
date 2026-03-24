@@ -8,7 +8,7 @@
 - **Started:** 2026-03-24T00:00:00Z
 - **Last updated:** 2026-03-24T03:00:00Z
 - **Current state:** in_progress
-- **Current task:** 7
+- **Current task:** 8
 
 ## Task Progress
 
@@ -22,7 +22,7 @@
 | 4   | Service Layer CRUD                               | done        | —      | UserPriceAlertService with 5 methods, 18 unit tests; fixes: removed tautological condition, added UpdateAlert_InvalidUserID test |
 | 5   | REST Handler + Routes                            | done        | —      | UserPriceAlertHandlers with 4 methods, wired in builder.go, 4 routes in routes.go; all three review stages PASS |
 | 6   | Background Evaluation Job                        | done        | —      | EvaluateAlerts implemented (cooldown/daily-cap, SSE, push, status update); UserPriceAlertJob scheduler; registered in ProvideScheduler; push name truncated to 30 chars |
-| 7   | Notification Delivery Integration                | pending     | —      | —       |
+| 7   | Notification Delivery Integration                | done        | —      | Added currency to metadata; UserPriceAlertMetadata interface; NotificationItem rendering; NotificationPanel routing to /dashboard/settings/alerts |
 | 8   | Frontend CreatePriceAlertForm                    | pending     | —      | —       |
 | 9   | Frontend Settings Alerts Page                    | pending     | —      | —       |
 | 10  | Frontend Prices Page Entry Point                 | pending     | —      | —       |
