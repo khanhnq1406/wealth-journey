@@ -269,6 +269,157 @@ export function pnlPeriodToJSON(object: PnlPeriod): string {
   }
 }
 
+export const AlertDirection = {
+  ALERT_DIRECTION_UNSPECIFIED: 0,
+  ALERT_DIRECTION_ABOVE: 1,
+  ALERT_DIRECTION_BELOW: 2,
+  UNRECOGNIZED: -1,
+} as const;
+
+export type AlertDirection = typeof AlertDirection[keyof typeof AlertDirection];
+
+export namespace AlertDirection {
+  export type ALERT_DIRECTION_UNSPECIFIED = typeof AlertDirection.ALERT_DIRECTION_UNSPECIFIED;
+  export type ALERT_DIRECTION_ABOVE = typeof AlertDirection.ALERT_DIRECTION_ABOVE;
+  export type ALERT_DIRECTION_BELOW = typeof AlertDirection.ALERT_DIRECTION_BELOW;
+  export type UNRECOGNIZED = typeof AlertDirection.UNRECOGNIZED;
+}
+
+export function alertDirectionFromJSON(object: any): AlertDirection {
+  switch (object) {
+    case 0:
+    case "ALERT_DIRECTION_UNSPECIFIED":
+      return AlertDirection.ALERT_DIRECTION_UNSPECIFIED;
+    case 1:
+    case "ALERT_DIRECTION_ABOVE":
+      return AlertDirection.ALERT_DIRECTION_ABOVE;
+    case 2:
+    case "ALERT_DIRECTION_BELOW":
+      return AlertDirection.ALERT_DIRECTION_BELOW;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return AlertDirection.UNRECOGNIZED;
+  }
+}
+
+export function alertDirectionToJSON(object: AlertDirection): string {
+  switch (object) {
+    case AlertDirection.ALERT_DIRECTION_UNSPECIFIED:
+      return "ALERT_DIRECTION_UNSPECIFIED";
+    case AlertDirection.ALERT_DIRECTION_ABOVE:
+      return "ALERT_DIRECTION_ABOVE";
+    case AlertDirection.ALERT_DIRECTION_BELOW:
+      return "ALERT_DIRECTION_BELOW";
+    case AlertDirection.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+export const AlertTriggerMode = {
+  ALERT_TRIGGER_MODE_UNSPECIFIED: 0,
+  ALERT_TRIGGER_MODE_ONCE: 1,
+  ALERT_TRIGGER_MODE_REPEAT: 2,
+  UNRECOGNIZED: -1,
+} as const;
+
+export type AlertTriggerMode = typeof AlertTriggerMode[keyof typeof AlertTriggerMode];
+
+export namespace AlertTriggerMode {
+  export type ALERT_TRIGGER_MODE_UNSPECIFIED = typeof AlertTriggerMode.ALERT_TRIGGER_MODE_UNSPECIFIED;
+  export type ALERT_TRIGGER_MODE_ONCE = typeof AlertTriggerMode.ALERT_TRIGGER_MODE_ONCE;
+  export type ALERT_TRIGGER_MODE_REPEAT = typeof AlertTriggerMode.ALERT_TRIGGER_MODE_REPEAT;
+  export type UNRECOGNIZED = typeof AlertTriggerMode.UNRECOGNIZED;
+}
+
+export function alertTriggerModeFromJSON(object: any): AlertTriggerMode {
+  switch (object) {
+    case 0:
+    case "ALERT_TRIGGER_MODE_UNSPECIFIED":
+      return AlertTriggerMode.ALERT_TRIGGER_MODE_UNSPECIFIED;
+    case 1:
+    case "ALERT_TRIGGER_MODE_ONCE":
+      return AlertTriggerMode.ALERT_TRIGGER_MODE_ONCE;
+    case 2:
+    case "ALERT_TRIGGER_MODE_REPEAT":
+      return AlertTriggerMode.ALERT_TRIGGER_MODE_REPEAT;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return AlertTriggerMode.UNRECOGNIZED;
+  }
+}
+
+export function alertTriggerModeToJSON(object: AlertTriggerMode): string {
+  switch (object) {
+    case AlertTriggerMode.ALERT_TRIGGER_MODE_UNSPECIFIED:
+      return "ALERT_TRIGGER_MODE_UNSPECIFIED";
+    case AlertTriggerMode.ALERT_TRIGGER_MODE_ONCE:
+      return "ALERT_TRIGGER_MODE_ONCE";
+    case AlertTriggerMode.ALERT_TRIGGER_MODE_REPEAT:
+      return "ALERT_TRIGGER_MODE_REPEAT";
+    case AlertTriggerMode.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+export const AlertStatus = {
+  ALERT_STATUS_UNSPECIFIED: 0,
+  ALERT_STATUS_ACTIVE: 1,
+  ALERT_STATUS_TRIGGERED: 2,
+  ALERT_STATUS_PAUSED: 3,
+  UNRECOGNIZED: -1,
+} as const;
+
+export type AlertStatus = typeof AlertStatus[keyof typeof AlertStatus];
+
+export namespace AlertStatus {
+  export type ALERT_STATUS_UNSPECIFIED = typeof AlertStatus.ALERT_STATUS_UNSPECIFIED;
+  export type ALERT_STATUS_ACTIVE = typeof AlertStatus.ALERT_STATUS_ACTIVE;
+  export type ALERT_STATUS_TRIGGERED = typeof AlertStatus.ALERT_STATUS_TRIGGERED;
+  export type ALERT_STATUS_PAUSED = typeof AlertStatus.ALERT_STATUS_PAUSED;
+  export type UNRECOGNIZED = typeof AlertStatus.UNRECOGNIZED;
+}
+
+export function alertStatusFromJSON(object: any): AlertStatus {
+  switch (object) {
+    case 0:
+    case "ALERT_STATUS_UNSPECIFIED":
+      return AlertStatus.ALERT_STATUS_UNSPECIFIED;
+    case 1:
+    case "ALERT_STATUS_ACTIVE":
+      return AlertStatus.ALERT_STATUS_ACTIVE;
+    case 2:
+    case "ALERT_STATUS_TRIGGERED":
+      return AlertStatus.ALERT_STATUS_TRIGGERED;
+    case 3:
+    case "ALERT_STATUS_PAUSED":
+      return AlertStatus.ALERT_STATUS_PAUSED;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return AlertStatus.UNRECOGNIZED;
+  }
+}
+
+export function alertStatusToJSON(object: AlertStatus): string {
+  switch (object) {
+    case AlertStatus.ALERT_STATUS_UNSPECIFIED:
+      return "ALERT_STATUS_UNSPECIFIED";
+    case AlertStatus.ALERT_STATUS_ACTIVE:
+      return "ALERT_STATUS_ACTIVE";
+    case AlertStatus.ALERT_STATUS_TRIGGERED:
+      return "ALERT_STATUS_TRIGGERED";
+    case AlertStatus.ALERT_STATUS_PAUSED:
+      return "ALERT_STATUS_PAUSED";
+    case AlertStatus.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 /** Investment represents an individual holding within an investment wallet */
 export interface Investment {
   id: number;
@@ -906,6 +1057,86 @@ export interface GetPublicMarketTypesResponse {
   silver: MarketTypeItem[];
   timestamp: string;
   currency: MarketTypeItem[];
+}
+
+export interface UserPriceAlert {
+  id: number;
+  userId: number;
+  symbol: string;
+  name: string;
+  assetType: InvestmentType;
+  currency: string;
+  priceSide: string;
+  direction: AlertDirection;
+  targetPrice: number;
+  triggerMode: AlertTriggerMode;
+  cooldownHours: number;
+  status: AlertStatus;
+  note: string;
+  lastTriggeredAt: number;
+  triggerCount: number;
+  currentPriceAtCreation: number;
+  currentPrice: number;
+  createdAt: number;
+}
+
+export interface CreateUserPriceAlertRequest {
+  symbol: string;
+  name: string;
+  assetType: InvestmentType;
+  currency: string;
+  priceSide: string;
+  direction: AlertDirection;
+  targetPrice: number;
+  triggerMode: AlertTriggerMode;
+  cooldownHours: number;
+  note: string;
+}
+
+export interface CreateUserPriceAlertResponse {
+  success: boolean;
+  message: string;
+  alert: UserPriceAlert | undefined;
+  timestamp: string;
+}
+
+export interface ListUserPriceAlertsRequest {
+  statusFilter: AlertStatus;
+  pagination: PaginationParams | undefined;
+}
+
+export interface ListUserPriceAlertsResponse {
+  success: boolean;
+  message: string;
+  alerts: UserPriceAlert[];
+  total: number;
+  timestamp: string;
+}
+
+export interface UpdateUserPriceAlertRequest {
+  id: number;
+  targetPrice: number;
+  triggerMode: AlertTriggerMode;
+  cooldownHours: number;
+  note: string;
+  status: AlertStatus;
+}
+
+export interface UpdateUserPriceAlertResponse {
+  success: boolean;
+  message: string;
+  alert: UserPriceAlert | undefined;
+  timestamp: string;
+}
+
+export interface DeleteUserPriceAlertRequest {
+  id: number;
+}
+
+export interface DeleteUserPriceAlertResponse {
+  success: boolean;
+  message: string;
+  timestamp: string;
 }
 
 function createBaseInvestment(): Investment {
@@ -8040,6 +8271,1364 @@ export const GetPublicMarketTypesResponse: MessageFns<GetPublicMarketTypesRespon
     message.silver = object.silver?.map((e) => MarketTypeItem.fromPartial(e)) || [];
     message.timestamp = object.timestamp ?? "";
     message.currency = object.currency?.map((e) => MarketTypeItem.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseUserPriceAlert(): UserPriceAlert {
+  return {
+    id: 0,
+    userId: 0,
+    symbol: "",
+    name: "",
+    assetType: 0,
+    currency: "",
+    priceSide: "",
+    direction: 0,
+    targetPrice: 0,
+    triggerMode: 0,
+    cooldownHours: 0,
+    status: 0,
+    note: "",
+    lastTriggeredAt: 0,
+    triggerCount: 0,
+    currentPriceAtCreation: 0,
+    currentPrice: 0,
+    createdAt: 0,
+  };
+}
+
+export const UserPriceAlert: MessageFns<UserPriceAlert> = {
+  encode(message: UserPriceAlert, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== 0) {
+      writer.uint32(8).int32(message.id);
+    }
+    if (message.userId !== 0) {
+      writer.uint32(16).int32(message.userId);
+    }
+    if (message.symbol !== "") {
+      writer.uint32(26).string(message.symbol);
+    }
+    if (message.name !== "") {
+      writer.uint32(34).string(message.name);
+    }
+    if (message.assetType !== 0) {
+      writer.uint32(40).int32(message.assetType);
+    }
+    if (message.currency !== "") {
+      writer.uint32(50).string(message.currency);
+    }
+    if (message.priceSide !== "") {
+      writer.uint32(58).string(message.priceSide);
+    }
+    if (message.direction !== 0) {
+      writer.uint32(64).int32(message.direction);
+    }
+    if (message.targetPrice !== 0) {
+      writer.uint32(72).int64(message.targetPrice);
+    }
+    if (message.triggerMode !== 0) {
+      writer.uint32(80).int32(message.triggerMode);
+    }
+    if (message.cooldownHours !== 0) {
+      writer.uint32(88).int32(message.cooldownHours);
+    }
+    if (message.status !== 0) {
+      writer.uint32(96).int32(message.status);
+    }
+    if (message.note !== "") {
+      writer.uint32(106).string(message.note);
+    }
+    if (message.lastTriggeredAt !== 0) {
+      writer.uint32(112).int64(message.lastTriggeredAt);
+    }
+    if (message.triggerCount !== 0) {
+      writer.uint32(120).int32(message.triggerCount);
+    }
+    if (message.currentPriceAtCreation !== 0) {
+      writer.uint32(128).int64(message.currentPriceAtCreation);
+    }
+    if (message.currentPrice !== 0) {
+      writer.uint32(136).int64(message.currentPrice);
+    }
+    if (message.createdAt !== 0) {
+      writer.uint32(144).int64(message.createdAt);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UserPriceAlert {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUserPriceAlert();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.id = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.userId = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.symbol = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.assetType = reader.int32() as any;
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.currency = reader.string();
+          continue;
+        }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.priceSide = reader.string();
+          continue;
+        }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
+
+          message.direction = reader.int32() as any;
+          continue;
+        }
+        case 9: {
+          if (tag !== 72) {
+            break;
+          }
+
+          message.targetPrice = longToNumber(reader.int64());
+          continue;
+        }
+        case 10: {
+          if (tag !== 80) {
+            break;
+          }
+
+          message.triggerMode = reader.int32() as any;
+          continue;
+        }
+        case 11: {
+          if (tag !== 88) {
+            break;
+          }
+
+          message.cooldownHours = reader.int32();
+          continue;
+        }
+        case 12: {
+          if (tag !== 96) {
+            break;
+          }
+
+          message.status = reader.int32() as any;
+          continue;
+        }
+        case 13: {
+          if (tag !== 106) {
+            break;
+          }
+
+          message.note = reader.string();
+          continue;
+        }
+        case 14: {
+          if (tag !== 112) {
+            break;
+          }
+
+          message.lastTriggeredAt = longToNumber(reader.int64());
+          continue;
+        }
+        case 15: {
+          if (tag !== 120) {
+            break;
+          }
+
+          message.triggerCount = reader.int32();
+          continue;
+        }
+        case 16: {
+          if (tag !== 128) {
+            break;
+          }
+
+          message.currentPriceAtCreation = longToNumber(reader.int64());
+          continue;
+        }
+        case 17: {
+          if (tag !== 136) {
+            break;
+          }
+
+          message.currentPrice = longToNumber(reader.int64());
+          continue;
+        }
+        case 18: {
+          if (tag !== 144) {
+            break;
+          }
+
+          message.createdAt = longToNumber(reader.int64());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UserPriceAlert {
+    return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      userId: isSet(object.userId)
+        ? globalThis.Number(object.userId)
+        : isSet(object.user_id)
+        ? globalThis.Number(object.user_id)
+        : 0,
+      symbol: isSet(object.symbol) ? globalThis.String(object.symbol) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      assetType: isSet(object.assetType)
+        ? investmentTypeFromJSON(object.assetType)
+        : isSet(object.asset_type)
+        ? investmentTypeFromJSON(object.asset_type)
+        : 0,
+      currency: isSet(object.currency) ? globalThis.String(object.currency) : "",
+      priceSide: isSet(object.priceSide)
+        ? globalThis.String(object.priceSide)
+        : isSet(object.price_side)
+        ? globalThis.String(object.price_side)
+        : "",
+      direction: isSet(object.direction) ? alertDirectionFromJSON(object.direction) : 0,
+      targetPrice: isSet(object.targetPrice)
+        ? globalThis.Number(object.targetPrice)
+        : isSet(object.target_price)
+        ? globalThis.Number(object.target_price)
+        : 0,
+      triggerMode: isSet(object.triggerMode)
+        ? alertTriggerModeFromJSON(object.triggerMode)
+        : isSet(object.trigger_mode)
+        ? alertTriggerModeFromJSON(object.trigger_mode)
+        : 0,
+      cooldownHours: isSet(object.cooldownHours)
+        ? globalThis.Number(object.cooldownHours)
+        : isSet(object.cooldown_hours)
+        ? globalThis.Number(object.cooldown_hours)
+        : 0,
+      status: isSet(object.status) ? alertStatusFromJSON(object.status) : 0,
+      note: isSet(object.note) ? globalThis.String(object.note) : "",
+      lastTriggeredAt: isSet(object.lastTriggeredAt)
+        ? globalThis.Number(object.lastTriggeredAt)
+        : isSet(object.last_triggered_at)
+        ? globalThis.Number(object.last_triggered_at)
+        : 0,
+      triggerCount: isSet(object.triggerCount)
+        ? globalThis.Number(object.triggerCount)
+        : isSet(object.trigger_count)
+        ? globalThis.Number(object.trigger_count)
+        : 0,
+      currentPriceAtCreation: isSet(object.currentPriceAtCreation)
+        ? globalThis.Number(object.currentPriceAtCreation)
+        : isSet(object.current_price_at_creation)
+        ? globalThis.Number(object.current_price_at_creation)
+        : 0,
+      currentPrice: isSet(object.currentPrice)
+        ? globalThis.Number(object.currentPrice)
+        : isSet(object.current_price)
+        ? globalThis.Number(object.current_price)
+        : 0,
+      createdAt: isSet(object.createdAt)
+        ? globalThis.Number(object.createdAt)
+        : isSet(object.created_at)
+        ? globalThis.Number(object.created_at)
+        : 0,
+    };
+  },
+
+  toJSON(message: UserPriceAlert): unknown {
+    const obj: any = {};
+    if (message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    if (message.userId !== 0) {
+      obj.userId = Math.round(message.userId);
+    }
+    if (message.symbol !== "") {
+      obj.symbol = message.symbol;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.assetType !== 0) {
+      obj.assetType = investmentTypeToJSON(message.assetType);
+    }
+    if (message.currency !== "") {
+      obj.currency = message.currency;
+    }
+    if (message.priceSide !== "") {
+      obj.priceSide = message.priceSide;
+    }
+    if (message.direction !== 0) {
+      obj.direction = alertDirectionToJSON(message.direction);
+    }
+    if (message.targetPrice !== 0) {
+      obj.targetPrice = Math.round(message.targetPrice);
+    }
+    if (message.triggerMode !== 0) {
+      obj.triggerMode = alertTriggerModeToJSON(message.triggerMode);
+    }
+    if (message.cooldownHours !== 0) {
+      obj.cooldownHours = Math.round(message.cooldownHours);
+    }
+    if (message.status !== 0) {
+      obj.status = alertStatusToJSON(message.status);
+    }
+    if (message.note !== "") {
+      obj.note = message.note;
+    }
+    if (message.lastTriggeredAt !== 0) {
+      obj.lastTriggeredAt = Math.round(message.lastTriggeredAt);
+    }
+    if (message.triggerCount !== 0) {
+      obj.triggerCount = Math.round(message.triggerCount);
+    }
+    if (message.currentPriceAtCreation !== 0) {
+      obj.currentPriceAtCreation = Math.round(message.currentPriceAtCreation);
+    }
+    if (message.currentPrice !== 0) {
+      obj.currentPrice = Math.round(message.currentPrice);
+    }
+    if (message.createdAt !== 0) {
+      obj.createdAt = Math.round(message.createdAt);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UserPriceAlert>): UserPriceAlert {
+    return UserPriceAlert.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UserPriceAlert>): UserPriceAlert {
+    const message = createBaseUserPriceAlert();
+    message.id = object.id ?? 0;
+    message.userId = object.userId ?? 0;
+    message.symbol = object.symbol ?? "";
+    message.name = object.name ?? "";
+    message.assetType = object.assetType ?? 0;
+    message.currency = object.currency ?? "";
+    message.priceSide = object.priceSide ?? "";
+    message.direction = object.direction ?? 0;
+    message.targetPrice = object.targetPrice ?? 0;
+    message.triggerMode = object.triggerMode ?? 0;
+    message.cooldownHours = object.cooldownHours ?? 0;
+    message.status = object.status ?? 0;
+    message.note = object.note ?? "";
+    message.lastTriggeredAt = object.lastTriggeredAt ?? 0;
+    message.triggerCount = object.triggerCount ?? 0;
+    message.currentPriceAtCreation = object.currentPriceAtCreation ?? 0;
+    message.currentPrice = object.currentPrice ?? 0;
+    message.createdAt = object.createdAt ?? 0;
+    return message;
+  },
+};
+
+function createBaseCreateUserPriceAlertRequest(): CreateUserPriceAlertRequest {
+  return {
+    symbol: "",
+    name: "",
+    assetType: 0,
+    currency: "",
+    priceSide: "",
+    direction: 0,
+    targetPrice: 0,
+    triggerMode: 0,
+    cooldownHours: 0,
+    note: "",
+  };
+}
+
+export const CreateUserPriceAlertRequest: MessageFns<CreateUserPriceAlertRequest> = {
+  encode(message: CreateUserPriceAlertRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.symbol !== "") {
+      writer.uint32(10).string(message.symbol);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.assetType !== 0) {
+      writer.uint32(24).int32(message.assetType);
+    }
+    if (message.currency !== "") {
+      writer.uint32(34).string(message.currency);
+    }
+    if (message.priceSide !== "") {
+      writer.uint32(42).string(message.priceSide);
+    }
+    if (message.direction !== 0) {
+      writer.uint32(48).int32(message.direction);
+    }
+    if (message.targetPrice !== 0) {
+      writer.uint32(56).int64(message.targetPrice);
+    }
+    if (message.triggerMode !== 0) {
+      writer.uint32(64).int32(message.triggerMode);
+    }
+    if (message.cooldownHours !== 0) {
+      writer.uint32(72).int32(message.cooldownHours);
+    }
+    if (message.note !== "") {
+      writer.uint32(82).string(message.note);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CreateUserPriceAlertRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreateUserPriceAlertRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.symbol = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.assetType = reader.int32() as any;
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.currency = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.priceSide = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.direction = reader.int32() as any;
+          continue;
+        }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
+
+          message.targetPrice = longToNumber(reader.int64());
+          continue;
+        }
+        case 8: {
+          if (tag !== 64) {
+            break;
+          }
+
+          message.triggerMode = reader.int32() as any;
+          continue;
+        }
+        case 9: {
+          if (tag !== 72) {
+            break;
+          }
+
+          message.cooldownHours = reader.int32();
+          continue;
+        }
+        case 10: {
+          if (tag !== 82) {
+            break;
+          }
+
+          message.note = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreateUserPriceAlertRequest {
+    return {
+      symbol: isSet(object.symbol) ? globalThis.String(object.symbol) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      assetType: isSet(object.assetType)
+        ? investmentTypeFromJSON(object.assetType)
+        : isSet(object.asset_type)
+        ? investmentTypeFromJSON(object.asset_type)
+        : 0,
+      currency: isSet(object.currency) ? globalThis.String(object.currency) : "",
+      priceSide: isSet(object.priceSide)
+        ? globalThis.String(object.priceSide)
+        : isSet(object.price_side)
+        ? globalThis.String(object.price_side)
+        : "",
+      direction: isSet(object.direction) ? alertDirectionFromJSON(object.direction) : 0,
+      targetPrice: isSet(object.targetPrice)
+        ? globalThis.Number(object.targetPrice)
+        : isSet(object.target_price)
+        ? globalThis.Number(object.target_price)
+        : 0,
+      triggerMode: isSet(object.triggerMode)
+        ? alertTriggerModeFromJSON(object.triggerMode)
+        : isSet(object.trigger_mode)
+        ? alertTriggerModeFromJSON(object.trigger_mode)
+        : 0,
+      cooldownHours: isSet(object.cooldownHours)
+        ? globalThis.Number(object.cooldownHours)
+        : isSet(object.cooldown_hours)
+        ? globalThis.Number(object.cooldown_hours)
+        : 0,
+      note: isSet(object.note) ? globalThis.String(object.note) : "",
+    };
+  },
+
+  toJSON(message: CreateUserPriceAlertRequest): unknown {
+    const obj: any = {};
+    if (message.symbol !== "") {
+      obj.symbol = message.symbol;
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.assetType !== 0) {
+      obj.assetType = investmentTypeToJSON(message.assetType);
+    }
+    if (message.currency !== "") {
+      obj.currency = message.currency;
+    }
+    if (message.priceSide !== "") {
+      obj.priceSide = message.priceSide;
+    }
+    if (message.direction !== 0) {
+      obj.direction = alertDirectionToJSON(message.direction);
+    }
+    if (message.targetPrice !== 0) {
+      obj.targetPrice = Math.round(message.targetPrice);
+    }
+    if (message.triggerMode !== 0) {
+      obj.triggerMode = alertTriggerModeToJSON(message.triggerMode);
+    }
+    if (message.cooldownHours !== 0) {
+      obj.cooldownHours = Math.round(message.cooldownHours);
+    }
+    if (message.note !== "") {
+      obj.note = message.note;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<CreateUserPriceAlertRequest>): CreateUserPriceAlertRequest {
+    return CreateUserPriceAlertRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<CreateUserPriceAlertRequest>): CreateUserPriceAlertRequest {
+    const message = createBaseCreateUserPriceAlertRequest();
+    message.symbol = object.symbol ?? "";
+    message.name = object.name ?? "";
+    message.assetType = object.assetType ?? 0;
+    message.currency = object.currency ?? "";
+    message.priceSide = object.priceSide ?? "";
+    message.direction = object.direction ?? 0;
+    message.targetPrice = object.targetPrice ?? 0;
+    message.triggerMode = object.triggerMode ?? 0;
+    message.cooldownHours = object.cooldownHours ?? 0;
+    message.note = object.note ?? "";
+    return message;
+  },
+};
+
+function createBaseCreateUserPriceAlertResponse(): CreateUserPriceAlertResponse {
+  return { success: false, message: "", alert: undefined, timestamp: "" };
+}
+
+export const CreateUserPriceAlertResponse: MessageFns<CreateUserPriceAlertResponse> = {
+  encode(message: CreateUserPriceAlertResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.alert !== undefined) {
+      UserPriceAlert.encode(message.alert, writer.uint32(26).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CreateUserPriceAlertResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreateUserPriceAlertResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.alert = UserPriceAlert.decode(reader, reader.uint32());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreateUserPriceAlertResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      alert: isSet(object.alert) ? UserPriceAlert.fromJSON(object.alert) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: CreateUserPriceAlertResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.alert !== undefined) {
+      obj.alert = UserPriceAlert.toJSON(message.alert);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<CreateUserPriceAlertResponse>): CreateUserPriceAlertResponse {
+    return CreateUserPriceAlertResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<CreateUserPriceAlertResponse>): CreateUserPriceAlertResponse {
+    const message = createBaseCreateUserPriceAlertResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.alert = (object.alert !== undefined && object.alert !== null)
+      ? UserPriceAlert.fromPartial(object.alert)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseListUserPriceAlertsRequest(): ListUserPriceAlertsRequest {
+  return { statusFilter: 0, pagination: undefined };
+}
+
+export const ListUserPriceAlertsRequest: MessageFns<ListUserPriceAlertsRequest> = {
+  encode(message: ListUserPriceAlertsRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.statusFilter !== 0) {
+      writer.uint32(8).int32(message.statusFilter);
+    }
+    if (message.pagination !== undefined) {
+      PaginationParams.encode(message.pagination, writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListUserPriceAlertsRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListUserPriceAlertsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.statusFilter = reader.int32() as any;
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.pagination = PaginationParams.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListUserPriceAlertsRequest {
+    return {
+      statusFilter: isSet(object.statusFilter)
+        ? alertStatusFromJSON(object.statusFilter)
+        : isSet(object.status_filter)
+        ? alertStatusFromJSON(object.status_filter)
+        : 0,
+      pagination: isSet(object.pagination) ? PaginationParams.fromJSON(object.pagination) : undefined,
+    };
+  },
+
+  toJSON(message: ListUserPriceAlertsRequest): unknown {
+    const obj: any = {};
+    if (message.statusFilter !== 0) {
+      obj.statusFilter = alertStatusToJSON(message.statusFilter);
+    }
+    if (message.pagination !== undefined) {
+      obj.pagination = PaginationParams.toJSON(message.pagination);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ListUserPriceAlertsRequest>): ListUserPriceAlertsRequest {
+    return ListUserPriceAlertsRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ListUserPriceAlertsRequest>): ListUserPriceAlertsRequest {
+    const message = createBaseListUserPriceAlertsRequest();
+    message.statusFilter = object.statusFilter ?? 0;
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PaginationParams.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseListUserPriceAlertsResponse(): ListUserPriceAlertsResponse {
+  return { success: false, message: "", alerts: [], total: 0, timestamp: "" };
+}
+
+export const ListUserPriceAlertsResponse: MessageFns<ListUserPriceAlertsResponse> = {
+  encode(message: ListUserPriceAlertsResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    for (const v of message.alerts) {
+      UserPriceAlert.encode(v!, writer.uint32(26).fork()).join();
+    }
+    if (message.total !== 0) {
+      writer.uint32(32).int32(message.total);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(42).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListUserPriceAlertsResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListUserPriceAlertsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.alerts.push(UserPriceAlert.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.total = reader.int32();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListUserPriceAlertsResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      alerts: globalThis.Array.isArray(object?.alerts) ? object.alerts.map((e: any) => UserPriceAlert.fromJSON(e)) : [],
+      total: isSet(object.total) ? globalThis.Number(object.total) : 0,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: ListUserPriceAlertsResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.alerts?.length) {
+      obj.alerts = message.alerts.map((e) => UserPriceAlert.toJSON(e));
+    }
+    if (message.total !== 0) {
+      obj.total = Math.round(message.total);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ListUserPriceAlertsResponse>): ListUserPriceAlertsResponse {
+    return ListUserPriceAlertsResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ListUserPriceAlertsResponse>): ListUserPriceAlertsResponse {
+    const message = createBaseListUserPriceAlertsResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.alerts = object.alerts?.map((e) => UserPriceAlert.fromPartial(e)) || [];
+    message.total = object.total ?? 0;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseUpdateUserPriceAlertRequest(): UpdateUserPriceAlertRequest {
+  return { id: 0, targetPrice: 0, triggerMode: 0, cooldownHours: 0, note: "", status: 0 };
+}
+
+export const UpdateUserPriceAlertRequest: MessageFns<UpdateUserPriceAlertRequest> = {
+  encode(message: UpdateUserPriceAlertRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== 0) {
+      writer.uint32(8).int32(message.id);
+    }
+    if (message.targetPrice !== 0) {
+      writer.uint32(16).int64(message.targetPrice);
+    }
+    if (message.triggerMode !== 0) {
+      writer.uint32(24).int32(message.triggerMode);
+    }
+    if (message.cooldownHours !== 0) {
+      writer.uint32(32).int32(message.cooldownHours);
+    }
+    if (message.note !== "") {
+      writer.uint32(42).string(message.note);
+    }
+    if (message.status !== 0) {
+      writer.uint32(48).int32(message.status);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateUserPriceAlertRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateUserPriceAlertRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.id = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.targetPrice = longToNumber(reader.int64());
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.triggerMode = reader.int32() as any;
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.cooldownHours = reader.int32();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.note = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 48) {
+            break;
+          }
+
+          message.status = reader.int32() as any;
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateUserPriceAlertRequest {
+    return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      targetPrice: isSet(object.targetPrice)
+        ? globalThis.Number(object.targetPrice)
+        : isSet(object.target_price)
+        ? globalThis.Number(object.target_price)
+        : 0,
+      triggerMode: isSet(object.triggerMode)
+        ? alertTriggerModeFromJSON(object.triggerMode)
+        : isSet(object.trigger_mode)
+        ? alertTriggerModeFromJSON(object.trigger_mode)
+        : 0,
+      cooldownHours: isSet(object.cooldownHours)
+        ? globalThis.Number(object.cooldownHours)
+        : isSet(object.cooldown_hours)
+        ? globalThis.Number(object.cooldown_hours)
+        : 0,
+      note: isSet(object.note) ? globalThis.String(object.note) : "",
+      status: isSet(object.status) ? alertStatusFromJSON(object.status) : 0,
+    };
+  },
+
+  toJSON(message: UpdateUserPriceAlertRequest): unknown {
+    const obj: any = {};
+    if (message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    if (message.targetPrice !== 0) {
+      obj.targetPrice = Math.round(message.targetPrice);
+    }
+    if (message.triggerMode !== 0) {
+      obj.triggerMode = alertTriggerModeToJSON(message.triggerMode);
+    }
+    if (message.cooldownHours !== 0) {
+      obj.cooldownHours = Math.round(message.cooldownHours);
+    }
+    if (message.note !== "") {
+      obj.note = message.note;
+    }
+    if (message.status !== 0) {
+      obj.status = alertStatusToJSON(message.status);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UpdateUserPriceAlertRequest>): UpdateUserPriceAlertRequest {
+    return UpdateUserPriceAlertRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateUserPriceAlertRequest>): UpdateUserPriceAlertRequest {
+    const message = createBaseUpdateUserPriceAlertRequest();
+    message.id = object.id ?? 0;
+    message.targetPrice = object.targetPrice ?? 0;
+    message.triggerMode = object.triggerMode ?? 0;
+    message.cooldownHours = object.cooldownHours ?? 0;
+    message.note = object.note ?? "";
+    message.status = object.status ?? 0;
+    return message;
+  },
+};
+
+function createBaseUpdateUserPriceAlertResponse(): UpdateUserPriceAlertResponse {
+  return { success: false, message: "", alert: undefined, timestamp: "" };
+}
+
+export const UpdateUserPriceAlertResponse: MessageFns<UpdateUserPriceAlertResponse> = {
+  encode(message: UpdateUserPriceAlertResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.alert !== undefined) {
+      UserPriceAlert.encode(message.alert, writer.uint32(26).fork()).join();
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(34).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateUserPriceAlertResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateUserPriceAlertResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.alert = UserPriceAlert.decode(reader, reader.uint32());
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateUserPriceAlertResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      alert: isSet(object.alert) ? UserPriceAlert.fromJSON(object.alert) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: UpdateUserPriceAlertResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.alert !== undefined) {
+      obj.alert = UserPriceAlert.toJSON(message.alert);
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UpdateUserPriceAlertResponse>): UpdateUserPriceAlertResponse {
+    return UpdateUserPriceAlertResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateUserPriceAlertResponse>): UpdateUserPriceAlertResponse {
+    const message = createBaseUpdateUserPriceAlertResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.alert = (object.alert !== undefined && object.alert !== null)
+      ? UserPriceAlert.fromPartial(object.alert)
+      : undefined;
+    message.timestamp = object.timestamp ?? "";
+    return message;
+  },
+};
+
+function createBaseDeleteUserPriceAlertRequest(): DeleteUserPriceAlertRequest {
+  return { id: 0 };
+}
+
+export const DeleteUserPriceAlertRequest: MessageFns<DeleteUserPriceAlertRequest> = {
+  encode(message: DeleteUserPriceAlertRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== 0) {
+      writer.uint32(8).int32(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteUserPriceAlertRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeleteUserPriceAlertRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.id = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeleteUserPriceAlertRequest {
+    return { id: isSet(object.id) ? globalThis.Number(object.id) : 0 };
+  },
+
+  toJSON(message: DeleteUserPriceAlertRequest): unknown {
+    const obj: any = {};
+    if (message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DeleteUserPriceAlertRequest>): DeleteUserPriceAlertRequest {
+    return DeleteUserPriceAlertRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeleteUserPriceAlertRequest>): DeleteUserPriceAlertRequest {
+    const message = createBaseDeleteUserPriceAlertRequest();
+    message.id = object.id ?? 0;
+    return message;
+  },
+};
+
+function createBaseDeleteUserPriceAlertResponse(): DeleteUserPriceAlertResponse {
+  return { success: false, message: "", timestamp: "" };
+}
+
+export const DeleteUserPriceAlertResponse: MessageFns<DeleteUserPriceAlertResponse> = {
+  encode(message: DeleteUserPriceAlertResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    if (message.timestamp !== "") {
+      writer.uint32(26).string(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteUserPriceAlertResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeleteUserPriceAlertResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.timestamp = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeleteUserPriceAlertResponse {
+    return {
+      success: isSet(object.success) ? globalThis.Boolean(object.success) : false,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+      timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+    };
+  },
+
+  toJSON(message: DeleteUserPriceAlertResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    if (message.timestamp !== "") {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DeleteUserPriceAlertResponse>): DeleteUserPriceAlertResponse {
+    return DeleteUserPriceAlertResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeleteUserPriceAlertResponse>): DeleteUserPriceAlertResponse {
+    const message = createBaseDeleteUserPriceAlertResponse();
+    message.success = object.success ?? false;
+    message.message = object.message ?? "";
+    message.timestamp = object.timestamp ?? "";
     return message;
   },
 };

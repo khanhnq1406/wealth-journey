@@ -471,6 +471,19 @@ service InvestmentService {
       get: "/api/v1/public/market-types"
     };
   }
+
+  rpc CreateUserPriceAlert(CreateUserPriceAlertRequest) returns (CreateUserPriceAlertResponse) {
+    option (google.api.http) = { post: "/api/v1/price-alerts" body: "*" };
+  }
+  rpc ListUserPriceAlerts(ListUserPriceAlertsRequest) returns (ListUserPriceAlertsResponse) {
+    option (google.api.http) = { get: "/api/v1/price-alerts" };
+  }
+  rpc UpdateUserPriceAlert(UpdateUserPriceAlertRequest) returns (UpdateUserPriceAlertResponse) {
+    option (google.api.http) = { put: "/api/v1/price-alerts/{id}" body: "*" };
+  }
+  rpc DeleteUserPriceAlert(DeleteUserPriceAlertRequest) returns (DeleteUserPriceAlertResponse) {
+    option (google.api.http) = { delete: "/api/v1/price-alerts/{id}" };
+  }
 }
 
 // Request/Response messages
@@ -706,4 +719,107 @@ message GetPublicMarketTypesResponse {
   repeated MarketTypeItem silver = 4 [json_name = "silver"];
   string timestamp = 5 [json_name = "timestamp"];
   repeated MarketTypeItem currency = 6 [json_name = "currency"];
+}
+
+// ── User Price Alert Enums ──
+
+enum AlertDirection {
+  ALERT_DIRECTION_UNSPECIFIED = 0;
+  ALERT_DIRECTION_ABOVE = 1;
+  ALERT_DIRECTION_BELOW = 2;
+}
+
+enum AlertTriggerMode {
+  ALERT_TRIGGER_MODE_UNSPECIFIED = 0;
+  ALERT_TRIGGER_MODE_ONCE = 1;
+  ALERT_TRIGGER_MODE_REPEAT = 2;
+}
+
+enum AlertStatus {
+  ALERT_STATUS_UNSPECIFIED = 0;
+  ALERT_STATUS_ACTIVE = 1;
+  ALERT_STATUS_TRIGGERED = 2;
+  ALERT_STATUS_PAUSED = 3;
+}
+
+// ── User Price Alert Messages ──
+
+message UserPriceAlert {
+  int32 id = 1 [json_name = "id"];
+  int32 user_id = 2 [json_name = "userId"];
+  string symbol = 3 [json_name = "symbol"];
+  string name = 4 [json_name = "name"];
+  InvestmentType asset_type = 5 [json_name = "assetType"];
+  string currency = 6 [json_name = "currency"];
+  string price_side = 7 [json_name = "priceSide"];
+  AlertDirection direction = 8 [json_name = "direction"];
+  int64 target_price = 9 [json_name = "targetPrice"];
+  AlertTriggerMode trigger_mode = 10 [json_name = "triggerMode"];
+  int32 cooldown_hours = 11 [json_name = "cooldownHours"];
+  AlertStatus status = 12 [json_name = "status"];
+  string note = 13 [json_name = "note"];
+  int64 last_triggered_at = 14 [json_name = "lastTriggeredAt"];
+  int32 trigger_count = 15 [json_name = "triggerCount"];
+  int64 current_price_at_creation = 16 [json_name = "currentPriceAtCreation"];
+  int64 current_price = 17 [json_name = "currentPrice"];
+  int64 created_at = 18 [json_name = "createdAt"];
+}
+
+message CreateUserPriceAlertRequest {
+  string symbol = 1 [json_name = "symbol"];
+  string name = 2 [json_name = "name"];
+  InvestmentType asset_type = 3 [json_name = "assetType"];
+  string currency = 4 [json_name = "currency"];
+  string price_side = 5 [json_name = "priceSide"];
+  AlertDirection direction = 6 [json_name = "direction"];
+  int64 target_price = 7 [json_name = "targetPrice"];
+  AlertTriggerMode trigger_mode = 8 [json_name = "triggerMode"];
+  int32 cooldown_hours = 9 [json_name = "cooldownHours"];
+  string note = 10 [json_name = "note"];
+}
+
+message CreateUserPriceAlertResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  UserPriceAlert alert = 3 [json_name = "alert"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+message ListUserPriceAlertsRequest {
+  AlertStatus status_filter = 1 [json_name = "statusFilter"];
+  wealthjourney.common.v1.PaginationParams pagination = 2 [json_name = "pagination"];
+}
+
+message ListUserPriceAlertsResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated UserPriceAlert alerts = 3 [json_name = "alerts"];
+  int32 total = 4 [json_name = "total"];
+  string timestamp = 5 [json_name = "timestamp"];
+}
+
+message UpdateUserPriceAlertRequest {
+  int32 id = 1 [json_name = "id"];
+  int64 target_price = 2 [json_name = "targetPrice"];
+  AlertTriggerMode trigger_mode = 3 [json_name = "triggerMode"];
+  int32 cooldown_hours = 4 [json_name = "cooldownHours"];
+  string note = 5 [json_name = "note"];
+  AlertStatus status = 6 [json_name = "status"];
+}
+
+message UpdateUserPriceAlertResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  UserPriceAlert alert = 3 [json_name = "alert"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+message DeleteUserPriceAlertRequest {
+  int32 id = 1 [json_name = "id"];
+}
+
+message DeleteUserPriceAlertResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
 }

@@ -157,6 +157,7 @@ export const ModalType = {
   CREATE_POST: "Create Post",
   EDIT_POST: "Edit Post",
   REPORT_CONTENT: "Report Content",
+  CREATE_PRICE_ALERT: "Create Price Alert",
 };
 
 export const SUPPORTED_CURRENCIES = [
