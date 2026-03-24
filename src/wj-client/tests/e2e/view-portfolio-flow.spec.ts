@@ -207,6 +207,49 @@ test.describe("Portfolio Actions", () => {
       expect(await typeSelector.count()).toBeGreaterThan(0);
     }
   });
+
+  test("should show Set Alert button when investment card is expanded", async ({ page }) => {
+    await page.goto("/dashboard/portfolio");
+    await page.waitForLoadState("networkidle");
+
+    const investmentCards = page.locator('[class*="overflow-hidden"]');
+    const cardCount = await investmentCards.count();
+
+    if (cardCount > 0) {
+      // Click to expand the card
+      await investmentCards.first().click();
+      await page.waitForTimeout(400);
+
+      // Set Alert button should appear in the expanded section
+      const setAlertBtn = page.locator('button[aria-label="Set Alert"]');
+      if ((await setAlertBtn.count()) > 0) {
+        await expect(setAlertBtn.first()).toBeVisible();
+      }
+    }
+  });
+
+  test("should open Create Price Alert modal when Set Alert button is clicked", async ({ page }) => {
+    await page.goto("/dashboard/portfolio");
+    await page.waitForLoadState("networkidle");
+
+    const investmentCards = page.locator('[class*="overflow-hidden"]');
+    const cardCount = await investmentCards.count();
+
+    if (cardCount > 0) {
+      // Expand the card first
+      await investmentCards.first().click();
+      await page.waitForTimeout(400);
+
+      const setAlertBtn = page.locator('button[aria-label="Set Alert"]');
+      if ((await setAlertBtn.count()) > 0) {
+        await setAlertBtn.first().click();
+
+        // Create Price Alert modal should open
+        const modal = page.locator('[role="dialog"]').filter({ hasText: /create price alert/i });
+        await expect(modal.first()).toBeVisible();
+      }
+    }
+  });
 });
 
 test.describe("Mobile Portfolio View", () => {

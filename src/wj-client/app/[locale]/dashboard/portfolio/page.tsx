@@ -38,18 +38,31 @@ import {
 } from "@/components/lazy/OptimizedComponents";
 import { BaseModal } from "@/components/modals/BaseModal";
 import { PortfolioSummaryEnhanced } from "./components/PortfolioSummaryEnhanced";
-import { InvestmentCardEnhanced } from "./components/InvestmentCardEnhanced";
+import {
+  InvestmentCardEnhanced,
+  InvestmentCardData,
+} from "./components/InvestmentCardEnhanced";
 import {
   EmptyInvestmentsState,
   UpdateProgressBanner,
   UpdateSuccessBanner,
 } from "./components";
 import { TabType } from "@/features/investment/components/InvestmentDetailModal";
+import { CreatePriceAlertForm } from "@/features/price-alert/forms/CreatePriceAlertForm";
+import type { AssetCategory } from "@/features/price-alert/forms/CreatePriceAlertForm";
 
 const ModalType = {
   ADD_INVESTMENT: "ADD_INVESTMENT",
   INVESTMENT_DETAIL: "INVESTMENT_DETAIL",
+  SET_PRICE_ALERT: "SET_PRICE_ALERT",
 } as const;
+
+/** Map an InvestmentType to the CreatePriceAlertForm asset category */
+function getAlertCategory(type: InvestmentType): AssetCategory {
+  if (type === InvestmentType.INVESTMENT_TYPE_GOLD_VND) return "gold";
+  if (type === InvestmentType.INVESTMENT_TYPE_SILVER_VND) return "silver";
+  return "other";
+}
 
 // These will be populated with translations inside the component
 const TYPE_FILTER_KEYS = [
@@ -123,6 +136,8 @@ export default function PortfolioPageEnhanced() {
   const [selectedInvestmentId, setSelectedInvestmentId] = useState<
     number | null
   >(null);
+  const [selectedInvestment, setSelectedInvestment] =
+    useState<InvestmentCardData | null>(null);
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
   const [showSuccessBanner, setShowSuccessBanner] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>();
@@ -252,6 +267,8 @@ export default function PortfolioPageEnhanced() {
         return t("modal.addInvestment");
       case ModalType.INVESTMENT_DETAIL:
         return t("modal.investmentDetails");
+      case ModalType.SET_PRICE_ALERT:
+        return "Create Price Alert";
       default:
         return "";
     }
@@ -272,6 +289,7 @@ export default function PortfolioPageEnhanced() {
   const handleCloseModal = useCallback(() => {
     setModalType(null);
     setSelectedInvestmentId(null);
+    setSelectedInvestment(null);
   }, []);
 
   const handleModalSuccess = useCallback(() => {
@@ -314,6 +332,16 @@ export default function PortfolioPageEnhanced() {
       setActiveTab("transactions");
     },
     [handleOpenModal],
+  );
+
+  const handleSetAlert = useCallback(
+    (investment: InvestmentCardData) => {
+      startTransition(() => {
+        setSelectedInvestment(investment);
+        setModalType(ModalType.SET_PRICE_ALERT);
+      });
+    },
+    [],
   );
 
   // Loading state
@@ -433,6 +461,7 @@ export default function PortfolioPageEnhanced() {
                     onBuyMore={handleBuyMore}
                     onSell={handleSell}
                     onEdit={handleEdit}
+                    onSetAlert={handleSetAlert}
                   />
                 ))}
               </div>
@@ -453,12 +482,24 @@ export default function PortfolioPageEnhanced() {
       )}
 
       <BaseModal
-        isOpen={modalType !== null && modalType !== ModalType.INVESTMENT_DETAIL}
+        isOpen={
+          modalType !== null && modalType !== ModalType.INVESTMENT_DETAIL
+        }
         onClose={handleCloseModal}
         title={modalTitle}
       >
         {modalType === ModalType.ADD_INVESTMENT && (
           <AddInvestmentForm onSuccess={handleModalSuccess} />
+        )}
+        {modalType === ModalType.SET_PRICE_ALERT && selectedInvestment && (
+          <CreatePriceAlertForm
+            onSuccess={handleCloseModal}
+            defaultCategory={getAlertCategory(selectedInvestment.type)}
+            defaultSymbol={selectedInvestment.symbol}
+            defaultName={selectedInvestment.name}
+            defaultAssetType={selectedInvestment.type}
+            defaultCurrency={selectedInvestment.currency ?? "USD"}
+          />
         )}
       </BaseModal>
     </>

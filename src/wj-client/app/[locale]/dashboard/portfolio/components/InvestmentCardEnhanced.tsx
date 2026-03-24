@@ -21,6 +21,7 @@ import { Sparkline } from "@/components/charts";
 import { motion, AnimatePresence } from "framer-motion";
 import { IconProps, PlusIcon, InfoIcon } from "@/components/icons";
 import { cn } from "@/lib/utils/cn";
+import { Bell } from "lucide-react";
 
 /**
  * Enhanced investment data type for card display
@@ -60,6 +61,7 @@ export interface InvestmentCardEnhancedProps {
   onBuyMore?: (investmentId: number) => void;
   onSell?: (investmentId: number) => void;
   onEdit?: (investmentId: number) => void;
+  onSetAlert?: (investment: InvestmentCardData) => void;
 }
 
 /**
@@ -111,6 +113,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
   onBuyMore,
   onSell,
   onEdit,
+  onSetAlert,
 }: InvestmentCardEnhancedProps) {
   const t = useTranslations("investment");
   const locale = useLocale();
@@ -204,6 +207,11 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     onEdit?.(id);
+  };
+
+  const handleSetAlert = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onSetAlert?.(investment);
   };
 
   return (
@@ -420,22 +428,16 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
                   onClick={handleBuyMore}
                   bgColor="bg-v2-gold-primary/20"
                   textColor="text-v2-gold-primary"
-                  className="w-full"
+                  className="flex-1"
                 />
-                {/* <QuickActionButton
-                  icon={`${resources}/remove.svg`}
-                  label="Sell"
-                  onClick={handleSell}
-                  bgColor="bg-red-100"
-                  textColor="text-red-700"
-                />
-                <QuickActionButton
-                  icon={`${resources}/editing.svg`}
-                  label="Edit"
-                  onClick={handleEdit}
-                  bgColor="bg-primary-100"
-                  textColor="text-primary-700"
-                /> */}
+                <button
+                  aria-label="Set Alert"
+                  onClick={handleSetAlert}
+                  className="flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg bg-v2-maroon-800 text-v2-text-secondary hover:text-v2-gold-primary hover:bg-v2-maroon-700 transition-colors flex-1 min-h-[44px]"
+                >
+                  <Bell size={20} aria-hidden="true" />
+                  <span className="text-xs font-medium">Set Alert</span>
+                </button>
               </div>
             </div>
           </motion.div>

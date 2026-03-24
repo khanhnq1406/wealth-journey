@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
@@ -37,6 +37,7 @@ jest.mock("@/utils/generated/hooks", () => {
     useMutationDeleteInvestmentTransaction: jest.fn(noopMutation),
     useMutationDeleteInvestment: jest.fn(noopMutation),
     useMutationUpdatePreferences: jest.fn(noopMutation),
+    useMutationCreateUserPriceAlert: jest.fn(noopMutation),
     // Event constants
     EVENT_InvestmentListUserInvestments: "EVENT_InvestmentListUserInvestments",
     EVENT_InvestmentGetAggregatedPortfolioSummary: "EVENT_InvestmentGetAggregatedPortfolioSummary",
@@ -46,6 +47,7 @@ jest.mock("@/utils/generated/hooks", () => {
     EVENT_WalletListWallets: "EVENT_WalletListWallets",
     EVENT_WalletGetWallet: "EVENT_WalletGetWallet",
     EVENT_InvestmentCreateInvestment: "EVENT_InvestmentCreateInvestment",
+    EVENT_InvestmentListUserPriceAlerts: "EVENT_InvestmentListUserPriceAlerts",
   };
 });
 
@@ -117,6 +119,7 @@ describe("Portfolio Page", () => {
     hooks.useMutationDeleteInvestmentTransaction.mockReturnValue(defaultMutationMock);
     hooks.useMutationDeleteInvestment.mockReturnValue(defaultMutationMock);
     hooks.useMutationUpdatePreferences.mockReturnValue(defaultMutationMock);
+    hooks.useMutationCreateUserPriceAlert.mockReturnValue(defaultMutationMock);
   });
 
   test("renders loading state for investments", () => {
@@ -323,6 +326,187 @@ describe("Portfolio Page", () => {
 
     await waitFor(() => {
       expect(screen.getByText(/No investments yet/i)).toBeInTheDocument();
+    });
+  });
+
+  test("shows Set Alert button when investment card is expanded", async () => {
+    const mockInvestments = {
+      investments: [
+        {
+          id: 1,
+          symbol: "VCB",
+          name: "Vietcombank",
+          type: 1, // STOCK
+          exchange: "HOSE",
+          currency: "VND",
+          quantity: 100,
+          unrealizedPnl: 500000,
+          unrealizedPnlPercent: 5.88,
+          isCustom: false,
+          updatedAt: Math.floor(Date.now() / 1000),
+        },
+      ],
+    };
+
+    mockedListInvestments.mockReturnValue({
+      isLoading: false,
+      isPending: false,
+      error: null,
+      data: mockInvestments,
+      refetch: jest.fn(),
+    } as any);
+
+    mockedGetPortfolioSummary.mockReturnValue({
+      isLoading: false,
+      isPending: false,
+      error: null,
+      data: undefined,
+      refetch: jest.fn(),
+    } as any);
+
+    render(
+      <TestWrapper>
+        <PortfolioPage />
+      </TestWrapper>,
+    );
+
+    // Wait for the investment card to appear
+    await waitFor(() => {
+      expect(screen.getByText("VCB")).toBeInTheDocument();
+    });
+
+    // Click on the card to expand it
+    const card = screen.getByText("VCB").closest(".overflow-hidden") as HTMLElement;
+    fireEvent.click(card);
+
+    // After expansion, the Set Alert button should be visible
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: /set alert/i }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test("opens Create Price Alert modal when Set Alert is clicked on a stock investment", async () => {
+    const mockInvestments = {
+      investments: [
+        {
+          id: 2,
+          symbol: "AAPL",
+          name: "Apple Inc.",
+          type: 1, // STOCK
+          exchange: "NASDAQ",
+          currency: "USD",
+          quantity: 10,
+          unrealizedPnl: 100,
+          unrealizedPnlPercent: 2.0,
+          isCustom: false,
+          updatedAt: Math.floor(Date.now() / 1000),
+        },
+      ],
+    };
+
+    mockedListInvestments.mockReturnValue({
+      isLoading: false,
+      isPending: false,
+      error: null,
+      data: mockInvestments,
+      refetch: jest.fn(),
+    } as any);
+
+    mockedGetPortfolioSummary.mockReturnValue({
+      isLoading: false,
+      isPending: false,
+      error: null,
+      data: undefined,
+      refetch: jest.fn(),
+    } as any);
+
+    render(
+      <TestWrapper>
+        <PortfolioPage />
+      </TestWrapper>,
+    );
+
+    // Wait for investment to render
+    await waitFor(() => {
+      expect(screen.getByText("AAPL")).toBeInTheDocument();
+    });
+
+    // Expand the card
+    const card = screen.getByText("AAPL").closest(".overflow-hidden") as HTMLElement;
+    fireEvent.click(card);
+
+    // Click the Set Alert button
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /set alert/i })).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByRole("button", { name: /set alert/i }));
+
+    // Modal should open with "Create Price Alert" title
+    await waitFor(() => {
+      expect(screen.getByText("Create Price Alert")).toBeInTheDocument();
+    });
+  });
+
+  test("opens Create Price Alert modal pre-filled for gold investment", async () => {
+    const mockInvestments = {
+      investments: [
+        {
+          id: 3,
+          symbol: "SJL1L10",
+          name: "SJC 1L-10L",
+          type: 8, // GOLD_VND
+          currency: "VND",
+          quantity: 750000,
+          unrealizedPnl: 0,
+          unrealizedPnlPercent: 0,
+          isCustom: false,
+          updatedAt: Math.floor(Date.now() / 1000),
+        },
+      ],
+    };
+
+    mockedListInvestments.mockReturnValue({
+      isLoading: false,
+      isPending: false,
+      error: null,
+      data: mockInvestments,
+      refetch: jest.fn(),
+    } as any);
+
+    mockedGetPortfolioSummary.mockReturnValue({
+      isLoading: false,
+      isPending: false,
+      error: null,
+      data: undefined,
+      refetch: jest.fn(),
+    } as any);
+
+    render(
+      <TestWrapper>
+        <PortfolioPage />
+      </TestWrapper>,
+    );
+
+    // Wait for investment to render
+    await waitFor(() => {
+      expect(screen.getByText("SJL1L10")).toBeInTheDocument();
+    });
+
+    // Expand the card
+    const card = screen.getByText("SJL1L10").closest(".overflow-hidden") as HTMLElement;
+    fireEvent.click(card);
+
+    // Click the Set Alert button
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /set alert/i })).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByRole("button", { name: /set alert/i }));
+
+    // Modal should open with "Create Price Alert" title
+    await waitFor(() => {
+      expect(screen.getByText("Create Price Alert")).toBeInTheDocument();
     });
   });
 });

@@ -25,8 +25,8 @@
 | 7   | Notification Delivery Integration                | done        | —      | Added currency to metadata; UserPriceAlertMetadata interface; NotificationItem rendering; NotificationPanel routing to /dashboard/settings/alerts |
 | 8   | Frontend CreatePriceAlertForm                    | done        | f028806 | CreatePriceAlertForm (3-step disclosure: category→symbol→config), price-alert-validation.ts Zod schema, 52 unit tests; SymbolAutocomplete cross-feature import noted (non-blocking) |
 | 9   | Frontend Settings Alerts Page                    | done        | 79374aa | AlertStatusBadge, PriceAlertList (MobileTable+desktop), settings page with filter tabs; fixed inline empty state → EmptyState, typo isDeletPending→isDeletePending |
-| 10  | Frontend Prices Page Entry Point                 | done        | —      | BellButton on gold/silver rows + Symbol Lookup "Set Alert"; 12 tests; i18n keys added |
-| 11  | Frontend Portfolio Page Entry Point              | done        | —      | Set Alert on InvestmentCardEnhanced; getAlertCategory() helper; 8 tests |
+| 10  | Frontend Prices Page Entry Point                 | done        | 6dd5b7c | BellButton on gold/silver rows + Symbol Lookup "Set Alert"; 12 tests; i18n keys added |
+| 11  | Frontend Portfolio Page Entry Point              | done        | 9cd04f2 | Set Alert on InvestmentCardEnhanced; getAlertCategory() helper; 8 tests |
 | 13  | Runtime Flow Diagrams                            | pending     | —      | —       |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
