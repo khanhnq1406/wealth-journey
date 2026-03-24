@@ -52,16 +52,15 @@ function getErrorKey(errorMsg: string): "alreadyInWatchlist" | "limitReached" | 
 export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
   const t = useTranslations("prices.watchlist.form");
   const tp = useTranslations("prices");
-  const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [category, setCategory] = useState<AssetCategory | null>(null);
+  const [category, setCategory] = useState<AssetCategory>("gold");
 
   const { data: marketData } = useQueryGetMarketPrices({}, { staleTime: 5 * 60 * 1000 });
 
   // Assembled watchlist item fields
-  const [symbol, setSymbol] = useState("");
-  const [name, setName] = useState("");
-  const [assetType, setAssetType] = useState<InvestmentType>(InvestmentType.INVESTMENT_TYPE_OTHER);
-  const [currency, setCurrency] = useState("USD");
+  const [symbol, setSymbol] = useState(GOLD_VND_OPTIONS[0]?.value ?? "");
+  const [name, setName] = useState(GOLD_VND_OPTIONS[0]?.label ?? "");
+  const [assetType, setAssetType] = useState<InvestmentType>(InvestmentType.INVESTMENT_TYPE_GOLD_VND);
+  const [currency, setCurrency] = useState(GOLD_VND_OPTIONS[0]?.currency ?? "VND");
   const [note, setNote] = useState("");
 
   const [errorKey, setErrorKey] = useState<"alreadyInWatchlist" | "limitReached" | "failedToAdd" | undefined>();
@@ -76,13 +75,13 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
     },
   });
 
-  // Step 1: Category selection
-  const handleCategorySelect = (cat: AssetCategory) => {
+  const handleCategoryChange = (cat: AssetCategory) => {
     setCategory(cat);
-    // Reset fields when switching category
+    // Reset symbol/name/note when switching category
     setSymbol("");
     setName("");
     setNote("");
+    setErrorKey(undefined);
     if (cat === "gold") {
       const first = GOLD_VND_OPTIONS[0];
       if (first) {
@@ -102,7 +101,6 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
     } else if (cat === "currency") {
       setAssetType(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY);
       setCurrency("VND");
-      // Pre-select first currency option if available
       const first = marketData?.currency?.[0];
       if (first) {
         setSymbol(first.typeCode);
@@ -112,10 +110,8 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
       setAssetType(InvestmentType.INVESTMENT_TYPE_OTHER);
       setCurrency("USD");
     }
-    setStep(2);
   };
 
-  // Step 2 gold/silver: dropdown change
   const handleGoldSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const opt = GOLD_VND_OPTIONS.find((o) => o.value === e.target.value);
     if (opt) {
@@ -146,7 +142,6 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
     }
   };
 
-  // Step 2 other assets: SymbolAutocomplete change
   const handleSymbolChange = (sym: string, result?: SearchResult) => {
     setSymbol(sym);
     if (result) {
@@ -155,8 +150,6 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
       setAssetType(mapQuoteTypeToInvestmentType(result.type || ""));
     }
   };
-
-  const canProceedToStep3 = symbol.trim().length > 0;
 
   const handleSubmit = () => {
     setErrorKey(undefined);
@@ -177,207 +170,142 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
     return <Success message={t("addedSuccess")} onDone={onSuccess} />;
   }
 
+  const categories: { value: AssetCategory; label: string }[] = [
+    { value: "gold", label: t("gold") },
+    { value: "silver", label: t("silver") },
+    { value: "currency", label: t("currency") },
+    { value: "other", label: t("otherAssets") },
+  ];
+
   return (
     <div className="flex flex-col gap-4">
-      {/* Step 1: Asset category */}
-      {step === 1 && (
-        <div className="flex flex-col gap-3">
-          <p className="text-sm text-v2-text-secondary mb-1">
-            {t("chooseCategoryLabel")}
-          </p>
-          <div className="grid grid-cols-2 gap-2 w-full">
-            <button
-              type="button"
-              onClick={() => handleCategorySelect("gold")}
-              className="min-h-[48px] rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent font-medium text-sm hover:border-v2-gold-primary hover:text-v2-gold-primary transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
-            >
-              {t("gold")}
-            </button>
-            <button
-              type="button"
-              onClick={() => handleCategorySelect("silver")}
-              className="min-h-[48px] rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent font-medium text-sm hover:border-v2-gold-primary hover:text-v2-gold-primary transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
-            >
-              {t("silver")}
-            </button>
-            <button
-              type="button"
-              onClick={() => handleCategorySelect("currency")}
-              className="min-h-[48px] rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent font-medium text-sm hover:border-v2-gold-primary hover:text-v2-gold-primary transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
-            >
-              {t("currency")}
-            </button>
-            <button
-              type="button"
-              onClick={() => handleCategorySelect("other")}
-              className="min-h-[48px] rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent font-medium text-sm hover:border-v2-gold-primary hover:text-v2-gold-primary transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
-            >
-              {t("otherAssets")}
-            </button>
-          </div>
+      {/* Category tabs */}
+      <div className="flex rounded-lg border border-v2-border-light overflow-hidden">
+        {categories.map((cat) => (
+          <button
+            key={cat.value}
+            type="button"
+            onClick={() => handleCategoryChange(cat.value)}
+            className={`flex-1 py-2 text-xs font-medium transition-colors duration-150 focus:outline-none focus:ring-inset focus:ring-2 focus:ring-v2-gold-primary ${
+              category === cat.value
+                ? "bg-v2-gold-primary text-v2-bg-surface"
+                : "bg-v2-bg-dark text-v2-text-secondary hover:text-v2-gold-accent"
+            }`}
+          >
+            {cat.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Symbol selector — changes based on category */}
+      {category === "gold" && (
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-medium text-v2-text-secondary">
+            {t("goldType")}
+          </label>
+          <select
+            value={symbol}
+            onChange={handleGoldSelect}
+            className="w-full min-h-[44px] sm:min-h-[48px] px-3 sm:px-4 rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent text-base focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent transition-all duration-200"
+          >
+            {GOLD_VND_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </div>
       )}
 
-      {/* Step 2: Symbol selection */}
-      {step === 2 && (
-        <div className="flex flex-col gap-4">
-          <button
-            type="button"
-            onClick={() => { setStep(1); setCategory(null); }}
-            className="self-start text-sm text-v2-text-tertiary hover:text-v2-gold-accent flex items-center gap-1 focus:outline-none"
-            aria-label={t("backToCategoryLabel")}
+      {category === "silver" && (
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-medium text-v2-text-secondary">
+            {t("silverType")}
+          </label>
+          <select
+            value={symbol}
+            onChange={handleSilverSelect}
+            className="w-full min-h-[44px] sm:min-h-[48px] px-3 sm:px-4 rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent text-base focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent transition-all duration-200"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            {t("back")}
-          </button>
-
-          {category === "gold" && (
-            <div className="flex flex-col gap-1.5">
-              <label className="block text-sm font-medium text-v2-text-secondary">
-                {t("goldType")}
-              </label>
-              <select
-                value={symbol}
-                onChange={handleGoldSelect}
-                className="w-full min-h-[44px] sm:min-h-[48px] px-3 sm:px-4 rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent text-base focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent transition-all duration-200"
-              >
-                {GOLD_VND_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {category === "silver" && (
-            <div className="flex flex-col gap-1.5">
-              <label className="block text-sm font-medium text-v2-text-secondary">
-                {t("silverType")}
-              </label>
-              <select
-                value={symbol}
-                onChange={handleSilverSelect}
-                className="w-full min-h-[44px] sm:min-h-[48px] px-3 sm:px-4 rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent text-base focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent transition-all duration-200"
-              >
-                {SILVER_VND_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {category === "currency" && (
-            <div className="flex flex-col gap-1.5">
-              <label className="block text-sm font-medium text-v2-text-secondary">
-                {t("currencyType")}
-              </label>
-              <select
-                value={symbol}
-                onChange={handleCurrencySelect}
-                className="w-full min-h-[44px] sm:min-h-[48px] px-3 sm:px-4 rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent text-base focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent transition-all duration-200"
-              >
-                {(marketData?.currency ?? []).map((item) => (
-                  <option key={item.typeCode} value={item.typeCode}>
-                    {item.name || item.typeCode}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {category === "other" && (
-            <div className="flex flex-col gap-1.5">
-              <label className="block text-sm font-medium text-v2-text-secondary">
-                {t("searchSymbol")}
-              </label>
-              <SymbolAutocomplete
-                value={symbol}
-                onChange={handleSymbolChange}
-                placeholder={t("searchSymbolPlaceholder")}
-                usePortal
-              />
-            </div>
-          )}
-
-          <Button
-            type={ButtonType.PRIMARY}
-            onClick={() => setStep(3)}
-            disabled={!canProceedToStep3}
-            className="w-full mt-1"
-          >
-            {t("continue")}
-          </Button>
+            {SILVER_VND_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </div>
       )}
 
-      {/* Step 3: Note + Confirm */}
-      {step === 3 && (
-        <div className="flex flex-col gap-4">
-          <button
-            type="button"
-            onClick={() => setStep(2)}
-            className="self-start text-sm text-v2-text-tertiary hover:text-v2-gold-accent flex items-center gap-1 focus:outline-none"
-            aria-label={t("backToSymbolLabel")}
+      {category === "currency" && (
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-medium text-v2-text-secondary">
+            {t("currencyType")}
+          </label>
+          <select
+            value={symbol}
+            onChange={handleCurrencySelect}
+            className="w-full min-h-[44px] sm:min-h-[48px] px-3 sm:px-4 rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent text-base focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent transition-all duration-200"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            {t("back")}
-          </button>
+            {(marketData?.currency ?? []).map((item) => (
+              <option key={item.typeCode} value={item.typeCode}>
+                {item.name || item.typeCode}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
-          {/* Summary of selected asset */}
-          <div className="rounded-lg border border-v2-border-light bg-v2-bg-dark px-4 py-3 flex flex-col gap-0.5">
-            <span className="text-xs text-v2-text-tertiary">{t("selectedAsset")}</span>
-            <span className="text-base font-semibold text-v2-gold-accent">{symbol}</span>
-            {name && name !== symbol && (
-              <span className="text-sm text-v2-text-secondary truncate">{name}</span>
-            )}
-            <span className="text-xs text-v2-text-tertiary">{currency}</span>
-          </div>
-
-          {/* Optional note */}
-          <FormInput
-            label={t("noteLabel")}
-            value={note}
-            onChange={(e) => {
-              if (e.target.value.length <= 200) {
-                setNote(e.target.value);
-              }
-            }}
-            maxLength={200}
-            placeholder={t("notePlaceholder")}
-            helperText={`${note.length}/200`}
+      {category === "other" && (
+        <div className="flex flex-col gap-1.5">
+          <label className="block text-sm font-medium text-v2-text-secondary">
+            {t("searchSymbol")}
+          </label>
+          <SymbolAutocomplete
+            value={symbol}
+            onChange={handleSymbolChange}
+            placeholder={t("searchSymbolPlaceholder")}
+            usePortal
           />
-
-          {/* Error message */}
-          {errorKey && (
-            <p className="text-sm text-v2-red-negative flex items-center gap-1">
-              <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span>{t(`errors.${errorKey}`)}</span>
-            </p>
-          )}
-
-          <Button
-            type={ButtonType.PRIMARY}
-            onClick={handleSubmit}
-            loading={createMutation.isPending}
-            className="w-full"
-          >
-            {tp("addToWatchlist")}
-          </Button>
         </div>
       )}
+
+      {/* Optional note */}
+      <FormInput
+        label={t("noteLabel")}
+        value={note}
+        onChange={(e) => {
+          if (e.target.value.length <= 200) {
+            setNote(e.target.value);
+          }
+        }}
+        maxLength={200}
+        placeholder={t("notePlaceholder")}
+        helperText={`${note.length}/200`}
+      />
+
+      {/* Error message */}
+      {errorKey && (
+        <p className="text-sm text-v2-red-negative flex items-center gap-1">
+          <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <span>{t(`errors.${errorKey}`)}</span>
+        </p>
+      )}
+
+      <Button
+        type={ButtonType.PRIMARY}
+        onClick={handleSubmit}
+        loading={createMutation.isPending}
+        disabled={!symbol.trim()}
+        className="w-full"
+      >
+        {tp("addToWatchlist")}
+      </Button>
     </div>
   );
 }
