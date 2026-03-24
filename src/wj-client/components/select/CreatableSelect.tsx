@@ -167,7 +167,7 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
  "bg-v2-bg-dark",
  "text-v2-gold-accent",
  "border border-v2-border-light",
- "placeholder:text-v2-text-tertiary",
+ "placeholder:text-v2-text-placeholder",
           "disabled:opacity-50 disabled:cursor-not-allowed",
           // Focus styles - single ring (clean, modern) - unified with other inputs
           "focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent",

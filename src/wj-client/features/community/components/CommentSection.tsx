@@ -127,7 +127,7 @@ export function CommentSection({ postId, currentUser, onCommentAdded, onCommentD
             onKeyDown={handleKeyDown}
             placeholder="Viết bình luận..."
             maxLength={500}
-            className="flex-1 bg-transparent font-roboto text-[13px] text-v2-gold-accent placeholder:text-v2-text-tertiary focus:outline-none"
+            className="flex-1 bg-transparent font-roboto text-[13px] text-v2-gold-accent placeholder:text-v2-text-placeholder focus:outline-none"
           />
           <button
             onClick={handleSubmit}

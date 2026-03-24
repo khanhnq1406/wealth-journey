@@ -178,7 +178,7 @@ export const CategoryQuickSelect = memo(function CategoryQuickSelect({
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               placeholder={t("newCategoryPlaceholder")}
- className="flex-1 px-3 py-2 text-sm bg-v2-bg-dark text-v2-gold-accent border border-v2-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-v2-gold-primary placeholder:text-v2-text-tertiary"
+ className="flex-1 px-3 py-2 text-sm bg-v2-bg-dark text-v2-gold-accent border border-v2-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-v2-gold-primary placeholder:text-v2-text-placeholder"
               autoFocus
             />
             <button

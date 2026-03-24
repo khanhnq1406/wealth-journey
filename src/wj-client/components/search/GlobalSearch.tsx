@@ -438,7 +438,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
               className={cn(
                 "w-full bg-transparent outline-none focus-visible:outline-none",
  "text-v2-gold-accent",
- "placeholder:text-v2-text-tertiary",
+ "placeholder:text-v2-text-placeholder",
                 "text-base",
               )}
               autoComplete="off"

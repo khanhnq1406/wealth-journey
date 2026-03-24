@@ -127,7 +127,7 @@ export function TagInput({
             "flex-1 min-w-[80px] text-base sm:text-base py-0.5",
             "bg-transparent border-none outline-none",
  "text-v2-gold-accent",
- "placeholder:text-v2-text-tertiary"
+ "placeholder:text-v2-text-placeholder"
           )}
           aria-invalid={hasError ? "true" : "false"}
           aria-describedby={cn(
