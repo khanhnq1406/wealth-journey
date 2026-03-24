@@ -196,7 +196,7 @@ export function InlinePriceEdit({ item, category }: InlinePriceEditProps) {
       <button
         onClick={handleEdit}
         disabled={isPending}
-        className="p-1 text-v2-maroon-900 hover:text-v2-text-secondary disabled:opacity-50"
+        className="p-1 text-v2-gold-primary/60 hover:text-v2-gold-accent disabled:opacity-50"
         title={t("edit")}
       >
         <svg

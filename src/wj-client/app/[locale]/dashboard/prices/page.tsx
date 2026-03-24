@@ -141,8 +141,8 @@ function StarToggleButton({
       aria-pressed={isInWatchlist}
       className={`flex items-center justify-center min-w-[44px] min-h-[44px] rounded transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary disabled:cursor-not-allowed ${
         isInWatchlist
-          ? "text-amber-400 hover:text-amber-500"
-          : "text-gray-400 hover:text-v2-gold-accent"
+          ? "text-v2-gold-primary hover:text-v2-gold-accent"
+          : "text-v2-gold-primary/40 hover:text-v2-gold-primary"
       }`}
     >
       {isPending ? (
@@ -177,11 +177,21 @@ function StarToggleButton({
 
 const columnHelper = createColumnHelper<PriceItem>();
 
-const TAB_TYPE_COLOR: Record<Tab, string> = {
-  watchlist: "text-v2-gold-accent",
+// Desktop (cream/parchment rows) — dark colors for readability
+const TAB_TYPE_COLOR_DESKTOP: Record<Tab, string> = {
+  watchlist: "text-v2-maroon-900",
   gold: "text-v2-maroon-900",
   silver: "text-v2-maroon-900",
   currency: "text-v2-maroon-900",
+  symbol: "text-v2-maroon-900",
+};
+
+// Mobile (dark BaseCard rows) — bright colors for readability
+const TAB_TYPE_COLOR_MOBILE: Record<Tab, string> = {
+  watchlist: "text-v2-gold-accent",
+  gold: "text-v2-gold-accent",
+  silver: "text-v2-text-tertiary",
+  currency: "text-v2-currency-accent",
   symbol: "text-v2-gold-accent",
 };
 
@@ -194,7 +204,7 @@ function buildTanstackColumns(
   onStarAddSuccess?: () => void,
   onStarRemoveSuccess?: () => void,
 ) {
-  const typeColor = TAB_TYPE_COLOR[tab];
+  const typeColor = TAB_TYPE_COLOR_DESKTOP[tab];
   const showUnitLabel = tab !== "currency";
   const divideValues = tab !== "currency";
   const cols = [
@@ -307,7 +317,7 @@ function buildMobileColumns(
   onStarAddSuccess?: () => void,
   onStarRemoveSuccess?: () => void,
 ): MobileColumnDef<PriceItem>[] {
-  const typeColor = TAB_TYPE_COLOR[tab];
+  const typeColor = TAB_TYPE_COLOR_MOBILE[tab];
   const showUnitLabel = tab !== "currency";
   const divideValues = tab !== "currency";
   const cols: MobileColumnDef<PriceItem>[] = [
@@ -319,7 +329,7 @@ function buildMobileColumns(
           <span className={`font-bold ${typeColor}`}>
             {row.name || row.typeCode}
           </span>
-          <span className="ml-1.5 text-xs text-v2-maroon-800/60">{row.currency}</span>
+          <span className="ml-1.5 text-xs text-v2-gold-accent/60">{row.currency}</span>
           <OverrideIndicator item={row} category={tab} isAdmin={isAdmin} />
         </div>
       ),
@@ -329,11 +339,11 @@ function buildMobileColumns(
       header: (
         <div>
           <span className="text-base font-bold">{t("table.buy")}</span>
-          {showUnitLabel && <span className="text-[10px] text-v2-maroon-800/60 ml-1">{t("table.buyUnit")}</span>}
+          {showUnitLabel && <span className="text-[10px] text-v2-gold-accent/60 ml-1">{t("table.buyUnit")}</span>}
         </div>
       ),
       cell: ({ row }) => (
-        <span className="font-bold text-red-700 tabular-nums">
+        <span className="font-bold text-v2-red-negative tabular-nums">
           {formatPriceValue(row.buy, row.currency, { divide: divideValues })}
         </span>
       ),
@@ -343,11 +353,11 @@ function buildMobileColumns(
       header: (
         <div>
           <span className="text-base font-bold">{t("table.sell")}</span>
-          {showUnitLabel && <span className="text-[10px] text-v2-maroon-800/60 ml-1">{t("table.sellUnit")}</span>}
+          {showUnitLabel && <span className="text-[10px] text-v2-gold-accent/60 ml-1">{t("table.sellUnit")}</span>}
         </div>
       ),
       cell: ({ row }) => (
-        <span className="font-bold text-green-700 tabular-nums">
+        <span className="font-bold text-v2-green-positive tabular-nums">
           {formatPriceValue(row.sell, row.currency, { divide: divideValues })}
         </span>
       ),
