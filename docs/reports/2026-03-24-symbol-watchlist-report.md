@@ -91,7 +91,7 @@ All other tasks approved without changes.
 | 2026-03-24 | Add `useTranslations` i18n to WatchlistTab and AddToWatchlistForm; add translation keys (EN + VI) | Minor | `WatchlistTab.tsx`, `AddToWatchlistForm.tsx`, `messages/en/investment.json`, `messages/vi/investment.json` |
 | 2026-03-24 | Symbol search dropdown in AddToWatchlistForm now renders via portal (escapes modal overflow clipping); fixed portal click-outside to include `portalRef` so option clicks are not intercepted | Minor | `Select.tsx`, `SymbolAutocomplete.tsx`, `AddToWatchlistForm.tsx` |
 | 2026-03-24 | "Add to Watchlist" in Symbol Lookup tab now adds directly without opening modal; inline success/error feedback | Minor | `prices/page.tsx`, `messages/en/investment.json`, `messages/vi/investment.json` |
-| 2026-03-24 | Fix drag overlap: replace `<table>`/`<tr>` layout with `div`+CSS grid — `<tr>` elements ignore z-index in CSS spec, so `whileDrag` z-index had no effect; grid divs respect z-index stacking correctly | Minor | `DraggableWatchlistTable.tsx` |
+| 2026-03-24 | Fix drag overlap: replace framer-motion `Reorder.Group/Item` with `@dnd-kit/sortable` — framer-motion v12 resets gesture origin on every `values` update during drag causing offset jump and visual overlap; dnd-kit uses `DragOverlay` portal so dragged item never re-renders mid-gesture | Minor | `DraggableWatchlistTable.tsx`, `package.json` |
 | 2026-03-24 | Star icon (unfilled/not-in-watchlist) color changed from `text-v2-text-tertiary` (#fcf2e0, near-white — invisible on light background) to `text-gray-400`; hover remains `text-v2-gold-accent` | Minor | `prices/page.tsx` |
 
 ## Known Issues / Technical Debt
