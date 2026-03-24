@@ -384,6 +384,25 @@ func RegisterRoutes(
 		community.GET("/trending", h.Community.GetTrendingTopics)
 	}
 
+	// Watchlist routes (protected)
+	if h.Watchlist != nil {
+		watchlist := v1.Group("/watchlist")
+		watchlist.Use(AuthMiddleware(authSrv))
+		if rateLimiter != nil {
+			watchlist.Use(appmiddleware.RateLimitByUser(rateLimiter))
+		}
+		{
+			// Specific routes must come before :id parameterized route
+			watchlist.GET("/check", h.Watchlist.CheckWatchlistItem)
+			watchlist.PUT("/reorder", h.Watchlist.ReorderWatchlist)
+			// CRUD routes
+			watchlist.POST("", h.Watchlist.CreateWatchlistItem)
+			watchlist.GET("", h.Watchlist.ListWatchlist)
+			watchlist.PUT("/:id", h.Watchlist.UpdateWatchlistItem)
+			watchlist.DELETE("/:id", h.Watchlist.DeleteWatchlistItem)
+		}
+	}
+
 	// Feedback routes (protected)
 	feedback := v1.Group("/feedback")
 	feedback.Use(AuthMiddleware(authSrv))

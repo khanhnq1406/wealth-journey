@@ -8,7 +8,7 @@
 - **Started:** 2026-03-24T00:00:00Z
 - **Last updated:** 2026-03-24T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 6
+- **Current task:** 9
 
 ## Task Progress
 
@@ -20,9 +20,9 @@
 | 3   | Database Migration — migrate-watchlist                 | done    | —      | Migration command and Taskfile entry for AutoMigrate |
 | 4   | Repository Layer — watchlist_repository.go             | done    | —      | 9-method repository with ownership scoping; ReorderItems validates per-ID ownership via RowsAffected |
 | 5   | Service Layer — watchlist_service.go                   | done    | —      | 6-method service with parallel price enrichment, ownership checks, 50-item limit, input validation |
-| 6   | Wire Repository + Service into DI                      | pending | —      | —       |
-| 7   | REST Handler — watchlist.go                            | pending | —      | —       |
-| 8   | Wire Handler + Routes                                  | pending | —      | —       |
+| 6   | Wire Repository + Service into DI                      | done    | —      | Watchlist wired into services.go and providers.go; go build clean |
+| 7   | REST Handler — watchlist.go                            | done    | —      | 6-endpoint handler using handler.* helpers; CheckWatchlistItem fixed to use handler.Success |
+| 8   | Wire Handler + Routes                                  | done    | —      | AllHandlers wired in builder.go; routes registered with /check+/reorder before /:id |
 | 9   | Frontend — Watchlist Feature Module + Generated Hooks  | pending | —      | —       |
 | 10  | Frontend — WatchlistTab + watchlist-helpers            | pending | —      | —       |
 | 11  | Frontend — AssetTypeBadge Component                    | pending | —      | —       |
