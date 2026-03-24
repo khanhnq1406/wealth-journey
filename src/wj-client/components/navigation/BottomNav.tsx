@@ -9,7 +9,6 @@ import {
   HomeIcon,
   PortfolioIcon,
   CommunityIcon,
-  PricesIcon,
 } from "@/components/icons";
 
 export interface NavItem {
@@ -80,7 +79,7 @@ export const BottomNav = memo(function BottomNav({
               onClick={(e) => handleClick(e, item.href)}
               className={cn(
                 "flex flex-col items-center justify-center",
-                "min-h-[48px] w-full max-w-[25%]", // 25% width for 4 items
+                "min-h-[48px] w-full max-w-[33.33%]", // 33% width for 3 items
                 "transition-all duration-200 ease-out",
                 "text-v2-text-tertiary",
                 isActive
@@ -151,12 +150,6 @@ export const createNavItems = (
       label: t ? t('home') : "Home",
       ariaLabel: t ? t('home') : "Go to home dashboard",
       icon: <HomeIcon size="md" decorative />,
-    },
-    {
-      href: routes.prices,
-      label: t ? t('prices') : "Prices",
-      ariaLabel: t ? t('prices') : "Go to market prices",
-      icon: <PricesIcon size="md" decorative />,
     },
     {
       href: routes.community,

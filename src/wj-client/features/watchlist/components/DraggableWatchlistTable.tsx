@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, startTransition } from "react";
 import {
   DndContext,
   closestCenter,
@@ -154,7 +154,9 @@ export function DraggableWatchlistTable({
 
   useEffect(() => {
     if (!isDraggingRef.current) {
-      setLocalItems(items);
+      startTransition(() => {
+        setLocalItems(items);
+      });
     }
   }, [items]);
 
