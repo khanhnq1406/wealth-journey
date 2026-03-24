@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-24-user-price-alerts-plan.md
 - **Spec file:** docs/specs/2026-03-24-user-price-alerts-spec.md
 - **Started:** 2026-03-24T00:00:00Z
-- **Last updated:** 2026-03-24T06:00:00Z
-- **Current state:** in_progress
-- **Current task:** 13
+- **Last updated:** 2026-03-24T07:00:00Z
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -27,7 +27,7 @@
 | 9   | Frontend Settings Alerts Page                    | done        | 79374aa | AlertStatusBadge, PriceAlertList (MobileTable+desktop), settings page with filter tabs; fixed inline empty state → EmptyState, typo isDeletPending→isDeletePending |
 | 10  | Frontend Prices Page Entry Point                 | done        | 6dd5b7c | BellButton on gold/silver rows + Symbol Lookup "Set Alert"; 12 tests; i18n keys added |
 | 11  | Frontend Portfolio Page Entry Point              | done        | 9cd04f2 | Set Alert on InvestmentCardEnhanced; getAlertCategory() helper; 8 tests |
-| 13  | Runtime Flow Diagrams                            | pending     | —      | —       |
+| 13  | Runtime Flow Diagrams                            | done        | 8059fde | flow-user-price-alert.md with 4 flows: create, evaluation, notification delivery, management |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
