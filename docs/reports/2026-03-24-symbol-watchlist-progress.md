@@ -8,7 +8,7 @@
 - **Started:** 2026-03-24T00:00:00Z
 - **Last updated:** 2026-03-24T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 9
+- **Current task:** 12
 
 ## Task Progress
 
@@ -23,9 +23,9 @@
 | 6   | Wire Repository + Service into DI                      | done    | —      | Watchlist wired into services.go and providers.go; go build clean |
 | 7   | REST Handler — watchlist.go                            | done    | —      | 6-endpoint handler using handler.* helpers; CheckWatchlistItem fixed to use handler.Success |
 | 8   | Wire Handler + Routes                                  | done    | —      | AllHandlers wired in builder.go; routes registered with /check+/reorder before /:id |
-| 9   | Frontend — Watchlist Feature Module + Generated Hooks  | pending | —      | —       |
-| 10  | Frontend — WatchlistTab + watchlist-helpers            | pending | —      | —       |
-| 11  | Frontend — AssetTypeBadge Component                    | pending | —      | —       |
+| 9   | Frontend — Watchlist Feature Module + Generated Hooks  | done    | —      | features/watchlist/ directory structure with placeholder files created |
+| 10  | Frontend — WatchlistTab + watchlist-helpers            | done    | —      | WatchlistTab with desktop table, mobile MobileTable, delete, FAB; helpers with price/change formatters |
+| 11  | Frontend — AssetTypeBadge Component                    | done    | —      | Colored badge mapping InvestmentType to display label |
 | 12  | Frontend — DraggableWatchlistTable Component           | pending | —      | —       |
 | 13  | Frontend — AddToWatchlistForm                          | pending | —      | —       |
 | 14  | Frontend — Integrate Watchlist Tab into Prices Page    | pending | —      | —       |
