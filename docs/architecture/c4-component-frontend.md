@@ -13,7 +13,7 @@ C4Component
         Component(finance_page, "Finance Page", "app/dashboard/finance", "Unified tabbed view: FinanceTabBar switches between TransactionContent, ReportContent, BudgetContent via URL query params (?tab=transaction|report|budget). Content lazy-loaded via next/dynamic. Old routes (/transaction, /report, /budget) redirect here via middleware.")
         Component(wallet_page, "Wallet Page", "app/dashboard/wallets", "Wallet grid/list with fund operations")
         Component(portfolio_page, "Portfolio Page", "app/dashboard/portfolio", "Investment portfolio with analytics; period pill selector (1D/1W/1M/ALL) via PortfolioSummaryEnhanced. No wallet filter — queries all investments via walletId=0.")
-        Component(prices_page, "Prices Page", "app/dashboard/prices", "Live gold/silver/currency/market prices with 4 tabs (Gold, Silver, Currency, Symbol Lookup). Admin users see inline price edit controls via useAuth isAdmin check.")
+        Component(prices_page, "Prices Page", "app/dashboard/prices", "Live gold/silver/currency/market prices with 5 tabs (Gold, Silver, Currency, Symbol Lookup, Watchlist). Admin users see inline price edit controls via useAuth isAdmin check. Added to desktop Sidebar and mobile BottomNav/slide-out menu as a primary navigation destination.")
         Component(community_page, "Community Page", "app/dashboard/community", "Social feed with posts, comments, likes, user profiles")
         Component(settings, "Settings Pages", "app/dashboard/settings", "Sessions, import templates, language toggle, security (auth methods, set/change password)")
         Component(feedback_page, "Feedback Page", "app/dashboard/feedback", "Submit feedback form and view personal feedback history with status badges")
@@ -32,10 +32,11 @@ C4Component
         Component(community_feat, "Community Feature", "features/community", "Posts, comments, likes, follows, profiles, topic tags; Phase 2 components: SharePostModal, SharedPostEmbed, HashtagLink, SavedPostsView, SuggestedUserCard, SuggestedUsers, TrendingTopics, ProfileView, FollowingView, UserListItem; updated: PostCard (share+save actions, onUserClick), PostBody (hashtag rendering, shared post embed), PostActions (Share/Save buttons), PostEngagement (shareCount), PostHeader (clickable avatar+name via onUserClick), CommunityFeed (onUserClick prop); hooks: useSavedPost, useNotifications (useNotificationCount, useMarkAllRead), usePushSubscription (SW registration, VAPID key fetch, subscribe/unsubscribe); utils: hashtag.ts (extractHashtags, tokenizeContent); Phase 3 components: ImageUpload, EditCommentForm, ReplyBubble, ReplyInput, ReplyList, ProfileEditModal, ProfileTabs; Phase 3 hooks: useNotificationStream (SSE-based real-time notifications with metadata + actorId=0 handling), useImageUpload (upload progress, preview, Supabase integration)")
         Component(feedback_feat, "Feedback Feature", "features/feedback", "SubmitFeedbackForm (Zod validation, rate limit handling), StatusBadge (pending/reviewed/resolved), FeedbackItem (expandable card), feedback-schema.ts")
         Component(admin_feat, "Admin Feature", "features/admin", "AdminGuard component (redirects non-admin users), AdminUsersTab (search, MobileTable, role toggle with self-protection, confirmation dialog), AdminFeedbackTab (status filter, edit panel for status/admin note, delete confirmation), AdminBroadcastForm (textarea with 500-char limit, char counter, POST /admin/broadcast), PriceAlertConfigForm (accordion-based config for global settings + per-category thresholds/templates, GET/PUT /admin/price-alert-config), Pagination component, admin-specific hooks and utilities")
+        Component(watchlist_feat, "Watchlist Feature", "features/watchlist", "WatchlistTab: draggable symbol list with live prices, P/L column, remove button. AddToWatchlistForm: SymbolAutocomplete-based add form with asset-type badge preview. DraggableWatchlistTable: drag-to-reorder rows with react-dnd. AssetTypeBadge: pill badge for STOCK/ETF/CRYPTO/GOLD/SILVER/CURRENCY asset types. hooks/useWatchlist.ts: query + mutations for list/add/remove. utils/watchlist-helpers.ts: price formatting and asset-type label resolution.")
     }
 
     Container_Boundary(shared, "Shared Layer") {
-        Component(layout, "Layout Components", "shared/components/layout", "Dashboard layout, sidebar, bottom nav, active link")
+        Component(layout, "Layout Components", "shared/components/layout", "Dashboard layout, sidebar (includes Prices nav item), bottom nav (includes Prices as 7th item, replacing earlier 6-item cap), mobile slide-out menu (includes Prices), active link")
         Component(forms, "Form Components", "shared/components/forms", "FormInput, FormSelect, FormNumberInput, DatePicker, Textarea, TagInput")
         Component(modals, "Modal Components", "shared/components/modals", "BaseModal, BottomSheet, ConfirmationDialog, Success")
         Component(selects, "Select Components", "shared/components/select", "Select, CreatableSelect, MultiSelect, CurrencySelector")
@@ -79,6 +80,7 @@ C4Component
     Rel(wallet_page, wallet_feat, "Renders wallet management")
     Rel(portfolio_page, invest_feat, "Renders portfolio")
     Rel(prices_page, prices_feat, "Renders price tables")
+    Rel(prices_page, watchlist_feat, "Renders Watchlist tab (5th tab)")
     Rel(prices_page, auth_feat, "useAuth isAdmin check for inline price editing")
     Rel(auth_pages, auth_feat, "Renders auth forms")
     Rel(settings, import_feat, "Renders import templates")
@@ -114,6 +116,9 @@ C4Component
     Rel(feedback_feat, feedback, "Uses EmptyState")
     Rel(admin_feat, redux, "Reads isAdmin from auth state")
     Rel(admin_feat, gen_hooks, "useQueryGetSiteSettings, useMutationUpdateSiteSettings")
+    Rel(watchlist_feat, gen_hooks, "useQueryGetWatchlist, useMutationAddToWatchlist, useMutationRemoveFromWatchlist")
+    Rel(watchlist_feat, forms, "Uses SymbolAutocomplete (FormAutocomplete) for add form")
+    Rel(watchlist_feat, tables, "Uses DraggableWatchlistTable (extends MobileTable with drag-to-reorder)")
 
     Rel(gen_api, errTranslation, "Passes error codes from API responses")
     Rel(errTranslation, intl_catalogs, "Resolves i18n translation keys")

@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+package wealthjourney.watchlist.v1;
+
+option go_package = "protobuf/v1";
+
+import "google/api/annotations.proto";
+import "protobuf/v1/investment.proto";
+
+// ── Watchlist Messages ──
+
+message WatchlistItem {
+  int32 id = 1 [json_name = "id"];
+  string symbol = 2 [json_name = "symbol"];
+  string name = 3 [json_name = "name"];
+  wealthjourney.investment.v1.InvestmentType asset_type = 4 [json_name = "assetType"];
+  string currency = 5 [json_name = "currency"];
+  string note = 6 [json_name = "note"];
+  int32 sort_order = 7 [json_name = "sortOrder"];
+  // Price fields (enriched at response time, not stored)
+  int64 current_price = 8 [json_name = "currentPrice"];
+  int64 price_change = 9 [json_name = "priceChange"];
+  double price_change_percent = 10 [json_name = "priceChangePercent"];
+  int64 buy_price = 11 [json_name = "buyPrice"];
+  int64 sell_price = 12 [json_name = "sellPrice"];
+  int64 created_at = 13 [json_name = "createdAt"];
+}
+
+// ── RPC Requests/Responses ──
+
+message CreateWatchlistItemRequest {
+  string symbol = 1 [json_name = "symbol"];
+  string name = 2 [json_name = "name"];
+  wealthjourney.investment.v1.InvestmentType asset_type = 3 [json_name = "assetType"];
+  string currency = 4 [json_name = "currency"];
+  string note = 5 [json_name = "note"];
+}
+
+message CreateWatchlistItemResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  WatchlistItem item = 3 [json_name = "item"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+message ListWatchlistRequest {}
+
+message ListWatchlistResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  repeated WatchlistItem items = 3 [json_name = "items"];
+  int32 total = 4 [json_name = "total"];
+  string timestamp = 5 [json_name = "timestamp"];
+}
+
+message UpdateWatchlistItemRequest {
+  int32 id = 1 [json_name = "id"];
+  string note = 2 [json_name = "note"];
+}
+
+message UpdateWatchlistItemResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  WatchlistItem item = 3 [json_name = "item"];
+  string timestamp = 4 [json_name = "timestamp"];
+}
+
+message DeleteWatchlistItemRequest {
+  int32 id = 1 [json_name = "id"];
+}
+
+message DeleteWatchlistItemResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+message ReorderWatchlistRequest {
+  repeated int32 item_ids = 1 [json_name = "itemIds"];
+}
+
+message ReorderWatchlistResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+message CheckWatchlistItemRequest {
+  string symbol = 1 [json_name = "symbol"];
+}
+
+message CheckWatchlistItemResponse {
+  bool exists = 1 [json_name = "exists"];
+  int32 item_id = 2 [json_name = "itemId"];
+}
+
+// ── Service Definition ──
+
+service WatchlistService {
+  rpc CreateWatchlistItem(CreateWatchlistItemRequest) returns (CreateWatchlistItemResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/watchlist"
+      body: "*"
+    };
+  }
+
+  rpc ListWatchlist(ListWatchlistRequest) returns (ListWatchlistResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/watchlist"
+    };
+  }
+
+  rpc UpdateWatchlistItem(UpdateWatchlistItemRequest) returns (UpdateWatchlistItemResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/watchlist/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteWatchlistItem(DeleteWatchlistItemRequest) returns (DeleteWatchlistItemResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/watchlist/{id}"
+    };
+  }
+
+  rpc ReorderWatchlist(ReorderWatchlistRequest) returns (ReorderWatchlistResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/watchlist/reorder"
+      body: "*"
+    };
+  }
+
+  rpc CheckWatchlistItem(CheckWatchlistItemRequest) returns (CheckWatchlistItemResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/watchlist/check"
+    };
+  }
+}
