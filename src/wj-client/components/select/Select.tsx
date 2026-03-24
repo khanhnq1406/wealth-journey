@@ -394,7 +394,7 @@ export function Select<T extends string = string>({
           spellCheck={false}
           className={cn(
  "w-full pr-16 rounded-lg border bg-v2-bg-dark",
- "text-v2-gold-accent",
+ "text-v2-gold-accent placeholder:text-v2-text-placeholder",
             "min-h-[44px] sm:min-h-[48px] px-3 sm:px-4 text-base sm:text-base",
             "transition-all duration-200",
             // Focus styles - aligned with FormSelect
