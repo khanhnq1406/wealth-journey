@@ -8,7 +8,7 @@
 - **Started:** 2026-03-24T00:00:00Z
 - **Last updated:** 2026-03-24T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 12
+- **Current task:** 14
 
 ## Task Progress
 
@@ -26,8 +26,8 @@
 | 9   | Frontend — Watchlist Feature Module + Generated Hooks  | done    | —      | features/watchlist/ directory structure with placeholder files created |
 | 10  | Frontend — WatchlistTab + watchlist-helpers            | done    | —      | WatchlistTab with desktop table, mobile MobileTable, delete, FAB; helpers with price/change formatters |
 | 11  | Frontend — AssetTypeBadge Component                    | done    | —      | Colored badge mapping InvestmentType to display label |
-| 12  | Frontend — DraggableWatchlistTable Component           | pending | —      | —       |
-| 13  | Frontend — AddToWatchlistForm                          | pending | —      | —       |
+| 12  | Frontend — DraggableWatchlistTable Component           | done    | —      | framer-motion Reorder.Group/Item drag-and-drop table; parent handles optimistic update + revert |
+| 13  | Frontend — AddToWatchlistForm                          | done    | —      | 3-step form (Gold/Silver/Other → symbol → note); duplicate/limit error messages |
 | 14  | Frontend — Integrate Watchlist Tab into Prices Page    | pending | —      | —       |
 | 15  | Frontend — Navigation Integration                      | pending | —      | —       |
 | 16  | Create Runtime Flow Diagram                            | pending | —      | —       |

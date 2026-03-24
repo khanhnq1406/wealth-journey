@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Trash2 } from "lucide-react";
-import { BaseCard } from "@/components/BaseCard";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
 import { EmptyState } from "@/components/feedback/EmptyState";
@@ -11,6 +10,7 @@ import { MobileTable, MobileColumnDef } from "@/components/table/MobileTable";
 import {
   useQueryListWatchlist,
   useMutationDeleteWatchlistItem,
+  useMutationReorderWatchlist,
 } from "@/utils/generated/hooks";
 import { WatchlistItem } from "@/gen/protobuf/v1/watchlist";
 import { AssetTypeBadge } from "@/features/watchlist/components/AssetTypeBadge";
@@ -18,6 +18,7 @@ import {
   formatWatchlistPrice,
   formatWatchlistChange,
 } from "@/features/watchlist/utils/watchlist-helpers";
+import { DraggableWatchlistTable } from "@/features/watchlist/components/DraggableWatchlistTable";
 
 interface WatchlistTabProps {
   onAddClick: () => void;
@@ -114,12 +115,45 @@ function DeleteButton({
 
 export function WatchlistTab({ onAddClick }: WatchlistTabProps) {
   const listQuery = useQueryListWatchlist({}, { refetchOnMount: "always" });
-  const items = listQuery.data?.items ?? [];
+  const serverItems = listQuery.data?.items ?? [];
   const total = listQuery.data?.total ?? 0;
+
+  // Local ordered copy for optimistic drag-and-drop updates
+  const [orderedItems, setOrderedItems] = useState<WatchlistItem[]>(serverItems);
+
+  // Sync local order whenever server data refreshes
+  useEffect(() => {
+    setOrderedItems(serverItems);
+  }, [serverItems]);
+
+  const deleteMutation = useMutationDeleteWatchlistItem({
+    onSuccess: () => {
+      listQuery.refetch();
+    },
+  });
+
+  const reorderMutation = useMutationReorderWatchlist({
+    onError: () => {
+      // Revert to server order on failure
+      setOrderedItems(serverItems);
+    },
+  });
+
+  const handleReorder = (newOrder: WatchlistItem[]) => {
+    setOrderedItems(newOrder);
+    reorderMutation.mutate({ itemIds: newOrder.map((it) => it.id) });
+  };
+
+  const handleDelete = (id: number) => {
+    deleteMutation.mutate({ id });
+  };
 
   const handleDeleted = () => {
     listQuery.refetch();
   };
+
+  // Use ordered items for rendering (falls back to server items before first reorder)
+  const items = orderedItems.length > 0 ? orderedItems : serverItems;
 
   // Mobile columns
   const mobileColumns: MobileColumnDef<WatchlistItem>[] = [
@@ -234,70 +268,14 @@ export function WatchlistTab({ onAddClick }: WatchlistTabProps) {
         />
       ) : (
         <>
-          {/* Desktop table */}
-          <div className="hidden sm:block overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-v2-border-light">
-                  <th className="text-left py-2 px-3 font-semibold text-v2-text-secondary">
-                    Symbol
-                  </th>
-                  <th className="text-right py-2 px-3 font-semibold text-v2-text-secondary">
-                    Price
-                  </th>
-                  <th className="text-right py-2 px-3 font-semibold text-v2-text-secondary">
-                    Change
-                  </th>
-                  <th className="text-center py-2 px-3 font-semibold text-v2-text-secondary">
-                    Type
-                  </th>
-                  <th className="text-left py-2 px-3 font-semibold text-v2-text-secondary">
-                    Note
-                  </th>
-                  <th className="py-2 px-3" aria-label="Actions" />
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="border-b border-v2-border-light last:border-0 hover:bg-v2-bg-surface-tint transition-colors duration-150"
-                  >
-                    <td className="py-3 px-3">
-                      <div>
-                        <span className="font-bold text-v2-gold-accent">
-                          {item.symbol}
-                        </span>
-                        {item.name && (
-                          <span className="block text-xs text-v2-text-tertiary mt-0.5">
-                            {item.name}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-3 px-3 text-right tabular-nums font-semibold">
-                      {formatWatchlistPrice(item)}
-                    </td>
-                    <td className="py-3 px-3 text-right">
-                      <div className="flex justify-end">
-                        <ChangeDisplay item={item} />
-                      </div>
-                    </td>
-                    <td className="py-3 px-3 text-center">
-                      <AssetTypeBadge assetType={item.assetType} />
-                    </td>
-                    <td className="py-3 px-3 text-v2-text-secondary max-w-[160px] truncate">
-                      {item.note || (
-                        <span className="text-v2-text-tertiary">—</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-3">
-                      <DeleteButton item={item} onDeleted={handleDeleted} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* Desktop draggable table */}
+          <div className="hidden sm:block">
+            <DraggableWatchlistTable
+              items={items}
+              onReorder={handleReorder}
+              onDelete={handleDelete}
+              isDeleting={deleteMutation.isPending}
+            />
           </div>
 
           {/* Mobile card list */}
