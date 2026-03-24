@@ -7,8 +7,8 @@
 - **Spec file:** `docs/specs/2026-03-24-watchlist-star-toggle-spec.md`
 - **Started:** 2026-03-24T00:00:00Z
 - **Last updated:** 2026-03-24T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 3 (final verification)
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -17,7 +17,7 @@
 | 0   | Add translation keys for star toggle                          | done        | —      | Added starAdd/starRemove/addedToWatchlist/removedFromWatchlist to en+vi |
 | 1   | Implement StarToggleButton and watchlist state in PricesPage  | done        | —      | StarToggleButton + watchedSymbolToId Map + star column in gold/silver/currency tables |
 | 2   | Update runtime flow diagrams                                  | done        | —      | Added flows 5+6 (quick-add/remove via star) to flow-watchlist.md |
-| 3   | Final verification (tsc + build)                              | pending     | —      | —       |
+| 3   | Final verification (tsc + build)                              | done        | bfad7d6 | npx tsc --noEmit: 0 errors; npm run build: success |
 
 ## Skill Recovery
 
