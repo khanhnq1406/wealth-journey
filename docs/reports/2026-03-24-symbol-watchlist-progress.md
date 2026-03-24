@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-24-symbol-watchlist-plan.md
 - **Spec file:** docs/specs/2026-03-24-symbol-watchlist-spec.md
 - **Started:** 2026-03-24T00:00:00Z
-- **Last updated:** 2026-03-24T07:00:00Z
-- **Current state:** in_progress
-- **Current task:** 17
+- **Last updated:** 2026-03-24T08:00:00Z
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -31,7 +31,7 @@
 | 14  | Frontend — Integrate Watchlist Tab into Prices Page    | done    | —      | Watchlist as default tab; WatchlistTab + AddToWatchlistForm modal wired into prices page; cache invalidation on success |
 | 15  | Frontend — Navigation Integration                      | done    | —      | PricesIcon SVG added; Prices in desktop sidebar (animationDelay=180), mobile slide-out, and bottom nav (4-item, 25% width); Admin delay fixed to 270ms |
 | 16  | Create Runtime Flow Diagram                            | done    | —      | flow-watchlist.md with 4 flows (add, list+enrich, reorder, check/delete); README updated |
-| 17  | Final Integration Testing                              | pending | —      | —       |
+| 17  | Final Integration Testing                              | done    | —      | go build + go test -short + tsc --noEmit + npm run build all pass; implementation report written |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
