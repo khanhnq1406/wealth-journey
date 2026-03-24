@@ -209,6 +209,7 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
             value={symbol}
             onChange={handleGoldSelect}
             disableInput
+            disableFilter
             clearable={false}
             usePortal
           />
@@ -225,6 +226,7 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
             value={symbol}
             onChange={handleSilverSelect}
             disableInput
+            disableFilter
             clearable={false}
             usePortal
           />
@@ -244,6 +246,7 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
             value={symbol}
             onChange={handleCurrencySelect}
             disableInput
+            disableFilter
             clearable={false}
             usePortal
           />

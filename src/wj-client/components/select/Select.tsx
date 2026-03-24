@@ -370,7 +370,9 @@ export function Select<T extends string = string>({
     );
 
   const defaultDropdown = (
-    <div className={dropdownClassName}>{dropdownContent}</div>
+    <div className={dropdownClassName}>
+      <div className="max-h-60 overflow-y-auto">{dropdownContent}</div>
+    </div>
   );
 
   return (
