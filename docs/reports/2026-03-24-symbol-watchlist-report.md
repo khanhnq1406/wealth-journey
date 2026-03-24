@@ -93,6 +93,7 @@ All other tasks approved without changes.
 | 2026-03-24 | "Add to Watchlist" in Symbol Lookup tab now adds directly without opening modal; inline success/error feedback | Minor | `prices/page.tsx`, `messages/en/investment.json`, `messages/vi/investment.json` |
 | 2026-03-24 | Fix drag overlap: replace framer-motion `Reorder.Group/Item` with `@dnd-kit/sortable` (`604d59a`) — framer-motion v12 resets gesture origin on every `values` update during drag causing offset jump and visual overlap; dnd-kit uses `DragOverlay` portal so dragged item never re-renders mid-gesture | Minor | `DraggableWatchlistTable.tsx`, `package.json` |
 | 2026-03-24 | Star icon (unfilled/not-in-watchlist) color changed from `text-v2-text-tertiary` (#fcf2e0, near-white — invisible on light background) to `text-gray-400`; hover remains `text-v2-gold-accent` | Minor | `prices/page.tsx` |
+| 2026-03-24 | Align watchlist desktop table columns with fixed pixel widths — changed Price/Change/Type columns from `auto` (content-sized per row) to `160px`/`90px`/`100px` so all rows align uniformly with the header | Minor | `DraggableWatchlistTable.tsx` |
 
 ## Known Issues / Technical Debt
 
