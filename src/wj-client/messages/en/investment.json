@@ -359,7 +359,8 @@
         "errors": {
           "alreadyInWatchlist": "Already in your watchlist",
           "limitReached": "Maximum of 50 items reached",
-          "failedToAdd": "Failed to add to watchlist"
+          "failedToAdd": "Failed to add to watchlist",
+          "failedToRemove": "Failed to remove from watchlist"
         }
       }
     },

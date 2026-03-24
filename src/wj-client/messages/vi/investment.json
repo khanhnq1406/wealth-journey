@@ -359,7 +359,8 @@
         "errors": {
           "alreadyInWatchlist": "Đã có trong danh sách theo dõi",
           "limitReached": "Đã đạt tối đa 50 mã",
-          "failedToAdd": "Không thể thêm vào danh sách theo dõi"
+          "failedToAdd": "Không thể thêm vào danh sách theo dõi",
+          "failedToRemove": "Không thể xóa khỏi danh sách theo dõi"
         }
       }
     },
