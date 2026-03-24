@@ -90,3 +90,15 @@ export const BudgetIcon = memo(function BudgetIcon(
     </Icon>
   );
 });
+
+export const PricesIcon = memo(function PricesIcon(
+  props: Omit<IconProps, "children">,
+) {
+  return (
+    <Icon {...props} ariaLabel={props.ariaLabel || "Prices"}>
+      <svg {...standardSvgProps}>
+        <path d="M3 3v18h18M7 16l4-4 4 4 4-8" />
+      </svg>
+    </Icon>
+  );
+});

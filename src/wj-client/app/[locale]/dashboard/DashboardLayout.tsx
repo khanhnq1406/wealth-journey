@@ -158,6 +158,11 @@ export function DashboardLayout({
       },
       { href: routes.wallets, label: t("wallets"), icon: <Wallet size={22} /> },
       {
+        href: routes.prices,
+        label: t("prices"),
+        icon: <TrendingUp size={22} />,
+      },
+      {
         href: routes.feedback,
         label: t("feedback"),
         icon: <MessageCircle size={22} />,
@@ -427,11 +432,20 @@ export function DashboardLayout({
                     isActive={path === routes.wallets}
                   />
                   <NavItem
+                    href={routes.prices}
+                    label={t("prices")}
+                    isExpanded={isExpanded}
+                    showTooltip={!isExpanded}
+                    animationDelay={180}
+                    icon={<TrendingUp size={20} />}
+                    isActive={path === routes.prices}
+                  />
+                  <NavItem
                     href={routes.feedback}
                     label={t("feedback")}
                     isExpanded={isExpanded}
                     showTooltip={!isExpanded}
-                    animationDelay={180}
+                    animationDelay={210}
                     icon={<MessageCircle size={20} />}
                     isActive={path === routes.feedback}
                   />
@@ -446,7 +460,7 @@ export function DashboardLayout({
                   label={t("settings")}
                   isExpanded={isExpanded}
                   showTooltip={!isExpanded}
-                  animationDelay={210}
+                  animationDelay={240}
                   icon={<Settings size={20} />}
                   isActive={path.startsWith("/dashboard/settings")}
                 />
@@ -456,7 +470,7 @@ export function DashboardLayout({
                     label="Admin"
                     isExpanded={isExpanded}
                     showTooltip={!isExpanded}
-                    animationDelay={210}
+                    animationDelay={270}
                     icon={<Shield size={20} />}
                     isActive={path.startsWith(routes.admin)}
                   />

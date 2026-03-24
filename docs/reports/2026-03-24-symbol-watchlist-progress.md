@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-24-symbol-watchlist-plan.md
 - **Spec file:** docs/specs/2026-03-24-symbol-watchlist-spec.md
 - **Started:** 2026-03-24T00:00:00Z
-- **Last updated:** 2026-03-24T00:00:00Z
+- **Last updated:** 2026-03-24T06:00:00Z
 - **Current state:** in_progress
-- **Current task:** 14
+- **Current task:** 16
 
 ## Task Progress
 
@@ -28,8 +28,8 @@
 | 11  | Frontend — AssetTypeBadge Component                    | done    | —      | Colored badge mapping InvestmentType to display label |
 | 12  | Frontend — DraggableWatchlistTable Component           | done    | —      | framer-motion Reorder.Group/Item drag-and-drop table; parent handles optimistic update + revert |
 | 13  | Frontend — AddToWatchlistForm                          | done    | —      | 3-step form (Gold/Silver/Other → symbol → note); duplicate/limit error messages |
-| 14  | Frontend — Integrate Watchlist Tab into Prices Page    | pending | —      | —       |
-| 15  | Frontend — Navigation Integration                      | pending | —      | —       |
+| 14  | Frontend — Integrate Watchlist Tab into Prices Page    | done    | —      | Watchlist as default tab; WatchlistTab + AddToWatchlistForm modal wired into prices page; cache invalidation on success |
+| 15  | Frontend — Navigation Integration                      | done    | —      | PricesIcon SVG added; Prices in desktop sidebar (animationDelay=180), mobile slide-out, and bottom nav (4-item, 25% width); Admin delay fixed to 270ms |
 | 16  | Create Runtime Flow Diagram                            | pending | —      | —       |
 | 17  | Final Integration Testing                              | pending | —      | —       |
 

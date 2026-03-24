@@ -3,15 +3,18 @@
 import { useState, useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { createColumnHelper } from "@tanstack/react-table";
+import { useQueryClient } from "@tanstack/react-query";
 import { BaseCard } from "@/components/BaseCard";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
+import { BaseModal } from "@/components/modals/BaseModal";
 import { TanStackTable } from "@/components/table/TanStackTable";
 import { MobileTable, MobileColumnDef } from "@/components/table/MobileTable";
 import { SymbolAutocomplete } from "@/features/investment/components/SymbolAutocomplete";
 import {
   useQueryGetMarketPrices,
   useQueryGetMarketPrice,
+  EVENT_WatchlistListWatchlist,
 } from "@/utils/generated/hooks";
 import { InvestmentType } from "@/gen/protobuf/v1/investment";
 import { formatPriceValue, formatChangeValue, PriceItem } from "./helpers";
@@ -22,8 +25,10 @@ import {
 } from "@/features/market-prices/components/InlinePriceEdit";
 import { SentimentCard } from "@/components/GoldSentimentCard";
 import { OrnateHeading } from "@/components/decorative/OrnateHeading";
+import { WatchlistTab } from "@/features/watchlist/components/WatchlistTab";
+import { AddToWatchlistForm } from "@/features/watchlist/forms/AddToWatchlistForm";
 
-type Tab = "gold" | "silver" | "currency" | "symbol";
+type Tab = "watchlist" | "gold" | "silver" | "currency" | "symbol";
 
 // Tab labels are provided via translations below
 
@@ -66,6 +71,7 @@ function ChangeCell({
 const columnHelper = createColumnHelper<PriceItem>();
 
 const TAB_TYPE_COLOR: Record<Tab, string> = {
+  watchlist: "text-v2-gold-accent",
   gold: "text-v2-maroon-900",
   silver: "text-v2-maroon-900",
   currency: "text-v2-maroon-900",
@@ -231,6 +237,7 @@ interface SymbolLookupTabProps {
   onSymbolInputChange: (val: string) => void;
   querySymbol: string;
   onSearch: (sym: string) => void;
+  onAddToWatchlist: () => void;
 }
 
 function SymbolLookupTab({
@@ -238,8 +245,10 @@ function SymbolLookupTab({
   onSymbolInputChange,
   querySymbol,
   onSearch,
+  onAddToWatchlist,
 }: SymbolLookupTabProps) {
   const t = useTranslations("prices.symbolLookup");
+  const tp = useTranslations("prices");
   const locale = useLocale();
   const {
     data: priceResp,
@@ -269,7 +278,7 @@ function SymbolLookupTab({
     <div className="space-y-4">
       <div className="flex gap-2 items-end">
         <div className="flex-1">
- <label className="block text-sm font-medium text-v2-text-secondary mb-1">
+          <label className="block text-sm font-medium text-v2-text-secondary mb-1">
             {t("symbolLabel")}
           </label>
           <SymbolAutocomplete
@@ -294,10 +303,10 @@ function SymbolLookupTab({
       )}
 
       {priceData && querySymbol && (
- <div className="p-4 bg-v2-bg-dark rounded-lg border border-v2-border-light">
+        <div className="p-4 bg-v2-bg-dark rounded-lg border border-v2-border-light">
           <div className="flex items-start justify-between gap-4">
             <div>
- <p className="text-lg font-bold text-v2-gold-accent">
+              <p className="text-lg font-bold text-v2-gold-accent">
                 {querySymbol}
               </p>
               <p className="text-xs text-v2-text-tertiary mt-0.5">
@@ -309,13 +318,38 @@ function SymbolLookupTab({
               </p>
             </div>
             <div className="text-right">
- <p className="text-2xl font-bold text-v2-gold-accent">
+              <p className="text-2xl font-bold text-v2-gold-accent">
                 {priceData.currency === "VND"
                   ? formatPriceValue(priceData.price, "VND")
                   : `$${priceData.priceDecimal.toFixed(2)}`}
               </p>
               <p className="text-xs text-v2-text-tertiary">{priceData.currency}</p>
             </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-v2-border-light">
+            <Button
+              type={ButtonType.PRIMARY}
+              onClick={onAddToWatchlist}
+              fullWidth={false}
+              leftIcon={
+                <svg
+                  aria-hidden="true"
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+              }
+            >
+              {tp("addToWatchlist")}
+            </Button>
           </div>
         </div>
       )}
@@ -335,7 +369,9 @@ export default function PricesPage() {
   const locale = useLocale();
   const { user } = useAuth();
   const isAdmin = user?.isAdmin ?? false;
-  const [activeTab, setActiveTab] = useState<Tab>("gold");
+  const [activeTab, setActiveTab] = useState<Tab>("watchlist");
+  const [modalType, setModalType] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const tanstackColumns = useMemo(
     () =>
       buildTanstackColumns(t as (key: string) => string, activeTab, isAdmin),
@@ -349,11 +385,19 @@ export default function PricesPage() {
   const [querySymbol, setQuerySymbol] = useState("");
 
   const TABS: { key: Tab; label: string }[] = [
+    { key: "watchlist", label: t("tabs.watchlist") },
     { key: "gold", label: t("tabs.gold") },
     { key: "silver", label: t("tabs.silver") },
     { key: "currency", label: t("tabs.currency") },
     { key: "symbol", label: t("tabs.symbolLookup") },
   ];
+
+  const handleCloseModal = () => setModalType(null);
+
+  const handleWatchlistSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: [EVENT_WatchlistListWatchlist] });
+    handleCloseModal();
+  };
 
   const { data, isLoading, isError, refetch, isFetching } =
     useQueryGetMarketPrices(
@@ -381,7 +425,7 @@ export default function PricesPage() {
             </p>
           )}
         </div>
-        {activeTab !== "symbol" && (
+        {activeTab !== "symbol" && activeTab !== "watchlist" && (
           <Button
             type={ButtonType.PRIMARY}
             onClick={() => refetch()}
@@ -428,6 +472,10 @@ export default function PricesPage() {
         </div>
 
         <div className="p-4">
+          {activeTab === "watchlist" && (
+            <WatchlistTab onAddClick={() => setModalType("add-watchlist")} />
+          )}
+
           {activeTab === "gold" && (
             <>
               {isError && (
@@ -556,10 +604,21 @@ export default function PricesPage() {
               onSymbolInputChange={setSymbolInput}
               querySymbol={querySymbol}
               onSearch={setQuerySymbol}
+              onAddToWatchlist={() => setModalType("add-watchlist")}
             />
           )}
         </div>
       </BaseCard>
+
+      <BaseModal
+        isOpen={modalType !== null}
+        onClose={handleCloseModal}
+        title={t("tabs.watchlist")}
+      >
+        {modalType === "add-watchlist" && (
+          <AddToWatchlistForm onSuccess={handleWatchlistSuccess} />
+        )}
+      </BaseModal>
     </div>
   );
 }

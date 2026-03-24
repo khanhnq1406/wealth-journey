@@ -307,11 +307,13 @@
     "title": "Giá thị trường",
     "lastUpdated": "Cập nhật lần cuối: {time}",
     "tabs": {
+      "watchlist": "Danh sách theo dõi",
       "gold": "Vàng",
       "silver": "Bạc",
       "currency": "Ngoại Tệ",
       "symbolLookup": "Tra cứu mã"
     },
+    "addToWatchlist": "Thêm vào danh sách theo dõi",
     "table": {
       "type": "Loại",
       "buy": "Mua",

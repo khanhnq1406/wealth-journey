@@ -307,11 +307,13 @@
     "title": "Market Prices",
     "lastUpdated": "Last updated: {time}",
     "tabs": {
+      "watchlist": "Watchlist",
       "gold": "Gold",
       "silver": "Silver",
       "currency": "Currency",
       "symbolLookup": "Symbol Lookup"
     },
+    "addToWatchlist": "Add to Watchlist",
     "table": {
       "type": "Type",
       "buy": "Buy",

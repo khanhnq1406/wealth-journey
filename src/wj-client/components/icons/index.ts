@@ -29,6 +29,7 @@ export {
   ReportsIcon,
   BudgetIcon,
   CommunityIcon,
+  PricesIcon,
 } from "./navigation";
 
 // Action Icons
