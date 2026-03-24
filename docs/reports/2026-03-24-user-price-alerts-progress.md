@@ -8,7 +8,7 @@
 - **Started:** 2026-03-24T00:00:00Z
 - **Last updated:** 2026-03-24T03:00:00Z
 - **Current state:** in_progress
-- **Current task:** 5
+- **Current task:** 6
 
 ## Task Progress
 
@@ -20,7 +20,7 @@
 | 2   | Database Model + Migration                       | done        | 4ba7a3a | UserPriceAlert GORM model, migration cmd, Taskfile entry, 6 unit tests |
 | 3   | Repository Layer                                 | done        | d37d3ee | UserPriceAlertRepository with 8 methods, sqlmock tests, wired in providers |
 | 4   | Service Layer CRUD                               | done        | —      | UserPriceAlertService with 5 methods, 18 unit tests; fixes: removed tautological condition, added UpdateAlert_InvalidUserID test |
-| 5   | REST Handler + Routes                            | pending     | —      | —       |
+| 5   | REST Handler + Routes                            | done        | —      | UserPriceAlertHandlers with 4 methods, wired in builder.go, 4 routes in routes.go; all three review stages PASS |
 | 6   | Background Evaluation Job                        | pending     | —      | —       |
 | 7   | Notification Delivery Integration                | pending     | —      | —       |
 | 8   | Frontend CreatePriceAlertForm                    | pending     | —      | —       |

@@ -282,6 +282,21 @@ func RegisterRoutes(
 		investments.DELETE("/:id", h.Investment.DeleteInvestment)
 	}
 
+	// Price alert routes (protected)
+	if h.UserPriceAlert != nil {
+		priceAlerts := v1.Group("/price-alerts")
+		if rateLimiter != nil {
+			priceAlerts.Use(appmiddleware.RateLimitByUser(rateLimiter))
+		}
+		priceAlerts.Use(AuthMiddleware(authSrv))
+		{
+			priceAlerts.POST("", h.UserPriceAlert.CreateAlert)
+			priceAlerts.GET("", h.UserPriceAlert.ListAlerts)
+			priceAlerts.PUT("/:id", h.UserPriceAlert.UpdateAlert)
+			priceAlerts.DELETE("/:id", h.UserPriceAlert.DeleteAlert)
+		}
+	}
+
 	// Investment transaction routes (protected)
 	investmentTransactions := v1.Group("/investment-transactions")
 	if rateLimiter != nil {
