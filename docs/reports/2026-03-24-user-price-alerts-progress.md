@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-24-user-price-alerts-plan.md
 - **Spec file:** docs/specs/2026-03-24-user-price-alerts-spec.md
 - **Started:** 2026-03-24T00:00:00Z
-- **Last updated:** 2026-03-24T04:00:00Z
+- **Last updated:** 2026-03-24T05:00:00Z
 - **Current state:** in_progress
-- **Current task:** 9
+- **Current task:** 10
 
 ## Task Progress
 
@@ -24,7 +24,7 @@
 | 6   | Background Evaluation Job                        | done        | —      | EvaluateAlerts implemented (cooldown/daily-cap, SSE, push, status update); UserPriceAlertJob scheduler; registered in ProvideScheduler; push name truncated to 30 chars |
 | 7   | Notification Delivery Integration                | done        | —      | Added currency to metadata; UserPriceAlertMetadata interface; NotificationItem rendering; NotificationPanel routing to /dashboard/settings/alerts |
 | 8   | Frontend CreatePriceAlertForm                    | done        | f028806 | CreatePriceAlertForm (3-step disclosure: category→symbol→config), price-alert-validation.ts Zod schema, 52 unit tests; SymbolAutocomplete cross-feature import noted (non-blocking) |
-| 9   | Frontend Settings Alerts Page                    | pending     | —      | —       |
+| 9   | Frontend Settings Alerts Page                    | done        | 79374aa | AlertStatusBadge, PriceAlertList (MobileTable+desktop), settings page with filter tabs; fixed inline empty state → EmptyState, typo isDeletPending→isDeletePending |
 | 10  | Frontend Prices Page Entry Point                 | pending     | —      | —       |
 | 11  | Frontend Portfolio Page Entry Point              | pending     | —      | —       |
 | 13  | Runtime Flow Diagrams                            | pending     | —      | —       |
