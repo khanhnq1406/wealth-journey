@@ -2,11 +2,14 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"regexp"
 	"strings"
 	"time"
+
+	"gorm.io/datatypes"
 
 	"wealthjourney/domain/models"
 	"wealthjourney/domain/repository"
@@ -300,8 +303,158 @@ func (s *userPriceAlertService) DeleteAlert(ctx context.Context, alertID int32, 
 	}, nil
 }
 
-// EvaluateAlerts is a stub — full implementation in Task 6 (background evaluation job).
-func (s *userPriceAlertService) EvaluateAlerts(_ context.Context) error {
+const (
+	alertDailyNotifCap       = 100
+	alertCooldownKeyPrefix   = "user_price_alert:cooldown:"
+	alertDailyCapKeyPrefix   = "user_price_alert:daily:"
+	alertEvalPriceFetchTimeout = 30 * time.Second
+)
+
+// EvaluateAlerts fetches all active alerts, compares against current prices,
+// and fires notifications for triggered conditions. Called by the background job every 15 minutes.
+func (s *userPriceAlertService) EvaluateAlerts(ctx context.Context) error {
+	alerts, err := s.alertRepo.ListActive(ctx)
+	if err != nil {
+		return fmt.Errorf("EvaluateAlerts: failed to list active alerts: %w", err)
+	}
+	if len(alerts) == 0 {
+		return nil
+	}
+
+	// Build price map grouped by asset type to avoid redundant API calls
+	fetchCtx, cancel := context.WithTimeout(ctx, alertEvalPriceFetchTimeout)
+	defer cancel()
+	priceMap := s.fetchPricesForAlerts(fetchCtx, alerts)
+
+	var rdb = s.rdb
+	total, triggered, skippedCooldown, skippedCap, errors := len(alerts), 0, 0, 0, 0
+
+	for _, alert := range alerts {
+		key := alert.Symbol + "|" + alert.PriceSide
+		currentPrice, ok := priceMap[key]
+		if !ok || currentPrice <= 0 {
+			// Price unavailable — skip without deactivating
+			continue
+		}
+
+		// Check trigger condition
+		var fired bool
+		switch alert.Direction {
+		case "above":
+			fired = currentPrice >= alert.TargetPrice
+		case "below":
+			fired = currentPrice <= alert.TargetPrice
+		}
+		if !fired {
+			continue
+		}
+
+		// Check per-alert cooldown in Redis
+		if rdb != nil {
+			cooldownKey := fmt.Sprintf("%s%d", alertCooldownKeyPrefix, alert.ID)
+			val, _ := rdb.GetClient().Get(ctx, cooldownKey).Result()
+			if val != "" {
+				skippedCooldown++
+				continue
+			}
+		}
+
+		// Check per-user daily notification cap
+		if rdb != nil {
+			dailyKey := fmt.Sprintf("%s%d", alertDailyCapKeyPrefix, alert.UserID)
+			capVal, _ := rdb.GetClient().Get(ctx, dailyKey).Int()
+			if capVal >= alertDailyNotifCap {
+				skippedCap++
+				continue
+			}
+		}
+
+		// Build notification metadata
+		metadata := map[string]interface{}{
+			"alertId":      alert.ID,
+			"symbol":       alert.Symbol,
+			"name":         alert.Name,
+			"direction":    alert.Direction,
+			"targetPrice":  alert.TargetPrice,
+			"currentPrice": currentPrice,
+			"priceSide":    alert.PriceSide,
+		}
+		metadataJSON, err := json.Marshal(metadata)
+		if err != nil {
+			log.Printf("EvaluateAlerts: failed to marshal metadata for alert %d: %v", alert.ID, err)
+			errors++
+			continue
+		}
+
+		// Create in-app notification
+		now := time.Now()
+		if err := s.notifRepo.Create(ctx, &models.Notification{
+			UserID:    alert.UserID,
+			Type:      "user_price_alert",
+			Metadata:  datatypes.JSON(metadataJSON),
+			CreatedAt: now,
+		}); err != nil {
+			log.Printf("EvaluateAlerts: failed to create notification for alert %d: %v", alert.ID, err)
+			errors++
+			continue
+		}
+
+		// Publish SSE to active browser sessions
+		if rdb != nil {
+			channel := fmt.Sprintf("user:%d:notifications", alert.UserID)
+			ssePayload := map[string]interface{}{
+				"type":     "user_price_alert",
+				"userId":   alert.UserID,
+				"metadata": string(metadataJSON),
+			}
+			_ = rdb.Publish(channel, ssePayload)
+		}
+
+		// Send push notification (truncate name to avoid exceeding mobile push limits)
+		if s.pushSvc != nil {
+			shortName := alert.Name
+			if len(shortName) > 30 {
+				shortName = shortName[:30] + "…"
+			}
+			title := fmt.Sprintf("Price Alert: %s", shortName)
+			body := fmt.Sprintf("%s has gone %s %d", shortName, alert.Direction, alert.TargetPrice)
+			_ = s.pushSvc.SendToUser(ctx, alert.UserID, title, body, "/dashboard/settings/alerts")
+		}
+
+		// Update alert status and counters
+		newTriggerCount := alert.TriggerCount + 1
+		if alert.TriggerMode == "once" {
+			if err := s.alertRepo.UpdateStatus(ctx, alert.ID, "triggered", &now, newTriggerCount); err != nil {
+				log.Printf("EvaluateAlerts: failed to update status for alert %d: %v", alert.ID, err)
+				errors++
+			}
+		} else {
+			// Repeat mode: set cooldown, keep status active
+			if rdb != nil {
+				cooldownKey := fmt.Sprintf("%s%d", alertCooldownKeyPrefix, alert.ID)
+				cooldownTTL := time.Duration(alert.CooldownHours) * time.Hour
+				rdb.GetClient().Set(ctx, cooldownKey, "1", cooldownTTL)
+			}
+			if err := s.alertRepo.UpdateStatus(ctx, alert.ID, "active", &now, newTriggerCount); err != nil {
+				log.Printf("EvaluateAlerts: failed to update trigger count for alert %d: %v", alert.ID, err)
+				errors++
+			}
+		}
+
+		// Increment daily cap counter
+		if rdb != nil {
+			dailyKey := fmt.Sprintf("%s%d", alertDailyCapKeyPrefix, alert.UserID)
+			pipe := rdb.GetClient().Pipeline()
+			pipe.Incr(ctx, dailyKey)
+			pipe.Expire(ctx, dailyKey, 24*time.Hour)
+			_, _ = pipe.Exec(ctx)
+		}
+
+		triggered++
+	}
+
+	log.Printf("EvaluateAlerts: total=%d triggered=%d skipped_cooldown=%d skipped_cap=%d errors=%d",
+		total, triggered, skippedCooldown, skippedCap, errors)
 	return nil
 }
 

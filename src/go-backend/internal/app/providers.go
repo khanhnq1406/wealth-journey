@@ -255,5 +255,10 @@ func ProvideScheduler(
 		backgroundJobs = append(backgroundJobs, scheduler.NewPriceAlertJob(services.PriceAlert))
 	}
 
+	// User price alert evaluation job — runs every 15 minutes
+	if services.UserPriceAlert != nil {
+		backgroundJobs = append(backgroundJobs, scheduler.NewUserPriceAlertJob(services.UserPriceAlert))
+	}
+
 	return scheduler.New(backgroundJobs...)
 }
