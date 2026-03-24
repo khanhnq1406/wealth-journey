@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/Button";
 import { FormInput } from "@/components/forms/FormInput";
 import { Success } from "@/components/modals/Success";
@@ -37,18 +38,20 @@ function mapQuoteTypeToInvestmentType(quoteType: string): InvestmentType {
   }
 }
 
-function getErrorMessage(errorMsg: string): string {
+function getErrorKey(errorMsg: string): "alreadyInWatchlist" | "limitReached" | "failedToAdd" {
   const lower = errorMsg.toLowerCase();
   if (lower.includes("already in watchlist") || lower.includes("already exists") || lower.includes("duplicate")) {
-    return "Already in your watchlist";
+    return "alreadyInWatchlist";
   }
   if (lower.includes("maximum") || lower.includes("limit") || lower.includes("max")) {
-    return "Maximum of 50 items reached";
+    return "limitReached";
   }
-  return "Failed to add to watchlist";
+  return "failedToAdd";
 }
 
 export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
+  const t = useTranslations("prices.watchlist.form");
+  const tp = useTranslations("prices");
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [category, setCategory] = useState<AssetCategory | null>(null);
 
@@ -59,7 +62,7 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
   const [currency, setCurrency] = useState("USD");
   const [note, setNote] = useState("");
 
-  const [errorMessage, setErrorMessage] = useState<string>();
+  const [errorKey, setErrorKey] = useState<"alreadyInWatchlist" | "limitReached" | "failedToAdd" | undefined>();
   const [showSuccess, setShowSuccess] = useState(false);
 
   const createMutation = useMutationCreateWatchlistItem({
@@ -67,7 +70,7 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
       setShowSuccess(true);
     },
     onError: (error: { message: string }) => {
-      setErrorMessage(getErrorMessage(error.message || ""));
+      setErrorKey(getErrorKey(error.message || ""));
     },
   });
 
@@ -135,9 +138,9 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
   const canProceedToStep3 = symbol.trim().length > 0;
 
   const handleSubmit = () => {
-    setErrorMessage(undefined);
+    setErrorKey(undefined);
     if (!symbol.trim()) {
-      setErrorMessage("Please select an asset");
+      setErrorKey("failedToAdd");
       return;
     }
     createMutation.mutate({
@@ -150,7 +153,7 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
   };
 
   if (showSuccess) {
-    return <Success message="Added to watchlist!" onDone={onSuccess} />;
+    return <Success message={t("addedSuccess")} onDone={onSuccess} />;
   }
 
   return (
@@ -159,7 +162,7 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
       {step === 1 && (
         <div className="flex flex-col gap-3">
           <p className="text-sm text-v2-text-secondary mb-1">
-            Choose an asset category to watch:
+            {t("chooseCategoryLabel")}
           </p>
           <div className="flex gap-2 w-full">
             <button
@@ -167,21 +170,21 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
               onClick={() => handleCategorySelect("gold")}
               className="flex-1 min-h-[48px] rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent font-medium text-sm hover:border-v2-gold-primary hover:text-v2-gold-primary transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
             >
-              Gold
+              {t("gold")}
             </button>
             <button
               type="button"
               onClick={() => handleCategorySelect("silver")}
               className="flex-1 min-h-[48px] rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent font-medium text-sm hover:border-v2-gold-primary hover:text-v2-gold-primary transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
             >
-              Silver
+              {t("silver")}
             </button>
             <button
               type="button"
               onClick={() => handleCategorySelect("other")}
               className="flex-1 min-h-[48px] rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent font-medium text-sm hover:border-v2-gold-primary hover:text-v2-gold-primary transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
             >
-              Other Assets
+              {t("otherAssets")}
             </button>
           </div>
         </div>
@@ -194,18 +197,18 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
             type="button"
             onClick={() => { setStep(1); setCategory(null); }}
             className="self-start text-sm text-v2-text-tertiary hover:text-v2-gold-accent flex items-center gap-1 focus:outline-none"
-            aria-label="Go back to category selection"
+            aria-label={t("backToCategoryLabel")}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
-            Back
+            {t("back")}
           </button>
 
           {category === "gold" && (
             <div className="flex flex-col gap-1.5">
               <label className="block text-sm font-medium text-v2-text-secondary">
-                Gold Type
+                {t("goldType")}
               </label>
               <select
                 value={symbol}
@@ -224,7 +227,7 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
           {category === "silver" && (
             <div className="flex flex-col gap-1.5">
               <label className="block text-sm font-medium text-v2-text-secondary">
-                Silver Type
+                {t("silverType")}
               </label>
               <select
                 value={symbol}
@@ -243,12 +246,12 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
           {category === "other" && (
             <div className="flex flex-col gap-1.5">
               <label className="block text-sm font-medium text-v2-text-secondary">
-                Search Symbol
+                {t("searchSymbol")}
               </label>
               <SymbolAutocomplete
                 value={symbol}
                 onChange={handleSymbolChange}
-                placeholder="Search for stocks, ETFs, crypto..."
+                placeholder={t("searchSymbolPlaceholder")}
               />
             </div>
           )}
@@ -259,7 +262,7 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
             disabled={!canProceedToStep3}
             className="w-full mt-1"
           >
-            Continue
+            {t("continue")}
           </Button>
         </div>
       )}
@@ -271,17 +274,17 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
             type="button"
             onClick={() => setStep(2)}
             className="self-start text-sm text-v2-text-tertiary hover:text-v2-gold-accent flex items-center gap-1 focus:outline-none"
-            aria-label="Go back to symbol selection"
+            aria-label={t("backToSymbolLabel")}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
-            Back
+            {t("back")}
           </button>
 
           {/* Summary of selected asset */}
           <div className="rounded-lg border border-v2-border-light bg-v2-bg-dark px-4 py-3 flex flex-col gap-0.5">
-            <span className="text-xs text-v2-text-tertiary">Selected Asset</span>
+            <span className="text-xs text-v2-text-tertiary">{t("selectedAsset")}</span>
             <span className="text-base font-semibold text-v2-gold-accent">{symbol}</span>
             {name && name !== symbol && (
               <span className="text-sm text-v2-text-secondary truncate">{name}</span>
@@ -291,7 +294,7 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
 
           {/* Optional note */}
           <FormInput
-            label="Note (optional)"
+            label={t("noteLabel")}
             value={note}
             onChange={(e) => {
               if (e.target.value.length <= 200) {
@@ -299,12 +302,12 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
               }
             }}
             maxLength={200}
-            placeholder="e.g. Watch for breakout above resistance"
+            placeholder={t("notePlaceholder")}
             helperText={`${note.length}/200`}
           />
 
           {/* Error message */}
-          {errorMessage && (
+          {errorKey && (
             <p className="text-sm text-v2-red-negative flex items-center gap-1">
               <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -313,7 +316,7 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
                   clipRule="evenodd"
                 />
               </svg>
-              <span>{errorMessage}</span>
+              <span>{t(`errors.${errorKey}`)}</span>
             </p>
           )}
 
@@ -323,7 +326,7 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
             loading={createMutation.isPending}
             className="w-full"
           >
-            Add to Watchlist
+            {tp("addToWatchlist")}
           </Button>
         </div>
       )}

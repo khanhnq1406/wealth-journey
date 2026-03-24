@@ -417,10 +417,10 @@ export default function PricesPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div>
+        <div className="flex-1 text-center">
           <OrnateHeading size="lg">{t("title")}</OrnateHeading>
           {lastUpdated && (
-            <p className="text-xs text-v2-text-tertiary mt-1 text-center">
+            <p className="text-xs text-v2-text-tertiary mt-1">
               {t("lastUpdated", { time: lastUpdated })}
             </p>
           )}
@@ -462,8 +462,8 @@ export default function PricesPage() {
               onClick={() => setActiveTab(tab.key)}
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === tab.key
-                  ? "border-b-2 border-v2-red-primary text-v2-red-primary"
- : "text-v2-text-tertiary hover:text-v2-text-secondary"
+                  ? "border-b-2 border-v2-gold-primary text-v2-gold-accent"
+                  : "text-v2-text-tertiary hover:text-v2-gold-accent"
               }`}
             >
               {tab.label}

@@ -314,6 +314,47 @@
       "symbolLookup": "Tra cứu mã"
     },
     "addToWatchlist": "Thêm vào danh sách theo dõi",
+    "watchlist": {
+      "symbolsTracked": "Đang theo dõi {count} mã",
+      "addSymbol": "Thêm mã",
+      "emptyTitle": "Danh sách theo dõi trống",
+      "emptyDescription": "Thêm mã để theo dõi giá thị trường tại một nơi.",
+      "errorTitle": "Không thể tải danh sách theo dõi",
+      "errorDescription": "Không thể lấy danh sách theo dõi. Vui lòng thử lại.",
+      "retry": "Thử lại",
+      "details": "Chi tiết",
+      "less": "Thu gọn",
+      "column": {
+        "symbol": "Mã",
+        "price": "Giá",
+        "change": "Thay đổi",
+        "type": "Loại",
+        "note": "Ghi chú"
+      },
+      "form": {
+        "chooseCategoryLabel": "Chọn loại tài sản muốn theo dõi:",
+        "gold": "Vàng",
+        "silver": "Bạc",
+        "otherAssets": "Tài sản khác",
+        "back": "Quay lại",
+        "backToCategoryLabel": "Quay lại chọn danh mục",
+        "backToSymbolLabel": "Quay lại chọn mã",
+        "goldType": "Loại vàng",
+        "silverType": "Loại bạc",
+        "searchSymbol": "Tìm mã",
+        "searchSymbolPlaceholder": "Tìm cổ phiếu, ETF, crypto...",
+        "continue": "Tiếp tục",
+        "selectedAsset": "Tài sản đã chọn",
+        "noteLabel": "Ghi chú (tùy chọn)",
+        "notePlaceholder": "VD: Theo dõi khi vượt ngưỡng kháng cự",
+        "addedSuccess": "Đã thêm vào danh sách theo dõi!",
+        "errors": {
+          "alreadyInWatchlist": "Đã có trong danh sách theo dõi",
+          "limitReached": "Đã đạt tối đa 50 mã",
+          "failedToAdd": "Không thể thêm vào danh sách theo dõi"
+        }
+      }
+    },
     "table": {
       "type": "Loại",
       "buy": "Mua",

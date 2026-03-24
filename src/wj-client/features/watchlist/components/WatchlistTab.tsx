@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
 import { EmptyState } from "@/components/feedback/EmptyState";
@@ -114,6 +115,7 @@ function DeleteButton({
 }
 
 export function WatchlistTab({ onAddClick }: WatchlistTabProps) {
+  const t = useTranslations("prices.watchlist");
   const listQuery = useQueryListWatchlist({}, { refetchOnMount: "always" });
   const serverItems = listQuery.data?.items ?? [];
   const total = listQuery.data?.total ?? 0;
@@ -159,7 +161,7 @@ export function WatchlistTab({ onAddClick }: WatchlistTabProps) {
   const mobileColumns: MobileColumnDef<WatchlistItem>[] = [
     {
       id: "symbol",
-      header: "Symbol",
+      header: t("column.symbol"),
       showInCollapsed: true,
       cell: ({ row }) => (
         <div>
@@ -174,7 +176,7 @@ export function WatchlistTab({ onAddClick }: WatchlistTabProps) {
     },
     {
       id: "price",
-      header: "Price",
+      header: t("column.price"),
       showInCollapsed: true,
       cell: ({ row }) => (
         <span className="font-semibold tabular-nums">
@@ -184,19 +186,19 @@ export function WatchlistTab({ onAddClick }: WatchlistTabProps) {
     },
     {
       id: "change",
-      header: "Change",
+      header: t("column.change"),
       showInCollapsed: false,
       cell: ({ row }) => <ChangeDisplay item={row} />,
     },
     {
       id: "type",
-      header: "Type",
+      header: t("column.type"),
       showInCollapsed: false,
       cell: ({ row }) => <AssetTypeBadge assetType={row.assetType} />,
     },
     {
       id: "note",
-      header: "Note",
+      header: t("column.note"),
       showInCollapsed: false,
       cell: ({ row }) =>
         row.note ? (
@@ -218,53 +220,49 @@ export function WatchlistTab({ onAddClick }: WatchlistTabProps) {
   if (listQuery.isError) {
     return (
       <EmptyState
-        title="Failed to load watchlist"
-        description="Could not fetch your watchlist. Please try again."
-        primaryAction={{ label: "Retry", onClick: () => listQuery.refetch() }}
+        title={t("errorTitle")}
+        description={t("errorDescription")}
+        primaryAction={{ label: t("retry"), onClick: () => listQuery.refetch() }}
       />
     );
   }
+
+  const addIcon = (
+    <svg
+      aria-hidden="true"
+      className="w-4 h-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+    </svg>
+  );
 
   return (
     <div className="space-y-4">
       {/* Header row */}
       <div className="flex items-center justify-between gap-2">
         <p className="text-sm text-v2-text-secondary">
-          {total} {total === 1 ? "symbol" : "symbols"} tracked
+          {t("symbolsTracked", { count: total })}
         </p>
-        {/* Desktop add button */}
-        <div className="hidden sm:block">
-          <Button
-            type={ButtonType.PRIMARY}
-            onClick={onAddClick}
-            fullWidth={false}
-            leftIcon={
-              <svg
-                aria-hidden="true"
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-            }
-          >
-            Add Symbol
-          </Button>
-        </div>
+        {/* Add button — visible on all screen sizes */}
+        <Button
+          type={ButtonType.PRIMARY}
+          onClick={onAddClick}
+          fullWidth={false}
+          leftIcon={addIcon}
+        >
+          {t("addSymbol")}
+        </Button>
       </div>
 
       {items.length === 0 ? (
         <EmptyState
-          title="Your watchlist is empty"
-          description="Add symbols to track market prices in one place."
-          primaryAction={{ label: "Add Symbol", onClick: onAddClick }}
+          title={t("emptyTitle")}
+          description={t("emptyDescription")}
+          primaryAction={{ label: t("addSymbol"), onClick: onAddClick }}
         />
       ) : (
         <>
@@ -285,8 +283,8 @@ export function WatchlistTab({ onAddClick }: WatchlistTabProps) {
               columns={mobileColumns}
               getKey={(item) => item.id}
               expandable
-              expandButtonLabel="Details"
-              collapseButtonLabel="Less"
+              expandButtonLabel={t("details")}
+              collapseButtonLabel={t("less")}
               renderActions={(item) => (
                 <DeleteButton item={item} onDeleted={handleDeleted} />
               )}
@@ -294,32 +292,6 @@ export function WatchlistTab({ onAddClick }: WatchlistTabProps) {
           </div>
         </>
       )}
-
-      {/* Mobile floating add button */}
-      <div className="sm:hidden fixed right-4 flex flex-col items-end" style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 70px)", zIndex: 40 }}>
-        <button
-          type="button"
-          onClick={onAddClick}
-          className="w-14 h-14 bg-v2-red-primary text-white rounded-full border-2 border-v2-gold-primary flex items-center justify-center hover:bg-v2-red-dark active:scale-95 transition-all duration-200"
-          style={{ boxShadow: "0 0 12px rgba(220, 38, 38, 0.4)" }}
-          aria-label="Add symbol to watchlist"
-        >
-          <svg
-            aria-hidden="true"
-            className="w-6 h-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-        </button>
-      </div>
     </div>
   );
 }

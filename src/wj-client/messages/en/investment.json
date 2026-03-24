@@ -314,6 +314,47 @@
       "symbolLookup": "Symbol Lookup"
     },
     "addToWatchlist": "Add to Watchlist",
+    "watchlist": {
+      "symbolsTracked": "{count, plural, one {# symbol tracked} other {# symbols tracked}}",
+      "addSymbol": "Add Symbol",
+      "emptyTitle": "Your watchlist is empty",
+      "emptyDescription": "Add symbols to track market prices in one place.",
+      "errorTitle": "Failed to load watchlist",
+      "errorDescription": "Could not fetch your watchlist. Please try again.",
+      "retry": "Retry",
+      "details": "Details",
+      "less": "Less",
+      "column": {
+        "symbol": "Symbol",
+        "price": "Price",
+        "change": "Change",
+        "type": "Type",
+        "note": "Note"
+      },
+      "form": {
+        "chooseCategoryLabel": "Choose an asset category to watch:",
+        "gold": "Gold",
+        "silver": "Silver",
+        "otherAssets": "Other Assets",
+        "back": "Back",
+        "backToCategoryLabel": "Go back to category selection",
+        "backToSymbolLabel": "Go back to symbol selection",
+        "goldType": "Gold Type",
+        "silverType": "Silver Type",
+        "searchSymbol": "Search Symbol",
+        "searchSymbolPlaceholder": "Search for stocks, ETFs, crypto...",
+        "continue": "Continue",
+        "selectedAsset": "Selected Asset",
+        "noteLabel": "Note (optional)",
+        "notePlaceholder": "e.g. Watch for breakout above resistance",
+        "addedSuccess": "Added to watchlist!",
+        "errors": {
+          "alreadyInWatchlist": "Already in your watchlist",
+          "limitReached": "Maximum of 50 items reached",
+          "failedToAdd": "Failed to add to watchlist"
+        }
+      }
+    },
     "table": {
       "type": "Type",
       "buy": "Buy",
