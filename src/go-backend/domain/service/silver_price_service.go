@@ -53,6 +53,17 @@ func NewSilverPriceService(redisClient *redis.Client) SilverPriceService {
 	}
 }
 
+// NewSilverPriceServiceWithCache creates a silver price service with an injected cache (for testing).
+func NewSilverPriceServiceWithCache(redisClient *redis.Client, silverCache *cache.SilverPriceCache) SilverPriceService {
+	return &silverPriceService{
+		client:        vnprice.NewClient(10 * time.Second),
+		cache:         silverCache,
+		phuquyClient:  silverprice.NewPhuQuyClient(),
+		ancaratClient: silverprice.NewAncaratClient(),
+		dojiClient:    silverprice.NewDOJIClient(),
+	}
+}
+
 // FetchPriceForSymbol fetches price for a specific silver symbol
 func (s *silverPriceService) FetchPriceForSymbol(ctx context.Context, symbol string) (*CachedSilverPrice, error) {
 	// For XAGUSD, use Yahoo Finance
@@ -185,8 +196,28 @@ func (s *silverPriceService) fetchUSDSilverPrice(ctx context.Context) (*CachedSi
 }
 
 // FetchAllPrices fetches silver prices from multiple sources in parallel:
-// Phú Quý, Ancarat, DOJI, and SBJ (static entries).
+// Phú Quý, Ancarat, DOJI, and SBJ (static entries). Reads from the aggregate
+// Redis cache before hitting external sources to limit external API calls.
 func (s *silverPriceService) FetchAllPrices(ctx context.Context) ([]*CachedSilverPrice, error) {
+	// Check aggregate cache first
+	cachedAll, err := s.cache.GetAll(ctx)
+	if err == nil && cachedAll != nil {
+		result := make([]*CachedSilverPrice, len(cachedAll))
+		for i, c := range cachedAll {
+			result[i] = &CachedSilverPrice{
+				TypeCode:   c.TypeCode,
+				Name:       c.Name,
+				Buy:        c.Buy,
+				Sell:       c.Sell,
+				ChangeBuy:  c.ChangeBuy,
+				ChangeSell: c.ChangeSell,
+				Currency:   c.Currency,
+				UpdateTime: time.Unix(c.UpdateTime, 0),
+			}
+		}
+		return result, nil
+	}
+
 	var (
 		phuquyPrices  []silverprice.ExternalSilverPrice
 		ancaratPrices []silverprice.ExternalSilverPrice
@@ -342,6 +373,26 @@ func (s *silverPriceService) FetchAllPrices(ctx context.Context) ([]*CachedSilve
 	if usdSilverPrice != nil {
 		prices = append(prices, usdSilverPrice)
 	}
+
+	// Write aggregate cache (non-blocking)
+	go func(snapshot []*CachedSilverPrice) {
+		cacheList := make([]*cache.CachedSilverPrice, len(snapshot))
+		for i, p := range snapshot {
+			cacheList[i] = &cache.CachedSilverPrice{
+				TypeCode:   p.TypeCode,
+				Name:       p.Name,
+				Buy:        p.Buy,
+				Sell:       p.Sell,
+				ChangeBuy:  p.ChangeBuy,
+				ChangeSell: p.ChangeSell,
+				Currency:   p.Currency,
+				UpdateTime: p.UpdateTime.Unix(),
+			}
+		}
+		if err := s.cache.SetAll(context.Background(), cacheList, cache.AllSilverPricesCacheTTL); err != nil {
+			log.Printf("Warning: failed to set aggregate silver price cache: %v", err)
+		}
+	}(prices)
 
 	return prices, nil
 }

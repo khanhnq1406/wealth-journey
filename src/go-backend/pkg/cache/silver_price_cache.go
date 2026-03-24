@@ -12,8 +12,12 @@ import (
 const (
 	// SilverPriceKeyPrefix is the prefix for silver price cache keys
 	SilverPriceKeyPrefix = "silver_price"
-	// SilverPriceCacheTTL is the time-to-live for silver price cache entries
+	// SilverPriceCacheTTL is the time-to-live for individual silver price cache entries
 	SilverPriceCacheTTL = 15 * time.Minute
+	// AllSilverPricesCacheTTL is the time-to-live for the aggregate silver prices cache
+	AllSilverPricesCacheTTL = 5 * time.Minute
+
+	silverAllKey = "silver_price:all"
 )
 
 // SilverPriceCache handles caching of silver prices from ancarat in Redis
@@ -80,4 +84,30 @@ func (c *SilverPriceCache) Get(ctx context.Context, symbol, currency string) (*C
 func (c *SilverPriceCache) Delete(ctx context.Context, symbol, currency string) error {
 	key := c.buildKey(symbol, currency)
 	return c.client.Del(ctx, key).Err()
+}
+
+// SetAll stores the full list of silver prices under the aggregate cache key.
+func (c *SilverPriceCache) SetAll(ctx context.Context, prices []*CachedSilverPrice, ttl time.Duration) error {
+	data, err := json.Marshal(prices)
+	if err != nil {
+		return fmt.Errorf("marshal silver prices: %w", err)
+	}
+	return c.client.Set(ctx, silverAllKey, data, ttl).Err()
+}
+
+// GetAll retrieves the full list of silver prices from the aggregate cache key.
+// Returns nil, nil on cache miss.
+func (c *SilverPriceCache) GetAll(ctx context.Context) ([]*CachedSilverPrice, error) {
+	data, err := c.client.Get(ctx, silverAllKey).Bytes()
+	if err != nil {
+		if err == redis.Nil {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("get all silver prices from cache: %w", err)
+	}
+	var prices []*CachedSilverPrice
+	if err := json.Unmarshal(data, &prices); err != nil {
+		return nil, fmt.Errorf("unmarshal silver prices: %w", err)
+	}
+	return prices, nil
 }

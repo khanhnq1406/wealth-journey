@@ -14,6 +14,7 @@ Infrastructure-level flows that are referenced by multiple domain flows. Read th
 - [Admin Broadcast Flow](#8-admin-broadcast-flow)
 - [Admin Price Alert Config Flow](#9-admin-price-alert-config-flow)
 - [Error Code Translation Flow](#10-error-code-translation-flow)
+- [FetchAllPrices Aggregate Cache Flow](#11-fetchallprices-aggregate-cache-flow)
 
 ---
 
@@ -861,3 +862,59 @@ sequenceDiagram
 - Error codes are optional — legacy error responses without a `code` field still work via the `message` fallback
 - The HTTP status code is determined by the error type (validation → 400, not found → 404, conflict → 409), not by the error code
 - Error codes are stable strings (not enums) — safe for frontend to match against without tight coupling to backend releases
+
+---
+
+## 11. FetchAllPrices Aggregate Cache Flow
+
+**Trigger:** `GET /api/v1/investments/market-prices` (Prices page load or manual refresh)
+**Source:** `domain/service/gold_price_service.go`, `domain/service/silver_price_service.go`, `domain/service/currency_price_service.go`
+
+This flow applies identically to all three price services. The aggregate cache key prevents repeated calls to the vangsaigon external API when users reload the Prices page.
+
+```mermaid
+sequenceDiagram
+    participant H as MarketPricesHandler
+    participant S as GoldPriceService<br/>(Silver / Currency identical)
+    participant R as Redis
+    participant A as vangsaigon API<br/>(external)
+
+    H->>S: FetchAllPrices(ctx)
+    S->>R: GET gold_price:all
+    alt Cache hit (within 5 min TTL)
+        R-->>S: []CachedGoldPrice (JSON)
+        S-->>H: []CachedGoldPrice (no external call)
+    else Cache miss (first call or TTL expired)
+        R-->>S: redis.Nil
+        S->>A: HTTP GET vangsaigon API
+        alt API success
+            A-->>S: PricesResponse
+            S->>S: build []CachedGoldPrice
+            S-->>H: []CachedGoldPrice
+            S-)R: SET gold_price:all TTL=5m (async goroutine)
+            S-)R: SET gold_price:<symbol> TTL=15m per symbol (async goroutines)
+        else API error
+            A-->>S: error
+            S-->>H: error (propagated to caller)
+        end
+    end
+```
+
+### Key Invariants
+
+- The aggregate cache key (`gold_price:all`, `silver_price:all`, `currency_price:all`) is **global** (not user-scoped) — market prices are public data
+- Aggregate cache TTL is **5 minutes** (`AllGoldPricesCacheTTL`, `AllSilverPricesCacheTTL`, `AllCurrencyPricesCacheTTL`), matching the frontend `staleTime: 5 * 60 * 1000`
+- Individual per-symbol cache TTL remains **15 minutes** (used by `FetchPriceForSymbol` for watchlist enrichment)
+- Cache write failures are **non-fatal** — logged as warnings, response returned to caller regardless
+- The aggregate cache stores the **fully assembled result** including SBJ static rows (silver service) — not raw per-source data
+- On cache hit the external API is **never called**, regardless of how many concurrent users reload the page
+
+### Error Paths
+
+| Condition | Response | Notes |
+|-----------|----------|-------|
+| Redis unavailable on GET | Cache miss → proceed to API | `redis.Nil` or network error treated as miss |
+| Redis unavailable on SET | Warning logged; result returned normally | Non-fatal |
+| External API error, cache warm | Returns cached data (key still within TTL) | Transparent to caller |
+| External API error, cache cold | Error propagated to `MarketPricesHandler` | Handler returns partial success or 503 |
+| Silver partial source failure (e.g., Phú Quý down) | Best-effort result cached | Existing behaviour unchanged |
