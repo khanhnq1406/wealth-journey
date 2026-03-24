@@ -252,3 +252,104 @@ sequenceDiagram
     H-->>SPA: 200 OK {success: true, timestamp}
     Note over SPA: useMutationDeleteWatchlistItem<br/>→ invalidates ListWatchlist cache
 ```
+
+---
+
+## 5. Quick-Add via Star Icon (Gold/Silver/Currency Table)
+
+**Trigger:** User clicks empty star on a price table row (Gold, Silver, or Currency tab)
+**Endpoint:** `POST /api/v1/watchlist`
+**Source:** `src/wj-client/app/[locale]/dashboard/prices/page.tsx` — `StarToggleButton`
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant PricesPage as PricesPage (StarToggleButton)
+    participant ReactQuery as React Query Cache
+    participant API as REST API
+
+    User->>PricesPage: click empty star (row: typeCode, currency)
+    Note over PricesPage: assetType hardcoded per tab<br/>gold=GOLD_VND, silver=SILVER_VND, currency=OTHER<br/>note always ""
+    PricesPage->>PricesPage: addMutation.mutate({symbol, name, assetType, currency, note:""})
+    PricesPage->>API: POST /api/v1/watchlist<br/>Authorization: Bearer {jwt}
+    Note over API: JWT auth check<br/>symbol 1-50 chars<br/>50-item limit check<br/>duplicate check
+    alt success (201)
+        API-->>PricesPage: {success: true, item: {...}}
+        PricesPage->>ReactQuery: invalidate EVENT_WatchlistListWatchlist
+        ReactQuery->>API: GET /api/v1/watchlist (refetch)
+        API-->>ReactQuery: updated list
+        ReactQuery-->>PricesPage: watchedSymbolToId updated
+        PricesPage-->>User: star fills (amber)
+    else duplicate (409)
+        API-->>PricesPage: error "already in watchlist"
+        PricesPage-->>User: warning toast
+    else limit reached (400)
+        API-->>PricesPage: error "maximum 50 items"
+        PricesPage-->>User: warning toast
+    else network error
+        API-->>PricesPage: error
+        PricesPage-->>User: error toast
+    end
+```
+
+**Key Invariants:**
+- `symbol` and `name` values originate from server-returned `PriceItem` — never user-typed text
+- `assetType` is hardcoded per tab (not user-controlled)
+- `note` is always empty string — no user input in quick-add flow
+- Star button disabled while `isPending` — prevents double-submission
+
+**Error Paths:**
+
+| Condition | Response | User Feedback |
+|-----------|----------|---------------|
+| 409 Duplicate | `alreadyInWatchlist` error | Warning toast |
+| 400 Limit reached | `limitReached` error | Warning toast |
+| Network error | Generic error | Error toast |
+
+---
+
+## 6. Quick-Remove via Star Icon (Gold/Silver/Currency Table)
+
+**Trigger:** User clicks filled star on a price table row
+**Endpoint:** `DELETE /api/v1/watchlist/:id`
+**Source:** `src/wj-client/app/[locale]/dashboard/prices/page.tsx` — `StarToggleButton`
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant PricesPage as PricesPage (StarToggleButton)
+    participant ReactQuery as React Query Cache
+    participant API as REST API
+
+    User->>PricesPage: click filled star
+    Note over PricesPage: watchlistItemId from watchedSymbolToId Map<br/>(server-returned ID, not user input)
+    PricesPage->>PricesPage: removeMutation.mutate({id: watchlistItemId})
+    PricesPage->>API: DELETE /api/v1/watchlist/{id}<br/>Authorization: Bearer {jwt}
+    Note over API: JWT auth check<br/>GetByIDForUser ownership check
+    alt success (200)
+        API-->>PricesPage: {success: true}
+        PricesPage->>ReactQuery: invalidate EVENT_WatchlistListWatchlist
+        ReactQuery->>API: GET /api/v1/watchlist (refetch)
+        API-->>ReactQuery: updated list (item removed)
+        ReactQuery-->>PricesPage: watchedSymbolToId updated (symbol removed)
+        PricesPage-->>User: star empties (outline)
+    else not found / unauthorized (404)
+        API-->>PricesPage: error
+        PricesPage-->>User: error toast
+    else network error
+        API-->>PricesPage: error
+        PricesPage-->>User: error toast
+    end
+```
+
+**Key Invariants:**
+- `id` is sourced from server-returned watchlist data — never user-supplied
+- Server performs `GetByIDForUser` ownership check before deletion
+- Star button disabled while `isPending` — prevents double-submission
+
+**Error Paths:**
+
+| Condition | Response | User Feedback |
+|-----------|----------|---------------|
+| 404 Not found | Error | Error toast |
+| Network error | Generic error | Error toast |

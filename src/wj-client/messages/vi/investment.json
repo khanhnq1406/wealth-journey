@@ -314,6 +314,10 @@
       "symbolLookup": "Tra cứu mã"
     },
     "addToWatchlist": "Thêm vào danh sách theo dõi",
+    "watchlistAddedSuccess": "Đã thêm vào danh sách theo dõi!",
+    "watchlistAlreadyAdded": "Mã đã có trong danh sách theo dõi",
+    "watchlistLimitReached": "Đã đạt tối đa 50 mục",
+    "watchlistFailedToAdd": "Không thể thêm vào danh sách theo dõi",
     "watchlist": {
       "symbolsTracked": "Đang theo dõi {count} mã",
       "addSymbol": "Thêm mã",
@@ -324,6 +328,10 @@
       "retry": "Thử lại",
       "details": "Chi tiết",
       "less": "Thu gọn",
+      "starAdd": "Thêm vào danh sách theo dõi",
+      "starRemove": "Xóa khỏi danh sách theo dõi",
+      "addedToWatchlist": "Đã thêm vào danh sách theo dõi",
+      "removedFromWatchlist": "Đã xóa khỏi danh sách theo dõi",
       "column": {
         "symbol": "Mã",
         "price": "Giá",

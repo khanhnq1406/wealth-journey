@@ -314,6 +314,10 @@
       "symbolLookup": "Symbol Lookup"
     },
     "addToWatchlist": "Add to Watchlist",
+    "watchlistAddedSuccess": "Added to watchlist!",
+    "watchlistAlreadyAdded": "Already in your watchlist",
+    "watchlistLimitReached": "Maximum of 50 items reached",
+    "watchlistFailedToAdd": "Failed to add to watchlist",
     "watchlist": {
       "symbolsTracked": "{count, plural, one {# symbol tracked} other {# symbols tracked}}",
       "addSymbol": "Add Symbol",
@@ -324,6 +328,10 @@
       "retry": "Retry",
       "details": "Details",
       "less": "Less",
+      "starAdd": "Add to watchlist",
+      "starRemove": "Remove from watchlist",
+      "addedToWatchlist": "Added to watchlist",
+      "removedFromWatchlist": "Removed from watchlist",
       "column": {
         "symbol": "Symbol",
         "price": "Price",
