@@ -8,7 +8,7 @@
 - **Started:** 2026-03-24T00:00:00Z
 - **Last updated:** 2026-03-24T03:00:00Z
 - **Current state:** in_progress
-- **Current task:** 4
+- **Current task:** 5
 
 ## Task Progress
 
@@ -18,8 +18,8 @@
 | 1   | Protobuf API Definition                          | done        | 3e02734 | Added enums/messages/RPCs; regenerated Go+TS code; fixed status_filter to use enum |
 | 12  | Frontend Constants Update                        | done        | 3e02734 | Added CREATE_PRICE_ALERT to ModalType |
 | 2   | Database Model + Migration                       | done        | 4ba7a3a | UserPriceAlert GORM model, migration cmd, Taskfile entry, 6 unit tests |
-| 3   | Repository Layer                                 | done        | —      | UserPriceAlertRepository with 8 methods, sqlmock tests, wired in providers |
-| 4   | Service Layer CRUD                               | pending     | —      | —       |
+| 3   | Repository Layer                                 | done        | d37d3ee | UserPriceAlertRepository with 8 methods, sqlmock tests, wired in providers |
+| 4   | Service Layer CRUD                               | done        | —      | UserPriceAlertService with 5 methods, 18 unit tests; fixes: removed tautological condition, added UpdateAlert_InvalidUserID test |
 | 5   | REST Handler + Routes                            | pending     | —      | —       |
 | 6   | Background Evaluation Job                        | pending     | —      | —       |
 | 7   | Notification Delivery Integration                | pending     | —      | —       |

@@ -319,6 +319,15 @@ type PriceAlertService interface {
 	ForceCheckAndAlert(ctx context.Context) error
 }
 
+// UserPriceAlertService handles user price alert CRUD and evaluation.
+type UserPriceAlertService interface {
+	CreateAlert(ctx context.Context, userID int32, req *v1.CreateUserPriceAlertRequest) (*v1.CreateUserPriceAlertResponse, error)
+	ListAlerts(ctx context.Context, userID int32, req *v1.ListUserPriceAlertsRequest) (*v1.ListUserPriceAlertsResponse, error)
+	UpdateAlert(ctx context.Context, alertID int32, userID int32, req *v1.UpdateUserPriceAlertRequest) (*v1.UpdateUserPriceAlertResponse, error)
+	DeleteAlert(ctx context.Context, alertID int32, userID int32) (*v1.DeleteUserPriceAlertResponse, error)
+	EvaluateAlerts(ctx context.Context) error
+}
+
 // WatchlistService defines the interface for watchlist business logic.
 type WatchlistService interface {
 	CreateItem(ctx context.Context, userID int32, req *v1.CreateWatchlistItemRequest) (*v1.CreateWatchlistItemResponse, error)
