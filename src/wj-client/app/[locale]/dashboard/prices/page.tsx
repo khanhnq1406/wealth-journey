@@ -142,7 +142,7 @@ function StarToggleButton({
       className={`flex items-center justify-center min-w-[44px] min-h-[44px] rounded transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary disabled:cursor-not-allowed ${
         isInWatchlist
           ? "text-amber-400 hover:text-amber-500"
-          : "text-v2-text-tertiary hover:text-v2-gold-accent"
+          : "text-gray-400 hover:text-v2-gold-accent"
       }`}
     >
       {isPending ? (
