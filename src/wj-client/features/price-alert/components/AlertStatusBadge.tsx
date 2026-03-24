@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { AlertStatus } from "@/gen/protobuf/v1/investment";
 
 interface AlertStatusBadgeProps {
@@ -7,36 +9,38 @@ interface AlertStatusBadgeProps {
 }
 
 export function AlertStatusBadge({ status }: AlertStatusBadgeProps) {
+  const t = useTranslations("priceAlerts");
+
   if (status === AlertStatus.ALERT_STATUS_ACTIVE) {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400">
-        <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
-        Active
+      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-v2-green-light text-v2-green-positive">
+        <span className="w-1.5 h-1.5 rounded-full bg-v2-green-positive inline-block" />
+        {t("statusActive")}
       </span>
     );
   }
 
   if (status === AlertStatus.ALERT_STATUS_TRIGGERED) {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-500/20 text-gray-400">
-        <span className="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block" />
-        Triggered
+      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-v2-gold-primary/20 text-v2-gold-accent">
+        <span className="w-1.5 h-1.5 rounded-full bg-v2-gold-accent inline-block" />
+        {t("statusTriggered")}
       </span>
     );
   }
 
   if (status === AlertStatus.ALERT_STATUS_PAUSED) {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-orange-500/20 text-orange-400">
-        <span className="w-1.5 h-1.5 rounded-full bg-orange-400 inline-block" />
-        Paused
+      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-v2-red-light text-v2-red-negative">
+        <span className="w-1.5 h-1.5 rounded-full bg-v2-red-negative inline-block" />
+        {t("statusPaused")}
       </span>
     );
   }
 
   return (
     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium bg-v2-border-light text-v2-text-tertiary">
-      Unknown
+      {t("statusUnknown")}
     </span>
   );
 }

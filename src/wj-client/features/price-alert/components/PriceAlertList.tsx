@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { MobileTable } from "@/components/table/MobileTable";
@@ -52,16 +53,25 @@ function formatPrice(price: number, currency: string): string {
   }).format(price);
 }
 
-function directionLabel(direction: AlertDirection): string {
-  if (direction === AlertDirection.ALERT_DIRECTION_ABOVE) return "Above";
-  if (direction === AlertDirection.ALERT_DIRECTION_BELOW) return "Below";
-  return "Unknown";
+function directionLabel(
+  direction: AlertDirection,
+  t: (key: string) => string
+): string {
+  if (direction === AlertDirection.ALERT_DIRECTION_ABOVE)
+    return t("directionAbove");
+  if (direction === AlertDirection.ALERT_DIRECTION_BELOW)
+    return t("directionBelow");
+  return t("directionUnknown");
 }
 
-function triggerModeLabel(mode: AlertTriggerMode): string {
-  if (mode === AlertTriggerMode.ALERT_TRIGGER_MODE_ONCE) return "Once";
-  if (mode === AlertTriggerMode.ALERT_TRIGGER_MODE_REPEAT) return "Repeat";
-  return "Unknown";
+function triggerModeLabel(
+  mode: AlertTriggerMode,
+  t: (key: string) => string
+): string {
+  if (mode === AlertTriggerMode.ALERT_TRIGGER_MODE_ONCE) return t("triggerOnce");
+  if (mode === AlertTriggerMode.ALERT_TRIGGER_MODE_REPEAT)
+    return t("triggerRepeat");
+  return t("triggerUnknown");
 }
 
 // ---------------------------------------------------------------------------
@@ -73,20 +83,22 @@ function ToggleButton({
   alert,
   onToggle,
   isPending,
+  t,
 }: {
   alert: UserPriceAlert;
   onToggle: (alert: UserPriceAlert) => void;
   isPending: boolean;
+  t: (key: string, values?: Record<string, string>) => string;
 }) {
   if (alert.status === AlertStatus.ALERT_STATUS_TRIGGERED) {
     return null;
   }
 
   const isActive = alert.status === AlertStatus.ALERT_STATUS_ACTIVE;
-  const label = isActive ? "Pause" : "Activate";
+  const label = isActive ? t("pauseLabel") : t("activateLabel");
   const ariaLabel = isActive
-    ? `Pause alert for ${alert.symbol}`
-    : `Activate alert for ${alert.symbol}`;
+    ? t("pauseAlertAria", { symbol: alert.symbol })
+    : t("activateAlertAria", { symbol: alert.symbol });
 
   return (
     <button
@@ -148,12 +160,14 @@ function DesktopAlertRow({
   onDelete,
   isTogglePending,
   isDeletePending,
+  t,
 }: {
   alert: UserPriceAlert;
   onToggle: (alert: UserPriceAlert) => void;
   onDelete: (alert: UserPriceAlert) => void;
   isTogglePending: boolean;
   isDeletePending: boolean;
+  t: (key: string, values?: Record<string, string>) => string;
 }) {
   return (
     <tr className="border-b border-v2-border-light hover:bg-v2-bg-surface-tint transition-colors">
@@ -167,11 +181,11 @@ function DesktopAlertRow({
         <span
           className={
             alert.direction === AlertDirection.ALERT_DIRECTION_ABOVE
-              ? "text-green-400"
-              : "text-red-400"
+              ? "text-v2-green-positive"
+              : "text-v2-red-negative"
           }
         >
-          {directionLabel(alert.direction)}
+          {directionLabel(alert.direction, t)}
         </span>{" "}
         {formatPrice(alert.targetPrice, alert.currency)}
       </td>
@@ -179,7 +193,7 @@ function DesktopAlertRow({
         {formatPrice(alert.currentPrice, alert.currency)}
       </td>
       <td className="py-3 px-4 text-sm text-v2-text-secondary">
-        {triggerModeLabel(alert.triggerMode)}
+        {triggerModeLabel(alert.triggerMode, t)}
       </td>
       <td className="py-3 px-4">
         <AlertStatusBadge status={alert.status} />
@@ -190,14 +204,15 @@ function DesktopAlertRow({
             alert={alert}
             onToggle={onToggle}
             isPending={isTogglePending}
+            t={t}
           />
           <button
             type="button"
-            aria-label={`Delete alert for ${alert.symbol}`}
+            aria-label={t("deleteAlertAria", { symbol: alert.symbol })}
             onClick={() => onDelete(alert)}
             disabled={isDeletePending}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md transition-colors hover:bg-red-500/10 disabled:opacity-50 disabled:cursor-not-allowed text-v2-text-secondary hover:text-red-400"
-            title="Delete"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md transition-colors hover:bg-v2-red-light disabled:opacity-50 disabled:cursor-not-allowed text-v2-text-secondary hover:text-v2-red-negative"
+            title={t("deleteLabel")}
           >
             <svg
               className="w-4 h-4"
@@ -224,6 +239,7 @@ function DesktopAlertRow({
 // ---------------------------------------------------------------------------
 
 export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
+  const t = useTranslations("priceAlerts");
   const queryClient = useQueryClient();
   const [alertToDelete, setAlertToDelete] = useState<UserPriceAlert | null>(
     null
@@ -296,7 +312,7 @@ export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
     () => [
       {
         id: "symbol",
-        header: "Symbol",
+        header: t("colSymbol"),
         showInCollapsed: true,
         cell: ({ row }) => (
           <div>
@@ -307,18 +323,18 @@ export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
       },
       {
         id: "target",
-        header: "Target",
+        header: t("colDirectionTarget"),
         showInCollapsed: true,
         cell: ({ row }) => (
           <span>
             <span
               className={
                 row.direction === AlertDirection.ALERT_DIRECTION_ABOVE
-                  ? "text-green-400"
-                  : "text-red-400"
+                  ? "text-v2-green-positive"
+                  : "text-v2-red-negative"
               }
             >
-              {directionLabel(row.direction)}
+              {directionLabel(row.direction, t)}
             </span>{" "}
             {formatPrice(row.targetPrice, row.currency)}
           </span>
@@ -326,24 +342,24 @@ export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
       },
       {
         id: "currentPrice",
-        header: "Current Price",
+        header: t("colCurrentPrice"),
         showInCollapsed: false,
         cell: ({ row }) => formatPrice(row.currentPrice, row.currency),
       },
       {
         id: "triggerMode",
-        header: "Trigger",
+        header: t("colTrigger"),
         showInCollapsed: false,
-        cell: ({ row }) => triggerModeLabel(row.triggerMode),
+        cell: ({ row }) => triggerModeLabel(row.triggerMode, t),
       },
       {
         id: "status",
-        header: "Status",
+        header: t("colStatus"),
         showInCollapsed: true,
         cell: ({ row }) => <AlertStatusBadge status={row.status} />,
       },
     ],
-    []
+    [t]
   );
 
   // ------------------------------------------------------------------
@@ -356,14 +372,15 @@ export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
           alert={row}
           onToggle={handleToggle}
           isPending={toggleMutation.isPending}
+          t={t}
         />
         <button
           type="button"
-          aria-label={`Delete alert for ${row.symbol}`}
+          aria-label={t("deleteAlertAria", { symbol: row.symbol })}
           onClick={() => setAlertToDelete(row)}
           disabled={deleteMutation.isPending}
-          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md transition-colors hover:bg-red-500/10 disabled:opacity-50 text-v2-text-secondary hover:text-red-400"
-          title="Delete"
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-md transition-colors hover:bg-v2-red-light disabled:opacity-50 text-v2-text-secondary hover:text-v2-red-negative"
+          title={t("deleteLabel")}
         >
           <svg
             className="w-4 h-4"
@@ -381,7 +398,7 @@ export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
         </button>
       </div>
     ),
-    [handleToggle, toggleMutation.isPending, deleteMutation.isPending]
+    [handleToggle, toggleMutation.isPending, deleteMutation.isPending, t]
   );
 
   // ------------------------------------------------------------------
@@ -399,10 +416,10 @@ export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
           renderActions={renderMobileActions}
           actionsPosition="top"
           expandable
-          expandButtonLabel="Details"
-          collapseButtonLabel="Less"
-          emptyMessage="No alerts yet"
-          emptyDescription="Create a price alert to get notified"
+          expandButtonLabel={t("expandDetails")}
+          collapseButtonLabel={t("collapseDetails")}
+          emptyMessage={t("emptyTitle")}
+          emptyDescription={t("emptyDescription")}
         />
       </div>
 
@@ -413,14 +430,14 @@ export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-14 bg-v2-maroon-900 animate-pulse rounded-md"
+                className="h-14 bg-v2-bg-dark animate-pulse rounded-md"
               />
             ))}
           </div>
         ) : alerts.length === 0 ? (
           <EmptyState
-            title="No alerts yet"
-            description="Create a price alert to get notified"
+            title={t("emptyTitle")}
+            description={t("emptyDescription")}
             variant="default"
             size="md"
           />
@@ -430,22 +447,22 @@ export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
               <thead>
                 <tr className="border-b border-v2-border-light bg-v2-bg-surface-tint">
                   <th className="py-3 px-4 text-left text-xs font-semibold text-v2-text-secondary uppercase tracking-wider">
-                    Symbol
+                    {t("colSymbol")}
                   </th>
                   <th className="py-3 px-4 text-left text-xs font-semibold text-v2-text-secondary uppercase tracking-wider">
-                    Direction &amp; Target
+                    {t("colDirectionTarget")}
                   </th>
                   <th className="py-3 px-4 text-left text-xs font-semibold text-v2-text-secondary uppercase tracking-wider">
-                    Current Price
+                    {t("colCurrentPrice")}
                   </th>
                   <th className="py-3 px-4 text-left text-xs font-semibold text-v2-text-secondary uppercase tracking-wider">
-                    Trigger
+                    {t("colTrigger")}
                   </th>
                   <th className="py-3 px-4 text-left text-xs font-semibold text-v2-text-secondary uppercase tracking-wider">
-                    Status
+                    {t("colStatus")}
                   </th>
                   <th className="py-3 px-4 text-left text-xs font-semibold text-v2-text-secondary uppercase tracking-wider">
-                    Actions
+                    {t("colActions")}
                   </th>
                 </tr>
               </thead>
@@ -458,6 +475,7 @@ export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
                     onDelete={setAlertToDelete}
                     isTogglePending={toggleMutation.isPending}
                     isDeletePending={deleteMutation.isPending}
+                    t={t}
                   />
                 ))}
               </tbody>
@@ -469,9 +487,9 @@ export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
       {/* Delete confirmation dialog */}
       {alertToDelete && (
         <ConfirmationDialog
-          title="Delete Alert"
-          message={`Are you sure you want to delete the price alert for ${alertToDelete.symbol}? This action cannot be undone.`}
-          confirmText="Delete"
+          title={t("deleteDialogTitle")}
+          message={t("deleteDialogMessage", { symbol: alertToDelete.symbol })}
+          confirmText={t("deleteConfirmButton")}
           onConfirm={handleDeleteConfirm}
           onCancel={() => setAlertToDelete(null)}
           isLoading={deleteMutation.isPending}

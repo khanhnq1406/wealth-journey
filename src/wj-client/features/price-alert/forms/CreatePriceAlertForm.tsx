@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
@@ -32,9 +33,9 @@ import {
   CreatePriceAlertFormValues,
   GOLD_VND_ALERT_OPTIONS,
   SILVER_VND_ALERT_OPTIONS,
-  DIRECTION_OPTIONS,
-  TRIGGER_MODE_OPTIONS,
-  PRICE_SIDE_OPTIONS,
+  getDirectionOptions,
+  getTriggerModeOptions,
+  getPriceSideOptions,
   PriceAlertAssetOption,
 } from "../utils/price-alert-validation";
 
@@ -107,7 +108,12 @@ export function CreatePriceAlertForm({
   defaultAssetType,
   defaultCurrency,
 }: CreatePriceAlertFormProps) {
+  const t = useTranslations("priceAlerts");
   const queryClient = useQueryClient();
+
+  const DIRECTION_OPTIONS = useMemo(() => getDirectionOptions(t), [t]);
+  const TRIGGER_MODE_OPTIONS = useMemo(() => getTriggerModeOptions(t), [t]);
+  const PRICE_SIDE_OPTIONS = useMemo(() => getPriceSideOptions(t), [t]);
 
   // ------------------------------------------------------------------
   // UI state
@@ -200,9 +206,7 @@ export function CreatePriceAlertForm({
       setShowSuccess(true);
     },
     onError: (error: any) => {
-      setErrorMessage(
-        error?.message ?? "Failed to create alert. Please try again."
-      );
+      setErrorMessage(error?.message ?? t("createError"));
     },
   });
 
@@ -320,7 +324,7 @@ export function CreatePriceAlertForm({
   if (showSuccess) {
     return (
       <Success
-        message="Your price alert has been created."
+        message={t("successMessage")}
         onDone={onSuccess}
       />
     );
@@ -346,7 +350,7 @@ export function CreatePriceAlertForm({
           id="category-label"
           className="text-sm font-medium text-v2-text-secondary mb-2"
         >
-          Asset Category
+          {t("assetCategory")}
         </p>
         <div
           role="group"
@@ -356,7 +360,11 @@ export function CreatePriceAlertForm({
           {(["gold", "silver", "other"] as AssetCategory[]).map((cat) => {
             const isActive = category === cat;
             const label =
-              cat === "gold" ? "Gold" : cat === "silver" ? "Silver" : "Other";
+              cat === "gold"
+                ? t("categoryGold")
+                : cat === "silver"
+                  ? t("categorySilver")
+                  : t("categoryOther");
             return (
               <button
                 key={cat}
@@ -368,7 +376,7 @@ export function CreatePriceAlertForm({
                   "flex-1 min-h-[44px] rounded-lg border text-sm font-medium transition-colors",
                   "cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-v2-gold-primary",
                   isActive
-                    ? "bg-v2-gold-primary text-v2-bg-deepest border-v2-gold-primary"
+                    ? "bg-v2-gold-primary text-v2-bg-dark border-v2-gold-primary"
                     : "bg-v2-bg-dark text-v2-text-secondary border-v2-border-light hover:border-v2-gold-primary hover:text-v2-gold-primary",
                 ].join(" ")}
               >
@@ -385,14 +393,14 @@ export function CreatePriceAlertForm({
       {category === "gold" && (
         <div>
           <Label htmlFor="gold-type-select" required>
-            Gold Type
+            {t("goldTypeLabel")}
           </Label>
           <BasicFormSelect
             id="gold-type-select"
             options={GOLD_SELECT_OPTIONS}
             value={currentGoldSymbol}
             onChange={handleGoldTypeChange}
-            placeholder="Select gold type"
+            placeholder={t("goldTypePlaceholder")}
             className="mt-1"
           />
         </div>
@@ -401,14 +409,14 @@ export function CreatePriceAlertForm({
       {category === "silver" && (
         <div>
           <Label htmlFor="silver-type-select" required>
-            Silver Type
+            {t("silverTypeLabel")}
           </Label>
           <BasicFormSelect
             id="silver-type-select"
             options={SILVER_SELECT_OPTIONS}
             value={currentSilverSymbol}
             onChange={handleSilverTypeChange}
-            placeholder="Select silver type"
+            placeholder={t("silverTypePlaceholder")}
             className="mt-1"
           />
         </div>
@@ -417,19 +425,19 @@ export function CreatePriceAlertForm({
       {category === "other" && (
         <div>
           <Label htmlFor="symbol-autocomplete-label" required>
-            Symbol
+            {t("symbolLabel")}
           </Label>
           <div id="symbol-autocomplete-label" className="mt-1">
             <SymbolAutocomplete
               value={otherSymbol}
               onChange={handleOtherSymbolChange}
-              placeholder="Search for stocks, ETFs, crypto..."
+              placeholder={t("symbolPlaceholder")}
               usePortal
             />
           </div>
           {!otherSymbol && (
             <p className="text-xs text-v2-text-tertiary mt-1">
-              Type at least 2 characters to search
+              {t("symbolHint")}
             </p>
           )}
         </div>
@@ -444,7 +452,7 @@ export function CreatePriceAlertForm({
         <FormSelect
           name="priceSide"
           control={control}
-          label="Price Side"
+          label={t("priceSideLabel")}
           options={PRICE_SIDE_OPTIONS}
           required
         />
@@ -454,7 +462,7 @@ export function CreatePriceAlertForm({
       <FormSelect
         name="direction"
         control={control}
-        label="Direction"
+        label={t("directionLabel")}
         options={DIRECTION_OPTIONS}
         parseAsNumber
         required
@@ -465,15 +473,14 @@ export function CreatePriceAlertForm({
         <FormNumberInput
           name="targetPrice"
           control={control}
-          label="Target Price"
+          label={t("targetPriceLabel")}
           placeholder="0"
           useThousandSeparator
           required
           showRecommendations={false}
         />
-        {/* Current price reference note */}
         <p className="text-xs text-v2-text-tertiary mt-1">
-          Enter the price that will trigger this alert
+          {t("targetPriceHint")}
         </p>
       </div>
 
@@ -481,7 +488,7 @@ export function CreatePriceAlertForm({
       <FormSelect
         name="triggerMode"
         control={control}
-        label="Trigger Mode"
+        label={t("triggerModeLabel")}
         options={TRIGGER_MODE_OPTIONS}
         parseAsNumber
         required
@@ -493,14 +500,14 @@ export function CreatePriceAlertForm({
           <FormNumberInput
             name="cooldownHours"
             control={control}
-            label="Cooldown (hours)"
+            label={t("cooldownLabel")}
             placeholder="24"
             useThousandSeparator={false}
             min={2}
             max={168}
             required
             showRecommendations={false}
-            helperText="Minimum 2 hours, maximum 168 hours (1 week)"
+            helperText={t("cooldownHint")}
           />
         </div>
       )}
@@ -509,8 +516,8 @@ export function CreatePriceAlertForm({
       <FormTextarea
         name="note"
         control={control}
-        label="Note"
-        placeholder="Optional note..."
+        label={t("noteLabel")}
+        placeholder={t("notePlaceholder")}
         maxLength={200}
         showCharacterCount
         rows={2}
@@ -529,7 +536,7 @@ export function CreatePriceAlertForm({
         disabled={createAlertMutation.isPending}
         className="w-full min-h-[44px]"
       >
-        Create Alert
+        {t("createButton")}
       </Button>
     </form>
   );

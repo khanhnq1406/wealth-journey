@@ -207,34 +207,30 @@ export const createPriceAlertSchema = z
 export type CreatePriceAlertFormValues = z.infer<typeof createPriceAlertSchema>;
 
 // ---------------------------------------------------------------------------
-// Helper: form select options for Direction
+// Helper: translated form select options
+// These are functions (not constants) because labels must come from i18n.
+// Call them inside a component with the `t` function from useTranslations().
 // ---------------------------------------------------------------------------
 
-export const DIRECTION_OPTIONS = [
-  { value: String(AlertDirection.ALERT_DIRECTION_ABOVE), label: "Above" },
-  { value: String(AlertDirection.ALERT_DIRECTION_BELOW), label: "Below" },
-];
+type TFn = (key: string) => string;
 
-// ---------------------------------------------------------------------------
-// Helper: form select options for TriggerMode
-// ---------------------------------------------------------------------------
+export function getDirectionOptions(t: TFn) {
+  return [
+    { value: String(AlertDirection.ALERT_DIRECTION_ABOVE), label: t("directionAbove") },
+    { value: String(AlertDirection.ALERT_DIRECTION_BELOW), label: t("directionBelow") },
+  ];
+}
 
-export const TRIGGER_MODE_OPTIONS = [
-  {
-    value: String(AlertTriggerMode.ALERT_TRIGGER_MODE_ONCE),
-    label: "Once",
-  },
-  {
-    value: String(AlertTriggerMode.ALERT_TRIGGER_MODE_REPEAT),
-    label: "Repeat",
-  },
-];
+export function getTriggerModeOptions(t: TFn) {
+  return [
+    { value: String(AlertTriggerMode.ALERT_TRIGGER_MODE_ONCE), label: t("triggerOnce") },
+    { value: String(AlertTriggerMode.ALERT_TRIGGER_MODE_REPEAT), label: t("triggerRepeat") },
+  ];
+}
 
-// ---------------------------------------------------------------------------
-// Helper: price side options
-// ---------------------------------------------------------------------------
-
-export const PRICE_SIDE_OPTIONS = [
-  { value: "buy", label: "Buy" },
-  { value: "sell", label: "Sell" },
-];
+export function getPriceSideOptions(t: TFn) {
+  return [
+    { value: "buy", label: t("priceSideBuy") },
+    { value: "sell", label: t("priceSideSell") },
+  ];
+}

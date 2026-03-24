@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/Button";
 import { ButtonType, ModalType } from "@/app/constants";
@@ -19,32 +20,36 @@ import {
 
 type FilterTab = "all" | "active" | "triggered";
 
-const FILTER_TABS: { id: FilterTab; label: string; status: AlertStatus }[] = [
-  {
-    id: "all",
-    label: "All",
-    status: AlertStatus.ALERT_STATUS_UNSPECIFIED,
-  },
-  {
-    id: "active",
-    label: "Active",
-    status: AlertStatus.ALERT_STATUS_ACTIVE,
-  },
-  {
-    id: "triggered",
-    label: "Triggered",
-    status: AlertStatus.ALERT_STATUS_TRIGGERED,
-  },
-];
-
 // ---------------------------------------------------------------------------
 // Page component
 // ---------------------------------------------------------------------------
 
 export default function PriceAlertsSettingsPage() {
+  const t = useTranslations("priceAlerts");
   const queryClient = useQueryClient();
   const [modalType, setModalType] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
+
+  const FILTER_TABS = useMemo(
+    () => [
+      {
+        id: "all" as FilterTab,
+        label: t("filterAll"),
+        status: AlertStatus.ALERT_STATUS_UNSPECIFIED,
+      },
+      {
+        id: "active" as FilterTab,
+        label: t("filterActive"),
+        status: AlertStatus.ALERT_STATUS_ACTIVE,
+      },
+      {
+        id: "triggered" as FilterTab,
+        label: t("filterTriggered"),
+        status: AlertStatus.ALERT_STATUS_TRIGGERED,
+      },
+    ],
+    [t]
+  );
 
   const handleOpenModal = useCallback((type: string) => {
     setModalType(type);
@@ -62,14 +67,14 @@ export default function PriceAlertsSettingsPage() {
   }, [queryClient, handleCloseModal]);
 
   const currentFilter =
-    FILTER_TABS.find((t) => t.id === activeFilter) ?? FILTER_TABS[0];
+    FILTER_TABS.find((tab) => tab.id === activeFilter) ?? FILTER_TABS[0];
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold text-v2-gold-accent">
-          Price Alerts
+          {t("title")}
         </h1>
         <Button
           type={ButtonType.PRIMARY}
@@ -92,7 +97,7 @@ export default function PriceAlertsSettingsPage() {
             </svg>
           }
         >
-          Create Alert
+          {t("createAlert")}
         </Button>
       </div>
 
@@ -107,7 +112,7 @@ export default function PriceAlertsSettingsPage() {
             className={[
               "px-3 py-1.5 rounded-md text-sm font-medium transition-colors min-h-[36px]",
               activeFilter === tab.id
-                ? "bg-v2-gold-primary text-v2-bg-deepest shadow-sm"
+                ? "bg-v2-gold-primary text-v2-bg-dark shadow-sm"
                 : "text-v2-text-secondary hover:text-v2-gold-primary hover:bg-v2-bg-dark",
             ].join(" ")}
           >
@@ -123,7 +128,7 @@ export default function PriceAlertsSettingsPage() {
       <BaseModal
         isOpen={modalType === ModalType.CREATE_PRICE_ALERT}
         onClose={handleCloseModal}
-        title="Create Price Alert"
+        title={t("modalTitle")}
         maxWidth="max-w-lg"
       >
         <CreatePriceAlertForm onSuccess={handleCreateSuccess} />
