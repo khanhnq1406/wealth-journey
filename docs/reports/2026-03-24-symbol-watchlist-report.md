@@ -89,6 +89,8 @@ All other tasks approved without changes.
 | 2026-03-24 | Center market price title + "last updated" timestamp on Prices page                | Minor    | `prices/page.tsx` |
 | 2026-03-24 | Replace mobile FAB with inline "Add Symbol" button above table to eliminate overlap | Minor    | `WatchlistTab.tsx` |
 | 2026-03-24 | Add `useTranslations` i18n to WatchlistTab and AddToWatchlistForm; add translation keys (EN + VI) | Minor | `WatchlistTab.tsx`, `AddToWatchlistForm.tsx`, `messages/en/investment.json`, `messages/vi/investment.json` |
+| 2026-03-24 | Symbol search dropdown in AddToWatchlistForm now renders via portal (escapes modal overflow clipping); fixed portal click-outside to include `portalRef` so option clicks are not intercepted | Minor | `Select.tsx`, `SymbolAutocomplete.tsx`, `AddToWatchlistForm.tsx` |
+| 2026-03-24 | "Add to Watchlist" in Symbol Lookup tab now adds directly without opening modal; inline success/error feedback | Minor | `prices/page.tsx`, `messages/en/investment.json`, `messages/vi/investment.json` |
 
 ## Known Issues / Technical Debt
 

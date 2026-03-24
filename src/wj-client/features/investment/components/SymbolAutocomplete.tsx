@@ -22,6 +22,8 @@ export interface SymbolAutocompleteProps {
   disabled?: boolean;
   /** Placeholder text when no value is selected */
   placeholder?: string;
+  /** Render the dropdown via a portal to escape overflow:hidden containers (e.g. modals) */
+  usePortal?: boolean;
 }
 
 /**
@@ -65,6 +67,7 @@ export function SymbolAutocomplete({
   className = "",
   disabled = false,
   placeholder = "Search for stocks, ETFs, crypto...",
+  usePortal = false,
 }: SymbolAutocompleteProps) {
   const t = useTranslations("symbolAutocomplete");
   const [inputValue, setInputValue] = useState("");
@@ -244,6 +247,7 @@ export function SymbolAutocomplete({
         clearable={true}
         disableFilter={true}
         renderDropdown={renderDropdown}
+        usePortal={usePortal}
       />
 
       {/* Error message */}

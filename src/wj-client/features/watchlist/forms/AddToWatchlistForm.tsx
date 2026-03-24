@@ -252,6 +252,7 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
                 value={symbol}
                 onChange={handleSymbolChange}
                 placeholder={t("searchSymbolPlaceholder")}
+                usePortal
               />
             </div>
           )}
