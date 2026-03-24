@@ -48,10 +48,10 @@ export interface MobileTableProps<T> {
    */
   showScrollIndicator?: boolean;
   /**
-   * Position of action buttons. 'inline' shows actions in each card, 'sticky' shows a sticky footer with actions.
+   * Position of action buttons. 'inline' shows actions at the bottom of each card, 'top' shows actions in the card header row (alongside the first collapsed column), 'sticky' shows a sticky footer with actions.
    * Sticky is better for scrollable tables with many rows.
    */
-  actionsPosition?: "inline" | "sticky";
+  actionsPosition?: "inline" | "top" | "sticky";
   /**
    * Label for sticky action button (only used when actionsPosition is 'sticky')
    */
@@ -140,7 +140,7 @@ const MobileTableRow = memo(function MobileTableRow<T>({
   columns: MobileColumnDef<T>[];
   renderFieldValue?: (columnId: string, value: any, row: T) => React.ReactNode;
   renderActions?: (row: T) => React.ReactNode;
-  actionsPosition: "inline" | "sticky";
+  actionsPosition: "inline" | "top" | "sticky";
   expandable?: boolean;
   expandButtonLabel: string;
   collapseButtonLabel: string;
@@ -211,11 +211,26 @@ const MobileTableRow = memo(function MobileTableRow<T>({
 
   return (
     <div className="p-3 space-y-2">
+      {/* Top actions header — show first collapsed column value + actions in one row */}
+      {renderActions && actionsPosition === "top" && (
+        <>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              {collapsedColumns[0] && renderColumn(collapsedColumns[0], 0)}
+            </div>
+            <div className="flex gap-1 -mr-2 shrink-0">{renderActions(row)}</div>
+          </div>
+          <div className="border-t border-v2-gold-primary/20" />
+        </>
+      )}
+
       {/* Collapsed view - show key info only */}
-      {collapsedColumns.map((column, cellIndex) => (
+      {collapsedColumns
+        .slice(actionsPosition === "top" ? 1 : 0)
+        .map((column, cellIndex) => (
         <React.Fragment key={column.id || cellIndex}>
           {renderColumn(column, cellIndex)}
-          {cellIndex < collapsedColumns.length - 1 && (
+          {cellIndex < collapsedColumns.slice(actionsPosition === "top" ? 1 : 0).length - 1 && (
             <div className="border-t border-v2-gold-primary/20" />
           )}
         </React.Fragment>
@@ -281,7 +296,7 @@ const MobileTableRow = memo(function MobileTableRow<T>({
   columns: MobileColumnDef<T>[];
   renderFieldValue?: (columnId: string, value: any, row: T) => React.ReactNode;
   renderActions?: (row: T) => React.ReactNode;
-  actionsPosition: "inline" | "sticky";
+  actionsPosition: "inline" | "top" | "sticky";
   expandable?: boolean;
   expandButtonLabel: string;
   collapseButtonLabel: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/Button";
@@ -120,29 +120,16 @@ export function WatchlistTab({ onAddClick }: WatchlistTabProps) {
   const serverItems = listQuery.data?.items ?? [];
   const total = listQuery.data?.total ?? 0;
 
-  // Local ordered copy for optimistic drag-and-drop updates
-  const [orderedItems, setOrderedItems] = useState<WatchlistItem[]>(serverItems);
-
-  // Sync local order whenever server data refreshes
-  useEffect(() => {
-    setOrderedItems(serverItems);
-  }, [serverItems]);
-
   const deleteMutation = useMutationDeleteWatchlistItem({
     onSuccess: () => {
       listQuery.refetch();
     },
   });
 
-  const reorderMutation = useMutationReorderWatchlist({
-    onError: () => {
-      // Revert to server order on failure
-      setOrderedItems(serverItems);
-    },
-  });
+  const reorderMutation = useMutationReorderWatchlist();
 
-  const handleReorder = (newOrder: WatchlistItem[]) => {
-    setOrderedItems(newOrder);
+  // Called by DraggableWatchlistTable once on drag drop with final order
+  const handleReorderCommit = (newOrder: WatchlistItem[]) => {
     reorderMutation.mutate({ itemIds: newOrder.map((it) => it.id) });
   };
 
@@ -154,8 +141,7 @@ export function WatchlistTab({ onAddClick }: WatchlistTabProps) {
     listQuery.refetch();
   };
 
-  // Use ordered items for rendering (falls back to server items before first reorder)
-  const items = orderedItems.length > 0 ? orderedItems : serverItems;
+  const items = serverItems;
 
   // Mobile columns
   const mobileColumns: MobileColumnDef<WatchlistItem>[] = [
@@ -270,7 +256,7 @@ export function WatchlistTab({ onAddClick }: WatchlistTabProps) {
           <div className="hidden sm:block">
             <DraggableWatchlistTable
               items={items}
-              onReorder={handleReorder}
+              onReorderCommit={handleReorderCommit}
               onDelete={handleDelete}
               isDeleting={deleteMutation.isPending}
             />
@@ -285,6 +271,7 @@ export function WatchlistTab({ onAddClick }: WatchlistTabProps) {
               expandable
               expandButtonLabel={t("details")}
               collapseButtonLabel={t("less")}
+              actionsPosition="top"
               renderActions={(item) => (
                 <DeleteButton item={item} onDeleted={handleDeleted} />
               )}
