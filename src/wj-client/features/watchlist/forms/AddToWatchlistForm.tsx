@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/Button";
 import { FormInput } from "@/components/forms/FormInput";
 import { Success } from "@/components/modals/Success";
+import { Select } from "@/components/select/Select";
 import { ButtonType } from "@/app/constants";
 import { useMutationCreateWatchlistItem, useQueryGetMarketPrices } from "@/utils/generated/hooks";
 import { InvestmentType, SearchResult } from "@/gen/protobuf/v1/investment";
@@ -112,8 +113,8 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
     }
   };
 
-  const handleGoldSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const opt = GOLD_VND_OPTIONS.find((o) => o.value === e.target.value);
+  const handleGoldSelect = (value: string) => {
+    const opt = GOLD_VND_OPTIONS.find((o) => o.value === value);
     if (opt) {
       setSymbol(opt.value);
       setName(opt.label);
@@ -122,8 +123,8 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
     }
   };
 
-  const handleSilverSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const opt = SILVER_VND_OPTIONS.find((o) => o.value === e.target.value);
+  const handleSilverSelect = (value: string) => {
+    const opt = SILVER_VND_OPTIONS.find((o) => o.value === value);
     if (opt) {
       setSymbol(opt.value);
       setName(opt.label);
@@ -132,8 +133,8 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
     }
   };
 
-  const handleCurrencySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const item = marketData?.currency?.find((c) => c.typeCode === e.target.value);
+  const handleCurrencySelect = (value: string) => {
+    const item = marketData?.currency?.find((c) => c.typeCode === value);
     if (item) {
       setSymbol(item.typeCode);
       setName(item.name || item.typeCode);
@@ -203,17 +204,14 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
           <label className="block text-sm font-medium text-v2-text-secondary">
             {t("goldType")}
           </label>
-          <select
+          <Select
+            options={GOLD_VND_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label }))}
             value={symbol}
             onChange={handleGoldSelect}
-            className="w-full min-h-[44px] sm:min-h-[48px] px-3 sm:px-4 rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent text-base focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent transition-all duration-200"
-          >
-            {GOLD_VND_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+            disableInput
+            clearable={false}
+            usePortal
+          />
         </div>
       )}
 
@@ -222,17 +220,14 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
           <label className="block text-sm font-medium text-v2-text-secondary">
             {t("silverType")}
           </label>
-          <select
+          <Select
+            options={SILVER_VND_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label }))}
             value={symbol}
             onChange={handleSilverSelect}
-            className="w-full min-h-[44px] sm:min-h-[48px] px-3 sm:px-4 rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent text-base focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent transition-all duration-200"
-          >
-            {SILVER_VND_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+            disableInput
+            clearable={false}
+            usePortal
+          />
         </div>
       )}
 
@@ -241,17 +236,17 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
           <label className="block text-sm font-medium text-v2-text-secondary">
             {t("currencyType")}
           </label>
-          <select
+          <Select
+            options={(marketData?.currency ?? []).map((item) => ({
+              value: item.typeCode,
+              label: item.name || item.typeCode,
+            }))}
             value={symbol}
             onChange={handleCurrencySelect}
-            className="w-full min-h-[44px] sm:min-h-[48px] px-3 sm:px-4 rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent text-base focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent transition-all duration-200"
-          >
-            {(marketData?.currency ?? []).map((item) => (
-              <option key={item.typeCode} value={item.typeCode}>
-                {item.name || item.typeCode}
-              </option>
-            ))}
-          </select>
+            disableInput
+            clearable={false}
+            usePortal
+          />
         </div>
       )}
 
