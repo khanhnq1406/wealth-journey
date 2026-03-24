@@ -39,6 +39,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	fxRateSvc := NewFXRateService(repos.FXRate, redisClient)
 	goldPriceSvc := NewGoldPriceService(redisClient)
 	silverPriceSvc := NewSilverPriceService(redisClient)
+	currencyPriceSvc := NewCurrencyPriceService(redisClient)
 	marketDataSvc := NewMarketDataService(repos.MarketData, goldPriceSvc, silverPriceSvc)
 	currencyCache := cache.NewCurrencyCache(redisClient)
 
@@ -75,8 +76,8 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		priceAlertSvc = NewPriceAlertService(goldPriceSvc, silverPriceSvc, repos.Notification, repos.User, rdb, pushSvc)
 	}
 
-	// Phase 1 (cont.): WatchlistService — depends on watchlist repo, gold/silver price services, market data service
-	watchlistSvc := NewWatchlistService(repos.Watchlist, goldPriceSvc, silverPriceSvc, marketDataSvc)
+	// Phase 1 (cont.): WatchlistService — depends on watchlist repo, gold/silver/currency price services, market data service
+	watchlistSvc := NewWatchlistService(repos.Watchlist, goldPriceSvc, silverPriceSvc, currencyPriceSvc, marketDataSvc)
 
 	// Phase 1 (cont.): CommunityService — depends on storage provider for image uploads
 	communitySvc := NewCommunityService(repos.Post, repos.Comment, repos.Like, repos.Follow, repos.Report, repos.User, repos.Notification, repos.SavedPost, repos.Hashtag, communityStorage, rdb)

@@ -349,6 +349,8 @@
         "backToSymbolLabel": "Quay lại chọn mã",
         "goldType": "Loại vàng",
         "silverType": "Loại bạc",
+        "currency": "Ngoại tệ",
+        "currencyType": "Loại ngoại tệ",
         "searchSymbol": "Tìm mã",
         "searchSymbolPlaceholder": "Tìm cổ phiếu, ETF, crypto...",
         "continue": "Tiếp tục",

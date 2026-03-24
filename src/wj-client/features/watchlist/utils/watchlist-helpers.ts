@@ -9,6 +9,8 @@ const GOLD_SILVER_TYPES: number[] = [
   InvestmentType.INVESTMENT_TYPE_SILVER_USD,
 ];
 
+const CURRENCY_TYPE = InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY;
+
 /**
  * Maps InvestmentType numeric values to human-readable display strings.
  */
@@ -26,6 +28,8 @@ export function getAssetTypeLabel(assetType: number): string {
     case InvestmentType.INVESTMENT_TYPE_SILVER_VND:
     case InvestmentType.INVESTMENT_TYPE_SILVER_USD:
       return "Silver";
+    case InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY:
+      return "Currency";
     default:
       return "Asset";
   }
@@ -39,9 +43,10 @@ export function getAssetTypeLabel(assetType: number): string {
  */
 export function formatWatchlistPrice(item: WatchlistItem): string {
   const isGoldSilver = GOLD_SILVER_TYPES.includes(item.assetType);
+  const isCurrency = item.assetType === CURRENCY_TYPE;
 
   let rawPrice: number | undefined;
-  if (isGoldSilver) {
+  if (isGoldSilver || isCurrency) {
     rawPrice = item.buyPrice || item.sellPrice || undefined;
   } else {
     rawPrice = item.currentPrice || undefined;
@@ -50,6 +55,13 @@ export function formatWatchlistPrice(item: WatchlistItem): string {
   if (!rawPrice) return "N/A";
 
   const currency = item.currency || "USD";
+
+  if (isCurrency) {
+    // Currency prices from vangsaigon are raw VND — no divisor
+    return new Intl.NumberFormat("vi-VN", {
+      maximumFractionDigits: 0,
+    }).format(rawPrice);
+  }
 
   if (currency === "VND") {
     // VND stored × 1000

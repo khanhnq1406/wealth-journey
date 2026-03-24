@@ -21,6 +21,8 @@ function getBadgeClasses(assetType: number): string {
     case InvestmentType.INVESTMENT_TYPE_SILVER_VND:
     case InvestmentType.INVESTMENT_TYPE_SILVER_USD:
       return "bg-gray-100 text-gray-600";
+    case InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY:
+      return "bg-blue-100 text-blue-700";
     default:
       return "bg-gray-100 text-gray-500";
   }

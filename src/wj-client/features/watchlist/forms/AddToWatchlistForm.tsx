@@ -6,14 +6,14 @@ import { Button } from "@/components/Button";
 import { FormInput } from "@/components/forms/FormInput";
 import { Success } from "@/components/modals/Success";
 import { ButtonType } from "@/app/constants";
-import { useMutationCreateWatchlistItem } from "@/utils/generated/hooks";
+import { useMutationCreateWatchlistItem, useQueryGetMarketPrices } from "@/utils/generated/hooks";
 import { InvestmentType, SearchResult } from "@/gen/protobuf/v1/investment";
 import { GOLD_VND_OPTIONS } from "@/features/investment/utils/gold-calculator";
 import { SILVER_VND_OPTIONS } from "@/features/investment/utils/silver-calculator";
 // eslint-disable-next-line no-restricted-imports
 import { SymbolAutocomplete } from "@/features/investment/components/SymbolAutocomplete";
 
-type AssetCategory = "gold" | "silver" | "other";
+type AssetCategory = "gold" | "silver" | "currency" | "other";
 
 interface AddToWatchlistFormProps {
   onSuccess?: () => void;
@@ -54,6 +54,8 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
   const tp = useTranslations("prices");
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [category, setCategory] = useState<AssetCategory | null>(null);
+
+  const { data: marketData } = useQueryGetMarketPrices({}, { staleTime: 5 * 60 * 1000 });
 
   // Assembled watchlist item fields
   const [symbol, setSymbol] = useState("");
@@ -97,6 +99,15 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
         setAssetType(InvestmentType.INVESTMENT_TYPE_SILVER_VND);
         setCurrency(first.currency);
       }
+    } else if (cat === "currency") {
+      setAssetType(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY);
+      setCurrency("VND");
+      // Pre-select first currency option if available
+      const first = marketData?.currency?.[0];
+      if (first) {
+        setSymbol(first.typeCode);
+        setName(first.name || first.typeCode);
+      }
     } else {
       setAssetType(InvestmentType.INVESTMENT_TYPE_OTHER);
       setCurrency("USD");
@@ -122,6 +133,16 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
       setName(opt.label);
       setAssetType(InvestmentType.INVESTMENT_TYPE_SILVER_VND);
       setCurrency(opt.currency);
+    }
+  };
+
+  const handleCurrencySelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const item = marketData?.currency?.find((c) => c.typeCode === e.target.value);
+    if (item) {
+      setSymbol(item.typeCode);
+      setName(item.name || item.typeCode);
+      setAssetType(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY);
+      setCurrency("VND");
     }
   };
 
@@ -164,25 +185,32 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
           <p className="text-sm text-v2-text-secondary mb-1">
             {t("chooseCategoryLabel")}
           </p>
-          <div className="flex gap-2 w-full">
+          <div className="grid grid-cols-2 gap-2 w-full">
             <button
               type="button"
               onClick={() => handleCategorySelect("gold")}
-              className="flex-1 min-h-[48px] rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent font-medium text-sm hover:border-v2-gold-primary hover:text-v2-gold-primary transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
+              className="min-h-[48px] rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent font-medium text-sm hover:border-v2-gold-primary hover:text-v2-gold-primary transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
             >
               {t("gold")}
             </button>
             <button
               type="button"
               onClick={() => handleCategorySelect("silver")}
-              className="flex-1 min-h-[48px] rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent font-medium text-sm hover:border-v2-gold-primary hover:text-v2-gold-primary transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
+              className="min-h-[48px] rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent font-medium text-sm hover:border-v2-gold-primary hover:text-v2-gold-primary transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
             >
               {t("silver")}
             </button>
             <button
               type="button"
+              onClick={() => handleCategorySelect("currency")}
+              className="min-h-[48px] rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent font-medium text-sm hover:border-v2-gold-primary hover:text-v2-gold-primary transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
+            >
+              {t("currency")}
+            </button>
+            <button
+              type="button"
               onClick={() => handleCategorySelect("other")}
-              className="flex-1 min-h-[48px] rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent font-medium text-sm hover:border-v2-gold-primary hover:text-v2-gold-primary transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
+              className="min-h-[48px] rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent font-medium text-sm hover:border-v2-gold-primary hover:text-v2-gold-primary transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary"
             >
               {t("otherAssets")}
             </button>
@@ -237,6 +265,25 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
                 {SILVER_VND_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {category === "currency" && (
+            <div className="flex flex-col gap-1.5">
+              <label className="block text-sm font-medium text-v2-text-secondary">
+                {t("currencyType")}
+              </label>
+              <select
+                value={symbol}
+                onChange={handleCurrencySelect}
+                className="w-full min-h-[44px] sm:min-h-[48px] px-3 sm:px-4 rounded-lg border border-v2-border-light bg-v2-bg-dark text-v2-gold-accent text-base focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:border-transparent transition-all duration-200"
+              >
+                {(marketData?.currency ?? []).map((item) => (
+                  <option key={item.typeCode} value={item.typeCode}>
+                    {item.name || item.typeCode}
                   </option>
                 ))}
               </select>

@@ -21,10 +21,11 @@ const watchlistMaxItems = 50
 
 // watchlistService implements WatchlistService.
 type watchlistService struct {
-	watchlistRepo  repository.WatchlistRepository
-	goldPriceSvc   GoldPriceService
-	silverPriceSvc SilverPriceService
-	marketDataSvc  MarketDataService
+	watchlistRepo   repository.WatchlistRepository
+	goldPriceSvc    GoldPriceService
+	silverPriceSvc  SilverPriceService
+	currencyPriceSvc CurrencyPriceService
+	marketDataSvc   MarketDataService
 }
 
 // NewWatchlistService creates a new WatchlistService.
@@ -32,13 +33,15 @@ func NewWatchlistService(
 	watchlistRepo repository.WatchlistRepository,
 	goldPriceSvc GoldPriceService,
 	silverPriceSvc SilverPriceService,
+	currencyPriceSvc CurrencyPriceService,
 	marketDataSvc MarketDataService,
 ) WatchlistService {
 	return &watchlistService{
-		watchlistRepo:  watchlistRepo,
-		goldPriceSvc:   goldPriceSvc,
-		silverPriceSvc: silverPriceSvc,
-		marketDataSvc:  marketDataSvc,
+		watchlistRepo:   watchlistRepo,
+		goldPriceSvc:    goldPriceSvc,
+		silverPriceSvc:  silverPriceSvc,
+		currencyPriceSvc: currencyPriceSvc,
+		marketDataSvc:   marketDataSvc,
 	}
 }
 
@@ -123,6 +126,7 @@ func (s *watchlistService) ListItems(ctx context.Context, userID int32) (*v1.Lis
 	// Group items by price source
 	var goldItems []*models.WatchlistItem
 	var silverItems []*models.WatchlistItem
+	var currencyItems []*models.WatchlistItem
 	var marketItems []*models.WatchlistItem
 
 	for _, item := range items {
@@ -131,6 +135,8 @@ func (s *watchlistService) ListItems(ctx context.Context, userID int32) (*v1.Lis
 			goldItems = append(goldItems, item)
 		} else if silver.IsSilverType(assetType) {
 			silverItems = append(silverItems, item)
+		} else if assetType == v1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY {
+			currencyItems = append(currencyItems, item)
 		} else {
 			marketItems = append(marketItems, item)
 		}
@@ -199,6 +205,34 @@ func (s *watchlistService) ListItems(ctx context.Context, userID int32) (*v1.Lis
 						currentPrice: sp.Buy,
 						buyPrice:     sp.Buy,
 						sellPrice:    sp.Sell,
+					}
+				}
+			}
+		}()
+	}
+
+	// Fetch currency prices in parallel
+	if len(currencyItems) > 0 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			allCurrencyPrices, err := s.currencyPriceSvc.FetchAllPrices(ctx)
+			if err != nil {
+				log.Printf("Warning: failed to fetch currency prices for watchlist: %v", err)
+				return
+			}
+			currencyByCode := make(map[string]*CachedCurrencyPrice, len(allCurrencyPrices))
+			for _, cp := range allCurrencyPrices {
+				currencyByCode[cp.TypeCode] = cp
+			}
+			mu.Lock()
+			defer mu.Unlock()
+			for _, item := range currencyItems {
+				if cp, ok := currencyByCode[item.Symbol]; ok {
+					priceMap[item.Symbol] = &priceInfo{
+						currentPrice: cp.Buy,
+						buyPrice:     cp.Buy,
+						sellPrice:    cp.Sell,
 					}
 				}
 			}

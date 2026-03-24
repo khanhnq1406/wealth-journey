@@ -349,6 +349,8 @@
         "backToSymbolLabel": "Go back to symbol selection",
         "goldType": "Gold Type",
         "silverType": "Silver Type",
+        "currency": "Currency",
+        "currencyType": "Currency",
         "searchSymbol": "Search Symbol",
         "searchSymbolPlaceholder": "Search for stocks, ETFs, crypto...",
         "continue": "Continue",

@@ -95,6 +95,7 @@ All other tasks approved without changes.
 | 2026-03-24 | Star icon (unfilled/not-in-watchlist) color changed from `text-v2-text-tertiary` (#fcf2e0, near-white — invisible on light background) to `text-gray-400`; hover remains `text-v2-gold-accent` | Minor | `prices/page.tsx` |
 | 2026-03-24 | Align watchlist desktop table columns with fixed pixel widths — changed Price/Change/Type columns from `auto` (content-sized per row) to `160px`/`90px`/`100px` so all rows align uniformly with the header | Minor | `DraggableWatchlistTable.tsx` |
 | 2026-03-24 | Remove Prices item from mobile bottom nav — prices page remains accessible via desktop sidebar; bottom nav item widths updated from `max-w-[25%]` (4 items) to `max-w-[33.33%]` (3 items) | Minor | `BottomNav.tsx` |
+| 2026-03-24 | Add `INVESTMENT_TYPE_FOREIGN_CURRENCY` (type 13) routing to watchlist — currency items starred from the Currency tab were incorrectly routed through Yahoo Finance (returning ~5,070 VND instead of ~25,470 VND); now routed through `CurrencyPriceService` (vangsaigon API, same source as the Currency tab); display logic updated to use raw VND with no divisor; badge shows teal "Currency" label | Minor | `watchlist_service.go`, `services.go`, `watchlist-helpers.ts`, `AssetTypeBadge.tsx`, `prices/page.tsx` |
 
 ## Known Issues / Technical Debt
 

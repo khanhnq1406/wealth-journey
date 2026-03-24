@@ -322,7 +322,7 @@ function buildTanstackColumns(
         ? InvestmentType.INVESTMENT_TYPE_GOLD_VND
         : tab === "silver"
           ? InvestmentType.INVESTMENT_TYPE_SILVER_VND
-          : InvestmentType.INVESTMENT_TYPE_OTHER;
+          : InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY;
 
     cols.push(
       columnHelper.display({
@@ -438,7 +438,7 @@ function buildMobileColumns(
         ? InvestmentType.INVESTMENT_TYPE_GOLD_VND
         : tab === "silver"
           ? InvestmentType.INVESTMENT_TYPE_SILVER_VND
-          : InvestmentType.INVESTMENT_TYPE_OTHER;
+          : InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY;
 
     cols.push({
       id: "star",
