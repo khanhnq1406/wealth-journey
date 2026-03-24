@@ -32,6 +32,57 @@ function renderModal(
   };
 }
 
+describe("BaseModal body scroll lock — scroll position preservation", () => {
+  beforeEach(() => {
+    // Reset body styles before each test
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.width = "";
+    document.body.style.top = "";
+  });
+
+  afterEach(() => {
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.width = "";
+    document.body.style.top = "";
+  });
+
+  it("captures scrollY and applies it as body top offset when modal opens", () => {
+    // Simulate page scrolled down 200px
+    Object.defineProperty(window, "scrollY", { value: 200, writable: true });
+
+    renderModal({ isOpen: true });
+
+    expect(document.body.style.position).toBe("fixed");
+    expect(document.body.style.top).toBe("-200px");
+  });
+
+  it("restores scroll position when modal closes", () => {
+    Object.defineProperty(window, "scrollY", { value: 300, writable: true });
+    const scrollToSpy = jest.spyOn(window, "scrollTo").mockImplementation(() => {});
+
+    const { rerender } = render(
+      <BaseModal isOpen={true} onClose={jest.fn()} title="T">
+        <div />
+      </BaseModal>
+    );
+
+    // Close the modal
+    rerender(
+      <BaseModal isOpen={false} onClose={jest.fn()} title="T">
+        <div />
+      </BaseModal>
+    );
+
+    expect(scrollToSpy).toHaveBeenCalledWith(0, 300);
+    expect(document.body.style.position).toBe("");
+    expect(document.body.style.top).toBe("");
+
+    scrollToSpy.mockRestore();
+  });
+});
+
 describe("BaseModal swipe-to-close", () => {
   let rafSpy: jest.SpyInstance;
 
