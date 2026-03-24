@@ -8,7 +8,7 @@
 - **Started:** 2026-03-24T00:00:00Z
 - **Last updated:** 2026-03-24T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 5
+- **Current task:** 6
 
 ## Task Progress
 
@@ -19,7 +19,7 @@
 | 2   | Database Model — watchlist.go                          | done    | —      | WatchlistItem GORM model with soft-delete-aware unique index on (user_id, symbol) |
 | 3   | Database Migration — migrate-watchlist                 | done    | —      | Migration command and Taskfile entry for AutoMigrate |
 | 4   | Repository Layer — watchlist_repository.go             | done    | —      | 9-method repository with ownership scoping; ReorderItems validates per-ID ownership via RowsAffected |
-| 5   | Service Layer — watchlist_service.go                   | pending | —      | —       |
+| 5   | Service Layer — watchlist_service.go                   | done    | —      | 6-method service with parallel price enrichment, ownership checks, 50-item limit, input validation |
 | 6   | Wire Repository + Service into DI                      | pending | —      | —       |
 | 7   | REST Handler — watchlist.go                            | pending | —      | —       |
 | 8   | Wire Handler + Routes                                  | pending | —      | —       |
