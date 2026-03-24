@@ -181,16 +181,16 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
   return (
     <div className="flex flex-col gap-4">
       {/* Category tabs */}
-      <div className="flex rounded-lg border border-v2-border-light overflow-hidden">
+      <div className="flex rounded-lg border border-v2-border-light bg-v2-bg-dark p-1 gap-1">
         {categories.map((cat) => (
           <button
             key={cat.value}
             type="button"
             onClick={() => handleCategoryChange(cat.value)}
-            className={`flex-1 py-2 text-xs font-medium transition-colors duration-150 focus:outline-none focus:ring-inset focus:ring-2 focus:ring-v2-gold-primary ${
+            className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-v2-gold-primary focus:ring-offset-1 ${
               category === cat.value
                 ? "bg-v2-gold-primary text-v2-bg-surface"
-                : "bg-v2-bg-dark text-v2-text-secondary hover:text-v2-gold-accent"
+                : "text-v2-text-secondary hover:text-v2-gold-accent"
             }`}
           >
             {cat.label}
