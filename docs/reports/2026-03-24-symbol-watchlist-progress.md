@@ -8,7 +8,7 @@
 - **Started:** 2026-03-24T00:00:00Z
 - **Last updated:** 2026-03-24T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 2
+- **Current task:** 5
 
 ## Task Progress
 
@@ -16,9 +16,9 @@
 | --- | ------------------------------------------------------ | ------- | ------ | ------- |
 | 0   | Update C4 Architecture Diagrams                        | done    | —      | Added GoldPriceService, SilverPriceService components and watchlist data flow examples to backend C4 diagram |
 | 1   | Define Protobuf API — watchlist.proto                  | done    | —      | Created watchlist.proto with 7 messages, 6 RPCs; generated Go+TS types and 8+ React Query hooks |
-| 2   | Database Model — watchlist.go                          | pending | —      | —       |
-| 3   | Database Migration — migrate-watchlist                 | pending | —      | —       |
-| 4   | Repository Layer — watchlist_repository.go             | pending | —      | —       |
+| 2   | Database Model — watchlist.go                          | done    | —      | WatchlistItem GORM model with soft-delete-aware unique index on (user_id, symbol) |
+| 3   | Database Migration — migrate-watchlist                 | done    | —      | Migration command and Taskfile entry for AutoMigrate |
+| 4   | Repository Layer — watchlist_repository.go             | done    | —      | 9-method repository with ownership scoping; ReorderItems validates per-ID ownership via RowsAffected |
 | 5   | Service Layer — watchlist_service.go                   | pending | —      | —       |
 | 6   | Wire Repository + Service into DI                      | pending | —      | —       |
 | 7   | REST Handler — watchlist.go                            | pending | —      | —       |

@@ -448,3 +448,35 @@ type PushSubscriptionRepository interface {
 	CountByUserID(ctx context.Context, userID int32) (int, error)
 	DeleteByID(ctx context.Context, id int32) error
 }
+
+// WatchlistRepository defines the interface for watchlist data operations.
+type WatchlistRepository interface {
+	// Create creates a new watchlist item.
+	Create(ctx context.Context, item *models.WatchlistItem) error
+
+	// GetByIDForUser retrieves a watchlist item by ID, ensuring it belongs to the user.
+	GetByIDForUser(ctx context.Context, itemID, userID int32) (*models.WatchlistItem, error)
+
+	// GetBySymbolForUser retrieves a watchlist item by symbol for a user.
+	GetBySymbolForUser(ctx context.Context, symbol string, userID int32) (*models.WatchlistItem, error)
+
+	// ListByUserID retrieves all watchlist items for a user, ordered by sort_order ASC, created_at ASC.
+	ListByUserID(ctx context.Context, userID int32) ([]*models.WatchlistItem, error)
+
+	// CountByUserID returns the number of watchlist items for a user.
+	CountByUserID(ctx context.Context, userID int32) (int64, error)
+
+	// Update updates a watchlist item (full model update).
+	Update(ctx context.Context, item *models.WatchlistItem) error
+
+	// Delete soft deletes a watchlist item by ID.
+	Delete(ctx context.Context, itemID int32) error
+
+	// ReorderItems updates sort_order for a list of item IDs within a transaction.
+	// All IDs must belong to the given user; ownership is validated via the UPDATE clause.
+	ReorderItems(ctx context.Context, userID int32, itemIDs []int32) error
+
+	// GetMaxSortOrder returns the maximum sort_order value for a user's watchlist,
+	// or -1 if the watchlist is empty.
+	GetMaxSortOrder(ctx context.Context, userID int32) (int32, error)
+}
