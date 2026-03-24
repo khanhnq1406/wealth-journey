@@ -686,7 +686,7 @@ export function FormSelect({
             "truncate flex-1 text-left",
             !selectedOption &&
               !selectedOptions.length &&
- "text-v2-text-tertiary",
+ "text-v2-text-placeholder",
           )}
         >
           {getSelectedLabel()}
