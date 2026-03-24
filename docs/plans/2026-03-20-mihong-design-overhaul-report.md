@@ -342,5 +342,7 @@ Fix issues and re-review. Issue #1 (missing color tokens) is critical — dozens
 
 | 2026-03-24 | Moved action buttons to top of MobileTable cards — added `actionsPosition="top"` variant to `MobileTable`: renders first collapsed column + actions in a header row at the top of each card (matching design reference where ID and action icons share the same top row), then remaining fields below. Updated `WatchlistTab` to pass `actionsPosition="top"`. Default remains `"inline"` to avoid breaking other callers. | Minor | `MobileTable.tsx`, `WatchlistTab.tsx` (2 files) |
 
+| 2026-03-24 | Aligned change column colors with sell/buy price colors on desktop price tables — added optional `upColor`/`downColor` props to `ChangeCell` (defaults remain `text-v2-green-positive`/`text-v2-red-negative` for mobile); desktop `buildTanstackColumns` now passes `upColor="text-green-700"` and `downColor="text-red-700"` to match the desktop cream/parchment sell (`text-green-700`) and buy (`text-red-700`) cell colors. Also added `thead th:hover` background-color styles for all three price table header variants (gold: `rgba(215,139,28,0.25)`, silver: `rgba(139,146,158,0.25)`, currency: `rgba(96,165,250,0.25)`) to give header hover feedback aligned with each table's mihong color. | Minor | `prices/page.tsx`, `globals.css` (2 files) |
+
 **Build verification:** `next build` passes with zero errors on all routes after fixes.
 **Security review:** APPROVED — all changes are UI-only (Tailwind class replacements + i18n text migration), no security impact.

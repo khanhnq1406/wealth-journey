@@ -40,16 +40,20 @@ function ChangeCell({
   value,
   currency,
   divide = true,
+  upColor = "text-v2-green-positive",
+  downColor = "text-v2-red-negative",
 }: {
   value: number | null | undefined;
   currency: string;
   divide?: boolean;
+  upColor?: string;
+  downColor?: string;
 }) {
   if (!value) return <span className="text-v2-text-tertiary">—</span>;
   const isUp = value > 0;
   return (
     <span
-      className={`flex items-center gap-0.5 ${isUp ? "text-v2-green-positive" : "text-v2-red-negative"}`}
+      className={`flex items-center gap-0.5 ${isUp ? upColor : downColor}`}
     >
       <svg
         aria-hidden="true"
@@ -65,7 +69,9 @@ function ChangeCell({
           d={isUp ? "M5 10l7-7m0 0l7 7m-7-7v18" : "M19 14l-7 7m0 0l-7-7m7 7V3"}
         />
       </svg>
-      <span className="tabular-nums">{formatChangeValue(value, currency, { divide })}</span>
+      <span className="tabular-nums">
+        {formatChangeValue(value, currency, { divide })}
+      </span>
     </span>
   );
 }
@@ -161,12 +167,28 @@ function StarToggleButton({
           />
         </svg>
       ) : isInWatchlist ? (
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <svg
+          className="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+        >
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
         </svg>
       ) : (
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+        <svg
+          className="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.5}
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+          />
         </svg>
       )}
     </button>
@@ -194,7 +216,6 @@ const TAB_TYPE_COLOR_MOBILE: Record<Tab, string> = {
   currency: "text-v2-currency-accent",
   symbol: "text-v2-gold-accent",
 };
-
 
 function buildTanstackColumns(
   t: (key: string) => string,
@@ -230,26 +251,42 @@ function buildTanstackColumns(
     columnHelper.accessor("buy", {
       header: () => (
         <div>
-          <span className="text-base font-black uppercase tracking-[1px]">{t("table.buy")}</span>
-          {showUnitLabel && <div className="font-normal text-[10px] opacity-70">{t("table.buyUnit")}</div>}
+          <span className="text-base font-black uppercase tracking-[1px]">
+            {t("table.buy")}
+          </span>
+          {showUnitLabel && (
+            <div className="font-normal text-[10px] opacity-70">
+              {t("table.buyUnit")}
+            </div>
+          )}
         </div>
       ),
       cell: ({ row }) => (
         <span className="font-bold text-red-700 tabular-nums">
-          {formatPriceValue(row.original.buy, row.original.currency, { divide: divideValues })}
+          {formatPriceValue(row.original.buy, row.original.currency, {
+            divide: divideValues,
+          })}
         </span>
       ),
     }),
     columnHelper.accessor("sell", {
       header: () => (
         <div>
-          <span className="text-base font-black uppercase tracking-[1px]">{t("table.sell")}</span>
-          {showUnitLabel && <div className="font-normal text-[10px] opacity-70">{t("table.sellUnit")}</div>}
+          <span className="text-base font-black uppercase tracking-[1px]">
+            {t("table.sell")}
+          </span>
+          {showUnitLabel && (
+            <div className="font-normal text-[10px] opacity-70">
+              {t("table.sellUnit")}
+            </div>
+          )}
         </div>
       ),
       cell: ({ row }) => (
         <span className="font-bold text-green-700 tabular-nums">
-          {formatPriceValue(row.original.sell, row.original.currency, { divide: divideValues })}
+          {formatPriceValue(row.original.sell, row.original.currency, {
+            divide: divideValues,
+          })}
         </span>
       ),
     }),
@@ -260,6 +297,8 @@ function buildTanstackColumns(
           value={row.original.changeBuy}
           currency={row.original.currency}
           divide={divideValues}
+          upColor="text-green-700"
+          downColor="text-red-700"
         />
       ),
     }),
@@ -329,7 +368,9 @@ function buildMobileColumns(
           <span className={`font-bold ${typeColor}`}>
             {row.name || row.typeCode}
           </span>
-          <span className="ml-1.5 text-xs text-v2-gold-accent/60">{row.currency}</span>
+          <span className="ml-1.5 text-xs text-v2-gold-accent/60">
+            {row.currency}
+          </span>
           <OverrideIndicator item={row} category={tab} isAdmin={isAdmin} />
         </div>
       ),
@@ -339,7 +380,11 @@ function buildMobileColumns(
       header: (
         <div>
           <span className="text-base font-bold">{t("table.buy")}</span>
-          {showUnitLabel && <span className="text-[10px] text-v2-gold-accent/60 ml-1">{t("table.buyUnit")}</span>}
+          {showUnitLabel && (
+            <span className="text-[10px] text-v2-gold-accent/60 ml-1">
+              {t("table.buyUnit")}
+            </span>
+          )}
         </div>
       ),
       cell: ({ row }) => (
@@ -353,7 +398,11 @@ function buildMobileColumns(
       header: (
         <div>
           <span className="text-base font-bold">{t("table.sell")}</span>
-          {showUnitLabel && <span className="text-[10px] text-v2-gold-accent/60 ml-1">{t("table.sellUnit")}</span>}
+          {showUnitLabel && (
+            <span className="text-[10px] text-v2-gold-accent/60 ml-1">
+              {t("table.sellUnit")}
+            </span>
+          )}
         </div>
       ),
       cell: ({ row }) => (
@@ -366,7 +415,11 @@ function buildMobileColumns(
       id: "change",
       header: t("table.change"),
       cell: ({ row }) => (
-        <ChangeCell value={row.changeBuy} currency={row.currency} divide={divideValues} />
+        <ChangeCell
+          value={row.changeBuy}
+          currency={row.currency}
+          divide={divideValues}
+        />
       ),
     },
   ];
@@ -567,14 +620,24 @@ function SymbolLookupTab({
                   ? formatPriceValue(priceData.price, "VND")
                   : `$${priceData.priceDecimal.toFixed(2)}`}
               </p>
-              <p className="text-xs text-v2-text-tertiary">{priceData.currency}</p>
+              <p className="text-xs text-v2-text-tertiary">
+                {priceData.currency}
+              </p>
             </div>
           </div>
           <div className="mt-3 pt-3 border-t border-v2-border-light space-y-2">
             {addedToWatchlist ? (
               <p className="text-sm text-v2-green-positive flex items-center gap-1">
-                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <svg
+                  className="w-4 h-4 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 {tp("watchlistAddedSuccess")}
               </p>
@@ -606,8 +669,16 @@ function SymbolLookupTab({
             )}
             {watchlistError && (
               <p className="text-sm text-v2-red-negative flex items-center gap-1">
-                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                <svg
+                  className="w-4 h-4 flex-shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 {watchlistError}
               </p>
@@ -640,7 +711,10 @@ export default function PricesPage() {
   const watchlistQuery = useQueryListWatchlist({}, { staleTime: 60 * 1000 });
   const watchedItems = watchlistQuery.data?.items ?? [];
   const watchedSymbolToId = useMemo(
-    () => new Map<string, number>(watchedItems.map((item) => [item.symbol, item.id])),
+    () =>
+      new Map<string, number>(
+        watchedItems.map((item) => [item.symbol, item.id]),
+      ),
     [watchedItems],
   );
 
@@ -708,7 +782,7 @@ export default function PricesPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="flex-1 text-center">
+        <div className="flex-1 text-center pt-4">
           <OrnateHeading size="lg">{t("title")}</OrnateHeading>
           {lastUpdated && (
             <p className="text-xs text-v2-text-tertiary mt-1">
@@ -746,7 +820,7 @@ export default function PricesPage() {
 
       <BaseCard padding="none">
         {/* Tab bar */}
- <div className="flex border-b border-v2-border-light overflow-x-auto scrollbar-hide">
+        <div className="flex border-b border-v2-border-light overflow-x-auto scrollbar-hide">
           {TABS.map((tab) => (
             <button
               key={tab.key}
@@ -896,7 +970,9 @@ export default function PricesPage() {
               querySymbol={querySymbol}
               onSearch={setQuerySymbol}
               onWatchlistAdded={() =>
-                queryClient.invalidateQueries({ queryKey: [EVENT_WatchlistListWatchlist] })
+                queryClient.invalidateQueries({
+                  queryKey: [EVENT_WatchlistListWatchlist],
+                })
               }
             />
           )}
