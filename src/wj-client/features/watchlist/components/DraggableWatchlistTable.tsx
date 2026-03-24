@@ -2,6 +2,7 @@
 
 import { Reorder } from "framer-motion";
 import { GripVertical, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { WatchlistItem } from "@/gen/protobuf/v1/watchlist";
 import { AssetTypeBadge } from "@/features/watchlist/components/AssetTypeBadge";
 import {
@@ -56,6 +57,7 @@ export function DraggableWatchlistTable({
   onDelete,
   isDeleting = false,
 }: DraggableWatchlistTableProps) {
+  const t = useTranslations("prices.watchlist.column");
   return (
     <div className="w-full overflow-x-auto">
       <table className="w-full text-sm">
@@ -64,19 +66,19 @@ export function DraggableWatchlistTable({
             {/* Drag handle column */}
             <th className="py-2 px-2 w-8" aria-label="Drag to reorder" />
             <th className="text-left py-2 px-3 font-semibold text-v2-text-secondary">
-              Symbol
+              {t("symbol")}
             </th>
             <th className="text-right py-2 px-3 font-semibold text-v2-text-secondary">
-              Price
+              {t("price")}
             </th>
             <th className="text-right py-2 px-3 font-semibold text-v2-text-secondary">
-              Change
+              {t("change")}
             </th>
             <th className="text-center py-2 px-3 font-semibold text-v2-text-secondary">
-              Type
+              {t("type")}
             </th>
             <th className="text-left py-2 px-3 font-semibold text-v2-text-secondary">
-              Note
+              {t("note")}
             </th>
             <th className="py-2 px-3 w-12" aria-label="Actions" />
           </tr>

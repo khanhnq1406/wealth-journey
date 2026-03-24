@@ -82,6 +82,14 @@ Tasks 14-15 required fixes before approval:
 
 All other tasks approved without changes.
 
+## Fix History
+
+| Date       | Fix                                                                                 | Severity | Files Changed |
+| ---------- | ----------------------------------------------------------------------------------- | -------- | ------------- |
+| 2026-03-24 | Center market price title + "last updated" timestamp on Prices page                | Minor    | `prices/page.tsx` |
+| 2026-03-24 | Replace mobile FAB with inline "Add Symbol" button above table to eliminate overlap | Minor    | `WatchlistTab.tsx` |
+| 2026-03-24 | Add `useTranslations` i18n to WatchlistTab and AddToWatchlistForm; add translation keys (EN + VI) | Minor | `WatchlistTab.tsx`, `AddToWatchlistForm.tsx`, `messages/en/investment.json`, `messages/vi/investment.json` |
+
 ## Known Issues / Technical Debt
 
 - No unit tests written for watchlist service or handler (consistent with project's current "limited test coverage" state per CLAUDE.md — not a regression)
