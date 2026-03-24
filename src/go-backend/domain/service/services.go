@@ -136,6 +136,7 @@ type Repositories struct {
 	SiteSettings          repository.SiteSettingsRepository
 	PushSubscription      repository.PushSubscriptionRepository
 	Watchlist             repository.WatchlistRepository
+	UserPriceAlert        repository.UserPriceAlertRepository
 }
 
 // NewRepositories creates all repository instances.

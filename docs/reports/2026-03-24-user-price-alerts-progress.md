@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-24-user-price-alerts-plan.md
 - **Spec file:** docs/specs/2026-03-24-user-price-alerts-spec.md
 - **Started:** 2026-03-24T00:00:00Z
-- **Last updated:** 2026-03-24T02:00:00Z
+- **Last updated:** 2026-03-24T03:00:00Z
 - **Current state:** in_progress
-- **Current task:** 3
+- **Current task:** 4
 
 ## Task Progress
 
@@ -17,8 +17,8 @@
 | 0   | Update C4 Architecture Diagrams                  | done        | 3e02734 | Added UserPriceAlert components to both C4 diagrams |
 | 1   | Protobuf API Definition                          | done        | 3e02734 | Added enums/messages/RPCs; regenerated Go+TS code; fixed status_filter to use enum |
 | 12  | Frontend Constants Update                        | done        | 3e02734 | Added CREATE_PRICE_ALERT to ModalType |
-| 2   | Database Model + Migration                       | done        | —      | UserPriceAlert GORM model, migration cmd, Taskfile entry, 6 unit tests |
-| 3   | Repository Layer                                 | pending     | —      | —       |
+| 2   | Database Model + Migration                       | done        | 4ba7a3a | UserPriceAlert GORM model, migration cmd, Taskfile entry, 6 unit tests |
+| 3   | Repository Layer                                 | done        | —      | UserPriceAlertRepository with 8 methods, sqlmock tests, wired in providers |
 | 4   | Service Layer CRUD                               | pending     | —      | —       |
 | 5   | REST Handler + Routes                            | pending     | —      | —       |
 | 6   | Background Evaluation Job                        | pending     | —      | —       |
