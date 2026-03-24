@@ -40,15 +40,13 @@
 
 **MANDATORY: Re-read these files before continuing work (context compaction drops them):**
 
-1. `.claude/skills/secure-feature-pipeline/step-3-implement.md` — orchestration protocol, three-stage review, checkpoint protocol
-2. `.claude/skills/secure-feature-pipeline/implementer-prompt.md` — implementer agent template
-3. `.claude/skills/secure-feature-pipeline/spec-reviewer-prompt.md` — spec compliance review template
-4. `.claude/skills/secure-feature-pipeline/security-reviewer-prompt.md` — security review template
-5. `.claude/skills/secure-feature-pipeline/code-quality-reviewer-prompt.md` — code quality review template
+1. `.claude/skills/secure-feature-pipeline/step-3-implement.md` — coordinator protocol, two-agent model, commit checkpoint
+2. `.claude/skills/secure-feature-pipeline/implementer-agent-prompt.md` — implementer template (placeholders to fill)
+3. `.claude/skills/secure-feature-pipeline/reviewer-agent-prompt.md` — reviewer template (placeholders to fill)
 
 **After re-reading, verify you can answer:**
-- What are the three review stages and their order?
-- What are the 4 steps of the commit checkpoint protocol?
+- What are the two agents per task and what does each one do?
+- Which agent commits — the implementer, the reviewer, or the coordinator?
 - What is the next pending task?
 
 ## Resume Instructions
@@ -77,6 +75,20 @@ To resume this implementation after context compaction or in a new session:
 4. **Always include** the progress file in every commit (it travels with the code)
 5. **Mark `completed`** when all tasks are done and the implementation report is written
 
+### Architecture: Thin Coordinator + Isolated Implementer + Fresh Reviewer
+
+**Why this design:** A single long-running orchestrator accumulates context from every agent report it reads — after 3-4 tasks the context triggers compaction which drops the protocol. The fix is to keep the coordinator thin and give each task a bounded context.
+
+**The model:**
+- The **coordinator** (you) holds only: progress file content + task list. Per task it dispatches ONE implementer agent, receives its structured report, dispatches ONE reviewer agent with that report, receives the verdict, then commits and loops.
+- The **implementer agent** starts fresh per task: implements with TDD, does a security self-check, Playwright E2E, and self-review, then reports back. It does NOT commit.
+- The **reviewer agent** starts with a completely fresh context — no knowledge of implementation choices. It receives only the task spec + implementer report + file list, reads the actual code independently, and runs all 3 review stages. This fresh context is the quality guarantee: a separate agent can't be biased toward choices it never made.
+- The **coordinator commits** after the reviewer approves — updating the progress file and staging all files in one checkpoint.
+
+**Context budget per task loop:**
+- Coordinator holds: implementer report (~1-2k tokens) + reviewer verdict (~1k tokens) → discards both after commit → next task starts near-baseline
+- Worst-case compaction hits one in-progress task cycle, not the whole feature
+
 ### Process
 
 ```dot
@@ -87,131 +99,146 @@ digraph implement {
     "Create task list (TaskCreate)" [shape=box];
     "Initialize progress file" [shape=box style=filled fillcolor="#cce5ff"];
     "Identify independent tasks" [shape=box];
-    "Dispatch parallel implementer agents" [shape=box];
 
-    subgraph cluster_per_task {
-        label="Per Task (parallel when independent)";
-        "Implementer agent works on task" [shape=box];
-        "Implementer self-reviews" [shape=box];
-        "Dispatch spec reviewer" [shape=box];
-        "Spec compliant?" [shape=diamond];
-        "Implementer fixes spec gaps" [shape=box];
-        "Dispatch security reviewer" [shape=box style=filled fillcolor="#ffcccc"];
-        "Security approved?" [shape=diamond];
-        "Implementer fixes security issues" [shape=box];
-        "Dispatch code quality reviewer" [shape=box];
-        "Quality approved?" [shape=diamond];
-        "Implementer fixes quality issues" [shape=box];
-        "Mark task complete" [shape=box];
+    subgraph cluster_coordinator_loop {
+        label="Coordinator loop (thin — near-baseline context per task)";
+        "Read progress file → next pending task" [shape=box style=filled fillcolor="#ffffcc"];
+        "Dispatch implementer agent" [shape=box];
+        "Receive implementer report" [shape=box];
+        "Dispatch reviewer agent (fresh context)" [shape=box style=filled fillcolor="#ffcccc"];
+        "Receive reviewer verdict" [shape=box];
+        "All stages approved?" [shape=diamond];
+        "Relay issues → re-dispatch implementer" [shape=box];
+        "Commit checkpoint" [shape=box style=filled fillcolor="#cce5ff"];
+        "Show user summary + auto-proceed" [shape=box style=filled fillcolor="#ffffcc"];
+        "More tasks?" [shape=diamond];
     }
 
-    subgraph cluster_checkpoint {
-        label="Checkpoint (NON-NEGOTIABLE)";
-        style=filled;
-        fillcolor="#ccffcc";
-        "Update progress file + commit" [shape=box style=filled fillcolor="#cce5ff"];
-        "Show user summary, auto-proceed" [shape=box style=filled fillcolor="#ffffcc"];
-    }
-
-    "More tasks?" [shape=diamond];
     "Dispatch final cross-cutting review" [shape=box];
     "Write implementation report" [shape=box];
 
     "Read plan, extract all tasks" -> "Create task list (TaskCreate)";
     "Create task list (TaskCreate)" -> "Initialize progress file";
     "Initialize progress file" -> "Identify independent tasks";
-    "Identify independent tasks" -> "Dispatch parallel implementer agents";
-    "Dispatch parallel implementer agents" -> "Implementer agent works on task";
-    "Implementer agent works on task" -> "Implementer self-reviews";
-    "Implementer self-reviews" -> "Dispatch spec reviewer";
-    "Dispatch spec reviewer" -> "Spec compliant?";
-    "Spec compliant?" -> "Implementer fixes spec gaps" [label="no"];
-    "Implementer fixes spec gaps" -> "Dispatch spec reviewer" [label="re-review"];
-    "Spec compliant?" -> "Dispatch security reviewer" [label="yes"];
-    "Dispatch security reviewer" -> "Security approved?";
-    "Security approved?" -> "Implementer fixes security issues" [label="no"];
-    "Implementer fixes security issues" -> "Dispatch security reviewer" [label="re-review"];
-    "Security approved?" -> "Dispatch code quality reviewer" [label="yes"];
-    "Dispatch code quality reviewer" -> "Quality approved?";
-    "Quality approved?" -> "Implementer fixes quality issues" [label="no"];
-    "Implementer fixes quality issues" -> "Dispatch code quality reviewer" [label="re-review"];
-    "Quality approved?" -> "Mark task complete" [label="yes"];
-    "Mark task complete" -> "Update progress file + commit";
-    "Update progress file + commit" -> "Show user summary, auto-proceed";
-    "Show user summary, auto-proceed" -> "More tasks?";
-    "More tasks?" -> "Dispatch parallel implementer agents" [label="yes"];
+    "Identify independent tasks" -> "Read progress file → next pending task";
+
+    "Read progress file → next pending task" -> "Dispatch implementer agent";
+    "Dispatch implementer agent" -> "Receive implementer report";
+    "Receive implementer report" -> "Dispatch reviewer agent (fresh context)";
+    "Dispatch reviewer agent (fresh context)" -> "Receive reviewer verdict";
+    "Receive reviewer verdict" -> "All stages approved?";
+    "All stages approved?" -> "Clarification needed?" [label="no"];
+    "Clarification needed?" -> "Relay questions → implementer answers" [label="yes"];
+    "Relay questions → implementer answers" -> "Re-dispatch reviewer with answers appended";
+    "Re-dispatch reviewer with answers appended" -> "Receive reviewer verdict";
+    "Clarification needed?" -> "Relay issues → re-dispatch implementer" [label="no (issues found)"];
+    "Relay issues → re-dispatch implementer" -> "Receive implementer report";
+    "All stages approved?" -> "Commit checkpoint" [label="yes"];
+    "Commit checkpoint" -> "Show user summary + auto-proceed";
+    "Show user summary + auto-proceed" -> "More tasks?";
+    "More tasks?" -> "Read progress file → next pending task" [label="yes"];
     "More tasks?" -> "Dispatch final cross-cutting review" [label="no"];
     "Dispatch final cross-cutting review" -> "Write implementation report";
 }
 ```
 
-### Three-Stage Review (Per Task)
+### Three-Stage Review (Per Task — Reviewer Agent)
 
-Unlike the standard two-stage review, financial features require **three stages**:
+Financial features require **three stages**, all run by the reviewer agent on a fresh context:
 
-1. **Spec Compliance Review** — Did they build what was requested? (Use `./spec-reviewer-prompt.md`)
-2. **Security Review** — Are security requirements met? (Use `./security-reviewer-prompt.md`)
-3. **Code Quality Review** — Is the code clean and maintainable? (Use `./code-quality-reviewer-prompt.md`)
+1. **Stage 1 — Spec Compliance** — Did it build what was requested?
+2. **Stage 2 — Security** — Are all 9 security categories satisfied?
+3. **Stage 3 — Code Quality** — Is the code clean, structured, and maintainable?
 
 **Order matters:** Spec first, then security, then quality. No skipping.
+**Gate:** Each stage must pass before the next. If any stage fails, reviewer reports issues with `file:line` references. Coordinator relays to implementer for fixes, then re-dispatches a fresh reviewer.
+**Why a separate agent:** The reviewer starts with NO knowledge of the implementation decisions. It cannot rationalize away choices it never made.
 
-### Commit Checkpoint Protocol (Per Task)
+### Dispatching Implementer Agents
 
-**NON-NEGOTIABLE.** After all three reviews pass for a task, execute this 4-step checkpoint sequence before moving to the next task:
+Use `./implementer-agent-prompt.md` as the template. Fill in ALL placeholders:
+
+| Placeholder | What to fill in |
+|---|---|
+| `[TASK_NUMBER]` | Task number from the plan (0, 1, 2, …) |
+| `[TASK_NAME]` | Task name from the plan |
+| `[FULL_TASK_TEXT]` | **Paste the complete task text** from the plan — do NOT tell agent to read the plan file |
+| `[CONTEXT]` | Where this fits, dependencies, architectural notes |
+| `[SECURITY_NOTES]` | Security notes for this task from the plan |
+| `[PROGRESS_FILE_PATH]` | `docs/reports/YYYY-MM-DD-<feature>-progress.md` |
+| `[PLAN_FILE_PATH]` | Path to the plan file |
+| `[SPEC_FILE_PATH]` | Path to the spec file |
+
+### Handling CLARIFICATION NEEDED
+
+When the reviewer returns `CLARIFICATION NEEDED`:
+
+1. **Dispatch an implementer agent** with a minimal prompt — just the questions and the original task context. No new implementation needed; the implementer only answers the questions.
+2. **Collect answers** from the implementer's response.
+3. **Re-dispatch the reviewer** using the same reviewer template, with one addition at the bottom of `[IMPLEMENTER_REPORT]`:
+   ```
+   ### Clarification answers (added by coordinator)
+   Q: [question from reviewer]
+   A: [implementer's answer]
+   ```
+4. The reviewer resumes from where it left off — it already has its Stage N findings, it only needs to resolve the questions before issuing a final verdict.
+
+**Limit:** Max 1 clarification round per stage. If the reviewer raises new questions after receiving answers, treat them as issues — it means the design needs fixing, not more Q&A.
+
+### Dispatching Reviewer Agents
+
+Use `./reviewer-agent-prompt.md` as the template. Fill in ALL placeholders:
+
+| Placeholder | What to fill in |
+|---|---|
+| `[TASK_NUMBER]` | Same task number |
+| `[TASK_NAME]` | Same task name |
+| `[ORIGINAL_TASK_TEXT]` | **Same full task text** pasted inline — do NOT reference plan file |
+| `[SECURITY_NOTES]` | Same security notes from the plan |
+| `[IMPLEMENTER_REPORT]` | **Full text of implementer's report** — paste it inline |
+| `[FILES_CHANGED]` | List of all changed files (from implementer report) |
+| `[SPEC_FILE_PATH]` | Path to spec file (reviewer may read for full context) |
+
+**Critical:** Paste the implementer report inline. The reviewer must not need to read any external state besides the changed code files themselves.
+
+### Commit Checkpoint (Coordinator, after reviewer approves)
+
+After the reviewer returns APPROVED on all stages, the coordinator executes the 4-step checkpoint:
 
 **Step 1: Update progress file**
-
-- Set the task status to `done` in the progress table
-- Add the commit hash (from step 2 — use a placeholder, then amend or update after committing)
-- Add a one-line summary of what was implemented
-- Advance `Current task` to the next pending task number (or `done` if this was the last task)
+- Set task status to `done`
+- Add commit hash placeholder (update after step 2)
+- Add one-line summary of what was implemented
+- Advance `Current task` to next pending (or `done` if last)
 - Update `Last updated` timestamp
 
 **Step 2: Stage and commit**
-
-- Stage all files changed by the task **plus** the progress file
-- Commit with a descriptive message: `feat(<feature>): implement task N — <task name>`
-- The progress file MUST be included in the commit
+- Stage all task files + progress file
+- Commit: `feat(<feature>): implement task N — <task name>`
+- Progress file MUST be in the commit
+- Update commit hash in progress file, then `git commit --amend --no-edit`
 
 **Step 3: Show user summary**
-Present a clear summary to the user:
-
 ```
 ## Task N Complete: [task name]
 
 **Files changed:** [list]
 **Commit:** [hash] — [message]
 **Progress:** N/M tasks done
-**Next task:** Task N+1 — [next task name]
+**Next task:** Task N+1 — [name, or "done"]
 ```
 
-**Step 4: Auto-proceed to next task**
-
-- Display the summary and immediately continue to the next task
-- Do NOT wait for user approval — keep implementation flowing continuously
-- The user can interrupt at any time if they need to course-correct
-- Only pause to ask the user if you encounter a blocker, ambiguity, or error
-
-**Step 0 (before EACH task): Context integrity check**
-
-Before starting each new task, quickly verify you still know:
-- The three-stage review order (spec → security → code quality)
-- The template file paths for each reviewer
-- The commit checkpoint protocol (4 steps)
-
-If you can't recall any of these, **STOP and run the Context Compaction Recovery protocol** (see section above) before proceeding. This takes 30 seconds but prevents an entire task from being done wrong.
-
-**Why this matters:** Context compaction can happen at any time. By committing after each task and persisting progress to disk, the worst case is losing in-progress work on one task — all completed tasks are safely committed and the progress file tells the next session exactly where to resume. Implementation runs continuously — the user can interrupt at any time but doesn't need to manually trigger each task.
+**Step 4: Auto-proceed**
+- Immediately dispatch the next implementer agent — do NOT wait for user approval
+- Only pause for blockers, ambiguity, or errors
 
 ### Parallel Execution
 
 - Identify tasks that are independent (no shared files, no data dependencies)
-- Dispatch independent tasks to parallel implementer agents
-- **Never dispatch parallel agents on tasks that modify the same files**
-- Use the task list (TaskCreate/TaskUpdate/TaskList) for coordination
-- Each agent reports completion; orchestrator dispatches reviews
-
-**Parallel execution and checkpoints:** When multiple independent tasks complete in the same parallel batch, commit each task individually (separate commits), then update the progress file once with all completed tasks marked `done`. Show the user a combined summary listing all completed tasks in the batch, then immediately proceed to the next batch.
+- Dispatch independent tasks as **parallel implementer agents** simultaneously
+- **Never parallelize tasks that modify the same files**
+- After all parallel implementers report back, dispatch **parallel reviewer agents** (one per implementer report)
+- After all reviewers approve, commit each task individually (separate commits), update progress file once with all completed tasks, show combined summary, proceed to next batch
 
 ### Implementation Report
 
@@ -314,65 +341,35 @@ Run after implementation to verify blast radius is covered:
 [Manual testing steps for verification]
 ```
 
-### Context Compaction Recovery (CRITICAL)
+### Context Compaction Recovery (COORDINATOR)
 
-**Problem:** During long implementation sessions, auto-compaction drops skill instructions from context. The orchestrator then stops following the three-stage review, checkpoint protocol, and progress file updates.
+**The coordinator's context is thin by design** — it holds only the progress file + current task's implementer report + reviewer verdict, then clears. Compaction hitting the coordinator is unlikely, but if it does, recovery is fast.
 
-**Detection — you may have lost context if ANY of these are true:**
-- You can't recall the three-stage review order (spec → security → code quality)
-- You can't recall the commit checkpoint protocol (4 steps)
-- You don't remember the prompt template file paths
-- You're about to dispatch a reviewer but aren't sure what template to use
-- You're about to proceed to the next task but aren't sure about the checkpoint steps
+**Detection — you may have lost context if:**
+- You can't recall the two-agent model (implementer then reviewer per task)
+- You don't know which agent commits (the coordinator does, not the agents)
+- You don't know which task to dispatch next
 
-**Recovery protocol — MANDATORY before continuing any task:**
+**Recovery protocol:**
+1. Re-read `.claude/skills/secure-feature-pipeline/step-3-implement.md`
+2. Re-read the progress file — `docs/reports/YYYY-MM-DD-<feature>-progress.md`
+3. Verify: what is the next pending task? Which agent commits?
 
-1. **Re-read this skill file:** Use `Read` tool on `.claude/skills/secure-feature-pipeline/step-3-implement.md`
-2. **Re-read the progress file** to know where you are
-3. **Verify you can cite these from memory before proceeding:**
-   - Three-stage review order and template file paths
-   - Commit checkpoint protocol (4 steps)
-   - Progress file update rules
-
-**The progress file includes a `## Skill Recovery` section (see template below) that lists the exact files to re-read.** This section survives compaction because it's on disk, not in context.
+**The progress file's `Skill Recovery` section** lists the three files to re-read. It's on disk, survives compaction.
 
 ### Resuming from Progress File
 
-If a session is lost to context compaction or you're starting a new session to continue an in-progress implementation:
+If the coordinator session is lost or you're starting a new session:
 
-**Procedure:**
+1. **Read the progress file** — identify `Current state`, `Current task`, `done` vs `pending` tasks
+2. **Re-read skill files** from progress file's Skill Recovery section:
+   - `step-3-implement.md`, `implementer-agent-prompt.md`, `reviewer-agent-prompt.md`
+3. **Verify git state:**
+   - `git log --oneline -10` — last commit should match last `done` task
+   - `git status` — if uncommitted work exists, ask the user before proceeding
+4. **Recreate TaskCreate list** from the plan; mark `completed` per progress file
+5. **Dispatch implementer for the first `pending` task**
 
-1. **Read the progress file** — `docs/reports/YYYY-MM-DD-<feature>-progress.md`
-   - Identify `Current state`, `Current task`, and which tasks are `done` vs `pending`
-   - **Read the `Skill Recovery` section** — it lists the skill files you must re-read
-2. **Re-read skill instructions** — listed in the progress file's `Skill Recovery` section:
-   - `.claude/skills/secure-feature-pipeline/step-3-implement.md` (orchestration protocol)
-   - `.claude/skills/secure-feature-pipeline/implementer-prompt.md` (implementer template)
-   - `.claude/skills/secure-feature-pipeline/spec-reviewer-prompt.md` (spec review template)
-   - `.claude/skills/secure-feature-pipeline/security-reviewer-prompt.md` (security review template)
-   - `.claude/skills/secure-feature-pipeline/code-quality-reviewer-prompt.md` (quality review template)
-3. **Read the plan file** — referenced in the progress file's `Metadata` section
-   - Understand the full task list, dependencies, and security notes
-4. **Read the spec file** — referenced in the progress file's `Metadata` section
-   - Needed for spec compliance reviews
-5. **Verify git state:**
-   - `git log --oneline -10` — confirm the last commit matches the last `done` task in the progress file
-   - `git status` — check for uncommitted work (if any, investigate before proceeding)
-   - `git diff` — review any uncommitted changes
-6. **Recreate TaskCreate list** from the plan:
-   - Create all tasks via TaskCreate
-   - Mark tasks as `completed` per the progress file (use TaskUpdate)
-   - The first `pending` task becomes your next work item
-7. **Cite the protocol before continuing** — prove you've recovered context:
-   - State the three-stage review order
-   - State the commit checkpoint protocol steps
-   - State the next task to work on
-8. **Continue from the next pending task** — follow the same implement → review → checkpoint protocol
+**Key rule:** Progress file is the source of truth, not TaskList state. If conflict, trust the progress file.
 
-**Key rule:** The **progress file is the source of truth**, not TaskList state. TaskList is ephemeral (lives in conversation context only). If there's a conflict between the progress file and TaskList state, trust the progress file.
-
-**Edge case — uncommitted work found:**
-
-- If `git status` shows uncommitted changes, present them to the user
-- Ask whether to: (a) commit them as part of the current task, (b) stash them, or (c) discard them
-- Never silently discard uncommitted work
+**Uncommitted work found:** Ask the user: (a) commit as part of current task, (b) stash, or (c) discard. Never silently discard.

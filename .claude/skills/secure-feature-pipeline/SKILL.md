@@ -120,16 +120,19 @@ Skipping the step file is the same as skipping the spec — it leads to wrong ou
 - Not initializing the progress file before starting the first task
 - Leaving the progress file out of task commits
 - Continuing implementation after context compaction without re-reading the skill files (progress file has the list)
-- Being unsure about the three-stage review order or checkpoint protocol but proceeding anyway
+- Being unsure about the task-cycle agent model or checkpoint protocol but proceeding anyway
+- Dispatching an implementer agent + separate reviewer agents instead of one task-cycle agent (old pattern — causes context accumulation)
+- Filling task-cycle agent prompt with "read the plan file for task details" instead of pasting the full task text inline
 
 ## Prompt Templates
 
-- `./implementer-prompt.md` — Implementer agent template
-- `./spec-reviewer-prompt.md` — Spec compliance reviewer template
-- `./security-reviewer-prompt.md` — Security reviewer template (financial-specific)
+**Step 3 — Implementation (two agents per task):**
+- `./implementer-agent-prompt.md` — Implementer: TDD + self-check + E2E + structured report. Does NOT commit.
+- `./reviewer-agent-prompt.md` — Reviewer: fresh context, reads actual code, 3 review stages, verdict. Does NOT commit.
+
+**Other steps:**
 - `./security-checklist.md` — Security analysis checklist for brainstorm step
 - `./security-audit-prompt.md` — Full security audit template for review step
-- `./code-quality-reviewer-prompt.md` — Code quality reviewer template
 - `./impact-reviewer-prompt.md` — Dependency impact reviewer template (GitNexus-powered)
 
 ## Integration
