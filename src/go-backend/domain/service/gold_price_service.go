@@ -37,8 +37,10 @@ type goldPriceService struct {
 }
 
 // NewGoldPriceService creates a new gold price service backed by a
-// vangsaigon → vang.today waterfall with source-health tracking.
+// vangsaigon → vang.today → BTMC (optional) → Mihong waterfall with
+// source-health tracking.
 // Pass a non-empty btmcAPIKey to enable BTMC as a tertiary fallback source.
+// Mihong is always appended as the final source — no API key needed (public endpoint).
 func NewGoldPriceService(redisClient *redis.Client, btmcAPIKey string) GoldPriceService {
 	fetchers := []GoldPriceFetcher{
 		NewVangSaiGonGoldFetcher(5 * time.Second),
@@ -52,6 +54,8 @@ func NewGoldPriceService(redisClient *redis.Client, btmcAPIKey string) GoldPrice
 			log.Printf("[goldPriceService] Warning: BTMC fetcher disabled: %v", err)
 		}
 	}
+	// Mihong is always appended — no API key needed (public endpoint).
+	fetchers = append(fetchers, NewMihongGoldFetcher(5*time.Second))
 
 	healthTracker := NewSourceHealthCacheAdapter(cache.NewSourceHealthCache(redisClient))
 

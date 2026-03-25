@@ -352,6 +352,111 @@ func TestWaterfallGoldFetcher_AllSources_NonAliasUnchanged(t *testing.T) {
 	}
 }
 
+func TestWaterfallGoldFetcher_AllSources_SJ9999AliasNormalization(t *testing.T) {
+	// vang.today returns "SJ9999" for SJC Ring gold (canonical "Vàng nhẫn SJC").
+	// FetchGoldPricesAllSources must normalize "SJ9999" to "Vàng nhẫn SJC".
+	vangtodayFetcher := &mockGoldFetcher{
+		source: SourceVangToday,
+		prices: []*CachedGoldPrice{
+			{TypeCode: "SJ9999", Name: "SJC Ring", Buy: 170_300_000, Sell: 173_300_000, Currency: "VND"},
+		},
+	}
+
+	health := &alwaysHealthy{}
+	wf := NewWaterfallGoldFetcher([]GoldPriceFetcher{vangtodayFetcher}, health)
+
+	prices, err := wf.FetchGoldPricesAllSources(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var found bool
+	for _, p := range prices {
+		if p.TypeCode == "Vàng nhẫn SJC" {
+			found = true
+			if p.Buy != 170_300_000 {
+				t.Errorf("Vàng nhẫn SJC Buy: expected 170300000, got %d", p.Buy)
+			}
+		}
+	}
+	if !found {
+		t.Errorf("expected canonical TypeCode 'Vàng nhẫn SJC' in merged prices; got %v", prices)
+	}
+}
+
+func TestWaterfallGoldFetcher_AllSources_SJL1L10AliasNormalization(t *testing.T) {
+	// vang.today returns "SJL1L10" for SJC 9999 gold (canonical "SJC").
+	// FetchGoldPricesAllSources must normalize "SJL1L10" to "SJC".
+	vangtodayFetcher := &mockGoldFetcher{
+		source: SourceVangToday,
+		prices: []*CachedGoldPrice{
+			{TypeCode: "SJL1L10", Name: "SJC 9999", Buy: 170_500_000, Sell: 173_500_000, Currency: "VND"},
+		},
+	}
+
+	health := &alwaysHealthy{}
+	wf := NewWaterfallGoldFetcher([]GoldPriceFetcher{vangtodayFetcher}, health)
+
+	prices, err := wf.FetchGoldPricesAllSources(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var found bool
+	for _, p := range prices {
+		if p.TypeCode == "SJC" {
+			found = true
+			if p.Buy != 170_500_000 {
+				t.Errorf("SJC Buy: expected 170500000, got %d", p.Buy)
+			}
+		}
+	}
+	if !found {
+		t.Errorf("expected canonical TypeCode 'SJC' in merged prices; got %v", prices)
+	}
+}
+
+// TestWaterfallGoldFetcher_AllSources_MihongFallback verifies that when
+// vangsaigon + vang.today + BTMC all fail, the Mihong source provides Mihong_999.
+func TestWaterfallGoldFetcher_AllSources_MihongFallback(t *testing.T) {
+	failFetcher := func(src PriceSource) *mockGoldFetcher {
+		return &mockGoldFetcher{
+			source: src,
+			err:    errors.New("source down"),
+		}
+	}
+	mihongFetcher := &mockGoldFetcher{
+		source: SourceMihong,
+		prices: []*CachedGoldPrice{
+			{TypeCode: "Mihong_999", Name: "Mi Hồng 999", Buy: 171_500_000, Sell: 175_000_000, Currency: "VND"},
+		},
+	}
+
+	fetchers := []GoldPriceFetcher{
+		failFetcher(SourceVangSaiGon),
+		failFetcher(SourceVangToday),
+		failFetcher(SourceBTMC),
+		mihongFetcher,
+	}
+	waterfall := NewWaterfallGoldFetcher(fetchers, &alwaysHealthy{})
+
+	allPrices, err := waterfall.FetchGoldPricesAllSources(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	found := false
+	for _, p := range allPrices {
+		if p.TypeCode == "Mihong_999" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("expected Mihong_999 in all-sources result, got none")
+	}
+}
+
 func TestWaterfallGoldFetcher_AllSources_MIHONG999AliasNormalization(t *testing.T) {
 	// vang.today uppercases all TypeCodes, so "Mihong_999" becomes "MIHONG_999".
 	// FetchGoldPricesAllSources must normalize "MIHONG_999" back to the canonical
