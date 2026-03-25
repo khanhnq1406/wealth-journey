@@ -218,7 +218,10 @@
       "failedToAdd": "Không thể thêm giao dịch. Vui lòng thử lại",
       "fixValidationErrors": "Vui lòng sửa các lỗi xác thực",
       "refreshPrice": "Giá hiện tại",
-      "refreshingPrice": "Đang tải..."
+      "refreshingPrice": "Đang tải...",
+      "saveChanges": "Lưu thay đổi",
+      "transactionUpdatedSuccess": "Giao dịch đã được cập nhật!",
+      "transactionUpdatedMessage": "Giao dịch đã được cập nhật thành công"
     },
     "detail": {
       "overview": "Tổng quan",
