@@ -248,13 +248,12 @@ func (s *marketDataService) fetchPriceFromAPI(ctx context.Context, symbol, curre
 	}, nil
 }
 
-// fetchGoldPriceFromAPI fetches gold price from vang.today API.
+// fetchGoldPriceFromAPI fetches gold price from the gold price waterfall.
 // Used for Vietnamese gold (GOLD_VND) and world gold (GOLD_USD) investments.
 func (s *marketDataService) fetchGoldPriceFromAPI(ctx context.Context, symbol, currency string, investmentType investmentv1.InvestmentType) (*models.MarketData, error) {
-	// Fetch price from vang.today API
 	price, err := s.goldPriceService.FetchPriceForSymbol(ctx, symbol)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch gold price from vang.today: %w", err)
+		return nil, fmt.Errorf("failed to fetch gold price: %w", err)
 	}
 
 	// Convert market price to storage format

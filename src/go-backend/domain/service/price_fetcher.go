@@ -31,8 +31,10 @@ const (
 //
 // Current entries:
 //   - "VNGSJC" (vang.today) → "SJC" (vangsaigon canonical)
+//   - "MIHONG_999" (vang.today uppercased) → "Mihong_999" (pkg/gold/types.go canonical)
 var aliasToCanonical = map[string]string{
-	"VNGSJC": "SJC",
+	"VNGSJC":    "SJC",
+	"MIHONG_999": "Mihong_999",
 }
 
 // GoldPriceFetcher abstracts fetching gold prices from a single source.

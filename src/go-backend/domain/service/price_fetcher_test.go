@@ -351,3 +351,36 @@ func TestWaterfallGoldFetcher_AllSources_NonAliasUnchanged(t *testing.T) {
 		t.Errorf("expected DOHNL unchanged, got %+v", prices)
 	}
 }
+
+func TestWaterfallGoldFetcher_AllSources_MIHONG999AliasNormalization(t *testing.T) {
+	// vang.today uppercases all TypeCodes, so "Mihong_999" becomes "MIHONG_999".
+	// FetchGoldPricesAllSources must normalize "MIHONG_999" back to the canonical
+	// "Mihong_999" so that FetchPriceForSymbol("Mihong_999") finds it.
+	vangtodayFetcher := &mockGoldFetcher{
+		source: SourceVangToday,
+		prices: []*CachedGoldPrice{
+			{TypeCode: "MIHONG_999", Name: "Mi Hong 999", Buy: 172_000_000, Sell: 175_000_000, Currency: "VND"},
+		},
+	}
+
+	health := &alwaysHealthy{}
+	wf := NewWaterfallGoldFetcher([]GoldPriceFetcher{vangtodayFetcher}, health)
+
+	prices, err := wf.FetchGoldPricesAllSources(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	var found bool
+	for _, p := range prices {
+		if p.TypeCode == "Mihong_999" {
+			found = true
+			if p.Buy != 172_000_000 {
+				t.Errorf("Mihong_999 Buy: expected 172000000, got %d", p.Buy)
+			}
+		}
+	}
+	if !found {
+		t.Error("expected canonical TypeCode 'Mihong_999' in merged prices after alias normalization")
+	}
+}
