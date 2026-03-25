@@ -17,6 +17,7 @@ const (
 	SourceVangSaiGon PriceSource = "vangsaigon"
 	SourceVangToday  PriceSource = "vangtoday"
 	SourceBTMC       PriceSource = "btmc"
+	SourceMihong     PriceSource = "mihong"
 
 	// waterfallSourceTimeout is the per-source fetch timeout used by the waterfall fetchers.
 	waterfallSourceTimeout = 5 * time.Second
