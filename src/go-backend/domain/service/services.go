@@ -1,6 +1,8 @@
 package service
 
 import (
+	"os"
+
 	"github.com/go-redis/redis/v8"
 
 	"wealthjourney/domain/repository"
@@ -38,7 +40,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	// Phase 1: Services with no service dependencies
 	categorySvc := NewCategoryService(repos.Category)
 	fxRateSvc := NewFXRateService(repos.FXRate, redisClient)
-	goldPriceSvc := NewGoldPriceService(redisClient)
+	goldPriceSvc := NewGoldPriceService(redisClient, os.Getenv("BTMC_API_KEY"))
 	silverPriceSvc := NewSilverPriceService(redisClient)
 	currencyPriceSvc := NewCurrencyPriceService(redisClient)
 	marketDataSvc := NewMarketDataService(repos.MarketData, goldPriceSvc, silverPriceSvc)

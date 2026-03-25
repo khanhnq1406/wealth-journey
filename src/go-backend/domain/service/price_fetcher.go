@@ -6,6 +6,8 @@ import (
 	"log"
 	"strings"
 	"time"
+
+	"wealthjourney/pkg/cache"
 )
 
 // PriceSource identifies a price data source.
@@ -152,4 +154,33 @@ func (w *WaterfallCurrencyFetcher) FetchCurrencyPrices(ctx context.Context) ([]*
 	}
 
 	return nil, fmt.Errorf("all currency price sources failed: [%s]", strings.Join(errs, "; "))
+}
+
+// ---------------------------------------------------------------------------
+// sourceHealthCacheAdapter
+// ---------------------------------------------------------------------------
+
+// sourceHealthCacheAdapter bridges *cache.SourceHealthCache (which uses plain
+// string source identifiers) to the SourceHealthTracker interface (which uses
+// the PriceSource type alias). This adapter allows the service layer to use
+// the Redis-backed SourceHealthCache without coupling pkg/cache to the
+// PriceSource type defined in the service package.
+type sourceHealthCacheAdapter struct {
+	inner *cache.SourceHealthCache
+}
+
+// NewSourceHealthCacheAdapter wraps a *cache.SourceHealthCache so it satisfies
+// the SourceHealthTracker interface expected by the waterfall fetchers.
+func NewSourceHealthCacheAdapter(inner *cache.SourceHealthCache) SourceHealthTracker {
+	return &sourceHealthCacheAdapter{inner: inner}
+}
+
+// IsHealthy converts PriceSource to string and delegates to the inner cache.
+func (a *sourceHealthCacheAdapter) IsHealthy(ctx context.Context, source PriceSource) bool {
+	return a.inner.IsHealthy(ctx, string(source))
+}
+
+// MarkUnhealthy converts PriceSource to string and delegates to the inner cache.
+func (a *sourceHealthCacheAdapter) MarkUnhealthy(ctx context.Context, source PriceSource) error {
+	return a.inner.MarkUnhealthy(ctx, string(source))
 }

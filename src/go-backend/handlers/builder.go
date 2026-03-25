@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"os"
+
 	"wealthjourney/domain/auth"
 	"wealthjourney/domain/service"
 	"wealthjourney/pkg/cache"
@@ -68,7 +70,7 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 	var marketPricesHandler *MarketPricesHandler
 	if deps.RDB != nil {
 		marketPricesHandler = NewMarketPricesHandler(
-			service.NewGoldPriceService(deps.RDB.GetClient()),
+			service.NewGoldPriceService(deps.RDB.GetClient(), os.Getenv("BTMC_API_KEY")),
 			service.NewSilverPriceService(deps.RDB.GetClient()),
 			service.NewCurrencyPriceService(deps.RDB.GetClient()),
 			cache.NewPriceOverrideCache(deps.RDB.GetClient()),
@@ -165,7 +167,7 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 		Public: NewPublicHandler(
 			func() service.GoldPriceService {
 				if deps.RDB != nil {
-					return service.NewGoldPriceService(deps.RDB.GetClient())
+					return service.NewGoldPriceService(deps.RDB.GetClient(), os.Getenv("BTMC_API_KEY"))
 				}
 				return nil
 			}(),

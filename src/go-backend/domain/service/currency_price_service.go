@@ -2,14 +2,12 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 
 	"wealthjourney/pkg/cache"
-	"wealthjourney/pkg/vnprice"
 )
 
 // CurrencyPriceService handles fetching foreign currency prices
@@ -29,105 +27,112 @@ type CachedCurrencyPrice struct {
 	UpdateTime time.Time
 }
 
-// currencyPriceService implements CurrencyPriceService
+// currencyPriceService implements CurrencyPriceService using a waterfall of
+// CurrencyPriceFetchers with emergency-cache fallback.
 type currencyPriceService struct {
-	client *vnprice.Client
-	cache  *cache.CurrencyPriceCache
+	waterfall *WaterfallCurrencyFetcher
+	cache     *cache.CurrencyPriceCache
 }
 
-// NewCurrencyPriceService creates a new currency price service
+// NewCurrencyPriceService creates a new currency price service backed by a
+// vangsaigon → vang.today waterfall with source-health tracking.
 func NewCurrencyPriceService(redisClient *redis.Client) CurrencyPriceService {
+	fetchers := []CurrencyPriceFetcher{
+		NewVangSaiGonCurrencyFetcher(5 * time.Second),
+		NewVangTodayCurrencyFetcher(5 * time.Second),
+	}
+	healthTracker := NewSourceHealthCacheAdapter(cache.NewSourceHealthCache(redisClient))
 	return &currencyPriceService{
-		client: vnprice.NewClient(10 * time.Second),
-		cache:  cache.NewCurrencyPriceCache(redisClient),
+		waterfall: NewWaterfallCurrencyFetcher(fetchers, healthTracker),
+		cache:     cache.NewCurrencyPriceCache(redisClient),
 	}
 }
 
-// NewCurrencyPriceServiceWithCache creates a currency price service with an injected cache (for testing).
-func NewCurrencyPriceServiceWithCache(redisClient *redis.Client, currCache *cache.CurrencyPriceCache) CurrencyPriceService {
-	return &currencyPriceService{
-		client: vnprice.NewClient(10 * time.Second),
-		cache:  currCache,
-	}
-}
-
-// FetchAllPrices fetches all foreign currency prices from vangsaigon API, reading
-// from the aggregate Redis cache before hitting the external API to limit external
-// API calls when users reload the Prices page.
+// FetchAllPrices fetches all foreign currency prices using a waterfall of
+// live sources, with a one-hour emergency cache as last resort.
+//
+// Flow:
+//  1. Return aggregate cache hit immediately.
+//  2. Try waterfall (sources in priority order, unhealthy sources skipped).
+//  3. On success: write regular + emergency caches (non-blocking), return data.
+//  4. On all-sources failure: serve emergency cache if valid, else error.
 func (s *currencyPriceService) FetchAllPrices(ctx context.Context) ([]*CachedCurrencyPrice, error) {
-	// Check aggregate cache first
+	// 1. Check aggregate cache first
 	cachedAll, err := s.cache.GetAll(ctx)
 	if err == nil && cachedAll != nil {
-		result := make([]*CachedCurrencyPrice, len(cachedAll))
-		for i, c := range cachedAll {
-			result[i] = &CachedCurrencyPrice{
-				TypeCode:   c.TypeCode,
-				Name:       c.Name,
-				Buy:        c.Buy,
-				Sell:       c.Sell,
-				ChangeBuy:  c.ChangeBuy,
-				ChangeSell: c.ChangeSell,
-				Currency:   c.Currency,
-				UpdateTime: time.Unix(c.UpdateTime, 0),
+		return toCurrencyPrices(cachedAll), nil
+	}
+
+	// 2. Try waterfall (live sources)
+	prices, err := s.waterfall.FetchCurrencyPrices(ctx)
+	if err == nil {
+		// 3. Write caches non-blocking so the response is not delayed.
+		cacheList := toCacheCurrencyPrices(prices)
+		go func(list []*cache.CachedCurrencyPrice) {
+			bgCtx := context.Background()
+			if setErr := s.cache.SetAll(bgCtx, list, cache.AllCurrencyPricesCacheTTL); setErr != nil {
+				log.Printf("[currencyPriceService] Warning: failed to set aggregate currency cache: %v", setErr)
 			}
-		}
-		return result, nil
-	}
-
-	// Cache miss — fetch from external API
-	pricesResp, err := s.client.FetchPrices(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("fetch prices from vangsaigon API: %w", err)
-	}
-
-	prices := make([]*CachedCurrencyPrice, 0, len(pricesResp.CurrencyPrices))
-	cacheList := make([]*cache.CachedCurrencyPrice, 0, len(pricesResp.CurrencyPrices))
-
-	for _, apiPrice := range pricesResp.CurrencyPrices {
-		// Currency prices from vangsaigon are already in raw VND — no multiplication needed
-		buy := int64(apiPrice.Buy)
-		sell := int64(apiPrice.Sell)
-		changeBuy := int64(apiPrice.BuyChange)
-		changeSell := int64(apiPrice.SellChange)
-
-		price := &CachedCurrencyPrice{
-			TypeCode:   apiPrice.Code,
-			Name:       apiPrice.Name,
-			Buy:        buy,
-			Sell:       sell,
-			ChangeBuy:  changeBuy,
-			ChangeSell: changeSell,
-			Currency:   "VND",
-			UpdateTime: apiPrice.UpdateAt,
-		}
-		prices = append(prices, price)
-
-		cp := &cache.CachedCurrencyPrice{
-			TypeCode:   price.TypeCode,
-			Name:       price.Name,
-			Buy:        price.Buy,
-			Sell:       price.Sell,
-			ChangeBuy:  price.ChangeBuy,
-			ChangeSell: price.ChangeSell,
-			Currency:   price.Currency,
-			UpdateTime: price.UpdateTime.Unix(),
-		}
-		cacheList = append(cacheList, cp)
-
-		// Also write per-symbol cache (non-blocking, keeps existing behavior)
-		go func(p *cache.CachedCurrencyPrice) {
-			if err := s.cache.Set(context.Background(), p.TypeCode, p, cache.CurrencyPriceCacheTTL); err != nil {
-				log.Printf("Warning: failed to cache currency price for %s: %v", p.TypeCode, err)
+			if setErr := s.cache.SetEmergency(bgCtx, list); setErr != nil {
+				log.Printf("[currencyPriceService] Warning: failed to set emergency currency cache: %v", setErr)
 			}
-		}(cp)
+			for _, p := range list {
+				if setErr := s.cache.Set(bgCtx, p.TypeCode, p, cache.CurrencyPriceCacheTTL); setErr != nil {
+					log.Printf("[currencyPriceService] Warning: failed to cache currency price for %s: %v", p.TypeCode, setErr)
+				}
+			}
+		}(cacheList)
+		return prices, nil
 	}
 
-	// Write aggregate cache (non-blocking)
-	go func(list []*cache.CachedCurrencyPrice) {
-		if err := s.cache.SetAll(context.Background(), list, cache.AllCurrencyPricesCacheTTL); err != nil {
-			log.Printf("Warning: failed to set aggregate currency price cache: %v", err)
-		}
-	}(cacheList)
+	// 4. All live sources failed — try emergency cache.
+	log.Printf("[currencyPriceService] All live sources failed: %v — trying emergency cache", err)
+	emergency, emergencyErr := s.cache.GetEmergency(ctx)
+	if emergencyErr == nil && emergency != nil {
+		log.Printf("[currencyPriceService] Serving stale emergency currency cache (%d entries)", len(emergency))
+		return toCurrencyPrices(emergency), nil
+	}
 
-	return prices, nil
+	// No emergency data available — return the original error.
+	return nil, err
+}
+
+// ---------------------------------------------------------------------------
+// Conversion helpers
+// ---------------------------------------------------------------------------
+
+// toCurrencyPrices converts cache layer structs to service layer structs.
+func toCurrencyPrices(list []*cache.CachedCurrencyPrice) []*CachedCurrencyPrice {
+	result := make([]*CachedCurrencyPrice, len(list))
+	for i, c := range list {
+		result[i] = &CachedCurrencyPrice{
+			TypeCode:   c.TypeCode,
+			Name:       c.Name,
+			Buy:        c.Buy,
+			Sell:       c.Sell,
+			ChangeBuy:  c.ChangeBuy,
+			ChangeSell: c.ChangeSell,
+			Currency:   c.Currency,
+			UpdateTime: time.Unix(c.UpdateTime, 0),
+		}
+	}
+	return result
+}
+
+// toCacheCurrencyPrices converts service layer structs to cache layer structs.
+func toCacheCurrencyPrices(list []*CachedCurrencyPrice) []*cache.CachedCurrencyPrice {
+	result := make([]*cache.CachedCurrencyPrice, len(list))
+	for i, p := range list {
+		result[i] = &cache.CachedCurrencyPrice{
+			TypeCode:   p.TypeCode,
+			Name:       p.Name,
+			Buy:        p.Buy,
+			Sell:       p.Sell,
+			ChangeBuy:  p.ChangeBuy,
+			ChangeSell: p.ChangeSell,
+			Currency:   p.Currency,
+			UpdateTime: p.UpdateTime.Unix(),
+		}
+	}
+	return result
 }

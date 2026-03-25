@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-25-price-fallback-plan.md
 - **Spec file:** docs/specs/2026-03-25-price-fallback-spec.md
 - **Started:** 2026-03-25T00:00:00Z
-- **Last updated:** 2026-03-25T04:00:00Z
+- **Last updated:** 2026-03-25T05:00:00Z
 - **Current state:** in_progress
-- **Current task:** 10
+- **Current task:** 12
 
 ## Task Progress
 
@@ -24,8 +24,8 @@
 | 7   | Implement vang.today GoldPriceFetcher and Currency Adapters | done   | 3dcbf72 | vangTodayGoldFetcher + vangTodayCurrencyFetcher direct field copy; ChangeBuy/Sell=0 for currency; 8 tests pass |
 | 8   | Implement BTMC GoldPriceFetcher Adapter                | done        | 3dcbf72 | btmcGoldFetcher wraps fetchBTMCFn; ChangeBuy/Sell=0; constructor errors on empty apiKey; 4 tests pass |
 | 9   | Implement vangsaigon CurrencyPriceFetcher Adapter      | done        | 3dcbf72 | vangSaiGonCurrencyFetcher wraps fetchPricesFn; raw VND prices; Source()=vangsaigon; 8 tests pass |
-| 10  | Refactor goldPriceService to Use Waterfall Fallback    | pending     | —      | —       |
-| 11  | Refactor currencyPriceService to Use Waterfall Fallback| pending     | —      | —       |
+| 10  | Refactor goldPriceService to Use Waterfall Fallback    | done        | pending | goldPriceService: waterfall struct, 4-step flow, non-blocking cache writes, emergency fallback; 10 tests |
+| 11  | Refactor currencyPriceService to Use Waterfall Fallback| done        | pending | currencyPriceService: 2-source waterfall, 4-step flow, emergency fallback; 5 tests; sourceHealthCacheAdapter in price_fetcher.go |
 | 12  | Update DI Wiring (services.go, builder.go, config.go)  | pending     | —      | —       |
 | 13  | Run Full Backend Lint + Test Suite                     | pending     | —      | —       |
 | 14  | Create/Update Runtime Flow Diagrams                    | pending     | —      | —       |
