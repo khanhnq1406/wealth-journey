@@ -28,7 +28,7 @@
 | 11  | Refactor currencyPriceService to Use Waterfall Fallback| done        | 7518ddf | currencyPriceService: 2-source waterfall, 4-step flow, emergency fallback; 5 tests; sourceHealthCacheAdapter in price_fetcher.go |
 | 12  | Update DI Wiring (services.go, builder.go, config.go)  | done        | 7ba5e65 | BTMC_API_KEY warning log in NewServices; services.go+builder.go already complete from task 10 |
 | 13  | Run Full Backend Lint + Test Suite                     | done        | 7ba5e65 | 0 lint issues; all tests pass (domain/service 1.691s, handlers 3.328s) |
-| 14  | Create/Update Runtime Flow Diagrams                    | done        | pending | flow-investment.md: waterfall in section 5 + updated price sources table; flow-cross-cutting.md: updated section 11 + new section 12 with fallback flowchart + health state machine |
+| 14  | Create/Update Runtime Flow Diagrams                    | done        | ccbb84c | flow-investment.md: waterfall in section 5 + updated price sources table; flow-cross-cutting.md: updated section 11 + new section 12 with fallback flowchart + health state machine |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
