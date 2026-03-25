@@ -170,6 +170,11 @@ func mapBTMCTypeCode(name string) string {
 		return "BTMC_jewelry"
 	}
 
+	// Pure 24K gold bar/ingot (vàng 24K / gold 24K — not rings/jewelry already matched above)
+	if strings.Contains(lower, "24k") || strings.Contains(lower, "24 k") {
+		return "BTMC_24K"
+	}
+
 	// Fallback: sanitize name to produce a BTMC-prefixed code
 	return "BTMC_" + sanitizeName(name)
 }

@@ -336,6 +336,50 @@ func TestBTMCClient_ZeroPriceFiltered(t *testing.T) {
 	}
 }
 
+func TestBTMCClient_TypeCodeMapping_BTMC24K(t *testing.T) {
+	// BTMC returns "Vàng 24K BTMC" for their pure 24K gold product.
+	// This must map to the canonical TypeCode "BTMC_24K" registered in pkg/gold/types.go.
+	xml24K := `<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <DataList>
+    <Data>
+      <n_1>Vàng 24K BTMC</n_1>
+      <k_1>24K</k_1>
+      <h_1>99.99</h_1>
+      <pb_1>90,000</pb_1>
+      <ps_1>92,000</ps_1>
+      <pt_1>3100</pt_1>
+      <d_1>25/03/2026 10:00</d_1>
+    </Data>
+  </DataList>
+</root>`
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/xml")
+		w.WriteHeader(http.StatusOK)
+		_, _ = fmt.Fprint(w, xml24K)
+	}))
+	defer srv.Close()
+
+	client, err := NewClient(5*time.Second, "test-api-key")
+	if err != nil {
+		t.Fatalf("NewClient failed: %v", err)
+	}
+	client.baseURL = srv.URL
+
+	prices, err := client.FetchGoldPrices(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if len(prices) != 1 {
+		t.Fatalf("expected 1 price, got %d", len(prices))
+	}
+	if prices[0].TypeCode != "BTMC_24K" {
+		t.Errorf("expected TypeCode 'BTMC_24K', got %q", prices[0].TypeCode)
+	}
+}
+
 func TestBTMCClient_EmptyAPIKey(t *testing.T) {
 	_, err := NewClient(5*time.Second, "")
 	if err == nil {
