@@ -3,14 +3,23 @@ package vangtoday
 import "time"
 
 // APIPrice represents a single price entry in the vang.today API response.
-// The API returns a flat JSON array where each entry can be a gold or currency type.
+// The API returns a JSON object keyed by type_code, where each entry contains
+// name, buy, sell, change_buy, change_sell, and currency.
 type APIPrice struct {
-	TypeCode   string  `json:"type_code"`
+	Name       string  `json:"name"`
 	Buy        float64 `json:"buy"`
 	Sell       float64 `json:"sell"`
 	ChangeBuy  float64 `json:"change_buy"`
 	ChangeSell float64 `json:"change_sell"`
-	UpdateTime string  `json:"update_time"`
+	Currency   string  `json:"currency"`
+}
+
+// APIResponse is the top-level JSON structure returned by the vang.today API.
+// Prices is a map from type_code to price entry.
+type APIResponse struct {
+	Success   bool                `json:"success"`
+	Timestamp int64               `json:"timestamp"`
+	Prices    map[string]APIPrice `json:"prices"`
 }
 
 // GoldPrice is the normalized output type for a gold price from vang.today.

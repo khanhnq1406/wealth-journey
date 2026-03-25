@@ -202,6 +202,27 @@ No database migrations required. No proto changes. No frontend changes.
 
 ---
 
+## Fix History
+
+| Date       | Fix                                                                 | Severity | Commit  |
+| ---------- | ------------------------------------------------------------------- | -------- | ------- |
+| 2026-03-25 | vangtoday: parse new object API format (gold=[], currency=[] empty) | Minor    | pending |
+
+### Root Cause
+
+The vang.today API changed its response format. Previously it returned a flat JSON array (`[]APIPrice`); it now returns a JSON object with a `prices` map keyed by type_code and a top-level `timestamp`. The parser tried to unmarshal an object into `[]vangtoday.APIPrice` and failed, causing both gold and currency waterfalls to fall through all sources and return empty arrays.
+
+### Changes Made
+
+| File | Change |
+|------|--------|
+| `pkg/vangtoday/types.go` | Replaced flat `APIPrice` struct with new `APIPrice` (has `name`/`currency`, no `type_code`/`update_time`) and new `APIResponse` wrapper |
+| `pkg/vangtoday/client.go` | Updated `FetchPrices` to unmarshal into `APIResponse`; updated `convertGoldPrice` to use `ap.Currency` field; VND prices stored as-is (full VND); USD prices converted to cents via `math.Round(x*100)`; added `success=false` guard; updated `goldTypePrefixes` for new type codes |
+| `pkg/vangtoday/client_test.go` | All test fixtures updated to new object format |
+| `domain/service/gold_fetcher_vangtoday.go` | Comment update only |
+
+---
+
 ## 11. Files Changed (Summary)
 
 - **New files:** 21 (10 implementation, 11 test)

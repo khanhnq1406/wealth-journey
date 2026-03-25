@@ -14,6 +14,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"strings"
 	"time"
@@ -29,9 +30,12 @@ const (
 
 // goldTypePrefixes are known Vietnamese and world gold brand prefixes.
 // Any type_code that starts with one of these is classified as gold.
+// Updated to match the new vang.today API type codes (as of 2026-03).
 var goldTypePrefixes = []string{
-	"SJC", "DOJI", "PNJ", "BTMC", "BAOTINMINH", "XAU",
-	"NHAN", "VSG", "AAA", "AGJ",
+	// New API codes
+	"XAUUSD", "DOHN", "DOHCM", "DOJI", "VNGSJC", "PQHN", "BTSJC", "BT9999", "VIETTINM", "SJ",
+	// Legacy codes (kept for compatibility if API reverts)
+	"SJC", "PNJ", "BTMC", "BAOTINMINH", "XAU", "NHAN", "VSG", "AAA", "AGJ",
 }
 
 // knownCurrencyCodes are ISO 4217 currency codes returned by vang.today.
@@ -104,9 +108,17 @@ func (c *Client) FetchPrices(ctx context.Context) (*PricesResponse, error) {
 		return nil, fmt.Errorf("vangtoday: response body exceeds %d bytes limit", MaxBodySize)
 	}
 
-	var apiPrices []APIPrice
-	if err := json.Unmarshal(body, &apiPrices); err != nil {
+	var apiResp APIResponse
+	if err := json.Unmarshal(body, &apiResp); err != nil {
 		return nil, fmt.Errorf("vangtoday: parse response: %w", err)
+	}
+	if !apiResp.Success {
+		return nil, fmt.Errorf("vangtoday: API returned success=false")
+	}
+
+	updateTime := time.Unix(apiResp.Timestamp, 0)
+	if apiResp.Timestamp == 0 {
+		updateTime = time.Time{}
 	}
 
 	result := &PricesResponse{
@@ -114,14 +126,12 @@ func (c *Client) FetchPrices(ctx context.Context) (*PricesResponse, error) {
 		CurrencyPrices: make([]*CurrencyPrice, 0),
 	}
 
-	for _, ap := range apiPrices {
-		if ap.TypeCode == "" {
+	for typeCode, ap := range apiResp.Prices {
+		if typeCode == "" {
 			continue
 		}
 
-		updateTime := parseUpdateTime(ap.UpdateTime)
-
-		typeCodeUpper := strings.ToUpper(ap.TypeCode)
+		typeCodeUpper := strings.ToUpper(typeCode)
 
 		switch classifyTypeCode(typeCodeUpper) {
 		case "gold":
@@ -137,7 +147,7 @@ func (c *Client) FetchPrices(ctx context.Context) (*PricesResponse, error) {
 			}
 			cp := &CurrencyPrice{
 				TypeCode:   typeCodeUpper,
-				Name:       typeCodeUpper,
+				Name:       ap.Name,
 				Buy:        int64(ap.Buy),
 				Sell:       int64(ap.Sell),
 				Currency:   "VND",
@@ -164,31 +174,37 @@ func classifyTypeCode(code string) string {
 }
 
 // convertGoldPrice normalises an APIPrice entry into a GoldPrice.
-// VND gold (all except XAU): multiply by 1000 to reach smallest VND unit.
-// USD gold (XAU):            multiply by 100 to reach cents.
+// The new vang.today API returns prices already in their smallest unit:
+//   - VND gold: full VND (e.g., 172,000,000) — stored as-is.
+//   - USD gold (currency=="USD"): USD value — converted to cents (×100).
 func convertGoldPrice(ap APIPrice, typeCode string, updateTime time.Time) *GoldPrice {
 	var buy, sell, changeBuy, changeSell int64
 	var currency string
 
-	if typeCode == "XAU" {
-		// World gold priced in USD per ounce — convert to cents.
-		buy = int64(ap.Buy * 100)
-		sell = int64(ap.Sell * 100)
-		changeBuy = int64(ap.ChangeBuy * 100)
-		changeSell = int64(ap.ChangeSell * 100)
+	if strings.EqualFold(ap.Currency, "USD") {
+		// World gold priced in USD — convert to cents using Round to avoid float64 truncation.
+		buy = int64(math.Round(ap.Buy * 100))
+		sell = int64(math.Round(ap.Sell * 100))
+		changeBuy = int64(math.Round(ap.ChangeBuy * 100))
+		changeSell = int64(math.Round(ap.ChangeSell * 100))
 		currency = "USD"
 	} else {
-		// Vietnamese gold priced in VND per tael — multiply by 1000.
-		buy = int64(ap.Buy * 1000)
-		sell = int64(ap.Sell * 1000)
-		changeBuy = int64(ap.ChangeBuy * 1000)
-		changeSell = int64(ap.ChangeSell * 1000)
+		// Vietnamese gold priced in full VND — stored as-is.
+		buy = int64(ap.Buy)
+		sell = int64(ap.Sell)
+		changeBuy = int64(ap.ChangeBuy)
+		changeSell = int64(ap.ChangeSell)
 		currency = "VND"
+	}
+
+	name := ap.Name
+	if name == "" {
+		name = typeCode
 	}
 
 	return &GoldPrice{
 		TypeCode:   typeCode,
-		Name:       typeCode,
+		Name:       name,
 		Buy:        buy,
 		Sell:       sell,
 		ChangeBuy:  changeBuy,
@@ -196,24 +212,4 @@ func convertGoldPrice(ap APIPrice, typeCode string, updateTime time.Time) *GoldP
 		Currency:   currency,
 		UpdateTime: updateTime,
 	}
-}
-
-// parseUpdateTime attempts to parse the update_time field from the API response.
-// Returns the zero time if parsing fails (callers should treat this as "unknown").
-func parseUpdateTime(raw string) time.Time {
-	if raw == "" {
-		return time.Time{}
-	}
-	formats := []string{
-		time.RFC3339,
-		"2006-01-02T15:04:05",
-		"2006-01-02 15:04:05",
-	}
-	for _, f := range formats {
-		t, err := time.Parse(f, raw)
-		if err == nil {
-			return t
-		}
-	}
-	return time.Time{}
 }

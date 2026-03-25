@@ -10,14 +10,18 @@ import (
 	"time"
 )
 
-// validJSONResponse mimics the expected vang.today API response format.
-const validJSONResponse = `[
-	{"type_code":"SJC","buy":87.5,"sell":89.5,"change_buy":0.1,"change_sell":0.1,"update_time":"2026-03-25T10:00:00Z"},
-	{"type_code":"DOJI","buy":86.0,"sell":88.0,"change_buy":-0.2,"change_sell":-0.2,"update_time":"2026-03-25T10:00:00Z"},
-	{"type_code":"XAU","buy":3100.5,"sell":3101.5,"change_buy":2.0,"change_sell":2.0,"update_time":"2026-03-25T10:00:00Z"},
-	{"type_code":"USD","buy":25900,"sell":26200,"change_buy":0,"change_sell":0,"update_time":"2026-03-25T10:00:00Z"},
-	{"type_code":"EUR","buy":28000,"sell":28500,"change_buy":0,"change_sell":0,"update_time":"2026-03-25T10:00:00Z"}
-]`
+// validJSONResponse mimics the vang.today API response format (new object format as of 2026-03).
+const validJSONResponse = `{
+	"success": true,
+	"timestamp": 1774400000,
+	"prices": {
+		"VNGSJC": {"name":"VN Gold SJC","buy":172000000,"sell":175000000,"change_buy":4800000,"change_sell":4800000,"currency":"VND"},
+		"DOHNL":  {"name":"DOJI Hanoi","buy":170500000,"sell":172500000,"change_buy":-1500000,"change_sell":-2500000,"currency":"VND"},
+		"XAUUSD": {"name":"World Gold (XAU/USD)","buy":4566.7,"sell":4570.0,"change_buy":27.9,"change_sell":28.0,"currency":"USD"},
+		"USD":    {"name":"USD","buy":25900,"sell":26200,"change_buy":0,"change_sell":0,"currency":"VND"},
+		"EUR":    {"name":"EUR","buy":28000,"sell":28500,"change_buy":0,"change_sell":0,"currency":"VND"}
+	}
+}`
 
 func TestVangTodayClient_ValidResponse(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +42,7 @@ func TestVangTodayClient_ValidResponse(t *testing.T) {
 		t.Fatal("expected non-nil result")
 	}
 
-	// Should have gold prices: SJC, DOJI, XAU
+	// Should have gold prices: VNGSJC, DOHNL, XAUUSD
 	if len(result.GoldPrices) != 3 {
 		t.Errorf("expected 3 gold prices, got %d", len(result.GoldPrices))
 	}
@@ -48,48 +52,51 @@ func TestVangTodayClient_ValidResponse(t *testing.T) {
 		t.Errorf("expected 2 currency prices, got %d", len(result.CurrencyPrices))
 	}
 
-	// Verify VND gold prices are multiplied by 1000
+	// Verify VND gold prices are stored as-is (no multiplication needed)
 	var sjc *GoldPrice
 	for _, gp := range result.GoldPrices {
-		if gp.TypeCode == "SJC" {
+		if gp.TypeCode == "VNGSJC" {
 			sjc = gp
 			break
 		}
 	}
 	if sjc == nil {
-		t.Fatal("expected SJC in gold prices")
+		t.Fatal("expected VNGSJC in gold prices")
 	}
-	// 87.5 * 1000 = 87500
-	if sjc.Buy != 87500 {
-		t.Errorf("SJC Buy: expected 87500, got %d", sjc.Buy)
+	// 172000000 stored as-is
+	if sjc.Buy != 172000000 {
+		t.Errorf("VNGSJC Buy: expected 172000000, got %d", sjc.Buy)
 	}
-	if sjc.Sell != 89500 {
-		t.Errorf("SJC Sell: expected 89500, got %d", sjc.Sell)
+	if sjc.Sell != 175000000 {
+		t.Errorf("VNGSJC Sell: expected 175000000, got %d", sjc.Sell)
 	}
 	if sjc.Currency != "VND" {
-		t.Errorf("SJC Currency: expected VND, got %s", sjc.Currency)
+		t.Errorf("VNGSJC Currency: expected VND, got %s", sjc.Currency)
 	}
-	if sjc.ChangeBuy != 100 {
-		t.Errorf("SJC ChangeBuy: expected 100, got %d", sjc.ChangeBuy)
+	if sjc.ChangeBuy != 4800000 {
+		t.Errorf("VNGSJC ChangeBuy: expected 4800000, got %d", sjc.ChangeBuy)
+	}
+	if sjc.Name != "VN Gold SJC" {
+		t.Errorf("VNGSJC Name: expected 'VN Gold SJC', got %s", sjc.Name)
 	}
 
-	// Verify USD gold (XAU) prices are multiplied by 100
+	// Verify USD gold (XAUUSD) prices are converted to cents (×100)
 	var xau *GoldPrice
 	for _, gp := range result.GoldPrices {
-		if gp.TypeCode == "XAU" {
+		if gp.TypeCode == "XAUUSD" {
 			xau = gp
 			break
 		}
 	}
 	if xau == nil {
-		t.Fatal("expected XAU in gold prices")
+		t.Fatal("expected XAUUSD in gold prices")
 	}
-	// 3100.5 * 100 = 310050
-	if xau.Buy != 310050 {
-		t.Errorf("XAU Buy: expected 310050, got %d", xau.Buy)
+	// 4566.7 * 100 = 456670
+	if xau.Buy != 456670 {
+		t.Errorf("XAUUSD Buy: expected 456670, got %d", xau.Buy)
 	}
 	if xau.Currency != "USD" {
-		t.Errorf("XAU Currency: expected USD, got %s", xau.Currency)
+		t.Errorf("XAUUSD Currency: expected USD, got %s", xau.Currency)
 	}
 
 	// Verify currency price format
@@ -171,11 +178,15 @@ func TestVangTodayClient_Timeout(t *testing.T) {
 }
 
 func TestVangTodayClient_ZeroPriceFiltered(t *testing.T) {
-	jsonWithZero := `[
-		{"type_code":"SJC","buy":0,"sell":89.5,"change_buy":0,"change_sell":0,"update_time":"2026-03-25T10:00:00Z"},
-		{"type_code":"DOJI","buy":86.0,"sell":0,"change_buy":0,"change_sell":0,"update_time":"2026-03-25T10:00:00Z"},
-		{"type_code":"PNJ","buy":85.0,"sell":87.0,"change_buy":0,"change_sell":0,"update_time":"2026-03-25T10:00:00Z"}
-	]`
+	jsonWithZero := `{
+		"success": true,
+		"timestamp": 1774400000,
+		"prices": {
+			"VNGSJC":  {"name":"SJC zero buy","buy":0,"sell":175000000,"change_buy":0,"change_sell":0,"currency":"VND"},
+			"DOHNL":   {"name":"DOJI zero sell","buy":170500000,"sell":0,"change_buy":0,"change_sell":0,"currency":"VND"},
+			"PQHNVM":  {"name":"PNJ valid","buy":170500000,"sell":173500000,"change_buy":0,"change_sell":0,"currency":"VND"}
+		}
+	}`
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -192,19 +203,23 @@ func TestVangTodayClient_ZeroPriceFiltered(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	// SJC (buy=0) and DOJI (sell=0) should be filtered out; only PNJ should remain
+	// VNGSJC (buy=0) and DOHNL (sell=0) should be filtered out; only PQHNVM should remain
 	if len(result.GoldPrices) != 1 {
-		t.Errorf("expected 1 gold price (PNJ), got %d", len(result.GoldPrices))
+		t.Errorf("expected 1 gold price (PQHNVM), got %d", len(result.GoldPrices))
 	}
-	if len(result.GoldPrices) > 0 && result.GoldPrices[0].TypeCode != "PNJ" {
-		t.Errorf("expected PNJ, got %s", result.GoldPrices[0].TypeCode)
+	if len(result.GoldPrices) > 0 && result.GoldPrices[0].TypeCode != "PQHNVM" {
+		t.Errorf("expected PQHNVM, got %s", result.GoldPrices[0].TypeCode)
 	}
 }
 
 func TestVangTodayClient_NegativePriceFiltered(t *testing.T) {
-	jsonWithNegative := `[
-		{"type_code":"SJC","buy":-87.5,"sell":89.5,"change_buy":0,"change_sell":0,"update_time":"2026-03-25T10:00:00Z"}
-	]`
+	jsonWithNegative := `{
+		"success": true,
+		"timestamp": 1774400000,
+		"prices": {
+			"VNGSJC": {"name":"SJC negative buy","buy":-172000000,"sell":175000000,"change_buy":0,"change_sell":0,"currency":"VND"}
+		}
+	}`
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -227,10 +242,22 @@ func TestVangTodayClient_NegativePriceFiltered(t *testing.T) {
 }
 
 func TestVangTodayClient_ResponseTooLarge(t *testing.T) {
-	// Generate a response larger than 1 MB
-	largeBody := `[{"type_code":"SJC","buy":87.5,"sell":89.5,"change_buy":0,"change_sell":0,"update_time":"2026-03-25T10:00:00Z"},` +
-		strings.Repeat(`{"type_code":"PADDING","buy":1.0,"sell":1.0,"change_buy":0,"change_sell":0,"update_time":"2026-03-25T10:00:00Z"},`, 15000) +
-		`{"type_code":"END","buy":1.0,"sell":1.0,"change_buy":0,"change_sell":0,"update_time":"2026-03-25T10:00:00Z"}]`
+	// Generate a response larger than 1 MB using the new object format.
+	// Each entry is ~100 bytes; 11000 entries ≈ 1.1 MB.
+	entry := `{"name":"padding","buy":1.0,"sell":1.0,"change_buy":0,"change_sell":0,"currency":"VND"}`
+	var sb strings.Builder
+	sb.WriteString(`{"success":true,"timestamp":1774400000,"prices":{`)
+	for i := 0; i < 11000; i++ {
+		if i > 0 {
+			sb.WriteByte(',')
+		}
+		sb.WriteString(`"PAD`)
+		fmt.Fprintf(&sb, "%06d", i)
+		sb.WriteString(`":`)
+		sb.WriteString(entry)
+	}
+	sb.WriteString(`}}`)
+	largeBody := sb.String()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

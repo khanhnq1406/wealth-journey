@@ -41,8 +41,8 @@ func (f *vangTodayGoldFetcher) Source() PriceSource {
 // entries to []*CachedGoldPrice.
 //
 // The vangtoday.Client already normalizes prices:
-//   - VND gold: Buy/Sell multiplied by 1000 (smallest VND unit)
-//   - USD gold (XAU): Buy/Sell multiplied by 100 (cents)
+//   - VND gold: Buy/Sell stored as full VND (e.g., 172_000_000)
+//   - USD gold (XAUUSD): Buy/Sell converted to cents (×100)
 //
 // The adapter performs a direct field copy — no additional normalization needed.
 func (f *vangTodayGoldFetcher) FetchGoldPrices(ctx context.Context) ([]*CachedGoldPrice, error) {
