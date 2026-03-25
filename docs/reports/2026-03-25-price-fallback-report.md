@@ -319,6 +319,54 @@ gold symbol "Vàng nhẫn SJC" not found in live price data
 
 ---
 
+### Fix 5 — Add Mihong Gold Source + SJ9999/SJL1L10 Aliases (2026-03-25)
+
+### Problem
+- `Mihong_999` not found: `vang.today` (the only working fallback when vangsaigon is down) does not carry any Mi Hồng products. Alias `MIHONG_999→Mihong_999` was correct logic but moot — the product is simply absent from vang.today.
+- `Vàng nhẫn SJC` stale cache warning: `vang.today` carries it as TypeCode `SJ9999` — the alias was missing from `aliasToCanonical`.
+- `SJC 9999` from `vang.today` uses TypeCode `SJL1L10` — also missing.
+
+### Root Cause
+Live curl of `vang.today` API confirmed: 12 entries returned, no Mihong products. `api.mihong.vn/v1/gold-prices?market=domestic` (with `x-market: mihong` header) is Mihong's own public API — discovered via JS bundle analysis of `www.mihong.vn`.
+
+### Fix
+
+**Part A — Alias fixes (immediate):**
+- Added `"SJ9999":"Vàng nhẫn SJC"` to `aliasToCanonical` (price_fetcher.go)
+- Added `"SJL1L10":"SJC"` to `aliasToCanonical` (price_fetcher.go)
+- TDD: 2 tests written first (red → green)
+
+**Part B — New 4th gold source:**
+- Created `pkg/mihong` — typed HTTP client for `api.mihong.vn` with `x-market: mihong` header, 1 MB body cap, zero-price guard, mace→lượng ×10 conversion. 6 unit tests (httptest).
+- Created `domain/service/gold_fetcher_mihong.go` — `GoldPriceFetcher` adapter. 3 unit tests.
+- Added `SourceMihong PriceSource = "mihong"` constant to `price_fetcher.go`.
+- Appended `NewMihongGoldFetcher(5s)` unconditionally as 4th source in `NewGoldPriceService`. E2E test: vangsaigon+vang.today+BTMC all fail → Mihong_999 found.
+
+### Waterfall after this fix
+```
+vangsaigon.vn → vang.today → BTMC (optional) → Mihong
+```
+
+### Files Changed
+- `domain/service/price_fetcher.go` — 4 aliases, `SourceMihong` constant
+- `domain/service/gold_fetcher_mihong.go` — new adapter (created)
+- `domain/service/gold_fetcher_mihong_test.go` — 3 unit tests (created)
+- `domain/service/gold_price_service.go` — Mihong wired as 4th source
+- `domain/service/price_fetcher_test.go` — SJ9999/SJL1L10/Mihong E2E tests
+- `pkg/mihong/types.go`, `pkg/mihong/client.go` — new package (created)
+- `pkg/mihong/types_test.go`, `pkg/mihong/client_test.go` — 6 unit tests (created)
+- `docs/architecture/c4-context.md` — Mi Hồng Price API added as external system
+- `docs/architecture/c4-component-backend.md` — pkg/mihong added, GoldPriceService 4-source chain
+- `docs/architecture/flow-cross-cutting.md` — §12 updated with 4th waterfall node + new aliases
+
+### Test Coverage
+- `pkg/mihong`: 6 tests (valid response, HTTP 500, zero price dropped, body limit, timeout, unmarshal)
+- `domain/service/gold_fetcher_mihong`: 3 tests (source, mapping, error propagation)
+- `domain/service/price_fetcher`: 2 alias tests (SJ9999, SJL1L10) + 1 E2E Mihong fallback test
+- All tests: `go test -short ./...` — pass, build clean, lint clean
+
+---
+
 ## 11. Files Changed (Summary)
 
 - **New files:** 21 (10 implementation, 11 test)

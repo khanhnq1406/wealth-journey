@@ -6,9 +6,9 @@
 - **Plan file:** `docs/plans/2026-03-25-mihong-gold-source-plan.md`
 - **Spec file:** `docs/specs/2026-03-25-mihong-gold-source-spec.md`
 - **Started:** 2026-03-25T00:00:00Z
-- **Last updated:** 2026-03-25T04:00:00Z
-- **Current state:** in_progress
-- **Current task:** 6
+- **Last updated:** 2026-03-25T05:00:00Z
+- **Current state:** completed
+- **Current task:** —
 
 ## Task Progress
 
@@ -19,9 +19,9 @@
 | 2   | Create pkg/mihong — Types                    | done        | 6060a10 | GoldPriceResponse + GoldPrice structs with JSON tags |
 | 3   | Create pkg/mihong — HTTP Client              | done        | 6060a10 | HTTP client with x-market header, 1MB cap, ×10 price conversion, 6 tests passing |
 | 4   | Create gold_fetcher_mihong.go Adapter        | done        | b65cb22 | GoldPriceFetcher adapter + SourceMihong constant, 3 tests passing |
-| 5   | Wire Mihong into NewGoldPriceService + E2E   | done        | TBD    | Mihong wired as 4th source, E2E test passing, build+lint clean |
-| 6   | Update flow-cross-cutting.md                 | pending     | —      | —       |
-| 7   | Append Fix 5 to Implementation Report        | pending     | —      | —       |
+| 5   | Wire Mihong into NewGoldPriceService + E2E   | done        | baf18e3 | Mihong wired as 4th source, E2E test passing, build+lint clean |
+| 6   | Update flow-cross-cutting.md                 | done        | —      | Added Mihong as 4th waterfall node; expanded alias table with SJ9999+SJL1L10 |
+| 7   | Append Fix 5 to Implementation Report        | done        | —      | Fix 5 section appended to price-fallback-report.md |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
