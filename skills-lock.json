@@ -11,6 +11,11 @@
       "sourceType": "github",
       "computedHash": "16c5f5bafd768c74bbf75b69b2d73c7fe2f2915ce57774ae4c6d7b285fd5d357"
     },
+    "claude-md-improver": {
+      "source": "anthropics/claude-plugins-official",
+      "sourceType": "github",
+      "computedHash": "d6707ed0467d9664d0f9d2c44724c8fb1814475ec6d3c62a5d54bbbe807e0775"
+    },
     "gitnexus-cli": {
       "source": "abhigyanpatwari/gitnexus",
       "sourceType": "github",

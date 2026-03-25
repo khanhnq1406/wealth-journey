@@ -10,10 +10,37 @@ WealthJourney is a comprehensive personal finance management application built w
 
 **Tech Stack:**
 
-- **Frontend**: Next.js 15 (App Router), React 19, TypeScript 5, Tailwind CSS 3.4, Redux Toolkit, React Query
-- **Backend**: Go 1.23, Gin (HTTP), gRPC, GORM (PostgreSQL ORM)
+- **Frontend**: Next.js 16.2 (App Router + i18n via next-intl), React 19, TypeScript 5, Tailwind CSS 3.4, Redux Toolkit, React Query v5
+- **Backend**: Go 1.25, Gin (HTTP), gRPC, GORM (PostgreSQL ORM)
 - **Database**: PostgreSQL 16 (Supabase), Redis 7 (caching/sessions)
 - **API Layer**: Protocol Buffers (single source of truth), REST + gRPC dual protocol support
+- **i18n**: next-intl v4 — all pages live under `app/[locale]/` route segment
+
+## Critical Patterns (Non-Obvious)
+
+### Backend Response Format
+- Use helper functions from `pkg/handler/response.go` — NOT raw `gin.H{}`
+  - Success: `handler.Success(c, result)` → HTTP 200, raw protobuf/JSON body (no envelope)
+  - Created: `handler.Created(c, result)` → HTTP 201, raw body
+  - Errors: `handler.HandleError(c, err)` / `handler.BadRequest(c, err)` / `handler.Unauthorized(c, msg)`
+- **Success responses**: data serialized directly (no wrapper) — `protojson.Marshal` for proto messages, `json.Marshal` for plain Go structs
+- **Error responses**: wrapped in `{success: false, error: {code, message, details}, timestamp}`
+- Proto fields use `json_name` annotations (camelCase) — enforced by `protojson.MarshalOptions{UseProtoNames: false}`
+
+### Proto Hook Response Access
+- Generated hooks return raw JSON mapped directly to proto TS interface
+- Access response fields **directly**: `data?.wallets` — NOT `data?.data?.wallets`
+- Example: `const { data } = useQueryListWallets(...)` → `data?.wallets`, `data?.total`
+
+### golangci-lint Depguard (Architecture Enforcement)
+- Domain/service layer must NOT import `gorm.io/gorm`, `go-redis`, or `gin-gonic/gin` directly
+- Only repository layer touches GORM; only handlers touch Gin
+- Violations fail `task ci:backend-lint` — fix by moving DB/cache logic to repository layer
+
+### i18n Routing (next-intl)
+- All pages are under `app/[locale]/` — never create pages directly under `app/dashboard/`
+- Server components use `getTranslations()` from `next-intl/server`
+- Client components use `useTranslations()` hook
 
 ## Architecture
 
@@ -33,7 +60,12 @@ Personal_Financial_Management/
 │       ├── budget.proto               # Budget management
 │       ├── investment.proto           # Investment portfolio management
 │       ├── session.proto              # Session management
-│       └── import.proto               # Bank statement import
+│       ├── import.proto               # Bank statement import
+│       ├── admin.proto                # Admin operations
+│       ├── community.proto            # Community features
+│       ├── feedback.proto             # Feedback API
+│       ├── watchlist.proto            # Watchlist management
+│       └── gold_sentiment.proto       # Gold sentiment voting
 │
 ├── src/
 │   ├── go-backend/                    # Go backend (Railway deployment)
@@ -47,7 +79,9 @@ Personal_Financial_Management/
 │   │   │       ├── portfolio_snapshot_job.go   # Portfolio history (1h)
 │   │   │       ├── session_cleanup_adapter.go  # Expired sessions (6h)
 │   │   │       ├── file_cleanup_job.go         # Orphaned uploads (1h)
-│   │   │       └── db_keepalive_job.go         # Connection keepalive (2m)
+│   │   │       ├── db_keepalive_job.go         # Connection keepalive (2m)
+│   │   │       ├── price_alert_job.go          # System price alert evaluation
+│   │   │       └── user_price_alert_job.go     # User price alert evaluation (NEW)
 │   │   ├── domain/                    # Domain layer (DDD pattern)
 │   │   │   ├── auth/                  # Authentication logic
 │   │   │   ├── gateway/               # gRPC-Gateway proxy
@@ -72,7 +106,13 @@ Personal_Financial_Management/
 │   │   │   ├── gold.go               # Gold types
 │   │   │   ├── silver.go             # Silver types
 │   │   │   ├── import.go             # Bank statement import
-│   │   │   └── session.go            # Session management
+│   │   │   ├── session.go            # Session management
+│   │   │   ├── user_price_alert.go   # Price alert CRUD (NEW)
+│   │   │   ├── community.go          # Community features
+│   │   │   ├── admin_user.go         # Admin user management
+│   │   │   ├── feedback.go           # Feedback submission
+│   │   │   ├── watchlist.go          # Symbol watchlist
+│   │   │   └── push.go               # Push notifications
 │   │   ├── cmd/                       # CLI commands (server, migrate)
 │   │   │   ├── main.go               # Server entrypoint
 │   │   │   └── migrate-*/            # Migration commands
@@ -90,15 +130,25 @@ Personal_Financial_Management/
 │   │   │   ├── layout.tsx             # Root layout
 │   │   │   ├── landing/page.tsx       # Landing page
 │   │   │   ├── auth/                  # Authentication pages
-│   │   │   ├── dashboard/             # Dashboard pages
-│   │   │   │   ├── home/page.tsx      # Main dashboard
-│   │   │   │   ├── transaction/page.tsx
-│   │   │   │   ├── wallets/page.tsx
-│   │   │   │   ├── portfolio/page.tsx # Investment portfolio
-│   │   │   │   ├── budget/page.tsx
-│   │   │   │   ├── report/page.tsx
-│   │   │   │   ├── prices/page.tsx    # Market prices
-│   │   │   │   └── settings/          # Settings pages
+│   │   │   ├── [locale]/              # i18n route segment (next-intl)
+│   │   │   │   ├── dashboard/         # Dashboard pages
+│   │   │   │   │   ├── home/page.tsx      # Main dashboard
+│   │   │   │   │   ├── transaction/page.tsx
+│   │   │   │   │   ├── wallets/page.tsx
+│   │   │   │   │   ├── portfolio/page.tsx # Investment portfolio
+│   │   │   │   │   ├── budget/page.tsx
+│   │   │   │   │   ├── report/page.tsx
+│   │   │   │   │   ├── prices/page.tsx    # Market prices
+│   │   │   │   │   ├── community/page.tsx # Community
+│   │   │   │   │   ├── admin/page.tsx     # Admin panel
+│   │   │   │   │   ├── feedback/page.tsx  # User feedback
+│   │   │   │   │   └── settings/          # Settings pages
+│   │   │   │   │       ├── page.tsx       # Settings hub
+│   │   │   │   │       ├── security/page.tsx
+│   │   │   │   │       ├── sessions/page.tsx
+│   │   │   │   │       ├── import-templates/page.tsx
+│   │   │   │   │       └── alerts/page.tsx # Price alerts (NEW)
+│   │   │   │   └── auth/              # Authentication pages
 │   │   │   └── constants.tsx          # App constants
 │   │   ├── features/                  # Feature modules (bounded contexts)
 │   │   │   ├── auth/                  # Auth: hooks/, store/
@@ -180,6 +230,12 @@ features/
 ├── investment/        # components/, forms/, hooks/, utils/
 ├── import/            # components/, forms/
 ├── market-prices/     # components/
+├── price-alert/       # components/, forms/, utils/, __tests__/ (NEW)
+├── settings/          # User settings components
+├── watchlist/         # Symbol watchlist
+├── community/         # Posts, comments, likes, follows
+├── admin/             # Admin panel features
+├── feedback/          # User feedback collection
 └── report/            # utils/export/
 ```
 
@@ -226,7 +282,7 @@ export function BaseCard({ children }: { children: React.ReactNode }) {
 
 #### "use client" Directive
 
-Since Next.js 15 uses App Router (server components by default), any component using:
+Since Next.js 16 uses App Router (server components by default), any component using:
 
 - React hooks (`useState`, `useEffect`, etc.)
 - Browser APIs (`localStorage`, etc.)
@@ -353,41 +409,83 @@ const getListWallets = useQueryListWallets(
 
 ### Styling with Tailwind CSS
 
-**Custom theme** defined in [tailwind.config.ts](src/wj-client/tailwind.config.ts):
+**Mihong.vn dark maroon & gold theme** — permanent dark, no toggle. Defined in [tailwind.config.ts](src/wj-client/tailwind.config.ts). Always use `v2-*` tokens for new code.
 
-```typescript
-colors: {
-  bg: "#008148",      // Primary green (CTAs, headers)
-  fg: "#F7F8FC",      // Light background
-  hgreen: "var(--btn-green)",  // Button green hover
-  lred: "#DC2626",    // Error/danger states (updated)
-  hover: "#c5c5c9",   // Hover states
-  modal: "rgba(0, 0, 0, 0.5)",  // Modal backdrop
-},
-dropShadow: {
-  round: "0px 0px 3px rgb(0 0 0 / 0.4)",  // Card shadows
-},
-screens: {
-  sm: '800px',  // Custom breakpoint
-}
-```
+#### Backgrounds
 
-**Component styling patterns:**
+| Token | Value | Use |
+|-------|-------|-----|
+| `bg-v2-bg-primary` | `#5F0202` | Page background |
+| `bg-v2-bg-surface` | `#580202` | Cards, modals |
+| `bg-v2-bg-surface-tint` | `#5A0A0A` | Table headers, active row hover |
+| `bg-v2-bg-dark` | `#3A0101` | Inputs, dropdowns, skeleton loaders |
+| `bg-v2-maroon-600` | `#6B0303` | Hover state on interactive elements |
 
-- Use utility classes directly (no CSS modules)
-- Responsive: mobile-first with `sm:` breakpoint at 800px
-- Wrap cards in `<BaseCard>` for consistent styling
-- Use `drop-shadow-round` for card shadows
-- Dark mode support via `dark:` variants
-- Safe area padding for mobile devices
+#### Text
 
-**Example grid layout:**
+| Token | Value | Use |
+|-------|-------|-----|
+| `text-v2-gold-accent` | `#F1BD61` | Headings, symbol names, primary labels |
+| `text-v2-text-secondary` | `#F1BD61` | Body text, table data |
+| `text-v2-text-tertiary` | `#fcf2e0` | Muted/helper text, subtitles |
+| `text-v2-text-placeholder` | `rgba(241,189,97,0.45)` | Input placeholders |
 
-```typescript
-<div className="sm:grid grid-cols-[75%_25%] divide-x-2">
-  {/* Main content 75%, Sidebar 25% on desktop */}
-</div>
-```
+#### Borders
+
+| Token | Use |
+|-------|-----|
+| `border-v2-border` | Standard gold border (`#D78B1C`) |
+| `border-v2-border-light` | Subtle dividers (`rgba(215,139,28,0.3)`) |
+
+#### Semantic / State Colors
+
+| Intent | Background token | Text token | Value |
+|--------|-----------------|------------|-------|
+| **Success / gain / up** | `bg-v2-green-light` | `text-v2-green-positive` | `#4ADE80` |
+| **Danger / loss / down** | `bg-v2-red-light` | `text-v2-red-negative` | `#F87171` |
+| **Gold / CTA / active** | `bg-v2-gold-primary` | `text-v2-gold-accent` | `#D78B1C` / `#F1BD61` |
+| **Brand red** | `bg-v2-red-primary` | — | `#9B0111` |
+
+> **Never use hardcoded colors** like `text-green-400`, `text-red-400`, `bg-orange-500/20`, `text-gray-400` — always use the semantic v2 tokens above.
+
+#### Active tab / selected button text
+
+Active state on a gold background: use `text-v2-bg-dark` (dark maroon text on gold — readable). **`v2-bg-deepest` does not exist** — do not use it.
+
+#### Asset type colors
+
+| Asset | Text token | Background token |
+|-------|-----------|-----------------|
+| Gold | `text-v2-gold-accent` | `bg-v2-gold-primary/20` |
+| Silver | `text-v2-silver-primary` | `bg-v2-silver-light` |
+| Currency / FX | `text-v2-currency-accent` | `bg-v2-currency-light` |
+
+#### Charts
+
+Use `chart-v2` palette: `chart-v2-gold`, `chart-v2-red`, `chart-v2-silver`, `chart-v2-gold-area`. The legacy `chart-*` (green-based) scale is still referenced in some older chart components.
+
+#### Typography
+
+Roboto only (400/500/700/900 weights). Aliases `font-vietnam`, `font-jakarta`, `font-jetbrains` all resolve to Roboto/Roboto Mono for backward compat.
+
+#### Breakpoints
+
+Standard Tailwind: `sm:640px`, `md:768px`, `lg:1024px`, `xl:1280px`. The old custom `sm:800px` was removed.
+
+#### Other utilities
+
+- Shadows: `shadow-card`, `shadow-modal`, `shadow-dropdown`, `shadow-focus` (gold focus ring)
+- Z-index: named scale — `z-modal`, `z-toast`, `z-dropdown`, `z-sidebar`, `z-tooltip`
+- Animations: `animate-fade-in`, `animate-slide-up`, `animate-scale-in`, `animate-stagger-fade-in`
+- Legacy: `drop-shadow-round` still works but prefer `shadow-card` for new components
+- Decorative: `OrnateHeading`, `OrnateDivider` in `components/decorative/` (gold diamond/line motifs)
+
+#### Rules
+
+- No `dark:` classes — they were stripped from all files; `ThemeProvider`/`ThemeToggle` deleted
+- No `bg-white` except `bg-white/10` or `bg-white/20` for transparent gradient overlays
+- Min touch target: `min-h-[44px]` on all interactive elements
+- Focus ring: `focus-visible:ring-2 focus-visible:ring-v2-gold-primary`
 
 ### Shared Components (components/)
 
@@ -533,34 +631,42 @@ export function AddTransactionForm({ onSuccess }: AddTransactionFormProps) {
 - **[Success.tsx](src/wj-client/components/modals/Success.tsx)** - Success message display
 - **[InvestmentDetailModal.tsx](src/wj-client/components/modals/InvestmentDetailModal.tsx)** - Complex multi-tab modal with Overview, Transactions, Add Transaction, and Set Price tabs
 
-### Routing Structure (Next.js App Router)
+### Routing Structure (Next.js App Router + next-intl)
 
-**File-based routing** in [app/](src/wj-client/app/):
+**All routes are under `app/[locale]/`** — the `[locale]` segment is handled by next-intl middleware.
 
 ```
 app/
-├── page.tsx                           # Homepage (redirector)
-├── landing/page.tsx                   # Landing page
-├── auth/
-│   ├── login/page.tsx                # /auth/login
-│   └── register/page.tsx             # /auth/register
-└── dashboard/
-    ├── home/page.tsx                 # /dashboard/home (main dashboard)
-    ├── transaction/page.tsx          # /dashboard/transaction
-    ├── wallets/page.tsx              # /dashboard/wallets
-    ├── portfolio/page.tsx            # /dashboard/portfolio
-    ├── budget/page.tsx               # /dashboard/budget
-    ├── report/page.tsx               # /dashboard/report
-    ├── prices/page.tsx               # /dashboard/prices (market prices)
-    └── settings/
-        ├── sessions/page.tsx         # /dashboard/settings/sessions
-        └── import-templates/page.tsx # /dashboard/settings/import-templates
+├── page.tsx                           # Root redirector
+└── [locale]/                          # i18n segment (en, vi, etc.)
+    ├── landing/page.tsx               # /landing
+    ├── auth/
+    │   ├── login/page.tsx            # /auth/login
+    │   └── register/page.tsx         # /auth/register
+    └── dashboard/
+        ├── home/page.tsx             # /dashboard/home
+        ├── transaction/page.tsx      # /dashboard/transaction
+        ├── wallets/page.tsx          # /dashboard/wallets
+        ├── portfolio/page.tsx        # /dashboard/portfolio
+        ├── budget/page.tsx           # /dashboard/budget
+        ├── report/page.tsx           # /dashboard/report
+        ├── prices/page.tsx           # /dashboard/prices (market prices)
+        ├── community/page.tsx        # /dashboard/community
+        ├── admin/page.tsx            # /dashboard/admin
+        ├── feedback/page.tsx         # /dashboard/feedback
+        └── settings/
+            ├── page.tsx              # /dashboard/settings (hub)
+            ├── security/page.tsx     # /dashboard/settings/security
+            ├── sessions/page.tsx     # /dashboard/settings/sessions
+            ├── import-templates/page.tsx
+            └── alerts/page.tsx       # /dashboard/settings/alerts (price alerts)
 ```
 
 **Route groups and layouts:**
 
 - Use `(group)` folders for route organization without affecting URLs
 - `layout.tsx` files for shared UI across routes
+- Never create pages directly under `app/dashboard/` — always use `app/[locale]/dashboard/`
 
 ### Mobile Bottom Navigation
 
@@ -578,60 +684,9 @@ app/
 
 ### PWA Installation Prompt
 
-**Components:**
-
-- **[PWAInstallPrompt.tsx](src/wj-client/components/pwa/PWAInstallPrompt.tsx)** - Main installation prompt modal
-- **[InstallSteps.tsx](src/wj-client/components/pwa/InstallSteps.tsx)** - Platform-specific installation instructions
-- **[usePWAInstall.ts](src/wj-client/hooks/usePWAInstall.ts)** - PWA detection and installation hook
-
-**Features:**
-
-- Automatic platform detection (iOS Safari, Android Chrome, Desktop browsers)
-- One-tap installation for supported browsers (beforeinstallprompt API)
-- Step-by-step manual installation guide for iOS Safari
-- Smart visibility rules (only shows when installable, dismisses for 7 days)
-- LocalStorage-based user preference persistence
-- Highlights PWA benefits (offline access, home screen, native feel)
-
-**Usage in Components:**
-
-```typescript
-import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
-
-export default function DashboardLayout() {
-  return (
-    <>
-      {/* Your dashboard content */}
-      <PWAInstallPrompt />
-    </>
-  );
-}
-```
-
-**Hook Usage:**
-
-```typescript
-import { usePWAInstall } from "@/hooks/usePWAInstall";
-
-export default function CustomInstallButton() {
-  const { isInstallable, isInstalled, isPWA, handleInstall } = usePWAInstall();
-
-  if (isInstalled || !isInstallable) return null;
-
-  return (
-    <button onClick={handleInstall}>
-      {isPWA ? "Install App" : "View Install Instructions"}
-    </button>
-  );
-}
-```
-
-**Testing:**
-
-- Desktop Chrome/Edge: Test beforeinstallprompt API flow
-- iOS Safari: Test manual installation steps modal
-- Installed PWA: Verify prompt doesn't show when already installed
-- Dismiss behavior: Verify 7-day cooldown period
+- `PWAInstallPrompt.tsx` — main modal, `InstallSteps.tsx` — platform steps, `usePWAInstall.ts` — hook
+- Auto-detects platform (iOS Safari, Android Chrome, Desktop); dismisses for 7 days via localStorage
+- Add `<PWAInstallPrompt />` to dashboard layout to enable install prompt
 
 ### Data Handling Patterns
 
@@ -679,6 +734,19 @@ go-backend/
 - **ADR-001**: Manual DI provider functions in `internal/app/providers.go` (no Google Wire)
 - **ADR-002**: Constructor injection — all dependencies passed upfront, no `Set*()` methods
 - Wire new handlers in `handlers/builder.go` → `AllHandlers` struct + `NewHandlers()` function
+
+### Linting & Formatting
+
+```bash
+# Backend
+cd src/go-backend && task ci:backend-lint  # golangci-lint (depguard + staticcheck + errcheck)
+cd src/go-backend && gofmt -w .            # Format Go files
+
+# Frontend
+cd src/wj-client && npm run lint           # ESLint flat config (eslint.config.mjs)
+```
+
+**golangci-lint depguard rules** enforce clean architecture — domain/service layer cannot import `gorm.io/gorm`, `go-redis`, or `gin-gonic/gin` directly.
 
 ### Repository Pattern
 
@@ -875,6 +943,7 @@ Realized PNL: 2,700,000 - 2,550,000 = 150,000
 Remaining: 70 shares @ 85,000 avg = 5,950,000 cost basis
 ```
 
+
 ### Market Data & Yahoo Finance Integration
 
 - **Models**: [MarketData](src/go-backend/domain/models/market_data.go)
@@ -981,22 +1050,7 @@ The `SymbolAutocomplete` component provides a user-friendly search interface:
 | GOLD_VND | 8     | VND      | gram         | tael              | Vietnamese gold (SJC) |
 | GOLD_USD | 9     | USD      | ounce        | ounce             | World gold (XAU)      |
 
-**Gold Type Options (Frontend):**
-
-Vietnamese gold (VND):
-- `SJL1L10` - SJC 1L-10L (Vàng miếng)
-- `SJL1L2` - SJC 1L-2L (Vàng miếng)
-- `SJL5C` - SJC 5 chỉ (Vàng miếng)
-- `SJL1C` - SJC 1 chỉ (Vàng miếng)
-- `SJL0_5C` - SJC 0.5 chỉ (Vàng miếng)
-- `SJR2` - SJC Nhẫn 2-5 chỉ
-- `SJR1` - SJC Nhẫn 1 chỉ
-- `SJT99` - SJC Trang sức 99.99
-- `SJT98` - SJC Trang sức 99.98
-- `SJT97` - SJC Trang sức 99.97
-
-World gold (USD):
-- `XAU` - Gold World (XAU/USD)
+**Gold Type Options (Frontend):** SJC variants (`SJL1L10`, `SJL1C`, `SJR2`, etc.) for VND; `XAU` for USD. See `pkg/gold/` for full registry.
 
 **Storage Format:**
 
@@ -1005,89 +1059,14 @@ World gold (USD):
 - **USD Gold**: Stored in ounces × 10000
   - Example: 1 ounce = 10000
 
-**Unit Conversions:**
-
-```typescript
-// Convert between gold units
-import { convertGoldQuantity } from "@/lib/utils/gold-calculator";
-
-// Convert 2 taels to grams
-const grams = convertGoldQuantity(2, "tael", "gram"); // 75
-
-// Convert 1 ounce to grams
-const grams = convertGoldQuantity(1, "oz", "gram"); // ~31.1035
-
-// Convert price per tael to price per gram
-const pricePerGram = convertGoldPricePerUnit(85000000, "tael", "gram"); // 2,266,667 VND
-```
-
-**Price Normalization:**
-
-Market prices from vang.today API need normalization:
-- VND gold prices are per tael, must convert to per gram for storage
-- USD gold prices are already per ounce (no conversion needed)
-
-```go
-// Backend: Convert market price to storage format
-normalizedPrice := s.goldConverter.ProcessMarketPrice(price.Buy, currency, investmentType)
-```
+**Storage Format:** VND gold in grams × 10000; USD gold in ounces × 10000. VND market prices (per tael) are normalized via `goldConverter.ProcessMarketPrice()` before storage.
 
 **API Endpoints:**
 
 - `GET /api/v1/investments/gold-types` - List available gold types (filtered by currency)
 - Gold investments use standard investment endpoints with type 8 or 9
 
-**Creating a Gold Investment:**
-
-```typescript
-// Frontend: Use gold calculator for conversions
-import { calculateGoldFromUserInput } from "@/lib/utils/gold-calculator";
-
-const result = calculateGoldFromUserInput({
-  quantity: 2, // User input in taels
-  quantityUnit: "tael",
-  pricePerUnit: 85000000, // 85M VND per tael
-  priceCurrency: "VND",
-  priceUnit: "tael",
-  investmentType: 8, // GOLD_VND
-  walletCurrency: "VND",
-  fxRate: 1, // No currency conversion needed
-});
-
-// result.storedQuantity: 750000 (75g × 10000)
-// result.totalCostNative: 170000000 VND
-```
-
-**Frontend Display:**
-
-```typescript
-// Format gold quantity for display
-import { formatGoldQuantity } from "@/app/dashboard/portfolio/helpers";
-
-const display = formatGoldQuantity(
-  750000,
-  InvestmentType.INVESTMENT_TYPE_GOLD_VND,
-);
-// Returns: "2.0000 lượng" (2 taels with 4 decimals)
-
-// Format gold price
-import { formatGoldPrice } from "@/app/dashboard/portfolio/helpers";
-
-const price = formatGoldPrice(
-  85000000,
-  "VND",
-  undefined,
-  InvestmentType.INVESTMENT_TYPE_GOLD_VND,
-);
-// Returns: "₫85,000,000/lượng"
-```
-
-**vang.today API Integration:**
-
-- Base URL: `https://www.vang.today/api/prices`
-- Returns: Gold type codes, buy/sell prices, change, update time
-- Caching: 15-minute TTL in Redis
-- Used by: `GoldPriceService` → `MarketDataService`
+**Utilities:** `@/lib/utils/gold-calculator` — `convertGoldQuantity()`, `calculateGoldFromUserInput()`. Display helpers in `@/app/[locale]/dashboard/portfolio/helpers`.
 
 **Testing:**
 
@@ -1139,6 +1118,19 @@ const price = formatGoldPrice(
 - `POST /api/v1/import/templates` - Create bank template
 - `PUT /api/v1/import/templates/{id}` - Update bank template
 
+### User Price Alerts (NEW)
+
+- **Model**: [user_price_alert.go](src/go-backend/domain/models/user_price_alert.go)
+- **Service**: [user_price_alert_service.go](src/go-backend/domain/service/user_price_alert_service.go)
+- **Handler**: [user_price_alert.go](src/go-backend/handlers/user_price_alert.go)
+- **Scheduler**: `user_price_alert_job.go` — evaluates alerts on schedule
+- **API**: `investment.proto` — `CreateUserPriceAlert`, `ListUserPriceAlerts`, `UpdateUserPriceAlert`, `DeleteUserPriceAlert`
+- **Frontend**: `features/price-alert/` — `AlertStatusBadge`, `PriceAlertList`, `CreatePriceAlertForm` (3-step)
+- **Settings page**: `/dashboard/settings/alerts`
+- **Migration**: `task backend:migrate-user-price-alerts`
+
+**AlertStatus enum:** `UNSPECIFIED`, `ACTIVE`, `TRIGGERED`, `PAUSED`
+
 ### Foreign Exchange (FX) Rates
 
 - **Models**: [FXRate](src/go-backend/domain/models/fx_rate.go)
@@ -1158,9 +1150,13 @@ const price = formatGoldPrice(
 
 ```bash
 # Development
-task dev                # Start both backend + frontend
+task dev                # Start Docker + backend + frontend
 task backend:dev        # Backend only (also: task dev:backend)
 task frontend:dev       # Frontend only (also: task dev:frontend)
+
+# Docker (Postgres + Redis)
+task docker:up          # Start local Postgres + Redis containers
+task docker:down        # Stop containers
 
 # Protobuf generation
 task proto:all          # Generate all (Go + TypeScript + API client)
@@ -1175,14 +1171,19 @@ task frontend:build     # Build Next.js frontend
 
 # Testing
 task test:all           # Run all tests
+task ci:backend         # Backend CI: lint + build + test
+task ci:backend-lint    # Backend lint + build only (no DB needed)
+task ci:frontend        # Frontend CI checks
+task ci:frontend-e2e    # Playwright E2E tests
 
-# Database migrations
+# Database migrations (run task --list | grep migrate for full list)
 task backend:migrate-categories        # Create default categories for users
 task backend:migrate-investments       # Create investment tables
 task backend:migrate-sessions          # Create session tables
 task backend:migrate-import            # Create import tables
 task backend:migrate-fx                # Create FX rate tables
 task backend:migrate-portfolio-history # Create portfolio history tables
+task backend:migrate-user-price-alerts # Create user_price_alert table (NEW)
 ```
 
 ### Adding a New Feature
@@ -1311,11 +1312,12 @@ const handleSuccess = () => {
 
 **Required:**
 
-- Go 1.23+
+- Go 1.25+
 - Node.js 20+
 - PostgreSQL 16+ (or Supabase account)
 - Redis 7+
 - Buf (Protobuf tool)
+- Docker (for local Postgres + Redis via `task docker:up`)
 
 **Setup:**
 
@@ -1348,8 +1350,15 @@ task dev
 | [api/protobuf/v1/investment.proto](api/protobuf/v1/investment.proto)   | Investment portfolio API                |
 | [api/protobuf/v1/session.proto](api/protobuf/v1/session.proto)         | Session management API                  |
 | [api/protobuf/v1/import.proto](api/protobuf/v1/import.proto)           | Bank statement import API               |
+| [api/protobuf/v1/admin.proto](api/protobuf/v1/admin.proto)             | Admin operations API                    |
+| [api/protobuf/v1/community.proto](api/protobuf/v1/community.proto)     | Community features API                  |
+| [api/protobuf/v1/feedback.proto](api/protobuf/v1/feedback.proto)       | Feedback API                            |
+| [api/protobuf/v1/watchlist.proto](api/protobuf/v1/watchlist.proto)     | Watchlist API                           |
+| [api/protobuf/v1/gold_sentiment.proto](api/protobuf/v1/gold_sentiment.proto) | Gold sentiment voting API          |
 
-**Note:** Category management is integrated into `transaction.proto`, not a separate file.
+**Notes:**
+- Category management is integrated into `transaction.proto`, not a separate file
+- Price alert RPCs (`CreateUserPriceAlert` etc.) are in `investment.proto`
 
 ### Frontend (wj-client)
 
@@ -1380,6 +1389,12 @@ task dev
 | Investment | `features/investment/` | AddInvestmentForm, InvestmentDetailModal, portfolio helpers, gold/silver calculators |
 | Import | `features/import/` | Import wizard components, template management |
 | Market Prices | `features/market-prices/` | Price display tables, symbol lookup |
+| Price Alerts | `features/price-alert/` | AlertStatusBadge, PriceAlertList, CreatePriceAlertForm (NEW) |
+| Settings | `features/settings/` | Settings page components |
+| Watchlist | `features/watchlist/` | Symbol watchlist |
+| Community | `features/community/` | Posts, comments, likes, follows |
+| Admin | `features/admin/` | Admin panel |
+| Feedback | `features/feedback/` | Feedback forms |
 | Report | `features/report/` | Financial tables, CSV/PDF export utils |
 
 ### Backend (go-backend)
@@ -1407,36 +1422,38 @@ task dev
 
 ## Testing Strategy
 
-**Current State:** Limited test coverage
-
-**Recommended:**
-
-- **Backend**: Unit tests for services, integration tests for handlers
-- **Frontend**: Component tests with React Testing Library
-- **E2E**: Playwright or Cypress for critical user flows
-
 **Running Tests:**
 
 ```bash
-# Unit tests only (fast, no external dependencies)
-go test -short ./...
+# Backend unit tests (fast, no external dependencies)
+cd src/go-backend && go test -short ./...
 
-# Integration tests (requires external services)
-go test -tags=integration ./domain/service/...
+# Backend integration tests (requires Docker: task docker:up first)
+cd src/go-backend && go test -tags=integration ./domain/service/...
 
-# All tests
-go test ./...
+# All backend tests
+cd src/go-backend && go test ./...
 
-# Frontend tests
-cd src/wj-client
-npm test
+# Frontend unit tests (Jest)
+cd src/wj-client && npm test
+cd src/wj-client && npm run test:watch
+
+# E2E tests (Playwright)
+cd src/wj-client && npm run test:e2e
+cd src/wj-client && npm run test:e2e:ui    # Interactive UI mode
+cd src/wj-client && npm run test:e2e:debug # Debug mode
+
+# Or via Task
+task ci:backend         # lint + build + test
+task ci:frontend-e2e    # Playwright E2E
 ```
 
 **Build Tags:**
 
-- Use `-short` flag for unit tests that skip external API calls
-- Use `-tags=integration` for tests that require Yahoo Finance API or database
-- Example: Market data integration tests require real Yahoo Finance API access
+- `-short` — skip external API calls (unit tests only)
+- `-tags=integration` — requires real Postgres + Redis (start with `task docker:up`)
+
+**E2E Tests** live in `src/wj-client/tests/e2e/` — includes `price-alerts-settings-flow.spec.ts`
 
 ## Deployment
 
@@ -1511,7 +1528,7 @@ import { ModalType } from "@/app/constants";
 
 ---
 
-**Last Updated:** 2026-03-05
+**Last Updated:** 2026-03-24
 **Maintainer:** WealthJourney Team
 
 ---
