@@ -162,46 +162,40 @@ func (r *investmentRepository) Delete(ctx context.Context, id int32) error {
 }
 
 // UpdatePrices updates current prices for multiple investments.
-// This method fetches each investment, updates its current_price, and saves it
-// to ensure GORM hooks (BeforeUpdate) are triggered for recalculating
-// current_value, unrealized_pnl, and unrealized_pnl_percent.
+// Each update is applied independently (no wrapping transaction) to avoid
+// deadlocks caused by concurrent goroutines holding row locks on the same
+// investment rows. Each row update is already atomic at the DB level.
 func (r *investmentRepository) UpdatePrices(ctx context.Context, updates []PriceUpdate) error {
 	if len(updates) == 0 {
 		return nil
 	}
 
-	// Use a transaction for batch updates
-	err := r.db.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		for _, update := range updates {
-			// Fetch the investment first
-			var investment models.Investment
-			if err := tx.Where("id = ?", update.InvestmentID).First(&investment).Error; err != nil {
-				return apperrors.NewInternalErrorWithCause("failed to fetch investment", err)
-			}
+	db := r.db.DB.WithContext(ctx)
 
-			// Update the current_price field
-			investment.CurrentPrice = update.Price
-
-			// Manually trigger recalculation to set derived fields
-			investment.Recalculate()
-
-			// Update only the specific fields we need to change (avoid enum serialization)
-			if err := tx.Model(&models.Investment{}).
-				Where("id = ?", update.InvestmentID).
-				Updates(map[string]interface{}{
-					"current_price":          investment.CurrentPrice,
-					"current_value":          investment.CurrentValue,
-					"unrealized_pnl":         investment.UnrealizedPNL,
-					"unrealized_pnl_percent": investment.UnrealizedPNLPercent,
-				}).Error; err != nil {
-				return apperrors.NewInternalErrorWithCause("failed to update investment price", err)
-			}
+	for _, update := range updates {
+		// Fetch the investment first
+		var investment models.Investment
+		if err := db.Where("id = ?", update.InvestmentID).First(&investment).Error; err != nil {
+			return apperrors.NewInternalErrorWithCause("failed to fetch investment", err)
 		}
-		return nil
-	})
 
-	if err != nil {
-		return err
+		// Update the current_price field
+		investment.CurrentPrice = update.Price
+
+		// Manually trigger recalculation to set derived fields
+		investment.Recalculate()
+
+		// Update only the specific fields we need to change (avoid enum serialization)
+		if err := db.Model(&models.Investment{}).
+			Where("id = ?", update.InvestmentID).
+			Updates(map[string]interface{}{
+				"current_price":          investment.CurrentPrice,
+				"current_value":          investment.CurrentValue,
+				"unrealized_pnl":         investment.UnrealizedPNL,
+				"unrealized_pnl_percent": investment.UnrealizedPNLPercent,
+			}).Error; err != nil {
+			return apperrors.NewInternalErrorWithCause("failed to update investment price", err)
+		}
 	}
 
 	return nil

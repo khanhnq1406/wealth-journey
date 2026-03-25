@@ -363,42 +363,65 @@ func TestInvestmentRepository_UpdatePrices(t *testing.T) {
 		{InvestmentID: 2, Price: 310000, Timestamp: time.Now().Unix()},
 	}
 
-	// Mock data for fetched investments
-	investmentRows := sqlmock.NewRows([]string{
+	// No BEGIN/COMMIT — UpdatePrices runs each update independently (no
+	// wrapping transaction) to prevent cross-goroutine deadlocks on the
+	// investment table.
+
+	// First investment fetch
+	rows1 := sqlmock.NewRows([]string{
 		"id", "wallet_id", "symbol", "name", "type", "quantity",
 		"average_cost", "total_cost", "currency", "current_price",
 		"current_value", "unrealized_pnl", "unrealized_pnl_percent",
 		"realized_pnl", "created_at", "updated_at",
-	})
-
-	mock.ExpectBegin()
-
-	// First investment fetch
-	rows1 := investmentRows.AddRow(1, 5, "AAPL", "Apple", 0, 10000, 150000, 150000, "USD", 175000, 175000, 25000, 16.67, 0, time.Now(), time.Now())
+	}).AddRow(1, 5, "AAPL", "Apple", 0, 10000, 150000, 150000, "USD", 175000, 175000, 25000, 16.67, 0, time.Now(), time.Now())
 	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `investment` WHERE id = ? AND `investment`.`deleted_at` IS NULL ORDER BY `investment`.`id` LIMIT ?")).
 		WithArgs(1, 1).
 		WillReturnRows(rows1)
 
-	// First investment save (UPDATE) - Save() updates all fields
+	// First investment UPDATE (auto-wrapped by GORM in its own implicit tx)
+	mock.ExpectBegin()
 	mock.ExpectExec(regexp.QuoteMeta("UPDATE `investment`")).
 		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
 
 	// Second investment fetch
-	rows2 := investmentRows.AddRow(2, 5, "BTC", "Bitcoin", 1, 100000000, 50000000000, 50000000000, "USD", 60000000000, 60000000000, 10000000000, 20.0, 0, time.Now(), time.Now())
+	rows2 := sqlmock.NewRows([]string{
+		"id", "wallet_id", "symbol", "name", "type", "quantity",
+		"average_cost", "total_cost", "currency", "current_price",
+		"current_value", "unrealized_pnl", "unrealized_pnl_percent",
+		"realized_pnl", "created_at", "updated_at",
+	}).AddRow(2, 5, "BTC", "Bitcoin", 1, 100000000, 50000000000, 50000000000, "USD", 60000000000, 60000000000, 10000000000, 20.0, 0, time.Now(), time.Now())
 	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `investment` WHERE id = ? AND `investment`.`deleted_at` IS NULL ORDER BY `investment`.`id` LIMIT ?")).
 		WithArgs(2, 1).
 		WillReturnRows(rows2)
 
-	// Second investment save (UPDATE)
+	// Second investment UPDATE
+	mock.ExpectBegin()
 	mock.ExpectExec(regexp.QuoteMeta("UPDATE `investment`")).
 		WillReturnResult(sqlmock.NewResult(2, 1))
-
 	mock.ExpectCommit()
 
 	err := repo.UpdatePrices(ctx, updates)
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+// TestInvestmentRepository_UpdatePrices_EmptyUpdates verifies early return on
+// an empty update slice.
+func TestInvestmentRepository_UpdatePrices_EmptyUpdates(t *testing.T) {
+	db, _, database := setupMockDB(t)
+	defer func() {
+		sqlDB, _ := db.DB()
+		_ = sqlDB.Close()
+	}()
+
+	repo := NewInvestmentRepository(database)
+	ctx := context.Background()
+
+	err := repo.UpdatePrices(ctx, []PriceUpdate{})
+
+	assert.NoError(t, err)
 }
 
 func TestInvestmentRepository_GetPortfolioSummary(t *testing.T) {
