@@ -65,6 +65,7 @@
     "INVESTMENT_SYMBOL_CURRENCY_REQUIRED": "Symbol and currency are required.",
     "INVESTMENT_TYPE_INVALID": "Invalid investment type.",
     "INVESTMENT_NOT_FOUND": "Investment not found.",
+    "INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY": "Cannot change to sell: not enough units remain after reversing the buy transaction.",
 
     "IMPORT_FILE_REQUIRED": "Please select a file to upload.",
     "IMPORT_FILENAME_REQUIRED": "File name is required.",

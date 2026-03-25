@@ -1044,6 +1044,23 @@ func (s *investmentService) EditTransaction(ctx context.Context, transactionID i
 		}
 	}
 
+	// 5b. Pre-flight viability check for BUY→SELL type change.
+	// reverseBuyTransaction writes to DB before processSellTransaction can validate.
+	// If quantityAfterReversal < req.Quantity, processSellTransaction would fail
+	// AFTER the reversal already committed — corrupting investment.Quantity and the lot.
+	// Reject here before any DB mutation.
+	if oldType == v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY &&
+		newType == v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL {
+		quantityAfterReversal := max(investment.Quantity-oldTx.Quantity, 0)
+		if quantityAfterReversal < req.Quantity {
+			return nil, apperrors.NewValidationErrorWithCode(
+				apperrors.Codes.InvestmentEditSellInsufficientQty,
+				fmt.Sprintf("INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY: chỉ còn %d đơn vị sau khi đảo ngược giao dịch mua, nhưng yêu cầu bán %d",
+					quantityAfterReversal, req.Quantity),
+			)
+		}
+	}
+
 	// 6. Validate transaction date is not in the future (if provided)
 	if req.TransactionDate > 0 {
 		txTime := time.Unix(req.TransactionDate, 0)

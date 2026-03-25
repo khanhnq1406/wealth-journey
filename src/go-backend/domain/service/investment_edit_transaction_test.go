@@ -643,12 +643,14 @@ func TestEditTransaction_UseExistingTypeWhenUnspecified(t *testing.T) {
 // TestEditTransaction_ReverseFailure_NoMutation
 // --------------------------------------------------------------------------
 
-// TestEditTransaction_BuyToSell_SingleLot_ProcessFailDoesNotDeleteOldTx verifies
-// that when a BUY→SELL edit has only one lot and processSellTransaction fails
-// (because reverseBuyTransaction zeroed the only lot, leaving no open lots),
-// the old BUY transaction is NOT soft-deleted. This prevents the "investment
-// transaction not found" error on retry and keeps the transaction list non-empty.
-func TestEditTransaction_BuyToSell_SingleLot_ProcessFailDoesNotDeleteOldTx(t *testing.T) {
+// TestEditTransaction_BuyToSell_SingleLot_InsufficientQtyAfterReversal_RejectsPreFlight
+// verifies that the pre-flight guard (step 5b) fires BEFORE any DB mutation when
+// the investment has only one BUY transaction and the user tries to change it to SELL.
+//
+// After reversing the BUY (qty=10000), investment.Quantity would drop to 0.
+// req.Quantity=5000 > 0 → guard fires → no UpdateLot, no Update(investment),
+// no Delete, no Create should be called.
+func TestEditTransaction_BuyToSell_SingleLot_InsufficientQtyAfterReversal_RejectsPreFlight(t *testing.T) {
 	d := newEditTestService(t)
 	ctx := context.Background()
 
@@ -670,29 +672,18 @@ func TestEditTransaction_BuyToSell_SingleLot_ProcessFailDoesNotDeleteOldTx(t *te
 		ID:                lotID,
 		InvestmentID:      5,
 		Quantity:          10000,
-		RemainingQuantity: 10000, // nothing sold — type change to SELL is allowed by guard
+		RemainingQuantity: 10000, // nothing sold — passes existing alreadySold guard
 		TotalCost:         150000000,
 		AverageCost:       15000000,
 	}
 
-	// After reverseBuyTransaction, investment qty drops to 0.
-	// processSellTransaction checks investment.Quantity < req.Quantity first,
-	// so it fails with "insufficient quantity" before even reaching GetOpenLots.
-	freshInvestment := createTestInvestment(5, 1, "AAPL", 0, 0, 0)
-
 	// --- ownership check ---
 	d.txRepo.On("GetByIDForUser", ctx, int32(1), int32(1)).Return(oldTx, nil)
-	// --- parent investment (first GetByID) ---
-	d.invRepo.On("GetByID", ctx, int32(5)).Return(investment, nil).Once()
-	// --- buy→sell guard: GetLotByID (alreadySold = 0, allowed) ---
+	// --- parent investment (single GetByID — pre-flight fires before second fetch) ---
+	d.invRepo.On("GetByID", ctx, int32(5)).Return(investment, nil)
+	// --- buy→sell existing guard: GetLotByID (alreadySold = 0, passes) ---
 	d.txRepo.On("GetLotByID", ctx, lotID).Return(lot, nil)
-	// --- reverseBuyTransaction: UpdateLot (zeros the lot) ---
-	d.txRepo.On("UpdateLot", ctx, mock.AnythingOfType("*models.InvestmentLot")).Return(nil)
-	// --- reverseBuyTransaction: Update investment ---
-	d.invRepo.On("Update", ctx, mock.AnythingOfType("*models.Investment")).Return(nil)
-	// --- re-fetch investment after reversal (second GetByID) ---
-	d.invRepo.On("GetByID", ctx, int32(5)).Return(freshInvestment, nil).Once()
-	// NOTE: processSellTransaction fails at quantity check (0 < 5000) before GetOpenLots
+	// NOTE: No UpdateLot, Update(investment), Delete, or Create — pre-flight fires before reversal
 
 	_, err := d.svc.EditTransaction(ctx, 1, 1, &v1.EditInvestmentTransactionRequest{
 		Type:            v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
@@ -702,9 +693,13 @@ func TestEditTransaction_BuyToSell_SingleLot_ProcessFailDoesNotDeleteOldTx(t *te
 		TransactionDate: pastDate(),
 	})
 
-	// Must return an error (no open lots)
 	assert.Error(t, err)
-	// Critical: Delete must NOT have been called — old tx must survive the failure
+	var ve apperrors.ValidationError
+	assert.True(t, errors.As(err, &ve), "expected ValidationError, got %T: %v", err, err)
+	assert.Contains(t, err.Error(), "INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY")
+	// Critical: no DB mutations occurred
+	d.txRepo.AssertNotCalled(t, "UpdateLot")
+	d.invRepo.AssertNotCalled(t, "Update")
 	d.txRepo.AssertNotCalled(t, "Delete")
 	d.txRepo.AssertNotCalled(t, "Create")
 	d.txRepo.AssertExpectations(t)
@@ -758,4 +753,184 @@ func TestEditTransaction_ReverseFailure_NoMutation(t *testing.T) {
 	d.txRepo.AssertNotCalled(t, "Delete")
 	d.txRepo.AssertNotCalled(t, "Create")
 	d.txRepo.AssertExpectations(t)
+}
+
+// --------------------------------------------------------------------------
+// TestEditTransaction_BuyToSell_PreFlightGuard_*
+// Tests for the step-5b pre-flight viability check.
+// --------------------------------------------------------------------------
+
+// TestEditTransaction_BuyToSell_OnlyOneLot_RejectsPreFlight verifies that
+// when the investment has only one BUY (qty=10000) and the user tries to
+// change it to SELL qty=5000, the pre-flight guard fires before any DB
+// mutation: investment.Quantity(10000) - oldTx.Quantity(10000) = 0 < 5000.
+func TestEditTransaction_BuyToSell_OnlyOneLot_RejectsPreFlight(t *testing.T) {
+	d := newEditTestService(t)
+	ctx := context.Background()
+
+	lotID := int32(10)
+	oldTx := &models.InvestmentTransaction{
+		ID:           1,
+		InvestmentID: 5,
+		UserID:       1,
+		Type:         int32(v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY),
+		Quantity:     10000,
+		Price:        15000000,
+		Cost:         150000000,
+		LotID:        &lotID,
+	}
+	investment := createTestInvestment(5, 1, "AAPL", 10000, 15000000, 150000000)
+
+	lot := &models.InvestmentLot{
+		ID:                lotID,
+		InvestmentID:      5,
+		Quantity:          10000,
+		RemainingQuantity: 10000,
+		TotalCost:         150000000,
+		AverageCost:       15000000,
+	}
+
+	d.txRepo.On("GetByIDForUser", ctx, int32(1), int32(1)).Return(oldTx, nil)
+	d.invRepo.On("GetByID", ctx, int32(5)).Return(investment, nil)
+	d.txRepo.On("GetLotByID", ctx, lotID).Return(lot, nil)
+	// NOTE: No UpdateLot, Update, Delete, or Create — guard fires first
+
+	_, err := d.svc.EditTransaction(ctx, 1, 1, &v1.EditInvestmentTransactionRequest{
+		Type:            v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
+		Quantity:        5000,
+		Price:           18000000,
+		TransactionDate: pastDate(),
+	})
+
+	assert.Error(t, err)
+	var ve apperrors.ValidationError
+	assert.True(t, errors.As(err, &ve), "expected ValidationError, got %T: %v", err, err)
+	assert.Contains(t, err.Error(), "INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY")
+	d.txRepo.AssertNotCalled(t, "UpdateLot")
+	d.invRepo.AssertNotCalled(t, "Update")
+	d.txRepo.AssertNotCalled(t, "Delete")
+	d.txRepo.AssertNotCalled(t, "Create")
+	d.txRepo.AssertExpectations(t)
+	d.invRepo.AssertExpectations(t)
+}
+
+// TestEditTransaction_BuyToSell_ExactBoundary_Passes verifies that when
+// quantityAfterReversal == req.Quantity (exact match), the guard passes.
+// investment.Quantity=20000, oldTx.Quantity=10000 → after reversal=10000.
+// req.Quantity=10000 → 10000 >= 10000 → allowed.
+func TestEditTransaction_BuyToSell_ExactBoundary_Passes(t *testing.T) {
+	d := newEditTestService(t)
+	ctx := context.Background()
+
+	lotID := int32(10)
+	oldTx := &models.InvestmentTransaction{
+		ID:           1,
+		InvestmentID: 5,
+		UserID:       1,
+		Type:         int32(v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY),
+		Quantity:     10000,
+		Price:        15000000,
+		Cost:         150000000,
+		LotID:        &lotID,
+	}
+	investment := createTestInvestment(5, 1, "AAPL", 20000, 15000000, 300000000)
+
+	lot := &models.InvestmentLot{
+		ID:                lotID,
+		InvestmentID:      5,
+		Quantity:          10000,
+		RemainingQuantity: 10000,
+		TotalCost:         150000000,
+		AverageCost:       15000000,
+	}
+	freshInvestment := createTestInvestment(5, 1, "AAPL", 10000, 15000000, 150000000)
+	newTxID := int32(2)
+	newSellTx := &models.InvestmentTransaction{
+		ID:           newTxID,
+		InvestmentID: 5,
+		Type:         int32(v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL),
+		Quantity:     10000,
+	}
+	openLot := &models.InvestmentLot{
+		ID: 13, InvestmentID: 5, Quantity: 10000, RemainingQuantity: 10000, AverageCost: 15000000,
+	}
+
+	d.txRepo.On("GetByIDForUser", ctx, int32(1), int32(1)).Return(oldTx, nil)
+	d.invRepo.On("GetByID", ctx, int32(5)).Return(investment, nil).Once()
+	d.txRepo.On("GetLotByID", ctx, lotID).Return(lot, nil)
+	d.txRepo.On("UpdateLot", ctx, mock.AnythingOfType("*models.InvestmentLot")).Return(nil)
+	d.invRepo.On("Update", ctx, mock.AnythingOfType("*models.Investment")).Return(nil)
+	d.txRepo.On("Delete", ctx, int32(1)).Return(nil)
+	d.invRepo.On("GetByID", ctx, int32(5)).Return(freshInvestment, nil).Once()
+	d.txRepo.On("GetOpenLots", ctx, int32(5)).Return([]*models.InvestmentLot{openLot}, nil)
+	d.txRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil).Run(
+		func(args mock.Arguments) { args.Get(1).(*models.InvestmentTransaction).ID = newTxID },
+	)
+	d.txRepo.On("ListByInvestmentID", ctx, int32(5), (*v1.InvestmentTransactionType)(nil), repository.ListOptions{
+		Limit: 1, OrderBy: "created_at", Order: "desc",
+	}).Return([]*models.InvestmentTransaction{newSellTx}, 1, nil)
+	d.setupEnrichMocks(ctx, 1)
+
+	resp, err := d.svc.EditTransaction(ctx, 1, 1, &v1.EditInvestmentTransactionRequest{
+		Type:            v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
+		Quantity:        10000, // exact match — guard passes
+		Price:           18000000,
+		TransactionDate: pastDate(),
+	})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.True(t, resp.Success)
+	d.txRepo.AssertExpectations(t)
+	d.invRepo.AssertExpectations(t)
+}
+
+// TestEditTransaction_BuyToSell_PartialRemainingInsufficient_RejectsPreFlight
+// verifies guard fires when investment.Quantity=13000, oldTx.Quantity=10000
+// → after reversal=3000 < req.Quantity=5000.
+func TestEditTransaction_BuyToSell_PartialRemainingInsufficient_RejectsPreFlight(t *testing.T) {
+	d := newEditTestService(t)
+	ctx := context.Background()
+
+	lotID := int32(10)
+	oldTx := &models.InvestmentTransaction{
+		ID:           1,
+		InvestmentID: 5,
+		UserID:       1,
+		Type:         int32(v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY),
+		Quantity:     10000,
+		Price:        15000000,
+		Cost:         150000000,
+		LotID:        &lotID,
+	}
+	// 13000 total: this BUY=10000, another BUY=3000
+	investment := createTestInvestment(5, 1, "AAPL", 13000, 15000000, 195000000)
+
+	lot := &models.InvestmentLot{
+		ID:                lotID,
+		Quantity:          10000,
+		RemainingQuantity: 10000, // nothing sold from this lot
+	}
+
+	d.txRepo.On("GetByIDForUser", ctx, int32(1), int32(1)).Return(oldTx, nil)
+	d.invRepo.On("GetByID", ctx, int32(5)).Return(investment, nil)
+	d.txRepo.On("GetLotByID", ctx, lotID).Return(lot, nil)
+
+	_, err := d.svc.EditTransaction(ctx, 1, 1, &v1.EditInvestmentTransactionRequest{
+		Type:            v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
+		Quantity:        5000, // 13000 - 10000 = 3000 remaining < 5000 → guard fires
+		Price:           18000000,
+		TransactionDate: pastDate(),
+	})
+
+	assert.Error(t, err)
+	var ve apperrors.ValidationError
+	assert.True(t, errors.As(err, &ve))
+	assert.Contains(t, err.Error(), "INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY")
+	d.txRepo.AssertNotCalled(t, "UpdateLot")
+	d.invRepo.AssertNotCalled(t, "Update")
+	d.txRepo.AssertNotCalled(t, "Delete")
+	d.txRepo.AssertNotCalled(t, "Create")
+	d.txRepo.AssertExpectations(t)
+	d.invRepo.AssertExpectations(t)
 }

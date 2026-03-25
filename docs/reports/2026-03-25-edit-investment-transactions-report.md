@@ -34,7 +34,7 @@ Implemented full edit capability for investment transactions (buy, sell, dividen
 | Frontend Form      | `AddInvestmentTransactionForm.edit.test.tsx`            | 15     | 15/15  | Pre-fill, mutation dispatch, date conversion, success/error |
 | Frontend Modal     | `InvestmentDetailModal.edit.test.tsx`                   | 6      | 6/6    | Edit button render, tab switch, state passing, success routing |
 
-**Total: 47 tests, 47/47 pass**
+**Total: 50 tests, 50/50 pass** _(+3 from BUY→SELL pre-flight guard fix; 1 test renamed and tightened)_
 
 ## Security Implementation Summary
 
@@ -89,12 +89,12 @@ All 9 security categories satisfied:
 | Date       | Fix                                                                     | Severity | Tests |
 | ---------- | ----------------------------------------------------------------------- | -------- | ----- |
 | 2026-03-25 | Price label for gold/silver VND was hardcoded English ("Price per Tael") — replaced with i18n key `transaction.pricePerUnitWithUnit` in `AddInvestmentTransactionForm.tsx`; added key to `en/investment.json` and `vi/investment.json` | Minor | 2 new tests added (17/17 pass) |
-| 2026-03-25 | Phí (fees) field showed blank on first render instead of `0` — `FormNumberInput` `useState("")` initialized display to empty; fixed by using a lazy initializer that computes the initial display value synchronously from the field's default value | Minor | 3 new tests added in `FormNumberInput.test.tsx` (394/394 pass) |
 | 2026-03-25 | BUY→SELL edit orphaned the old transaction when processSellTransaction failed — `txRepo.Delete` ran before the process step, so on failure the old tx was soft-deleted with no replacement, causing "investment transaction not found" on retry and empty transaction list on refresh; fixed by moving Delete to after the process switch | Minor | 1 new test `TestEditTransaction_BuyToSell_SingleLot_ProcessFailDoesNotDeleteOldTx` (12/12 pass) | commit 99e2ad2 |
+| 2026-03-25 | BUY→SELL edit corrupted `investment.Quantity` and `lot.RemainingQuantity` — `reverseBuyTransaction` wrote to DB before `processSellTransaction` validated viability, leaving investment qty=0 with old tx still present; also showed misleading "Số lượng phải lớn hơn 0." error. Fixed by adding pre-flight guard (step 5b) in `EditTransaction`: `quantityAfterReversal = investment.Quantity - oldTx.Quantity`; rejects with `INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY` before any DB write | Critical | Renamed + tightened `TestEditTransaction_BuyToSell_SingleLot_InsufficientQtyAfterReversal_RejectsPreFlight` + 3 new tests: `TestEditTransaction_BuyToSell_OnlyOneLot_RejectsPreFlight`, `TestEditTransaction_BuyToSell_ExactBoundary_Passes`, `TestEditTransaction_BuyToSell_PartialRemainingInsufficient_RejectsPreFlight` (15/15 pass) |
 
 ## Known Issues / Technical Debt
 
-- **No DB-level atomicity**: `EditTransaction` performs reversal + soft-delete + re-process as sequential repository calls. If the process crashes mid-way, the lot/wallet state could be partially updated. Full atomicity would require DB transactions at the repository layer — deferred.
+- **No DB-level atomicity**: `EditTransaction` performs reversal + soft-delete + re-process as sequential repository calls. If the process crashes mid-way, the lot/wallet state could be partially updated. Full atomicity would require DB transactions at the repository layer — deferred. Note: the BUY→SELL data corruption case is now prevented by the step-5b pre-flight guard; other mid-sequence crash scenarios remain.
 - **Concurrent-replay race**: No pessimistic lock guards `EditTransaction`. Two simultaneous requests with the same transaction ID could double-reverse and double-process. Fix requires `SELECT FOR UPDATE` inside a DB transaction wrapping the reversal+process+delete sequence — deferred.
 - **Re-fetch after reversal**: `reverseBuyTransaction` mutates the in-memory `investment` pointer and persists. We re-fetch via `investmentRepo.GetByID` after reversal to avoid stale-state bugs on type changes. This is a known N+1 for edit — acceptable given edit frequency.
 

@@ -65,6 +65,7 @@
     "INVESTMENT_SYMBOL_CURRENCY_REQUIRED": "Mã và tiền tệ là bắt buộc.",
     "INVESTMENT_TYPE_INVALID": "Loại đầu tư không hợp lệ.",
     "INVESTMENT_NOT_FOUND": "Không tìm thấy khoản đầu tư.",
+    "INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY": "Không thể đổi thành bán: không còn đủ đơn vị sau khi đảo ngược giao dịch mua.",
 
     "IMPORT_FILE_REQUIRED": "Vui lòng chọn tệp để tải lên.",
     "IMPORT_FILENAME_REQUIRED": "Tên tệp là bắt buộc.",

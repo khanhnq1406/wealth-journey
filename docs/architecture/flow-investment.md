@@ -666,6 +666,14 @@ sequenceDiagram
         end
     end
 
+    alt oldType == BUY and newType == SELL
+        Note over IS: Step 5b — Pre-flight viability check (no DB writes)
+        IS->>IS: quantityAfterReversal = investment.Quantity - oldTx.Quantity
+        alt quantityAfterReversal < req.Quantity
+            IS-->>H: 400 Bad Request (INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY)<br/>No DB mutations — prevents data corruption
+        end
+    end
+
     Note over IS: Reverse old transaction
 
     alt oldTx.Type == BUY
@@ -720,6 +728,7 @@ sequenceDiagram
 - Ownership is verified (`GetByIDForUser`) before any mutation — a missing or unowned transaction returns 404
 - Buy quantity reduction guard: cannot reduce a buy quantity below units already sold from the lot (`validateBuyQuantityReduction`)
 - Type change from BUY with consumed lot is rejected before any mutation begins — no partial state is written
+- BUY→SELL pre-flight guard: `quantityAfterReversal = investment.Quantity - oldTx.Quantity` must be ≥ `req.Quantity` before any DB mutation — prevents investment.Quantity corruption when reversing the only BUY lot leaves nothing to sell (`INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY`)
 - Transaction date must not be in the future (`transactionDate ≤ now`)
 - After reversal, investment state is re-fetched from DB (`IR.GetByID`) — never uses in-memory stale state from prior operations
 - Cache is invalidated after successful edit so portfolio summary reflects the change immediately
@@ -734,5 +743,6 @@ sequenceDiagram
 | Buy quantity below already-sold amount | 400 Bad Request (`ValidationError`) |
 | BUY→SELL or BUY→DIVIDEND with consumed lot | 400 Bad Request (`ValidationError`) |
 | Transaction date in the future | 400 Bad Request (`InvestmentTxDateFuture`) |
+| BUY→SELL where qty after reversal < requested sell qty | 400 Bad Request (`INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY`) — no DB writes |
 | Reversal failure (lot update or delete) | 500 Internal Server Error (no partial state committed) |
 | New transaction processing failure | 500 Internal Server Error (reversal already applied — inconsistency risk logged) |
