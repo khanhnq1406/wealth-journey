@@ -1070,12 +1070,7 @@ func (s *investmentService) EditTransaction(ctx context.Context, transactionID i
 		return nil, apperrors.NewValidationError("unsupported transaction type for edit")
 	}
 
-	// 8. Soft-delete the old transaction record (preserves audit trail)
-	if err := s.txRepo.Delete(ctx, oldTx.ID); err != nil {
-		return nil, apperrors.NewInternalErrorWithCause("failed to delete old transaction", err)
-	}
-
-	// 8b. Re-fetch the investment after reversal to get fresh DB state.
+	// 8. Re-fetch the investment after reversal to get fresh DB state.
 	// The reverseXxx functions mutate the investment in-place AND persist to DB.
 	// For processXxx to operate on correct totals (especially for type changes,
 	// e.g., buy→sell where Quantity was decremented by reversal), we need
@@ -1123,7 +1118,15 @@ func (s *investmentService) EditTransaction(ctx context.Context, transactionID i
 		return nil, apperrors.NewValidationError("unsupported new transaction type")
 	}
 
-	// 11. Cache invalidation (best-effort, non-fatal)
+	// 11. Soft-delete the old transaction record (preserves audit trail).
+	// Intentionally placed AFTER the process step so that if process fails
+	// (e.g., no open lots for a sell), the original transaction is not orphaned
+	// and retrying will not produce "investment transaction not found".
+	if err := s.txRepo.Delete(ctx, oldTx.ID); err != nil {
+		return nil, apperrors.NewInternalErrorWithCause("failed to delete old transaction", err)
+	}
+
+	// 12. Cache invalidation (best-effort, non-fatal)
 	if err := s.invalidateInvestmentCache(ctx, userID, oldTx.InvestmentID); err != nil {
 		fmt.Printf("Warning: failed to invalidate currency cache for investment %d: %v\n", oldTx.InvestmentID, err)
 	}
@@ -1133,7 +1136,7 @@ func (s *investmentService) EditTransaction(ctx context.Context, transactionID i
 		}
 	}
 
-	// 12. Build response — dividend path has the tx directly; buy/sell must query latest
+	// 13. Build response — dividend path has the tx directly; buy/sell must query latest
 	var newTxProto *v1.InvestmentTransaction
 	if newDividendTx != nil {
 		// Dividend: transaction was returned directly from processDividendTransaction

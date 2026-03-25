@@ -643,6 +643,74 @@ func TestEditTransaction_UseExistingTypeWhenUnspecified(t *testing.T) {
 // TestEditTransaction_ReverseFailure_NoMutation
 // --------------------------------------------------------------------------
 
+// TestEditTransaction_BuyToSell_SingleLot_ProcessFailDoesNotDeleteOldTx verifies
+// that when a BUY→SELL edit has only one lot and processSellTransaction fails
+// (because reverseBuyTransaction zeroed the only lot, leaving no open lots),
+// the old BUY transaction is NOT soft-deleted. This prevents the "investment
+// transaction not found" error on retry and keeps the transaction list non-empty.
+func TestEditTransaction_BuyToSell_SingleLot_ProcessFailDoesNotDeleteOldTx(t *testing.T) {
+	d := newEditTestService(t)
+	ctx := context.Background()
+
+	lotID := int32(10)
+	oldTx := &models.InvestmentTransaction{
+		ID:           1,
+		InvestmentID: 5,
+		UserID:       1,
+		Type:         int32(v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY),
+		Quantity:     10000,
+		Price:        15000000,
+		Cost:         150000000,
+		LotID:        &lotID,
+	}
+	// Investment has ONLY the qty from this one BUY transaction
+	investment := createTestInvestment(5, 1, "AAPL", 10000, 15000000, 150000000)
+
+	lot := &models.InvestmentLot{
+		ID:                lotID,
+		InvestmentID:      5,
+		Quantity:          10000,
+		RemainingQuantity: 10000, // nothing sold — type change to SELL is allowed by guard
+		TotalCost:         150000000,
+		AverageCost:       15000000,
+	}
+
+	// After reverseBuyTransaction, investment qty drops to 0.
+	// processSellTransaction checks investment.Quantity < req.Quantity first,
+	// so it fails with "insufficient quantity" before even reaching GetOpenLots.
+	freshInvestment := createTestInvestment(5, 1, "AAPL", 0, 0, 0)
+
+	// --- ownership check ---
+	d.txRepo.On("GetByIDForUser", ctx, int32(1), int32(1)).Return(oldTx, nil)
+	// --- parent investment (first GetByID) ---
+	d.invRepo.On("GetByID", ctx, int32(5)).Return(investment, nil).Once()
+	// --- buy→sell guard: GetLotByID (alreadySold = 0, allowed) ---
+	d.txRepo.On("GetLotByID", ctx, lotID).Return(lot, nil)
+	// --- reverseBuyTransaction: UpdateLot (zeros the lot) ---
+	d.txRepo.On("UpdateLot", ctx, mock.AnythingOfType("*models.InvestmentLot")).Return(nil)
+	// --- reverseBuyTransaction: Update investment ---
+	d.invRepo.On("Update", ctx, mock.AnythingOfType("*models.Investment")).Return(nil)
+	// --- re-fetch investment after reversal (second GetByID) ---
+	d.invRepo.On("GetByID", ctx, int32(5)).Return(freshInvestment, nil).Once()
+	// NOTE: processSellTransaction fails at quantity check (0 < 5000) before GetOpenLots
+
+	_, err := d.svc.EditTransaction(ctx, 1, 1, &v1.EditInvestmentTransactionRequest{
+		Type:            v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL,
+		Quantity:        5000,
+		Price:           18000000,
+		Fees:            0,
+		TransactionDate: pastDate(),
+	})
+
+	// Must return an error (no open lots)
+	assert.Error(t, err)
+	// Critical: Delete must NOT have been called — old tx must survive the failure
+	d.txRepo.AssertNotCalled(t, "Delete")
+	d.txRepo.AssertNotCalled(t, "Create")
+	d.txRepo.AssertExpectations(t)
+	d.invRepo.AssertExpectations(t)
+}
+
 // TestEditTransaction_ReverseFailure_NoMutation verifies that if the reversal
 // step fails (UpdateLot returns error), the operation aborts and neither
 // soft-delete nor create is performed.
