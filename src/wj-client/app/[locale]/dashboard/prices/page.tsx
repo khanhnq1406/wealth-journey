@@ -18,9 +18,11 @@ import {
   useMutationCreateWatchlistItem,
   useMutationDeleteWatchlistItem,
   EVENT_WatchlistListWatchlist,
+  EVENT_InvestmentListUserPriceAlerts,
 } from "@/utils/generated/hooks";
 import { useNotification } from "@/contexts/NotificationContext";
-import { InvestmentType, SearchResult } from "@/gen/protobuf/v1/investment";
+import { InvestmentType, SearchResult, AlertStatus } from "@/gen/protobuf/v1/investment";
+import { PriceAlertList } from "@/features/price-alert/components/PriceAlertList";
 import { formatPriceValue, formatChangeValue, PriceItem } from "./helpers";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import {
@@ -34,7 +36,7 @@ import { AddToWatchlistForm } from "@/features/watchlist/forms/AddToWatchlistFor
 import { CreatePriceAlertForm } from "@/features/price-alert/forms/CreatePriceAlertForm";
 import type { AssetCategory } from "@/features/price-alert/forms/CreatePriceAlertForm";
 
-type Tab = "watchlist" | "gold" | "silver" | "currency" | "symbol";
+type Tab = "priceAlerts" | "watchlist" | "gold" | "silver" | "currency" | "symbol";
 
 // Tab labels are provided via translations below
 
@@ -247,6 +249,7 @@ const columnHelper = createColumnHelper<PriceItem>();
 
 // Desktop (cream/parchment rows) — dark colors for readability
 const TAB_TYPE_COLOR_DESKTOP: Record<Tab, string> = {
+  priceAlerts: "text-v2-maroon-900",
   watchlist: "text-v2-maroon-900",
   gold: "text-v2-maroon-900",
   silver: "text-v2-maroon-900",
@@ -256,6 +259,7 @@ const TAB_TYPE_COLOR_DESKTOP: Record<Tab, string> = {
 
 // Mobile (dark BaseCard rows) — bright colors for readability
 const TAB_TYPE_COLOR_MOBILE: Record<Tab, string> = {
+  priceAlerts: "text-v2-gold-accent",
   watchlist: "text-v2-gold-accent",
   gold: "text-v2-gold-accent",
   silver: "text-v2-text-tertiary",
@@ -846,11 +850,13 @@ function SymbolLookupTab({
 
 export default function PricesPage() {
   const t = useTranslations("prices");
+  const tAlerts = useTranslations("priceAlerts");
   const tc = useTranslations("common");
   const locale = useLocale();
   const { user } = useAuth();
   const isAdmin = user?.isAdmin ?? false;
-  const [activeTab, setActiveTab] = useState<Tab>("watchlist");
+  const [activeTab, setActiveTab] = useState<Tab>("priceAlerts");
+  const [alertFilter, setAlertFilter] = useState<AlertStatus>(AlertStatus.ALERT_STATUS_UNSPECIFIED);
   const [modalType, setModalType] = useState<string | null>(null);
   const [selectedPriceAlert, setSelectedPriceAlert] =
     useState<PriceAlertTarget | null>(null);
@@ -907,6 +913,7 @@ export default function PricesPage() {
   const [querySymbol, setQuerySymbol] = useState("");
 
   const TABS: { key: Tab; label: string }[] = [
+    { key: "priceAlerts", label: t("tabs.priceAlerts") },
     { key: "watchlist", label: t("tabs.watchlist") },
     { key: "gold", label: t("tabs.gold") },
     { key: "silver", label: t("tabs.silver") },
@@ -914,10 +921,24 @@ export default function PricesPage() {
     { key: "symbol", label: t("tabs.symbolLookup") },
   ];
 
+  const ALERT_FILTER_TABS = useMemo(
+    () => [
+      { id: AlertStatus.ALERT_STATUS_UNSPECIFIED, label: tAlerts("filterAll") },
+      { id: AlertStatus.ALERT_STATUS_ACTIVE, label: tAlerts("filterActive") },
+      { id: AlertStatus.ALERT_STATUS_TRIGGERED, label: tAlerts("filterTriggered") },
+    ],
+    [tAlerts]
+  );
+
   const handleCloseModal = useCallback(() => {
     setModalType(null);
     setSelectedPriceAlert(null);
   }, []);
+
+  const handleCreateAlertSuccess = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: [EVENT_InvestmentListUserPriceAlerts] });
+    handleCloseModal();
+  }, [queryClient, handleCloseModal]);
 
   const handleWatchlistSuccess = () => {
     queryClient.invalidateQueries({ queryKey: [EVENT_WatchlistListWatchlist] });
@@ -950,7 +971,7 @@ export default function PricesPage() {
             </p>
           )}
         </div>
-        {activeTab !== "symbol" && activeTab !== "watchlist" && (
+        {activeTab !== "symbol" && activeTab !== "watchlist" && activeTab !== "priceAlerts" && (
           <Button
             type={ButtonType.PRIMARY}
             onClick={() => refetch()}
@@ -997,6 +1018,63 @@ export default function PricesPage() {
         </div>
 
         <div className="p-4">
+          {activeTab === "priceAlerts" && (
+            <div className="space-y-4">
+              {/* Header */}
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-lg font-semibold text-v2-gold-accent">
+                  {tAlerts("title")}
+                </h2>
+                <Button
+                  type={ButtonType.PRIMARY}
+                  onClick={() => setModalType(ModalType.CREATE_PRICE_ALERT)}
+                  fullWidth={false}
+                  className="min-h-[44px] shrink-0"
+                  leftIcon={
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                  }
+                >
+                  {tAlerts("createAlert")}
+                </Button>
+              </div>
+
+              {/* Status filter tabs */}
+              <div className="flex gap-1 bg-v2-bg-surface-tint rounded-lg p-1 w-fit">
+                {ALERT_FILTER_TABS.map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setAlertFilter(tab.id)}
+                    aria-pressed={alertFilter === tab.id}
+                    className={[
+                      "px-3 py-1.5 rounded-md text-sm font-medium transition-colors min-h-[36px]",
+                      alertFilter === tab.id
+                        ? "bg-v2-gold-primary text-v2-bg-dark shadow-sm"
+                        : "text-v2-text-secondary hover:text-v2-gold-primary hover:bg-v2-bg-dark",
+                    ].join(" ")}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Alert list */}
+              <PriceAlertList statusFilter={alertFilter} />
+            </div>
+          )}
+
           {activeTab === "watchlist" && (
             <WatchlistTab onAddClick={() => setModalType("add-watchlist")} />
           )}
@@ -1152,14 +1230,14 @@ export default function PricesPage() {
         {modalType === "add-watchlist" && (
           <AddToWatchlistForm onSuccess={handleWatchlistSuccess} />
         )}
-        {modalType === ModalType.CREATE_PRICE_ALERT && selectedPriceAlert && (
+        {modalType === ModalType.CREATE_PRICE_ALERT && (
           <CreatePriceAlertForm
-            onSuccess={handleCloseModal}
-            defaultCategory={selectedPriceAlert.category}
-            defaultSymbol={selectedPriceAlert.symbol}
-            defaultName={selectedPriceAlert.name}
-            defaultAssetType={selectedPriceAlert.assetType}
-            defaultCurrency={selectedPriceAlert.currency}
+            onSuccess={handleCreateAlertSuccess}
+            defaultCategory={selectedPriceAlert?.category}
+            defaultSymbol={selectedPriceAlert?.symbol}
+            defaultName={selectedPriceAlert?.name}
+            defaultAssetType={selectedPriceAlert?.assetType}
+            defaultCurrency={selectedPriceAlert?.currency}
           />
         )}
       </BaseModal>

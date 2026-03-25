@@ -307,6 +307,7 @@
     "title": "Giá thị trường",
     "lastUpdated": "Cập nhật lần cuối: {time}",
     "tabs": {
+      "priceAlerts": "Cảnh báo giá",
       "watchlist": "Danh sách theo dõi",
       "gold": "Vàng",
       "silver": "Bạc",

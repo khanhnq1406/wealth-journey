@@ -307,6 +307,7 @@
     "title": "Market Prices",
     "lastUpdated": "Last updated: {time}",
     "tabs": {
+      "priceAlerts": "Price Alerts",
       "watchlist": "Watchlist",
       "gold": "Gold",
       "silver": "Silver",

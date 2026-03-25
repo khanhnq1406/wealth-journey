@@ -65,6 +65,13 @@ jest.mock("@/utils/generated/hooks", () => ({
     isPending: false,
   })),
   EVENT_WatchlistListWatchlist: "api.watchlist.listWatchlist",
+  EVENT_InvestmentListUserPriceAlerts: "api.investment.listUserPriceAlerts",
+}));
+
+jest.mock("@/features/price-alert/components/PriceAlertList", () => ({
+  PriceAlertList: ({ statusFilter }: { statusFilter: number }) => (
+    <div data-testid="price-alert-list" data-status={statusFilter} />
+  ),
 }));
 
 jest.mock("@/features/auth/hooks/useAuth", () => ({
@@ -160,6 +167,7 @@ const messages = {
     title: "Market Prices",
     lastUpdated: "Last updated: {time}",
     tabs: {
+      priceAlerts: "Price Alerts",
       watchlist: "Watchlist",
       gold: "Gold",
       silver: "Silver",
@@ -257,6 +265,14 @@ const messages = {
     showDetails: "Show Details",
     hideDetails: "Hide Details",
     loading: "Loading",
+  },
+  priceAlerts: {
+    title: "Price Alerts",
+    createAlert: "Create Alert",
+    modalTitle: "New Price Alert",
+    filterAll: "All",
+    filterActive: "Active",
+    filterTriggered: "Triggered",
   },
 };
 
@@ -441,6 +457,44 @@ describe("PricesPage — Set Alert bell buttons", () => {
       expect(
         screen.getByRole("button", { name: /set alert/i }),
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("Price Alerts tab (first tab)", () => {
+    it("renders Price Alerts as the first tab in the tab bar", () => {
+      renderPage();
+      const allTabButtons = screen.getAllByRole("button");
+      const tabBarButtons = allTabButtons.filter((btn) =>
+        /price alerts|watchlist|gold|silver|currency|symbol lookup/i.test(
+          btn.textContent ?? ""
+        )
+      );
+      expect(tabBarButtons[0]).toHaveTextContent(/price alerts/i);
+    });
+
+    it("shows PriceAlertList by default on page load", () => {
+      renderPage();
+      expect(screen.getByTestId("price-alert-list")).toBeInTheDocument();
+    });
+
+    it("shows Create Alert button on Price Alerts tab", () => {
+      renderPage();
+      expect(
+        screen.getByRole("button", { name: /create alert/i })
+      ).toBeInTheDocument();
+    });
+
+    it("opens CreatePriceAlertForm modal when Create Alert button is clicked", () => {
+      renderPage();
+      fireEvent.click(screen.getByRole("button", { name: /create alert/i }));
+      expect(screen.getByTestId("create-price-alert-form")).toBeInTheDocument();
+    });
+
+    it("does not pre-fill form when opened from Create Alert button (no target)", () => {
+      renderPage();
+      fireEvent.click(screen.getByRole("button", { name: /create alert/i }));
+      const form = screen.getByTestId("create-price-alert-form");
+      expect(form).not.toHaveAttribute("data-symbol");
     });
   });
 });
