@@ -124,8 +124,10 @@ func (s *goldPriceService) FetchPriceForSymbol(ctx context.Context, symbol strin
 		return fromCacheGoldPrice(cached), nil
 	}
 
-	// 2. Try waterfall (live sources).
-	allPrices, waterfallErr := s.waterfall.FetchGoldPrices(ctx)
+	// 2. Try all sources (merged) so that source-exclusive symbols such as
+	// BTMC_24K (only available from the BTMC fetcher) are reachable even when
+	// an earlier source succeeds but does not carry that symbol.
+	allPrices, waterfallErr := s.waterfall.FetchGoldPricesAllSources(ctx)
 	if waterfallErr == nil {
 		// Cache all fetched prices non-blocking.
 		go func(list []*CachedGoldPrice) {

@@ -383,6 +383,60 @@ func TestGoldPriceService_FetchPriceForSymbol_WaterfallFetch(t *testing.T) {
 }
 
 // ---------------------------------------------------------------------------
+// TestGoldPriceService_FetchPriceForSymbol_SymbolOnlyInThirdSource
+// ---------------------------------------------------------------------------
+
+// TestGoldPriceService_FetchPriceForSymbol_SymbolOnlyInThirdSource verifies
+// that FetchPriceForSymbol finds a symbol that exists only in the third source
+// (e.g. BTMC_24K from BTMC API) when the first successful source (vang.today)
+// does not carry that symbol.
+func TestGoldPriceService_FetchPriceForSymbol_SymbolOnlyInThirdSource(t *testing.T) {
+	ctx := context.Background()
+	client, _ := newMiniredisClient(t)
+	goldCache := cache.NewGoldPriceCache(client)
+
+	// primary (vangsaigon) fails
+	// secondary (vangtoday) succeeds but does NOT contain BTMC_24K
+	// tertiary (btmc) succeeds and contains BTMC_24K
+	vangSaiGonPrices := []*CachedGoldPrice{} // unused — primary will fail
+	vangTodayPrices := []*CachedGoldPrice{
+		{TypeCode: "SJC", Buy: 85_000_000, Sell: 87_000_000, Currency: "VND"},
+	}
+	btmcPrices := []*CachedGoldPrice{
+		{TypeCode: "BTMC_24K", Name: "Bao Tin 24K", Buy: 82_000_000, Sell: 84_000_000, Currency: "VND"},
+	}
+	_ = vangSaiGonPrices
+
+	primary := &mockGoldPriceFetcher{}
+	secondary := &mockGoldPriceFetcher{}
+	tertiary := &mockGoldPriceFetcher{}
+	health := &mockHealthTracker{}
+
+	primary.On("Source").Return(SourceVangSaiGon)
+	primary.On("FetchGoldPrices", mock.Anything).Return(nil, errors.New("timeout"))
+	health.On("IsHealthy", mock.Anything, SourceVangSaiGon).Return(true)
+	health.On("MarkUnhealthy", mock.Anything, SourceVangSaiGon).Return(nil)
+
+	secondary.On("Source").Return(SourceVangToday)
+	secondary.On("FetchGoldPrices", mock.Anything).Return(vangTodayPrices, nil)
+	health.On("IsHealthy", mock.Anything, SourceVangToday).Return(true)
+
+	tertiary.On("Source").Return(SourceBTMC)
+	tertiary.On("FetchGoldPrices", mock.Anything).Return(btmcPrices, nil)
+	health.On("IsHealthy", mock.Anything, SourceBTMC).Return(true)
+
+	waterfall := NewWaterfallGoldFetcher([]GoldPriceFetcher{primary, secondary, tertiary}, health)
+	svc := newGoldPriceServiceForTest(waterfall, goldCache)
+
+	got, err := svc.FetchPriceForSymbol(ctx, "BTMC_24K")
+
+	require.NoError(t, err, "BTMC_24K should be found in tertiary source")
+	require.NotNil(t, got)
+	assert.Equal(t, "BTMC_24K", got.TypeCode)
+	assert.Equal(t, int64(82_000_000), got.Buy)
+}
+
+// ---------------------------------------------------------------------------
 // TestGoldPriceService_FetchPriceForSymbol_SymbolNotFound
 // ---------------------------------------------------------------------------
 

@@ -206,13 +206,16 @@ No database migrations required. No proto changes. No frontend changes.
 
 | Date       | Fix                                                                 | Severity | Commit  |
 | ---------- | ------------------------------------------------------------------- | -------- | ------- |
-| 2026-03-25 | vangtoday: parse new object API format (gold=[], currency=[] empty) | Minor    | pending |
+| 2026-03-25 | vangtoday: parse new object API format (gold=[], currency=[] empty) | Minor    | 2e42300 |
+| 2026-03-25 | FetchPriceForSymbol: query all sources to find BTMC-exclusive symbols | Minor  | pending |
 
-### Root Cause
+---
 
-The vang.today API changed its response format. Previously it returned a flat JSON array (`[]APIPrice`); it now returns a JSON object with a `prices` map keyed by type_code and a top-level `timestamp`. The parser tried to unmarshal an object into `[]vangtoday.APIPrice` and failed, causing both gold and currency waterfalls to fall through all sources and return empty arrays.
+### Fix 1 — vangtoday: new object API format
 
-### Changes Made
+**Root Cause:** The vang.today API changed its response format. Previously it returned a flat JSON array (`[]APIPrice`); it now returns a JSON object with a `prices` map keyed by type_code and a top-level `timestamp`. The parser tried to unmarshal an object into `[]vangtoday.APIPrice` and failed, causing both gold and currency waterfalls to fall through all sources and return empty arrays.
+
+**Changes Made:**
 
 | File | Change |
 |------|--------|
@@ -220,6 +223,34 @@ The vang.today API changed its response format. Previously it returned a flat JS
 | `pkg/vangtoday/client.go` | Updated `FetchPrices` to unmarshal into `APIResponse`; updated `convertGoldPrice` to use `ap.Currency` field; VND prices stored as-is (full VND); USD prices converted to cents via `math.Round(x*100)`; added `success=false` guard; updated `goldTypePrefixes` for new type codes |
 | `pkg/vangtoday/client_test.go` | All test fixtures updated to new object format |
 | `domain/service/gold_fetcher_vangtoday.go` | Comment update only |
+
+---
+
+### Fix 2 — FetchPriceForSymbol: BTMC_24K not found in live price data
+
+**Symptom (from runtime logs):**
+```
+Warning: failed to get price for BTMC_24K: unable to fetch current price for BTMC_24K.
+Error: failed to fetch gold price from vang.today: gold symbol "BTMC_24K" not found in live price data
+```
+
+**Root Cause:** `FetchPriceForSymbol` called `s.waterfall.FetchGoldPrices(ctx)`, which stops at the **first source that returns data successfully** (waterfall stop-on-success). With vangsaigon timing out, vang.today became the successful source — but vang.today does not carry `BTMC_24K` (a Bảo Tín Minh Châu 24K type exclusive to the BTMC API). The waterfall stopped at vang.today, BTMC was never tried, and the symbol lookup returned "not found in live price data".
+
+The design gap: the waterfall model assumes all sources serve a complete/redundant price set. BTMC adds *additional* symbols (BTMC-exclusive types not available from other sources), so stopping at the first successful source is insufficient for per-symbol lookups.
+
+**Fix:** Added `FetchGoldPricesAllSources` to `WaterfallGoldFetcher` — queries every configured source regardless of health status, merges results (first-source wins on TypeCode conflict). `FetchPriceForSymbol` now uses this instead of `FetchGoldPrices`.
+
+**Changes Made:**
+
+| File | Change |
+|------|--------|
+| `domain/service/price_fetcher.go` | Added `FetchGoldPricesAllSources` — iterates all fetchers, merges by TypeCode, skips failing sources |
+| `domain/service/gold_price_service.go` | `FetchPriceForSymbol` step 2: use `FetchGoldPricesAllSources` instead of `FetchGoldPrices` |
+| `domain/service/gold_price_service_test.go` | Added `TestGoldPriceService_FetchPriceForSymbol_SymbolOnlyInThirdSource` (TDD — written before fix) |
+
+**`FetchAllPrices` is unaffected** — it still uses `FetchGoldPrices` (stop-at-first-success, health-aware). Only the per-symbol path uses the all-sources merge.
+
+**Security review:** Approved — all external calls remain timeout-bounded (5 s per source), health-bypass is intentional and contained to this path, no new error detail exposed, no data integrity regression.
 
 ---
 

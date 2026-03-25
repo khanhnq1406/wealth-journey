@@ -100,6 +100,45 @@ func (w *WaterfallGoldFetcher) FetchGoldPrices(ctx context.Context) ([]*CachedGo
 	return nil, fmt.Errorf("all gold price sources failed: [%s]", strings.Join(errs, "; "))
 }
 
+// FetchGoldPricesAllSources queries every configured source (ignoring health
+// status) and merges their results. First-source wins on TypeCode conflicts.
+// Sources that return an error are skipped; if ALL sources fail, an error is
+// returned. This is used by per-symbol lookups so that source-exclusive symbols
+// (e.g. BTMC_24K from the BTMC fetcher) are reachable even when an earlier
+// source succeeded but did not carry that symbol.
+func (w *WaterfallGoldFetcher) FetchGoldPricesAllSources(ctx context.Context) ([]*CachedGoldPrice, error) {
+	seen := make(map[string]struct{})
+	merged := make([]*CachedGoldPrice, 0)
+	var errs []string
+
+	for _, f := range w.fetchers {
+		src := f.Source()
+		fetchCtx, cancel := context.WithTimeout(ctx, waterfallSourceTimeout)
+		start := time.Now()
+		prices, err := f.FetchGoldPrices(fetchCtx)
+		elapsed := time.Since(start)
+		cancel()
+
+		if err != nil {
+			log.Printf("[WaterfallGoldFetcher] all-sources: source %q failed after %v: %v", src, elapsed, err)
+			errs = append(errs, fmt.Sprintf("%s: %v", src, err))
+			continue
+		}
+
+		for _, p := range prices {
+			if _, exists := seen[p.TypeCode]; !exists {
+				seen[p.TypeCode] = struct{}{}
+				merged = append(merged, p)
+			}
+		}
+	}
+
+	if len(merged) == 0 && len(errs) == len(w.fetchers) {
+		return nil, fmt.Errorf("all gold price sources failed: [%s]", strings.Join(errs, "; "))
+	}
+	return merged, nil
+}
+
 // ---------------------------------------------------------------------------
 // WaterfallCurrencyFetcher
 // ---------------------------------------------------------------------------
