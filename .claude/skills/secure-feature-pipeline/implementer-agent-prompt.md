@@ -97,8 +97,15 @@ Build in this order: model → repository → service → handler
 - Location: `src/go-backend/handlers/` — NOT `api/handlers/`
 - Wire new handlers in `handlers/builder.go` → `AllHandlers` struct + `NewHandlers()`
 - Register routes in `handlers/routes.go`
-- Responses: `gin.H{}` with fields at top level (NOT nested under `data`) — proto-generated hooks read top-level fields
-- Response shape: `{success, message, <fields at top level>, timestamp}`
+- **Responses: always go through helper functions from `pkg/handler/response.go` — NEVER call `c.JSON(...)` directly**
+  - Success: `handler.Success(c, result)` → HTTP 200, data serialized directly (no envelope wrapper)
+  - Created: `handler.Created(c, result)` → HTTP 201, data serialized directly
+  - Errors: `handler.HandleError(c, err)` / `handler.BadRequest(c, err)` / `handler.Unauthorized(c, msg)`
+  - `result` can be a proto message (serialized via `protojson`, camelCase) OR a `gin.H{}` map (serialized via `json.Marshal`) — both are valid
+  - Success responses have NO wrapper — fields sit at the top level of the JSON body
+  - Error responses ARE wrapped: `{success: false, error: {code, message, details}, timestamp}`
+  - Frontend hooks read top-level fields directly: `data?.wallets` — NOT `data?.data?.wallets`
+  - **Anti-pattern:** `c.JSON(http.StatusOK, gin.H{...})` — bypasses the helper, do NOT use
 
 ---
 

@@ -268,6 +268,12 @@ For each new `.tsx` file listed in [FILES_CHANGED]:
 - [ ] Context propagation (`ctx context.Context`) is threaded through all function calls
 - [ ] Proper GORM usage (no raw SQL without documented reason)
 - [ ] Resource cleanup with `defer` for any close operations
+- [ ] Handler responses always go through helpers from `pkg/handler/response.go` — **NEVER call `c.JSON(...)` directly** (flag as Important if violated)
+  - ✅ `handler.Success(c, result)` — where `result` is a proto message or `gin.H{}` map
+  - ✅ `handler.Created(c, result)`, `handler.HandleError(c, err)`, `handler.BadRequest(c, err)`, `handler.Unauthorized(c, msg)`
+  - ❌ `c.JSON(http.StatusOK, gin.H{...})` — bypasses helper, do NOT use
+- [ ] Success responses serialize data directly (no `{success, data, ...}` envelope) — fields at top level
+- [ ] Error responses produced via helper functions (they wrap automatically: `{success: false, error: {...}}`)
 
 ### Testing
 - [ ] Tests verify behavior (not just that functions exist or that code runs without panicking)

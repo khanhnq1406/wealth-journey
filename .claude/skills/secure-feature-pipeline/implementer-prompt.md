@@ -27,6 +27,15 @@ Task tool (general-purpose):
     - **Frontend:** Functional components, TypeScript strict, `"use client"` for hooks/events
     - **Handlers:** In `src/go-backend/handlers/`, NOT `api/handlers/`
     - **Generated code:** Don't manually edit files in `gen/`, `utils/generated/`, or `protobuf/`
+    - **Backend responses — always go through helpers in `pkg/handler/response.go`, NEVER call `c.JSON(...)` directly:**
+      - Success: `handler.Success(c, result)` → HTTP 200, data serialized directly (no envelope)
+      - Created: `handler.Created(c, result)` → HTTP 201, data serialized directly
+      - Errors: `handler.HandleError(c, err)` / `handler.BadRequest(c, err)` / `handler.Unauthorized(c, msg)`
+      - `result` can be a proto message (camelCase via `protojson`) OR a `gin.H{}` map — both valid as the argument
+      - Success responses are NOT wrapped — fields sit at the top level of the JSON body
+      - Error responses ARE wrapped: `{success: false, error: {code, message, details}, timestamp}`
+      - Frontend hooks access response fields **directly**: `data?.wallets` — NOT `data?.data?.wallets`
+      - **Anti-pattern:** `c.JSON(http.StatusOK, gin.H{...})` — bypasses the helper, do NOT use
 
     ## Frontend/UI Tasks — Required Sub-Skills
 
