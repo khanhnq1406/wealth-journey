@@ -610,6 +610,7 @@ message EditInvestmentTransactionRequest {
   int64 fees = 4 [json_name = "fees"];
   int64 transactionDate = 5 [json_name = "transactionDate"];
   string notes = 6 [json_name = "notes"];
+  InvestmentTransactionType type = 7 [json_name = "type"];  // NEW field — allow type change
 }
 
 message EditInvestmentTransactionResponse {
@@ -617,6 +618,7 @@ message EditInvestmentTransactionResponse {
   string message = 2 [json_name = "message"];
   InvestmentTransaction data = 3 [json_name = "data"];
   string timestamp = 4 [json_name = "timestamp"];
+  Investment updatedInvestment = 5 [json_name = "updatedInvestment"];  // NEW field — updated investment after edit
 }
 
 message DeleteInvestmentTransactionRequest {
