@@ -294,7 +294,8 @@ export function formatGoldQuantityDisplay(
   }
 
   // Convert from storage unit to display unit
-  const inStorageUnits = storedQuantity / 10000;
+  // Guard against null/undefined (e.g. dividend transactions have no quantity)
+  const inStorageUnits = (storedQuantity ?? 0) / 10000;
   const value = convertGoldQuantity(inStorageUnits, storageUnit, displayUnit);
 
   return { value, unit: displayUnit };

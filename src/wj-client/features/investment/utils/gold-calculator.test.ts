@@ -309,3 +309,30 @@ describe('Gold Calculator - Integration Tests', () => {
   });
 });
 
+describe('formatGoldQuantityDisplay - null/zero guard', () => {
+  it('should return 0 value (not NaN) when storedQuantity is null', () => {
+    // Dividend transactions or missing API data can produce null quantity
+    const result = formatGoldQuantityDisplay(null as unknown as number, 8, '');
+    expect(result.value).toBe(0);
+    expect(result.unit).toBe('mace');
+  });
+
+  it('should return 0 value (not NaN) when storedQuantity is undefined', () => {
+    const result = formatGoldQuantityDisplay(undefined as unknown as number, 8, '');
+    expect(result.value).toBe(0);
+    expect(result.unit).toBe('mace');
+  });
+
+  it('should return 0 value for storedQuantity of 0 (VND gold)', () => {
+    const result = formatGoldQuantityDisplay(0, 8, '');
+    expect(result.value).toBe(0);
+    expect(result.unit).toBe('mace');
+  });
+
+  it('should return 0 value for storedQuantity of 0 (USD gold)', () => {
+    const result = formatGoldQuantityDisplay(0, 9, '');
+    expect(result.value).toBe(0);
+    expect(result.unit).toBe('oz');
+  });
+});
+

@@ -234,7 +234,8 @@ export function formatSilverQuantityDisplay(
     investmentType === InvestmentType.INVESTMENT_TYPE_SILVER_VND
       ? "gram"
       : "oz";
-  const quantityInStorage = storedQuantity / 10000;
+  // Guard against null/undefined (e.g. dividend transactions have no quantity)
+  const quantityInStorage = (storedQuantity ?? 0) / 10000;
 
   // Convert from storage unit to purchase unit for display
   const displayValue = convertSilverQuantity(
