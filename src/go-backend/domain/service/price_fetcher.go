@@ -22,6 +22,19 @@ const (
 	waterfallSourceTimeout = 5 * time.Second
 )
 
+// aliasToCanonical maps each known alias TypeCode (as returned by a fallback source)
+// to its canonical TypeCode (as registered in pkg/gold/types.go and used by vangsaigon).
+//
+// Maintenance note: add entries when a fallback source uses a different type code
+// for the same gold product. The canonical TypeCode is what callers (FetchPriceForSymbol,
+// portfolio valuation) use to look up prices.
+//
+// Current entries:
+//   - "VNGSJC" (vang.today) → "SJC" (vangsaigon canonical)
+var aliasToCanonical = map[string]string{
+	"VNGSJC": "SJC",
+}
+
 // GoldPriceFetcher abstracts fetching gold prices from a single source.
 type GoldPriceFetcher interface {
 	FetchGoldPrices(ctx context.Context) ([]*CachedGoldPrice, error)
@@ -126,9 +139,18 @@ func (w *WaterfallGoldFetcher) FetchGoldPricesAllSources(ctx context.Context) ([
 		}
 
 		for _, p := range prices {
-			if _, exists := seen[p.TypeCode]; !exists {
-				seen[p.TypeCode] = struct{}{}
-				merged = append(merged, p)
+			// Normalize alias TypeCode to canonical before merging.
+			typeCode := p.TypeCode
+			if canonical, ok := aliasToCanonical[typeCode]; ok {
+				typeCode = canonical
+			}
+
+			// First-source-wins: don't overwrite an entry already set by a higher-priority source.
+			if _, exists := seen[typeCode]; !exists {
+				seen[typeCode] = struct{}{}
+				normalized := *p
+				normalized.TypeCode = typeCode
+				merged = append(merged, &normalized)
 			}
 		}
 	}

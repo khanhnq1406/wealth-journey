@@ -34,6 +34,7 @@ const (
 var goldTypePrefixes = []string{
 	// New API codes
 	"XAUUSD", "DOHN", "DOHCM", "DOJI", "VNGSJC", "PQHN", "BTSJC", "BT9999", "VIETTINM", "SJ",
+	"MIHONG",
 	// Legacy codes (kept for compatibility if API reverts)
 	"SJC", "PNJ", "BTMC", "BAOTINMINH", "XAU", "NHAN", "VSG", "AAA", "AGJ",
 }

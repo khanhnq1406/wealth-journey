@@ -276,6 +276,35 @@ func TestVangTodayClient_ResponseTooLarge(t *testing.T) {
 	}
 }
 
+func TestVangTodayClient_MIHONGGoldClassified(t *testing.T) {
+	jsonWithMIHONG := `{
+		"success": true,
+		"timestamp": 1774400000,
+		"prices": {
+			"MIHONG999": {"name":"Mi Hong 999","buy":172000000,"sell":175000000,"change_buy":0,"change_sell":0,"currency":"VND"},
+			"MIHONG_VN": {"name":"Mi Hong VN","buy":170000000,"sell":173000000,"change_buy":0,"change_sell":0,"currency":"VND"}
+		}
+	}`
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = fmt.Fprint(w, jsonWithMIHONG)
+	}))
+	defer srv.Close()
+
+	client := NewClient(5 * time.Second)
+	client.baseURL = srv.URL
+
+	result, err := client.FetchPrices(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(result.GoldPrices) != 2 {
+		t.Errorf("expected 2 MIHONG gold prices, got %d", len(result.GoldPrices))
+	}
+}
+
 func TestVangTodayClient_UpdateTimePresent(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
