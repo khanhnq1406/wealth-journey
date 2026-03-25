@@ -164,7 +164,7 @@ func TestLoadPriceAlertConfig_FromRedis(t *testing.T) {
 		},
 	}
 	data, _ := json.Marshal(cfg)
-	mr.Set(priceAlertConfigKey, string(data))
+	require.NoError(t, mr.Set(priceAlertConfigKey, string(data)))
 
 	loaded := LoadPriceAlertConfig(ctx, rdb)
 
@@ -207,7 +207,7 @@ func TestLoadPriceAlertConfig_MergesMissingCategories(t *testing.T) {
 		},
 	}
 	data, _ := json.Marshal(cfg)
-	mr.Set(priceAlertConfigKey, string(data))
+	require.NoError(t, mr.Set(priceAlertConfigKey, string(data)))
 
 	loaded := LoadPriceAlertConfig(ctx, rdb)
 

@@ -194,10 +194,7 @@ export const createPriceAlertSchema = z
       data.triggerMode === AlertTriggerMode.ALERT_TRIGGER_MODE_REPEAT;
     if (isRepeat && data.cooldownHours < 2) {
       ctx.addIssue({
-        code: z.ZodIssueCode.too_small,
-        minimum: 2,
-        type: "number",
-        inclusive: true,
+        code: "custom",
         path: ["cooldownHours"],
         message: "Cooldown must be at least 2 hours for repeat mode",
       });

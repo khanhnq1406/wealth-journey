@@ -305,12 +305,12 @@ export function CreatePriceAlertForm({
       createAlertMutation.mutate({
         symbol: data.symbol,
         name: data.name,
-        assetType: data.assetType,
+        assetType: data.assetType as InvestmentType,
         currency: data.currency,
         priceSide: isGoldOrSilver ? data.priceSide : "buy",
-        direction: data.direction,
+        direction: data.direction as AlertDirection,
         targetPrice: data.targetPrice,
-        triggerMode: data.triggerMode,
+        triggerMode: data.triggerMode as AlertTriggerMode,
         cooldownHours: isRepeat ? data.cooldownHours : 0,
         note: data.note ?? "",
       });

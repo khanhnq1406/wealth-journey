@@ -218,9 +218,9 @@ func newTestAlertService(
 	silverSvc SilverPriceService,
 	marketSvc MarketDataService,
 ) UserPriceAlertService {
-	var g GoldPriceService = goldSvc
-	var sv SilverPriceService = silverSvc
-	var mkt MarketDataService = marketSvc
+	g := goldSvc
+	sv := silverSvc
+	mkt := marketSvc
 
 	if g == nil {
 		g = &mockAlertGoldPriceSvc{}
