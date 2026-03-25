@@ -191,7 +191,8 @@
       "fees": "Phí",
       "total": "Tổng",
       "date": "Ngày",
-      "deleteTransaction": "Xóa giao dịch"
+      "deleteTransaction": "Xóa giao dịch",
+      "editTransaction": "Sửa giao dịch"
     },
     "transaction": {
       "title": "Thêm giao dịch",
@@ -218,12 +219,17 @@
       "failedToAdd": "Không thể thêm giao dịch. Vui lòng thử lại",
       "fixValidationErrors": "Vui lòng sửa các lỗi xác thực",
       "refreshPrice": "Giá hiện tại",
-      "refreshingPrice": "Đang tải..."
+      "refreshingPrice": "Đang tải...",
+      "saveChanges": "Lưu thay đổi",
+      "transactionUpdatedSuccess": "Giao dịch đã được cập nhật!",
+      "transactionUpdatedMessage": "Giao dịch đã được cập nhật thành công",
+      "pricePerUnitWithUnit": "Giá mỗi {unit} ({currency})"
     },
     "detail": {
       "overview": "Tổng quan",
       "transactions": "Giao dịch",
       "addTransaction": "Thêm giao dịch",
+      "editTransaction": "Sửa giao dịch",
       "setPrice": "Đặt giá",
       "loadingDetails": "Đang tải chi tiết đầu tư...",
       "investmentNotFound": "Không tìm thấy khoản đầu tư",

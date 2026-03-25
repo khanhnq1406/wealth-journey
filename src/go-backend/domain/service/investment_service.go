@@ -985,8 +985,17 @@ func (s *investmentService) ListTransactions(ctx context.Context, userID int32, 
 	}, nil
 }
 
-// EditTransaction edits an existing transaction.
+// EditTransaction performs a full delete-and-recreate edit of an investment transaction.
+//
+// Strategy: reverse the old transaction's impact on lots and investment totals,
+// soft-delete the old record, then process a new transaction with the updated values.
+// This reuses the battle-tested reverseXxx / processXxx helpers and preserves FIFO
+// lot integrity.
+//
+// Security: ownership verified via GetByIDForUser (JOIN-based check). All monetary
+// values are int64. Cache invalidated after mutation.
 func (s *investmentService) EditTransaction(ctx context.Context, transactionID int32, userID int32, req *v1.EditInvestmentTransactionRequest) (*v1.EditInvestmentTransactionResponse, error) {
+	// 1. Validate IDs
 	if err := validator.ID(transactionID); err != nil {
 		return nil, err
 	}
@@ -994,36 +1003,184 @@ func (s *investmentService) EditTransaction(ctx context.Context, transactionID i
 		return nil, err
 	}
 
-	// Get transaction and verify ownership
-	tx, err := s.txRepo.GetByIDForUser(ctx, transactionID, userID)
+	// 2. Get transaction and verify ownership (JOIN-based authorization)
+	oldTx, err := s.txRepo.GetByIDForUser(ctx, transactionID, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get the parent investment for currency information
-	investment, err := s.investmentRepo.GetByID(ctx, tx.InvestmentID)
+	// 3. Get parent investment
+	investment, err := s.investmentRepo.GetByID(ctx, oldTx.InvestmentID)
 	if err != nil {
 		return nil, apperrors.NewInternalErrorWithCause("failed to get parent investment", err)
 	}
 
-	// Note: Editing transactions is complex with FIFO tracking
-	// For now, we only allow editing notes
-	if req.Notes != "" {
-		tx.Notes = req.Notes
+	// 4. Determine effective new type (use old type if not specified)
+	oldType := v1.InvestmentTransactionType(oldTx.Type)
+	newType := oldType
+	if req.Type != v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_UNSPECIFIED {
+		newType = req.Type
 	}
 
-	if err := s.txRepo.Update(ctx, tx); err != nil {
-		return nil, err
+	// 5. Buy quantity reduction guard and buy→sell type-change guard
+	if oldType == v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY && oldTx.LotID != nil {
+		if newType == v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY {
+			// Guard: new quantity must be >= units already sold from this lot
+			if err := s.validateBuyQuantityReduction(ctx, oldTx, req.Quantity); err != nil {
+				return nil, err
+			}
+		} else {
+			// Changing buy → sell or dividend: only allowed if lot is fully intact
+			lot, lotErr := s.txRepo.GetLotByID(ctx, *oldTx.LotID)
+			if lotErr != nil {
+				return nil, apperrors.NewInternalErrorWithCause("failed to get lot", lotErr)
+			}
+			alreadySold := lot.Quantity - lot.RemainingQuantity
+			if alreadySold > 0 {
+				return nil, apperrors.NewValidationError(
+					fmt.Sprintf("Cannot change type from buy: %d units already sold from this lot", alreadySold),
+				)
+			}
+		}
 	}
 
-	txProto := s.mapper.TransactionToProto(tx)
-	s.enrichTransactionProto(ctx, userID, txProto, investment.Currency)
+	// 5b. Pre-flight viability check for BUY→SELL type change.
+	// reverseBuyTransaction writes to DB before processSellTransaction can validate.
+	// If quantityAfterReversal < req.Quantity, processSellTransaction would fail
+	// AFTER the reversal already committed — corrupting investment.Quantity and the lot.
+	// Reject here before any DB mutation.
+	if oldType == v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY &&
+		newType == v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL {
+		quantityAfterReversal := max(investment.Quantity-oldTx.Quantity, 0)
+		if quantityAfterReversal < req.Quantity {
+			return nil, apperrors.NewValidationErrorWithCode(
+				apperrors.Codes.InvestmentEditSellInsufficientQty,
+				fmt.Sprintf("INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY: chỉ còn %d đơn vị sau khi đảo ngược giao dịch mua, nhưng yêu cầu bán %d",
+					quantityAfterReversal, req.Quantity),
+			)
+		}
+	}
+
+	// 6. Validate transaction date is not in the future (if provided)
+	if req.TransactionDate > 0 {
+		txTime := time.Unix(req.TransactionDate, 0)
+		if txTime.After(time.Now()) {
+			return nil, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentTxDateFuture, "transaction date cannot be in the future")
+		}
+	}
+
+	// 7. Reverse the old transaction (undo its impact on lots + investment totals)
+	switch oldType {
+	case v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY:
+		if err := s.reverseBuyTransaction(ctx, investment, oldTx); err != nil {
+			return nil, err
+		}
+	case v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL:
+		if err := s.reverseSellTransaction(ctx, investment, oldTx); err != nil {
+			return nil, err
+		}
+	case v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_DIVIDEND:
+		if err := s.reverseDividendTransaction(ctx, investment, oldTx); err != nil {
+			return nil, err
+		}
+	default:
+		return nil, apperrors.NewValidationError("unsupported transaction type for edit")
+	}
+
+	// 8. Re-fetch the investment after reversal to get fresh DB state.
+	// The reverseXxx functions mutate the investment in-place AND persist to DB.
+	// For processXxx to operate on correct totals (especially for type changes,
+	// e.g., buy→sell where Quantity was decremented by reversal), we need
+	// the authoritative post-reversal state from the DB.
+	freshInvestment, err := s.investmentRepo.GetByID(ctx, oldTx.InvestmentID)
+	if err != nil {
+		return nil, apperrors.NewInternalErrorWithCause("failed to re-fetch investment after reversal", err)
+	}
+
+	// 9. Build the AddTransactionRequest for the new transaction
+	addReq := &v1.AddTransactionRequest{
+		InvestmentId:    oldTx.InvestmentID,
+		Type:            newType,
+		Quantity:        req.Quantity,
+		Price:           req.Price,
+		Fees:            req.Fees,
+		TransactionDate: req.TransactionDate,
+		Notes:           req.Notes,
+	}
+
+	// 10. Process the new transaction (create new lot/consume lots + create record + update investment)
+	cost := units.CalculateTransactionCost(req.Quantity, req.Price, v1.InvestmentType(freshInvestment.Type))
+	totalCost := cost + req.Fees
+
+	var updatedInvestment *models.Investment
+	var newDividendTx *models.InvestmentTransaction
+
+	switch newType {
+	case v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY:
+		updatedInvestment, err = s.processBuyTransaction(ctx, freshInvestment, addReq, cost, totalCost)
+		if err != nil {
+			return nil, err
+		}
+	case v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL:
+		updatedInvestment, err = s.processSellTransaction(ctx, freshInvestment, addReq)
+		if err != nil {
+			return nil, err
+		}
+	case v1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_DIVIDEND:
+		updatedInvestment, newDividendTx, err = s.processDividendTransaction(ctx, freshInvestment, addReq)
+		if err != nil {
+			return nil, err
+		}
+	default:
+		return nil, apperrors.NewValidationError("unsupported new transaction type")
+	}
+
+	// 11. Soft-delete the old transaction record (preserves audit trail).
+	// Intentionally placed AFTER the process step so that if process fails
+	// (e.g., no open lots for a sell), the original transaction is not orphaned
+	// and retrying will not produce "investment transaction not found".
+	if err := s.txRepo.Delete(ctx, oldTx.ID); err != nil {
+		return nil, apperrors.NewInternalErrorWithCause("failed to delete old transaction", err)
+	}
+
+	// 12. Cache invalidation (best-effort, non-fatal)
+	if err := s.invalidateInvestmentCache(ctx, userID, oldTx.InvestmentID); err != nil {
+		fmt.Printf("Warning: failed to invalidate currency cache for investment %d: %v\n", oldTx.InvestmentID, err)
+	}
+	if freshInvestment.WalletID != nil {
+		if ws, ok := s.walletService.(*walletService); ok {
+			ws.invalidateInvestmentValueCache(ctx, *freshInvestment.WalletID)
+		}
+	}
+
+	// 13. Build response — dividend path has the tx directly; buy/sell must query latest
+	var newTxProto *v1.InvestmentTransaction
+	if newDividendTx != nil {
+		// Dividend: transaction was returned directly from processDividendTransaction
+		newTxProto = s.mapper.TransactionToProto(newDividendTx)
+		s.enrichTransactionProto(ctx, userID, newTxProto, freshInvestment.Currency)
+	} else {
+		// Buy/sell: query the most recently created transaction
+		transactions, _, listErr := s.txRepo.ListByInvestmentID(ctx, freshInvestment.ID, nil, repository.ListOptions{
+			Limit:   1,
+			OrderBy: "created_at",
+			Order:   "desc",
+		})
+		if listErr == nil && len(transactions) > 0 {
+			newTxProto = s.mapper.TransactionToProto(transactions[0])
+			s.enrichTransactionProto(ctx, userID, newTxProto, freshInvestment.Currency)
+		}
+	}
+
+	updatedInvProto := s.mapper.ModelToProto(updatedInvestment)
+	s.enrichInvestmentProto(ctx, userID, updatedInvProto, updatedInvestment)
 
 	return &v1.EditInvestmentTransactionResponse{
-		Success:   true,
-		Message:   "Transaction updated successfully",
-		Data:      txProto,
-		Timestamp: time.Now().Format(time.RFC3339),
+		Success:           true,
+		Message:           "Transaction updated successfully",
+		Data:              newTxProto,
+		UpdatedInvestment: updatedInvProto,
+		Timestamp:         time.Now().Format(time.RFC3339),
 	}, nil
 }
 
@@ -2176,4 +2333,30 @@ func (s *investmentService) calculatePerformers(ctx context.Context, userID int3
 	}
 
 	return topPerformers, worstPerformers, nil
+}
+
+// validateBuyQuantityReduction checks if reducing a buy transaction's quantity
+// would conflict with lots already consumed by sells.
+// Returns error if new quantity < (original lot quantity - remaining quantity on lot).
+// This prevents lot.RemainingQuantity from going negative, which would corrupt
+// FIFO cost-basis accounting.
+func (s *investmentService) validateBuyQuantityReduction(ctx context.Context, tx *models.InvestmentTransaction, newQuantity int64) error {
+	if tx.LotID == nil {
+		return nil // No lot tracking, nothing to validate
+	}
+
+	lot, err := s.txRepo.GetLotByID(ctx, *tx.LotID)
+	if err != nil {
+		return apperrors.NewInternalErrorWithCause("failed to get lot for validation", err)
+	}
+
+	// Amount already sold from this lot = original lot quantity - remaining
+	alreadySold := lot.Quantity - lot.RemainingQuantity
+	if alreadySold > 0 && newQuantity < alreadySold {
+		return apperrors.NewValidationError(
+			fmt.Sprintf("Cannot reduce quantity below %d units (%d already sold from this lot)", alreadySold, alreadySold),
+		)
+	}
+
+	return nil
 }

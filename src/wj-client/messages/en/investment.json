@@ -191,7 +191,8 @@
       "fees": "Fees",
       "total": "Total",
       "date": "Date",
-      "deleteTransaction": "Delete transaction"
+      "deleteTransaction": "Delete transaction",
+      "editTransaction": "Edit transaction"
     },
     "transaction": {
       "title": "Add Transaction",
@@ -218,12 +219,17 @@
       "failedToAdd": "Failed to add transaction. Please try again",
       "fixValidationErrors": "Please fix the validation errors",
       "refreshPrice": "Current price",
-      "refreshingPrice": "Loading..."
+      "refreshingPrice": "Loading...",
+      "saveChanges": "Save Changes",
+      "transactionUpdatedSuccess": "Transaction Updated!",
+      "transactionUpdatedMessage": "Transaction updated successfully",
+      "pricePerUnitWithUnit": "Price per {unit} ({currency})"
     },
     "detail": {
       "overview": "Overview",
       "transactions": "Transactions",
       "addTransaction": "Add Transaction",
+      "editTransaction": "Edit Transaction",
       "setPrice": "Set Price",
       "loadingDetails": "Loading investment details...",
       "investmentNotFound": "Investment not found",

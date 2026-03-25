@@ -929,6 +929,8 @@ export interface EditInvestmentTransactionRequest {
   fees: number;
   transactionDate: number;
   notes: string;
+  /** NEW field — allow type change */
+  type: InvestmentTransactionType;
 }
 
 export interface EditInvestmentTransactionResponse {
@@ -936,6 +938,8 @@ export interface EditInvestmentTransactionResponse {
   message: string;
   data: InvestmentTransaction | undefined;
   timestamp: string;
+  /** NEW field — updated investment after edit */
+  updatedInvestment: Investment | undefined;
 }
 
 export interface DeleteInvestmentTransactionRequest {
@@ -6559,7 +6563,7 @@ export const ListInvestmentTransactionsResponse: MessageFns<ListInvestmentTransa
 };
 
 function createBaseEditInvestmentTransactionRequest(): EditInvestmentTransactionRequest {
-  return { id: 0, quantity: 0, price: 0, fees: 0, transactionDate: 0, notes: "" };
+  return { id: 0, quantity: 0, price: 0, fees: 0, transactionDate: 0, notes: "", type: 0 };
 }
 
 export const EditInvestmentTransactionRequest: MessageFns<EditInvestmentTransactionRequest> = {
@@ -6581,6 +6585,9 @@ export const EditInvestmentTransactionRequest: MessageFns<EditInvestmentTransact
     }
     if (message.notes !== "") {
       writer.uint32(50).string(message.notes);
+    }
+    if (message.type !== 0) {
+      writer.uint32(56).int32(message.type);
     }
     return writer;
   },
@@ -6640,6 +6647,14 @@ export const EditInvestmentTransactionRequest: MessageFns<EditInvestmentTransact
           message.notes = reader.string();
           continue;
         }
+        case 7: {
+          if (tag !== 56) {
+            break;
+          }
+
+          message.type = reader.int32() as any;
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -6657,6 +6672,7 @@ export const EditInvestmentTransactionRequest: MessageFns<EditInvestmentTransact
       fees: isSet(object.fees) ? globalThis.Number(object.fees) : 0,
       transactionDate: isSet(object.transactionDate) ? globalThis.Number(object.transactionDate) : 0,
       notes: isSet(object.notes) ? globalThis.String(object.notes) : "",
+      type: isSet(object.type) ? investmentTransactionTypeFromJSON(object.type) : 0,
     };
   },
 
@@ -6680,6 +6696,9 @@ export const EditInvestmentTransactionRequest: MessageFns<EditInvestmentTransact
     if (message.notes !== "") {
       obj.notes = message.notes;
     }
+    if (message.type !== 0) {
+      obj.type = investmentTransactionTypeToJSON(message.type);
+    }
     return obj;
   },
 
@@ -6694,12 +6713,13 @@ export const EditInvestmentTransactionRequest: MessageFns<EditInvestmentTransact
     message.fees = object.fees ?? 0;
     message.transactionDate = object.transactionDate ?? 0;
     message.notes = object.notes ?? "";
+    message.type = object.type ?? 0;
     return message;
   },
 };
 
 function createBaseEditInvestmentTransactionResponse(): EditInvestmentTransactionResponse {
-  return { success: false, message: "", data: undefined, timestamp: "" };
+  return { success: false, message: "", data: undefined, timestamp: "", updatedInvestment: undefined };
 }
 
 export const EditInvestmentTransactionResponse: MessageFns<EditInvestmentTransactionResponse> = {
@@ -6715,6 +6735,9 @@ export const EditInvestmentTransactionResponse: MessageFns<EditInvestmentTransac
     }
     if (message.timestamp !== "") {
       writer.uint32(34).string(message.timestamp);
+    }
+    if (message.updatedInvestment !== undefined) {
+      Investment.encode(message.updatedInvestment, writer.uint32(42).fork()).join();
     }
     return writer;
   },
@@ -6758,6 +6781,14 @@ export const EditInvestmentTransactionResponse: MessageFns<EditInvestmentTransac
           message.timestamp = reader.string();
           continue;
         }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.updatedInvestment = Investment.decode(reader, reader.uint32());
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -6773,6 +6804,7 @@ export const EditInvestmentTransactionResponse: MessageFns<EditInvestmentTransac
       message: isSet(object.message) ? globalThis.String(object.message) : "",
       data: isSet(object.data) ? InvestmentTransaction.fromJSON(object.data) : undefined,
       timestamp: isSet(object.timestamp) ? globalThis.String(object.timestamp) : "",
+      updatedInvestment: isSet(object.updatedInvestment) ? Investment.fromJSON(object.updatedInvestment) : undefined,
     };
   },
 
@@ -6790,6 +6822,9 @@ export const EditInvestmentTransactionResponse: MessageFns<EditInvestmentTransac
     if (message.timestamp !== "") {
       obj.timestamp = message.timestamp;
     }
+    if (message.updatedInvestment !== undefined) {
+      obj.updatedInvestment = Investment.toJSON(message.updatedInvestment);
+    }
     return obj;
   },
 
@@ -6804,6 +6839,9 @@ export const EditInvestmentTransactionResponse: MessageFns<EditInvestmentTransac
       ? InvestmentTransaction.fromPartial(object.data)
       : undefined;
     message.timestamp = object.timestamp ?? "";
+    message.updatedInvestment = (object.updatedInvestment !== undefined && object.updatedInvestment !== null)
+      ? Investment.fromPartial(object.updatedInvestment)
+      : undefined;
     return message;
   },
 };

@@ -67,13 +67,15 @@ type ErrorCodes struct {
 	InvestmentPricePositive          string
 	InvestmentFeesNegative           string
 	InvestmentTxTypeRequired         string
+	InvestmentTxTypeInvalid          string
 	InvestmentTxDateFuture           string
 	InvestmentDuplicate              string
 	InvestmentQueryRequired          string
 	InvestmentQueryTooLong           string
 	InvestmentSymbolCurrencyRequired string
 	InvestmentTypeInvalid            string
-	InvestmentNotFound               string
+	InvestmentNotFound                    string
+	InvestmentEditSellInsufficientQty    string
 
 	// Import Domain
 	ImportFileRequired                  string
@@ -307,13 +309,15 @@ var Codes = ErrorCodes{
 	InvestmentPricePositive:          "INVESTMENT_PRICE_POSITIVE",
 	InvestmentFeesNegative:           "INVESTMENT_FEES_NEGATIVE",
 	InvestmentTxTypeRequired:         "INVESTMENT_TX_TYPE_REQUIRED",
+	InvestmentTxTypeInvalid:          "INVESTMENT_TX_TYPE_INVALID",
 	InvestmentTxDateFuture:           "INVESTMENT_TX_DATE_FUTURE",
 	InvestmentDuplicate:              "INVESTMENT_DUPLICATE",
 	InvestmentQueryRequired:          "INVESTMENT_QUERY_REQUIRED",
 	InvestmentQueryTooLong:           "INVESTMENT_QUERY_TOO_LONG",
 	InvestmentSymbolCurrencyRequired: "INVESTMENT_SYMBOL_CURRENCY_REQUIRED",
 	InvestmentTypeInvalid:            "INVESTMENT_TYPE_INVALID",
-	InvestmentNotFound:               "INVESTMENT_NOT_FOUND",
+	InvestmentNotFound:                    "INVESTMENT_NOT_FOUND",
+	InvestmentEditSellInsufficientQty:    "INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY",
 
 	// Import Domain
 	ImportFileRequired:                  "IMPORT_FILE_REQUIRED",

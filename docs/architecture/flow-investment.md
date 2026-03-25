@@ -10,6 +10,9 @@ Investment portfolio management flows covering the most complex business logic i
 - [Dividend Processing](#4-dividend-processing)
 - [Market Price Update Pipeline](#5-market-price-update-pipeline)
 - [Portfolio Summary Calculation](#6-portfolio-summary-calculation)
+- [Period PnL Calculation](#7-period-pnl-calculation)
+- [Gold/Silver Chart Data Flow](#8-goldsilver-chart-data-flow)
+- [Edit Transaction (Delete-and-Recreate)](#9-edit-transaction-delete-and-recreate)
 
 ---
 
@@ -619,3 +622,127 @@ sequenceDiagram
 | Stale cache also missing | 503 Service Unavailable | None |
 | Timestamp parse failure on individual point | Skip point, continue | Partial dataset returned |
 | Redis write failure (SET) | Log warning, continue | Fresh data still returned to client; next request will refetch |
+
+---
+
+## 9. Edit Transaction (Delete-and-Recreate)
+
+**Trigger:** User clicks "Edit" on an existing investment transaction in the portfolio modal.
+**Endpoint:** `PUT /api/v1/investment-transactions/{id}`
+**Source:** `domain/service/investment_service.go` — `EditTransaction()`, `reverseBuyTransaction()`, `reverseSellTransaction()`, `reverseDividendTransaction()`, `processBuyTransaction()`, `processSellTransaction()`, `processDividendTransaction()`
+
+**Strategy:** Atomic reverse-then-recreate — the old transaction is reversed and soft-deleted, then a new transaction is created with the updated values. This reuses the battle-tested `reverseBuyTransaction`/`reverseSellTransaction`/`reverseDividendTransaction` and `processBuyTransaction`/`processSellTransaction`/`processDividendTransaction` methods.
+
+### Sequence Diagram
+
+```mermaid
+sequenceDiagram
+    participant SPA as Next.js SPA
+    participant H as InvestmentHandler
+    participant IS as InvestmentService
+    participant ITR as InvestmentTxRepository
+    participant IR as InvestmentRepository
+    participant LR as LotRepository
+    participant Cache as Redis Cache
+
+    SPA->>H: PUT /api/v1/investment-transactions/{id}<br/>{type, quantity, price, fees, transactionDate}
+    H->>IS: EditTransaction(userID, txID, request)
+
+    activate IS
+
+    IS->>ITR: GetByIDForUser(txID, userID)
+    alt Transaction not found or not owned by user
+        ITR-->>IS: nil / error
+        IS-->>H: 404 Not Found
+    end
+    ITR-->>IS: Existing transaction + investment
+
+    IS->>IS: Validate request<br/>(type enum, quantity > 0, price > 0,<br/>transactionDate ≤ now)
+
+    alt type == BUY and newQty < oldQty (quantity reduction)
+        IS->>IS: validateBuyQuantityReduction(investment, oldTx, newQty)<br/>ensure no sold lots depend on reduced quantity
+        alt Reduction would orphan sold lots
+            IS-->>H: 400 Bad Request (ValidationError)
+        end
+    end
+
+    alt oldType == BUY and newType == SELL
+        Note over IS: Step 5b — Pre-flight viability check (no DB writes)
+        IS->>IS: quantityAfterReversal = investment.Quantity - oldTx.Quantity
+        alt quantityAfterReversal < req.Quantity
+            IS-->>H: 400 Bad Request (INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY)<br/>No DB mutations — prevents data corruption
+        end
+    end
+
+    Note over IS: Reverse old transaction
+
+    alt oldTx.Type == BUY
+        IS->>IS: reverseBuyTransaction(investment, oldTx)
+        IS->>LR: Update lot (restore RemainingQty or delete lot)
+        IS->>IS: investment.Quantity -= oldTx.Quantity<br/>investment.TotalCost -= oldTx.Cost
+    else oldTx.Type == SELL
+        IS->>IS: reverseSellTransaction(investment, oldTx)
+        IS->>LR: Restore lot RemainingQty consumed by sell
+        IS->>IS: investment.Quantity += oldTx.Quantity<br/>investment.RealizedPNL -= oldTx.RealizedPNL
+    else oldTx.Type == DIVIDEND
+        IS->>IS: reverseDividendTransaction(investment, oldTx)
+        IS->>IS: investment.TotalDividends -= oldTx.Cost
+    end
+
+    IS->>ITR: Delete(oldTx) [soft delete]
+    ITR-->>IS: Old transaction soft-deleted
+
+    IS->>IR: GetByID(investment.ID)
+    Note over IS,IR: Re-fetch investment state from DB<br/>(not using in-memory stale state)
+    IR-->>IS: Fresh investment record
+
+    Note over IS: Process new transaction
+
+    alt newTx.Type == BUY
+        IS->>IS: processBuyTransaction(investment, request)
+        IS->>LR: Create or merge lot
+        IS->>IS: investment.Quantity += newQty<br/>investment.TotalCost += newCost
+    else newTx.Type == SELL
+        IS->>IS: processSellTransaction(investment, request)
+        IS->>LR: Consume lots (FIFO)
+        IS->>IS: investment.Quantity -= newQty<br/>investment.RealizedPNL += realizedPNL
+    else newTx.Type == DIVIDEND
+        IS->>IS: processDividendTransaction(investment, request)
+        IS->>IS: investment.TotalDividends += newCost
+    end
+
+    IS->>IR: Update(investment)
+    IR-->>IS: Investment updated
+
+    IS->>Cache: Invalidate wallet investment value cache
+    Note over IS,Cache: nil-guarded; skipped if investment<br/>has no associated wallet
+
+    deactivate IS
+
+    IS-->>H: EditTransactionResponse{transaction, investment}
+    H-->>SPA: 200 OK {transaction, investment}
+```
+
+### Key Invariants
+
+- Ownership is verified (`GetByIDForUser`) before any mutation — a missing or unowned transaction returns 404
+- Buy quantity reduction guard: cannot reduce a buy quantity below units already sold from the lot (`validateBuyQuantityReduction`)
+- Type change from BUY with consumed lot is rejected before any mutation begins — no partial state is written
+- BUY→SELL pre-flight guard: `quantityAfterReversal = investment.Quantity - oldTx.Quantity` must be ≥ `req.Quantity` before any DB mutation — prevents investment.Quantity corruption when reversing the only BUY lot leaves nothing to sell (`INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY`)
+- Transaction date must not be in the future (`transactionDate ≤ now`)
+- After reversal, investment state is re-fetched from DB (`IR.GetByID`) — never uses in-memory stale state from prior operations
+- Cache is invalidated after successful edit so portfolio summary reflects the change immediately
+- Original transaction is soft-deleted (preserved in DB for audit trail); new transaction is a fresh record
+
+### Error Paths
+
+| Condition | Error Response |
+|-----------|---------------|
+| Transaction not owned by user | 404 Not Found |
+| Invalid type enum value | 400 Bad Request (`INVESTMENT_TX_TYPE_INVALID`) |
+| Buy quantity below already-sold amount | 400 Bad Request (`ValidationError`) |
+| BUY→SELL or BUY→DIVIDEND with consumed lot | 400 Bad Request (`ValidationError`) |
+| Transaction date in the future | 400 Bad Request (`InvestmentTxDateFuture`) |
+| BUY→SELL where qty after reversal < requested sell qty | 400 Bad Request (`INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY`) — no DB writes |
+| Reversal failure (lot update or delete) | 500 Internal Server Error (no partial state committed) |
+| New transaction processing failure | 500 Internal Server Error (reversal already applied — inconsistency risk logged) |

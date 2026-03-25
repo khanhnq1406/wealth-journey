@@ -22,9 +22,14 @@ import {
   EVENT_InvestmentGetPortfolioSummary,
   EVENT_WalletListWallets,
   EVENT_WalletGetWallet,
+  EVENT_InvestmentListInvestmentTransactions,
 } from "@/utils/generated/hooks";
 import { ConfirmationDialog } from "@/components/modals/ConfirmationDialog";
-import { InvestmentTransactionType } from "@/gen/protobuf/v1/investment";
+import {
+  InvestmentTransactionType,
+  type InvestmentTransaction as InvestmentTransactionProto,
+} from "@/gen/protobuf/v1/investment";
+import { EditIcon } from "@/components/icons/actions";
 import { AddInvestmentTransactionForm } from "@/features/investment/forms/AddInvestmentTransactionForm";
 import { UpdateInvestmentPriceForm } from "@/features/investment/forms/UpdateInvestmentPriceForm";
 import { formatCurrency } from "@/lib/utils/units";
@@ -88,6 +93,8 @@ export function InvestmentDetailModal({
   const [activeTab, setActiveTab] = useState<TabType>(
     activeTabProp || "overview",
   );
+  const [editingTransaction, setEditingTransaction] =
+    useState<InvestmentTransactionProto | null>(null);
   const [deletingTransactionId, setDeletingTransactionId] = useState<
     number | null
   >(null);
@@ -97,6 +104,14 @@ export function InvestmentDetailModal({
     string | null
   >(null);
   const queryClient = useQueryClient();
+
+  // Clear edit state when switching away from add-transaction tab manually
+  const handleTabChange = (tab: TabType) => {
+    if (tab !== "add-transaction") {
+      setEditingTransaction(null);
+    }
+    setActiveTab(tab);
+  };
 
   const getTransactionTypeLabel = (type: InvestmentTransactionType): string => {
     switch (type) {
@@ -372,29 +387,43 @@ export function InvestmentDetailModal({
         id: "actions",
         header: "",
         cell: ({ row }) => (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setDeletingTransactionId(row.original.id);
-            }}
-            className="p-1 text-v2-text-tertiary hover:text-v2-red-negative transition-colors"
-            title={t("transactionTable.deleteTransaction")}
-            aria-label={t("transactionTable.deleteTransaction")}
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          <div className="flex items-center gap-1">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditingTransaction(row.original as InvestmentTransactionProto);
+                setActiveTab("add-transaction");
+              }}
+              className="p-1 min-h-[44px] min-w-[44px] flex items-center justify-center text-v2-text-tertiary hover:text-v2-gold-accent transition-colors cursor-pointer"
+              title={t("transactionTable.editTransaction")}
+              aria-label={t("transactionTable.editTransaction")}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              />
-            </svg>
-          </button>
+              <EditIcon size="sm" decorative />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setDeletingTransactionId(row.original.id);
+              }}
+              className="p-1 min-h-[44px] min-w-[44px] flex items-center justify-center text-v2-text-tertiary hover:text-v2-red-negative transition-colors cursor-pointer"
+              title={t("transactionTable.deleteTransaction")}
+              aria-label={t("transactionTable.deleteTransaction")}
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </button>
+          </div>
         ),
       },
     ],
@@ -470,26 +499,39 @@ export function InvestmentDetailModal({
         id: "actions",
         header: "",
         accessorFn: (row) => (
-          <button
-            onClick={() => setDeletingTransactionId(row.id)}
-            className="p-2 text-v2-text-tertiary hover:text-v2-red-negative transition-colors"
-            title={t("transactionTable.deleteTransaction")}
-            aria-label={t("transactionTable.deleteTransaction")}
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => {
+                setEditingTransaction(row as InvestmentTransactionProto);
+                setActiveTab("add-transaction");
+              }}
+              className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-v2-text-tertiary hover:text-v2-gold-accent transition-colors cursor-pointer"
+              title={t("transactionTable.editTransaction")}
+              aria-label={t("transactionTable.editTransaction")}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              />
-            </svg>
-          </button>
+              <EditIcon size="sm" decorative />
+            </button>
+            <button
+              onClick={() => setDeletingTransactionId(row.id)}
+              className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-v2-text-tertiary hover:text-v2-red-negative transition-colors cursor-pointer"
+              title={t("transactionTable.deleteTransaction")}
+              aria-label={t("transactionTable.deleteTransaction")}
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </button>
+          </div>
         ),
       },
     ],
@@ -497,13 +539,24 @@ export function InvestmentDetailModal({
     [investment, t, getTransactionTypeLabel],
   );
 
-  // Handle successful transaction addition
+  // Handle successful transaction addition or edit
   const handleTransactionSuccess = () => {
-    onSuccess?.();
-    getInvestment.refetch();
-    getListInvestmentTransactions.refetch();
-    setActiveTab("overview");
-    onClose();
+    if (editingTransaction) {
+      // After edit: return to transactions list and clear edit state
+      setEditingTransaction(null);
+      setActiveTab("transactions");
+      // Invalidate transaction list so refreshed data is shown
+      queryClient.invalidateQueries({
+        queryKey: [EVENT_InvestmentListInvestmentTransactions],
+      });
+      onSuccess?.();
+    } else {
+      onSuccess?.();
+      getInvestment.refetch();
+      getListInvestmentTransactions.refetch();
+      setActiveTab("overview");
+      onClose();
+    }
   };
 
   return (
@@ -522,7 +575,7 @@ export function InvestmentDetailModal({
           {/* Tabs */}
           <div className="flex border-b border-v2-gold-primary/20 overflow-x-auto scrollbar-hide">
             <button
-              onClick={() => setActiveTab("overview")}
+              onClick={() => handleTabChange("overview")}
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === "overview"
                   ? "border-b-2 border-v2-gold-primary text-v2-gold-primary"
@@ -532,7 +585,7 @@ export function InvestmentDetailModal({
               {t("detail.overview")}
             </button>
             <button
-              onClick={() => setActiveTab("transactions")}
+              onClick={() => handleTabChange("transactions")}
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === "transactions"
                   ? "border-b-2 border-v2-gold-primary text-v2-gold-primary"
@@ -542,17 +595,19 @@ export function InvestmentDetailModal({
               {t("detail.transactions")}
             </button>
             <button
-              onClick={() => setActiveTab("add-transaction")}
+              onClick={() => handleTabChange("add-transaction")}
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === "add-transaction"
                   ? "border-b-2 border-v2-gold-primary text-v2-gold-primary"
                   : "text-v2-text-secondary hover:text-v2-gold-accent"
               }`}
             >
-              {t("detail.addTransaction")}
+              {editingTransaction
+                ? t("detail.editTransaction")
+                : t("detail.addTransaction")}
             </button>
             <button
-              onClick={() => setActiveTab("set-price")}
+              onClick={() => handleTabChange("set-price")}
               className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
                 activeTab === "set-price"
                   ? "border-b-2 border-v2-gold-primary text-v2-gold-primary"
@@ -928,7 +983,7 @@ export function InvestmentDetailModal({
             </div>
           )}
 
-          {/* Add Transaction Tab */}
+          {/* Add / Edit Transaction Tab */}
           {activeTab === "add-transaction" && investment && (
             <AddInvestmentTransactionForm
               investmentId={investmentId}
@@ -937,6 +992,7 @@ export function InvestmentDetailModal({
               purchaseUnit={investment.purchaseUnit}
               onSuccess={handleTransactionSuccess}
               symbol={investment.symbol}
+              editTransaction={editingTransaction ?? undefined}
             />
           )}
 
