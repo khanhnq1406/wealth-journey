@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-24-edit-investment-transactions-plan.md
 - **Spec file:** docs/specs/2026-03-24-edit-investment-transactions-spec.md
 - **Started:** 2026-03-25T00:00:00Z
-- **Last updated:** 2026-03-25T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 6
+- **Last updated:** 2026-03-25T12:00:00Z
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -20,7 +20,7 @@
 | 3   | Backend — Update Handler type validation + response  | done        | 1b12042 | Added type enum allowlist validation; handler.Success returns updatedInvestment; 7 tests |
 | 4   | Frontend — Edit Mode to AddInvestmentTransactionForm | done        | 870a37d | editTransaction prop, reverse conversions, edit mutation, UI text, 15 tests + E2E spec |
 | 5   | Frontend — Edit Button + State in InvestmentDetailModal | done     | 505f315 | Edit button in desktop+mobile tables, editingTransaction state, tab label, success routing; 6 tests |
-| 6   | Update Runtime Flow Diagram                          | pending     | —      | —       |
+| 6   | Update Runtime Flow Diagram                          | done        | 230d138 | Added section 9 "Edit Transaction (Delete-and-Recreate)" sequenceDiagram + Key Invariants + Error Paths; backfilled TOC entries |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
