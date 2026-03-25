@@ -14,7 +14,7 @@
 
 | #   | Task Name                                              | Status      | Commit | Summary |
 | --- | ------------------------------------------------------ | ----------- | ------ | ------- |
-| 0   | Update C4 Architecture Diagrams                        | pending     | —      | —       |
+| 0   | Update C4 Architecture Diagrams                        | done        | 0c11373 | Added vang.today & BTMC as external systems in c4-context.md; updated backend component diagram with fallback chain |
 | 1   | Create PriceFetcher Interface and Source Abstraction   | pending     | —      | —       |
 | 2   | Create Source Health Tracker (Redis-backed)            | pending     | —      | —       |
 | 3   | Create Emergency Cache (1-Hour Stale Data)             | pending     | —      | —       |

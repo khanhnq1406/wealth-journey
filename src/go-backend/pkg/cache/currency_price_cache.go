@@ -111,3 +111,39 @@ func (c *CurrencyPriceCache) GetAll(ctx context.Context) ([]*CachedCurrencyPrice
 	}
 	return prices, nil
 }
+
+const (
+	// EmergencyCurrencyCacheTTL is the TTL for the emergency currency price cache.
+	// Stale data is served for up to 1 hour when all live sources are unavailable.
+	EmergencyCurrencyCacheTTL = 1 * time.Hour
+
+	emergencyCurrencyKey = "currency_price:emergency"
+)
+
+// SetEmergency stores the full list of currency prices under a long-lived emergency
+// cache key (1-hour TTL). This is refreshed after every successful live fetch
+// so that stale-but-valid data is available as a last resort.
+func (c *CurrencyPriceCache) SetEmergency(ctx context.Context, prices []*CachedCurrencyPrice) error {
+	data, err := json.Marshal(prices)
+	if err != nil {
+		return fmt.Errorf("marshal emergency currency prices: %w", err)
+	}
+	return c.client.Set(ctx, emergencyCurrencyKey, data, EmergencyCurrencyCacheTTL).Err()
+}
+
+// GetEmergency retrieves currency prices from the emergency cache.
+// Returns nil, nil on cache miss (key absent or expired).
+func (c *CurrencyPriceCache) GetEmergency(ctx context.Context) ([]*CachedCurrencyPrice, error) {
+	data, err := c.client.Get(ctx, emergencyCurrencyKey).Bytes()
+	if err != nil {
+		if err == redis.Nil {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("get emergency currency prices from cache: %w", err)
+	}
+	var prices []*CachedCurrencyPrice
+	if err := json.Unmarshal(data, &prices); err != nil {
+		return nil, fmt.Errorf("unmarshal emergency currency prices: %w", err)
+	}
+	return prices, nil
+}

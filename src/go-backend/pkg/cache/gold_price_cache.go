@@ -111,3 +111,39 @@ func (c *GoldPriceCache) GetAll(ctx context.Context) ([]*CachedGoldPrice, error)
 	}
 	return prices, nil
 }
+
+const (
+	// EmergencyGoldCacheTTL is the TTL for the emergency gold price cache.
+	// Stale data is served for up to 1 hour when all live sources are unavailable.
+	EmergencyGoldCacheTTL = 1 * time.Hour
+
+	emergencyGoldKey = "gold_price:emergency"
+)
+
+// SetEmergency stores the full list of gold prices under a long-lived emergency
+// cache key (1-hour TTL). This is refreshed after every successful live fetch
+// so that stale-but-valid data is available as a last resort.
+func (c *GoldPriceCache) SetEmergency(ctx context.Context, prices []*CachedGoldPrice) error {
+	data, err := json.Marshal(prices)
+	if err != nil {
+		return fmt.Errorf("marshal emergency gold prices: %w", err)
+	}
+	return c.client.Set(ctx, emergencyGoldKey, data, EmergencyGoldCacheTTL).Err()
+}
+
+// GetEmergency retrieves gold prices from the emergency cache.
+// Returns nil, nil on cache miss (key absent or expired).
+func (c *GoldPriceCache) GetEmergency(ctx context.Context) ([]*CachedGoldPrice, error) {
+	data, err := c.client.Get(ctx, emergencyGoldKey).Bytes()
+	if err != nil {
+		if err == redis.Nil {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("get emergency gold prices from cache: %w", err)
+	}
+	var prices []*CachedGoldPrice
+	if err := json.Unmarshal(data, &prices); err != nil {
+		return nil, fmt.Errorf("unmarshal emergency gold prices: %w", err)
+	}
+	return prices, nil
+}
