@@ -203,7 +203,7 @@ interface PriceAlertTarget {
   category: AssetCategory;
   symbol: string;
   name: string;
-  assetType: number;
+  assetType: InvestmentType;
   currency: string;
 }
 

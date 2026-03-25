@@ -15,6 +15,7 @@ import { z } from "zod";
 import {
   AlertDirection,
   AlertTriggerMode,
+  InvestmentType,
 } from "@/gen/protobuf/v1/investment";
 
 // ---------------------------------------------------------------------------
@@ -27,7 +28,7 @@ export interface PriceAlertAssetOption {
   /** Human-readable display label */
   label: string;
   /** InvestmentType enum value (8 = GOLD_VND, 10 = SILVER_VND) */
-  assetType: number;
+  assetType: InvestmentType;
   /** ISO 4217 currency code */
   currency: string;
 }
@@ -38,34 +39,34 @@ export interface PriceAlertAssetOption {
 // ---------------------------------------------------------------------------
 
 export const GOLD_VND_ALERT_OPTIONS: PriceAlertAssetOption[] = [
-  { value: "SJC", label: "SJC", assetType: 8, currency: "VND" },
+  { value: "SJC", label: "SJC", assetType: InvestmentType.INVESTMENT_TYPE_GOLD_VND, currency: "VND" },
   {
     value: "Vàng nhẫn SJC",
     label: "Nhẫn SJC 9999",
-    assetType: 8,
+    assetType: InvestmentType.INVESTMENT_TYPE_GOLD_VND,
     currency: "VND",
   },
   {
     value: "Doji_24K",
     label: "Nhẫn Doji 9999",
-    assetType: 8,
+    assetType: InvestmentType.INVESTMENT_TYPE_GOLD_VND,
     currency: "VND",
   },
-  { value: "Mi hồng", label: "SJC Mi Hồng", assetType: 8, currency: "VND" },
+  { value: "Mi hồng", label: "SJC Mi Hồng", assetType: InvestmentType.INVESTMENT_TYPE_GOLD_VND, currency: "VND" },
   {
     value: "Mihong_999",
     label: "Nhẫn Mi Hồng 9999",
-    assetType: 8,
+    assetType: InvestmentType.INVESTMENT_TYPE_GOLD_VND,
     currency: "VND",
   },
-  { value: "BTMC", label: "SJC BTMC", assetType: 8, currency: "VND" },
+  { value: "BTMC", label: "SJC BTMC", assetType: InvestmentType.INVESTMENT_TYPE_GOLD_VND, currency: "VND" },
   {
     value: "BTMC_24K",
     label: "Nhẫn BTMC",
-    assetType: 8,
+    assetType: InvestmentType.INVESTMENT_TYPE_GOLD_VND,
     currency: "VND",
   },
-  { value: "PNJ HCM", label: "PNJ", assetType: 8, currency: "VND" },
+  { value: "PNJ HCM", label: "PNJ", assetType: InvestmentType.INVESTMENT_TYPE_GOLD_VND, currency: "VND" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -77,64 +78,64 @@ export const SILVER_VND_ALERT_OPTIONS: PriceAlertAssetOption[] = [
   {
     value: "PH_QU_THI_1L",
     label: "Phú Quý thỏi 1L",
-    assetType: 10,
+    assetType: InvestmentType.INVESTMENT_TYPE_SILVER_VND,
     currency: "VND",
   },
   {
     value: "PH_QU_THI_5L_10L",
     label: "Phú Quý thỏi 5L,10L",
-    assetType: 10,
+    assetType: InvestmentType.INVESTMENT_TYPE_SILVER_VND,
     currency: "VND",
   },
   {
     value: "BC_M_NGH_PH_QU",
     label: "Bạc Mỹ nghệ Phú Quý",
-    assetType: 10,
+    assetType: InvestmentType.INVESTMENT_TYPE_SILVER_VND,
     currency: "VND",
   },
   {
     value: "ANCARAT_NGN_LONG_1L",
     label: "Ancarat Ngân Long 1L",
-    assetType: 10,
+    assetType: InvestmentType.INVESTMENT_TYPE_SILVER_VND,
     currency: "VND",
   },
   {
     value: "ANCARAT_NGN_LONG_5L",
     label: "Ancarat Ngân Long 5L",
-    assetType: 10,
+    assetType: InvestmentType.INVESTMENT_TYPE_SILVER_VND,
     currency: "VND",
   },
   {
     value: "SBJ_1L_10L_50L",
     label: "SBJ 1L,10L,50L",
-    assetType: 10,
+    assetType: InvestmentType.INVESTMENT_TYPE_SILVER_VND,
     currency: "VND",
   },
   {
     value: "DOJI_99.9_1L",
     label: "DOJI 99.9 1L",
-    assetType: 10,
+    assetType: InvestmentType.INVESTMENT_TYPE_SILVER_VND,
     currency: "VND",
   },
   {
     value: "DOJI_99.9_5L",
     label: "DOJI 99.9 5L",
-    assetType: 10,
+    assetType: InvestmentType.INVESTMENT_TYPE_SILVER_VND,
     currency: "VND",
   },
   {
     value: "ANCARAT_NGN_LONG_1KG",
     label: "Ancarat Ngân Long 1kg",
-    assetType: 10,
+    assetType: InvestmentType.INVESTMENT_TYPE_SILVER_VND,
     currency: "VND",
   },
   {
     value: "ANCARAT_THI_999_-_1KG",
     label: "Ancarat thỏi 999 - 1kg",
-    assetType: 10,
+    assetType: InvestmentType.INVESTMENT_TYPE_SILVER_VND,
     currency: "VND",
   },
-  { value: "SBJ_1KG", label: "SBJ 1kg", assetType: 10, currency: "VND" },
+  { value: "SBJ_1KG", label: "SBJ 1kg", assetType: InvestmentType.INVESTMENT_TYPE_SILVER_VND, currency: "VND" },
 ];
 
 // ---------------------------------------------------------------------------

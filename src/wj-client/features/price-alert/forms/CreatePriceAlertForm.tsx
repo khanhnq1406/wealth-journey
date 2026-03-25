@@ -54,7 +54,7 @@ export interface CreatePriceAlertFormProps {
   /** Pre-fill: display name */
   defaultName?: string;
   /** Pre-fill: InvestmentType enum value */
-  defaultAssetType?: number;
+  defaultAssetType?: InvestmentType;
   /** Pre-fill: ISO 4217 currency code */
   defaultCurrency?: string;
 }
@@ -132,7 +132,7 @@ export function CreatePriceAlertForm({
   const [otherCurrency, setOtherCurrency] = useState(
     defaultCategory === "other" ? (defaultCurrency ?? "USD") : "USD"
   );
-  const [otherAssetType, setOtherAssetType] = useState<number>(
+  const [otherAssetType, setOtherAssetType] = useState<InvestmentType>(
     defaultCategory === "other"
       ? (defaultAssetType ?? InvestmentType.INVESTMENT_TYPE_STOCK)
       : InvestmentType.INVESTMENT_TYPE_STOCK
