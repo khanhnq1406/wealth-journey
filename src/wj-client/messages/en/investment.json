@@ -191,7 +191,8 @@
       "fees": "Fees",
       "total": "Total",
       "date": "Date",
-      "deleteTransaction": "Delete transaction"
+      "deleteTransaction": "Delete transaction",
+      "editTransaction": "Edit transaction"
     },
     "transaction": {
       "title": "Add Transaction",
@@ -227,6 +228,7 @@
       "overview": "Overview",
       "transactions": "Transactions",
       "addTransaction": "Add Transaction",
+      "editTransaction": "Edit Transaction",
       "setPrice": "Set Price",
       "loadingDetails": "Loading investment details...",
       "investmentNotFound": "Investment not found",

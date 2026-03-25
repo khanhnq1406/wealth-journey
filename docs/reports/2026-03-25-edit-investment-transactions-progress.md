@@ -8,7 +8,7 @@
 - **Started:** 2026-03-25T00:00:00Z
 - **Last updated:** 2026-03-25T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 5
+- **Current task:** 6
 
 ## Task Progress
 
@@ -19,7 +19,7 @@
 | 2   | Backend — Full EditTransaction Delete-and-Recreate   | done        | 3157b5e | Rewrote EditTransaction: ownership check, guards, reverse+delete+process, cache invalidation; 11 tests |
 | 3   | Backend — Update Handler type validation + response  | done        | 1b12042 | Added type enum allowlist validation; handler.Success returns updatedInvestment; 7 tests |
 | 4   | Frontend — Edit Mode to AddInvestmentTransactionForm | done        | 870a37d | editTransaction prop, reverse conversions, edit mutation, UI text, 15 tests + E2E spec |
-| 5   | Frontend — Edit Button + State in InvestmentDetailModal | pending  | —      | —       |
+| 5   | Frontend — Edit Button + State in InvestmentDetailModal | done     | 505f315 | Edit button in desktop+mobile tables, editingTransaction state, tab label, success routing; 6 tests |
 | 6   | Update Runtime Flow Diagram                          | pending     | —      | —       |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`

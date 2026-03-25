@@ -191,7 +191,8 @@
       "fees": "Phí",
       "total": "Tổng",
       "date": "Ngày",
-      "deleteTransaction": "Xóa giao dịch"
+      "deleteTransaction": "Xóa giao dịch",
+      "editTransaction": "Sửa giao dịch"
     },
     "transaction": {
       "title": "Thêm giao dịch",
@@ -227,6 +228,7 @@
       "overview": "Tổng quan",
       "transactions": "Giao dịch",
       "addTransaction": "Thêm giao dịch",
+      "editTransaction": "Sửa giao dịch",
       "setPrice": "Đặt giá",
       "loadingDetails": "Đang tải chi tiết đầu tư...",
       "investmentNotFound": "Không tìm thấy khoản đầu tư",
