@@ -15,11 +15,11 @@
 | #   | Task Name                                              | Status      | Commit | Summary |
 | --- | ------------------------------------------------------ | ----------- | ------ | ------- |
 | 0   | Update C4 Architecture Diagrams                        | done        | 0c11373 | Added vang.today & BTMC as external systems in c4-context.md; updated backend component diagram with fallback chain |
-| 1   | Create PriceFetcher Interface and Source Abstraction   | pending     | —      | —       |
-| 2   | Create Source Health Tracker (Redis-backed)            | pending     | —      | —       |
-| 3   | Create Emergency Cache (1-Hour Stale Data)             | pending     | —      | —       |
-| 4   | Create vang.today Client (pkg/vangtoday)               | pending     | —      | —       |
-| 5   | Create BTMC Client (pkg/btmc)                          | pending     | —      | —       |
+| 1   | Create PriceFetcher Interface and Source Abstraction   | done        | c8418ad | GoldPriceFetcher/CurrencyPriceFetcher interfaces + WaterfallGoldFetcher/WaterfallCurrencyFetcher with 5s timeout, health skip, last-always-tried |
+| 2   | Create Source Health Tracker (Redis-backed)            | done        | c8418ad | SourceHealthCache: IsHealthy fail-open + MarkUnhealthy 2-min TTL; keys price_source_health:<source> |
+| 3   | Create Emergency Cache (1-Hour Stale Data)             | done        | c8418ad | SetEmergency/GetEmergency on GoldPriceCache and CurrencyPriceCache with 1-hour TTL |
+| 4   | Create vang.today Client (pkg/vangtoday)               | done        | —      | HTTPS JSON client: 1MB limit, context timeout, prefix-based gold/currency classification, zero-price filtering |
+| 5   | Create BTMC Client (pkg/btmc)                          | done        | —      | HTTP XML client: 1MB limit, context timeout, type-code mapping, comma-price parsing, API key required |
 | 6   | Implement vangsaigon GoldPriceFetcher Adapter          | pending     | —      | —       |
 | 7   | Implement vang.today GoldPriceFetcher and Currency Adapters | pending | —      | —       |
 | 8   | Implement BTMC GoldPriceFetcher Adapter                | pending     | —      | —       |
