@@ -42,6 +42,7 @@ export default async function SettingsPage() {
           </svg>
         </div>
       </Link>
+
     </div>
   );
 }

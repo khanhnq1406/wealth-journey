@@ -30,6 +30,17 @@ interface BroadcastMetadata {
   broadcastTitle?: string;
 }
 
+interface UserPriceAlertMetadata {
+  alertId: number;
+  symbol: string;
+  name: string;
+  direction: string;
+  targetPrice: number;
+  currentPrice: number;
+  priceSide: string;
+  currency: string;
+}
+
 function parseMetadata<T>(metadata?: string): T | null {
   if (!metadata) return null;
   try {
@@ -96,6 +107,44 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
               </span>
             </p>
           ) : null}
+          <p className="mt-1 font-roboto text-xs text-v2-text-tertiary">{timeAgo}</p>
+        </div>
+      </button>
+    );
+  }
+
+  // User price alert notification
+  if (notification.type === "user_price_alert") {
+    const meta = parseMetadata<UserPriceAlertMetadata>(notification.metadata);
+    const isAbove = meta?.direction === "above";
+
+    return (
+      <button
+        onClick={() => onClick?.(notification)}
+        className={cn(
+          "w-full flex items-start gap-3 px-4 py-3 text-left transition-colors",
+          notification.isRead
+            ? "hover:bg-v2-maroon-900"
+            : "bg-v2-maroon-900/80 hover:bg-v2-maroon-900"
+        )}
+      >
+        <div className="relative flex-shrink-0">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm bg-v2-gold-primary/20 text-v2-gold-accent">
+            {isAbove ? "↑" : "↓"}
+          </div>
+          {!notification.isRead && (
+            <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-v2-gold-primary rounded-full ring-2 ring-v2-maroon-800" />
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-roboto text-sm text-v2-gold-accent leading-snug font-medium">
+            {meta?.symbol ?? "Price alert"} triggered
+          </p>
+          {meta && (
+            <p className="mt-0.5 font-roboto text-xs text-v2-text-secondary leading-snug">
+              {isAbove ? "↑ Above" : "↓ Below"} {meta.targetPrice.toLocaleString()} — now {meta.currentPrice.toLocaleString()} {meta.currency}
+            </p>
+          )}
           <p className="mt-1 font-roboto text-xs text-v2-text-tertiary">{timeAgo}</p>
         </div>
       </button>

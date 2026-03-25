@@ -172,6 +172,12 @@ tasks:
     cmds:
       - go run cmd/migrate-watchlist/main.go
 
+  backend:migrate-user-price-alerts:
+    desc: "Create user_price_alert table for price alert feature"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-user-price-alerts/main.go
+
   backend:migrate-all:
     desc: "Run all migrations in order (safe for fresh or existing databases)"
     dir: "{{.BACKEND_DIR}}"

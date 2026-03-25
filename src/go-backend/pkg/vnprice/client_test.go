@@ -7,6 +7,9 @@ import (
 )
 
 func TestClient_FetchPrices(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping external API test in short mode")
+	}
 	client := NewClient(10 * time.Second)
 	ctx := context.Background()
 

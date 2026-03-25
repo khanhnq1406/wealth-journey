@@ -41,6 +41,10 @@ const (
 	InvestmentService_GetGoldChart_FullMethodName                  = "/wealthjourney.investment.v1.InvestmentService/GetGoldChart"
 	InvestmentService_GetSilverChart_FullMethodName                = "/wealthjourney.investment.v1.InvestmentService/GetSilverChart"
 	InvestmentService_GetPublicMarketTypes_FullMethodName          = "/wealthjourney.investment.v1.InvestmentService/GetPublicMarketTypes"
+	InvestmentService_CreateUserPriceAlert_FullMethodName          = "/wealthjourney.investment.v1.InvestmentService/CreateUserPriceAlert"
+	InvestmentService_ListUserPriceAlerts_FullMethodName           = "/wealthjourney.investment.v1.InvestmentService/ListUserPriceAlerts"
+	InvestmentService_UpdateUserPriceAlert_FullMethodName          = "/wealthjourney.investment.v1.InvestmentService/UpdateUserPriceAlert"
+	InvestmentService_DeleteUserPriceAlert_FullMethodName          = "/wealthjourney.investment.v1.InvestmentService/DeleteUserPriceAlert"
 )
 
 // InvestmentServiceClient is the client API for InvestmentService service.
@@ -93,6 +97,10 @@ type InvestmentServiceClient interface {
 	GetSilverChart(ctx context.Context, in *GetSilverChartRequest, opts ...grpc.CallOption) (*GetSilverChartResponse, error)
 	// GetPublicMarketTypes returns gold/silver type names without prices (no auth required)
 	GetPublicMarketTypes(ctx context.Context, in *GetPublicMarketTypesRequest, opts ...grpc.CallOption) (*GetPublicMarketTypesResponse, error)
+	CreateUserPriceAlert(ctx context.Context, in *CreateUserPriceAlertRequest, opts ...grpc.CallOption) (*CreateUserPriceAlertResponse, error)
+	ListUserPriceAlerts(ctx context.Context, in *ListUserPriceAlertsRequest, opts ...grpc.CallOption) (*ListUserPriceAlertsResponse, error)
+	UpdateUserPriceAlert(ctx context.Context, in *UpdateUserPriceAlertRequest, opts ...grpc.CallOption) (*UpdateUserPriceAlertResponse, error)
+	DeleteUserPriceAlert(ctx context.Context, in *DeleteUserPriceAlertRequest, opts ...grpc.CallOption) (*DeleteUserPriceAlertResponse, error)
 }
 
 type investmentServiceClient struct {
@@ -301,6 +309,42 @@ func (c *investmentServiceClient) GetPublicMarketTypes(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *investmentServiceClient) CreateUserPriceAlert(ctx context.Context, in *CreateUserPriceAlertRequest, opts ...grpc.CallOption) (*CreateUserPriceAlertResponse, error) {
+	out := new(CreateUserPriceAlertResponse)
+	err := c.cc.Invoke(ctx, InvestmentService_CreateUserPriceAlert_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *investmentServiceClient) ListUserPriceAlerts(ctx context.Context, in *ListUserPriceAlertsRequest, opts ...grpc.CallOption) (*ListUserPriceAlertsResponse, error) {
+	out := new(ListUserPriceAlertsResponse)
+	err := c.cc.Invoke(ctx, InvestmentService_ListUserPriceAlerts_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *investmentServiceClient) UpdateUserPriceAlert(ctx context.Context, in *UpdateUserPriceAlertRequest, opts ...grpc.CallOption) (*UpdateUserPriceAlertResponse, error) {
+	out := new(UpdateUserPriceAlertResponse)
+	err := c.cc.Invoke(ctx, InvestmentService_UpdateUserPriceAlert_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *investmentServiceClient) DeleteUserPriceAlert(ctx context.Context, in *DeleteUserPriceAlertRequest, opts ...grpc.CallOption) (*DeleteUserPriceAlertResponse, error) {
+	out := new(DeleteUserPriceAlertResponse)
+	err := c.cc.Invoke(ctx, InvestmentService_DeleteUserPriceAlert_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InvestmentServiceServer is the server API for InvestmentService service.
 // All implementations must embed UnimplementedInvestmentServiceServer
 // for forward compatibility
@@ -351,6 +395,10 @@ type InvestmentServiceServer interface {
 	GetSilverChart(context.Context, *GetSilverChartRequest) (*GetSilverChartResponse, error)
 	// GetPublicMarketTypes returns gold/silver type names without prices (no auth required)
 	GetPublicMarketTypes(context.Context, *GetPublicMarketTypesRequest) (*GetPublicMarketTypesResponse, error)
+	CreateUserPriceAlert(context.Context, *CreateUserPriceAlertRequest) (*CreateUserPriceAlertResponse, error)
+	ListUserPriceAlerts(context.Context, *ListUserPriceAlertsRequest) (*ListUserPriceAlertsResponse, error)
+	UpdateUserPriceAlert(context.Context, *UpdateUserPriceAlertRequest) (*UpdateUserPriceAlertResponse, error)
+	DeleteUserPriceAlert(context.Context, *DeleteUserPriceAlertRequest) (*DeleteUserPriceAlertResponse, error)
 	mustEmbedUnimplementedInvestmentServiceServer()
 }
 
@@ -423,6 +471,18 @@ func (UnimplementedInvestmentServiceServer) GetSilverChart(context.Context, *Get
 }
 func (UnimplementedInvestmentServiceServer) GetPublicMarketTypes(context.Context, *GetPublicMarketTypesRequest) (*GetPublicMarketTypesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPublicMarketTypes not implemented")
+}
+func (UnimplementedInvestmentServiceServer) CreateUserPriceAlert(context.Context, *CreateUserPriceAlertRequest) (*CreateUserPriceAlertResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateUserPriceAlert not implemented")
+}
+func (UnimplementedInvestmentServiceServer) ListUserPriceAlerts(context.Context, *ListUserPriceAlertsRequest) (*ListUserPriceAlertsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListUserPriceAlerts not implemented")
+}
+func (UnimplementedInvestmentServiceServer) UpdateUserPriceAlert(context.Context, *UpdateUserPriceAlertRequest) (*UpdateUserPriceAlertResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserPriceAlert not implemented")
+}
+func (UnimplementedInvestmentServiceServer) DeleteUserPriceAlert(context.Context, *DeleteUserPriceAlertRequest) (*DeleteUserPriceAlertResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteUserPriceAlert not implemented")
 }
 func (UnimplementedInvestmentServiceServer) mustEmbedUnimplementedInvestmentServiceServer() {}
 
@@ -833,6 +893,78 @@ func _InvestmentService_GetPublicMarketTypes_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _InvestmentService_CreateUserPriceAlert_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateUserPriceAlertRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InvestmentServiceServer).CreateUserPriceAlert(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InvestmentService_CreateUserPriceAlert_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InvestmentServiceServer).CreateUserPriceAlert(ctx, req.(*CreateUserPriceAlertRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InvestmentService_ListUserPriceAlerts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUserPriceAlertsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InvestmentServiceServer).ListUserPriceAlerts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InvestmentService_ListUserPriceAlerts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InvestmentServiceServer).ListUserPriceAlerts(ctx, req.(*ListUserPriceAlertsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InvestmentService_UpdateUserPriceAlert_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserPriceAlertRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InvestmentServiceServer).UpdateUserPriceAlert(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InvestmentService_UpdateUserPriceAlert_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InvestmentServiceServer).UpdateUserPriceAlert(ctx, req.(*UpdateUserPriceAlertRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InvestmentService_DeleteUserPriceAlert_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteUserPriceAlertRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InvestmentServiceServer).DeleteUserPriceAlert(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InvestmentService_DeleteUserPriceAlert_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InvestmentServiceServer).DeleteUserPriceAlert(ctx, req.(*DeleteUserPriceAlertRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // InvestmentService_ServiceDesc is the grpc.ServiceDesc for InvestmentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -927,6 +1059,22 @@ var InvestmentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPublicMarketTypes",
 			Handler:    _InvestmentService_GetPublicMarketTypes_Handler,
+		},
+		{
+			MethodName: "CreateUserPriceAlert",
+			Handler:    _InvestmentService_CreateUserPriceAlert_Handler,
+		},
+		{
+			MethodName: "ListUserPriceAlerts",
+			Handler:    _InvestmentService_ListUserPriceAlerts_Handler,
+		},
+		{
+			MethodName: "UpdateUserPriceAlert",
+			Handler:    _InvestmentService_UpdateUserPriceAlert_Handler,
+		},
+		{
+			MethodName: "DeleteUserPriceAlert",
+			Handler:    _InvestmentService_DeleteUserPriceAlert_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

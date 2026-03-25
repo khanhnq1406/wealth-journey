@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
 import { ZIndex } from "@/lib/utils/z-index";
@@ -158,14 +159,20 @@ export function BaseModal({
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
+      const scrollY = window.scrollY;
       document.body.style.overflow = "hidden";
-      // Also prevent scroll on mobile to prevent bounce
+      // position:fixed prevents body scroll on mobile but jumps the page to top.
+      // Offset with top:-scrollYpx so the viewport stays in place.
       document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
       document.body.style.width = "100%";
       return () => {
         document.body.style.overflow = "";
         document.body.style.position = "";
+        document.body.style.top = "";
         document.body.style.width = "";
+        // Restore the scroll position that was active before the modal opened
+        window.scrollTo(0, scrollY);
       };
     }
   }, [isOpen]);
@@ -374,7 +381,9 @@ export function BaseModal({
 
   if (!isOpen) return null;
 
-  return (
+  // Render into document.body so `position:fixed` resolves against the true
+  // viewport regardless of any overflow:hidden/scroll ancestor in the tree.
+  return createPortal(
     <>
       {/* Backdrop with fade animation and swipe feedback */}
       <div
@@ -406,8 +415,9 @@ export function BaseModal({
         tabIndex={-1}
         className={cn(
           "fixed flex justify-center px-safe mx-2 sm:p-4 sm:mx-0",
-          // Use visual viewport height on mobile to prevent jumping
-          "top-0 left-0 right-0",
+          // inset-0 (top/right/bottom/left: 0) ensures the flex container fills the full
+          // viewport so items-center works regardless of height calculation quirks
+          "inset-0",
           // Variant positioning with smooth transition
           "transition-all duration-300 ease-out",
           variant === "bottom" && "items-end sm:items-center",
@@ -416,13 +426,7 @@ export function BaseModal({
           // Keep modal at bottom when keyboard is visible on mobile
           isKeyboardVisible && "sm:items-center",
         )}
-        style={{
-          zIndex,
-          // Use visual viewport height on mobile to prevent modal jumping
-          height: isKeyboardVisible
-            ? `${window.visualViewport?.height || window.innerHeight}px`
-            : "100vh",
-        }}
+        style={{ zIndex }}
       >
         <div
           ref={modalContentRef}
@@ -582,6 +586,7 @@ export function BaseModal({
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }

@@ -29,6 +29,7 @@ type Services struct {
 	Push               PushService
 	PriceAlert         PriceAlertService
 	Watchlist          WatchlistService
+	UserPriceAlert     UserPriceAlertService
 }
 
 // NewServices creates all service instances with proper dependency ordering.
@@ -79,6 +80,20 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	// Phase 1 (cont.): WatchlistService — depends on watchlist repo, gold/silver/currency price services, market data service
 	watchlistSvc := NewWatchlistService(repos.Watchlist, goldPriceSvc, silverPriceSvc, currencyPriceSvc, marketDataSvc)
 
+	// Phase 1 (cont.): UserPriceAlertService — depends on alert repo, price services, notification repo, push service, Redis
+	var userPriceAlertSvc UserPriceAlertService
+	if rdb != nil {
+		userPriceAlertSvc = NewUserPriceAlertService(
+			repos.UserPriceAlert,
+			goldPriceSvc,
+			silverPriceSvc,
+			marketDataSvc,
+			repos.Notification,
+			pushSvc,
+			rdb,
+		)
+	}
+
 	// Phase 1 (cont.): CommunityService — depends on storage provider for image uploads
 	communitySvc := NewCommunityService(repos.Post, repos.Comment, repos.Like, repos.Follow, repos.Report, repos.User, repos.Notification, repos.SavedPost, repos.Hashtag, communityStorage, rdb)
 
@@ -101,6 +116,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		Push:             pushSvc,
 		PriceAlert:       priceAlertSvc,
 		Watchlist:        watchlistSvc,
+		UserPriceAlert:   userPriceAlertSvc,
 	}
 }
 
@@ -136,6 +152,7 @@ type Repositories struct {
 	SiteSettings          repository.SiteSettingsRepository
 	PushSubscription      repository.PushSubscriptionRepository
 	Watchlist             repository.WatchlistRepository
+	UserPriceAlert        repository.UserPriceAlertRepository
 }
 
 // NewRepositories creates all repository instances.

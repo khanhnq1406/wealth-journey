@@ -39,6 +39,7 @@ C4Component
         Component(price_alert_config_h, "PriceAlertConfig Handler", "handlers/price_alert_config.go", "Admin-only: GET/PUT /admin/price-alert-config. Loads config from Redis with env var defaults, merges partial updates, sanitizes HTML, validates fields. Protected by AdminMiddleware.")
         Component(push_h, "Push Handler", "handlers/push.go", "GET /push/vapid-key (public key), POST /push/subscribe (validates HTTPS endpoint, base64 keys, max 5 subs/user), DELETE /push/subscribe (by endpoint). Auth required for subscribe/unsubscribe.")
         Component(watchlist_h, "Watchlist Handler", "handlers/watchlist.go", "CRUD for user symbol watchlists. GET /watchlist (list), POST /watchlist (add symbol), DELETE /watchlist/{id} (remove). Auth required. Delegates to WatchlistService and fetches live prices on list.")
+        Component(user_price_alert_h, "UserPriceAlert Handler", "handlers/user_price_alert.go", "CRUD for user-defined price alerts. GET /price-alerts (list), POST /price-alerts (create), PUT /price-alerts/{id} (update), DELETE /price-alerts/{id} (remove). Auth required. Delegates to UserPriceAlertService.")
     }
 
     Container_Boundary(services, "Service Layer — TRUST BOUNDARY: Data considered validated after this point") {
@@ -65,6 +66,7 @@ C4Component
         Component(gold_price_svc, "Gold Price Service", "domain/service/gold_price_service.go", "Fetches and caches Vietnamese and world gold prices from vangsaigon.vn API. Provides typed gold price lookup by type code (SJC variants, DOJI, XAU). Redis-cached with 15-minute TTL.")
         Component(silver_price_svc, "Silver Price Service", "domain/service/silver_price_service.go", "Fetches and caches silver prices from multiple sources (Phú Quý, Ancarat, DOJI). Provides typed silver price lookup by type code. Redis-cached with 15-minute TTL.")
         Component(watchlist_svc, "Watchlist Service", "domain/service/watchlist_service.go", "User watchlist management: add/remove/list symbols with deduplication. Enriches list results with live prices by delegating to MarketDataService (stocks/crypto/ETFs), GoldPriceService (gold type codes), and SilverPriceService (silver type codes). Validates symbol existence before adding.")
+        Component(user_price_alert_svc, "UserPriceAlert Service", "domain/service/user_price_alert_service.go", "Manages user-defined price alerts: CRUD operations, threshold evaluation against live prices from MarketDataService/GoldPriceService/SilverPriceService. Triggers notifications via NotificationRepository and push delivery via PushService when alert conditions are met.")
     }
 
     Container_Boundary(repos, "Repository Layer (Data Access)") {
@@ -93,6 +95,7 @@ C4Component
         Component(feedback_repo, "Feedback Repository", "GORM", "Feedback CRUD with user scoping and rate limit counting")
         Component(site_settings_repo, "SiteSettings Repository", "GORM", "site_settings table CRUD with bulk upsert via ON CONFLICT")
         Component(watchlist_repo, "Watchlist Repository", "GORM", "watchlist table CRUD with user scoping. Enforces unique (user_id, symbol) constraint. Supports list by user_id with ordering by created_at.")
+        Component(user_price_alert_repo, "UserPriceAlert Repository", "GORM", "user_price_alert table CRUD with user scoping. Stores per-user alert definitions (symbol, target_price, direction, trigger_mode, AlertStatus enum: active/triggered/paused). Supports list by user_id and lookup by id+user_id for ownership verification.")
     }
 
     Container_Boundary(external, "External Integrations — TRUST BOUNDARY: Untrusted external responses") {
@@ -144,6 +147,7 @@ C4Component
     Rel(gin, push_h, "Routes /push/*")
     Rel(gin, price_alert_config_h, "Routes /admin/price-alert-config")
     Rel(gin, watchlist_h, "Routes /watchlist/*")
+    Rel(gin, user_price_alert_h, "Routes /price-alerts/*")
 
     Rel(auth_h, auth_svc, "Delegates auth logic")
     Rel(user_h, user_svc, "Delegates user ops")
@@ -224,16 +228,24 @@ C4Component
     Rel(price_alert_svc, user_repo, "Gets all user IDs")
     Rel(price_alert_svc, redis, "Baselines, cooldowns, SSE publish")
     Rel(watchlist_h, watchlist_svc, "Delegates watchlist ops")
+    Rel(user_price_alert_h, user_price_alert_svc, "Delegates price alert ops")
     Rel(watchlist_svc, watchlist_repo, "Persists watchlist entries")
     Rel(watchlist_svc, market_svc, "Fetches live prices for stock/crypto/ETF symbols")
     Rel(watchlist_svc, gold_price_svc, "Fetches live prices for gold type code symbols")
     Rel(watchlist_svc, silver_price_svc, "Fetches live prices for silver type code symbols")
+    Rel(user_price_alert_svc, user_price_alert_repo, "Persists user alert definitions")
+    Rel(user_price_alert_svc, market_svc, "Fetches live prices for alert evaluation (stocks/crypto/ETF)")
+    Rel(user_price_alert_svc, gold_price_svc, "Fetches live gold prices for alert evaluation")
+    Rel(user_price_alert_svc, silver_price_svc, "Fetches live silver prices for alert evaluation")
+    Rel(user_price_alert_svc, notification_repo, "Creates notifications when alert conditions are met")
+    Rel(user_price_alert_svc, push_svc, "Push delivery when alert conditions are met")
     Rel(price_alert_svc, gold_price_svc, "Fetches gold prices for movement detection")
     Rel(price_alert_svc, silver_price_svc, "Fetches silver prices for movement detection")
     Rel(push_svc, push_sub_repo, "Fetches subscriptions for delivery")
     Rel(push_sub_repo, postgres, "SQL")
     Rel(gold_sentiment_svc, redis, "Caches vote counts (30s TTL)")
     Rel(watchlist_repo, postgres, "SQL")
+    Rel(user_price_alert_repo, postgres, "SQL")
     Rel(community_svc, post_repo, "Persists posts")
     Rel(community_svc, comment_repo, "Persists comments")
     Rel(community_svc, like_repo, "Persists likes")

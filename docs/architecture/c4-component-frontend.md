@@ -13,9 +13,10 @@ C4Component
         Component(finance_page, "Finance Page", "app/dashboard/finance", "Unified tabbed view: FinanceTabBar switches between TransactionContent, ReportContent, BudgetContent via URL query params (?tab=transaction|report|budget). Content lazy-loaded via next/dynamic. Old routes (/transaction, /report, /budget) redirect here via middleware.")
         Component(wallet_page, "Wallet Page", "app/dashboard/wallets", "Wallet grid/list with fund operations")
         Component(portfolio_page, "Portfolio Page", "app/dashboard/portfolio", "Investment portfolio with analytics; period pill selector (1D/1W/1M/ALL) via PortfolioSummaryEnhanced. No wallet filter — queries all investments via walletId=0.")
-        Component(prices_page, "Prices Page", "app/dashboard/prices", "Live gold/silver/currency/market prices with 5 tabs (Gold, Silver, Currency, Symbol Lookup, Watchlist). Admin users see inline price edit controls via useAuth isAdmin check. Added to desktop Sidebar and mobile BottomNav/slide-out menu as a primary navigation destination.")
+        Component(prices_page, "Prices Page", "app/dashboard/prices", "Live gold/silver/currency/market prices with 6 tabs (Price Alerts [default], Watchlist, Gold, Silver, Currency, Symbol Lookup). Price Alerts tab is first — renders PriceAlertList + CreatePriceAlertForm modal inline. Admin users see inline price edit controls via useAuth isAdmin check.")
         Component(community_page, "Community Page", "app/dashboard/community", "Social feed with posts, comments, likes, user profiles")
         Component(settings, "Settings Pages", "app/dashboard/settings", "Sessions, import templates, language toggle, security (auth methods, set/change password)")
+        Component(alerts_page, "Alerts Settings Redirect", "app/dashboard/settings/alerts", "Server-side redirect to /dashboard/prices. Price alert management was moved to the Prices page (Price Alerts tab). This route is kept for backward compatibility / bookmarked links.")
         Component(feedback_page, "Feedback Page", "app/dashboard/feedback", "Submit feedback form and view personal feedback history with status badges")
         Component(admin_page, "Admin CMS Page", "app/dashboard/admin", "Tabbed admin dashboard (SEO/Users/Feedback/Notifications). SEO tab: metadata editor (title, description, keywords, OG tags, Twitter cards, robots directives) and footer editor. Users tab: search users, toggle admin roles with self-protection. Feedback tab: status filter, view/update feedback with admin notes, soft-delete. Notifications tab: broadcast form (500 char limit) + price alert config form (global settings, per-category thresholds/templates/enable-disable). Admin-only access via AdminGuard.")
     }
@@ -33,6 +34,7 @@ C4Component
         Component(feedback_feat, "Feedback Feature", "features/feedback", "SubmitFeedbackForm (Zod validation, rate limit handling), StatusBadge (pending/reviewed/resolved), FeedbackItem (expandable card), feedback-schema.ts")
         Component(admin_feat, "Admin Feature", "features/admin", "AdminGuard component (redirects non-admin users), AdminUsersTab (search, MobileTable, role toggle with self-protection, confirmation dialog), AdminFeedbackTab (status filter, edit panel for status/admin note, delete confirmation), AdminBroadcastForm (textarea with 500-char limit, char counter, POST /admin/broadcast), PriceAlertConfigForm (accordion-based config for global settings + per-category thresholds/templates, GET/PUT /admin/price-alert-config), Pagination component, admin-specific hooks and utilities")
         Component(watchlist_feat, "Watchlist Feature", "features/watchlist", "WatchlistTab: draggable symbol list with live prices, P/L column, remove button. AddToWatchlistForm: SymbolAutocomplete-based add form with asset-type badge preview. DraggableWatchlistTable: drag-to-reorder rows with react-dnd. AssetTypeBadge: pill badge for STOCK/ETF/CRYPTO/GOLD/SILVER/CURRENCY asset types. hooks/useWatchlist.ts: query + mutations for list/add/remove. utils/watchlist-helpers.ts: price formatting and asset-type label resolution.")
+        Component(price_alert_feat, "Price Alert Feature", "features/price-alert", "CreatePriceAlertForm: SymbolAutocomplete-based form to define alert symbol, threshold price, and direction (above/below). PriceAlertList: list of user alerts with active/inactive toggle, edit and delete actions. PriceAlertItem: single alert card showing symbol, threshold, direction, and last-triggered time. hooks/usePriceAlerts.ts: query + mutations for list/create/update/delete. utils/price-alert-helpers.ts: direction label and threshold formatting.")
     }
 
     Container_Boundary(shared, "Shared Layer") {
@@ -79,9 +81,11 @@ C4Component
     Rel(finance_page, report_feat, "Renders report tab content")
     Rel(wallet_page, wallet_feat, "Renders wallet management")
     Rel(portfolio_page, invest_feat, "Renders portfolio")
+    Rel(portfolio_page, price_alert_feat, "Set Alert entry point: per-holding alert button in investment detail modal")
     Rel(prices_page, prices_feat, "Renders price tables")
-    Rel(prices_page, watchlist_feat, "Renders Watchlist tab (5th tab)")
+    Rel(prices_page, watchlist_feat, "Renders Watchlist tab (2nd tab)")
     Rel(prices_page, auth_feat, "useAuth isAdmin check for inline price editing")
+    Rel(prices_page, price_alert_feat, "Price Alerts tab (1st, default): full alert list + create form; Set Alert entry point on Gold/Silver/Symbol rows")
     Rel(auth_pages, auth_feat, "Renders auth forms")
     Rel(settings, import_feat, "Renders import templates")
     Rel(community_page, community_feat, "Renders social feed and profiles")
@@ -117,6 +121,8 @@ C4Component
     Rel(admin_feat, redux, "Reads isAdmin from auth state")
     Rel(admin_feat, gen_hooks, "useQueryGetSiteSettings, useMutationUpdateSiteSettings")
     Rel(watchlist_feat, gen_hooks, "useQueryGetWatchlist, useMutationAddToWatchlist, useMutationRemoveFromWatchlist")
+    Rel(price_alert_feat, gen_hooks, "useQueryListPriceAlerts, useMutationCreatePriceAlert, useMutationUpdatePriceAlert, useMutationDeletePriceAlert")
+    Rel(price_alert_feat, forms, "Uses SymbolAutocomplete, FormInput, FormSelect for alert creation")
     Rel(watchlist_feat, forms, "Uses SymbolAutocomplete (FormAutocomplete) for add form")
     Rel(watchlist_feat, tables, "Uses DraggableWatchlistTable (extends MobileTable with drag-to-reorder)")
 

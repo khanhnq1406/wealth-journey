@@ -63,6 +63,21 @@ function parseHTTPAnnotation(lines, startIndex) {
       if (braceMatch) braceCount += braceMatch.length;
       const closeMatch = line.match(/\}/g);
       if (closeMatch) braceCount -= closeMatch.length;
+
+      // Parse method/path/body from this line (handles single-line annotations like
+      // `option (google.api.http) = { post: "/api/v1/price-alerts" body: "*" };`)
+      const getMatch = line.match(/get:\s*["']([^"']+)["']/);
+      const postMatch = line.match(/post:\s*["']([^"']+)["']/);
+      const putMatch = line.match(/put:\s*["']([^"']+)["']/);
+      const deleteMatch = line.match(/delete:\s*["']([^"']+)["']/);
+      const bodyMatch = line.match(/body:\s*["']([^"']+)["']/);
+      if (getMatch) result = { method: "get", path: getMatch[1], body: null };
+      if (postMatch) result = { method: "post", path: postMatch[1], body: null };
+      if (putMatch) result = { method: "put", path: putMatch[1], body: null };
+      if (deleteMatch) result = { method: "delete", path: deleteMatch[1], body: null };
+      if (bodyMatch) result.body = bodyMatch[1];
+
+      if (braceCount <= 0) break;
       continue;
     }
 
