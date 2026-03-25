@@ -209,6 +209,7 @@ No database migrations required. No proto changes. No frontend changes.
 | 2026-03-25 | vangtoday: parse new object API format (gold=[], currency=[] empty) | Minor    | 2e42300 |
 | 2026-03-25 | FetchPriceForSymbol: query all sources to find BTMC-exclusive symbols | Minor  | 52917fd |
 | 2026-03-25 | FetchGoldPricesAllSources: normalize alias TypeCodes (VNGSJC→SJC); add MIHONG prefix to vangtoday classifier | Minor | 8cd8161 |
+| 2026-03-25 | Alias MIHONG_999→Mihong_999 in aliasToCanonical; fix misleading "from vang.today" error message | Minor | c3c9ed9 |
 
 ---
 
@@ -284,6 +285,37 @@ gold symbol "SJC" not found in live price data
 **`FetchAllPrices` is unaffected** — it still uses `FetchGoldPrices` (stop-at-first-success, health-aware). Only the all-sources merge path normalizes aliases.
 
 **Security review:** Alias map is a compile-time constant with no user input. Normalization only replaces TypeCode strings; Buy/Sell values are unchanged. Zero/negative price guards in the vangtoday client remain in place.
+
+---
+
+---
+
+### Fix 4 — MIHONG_999 alias + misleading error message
+
+**Symptoms (from runtime logs):**
+```
+Warning: failed to get price for Mihong_999: unable to fetch current price for Mihong_999.
+Error: failed to fetch gold price from vang.today: gold symbol "Mihong_999" not found in live price data
+
+Warning: API fetch failed for Vàng nhẫn SJC, using stale cache: failed to fetch gold price from vang.today:
+gold symbol "Vàng nhẫn SJC" not found in live price data
+```
+
+**Root Cause (Issue 1 — Mihong_999):** `pkg/gold/types.go` registers `"Mihong_999"` as the canonical TypeCode for Mi Hồng 999 gold. The vangtoday client applies `strings.ToUpper()` to all TypeCodes, producing `"MIHONG_999"`. `FetchGoldPricesAllSources` merges results and only applies `aliasToCanonical` normalization — but `"MIHONG_999"` was not in that map. The exact-match lookup `p.TypeCode == "Mihong_999"` therefore never matched, and the symbol was reported "not found in live price data".
+
+**Root Cause (Issue 2 — misleading "from vang.today"):** The error wrapper in `fetchGoldPriceFromAPI` used the hardcoded string `"failed to fetch gold price from vang.today"`. However, `FetchPriceForSymbol` calls `FetchGoldPricesAllSources` which queries **all** configured sources (vangsaigon, vang.today, BTMC) and merges results. When the symbol is unavailable across all sources (e.g., `"Vàng nhẫn SJC"` is exclusive to vangsaigon, which is timing out), the error message implied only vang.today was tried — misleading for operators reading logs.
+
+**Fix:**
+
+| File | Change |
+|------|--------|
+| `domain/service/price_fetcher.go` | Added `"MIHONG_999": "Mihong_999"` to `aliasToCanonical` map |
+| `domain/service/price_fetcher_test.go` | Added `TestWaterfallGoldFetcher_AllSources_MIHONG999AliasNormalization` (TDD — written before fix) |
+| `domain/service/market_data_service.go` | Changed `"failed to fetch gold price from vang.today"` → `"failed to fetch gold price"` |
+
+**Behavior of `Vàng nhẫn SJC`:** This symbol is exclusive to vangsaigon and has no equivalent in vang.today or BTMC. When vangsaigon times out, the symbol is genuinely unavailable from live sources. The system correctly falls back to the DB stale cache (logs show `rows:1` in `market_data_repository`). This is expected graceful degradation — the fix only improves the log message accuracy. Adding a vangtoday alias would require first observing what TypeCode vang.today uses for SJC nhẫn in production data.
+
+**Security review:** Approved — alias map is compile-time constant with no external input; error message change has no client-visible effect (handler strips raw errors before responding).
 
 ---
 
