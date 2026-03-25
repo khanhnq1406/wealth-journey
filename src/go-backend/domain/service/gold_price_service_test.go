@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -464,6 +465,44 @@ func TestGoldPriceService_FetchPriceForSymbol_SymbolNotFound(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Nil(t, got)
+}
+
+// ---------------------------------------------------------------------------
+// TestGoldPriceService_FetchPriceForSymbol_AliasFromVangToday
+// ---------------------------------------------------------------------------
+
+// TestGoldPriceService_FetchPriceForSymbol_AliasFromVangToday verifies the
+// end-to-end alias lookup path: vangsaigon is down, vang.today returns
+// "VNGSJC" for SJC gold, FetchPriceForSymbol("SJC") should find it via
+// the aliasToCanonical map applied inside FetchGoldPricesAllSources.
+func TestGoldPriceService_FetchPriceForSymbol_AliasFromVangToday(t *testing.T) {
+	ctx := context.Background()
+	client, _ := newMiniredisClient(t)
+	goldCache := cache.NewGoldPriceCache(client)
+
+	// vangsaigon fails — simulates the scenario observed in production logs.
+	vangsaigonFetcher := &mockGoldFetcher{
+		source: SourceVangSaiGon,
+		err:    fmt.Errorf("vangsaigon: connection refused"),
+	}
+	// vang.today returns "VNGSJC" — the alias for canonical "SJC".
+	vangtodayFetcher := &mockGoldFetcher{
+		source: SourceVangToday,
+		prices: []*CachedGoldPrice{
+			{TypeCode: "VNGSJC", Name: "VN Gold SJC", Buy: 172_000_000, Sell: 175_000_000, Currency: "VND"},
+		},
+	}
+
+	health := &alwaysHealthy{}
+	waterfall := NewWaterfallGoldFetcher([]GoldPriceFetcher{vangsaigonFetcher, vangtodayFetcher}, health)
+	svc := newGoldPriceServiceForTest(waterfall, goldCache)
+
+	got, err := svc.FetchPriceForSymbol(ctx, "SJC")
+
+	require.NoError(t, err, "FetchPriceForSymbol('SJC') should succeed via VNGSJC alias")
+	require.NotNil(t, got)
+	assert.Equal(t, "SJC", got.TypeCode, "TypeCode must be normalized to canonical 'SJC'")
+	assert.Equal(t, int64(172_000_000), got.Buy, "Buy price must be preserved from vang.today source")
 }
 
 // ---------------------------------------------------------------------------
