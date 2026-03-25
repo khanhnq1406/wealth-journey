@@ -8,7 +8,7 @@
 - **Started:** 2026-03-25T00:00:00Z
 - **Last updated:** 2026-03-25T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 3
+- **Current task:** 4
 
 ## Task Progress
 
@@ -17,7 +17,7 @@
 | 0   | Proto Changes — Add type + updatedInvestment         | done        | 1644a61 | Added type=7 to EditInvestmentTransactionRequest, updatedInvestment=5 to response; regenerated all |
 | 1   | Backend — Buy Quantity Reduction Guard               | done        | 477d42c | Added validateBuyQuantityReduction helper + 8 TDD tests |
 | 2   | Backend — Full EditTransaction Delete-and-Recreate   | done        | 3157b5e | Rewrote EditTransaction: ownership check, guards, reverse+delete+process, cache invalidation; 11 tests |
-| 3   | Backend — Update Handler type validation + response  | pending     | —      | —       |
+| 3   | Backend — Update Handler type validation + response  | done        | 1b12042 | Added type enum allowlist validation; handler.Success returns updatedInvestment; 7 tests |
 | 4   | Frontend — Edit Mode to AddInvestmentTransactionForm | pending     | —      | —       |
 | 5   | Frontend — Edit Button + State in InvestmentDetailModal | pending  | —      | —       |
 | 6   | Update Runtime Flow Diagram                          | pending     | —      | —       |

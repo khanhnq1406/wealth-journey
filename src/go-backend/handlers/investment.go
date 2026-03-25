@@ -484,6 +484,16 @@ func (h *InvestmentHandlers) EditTransaction(c *gin.Context) {
 		return
 	}
 
+	// Validate type: 0 (UNSPECIFIED = keep existing), 1 (BUY), 2 (SELL), 3 (DIVIDEND) are allowed.
+	// SPLIT (4) and any unknown value are rejected.
+	if req.Type != investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_UNSPECIFIED &&
+		req.Type != investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_BUY &&
+		req.Type != investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_SELL &&
+		req.Type != investmentv1.InvestmentTransactionType_INVESTMENT_TRANSACTION_TYPE_DIVIDEND {
+		handler.BadRequest(c, apperrors.NewValidationErrorWithCode(apperrors.Codes.InvestmentTxTypeInvalid, "type must be one of: 0 (unspecified), 1 (buy), 2 (sell), 3 (dividend)"))
+		return
+	}
+
 	// Set default transaction date if not provided
 	if req.TransactionDate == 0 {
 		req.TransactionDate = time.Now().Unix()

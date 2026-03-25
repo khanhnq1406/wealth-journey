@@ -67,6 +67,7 @@ type ErrorCodes struct {
 	InvestmentPricePositive          string
 	InvestmentFeesNegative           string
 	InvestmentTxTypeRequired         string
+	InvestmentTxTypeInvalid          string
 	InvestmentTxDateFuture           string
 	InvestmentDuplicate              string
 	InvestmentQueryRequired          string
@@ -307,6 +308,7 @@ var Codes = ErrorCodes{
 	InvestmentPricePositive:          "INVESTMENT_PRICE_POSITIVE",
 	InvestmentFeesNegative:           "INVESTMENT_FEES_NEGATIVE",
 	InvestmentTxTypeRequired:         "INVESTMENT_TX_TYPE_REQUIRED",
+	InvestmentTxTypeInvalid:          "INVESTMENT_TX_TYPE_INVALID",
 	InvestmentTxDateFuture:           "INVESTMENT_TX_DATE_FUTURE",
 	InvestmentDuplicate:              "INVESTMENT_DUPLICATE",
 	InvestmentQueryRequired:          "INVESTMENT_QUERY_REQUIRED",
