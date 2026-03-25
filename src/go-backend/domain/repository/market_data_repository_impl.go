@@ -7,6 +7,8 @@ import (
 	"wealthjourney/domain/models"
 	"wealthjourney/pkg/database"
 	apperrors "wealthjourney/pkg/errors"
+
+	"gorm.io/gorm/clause"
 )
 
 // marketDataRepository implements MarketDataRepository using GORM.
@@ -35,9 +37,17 @@ func (r *marketDataRepository) GetBySymbolAndCurrency(ctx context.Context, symbo
 	return &data, nil
 }
 
-// Create creates a new market data entry.
+// Create upserts a market data entry. If a row for the same (symbol, currency) already
+// exists it is updated in-place, preventing "duplicate key value violates unique
+// constraint idx_symbol_currency" errors that occur when concurrent goroutines both
+// see a cache miss and race to insert the same symbol.
 func (r *marketDataRepository) Create(ctx context.Context, data *models.MarketData) error {
-	result := r.db.DB.WithContext(ctx).Create(data)
+	result := r.db.DB.WithContext(ctx).
+		Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "symbol"}, {Name: "currency"}},
+			DoUpdates: clause.AssignmentColumns([]string{"price", "change24h", "volume24h", "timestamp", "updated_at"}),
+		}).
+		Create(data)
 	if result.Error != nil {
 		return r.handleDBError(result.Error, "market data", "create market data")
 	}
