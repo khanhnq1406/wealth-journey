@@ -89,10 +89,13 @@ All 9 security categories satisfied:
 | Date       | Fix                                                                     | Severity | Tests |
 | ---------- | ----------------------------------------------------------------------- | -------- | ----- |
 | 2026-03-25 | Price label for gold/silver VND was hardcoded English ("Price per Tael") — replaced with i18n key `transaction.pricePerUnitWithUnit` in `AddInvestmentTransactionForm.tsx`; added key to `en/investment.json` and `vi/investment.json` | Minor | 2 new tests added (17/17 pass) |
+| 2026-03-25 | Phí (fees) field showed blank on first render instead of `0` — `FormNumberInput` `useState("")` initialized display to empty; fixed by using a lazy initializer that computes the initial display value synchronously from the field's default value | Minor | 3 new tests added in `FormNumberInput.test.tsx` (394/394 pass) |
+| 2026-03-25 | BUY→SELL edit orphaned the old transaction when processSellTransaction failed — `txRepo.Delete` ran before the process step, so on failure the old tx was soft-deleted with no replacement, causing "investment transaction not found" on retry and empty transaction list on refresh; fixed by moving Delete to after the process switch | Minor | 1 new test `TestEditTransaction_BuyToSell_SingleLot_ProcessFailDoesNotDeleteOldTx` (12/12 pass) | commit 99e2ad2 |
 
 ## Known Issues / Technical Debt
 
-- **No DB-level atomicity**: `EditTransaction` performs reversal + soft-delete + re-process as sequential repository calls. If the process crashes mid-way, the lot/wallet state could be partially updated. Mitigation: each step is logged and the operation is idempotent-ish (re-running will fail at the ownership check on the already-soft-deleted tx). Full atomicity would require DB transactions at the repository layer — deferred.
+- **No DB-level atomicity**: `EditTransaction` performs reversal + soft-delete + re-process as sequential repository calls. If the process crashes mid-way, the lot/wallet state could be partially updated. Full atomicity would require DB transactions at the repository layer — deferred.
+- **Concurrent-replay race**: No pessimistic lock guards `EditTransaction`. Two simultaneous requests with the same transaction ID could double-reverse and double-process. Fix requires `SELECT FOR UPDATE` inside a DB transaction wrapping the reversal+process+delete sequence — deferred.
 - **Re-fetch after reversal**: `reverseBuyTransaction` mutates the in-memory `investment` pointer and persists. We re-fetch via `investmentRepo.GetByID` after reversal to avoid stale-state bugs on type changes. This is a known N+1 for edit — acceptable given edit frequency.
 
 ## Files Changed
