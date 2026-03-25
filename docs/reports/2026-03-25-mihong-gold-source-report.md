@@ -143,3 +143,9 @@ GitNexus not available — manual blast radius review performed.
 2. Observe logs: the recurring warnings `gold symbol "Mihong_999" not found` and `gold symbol "Vàng nhẫn SJC" not found` should no longer appear
 3. Trigger a portfolio price refresh for a `Mihong_999` holding — should succeed even if vangsaigon/vang.today are unavailable
 4. Check `Vàng nhẫn SJC` — should now resolve from vang.today's `SJ9999` TypeCode without stale-cache fallback
+
+## Fix History
+
+| Date       | Fix                                                                              | Severity | Commit    |
+| ---------- | -------------------------------------------------------------------------------- | -------- | --------- |
+| 2026-03-25 | Replace plain `INSERT` in `marketDataRepository.Create` with upsert (`INSERT … ON CONFLICT DO UPDATE`) to eliminate `idx_symbol_currency` duplicate-key errors caused by concurrent cache-miss goroutines. Adds 2 regression tests. | Minor    | 49ae762   |
