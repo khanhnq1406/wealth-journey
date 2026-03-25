@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-25-price-fallback-plan.md
 - **Spec file:** docs/specs/2026-03-25-price-fallback-spec.md
 - **Started:** 2026-03-25T00:00:00Z
-- **Last updated:** 2026-03-25T00:00:00Z
+- **Last updated:** 2026-03-25T04:00:00Z
 - **Current state:** in_progress
-- **Current task:** 0
+- **Current task:** 10
 
 ## Task Progress
 
@@ -20,10 +20,10 @@
 | 3   | Create Emergency Cache (1-Hour Stale Data)             | done        | c8418ad | SetEmergency/GetEmergency on GoldPriceCache and CurrencyPriceCache with 1-hour TTL |
 | 4   | Create vang.today Client (pkg/vangtoday)               | done        | —      | HTTPS JSON client: 1MB limit, context timeout, prefix-based gold/currency classification, zero-price filtering |
 | 5   | Create BTMC Client (pkg/btmc)                          | done        | —      | HTTP XML client: 1MB limit, context timeout, type-code mapping, comma-price parsing, API key required |
-| 6   | Implement vangsaigon GoldPriceFetcher Adapter          | pending     | —      | —       |
-| 7   | Implement vang.today GoldPriceFetcher and Currency Adapters | pending | —      | —       |
-| 8   | Implement BTMC GoldPriceFetcher Adapter                | pending     | —      | —       |
-| 9   | Implement vangsaigon CurrencyPriceFetcher Adapter      | pending     | —      | —       |
+| 6   | Implement vangsaigon GoldPriceFetcher Adapter          | done        | 3dcbf72 | vangSaiGonGoldFetcher wraps fetchPricesFn; VND×1000, USD×100; 5 tests pass |
+| 7   | Implement vang.today GoldPriceFetcher and Currency Adapters | done   | 3dcbf72 | vangTodayGoldFetcher + vangTodayCurrencyFetcher direct field copy; ChangeBuy/Sell=0 for currency; 8 tests pass |
+| 8   | Implement BTMC GoldPriceFetcher Adapter                | done        | 3dcbf72 | btmcGoldFetcher wraps fetchBTMCFn; ChangeBuy/Sell=0; constructor errors on empty apiKey; 4 tests pass |
+| 9   | Implement vangsaigon CurrencyPriceFetcher Adapter      | done        | 3dcbf72 | vangSaiGonCurrencyFetcher wraps fetchPricesFn; raw VND prices; Source()=vangsaigon; 8 tests pass |
 | 10  | Refactor goldPriceService to Use Waterfall Fallback    | pending     | —      | —       |
 | 11  | Refactor currencyPriceService to Use Waterfall Fallback| pending     | —      | —       |
 | 12  | Update DI Wiring (services.go, builder.go, config.go)  | pending     | —      | —       |
