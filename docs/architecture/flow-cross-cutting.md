@@ -15,6 +15,7 @@ Infrastructure-level flows that are referenced by multiple domain flows. Read th
 - [Admin Price Alert Config Flow](#9-admin-price-alert-config-flow)
 - [Error Code Translation Flow](#10-error-code-translation-flow)
 - [FetchAllPrices Aggregate Cache Flow](#11-fetchallprices-aggregate-cache-flow)
+- [Price Fallback Chain](#12-price-fallback-chain)
 
 ---
 
@@ -870,51 +871,122 @@ sequenceDiagram
 **Trigger:** `GET /api/v1/investments/market-prices` (Prices page load or manual refresh)
 **Source:** `domain/service/gold_price_service.go`, `domain/service/silver_price_service.go`, `domain/service/currency_price_service.go`
 
-This flow applies identically to all three price services. The aggregate cache key prevents repeated calls to the vangsaigon external API when users reload the Prices page.
+Gold and currency services use a multi-source waterfall with emergency cache. Silver service uses a direct aggregation (unchanged). The aggregate cache key prevents repeated API calls on page reload.
 
 ```mermaid
 sequenceDiagram
     participant H as MarketPricesHandler
-    participant S as GoldPriceService<br/>(Silver / Currency identical)
+    participant S as GoldPriceService<br/>(CurrencyPriceService identical)
     participant R as Redis
-    participant A as vangsaigon API<br/>(external)
+    participant V1 as vangsaigon API
+    participant V2 as vang.today API
+    participant BT as BTMC API<br/>(gold only, optional)
 
     H->>S: FetchAllPrices(ctx)
     S->>R: GET gold_price:all
     alt Cache hit (within 5 min TTL)
         R-->>S: []CachedGoldPrice (JSON)
         S-->>H: []CachedGoldPrice (no external call)
-    else Cache miss (first call or TTL expired)
+    else Cache miss
         R-->>S: redis.Nil
-        S->>A: HTTP GET vangsaigon API
-        alt API success
-            A-->>S: PricesResponse
-            S->>S: build []CachedGoldPrice
+        S->>V1: FetchGoldPrices (5s timeout)
+        alt vangsaigon success
+            V1-->>S: []CachedGoldPrice
             S-->>H: []CachedGoldPrice
-            S-)R: SET gold_price:all TTL=5m (async goroutine)
-            S-)R: SET gold_price:<symbol> TTL=15m per symbol (async goroutines)
-        else API error
-            A-->>S: error
-            S-->>H: error (propagated to caller)
+            S-)R: SET gold_price:all TTL=5m (async)
+            S-)R: SET gold_price:emergency TTL=1h (async)
+            S-)R: SET gold_price:<symbol> TTL=15m (async)
+        else vangsaigon fails → try vang.today
+            V1-->>S: error (mark unhealthy 2min)
+            S->>V2: FetchGoldPrices (5s timeout)
+            alt vang.today success
+                V2-->>S: []CachedGoldPrice
+                S-->>H: []CachedGoldPrice
+                S-)R: SET gold_price:all + emergency + per-symbol (async)
+            else vang.today fails → try BTMC (gold only)
+                V2-->>S: error (mark unhealthy 2min)
+                S->>BT: FetchGoldPrices (5s timeout)
+                alt BTMC success
+                    BT-->>S: []CachedGoldPrice
+                    S-->>H: []CachedGoldPrice
+                    S-)R: SET gold_price:all + emergency + per-symbol (async)
+                else all sources fail → try emergency cache
+                    BT-->>S: error
+                    S->>R: GET gold_price:emergency
+                    alt Emergency cache valid (< 1h)
+                        R-->>S: []CachedGoldPrice (stale)
+                        S-->>H: []CachedGoldPrice (stale, warning logged)
+                    else Emergency cache expired
+                        R-->>S: redis.Nil
+                        S-->>H: error
+                    end
+                end
+            end
         end
     end
 ```
 
 ### Key Invariants
 
-- The aggregate cache key (`gold_price:all`, `silver_price:all`, `currency_price:all`) is **global** (not user-scoped) — market prices are public data
-- Aggregate cache TTL is **5 minutes** (`AllGoldPricesCacheTTL`, `AllSilverPricesCacheTTL`, `AllCurrencyPricesCacheTTL`), matching the frontend `staleTime: 5 * 60 * 1000`
-- Individual per-symbol cache TTL remains **15 minutes** (used by `FetchPriceForSymbol` for watchlist enrichment)
+- The aggregate cache key (`gold_price:all`, `currency_price:all`) is **global** (not user-scoped) — market prices are public data
+- Aggregate cache TTL is **5 minutes**; individual per-symbol TTL is **15 minutes**; emergency cache TTL is **1 hour**
+- Unhealthy sources are **skipped for 2 minutes** (Redis TTL on health key) — the last source in the chain is always tried
+- Emergency cache is updated on **every successful fetch** (any source) — ensures freshness within the hour
 - Cache write failures are **non-fatal** — logged as warnings, response returned to caller regardless
-- The aggregate cache stores the **fully assembled result** including SBJ static rows (silver service) — not raw per-source data
-- On cache hit the external API is **never called**, regardless of how many concurrent users reload the page
+- BTMC is **optional** — if `BTMC_API_KEY` is absent, gold chain runs with 2 sources (vangsaigon → vang.today)
+- Currency service uses **2 sources only** (vangsaigon → vang.today) — BTMC has no currency data
 
 ### Error Paths
 
 | Condition | Response | Notes |
 |-----------|----------|-------|
-| Redis unavailable on GET | Cache miss → proceed to API | `redis.Nil` or network error treated as miss |
+| Redis unavailable on GET | Cache miss → proceed to waterfall | `redis.Nil` treated as miss |
 | Redis unavailable on SET | Warning logged; result returned normally | Non-fatal |
-| External API error, cache warm | Returns cached data (key still within TTL) | Transparent to caller |
-| External API error, cache cold | Error propagated to `MarketPricesHandler` | Handler returns partial success or 503 |
-| Silver partial source failure (e.g., Phú Quý down) | Best-effort result cached | Existing behaviour unchanged |
+| Single source fails | Next source tried; failing source marked unhealthy | Self-healing after 2-min TTL |
+| All live sources fail, emergency cache warm | Stale data returned with warning | Graceful degradation |
+| All live sources fail, emergency cache cold | Error propagated to `MarketPricesHandler` | Handler returns 503 |
+| Silver partial source failure (e.g., Phú Quý down) | Best-effort result cached | Silver service unchanged |
+
+---
+
+## 12. Price Fallback Chain
+
+**Source:** `domain/service/price_fetcher.go`, `domain/service/gold_price_service.go`, `domain/service/currency_price_service.go`
+**Added:** 2026-03-25 (price-fallback feature)
+
+```mermaid
+flowchart TD
+    A[FetchAllPrices called] --> B{Aggregate\ncache hit?}
+    B -->|Yes| C[Return cached data]
+    B -->|No| D[Get source list\nvangsaigon→vang.today→BTMC]
+    D --> E{More sources?}
+    E -->|No| K{Emergency\ncache valid?}
+    E -->|Yes, pick next| F{Source\nhealthy?}
+    F -->|No - skip\nunless last| E
+    F -->|Yes| G[Fetch with 5s timeout]
+    G -->|Success| H[Cache: regular +\nemergency + per-symbol]
+    H --> C
+    G -->|Fail| I[Log failure\nMark unhealthy 2min]
+    I --> E
+    K -->|Yes < 1h| L[Log warning\nReturn stale data]
+    K -->|No, expired| M[Return error]:::error
+
+    classDef error fill:#fee,stroke:#c00,color:#900
+```
+
+### Source Health State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> Healthy : initial state
+    Healthy --> Unhealthy : fetch fails\n(MarkUnhealthy TTL=2min)
+    Unhealthy --> Healthy : Redis TTL expires\n(self-healing)
+    Unhealthy --> Healthy : IsHealthy Redis error\n(fail-open)
+```
+
+### Key Invariants
+
+- **Fail-open**: if Redis is unavailable, `IsHealthy` returns `true` — never block all sources
+- **Last-source guarantee**: the last fetcher in the slice is **always tried** regardless of health status
+- **Emergency cache**: written asynchronously on every successful fetch; read synchronously only when all live sources fail
+- **BTMC key rotation**: if the API key changes, restart the service — the key is read once at startup via `os.Getenv`

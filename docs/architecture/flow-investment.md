@@ -357,7 +357,10 @@ flowchart TD
     J --> K["Create/update MarketData\n{symbol, price, change24h}"]
 
     G -- "Gold (VND/USD)" --> L["goldPriceService.FetchPriceForSymbol()"]
-    L --> M["vang.today API\nGold prices by type code"]
+    L --> L1{"Waterfall:\nvangsaigon → vang.today → BTMC"}
+    L1 -- "First success" --> M["[]CachedGoldPrice\nfiltered by TypeCode"]
+    L1 -- "All fail" --> L2["Emergency cache\n(1-hour TTL)"]
+    L2 --> M
     M --> N{"Gold type?"}
     N -- "VND" --> O["Price per lượng →\ngoldConverter.ProcessMarketPrice()\n→ price per gram (storage format)"]
     N -- "USD" --> P["Price per ounce × 100\n(convert to cents)"]
@@ -405,8 +408,8 @@ flowchart TD
 |----------------|---------------|----------|-----------|
 | Stocks / ETFs | Yahoo Finance | Stale cache | 15 min |
 | Crypto | Yahoo Finance | Stale cache | 15 min |
-| Gold (VND) | vang.today | Redis gold cache | 15 min |
-| Gold (USD) | vang.today | Redis gold cache | 15 min |
+| Gold (VND) | vangsaigon → vang.today → BTMC | Emergency cache (1h) | 15 min |
+| Gold (USD) | vangsaigon → vang.today → BTMC | Emergency cache (1h) | 15 min |
 | Silver (VND) | vang.today | Redis silver cache | 15 min |
 | Silver (USD) | Yahoo Finance (`SI=F`) | Stale cache | 15 min |
 | Custom | Manual only | N/A | N/A |
