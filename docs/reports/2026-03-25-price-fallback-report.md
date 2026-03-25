@@ -365,6 +365,8 @@ vangsaigon.vn → vang.today → BTMC (optional) → Mihong
 - `domain/service/price_fetcher`: 2 alias tests (SJ9999, SJL1L10) + 1 E2E Mihong fallback test
 - All tests: `go test -short ./...` — pass, build clean, lint clean
 
+**Full implementation report:** [`docs/reports/2026-03-25-mihong-gold-source-report.md`](./2026-03-25-mihong-gold-source-report.md)
+
 ---
 
 ## 11. Files Changed (Summary)
