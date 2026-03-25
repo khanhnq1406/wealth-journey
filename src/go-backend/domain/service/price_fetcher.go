@@ -32,9 +32,13 @@ const (
 // Current entries:
 //   - "VNGSJC" (vang.today) → "SJC" (vangsaigon canonical)
 //   - "MIHONG_999" (vang.today uppercased) → "Mihong_999" (pkg/gold/types.go canonical)
+//   - "SJ9999" (vang.today) → "Vàng nhẫn SJC" (pkg/gold/types.go canonical for SJC Ring)
+//   - "SJL1L10" (vang.today) → "SJC" (pkg/gold/types.go canonical for SJC 9999 bar)
 var aliasToCanonical = map[string]string{
 	"VNGSJC":    "SJC",
 	"MIHONG_999": "Mihong_999",
+	"SJ9999":    "Vàng nhẫn SJC",
+	"SJL1L10":   "SJC",
 }
 
 // GoldPriceFetcher abstracts fetching gold prices from a single source.
