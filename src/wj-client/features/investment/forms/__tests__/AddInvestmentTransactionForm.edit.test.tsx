@@ -415,3 +415,100 @@ describe("AddInvestmentTransactionForm — Edit Mode", () => {
     });
   });
 });
+
+describe("AddInvestmentTransactionForm — Price label i18n", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  const silverVndTxFixture: InvestmentTransaction = {
+    id: 99,
+    investmentId: 1,
+    walletId: 1,
+    type: InvestmentTransactionType.INVESTMENT_TRANSACTION_TYPE_BUY,
+    quantity: 100000, // 10 tael × 10000
+    price: 1000000, // 1,000,000 VND per gram (stored raw VND)
+    cost: 10000000,
+    fees: 0,
+    transactionDate: 1710460800,
+    notes: "",
+    createdAt: 1710460800,
+    updatedAt: 1710460800,
+    lotId: 0,
+    remainingQuantity: 100000,
+    displayPrice: undefined,
+    displayCost: undefined,
+    displayFees: undefined,
+    displayCurrency: "VND",
+  };
+
+  it("renders price label using i18n for silver VND investment (not hardcoded English)", () => {
+    // Use Vietnamese locale messages to verify i18n is used
+    const viMessages = {
+      ...commonMessages,
+      ...investmentMessages, // en messages as fallback; we override the specific key below
+    };
+
+    // Override the specific key with a Vietnamese translation to verify i18n is used
+    const viTestMessages = {
+      ...viMessages,
+      investment: {
+        ...(viMessages as any).investment,
+        transaction: {
+          ...(viMessages as any).investment?.transaction,
+          pricePerUnitWithUnit: "Giá mỗi {unit} ({currency})",
+        },
+      },
+    };
+
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <NextIntlClientProvider locale="vi" messages={viTestMessages}>
+          <AddInvestmentTransactionForm
+            investmentId={1}
+            investmentType={InvestmentType.INVESTMENT_TYPE_SILVER_VND}
+            investmentCurrency="VND"
+            purchaseUnit="tael"
+          />
+        </NextIntlClientProvider>
+      </QueryClientProvider>,
+    );
+
+    // Should render the i18n key with "Giá mỗi" prefix (Vietnamese), NOT "Price per" (hardcoded English)
+    const label = screen.queryByText(/price per/i);
+    expect(label).not.toBeInTheDocument();
+  });
+
+  it("renders price label using i18n key pricePerUnitWithUnit for gold VND investment", () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    });
+
+    const testMessages = {
+      ...commonMessages,
+      ...investmentMessages,
+    };
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <NextIntlClientProvider locale="en" messages={testMessages}>
+          <AddInvestmentTransactionForm
+            investmentId={1}
+            investmentType={InvestmentType.INVESTMENT_TYPE_GOLD_VND}
+            investmentCurrency="VND"
+          />
+        </NextIntlClientProvider>
+      </QueryClientProvider>,
+    );
+
+    // Should contain the translated label (the key value from en messages)
+    // The en key "pricePerUnitWithUnit" with unit=Mace (chỉ) should render
+    // as "Price per Mace (chỉ) (VND)" using the i18n key
+    const label = screen.getByText(/price per mace/i);
+    expect(label).toBeInTheDocument();
+  });
+});

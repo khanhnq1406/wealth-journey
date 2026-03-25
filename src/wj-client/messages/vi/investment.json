@@ -222,7 +222,8 @@
       "refreshingPrice": "Đang tải...",
       "saveChanges": "Lưu thay đổi",
       "transactionUpdatedSuccess": "Giao dịch đã được cập nhật!",
-      "transactionUpdatedMessage": "Giao dịch đã được cập nhật thành công"
+      "transactionUpdatedMessage": "Giao dịch đã được cập nhật thành công",
+      "pricePerUnitWithUnit": "Giá mỗi {unit} ({currency})"
     },
     "detail": {
       "overview": "Tổng quan",

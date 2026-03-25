@@ -222,7 +222,8 @@
       "refreshingPrice": "Loading...",
       "saveChanges": "Save Changes",
       "transactionUpdatedSuccess": "Transaction Updated!",
-      "transactionUpdatedMessage": "Transaction updated successfully"
+      "transactionUpdatedMessage": "Transaction updated successfully",
+      "pricePerUnitWithUnit": "Price per {unit} ({currency})"
     },
     "detail": {
       "overview": "Overview",

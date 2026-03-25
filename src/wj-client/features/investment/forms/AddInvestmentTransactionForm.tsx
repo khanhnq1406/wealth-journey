@@ -597,9 +597,15 @@ export function AddInvestmentTransactionForm({
         <div className="flex items-center gap-2 mb-1">
           <label className="block text-sm font-medium text-v2-gold-accent">
             {isGoldInvestment
-              ? `Price per ${getInvestmentUnitLabelFull(goldDisplayUnit || "oz", investmentType)} (${investmentCurrency})`
+              ? t("transaction.pricePerUnitWithUnit", {
+                  unit: getInvestmentUnitLabelFull(goldDisplayUnit || "oz", investmentType),
+                  currency: investmentCurrency,
+                })
               : isSilverInvestment && silverDisplayUnit
-                ? `Price per ${getInvestmentUnitLabelFull(silverDisplayUnit, investmentType)} (${investmentCurrency})`
+                ? t("transaction.pricePerUnitWithUnit", {
+                    unit: getInvestmentUnitLabelFull(silverDisplayUnit, investmentType),
+                    currency: investmentCurrency,
+                  })
                 : t("transaction.pricePerUnit", {
                     currency: investmentCurrency,
                   })}
