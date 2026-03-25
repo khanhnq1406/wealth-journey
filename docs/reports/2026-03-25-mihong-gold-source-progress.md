@@ -20,8 +20,8 @@
 | 3   | Create pkg/mihong — HTTP Client              | done        | 6060a10 | HTTP client with x-market header, 1MB cap, ×10 price conversion, 6 tests passing |
 | 4   | Create gold_fetcher_mihong.go Adapter        | done        | b65cb22 | GoldPriceFetcher adapter + SourceMihong constant, 3 tests passing |
 | 5   | Wire Mihong into NewGoldPriceService + E2E   | done        | baf18e3 | Mihong wired as 4th source, E2E test passing, build+lint clean |
-| 6   | Update flow-cross-cutting.md                 | done        | —      | Added Mihong as 4th waterfall node; expanded alias table with SJ9999+SJL1L10 |
-| 7   | Append Fix 5 to Implementation Report        | done        | —      | Fix 5 section appended to price-fallback-report.md |
+| 6   | Update flow-cross-cutting.md                 | done        | 31bb352 | Added Mihong as 4th waterfall node; expanded alias table with SJ9999+SJL1L10 |
+| 7   | Append Fix 5 to Implementation Report        | done        | 31bb352 | Fix 5 section appended to price-fallback-report.md |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
