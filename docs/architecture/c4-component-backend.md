@@ -51,7 +51,7 @@ C4Component
         Component(budget_svc, "Budget Service", "domain/service", "Budget lifecycle, budget item tracking, spending analysis")
         Component(invest_svc, "Investment Service", "domain/service", "Holdings management, FIFO cost basis, PNL calculation. Investments owned directly by user_id; wallet association is optional (walletId=0 means no wallet).")
         Component(market_svc, "Market Data Service", "domain/service", "Price caching, Yahoo Finance integration, gold/silver normalization")
-        Component(currency_svc, "Currency Price Service", "domain/service", "Foreign currency price fetching from vangsaigon API, Redis caching")
+        Component(currency_svc, "Currency Price Service", "domain/service", "Foreign currency price fetching using a 2-source waterfall fallback: vangsaigon.vn (primary, 5s timeout) → vang.today (fallback #1, 5s timeout). BTMC is excluded as it provides no currency data. Redis-cached.")
         Component(silver_ext, "External Silver Clients", "pkg/silverprice", "Multi-source silver prices: Phú Quý (HTML), Ancarat (JSON), DOJI (text)")
         Component(fx_svc, "FX Rate Service", "domain/service", "Currency conversion rates, cross-currency calculations")
         Component(import_svc, "Import Service", "domain/service", "File parsing, field mapping, duplicate detection, batch execution")
@@ -63,7 +63,7 @@ C4Component
         Component(admin_svc, "Admin Service", "domain/service", "Admin user management (list with search, toggle role with self-protection), feedback management (list with status filter, update status/note with HTML stripping, soft-delete), and broadcast messaging (HTML stripping, rate limiting 10/hr/admin via Redis, batch notification creation, SSE publish, push delivery)")
         Component(push_svc, "Push Service", "domain/service/push_service.go", "Web Push notification delivery via VAPID/webpush-go. Concurrent fan-out with 20-worker semaphore. Returns noopPushService when VAPID keys absent. Auto-removes 410 Gone subscriptions.")
         Component(price_alert_svc, "Price Alert Service", "domain/service/price_alert_service.go", "Detects significant gold/silver price movements vs Redis baselines across 4 categories. Reads PriceAlertConfig from Redis at runtime (thresholds, cooldown, topMoversCount, templates, enable/disable per category). Uses template resolution for notification title/body. Batch notification creation, SSE publish, push delivery.")
-        Component(gold_price_svc, "Gold Price Service", "domain/service/gold_price_service.go", "Fetches and caches Vietnamese and world gold prices from vangsaigon.vn API. Provides typed gold price lookup by type code (SJC variants, DOJI, XAU). Redis-cached with 15-minute TTL.")
+        Component(gold_price_svc, "Gold Price Service", "domain/service/gold_price_service.go", "Fetches and caches Vietnamese and world gold prices using a 3-source waterfall fallback: vangsaigon.vn (primary, 5s timeout) → vang.today (fallback #1, 5s timeout) → BTMC (fallback #2, 5s timeout). Provides typed gold price lookup by type code (SJC variants, DOJI, XAU). Redis-cached with 15-minute TTL.")
         Component(silver_price_svc, "Silver Price Service", "domain/service/silver_price_service.go", "Fetches and caches silver prices from multiple sources (Phú Quý, Ancarat, DOJI). Provides typed silver price lookup by type code. Redis-cached with 15-minute TTL.")
         Component(watchlist_svc, "Watchlist Service", "domain/service/watchlist_service.go", "User watchlist management: add/remove/list symbols with deduplication. Enriches list results with live prices by delegating to MarketDataService (stocks/crypto/ETFs), GoldPriceService (gold type codes), and SilverPriceService (silver type codes). Validates symbol existence before adding.")
         Component(user_price_alert_svc, "UserPriceAlert Service", "domain/service/user_price_alert_service.go", "Manages user-defined price alerts: CRUD operations, threshold evaluation against live prices from MarketDataService/GoldPriceService/SilverPriceService. Triggers notifications via NotificationRepository and push delivery via PushService when alert conditions are met.")
@@ -100,7 +100,9 @@ C4Component
 
     Container_Boundary(external, "External Integrations — TRUST BOUNDARY: Untrusted external responses") {
         Component(yahoo_client, "Yahoo Finance Client", "pkg/yahoo", "Market price quotes, symbol search, rate throttling")
-        Component(vang_client, "vangsaigon.vn Client", "pkg/vnprice", "Vietnamese gold/silver/currency price fetching via vangsaigon.vn REST API")
+        Component(vang_client, "vangsaigon.vn Client", "pkg/vnprice", "Vietnamese gold/silver/currency price fetching via vangsaigon.vn REST API — primary source")
+        Component(vangtoday_client, "vang.today Client", "pkg/vangtoday", "Fallback gold and currency price fetching from www.vang.today/api/prices (JSON). Used when vangsaigon.vn is unavailable.")
+        Component(btmc_client, "BTMC Client", "pkg/btmc", "Secondary fallback gold price fetching from api.btmc.vn (XML). Used when both vangsaigon.vn and vang.today are unavailable. No currency data available.")
         Component(phuquy_client, "Phú Quý Client", "pkg/silverprice", "Silver prices from giabac.phuquygroup.vn (HTML parsing)")
         Component(ancarat_client, "Ancarat Client", "pkg/silverprice", "Silver prices from giabac.ancarat.com (JSON 2D array)")
         Component(doji_client, "DOJI Client", "pkg/silverprice", "Silver prices from giabac.doji.vn (pipe-delimited text)")
@@ -203,6 +205,10 @@ C4Component
     Rel(market_svc, yahoo_client, "Fetches market prices")
     Rel(market_svc, vang_client, "Fetches gold/silver prices")
     Rel(currency_svc, vang_client, "Fetches currency prices")
+    Rel(gold_price_svc, vang_client, "Fetches gold prices [primary]")
+    Rel(gold_price_svc, vangtoday_client, "Fetches gold prices [fallback #1]")
+    Rel(gold_price_svc, btmc_client, "Fetches gold prices [fallback #2]")
+    Rel(currency_svc, vangtoday_client, "Fetches currency prices [fallback #1]")
     Rel(currency_svc, redis, "Currency price cache")
     Rel(silver_ext, phuquy_client, "Fetches Phú Quý silver prices")
     Rel(silver_ext, ancarat_client, "Fetches Ancarat silver prices")
@@ -296,8 +302,8 @@ C4Component
 | **Admin Middleware → Admin Handlers** | After admin check | Verifies is_admin flag in gin context. Non-admin requests rejected with 403 Forbidden before reaching handler logic. |
 | **Handlers → Service Layer** | Handler calls service method | Handler validates/parses request body. Service layer performs business validation + ownership checks. After service validation, data is considered trusted. |
 | **Service Layer → Repository** | Service calls repository | Data is validated and authorized. Repository only handles persistence logic (no business rules). |
-| **Service → External APIs** | Outbound to Yahoo/vangsaigon.vn/Google | Responses are UNTRUSTED. Must validate types, ranges, handle timeouts. Cache with TTL for resilience. |
-| **External APIs → Service** | Inbound price/token data | All external data validated before storing. Numeric ranges checked. Graceful fallback to stale cache on failure. |
+| **Service → External APIs** | Outbound to Yahoo/vangsaigon.vn/vang.today/BTMC/Google | Responses are UNTRUSTED. Must validate types, ranges, handle timeouts. Cache with TTL for resilience. Gold/currency services use waterfall fallback across 3 and 2 sources respectively. |
+| **External APIs → Service** | Inbound price/token data | All external data validated before storing. Numeric ranges checked. Graceful fallback to next waterfall source on failure; stale cache used when all sources fail. |
 | **Handler → External APIs (chart)** | Outbound to mihong.vn/giabac.vn/Yahoo Finance | Chart handlers call external APIs directly (no service layer). Responses are UNTRUSTED. Query params validated via allowlist. Stale cache used as fallback on failure. |
 
 **Security invariants:**
@@ -397,7 +403,8 @@ Admin → SPA → REST API → Auth MW → Admin MW → PriceAlertConfig Handler
 Scheduler (every 15min) → User Repository (list all users)
                         → Investment Repository (list user investments)
                         → Market Data Service → Yahoo Finance (stocks/ETFs/crypto)
-                                              → vangsaigon.vn (gold/currency)
+                                              → vangsaigon.vn → vang.today → BTMC (gold, waterfall)
+                                              → vangsaigon.vn → vang.today (currency, waterfall)
                                               → Phú Quý / Ancarat / DOJI (silver)
                                               → Redis (update price cache)
                                               → Market Data Repository (persist to DB)
