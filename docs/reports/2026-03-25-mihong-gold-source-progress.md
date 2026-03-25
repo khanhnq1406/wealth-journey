@@ -6,18 +6,18 @@
 - **Plan file:** `docs/plans/2026-03-25-mihong-gold-source-plan.md`
 - **Spec file:** `docs/specs/2026-03-25-mihong-gold-source-spec.md`
 - **Started:** 2026-03-25T00:00:00Z
-- **Last updated:** 2026-03-25T01:00:00Z
+- **Last updated:** 2026-03-25T02:00:00Z
 - **Current state:** in_progress
-- **Current task:** 2
+- **Current task:** 4
 
 ## Task Progress
 
 | #   | Task Name                                    | Status      | Commit | Summary |
 | --- | -------------------------------------------- | ----------- | ------ | ------- |
-| 0   | Update C4 Architecture Diagrams              | done        | TBD    | Added Mi Hồng Price API to c4-context.md and pkg/mihong to c4-component-backend.md |
-| 1   | Fix aliasToCanonical — SJ9999 + SJL1L10      | done        | TBD    | Added SJ9999→Vàng nhẫn SJC and SJL1L10→SJC to aliasToCanonical |
-| 2   | Create pkg/mihong — Types                    | pending     | —      | —       |
-| 3   | Create pkg/mihong — HTTP Client              | pending     | —      | —       |
+| 0   | Update C4 Architecture Diagrams              | done        | ae5be55 | Added Mi Hồng Price API to c4-context.md and pkg/mihong to c4-component-backend.md |
+| 1   | Fix aliasToCanonical — SJ9999 + SJL1L10      | done        | 52e3966 | Added SJ9999→Vàng nhẫn SJC and SJL1L10→SJC to aliasToCanonical |
+| 2   | Create pkg/mihong — Types                    | done        | TBD    | GoldPriceResponse + GoldPrice structs with JSON tags |
+| 3   | Create pkg/mihong — HTTP Client              | done        | TBD    | HTTP client with x-market header, 1MB cap, ×10 price conversion, 6 tests passing |
 | 4   | Create gold_fetcher_mihong.go Adapter        | pending     | —      | —       |
 | 5   | Wire Mihong into NewGoldPriceService + E2E   | pending     | —      | —       |
 | 6   | Update flow-cross-cutting.md                 | pending     | —      | —       |
