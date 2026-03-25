@@ -8,14 +8,14 @@
 - **Started:** 2026-03-25T00:00:00Z
 - **Last updated:** 2026-03-25T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 1
+- **Current task:** 2
 
 ## Task Progress
 
 | #   | Task Name                                            | Status      | Commit | Summary |
 | --- | ---------------------------------------------------- | ----------- | ------ | ------- |
 | 0   | Proto Changes — Add type + updatedInvestment         | done        | 1644a61 | Added type=7 to EditInvestmentTransactionRequest, updatedInvestment=5 to response; regenerated all |
-| 1   | Backend — Buy Quantity Reduction Guard               | pending     | —      | —       |
+| 1   | Backend — Buy Quantity Reduction Guard               | done        | 477d42c | Added validateBuyQuantityReduction helper + 8 TDD tests |
 | 2   | Backend — Full EditTransaction Delete-and-Recreate   | pending     | —      | —       |
 | 3   | Backend — Update Handler type validation + response  | pending     | —      | —       |
 | 4   | Frontend — Edit Mode to AddInvestmentTransactionForm | pending     | —      | —       |

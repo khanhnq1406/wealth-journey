@@ -2177,3 +2177,29 @@ func (s *investmentService) calculatePerformers(ctx context.Context, userID int3
 
 	return topPerformers, worstPerformers, nil
 }
+
+// validateBuyQuantityReduction checks if reducing a buy transaction's quantity
+// would conflict with lots already consumed by sells.
+// Returns error if new quantity < (original lot quantity - remaining quantity on lot).
+// This prevents lot.RemainingQuantity from going negative, which would corrupt
+// FIFO cost-basis accounting.
+func (s *investmentService) validateBuyQuantityReduction(ctx context.Context, tx *models.InvestmentTransaction, newQuantity int64) error {
+	if tx.LotID == nil {
+		return nil // No lot tracking, nothing to validate
+	}
+
+	lot, err := s.txRepo.GetLotByID(ctx, *tx.LotID)
+	if err != nil {
+		return apperrors.NewInternalErrorWithCause("failed to get lot for validation", err)
+	}
+
+	// Amount already sold from this lot = original lot quantity - remaining
+	alreadySold := lot.Quantity - lot.RemainingQuantity
+	if alreadySold > 0 && newQuantity < alreadySold {
+		return apperrors.NewValidationError(
+			fmt.Sprintf("Cannot reduce quantity below %d units (%d already sold from this lot)", alreadySold, alreadySold),
+		)
+	}
+
+	return nil
+}
