@@ -7,8 +7,8 @@
 - **Spec file:** `docs/specs/2026-03-25-symbol-alias-map-spec.md`
 - **Started:** 2026-03-25T16:30:00+07:00
 - **Last updated:** 2026-03-25T16:45:00+07:00
-- **Current state:** in_progress
-- **Current task:** 6
+- **Current state:** complete
+- **Current task:** —
 
 ## Task Progress
 
@@ -19,7 +19,7 @@
 | 3  | E2E test FetchPriceForSymbol with alias                    | done        | pending| TestGoldPriceService_FetchPriceForSymbol_AliasFromVangToday added; passes |
 | 4  | Lint and build verification                                | done        | —      | lint=0, build clean, all tests green |
 | 5  | Update flow-cross-cutting.md §12                           | done        | pending| Added FetchPriceForSymbol flowchart + alias-map step; updated Key Invariants |
-| 6  | Update implementation report                               | in_progress | —      | —       |
+| 6  | Update implementation report                               | done        | pending| Fix 3 entry + section added to price-fallback-report.md |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 

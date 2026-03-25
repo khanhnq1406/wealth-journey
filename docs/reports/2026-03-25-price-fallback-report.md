@@ -207,7 +207,8 @@ No database migrations required. No proto changes. No frontend changes.
 | Date       | Fix                                                                 | Severity | Commit  |
 | ---------- | ------------------------------------------------------------------- | -------- | ------- |
 | 2026-03-25 | vangtoday: parse new object API format (gold=[], currency=[] empty) | Minor    | 2e42300 |
-| 2026-03-25 | FetchPriceForSymbol: query all sources to find BTMC-exclusive symbols | Minor  | pending |
+| 2026-03-25 | FetchPriceForSymbol: query all sources to find BTMC-exclusive symbols | Minor  | 52917fd |
+| 2026-03-25 | FetchGoldPricesAllSources: normalize alias TypeCodes (VNGSJC→SJC); add MIHONG prefix to vangtoday classifier | Minor | 8cd8161 |
 
 ---
 
@@ -251,6 +252,38 @@ The design gap: the waterfall model assumes all sources serve a complete/redunda
 **`FetchAllPrices` is unaffected** — it still uses `FetchGoldPrices` (stop-at-first-success, health-aware). Only the per-symbol path uses the all-sources merge.
 
 **Security review:** Approved — all external calls remain timeout-bounded (5 s per source), health-bypass is intentional and contained to this path, no new error detail exposed, no data integrity regression.
+
+---
+
+### Fix 3 — Symbol alias map + MIHONG prefix
+
+**Symptoms (from runtime logs):**
+```
+Warning: failed to get price for Mihong_999: unable to fetch current price for Mihong_999.
+Error: failed to fetch gold price from vang.today: gold symbol "Mihong_999" not found in live price data
+
+Warning: API fetch failed for SJC, using stale cache: failed to fetch gold price from vang.today:
+gold symbol "SJC" not found in live price data
+```
+
+**Root Cause (Issue 1 — SJC):** `FetchPriceForSymbol("SJC")` calls `FetchGoldPricesAllSources` which merges results by exact TypeCode. vang.today uses `"VNGSJC"` for SJC gold; the canonical code used by vangsaigon and all callers is `"SJC"`. The exact-match lookup finds `"VNGSJC"` in the merged map but not `"SJC"`, so it returns "not found in live price data".
+
+**Root Cause (Issue 2 — Mihong_999):** The vangtoday client classifies a type code as "gold" only if it matches one of the known prefixes in `goldTypePrefixes`. The `"MIHONG"` prefix was absent, so any Mi Hồng entry from vang.today was classified as an empty-string type and silently dropped before the price reached the service layer.
+
+**Fix:**
+
+| File | Change |
+|------|--------|
+| `pkg/vangtoday/client.go` | Added `"MIHONG"` to `goldTypePrefixes` — Mi Hồng entries now classified as gold |
+| `domain/service/price_fetcher.go` | Added `aliasToCanonical = {"VNGSJC": "SJC"}` package-level map; `FetchGoldPricesAllSources` normalizes alias TypeCodes to canonical before merging |
+| `domain/service/gold_price_service_test.go` | Added `TestGoldPriceService_FetchPriceForSymbol_AliasFromVangToday` E2E test |
+| `pkg/vangtoday/client_test.go` | Added `TestVangTodayClient_MIHONGGoldClassified` |
+| `domain/service/price_fetcher_test.go` | Added `TestWaterfallGoldFetcher_AllSources_AliasNormalization`, `TestWaterfallGoldFetcher_AllSources_NonAliasUnchanged` |
+| `docs/architecture/flow-cross-cutting.md` | Added `FetchPriceForSymbol` flowchart to §12 showing alias-map step |
+
+**`FetchAllPrices` is unaffected** — it still uses `FetchGoldPrices` (stop-at-first-success, health-aware). Only the all-sources merge path normalizes aliases.
+
+**Security review:** Alias map is a compile-time constant with no user input. Normalization only replaces TypeCode strings; Buy/Sell values are unchanged. Zero/negative price guards in the vangtoday client remain in place.
 
 ---
 
