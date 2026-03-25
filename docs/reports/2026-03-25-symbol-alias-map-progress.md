@@ -8,7 +8,7 @@
 - **Started:** 2026-03-25T16:30:00+07:00
 - **Last updated:** 2026-03-25T16:45:00+07:00
 - **Current state:** in_progress
-- **Current task:** 4
+- **Current task:** 6
 
 ## Task Progress
 
@@ -17,9 +17,9 @@
 | 1  | Add MIHONG prefix to vangtoday goldTypePrefixes            | done        | pending| Add MIHONG to goldTypePrefixes; 9 tests pass |
 | 2  | Add aliasToCanonical + normalize in FetchGoldPricesAllSources | done     | pending| aliasToCanonical map + normalization in merge loop; 2 new tests |
 | 3  | E2E test FetchPriceForSymbol with alias                    | done        | pending| TestGoldPriceService_FetchPriceForSymbol_AliasFromVangToday added; passes |
-| 4  | Lint and build verification                                | in_progress | —      | —       |
-| 5  | Update flow-cross-cutting.md §12                           | pending     | —      | —       |
-| 6  | Update implementation report                               | pending     | —      | —       |
+| 4  | Lint and build verification                                | done        | —      | lint=0, build clean, all tests green |
+| 5  | Update flow-cross-cutting.md §12                           | done        | pending| Added FetchPriceForSymbol flowchart + alias-map step; updated Key Invariants |
+| 6  | Update implementation report                               | in_progress | —      | —       |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 

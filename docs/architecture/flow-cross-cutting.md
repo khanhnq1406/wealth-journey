@@ -984,9 +984,34 @@ stateDiagram-v2
     Unhealthy --> Healthy : IsHealthy Redis error\n(fail-open)
 ```
 
+### FetchPriceForSymbol Flow
+
+```mermaid
+flowchart TD
+    A[FetchPriceForSymbol\ncalled with symbol S] --> B{Per-symbol\ncache hit?}
+    B -->|Yes| C[Return cached price]
+    B -->|No| D[FetchGoldPricesAllSources\nquery ALL sources, merge]
+    D --> E{Source returned\nTypeCode = S\ndirect match?}
+    E -->|Yes| F[Return price\nwith TypeCode = S]
+    E -->|No| G{aliasToCanonical\ncontains fetched TypeCode?}
+    G -->|Yes — normalize| H[Replace alias TypeCode\nwith canonical S\nin merged results]
+    H --> F
+    G -->|No match in either| I{Waterfall\nfailed entirely?}
+    I -->|No - symbol just absent| J[Return error:\n'not found in live data']:::error
+    I -->|Yes - all sources failed| K{Emergency\ncache has S?}
+    K -->|Yes| L[Return stale price\nwith warning log]
+    K -->|No| M[Return error]:::error
+
+    classDef error fill:#fee,stroke:#c00,color:#900
+```
+
+> **Note:** Alias normalization happens inside `FetchGoldPricesAllSources` before the symbol search — the merged result always contains canonical TypeCodes. `FetchPriceForSymbol`'s exact-match loop at `gold_price_service.go:144` finds `"SJC"` regardless of which source served it.
+
 ### Key Invariants
 
 - **Fail-open**: if Redis is unavailable, `IsHealthy` returns `true` — never block all sources
 - **Last-source guarantee**: the last fetcher in the slice is **always tried** regardless of health status
 - **Emergency cache**: written asynchronously on every successful fetch; read synchronously only when all live sources fail
 - **BTMC key rotation**: if the API key changes, restart the service — the key is read once at startup via `os.Getenv`
+- **Canonical TypeCodes always returned**: `FetchGoldPricesAllSources` normalizes alias TypeCodes (e.g., `"VNGSJC"` → `"SJC"`) before merging; callers always see the canonical code regardless of which source provided the price
+- **Alias staleness degrades gracefully**: if a source renames a TypeCode, the alias miss falls through to the emergency cache — no user-visible error beyond the existing "not found in live data" warning
