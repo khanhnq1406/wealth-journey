@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-25-price-fallback-plan.md
 - **Spec file:** docs/specs/2026-03-25-price-fallback-spec.md
 - **Started:** 2026-03-25T00:00:00Z
-- **Last updated:** 2026-03-25T05:00:00Z
+- **Last updated:** 2026-03-25T06:00:00Z
 - **Current state:** in_progress
-- **Current task:** 12
+- **Current task:** 14
 
 ## Task Progress
 
@@ -24,10 +24,10 @@
 | 7   | Implement vang.today GoldPriceFetcher and Currency Adapters | done   | 3dcbf72 | vangTodayGoldFetcher + vangTodayCurrencyFetcher direct field copy; ChangeBuy/Sell=0 for currency; 8 tests pass |
 | 8   | Implement BTMC GoldPriceFetcher Adapter                | done        | 3dcbf72 | btmcGoldFetcher wraps fetchBTMCFn; ChangeBuy/Sell=0; constructor errors on empty apiKey; 4 tests pass |
 | 9   | Implement vangsaigon CurrencyPriceFetcher Adapter      | done        | 3dcbf72 | vangSaiGonCurrencyFetcher wraps fetchPricesFn; raw VND prices; Source()=vangsaigon; 8 tests pass |
-| 10  | Refactor goldPriceService to Use Waterfall Fallback    | done        | pending | goldPriceService: waterfall struct, 4-step flow, non-blocking cache writes, emergency fallback; 10 tests |
-| 11  | Refactor currencyPriceService to Use Waterfall Fallback| done        | pending | currencyPriceService: 2-source waterfall, 4-step flow, emergency fallback; 5 tests; sourceHealthCacheAdapter in price_fetcher.go |
-| 12  | Update DI Wiring (services.go, builder.go, config.go)  | pending     | —      | —       |
-| 13  | Run Full Backend Lint + Test Suite                     | pending     | —      | —       |
+| 10  | Refactor goldPriceService to Use Waterfall Fallback    | done        | 7518ddf | goldPriceService: waterfall struct, 4-step flow, non-blocking cache writes, emergency fallback; 10 tests |
+| 11  | Refactor currencyPriceService to Use Waterfall Fallback| done        | 7518ddf | currencyPriceService: 2-source waterfall, 4-step flow, emergency fallback; 5 tests; sourceHealthCacheAdapter in price_fetcher.go |
+| 12  | Update DI Wiring (services.go, builder.go, config.go)  | done        | pending | BTMC_API_KEY warning log in NewServices; services.go+builder.go already complete from task 10 |
+| 13  | Run Full Backend Lint + Test Suite                     | done        | pending | 0 lint issues; all tests pass (domain/service 1.691s, handlers 3.328s) |
 | 14  | Create/Update Runtime Flow Diagrams                    | pending     | —      | —       |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`

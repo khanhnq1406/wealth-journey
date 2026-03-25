@@ -1,6 +1,7 @@
 package service
 
 import (
+	"log"
 	"os"
 
 	"github.com/go-redis/redis/v8"
@@ -40,7 +41,11 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	// Phase 1: Services with no service dependencies
 	categorySvc := NewCategoryService(repos.Category)
 	fxRateSvc := NewFXRateService(repos.FXRate, redisClient)
-	goldPriceSvc := NewGoldPriceService(redisClient, os.Getenv("BTMC_API_KEY"))
+	btmcAPIKey := os.Getenv("BTMC_API_KEY")
+	if btmcAPIKey == "" {
+		log.Println("[NewServices] Warning: BTMC_API_KEY not set — gold price fallback chain reduced to 2 sources")
+	}
+	goldPriceSvc := NewGoldPriceService(redisClient, btmcAPIKey)
 	silverPriceSvc := NewSilverPriceService(redisClient)
 	currencyPriceSvc := NewCurrencyPriceService(redisClient)
 	marketDataSvc := NewMarketDataService(repos.MarketData, goldPriceSvc, silverPriceSvc)
