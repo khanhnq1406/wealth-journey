@@ -17,6 +17,8 @@ Infrastructure-level flows that are referenced by multiple domain flows. Read th
 - [FetchAllPrices Aggregate Cache Flow](#11-fetchallprices-aggregate-cache-flow)
 - [Price Fallback Chain](#12-price-fallback-chain)
 - [Price Cache Background Job](#13-price-cache-background-job)
+- [Gold Display Prices Read Flow](#14-gold-display-prices-read-flow)
+- [Admin Gold Display Config CRUD Flow](#15-admin-gold-display-config-crud-flow)
 
 ---
 
@@ -1154,3 +1156,154 @@ Beyond `MarketPricesHandler` and `PublicHandler`, the following services also re
 | `WatchlistService.ListItems` | `GetAllPrices()` | Falls back to zero buy/sell prices on error; stale rows propagated to client as-is |
 
 **Yahoo Finance (`MarketDataService`) remains live** — `WatchlistService` still fetches market items (stocks, crypto, ETFs) from Yahoo Finance concurrently. Only the gold/silver/currency lookup in `WatchlistService.ListItems` uses the DB cache.
+
+---
+
+## 14. Gold Display Prices Read Flow
+
+**Trigger:** Any component calls `useQueryGetGoldDisplayPrices()`
+**Sources:** `handlers/gold_display_config.go`, `domain/service/gold_display_config_service.go`, `domain/repository/gold_display_config_repository.go`
+
+```mermaid
+flowchart TD
+    A["Component calls\nuseQueryGetGoldDisplayPrices()"] --> B["GET /api/v1/public/gold-display-prices"]
+    B --> C["GoldDisplayConfigHandler\n.GetDisplayPrices"]
+
+    C --> D["GoldDisplayConfigService\n.GetDisplayPrices(ctx)"]
+
+    D --> E["repo.ListEnabled(ctx)\nReturns enabled configs\nsorted by display_order"]
+    D --> F["AssetPriceService\n.GetPricesByAssetType(ctx, 'gold')\nBuilds priceMap[typeCode]→price"]
+
+    E --> G["Join: for each config,\nlook up TypeCode in priceMap"]
+    F --> G
+
+    G --> H{TypeCode found\nin priceMap?}
+    H -- Yes --> I["Populate buy/sell/currency\nupdatedAt/isStale from price row"]
+    H -- No --> J["buy=0, sell=0\nisStale=true (safe default)"]
+
+    I --> K["Service returns\n[]GoldDisplayPrice"]
+    J --> K
+
+    K --> L["Handler: PriceOverrideCache\n.GetAll(ctx)\n(graceful skip if Redis nil)"]
+    L --> M["Build overrideMap\n[typeCode:currency]→override"]
+    M --> N["Apply override if\ntypeCode:currency key present"]
+    N --> O["Return GetGoldDisplayPricesResponse\n{Prices: [...]}"]
+
+    O --> P["Frontend receives prices array\nsorted by displayOrder"]
+    P --> Q{isStale || buy === 0?}
+    Q -- Yes --> R["Display '--'"]
+    Q -- No --> S["Format and display price"]
+
+    classDef service fill:#ddf,stroke:#66c,color:#003
+    classDef handler fill:#dfd,stroke:#6a6,color:#030
+    classDef repo fill:#ffd,stroke:#aa6,color:#330
+    classDef frontend fill:#fdf,stroke:#c6c,color:#303
+    classDef default_node fill:#eee,stroke:#999,color:#333
+
+    class C,N handler
+    class D,K service
+    class E,F repo
+    class A,P,Q,R,S frontend
+```
+
+### Key Invariants
+
+- Missing prices never block the response — zero prices with `isStale=true` are safe defaults for configs with no matching price row in the DB cache
+- Redis overrides are applied at handler level, not service level (same pattern as `market_prices.go`)
+- Response is sorted by `displayOrder` from the DB config — the order is fully admin-controlled
+- Frontend stale check: `isStale || buy === 0` → display `"--"` (same convention as market prices page)
+- `GetAll` on the override cache uses a graceful skip if `PriceOverrideCache` is nil — no panic on cold start
+
+---
+
+## 15. Admin Gold Display Config CRUD Flow
+
+**Trigger:** Admin opens the `GoldDisplayConfigTable` or submits `GoldDisplayConfigForm`
+**Sources:** `handlers/gold_display_config.go`, `domain/service/gold_display_config_service.go`, `domain/repository/gold_display_config_repository.go`
+
+### Diagram A — Read: ListAll
+
+```mermaid
+flowchart TD
+    A["Admin opens\nGoldDisplayConfigTable"] --> B["GET /api/v1/admin/gold-display-config"]
+    B --> C["GoldDisplayConfigHandler\n.ListAll"]
+    C --> D["GoldDisplayConfigService\n.ListAll(ctx)"]
+    D --> E["repo.ListAll(ctx)\nIncludes disabled entries\nNo soft-delete filter"]
+    E --> F["Returns all configs\n(enabled + disabled)"]
+    F --> G["ListGoldDisplayConfigResponse\n{Configs: [...]}"]
+    G --> H["GoldDisplayConfigTable\nrenders rows"]
+
+    classDef handler fill:#dfd,stroke:#6a6,color:#030
+    classDef service fill:#ddf,stroke:#66c,color:#003
+    classDef repo fill:#ffd,stroke:#aa6,color:#330
+    classDef frontend fill:#fdf,stroke:#c6c,color:#303
+
+    class C handler
+    class D,F service
+    class E repo
+    class A,H frontend
+```
+
+### Diagram B — Write: Create / Update / Delete
+
+```mermaid
+flowchart TD
+    A["Admin submits\nGoldDisplayConfigForm"] --> B{Operation?}
+
+    B -- Create --> C["POST /api/v1/admin/gold-display-config"]
+    B -- Update --> D["PUT /api/v1/admin/gold-display-config/{id}"]
+    B -- Delete --> E["DELETE /api/v1/admin/gold-display-config/{id}"]
+
+    D --> F["Parse id from path\nid ≤ 0 → 400 Bad Request"]
+    E --> F
+
+    C --> G["handler.BindAndValidate\n(request body)"]
+    F --> G
+
+    G --> H["Service validates:\n• typeCode ≤ 50 chars\n• displayName trimmed + ≤ 100 chars\n• displayOrder ≥ 0\n• duplicate typeCode check (Create only)"]
+
+    H --> I{Validation\npassed?}
+    I -- No --> J["400 Bad Request\n(validation error)"]
+
+    I -- Yes --> K{Operation?}
+
+    K -- Create --> L["repo.Create(ctx, config)"]
+    K -- Update --> M["repo.Update(ctx, config)\n(typeCode field ignored)"]
+    K -- Delete --> N["repo.Delete(ctx, id)\nGORM soft delete\n(sets deleted_at)"]
+
+    L --> O{Duplicate\ntypeCode?}
+    O -- Yes --> P["409 Conflict"]
+    O -- No --> Q["Returns created config proto"]
+
+    M --> R{Record\nexists?}
+    R -- No --> S["404 Not Found"]
+    R -- Yes --> T["Returns updated config proto"]
+
+    N --> U{Record\nexists?}
+    U -- No --> S
+    U -- Yes --> V["Returns success response"]
+
+    Q --> W["Frontend: React Query cache\ninvalidation (QUERY_KEY_GOLD_DISPLAY_CONFIG)\n→ table re-fetches"]
+    T --> W
+    V --> W
+
+    classDef handler fill:#dfd,stroke:#6a6,color:#030
+    classDef service fill:#ddf,stroke:#66c,color:#003
+    classDef repo fill:#ffd,stroke:#aa6,color:#330
+    classDef frontend fill:#fdf,stroke:#c6c,color:#303
+    classDef error fill:#fee,stroke:#c00,color:#900
+
+    class G,F handler
+    class H,I service
+    class L,M,N,O,R,U repo
+    class A,W frontend
+    class J,P,S error
+```
+
+### Key Invariants
+
+- `typeCode` is immutable after creation — the Update endpoint does not accept a `typeCode` field; any value sent is ignored
+- Soft deletes via GORM `DeletedAt` — deleted records remain in the DB but are hidden from `ListEnabled` (the public read path)
+- Admin CRUD endpoints do NOT use generated proto hooks — the frontend uses `apiClient` directly (no RPCs defined for these endpoints in the proto file)
+- `ListAll` (admin) includes disabled entries; `ListEnabled` (public) filters to `is_enabled = true` only
+- React Query cache invalidation key `QUERY_KEY_GOLD_DISPLAY_CONFIG` is shared across the table and any other consumers of the admin list endpoint
