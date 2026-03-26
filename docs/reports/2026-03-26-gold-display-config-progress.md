@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-26-gold-display-config-plan.md
 - **Spec file:** docs/specs/2026-03-26-gold-display-config-spec.md
 - **Started:** 2026-03-26T00:00:00Z
-- **Last updated:** 2026-03-26T04:00:00Z
-- **Current state:** in_progress
-- **Current task:** 6
+- **Last updated:** 2026-03-26T12:00:00Z
+- **Current state:** done
+- **Current task:** —
 
 ## Task Progress
 
@@ -19,13 +19,13 @@
 | 2   | Database Model + Migration            | done    | fc15ebb | GoldDisplayConfig GORM model, migration command, seed data, Taskfile task |
 | 3   | Repository Layer                      | done    | —      | GoldDisplayConfigRepository with 7 methods; wired into Repositories + providers |
 | 4   | Service Layer                         | done    | —      | GoldDisplayConfigService: GetDisplayPrices join, CRUD with full validation; 16 tests |
-| 5   | Handler + Routes                      | done    | 68e54dd | GoldDisplayConfigHandler (5 methods), wired into builder.go + routes.go; 14 tests pass |
-| 6   | Frontend — Home Page GoldPriceTable   | pending | —      | —       |
-| 7   | Frontend — Landing GoldPriceTable     | pending | —      | —       |
-| 8   | Frontend — Investment Gold Dropdown   | pending | —      | —       |
-| 9   | Frontend — Admin Gold Display Config  | pending | —      | —       |
-| 10  | Cleanup — Remove Frontend Constants   | pending | —      | —       |
-| 11  | Runtime Flow Diagrams                 | pending | —      | —       |
+| 5   | Handler + Routes                      | done    | 4d4f5e3 | GoldDisplayConfigHandler (5 methods), wired into builder.go + routes.go; 14 tests pass |
+| 6   | Frontend — Home Page GoldPriceTable   | done    | 0371992 | useQueryGetGoldDisplayPrices hook; v2 color tokens; stale → "--" |
+| 7   | Frontend — Landing GoldPriceTable     | done    | 0371992 | Same hook; masked buy/sell with text-v2-text-secondary |
+| 8   | Frontend — Investment Gold Dropdown   | done    | 0371992 | showInInvestment filter; GOLD_USD_OPTIONS appended; disabled while loading |
+| 9   | Frontend — Admin Gold Display Config  | done    | 0371992 | GoldDisplayConfigTable + Form; "gold-config" tab on admin page |
+| 10  | Cleanup — Remove Frontend Constants   | done    | 6d66ba0 | Deleted gold-filter.ts; removed stale GOLD_TABLE_FILTER comment |
+| 11  | Runtime Flow Diagrams                 | done    | a0c6b2c | Sections 14-15 in flow-cross-cutting.md |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
