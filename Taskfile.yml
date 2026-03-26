@@ -178,6 +178,12 @@ tasks:
     cmds:
       - go run cmd/migrate-user-price-alerts/main.go
 
+  backend:migrate-asset-prices:
+    desc: "Create asset_price table for price caching"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-asset-prices/main.go
+
   backend:migrate-all:
     desc: "Run all migrations in order (safe for fresh or existing databases)"
     dir: "{{.BACKEND_DIR}}"

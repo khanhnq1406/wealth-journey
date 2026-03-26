@@ -8,14 +8,14 @@
 - **Started:** 2026-03-26T00:00:00Z
 - **Last updated:** 2026-03-26T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 1
+- **Current task:** 2
 
 ## Task Progress
 
 | #   | Task Name                                          | Status     | Commit | Summary |
 | --- | -------------------------------------------------- | ---------- | ------ | ------- |
-| 0   | Update C4 Architecture Diagrams                    | done       | TBD    | Added AssetPriceRepository, AssetPriceService, PriceCacheJob to C4 diagram; updated handler dependencies |
-| 1   | AssetPrice GORM Model + Migration                  | pending    | —      | —       |
+| 0   | Update C4 Architecture Diagrams                    | done       | ce7c4fc | Added AssetPriceRepository, AssetPriceService, PriceCacheJob to C4 diagram; updated handler dependencies |
+| 1   | AssetPrice GORM Model + Migration                  | done       | TBD    | AssetPrice model, migration command, Taskfile entry; 5 unit tests pass |
 | 2   | AssetPrice Repository                              | pending    | —      | —       |
 | 3   | AssetPrice Service                                 | pending    | —      | —       |
 | 4   | PriceCacheJob Background Scheduler                 | pending    | —      | —       |
