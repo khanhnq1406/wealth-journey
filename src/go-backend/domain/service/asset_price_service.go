@@ -4,11 +4,16 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 	"sync"
 	"time"
 
 	"wealthjourney/domain/models"
 	"wealthjourney/domain/repository"
+	"wealthjourney/pkg/btmcdirect"
+	"wealthjourney/pkg/doji"
+	"wealthjourney/pkg/pnj"
+	"wealthjourney/pkg/sjc"
 )
 
 // assetPriceService implements AssetPriceService.
@@ -21,95 +26,117 @@ type assetPriceService struct {
 	goldSvc     GoldPriceService
 	silverSvc   SilverPriceService
 	currencySvc CurrencyPriceService
+	sjcClient   *sjc.Client        // nil = not configured; source skipped
+	dojiClient  *doji.Client       // nil = not configured; source skipped
+	btmcClient  *btmcdirect.Client // nil = not configured; source skipped
+	pnjClient   *pnj.Client        // nil = not configured; source skipped
 }
 
 // NewAssetPriceService creates a new AssetPriceService with constructor injection.
+// Pass nil for any of the new source clients to skip that source.
 func NewAssetPriceService(
 	repo repository.AssetPriceRepository,
 	goldSvc GoldPriceService,
 	silverSvc SilverPriceService,
 	currencySvc CurrencyPriceService,
+	sjcClient *sjc.Client,
+	dojiClient *doji.Client,
+	btmcClient *btmcdirect.Client,
+	pnjClient *pnj.Client,
 ) AssetPriceService {
 	return &assetPriceService{
 		repo:        repo,
 		goldSvc:     goldSvc,
 		silverSvc:   silverSvc,
 		currencySvc: currencySvc,
+		sjcClient:   sjcClient,
+		dojiClient:  dojiClient,
+		btmcClient:  btmcClient,
+		pnjClient:   pnjClient,
 	}
+}
+
+// ---------------------------------------------------------------------------
+// refreshResult — shared named type for all 7 goroutine results
+// ---------------------------------------------------------------------------
+
+// refreshResult carries the outcome of a single source refresh.
+type refreshResult struct {
+	source string
+	count  int
+	err    error
 }
 
 // ---------------------------------------------------------------------------
 // RefreshAllPrices
 // ---------------------------------------------------------------------------
 
-// RefreshAllPrices fetches fresh prices from all three live price services and
+// RefreshAllPrices fetches fresh prices from all configured price sources and
 // persists them in the asset_price table.
 //
-// Each asset type is handled independently: a failure for one type marks that
-// type's rows stale but does not interrupt the other two types.
+// Each source runs in its own goroutine. One failure marks only that source stale
+// and does not interrupt the others.
+//
+// Returns non-nil error only when every one of the 7 sources fails, so callers
+// can decide to retry or alert.
 //
 // Log summary format (for observability):
 //
-//	"Price cache job completed: gold=OK(25 items), silver=FAIL(error: ...), currency=OK(12 items)"
+//	"[assetPriceService] Price cache job completed: gold_waterfall=OK(25), silver_waterfall=FAIL(...), ..."
 func (s *assetPriceService) RefreshAllPrices(ctx context.Context) error {
-	now := time.Now()
+	results := make(chan refreshResult, 7)
+	var wg sync.WaitGroup
 
-	type result struct {
-		count int
-		err   error
-	}
-
-	var (
-		goldResult, silverResult, currencyResult result
-		wg                                       sync.WaitGroup
-	)
-
+	// Existing 3 waterfall sources
 	wg.Add(3)
-	go func() {
-		defer wg.Done()
-		goldResult = s.refreshGold(ctx, now)
-	}()
-	go func() {
-		defer wg.Done()
-		silverResult = s.refreshSilver(ctx, now)
-	}()
-	go func() {
-		defer wg.Done()
-		currencyResult = s.refreshCurrency(ctx, now)
-	}()
-	wg.Wait()
+	go func() { defer wg.Done(); results <- s.refreshGold(ctx) }()
+	go func() { defer wg.Done(); results <- s.refreshSilver(ctx) }()
+	go func() { defer wg.Done(); results <- s.refreshCurrency(ctx) }()
 
-	// Build log summary.
-	goldStr := formatRefreshResult(goldResult.count, goldResult.err)
-	silverStr := formatRefreshResult(silverResult.count, silverResult.err)
-	currencyStr := formatRefreshResult(currencyResult.count, currencyResult.err)
+	// 4 new per-source gold clients
+	wg.Add(4)
+	go func() { defer wg.Done(); results <- s.refreshGoldSJC(ctx) }()
+	go func() { defer wg.Done(); results <- s.refreshGoldDOJI(ctx) }()
+	go func() { defer wg.Done(); results <- s.refreshGoldBTMC(ctx) }()
+	go func() { defer wg.Done(); results <- s.refreshGoldPNJ(ctx) }()
 
-	log.Printf("[assetPriceService] Price cache job completed: gold=%s, silver=%s, currency=%s",
-		goldStr, silverStr, currencyStr)
+	// Close channel once all goroutines complete.
+	go func() { wg.Wait(); close(results) }()
 
-	// Return combined error only if ALL three failed so callers can decide to retry.
-	if goldResult.err != nil && silverResult.err != nil && currencyResult.err != nil {
-		return fmt.Errorf("all price types failed: gold: %w; silver: %v; currency: %v",
-			goldResult.err, silverResult.err, currencyResult.err)
+	// Collect results and build log summary.
+	summaryParts := make([]string, 0, 7)
+	failCount := 0
+	for r := range results {
+		if r.err != nil {
+			summaryParts = append(summaryParts, fmt.Sprintf("%s=FAIL(%v)", r.source, r.err))
+			failCount++
+		} else {
+			summaryParts = append(summaryParts, fmt.Sprintf("%s=OK(%d)", r.source, r.count))
+		}
+	}
+	log.Printf("[assetPriceService] Price cache job completed: %s", strings.Join(summaryParts, ", "))
+
+	// Return error only when ALL sources failed.
+	if failCount == 7 {
+		return fmt.Errorf("all price sources failed")
 	}
 	return nil
 }
 
-// refreshGold fetches gold prices and upserts them. On failure it marks rows stale.
-func (s *assetPriceService) refreshGold(ctx context.Context, now time.Time) struct {
-	count int
-	err   error
-} {
+// ---------------------------------------------------------------------------
+// Existing waterfall refresh methods (refactored to return refreshResult)
+// ---------------------------------------------------------------------------
+
+// refreshGold fetches gold prices from the waterfall service and upserts them.
+// On failure it marks gold rows stale.
+func (s *assetPriceService) refreshGold(ctx context.Context) refreshResult {
 	prices, err := s.goldSvc.FetchAllPrices(ctx)
 	if err != nil {
 		log.Printf("[assetPriceService] gold fetch failed: %v — marking stale", err)
 		if markErr := s.repo.MarkStaleByAssetType(ctx, "gold"); markErr != nil {
 			log.Printf("[assetPriceService] failed to mark gold stale: %v", markErr)
 		}
-		return struct {
-			count int
-			err   error
-		}{0, err}
+		return refreshResult{source: "gold_waterfall", count: 0, err: err}
 	}
 
 	// Normalization (alias → canonical) happens at the WaterfallGoldFetcher level,
@@ -133,7 +160,7 @@ func (s *assetPriceService) refreshGold(ctx context.Context, now time.Time) stru
 			Currency:   p.Currency,
 			Source:     "waterfall",
 			IsStale:    false,
-			FetchedAt:  now,
+			FetchedAt:  time.Now(),
 		})
 	}
 
@@ -142,33 +169,21 @@ func (s *assetPriceService) refreshGold(ctx context.Context, now time.Time) stru
 		if markErr := s.repo.MarkStaleByAssetType(ctx, "gold"); markErr != nil {
 			log.Printf("[assetPriceService] failed to mark gold stale after upsert failure: %v", markErr)
 		}
-		return struct {
-			count int
-			err   error
-		}{0, upsertErr}
+		return refreshResult{source: "gold_waterfall", count: 0, err: upsertErr}
 	}
 
-	return struct {
-		count int
-		err   error
-	}{len(batch), nil}
+	return refreshResult{source: "gold_waterfall", count: len(batch), err: nil}
 }
 
 // refreshSilver fetches silver prices and upserts them. On failure it marks rows stale.
-func (s *assetPriceService) refreshSilver(ctx context.Context, now time.Time) struct {
-	count int
-	err   error
-} {
+func (s *assetPriceService) refreshSilver(ctx context.Context) refreshResult {
 	prices, err := s.silverSvc.FetchAllPrices(ctx)
 	if err != nil {
 		log.Printf("[assetPriceService] silver fetch failed: %v — marking stale", err)
 		if markErr := s.repo.MarkStaleByAssetType(ctx, "silver"); markErr != nil {
 			log.Printf("[assetPriceService] failed to mark silver stale: %v", markErr)
 		}
-		return struct {
-			count int
-			err   error
-		}{0, err}
+		return refreshResult{source: "silver_waterfall", count: 0, err: err}
 	}
 
 	batch := make([]*models.AssetPrice, 0, len(prices))
@@ -184,7 +199,7 @@ func (s *assetPriceService) refreshSilver(ctx context.Context, now time.Time) st
 			Currency:   p.Currency,
 			Source:     "waterfall",
 			IsStale:    false,
-			FetchedAt:  now,
+			FetchedAt:  time.Now(),
 		})
 	}
 
@@ -193,33 +208,21 @@ func (s *assetPriceService) refreshSilver(ctx context.Context, now time.Time) st
 		if markErr := s.repo.MarkStaleByAssetType(ctx, "silver"); markErr != nil {
 			log.Printf("[assetPriceService] failed to mark silver stale after upsert failure: %v", markErr)
 		}
-		return struct {
-			count int
-			err   error
-		}{0, upsertErr}
+		return refreshResult{source: "silver_waterfall", count: 0, err: upsertErr}
 	}
 
-	return struct {
-		count int
-		err   error
-	}{len(batch), nil}
+	return refreshResult{source: "silver_waterfall", count: len(batch), err: nil}
 }
 
 // refreshCurrency fetches currency prices and upserts them. On failure it marks rows stale.
-func (s *assetPriceService) refreshCurrency(ctx context.Context, now time.Time) struct {
-	count int
-	err   error
-} {
+func (s *assetPriceService) refreshCurrency(ctx context.Context) refreshResult {
 	prices, err := s.currencySvc.FetchAllPrices(ctx)
 	if err != nil {
 		log.Printf("[assetPriceService] currency fetch failed: %v — marking stale", err)
 		if markErr := s.repo.MarkStaleByAssetType(ctx, "currency"); markErr != nil {
 			log.Printf("[assetPriceService] failed to mark currency stale: %v", markErr)
 		}
-		return struct {
-			count int
-			err   error
-		}{0, err}
+		return refreshResult{source: "currency_waterfall", count: 0, err: err}
 	}
 
 	batch := make([]*models.AssetPrice, 0, len(prices))
@@ -235,7 +238,7 @@ func (s *assetPriceService) refreshCurrency(ctx context.Context, now time.Time) 
 			Currency:   p.Currency,
 			Source:     "waterfall",
 			IsStale:    false,
-			FetchedAt:  now,
+			FetchedAt:  time.Now(),
 		})
 	}
 
@@ -244,24 +247,182 @@ func (s *assetPriceService) refreshCurrency(ctx context.Context, now time.Time) 
 		if markErr := s.repo.MarkStaleByAssetType(ctx, "currency"); markErr != nil {
 			log.Printf("[assetPriceService] failed to mark currency stale after upsert failure: %v", markErr)
 		}
-		return struct {
-			count int
-			err   error
-		}{0, upsertErr}
+		return refreshResult{source: "currency_waterfall", count: 0, err: upsertErr}
 	}
 
-	return struct {
-		count int
-		err   error
-	}{len(batch), nil}
+	return refreshResult{source: "currency_waterfall", count: len(batch), err: nil}
 }
 
-// formatRefreshResult returns a human-readable summary fragment like "OK(25 items)" or "FAIL(error: timeout)".
-func formatRefreshResult(count int, err error) string {
-	if err != nil {
-		return fmt.Sprintf("FAIL(error: %v)", err)
+// ---------------------------------------------------------------------------
+// New per-source gold refresh methods
+// ---------------------------------------------------------------------------
+
+// refreshGoldSJC fetches gold prices directly from the SJC API and upserts them.
+// Returns an error result when client is nil (not configured) without panicking.
+func (s *assetPriceService) refreshGoldSJC(ctx context.Context) refreshResult {
+	if s.sjcClient == nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "sjc")
+		return refreshResult{source: "gold_sjc", count: 0, err: fmt.Errorf("sjc client not configured")}
 	}
-	return fmt.Sprintf("OK(%d items)", count)
+	prices, err := s.sjcClient.FetchGoldPrices(ctx)
+	if err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "sjc")
+		return refreshResult{source: "gold_sjc", count: 0, err: err}
+	}
+	batch := make([]*models.AssetPrice, 0, len(prices))
+	for _, p := range prices {
+		if p.Buy <= 0 && p.Sell <= 0 {
+			continue
+		}
+		batch = append(batch, &models.AssetPrice{
+			TypeCode:   p.TypeCode,
+			AssetType:  "gold",
+			Name:       p.Name,
+			Buy:        p.Buy,
+			Sell:       p.Sell,
+			ChangeBuy:  p.ChangeBuy,
+			ChangeSell: p.ChangeSell,
+			Currency:   p.Currency,
+			Source:     "sjc",
+			IsStale:    false,
+			FetchedAt:  time.Now(),
+		})
+	}
+	if len(batch) == 0 {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "sjc")
+		return refreshResult{source: "gold_sjc", count: 0, err: fmt.Errorf("sjc: no valid prices")}
+	}
+	if err := s.repo.UpsertBatch(ctx, batch); err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "sjc")
+		return refreshResult{source: "gold_sjc", count: 0, err: err}
+	}
+	return refreshResult{source: "gold_sjc", count: len(batch), err: nil}
+}
+
+// refreshGoldDOJI fetches gold prices from the DOJI website and upserts them.
+// DOJI GoldPrice does not have ChangeBuy/ChangeSell fields; those default to 0.
+func (s *assetPriceService) refreshGoldDOJI(ctx context.Context) refreshResult {
+	if s.dojiClient == nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "doji")
+		return refreshResult{source: "gold_doji", count: 0, err: fmt.Errorf("doji client not configured")}
+	}
+	prices, err := s.dojiClient.FetchGoldPrices(ctx)
+	if err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "doji")
+		return refreshResult{source: "gold_doji", count: 0, err: err}
+	}
+	batch := make([]*models.AssetPrice, 0, len(prices))
+	for _, p := range prices {
+		if p.Buy <= 0 && p.Sell <= 0 {
+			continue
+		}
+		batch = append(batch, &models.AssetPrice{
+			TypeCode:   p.TypeCode,
+			AssetType:  "gold",
+			Name:       p.Name,
+			Buy:        p.Buy,
+			Sell:       p.Sell,
+			ChangeBuy:  0,
+			ChangeSell: 0,
+			Currency:   p.Currency,
+			Source:     "doji",
+			IsStale:    false,
+			FetchedAt:  time.Now(),
+		})
+	}
+	if len(batch) == 0 {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "doji")
+		return refreshResult{source: "gold_doji", count: 0, err: fmt.Errorf("doji: no valid prices")}
+	}
+	if err := s.repo.UpsertBatch(ctx, batch); err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "doji")
+		return refreshResult{source: "gold_doji", count: 0, err: err}
+	}
+	return refreshResult{source: "gold_doji", count: len(batch), err: nil}
+}
+
+// refreshGoldBTMC fetches gold prices from the BTMC website and upserts them.
+// BTMC GoldPrice does not have ChangeBuy/ChangeSell fields; those default to 0.
+func (s *assetPriceService) refreshGoldBTMC(ctx context.Context) refreshResult {
+	if s.btmcClient == nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "btmc")
+		return refreshResult{source: "gold_btmc", count: 0, err: fmt.Errorf("btmc client not configured")}
+	}
+	prices, err := s.btmcClient.FetchGoldPrices(ctx)
+	if err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "btmc")
+		return refreshResult{source: "gold_btmc", count: 0, err: err}
+	}
+	batch := make([]*models.AssetPrice, 0, len(prices))
+	for _, p := range prices {
+		if p.Buy <= 0 && p.Sell <= 0 {
+			continue
+		}
+		batch = append(batch, &models.AssetPrice{
+			TypeCode:   p.TypeCode,
+			AssetType:  "gold",
+			Name:       p.Name,
+			Buy:        p.Buy,
+			Sell:       p.Sell,
+			ChangeBuy:  0,
+			ChangeSell: 0,
+			Currency:   p.Currency,
+			Source:     "btmc",
+			IsStale:    false,
+			FetchedAt:  time.Now(),
+		})
+	}
+	if len(batch) == 0 {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "btmc")
+		return refreshResult{source: "gold_btmc", count: 0, err: fmt.Errorf("btmc: no valid prices")}
+	}
+	if err := s.repo.UpsertBatch(ctx, batch); err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "btmc")
+		return refreshResult{source: "gold_btmc", count: 0, err: err}
+	}
+	return refreshResult{source: "gold_btmc", count: len(batch), err: nil}
+}
+
+// refreshGoldPNJ fetches gold prices from the PNJ API and upserts them.
+// PNJ GoldPrice does not have ChangeBuy/ChangeSell fields; those default to 0.
+func (s *assetPriceService) refreshGoldPNJ(ctx context.Context) refreshResult {
+	if s.pnjClient == nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "pnj")
+		return refreshResult{source: "gold_pnj", count: 0, err: fmt.Errorf("pnj client not configured")}
+	}
+	prices, err := s.pnjClient.FetchGoldPrices(ctx)
+	if err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "pnj")
+		return refreshResult{source: "gold_pnj", count: 0, err: err}
+	}
+	batch := make([]*models.AssetPrice, 0, len(prices))
+	for _, p := range prices {
+		if p.Buy <= 0 && p.Sell <= 0 {
+			continue
+		}
+		batch = append(batch, &models.AssetPrice{
+			TypeCode:   p.TypeCode,
+			AssetType:  "gold",
+			Name:       p.Name,
+			Buy:        p.Buy,
+			Sell:       p.Sell,
+			ChangeBuy:  0,
+			ChangeSell: 0,
+			Currency:   p.Currency,
+			Source:     "pnj",
+			IsStale:    false,
+			FetchedAt:  time.Now(),
+		})
+	}
+	if len(batch) == 0 {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "pnj")
+		return refreshResult{source: "gold_pnj", count: 0, err: fmt.Errorf("pnj: no valid prices")}
+	}
+	if err := s.repo.UpsertBatch(ctx, batch); err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "pnj")
+		return refreshResult{source: "gold_pnj", count: 0, err: err}
+	}
+	return refreshResult{source: "gold_pnj", count: len(batch), err: nil}
 }
 
 // ---------------------------------------------------------------------------

@@ -79,8 +79,9 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	// Phase 1 (cont.): PushService — depends on push subscription repo
 	pushSvc := NewPushService(repos.PushSubscription)
 
-	// Phase 1 (cont.): AssetPriceService — depends on asset price repo and price services
-	assetPriceSvc := NewAssetPriceService(repos.AssetPrice, goldPriceSvc, silverPriceSvc, currencyPriceSvc)
+	// Phase 1 (cont.): AssetPriceService — depends on asset price repo and price services.
+	// SJC, DOJI, BTMC, PNJ clients are passed as nil here; Task 10 will wire the real clients.
+	assetPriceSvc := NewAssetPriceService(repos.AssetPrice, goldPriceSvc, silverPriceSvc, currencyPriceSvc, nil, nil, nil, nil)
 
 	// Phase 1 (cont.): PriceAlertService — reads from DB cache via AssetPriceService
 	var priceAlertSvc PriceAlertService

@@ -6,9 +6,9 @@
 - **Plan file:** `docs/plans/2026-03-26-multi-source-gold-price-plan.md`
 - **Spec file:** `docs/specs/2026-03-26-multi-source-gold-price-spec.md`
 - **Started:** 2026-03-26T00:00:00Z
-- **Last updated:** 2026-03-26T12:00:00Z
+- **Last updated:** 2026-03-26T13:00:00Z
 - **Current state:** in_progress
-- **Current task:** 9 — Integrate sources into AssetPriceService
+- **Current task:** 10 — Wire DI providers
 
 ## Task Progress
 
@@ -18,12 +18,12 @@
 | 1   | DB Schema Migration — Add source constraint   | done        | eff5a89 | 3-column unique index + migration command + UpsertBatch updated |
 | 2   | MarkStaleByAssetTypeAndSource                 | done        | 100c89a | Source-granular stale marking in repository |
 | 3   | Set source="waterfall" in existing methods    | done        | dd26f58 | Source field set in refreshGold/Silver/Currency |
-| 4   | SJC Client Package                            | done        | pending commit | JSON API client; float64→int64; 5s timeout; 1MB limit; SanitizeTypeCode("SJC") |
-| 5   | DOJI Client Package                           | done        | pending commit | HTML scraper; ×1,000,000 multiplier; regex row/cell extraction; SanitizeTypeCode("DOJI") |
-| 6   | BTMC Direct Client Package                    | done        | pending commit | HTML scraper; ×1000 multiplier; "Liên hệ"→sell=0; SanitizeTypeCode("BTMC") |
-| 7   | PNJ Client Package                            | done        | pending commit | JSON API; TPHCM region preference; ×1000 multiplier; SanitizeTypeCode("PNJ") |
+| 4   | SJC Client Package                            | done        | 765ad9c | JSON API client; float64→int64; 5s timeout; 1MB limit; SanitizeTypeCode("SJC") |
+| 5   | DOJI Client Package                           | done        | 765ad9c | HTML scraper; ×1,000,000 multiplier; regex row/cell extraction; SanitizeTypeCode("DOJI") |
+| 6   | BTMC Direct Client Package                    | done        | 765ad9c | HTML scraper; ×1000 multiplier; "Liên hệ"→sell=0; SanitizeTypeCode("BTMC") |
+| 7   | PNJ Client Package                            | done        | 765ad9c | JSON API; TPHCM region preference; ×1000 multiplier; SanitizeTypeCode("PNJ") |
 | 8   | Shared SanitizeTypeCode utility               | done        | ee7bbaf | SanitizeTypeCode(prefix,name) — diacritics, uppercase, alphanumeric enforcement, max 50 chars |
-| 9   | Integrate sources into AssetPriceService      | pending     | —      | —       |
+| 9   | Integrate sources into AssetPriceService      | done        | 422e0cd | 7-goroutine channel design; refreshResult named type; nil-safe clients; per-source stale marking |
 | 10  | Wire DI providers                             | pending     | —      | —       |
 | 11  | No-regression check                           | pending     | —      | —       |
 | 12  | Log format (included in Task 9)               | skipped     | —      | Handled in Task 9 |
