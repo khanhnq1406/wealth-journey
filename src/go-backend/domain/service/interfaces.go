@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"wealthjourney/domain/models"
 	"wealthjourney/pkg/fx"
@@ -336,4 +337,63 @@ type WatchlistService interface {
 	DeleteItem(ctx context.Context, itemID int32, userID int32) (*v1.DeleteWatchlistItemResponse, error)
 	ReorderItems(ctx context.Context, userID int32, req *v1.ReorderWatchlistRequest) (*v1.ReorderWatchlistResponse, error)
 	CheckItem(ctx context.Context, userID int32, symbol string) (*v1.CheckWatchlistItemResponse, error)
+}
+
+// AssetPriceService manages the DB-backed price cache for gold, silver, and currency.
+// It is the single point of truth for the price cache job and for handlers that
+// serve prices from the database instead of live APIs.
+type AssetPriceService interface {
+	// RefreshAllPrices fetches fresh prices from gold/silver/currency price services
+	// and persists them in the asset_price table. Each asset type is fetched
+	// independently so a single-source failure does not abort the others.
+	// On failure for a type, that type's rows are marked stale.
+	RefreshAllPrices(ctx context.Context) error
+
+	// GetAllPrices reads all rows from the DB and groups them by asset type.
+	GetAllPrices(ctx context.Context) (*AllAssetPrices, error)
+
+	// GetPricesByAssetType reads DB rows for a single asset type ("gold", "silver", "currency").
+	GetPricesByAssetType(ctx context.Context, assetType string) ([]*AssetPriceDTO, error)
+
+	// GetMarketTypes reads all DB rows and returns the list of type codes per
+	// asset type together with the latest FetchedAt timestamp per group.
+	GetMarketTypes(ctx context.Context) (*MarketTypesDTO, error)
+}
+
+// AllAssetPrices groups DB-backed prices by asset class.
+type AllAssetPrices struct {
+	Gold     []*AssetPriceDTO
+	Silver   []*AssetPriceDTO
+	Currency []*AssetPriceDTO
+}
+
+// AssetPriceDTO is the service-layer view of a single asset price row.
+type AssetPriceDTO struct {
+	TypeCode   string
+	Name       string
+	Buy        int64
+	Sell       int64
+	ChangeBuy  int64
+	ChangeSell int64
+	Currency   string
+	IsStale    bool
+	FetchedAt  time.Time
+}
+
+// MarketTypeItem is a lightweight descriptor for a single tradable type.
+type MarketTypeItem struct {
+	Code     string
+	Name     string
+	Currency string
+}
+
+// MarketTypesDTO contains the full set of market types per asset class together
+// with the freshness timestamps (Unix seconds) for each group.
+type MarketTypesDTO struct {
+	Gold              []MarketTypeItem
+	Silver            []MarketTypeItem
+	Currency          []MarketTypeItem
+	GoldUpdatedAt     int64
+	SilverUpdatedAt   int64
+	CurrencyUpdatedAt int64
 }

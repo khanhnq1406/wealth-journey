@@ -33,6 +33,7 @@ type Services struct {
 	PriceAlert         PriceAlertService
 	Watchlist          WatchlistService
 	UserPriceAlert     UserPriceAlertService
+	AssetPrice         AssetPriceService
 }
 
 // NewServices creates all service instances with proper dependency ordering.
@@ -84,6 +85,9 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		priceAlertSvc = NewPriceAlertService(goldPriceSvc, silverPriceSvc, repos.Notification, repos.User, rdb, pushSvc)
 	}
 
+	// Phase 1 (cont.): AssetPriceService — depends on asset price repo and price services
+	assetPriceSvc := NewAssetPriceService(repos.AssetPrice, goldPriceSvc, silverPriceSvc, currencyPriceSvc)
+
 	// Phase 1 (cont.): WatchlistService — depends on watchlist repo, gold/silver/currency price services, market data service
 	watchlistSvc := NewWatchlistService(repos.Watchlist, goldPriceSvc, silverPriceSvc, currencyPriceSvc, marketDataSvc)
 
@@ -124,6 +128,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		PriceAlert:       priceAlertSvc,
 		Watchlist:        watchlistSvc,
 		UserPriceAlert:   userPriceAlertSvc,
+		AssetPrice:       assetPriceSvc,
 	}
 }
 
