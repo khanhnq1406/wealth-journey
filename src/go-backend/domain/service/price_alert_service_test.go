@@ -21,44 +21,45 @@ import (
 // Mock types (prefixed with mockPA to avoid conflicts)
 // ---------------------------------------------------------------------------
 
-type mockPAGoldPriceSvc struct {
+type mockPAAssetPriceSvc struct {
 	mock.Mock
 }
 
-func (m *mockPAGoldPriceSvc) FetchPriceForSymbol(ctx context.Context, symbol string) (*CachedGoldPrice, error) {
-	args := m.Called(ctx, symbol)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*CachedGoldPrice), args.Error(1)
+func (m *mockPAAssetPriceSvc) RefreshAllPrices(ctx context.Context) error {
+	args := m.Called(ctx)
+	return args.Error(0)
 }
 
-func (m *mockPAGoldPriceSvc) FetchAllPrices(ctx context.Context) ([]*CachedGoldPrice, error) {
+func (m *mockPAAssetPriceSvc) GetAllPrices(ctx context.Context) (*AllAssetPrices, error) {
 	args := m.Called(ctx)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).([]*CachedGoldPrice), args.Error(1)
+	return args.Get(0).(*AllAssetPrices), args.Error(1)
 }
 
-type mockPASilverPriceSvc struct {
-	mock.Mock
-}
-
-func (m *mockPASilverPriceSvc) FetchPriceForSymbol(ctx context.Context, symbol string) (*CachedSilverPrice, error) {
-	args := m.Called(ctx, symbol)
+func (m *mockPAAssetPriceSvc) GetPricesByAssetType(ctx context.Context, assetType string) ([]*AssetPriceDTO, error) {
+	args := m.Called(ctx, assetType)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*CachedSilverPrice), args.Error(1)
+	return args.Get(0).([]*AssetPriceDTO), args.Error(1)
 }
 
-func (m *mockPASilverPriceSvc) FetchAllPrices(ctx context.Context) ([]*CachedSilverPrice, error) {
+func (m *mockPAAssetPriceSvc) GetMarketTypes(ctx context.Context) (*MarketTypesDTO, error) {
 	args := m.Called(ctx)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).([]*CachedSilverPrice), args.Error(1)
+	return args.Get(0).(*MarketTypesDTO), args.Error(1)
+}
+
+func (m *mockPAAssetPriceSvc) GetPriceByTypeCode(ctx context.Context, typeCode string) (*AssetPriceDTO, error) {
+	args := m.Called(ctx, typeCode)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*AssetPriceDTO), args.Error(1)
 }
 
 type mockPANotifRepo struct {
@@ -185,8 +186,7 @@ func (m *mockPAPushSvc) GetVAPIDPublicKey() string {
 
 func newPriceAlertServiceWithMiniredis(
 	t *testing.T,
-	goldSvc GoldPriceService,
-	silverSvc SilverPriceService,
+	assetPriceSvc AssetPriceService,
 	notifRepo repository.NotificationRepository,
 	userRepo repository.UserRepository,
 	pushSvc PushService,
@@ -206,7 +206,7 @@ func newPriceAlertServiceWithMiniredis(
 
 	rdb := pkgredis.NewFromClient(redisClient)
 
-	svc := NewPriceAlertService(goldSvc, silverSvc, notifRepo, userRepo, rdb, pushSvc)
+	svc := NewPriceAlertService(assetPriceSvc, notifRepo, userRepo, rdb, pushSvc)
 	return svc, mr
 }
 
@@ -240,32 +240,30 @@ func TestPriceAlertService_FirstRun_SetsBaselines(t *testing.T) {
 	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "2.0")
 	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
 
-	goldSvc := new(mockPAGoldPriceSvc)
-	silverSvc := new(mockPASilverPriceSvc)
+	assetPriceSvc := new(mockPAAssetPriceSvc)
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, goldSvc, silverSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
 	ctx := context.Background()
 
-	goldPrices := []*CachedGoldPrice{
-		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: 8500000000, Sell: 8600000000, Currency: "VND", UpdateTime: time.Now()},
-		{TypeCode: "XAU", Name: "Gold World", Buy: 200000, Sell: 201000, Currency: "USD", UpdateTime: time.Now()},
+	goldPrices := []*AssetPriceDTO{
+		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: 8500000000, Sell: 8600000000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
+		{TypeCode: "XAU", Name: "Gold World", Buy: 200000, Sell: 201000, Currency: "USD", IsStale: false, FetchedAt: time.Now()},
 	}
-	silverPrices := []*CachedSilverPrice{
-		{TypeCode: "AGV", Name: "Silver VND", Buy: 1500000, Sell: 1520000, Currency: "VND", UpdateTime: time.Now()},
+	silverPrices := []*AssetPriceDTO{
+		{TypeCode: "AGV", Name: "Silver VND", Buy: 1500000, Sell: 1520000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
 	}
 
-	goldSvc.On("FetchAllPrices", ctx).Return(goldPrices, nil)
-	silverSvc.On("FetchAllPrices", ctx).Return(silverPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
 
 	// BatchCreate must NOT be called — no alerts on first run
 	err := svc.CheckAndAlert(ctx)
 
 	assert.NoError(t, err)
-	goldSvc.AssertExpectations(t)
-	silverSvc.AssertExpectations(t)
+	assetPriceSvc.AssertExpectations(t)
 	notifRepo.AssertNotCalled(t, "BatchCreate", mock.Anything, mock.Anything)
 	pushSvc.AssertNotCalled(t, "SendToAll", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 
@@ -282,13 +280,12 @@ func TestPriceAlertService_SignificantChange_TriggersAlert(t *testing.T) {
 	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "2.0")
 	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
 
-	goldSvc := new(mockPAGoldPriceSvc)
-	silverSvc := new(mockPASilverPriceSvc)
+	assetPriceSvc := new(mockPAAssetPriceSvc)
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, goldSvc, silverSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
 	ctx := context.Background()
 
 	// Baseline: 8,500,000,000 VND. New price is ~3% higher → should trigger.
@@ -296,13 +293,13 @@ func TestPriceAlertService_SignificantChange_TriggersAlert(t *testing.T) {
 	newPrice := int64(8_755_000_000) // ~3% increase
 	setBaseline(mr, "SJL1L10", baselinePrice)
 
-	goldPrices := []*CachedGoldPrice{
-		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: newPrice, Sell: newPrice + 100_000_000, Currency: "VND", UpdateTime: time.Now()},
+	goldPrices := []*AssetPriceDTO{
+		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: newPrice, Sell: newPrice + 100_000_000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
 	}
-	silverPrices := []*CachedSilverPrice{}
+	silverPrices := []*AssetPriceDTO{}
 
-	goldSvc.On("FetchAllPrices", ctx).Return(goldPrices, nil)
-	silverSvc.On("FetchAllPrices", ctx).Return(silverPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1, 2, 3}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
 	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
@@ -310,8 +307,7 @@ func TestPriceAlertService_SignificantChange_TriggersAlert(t *testing.T) {
 	err := svc.CheckAndAlert(ctx)
 
 	assert.NoError(t, err)
-	goldSvc.AssertExpectations(t)
-	silverSvc.AssertExpectations(t)
+	assetPriceSvc.AssertExpectations(t)
 	notifRepo.AssertExpectations(t)
 	pushSvc.AssertExpectations(t)
 	userRepo.AssertExpectations(t)
@@ -346,13 +342,12 @@ func TestPriceAlertService_BelowThreshold_NoAlert(t *testing.T) {
 	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "2.0")
 	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
 
-	goldSvc := new(mockPAGoldPriceSvc)
-	silverSvc := new(mockPASilverPriceSvc)
+	assetPriceSvc := new(mockPAAssetPriceSvc)
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, goldSvc, silverSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
 	ctx := context.Background()
 
 	// Baseline: 8,500,000,000. New price is ~0.5% higher → below 2% threshold.
@@ -360,19 +355,18 @@ func TestPriceAlertService_BelowThreshold_NoAlert(t *testing.T) {
 	newPrice := int64(8_542_500_000) // 0.5% increase
 	setBaseline(mr, "SJL1L10", baselinePrice)
 
-	goldPrices := []*CachedGoldPrice{
-		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: newPrice, Sell: newPrice + 50_000_000, Currency: "VND", UpdateTime: time.Now()},
+	goldPrices := []*AssetPriceDTO{
+		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: newPrice, Sell: newPrice + 50_000_000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
 	}
-	silverPrices := []*CachedSilverPrice{}
+	silverPrices := []*AssetPriceDTO{}
 
-	goldSvc.On("FetchAllPrices", ctx).Return(goldPrices, nil)
-	silverSvc.On("FetchAllPrices", ctx).Return(silverPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
 
 	err := svc.CheckAndAlert(ctx)
 
 	assert.NoError(t, err)
-	goldSvc.AssertExpectations(t)
-	silverSvc.AssertExpectations(t)
+	assetPriceSvc.AssertExpectations(t)
 	notifRepo.AssertNotCalled(t, "BatchCreate", mock.Anything, mock.Anything)
 	pushSvc.AssertNotCalled(t, "SendToAll", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 	userRepo.AssertNotCalled(t, "GetAllUserIDs", mock.Anything)
@@ -384,13 +378,12 @@ func TestPriceAlertService_Cooldown_SkipsAlert(t *testing.T) {
 	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "2.0")
 	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
 
-	goldSvc := new(mockPAGoldPriceSvc)
-	silverSvc := new(mockPASilverPriceSvc)
+	assetPriceSvc := new(mockPAAssetPriceSvc)
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, goldSvc, silverSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
 	ctx := context.Background()
 
 	// Set baseline and a large price change (3%)
@@ -401,19 +394,18 @@ func TestPriceAlertService_Cooldown_SkipsAlert(t *testing.T) {
 	// Set cooldown for the gold_vnd category
 	setCooldown(mr, "gold_vnd")
 
-	goldPrices := []*CachedGoldPrice{
-		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: newPrice, Sell: newPrice + 100_000_000, Currency: "VND", UpdateTime: time.Now()},
+	goldPrices := []*AssetPriceDTO{
+		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: newPrice, Sell: newPrice + 100_000_000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
 	}
-	silverPrices := []*CachedSilverPrice{}
+	silverPrices := []*AssetPriceDTO{}
 
-	goldSvc.On("FetchAllPrices", ctx).Return(goldPrices, nil)
-	silverSvc.On("FetchAllPrices", ctx).Return(silverPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
 
 	err := svc.CheckAndAlert(ctx)
 
 	assert.NoError(t, err)
-	goldSvc.AssertExpectations(t)
-	silverSvc.AssertExpectations(t)
+	assetPriceSvc.AssertExpectations(t)
 	// Cooldown must prevent BatchCreate and SendToAll
 	notifRepo.AssertNotCalled(t, "BatchCreate", mock.Anything, mock.Anything)
 	pushSvc.AssertNotCalled(t, "SendToAll", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
@@ -427,13 +419,12 @@ func TestPriceAlertService_GoldFetchError_ContinuesToSilver(t *testing.T) {
 	t.Setenv("PRICE_ALERT_SILVER_VND_PCT", "2.0")
 	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
 
-	goldSvc := new(mockPAGoldPriceSvc)
-	silverSvc := new(mockPASilverPriceSvc)
+	assetPriceSvc := new(mockPAAssetPriceSvc)
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, goldSvc, silverSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
 	ctx := context.Background()
 
 	// Silver: 3% change above threshold
@@ -441,9 +432,9 @@ func TestPriceAlertService_GoldFetchError_ContinuesToSilver(t *testing.T) {
 	silverNewPrice := int64(1_545_000) // 3% increase
 	setBaseline(mr, "AGV", silverBaseline)
 
-	goldSvc.On("FetchAllPrices", ctx).Return(nil, fmt.Errorf("upstream timeout"))
-	silverSvc.On("FetchAllPrices", ctx).Return([]*CachedSilverPrice{
-		{TypeCode: "AGV", Name: "Silver VND", Buy: silverNewPrice, Sell: silverNewPrice + 10_000, Currency: "VND", UpdateTime: time.Now()},
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(nil, fmt.Errorf("upstream timeout"))
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return([]*AssetPriceDTO{
+		{TypeCode: "AGV", Name: "Silver VND", Buy: silverNewPrice, Sell: silverNewPrice + 10_000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
 	}, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{10, 20}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
@@ -452,8 +443,7 @@ func TestPriceAlertService_GoldFetchError_ContinuesToSilver(t *testing.T) {
 	err := svc.CheckAndAlert(ctx)
 
 	assert.NoError(t, err)
-	goldSvc.AssertExpectations(t)
-	silverSvc.AssertExpectations(t)
+	assetPriceSvc.AssertExpectations(t)
 	// Silver alert must still be delivered
 	notifRepo.AssertExpectations(t)
 	pushSvc.AssertExpectations(t)
@@ -467,23 +457,22 @@ func TestPriceAlertService_NoUsers_NoNotifications(t *testing.T) {
 	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "2.0")
 	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
 
-	goldSvc := new(mockPAGoldPriceSvc)
-	silverSvc := new(mockPASilverPriceSvc)
+	assetPriceSvc := new(mockPAAssetPriceSvc)
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, goldSvc, silverSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
 	ctx := context.Background()
 
 	baselinePrice := int64(8_500_000_000)
 	newPrice := int64(8_755_000_000) // ~3% — above threshold
 	setBaseline(mr, "SJL1L10", baselinePrice)
 
-	goldSvc.On("FetchAllPrices", ctx).Return([]*CachedGoldPrice{
-		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: newPrice, Sell: newPrice + 100_000_000, Currency: "VND", UpdateTime: time.Now()},
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return([]*AssetPriceDTO{
+		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: newPrice, Sell: newPrice + 100_000_000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
 	}, nil)
-	silverSvc.On("FetchAllPrices", ctx).Return([]*CachedSilverPrice{}, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return([]*AssetPriceDTO{}, nil)
 
 	// No users registered in the system
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{}, nil)
@@ -496,8 +485,7 @@ func TestPriceAlertService_NoUsers_NoNotifications(t *testing.T) {
 	err := svc.CheckAndAlert(ctx)
 
 	assert.NoError(t, err)
-	goldSvc.AssertExpectations(t)
-	silverSvc.AssertExpectations(t)
+	assetPriceSvc.AssertExpectations(t)
 	userRepo.AssertExpectations(t)
 
 	// If BatchCreate was called, it must have been with zero notifications
@@ -517,13 +505,12 @@ func TestPriceAlertService_ForceCheck_AlwaysSendsAlert(t *testing.T) {
 	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "2.0")
 	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
 
-	goldSvc := new(mockPAGoldPriceSvc)
-	silverSvc := new(mockPASilverPriceSvc)
+	assetPriceSvc := new(mockPAAssetPriceSvc)
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, goldSvc, silverSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
 	ctx := context.Background()
 
 	// Set baseline with only 0.5% change — below threshold for normal check
@@ -534,13 +521,13 @@ func TestPriceAlertService_ForceCheck_AlwaysSendsAlert(t *testing.T) {
 	// Also set cooldown — would block normal CheckAndAlert
 	setCooldown(mr, "gold_vnd")
 
-	goldPrices := []*CachedGoldPrice{
-		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: newPrice, Sell: newPrice + 50_000_000, Currency: "VND", UpdateTime: time.Now()},
+	goldPrices := []*AssetPriceDTO{
+		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: newPrice, Sell: newPrice + 50_000_000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
 	}
-	silverPrices := []*CachedSilverPrice{}
+	silverPrices := []*AssetPriceDTO{}
 
-	goldSvc.On("FetchAllPrices", ctx).Return(goldPrices, nil)
-	silverSvc.On("FetchAllPrices", ctx).Return(silverPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1, 2}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
 	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
@@ -549,8 +536,7 @@ func TestPriceAlertService_ForceCheck_AlwaysSendsAlert(t *testing.T) {
 	err := svc.ForceCheckAndAlert(ctx)
 
 	assert.NoError(t, err)
-	goldSvc.AssertExpectations(t)
-	silverSvc.AssertExpectations(t)
+	assetPriceSvc.AssertExpectations(t)
 	notifRepo.AssertExpectations(t)
 	pushSvc.AssertExpectations(t)
 	userRepo.AssertExpectations(t)
@@ -579,24 +565,23 @@ func TestPriceAlertService_ForceCheck_RateLimit(t *testing.T) {
 	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "2.0")
 	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
 
-	goldSvc := new(mockPAGoldPriceSvc)
-	silverSvc := new(mockPASilverPriceSvc)
+	assetPriceSvc := new(mockPAAssetPriceSvc)
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, goldSvc, silverSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
 	ctx := context.Background()
 
 	setBaseline(mr, "SJL1L10", 8_500_000_000)
 
-	goldPrices := []*CachedGoldPrice{
-		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: 8_600_000_000, Sell: 8_700_000_000, Currency: "VND", UpdateTime: time.Now()},
+	goldPrices := []*AssetPriceDTO{
+		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: 8_600_000_000, Sell: 8_700_000_000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
 	}
-	silverPrices := []*CachedSilverPrice{}
+	silverPrices := []*AssetPriceDTO{}
 
-	goldSvc.On("FetchAllPrices", ctx).Return(goldPrices, nil)
-	silverSvc.On("FetchAllPrices", ctx).Return(silverPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
 	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
@@ -618,23 +603,22 @@ func TestPriceAlertService_ForceCheck_NoBaseline_StillSendsAlert(t *testing.T) {
 	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "2.0")
 	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
 
-	goldSvc := new(mockPAGoldPriceSvc)
-	silverSvc := new(mockPASilverPriceSvc)
+	assetPriceSvc := new(mockPAAssetPriceSvc)
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
 
-	svc, _ := newPriceAlertServiceWithMiniredis(t, goldSvc, silverSvc, notifRepo, userRepo, pushSvc)
+	svc, _ := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
 	ctx := context.Background()
 
 	// NO baseline set — first run scenario
-	goldPrices := []*CachedGoldPrice{
-		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: 8500000000, Sell: 8600000000, Currency: "VND", UpdateTime: time.Now()},
+	goldPrices := []*AssetPriceDTO{
+		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: 8500000000, Sell: 8600000000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
 	}
-	silverPrices := []*CachedSilverPrice{}
+	silverPrices := []*AssetPriceDTO{}
 
-	goldSvc.On("FetchAllPrices", ctx).Return(goldPrices, nil)
-	silverSvc.On("FetchAllPrices", ctx).Return(silverPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
 	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
@@ -665,30 +649,29 @@ func TestPriceAlertService_ForceCheck_NoBaseline_StillSendsAlert(t *testing.T) {
 }
 
 // TestPriceAlertService_ForceCheck_SilverUSD_IncludedInAlert verifies that
-// when FetchAllPrices returns a USD-denominated silver price (XAGUSD),
+// when GetPricesByAssetType returns a USD-denominated silver price (XAGUSD),
 // ForceCheckAndAlert creates a silver_usd category alert.
 func TestPriceAlertService_ForceCheck_SilverUSD_IncludedInAlert(t *testing.T) {
 	t.Setenv("PRICE_ALERT_SILVER_USD_PCT", "2.0")
 	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
 
-	goldSvc := new(mockPAGoldPriceSvc)
-	silverSvc := new(mockPASilverPriceSvc)
+	assetPriceSvc := new(mockPAAssetPriceSvc)
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
 
-	svc, _ := newPriceAlertServiceWithMiniredis(t, goldSvc, silverSvc, notifRepo, userRepo, pushSvc)
+	svc, _ := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
 	ctx := context.Background()
 
 	// Gold: empty (we only care about silver_usd here)
-	goldSvc.On("FetchAllPrices", ctx).Return([]*CachedGoldPrice{}, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return([]*AssetPriceDTO{}, nil)
 
 	// Silver: include both VND and USD prices
-	silverPrices := []*CachedSilverPrice{
-		{TypeCode: "PHU_QUY_THOI_1L", Name: "Phú Quý thỏi 1L", Buy: 1_500_000, Sell: 1_520_000, Currency: "VND", UpdateTime: time.Now()},
-		{TypeCode: "XAGUSD", Name: "Silver World (XAG/USD)", Buy: 3200, Sell: 3200, Currency: "USD", UpdateTime: time.Now()},
+	silverPrices := []*AssetPriceDTO{
+		{TypeCode: "PHU_QUY_THOI_1L", Name: "Phú Quý thỏi 1L", Buy: 1_500_000, Sell: 1_520_000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
+		{TypeCode: "XAGUSD", Name: "Silver World (XAG/USD)", Buy: 3200, Sell: 3200, Currency: "USD", IsStale: false, FetchedAt: time.Now()},
 	}
-	silverSvc.On("FetchAllPrices", ctx).Return(silverPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
 	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
@@ -719,4 +702,141 @@ func TestPriceAlertService_ForceCheck_SilverUSD_IncludedInAlert(t *testing.T) {
 		}
 	}
 	assert.True(t, found, "expected a silver_usd category notification with XAGUSD mover")
+}
+
+// ---------------------------------------------------------------------------
+// New tests: Stale price handling (security requirement)
+// ---------------------------------------------------------------------------
+
+// TestPriceAlertService_StaleGoldPrices_NoAlert verifies that when all gold
+// prices are stale (IsStale == true), no alert is triggered even if the price
+// moved significantly. Stale prices must never trigger phantom alerts.
+func TestPriceAlertService_StaleGoldPrices_NoAlert(t *testing.T) {
+	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "2.0")
+	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
+
+	assetPriceSvc := new(mockPAAssetPriceSvc)
+	notifRepo := new(mockPANotifRepo)
+	userRepo := new(mockPAUserRepo)
+	pushSvc := new(mockPAPushSvc)
+
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	ctx := context.Background()
+
+	// Set baseline and a large price change — but price is stale
+	baselinePrice := int64(8_500_000_000)
+	newPrice := int64(8_755_000_000) // ~3% change — would trigger if non-stale
+	setBaseline(mr, "SJL1L10", baselinePrice)
+
+	goldPrices := []*AssetPriceDTO{
+		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: newPrice, Sell: newPrice + 100_000_000, Currency: "VND", IsStale: true, FetchedAt: time.Now()},
+	}
+	silverPrices := []*AssetPriceDTO{}
+
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
+
+	err := svc.CheckAndAlert(ctx)
+
+	assert.NoError(t, err)
+	assetPriceSvc.AssertExpectations(t)
+	// Stale prices must NEVER trigger notifications
+	notifRepo.AssertNotCalled(t, "BatchCreate", mock.Anything, mock.Anything)
+	pushSvc.AssertNotCalled(t, "SendToAll", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+	userRepo.AssertNotCalled(t, "GetAllUserIDs", mock.Anything)
+}
+
+// TestPriceAlertService_PartialStale_NonStaleFiresAlert verifies that when
+// some gold prices are stale and some are not, only non-stale prices produce
+// movers. The non-stale silver price should still trigger an alert while
+// the stale gold price is silently skipped.
+func TestPriceAlertService_PartialStale_NonStaleFiresAlert(t *testing.T) {
+	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "2.0")
+	t.Setenv("PRICE_ALERT_SILVER_VND_PCT", "2.0")
+	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
+
+	assetPriceSvc := new(mockPAAssetPriceSvc)
+	notifRepo := new(mockPANotifRepo)
+	userRepo := new(mockPAUserRepo)
+	pushSvc := new(mockPAPushSvc)
+
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	ctx := context.Background()
+
+	// Gold: stale — significant price change should be ignored
+	goldBaseline := int64(8_500_000_000)
+	goldNewPrice := int64(8_755_000_000) // ~3% change — stale, must be ignored
+	setBaseline(mr, "SJL1L10", goldBaseline)
+
+	// Silver: non-stale — significant price change should trigger
+	silverBaseline := int64(1_500_000)
+	silverNewPrice := int64(1_545_000) // 3% change — non-stale, must trigger
+	setBaseline(mr, "AGV", silverBaseline)
+
+	goldPrices := []*AssetPriceDTO{
+		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: goldNewPrice, Sell: goldNewPrice + 100_000_000, Currency: "VND", IsStale: true, FetchedAt: time.Now()},
+	}
+	silverPrices := []*AssetPriceDTO{
+		{TypeCode: "AGV", Name: "Silver VND", Buy: silverNewPrice, Sell: silverNewPrice + 10_000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
+	}
+
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
+	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1, 2}, nil)
+	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
+	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
+
+	err := svc.CheckAndAlert(ctx)
+
+	assert.NoError(t, err)
+	assetPriceSvc.AssertExpectations(t)
+	// Silver alert must have fired (non-stale)
+	notifRepo.AssertExpectations(t)
+	pushSvc.AssertExpectations(t)
+	userRepo.AssertExpectations(t)
+
+	// Verify the notification is for silver_vnd (not gold_vnd)
+	batchCreateCall := notifRepo.Calls[0]
+	notifications := batchCreateCall.Arguments.Get(1).([]*models.Notification)
+	assert.NotEmpty(t, notifications)
+	var meta map[string]interface{}
+	err = json.Unmarshal([]byte(notifications[0].Metadata), &meta)
+	assert.NoError(t, err)
+	assert.Equal(t, "silver_vnd", meta["category"], "alert must be for silver_vnd, not stale gold_vnd")
+}
+
+// TestPriceAlertService_ForceCheck_StaleSkipped verifies that ForceCheckAndAlert
+// also skips stale prices — force mode does not bypass the stale check.
+func TestPriceAlertService_ForceCheck_StaleSkipped(t *testing.T) {
+	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "2.0")
+	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
+
+	assetPriceSvc := new(mockPAAssetPriceSvc)
+	notifRepo := new(mockPANotifRepo)
+	userRepo := new(mockPAUserRepo)
+	pushSvc := new(mockPAPushSvc)
+
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	ctx := context.Background()
+
+	// Set a baseline — force check would normally fire but price is stale
+	setBaseline(mr, "SJL1L10", 8_500_000_000)
+
+	// All gold prices are stale
+	goldPrices := []*AssetPriceDTO{
+		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: 8_600_000_000, Sell: 8_700_000_000, Currency: "VND", IsStale: true, FetchedAt: time.Now()},
+	}
+	silverPrices := []*AssetPriceDTO{}
+
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
+
+	err := svc.ForceCheckAndAlert(ctx)
+
+	assert.NoError(t, err)
+	assetPriceSvc.AssertExpectations(t)
+	// Force mode must also skip stale prices — no phantom alerts
+	notifRepo.AssertNotCalled(t, "BatchCreate", mock.Anything, mock.Anything)
+	pushSvc.AssertNotCalled(t, "SendToAll", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+	userRepo.AssertNotCalled(t, "GetAllUserIDs", mock.Anything)
 }

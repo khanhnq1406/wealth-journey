@@ -79,25 +79,24 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	// Phase 1 (cont.): PushService — depends on push subscription repo
 	pushSvc := NewPushService(repos.PushSubscription)
 
-	// Phase 1 (cont.): PriceAlertService — depends on gold/silver price services, notification repo, user repo, Redis, push service
-	var priceAlertSvc PriceAlertService
-	if rdb != nil {
-		priceAlertSvc = NewPriceAlertService(goldPriceSvc, silverPriceSvc, repos.Notification, repos.User, rdb, pushSvc)
-	}
-
 	// Phase 1 (cont.): AssetPriceService — depends on asset price repo and price services
 	assetPriceSvc := NewAssetPriceService(repos.AssetPrice, goldPriceSvc, silverPriceSvc, currencyPriceSvc)
 
-	// Phase 1 (cont.): WatchlistService — depends on watchlist repo, gold/silver/currency price services, market data service
-	watchlistSvc := NewWatchlistService(repos.Watchlist, goldPriceSvc, silverPriceSvc, currencyPriceSvc, marketDataSvc)
+	// Phase 1 (cont.): PriceAlertService — reads from DB cache via AssetPriceService
+	var priceAlertSvc PriceAlertService
+	if rdb != nil {
+		priceAlertSvc = NewPriceAlertService(assetPriceSvc, repos.Notification, repos.User, rdb, pushSvc)
+	}
 
-	// Phase 1 (cont.): UserPriceAlertService — depends on alert repo, price services, notification repo, push service, Redis
+	// Phase 1 (cont.): WatchlistService — reads from DB cache via AssetPriceService
+	watchlistSvc := NewWatchlistService(repos.Watchlist, assetPriceSvc, marketDataSvc)
+
+	// Phase 1 (cont.): UserPriceAlertService — depends on alert repo, asset price DB cache, market data, notification repo, push service, Redis
 	var userPriceAlertSvc UserPriceAlertService
 	if rdb != nil {
 		userPriceAlertSvc = NewUserPriceAlertService(
 			repos.UserPriceAlert,
-			goldPriceSvc,
-			silverPriceSvc,
+			assetPriceSvc,
 			marketDataSvc,
 			repos.Notification,
 			pushSvc,

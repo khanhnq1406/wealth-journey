@@ -8,20 +8,20 @@
 - **Started:** 2026-03-26
 - **Last updated:** 2026-03-26
 - **Current state:** in_progress
-- **Current task:** 0
+- **Current task:** 5
 
 ## Task Progress
 
-| #   | Task Name                                        | Status     | Commit | Summary |
-| --- | ------------------------------------------------ | ---------- | ------ | ------- |
-| 0   | Update C4 Architecture Diagrams                  | pending    | —      | —       |
-| 1   | Add GetPriceByTypeCode to AssetPriceService      | pending    | —      | —       |
-| 2   | Migrate PriceAlertService to DB cache            | pending    | —      | —       |
-| 3   | Migrate UserPriceAlertService to DB cache        | pending    | —      | —       |
-| 4   | Migrate WatchlistService to DB cache + add tests | pending    | —      | —       |
-| 5   | Build + test verification                        | pending    | —      | —       |
-| 6   | Update flow diagrams                             | pending    | —      | —       |
-| 7   | Update report                                    | pending    | —      | —       |
+| #   | Task Name                                        | Status     | Commit  | Summary |
+| --- | ------------------------------------------------ | ---------- | ------- | ------- |
+| 0   | Update C4 Architecture Diagrams                  | done       | 6c77f1a | Removed live-API arrows from alert/watchlist services to AssetPriceService in C4 diagram |
+| 1   | Add GetPriceByTypeCode to AssetPriceService      | done       | 6c77f1a | Added interface method + impl (ListAll scan) + 3 TDD tests |
+| 2   | Migrate PriceAlertService to DB cache            | done       | —       | Replaced goldPriceSvc/silverPriceSvc with assetPriceSvc; stale rows skipped; 13 tests pass |
+| 3   | Migrate UserPriceAlertService to DB cache        | done       | —       | Replaced gold/silver deps with assetPriceSvc; fetchCurrentPrice+fetchPricesForAlerts updated; 29 tests pass |
+| 4   | Migrate WatchlistService to DB cache + add tests | done       | —       | Replaced 3 goroutines with single GetAllPrices call; created watchlist_service_test.go (6 tests) |
+| 5   | Build + test verification                        | pending    | —       | — |
+| 6   | Update flow diagrams                             | pending    | —       | — |
+| 7   | Update report                                    | pending    | —       | — |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
