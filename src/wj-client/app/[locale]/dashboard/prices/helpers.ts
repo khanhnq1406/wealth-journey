@@ -11,7 +11,7 @@ export function formatPriceValue(
   options?: { divide?: boolean },
 ): string {
   const divide = options?.divide ?? true;
-  if (value === null || value === undefined) return "-";
+  if (value === null || value === undefined || value === 0) return "--";
   if (currency === "VND") {
     return new Intl.NumberFormat("vi-VN", {
       maximumFractionDigits: 0,
@@ -21,12 +21,11 @@ export function formatPriceValue(
 }
 
 export function formatChangeValue(
-  value: number,
+  value: number | null | undefined,
   currency: string,
   options?: { divide?: boolean },
 ): string {
-  if (value === null || value === undefined) return "0";
-  if (value === 0) return "";
+  if (value === null || value === undefined || value === 0) return "--";
   const abs = Math.abs(value);
   const formatted = formatPriceValue(abs, currency, options);
   return formatted;

@@ -8,7 +8,7 @@
 - **Started:** 2026-03-26T00:00:00Z
 - **Last updated:** 2026-03-26T12:00:00Z
 - **Current state:** in_progress
-- **Current task:** 8
+- **Current task:** 9
 
 ## Task Progress
 
@@ -20,9 +20,9 @@
 | 3   | AssetPrice Service                                 | done       | 783279c | Interface + DTOs + impl; 9 unit tests; wired into NewServices |
 | 4   | PriceCacheJob Background Scheduler                 | done       | a51d7b4 | price_cache_job.go; 6 tests; registered in ProvideScheduler |
 | 5   | Add isStale to PriceItem Proto + Regenerate        | done       | e50dcd0 | isStale field 10 in PriceItem; Go + TS regenerated |
-| 6   | Switch GetMarketPrices Handler to DB               | done       | —      | MarketPricesHandler uses AssetPriceService; 6 tests pass; applyOverrides nil-safe; IsStale forwarded |
-| 7   | Switch GetPublicMarketTypes Handler to DB          | done       | —      | PublicHandler uses AssetPriceService; cold-start fallback to static; 5 tests pass |
-| 8   | Frontend — Display -- for Zero/Stale Prices        | pending    | —      | —       |
+| 6   | Switch GetMarketPrices Handler to DB               | done       | 6855529 | MarketPricesHandler uses AssetPriceService; 6 tests pass; applyOverrides nil-safe; IsStale forwarded |
+| 7   | Switch GetPublicMarketTypes Handler to DB          | done       | 6855529 | PublicHandler uses AssetPriceService; cold-start fallback to static; 5 tests pass |
+| 8   | Frontend — Display -- for Zero/Stale Prices        | done       | —      | formatPriceValue+formatChangeValue return "--" for 0/null/undefined; 13 tests pass |
 | 9   | Create/Update Runtime Flow Diagrams                | pending    | —      | —       |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
