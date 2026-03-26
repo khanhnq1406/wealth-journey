@@ -1084,3 +1084,15 @@ sequenceDiagram
 | All three sources fail | All types marked stale | All price items have `isStale: true` |
 | DB write fails | Error logged; job returns error | Next run retries; prices may be stale |
 | DB empty (first run not yet complete) | Handlers return empty arrays or static fallback | `GetPublicMarketTypes` falls back to static registries |
+
+### DB-Backed Consumers of AssetPriceService
+
+Beyond `MarketPricesHandler` and `PublicHandler`, the following services also read gold/silver/currency prices from the `asset_price` DB cache via `AssetPriceService`. **None of them call live gold/silver/currency APIs directly.**
+
+| Consumer | Method used | Stale handling |
+|----------|-------------|----------------|
+| `PriceAlertJob` → `PriceAlertService` | `GetPricesByAssetType("gold")`, `GetPricesByAssetType("silver")` | Rows with `IsStale: true` are skipped — no alert fired on stale price |
+| `UserPriceAlertJob` → `UserPriceAlertService` | `GetPriceByTypeCode(symbol)` (single alert), `GetPricesByAssetType` (batch) | Returns price 0 / skips map entry when stale — alert not triggered |
+| `WatchlistService.ListItems` | `GetAllPrices()` | Falls back to zero buy/sell prices on error; stale rows propagated to client as-is |
+
+**Yahoo Finance (`MarketDataService`) remains live** — `WatchlistService` still fetches market items (stocks, crypto, ETFs) from Yahoo Finance concurrently. Only the gold/silver/currency lookup in `WatchlistService.ListItems` uses the DB cache.

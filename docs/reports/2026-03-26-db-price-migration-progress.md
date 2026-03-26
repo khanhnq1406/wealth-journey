@@ -7,8 +7,8 @@
 - **Spec file:** `docs/specs/2026-03-26-db-price-migration-spec.md`
 - **Started:** 2026-03-26
 - **Last updated:** 2026-03-26
-- **Current state:** in_progress
-- **Current task:** 5
+- **Current state:** complete
+- **Current task:** 7
 
 ## Task Progress
 
@@ -20,8 +20,8 @@
 | 3   | Migrate UserPriceAlertService to DB cache        | done       | 24be16c | Replaced gold/silver deps with assetPriceSvc; fetchCurrentPrice+fetchPricesForAlerts updated; 29 tests pass |
 | 4   | Migrate WatchlistService to DB cache + add tests | done       | aced770 | Replaced 3 goroutines with single GetAllPrices call; created watchlist_service_test.go (6 tests) |
 | 5   | Build + test verification                        | done       | —       | go build + go test -short + golangci-lint all pass |
-| 6   | Update flow diagrams                             | pending    | —       | — |
-| 7   | Update report                                    | pending    | —       | — |
+| 6   | Update flow diagrams                             | done       | —       | Added DB-Backed Consumers table to Section 13 of flow-cross-cutting.md |
+| 7   | Update report                                    | done       | —       | Appended Major fix entry to price-cache-job-report.md Fix History |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
