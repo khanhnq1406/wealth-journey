@@ -2,31 +2,22 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import type { MarketTypeItem } from "@/features/market-prices/hooks/usePublicMarketTypes";
-import { GOLD_TABLE_FILTER } from "@/features/market-prices/constants/gold-filter";
+import { useQueryGetGoldDisplayPrices } from "@/utils/generated/hooks";
+import { formatUpdateTimestamp } from "@/features/market-prices/utils/format-update-time";
 
-interface LandingGoldPriceTableProps {
-  types: MarketTypeItem[];
-  isLoading?: boolean;
-  updatedTime?: string;
-}
-
-export function LandingGoldPriceTable({
-  types,
-  isLoading,
-  updatedTime,
-}: LandingGoldPriceTableProps) {
+export function LandingGoldPriceTable() {
   const t = useTranslations("landing.priceTeaser");
+  const { data, isLoading } = useQueryGetGoldDisplayPrices();
 
-  // Filter and reorder to show only 9 configured gold types
-  const filteredTypes = GOLD_TABLE_FILTER.map((filter) => {
-    const match = types.find(
-      (item) => item.code === filter.apiName || item.name === filter.apiName,
-    );
-    return match ? { ...match, displayName: filter.displayName } : null;
-  }).filter(Boolean) as (MarketTypeItem & { displayName: string })[];
+  const prices = data?.prices ?? [];
 
-  if (isLoading) {
+  // Derive updated time from the most recent price entry
+  const updatedTime = (() => {
+    const entry = prices.find((p) => p.updatedAt && p.updatedAt > 0);
+    return entry?.updatedAt ? formatUpdateTimestamp(entry.updatedAt) : undefined;
+  })();
+
+  if (isLoading && prices.length === 0) {
     return (
       <div className="rounded-lg border-2 border-v2-gold-primary/30 overflow-hidden shadow-v2-card">
         <div className="bg-gradient-to-r from-v2-gold-primary via-v2-gold-light to-v2-gold-primary px-5 py-3">
@@ -80,15 +71,15 @@ export function LandingGoldPriceTable({
             </tr>
           </thead>
           <tbody>
-            {filteredTypes.map((item, index) => (
+            {prices.map((item, index) => (
               <tr
-                key={item.code}
+                key={item.typeCode}
                 className={`border-b border-v2-gold-primary/10 ${index % 2 === 0 ? "bg-v2-cream-200" : "bg-v2-cream-300"}`}
               >
                 <td className="px-5 py-3.5 font-roboto font-bold text-[14px] text-v2-maroon-900 border-r border-v2-gold-primary/10">
                   {item.displayName}
                 </td>
-                <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-green-700 border-r border-v2-gold-primary/10">
+                <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-v2-text-secondary border-r border-v2-gold-primary/10">
                   {t.rich("loginPrompt", {
                     loginLink: (chunks) => (
                       <Link
@@ -100,7 +91,7 @@ export function LandingGoldPriceTable({
                     ),
                   })}
                 </td>
-                <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-green-700">
+                <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-v2-text-secondary">
                   {t.rich("loginPrompt", {
                     loginLink: (chunks) => (
                       <Link
@@ -114,7 +105,7 @@ export function LandingGoldPriceTable({
                 </td>
               </tr>
             ))}
-            {filteredTypes.length === 0 && (
+            {prices.length === 0 && (
               <tr>
                 <td
                   colSpan={3}

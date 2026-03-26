@@ -21,6 +21,7 @@ import { AdminFeedbackTab } from "@/features/admin/components/AdminFeedbackTab";
 import { AdminBroadcastForm } from "@/features/admin/components/AdminBroadcastForm";
 import { PriceAlertConfigForm } from "@/features/admin/components/PriceAlertConfigForm";
 import { PriceAlertTriggerCard } from "@/features/admin/components/PriceAlertTriggerCard";
+import { GoldDisplayConfigTable } from "@/features/admin/components/GoldDisplayConfigTable";
 
 interface SiteSetting {
   key: string;
@@ -377,7 +378,7 @@ function AdminCMSContent() {
   );
 }
 
-type AdminTab = "seo" | "users" | "feedback" | "notifications";
+type AdminTab = "seo" | "users" | "feedback" | "notifications" | "gold-config";
 
 export default function AdminCMSPage() {
   const searchParams = useSearchParams();
@@ -391,6 +392,7 @@ export default function AdminCMSPage() {
     { id: "users", label: t("page.tabs.users") },
     { id: "feedback", label: t("page.tabs.feedback") },
     { id: "notifications", label: t("page.tabs.notifications") },
+    { id: "gold-config", label: "Gold Config" },
   ];
 
   const handleTabChange = (tab: AdminTab) => {
@@ -441,6 +443,7 @@ export default function AdminCMSPage() {
             <PriceAlertTriggerCard />
           </div>
         )}
+        {activeTab === "gold-config" && <GoldDisplayConfigTable />}
       </div>
     </AdminGuard>
   );

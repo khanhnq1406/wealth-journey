@@ -29,14 +29,10 @@ export function LandingContent({ initialData }: LandingContentProps) {
   // Use client-side data if available, otherwise fall back to SSR initial data
   const effectiveData = data ?? initialData;
 
-  const goldTypes = effectiveData?.gold ?? [];
   const silverTypes = effectiveData?.silver ?? [];
   const currencyTypes = effectiveData?.currency ?? [];
 
   // Update timestamps from API
-  const goldUpdatedTime = effectiveData?.goldUpdatedAt
-    ? formatUpdateTimestamp(effectiveData.goldUpdatedAt)
-    : undefined;
   const silverUpdatedTime = effectiveData?.silverUpdatedAt
     ? formatUpdateTimestamp(effectiveData.silverUpdatedAt)
     : undefined;
@@ -69,11 +65,7 @@ export function LandingContent({ initialData }: LandingContentProps) {
 
           {/* Mobile Layout */}
           <div className="sm:hidden px-4 py-4 pb-8 space-y-6">
-            <LandingGoldPriceTable
-              types={goldTypes}
-              isLoading={showLoading}
-              updatedTime={goldUpdatedTime}
-            />
+            <LandingGoldPriceTable />
             <LandingGoldPriceChart />
             <SentimentCard variant="landing" asset="gold" />
             <OrnateDivider variant="ornate" className="my-6" />
@@ -97,11 +89,7 @@ export function LandingContent({ initialData }: LandingContentProps) {
           <div className="hidden sm:block px-8 py-6 space-y-6">
             {/* Row 1: Gold Table + Gold Chart */}
             <div className="grid grid-cols-2 gap-6 [&>*]:!mb-0">
-              <LandingGoldPriceTable
-                types={goldTypes}
-                isLoading={showLoading}
-                updatedTime={goldUpdatedTime}
-              />
+              <LandingGoldPriceTable />
               <LandingGoldPriceChart />
             </div>
             {/* Gold Sentiment Survey */}
