@@ -7,8 +7,8 @@
 - **Spec file:** `docs/specs/2026-03-26-price-cache-job-spec.md`
 - **Started:** 2026-03-26T00:00:00Z
 - **Last updated:** 2026-03-26T12:00:00Z
-- **Current state:** in_progress
-- **Current task:** 9
+- **Current state:** done
+- **Current task:** —
 
 ## Task Progress
 
@@ -23,7 +23,7 @@
 | 6   | Switch GetMarketPrices Handler to DB               | done       | 6855529 | MarketPricesHandler uses AssetPriceService; 6 tests pass; applyOverrides nil-safe; IsStale forwarded |
 | 7   | Switch GetPublicMarketTypes Handler to DB          | done       | 6855529 | PublicHandler uses AssetPriceService; cold-start fallback to static; 5 tests pass |
 | 8   | Frontend — Display -- for Zero/Stale Prices        | done       | —      | formatPriceValue+formatChangeValue return "--" for 0/null/undefined; 13 tests pass |
-| 9   | Create/Update Runtime Flow Diagrams                | pending    | —      | —       |
+| 9   | Create/Update Runtime Flow Diagrams                | done       | —      | Added Section 13 (Price Cache Job); updated Section 3 (scheduler jobs); replaced Section 5 (Market Prices) with DB-backed flow |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 

@@ -16,6 +16,7 @@ Infrastructure-level flows that are referenced by multiple domain flows. Read th
 - [Error Code Translation Flow](#10-error-code-translation-flow)
 - [FetchAllPrices Aggregate Cache Flow](#11-fetchallprices-aggregate-cache-flow)
 - [Price Fallback Chain](#12-price-fallback-chain)
+- [Price Cache Background Job](#13-price-cache-background-job)
 
 ---
 
@@ -157,6 +158,7 @@ flowchart LR
 
     Start --> KA["DB Keep-Alive\n⏱ ~2 min\n⏳ immediate"]
     Start --> PU["Price Update\n⏱ 15 min\n⏳ 5s delay"]
+    Start --> PC["Price Cache\n⏱ 15 min\n⏳ 10s delay"]
     Start --> PS["Portfolio Snapshot\n⏱ 1 hour\n⏳ 10s delay"]
     Start --> SC["Session Cleanup\n⏱ ~6 hours\n⏳ staggered"]
     Start --> FC["File Cleanup\n⏱ ~1 hour\n⏳ staggered"]
@@ -166,6 +168,13 @@ flowchart LR
         PU --> PU1["List all users"]
         PU1 --> PU2["For each user:\ninvestmentSvc.UpdatePrices()"]
         PU2 --> PU3["Log: X updated, Y errors"]
+    end
+
+    subgraph PriceCache["Price Cache Job Detail"]
+        PC --> PC1["assetPriceSvc.RefreshAllPrices()"]
+        PC1 --> PC2["Fetch gold/silver/currency\nfrom live price services"]
+        PC2 --> PC3["Upsert into asset_price table\nMarkStale on fetch failure"]
+        PC3 --> PC4["Log: completed or error"]
     end
 
     subgraph PortfolioSnapshot["Portfolio Snapshot Job Detail"]
@@ -195,6 +204,7 @@ flowchart LR
 |-----|----------|---------------|-----------|
 | DB Keep-Alive | ~2 min | Immediate | Always |
 | Price Update | 15 min | 5 sec | Always |
+| Price Cache | 15 min | 10 sec | `AssetPriceService` available |
 | Portfolio Snapshot | 1 hour | 10 sec | Always |
 | Session Cleanup | ~6 hours | Staggered | `ENABLE_SESSION_CLEANUP` |
 | File Cleanup | ~1 hour | Staggered | `ENABLE_FILE_CLEANUP` |
@@ -254,87 +264,58 @@ flowchart TD
 ## 5. Market Prices Aggregation Flow
 
 **Trigger:** `GET /api/v1/investments/market-prices` (authenticated) or `GET /api/v1/public/market-types` (public)
-**Source:** `handlers/market_prices.go`, `handlers/public.go`
+**Source:** `handlers/market_prices.go`, `handlers/public.go`, `domain/service/asset_price_service.go`
+
+Handlers now read from the DB-backed `asset_price` table via `AssetPriceService`. Live external API calls happen only in the background `PriceCacheJob` (see [Section 13](#13-price-cache-background-job)), not on every HTTP request.
 
 ```mermaid
 sequenceDiagram
     participant C as Frontend
     participant H as MarketPricesHandler
-    participant G as GoldPriceService
-    participant S as SilverPriceService
-    participant CR as CurrencyPriceService
-    participant PQ as Phú Quý Client
-    participant AN as Ancarat Client
-    participant DJ as DOJI Client
-    participant V as vangsaigon.vn
+    participant APS as AssetPriceService
+    participant APR as AssetPriceRepository
+    participant DB as PostgreSQL<br/>(asset_price table)
+    participant POC as PriceOverrideCache
     participant R as Redis
 
     C->>H: GET /market-prices
 
-    par Gold prices
-        H->>G: FetchAllPrices(ctx)
-        G->>R: Check cache
-        alt Cache hit
-            R-->>G: Cached gold prices
-        else Cache miss
-            G->>V: Fetch gold prices
-            V-->>G: Gold price data
-            G->>R: Cache async (15min TTL)
-        end
-        G-->>H: []*CachedGoldPrice
-    and Silver prices (multi-source)
-        H->>S: FetchAllPrices(ctx)
-        par Phú Quý
-            S->>PQ: FetchPrices(ctx)
-            PQ-->>S: 4 silver prices (HTML)
-        and Ancarat
-            S->>AN: FetchPrices(ctx)
-            AN-->>S: 4 silver prices (JSON)
-        and DOJI
-            S->>DJ: FetchPrices(ctx)
-            DJ-->>S: 2 silver prices (text)
-        end
-        Note over S: Merge into 12 ordered rows:<br/>4 Phú Quý + 4 Ancarat + 2 SBJ (static) + 2 DOJI
-        S->>R: Cache each price async
-        S-->>H: []*CachedSilverPrice
-    and Currency prices
-        H->>CR: FetchAllPrices(ctx)
-        CR->>R: Check cache
-        alt Cache hit
-            R-->>CR: Cached currency prices
-        else Cache miss
-            CR->>V: Fetch currency prices
-            V-->>CR: Currency nationwide data
-            CR->>R: Cache async (15min TTL)
-        end
-        CR-->>H: []*CachedCurrencyPrice
+    H->>APS: GetAllPrices(ctx)
+    APS->>APR: ListAll(ctx)
+    APR->>DB: SELECT * FROM asset_price WHERE deleted_at IS NULL
+    DB-->>APR: []AssetPrice rows
+    APR-->>APS: []AssetPrice
+    Note over APS: Group by asset_type<br/>Map to AssetPriceDTO[]
+    APS-->>H: AllAssetPrices{Gold, Silver, Currency}
+
+    Note over H: Convert DTOs → PriceItem proto<br/>(includes IsStale field)
+
+    opt Redis available
+        H->>POC: GetAll(ctx)
+        POC->>R: SCAN price_override:*
+        R-->>POC: []PriceOverride
+        Note over H: Merge overrides into items<br/>(IsOverridden = true)
     end
 
-    alt All three failed
-        H-->>C: 503 Service Unavailable
-    else Partial or full success
-        Note over H: Empty slice for failed categories<br/>(never null)
-        H-->>C: 200 {gold, silver, currency, timestamp}
-    end
+    H-->>C: 200 {gold, silver, currency, timestamp}
 ```
 
 ### Key Invariants
 
-- Gold, silver, and currency are fetched in parallel via `sync.WaitGroup` — one failure does not block others
-- Silver aggregates from 4 sources (Phú Quý, Ancarat, DOJI, SBJ); SBJ entries are static (prices = 0, displayed as "—")
-- Currency prices come from vangsaigon's `currencyNationWide` field — raw VND values (no ×1000 multiplier)
-- 503 is returned only if ALL THREE categories fail; partial success returns empty slices for failed categories
-- All prices are cached in Redis with 15-minute TTL; cache writes are non-blocking goroutines
+- `GetMarketPrices` never calls external APIs — all data comes from the DB-backed `asset_price` table
+- `IsStale = true` on a price item means the last background fetch for that type failed; the price shown is the last known value
+- Admin price overrides (Redis) are applied on top of DB data at read time; override failures are graceful (original prices returned)
+- If `AssetPriceService` returns an error, `handler.HandleError` returns 500 (unlike the old flow which returned 503 only when all three failed)
+- Cold start (before first `PriceCacheJob` run): `asset_price` table is empty → `GetAllPrices` returns empty slices; `GetPublicMarketTypes` falls back to static registries
 
 ### Error Paths
 
 | Condition | Response | Fallback |
 |-----------|----------|----------|
-| One category fails (e.g., silver) | 200 with empty `silver: []` | Other categories still returned |
-| All three categories fail | 503 Service Unavailable | No fallback |
-| Individual silver source fails (e.g., Phú Quý down) | Rows from that source omitted | Other sources still included |
-| Redis cache write fails | Logged warning | Next request re-fetches from source |
-| vangsaigon.vn timeout | Gold/currency return empty | Stale cache if available |
+| DB read error | 500 Internal Server Error | None — handler returns error |
+| `IsStale = true` on price item | 200 with item in response, `isStale: true` | Frontend displays `"--"` for stale values |
+| Redis override cache unavailable | 200 without overrides applied | Graceful degradation |
+| DB empty (cold start) | 200 with empty arrays (authenticated); static registry fallback (public) | Public endpoint always returns data |
 
 ---
 
@@ -1025,3 +1006,81 @@ flowchart TD
 - **Mihong source**: `api.mihong.vn/v1/gold-prices?market=domestic` (requires `x-market: mihong` header) — carries Mihong-exclusive products (e.g., `Mihong_999`) not available from any other source
 - **Canonical TypeCodes always returned**: `FetchGoldPricesAllSources` normalizes alias TypeCodes (e.g., `"VNGSJC"` → `"SJC"`) before merging; callers always see the canonical code regardless of which source provided the price
 - **Alias staleness degrades gracefully**: if a source renames a TypeCode, the alias miss falls through to the emergency cache — no user-visible error beyond the existing "not found in live data" warning
+
+---
+
+## 13. Price Cache Background Job
+
+**Trigger:** Application startup — runs every 15 minutes (10-second startup delay)
+**Source:** `internal/scheduler/price_cache_job.go`, `domain/service/asset_price_service.go`, `domain/repository/asset_price_repository.go`
+
+Decouples market price HTTP handlers from live external APIs. The job fetches all gold, silver, and currency prices and persists them to the `asset_price` PostgreSQL table. Handlers then read from the DB exclusively, eliminating per-request external API calls.
+
+```mermaid
+sequenceDiagram
+    participant SCH as Scheduler
+    participant PCJ as PriceCacheJob
+    participant APS as AssetPriceService
+    participant GPS as GoldPriceService
+    participant SPS as SilverPriceService
+    participant CPS as CurrencyPriceService
+    participant APR as AssetPriceRepository
+    participant DB as PostgreSQL<br/>(asset_price table)
+
+    SCH->>PCJ: Run(ctx) [every 15 min]
+    PCJ->>APS: RefreshAllPrices(ctx)
+
+    par Gold fetch
+        APS->>GPS: FetchAllPrices(ctx)
+        alt Fetch success
+            GPS-->>APS: []*CachedGoldPrice
+            Note over APS: Convert to []AssetPrice<br/>AssetType="gold", IsStale=false
+            APS->>APR: UpsertBatch(ctx, goldPrices)
+            APR->>DB: INSERT ... ON CONFLICT (type_code, currency) DO UPDATE
+        else Fetch failure
+            GPS-->>APS: error
+            APS->>APR: MarkStaleByAssetType(ctx, "gold")
+            APR->>DB: UPDATE asset_price SET is_stale=true WHERE asset_type='gold'
+        end
+    and Silver fetch
+        APS->>SPS: FetchAllPrices(ctx)
+        alt Fetch success
+            SPS-->>APS: []*CachedSilverPrice
+            Note over APS: Convert to []AssetPrice<br/>AssetType="silver", IsStale=false
+            APS->>APR: UpsertBatch(ctx, silverPrices)
+        else Fetch failure
+            SPS-->>APS: error
+            APS->>APR: MarkStaleByAssetType(ctx, "silver")
+        end
+    and Currency fetch
+        APS->>CPS: FetchAllPrices(ctx)
+        alt Fetch success
+            CPS-->>APS: []*CachedCurrencyPrice
+            Note over APS: Convert to []AssetPrice<br/>AssetType="currency", IsStale=false
+            APS->>APR: UpsertBatch(ctx, currencyPrices)
+        else Fetch failure
+            CPS-->>APS: error
+            APS->>APR: MarkStaleByAssetType(ctx, "currency")
+        end
+    end
+
+    APS-->>PCJ: nil (or error if all three failed)
+    PCJ-->>SCH: Log result
+```
+
+### Key Invariants
+
+- Gold, silver, and currency fetches are **independent** — one failure does not prevent others from succeeding
+- On fetch success: `UpsertBatch` uses `ON CONFLICT (type_code, currency) DO UPDATE` — idempotent
+- On fetch failure: `MarkStaleByAssetType` sets `is_stale=true` for all rows of that type — stale prices remain visible with `isStale: true` flag
+- The job never crashes the scheduler — all errors are logged and returned without panicking
+- `PriceCacheJob` has a 10-second startup delay so the app is fully initialized before the first fetch
+
+### Error Paths
+
+| Condition | Response | User Impact |
+|-----------|----------|-------------|
+| One source fails (e.g., gold API down) | `MarkStaleByAssetType("gold")` | Gold prices show `isStale: true`; frontend displays `"--"` |
+| All three sources fail | All types marked stale | All price items have `isStale: true` |
+| DB write fails | Error logged; job returns error | Next run retries; prices may be stale |
+| DB empty (first run not yet complete) | Handlers return empty arrays or static fallback | `GetPublicMarketTypes` falls back to static registries |
