@@ -67,6 +67,7 @@ C4Component
         Component(silver_price_svc, "Silver Price Service", "domain/service/silver_price_service.go", "Fetches and caches silver prices from multiple sources (Phú Quý, Ancarat, DOJI). Provides typed silver price lookup by type code. Redis-cached with 15-minute TTL.")
         Component(watchlist_svc, "Watchlist Service", "domain/service/watchlist_service.go", "User watchlist management: add/remove/list symbols with deduplication. Enriches list results with live prices by delegating to MarketDataService (stocks/crypto/ETFs), GoldPriceService (gold type codes), and SilverPriceService (silver type codes). Validates symbol existence before adding.")
         Component(user_price_alert_svc, "UserPriceAlert Service", "domain/service/user_price_alert_service.go", "Manages user-defined price alerts: CRUD operations, threshold evaluation against live prices from MarketDataService/GoldPriceService/SilverPriceService. Triggers notifications via NotificationRepository and push delivery via PushService when alert conditions are met.")
+        Component(asset_price_svc, "AssetPrice Service", "domain/service/asset_price_service.go", "Reads cached prices from asset_price DB table. GetAllPrices returns gold/silver/currency grouped. GetMarketTypes returns type names + timestamps for public endpoint. RefreshAllPrices called by PriceCacheJob to orchestrate fetch from gold/silver/currency services and persist results.")
     }
 
     Container_Boundary(repos, "Repository Layer (Data Access)") {
@@ -96,6 +97,11 @@ C4Component
         Component(site_settings_repo, "SiteSettings Repository", "GORM", "site_settings table CRUD with bulk upsert via ON CONFLICT")
         Component(watchlist_repo, "Watchlist Repository", "GORM", "watchlist table CRUD with user scoping. Enforces unique (user_id, symbol) constraint. Supports list by user_id with ordering by created_at.")
         Component(user_price_alert_repo, "UserPriceAlert Repository", "GORM", "user_price_alert table CRUD with user scoping. Stores per-user alert definitions (symbol, target_price, direction, trigger_mode, AlertStatus enum: active/triggered/paused). Supports list by user_id and lookup by id+user_id for ownership verification.")
+        Component(asset_price_repo, "AssetPrice Repository", "GORM", "asset_price table CRUD. UpsertBatch via ON CONFLICT (type_code, currency) DO UPDATE for efficient bulk upsert. ListByAssetType and ListAll for handler reads. MarkStaleByAssetType sets is_stale=true for all rows of a given asset type when fetch fails.")
+    }
+
+    Container_Boundary(scheduler, "Scheduler Layer — Background jobs") {
+        Component(price_cache_job, "PriceCacheJob", "internal/scheduler/price_cache_job.go", "Runs every 15 minutes (10s startup delay). Calls AssetPriceService.RefreshAllPrices to fetch gold/silver/currency prices from external services and persist to DB. Each asset type fetched independently — one failure doesn't block others. Implements scheduler.Job interface.")
     }
 
     Container_Boundary(external, "External Integrations — TRUST BOUNDARY: Untrusted external responses") {
@@ -162,10 +168,9 @@ C4Component
     Rel(invest_h, market_svc, "Price lookups")
     Rel(invest_h, portfolio_svc, "Historical values")
     Rel(import_h, import_svc, "Delegates import ops")
-    Rel(price_h, market_svc, "Gold prices")
+    Rel(price_h, asset_price_svc, "Reads all cached prices from DB")
     Rel(price_h, price_override_cache, "Merges admin overrides into market prices")
-    Rel(price_h, currency_svc, "Currency prices")
-    Rel(public_h, currency_svc, "Currency update timestamps")
+    Rel(public_h, asset_price_svc, "Reads market type names + timestamps from DB")
     Rel(price_override_h, price_override_cache, "Set/List/Delete overrides")
     Rel(gin, site_settings_h, "Routes /public/site-settings (GET), /admin/site-settings (PUT)")
     Rel(gold_sentiment_h, gold_sentiment_svc, "Delegates sentiment ops")
@@ -235,6 +240,12 @@ C4Component
     Rel(price_alert_svc, notification_repo, "BatchCreate price alert notifications")
     Rel(price_alert_svc, user_repo, "Gets all user IDs")
     Rel(price_alert_svc, redis, "Baselines, cooldowns, SSE publish")
+    Rel(price_cache_job, asset_price_svc, "Triggers RefreshAllPrices every 15 minutes")
+    Rel(asset_price_svc, asset_price_repo, "Reads and upserts cached prices")
+    Rel(asset_price_svc, gold_price_svc, "Fetches live gold prices for cache refresh")
+    Rel(asset_price_svc, silver_price_svc, "Fetches live silver prices for cache refresh")
+    Rel(asset_price_svc, currency_svc, "Fetches live currency prices for cache refresh")
+    Rel(asset_price_repo, postgres, "SQL")
     Rel(watchlist_h, watchlist_svc, "Delegates watchlist ops")
     Rel(user_price_alert_h, user_price_alert_svc, "Delegates price alert ops")
     Rel(watchlist_svc, watchlist_repo, "Persists watchlist entries")
