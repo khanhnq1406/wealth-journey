@@ -112,24 +112,18 @@ func (s *assetPriceService) refreshGold(ctx context.Context, now time.Time) stru
 		}{0, err}
 	}
 
-	// Normalize alias TypeCodes to canonical before upserting.
-	// vangtoday returns uppercase alias codes (e.g. VNGSJC, SJ9999, MIHONG_999);
-	// aliasToCanonical maps these back to the canonical codes that filterGoldPrices
-	// and portfolio valuation use. First-wins deduplication handles cases where
-	// two aliases resolve to the same canonical code (e.g. VNGSJC and SJL1L10 → SJC).
+	// Normalization (alias → canonical) happens at the WaterfallGoldFetcher level,
+	// so prices here already carry canonical TypeCodes. Deduplication handles the
+	// rare case where two sources return the same canonical code; first-wins.
 	seen := make(map[string]struct{}, len(prices))
 	batch := make([]*models.AssetPrice, 0, len(prices))
 	for _, p := range prices {
-		typeCode := p.TypeCode
-		if canonical, ok := aliasToCanonical[typeCode]; ok {
-			typeCode = canonical
-		}
-		if _, exists := seen[typeCode]; exists {
+		if _, exists := seen[p.TypeCode]; exists {
 			continue // deduplicate: first-wins
 		}
-		seen[typeCode] = struct{}{}
+		seen[p.TypeCode] = struct{}{}
 		batch = append(batch, &models.AssetPrice{
-			TypeCode:   typeCode,
+			TypeCode:   p.TypeCode,
 			AssetType:  "gold",
 			Name:       p.Name,
 			Buy:        p.Buy,

@@ -535,26 +535,26 @@ func TestAssetPriceService_GetPriceByTypeCode_RepoError(t *testing.T) {
 }
 
 // ---------------------------------------------------------------------------
-// Tests: refreshGold alias normalization
+// Tests: refreshGold deduplication (normalization is handled upstream by WaterfallGoldFetcher)
 // ---------------------------------------------------------------------------
 
-func TestAssetPriceService_RefreshGold_NormalizesAliasCodes(t *testing.T) {
-	// vangtoday returns uppercase alias codes; refreshGold must normalize them
-	// to canonical codes before upserting so filterGoldPrices matches correctly.
-	aliasPrices := []*CachedGoldPrice{
-		{TypeCode: "VNGSJC", Name: "SJC vangtoday", Buy: 8500000, Sell: 8600000, Currency: "VND", UpdateTime: time.Now()},
-		{TypeCode: "SJ9999", Name: "Nhan SJC vangtoday", Buy: 8000000, Sell: 8100000, Currency: "VND", UpdateTime: time.Now()},
-		{TypeCode: "MIHONG_999", Name: "Mi Hong vangtoday", Buy: 7900000, Sell: 8000000, Currency: "VND", UpdateTime: time.Now()},
-		// SJL1L10 → SJC: same canonical code as VNGSJC — first-wins, so this
-		// should be deduplicated (not produce a second SJC row).
-		{TypeCode: "SJL1L10", Name: "SJC SJL1L10 vangtoday", Buy: 8550000, Sell: 8650000, Currency: "VND", UpdateTime: time.Now()},
-		// Unrecognized code — should pass through unchanged.
-		{TypeCode: "BTMC_24K", Name: "BTMC 24K", Buy: 7800000, Sell: 7900000, Currency: "VND", UpdateTime: time.Now()},
+func TestAssetPriceService_RefreshGold_DeduplicatesCanonicalCodes(t *testing.T) {
+	// Normalization (alias → canonical) now happens in WaterfallGoldFetcher.FetchGoldPrices,
+	// so prices arriving at refreshGold are already canonical.
+	// This test verifies that refreshGold correctly deduplicates identical canonical codes
+	// (first-wins) and passes all unique codes through to the DB unchanged.
+	canonicalPrices := []*CachedGoldPrice{
+		{TypeCode: "SJC", Name: "SJC 9999", Buy: 8500000, Sell: 8600000, Currency: "VND", UpdateTime: time.Now()},
+		{TypeCode: "Vàng nhẫn SJC", Name: "Nhẫn SJC 9999", Buy: 8000000, Sell: 8100000, Currency: "VND", UpdateTime: time.Now()},
+		{TypeCode: "Mihong_999", Name: "Mi Hồng 999", Buy: 7900000, Sell: 8000000, Currency: "VND", UpdateTime: time.Now()},
+		// Duplicate SJC — first-wins, this one should be dropped.
+		{TypeCode: "SJC", Name: "SJC 9999 duplicate", Buy: 8550000, Sell: 8650000, Currency: "VND", UpdateTime: time.Now()},
+		{TypeCode: "BTMC_24K", Name: "Bảo Tín 24K", Buy: 7800000, Sell: 7900000, Currency: "VND", UpdateTime: time.Now()},
 	}
 
 	repo := &mockAssetPriceRepo{}
 	svc := NewAssetPriceService(repo,
-		&mockGoldPriceSvc{prices: aliasPrices},
+		&mockGoldPriceSvc{prices: canonicalPrices},
 		&mockSilverPriceSvc{},
 		&mockCurrencyPriceSvc{},
 	)
@@ -582,31 +582,14 @@ func TestAssetPriceService_RefreshGold_NormalizesAliasCodes(t *testing.T) {
 		byCode[item.TypeCode] = item
 	}
 
-	// VNGSJC must be stored as canonical "SJC".
-	if _, ok := byCode["SJC"]; !ok {
-		t.Errorf("expected canonical TypeCode SJC; got codes: %v", keys(byCode))
-	}
-	if _, ok := byCode["VNGSJC"]; ok {
-		t.Errorf("alias VNGSJC should not appear in DB; got codes: %v", keys(byCode))
-	}
-
-	// SJ9999 must be stored as canonical "Vàng nhẫn SJC".
-	if _, ok := byCode["Vàng nhẫn SJC"]; !ok {
-		t.Errorf("expected canonical TypeCode 'Vàng nhẫn SJC'; got codes: %v", keys(byCode))
-	}
-	if _, ok := byCode["SJ9999"]; ok {
-		t.Errorf("alias SJ9999 should not appear in DB; got codes: %v", keys(byCode))
+	// All canonical codes must be present.
+	for _, code := range []string{"SJC", "Vàng nhẫn SJC", "Mihong_999", "BTMC_24K"} {
+		if _, ok := byCode[code]; !ok {
+			t.Errorf("expected canonical TypeCode %q in batch; got codes: %v", code, keys(byCode))
+		}
 	}
 
-	// MIHONG_999 must be stored as canonical "Mihong_999".
-	if _, ok := byCode["Mihong_999"]; !ok {
-		t.Errorf("expected canonical TypeCode Mihong_999; got codes: %v", keys(byCode))
-	}
-	if _, ok := byCode["MIHONG_999"]; ok {
-		t.Errorf("alias MIHONG_999 should not appear in DB; got codes: %v", keys(byCode))
-	}
-
-	// SJL1L10 also maps to "SJC" — should be deduplicated (only 1 SJC row).
+	// Duplicate SJC must be deduplicated — exactly 1 SJC row, with first-seen price.
 	sjcCount := 0
 	for _, item := range goldBatch {
 		if item.TypeCode == "SJC" {
@@ -616,10 +599,13 @@ func TestAssetPriceService_RefreshGold_NormalizesAliasCodes(t *testing.T) {
 	if sjcCount != 1 {
 		t.Errorf("expected exactly 1 row with TypeCode=SJC (deduplication), got %d", sjcCount)
 	}
+	if sjc, ok := byCode["SJC"]; ok && sjc.Buy != 8500000 {
+		t.Errorf("expected first-seen SJC Buy=8500000, got %d", sjc.Buy)
+	}
 
-	// BTMC_24K has no alias — should pass through unchanged.
-	if _, ok := byCode["BTMC_24K"]; !ok {
-		t.Errorf("expected BTMC_24K (no alias) to pass through; got codes: %v", keys(byCode))
+	// Total: 4 unique codes (5 inputs minus 1 duplicate).
+	if len(goldBatch) != 4 {
+		t.Errorf("expected 4 unique gold rows, got %d: %v", len(goldBatch), keys(byCode))
 	}
 }
 

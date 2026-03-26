@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"wealthjourney/pkg/cache"
+	"wealthjourney/pkg/gold"
 )
 
 // PriceSource identifies a price data source.
@@ -22,25 +23,6 @@ const (
 	// waterfallSourceTimeout is the per-source fetch timeout used by the waterfall fetchers.
 	waterfallSourceTimeout = 5 * time.Second
 )
-
-// aliasToCanonical maps each known alias TypeCode (as returned by a fallback source)
-// to its canonical TypeCode (as registered in pkg/gold/types.go and used by vangsaigon).
-//
-// Maintenance note: add entries when a fallback source uses a different type code
-// for the same gold product. The canonical TypeCode is what callers (FetchPriceForSymbol,
-// portfolio valuation) use to look up prices.
-//
-// Current entries:
-//   - "VNGSJC" (vang.today) → "SJC" (vangsaigon canonical)
-//   - "MIHONG_999" (vang.today uppercased) → "Mihong_999" (pkg/gold/types.go canonical)
-//   - "SJ9999" (vang.today) → "Vàng nhẫn SJC" (pkg/gold/types.go canonical for SJC Ring)
-//   - "SJL1L10" (vang.today) → "SJC" (pkg/gold/types.go canonical for SJC 9999 bar)
-var aliasToCanonical = map[string]string{
-	"VNGSJC":    "SJC",
-	"MIHONG_999": "Mihong_999",
-	"SJ9999":    "Vàng nhẫn SJC",
-	"SJL1L10":   "SJC",
-}
 
 // GoldPriceFetcher abstracts fetching gold prices from a single source.
 type GoldPriceFetcher interface {
@@ -114,6 +96,14 @@ func (w *WaterfallGoldFetcher) FetchGoldPrices(ctx context.Context) ([]*CachedGo
 			continue
 		}
 
+		// Normalize alias TypeCodes to canonical before returning.
+		for i, p := range prices {
+			if canonical, ok := gold.AliasToCanonical[p.TypeCode]; ok {
+				normalized := *p
+				normalized.TypeCode = canonical
+				prices[i] = &normalized
+			}
+		}
 		return prices, nil
 	}
 
@@ -148,7 +138,7 @@ func (w *WaterfallGoldFetcher) FetchGoldPricesAllSources(ctx context.Context) ([
 		for _, p := range prices {
 			// Normalize alias TypeCode to canonical before merging.
 			typeCode := p.TypeCode
-			if canonical, ok := aliasToCanonical[typeCode]; ok {
+			if canonical, ok := gold.AliasToCanonical[typeCode]; ok {
 				typeCode = canonical
 			}
 

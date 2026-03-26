@@ -489,3 +489,46 @@ func TestWaterfallGoldFetcher_AllSources_MIHONG999AliasNormalization(t *testing.
 		t.Error("expected canonical TypeCode 'Mihong_999' in merged prices after alias normalization")
 	}
 }
+
+// TestWaterfallGoldFetcher_FetchGoldPrices_NormalizesAlias verifies that the
+// single-source waterfall path normalizes vang.today alias codes to canonical
+// codes via gold.AliasToCanonical.
+func TestWaterfallGoldFetcher_FetchGoldPrices_NormalizesAlias(t *testing.T) {
+	aliasPrices := []*CachedGoldPrice{
+		{TypeCode: "VNGSJC", Name: "vng sjc", Buy: 85_000_000, Sell: 86_000_000, Currency: "VND"},
+		{TypeCode: "DOHN", Name: "doji hn", Buy: 84_000_000, Sell: 85_000_000, Currency: "VND"},
+		{TypeCode: "XAUUSD", Name: "xau", Buy: 290000, Sell: 290100, Currency: "USD"},
+	}
+
+	f := &mockGoldFetcher{source: SourceVangToday, prices: aliasPrices}
+	healthy := &alwaysHealthy{}
+	w := NewWaterfallGoldFetcher([]GoldPriceFetcher{f}, healthy)
+
+	prices, err := w.FetchGoldPrices(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(prices) != 3 {
+		t.Fatalf("expected 3 prices, got %d", len(prices))
+	}
+
+	byCode := make(map[string]*CachedGoldPrice)
+	for _, p := range prices {
+		byCode[p.TypeCode] = p
+	}
+	if _, ok := byCode["SJC"]; !ok {
+		t.Error("VNGSJC should normalize to SJC")
+	}
+	if _, ok := byCode["Doji"]; !ok {
+		t.Error("DOHN should normalize to Doji")
+	}
+	if _, ok := byCode["XAUUSD"]; !ok {
+		t.Error("XAUUSD should pass through unchanged")
+	}
+	if _, ok := byCode["VNGSJC"]; ok {
+		t.Error("original alias VNGSJC should not appear in output")
+	}
+	if _, ok := byCode["DOHN"]; ok {
+		t.Error("original alias DOHN should not appear in output")
+	}
+}
