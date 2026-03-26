@@ -6,16 +6,16 @@
 - **Plan file:** docs/plans/2026-03-26-gold-display-config-plan.md
 - **Spec file:** docs/specs/2026-03-26-gold-display-config-spec.md
 - **Started:** 2026-03-26T00:00:00Z
-- **Last updated:** 2026-03-26T00:00:00Z
+- **Last updated:** 2026-03-26T01:00:00Z
 - **Current state:** in_progress
-- **Current task:** 0
+- **Current task:** 2
 
 ## Task Progress
 
 | #   | Task Name                             | Status  | Commit | Summary |
 | --- | ------------------------------------- | ------- | ------ | ------- |
-| 0   | Update C4 Architecture Diagrams       | pending | —      | —       |
-| 1   | Proto Definitions                     | pending | —      | —       |
+| 0   | Update C4 Architecture Diagrams       | done    | ba5b7cb | Added GoldDisplayConfigHandler/Service/Repo to backend C4; updated frontend C4 for API hook |
+| 1   | Proto Definitions                     | done    | 5ad8313 | Added 11 proto messages for gold display config; regenerated Go + TS types |
 | 2   | Database Model + Migration            | pending | —      | —       |
 | 3   | Repository Layer                      | pending | —      | —       |
 | 4   | Service Layer                         | pending | —      | —       |

@@ -190,6 +190,12 @@ tasks:
     cmds:
       - go run cmd/migrate-multi-source/main.go
 
+  backend:migrate-gold-display-config:
+    desc: "Create gold_display_config table with seed data"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-gold-display-config/main.go
+
   backend:migrate-all:
     desc: "Run all migrations in order (safe for fresh or existing databases)"
     dir: "{{.BACKEND_DIR}}"
