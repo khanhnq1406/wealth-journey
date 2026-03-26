@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"net/http"
-	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -10,158 +8,111 @@ import (
 	"wealthjourney/domain/service"
 	"wealthjourney/pkg/currency"
 	"wealthjourney/pkg/gold"
+	handler "wealthjourney/pkg/handler"
 	"wealthjourney/pkg/silver"
 )
 
-// PublicHandler handles public (no auth) endpoints
+// PublicHandler handles public (no auth) endpoints.
+// It reads market type data from the DB-backed AssetPriceService and falls back
+// to static registries on cold start (before the first PriceCacheJob run).
 type PublicHandler struct {
-	goldSvc     service.GoldPriceService
-	silverSvc   service.SilverPriceService
-	currencySvc service.CurrencyPriceService
+	assetPriceSvc service.AssetPriceService
 }
 
-// NewPublicHandler creates a new public handler
-func NewPublicHandler(goldSvc service.GoldPriceService, silverSvc service.SilverPriceService, currencySvc service.CurrencyPriceService) *PublicHandler {
-	return &PublicHandler{
-		goldSvc:     goldSvc,
-		silverSvc:   silverSvc,
-		currencySvc: currencySvc,
-	}
+// NewPublicHandler creates a new public handler.
+func NewPublicHandler(assetPriceSvc service.AssetPriceService) *PublicHandler {
+	return &PublicHandler{assetPriceSvc: assetPriceSvc}
 }
 
 // GetPublicMarketTypes returns gold/silver/currency type names without prices.
-// Derives type lists from live price services so the landing page shows the
+// Reads from the DB-backed AssetPriceService so the landing page shows the
 // same items as the authenticated dashboard. Falls back to static registries
-// when a service is unavailable.
+// on cold start (when DB cache is empty) or on service error.
 // GET /api/v1/public/market-types
 func (h *PublicHandler) GetPublicMarketTypes(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	var (
-		goldTypes, silverTypes, currencyTypes []gin.H
-		goldUpdatedAt, silverUpdatedAt, currencyUpdatedAt int64
-		wg sync.WaitGroup
-		mu sync.Mutex
-	)
+	marketTypes, err := h.assetPriceSvc.GetMarketTypes(ctx)
+	if err != nil || marketTypes == nil {
+		// Fallback to static registries on error (cold start or service unavailable)
+		h.fallbackStaticTypes(c)
+		return
+	}
 
-	wg.Add(3)
+	// Convert to response arrays
+	goldTypes := convertMarketTypeItems(marketTypes.Gold)
+	silverTypes := convertMarketTypeItems(marketTypes.Silver)
+	currencyTypes := convertMarketTypeItems(marketTypes.Currency)
 
-	// Gold: derive from live prices, fallback to static registry
-	go func() {
-		defer wg.Done()
-		if h.goldSvc != nil {
-			prices, err := h.goldSvc.FetchAllPrices(ctx)
-			if err == nil && len(prices) > 0 {
-				mu.Lock()
-				goldTypes = make([]gin.H, len(prices))
-				for i, p := range prices {
-					goldTypes[i] = gin.H{
-						"code":     p.TypeCode,
-						"name":     p.Name,
-						"currency": p.Currency,
-					}
-					if p.UpdateTime.Unix() > goldUpdatedAt {
-						goldUpdatedAt = p.UpdateTime.Unix()
-					}
-				}
-				mu.Unlock()
-				return
-			}
-		}
-		// Fallback to static registry
-		mu.Lock()
-		goldTypes = make([]gin.H, len(gold.GoldTypes))
-		for i, gt := range gold.GoldTypes {
-			goldTypes[i] = gin.H{
-				"code":     gt.Code,
-				"name":     gt.Name,
-				"currency": gt.Currency,
-			}
-		}
-		mu.Unlock()
-	}()
+	// If all empty, fallback to static (cold start: PriceCacheJob hasn't run yet)
+	if len(goldTypes) == 0 && len(silverTypes) == 0 && len(currencyTypes) == 0 {
+		h.fallbackStaticTypes(c)
+		return
+	}
 
-	// Silver: derive from live prices, fallback to static registry
-	go func() {
-		defer wg.Done()
-		if h.silverSvc != nil {
-			prices, err := h.silverSvc.FetchAllPrices(ctx)
-			if err == nil && len(prices) > 0 {
-				mu.Lock()
-				silverTypes = make([]gin.H, len(prices))
-				for i, p := range prices {
-					silverTypes[i] = gin.H{
-						"code":     p.TypeCode,
-						"name":     p.Name,
-						"currency": p.Currency,
-					}
-					if p.UpdateTime.Unix() > silverUpdatedAt {
-						silverUpdatedAt = p.UpdateTime.Unix()
-					}
-				}
-				mu.Unlock()
-				return
-			}
-		}
-		// Fallback to static registry
-		mu.Lock()
-		silverTypes = make([]gin.H, len(silver.SilverTypes))
-		for i, st := range silver.SilverTypes {
-			silverTypes[i] = gin.H{
-				"code":     st.Code,
-				"name":     st.Name,
-				"currency": st.Currency,
-			}
-		}
-		mu.Unlock()
-	}()
+	handler.Success(c, gin.H{
+		"gold":              goldTypes,
+		"silver":            silverTypes,
+		"currency":          currencyTypes,
+		"goldUpdatedAt":     marketTypes.GoldUpdatedAt,
+		"silverUpdatedAt":   marketTypes.SilverUpdatedAt,
+		"currencyUpdatedAt": marketTypes.CurrencyUpdatedAt,
+		"timestamp":         time.Now().Format(time.RFC3339),
+	})
+}
 
-	// Currency: derive from live prices, fallback to static registry
-	go func() {
-		defer wg.Done()
-		if h.currencySvc != nil {
-			prices, err := h.currencySvc.FetchAllPrices(ctx)
-			if err == nil && len(prices) > 0 {
-				mu.Lock()
-				currencyTypes = make([]gin.H, len(prices))
-				for i, p := range prices {
-					currencyTypes[i] = gin.H{
-						"code":     p.TypeCode,
-						"name":     p.Name,
-						"currency": p.Currency,
-					}
-					if p.UpdateTime.Unix() > currencyUpdatedAt {
-						currencyUpdatedAt = p.UpdateTime.Unix()
-					}
-				}
-				mu.Unlock()
-				return
-			}
+// convertMarketTypeItems converts service-layer MarketTypeItem slice to gin.H slice
+// for JSON serialization.
+func convertMarketTypeItems(items []service.MarketTypeItem) []gin.H {
+	result := make([]gin.H, len(items))
+	for i, item := range items {
+		result[i] = gin.H{
+			"code":     item.Code,
+			"name":     item.Name,
+			"currency": item.Currency,
 		}
-		// Fallback to static registry
-		mu.Lock()
-		currencyTypes = make([]gin.H, len(currency.CurrencyTypes))
-		for i, ct := range currency.CurrencyTypes {
-			currencyTypes[i] = gin.H{
-				"code":     ct.Code,
-				"name":     ct.Name,
-				"currency": ct.Currency,
-			}
+	}
+	return result
+}
+
+// fallbackStaticTypes serves market types from static registries.
+// Used when the DB cache is empty (cold start before first PriceCacheJob run)
+// or when AssetPriceService returns an error.
+func (h *PublicHandler) fallbackStaticTypes(c *gin.Context) {
+	goldTypes := make([]gin.H, len(gold.GoldTypes))
+	for i, gt := range gold.GoldTypes {
+		goldTypes[i] = gin.H{
+			"code":     gt.Code,
+			"name":     gt.Name,
+			"currency": gt.Currency,
 		}
-		mu.Unlock()
-	}()
+	}
 
-	wg.Wait()
+	silverTypes := make([]gin.H, len(silver.SilverTypes))
+	for i, st := range silver.SilverTypes {
+		silverTypes[i] = gin.H{
+			"code":     st.Code,
+			"name":     st.Name,
+			"currency": st.Currency,
+		}
+	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"success":            true,
-		"message":            "Market types retrieved successfully",
-		"gold":               goldTypes,
-		"silver":             silverTypes,
-		"currency":           currencyTypes,
-		"goldUpdatedAt":      goldUpdatedAt,
-		"silverUpdatedAt":    silverUpdatedAt,
-		"currencyUpdatedAt":  currencyUpdatedAt,
-		"timestamp":          time.Now().Format(time.RFC3339),
+	currencyTypes := make([]gin.H, len(currency.CurrencyTypes))
+	for i, ct := range currency.CurrencyTypes {
+		currencyTypes[i] = gin.H{
+			"code":     ct.Code,
+			"name":     ct.Name,
+			"currency": ct.Currency,
+		}
+	}
+
+	handler.Success(c, gin.H{
+		"gold":              goldTypes,
+		"silver":            silverTypes,
+		"currency":          currencyTypes,
+		"goldUpdatedAt":     int64(0),
+		"silverUpdatedAt":   int64(0),
+		"currencyUpdatedAt": int64(0),
+		"timestamp":         time.Now().Format(time.RFC3339),
 	})
 }
