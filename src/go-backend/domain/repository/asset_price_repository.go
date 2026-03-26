@@ -34,6 +34,13 @@ type AssetPriceRepository interface {
 	// as stale (is_stale = true). Called before a refresh so that any type code
 	// that disappears from the source is automatically considered stale.
 	MarkStaleByAssetType(ctx context.Context, assetType string) error
+
+	// MarkStaleByAssetTypeAndSource marks only the rows matching both asset type
+	// and source as stale. Used when a specific source fails so that only that
+	// source's rows are flagged — other sources remain fresh.
+	// Both assetType and source must be non-empty; callers are responsible for
+	// validating that source belongs to a known set before calling this method.
+	MarkStaleByAssetTypeAndSource(ctx context.Context, assetType string, source string) error
 }
 
 // assetPriceRepository implements AssetPriceRepository using GORM.
@@ -132,6 +139,26 @@ func (r *assetPriceRepository) MarkStaleByAssetType(ctx context.Context, assetTy
 		})
 	if result.Error != nil {
 		return apperrors.NewInternalErrorWithCause("failed to mark asset prices as stale", result.Error)
+	}
+	return nil
+}
+
+// MarkStaleByAssetTypeAndSource marks only the rows matching both asset type and
+// source as stale. This provides source-level granularity so that a failure in
+// one upstream source does not pollute rows fetched from other sources.
+// GORM parameterized Where("asset_type = ? AND source = ?", ...) prevents SQL
+// injection. Both arguments must be non-empty — validation is the caller's
+// responsibility (service layer holds a known-source set).
+func (r *assetPriceRepository) MarkStaleByAssetTypeAndSource(ctx context.Context, assetType string, source string) error {
+	result := r.db.DB.WithContext(ctx).
+		Model(&models.AssetPrice{}).
+		Where("asset_type = ? AND source = ?", assetType, source).
+		Updates(map[string]interface{}{
+			"is_stale":   true,
+			"updated_at": time.Now(),
+		})
+	if result.Error != nil {
+		return apperrors.NewInternalErrorWithCause("failed to mark asset prices stale by source", result.Error)
 	}
 	return nil
 }

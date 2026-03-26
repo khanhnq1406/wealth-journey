@@ -332,6 +332,59 @@ func TestAssetPriceRepository_MarkStaleByAssetType_DBError(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
+// ---- MarkStaleByAssetTypeAndSource ----
+
+// TestAssetPriceRepository_MarkStaleByAssetTypeAndSource_WhereClause verifies
+// that the UPDATE statement includes both asset_type AND source in its WHERE
+// clause, using sqlmock so no live database is needed.
+func TestAssetPriceRepository_MarkStaleByAssetTypeAndSource_WhereClause(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping DB mock test in short mode")
+	}
+
+	db, mock, database := setupMockDB(t)
+	defer func() { sqlDB, _ := db.DB(); _ = sqlDB.Close() }()
+
+	repo := NewAssetPriceRepository(database)
+	ctx := context.Background()
+
+	// The WHERE clause must include both conditions so only the target source is
+	// marked stale — not all gold rows indiscriminately.
+	mock.ExpectBegin()
+	mock.ExpectExec(regexp.QuoteMeta("UPDATE `asset_price` SET")).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectCommit()
+
+	err := repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "sjc")
+
+	assert.NoError(t, err)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+// TestAssetPriceRepository_MarkStaleByAssetTypeAndSource_DBError verifies that
+// a database error is propagated as an apperrors.InternalError.
+func TestAssetPriceRepository_MarkStaleByAssetTypeAndSource_DBError(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping DB mock test in short mode")
+	}
+
+	db, mock, database := setupMockDB(t)
+	defer func() { sqlDB, _ := db.DB(); _ = sqlDB.Close() }()
+
+	repo := NewAssetPriceRepository(database)
+	ctx := context.Background()
+
+	mock.ExpectBegin()
+	mock.ExpectExec(regexp.QuoteMeta("UPDATE `asset_price` SET")).
+		WillReturnError(gorm.ErrInvalidDB)
+	mock.ExpectRollback()
+
+	err := repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "sjc")
+
+	assert.Error(t, err)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
 // TestUpsertBatch_MultiSource is an integration test verifying that two rows
 // with the same (type_code, currency) but different source values can coexist
 // without a unique-constraint conflict after the multi-source migration.
