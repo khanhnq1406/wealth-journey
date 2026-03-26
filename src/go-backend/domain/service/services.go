@@ -160,6 +160,7 @@ type Repositories struct {
 	PushSubscription      repository.PushSubscriptionRepository
 	Watchlist             repository.WatchlistRepository
 	UserPriceAlert        repository.UserPriceAlertRepository
+	AssetPrice            repository.AssetPriceRepository
 }
 
 // NewRepositories creates all repository instances.

@@ -114,6 +114,7 @@ func ProvideRepositories(db *database.Database) *service.Repositories {
 		PushSubscription:      repository.NewPushSubscriptionRepository(db),
 		Watchlist:             repository.NewWatchlistRepository(db),
 		UserPriceAlert:        repository.NewUserPriceAlertRepository(db),
+		AssetPrice:            repository.NewAssetPriceRepository(db),
 	}
 }
 
