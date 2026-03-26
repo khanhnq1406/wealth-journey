@@ -986,16 +986,21 @@ flowchart TD
     classDef error fill:#fee,stroke:#c00,color:#900
 ```
 
-> **Note:** Alias normalization happens inside `FetchGoldPricesAllSources` before the symbol search — the merged result always contains canonical TypeCodes. `FetchPriceForSymbol`'s exact-match loop at `gold_price_service.go:144` finds `"SJC"` regardless of which source served it.
+> **Note:** Alias normalization happens inside `WaterfallGoldFetcher.FetchGoldPrices` (and `FetchGoldPricesAllSources`) before returning — the result always contains canonical TypeCodes. `FetchPriceForSymbol`'s exact-match loop at `gold_price_service.go:144` finds `"SJC"` regardless of which source served it.
 >
-> **Alias map (compile-time constant in `price_fetcher.go`):**
+> **Alias map (`gold.AliasToCanonical` in `pkg/gold/types.go` — single source of truth alongside canonical definitions):**
 >
 > | Source TypeCode | Canonical TypeCode | Notes |
 > |---|---|---|
-> | `VNGSJC` | `SJC` | vang.today uses different prefix for SJC bar gold |
-> | `MIHONG_999` | `Mihong_999` | vangtoday uppercases all TypeCodes |
-> | `SJ9999` | `Vàng nhẫn SJC` | vang.today TypeCode for SJC ring gold |
-> | `SJL1L10` | `SJC` | vang.today TypeCode for SJC 9999 bar |
+> | `VNGSJC` | `SJC` | vang.today main SJC bar code |
+> | `SJL1L10` | `SJC` | vang.today SJC 1L/10L bar variant |
+> | `SJ9999` | `Vàng nhẫn SJC` | vang.today SJC ring 9999 |
+> | `MIHONG_999` | `Mihong_999` | vang.today uppercases the underscore variant |
+> | `DOHN` | `Doji` | DOJI Hanoi branch |
+> | `DOHCM` | `Doji` | DOJI HCM branch |
+> | `BTSJC` | `BTMC` | Bảo Tín SJC bar |
+> | `BT9999` | `BTMC_24K` | Bảo Tín 24K bar |
+> | `VIETTINM` | `VietinGold` | VietinBank gold |
 
 ### Key Invariants
 
@@ -1004,7 +1009,8 @@ flowchart TD
 - **Emergency cache**: written asynchronously on every successful fetch; read synchronously only when all live sources fail
 - **BTMC key rotation**: if the API key changes, restart the service — the key is read once at startup via `os.Getenv`
 - **Mihong source**: `api.mihong.vn/v1/gold-prices?market=domestic` (requires `x-market: mihong` header) — carries Mihong-exclusive products (e.g., `Mihong_999`) not available from any other source
-- **Canonical TypeCodes always returned**: `FetchGoldPricesAllSources` normalizes alias TypeCodes (e.g., `"VNGSJC"` → `"SJC"`) before merging; callers always see the canonical code regardless of which source provided the price
+- **Canonical TypeCodes always returned**: both `FetchGoldPrices` (waterfall single-source) and `FetchGoldPricesAllSources` (all-sources merge) normalize alias TypeCodes via `gold.AliasToCanonical` (`pkg/gold/types.go`); callers always see canonical codes regardless of which source provided the price
+- **Alias map lives in `pkg/gold/types.go`**: co-located with canonical `GoldTypes` definitions — single source of truth; add new aliases there when a price source introduces a new code
 - **Alias staleness degrades gracefully**: if a source renames a TypeCode, the alias miss falls through to the emergency cache — no user-visible error beyond the existing "not found in live data" warning
 
 ---
@@ -1033,8 +1039,9 @@ sequenceDiagram
     par Gold fetch
         APS->>GPS: FetchAllPrices(ctx)
         alt Fetch success
-            GPS-->>APS: []*CachedGoldPrice
-            Note over APS: Convert to []AssetPrice<br/>AssetType="gold", IsStale=false
+            GPS-->>APS: []*CachedGoldPrice (canonical TypeCodes)
+            Note over GPS: Alias normalization (e.g. VNGSJC→SJC)<br/>happens inside WaterfallGoldFetcher.FetchGoldPrices<br/>via gold.AliasToCanonical (pkg/gold/types.go)
+            Note over APS: Convert to []AssetPrice<br/>AssetType="gold", IsStale=false<br/>Deduplicate canonical codes (first-wins)
             APS->>APR: UpsertBatch(ctx, goldPrices)
             APR->>DB: INSERT ... ON CONFLICT (type_code, currency) DO UPDATE
         else Fetch failure
@@ -1075,6 +1082,7 @@ sequenceDiagram
 - On fetch failure: `MarkStaleByAssetType` sets `is_stale=true` for all rows of that type — stale prices remain visible with `isStale: true` flag
 - The job never crashes the scheduler — all errors are logged and returned without panicking
 - `PriceCacheJob` has a 10-second startup delay so the app is fully initialized before the first fetch
+- **Alias normalization boundary**: `WaterfallGoldFetcher.FetchGoldPrices` (and `FetchGoldPricesAllSources`) normalizes vang.today alias TypeCodes to canonical codes via `gold.AliasToCanonical` (`pkg/gold/types.go`) before returning. `AssetPriceService.refreshGold` receives only canonical codes and only deduplicates — it no longer performs alias mapping.
 
 ### Error Paths
 
