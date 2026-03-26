@@ -364,6 +364,35 @@ type AssetPriceService interface {
 	GetPriceByTypeCode(ctx context.Context, typeCode string) (*AssetPriceDTO, error)
 }
 
+// GoldDisplayConfigService manages the admin-configurable gold display config table.
+type GoldDisplayConfigService interface {
+	// GetDisplayPrices returns enabled gold configs joined with latest prices and admin overrides.
+	GetDisplayPrices(ctx context.Context) ([]*GoldDisplayPriceDTO, error)
+	// ListAll returns all configs (including disabled) for admin.
+	ListAll(ctx context.Context) ([]*models.GoldDisplayConfig, error)
+	// Create adds a new gold display config entry.
+	Create(ctx context.Context, typeCode, displayName string, displayOrder int32, enabled, showInInvestment bool) (*models.GoldDisplayConfig, error)
+	// Update modifies an existing config entry.
+	Update(ctx context.Context, id int32, displayName string, displayOrder int32, enabled, showInInvestment bool) (*models.GoldDisplayConfig, error)
+	// Delete soft-deletes a config entry.
+	Delete(ctx context.Context, id int32) error
+}
+
+// GoldDisplayPriceDTO is the combined config + price data returned by the public endpoint.
+type GoldDisplayPriceDTO struct {
+	TypeCode         string
+	DisplayName      string
+	Buy              int64
+	Sell             int64
+	ChangeBuy        int64
+	ChangeSell       int64
+	Currency         string
+	UpdatedAt        int64
+	IsStale          bool
+	ShowInInvestment bool
+	DisplayOrder     int32
+}
+
 // AllAssetPrices groups DB-backed prices by asset class.
 type AllAssetPrices struct {
 	Gold     []*AssetPriceDTO

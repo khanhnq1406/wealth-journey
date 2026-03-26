@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-26-gold-display-config-plan.md
 - **Spec file:** docs/specs/2026-03-26-gold-display-config-spec.md
 - **Started:** 2026-03-26T00:00:00Z
-- **Last updated:** 2026-03-26T02:00:00Z
+- **Last updated:** 2026-03-26T03:00:00Z
 - **Current state:** in_progress
-- **Current task:** 4
+- **Current task:** 5
 
 ## Task Progress
 
@@ -18,7 +18,7 @@
 | 1   | Proto Definitions                     | done    | 5ad8313 | Added 11 proto messages for gold display config; regenerated Go + TS types |
 | 2   | Database Model + Migration            | done    | fc15ebb | GoldDisplayConfig GORM model, migration command, seed data, Taskfile task |
 | 3   | Repository Layer                      | done    | —      | GoldDisplayConfigRepository with 7 methods; wired into Repositories + providers |
-| 4   | Service Layer                         | pending | —      | —       |
+| 4   | Service Layer                         | done    | —      | GoldDisplayConfigService: GetDisplayPrices join, CRUD with full validation; 16 tests |
 | 5   | Handler + Routes                      | pending | —      | —       |
 | 6   | Frontend — Home Page GoldPriceTable   | pending | —      | —       |
 | 7   | Frontend — Landing GoldPriceTable     | pending | —      | —       |

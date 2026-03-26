@@ -38,6 +38,7 @@ type Services struct {
 	Watchlist          WatchlistService
 	UserPriceAlert     UserPriceAlertService
 	AssetPrice         AssetPriceService
+	GoldDisplayConfig  GoldDisplayConfigService
 }
 
 // NewServices creates all service instances with proper dependency ordering.
@@ -95,6 +96,9 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		sjcClient, dojiClient, btmcClient, pnjClient,
 	)
 
+	// Phase 1 (cont.): GoldDisplayConfigService — joins gold display configs with DB-cached prices
+	goldDisplayConfigSvc := NewGoldDisplayConfigService(repos.GoldDisplayConfig, assetPriceSvc)
+
 	// Phase 1 (cont.): PriceAlertService — reads from DB cache via AssetPriceService
 	var priceAlertSvc PriceAlertService
 	if rdb != nil {
@@ -139,8 +143,9 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		Push:             pushSvc,
 		PriceAlert:       priceAlertSvc,
 		Watchlist:        watchlistSvc,
-		UserPriceAlert:   userPriceAlertSvc,
-		AssetPrice:       assetPriceSvc,
+		UserPriceAlert:    userPriceAlertSvc,
+		AssetPrice:        assetPriceSvc,
+		GoldDisplayConfig: goldDisplayConfigSvc,
 	}
 }
 
