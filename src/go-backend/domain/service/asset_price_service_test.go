@@ -758,62 +758,6 @@ func TestRefreshCurrency_SetsSourceWaterfall(t *testing.T) {
 // Tests: New per-source gold refresh (SJC, DOJI, BTMC, PNJ)
 // ---------------------------------------------------------------------------
 
-// mockSJCClient is a test double for *sjc.Client.
-// It wraps the interface expectation: FetchGoldPrices(ctx) ([]*sjc.GoldPrice, error).
-type mockSJCClient struct {
-	prices []*sjcGoldPrice
-	err    error
-}
-
-// sjcGoldPrice mirrors sjc.GoldPrice for test use without importing the real package.
-type sjcGoldPrice struct {
-	TypeCode   string
-	Name       string
-	Buy        int64
-	Sell       int64
-	ChangeBuy  int64
-	ChangeSell int64
-	Currency   string
-}
-
-type mockDOJIClient struct {
-	prices []*dojiGoldPrice
-	err    error
-}
-
-type dojiGoldPrice struct {
-	TypeCode string
-	Name     string
-	Buy      int64
-	Sell     int64
-	Currency string
-}
-
-type mockBTMCDirectClient struct {
-	prices []*btmcDirectGoldPrice
-	err    error
-}
-
-type btmcDirectGoldPrice struct {
-	TypeCode string
-	Name     string
-	Buy      int64
-	Sell     int64
-	Currency string
-}
-
-type mockPNJClient struct {
-	prices []*pnjGoldPrice
-	err    error
-}
-
-type pnjGoldPrice struct {
-	TypeCode string
-	Name     string
-	Buy      int64
-	Sell     int64
-	Currency string
-}
 
 func TestRefreshAllPrices_IncludesNewSources(t *testing.T) {
 	goldPrices := makeGoldPrices(2)
