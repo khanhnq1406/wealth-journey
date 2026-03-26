@@ -29,7 +29,7 @@ export interface GoldTypeOption {
   type: number;      // InvestmentType enum value
 }
 
-// Vietnamese gold type options — aligned with GOLD_TABLE_FILTER (price table display)
+// Vietnamese gold type options for frontend dropdowns
 export const GOLD_VND_OPTIONS: GoldTypeOption[] = [
   { value: "SJC", label: "SJC", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
   { value: "Vàng nhẫn SJC", label: "Nhẫn SJC 9999", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
