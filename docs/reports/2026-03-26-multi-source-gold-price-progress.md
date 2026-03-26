@@ -6,9 +6,9 @@
 - **Plan file:** `docs/plans/2026-03-26-multi-source-gold-price-plan.md`
 - **Spec file:** `docs/specs/2026-03-26-multi-source-gold-price-spec.md`
 - **Started:** 2026-03-26T00:00:00Z
-- **Last updated:** 2026-03-26T13:00:00Z
+- **Last updated:** 2026-03-26T14:00:00Z
 - **Current state:** in_progress
-- **Current task:** 10 — Wire DI providers
+- **Current task:** 13 — Backend lint & build verification
 
 ## Task Progress
 
@@ -24,8 +24,8 @@
 | 7   | PNJ Client Package                            | done        | 765ad9c | JSON API; TPHCM region preference; ×1000 multiplier; SanitizeTypeCode("PNJ") |
 | 8   | Shared SanitizeTypeCode utility               | done        | ee7bbaf | SanitizeTypeCode(prefix,name) — diacritics, uppercase, alphanumeric enforcement, max 50 chars |
 | 9   | Integrate sources into AssetPriceService      | done        | 422e0cd | 7-goroutine channel design; refreshResult named type; nil-safe clients; per-source stale marking |
-| 10  | Wire DI providers                             | pending     | —      | —       |
-| 11  | No-regression check                           | pending     | —      | —       |
+| 10  | Wire DI providers                             | done        | f2885e3 | Real sjc/doji/btmc/pnj clients wired in NewServices; nil placeholders replaced |
+| 11  | No-regression check                           | done        | f2885e3 | GetPriceByTypeCode exact-match verified; no collision with source-prefixed codes |
 | 12  | Log format (included in Task 9)               | skipped     | —      | Handled in Task 9 |
 | 13  | Backend lint & build verification             | pending     | —      | —       |
 | 14  | Update runtime flow diagram                   | pending     | —      | —       |

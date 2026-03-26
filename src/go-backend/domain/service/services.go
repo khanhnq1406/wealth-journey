@@ -7,8 +7,12 @@ import (
 	"github.com/go-redis/redis/v8"
 
 	"wealthjourney/domain/repository"
+	"wealthjourney/pkg/btmcdirect"
 	"wealthjourney/pkg/cache"
+	"wealthjourney/pkg/doji"
+	"wealthjourney/pkg/pnj"
 	pkgredis "wealthjourney/pkg/redis"
+	"wealthjourney/pkg/sjc"
 	"wealthjourney/pkg/storage"
 )
 
@@ -80,8 +84,16 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	pushSvc := NewPushService(repos.PushSubscription)
 
 	// Phase 1 (cont.): AssetPriceService — depends on asset price repo and price services.
-	// SJC, DOJI, BTMC, PNJ clients are passed as nil here; Task 10 will wire the real clients.
-	assetPriceSvc := NewAssetPriceService(repos.AssetPrice, goldPriceSvc, silverPriceSvc, currencyPriceSvc, nil, nil, nil, nil)
+	// Real per-source gold clients wired here for direct (non-waterfall) DB cache rows.
+	sjcClient := sjc.NewClient()
+	dojiClient := doji.NewClient()
+	btmcClient := btmcdirect.NewClient()
+	pnjClient := pnj.NewClient()
+
+	assetPriceSvc := NewAssetPriceService(
+		repos.AssetPrice, goldPriceSvc, silverPriceSvc, currencyPriceSvc,
+		sjcClient, dojiClient, btmcClient, pnjClient,
+	)
 
 	// Phase 1 (cont.): PriceAlertService — reads from DB cache via AssetPriceService
 	var priceAlertSvc PriceAlertService

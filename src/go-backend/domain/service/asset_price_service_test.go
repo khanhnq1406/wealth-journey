@@ -919,3 +919,74 @@ func contains(slice []string, s string) bool {
 	}
 	return false
 }
+
+// ---------------------------------------------------------------------------
+// Tests: GetPriceByTypeCode — no collision between waterfall and source-prefixed codes
+// ---------------------------------------------------------------------------
+
+// TestGetPriceByTypeCode_NoCollisionWithSourcePrefixedCodes verifies that
+// GetPriceByTypeCode performs exact string matching and never confuses a
+// short waterfall code (e.g. "SJC") with a longer source-prefixed code
+// (e.g. "SJC_1L").  The two rows coexist in the DB because the unique
+// index is (type_code, source), so "SJC"/waterfall and "SJC_1L"/sjc are
+// separate rows.  GetPriceByTypeCode("SJC") must return only the waterfall
+// row; GetPriceByTypeCode("SJC_1L") must return only the sjc row.
+func TestGetPriceByTypeCode_NoCollisionWithSourcePrefixedCodes(t *testing.T) {
+	now := time.Now()
+	rows := []*models.AssetPrice{
+		// Waterfall canonical row — short code "SJC"
+		{TypeCode: "SJC", AssetType: "gold", Name: "SJC 9999 (waterfall)", Buy: 8500000, Sell: 8600000, Currency: "VND", IsStale: false, FetchedAt: now},
+		// SJC-source-prefixed row — longer code "SJC_1L"
+		{TypeCode: "SJC_1L", AssetType: "gold", Name: "SJC 1 Luong (sjc direct)", Buy: 8510000, Sell: 8610000, Currency: "VND", IsStale: false, FetchedAt: now},
+		// Unrelated rows that must not interfere.
+		{TypeCode: "DOJI_1L", AssetType: "gold", Name: "DOJI 1 Luong", Buy: 8400000, Sell: 8500000, Currency: "VND", IsStale: false, FetchedAt: now},
+	}
+
+	repo := &mockAssetPriceRepo{listAllResult: rows}
+	svc := NewAssetPriceService(repo, &mockGoldPriceSvc{}, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil)
+
+	// GetPriceByTypeCode("SJC") must return only the waterfall row, not "SJC_1L".
+	t.Run("waterfall code returns waterfall row only", func(t *testing.T) {
+		dto, err := svc.GetPriceByTypeCode(context.Background(), "SJC")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if dto == nil {
+			t.Fatal("expected DTO for 'SJC', got nil")
+		}
+		if dto.TypeCode != "SJC" {
+			t.Errorf("expected TypeCode='SJC', got %q", dto.TypeCode)
+		}
+		if dto.Buy != 8500000 {
+			t.Errorf("expected waterfall Buy=8500000, got %d (collision with SJC_1L?)", dto.Buy)
+		}
+	})
+
+	// GetPriceByTypeCode("SJC_1L") must return only the source-prefixed row, not "SJC".
+	t.Run("source-prefixed code returns source row only", func(t *testing.T) {
+		dto, err := svc.GetPriceByTypeCode(context.Background(), "SJC_1L")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if dto == nil {
+			t.Fatal("expected DTO for 'SJC_1L', got nil")
+		}
+		if dto.TypeCode != "SJC_1L" {
+			t.Errorf("expected TypeCode='SJC_1L', got %q", dto.TypeCode)
+		}
+		if dto.Buy != 8510000 {
+			t.Errorf("expected sjc-source Buy=8510000, got %d (collision with SJC?)", dto.Buy)
+		}
+	})
+
+	// Neither "SJC" nor "SJC_1L" should match "DOJI_1L".
+	t.Run("unrelated code not matched by prefix lookup", func(t *testing.T) {
+		dto, err := svc.GetPriceByTypeCode(context.Background(), "DOJI")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if dto != nil {
+			t.Errorf("expected nil DTO for 'DOJI' (not in DB), but got TypeCode=%q", dto.TypeCode)
+		}
+	})
+}
