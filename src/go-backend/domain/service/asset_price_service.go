@@ -369,6 +369,25 @@ func (s *assetPriceService) GetMarketTypes(ctx context.Context) (*MarketTypesDTO
 }
 
 // ---------------------------------------------------------------------------
+// GetPriceByTypeCode
+// ---------------------------------------------------------------------------
+
+// GetPriceByTypeCode scans ListAll results for a matching typeCode.
+// Returns nil, nil when not found.
+func (s *assetPriceService) GetPriceByTypeCode(ctx context.Context, typeCode string) (*AssetPriceDTO, error) {
+	rows, err := s.repo.ListAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, row := range rows {
+		if row.TypeCode == typeCode {
+			return modelToDTO(row), nil
+		}
+	}
+	return nil, nil
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 

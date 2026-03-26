@@ -460,6 +460,81 @@ func TestAssetPriceService_GetMarketTypes_EmptyDB(t *testing.T) {
 }
 
 // ---------------------------------------------------------------------------
+// Tests: GetPriceByTypeCode
+// ---------------------------------------------------------------------------
+
+func TestAssetPriceService_GetPriceByTypeCode_Found(t *testing.T) {
+	now := time.Now()
+	rows := []*models.AssetPrice{
+		{TypeCode: "SJC_1L", AssetType: "gold", Name: "SJC 1 Luong", Buy: 8500000, Sell: 8600000, Currency: "VND", IsStale: false, FetchedAt: now},
+		{TypeCode: "DOJI", AssetType: "gold", Name: "DOJI Bar", Buy: 8400000, Sell: 8500000, Currency: "VND", IsStale: false, FetchedAt: now},
+		{TypeCode: "SILVER_1L", AssetType: "silver", Name: "Silver 1L", Buy: 200000, Sell: 210000, Currency: "VND", IsStale: false, FetchedAt: now},
+	}
+
+	repo := &mockAssetPriceRepo{listAllResult: rows}
+	svc := NewAssetPriceService(repo, &mockGoldPriceSvc{}, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{})
+
+	dto, err := svc.GetPriceByTypeCode(context.Background(), "SJC_1L")
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+	if dto == nil {
+		t.Fatal("expected DTO to be returned, got nil")
+	}
+	if dto.TypeCode != "SJC_1L" {
+		t.Errorf("expected TypeCode=SJC_1L, got %q", dto.TypeCode)
+	}
+	if dto.Buy != 8500000 {
+		t.Errorf("expected Buy=8500000, got %d", dto.Buy)
+	}
+	if dto.Sell != 8600000 {
+		t.Errorf("expected Sell=8600000, got %d", dto.Sell)
+	}
+	if dto.Currency != "VND" {
+		t.Errorf("expected Currency=VND, got %q", dto.Currency)
+	}
+	if dto.IsStale {
+		t.Error("expected IsStale=false")
+	}
+}
+
+func TestAssetPriceService_GetPriceByTypeCode_NotFound(t *testing.T) {
+	now := time.Now()
+	rows := []*models.AssetPrice{
+		{TypeCode: "SJC_1L", AssetType: "gold", Name: "SJC 1 Luong", Buy: 8500000, Sell: 8600000, Currency: "VND", FetchedAt: now},
+		{TypeCode: "DOJI", AssetType: "gold", Name: "DOJI Bar", Buy: 8400000, Sell: 8500000, Currency: "VND", FetchedAt: now},
+	}
+
+	repo := &mockAssetPriceRepo{listAllResult: rows}
+	svc := NewAssetPriceService(repo, &mockGoldPriceSvc{}, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{})
+
+	dto, err := svc.GetPriceByTypeCode(context.Background(), "NONEXISTENT")
+	if err != nil {
+		t.Fatalf("expected no error for missing typeCode, got: %v", err)
+	}
+	if dto != nil {
+		t.Errorf("expected nil DTO for missing typeCode, got: %+v", dto)
+	}
+}
+
+func TestAssetPriceService_GetPriceByTypeCode_RepoError(t *testing.T) {
+	repoErr := errors.New("db connection refused")
+	repo := &mockAssetPriceRepo{listAllErr: repoErr}
+	svc := NewAssetPriceService(repo, &mockGoldPriceSvc{}, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{})
+
+	dto, err := svc.GetPriceByTypeCode(context.Background(), "SJC_1L")
+	if err == nil {
+		t.Fatal("expected error from repo, got nil")
+	}
+	if dto != nil {
+		t.Errorf("expected nil DTO on error, got: %+v", dto)
+	}
+	if err.Error() != repoErr.Error() {
+		t.Errorf("expected error %q, got %q", repoErr.Error(), err.Error())
+	}
+}
+
+// ---------------------------------------------------------------------------
 // Helper
 // ---------------------------------------------------------------------------
 

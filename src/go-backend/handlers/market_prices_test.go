@@ -60,6 +60,10 @@ func (m *mockAssetPriceService) GetMarketTypes(ctx context.Context) (*service.Ma
 	return &service.MarketTypesDTO{}, nil
 }
 
+func (m *mockAssetPriceService) GetPriceByTypeCode(_ context.Context, _ string) (*service.AssetPriceDTO, error) {
+	return nil, nil
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------

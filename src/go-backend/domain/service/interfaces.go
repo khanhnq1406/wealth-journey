@@ -358,6 +358,10 @@ type AssetPriceService interface {
 	// GetMarketTypes reads all DB rows and returns the list of type codes per
 	// asset type together with the latest FetchedAt timestamp per group.
 	GetMarketTypes(ctx context.Context) (*MarketTypesDTO, error)
+
+	// GetPriceByTypeCode looks up a single cached price row by typeCode.
+	// Returns nil, nil when not found (cold-start: price not yet in DB).
+	GetPriceByTypeCode(ctx context.Context, typeCode string) (*AssetPriceDTO, error)
 }
 
 // AllAssetPrices groups DB-backed prices by asset class.
