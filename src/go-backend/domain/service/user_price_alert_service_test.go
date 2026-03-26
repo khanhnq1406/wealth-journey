@@ -75,48 +75,47 @@ func (m *mockUserPriceAlertRepo) UpdateStatus(ctx context.Context, id int32, sta
 	return args.Error(0)
 }
 
-// --- Mock: GoldPriceService (alert-scope) ---
+// --- Mock: AssetPriceService (alert-scope) ---
 
-type mockAlertGoldPriceSvc struct {
+type mockAlertAssetPriceSvc struct {
 	mock.Mock
 }
 
-func (m *mockAlertGoldPriceSvc) FetchPriceForSymbol(ctx context.Context, symbol string) (*CachedGoldPrice, error) {
-	args := m.Called(ctx, symbol)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*CachedGoldPrice), args.Error(1)
+func (m *mockAlertAssetPriceSvc) RefreshAllPrices(ctx context.Context) error {
+	args := m.Called(ctx)
+	return args.Error(0)
 }
 
-func (m *mockAlertGoldPriceSvc) FetchAllPrices(ctx context.Context) ([]*CachedGoldPrice, error) {
+func (m *mockAlertAssetPriceSvc) GetAllPrices(ctx context.Context) (*AllAssetPrices, error) {
 	args := m.Called(ctx)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).([]*CachedGoldPrice), args.Error(1)
+	return args.Get(0).(*AllAssetPrices), args.Error(1)
 }
 
-// --- Mock: SilverPriceService (alert-scope) ---
-
-type mockAlertSilverPriceSvc struct {
-	mock.Mock
-}
-
-func (m *mockAlertSilverPriceSvc) FetchPriceForSymbol(ctx context.Context, symbol string) (*CachedSilverPrice, error) {
-	args := m.Called(ctx, symbol)
+func (m *mockAlertAssetPriceSvc) GetPricesByAssetType(ctx context.Context, assetType string) ([]*AssetPriceDTO, error) {
+	args := m.Called(ctx, assetType)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).(*CachedSilverPrice), args.Error(1)
+	return args.Get(0).([]*AssetPriceDTO), args.Error(1)
 }
 
-func (m *mockAlertSilverPriceSvc) FetchAllPrices(ctx context.Context) ([]*CachedSilverPrice, error) {
+func (m *mockAlertAssetPriceSvc) GetMarketTypes(ctx context.Context) (*MarketTypesDTO, error) {
 	args := m.Called(ctx)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).([]*CachedSilverPrice), args.Error(1)
+	return args.Get(0).(*MarketTypesDTO), args.Error(1)
+}
+
+func (m *mockAlertAssetPriceSvc) GetPriceByTypeCode(ctx context.Context, typeCode string) (*AssetPriceDTO, error) {
+	args := m.Called(ctx, typeCode)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*AssetPriceDTO), args.Error(1)
 }
 
 // --- Mock: MarketDataService (alert-scope) ---
@@ -211,35 +210,29 @@ func (m *mockAlertPushSvc) GetVAPIDPublicKey() string {
 // --- Helpers ---
 
 // newTestAlertService creates a UserPriceAlertService backed by the provided mocks.
-// Passing nil for goldSvc/silverSvc/marketSvc is fine for tests that don't need price fetching.
+// Passing nil for assetPriceSvc/marketSvc is fine for tests that don't need price fetching.
 func newTestAlertService(
 	alertRepo *mockUserPriceAlertRepo,
-	goldSvc GoldPriceService,
-	silverSvc SilverPriceService,
+	assetPriceSvc AssetPriceService,
 	marketSvc MarketDataService,
 ) UserPriceAlertService {
-	g := goldSvc
-	sv := silverSvc
+	ap := assetPriceSvc
 	mkt := marketSvc
 
-	if g == nil {
-		g = &mockAlertGoldPriceSvc{}
-	}
-	if sv == nil {
-		sv = &mockAlertSilverPriceSvc{}
+	if ap == nil {
+		ap = &mockAlertAssetPriceSvc{}
 	}
 	if mkt == nil {
 		mkt = &mockAlertMarketDataSvc{}
 	}
 
 	return &userPriceAlertService{
-		alertRepo:      alertRepo,
-		goldPriceSvc:   g,
-		silverPriceSvc: sv,
-		marketDataSvc:  mkt,
-		notifRepo:      &mockAlertNotifRepo{},
-		pushSvc:        &mockAlertPushSvc{},
-		rdb:            nil,
+		alertRepo:     alertRepo,
+		assetPriceSvc: ap,
+		marketDataSvc: mkt,
+		notifRepo:     &mockAlertNotifRepo{},
+		pushSvc:       &mockAlertPushSvc{},
+		rdb:           nil,
 	}
 }
 
@@ -257,12 +250,40 @@ func validStockCreateReq() *v1.CreateUserPriceAlertRequest {
 	}
 }
 
+// validGoldCreateReq returns a minimal valid CreateUserPriceAlertRequest for a gold asset.
+func validGoldCreateReq() *v1.CreateUserPriceAlertRequest {
+	return &v1.CreateUserPriceAlertRequest{
+		Symbol:      "SJL1L10",
+		Name:        "SJC 1-10 Luong",
+		AssetType:   v1.InvestmentType_INVESTMENT_TYPE_GOLD_VND,
+		Currency:    "VND",
+		PriceSide:   "buy",
+		Direction:   v1.AlertDirection_ALERT_DIRECTION_ABOVE,
+		TargetPrice: 9000000000,
+		TriggerMode: v1.AlertTriggerMode_ALERT_TRIGGER_MODE_ONCE,
+	}
+}
+
+// validSilverCreateReq returns a minimal valid CreateUserPriceAlertRequest for a silver asset.
+func validSilverCreateReq() *v1.CreateUserPriceAlertRequest {
+	return &v1.CreateUserPriceAlertRequest{
+		Symbol:      "AG_VND",
+		Name:        "Silver VND",
+		AssetType:   v1.InvestmentType_INVESTMENT_TYPE_SILVER_VND,
+		Currency:    "VND",
+		PriceSide:   "sell",
+		Direction:   v1.AlertDirection_ALERT_DIRECTION_BELOW,
+		TargetPrice: 2000000,
+		TriggerMode: v1.AlertTriggerMode_ALERT_TRIGGER_MODE_ONCE,
+	}
+}
+
 // --- Tests: CreateAlert ---
 
 func TestUserPriceAlertService_CreateAlert_Success(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
 	marketSvc := new(mockAlertMarketDataSvc)
-	svc := newTestAlertService(alertRepo, nil, nil, marketSvc)
+	svc := newTestAlertService(alertRepo, nil, marketSvc)
 	ctx := context.Background()
 
 	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
@@ -285,7 +306,7 @@ func TestUserPriceAlertService_CreateAlert_Success(t *testing.T) {
 
 func TestUserPriceAlertService_CreateAlert_MaxAlertsReached(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	svc := newTestAlertService(alertRepo, nil, nil, nil)
+	svc := newTestAlertService(alertRepo, nil, nil)
 	ctx := context.Background()
 
 	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(30, nil)
@@ -300,7 +321,7 @@ func TestUserPriceAlertService_CreateAlert_MaxAlertsReached(t *testing.T) {
 
 func TestUserPriceAlertService_CreateAlert_InvalidTargetPrice(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	svc := newTestAlertService(alertRepo, nil, nil, nil)
+	svc := newTestAlertService(alertRepo, nil, nil)
 	ctx := context.Background()
 
 	req := validStockCreateReq()
@@ -316,7 +337,7 @@ func TestUserPriceAlertService_CreateAlert_InvalidTargetPrice(t *testing.T) {
 
 func TestUserPriceAlertService_CreateAlert_InvalidDirection(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	svc := newTestAlertService(alertRepo, nil, nil, nil)
+	svc := newTestAlertService(alertRepo, nil, nil)
 	ctx := context.Background()
 
 	req := validStockCreateReq()
@@ -331,7 +352,7 @@ func TestUserPriceAlertService_CreateAlert_InvalidDirection(t *testing.T) {
 
 func TestUserPriceAlertService_CreateAlert_EmptySymbol(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	svc := newTestAlertService(alertRepo, nil, nil, nil)
+	svc := newTestAlertService(alertRepo, nil, nil)
 	ctx := context.Background()
 
 	req := validStockCreateReq()
@@ -346,7 +367,7 @@ func TestUserPriceAlertService_CreateAlert_EmptySymbol(t *testing.T) {
 
 func TestUserPriceAlertService_CreateAlert_RepeatMode_CooldownTooShort(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	svc := newTestAlertService(alertRepo, nil, nil, nil)
+	svc := newTestAlertService(alertRepo, nil, nil)
 	ctx := context.Background()
 
 	req := validStockCreateReq()
@@ -362,7 +383,7 @@ func TestUserPriceAlertService_CreateAlert_RepeatMode_CooldownTooShort(t *testin
 
 func TestUserPriceAlertService_CreateAlert_RepeatMode_CooldownTooLong(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	svc := newTestAlertService(alertRepo, nil, nil, nil)
+	svc := newTestAlertService(alertRepo, nil, nil)
 	ctx := context.Background()
 
 	req := validStockCreateReq()
@@ -379,7 +400,7 @@ func TestUserPriceAlertService_CreateAlert_RepeatMode_CooldownTooLong(t *testing
 func TestUserPriceAlertService_CreateAlert_PriceFetchFails_StillCreates(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
 	marketSvc := new(mockAlertMarketDataSvc)
-	svc := newTestAlertService(alertRepo, nil, nil, marketSvc)
+	svc := newTestAlertService(alertRepo, nil, marketSvc)
 	ctx := context.Background()
 
 	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
@@ -396,12 +417,181 @@ func TestUserPriceAlertService_CreateAlert_PriceFetchFails_StillCreates(t *testi
 	alertRepo.AssertExpectations(t)
 }
 
+// --- Tests: fetchCurrentPrice with DB-backed AssetPriceService ---
+
+func TestUserPriceAlertService_CreateAlert_GoldPrice_NonStale_ReturnsBuy(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	ctx := context.Background()
+
+	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
+	// DB returns a non-stale gold price
+	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "SJL1L10").
+		Return(&AssetPriceDTO{
+			TypeCode: "SJL1L10",
+			Name:     "SJC 1-10 Luong",
+			Buy:      9200000000,
+			Sell:     9300000000,
+			IsStale:  false,
+		}, nil)
+	alertRepo.On("Create", ctx, mock.AnythingOfType("*models.UserPriceAlert")).Return(nil)
+
+	resp, err := svc.CreateAlert(ctx, 1, validGoldCreateReq())
+
+	assert.NoError(t, err)
+	assert.True(t, resp.Success)
+	// buy price should be set at creation time
+	assert.Equal(t, int64(9200000000), resp.Alert.CurrentPriceAtCreation)
+	alertRepo.AssertExpectations(t)
+	assetPriceSvc.AssertExpectations(t)
+}
+
+func TestUserPriceAlertService_CreateAlert_GoldPrice_SellSide(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	ctx := context.Background()
+
+	req := validGoldCreateReq()
+	req.PriceSide = "sell"
+
+	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
+	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "SJL1L10").
+		Return(&AssetPriceDTO{
+			TypeCode: "SJL1L10",
+			Buy:      9200000000,
+			Sell:     9300000000,
+			IsStale:  false,
+		}, nil)
+	alertRepo.On("Create", ctx, mock.AnythingOfType("*models.UserPriceAlert")).Return(nil)
+
+	resp, err := svc.CreateAlert(ctx, 1, req)
+
+	assert.NoError(t, err)
+	// sell price should be returned
+	assert.Equal(t, int64(9300000000), resp.Alert.CurrentPriceAtCreation)
+	alertRepo.AssertExpectations(t)
+}
+
+func TestUserPriceAlertService_CreateAlert_GoldPrice_Stale_ReturnsZero(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	ctx := context.Background()
+
+	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
+	// DB returns a stale price — should return 0
+	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "SJL1L10").
+		Return(&AssetPriceDTO{
+			TypeCode: "SJL1L10",
+			Buy:      9200000000,
+			Sell:     9300000000,
+			IsStale:  true,
+		}, nil)
+	alertRepo.On("Create", ctx, mock.AnythingOfType("*models.UserPriceAlert")).Return(nil)
+
+	resp, err := svc.CreateAlert(ctx, 1, validGoldCreateReq())
+
+	assert.NoError(t, err)
+	// stale price → 0
+	assert.Equal(t, int64(0), resp.Alert.CurrentPriceAtCreation)
+	alertRepo.AssertExpectations(t)
+}
+
+func TestUserPriceAlertService_CreateAlert_GoldPrice_NotFound_ReturnsZero(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	ctx := context.Background()
+
+	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
+	// DB returns nil (not found)
+	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "SJL1L10").
+		Return(nil, nil)
+	alertRepo.On("Create", ctx, mock.AnythingOfType("*models.UserPriceAlert")).Return(nil)
+
+	resp, err := svc.CreateAlert(ctx, 1, validGoldCreateReq())
+
+	assert.NoError(t, err)
+	// not found → 0
+	assert.Equal(t, int64(0), resp.Alert.CurrentPriceAtCreation)
+	alertRepo.AssertExpectations(t)
+}
+
+func TestUserPriceAlertService_CreateAlert_GoldPrice_DBError_ReturnsZero(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	ctx := context.Background()
+
+	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
+	// DB returns an error — should return 0 (best-effort)
+	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "SJL1L10").
+		Return(nil, apperrors.NewValidationError("db error"))
+	alertRepo.On("Create", ctx, mock.AnythingOfType("*models.UserPriceAlert")).Return(nil)
+
+	resp, err := svc.CreateAlert(ctx, 1, validGoldCreateReq())
+
+	assert.NoError(t, err)
+	// db error → 0, alert still created
+	assert.Equal(t, int64(0), resp.Alert.CurrentPriceAtCreation)
+	alertRepo.AssertExpectations(t)
+}
+
+func TestUserPriceAlertService_CreateAlert_SilverPrice_NonStale_ReturnsSell(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	ctx := context.Background()
+
+	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
+	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "AG_VND").
+		Return(&AssetPriceDTO{
+			TypeCode: "AG_VND",
+			Buy:      1800000,
+			Sell:     1900000,
+			IsStale:  false,
+		}, nil)
+	alertRepo.On("Create", ctx, mock.AnythingOfType("*models.UserPriceAlert")).Return(nil)
+
+	resp, err := svc.CreateAlert(ctx, 1, validSilverCreateReq())
+
+	assert.NoError(t, err)
+	// validSilverCreateReq uses priceSide "sell"
+	assert.Equal(t, int64(1900000), resp.Alert.CurrentPriceAtCreation)
+	alertRepo.AssertExpectations(t)
+}
+
+func TestUserPriceAlertService_CreateAlert_SilverPrice_Stale_ReturnsZero(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	ctx := context.Background()
+
+	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
+	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "AG_VND").
+		Return(&AssetPriceDTO{
+			TypeCode: "AG_VND",
+			Buy:      1800000,
+			Sell:     1900000,
+			IsStale:  true,
+		}, nil)
+	alertRepo.On("Create", ctx, mock.AnythingOfType("*models.UserPriceAlert")).Return(nil)
+
+	resp, err := svc.CreateAlert(ctx, 1, validSilverCreateReq())
+
+	assert.NoError(t, err)
+	assert.Equal(t, int64(0), resp.Alert.CurrentPriceAtCreation)
+	alertRepo.AssertExpectations(t)
+}
+
 // --- Tests: ListAlerts ---
 
 func TestUserPriceAlertService_ListAlerts_Success(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
 	marketSvc := new(mockAlertMarketDataSvc)
-	svc := newTestAlertService(alertRepo, nil, nil, marketSvc)
+	svc := newTestAlertService(alertRepo, nil, marketSvc)
 	ctx := context.Background()
 
 	now := time.Now()
@@ -441,7 +631,7 @@ func TestUserPriceAlertService_ListAlerts_Success(t *testing.T) {
 
 func TestUserPriceAlertService_ListAlerts_WithStatusFilter(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	svc := newTestAlertService(alertRepo, nil, nil, nil)
+	svc := newTestAlertService(alertRepo, nil, nil)
 	ctx := context.Background()
 
 	alertRepo.On("ListByUserID", ctx, int32(1), "active", mock.AnythingOfType("repository.ListOptions")).
@@ -457,11 +647,125 @@ func TestUserPriceAlertService_ListAlerts_WithStatusFilter(t *testing.T) {
 	alertRepo.AssertExpectations(t)
 }
 
+// --- Tests: fetchPricesForAlerts with DB-backed AssetPriceService ---
+
+func TestUserPriceAlertService_ListAlerts_GoldPrices_FromDB_NonStale(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	ctx := context.Background()
+
+	now := time.Now()
+	alerts := []*models.UserPriceAlert{
+		{
+			ID:        1,
+			UserID:    1,
+			Symbol:    "SJL1L10",
+			AssetType: int32(v1.InvestmentType_INVESTMENT_TYPE_GOLD_VND),
+			Currency:  "VND",
+			PriceSide: "buy",
+			Status:    "active",
+			CreatedAt: now,
+			UpdatedAt: now,
+		},
+	}
+
+	alertRepo.On("ListByUserID", ctx, int32(1), "", mock.AnythingOfType("repository.ListOptions")).
+		Return(alerts, 1, nil)
+	// GetPricesByAssetType for gold returns non-stale data
+	assetPriceSvc.On("GetPricesByAssetType", mock.Anything, "gold").
+		Return([]*AssetPriceDTO{
+			{TypeCode: "SJL1L10", Buy: 9100000000, Sell: 9200000000, IsStale: false},
+		}, nil)
+
+	resp, err := svc.ListAlerts(ctx, 1, &v1.ListUserPriceAlertsRequest{})
+
+	assert.NoError(t, err)
+	assert.Len(t, resp.Alerts, 1)
+	assert.Equal(t, int64(9100000000), resp.Alerts[0].CurrentPrice)
+	assetPriceSvc.AssertExpectations(t)
+}
+
+func TestUserPriceAlertService_ListAlerts_GoldPrices_Stale_ExcludedFromPriceMap(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	ctx := context.Background()
+
+	now := time.Now()
+	alerts := []*models.UserPriceAlert{
+		{
+			ID:        1,
+			UserID:    1,
+			Symbol:    "SJL1L10",
+			AssetType: int32(v1.InvestmentType_INVESTMENT_TYPE_GOLD_VND),
+			Currency:  "VND",
+			PriceSide: "buy",
+			Status:    "active",
+			CreatedAt: now,
+			UpdatedAt: now,
+		},
+	}
+
+	alertRepo.On("ListByUserID", ctx, int32(1), "", mock.AnythingOfType("repository.ListOptions")).
+		Return(alerts, 1, nil)
+	// DB returns stale price — should NOT appear in price map
+	assetPriceSvc.On("GetPricesByAssetType", mock.Anything, "gold").
+		Return([]*AssetPriceDTO{
+			{TypeCode: "SJL1L10", Buy: 9100000000, Sell: 9200000000, IsStale: true},
+		}, nil)
+
+	resp, err := svc.ListAlerts(ctx, 1, &v1.ListUserPriceAlertsRequest{})
+
+	assert.NoError(t, err)
+	assert.Len(t, resp.Alerts, 1)
+	// stale price excluded → CurrentPrice not populated
+	assert.Equal(t, int64(0), resp.Alerts[0].CurrentPrice)
+	assetPriceSvc.AssertExpectations(t)
+}
+
+func TestUserPriceAlertService_ListAlerts_SilverPrices_FromDB_NonStale(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	ctx := context.Background()
+
+	now := time.Now()
+	alerts := []*models.UserPriceAlert{
+		{
+			ID:        2,
+			UserID:    1,
+			Symbol:    "AG_VND",
+			AssetType: int32(v1.InvestmentType_INVESTMENT_TYPE_SILVER_VND),
+			Currency:  "VND",
+			PriceSide: "sell",
+			Status:    "active",
+			CreatedAt: now,
+			UpdatedAt: now,
+		},
+	}
+
+	alertRepo.On("ListByUserID", ctx, int32(1), "", mock.AnythingOfType("repository.ListOptions")).
+		Return(alerts, 1, nil)
+	assetPriceSvc.On("GetPricesByAssetType", mock.Anything, "silver").
+		Return([]*AssetPriceDTO{
+			{TypeCode: "AG_VND", Buy: 1800000, Sell: 1900000, IsStale: false},
+		}, nil)
+
+	resp, err := svc.ListAlerts(ctx, 1, &v1.ListUserPriceAlertsRequest{})
+
+	assert.NoError(t, err)
+	assert.Len(t, resp.Alerts, 1)
+	// sell side price
+	assert.Equal(t, int64(1900000), resp.Alerts[0].CurrentPrice)
+	assetPriceSvc.AssertExpectations(t)
+}
+
 // --- Tests: UpdateAlert ---
 
 func TestUserPriceAlertService_UpdateAlert_Success(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	svc := newTestAlertService(alertRepo, nil, nil, nil)
+	svc := newTestAlertService(alertRepo, nil, nil)
 	ctx := context.Background()
 
 	existing := &models.UserPriceAlert{
@@ -492,7 +796,7 @@ func TestUserPriceAlertService_UpdateAlert_Success(t *testing.T) {
 
 func TestUserPriceAlertService_UpdateAlert_NotFound(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	svc := newTestAlertService(alertRepo, nil, nil, nil)
+	svc := newTestAlertService(alertRepo, nil, nil)
 	ctx := context.Background()
 
 	alertRepo.On("GetByIDForUser", ctx, int32(99), int32(1)).
@@ -511,7 +815,7 @@ func TestUserPriceAlertService_UpdateAlert_NotFound(t *testing.T) {
 
 func TestUserPriceAlertService_UpdateAlert_RepeatMode_CooldownInvalid(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	svc := newTestAlertService(alertRepo, nil, nil, nil)
+	svc := newTestAlertService(alertRepo, nil, nil)
 	ctx := context.Background()
 
 	existing := &models.UserPriceAlert{
@@ -539,7 +843,7 @@ func TestUserPriceAlertService_UpdateAlert_RepeatMode_CooldownInvalid(t *testing
 
 func TestUserPriceAlertService_DeleteAlert_Success(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	svc := newTestAlertService(alertRepo, nil, nil, nil)
+	svc := newTestAlertService(alertRepo, nil, nil)
 	ctx := context.Background()
 
 	alertRepo.On("Delete", ctx, int32(1), int32(1)).Return(nil)
@@ -553,7 +857,7 @@ func TestUserPriceAlertService_DeleteAlert_Success(t *testing.T) {
 
 func TestUserPriceAlertService_DeleteAlert_NotFound(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	svc := newTestAlertService(alertRepo, nil, nil, nil)
+	svc := newTestAlertService(alertRepo, nil, nil)
 	ctx := context.Background()
 
 	alertRepo.On("Delete", ctx, int32(99), int32(1)).
@@ -567,11 +871,111 @@ func TestUserPriceAlertService_DeleteAlert_NotFound(t *testing.T) {
 	alertRepo.AssertExpectations(t)
 }
 
+// --- Tests: EvaluateAlerts with DB-backed prices ---
+
+func TestUserPriceAlertService_EvaluateAlerts_GoldAlert_TriggeredFromDB(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	notifRepo := new(mockAlertNotifRepo)
+	pushSvc := new(mockAlertPushSvc)
+	svc := &userPriceAlertService{
+		alertRepo:     alertRepo,
+		assetPriceSvc: assetPriceSvc,
+		marketDataSvc: &mockAlertMarketDataSvc{},
+		notifRepo:     notifRepo,
+		pushSvc:       pushSvc,
+		rdb:           nil,
+	}
+	ctx := context.Background()
+
+	now := time.Now()
+	activeAlerts := []*models.UserPriceAlert{
+		{
+			ID:          10,
+			UserID:      1,
+			Symbol:      "SJL1L10",
+			Name:        "SJC Gold",
+			AssetType:   int32(v1.InvestmentType_INVESTMENT_TYPE_GOLD_VND),
+			Currency:    "VND",
+			PriceSide:   "buy",
+			Direction:   "above",
+			TargetPrice: 9000000000,
+			TriggerMode: "once",
+			Status:      "active",
+			CreatedAt:   now,
+			UpdatedAt:   now,
+		},
+	}
+
+	alertRepo.On("ListActive", ctx).Return(activeAlerts, nil)
+	// DB returns non-stale price above target → alert should trigger
+	assetPriceSvc.On("GetPricesByAssetType", mock.Anything, "gold").
+		Return([]*AssetPriceDTO{
+			{TypeCode: "SJL1L10", Buy: 9100000000, Sell: 9200000000, IsStale: false},
+		}, nil)
+	notifRepo.On("Create", mock.Anything, mock.AnythingOfType("*models.Notification")).Return(nil)
+	pushSvc.On("SendToUser", mock.Anything, int32(1), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(nil)
+	alertRepo.On("UpdateStatus", mock.Anything, int32(10), "triggered", mock.Anything, int32(1)).Return(nil)
+
+	err := svc.EvaluateAlerts(ctx)
+
+	assert.NoError(t, err)
+	alertRepo.AssertExpectations(t)
+	assetPriceSvc.AssertExpectations(t)
+	notifRepo.AssertExpectations(t)
+	pushSvc.AssertExpectations(t)
+}
+
+func TestUserPriceAlertService_EvaluateAlerts_GoldAlert_StalePrice_NotTriggered(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	svc := &userPriceAlertService{
+		alertRepo:     alertRepo,
+		assetPriceSvc: assetPriceSvc,
+		marketDataSvc: &mockAlertMarketDataSvc{},
+		notifRepo:     &mockAlertNotifRepo{},
+		pushSvc:       &mockAlertPushSvc{},
+		rdb:           nil,
+	}
+	ctx := context.Background()
+
+	now := time.Now()
+	activeAlerts := []*models.UserPriceAlert{
+		{
+			ID:          11,
+			UserID:      1,
+			Symbol:      "SJL1L10",
+			AssetType:   int32(v1.InvestmentType_INVESTMENT_TYPE_GOLD_VND),
+			Currency:    "VND",
+			PriceSide:   "buy",
+			Direction:   "above",
+			TargetPrice: 9000000000,
+			TriggerMode: "once",
+			Status:      "active",
+			CreatedAt:   now,
+			UpdatedAt:   now,
+		},
+	}
+
+	alertRepo.On("ListActive", ctx).Return(activeAlerts, nil)
+	// DB returns stale price — should be excluded from price map, alert skipped
+	assetPriceSvc.On("GetPricesByAssetType", mock.Anything, "gold").
+		Return([]*AssetPriceDTO{
+			{TypeCode: "SJL1L10", Buy: 9100000000, Sell: 9200000000, IsStale: true},
+		}, nil)
+
+	err := svc.EvaluateAlerts(ctx)
+
+	assert.NoError(t, err)
+	// No notification, no status update — alert skipped due to missing/stale price
+	alertRepo.AssertNotCalled(t, "UpdateStatus")
+}
+
 // --- Security checks ---
 
 func TestUserPriceAlertService_CreateAlert_InvalidUserID(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	svc := newTestAlertService(alertRepo, nil, nil, nil)
+	svc := newTestAlertService(alertRepo, nil, nil)
 	ctx := context.Background()
 
 	resp, err := svc.CreateAlert(ctx, 0, validStockCreateReq())
@@ -583,7 +987,7 @@ func TestUserPriceAlertService_CreateAlert_InvalidUserID(t *testing.T) {
 
 func TestUserPriceAlertService_DeleteAlert_InvalidUserID(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	svc := newTestAlertService(alertRepo, nil, nil, nil)
+	svc := newTestAlertService(alertRepo, nil, nil)
 	ctx := context.Background()
 
 	resp, err := svc.DeleteAlert(ctx, 1, 0)
@@ -595,7 +999,7 @@ func TestUserPriceAlertService_DeleteAlert_InvalidUserID(t *testing.T) {
 
 func TestUserPriceAlertService_UpdateAlert_InvalidUserID(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	svc := newTestAlertService(alertRepo, nil, nil, nil)
+	svc := newTestAlertService(alertRepo, nil, nil)
 	ctx := context.Background()
 
 	resp, err := svc.UpdateAlert(ctx, 1, 0, &v1.UpdateUserPriceAlertRequest{
