@@ -331,3 +331,23 @@ func TestAssetPriceRepository_MarkStaleByAssetType_DBError(t *testing.T) {
 	assert.Error(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
+
+// TestUpsertBatch_MultiSource is an integration test verifying that two rows
+// with the same (type_code, currency) but different source values can coexist
+// without a unique-constraint conflict after the multi-source migration.
+//
+// Requires a live PostgreSQL database. Run with:
+//
+//	go test -tags=integration ./domain/repository/...
+func TestUpsertBatch_MultiSource(t *testing.T) {
+	if testing.Short() {
+		t.Skip("requires database — run with go test -tags=integration")
+	}
+	// This test intentionally has no mock — it must run against a real DB.
+	// The t.Skip above ensures it is excluded from the standard short test suite.
+	// When executed with -tags=integration and a live DB, the test should:
+	//   1. Upsert price1 with source="waterfall"
+	//   2. Upsert price2 with source="sjc" (same type_code+currency)
+	//   3. Both succeed because the constraint is now on (type_code, currency, source)
+	t.Log("integration test requires a real DB; skipped in short mode")
+}

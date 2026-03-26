@@ -14,7 +14,7 @@
 
 | #   | Task Name                                     | Status      | Commit | Summary |
 | --- | --------------------------------------------- | ----------- | ------ | ------- |
-| 0   | Update C4 Architecture Diagrams               | pending     | —      | —       |
+| 0   | Update C4 Architecture Diagrams               | done        | da7139f | Added 4 client components + 4 external systems to C4 diagrams |
 | 1   | DB Schema Migration — Add source constraint   | pending     | —      | —       |
 | 2   | MarkStaleByAssetTypeAndSource                 | pending     | —      | —       |
 | 3   | Set source="waterfall" in existing methods    | pending     | —      | —       |
@@ -22,7 +22,7 @@
 | 5   | DOJI Client Package                           | pending     | —      | —       |
 | 6   | BTMC Direct Client Package                    | pending     | —      | —       |
 | 7   | PNJ Client Package                            | pending     | —      | —       |
-| 8   | Shared SanitizeTypeCode utility               | pending     | —      | —       |
+| 8   | Shared SanitizeTypeCode utility               | done        | ee7bbaf | SanitizeTypeCode(prefix,name) — diacritics, uppercase, alphanumeric enforcement, max 50 chars |
 | 9   | Integrate sources into AssetPriceService      | pending     | —      | —       |
 | 10  | Wire DI providers                             | pending     | —      | —       |
 | 11  | No-regression check                           | pending     | —      | —       |

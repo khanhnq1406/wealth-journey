@@ -1,6 +1,8 @@
 package models_test
 
 import (
+	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -145,5 +147,47 @@ func TestAssetPrice_SilverAssetType(t *testing.T) {
 	}
 	if ap.Sell != 960000000 {
 		t.Errorf("expected Sell=960000000, got %d", ap.Sell)
+	}
+}
+
+// TestAssetPrice_UniqueIndex_ContainsSource verifies that the GORM struct tags on
+// TypeCode, Currency, and Source all reference the same 3-column unique index
+// (idx_asset_price_type_code_currency_source). This is a compile-time/struct-tag
+// unit test that does NOT require a database.
+func TestAssetPrice_UniqueIndex_ContainsSource(t *testing.T) {
+	const wantIndex = "idx_asset_price_type_code_currency_source"
+
+	typ := reflect.TypeOf(models.AssetPrice{})
+	fieldsToCheck := []string{"TypeCode", "Currency", "Source"}
+
+	for _, fieldName := range fieldsToCheck {
+		field, ok := typ.FieldByName(fieldName)
+		if !ok {
+			t.Errorf("field %s not found in AssetPrice", fieldName)
+			continue
+		}
+		tag := field.Tag.Get("gorm")
+		if !strings.Contains(tag, wantIndex) {
+			t.Errorf("field %s gorm tag %q does not contain uniqueIndex name %q", fieldName, tag, wantIndex)
+		}
+	}
+}
+
+// TestAssetPrice_Source_NotNullDefault verifies that the Source field's GORM tag
+// contains "not null" and "default:'waterfall'" constraints.
+func TestAssetPrice_Source_NotNullDefault(t *testing.T) {
+	typ := reflect.TypeOf(models.AssetPrice{})
+	field, ok := typ.FieldByName("Source")
+	if !ok {
+		t.Fatal("Source field not found in AssetPrice")
+	}
+
+	tag := field.Tag.Get("gorm")
+
+	if !strings.Contains(tag, "not null") {
+		t.Errorf("Source gorm tag %q missing 'not null'", tag)
+	}
+	if !strings.Contains(tag, "default:'waterfall'") {
+		t.Errorf("Source gorm tag %q missing \"default:'waterfall'\"", tag)
 	}
 }

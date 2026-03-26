@@ -16,7 +16,7 @@ import (
 // serve cached prices without live API calls.
 type AssetPriceRepository interface {
 	// UpsertBatch inserts or updates a batch of asset prices using
-	// clause.OnConflict on (type_code, currency). No raw SQL is used.
+	// clause.OnConflict on (type_code, currency, source). No raw SQL is used.
 	UpsertBatch(ctx context.Context, prices []*models.AssetPrice) error
 
 	// ListByAssetType retrieves all non-deleted prices for the given asset type
@@ -48,7 +48,7 @@ func NewAssetPriceRepository(db *database.Database) AssetPriceRepository {
 	}
 }
 
-// UpsertBatch inserts or updates asset prices using ON CONFLICT (type_code, currency).
+// UpsertBatch inserts or updates asset prices using ON CONFLICT (type_code, currency, source).
 // Each row is processed individually so that partial failures can be diagnosed;
 // the loop is intentional and mirrors UpdatePrices in investment_repository_impl.go.
 func (r *assetPriceRepository) UpsertBatch(ctx context.Context, prices []*models.AssetPrice) error {
@@ -62,6 +62,7 @@ func (r *assetPriceRepository) UpsertBatch(ctx context.Context, prices []*models
 				Columns: []clause.Column{
 					{Name: "type_code"},
 					{Name: "currency"},
+					{Name: "source"},
 				},
 				DoUpdates: clause.AssignmentColumns([]string{
 					"name",
