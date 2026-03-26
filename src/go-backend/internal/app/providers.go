@@ -261,5 +261,10 @@ func ProvideScheduler(
 		backgroundJobs = append(backgroundJobs, scheduler.NewUserPriceAlertJob(services.UserPriceAlert))
 	}
 
+	// Price cache job — persists all prices to DB for fast handler reads
+	if services.AssetPrice != nil {
+		backgroundJobs = append(backgroundJobs, scheduler.NewPriceCacheJob(services.AssetPrice))
+	}
+
 	return scheduler.New(backgroundJobs...)
 }

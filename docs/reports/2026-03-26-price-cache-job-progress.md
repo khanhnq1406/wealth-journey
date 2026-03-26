@@ -8,7 +8,7 @@
 - **Started:** 2026-03-26T00:00:00Z
 - **Last updated:** 2026-03-26T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 4
+- **Current task:** 6
 
 ## Task Progress
 
@@ -17,9 +17,9 @@
 | 0   | Update C4 Architecture Diagrams                    | done       | ce7c4fc | Added AssetPriceRepository, AssetPriceService, PriceCacheJob to C4 diagram; updated handler dependencies |
 | 1   | AssetPrice GORM Model + Migration                  | done       | 5137e23 | AssetPrice model, migration command, Taskfile entry; 5 unit tests pass |
 | 2   | AssetPrice Repository                              | done       | 61b0fe7 | Interface + impl; 12 unit tests pass; wired into DI |
-| 3   | AssetPrice Service                                 | done       | TBD    | Interface + DTOs + impl; 9 unit tests; wired into NewServices |
-| 4   | PriceCacheJob Background Scheduler                 | pending    | —      | —       |
-| 5   | Add isStale to PriceItem Proto + Regenerate        | pending    | —      | —       |
+| 3   | AssetPrice Service                                 | done       | 783279c | Interface + DTOs + impl; 9 unit tests; wired into NewServices |
+| 4   | PriceCacheJob Background Scheduler                 | done       | TBD    | price_cache_job.go; 6 tests; registered in ProvideScheduler |
+| 5   | Add isStale to PriceItem Proto + Regenerate        | done       | TBD    | isStale field 10 in PriceItem; Go + TS regenerated |
 | 6   | Switch GetMarketPrices Handler to DB               | pending    | —      | —       |
 | 7   | Switch GetPublicMarketTypes Handler to DB          | pending    | —      | —       |
 | 8   | Frontend — Display -- for Zero/Stale Prices        | pending    | —      | —       |
