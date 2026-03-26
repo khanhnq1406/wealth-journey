@@ -230,9 +230,33 @@ There is **no deduplication bug.** All 11 TypeCodes in the gold response are uni
 
 ---
 
+---
+
+## Investigation Log (2026-03-26 — Post-Deployment #2)
+
+### `currency=OK(0 items)` — not a code bug
+
+**Observation:** Log shows `currency=OK(0 items)` — no error, but zero currency rows written to DB.
+
+**Root cause:** `OK(0 items)` means `FetchAllPrices` returned `nil` error AND an empty slice. The flow:
+1. vangsaigon currency endpoint fails (connectivity issue, same as gold at that time).
+2. Waterfall falls to `vangTodayCurrencyFetcher`, which calls `vangtoday.Client.FetchPrices`.
+3. The vangtoday client classifies response entries via exact-match against `knownCurrencyCodes` map (`USD`, `EUR`, `GBP` etc.).
+4. If vangtoday's API currently returns currency type codes in a different format (e.g. `USDFREE`, `USDVCB`) or has removed currency data from this endpoint, they do not match and `CurrencyPrices` returns empty.
+5. Empty slice → `UpsertBatch` with 0 rows → no DB writes → `OK(0 items)`.
+
+**Not a code bug.** The waterfall succeeded (no error from either source), but vangtoday returned no classifiable currency entries. The currency source needs a dedicated endpoint or a third fetcher (e.g. a free FX rate API) to be reliable when vangsaigon is down.
+
+**Workaround:** Currency rows from a prior successful fetch remain in the DB (they are only overwritten on success, never deleted on empty-fetch). If vangsaigon was healthy during a previous 15-minute window, DB still has recent currency data. The `isStale` flag is only set on explicit `MarkStaleByAssetType` which requires an error — a 0-item success does not mark anything stale.
+
+**Follow-up:** Track a future task to add a third currency source (e.g. a dedicated FX API or vangtoday's currency-specific endpoint) so the fallback chain is complete.
+
+---
+
 ## Fix History
 
 | Date | Fix | Severity | Files |
 |------|-----|----------|-------|
 | 2026-03-26 | `RefreshAllPrices` now runs gold/silver/currency fetches concurrently via `sync.WaitGroup`. Previously sequential — a 20s gold timeout would block silver and currency. Mock updated with `sync.Mutex`; order-dependent tests updated to assert by set membership. | Minor | `asset_price_service.go`, `asset_price_service_test.go` |
 | 2026-03-26 | Scheduler now runs each job immediately after its startup delay, before the first ticker fires. Previously the first run was `StartupDelay + Interval` after server start (10s + 15min = ~15min cold-start window). Now the DB is populated within seconds of startup. New test `TestScheduler_RunsJobImmediatelyAfterStartupDelay` added. | Minor | `internal/scheduler/scheduler.go`, `internal/scheduler/scheduler_test.go` |
+| 2026-03-26 | `refreshGold` now applies `aliasToCanonical` normalization and first-wins deduplication before upserting to DB. When vangsaigon fails and vangtoday is the fallback, TypeCodes were stored as raw uppercase alias codes (`VNGSJC`, `SJ9999`, `MIHONG_999`, `SJL1L10`) instead of canonical codes (`SJC`, `Vàng nhẫn SJC`, `Mihong_999`). This caused `filterGoldPrices` on the frontend to find zero matches (home dashboard gold table empty). New test `TestAssetPriceService_RefreshGold_NormalizesAliasCodes` added. | Minor | `asset_price_service.go`, `asset_price_service_test.go` |
