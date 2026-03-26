@@ -1020,77 +1020,127 @@ flowchart TD
 **Trigger:** Application startup — runs every 15 minutes (10-second startup delay)
 **Source:** `internal/scheduler/price_cache_job.go`, `domain/service/asset_price_service.go`, `domain/repository/asset_price_repository.go`
 
-Decouples market price HTTP handlers from live external APIs. The job fetches all gold, silver, and currency prices and persists them to the `asset_price` PostgreSQL table. Handlers then read from the DB exclusively, eliminating per-request external API calls.
+Decouples market price HTTP handlers from live external APIs. The job fetches gold (waterfall + 4 per-source direct), silver, and currency prices in **7 parallel goroutines** and persists them to the `asset_price` PostgreSQL table. Handlers then read from the DB exclusively, eliminating per-request external API calls.
 
 ```mermaid
 sequenceDiagram
     participant SCH as Scheduler
     participant PCJ as PriceCacheJob
     participant APS as AssetPriceService
-    participant GPS as GoldPriceService
+    participant GPS as GoldPriceService<br/>(waterfall)
     participant SPS as SilverPriceService
     participant CPS as CurrencyPriceService
+    participant SJC as pkg/sjc.Client
+    participant DOJ as pkg/doji.Client
+    participant BTC as pkg/btmcdirect.Client
+    participant PNJ as pkg/pnj.Client
     participant APR as AssetPriceRepository
     participant DB as PostgreSQL<br/>(asset_price table)
 
     SCH->>PCJ: Run(ctx) [every 15 min]
     PCJ->>APS: RefreshAllPrices(ctx)
+    Note over APS: Launches 7 goroutines into buffered channel<br/>WaitGroup closer goroutine drains when all done
 
-    par Gold fetch
+    par Waterfall gold fetch [source="waterfall"]
         APS->>GPS: FetchAllPrices(ctx)
         alt Fetch success
             GPS-->>APS: []*CachedGoldPrice (canonical TypeCodes)
-            Note over GPS: Alias normalization (e.g. VNGSJC→SJC)<br/>happens inside WaterfallGoldFetcher.FetchGoldPrices<br/>via gold.AliasToCanonical (pkg/gold/types.go)
-            Note over APS: Convert to []AssetPrice<br/>AssetType="gold", IsStale=false<br/>Deduplicate canonical codes (first-wins)
+            Note over GPS: Alias normalization (e.g. VNGSJC→SJC)<br/>via gold.AliasToCanonical (pkg/gold/types.go)
+            Note over APS: Convert to []AssetPrice<br/>AssetType="gold", Source="waterfall", IsStale=false
             APS->>APR: UpsertBatch(ctx, goldPrices)
-            APR->>DB: INSERT ... ON CONFLICT (type_code, currency) DO UPDATE
+            APR->>DB: INSERT ... ON CONFLICT (type_code, currency, source) DO UPDATE
         else Fetch failure
             GPS-->>APS: error
-            APS->>APR: MarkStaleByAssetType(ctx, "gold")
-            APR->>DB: UPDATE asset_price SET is_stale=true WHERE asset_type='gold'
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "gold", "waterfall")
+            APR->>DB: UPDATE asset_price SET is_stale=true<br/>WHERE asset_type='gold' AND source='waterfall'
         end
-    and Silver fetch
+    and SJC direct fetch [source="sjc"]
+        APS->>SJC: FetchGoldPrices(ctx)
+        alt Fetch success
+            SJC-->>APS: []*sjc.GoldPrice (TypeCode="SJC_*", Buy/Sell int64)
+            Note over APS: Convert to []AssetPrice<br/>Source="sjc", IsStale=false
+            APS->>APR: UpsertBatch(ctx, sjcPrices)
+        else Fetch failure / nil client
+            SJC-->>APS: error
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "gold", "sjc")
+        end
+    and DOJI direct fetch [source="doji"]
+        APS->>DOJ: FetchGoldPrices(ctx)
+        alt Fetch success
+            DOJ-->>APS: []*doji.GoldPrice (TypeCode="DOJI_*", ×1,000,000 applied)
+            Note over APS: Convert to []AssetPrice<br/>Source="doji", IsStale=false
+            APS->>APR: UpsertBatch(ctx, dojiPrices)
+        else Fetch failure / nil client
+            DOJ-->>APS: error
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "gold", "doji")
+        end
+    and BTMC direct fetch [source="btmc"]
+        APS->>BTC: FetchGoldPrices(ctx)
+        alt Fetch success
+            BTC-->>APS: []*btmcdirect.GoldPrice (TypeCode="BTMC_*", ×1,000 applied)
+            Note over APS: Convert to []AssetPrice<br/>Source="btmc", IsStale=false
+            APS->>APR: UpsertBatch(ctx, btmcPrices)
+        else Fetch failure / nil client
+            BTC-->>APS: error
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "gold", "btmc")
+        end
+    and PNJ direct fetch [source="pnj"]
+        APS->>PNJ: FetchGoldPrices(ctx)
+        alt Fetch success
+            PNJ-->>APS: []*pnj.GoldPrice (TypeCode="PNJ_*", ×1,000 applied, TPHCM region)
+            Note over APS: Convert to []AssetPrice<br/>Source="pnj", IsStale=false
+            APS->>APR: UpsertBatch(ctx, pnjPrices)
+        else Fetch failure / nil client
+            PNJ-->>APS: error
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "gold", "pnj")
+        end
+    and Silver fetch [source="waterfall"]
         APS->>SPS: FetchAllPrices(ctx)
         alt Fetch success
             SPS-->>APS: []*CachedSilverPrice
-            Note over APS: Convert to []AssetPrice<br/>AssetType="silver", IsStale=false
+            Note over APS: Convert to []AssetPrice<br/>AssetType="silver", Source="waterfall", IsStale=false
             APS->>APR: UpsertBatch(ctx, silverPrices)
         else Fetch failure
             SPS-->>APS: error
-            APS->>APR: MarkStaleByAssetType(ctx, "silver")
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "silver", "waterfall")
         end
-    and Currency fetch
+    and Currency fetch [source="waterfall"]
         APS->>CPS: FetchAllPrices(ctx)
         alt Fetch success
             CPS-->>APS: []*CachedCurrencyPrice
-            Note over APS: Convert to []AssetPrice<br/>AssetType="currency", IsStale=false
+            Note over APS: Convert to []AssetPrice<br/>AssetType="currency", Source="waterfall", IsStale=false
             APS->>APR: UpsertBatch(ctx, currencyPrices)
         else Fetch failure
             CPS-->>APS: error
-            APS->>APR: MarkStaleByAssetType(ctx, "currency")
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "currency", "waterfall")
         end
     end
 
-    APS-->>PCJ: nil (or error if all three failed)
+    Note over APS: Collect all 7 refreshResult values from channel<br/>failCount < 7 → nil; failCount == 7 → error "all price sources failed"
+    APS-->>PCJ: nil (or error if all 7 failed)
     PCJ-->>SCH: Log result
 ```
 
 ### Key Invariants
 
-- Gold, silver, and currency fetches are **independent** — one failure does not prevent others from succeeding
-- On fetch success: `UpsertBatch` uses `ON CONFLICT (type_code, currency) DO UPDATE` — idempotent
-- On fetch failure: `MarkStaleByAssetType` sets `is_stale=true` for all rows of that type — stale prices remain visible with `isStale: true` flag
+- All 7 fetches are **independent** — one failure does not prevent others from succeeding
+- On fetch success: `UpsertBatch` uses `ON CONFLICT (type_code, currency, source) DO UPDATE` — idempotent (3-column unique index)
+- On fetch failure: `MarkStaleByAssetTypeAndSource(ctx, assetType, source)` marks stale only for that source — other sources' rows for the same `asset_type` are unaffected
+- Nil client (e.g., no `BTMC_API_KEY`) → goroutine treats it as failure → marks stale for that source; the other 6 sources are unaffected
+- Error is returned only if **all 7** sources fail simultaneously
 - The job never crashes the scheduler — all errors are logged and returned without panicking
 - `PriceCacheJob` has a 10-second startup delay so the app is fully initialized before the first fetch
-- **Alias normalization boundary**: `WaterfallGoldFetcher.FetchGoldPrices` (and `FetchGoldPricesAllSources`) normalizes vang.today alias TypeCodes to canonical codes via `gold.AliasToCanonical` (`pkg/gold/types.go`) before returning. `AssetPriceService.refreshGold` receives only canonical codes and only deduplicates — it no longer performs alias mapping.
+- **Alias normalization boundary**: `WaterfallGoldFetcher.FetchGoldPrices` normalizes vang.today alias TypeCodes to canonical codes via `gold.AliasToCanonical` (`pkg/gold/types.go`) before returning. `AssetPriceService.refreshGold` receives only canonical codes and only deduplicates — it no longer performs alias mapping.
+- **TypeCode namespacing**: waterfall codes are canonical (e.g., `SJC`, `DOJI`); per-source direct codes carry a source prefix (e.g., `SJC_1L10L1KG`, `DOJI_NHANVANG`). No collision possible due to the 3-column unique index including `source`.
 
 ### Error Paths
 
 | Condition | Response | User Impact |
 |-----------|----------|-------------|
-| One source fails (e.g., gold API down) | `MarkStaleByAssetType("gold")` | Gold prices show `isStale: true`; frontend displays `"--"` |
-| All three sources fail | All types marked stale | All price items have `isStale: true` |
-| DB write fails | Error logged; job returns error | Next run retries; prices may be stale |
+| One per-source client fails (e.g., SJC API down) | `MarkStaleByAssetTypeAndSource("gold", "sjc")` | SJC-sourced gold prices show `isStale: true`; waterfall + other sources unaffected |
+| Waterfall gold fails | `MarkStaleByAssetTypeAndSource("gold", "waterfall")` | Waterfall gold prices stale; direct-source rows unaffected |
+| All 7 sources fail | `RefreshAllPrices` returns error | All price items have `isStale: true`; frontend displays `"--"` |
+| DB write fails for one source | Error logged; that source's prices may lag | Next run retries; other sources update normally |
 | DB empty (first run not yet complete) | Handlers return empty arrays or static fallback | `GetPublicMarketTypes` falls back to static registries |
 
 ### DB-Backed Consumers of AssetPriceService

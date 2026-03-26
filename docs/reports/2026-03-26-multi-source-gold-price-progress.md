@@ -6,9 +6,9 @@
 - **Plan file:** `docs/plans/2026-03-26-multi-source-gold-price-plan.md`
 - **Spec file:** `docs/specs/2026-03-26-multi-source-gold-price-spec.md`
 - **Started:** 2026-03-26T00:00:00Z
-- **Last updated:** 2026-03-26T14:00:00Z
+- **Last updated:** 2026-03-26T15:00:00Z
 - **Current state:** in_progress
-- **Current task:** 13 — Backend lint & build verification
+- **Current task:** 14 — Update runtime flow diagram
 
 ## Task Progress
 
@@ -27,7 +27,7 @@
 | 10  | Wire DI providers                             | done        | f2885e3 | Real sjc/doji/btmc/pnj clients wired in NewServices; nil placeholders replaced |
 | 11  | No-regression check                           | done        | f2885e3 | GetPriceByTypeCode exact-match verified; no collision with source-prefixed codes |
 | 12  | Log format (included in Task 9)               | skipped     | —      | Handled in Task 9 |
-| 13  | Backend lint & build verification             | pending     | —      | —       |
+| 13  | Backend lint & build verification             | done        | 4f13565 | 0 lint issues; all tests pass; removed 8 unused mock types from test file |
 | 14  | Update runtime flow diagram                   | pending     | —      | —       |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
