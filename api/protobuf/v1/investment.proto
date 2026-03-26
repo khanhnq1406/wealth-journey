@@ -826,3 +826,70 @@ message DeleteUserPriceAlertResponse {
   string message = 2 [json_name = "message"];
   string timestamp = 3 [json_name = "timestamp"];
 }
+
+// ── Gold Display Config Messages ──
+
+// GoldDisplayPrice represents a gold type with live price data for display
+// Public endpoint: no internal DB IDs exposed
+message GoldDisplayPrice {
+  string type_code = 1 [json_name = "typeCode"];
+  string display_name = 2 [json_name = "displayName"];
+  int64 buy = 3 [json_name = "buy"];
+  int64 sell = 4 [json_name = "sell"];
+  int64 change_buy = 5 [json_name = "changeBuy"];
+  int64 change_sell = 6 [json_name = "changeSell"];
+  string currency = 7 [json_name = "currency"];
+  int64 updated_at = 8 [json_name = "updatedAt"];
+  bool is_stale = 9 [json_name = "isStale"];
+  bool show_in_investment = 10 [json_name = "showInInvestment"];
+  int32 display_order = 11 [json_name = "displayOrder"];
+}
+
+message GetGoldDisplayPricesRequest {}
+
+message GetGoldDisplayPricesResponse {
+  repeated GoldDisplayPrice prices = 1 [json_name = "prices"];
+}
+
+// GoldDisplayConfig represents an admin-managed gold type display configuration entry
+message GoldDisplayConfig {
+  int32 id = 1 [json_name = "id"];
+  string type_code = 2 [json_name = "typeCode"];
+  string display_name = 3 [json_name = "displayName"];
+  int32 display_order = 4 [json_name = "displayOrder"];
+  bool enabled = 5 [json_name = "enabled"];
+  bool show_in_investment = 6 [json_name = "showInInvestment"];
+}
+
+message ListGoldDisplayConfigRequest {}
+
+message ListGoldDisplayConfigResponse {
+  repeated GoldDisplayConfig configs = 1 [json_name = "configs"];
+}
+
+message CreateGoldDisplayConfigRequest {
+  string type_code = 1 [json_name = "typeCode"];
+  string display_name = 2 [json_name = "displayName"];
+  int32 display_order = 3 [json_name = "displayOrder"];
+  bool enabled = 4 [json_name = "enabled"];
+  bool show_in_investment = 5 [json_name = "showInInvestment"];
+}
+
+message CreateGoldDisplayConfigResponse {
+  GoldDisplayConfig config = 1 [json_name = "config"];
+}
+
+message UpdateGoldDisplayConfigRequest {
+  string display_name = 1 [json_name = "displayName"];
+  int32 display_order = 2 [json_name = "displayOrder"];
+  bool enabled = 3 [json_name = "enabled"];
+  bool show_in_investment = 4 [json_name = "showInInvestment"];
+}
+
+message UpdateGoldDisplayConfigResponse {
+  GoldDisplayConfig config = 1 [json_name = "config"];
+}
+
+message DeleteGoldDisplayConfigResponse {
+  bool success = 1 [json_name = "success"];
+}
