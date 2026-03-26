@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"sync"
 	"testing"
 	"time"
 
@@ -14,6 +15,7 @@ import (
 // ---------------------------------------------------------------------------
 
 type mockAssetPriceRepo struct {
+	mu                sync.Mutex
 	upsertedBatches   [][]*models.AssetPrice
 	staledTypes       []string
 	listAllResult     []*models.AssetPrice
@@ -25,6 +27,8 @@ type mockAssetPriceRepo struct {
 }
 
 func (m *mockAssetPriceRepo) UpsertBatch(_ context.Context, prices []*models.AssetPrice) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	if m.upsertErr != nil {
 		return m.upsertErr
 	}
@@ -33,6 +37,8 @@ func (m *mockAssetPriceRepo) UpsertBatch(_ context.Context, prices []*models.Ass
 }
 
 func (m *mockAssetPriceRepo) MarkStaleByAssetType(_ context.Context, assetType string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	if m.markStaleErr != nil {
 		return m.markStaleErr
 	}
@@ -184,15 +190,20 @@ func TestAssetPriceService_RefreshAllPrices_AllSucceed(t *testing.T) {
 		t.Fatalf("expected 3 upsert batches, got %d", len(repo.upsertedBatches))
 	}
 
-	// Counts must match input sizes.
-	if len(repo.upsertedBatches[0]) != 3 {
-		t.Errorf("gold batch: expected 3 items, got %d", len(repo.upsertedBatches[0]))
+	// Counts must match input sizes — batches arrive in non-deterministic order,
+	// so collect sizes into a set and compare.
+	batchSizes := make(map[int]int)
+	for _, batch := range repo.upsertedBatches {
+		batchSizes[len(batch)]++
 	}
-	if len(repo.upsertedBatches[1]) != 2 {
-		t.Errorf("silver batch: expected 2 items, got %d", len(repo.upsertedBatches[1]))
+	if batchSizes[3] != 1 {
+		t.Errorf("gold batch: expected exactly 1 batch with 3 items; sizes=%v", batchSizes)
 	}
-	if len(repo.upsertedBatches[2]) != 4 {
-		t.Errorf("currency batch: expected 4 items, got %d", len(repo.upsertedBatches[2]))
+	if batchSizes[2] != 1 {
+		t.Errorf("silver batch: expected exactly 1 batch with 2 items; sizes=%v", batchSizes)
+	}
+	if batchSizes[4] != 1 {
+		t.Errorf("currency batch: expected exactly 1 batch with 4 items; sizes=%v", batchSizes)
 	}
 
 	// No types should have been marked stale.
@@ -288,13 +299,16 @@ func TestAssetPriceService_RefreshAllPrices_AssetTypeFields(t *testing.T) {
 		t.Fatalf("expected 3 batches")
 	}
 
-	// Batch order: gold, silver, currency (sequential calls in refreshGold/refreshSilver/refreshCurrency).
-	assetTypes := []string{"gold", "silver", "currency"}
-	for i, expectedType := range assetTypes {
-		for _, item := range repo.upsertedBatches[i] {
-			if item.AssetType != expectedType {
-				t.Errorf("batch %d: expected AssetType %q, got %q", i, expectedType, item.AssetType)
-			}
+	// Collect all items across batches — order is non-deterministic with concurrent refresh.
+	seenTypes := make(map[string]int)
+	for _, batch := range repo.upsertedBatches {
+		for _, item := range batch {
+			seenTypes[item.AssetType]++
+		}
+	}
+	for _, expectedType := range []string{"gold", "silver", "currency"} {
+		if seenTypes[expectedType] != 1 {
+			t.Errorf("expected exactly 1 item with AssetType %q, got %d; seenTypes=%v", expectedType, seenTypes[expectedType], seenTypes)
 		}
 	}
 }

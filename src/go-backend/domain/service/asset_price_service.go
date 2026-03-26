@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	"wealthjourney/domain/models"
@@ -54,14 +55,29 @@ func (s *assetPriceService) RefreshAllPrices(ctx context.Context) error {
 	now := time.Now()
 
 	type result struct {
-		label string
 		count int
 		err   error
 	}
 
-	goldResult := s.refreshGold(ctx, now)
-	silverResult := s.refreshSilver(ctx, now)
-	currencyResult := s.refreshCurrency(ctx, now)
+	var (
+		goldResult, silverResult, currencyResult result
+		wg                                       sync.WaitGroup
+	)
+
+	wg.Add(3)
+	go func() {
+		defer wg.Done()
+		goldResult = s.refreshGold(ctx, now)
+	}()
+	go func() {
+		defer wg.Done()
+		silverResult = s.refreshSilver(ctx, now)
+	}()
+	go func() {
+		defer wg.Done()
+		currencyResult = s.refreshCurrency(ctx, now)
+	}()
+	wg.Wait()
 
 	// Build log summary.
 	goldStr := formatRefreshResult(goldResult.count, goldResult.err)
