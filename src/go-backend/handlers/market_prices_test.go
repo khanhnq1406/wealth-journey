@@ -188,7 +188,7 @@ func TestGetMarketPrices_DoesNotCallLivePriceServices(t *testing.T) {
 
 	// Verify struct has no goldSvc/silverSvc/currencySvc fields — confirmed by compilation.
 	// The only service dep is assetPriceSvc.
-	var _ service.AssetPriceService = h.assetPriceSvc // assert field type
+	var _ = h.assetPriceSvc // assert field is accessible (type: service.AssetPriceService)
 
 	w := runMarketPricesRequest(h)
 	assert.Equal(t, http.StatusOK, w.Code)

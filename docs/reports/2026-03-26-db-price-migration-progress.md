@@ -19,7 +19,7 @@
 | 2   | Migrate PriceAlertService to DB cache            | done       | db9bf87 | Replaced goldPriceSvc/silverPriceSvc with assetPriceSvc; stale rows skipped; 13 tests pass |
 | 3   | Migrate UserPriceAlertService to DB cache        | done       | 24be16c | Replaced gold/silver deps with assetPriceSvc; fetchCurrentPrice+fetchPricesForAlerts updated; 29 tests pass |
 | 4   | Migrate WatchlistService to DB cache + add tests | done       | aced770 | Replaced 3 goroutines with single GetAllPrices call; created watchlist_service_test.go (6 tests) |
-| 5   | Build + test verification                        | pending    | —       | — |
+| 5   | Build + test verification                        | done       | —       | go build + go test -short + golangci-lint all pass |
 | 6   | Update flow diagrams                             | pending    | —       | — |
 | 7   | Update report                                    | pending    | —       | — |
 

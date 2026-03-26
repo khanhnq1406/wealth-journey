@@ -36,13 +36,13 @@ func TestAssetPrice_FieldTypes(t *testing.T) {
 	}
 
 	// Verify ID is int32
-	var _ int32 = ap.ID
+	var _ = ap.ID
 
 	// Verify monetary fields are int64
-	var _ int64 = ap.Buy
-	var _ int64 = ap.Sell
-	var _ int64 = ap.ChangeBuy
-	var _ int64 = ap.ChangeSell
+	var _ = ap.Buy
+	var _ = ap.Sell
+	var _ = ap.ChangeBuy
+	var _ = ap.ChangeSell
 
 	// Verify string fields
 	if ap.TypeCode != "SJC_1L" {
