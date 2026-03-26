@@ -255,7 +255,9 @@ func TestFetchGoldPrices_InvalidJSON(t *testing.T) {
 	}
 }
 
-// TestFetchGoldPrices_EmptyRegions verifies that a response with no regions returns an error.
+// TestFetchGoldPrices_EmptyRegions verifies that a response with no regions returns
+// an empty slice (not an error). PNJ may legitimately return no regions during off-hours
+// or maintenance windows — returning empty is more resilient than failing the source.
 func TestFetchGoldPrices_EmptyRegions(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -265,9 +267,32 @@ func TestFetchGoldPrices_EmptyRegions(t *testing.T) {
 	defer srv.Close()
 
 	c := newTestClient(srv.URL)
-	_, err := c.FetchGoldPrices(context.Background())
-	if err == nil {
-		t.Fatal("expected non-nil error for empty regions, got nil")
+	prices, err := c.FetchGoldPrices(context.Background())
+	if err != nil {
+		t.Fatalf("expected nil error for empty regions, got: %v", err)
+	}
+	if len(prices) != 0 {
+		t.Errorf("expected empty slice for empty regions, got %d items", len(prices))
+	}
+}
+
+// TestFetchGoldPrices_NullRegions verifies that a response with null regions field
+// returns an empty slice (not an error).
+func TestFetchGoldPrices_NullRegions(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`{}`))
+	}))
+	defer srv.Close()
+
+	c := newTestClient(srv.URL)
+	prices, err := c.FetchGoldPrices(context.Background())
+	if err != nil {
+		t.Fatalf("expected nil error for null regions, got: %v", err)
+	}
+	if len(prices) != 0 {
+		t.Errorf("expected empty slice for null regions, got %d items", len(prices))
 	}
 }
 

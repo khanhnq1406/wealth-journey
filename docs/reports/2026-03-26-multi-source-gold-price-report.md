@@ -92,3 +92,46 @@ All clients use `SanitizeTypeCode(prefix, rawName)` from `pkg/gold` — strips d
 - `docs/architecture/c4-container.md` — 4 new client components + 4 external gold systems
 - `docs/architecture/c4-component-backend.md` — matching component updates
 - `docs/architecture/flow-cross-cutting.md` — Section 13 updated for 7-source parallel diagram
+
+## Fix History
+
+| Date       | Fix                                                                 | Severity | Action |
+| ---------- | ------------------------------------------------------------------- | -------- | ------ |
+| 2026-03-26 | DB schema mismatch: `migrate-multi-source` not applied to local DB — run `task backend:migrate-multi-source` | Minor | Runbook — no code change needed |
+| 2026-03-26 | PNJ: `no regions in response` — empty regions treated as error instead of "no data" | Minor | `pkg/pnj/client.go`: return `[]*GoldPrice{}, nil` when no region; `pkg/pnj/client_test.go`: updated `TestFetchGoldPrices_EmptyRegions` + added `TestFetchGoldPrices_NullRegions` |
+| 2026-03-26 | SJC: `context deadline exceeded` — 5s timeout too short for sjc.com.vn response latency | Minor | `pkg/sjc/client.go`: increase `requestTimeout` 5s → 15s; update `NewClient` doc comment |
+
+### Fix Details: PNJ — `no regions in response`
+
+**Symptom:** `gold_pnj=FAIL(pnj: no regions in response)` in price cache job log.
+
+**Root cause:** The PNJ API at `edge-cf-api.pnj.io` returned an HTTP 200 response with an empty `regions` array (or omitted the field entirely). The original code treated `selectRegion() == nil` as a hard error. This is too strict — PNJ legitimately returns no regions during off-hours or maintenance windows.
+
+**Fix:** `pkg/pnj/client.go` — when `selectRegion()` returns nil, return `[]*GoldPrice{}, nil` instead of `fmt.Errorf("pnj: no regions in response")`. The asset price service already handles empty slices by calling `MarkStaleByAssetTypeAndSource` and returning `err: fmt.Errorf("pnj: no valid prices")`, so stale behavior is preserved. The log now shows `gold_pnj=FAIL(pnj: no valid prices)` in this case.
+
+**Tests:** `TestFetchGoldPrices_EmptyRegions` updated (was asserting error, now asserts empty slice + nil error); `TestFetchGoldPrices_NullRegions` added.
+
+---
+
+### Fix Details: SJC — `context deadline exceeded`
+
+**Symptom:** `gold_sjc=FAIL(sjc: fetch: Get "https://sjc.com.vn/GoldPrice/Services/PriceService.ashx?LocationId=2&method=AllBranch": context deadline exceeded (Client.Timeout exceeded while awaiting headers))`.
+
+**Root cause:** The SJC client had a 5-second `requestTimeout`. The `sjc.com.vn` endpoint is slow to respond and frequently exceeds 5 seconds before returning headers, causing every request to fail.
+
+**Fix:** `pkg/sjc/client.go` — increase `requestTimeout` constant from `5 * time.Second` to `15 * time.Second`. The caller's context still provides an upper bound; the client timeout is now a harder cap at 15s. Also updated the stale `NewClient()` doc comment from "5-second" to "15-second".
+
+---
+
+### Fix Details: SQLSTATE 42P10 — ON CONFLICT constraint mismatch
+
+**Symptom:** `ERROR: there is no unique or exclusion constraint matching the ON CONFLICT specification (SQLSTATE 42P10)` — all gold/silver/waterfall upserts fail, all asset prices marked stale.
+
+**Root cause:** The `migrate-asset-prices` migration was run against the DB, creating the table with the old 2-column unique index `(type_code, currency)`. The multi-source feature changed the unique key to 3 columns `(type_code, currency, source)` and wrote `cmd/migrate-multi-source/main.go` to perform the transition. However, `task backend:migrate-multi-source` was never executed on this database instance. The upsert code does `ON CONFLICT ("type_code", "currency", "source")` which requires the 3-column constraint to exist — PostgreSQL rejects the statement with 42P10 when it doesn't.
+
+**Fix:** Run `task backend:migrate-multi-source`. The migration:
+1. Backfills `source='waterfall'` for any rows with NULL/empty source
+2. Drops old `idx_asset_price_type_code_currency` (2-column) index
+3. Calls `AutoMigrate(&models.AssetPrice{})` to create the new `idx_asset_price_type_code_currency_source` (3-column) constraint
+
+No code changes were required — the migration was already written; it just needed to be run.

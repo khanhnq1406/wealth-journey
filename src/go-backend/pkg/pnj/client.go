@@ -85,7 +85,10 @@ func (c *Client) FetchGoldPrices(ctx context.Context) ([]*GoldPrice, error) {
 
 	region := selectRegion(apiResp.Regions)
 	if region == nil {
-		return nil, fmt.Errorf("pnj: no regions in response")
+		// PNJ may return an empty regions array during off-hours or maintenance windows.
+		// Treat as "no data available" — return empty slice so the caller can mark stale
+		// rather than surfacing a hard error.
+		return []*GoldPrice{}, nil
 	}
 
 	var results []*GoldPrice

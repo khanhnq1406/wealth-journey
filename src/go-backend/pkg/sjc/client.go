@@ -14,7 +14,11 @@ import (
 const (
 	defaultURL     = "https://sjc.com.vn/GoldPrice/Services/PriceService.ashx"
 	maxBodySize    = 1 << 20 // 1 MB
-	requestTimeout = 5 * time.Second
+	// requestTimeout is set to 15 seconds to accommodate the slow response times
+	// observed on sjc.com.vn (the 5 s default triggered context deadline exceeded
+	// in production). The caller also passes a context with its own deadline;
+	// this acts as a hard upper bound.
+	requestTimeout = 15 * time.Second
 )
 
 // Client fetches gold prices from the SJC official JSON API.
@@ -23,7 +27,7 @@ type Client struct {
 	url        string
 }
 
-// NewClient returns a new SJC Client with a 5-second timeout.
+// NewClient returns a new SJC Client with a 15-second timeout.
 func NewClient() *Client {
 	return &Client{
 		httpClient: &http.Client{Timeout: requestTimeout},
