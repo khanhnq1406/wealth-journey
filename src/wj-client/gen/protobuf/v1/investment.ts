@@ -713,6 +713,8 @@ export interface PriceItem {
   name: string;
   /** True if price was admin-overridden */
   isOverridden: boolean;
+  /** True when price fetch failed */
+  isStale: boolean;
 }
 
 /** GetMarketPricesRequest for fetching all gold and silver prices */
@@ -3807,6 +3809,7 @@ function createBasePriceItem(): PriceItem {
     updatedAt: 0,
     name: "",
     isOverridden: false,
+    isStale: false,
   };
 }
 
@@ -3838,6 +3841,9 @@ export const PriceItem: MessageFns<PriceItem> = {
     }
     if (message.isOverridden !== false) {
       writer.uint32(72).bool(message.isOverridden);
+    }
+    if (message.isStale !== false) {
+      writer.uint32(80).bool(message.isStale);
     }
     return writer;
   },
@@ -3921,6 +3927,14 @@ export const PriceItem: MessageFns<PriceItem> = {
           message.isOverridden = reader.bool();
           continue;
         }
+        case 10: {
+          if (tag !== 80) {
+            break;
+          }
+
+          message.isStale = reader.bool();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3941,6 +3955,7 @@ export const PriceItem: MessageFns<PriceItem> = {
       updatedAt: isSet(object.updatedAt) ? globalThis.Number(object.updatedAt) : 0,
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       isOverridden: isSet(object.isOverridden) ? globalThis.Boolean(object.isOverridden) : false,
+      isStale: isSet(object.isStale) ? globalThis.Boolean(object.isStale) : false,
     };
   },
 
@@ -3973,6 +3988,9 @@ export const PriceItem: MessageFns<PriceItem> = {
     if (message.isOverridden !== false) {
       obj.isOverridden = message.isOverridden;
     }
+    if (message.isStale !== false) {
+      obj.isStale = message.isStale;
+    }
     return obj;
   },
 
@@ -3990,6 +4008,7 @@ export const PriceItem: MessageFns<PriceItem> = {
     message.updatedAt = object.updatedAt ?? 0;
     message.name = object.name ?? "";
     message.isOverridden = object.isOverridden ?? false;
+    message.isStale = object.isStale ?? false;
     return message;
   },
 };

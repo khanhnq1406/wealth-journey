@@ -238,6 +238,7 @@ message PriceItem {
   int64 updatedAt = 7 [json_name = "updatedAt"];
   string name = 8 [json_name = "name"];
   bool isOverridden = 9 [json_name = "isOverridden"];  // True if price was admin-overridden
+  bool isStale = 10 [json_name = "isStale"];  // True when price fetch failed
 }
 
 // GetMarketPricesRequest for fetching all gold and silver prices
