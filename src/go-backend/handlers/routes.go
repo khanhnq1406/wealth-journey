@@ -27,6 +27,9 @@ func RegisterRoutes(
 		if h.SiteSettings != nil {
 			publicGroup.GET("/site-settings", h.SiteSettings.GetSiteSettings)
 		}
+		if h.GoldDisplayConfig != nil {
+			publicGroup.GET("/gold-display-prices", h.GoldDisplayConfig.GetDisplayPrices)
+		}
 	}
 
 	// Gold Sentiment — Public routes (no auth, optional auth for user_vote)
@@ -91,6 +94,13 @@ func RegisterRoutes(
 		// Price alert manual trigger
 		if h.PriceAlertTrigger != nil {
 			admin.POST("/price-alert-trigger", h.PriceAlertTrigger.TriggerCheck)
+		}
+		// Gold display config management
+		if h.GoldDisplayConfig != nil {
+			admin.GET("/gold-display-config", h.GoldDisplayConfig.ListAll)
+			admin.POST("/gold-display-config", h.GoldDisplayConfig.Create)
+			admin.PUT("/gold-display-config/:id", h.GoldDisplayConfig.Update)
+			admin.DELETE("/gold-display-config/:id", h.GoldDisplayConfig.Delete)
 		}
 	}
 

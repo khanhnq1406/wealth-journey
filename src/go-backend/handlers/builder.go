@@ -39,6 +39,7 @@ type AllHandlers struct {
 	Push               *PushHandler
 	Watchlist          *WatchlistHandler
 	UserPriceAlert     *UserPriceAlertHandlers
+	GoldDisplayConfig  *GoldDisplayConfigHandler
 }
 
 // HandlerDeps holds the infrastructure dependencies needed by NewHandlers.
@@ -159,6 +160,16 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 		UserPriceAlert: func() *UserPriceAlertHandlers {
 			if services.UserPriceAlert != nil {
 				return NewUserPriceAlertHandlers(services.UserPriceAlert)
+			}
+			return nil
+		}(),
+		GoldDisplayConfig: func() *GoldDisplayConfigHandler {
+			if services.GoldDisplayConfig != nil {
+				var overrideCache *cache.PriceOverrideCache
+				if deps.RDB != nil {
+					overrideCache = cache.NewPriceOverrideCache(deps.RDB.GetClient())
+				}
+				return NewGoldDisplayConfigHandler(services.GoldDisplayConfig, overrideCache)
 			}
 			return nil
 		}(),
