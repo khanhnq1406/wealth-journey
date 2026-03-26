@@ -186,6 +186,50 @@ The type was `value: number` but the runtime guard handled `null | undefined`. U
 
 ---
 
+## Investigation Log (2026-03-26 — Post-Deployment Observations)
+
+### 2026-03-26 — `currency: []` empty and gold table appearing empty in frontend
+
+**Observation:**
+1. `GET /api/v1/investments/market-prices` returns `"currency": []` (empty array).
+2. Gold items appear in the API response with valid data, but the prices page showed an empty gold table in the UI.
+
+---
+
+#### Issue 1: `currency: []`
+
+**Root cause: External API connectivity failure for both currency fetchers.**
+
+The scheduler log line `currency=FAIL(error: ...)` confirms the currency fetch is failing. The flow:
+
+1. `PriceCacheJob` → `AssetPriceService.RefreshAllPrices()` → `refreshCurrency()`
+2. `currencyPriceService.FetchAllPrices()` → checks Redis aggregate cache → miss
+3. Waterfall: vangsaigon currency endpoint (5s timeout) → **fails** (same connectivity issue as gold)
+4. Fallback: vangtoday `FetchPrices()` → currency items classified via `knownCurrencyCodes` map → either vangtoday doesn't serve currency or also fails
+5. Emergency Redis cache → empty (no prior successful fetch)
+6. Returns `nil, err` → `MarkStaleByAssetType("currency")` called → no DB rows exist to mark → DB remains empty
+7. `GetAllPrices()` returns `Currency: []*AssetPriceDTO{}` → handler returns `"currency": []`
+
+**Resolution:** Not a code bug. To verify, check Railway logs for:
+```
+[assetPriceService] Price cache job completed: gold=OK(11 items), silver=OK(12 items), currency=FAIL(error: ...)
+```
+If the vangtoday API does not include currency prices in its response, a third currency source (e.g., a dedicated FX API) would be needed. If it's a transient network failure, the next 15-minute job run will populate the currency rows.
+
+---
+
+#### Issue 2: Gold items in API but frontend showing empty table
+
+**Root cause: React Query stale cache serving an old empty response.**
+
+`useQueryGetMarketPrices` has `staleTime: 5 * 60 * 1000` (5 minutes). If the prices page was loaded in the first ~10 seconds after deployment (before `PriceCacheJob`'s startup delay populated the DB), React Query cached an empty `gold: []` response. That cache entry is served as fresh for 5 minutes.
+
+There is **no deduplication bug.** All 11 TypeCodes in the gold response are unique map keys from vangtoday's `Prices` map. The DB composite unique index `(type_code, currency)` handles any vangsaigon/vangtoday overlap correctly via `UpsertBatch`'s `clause.OnConflict`.
+
+**Resolution:** Hard-refresh the page (Cmd+Shift+R / Ctrl+Shift+F5) to clear React Query's cache and refetch from the API. The gold table renders from `data?.gold ?? []` — once the cache is cleared it will show all 11 items correctly.
+
+---
+
 ## Fix History
 
 | Date | Fix | Severity | Files |
