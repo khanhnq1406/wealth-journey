@@ -1,6 +1,10 @@
 package gold
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestGetGoldTypeByCode_NewTypes(t *testing.T) {
 	tests := []struct {
@@ -46,6 +50,46 @@ func TestGetGoldTypeByCode_RemovedTypes(t *testing.T) {
 			if gt != nil {
 				t.Errorf("Expected nil for removed type %s, got %+v", code, gt)
 			}
+		})
+	}
+}
+
+// TestAliasToCanonical_AllTargetsExistInGoldTypes verifies that every canonical
+// code referenced by AliasToCanonical is present in the GoldTypes registry.
+// This prevents phantom aliases that point to non-existent codes.
+func TestAliasToCanonical_AllTargetsExistInGoldTypes(t *testing.T) {
+	canonicalCodes := make(map[string]struct{}, len(GoldTypes))
+	for _, gt := range GoldTypes {
+		canonicalCodes[gt.Code] = struct{}{}
+	}
+	for alias, canonical := range AliasToCanonical {
+		_, exists := canonicalCodes[canonical]
+		assert.True(t, exists,
+			"AliasToCanonical[%q] = %q but %q is not in GoldTypes", alias, canonical, canonical)
+	}
+}
+
+// TestAliasToCanonical_KnownMappings verifies specific known mappings.
+func TestAliasToCanonical_KnownMappings(t *testing.T) {
+	cases := []struct {
+		alias     string
+		canonical string
+	}{
+		{"VNGSJC", "SJC"},
+		{"MIHONG_999", "Mihong_999"},
+		{"SJ9999", "Vàng nhẫn SJC"},
+		{"SJL1L10", "SJC"},
+		{"DOHN", "Doji"},
+		{"DOHCM", "Doji"},
+		{"BTSJC", "BTMC"},
+		{"BT9999", "BTMC_24K"},
+		{"VIETTINM", "VietinGold"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.alias, func(t *testing.T) {
+			got, ok := AliasToCanonical[tc.alias]
+			assert.True(t, ok, "missing alias %q", tc.alias)
+			assert.Equal(t, tc.canonical, got)
 		})
 	}
 }

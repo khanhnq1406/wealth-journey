@@ -204,6 +204,39 @@ var GoldTypes = []GoldType{
 	},
 }
 
+// AliasToCanonical maps external API alias TypeCodes to their canonical Code
+// as defined in GoldTypes above.
+//
+// Maintenance: when a price source introduces a new TypeCode for an existing
+// gold product, add the mapping here. The canonical code is what callers
+// (portfolio valuation, price alerts, filterGoldPrices on the frontend) use.
+//
+// Current sources:
+//   - vangsaigon.vn: uses canonical codes directly (entry.Name matches GoldTypes.Code)
+//   - vang.today:    returns uppercase API keys that differ from canonical codes
+var AliasToCanonical = map[string]string{
+	// vang.today SJC aliases
+	"VNGSJC":  "SJC",   // vang.today's main SJC bar code
+	"SJL1L10": "SJC",   // vang.today SJC 1L/10L bar variant
+
+	// vang.today SJC ring
+	"SJ9999": "Vàng nhẫn SJC", // vang.today SJC ring 9999
+
+	// vang.today Mihong
+	"MIHONG_999": "Mihong_999", // vang.today uppercases the underscore variant
+
+	// vang.today DOJI — HN and HCM branches both map to canonical "Doji"
+	"DOHN":  "Doji",
+	"DOHCM": "Doji",
+
+	// vang.today Bảo Tín Minh Châu
+	"BTSJC":  "BTMC",     // Bảo Tín SJC bar
+	"BT9999": "BTMC_24K", // Bảo Tín 24K bar
+
+	// vang.today VietinBank gold
+	"VIETTINM": "VietinGold",
+}
+
 // GetGoldTypeByCode returns the gold type definition for a given code
 func GetGoldTypeByCode(code string) *GoldType {
 	for _, gt := range GoldTypes {
