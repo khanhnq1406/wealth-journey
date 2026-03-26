@@ -131,6 +131,7 @@ func (s *assetPriceService) refreshGold(ctx context.Context, now time.Time) stru
 			ChangeBuy:  p.ChangeBuy,
 			ChangeSell: p.ChangeSell,
 			Currency:   p.Currency,
+			Source:     "waterfall",
 			IsStale:    false,
 			FetchedAt:  now,
 		})
@@ -181,6 +182,7 @@ func (s *assetPriceService) refreshSilver(ctx context.Context, now time.Time) st
 			ChangeBuy:  p.ChangeBuy,
 			ChangeSell: p.ChangeSell,
 			Currency:   p.Currency,
+			Source:     "waterfall",
 			IsStale:    false,
 			FetchedAt:  now,
 		})
@@ -231,6 +233,7 @@ func (s *assetPriceService) refreshCurrency(ctx context.Context, now time.Time) 
 			ChangeBuy:  p.ChangeBuy,
 			ChangeSell: p.ChangeSell,
 			Currency:   p.Currency,
+			Source:     "waterfall",
 			IsStale:    false,
 			FetchedAt:  now,
 		})

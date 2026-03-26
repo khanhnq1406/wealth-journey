@@ -46,6 +46,16 @@ func (m *mockAssetPriceRepo) MarkStaleByAssetType(_ context.Context, assetType s
 	return nil
 }
 
+func (m *mockAssetPriceRepo) MarkStaleByAssetTypeAndSource(_ context.Context, assetType string, _ string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.markStaleErr != nil {
+		return m.markStaleErr
+	}
+	m.staledTypes = append(m.staledTypes, assetType)
+	return nil
+}
+
 func (m *mockAssetPriceRepo) ListAll(_ context.Context) ([]*models.AssetPrice, error) {
 	return m.listAllResult, m.listAllErr
 }
@@ -615,6 +625,115 @@ func keys(m map[string]*models.AssetPrice) []string {
 		result = append(result, k)
 	}
 	return result
+}
+
+// ---------------------------------------------------------------------------
+// Tests: Source="waterfall" field set in all refresh methods
+// ---------------------------------------------------------------------------
+
+func TestRefreshGold_SetsSourceWaterfall(t *testing.T) {
+	goldPrices := makeGoldPrices(3)
+
+	repo := &mockAssetPriceRepo{}
+	svc := NewAssetPriceService(repo,
+		&mockGoldPriceSvc{prices: goldPrices},
+		&mockSilverPriceSvc{},
+		&mockCurrencyPriceSvc{},
+	)
+
+	err := svc.RefreshAllPrices(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Find the gold batch.
+	var goldBatch []*models.AssetPrice
+	for _, batch := range repo.upsertedBatches {
+		if len(batch) > 0 && batch[0].AssetType == "gold" {
+			goldBatch = batch
+			break
+		}
+	}
+	if goldBatch == nil {
+		t.Fatal("no gold batch was upserted")
+	}
+
+	// Every item in the gold batch must have Source="waterfall".
+	for _, item := range goldBatch {
+		if item.Source != "waterfall" {
+			t.Errorf("gold item TypeCode=%q: expected Source=%q, got %q", item.TypeCode, "waterfall", item.Source)
+		}
+	}
+}
+
+func TestRefreshSilver_SetsSourceWaterfall(t *testing.T) {
+	silverPrices := makeSilverPrices(2)
+
+	repo := &mockAssetPriceRepo{}
+	svc := NewAssetPriceService(repo,
+		&mockGoldPriceSvc{},
+		&mockSilverPriceSvc{prices: silverPrices},
+		&mockCurrencyPriceSvc{},
+	)
+
+	err := svc.RefreshAllPrices(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Find the silver batch.
+	var silverBatch []*models.AssetPrice
+	for _, batch := range repo.upsertedBatches {
+		if len(batch) > 0 && batch[0].AssetType == "silver" {
+			silverBatch = batch
+			break
+		}
+	}
+	if silverBatch == nil {
+		t.Fatal("no silver batch was upserted")
+	}
+
+	// Every item in the silver batch must have Source="waterfall".
+	for _, item := range silverBatch {
+		if item.Source != "waterfall" {
+			t.Errorf("silver item TypeCode=%q: expected Source=%q, got %q", item.TypeCode, "waterfall", item.Source)
+		}
+	}
+}
+
+func TestRefreshCurrency_SetsSourceWaterfall(t *testing.T) {
+	currencyPrices := makeCurrencyPrices(4)
+
+	repo := &mockAssetPriceRepo{}
+	svc := NewAssetPriceService(repo,
+		&mockGoldPriceSvc{},
+		&mockSilverPriceSvc{},
+		&mockCurrencyPriceSvc{prices: currencyPrices},
+	)
+
+	err := svc.RefreshAllPrices(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Find the currency batch.
+	var currencyBatch []*models.AssetPrice
+	for _, batch := range repo.upsertedBatches {
+		if len(batch) > 0 && batch[0].AssetType == "currency" {
+			currencyBatch = batch
+			break
+		}
+	}
+	if currencyBatch == nil {
+		t.Fatal("no currency batch was upserted")
+	}
+
+	// Every item in the currency batch must have Source="waterfall".
+	for _, item := range currencyBatch {
+		if item.Source != "waterfall" {
+			t.Errorf("currency item TypeCode=%q: expected Source=%q, got %q", item.TypeCode, "waterfall", item.Source)
+		}
+	}
 }
 
 // ---------------------------------------------------------------------------
