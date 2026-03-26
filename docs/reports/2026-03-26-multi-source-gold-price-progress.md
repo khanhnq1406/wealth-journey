@@ -6,22 +6,22 @@
 - **Plan file:** `docs/plans/2026-03-26-multi-source-gold-price-plan.md`
 - **Spec file:** `docs/specs/2026-03-26-multi-source-gold-price-spec.md`
 - **Started:** 2026-03-26T00:00:00Z
-- **Last updated:** 2026-03-26T00:00:00Z
+- **Last updated:** 2026-03-26T12:00:00Z
 - **Current state:** in_progress
-- **Current task:** 0 (C4 diagrams) + 8 (shared sanitizer) — parallel first batch
+- **Current task:** 9 — Integrate sources into AssetPriceService
 
 ## Task Progress
 
 | #   | Task Name                                     | Status      | Commit | Summary |
 | --- | --------------------------------------------- | ----------- | ------ | ------- |
 | 0   | Update C4 Architecture Diagrams               | done        | da7139f | Added 4 client components + 4 external systems to C4 diagrams |
-| 1   | DB Schema Migration — Add source constraint   | pending     | —      | —       |
-| 2   | MarkStaleByAssetTypeAndSource                 | pending     | —      | —       |
-| 3   | Set source="waterfall" in existing methods    | pending     | —      | —       |
-| 4   | SJC Client Package                            | pending     | —      | —       |
-| 5   | DOJI Client Package                           | pending     | —      | —       |
-| 6   | BTMC Direct Client Package                    | pending     | —      | —       |
-| 7   | PNJ Client Package                            | pending     | —      | —       |
+| 1   | DB Schema Migration — Add source constraint   | done        | eff5a89 | 3-column unique index + migration command + UpsertBatch updated |
+| 2   | MarkStaleByAssetTypeAndSource                 | done        | 100c89a | Source-granular stale marking in repository |
+| 3   | Set source="waterfall" in existing methods    | done        | dd26f58 | Source field set in refreshGold/Silver/Currency |
+| 4   | SJC Client Package                            | done        | pending commit | JSON API client; float64→int64; 5s timeout; 1MB limit; SanitizeTypeCode("SJC") |
+| 5   | DOJI Client Package                           | done        | pending commit | HTML scraper; ×1,000,000 multiplier; regex row/cell extraction; SanitizeTypeCode("DOJI") |
+| 6   | BTMC Direct Client Package                    | done        | pending commit | HTML scraper; ×1000 multiplier; "Liên hệ"→sell=0; SanitizeTypeCode("BTMC") |
+| 7   | PNJ Client Package                            | done        | pending commit | JSON API; TPHCM region preference; ×1000 multiplier; SanitizeTypeCode("PNJ") |
 | 8   | Shared SanitizeTypeCode utility               | done        | ee7bbaf | SanitizeTypeCode(prefix,name) — diacritics, uppercase, alphanumeric enforcement, max 50 chars |
 | 9   | Integrate sources into AssetPriceService      | pending     | —      | —       |
 | 10  | Wire DI providers                             | pending     | —      | —       |
