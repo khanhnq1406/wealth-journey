@@ -157,7 +157,7 @@ The type was `value: number` but the runtime guard handled `null | undefined`. U
 
 1. **No test for override application path in MarketPricesHandler tests** — `newTestMarketPricesHandler` always passes `nil` for `overrideCache`. The `applyOverrides` function is a pure function testable independently, but there is no end-to-end test with a real or mock `PriceOverrideCache`. Flagged as minor by reviewer; does not affect correctness.
 
-2. **cold-start authenticated endpoint** — After a server restart and before the first `PriceCacheJob` run (10-second startup delay), `GetMarketPrices` returns empty arrays for all three categories. The frontend already handles empty arrays gracefully (renders empty state). The public endpoint has static fallback so it is unaffected.
+2. ~~**cold-start authenticated endpoint**~~ — **Fixed (2026-03-26).** The scheduler now runs each job immediately after its startup delay. `PriceCacheJob` (10s startup delay) populates the DB within ~10s of server start instead of ~15min. The frontend empty-state fallback remains in place as a safety net for the brief 10-second window.
 
 3. **Per-row UpsertBatch performance** — For the current volume (≤50 rows per type), per-row upserts are fast. If the number of tracked symbols grows significantly, a true batch upsert should be re-evaluated.
 
@@ -191,3 +191,4 @@ The type was `value: number` but the runtime guard handled `null | undefined`. U
 | Date | Fix | Severity | Files |
 |------|-----|----------|-------|
 | 2026-03-26 | `RefreshAllPrices` now runs gold/silver/currency fetches concurrently via `sync.WaitGroup`. Previously sequential — a 20s gold timeout would block silver and currency. Mock updated with `sync.Mutex`; order-dependent tests updated to assert by set membership. | Minor | `asset_price_service.go`, `asset_price_service_test.go` |
+| 2026-03-26 | Scheduler now runs each job immediately after its startup delay, before the first ticker fires. Previously the first run was `StartupDelay + Interval` after server start (10s + 15min = ~15min cold-start window). Now the DB is populated within seconds of startup. New test `TestScheduler_RunsJobImmediatelyAfterStartupDelay` added. | Minor | `internal/scheduler/scheduler.go`, `internal/scheduler/scheduler_test.go` |
