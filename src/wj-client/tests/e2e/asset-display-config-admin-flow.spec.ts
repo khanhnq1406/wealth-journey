@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 /**
- * E2E Test: Gold Display Config Admin Management
+ * E2E Test: Asset Display Config Admin Management
  *
  * Tests admin gold-config tab navigation and CRUD rendering:
  * - Navigate to Gold Config tab
@@ -36,7 +36,7 @@ const MOCK_SETTINGS_RESPONSE = {
   },
 };
 
-const MOCK_GOLD_DISPLAY_CONFIGS = {
+const MOCK_ASSET_DISPLAY_CONFIGS = {
   configs: [
     {
       id: 1,
@@ -77,16 +77,16 @@ async function waitForAdminPage(page: import("@playwright/test").Page) {
 }
 
 /**
- * Helper: wait for Gold Config tab content to appear.
+ * Helper: wait for Asset Display Config tab content to appear.
  */
-async function waitForGoldConfigContent(page: import("@playwright/test").Page) {
+async function waitForAssetConfigContent(page: import("@playwright/test").Page) {
   await waitForAdminPage(page);
   await page.waitForFunction(
     () => {
       const body = document.body.innerText;
       return (
-        body.includes("Gold Display Configs") ||
-        body.includes("No gold display configs found") ||
+        body.includes("Asset Display Configs") ||
+        body.includes("No asset display configs found") ||
         body.includes("SJC") ||
         body.includes("DOJI")
       );
@@ -95,7 +95,7 @@ async function waitForGoldConfigContent(page: import("@playwright/test").Page) {
   );
 }
 
-test.describe("Admin Gold Display Config Tab", () => {
+test.describe("Admin Asset Display Config Tab", () => {
   test.beforeEach(async ({ page }) => {
     // Mock auth verify
     await page.route("**/api/v1/auth/verify**", (route) => {
@@ -124,13 +124,13 @@ test.describe("Admin Gold Display Config Tab", () => {
       });
     });
 
-    // Mock gold display config list
-    await page.route("**/api/v1/admin/gold-display-config**", (route) => {
+    // Mock asset display config list
+    await page.route("**/api/v1/admin/asset-display-config**", (route) => {
       if (route.request().method() === "GET") {
         route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify(MOCK_GOLD_DISPLAY_CONFIGS),
+          body: JSON.stringify(MOCK_ASSET_DISPLAY_CONFIGS),
         });
       } else {
         route.continue();
@@ -170,7 +170,7 @@ test.describe("Admin Gold Display Config Tab", () => {
     page,
   }) => {
     await page.goto("/dashboard/admin?tab=gold-config");
-    await waitForGoldConfigContent(page);
+    await waitForAssetConfigContent(page);
 
     // Config display names should be visible
     await expect(page.getByText("SJC 1 Lượng")).toBeVisible({
@@ -183,27 +183,27 @@ test.describe("Admin Gold Display Config Tab", () => {
 
   test("should show type codes in config list", async ({ page }) => {
     await page.goto("/dashboard/admin?tab=gold-config");
-    await waitForGoldConfigContent(page);
+    await waitForAssetConfigContent(page);
 
     await expect(page.getByText("SJC_1L")).toBeVisible({ timeout: 10000 });
     await expect(page.getByText("DOJI_1L")).toBeVisible({ timeout: 10000 });
   });
 
-  test("should show Add Gold Type button", async ({ page }) => {
+  test("should show Add Asset Type button", async ({ page }) => {
     await page.goto("/dashboard/admin?tab=gold-config");
-    await waitForGoldConfigContent(page);
+    await waitForAssetConfigContent(page);
 
-    const addButton = page.locator("button").filter({ hasText: /Add Gold Type/i });
+    const addButton = page.locator("button").filter({ hasText: /Add Asset Type/i });
     await expect(addButton).toBeVisible({ timeout: 10000 });
   });
 
-  test("should open create modal when Add Gold Type is clicked", async ({
+  test("should open create modal when Add Asset Type is clicked", async ({
     page,
   }) => {
     await page.goto("/dashboard/admin?tab=gold-config");
-    await waitForGoldConfigContent(page);
+    await waitForAssetConfigContent(page);
 
-    const addButton = page.locator("button").filter({ hasText: /\+ Add Gold Type/i });
+    const addButton = page.locator("button").filter({ hasText: /\+ Add Asset Type/i });
     await addButton.click();
 
     // Modal should appear with create title
@@ -217,7 +217,7 @@ test.describe("Admin Gold Display Config Tab", () => {
 
   test("should show Edit buttons for each config", async ({ page }) => {
     await page.goto("/dashboard/admin?tab=gold-config");
-    await waitForGoldConfigContent(page);
+    await waitForAssetConfigContent(page);
 
     const editButtons = page.locator("button").filter({ hasText: /^Edit$/ });
     // There should be at least one Edit button (one per config in expanded view)
@@ -229,20 +229,20 @@ test.describe("Admin Gold Display Config Tab", () => {
     page,
   }) => {
     await page.goto("/dashboard/admin?tab=gold-config");
-    await waitForGoldConfigContent(page);
+    await waitForAssetConfigContent(page);
 
     // Click the first Delete button visible
     const deleteButton = page.locator("button").filter({ hasText: /^Delete$/ }).first();
     await deleteButton.click();
 
     // Confirmation dialog should appear
-    const dialog = page.locator("[data-testid='confirmation-dialog'], [role='dialog']").filter({ hasText: /Delete Gold Type/ });
+    const dialog = page.locator("[data-testid='confirmation-dialog'], [role='dialog']").filter({ hasText: /Delete Asset Type/ });
     await expect(dialog).toBeVisible({ timeout: 5000 });
   });
 
   test("should show empty state when no configs", async ({ page }) => {
     // Override the mock to return empty configs
-    await page.route("**/api/v1/admin/gold-display-config**", (route) => {
+    await page.route("**/api/v1/admin/asset-display-config**", (route) => {
       if (route.request().method() === "GET") {
         route.fulfill({
           status: 200,
@@ -255,15 +255,15 @@ test.describe("Admin Gold Display Config Tab", () => {
     });
 
     await page.goto("/dashboard/admin?tab=gold-config");
-    await waitForGoldConfigContent(page);
+    await waitForAssetConfigContent(page);
 
     await expect(
-      page.getByText(/no gold display configs found/i)
+      page.getByText(/no asset display configs found/i)
     ).toBeVisible({ timeout: 10000 });
   });
 });
 
-test.describe("Admin Gold Config Tab — Mobile (375px)", () => {
+test.describe("Admin Asset Config Tab — Mobile (375px)", () => {
   test.use({ viewport: { width: 375, height: 667 } });
 
   test.beforeEach(async ({ page }) => {
@@ -291,12 +291,12 @@ test.describe("Admin Gold Config Tab — Mobile (375px)", () => {
       });
     });
 
-    await page.route("**/api/v1/admin/gold-display-config**", (route) => {
+    await page.route("**/api/v1/admin/asset-display-config**", (route) => {
       if (route.request().method() === "GET") {
         route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify(MOCK_GOLD_DISPLAY_CONFIGS),
+          body: JSON.stringify(MOCK_ASSET_DISPLAY_CONFIGS),
         });
       } else {
         route.continue();
@@ -321,11 +321,11 @@ test.describe("Admin Gold Config Tab — Mobile (375px)", () => {
     });
   });
 
-  test("should render gold config tab on mobile without horizontal scroll", async ({
+  test("should render asset config tab on mobile without horizontal scroll", async ({
     page,
   }) => {
     await page.goto("/dashboard/admin?tab=gold-config");
-    await waitForGoldConfigContent(page);
+    await waitForAssetConfigContent(page);
 
     await expect(page.getByText("SJC 1 Lượng")).toBeVisible({
       timeout: 10000,
@@ -338,11 +338,11 @@ test.describe("Admin Gold Config Tab — Mobile (375px)", () => {
     expect(hasHorizontalScroll).toBe(false);
   });
 
-  test("should show Add Gold Type button on mobile", async ({ page }) => {
+  test("should show Add Asset Type button on mobile", async ({ page }) => {
     await page.goto("/dashboard/admin?tab=gold-config");
-    await waitForGoldConfigContent(page);
+    await waitForAssetConfigContent(page);
 
-    const addButton = page.locator("button").filter({ hasText: /Add Gold Type/i });
+    const addButton = page.locator("button").filter({ hasText: /Add Asset Type/i });
     await expect(addButton).toBeVisible({ timeout: 10000 });
 
     // Verify minimum touch target height

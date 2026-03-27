@@ -4,7 +4,7 @@ import { test, expect } from "@playwright/test";
  * E2E Test: Home Page GoldPriceTable
  *
  * Verifies that the GoldPriceTable on the home dashboard:
- * - Calls the public /api/v1/public/gold-display-prices endpoint
+ * - Calls the public /api/v1/public/asset-display-prices endpoint
  * - Renders gold type display names from the API response
  * - Shows "--" for stale prices
  * - Shows the "Gold Prices Today" heading
@@ -13,7 +13,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Home Page — GoldPriceTable", () => {
   test.beforeEach(async ({ page }) => {
     // Mock the public gold display prices endpoint
-    await page.route("**/api/v1/public/gold-display-prices", async (route) => {
+    await page.route("**/api/v1/public/asset-display-prices", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -66,10 +66,10 @@ test.describe("Home Page — GoldPriceTable", () => {
     });
   });
 
-  test("fetches from /api/v1/public/gold-display-prices", async ({ page }) => {
+  test("fetches from /api/v1/public/asset-display-prices", async ({ page }) => {
     let goldDisplayPricesCalled = false;
 
-    await page.route("**/api/v1/public/gold-display-prices", async (route) => {
+    await page.route("**/api/v1/public/asset-display-prices", async (route) => {
       goldDisplayPricesCalled = true;
       await route.fulfill({
         status: 200,
@@ -90,7 +90,7 @@ test.describe("Home Page — GoldPriceTable", () => {
     expect(goldDisplayPricesCalled).toBe(true);
   });
 
-  test("renders displayName values from gold-display-prices response", async ({
+  test("renders displayName values from asset-display-prices response", async ({
     page,
   }) => {
     await page.goto("/dashboard/home");
