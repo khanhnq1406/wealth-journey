@@ -7,8 +7,8 @@
 - **Spec file:** docs/specs/2026-03-27-multi-source-currency-price-spec.md
 - **Started:** 2026-03-27T00:00:00Z
 - **Last updated:** 2026-03-27T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 3
+- **Current state:** done
+- **Current task:** —
 
 ## Task Progress
 
@@ -17,12 +17,12 @@
 | 0   | Update C4 Architecture Diagrams                        | done       | 948fde8c | Added VietcombankClient to c4-component-backend.md + Rels |
 | 1   | Create Vietcombank API Client (pkg/vietcombank/)       | done       | 948fde8c | types.go + client.go + client_test.go, 9 tests pass |
 | 2   | Create Vietcombank Currency Fetcher Adapter            | done       | 5dd2a7f2 | currency_fetcher_vietcombank.go + test, SourceVietcombank const, 7 tests pass |
-| 3   | Replace Currency Waterfall with 3 Parallel Refresh     | pending    | —      | —       |
-| 4   | Wire Vietcombank Client + Currency Fetchers in DI      | pending    | —      | —       |
-| 5   | Seed Vietcombank Currency Display Config + Fetch Codes | pending    | —      | —       |
-| 6   | Update Flow Diagram (Background Scheduler)             | pending    | —      | —       |
-| 7   | Full Backend Verification (Lint + Test + Build)        | pending    | —      | —       |
-| 8   | Update CLAUDE.md Documentation                         | pending    | —      | —       |
+| 3   | Replace Currency Waterfall with 3 Parallel Refresh     | done       | 5a851321 | 3 refreshCurrencyXxx methods, 10 goroutines, 9 tests pass |
+| 4   | Wire Vietcombank Client + Currency Fetchers in DI      | done       | 5a851321 | services.go: VIETCOMBANK_FX_ENABLED feature flag |
+| 5   | Seed Vietcombank Currency Display Config + Fetch Codes | done       | 5a851321 | migrate-vietcombank-currency cmd, 13 _VCB seed entries |
+| 6   | Update Flow Diagram (Background Scheduler)             | done       | 5a851321 | flow-cross-cutting.md section 13: 10-goroutine diagram |
+| 7   | Full Backend Verification (Lint + Test + Build)        | done       | 5a851321 | 0 lint issues, all tests pass, build clean |
+| 8   | Update CLAUDE.md Documentation                         | done       | 5a851321 | Currency sources, VIETCOMBANK_FX_ENABLED, new migration |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
