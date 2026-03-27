@@ -176,6 +176,58 @@
         "silver_usd": "Bạc thế giới (USD)"
       }
     },
+    "goldDisplayConfig": {
+      "title": "Cấu hình hiển thị vàng",
+      "addButton": "+ Thêm loại vàng",
+      "emptyMessage": "Chưa có cấu hình hiển thị vàng",
+      "emptyDescription": "Thêm loại vàng đầu tiên bằng nút bên trên",
+      "columns": {
+        "order": "Thứ tự",
+        "typeCode": "Mã loại",
+        "displayName": "Tên hiển thị",
+        "enabled": "Kích hoạt",
+        "inInvestment": "Trong đầu tư"
+      },
+      "actions": {
+        "edit": "Sửa",
+        "delete": "Xóa",
+        "more": "Thêm",
+        "less": "Thu gọn"
+      },
+      "modal": {
+        "addTitle": "Thêm loại vàng",
+        "editTitle": "Sửa loại vàng"
+      },
+      "form": {
+        "typeCode": "Mã loại",
+        "typeCodePlaceholder": "VD: SJC_1L",
+        "typeCodeRequired": "Mã loại là bắt buộc",
+        "displayName": "Tên hiển thị",
+        "displayNamePlaceholder": "VD: SJC 1 Lượng",
+        "displayNameRequired": "Tên hiển thị là bắt buộc",
+        "displayOrder": "Thứ tự hiển thị",
+        "enabled": "Kích hoạt",
+        "showInInvestment": "Hiển thị trong đầu tư",
+        "existingCodesLabel": "Mã hiện có trong cơ sở dữ liệu — nhấn để sao chép:",
+        "submitCreate": "Thêm loại vàng",
+        "submitEdit": "Lưu thay đổi",
+        "createError": "Không thể tạo cấu hình",
+        "updateError": "Không thể cập nhật cấu hình"
+      },
+      "delete": {
+        "title": "Xóa loại vàng",
+        "message": "Bạn có chắc chắn muốn xóa {name} ({code})?",
+        "confirm": "Xóa"
+      },
+      "toast": {
+        "created": "Đã tạo cấu hình",
+        "updated": "Đã cập nhật cấu hình",
+        "deleted": "Đã xóa cấu hình",
+        "loadFailed": "Không thể tải cấu hình hiển thị vàng",
+        "updateFailed": "Không thể cập nhật cấu hình",
+        "deleteFailed": "Không thể xóa cấu hình"
+      }
+    },
     "pagination": {
       "prev": "Trước",
       "next": "Sau"

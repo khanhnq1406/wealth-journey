@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { FormInput } from "@/components/forms/FormInput";
 import { FormNumberInput } from "@/components/forms/FormNumberInput";
 import { Button } from "@/components/Button";
@@ -30,6 +31,8 @@ export interface GoldDisplayConfigFormProps {
     enabled: boolean;
     showInInvestment: boolean;
   };
+  /** Existing type codes from the database — shown as reference chips in create mode */
+  existingCodes?: string[];
   onSuccess?: () => void;
 }
 
@@ -51,10 +54,12 @@ interface UpdateConfigRequest {
 export function GoldDisplayConfigForm({
   mode,
   initialValues,
+  existingCodes,
   onSuccess,
 }: GoldDisplayConfigFormProps) {
   const queryClient = useQueryClient();
   const [errorMessage, setErrorMessage] = useState<string>();
+  const t = useTranslations("admin.goldDisplayConfig");
 
   const { register, handleSubmit, control, reset, setValue } =
     useForm<GoldDisplayConfigFormValues>({
@@ -92,7 +97,7 @@ export function GoldDisplayConfigForm({
       onSuccess?.();
     },
     onError: (error: any) => {
-      setErrorMessage(error.message || "Failed to create config");
+      setErrorMessage(error.message || t("form.createError"));
     },
   });
 
@@ -109,7 +114,7 @@ export function GoldDisplayConfigForm({
       onSuccess?.();
     },
     onError: (error: any) => {
-      setErrorMessage(error.message || "Failed to update config");
+      setErrorMessage(error.message || t("form.updateError"));
     },
   });
 
@@ -139,28 +144,49 @@ export function GoldDisplayConfigForm({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* typeCode — only shown on create */}
       {mode === "create" && (
-        <FormInput
-          label="Type Code"
-          placeholder="e.g. SJC_1L"
-          required
-          error={undefined}
-          {...register("typeCode", { required: "Type code is required" })}
-        />
+        <div className="space-y-2">
+          <FormInput
+            label={t("form.typeCode")}
+            placeholder={t("form.typeCodePlaceholder")}
+            required
+            error={undefined}
+            {...register("typeCode", { required: t("form.typeCodeRequired") })}
+          />
+          {existingCodes && existingCodes.length > 0 && (
+            <div className="rounded-md border border-v2-border-light bg-v2-bg-dark p-3 space-y-2">
+              <p className="text-xs font-medium text-v2-text-tertiary">
+                {t("form.existingCodesLabel")}
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {existingCodes.map((code) => (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() => setValue("typeCode", code)}
+                    className="px-2 py-0.5 text-xs font-mono rounded border border-v2-border-light text-v2-gold-accent bg-v2-bg-surface hover:bg-v2-maroon-600 hover:border-v2-border transition-colors cursor-pointer focus-visible:ring-1 focus-visible:ring-v2-gold-primary"
+                  >
+                    {code}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
       {/* displayName */}
       <FormInput
-        label="Display Name"
-        placeholder="e.g. SJC 1 Lượng"
+        label={t("form.displayName")}
+        placeholder={t("form.displayNamePlaceholder")}
         required
-        {...register("displayName", { required: "Display name is required" })}
+        {...register("displayName", { required: t("form.displayNameRequired") })}
       />
 
       {/* displayOrder */}
       <FormNumberInput
         name="displayOrder"
         control={control}
-        label="Display Order"
+        label={t("form.displayOrder")}
         placeholder="0"
         required
         useThousandSeparator={false}
@@ -170,7 +196,7 @@ export function GoldDisplayConfigForm({
 
       {/* enabled toggle */}
       <div className="flex items-center justify-between py-2 border-b border-v2-border-light">
-        <span className="text-sm font-medium text-v2-gold-accent">Enabled</span>
+        <span className="text-sm font-medium text-v2-gold-accent">{t("form.enabled")}</span>
         <button
           type="button"
           role="switch"
@@ -191,7 +217,7 @@ export function GoldDisplayConfigForm({
       {/* showInInvestment toggle */}
       <div className="flex items-center justify-between py-2 border-b border-v2-border-light">
         <span className="text-sm font-medium text-v2-gold-accent">
-          Show in Investment
+          {t("form.showInInvestment")}
         </span>
         <button
           type="button"
@@ -223,7 +249,7 @@ export function GoldDisplayConfigForm({
         fullWidth={false}
         className="w-full mt-2"
       >
-        {mode === "create" ? "Add Gold Type" : "Save Changes"}
+        {mode === "create" ? t("form.submitCreate") : t("form.submitEdit")}
       </Button>
     </form>
   );

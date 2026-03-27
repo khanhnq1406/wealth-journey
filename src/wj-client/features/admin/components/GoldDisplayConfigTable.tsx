@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { MobileTable } from "@/components/table/MobileTable";
 import type { MobileColumnDef } from "@/components/table/MobileTable";
 import { BaseModal } from "@/components/modals/BaseModal";
@@ -38,6 +39,7 @@ interface UpdateConfigRequest {
 export function GoldDisplayConfigTable() {
   const { toast } = useNotification();
   const queryClient = useQueryClient();
+  const t = useTranslations("admin.goldDisplayConfig");
 
   // Modal state: null = closed, "create" = create modal, number = edit modal for that id
   const [modalState, setModalState] = useState<null | "create" | number>(null);
@@ -58,9 +60,9 @@ export function GoldDisplayConfigTable() {
 
   useEffect(() => {
     if (error) {
-      toast.error("Failed to load gold display configs");
+      toast.error(t("toast.loadFailed"));
     }
-  }, [error, toast]);
+  }, [error, toast, t]);
 
   const configs = data?.configs ?? [];
 
@@ -78,7 +80,7 @@ export function GoldDisplayConfigTable() {
       });
     },
     onError: (err: any) => {
-      toast.error(err.message || "Failed to update config");
+      toast.error(err.message || t("toast.updateFailed"));
     },
   });
 
@@ -89,11 +91,11 @@ export function GoldDisplayConfigTable() {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEY_GOLD_DISPLAY_CONFIG],
       });
-      toast.success("Config deleted");
+      toast.success(t("toast.deleted"));
       setDeleteTarget(null);
     },
     onError: (err: any) => {
-      toast.error(err.message || "Failed to delete config");
+      toast.error(err.message || t("toast.deleteFailed"));
       setDeleteTarget(null);
     },
   });
@@ -158,10 +160,10 @@ export function GoldDisplayConfigTable() {
     setModalState(null);
     toast.success(
       typeof modalState === "number"
-        ? "Config updated"
-        : "Config created"
+        ? t("toast.updated")
+        : t("toast.created")
     );
-  }, [modalState, toast]);
+  }, [modalState, toast, t]);
 
   const editTarget =
     typeof modalState === "number"
@@ -171,25 +173,25 @@ export function GoldDisplayConfigTable() {
   const columns: MobileColumnDef<GoldDisplayConfigItem>[] = [
     {
       id: "displayOrder",
-      header: "Order",
+      header: t("columns.order"),
       accessorKey: "displayOrder",
       showInCollapsed: true,
     },
     {
       id: "typeCode",
-      header: "Type Code",
+      header: t("columns.typeCode"),
       accessorKey: "typeCode",
       showInCollapsed: true,
     },
     {
       id: "displayName",
-      header: "Display Name",
+      header: t("columns.displayName"),
       accessorKey: "displayName",
       showInCollapsed: true,
     },
     {
       id: "enabled",
-      header: "Enabled",
+      header: t("columns.enabled"),
       showInCollapsed: true,
       cell: ({ row }) => {
         const key = `enabled-${row.id}`;
@@ -204,24 +206,28 @@ export function GoldDisplayConfigTable() {
               e.stopPropagation();
               handleToggleEnabled(row);
             }}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-v2-gold-primary min-h-[44px] min-w-[44px] justify-center ${
-              isInFlight
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            } ${row.enabled ? "bg-v2-green-positive/60" : "bg-v2-bg-dark"}`}
+            className={`inline-flex items-center justify-center min-h-[44px] min-w-[44px] cursor-pointer focus-visible:ring-2 focus-visible:ring-v2-gold-primary rounded-md ${
+              isInFlight ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                row.enabled ? "translate-x-2" : "-translate-x-2"
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                row.enabled ? "bg-v2-green-positive/60" : "bg-v2-bg-dark"
               }`}
-            />
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  row.enabled ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </span>
           </button>
         );
       },
     },
     {
       id: "showInInvestment",
-      header: "In Investment",
+      header: t("columns.inInvestment"),
       showInCollapsed: false,
       cell: ({ row }) => {
         const key = `showInInvestment-${row.id}`;
@@ -236,17 +242,21 @@ export function GoldDisplayConfigTable() {
               e.stopPropagation();
               handleToggleShowInInvestment(row);
             }}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-v2-gold-primary min-h-[44px] min-w-[44px] justify-center ${
-              isInFlight
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            } ${row.showInInvestment ? "bg-v2-green-positive/60" : "bg-v2-bg-dark"}`}
+            className={`inline-flex items-center justify-center min-h-[44px] min-w-[44px] cursor-pointer focus-visible:ring-2 focus-visible:ring-v2-gold-primary rounded-md ${
+              isInFlight ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                row.showInInvestment ? "translate-x-2" : "-translate-x-2"
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                row.showInInvestment ? "bg-v2-green-positive/60" : "bg-v2-bg-dark"
               }`}
-            />
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  row.showInInvestment ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </span>
           </button>
         );
       },
@@ -258,7 +268,7 @@ export function GoldDisplayConfigTable() {
       {/* Header with Add button */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-v2-gold-accent">
-          Gold Display Configs
+          {t("title")}
         </h2>
         <Button
           type={ButtonType.PRIMARY}
@@ -267,7 +277,7 @@ export function GoldDisplayConfigTable() {
           size="sm"
           className="min-h-[44px]"
         >
-          + Add Gold Type
+          {t("addButton")}
         </Button>
       </div>
 
@@ -277,28 +287,28 @@ export function GoldDisplayConfigTable() {
         columns={columns}
         getKey={(item) => item.id}
         isLoading={isLoading}
-        emptyMessage="No gold display configs found"
-        emptyDescription="Add your first gold type config using the button above"
+        emptyMessage={t("emptyMessage")}
+        emptyDescription={t("emptyDescription")}
         expandable
-        expandButtonLabel="More"
-        collapseButtonLabel="Less"
+        expandButtonLabel={t("actions.more")}
+        collapseButtonLabel={t("actions.less")}
         renderActions={(row) => (
           <div className="flex gap-2">
             <button
               type="button"
               onClick={() => setModalState(row.id)}
               className="min-h-[44px] px-3 py-1 text-sm font-medium text-v2-gold-accent border border-v2-border rounded-md hover:bg-v2-maroon-600 cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-v2-gold-primary"
-              aria-label={`Edit ${row.displayName}`}
+              aria-label={`${t("actions.edit")} ${row.displayName}`}
             >
-              Edit
+              {t("actions.edit")}
             </button>
             <button
               type="button"
               onClick={() => setDeleteTarget(row)}
               className="min-h-[44px] px-3 py-1 text-sm font-medium text-v2-red-negative border border-v2-red-negative/40 rounded-md hover:bg-v2-red-negative/10 cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-v2-red-negative"
-              aria-label={`Delete ${row.displayName}`}
+              aria-label={`${t("actions.delete")} ${row.displayName}`}
             >
-              Delete
+              {t("actions.delete")}
             </button>
           </div>
         )}
@@ -309,13 +319,14 @@ export function GoldDisplayConfigTable() {
         isOpen={modalState !== null}
         onClose={() => setModalState(null)}
         title={
-          modalState === "create" ? "Add Gold Type" : "Edit Gold Type"
+          modalState === "create" ? t("modal.addTitle") : t("modal.editTitle")
         }
         maxWidth="max-w-md"
       >
         {modalState === "create" && (
           <GoldDisplayConfigForm
             mode="create"
+            existingCodes={configs.map((c) => c.typeCode)}
             onSuccess={handleModalSuccess}
           />
         )}
@@ -331,17 +342,16 @@ export function GoldDisplayConfigTable() {
       {/* Delete Confirmation */}
       {deleteTarget && (
         <ConfirmationDialog
-          title="Delete Gold Type"
+          title={t("delete.title")}
           message={
             <span className="text-v2-text-secondary">
-              Are you sure you want to delete{" "}
-              <strong className="text-v2-gold-accent">
-                {deleteTarget.displayName}
-              </strong>{" "}
-              ({deleteTarget.typeCode})?
+              {t("delete.message", {
+                name: deleteTarget.displayName,
+                code: deleteTarget.typeCode,
+              })}
             </span>
           }
-          confirmText="Delete"
+          confirmText={t("delete.confirm")}
           onConfirm={() => deleteMutation.mutate(deleteTarget.id)}
           onCancel={() => setDeleteTarget(null)}
           isLoading={deleteMutation.isPending}

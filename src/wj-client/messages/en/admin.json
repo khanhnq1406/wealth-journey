@@ -176,6 +176,58 @@
         "silver_usd": "World Silver (USD)"
       }
     },
+    "goldDisplayConfig": {
+      "title": "Gold Display Configs",
+      "addButton": "+ Add Gold Type",
+      "emptyMessage": "No gold display configs found",
+      "emptyDescription": "Add your first gold type config using the button above",
+      "columns": {
+        "order": "Order",
+        "typeCode": "Type Code",
+        "displayName": "Display Name",
+        "enabled": "Enabled",
+        "inInvestment": "In Investment"
+      },
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete",
+        "more": "More",
+        "less": "Less"
+      },
+      "modal": {
+        "addTitle": "Add Gold Type",
+        "editTitle": "Edit Gold Type"
+      },
+      "form": {
+        "typeCode": "Type Code",
+        "typeCodePlaceholder": "e.g. SJC_1L",
+        "typeCodeRequired": "Type code is required",
+        "displayName": "Display Name",
+        "displayNamePlaceholder": "e.g. SJC 1 Lượng",
+        "displayNameRequired": "Display name is required",
+        "displayOrder": "Display Order",
+        "enabled": "Enabled",
+        "showInInvestment": "Show in Investment",
+        "existingCodesLabel": "Existing codes in database — click to copy:",
+        "submitCreate": "Add Gold Type",
+        "submitEdit": "Save Changes",
+        "createError": "Failed to create config",
+        "updateError": "Failed to update config"
+      },
+      "delete": {
+        "title": "Delete Gold Type",
+        "message": "Are you sure you want to delete {name} ({code})?",
+        "confirm": "Delete"
+      },
+      "toast": {
+        "created": "Config created",
+        "updated": "Config updated",
+        "deleted": "Config deleted",
+        "loadFailed": "Failed to load gold display configs",
+        "updateFailed": "Failed to update config",
+        "deleteFailed": "Failed to delete config"
+      }
+    },
     "pagination": {
       "prev": "Prev",
       "next": "Next"
