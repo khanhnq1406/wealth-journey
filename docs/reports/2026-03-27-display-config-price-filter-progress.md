@@ -6,21 +6,21 @@
 - **Plan file:** docs/plans/2026-03-27-display-config-price-filter-plan.md
 - **Spec file:** docs/specs/2026-03-27-display-config-price-filter-spec.md
 - **Started:** 2026-03-27T00:00:00Z
-- **Last updated:** 2026-03-27T00:00:00Z
+- **Last updated:** 2026-03-27T17:30:00Z
 - **Current state:** in_progress
-- **Current task:** 1
+- **Current task:** 6
 
 ## Task Progress
 
 | #   | Task Name                                                  | Status      | Commit | Summary |
 | --- | ---------------------------------------------------------- | ----------- | ------ | ------- |
 | 0   | Update C4 Architecture Diagrams                            | pending     | —      | —       |
-| 1   | Add ListEnabledTypeCodesByAssetType to AssetDisplayConfigRepository | pending | —  | —       |
-| 2   | Add ListByAssetTypeFiltered to AssetPriceRepository        | pending     | —      | —       |
-| 3   | Inject configRepo + update GetAllPrices                    | pending     | —      | —       |
-| 4   | Update GetMarketTypes filter                               | pending     | —      | —       |
-| 5   | Wire DI in services.go                                     | pending     | —      | —       |
-| 6   | Run CI and lint                                            | pending     | —      | —       |
+| 1   | Add ListEnabledTypeCodesByAssetType to AssetDisplayConfigRepository | done | committed | Method added to interface + GORM impl + mock stub |
+| 2   | Add ListByAssetTypeFiltered to AssetPriceRepository        | done        | committed | Method added to interface + GORM impl + mock in test |
+| 3   | Inject configRepo + update GetAllPrices                    | done        | committed | configRepo field injected; GetAllPrices uses filter chain; 5 new tests |
+| 4   | Update GetMarketTypes filter                               | done        | committed | GetMarketTypes uses filter chain; existing tests migrated |
+| 5   | Wire DI in services.go                                     | done        | committed | repos.AssetDisplayConfig passed as second arg to NewAssetPriceService |
+| 6   | Run CI and lint                                            | done        | —      | 0 lint issues, build clean, all service+repo tests pass |
 | 7   | Update flow-cross-cutting.md                               | pending     | —      | —       |
 | 8   | Update implementation report                               | pending     | —      | —       |
 

@@ -16,6 +16,9 @@ import (
 	"wealthjourney/pkg/sjc"
 )
 
+// knownAssetTypes is the fixed set of asset types served by display-facing methods.
+var knownAssetTypes = []string{"gold", "silver", "currency"}
+
 // assetPriceService implements AssetPriceService.
 // It owns the price-cache lifecycle: fetch from live price services → persist to DB →
 // serve cached data to callers (handlers, scheduler jobs).
@@ -23,6 +26,7 @@ import (
 // Depguard: no gorm.io/gorm import — all DB access goes through the repository interface.
 type assetPriceService struct {
 	repo              repository.AssetPriceRepository
+	configRepo        repository.AssetDisplayConfigRepository // nil = no display filter; all rows returned
 	silverSvc         SilverPriceService
 	currencySvc       CurrencyPriceService
 	vangSaiGonFetcher GoldPriceFetcher // nil = not configured; source skipped
@@ -34,9 +38,11 @@ type assetPriceService struct {
 }
 
 // NewAssetPriceService creates a new AssetPriceService with constructor injection.
+// Pass nil for configRepo to skip display-config filtering (all prices returned).
 // Pass nil for any of the fetcher or client arguments to skip that source.
 func NewAssetPriceService(
 	repo repository.AssetPriceRepository,
+	configRepo repository.AssetDisplayConfigRepository,
 	silverSvc SilverPriceService,
 	currencySvc CurrencyPriceService,
 	vangSaiGonFetcher GoldPriceFetcher,
@@ -48,6 +54,7 @@ func NewAssetPriceService(
 ) AssetPriceService {
 	return &assetPriceService{
 		repo:              repo,
+		configRepo:        configRepo,
 		silverSvc:         silverSvc,
 		currencySvc:       currencySvc,
 		vangSaiGonFetcher: vangSaiGonFetcher,
@@ -479,34 +486,37 @@ func (s *assetPriceService) refreshGoldPNJ(ctx context.Context) refreshResult {
 // GetAllPrices
 // ---------------------------------------------------------------------------
 
-// GetAllPrices reads all rows from the DB and groups them by asset type.
+// GetAllPrices reads enabled rows from the DB (filtered by display config) and groups them by asset type.
+// For each known asset type, it fetches the enabled type codes from configRepo, then reads only matching
+// rows from the price store. This ensures disabled configs are excluded from display-facing responses.
 func (s *assetPriceService) GetAllPrices(ctx context.Context) (*AllAssetPrices, error) {
-	rows, err := s.repo.ListAll(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	result := &AllAssetPrices{
 		Gold:     make([]*AssetPriceDTO, 0),
 		Silver:   make([]*AssetPriceDTO, 0),
 		Currency: make([]*AssetPriceDTO, 0),
 	}
 
-	for _, row := range rows {
-		dto := modelToDTO(row)
-		switch row.AssetType {
-		case "gold":
-			result.Gold = append(result.Gold, dto)
-		case "silver":
-			result.Silver = append(result.Silver, dto)
-		case "currency":
-			result.Currency = append(result.Currency, dto)
-		default:
-			// Unknown asset type — skip silently; avoids panics on schema evolution.
-			log.Printf("[assetPriceService] unknown AssetType %q for TypeCode %q — skipping", row.AssetType, row.TypeCode)
+	for _, assetType := range knownAssetTypes {
+		enabledCodes, err := s.configRepo.ListEnabledTypeCodesByAssetType(ctx, assetType)
+		if err != nil {
+			return nil, err
+		}
+		rows, err := s.repo.ListByAssetTypeFiltered(ctx, assetType, enabledCodes)
+		if err != nil {
+			return nil, err
+		}
+		for _, row := range rows {
+			dto := modelToDTO(row)
+			switch assetType {
+			case "gold":
+				result.Gold = append(result.Gold, dto)
+			case "silver":
+				result.Silver = append(result.Silver, dto)
+			case "currency":
+				result.Currency = append(result.Currency, dto)
+			}
 		}
 	}
-
 	return result, nil
 }
 
@@ -532,51 +542,52 @@ func (s *assetPriceService) GetPricesByAssetType(ctx context.Context, assetType 
 // GetMarketTypes
 // ---------------------------------------------------------------------------
 
-// GetMarketTypes reads all DB rows and returns type descriptors grouped by asset class,
-// together with the freshest FetchedAt timestamp per group expressed as Unix seconds.
+// GetMarketTypes reads enabled DB rows (filtered by display config) and returns type descriptors
+// grouped by asset class, together with the freshest FetchedAt timestamp per group as Unix seconds.
+// Only type codes enabled in the display config are included.
 func (s *assetPriceService) GetMarketTypes(ctx context.Context) (*MarketTypesDTO, error) {
-	rows, err := s.repo.ListAll(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	result := &MarketTypesDTO{
 		Gold:     make([]MarketTypeItem, 0),
 		Silver:   make([]MarketTypeItem, 0),
 		Currency: make([]MarketTypeItem, 0),
 	}
-
-	// Track max FetchedAt per asset type to report freshness.
 	var goldMax, silverMax, currencyMax time.Time
 
-	for _, row := range rows {
-		item := MarketTypeItem{
-			Code:     row.TypeCode,
-			Name:     row.Name,
-			Currency: row.Currency,
+	for _, assetType := range knownAssetTypes {
+		enabledCodes, err := s.configRepo.ListEnabledTypeCodesByAssetType(ctx, assetType)
+		if err != nil {
+			return nil, err
 		}
-		switch row.AssetType {
-		case "gold":
-			result.Gold = append(result.Gold, item)
-			if row.FetchedAt.After(goldMax) {
-				goldMax = row.FetchedAt
+		rows, err := s.repo.ListByAssetTypeFiltered(ctx, assetType, enabledCodes)
+		if err != nil {
+			return nil, err
+		}
+		for _, row := range rows {
+			item := MarketTypeItem{
+				Code:     row.TypeCode,
+				Name:     row.Name,
+				Currency: row.Currency,
 			}
-		case "silver":
-			result.Silver = append(result.Silver, item)
-			if row.FetchedAt.After(silverMax) {
-				silverMax = row.FetchedAt
+			switch assetType {
+			case "gold":
+				result.Gold = append(result.Gold, item)
+				if row.FetchedAt.After(goldMax) {
+					goldMax = row.FetchedAt
+				}
+			case "silver":
+				result.Silver = append(result.Silver, item)
+				if row.FetchedAt.After(silverMax) {
+					silverMax = row.FetchedAt
+				}
+			case "currency":
+				result.Currency = append(result.Currency, item)
+				if row.FetchedAt.After(currencyMax) {
+					currencyMax = row.FetchedAt
+				}
 			}
-		case "currency":
-			result.Currency = append(result.Currency, item)
-			if row.FetchedAt.After(currencyMax) {
-				currencyMax = row.FetchedAt
-			}
-		default:
-			log.Printf("[assetPriceService] unknown AssetType %q for TypeCode %q — skipping", row.AssetType, row.TypeCode)
 		}
 	}
 
-	// Convert non-zero timestamps to Unix seconds; zero time stays 0.
 	if !goldMax.IsZero() {
 		result.GoldUpdatedAt = goldMax.Unix()
 	}

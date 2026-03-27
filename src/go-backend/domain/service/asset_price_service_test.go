@@ -101,6 +101,58 @@ func (m *mockAssetPriceRepo) ListByAssetTypeFiltered(_ context.Context, assetTyp
 }
 
 // ---------------------------------------------------------------------------
+// Mock: AssetDisplayConfigRepository
+// ---------------------------------------------------------------------------
+
+// mockAssetDisplayConfigRepo is a simple test double for AssetDisplayConfigRepository.
+// Set enabledCodes to control which type codes are returned per asset type.
+// Set enabledCodesErr to simulate a ListEnabledTypeCodesByAssetType failure.
+type mockAssetDisplayConfigRepo struct {
+	// enabledCodes maps assetType → []typeCode returned by ListEnabledTypeCodesByAssetType.
+	enabledCodes    map[string][]string
+	enabledCodesErr error
+}
+
+func (m *mockAssetDisplayConfigRepo) ListEnabledTypeCodesByAssetType(_ context.Context, assetType string) ([]string, error) {
+	if m.enabledCodesErr != nil {
+		return nil, m.enabledCodesErr
+	}
+	if m.enabledCodes != nil {
+		return m.enabledCodes[assetType], nil
+	}
+	return []string{}, nil
+}
+
+// Stub all other interface methods to satisfy the interface.
+func (m *mockAssetDisplayConfigRepo) ListAll(_ context.Context, _ string) ([]*models.AssetDisplayConfig, error) {
+	return nil, nil
+}
+func (m *mockAssetDisplayConfigRepo) ListEnabled(_ context.Context) ([]*models.AssetDisplayConfig, error) {
+	return nil, nil
+}
+func (m *mockAssetDisplayConfigRepo) GetByID(_ context.Context, _ int32) (*models.AssetDisplayConfig, error) {
+	return nil, nil
+}
+func (m *mockAssetDisplayConfigRepo) GetByTypeCode(_ context.Context, _ string) (*models.AssetDisplayConfig, error) {
+	return nil, nil
+}
+func (m *mockAssetDisplayConfigRepo) Create(_ context.Context, _ *models.AssetDisplayConfig) error {
+	return nil
+}
+func (m *mockAssetDisplayConfigRepo) Update(_ context.Context, _ *models.AssetDisplayConfig) error {
+	return nil
+}
+func (m *mockAssetDisplayConfigRepo) Delete(_ context.Context, _ int32) error {
+	return nil
+}
+func (m *mockAssetDisplayConfigRepo) ListByAssetType(_ context.Context, _ string) ([]*models.AssetDisplayConfig, error) {
+	return nil, nil
+}
+func (m *mockAssetDisplayConfigRepo) GetByTypeCodeAndAssetType(_ context.Context, _, _ string) (*models.AssetDisplayConfig, error) {
+	return nil, nil
+}
+
+// ---------------------------------------------------------------------------
 // Mock: SilverPriceService
 // ---------------------------------------------------------------------------
 
@@ -217,6 +269,7 @@ func TestAssetPriceService_RefreshAllPrices_AllSucceed(t *testing.T) {
 	vsgFetcher := &mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, prices: vsgPrices}
 	vtFetcher := &mockSimpleGoldPriceFetcher{source: SourceVangToday, prices: makeGoldPrices(2)}
 	svc := NewAssetPriceService(repo,
+		nil,
 		&mockSilverPriceSvc{prices: silverPrices},
 		&mockCurrencyPriceSvc{prices: currencyPrices},
 		vsgFetcher, vtFetcher,
@@ -265,6 +318,7 @@ func TestAssetPriceService_RefreshAllPrices_GoldFails(t *testing.T) {
 	repo := &mockAssetPriceRepo{}
 	// Both gold fetchers fail; silver and currency succeed.
 	svc := NewAssetPriceService(repo,
+		nil,
 		&mockSilverPriceSvc{prices: silverPrices},
 		&mockCurrencyPriceSvc{prices: currencyPrices},
 		&mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, err: goldErr},
@@ -297,6 +351,7 @@ func TestAssetPriceService_RefreshAllPrices_AllFail(t *testing.T) {
 	repo := &mockAssetPriceRepo{}
 	// Both gold fetchers fail + nil clients (4) + silver fails + currency fails = 8 total failures.
 	svc := NewAssetPriceService(repo,
+		nil,
 		&mockSilverPriceSvc{err: silverErr},
 		&mockCurrencyPriceSvc{err: currencyErr},
 		&mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, err: goldErr},
@@ -331,6 +386,7 @@ func TestAssetPriceService_RefreshAllPrices_AssetTypeFields(t *testing.T) {
 	repo := &mockAssetPriceRepo{}
 	// Use vsgFetcher for gold; vtFetcher fails so only one gold batch.
 	svc := NewAssetPriceService(repo,
+		nil,
 		&mockSilverPriceSvc{prices: silverPrices},
 		&mockCurrencyPriceSvc{prices: currencyPrices},
 		&mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, prices: goldPrices},
@@ -365,16 +421,30 @@ func TestAssetPriceService_RefreshAllPrices_AssetTypeFields(t *testing.T) {
 
 func TestAssetPriceService_GetAllPrices_GroupsByAssetType(t *testing.T) {
 	now := time.Now()
-	rows := []*models.AssetPrice{
-		{TypeCode: "SJC", AssetType: "gold", Name: "SJC Bar", Buy: 1000, Sell: 1010, Currency: "VND", FetchedAt: now},
-		{TypeCode: "DOJI", AssetType: "gold", Name: "DOJI Bar", Buy: 990, Sell: 1000, Currency: "VND", FetchedAt: now},
-		{TypeCode: "SILVER_1L", AssetType: "silver", Name: "Silver 1L", Buy: 200, Sell: 210, Currency: "VND", FetchedAt: now},
-		{TypeCode: "USD", AssetType: "currency", Name: "US Dollar", Buy: 25000, Sell: 25200, Currency: "VND", FetchedAt: now},
-		{TypeCode: "EUR", AssetType: "currency", Name: "Euro", Buy: 27000, Sell: 27200, Currency: "VND", FetchedAt: now},
+	repo := &mockAssetPriceRepo{
+		listByTypeResults: map[string][]*models.AssetPrice{
+			"gold": {
+				{TypeCode: "SJC", AssetType: "gold", Name: "SJC Bar", Buy: 1000, Sell: 1010, Currency: "VND", FetchedAt: now},
+				{TypeCode: "DOJI", AssetType: "gold", Name: "DOJI Bar", Buy: 990, Sell: 1000, Currency: "VND", FetchedAt: now},
+			},
+			"silver": {
+				{TypeCode: "SILVER_1L", AssetType: "silver", Name: "Silver 1L", Buy: 200, Sell: 210, Currency: "VND", FetchedAt: now},
+			},
+			"currency": {
+				{TypeCode: "USD", AssetType: "currency", Name: "US Dollar", Buy: 25000, Sell: 25200, Currency: "VND", FetchedAt: now},
+				{TypeCode: "EUR", AssetType: "currency", Name: "Euro", Buy: 27000, Sell: 27200, Currency: "VND", FetchedAt: now},
+			},
+		},
 	}
-
-	repo := &mockAssetPriceRepo{listAllResult: rows}
+	configRepo := &mockAssetDisplayConfigRepo{
+		enabledCodes: map[string][]string{
+			"gold":     {"SJC", "DOJI"},
+			"silver":   {"SILVER_1L"},
+			"currency": {"USD", "EUR"},
+		},
+	}
 	svc := NewAssetPriceService(repo,
+		configRepo,
 		&mockSilverPriceSvc{},
 		&mockCurrencyPriceSvc{},
 		nil, nil,
@@ -406,8 +476,11 @@ func TestAssetPriceService_GetAllPrices_GroupsByAssetType(t *testing.T) {
 }
 
 func TestAssetPriceService_GetAllPrices_RepoError(t *testing.T) {
-	repo := &mockAssetPriceRepo{listAllErr: errors.New("db down")}
+	// Error can come from configRepo (called first) — simulate a config repo failure.
+	repo := &mockAssetPriceRepo{}
+	configRepo := &mockAssetDisplayConfigRepo{enabledCodesErr: errors.New("db down")}
 	svc := NewAssetPriceService(repo,
+		configRepo,
 		&mockSilverPriceSvc{},
 		&mockCurrencyPriceSvc{},
 		nil, nil,
@@ -422,12 +495,21 @@ func TestAssetPriceService_GetAllPrices_RepoError(t *testing.T) {
 
 func TestAssetPriceService_GetAllPrices_IsStaleField(t *testing.T) {
 	now := time.Now()
-	rows := []*models.AssetPrice{
-		{TypeCode: "SJC", AssetType: "gold", Name: "SJC", Buy: 1000, Sell: 1010, Currency: "VND", IsStale: true, FetchedAt: now},
+	repo := &mockAssetPriceRepo{
+		listByTypeResults: map[string][]*models.AssetPrice{
+			"gold": {
+				{TypeCode: "SJC", AssetType: "gold", Name: "SJC", Buy: 1000, Sell: 1010, Currency: "VND", IsStale: true, FetchedAt: now},
+			},
+		},
 	}
-
-	repo := &mockAssetPriceRepo{listAllResult: rows}
-	svc := NewAssetPriceService(repo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
+	configRepo := &mockAssetDisplayConfigRepo{
+		enabledCodes: map[string][]string{
+			"gold":     {"SJC"},
+			"silver":   {},
+			"currency": {},
+		},
+	}
+	svc := NewAssetPriceService(repo, configRepo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
 
 	result, _ := svc.GetAllPrices(context.Background())
 	if !result.Gold[0].IsStale {
@@ -444,15 +526,28 @@ func TestAssetPriceService_GetMarketTypes_ExtractsTypes(t *testing.T) {
 	t2 := time.Unix(1700001000, 0) // later
 	t3 := time.Unix(1700002000, 0) // even later
 
-	rows := []*models.AssetPrice{
-		{TypeCode: "SJC", AssetType: "gold", Name: "SJC Bar", Currency: "VND", FetchedAt: t1},
-		{TypeCode: "DOJI", AssetType: "gold", Name: "DOJI", Currency: "VND", FetchedAt: t2},
-		{TypeCode: "SILVER_1L", AssetType: "silver", Name: "Silver 1L", Currency: "VND", FetchedAt: t3},
-		{TypeCode: "USD", AssetType: "currency", Name: "US Dollar", Currency: "VND", FetchedAt: t1},
+	repo := &mockAssetPriceRepo{
+		listByTypeResults: map[string][]*models.AssetPrice{
+			"gold": {
+				{TypeCode: "SJC", AssetType: "gold", Name: "SJC Bar", Currency: "VND", FetchedAt: t1},
+				{TypeCode: "DOJI", AssetType: "gold", Name: "DOJI", Currency: "VND", FetchedAt: t2},
+			},
+			"silver": {
+				{TypeCode: "SILVER_1L", AssetType: "silver", Name: "Silver 1L", Currency: "VND", FetchedAt: t3},
+			},
+			"currency": {
+				{TypeCode: "USD", AssetType: "currency", Name: "US Dollar", Currency: "VND", FetchedAt: t1},
+			},
+		},
 	}
-
-	repo := &mockAssetPriceRepo{listAllResult: rows}
-	svc := NewAssetPriceService(repo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
+	configRepo := &mockAssetDisplayConfigRepo{
+		enabledCodes: map[string][]string{
+			"gold":     {"SJC", "DOJI"},
+			"silver":   {"SILVER_1L"},
+			"currency": {"USD"},
+		},
+	}
+	svc := NewAssetPriceService(repo, configRepo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
 
 	result, err := svc.GetMarketTypes(context.Background())
 	if err != nil {
@@ -492,8 +587,10 @@ func TestAssetPriceService_GetMarketTypes_ExtractsTypes(t *testing.T) {
 }
 
 func TestAssetPriceService_GetMarketTypes_EmptyDB(t *testing.T) {
-	repo := &mockAssetPriceRepo{listAllResult: []*models.AssetPrice{}}
-	svc := NewAssetPriceService(repo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
+	// When configRepo returns empty type codes, ListByAssetTypeFiltered short-circuits to empty.
+	repo := &mockAssetPriceRepo{}
+	configRepo := &mockAssetDisplayConfigRepo{} // returns [] for all asset types
+	svc := NewAssetPriceService(repo, configRepo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
 
 	result, err := svc.GetMarketTypes(context.Background())
 	if err != nil {
@@ -520,7 +617,7 @@ func TestAssetPriceService_GetPriceByTypeCode_Found(t *testing.T) {
 	}
 
 	repo := &mockAssetPriceRepo{listAllResult: rows}
-	svc := NewAssetPriceService(repo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
+	svc := NewAssetPriceService(repo, nil, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
 
 	dto, err := svc.GetPriceByTypeCode(context.Background(), "SJC_1L")
 	if err != nil {
@@ -554,7 +651,7 @@ func TestAssetPriceService_GetPriceByTypeCode_NotFound(t *testing.T) {
 	}
 
 	repo := &mockAssetPriceRepo{listAllResult: rows}
-	svc := NewAssetPriceService(repo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
+	svc := NewAssetPriceService(repo, nil, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
 
 	dto, err := svc.GetPriceByTypeCode(context.Background(), "NONEXISTENT")
 	if err != nil {
@@ -568,7 +665,7 @@ func TestAssetPriceService_GetPriceByTypeCode_NotFound(t *testing.T) {
 func TestAssetPriceService_GetPriceByTypeCode_RepoError(t *testing.T) {
 	repoErr := errors.New("db connection refused")
 	repo := &mockAssetPriceRepo{listAllErr: repoErr}
-	svc := NewAssetPriceService(repo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
+	svc := NewAssetPriceService(repo, nil, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
 
 	dto, err := svc.GetPriceByTypeCode(context.Background(), "SJC_1L")
 	if err == nil {
@@ -598,6 +695,7 @@ func TestAssetPriceService_RefreshGoldVangSaiGon_AliasNormalization(t *testing.T
 
 	repo := &mockAssetPriceRepo{}
 	svc := NewAssetPriceService(repo,
+		nil,
 		&mockSilverPriceSvc{},
 		&mockCurrencyPriceSvc{},
 		&mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, prices: aliasPrices},
@@ -642,6 +740,7 @@ func TestRefreshSilver_SetsSourceWaterfall(t *testing.T) {
 
 	repo := &mockAssetPriceRepo{}
 	svc := NewAssetPriceService(repo,
+		nil,
 		&mockSilverPriceSvc{prices: silverPrices},
 		&mockCurrencyPriceSvc{},
 		nil, nil,
@@ -678,6 +777,7 @@ func TestRefreshCurrency_SetsSourceWaterfall(t *testing.T) {
 
 	repo := &mockAssetPriceRepo{}
 	svc := NewAssetPriceService(repo,
+		nil,
 		&mockSilverPriceSvc{},
 		&mockCurrencyPriceSvc{prices: currencyPrices},
 		nil, nil,
@@ -721,6 +821,7 @@ func TestRefreshAllPrices_IncludesNewSources(t *testing.T) {
 
 	repo := &mockAssetPriceRepo{}
 	svc := NewAssetPriceService(repo,
+		nil,
 		&mockSilverPriceSvc{prices: silverPrices},
 		&mockCurrencyPriceSvc{prices: currencyPrices},
 		&mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, prices: goldPrices},
@@ -752,6 +853,7 @@ func TestRefreshAllPrices_SourceFailureIndependent(t *testing.T) {
 
 	repo := &mockAssetPriceRepo{}
 	svc := NewAssetPriceService(repo,
+		nil,
 		&mockSilverPriceSvc{prices: silverPrices},
 		&mockCurrencyPriceSvc{prices: currencyPrices},
 		&mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, prices: goldPrices},
@@ -791,6 +893,7 @@ func TestRefreshAllPrices_AllFailIncludingNilClients(t *testing.T) {
 	// Both gold fetchers fail + 4 nil clients + silver fails + currency fails = 8 total failures → must return error.
 	repo := &mockAssetPriceRepo{}
 	svc := NewAssetPriceService(repo,
+		nil,
 		&mockSilverPriceSvc{err: errTest},
 		&mockCurrencyPriceSvc{err: errTest},
 		&mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, err: errTest},
@@ -842,7 +945,7 @@ func TestGetPriceByTypeCode_NoCollisionWithSourcePrefixedCodes(t *testing.T) {
 	}
 
 	repo := &mockAssetPriceRepo{listAllResult: rows}
-	svc := NewAssetPriceService(repo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
+	svc := NewAssetPriceService(repo, nil, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
 
 	// GetPriceByTypeCode("SJC") must return only the waterfall row, not "SJC_1L".
 	t.Run("waterfall code returns waterfall row only", func(t *testing.T) {
@@ -906,7 +1009,7 @@ func TestRefreshAllPrices_VangSaiGonSuccess(t *testing.T) {
 	vtFetcher := &mockSimpleGoldPriceFetcher{source: SourceVangToday, err: fmt.Errorf("vangtoday down")}
 	silverSvc := &mockSilverPriceSvc{}
 	currencySvc := &mockCurrencyPriceSvc{}
-	svc := NewAssetPriceService(repo, silverSvc, currencySvc, vsgFetcher, vtFetcher, nil, nil, nil, nil)
+	svc := NewAssetPriceService(repo, nil, silverSvc, currencySvc, vsgFetcher, vtFetcher, nil, nil, nil, nil)
 	err := svc.RefreshAllPrices(context.Background())
 	// Should not error (not all 8 failed)
 	require.NoError(t, err)
@@ -937,7 +1040,7 @@ func TestRefreshAllPrices_VangTodaySuccess(t *testing.T) {
 	}
 	silverSvc := &mockSilverPriceSvc{}
 	currencySvc := &mockCurrencyPriceSvc{}
-	svc := NewAssetPriceService(repo, silverSvc, currencySvc, vsgFetcher, vtFetcher, nil, nil, nil, nil)
+	svc := NewAssetPriceService(repo, nil, silverSvc, currencySvc, vsgFetcher, vtFetcher, nil, nil, nil, nil)
 	err := svc.RefreshAllPrices(context.Background())
 	require.NoError(t, err)
 	repo.mu.Lock()
@@ -966,7 +1069,7 @@ func TestRefreshAllPrices_VangSaiGonFail_MarksStale(t *testing.T) {
 	}
 	silverSvc := &mockSilverPriceSvc{}
 	currencySvc := &mockCurrencyPriceSvc{}
-	svc := NewAssetPriceService(repo, silverSvc, currencySvc, vsgFetcher, vtFetcher, nil, nil, nil, nil)
+	svc := NewAssetPriceService(repo, nil, silverSvc, currencySvc, vsgFetcher, vtFetcher, nil, nil, nil, nil)
 	err := svc.RefreshAllPrices(context.Background())
 	require.NoError(t, err)
 	// vangsaigon failure should trigger MarkStaleByAssetTypeAndSource for gold
@@ -994,7 +1097,7 @@ func TestRefreshAllPrices_VangSaiGonEmptyPrices_MarksStale(t *testing.T) {
 	}
 	silverSvc := &mockSilverPriceSvc{}
 	currencySvc := &mockCurrencyPriceSvc{}
-	svc := NewAssetPriceService(repo, silverSvc, currencySvc, vsgFetcher, vtFetcher, nil, nil, nil, nil)
+	svc := NewAssetPriceService(repo, nil, silverSvc, currencySvc, vsgFetcher, vtFetcher, nil, nil, nil, nil)
 	err := svc.RefreshAllPrices(context.Background())
 	require.NoError(t, err) // not all sources failed
 	// Empty result should still mark stale
@@ -1117,4 +1220,128 @@ func TestListByAssetTypeFiltered_DBError_Propagated(t *testing.T) {
 	require.Error(t, err)
 	assert.Nil(t, prices)
 	assert.Contains(t, err.Error(), "connection refused")
+}
+
+// ---------------------------------------------------------------------------
+// Tests: GetAllPrices + GetMarketTypes filtering via configRepo
+// ---------------------------------------------------------------------------
+
+// TestAssetPriceService_GetAllPrices_FiltersDisabledConfigs verifies that only
+// type codes enabled in the display config are returned in GetAllPrices.
+func TestAssetPriceService_GetAllPrices_FiltersDisabledConfigs(t *testing.T) {
+	now := time.Now()
+	repo := &mockAssetPriceRepo{
+		listByTypeResults: map[string][]*models.AssetPrice{
+			"gold": {
+				{TypeCode: "SJC_1L", AssetType: "gold", Name: "SJC 1 Lượng", Buy: 8500000, Sell: 8600000, Currency: "VND", FetchedAt: now},
+				{TypeCode: "DOJI", AssetType: "gold", Name: "DOJI", Buy: 8400000, Sell: 8500000, Currency: "VND", FetchedAt: now},
+			},
+		},
+	}
+	// Only SJC_1L is enabled; DOJI is disabled.
+	configRepo := &mockAssetDisplayConfigRepo{
+		enabledCodes: map[string][]string{
+			"gold":     {"SJC_1L"},
+			"silver":   {},
+			"currency": {},
+		},
+	}
+	svc := NewAssetPriceService(repo, configRepo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
+
+	result, err := svc.GetAllPrices(context.Background())
+	require.NoError(t, err)
+
+	// Only SJC_1L should appear; DOJI is excluded.
+	require.Len(t, result.Gold, 1, "expected 1 gold price (SJC_1L only)")
+	assert.Equal(t, "SJC_1L", result.Gold[0].TypeCode)
+	assert.Empty(t, result.Silver)
+	assert.Empty(t, result.Currency)
+}
+
+// TestAssetPriceService_GetAllPrices_EmptyDisplayConfig verifies that when
+// display config returns no enabled codes, all asset type slices are empty.
+func TestAssetPriceService_GetAllPrices_EmptyDisplayConfig(t *testing.T) {
+	now := time.Now()
+	repo := &mockAssetPriceRepo{
+		listByTypeResults: map[string][]*models.AssetPrice{
+			"gold": {
+				{TypeCode: "SJC", AssetType: "gold", Buy: 8500000, Sell: 8600000, Currency: "VND", FetchedAt: now},
+			},
+		},
+	}
+	// configRepo returns empty slice for all types → no prices shown.
+	configRepo := &mockAssetDisplayConfigRepo{} // default: returns [] for all
+	svc := NewAssetPriceService(repo, configRepo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
+
+	result, err := svc.GetAllPrices(context.Background())
+	require.NoError(t, err)
+
+	assert.Empty(t, result.Gold)
+	assert.Empty(t, result.Silver)
+	assert.Empty(t, result.Currency)
+}
+
+// TestAssetPriceService_GetAllPrices_ConfigRepoError verifies that a configRepo error
+// is propagated immediately from GetAllPrices.
+func TestAssetPriceService_GetAllPrices_ConfigRepoError(t *testing.T) {
+	configErr := fmt.Errorf("config DB down")
+	repo := &mockAssetPriceRepo{}
+	configRepo := &mockAssetDisplayConfigRepo{enabledCodesErr: configErr}
+	svc := NewAssetPriceService(repo, configRepo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
+
+	_, err := svc.GetAllPrices(context.Background())
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "config DB down")
+}
+
+// TestAssetPriceService_GetMarketTypes_FiltersDisabledConfigs verifies that only
+// type codes enabled in the display config appear in GetMarketTypes results.
+func TestAssetPriceService_GetMarketTypes_FiltersDisabledConfigs(t *testing.T) {
+	t1 := time.Unix(1700000000, 0)
+	t2 := time.Unix(1700001000, 0)
+	repo := &mockAssetPriceRepo{
+		listByTypeResults: map[string][]*models.AssetPrice{
+			"gold": {
+				{TypeCode: "SJC", AssetType: "gold", Name: "SJC", Currency: "VND", FetchedAt: t1},
+				{TypeCode: "DOJI", AssetType: "gold", Name: "DOJI", Currency: "VND", FetchedAt: t2},
+			},
+		},
+	}
+	// Only SJC is enabled; DOJI is disabled.
+	configRepo := &mockAssetDisplayConfigRepo{
+		enabledCodes: map[string][]string{
+			"gold":     {"SJC"},
+			"silver":   {},
+			"currency": {},
+		},
+	}
+	svc := NewAssetPriceService(repo, configRepo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
+
+	result, err := svc.GetMarketTypes(context.Background())
+	require.NoError(t, err)
+
+	require.Len(t, result.Gold, 1, "expected 1 gold type (SJC only)")
+	assert.Equal(t, "SJC", result.Gold[0].Code)
+	assert.Empty(t, result.Silver)
+	assert.Empty(t, result.Currency)
+	// GoldUpdatedAt = t1 (only SJC row).
+	assert.Equal(t, t1.Unix(), result.GoldUpdatedAt)
+}
+
+// TestAssetPriceService_GetMarketTypes_EmptyDisplayConfig_AllZero verifies that when
+// display config returns no enabled codes, all slices are empty and all timestamps are 0.
+func TestAssetPriceService_GetMarketTypes_EmptyDisplayConfig_AllZero(t *testing.T) {
+	repo := &mockAssetPriceRepo{}
+	configRepo := &mockAssetDisplayConfigRepo{} // returns [] for all asset types
+	svc := NewAssetPriceService(repo, configRepo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
+
+	result, err := svc.GetMarketTypes(context.Background())
+	require.NoError(t, err)
+
+	assert.Empty(t, result.Gold)
+	assert.Empty(t, result.Silver)
+	assert.Empty(t, result.Currency)
+	assert.Zero(t, result.GoldUpdatedAt)
+	assert.Zero(t, result.SilverUpdatedAt)
+	assert.Zero(t, result.CurrencyUpdatedAt)
 }

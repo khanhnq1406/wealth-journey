@@ -96,6 +96,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 
 	assetPriceSvc := NewAssetPriceService(
 		repos.AssetPrice,
+		repos.AssetDisplayConfig,
 		silverPriceSvc,
 		currencyPriceSvc,
 		NewVangSaiGonGoldFetcher(waterfallSourceTimeout),
