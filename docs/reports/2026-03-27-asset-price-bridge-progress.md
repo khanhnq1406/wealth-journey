@@ -8,7 +8,7 @@
 - **Started:** 2026-03-27T00:00:00Z
 - **Last updated:** 2026-03-27T05:00:00Z
 - **Current state:** in_progress
-- **Current task:** 12
+- **Current task:** 13
 
 ## Task Progress
 
@@ -26,7 +26,7 @@
 | 9   | Backend Service — Bridge MarketDataService (DB read)                   | done    | 3aed84ba | MarketDataService uses ResolvePrice (DB-first) for gold/silver; nil-guard fallback to live API; 7 tests |
 | 10  | Backend DI Wiring — Update providers, services, builder                | done    | a28c46d6 | AssetDisplayConfig wired in services/providers/builder/routes; MarketDataService receives real service |
 | 11  | Backend Handler — AssetDisplayConfigHandler (rename + fetch codes)     | done    | —      | AssetDisplayConfigHandler (10 methods), 30 tests; deleted gold_display_config* handler + service files |
-| 12  | Proto — Rename messages + add new fields                               | pending | —      | —       |
+| 12  | Proto — Rename messages + add new fields                               | done    | —      | Renamed Gold*→Asset* (11 messages), added 9 fetch code messages, Investment.price_updated_at=29, task proto:all |
 | 13  | Backend — Update Investment.ToProto + PriceUpdatedAt                   | pending | —      | —       |
 | 14  | Frontend — Update i18n translations                                    | pending | —      | —       |
 | 15  | Frontend — Rename admin components GoldDisplayConfig → AssetDisplayConfig | pending | — | —       |

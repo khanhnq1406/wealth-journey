@@ -486,6 +486,8 @@ export interface Investment {
   isCustom: boolean;
   /** Owner user ID (read-only, set by server from JWT) */
   userId: number;
+  /** Unix timestamp when price was last updated by background job (0 if never) */
+  priceUpdatedAt: number;
 }
 
 /** InvestmentTransaction represents a buy or sell transaction */
@@ -1146,10 +1148,10 @@ export interface DeleteUserPriceAlertResponse {
 }
 
 /**
- * GoldDisplayPrice represents a gold type with live price data for display
+ * AssetDisplayPrice represents an asset type (gold, silver, etc.) with live price data for display
  * Public endpoint: no internal DB IDs exposed
  */
-export interface GoldDisplayPrice {
+export interface AssetDisplayPrice {
   typeCode: string;
   displayName: string;
   buy: number;
@@ -1161,57 +1163,110 @@ export interface GoldDisplayPrice {
   isStale: boolean;
   showInInvestment: boolean;
   displayOrder: number;
+  /** "gold", "silver", etc. */
+  assetType: string;
+  enabled: boolean;
 }
 
-export interface GetGoldDisplayPricesRequest {
+export interface GetAssetDisplayPricesRequest {
+  /** Filter by asset type; empty = all */
+  assetType: string;
 }
 
-export interface GetGoldDisplayPricesResponse {
-  prices: GoldDisplayPrice[];
+export interface GetAssetDisplayPricesResponse {
+  prices: AssetDisplayPrice[];
 }
 
-/** GoldDisplayConfig represents an admin-managed gold type display configuration entry */
-export interface GoldDisplayConfig {
+/** AssetDisplayConfig represents an admin-managed asset type display configuration entry */
+export interface AssetDisplayConfig {
   id: number;
   typeCode: string;
   displayName: string;
   displayOrder: number;
   enabled: boolean;
   showInInvestment: boolean;
+  /** "gold", "silver", etc. */
+  assetType: string;
 }
 
-export interface ListGoldDisplayConfigRequest {
+export interface ListAssetDisplayConfigRequest {
+  /** Filter by asset type; empty = all */
+  assetType: string;
 }
 
-export interface ListGoldDisplayConfigResponse {
-  configs: GoldDisplayConfig[];
+export interface ListAssetDisplayConfigResponse {
+  configs: AssetDisplayConfig[];
 }
 
-export interface CreateGoldDisplayConfigRequest {
+export interface CreateAssetDisplayConfigRequest {
   typeCode: string;
   displayName: string;
   displayOrder: number;
   enabled: boolean;
   showInInvestment: boolean;
+  /** "gold", "silver", etc. */
+  assetType: string;
 }
 
-export interface CreateGoldDisplayConfigResponse {
-  config: GoldDisplayConfig | undefined;
+export interface CreateAssetDisplayConfigResponse {
+  config: AssetDisplayConfig | undefined;
 }
 
-export interface UpdateGoldDisplayConfigRequest {
+export interface UpdateAssetDisplayConfigRequest {
   displayName: string;
   displayOrder: number;
   enabled: boolean;
   showInInvestment: boolean;
 }
 
-export interface UpdateGoldDisplayConfigResponse {
-  config: GoldDisplayConfig | undefined;
+export interface UpdateAssetDisplayConfigResponse {
+  config: AssetDisplayConfig | undefined;
 }
 
-export interface DeleteGoldDisplayConfigResponse {
+export interface DeleteAssetDisplayConfigResponse {
   success: boolean;
+}
+
+/** AssetConfigFetchCode represents a source type_code attached to a display config entry */
+export interface AssetConfigFetchCode {
+  id: number;
+  configId: number;
+  typeCode: string;
+  priority: number;
+}
+
+export interface ListFetchCodesResponse {
+  fetchCodes: AssetConfigFetchCode[];
+}
+
+export interface CreateFetchCodeRequest {
+  typeCode: string;
+  priority: number;
+}
+
+export interface CreateFetchCodeResponse {
+  fetchCode: AssetConfigFetchCode | undefined;
+}
+
+export interface UpdateFetchCodeRequest {
+  priority: number;
+}
+
+export interface UpdateFetchCodeResponse {
+  fetchCode: AssetConfigFetchCode | undefined;
+}
+
+export interface DeleteFetchCodeResponse {
+  success: boolean;
+}
+
+export interface ListAssetPriceTypeCodesRequest {
+  /** "gold", "silver", etc. */
+  assetType: string;
+}
+
+export interface ListAssetPriceTypeCodesResponse {
+  typeCodes: string[];
 }
 
 function createBaseInvestment(): Investment {
@@ -1244,6 +1299,7 @@ function createBaseInvestment(): Investment {
     displayAverageCost: undefined,
     isCustom: false,
     userId: 0,
+    priceUpdatedAt: 0,
   };
 }
 
@@ -1332,6 +1388,9 @@ export const Investment: MessageFns<Investment> = {
     }
     if (message.userId !== 0) {
       writer.uint32(224).int32(message.userId);
+    }
+    if (message.priceUpdatedAt !== 0) {
+      writer.uint32(232).int64(message.priceUpdatedAt);
     }
     return writer;
   },
@@ -1567,6 +1626,14 @@ export const Investment: MessageFns<Investment> = {
           message.userId = reader.int32();
           continue;
         }
+        case 29: {
+          if (tag !== 232) {
+            break;
+          }
+
+          message.priceUpdatedAt = longToNumber(reader.int64());
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1608,6 +1675,11 @@ export const Investment: MessageFns<Investment> = {
       displayAverageCost: isSet(object.displayAverageCost) ? Money.fromJSON(object.displayAverageCost) : undefined,
       isCustom: isSet(object.isCustom) ? globalThis.Boolean(object.isCustom) : false,
       userId: isSet(object.userId) ? globalThis.Number(object.userId) : 0,
+      priceUpdatedAt: isSet(object.priceUpdatedAt)
+        ? globalThis.Number(object.priceUpdatedAt)
+        : isSet(object.price_updated_at)
+        ? globalThis.Number(object.price_updated_at)
+        : 0,
     };
   },
 
@@ -1697,6 +1769,9 @@ export const Investment: MessageFns<Investment> = {
     if (message.userId !== 0) {
       obj.userId = Math.round(message.userId);
     }
+    if (message.priceUpdatedAt !== 0) {
+      obj.priceUpdatedAt = Math.round(message.priceUpdatedAt);
+    }
     return obj;
   },
 
@@ -1745,6 +1820,7 @@ export const Investment: MessageFns<Investment> = {
       : undefined;
     message.isCustom = object.isCustom ?? false;
     message.userId = object.userId ?? 0;
+    message.priceUpdatedAt = object.priceUpdatedAt ?? 0;
     return message;
   },
 };
@@ -9759,7 +9835,7 @@ export const DeleteUserPriceAlertResponse: MessageFns<DeleteUserPriceAlertRespon
   },
 };
 
-function createBaseGoldDisplayPrice(): GoldDisplayPrice {
+function createBaseAssetDisplayPrice(): AssetDisplayPrice {
   return {
     typeCode: "",
     displayName: "",
@@ -9772,11 +9848,13 @@ function createBaseGoldDisplayPrice(): GoldDisplayPrice {
     isStale: false,
     showInInvestment: false,
     displayOrder: 0,
+    assetType: "",
+    enabled: false,
   };
 }
 
-export const GoldDisplayPrice: MessageFns<GoldDisplayPrice> = {
-  encode(message: GoldDisplayPrice, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const AssetDisplayPrice: MessageFns<AssetDisplayPrice> = {
+  encode(message: AssetDisplayPrice, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.typeCode !== "") {
       writer.uint32(10).string(message.typeCode);
     }
@@ -9810,13 +9888,19 @@ export const GoldDisplayPrice: MessageFns<GoldDisplayPrice> = {
     if (message.displayOrder !== 0) {
       writer.uint32(88).int32(message.displayOrder);
     }
+    if (message.assetType !== "") {
+      writer.uint32(98).string(message.assetType);
+    }
+    if (message.enabled !== false) {
+      writer.uint32(104).bool(message.enabled);
+    }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GoldDisplayPrice {
+  decode(input: BinaryReader | Uint8Array, length?: number): AssetDisplayPrice {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGoldDisplayPrice();
+    const message = createBaseAssetDisplayPrice();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -9908,6 +9992,22 @@ export const GoldDisplayPrice: MessageFns<GoldDisplayPrice> = {
           message.displayOrder = reader.int32();
           continue;
         }
+        case 12: {
+          if (tag !== 98) {
+            break;
+          }
+
+          message.assetType = reader.string();
+          continue;
+        }
+        case 13: {
+          if (tag !== 104) {
+            break;
+          }
+
+          message.enabled = reader.bool();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -9917,7 +10017,7 @@ export const GoldDisplayPrice: MessageFns<GoldDisplayPrice> = {
     return message;
   },
 
-  fromJSON(object: any): GoldDisplayPrice {
+  fromJSON(object: any): AssetDisplayPrice {
     return {
       typeCode: isSet(object.typeCode)
         ? globalThis.String(object.typeCode)
@@ -9962,10 +10062,16 @@ export const GoldDisplayPrice: MessageFns<GoldDisplayPrice> = {
         : isSet(object.display_order)
         ? globalThis.Number(object.display_order)
         : 0,
+      assetType: isSet(object.assetType)
+        ? globalThis.String(object.assetType)
+        : isSet(object.asset_type)
+        ? globalThis.String(object.asset_type)
+        : "",
+      enabled: isSet(object.enabled) ? globalThis.Boolean(object.enabled) : false,
     };
   },
 
-  toJSON(message: GoldDisplayPrice): unknown {
+  toJSON(message: AssetDisplayPrice): unknown {
     const obj: any = {};
     if (message.typeCode !== "") {
       obj.typeCode = message.typeCode;
@@ -10000,14 +10106,20 @@ export const GoldDisplayPrice: MessageFns<GoldDisplayPrice> = {
     if (message.displayOrder !== 0) {
       obj.displayOrder = Math.round(message.displayOrder);
     }
+    if (message.assetType !== "") {
+      obj.assetType = message.assetType;
+    }
+    if (message.enabled !== false) {
+      obj.enabled = message.enabled;
+    }
     return obj;
   },
 
-  create(base?: DeepPartial<GoldDisplayPrice>): GoldDisplayPrice {
-    return GoldDisplayPrice.fromPartial(base ?? {});
+  create(base?: DeepPartial<AssetDisplayPrice>): AssetDisplayPrice {
+    return AssetDisplayPrice.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<GoldDisplayPrice>): GoldDisplayPrice {
-    const message = createBaseGoldDisplayPrice();
+  fromPartial(object: DeepPartial<AssetDisplayPrice>): AssetDisplayPrice {
+    const message = createBaseAssetDisplayPrice();
     message.typeCode = object.typeCode ?? "";
     message.displayName = object.displayName ?? "";
     message.buy = object.buy ?? 0;
@@ -10019,69 +10131,28 @@ export const GoldDisplayPrice: MessageFns<GoldDisplayPrice> = {
     message.isStale = object.isStale ?? false;
     message.showInInvestment = object.showInInvestment ?? false;
     message.displayOrder = object.displayOrder ?? 0;
+    message.assetType = object.assetType ?? "";
+    message.enabled = object.enabled ?? false;
     return message;
   },
 };
 
-function createBaseGetGoldDisplayPricesRequest(): GetGoldDisplayPricesRequest {
-  return {};
+function createBaseGetAssetDisplayPricesRequest(): GetAssetDisplayPricesRequest {
+  return { assetType: "" };
 }
 
-export const GetGoldDisplayPricesRequest: MessageFns<GetGoldDisplayPricesRequest> = {
-  encode(_: GetGoldDisplayPricesRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): GetGoldDisplayPricesRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetGoldDisplayPricesRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): GetGoldDisplayPricesRequest {
-    return {};
-  },
-
-  toJSON(_: GetGoldDisplayPricesRequest): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create(base?: DeepPartial<GetGoldDisplayPricesRequest>): GetGoldDisplayPricesRequest {
-    return GetGoldDisplayPricesRequest.fromPartial(base ?? {});
-  },
-  fromPartial(_: DeepPartial<GetGoldDisplayPricesRequest>): GetGoldDisplayPricesRequest {
-    const message = createBaseGetGoldDisplayPricesRequest();
-    return message;
-  },
-};
-
-function createBaseGetGoldDisplayPricesResponse(): GetGoldDisplayPricesResponse {
-  return { prices: [] };
-}
-
-export const GetGoldDisplayPricesResponse: MessageFns<GetGoldDisplayPricesResponse> = {
-  encode(message: GetGoldDisplayPricesResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    for (const v of message.prices) {
-      GoldDisplayPrice.encode(v!, writer.uint32(10).fork()).join();
+export const GetAssetDisplayPricesRequest: MessageFns<GetAssetDisplayPricesRequest> = {
+  encode(message: GetAssetDisplayPricesRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.assetType !== "") {
+      writer.uint32(10).string(message.assetType);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GetGoldDisplayPricesResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAssetDisplayPricesRequest {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGetGoldDisplayPricesResponse();
+    const message = createBaseGetAssetDisplayPricesRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -10090,7 +10161,7 @@ export const GetGoldDisplayPricesResponse: MessageFns<GetGoldDisplayPricesRespon
             break;
           }
 
-          message.prices.push(GoldDisplayPrice.decode(reader, reader.uint32()));
+          message.assetType = reader.string();
           continue;
         }
       }
@@ -10102,38 +10173,110 @@ export const GetGoldDisplayPricesResponse: MessageFns<GetGoldDisplayPricesRespon
     return message;
   },
 
-  fromJSON(object: any): GetGoldDisplayPricesResponse {
+  fromJSON(object: any): GetAssetDisplayPricesRequest {
     return {
-      prices: globalThis.Array.isArray(object?.prices)
-        ? object.prices.map((e: any) => GoldDisplayPrice.fromJSON(e))
-        : [],
+      assetType: isSet(object.assetType)
+        ? globalThis.String(object.assetType)
+        : isSet(object.asset_type)
+        ? globalThis.String(object.asset_type)
+        : "",
     };
   },
 
-  toJSON(message: GetGoldDisplayPricesResponse): unknown {
+  toJSON(message: GetAssetDisplayPricesRequest): unknown {
     const obj: any = {};
-    if (message.prices?.length) {
-      obj.prices = message.prices.map((e) => GoldDisplayPrice.toJSON(e));
+    if (message.assetType !== "") {
+      obj.assetType = message.assetType;
     }
     return obj;
   },
 
-  create(base?: DeepPartial<GetGoldDisplayPricesResponse>): GetGoldDisplayPricesResponse {
-    return GetGoldDisplayPricesResponse.fromPartial(base ?? {});
+  create(base?: DeepPartial<GetAssetDisplayPricesRequest>): GetAssetDisplayPricesRequest {
+    return GetAssetDisplayPricesRequest.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<GetGoldDisplayPricesResponse>): GetGoldDisplayPricesResponse {
-    const message = createBaseGetGoldDisplayPricesResponse();
-    message.prices = object.prices?.map((e) => GoldDisplayPrice.fromPartial(e)) || [];
+  fromPartial(object: DeepPartial<GetAssetDisplayPricesRequest>): GetAssetDisplayPricesRequest {
+    const message = createBaseGetAssetDisplayPricesRequest();
+    message.assetType = object.assetType ?? "";
     return message;
   },
 };
 
-function createBaseGoldDisplayConfig(): GoldDisplayConfig {
-  return { id: 0, typeCode: "", displayName: "", displayOrder: 0, enabled: false, showInInvestment: false };
+function createBaseGetAssetDisplayPricesResponse(): GetAssetDisplayPricesResponse {
+  return { prices: [] };
 }
 
-export const GoldDisplayConfig: MessageFns<GoldDisplayConfig> = {
-  encode(message: GoldDisplayConfig, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const GetAssetDisplayPricesResponse: MessageFns<GetAssetDisplayPricesResponse> = {
+  encode(message: GetAssetDisplayPricesResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.prices) {
+      AssetDisplayPrice.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): GetAssetDisplayPricesResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseGetAssetDisplayPricesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.prices.push(AssetDisplayPrice.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): GetAssetDisplayPricesResponse {
+    return {
+      prices: globalThis.Array.isArray(object?.prices)
+        ? object.prices.map((e: any) => AssetDisplayPrice.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: GetAssetDisplayPricesResponse): unknown {
+    const obj: any = {};
+    if (message.prices?.length) {
+      obj.prices = message.prices.map((e) => AssetDisplayPrice.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<GetAssetDisplayPricesResponse>): GetAssetDisplayPricesResponse {
+    return GetAssetDisplayPricesResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<GetAssetDisplayPricesResponse>): GetAssetDisplayPricesResponse {
+    const message = createBaseGetAssetDisplayPricesResponse();
+    message.prices = object.prices?.map((e) => AssetDisplayPrice.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseAssetDisplayConfig(): AssetDisplayConfig {
+  return {
+    id: 0,
+    typeCode: "",
+    displayName: "",
+    displayOrder: 0,
+    enabled: false,
+    showInInvestment: false,
+    assetType: "",
+  };
+}
+
+export const AssetDisplayConfig: MessageFns<AssetDisplayConfig> = {
+  encode(message: AssetDisplayConfig, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.id !== 0) {
       writer.uint32(8).int32(message.id);
     }
@@ -10152,13 +10295,16 @@ export const GoldDisplayConfig: MessageFns<GoldDisplayConfig> = {
     if (message.showInInvestment !== false) {
       writer.uint32(48).bool(message.showInInvestment);
     }
+    if (message.assetType !== "") {
+      writer.uint32(58).string(message.assetType);
+    }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): GoldDisplayConfig {
+  decode(input: BinaryReader | Uint8Array, length?: number): AssetDisplayConfig {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseGoldDisplayConfig();
+    const message = createBaseAssetDisplayConfig();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -10210,6 +10356,14 @@ export const GoldDisplayConfig: MessageFns<GoldDisplayConfig> = {
           message.showInInvestment = reader.bool();
           continue;
         }
+        case 7: {
+          if (tag !== 58) {
+            break;
+          }
+
+          message.assetType = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -10219,7 +10373,7 @@ export const GoldDisplayConfig: MessageFns<GoldDisplayConfig> = {
     return message;
   },
 
-  fromJSON(object: any): GoldDisplayConfig {
+  fromJSON(object: any): AssetDisplayConfig {
     return {
       id: isSet(object.id) ? globalThis.Number(object.id) : 0,
       typeCode: isSet(object.typeCode)
@@ -10243,10 +10397,15 @@ export const GoldDisplayConfig: MessageFns<GoldDisplayConfig> = {
         : isSet(object.show_in_investment)
         ? globalThis.Boolean(object.show_in_investment)
         : false,
+      assetType: isSet(object.assetType)
+        ? globalThis.String(object.assetType)
+        : isSet(object.asset_type)
+        ? globalThis.String(object.asset_type)
+        : "",
     };
   },
 
-  toJSON(message: GoldDisplayConfig): unknown {
+  toJSON(message: AssetDisplayConfig): unknown {
     const obj: any = {};
     if (message.id !== 0) {
       obj.id = Math.round(message.id);
@@ -10266,83 +10425,44 @@ export const GoldDisplayConfig: MessageFns<GoldDisplayConfig> = {
     if (message.showInInvestment !== false) {
       obj.showInInvestment = message.showInInvestment;
     }
+    if (message.assetType !== "") {
+      obj.assetType = message.assetType;
+    }
     return obj;
   },
 
-  create(base?: DeepPartial<GoldDisplayConfig>): GoldDisplayConfig {
-    return GoldDisplayConfig.fromPartial(base ?? {});
+  create(base?: DeepPartial<AssetDisplayConfig>): AssetDisplayConfig {
+    return AssetDisplayConfig.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<GoldDisplayConfig>): GoldDisplayConfig {
-    const message = createBaseGoldDisplayConfig();
+  fromPartial(object: DeepPartial<AssetDisplayConfig>): AssetDisplayConfig {
+    const message = createBaseAssetDisplayConfig();
     message.id = object.id ?? 0;
     message.typeCode = object.typeCode ?? "";
     message.displayName = object.displayName ?? "";
     message.displayOrder = object.displayOrder ?? 0;
     message.enabled = object.enabled ?? false;
     message.showInInvestment = object.showInInvestment ?? false;
+    message.assetType = object.assetType ?? "";
     return message;
   },
 };
 
-function createBaseListGoldDisplayConfigRequest(): ListGoldDisplayConfigRequest {
-  return {};
+function createBaseListAssetDisplayConfigRequest(): ListAssetDisplayConfigRequest {
+  return { assetType: "" };
 }
 
-export const ListGoldDisplayConfigRequest: MessageFns<ListGoldDisplayConfigRequest> = {
-  encode(_: ListGoldDisplayConfigRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): ListGoldDisplayConfigRequest {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseListGoldDisplayConfigRequest();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(_: any): ListGoldDisplayConfigRequest {
-    return {};
-  },
-
-  toJSON(_: ListGoldDisplayConfigRequest): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  create(base?: DeepPartial<ListGoldDisplayConfigRequest>): ListGoldDisplayConfigRequest {
-    return ListGoldDisplayConfigRequest.fromPartial(base ?? {});
-  },
-  fromPartial(_: DeepPartial<ListGoldDisplayConfigRequest>): ListGoldDisplayConfigRequest {
-    const message = createBaseListGoldDisplayConfigRequest();
-    return message;
-  },
-};
-
-function createBaseListGoldDisplayConfigResponse(): ListGoldDisplayConfigResponse {
-  return { configs: [] };
-}
-
-export const ListGoldDisplayConfigResponse: MessageFns<ListGoldDisplayConfigResponse> = {
-  encode(message: ListGoldDisplayConfigResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    for (const v of message.configs) {
-      GoldDisplayConfig.encode(v!, writer.uint32(10).fork()).join();
+export const ListAssetDisplayConfigRequest: MessageFns<ListAssetDisplayConfigRequest> = {
+  encode(message: ListAssetDisplayConfigRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.assetType !== "") {
+      writer.uint32(10).string(message.assetType);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): ListGoldDisplayConfigResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): ListAssetDisplayConfigRequest {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseListGoldDisplayConfigResponse();
+    const message = createBaseListAssetDisplayConfigRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -10351,7 +10471,7 @@ export const ListGoldDisplayConfigResponse: MessageFns<ListGoldDisplayConfigResp
             break;
           }
 
-          message.configs.push(GoldDisplayConfig.decode(reader, reader.uint32()));
+          message.assetType = reader.string();
           continue;
         }
       }
@@ -10363,38 +10483,102 @@ export const ListGoldDisplayConfigResponse: MessageFns<ListGoldDisplayConfigResp
     return message;
   },
 
-  fromJSON(object: any): ListGoldDisplayConfigResponse {
+  fromJSON(object: any): ListAssetDisplayConfigRequest {
     return {
-      configs: globalThis.Array.isArray(object?.configs)
-        ? object.configs.map((e: any) => GoldDisplayConfig.fromJSON(e))
-        : [],
+      assetType: isSet(object.assetType)
+        ? globalThis.String(object.assetType)
+        : isSet(object.asset_type)
+        ? globalThis.String(object.asset_type)
+        : "",
     };
   },
 
-  toJSON(message: ListGoldDisplayConfigResponse): unknown {
+  toJSON(message: ListAssetDisplayConfigRequest): unknown {
     const obj: any = {};
-    if (message.configs?.length) {
-      obj.configs = message.configs.map((e) => GoldDisplayConfig.toJSON(e));
+    if (message.assetType !== "") {
+      obj.assetType = message.assetType;
     }
     return obj;
   },
 
-  create(base?: DeepPartial<ListGoldDisplayConfigResponse>): ListGoldDisplayConfigResponse {
-    return ListGoldDisplayConfigResponse.fromPartial(base ?? {});
+  create(base?: DeepPartial<ListAssetDisplayConfigRequest>): ListAssetDisplayConfigRequest {
+    return ListAssetDisplayConfigRequest.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<ListGoldDisplayConfigResponse>): ListGoldDisplayConfigResponse {
-    const message = createBaseListGoldDisplayConfigResponse();
-    message.configs = object.configs?.map((e) => GoldDisplayConfig.fromPartial(e)) || [];
+  fromPartial(object: DeepPartial<ListAssetDisplayConfigRequest>): ListAssetDisplayConfigRequest {
+    const message = createBaseListAssetDisplayConfigRequest();
+    message.assetType = object.assetType ?? "";
     return message;
   },
 };
 
-function createBaseCreateGoldDisplayConfigRequest(): CreateGoldDisplayConfigRequest {
-  return { typeCode: "", displayName: "", displayOrder: 0, enabled: false, showInInvestment: false };
+function createBaseListAssetDisplayConfigResponse(): ListAssetDisplayConfigResponse {
+  return { configs: [] };
 }
 
-export const CreateGoldDisplayConfigRequest: MessageFns<CreateGoldDisplayConfigRequest> = {
-  encode(message: CreateGoldDisplayConfigRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const ListAssetDisplayConfigResponse: MessageFns<ListAssetDisplayConfigResponse> = {
+  encode(message: ListAssetDisplayConfigResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.configs) {
+      AssetDisplayConfig.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListAssetDisplayConfigResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListAssetDisplayConfigResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.configs.push(AssetDisplayConfig.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListAssetDisplayConfigResponse {
+    return {
+      configs: globalThis.Array.isArray(object?.configs)
+        ? object.configs.map((e: any) => AssetDisplayConfig.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: ListAssetDisplayConfigResponse): unknown {
+    const obj: any = {};
+    if (message.configs?.length) {
+      obj.configs = message.configs.map((e) => AssetDisplayConfig.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ListAssetDisplayConfigResponse>): ListAssetDisplayConfigResponse {
+    return ListAssetDisplayConfigResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ListAssetDisplayConfigResponse>): ListAssetDisplayConfigResponse {
+    const message = createBaseListAssetDisplayConfigResponse();
+    message.configs = object.configs?.map((e) => AssetDisplayConfig.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseCreateAssetDisplayConfigRequest(): CreateAssetDisplayConfigRequest {
+  return { typeCode: "", displayName: "", displayOrder: 0, enabled: false, showInInvestment: false, assetType: "" };
+}
+
+export const CreateAssetDisplayConfigRequest: MessageFns<CreateAssetDisplayConfigRequest> = {
+  encode(message: CreateAssetDisplayConfigRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.typeCode !== "") {
       writer.uint32(10).string(message.typeCode);
     }
@@ -10410,13 +10594,16 @@ export const CreateGoldDisplayConfigRequest: MessageFns<CreateGoldDisplayConfigR
     if (message.showInInvestment !== false) {
       writer.uint32(40).bool(message.showInInvestment);
     }
+    if (message.assetType !== "") {
+      writer.uint32(50).string(message.assetType);
+    }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): CreateGoldDisplayConfigRequest {
+  decode(input: BinaryReader | Uint8Array, length?: number): CreateAssetDisplayConfigRequest {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCreateGoldDisplayConfigRequest();
+    const message = createBaseCreateAssetDisplayConfigRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -10460,6 +10647,14 @@ export const CreateGoldDisplayConfigRequest: MessageFns<CreateGoldDisplayConfigR
           message.showInInvestment = reader.bool();
           continue;
         }
+        case 6: {
+          if (tag !== 50) {
+            break;
+          }
+
+          message.assetType = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -10469,7 +10664,7 @@ export const CreateGoldDisplayConfigRequest: MessageFns<CreateGoldDisplayConfigR
     return message;
   },
 
-  fromJSON(object: any): CreateGoldDisplayConfigRequest {
+  fromJSON(object: any): CreateAssetDisplayConfigRequest {
     return {
       typeCode: isSet(object.typeCode)
         ? globalThis.String(object.typeCode)
@@ -10492,10 +10687,15 @@ export const CreateGoldDisplayConfigRequest: MessageFns<CreateGoldDisplayConfigR
         : isSet(object.show_in_investment)
         ? globalThis.Boolean(object.show_in_investment)
         : false,
+      assetType: isSet(object.assetType)
+        ? globalThis.String(object.assetType)
+        : isSet(object.asset_type)
+        ? globalThis.String(object.asset_type)
+        : "",
     };
   },
 
-  toJSON(message: CreateGoldDisplayConfigRequest): unknown {
+  toJSON(message: CreateAssetDisplayConfigRequest): unknown {
     const obj: any = {};
     if (message.typeCode !== "") {
       obj.typeCode = message.typeCode;
@@ -10512,39 +10712,43 @@ export const CreateGoldDisplayConfigRequest: MessageFns<CreateGoldDisplayConfigR
     if (message.showInInvestment !== false) {
       obj.showInInvestment = message.showInInvestment;
     }
+    if (message.assetType !== "") {
+      obj.assetType = message.assetType;
+    }
     return obj;
   },
 
-  create(base?: DeepPartial<CreateGoldDisplayConfigRequest>): CreateGoldDisplayConfigRequest {
-    return CreateGoldDisplayConfigRequest.fromPartial(base ?? {});
+  create(base?: DeepPartial<CreateAssetDisplayConfigRequest>): CreateAssetDisplayConfigRequest {
+    return CreateAssetDisplayConfigRequest.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<CreateGoldDisplayConfigRequest>): CreateGoldDisplayConfigRequest {
-    const message = createBaseCreateGoldDisplayConfigRequest();
+  fromPartial(object: DeepPartial<CreateAssetDisplayConfigRequest>): CreateAssetDisplayConfigRequest {
+    const message = createBaseCreateAssetDisplayConfigRequest();
     message.typeCode = object.typeCode ?? "";
     message.displayName = object.displayName ?? "";
     message.displayOrder = object.displayOrder ?? 0;
     message.enabled = object.enabled ?? false;
     message.showInInvestment = object.showInInvestment ?? false;
+    message.assetType = object.assetType ?? "";
     return message;
   },
 };
 
-function createBaseCreateGoldDisplayConfigResponse(): CreateGoldDisplayConfigResponse {
+function createBaseCreateAssetDisplayConfigResponse(): CreateAssetDisplayConfigResponse {
   return { config: undefined };
 }
 
-export const CreateGoldDisplayConfigResponse: MessageFns<CreateGoldDisplayConfigResponse> = {
-  encode(message: CreateGoldDisplayConfigResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const CreateAssetDisplayConfigResponse: MessageFns<CreateAssetDisplayConfigResponse> = {
+  encode(message: CreateAssetDisplayConfigResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.config !== undefined) {
-      GoldDisplayConfig.encode(message.config, writer.uint32(10).fork()).join();
+      AssetDisplayConfig.encode(message.config, writer.uint32(10).fork()).join();
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): CreateGoldDisplayConfigResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): CreateAssetDisplayConfigResponse {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseCreateGoldDisplayConfigResponse();
+    const message = createBaseCreateAssetDisplayConfigResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -10553,7 +10757,7 @@ export const CreateGoldDisplayConfigResponse: MessageFns<CreateGoldDisplayConfig
             break;
           }
 
-          message.config = GoldDisplayConfig.decode(reader, reader.uint32());
+          message.config = AssetDisplayConfig.decode(reader, reader.uint32());
           continue;
         }
       }
@@ -10565,36 +10769,36 @@ export const CreateGoldDisplayConfigResponse: MessageFns<CreateGoldDisplayConfig
     return message;
   },
 
-  fromJSON(object: any): CreateGoldDisplayConfigResponse {
-    return { config: isSet(object.config) ? GoldDisplayConfig.fromJSON(object.config) : undefined };
+  fromJSON(object: any): CreateAssetDisplayConfigResponse {
+    return { config: isSet(object.config) ? AssetDisplayConfig.fromJSON(object.config) : undefined };
   },
 
-  toJSON(message: CreateGoldDisplayConfigResponse): unknown {
+  toJSON(message: CreateAssetDisplayConfigResponse): unknown {
     const obj: any = {};
     if (message.config !== undefined) {
-      obj.config = GoldDisplayConfig.toJSON(message.config);
+      obj.config = AssetDisplayConfig.toJSON(message.config);
     }
     return obj;
   },
 
-  create(base?: DeepPartial<CreateGoldDisplayConfigResponse>): CreateGoldDisplayConfigResponse {
-    return CreateGoldDisplayConfigResponse.fromPartial(base ?? {});
+  create(base?: DeepPartial<CreateAssetDisplayConfigResponse>): CreateAssetDisplayConfigResponse {
+    return CreateAssetDisplayConfigResponse.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<CreateGoldDisplayConfigResponse>): CreateGoldDisplayConfigResponse {
-    const message = createBaseCreateGoldDisplayConfigResponse();
+  fromPartial(object: DeepPartial<CreateAssetDisplayConfigResponse>): CreateAssetDisplayConfigResponse {
+    const message = createBaseCreateAssetDisplayConfigResponse();
     message.config = (object.config !== undefined && object.config !== null)
-      ? GoldDisplayConfig.fromPartial(object.config)
+      ? AssetDisplayConfig.fromPartial(object.config)
       : undefined;
     return message;
   },
 };
 
-function createBaseUpdateGoldDisplayConfigRequest(): UpdateGoldDisplayConfigRequest {
+function createBaseUpdateAssetDisplayConfigRequest(): UpdateAssetDisplayConfigRequest {
   return { displayName: "", displayOrder: 0, enabled: false, showInInvestment: false };
 }
 
-export const UpdateGoldDisplayConfigRequest: MessageFns<UpdateGoldDisplayConfigRequest> = {
-  encode(message: UpdateGoldDisplayConfigRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const UpdateAssetDisplayConfigRequest: MessageFns<UpdateAssetDisplayConfigRequest> = {
+  encode(message: UpdateAssetDisplayConfigRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.displayName !== "") {
       writer.uint32(10).string(message.displayName);
     }
@@ -10610,10 +10814,10 @@ export const UpdateGoldDisplayConfigRequest: MessageFns<UpdateGoldDisplayConfigR
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): UpdateGoldDisplayConfigRequest {
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAssetDisplayConfigRequest {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseUpdateGoldDisplayConfigRequest();
+    const message = createBaseUpdateAssetDisplayConfigRequest();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -10658,7 +10862,7 @@ export const UpdateGoldDisplayConfigRequest: MessageFns<UpdateGoldDisplayConfigR
     return message;
   },
 
-  fromJSON(object: any): UpdateGoldDisplayConfigRequest {
+  fromJSON(object: any): UpdateAssetDisplayConfigRequest {
     return {
       displayName: isSet(object.displayName)
         ? globalThis.String(object.displayName)
@@ -10679,7 +10883,7 @@ export const UpdateGoldDisplayConfigRequest: MessageFns<UpdateGoldDisplayConfigR
     };
   },
 
-  toJSON(message: UpdateGoldDisplayConfigRequest): unknown {
+  toJSON(message: UpdateAssetDisplayConfigRequest): unknown {
     const obj: any = {};
     if (message.displayName !== "") {
       obj.displayName = message.displayName;
@@ -10696,11 +10900,11 @@ export const UpdateGoldDisplayConfigRequest: MessageFns<UpdateGoldDisplayConfigR
     return obj;
   },
 
-  create(base?: DeepPartial<UpdateGoldDisplayConfigRequest>): UpdateGoldDisplayConfigRequest {
-    return UpdateGoldDisplayConfigRequest.fromPartial(base ?? {});
+  create(base?: DeepPartial<UpdateAssetDisplayConfigRequest>): UpdateAssetDisplayConfigRequest {
+    return UpdateAssetDisplayConfigRequest.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<UpdateGoldDisplayConfigRequest>): UpdateGoldDisplayConfigRequest {
-    const message = createBaseUpdateGoldDisplayConfigRequest();
+  fromPartial(object: DeepPartial<UpdateAssetDisplayConfigRequest>): UpdateAssetDisplayConfigRequest {
+    const message = createBaseUpdateAssetDisplayConfigRequest();
     message.displayName = object.displayName ?? "";
     message.displayOrder = object.displayOrder ?? 0;
     message.enabled = object.enabled ?? false;
@@ -10709,22 +10913,22 @@ export const UpdateGoldDisplayConfigRequest: MessageFns<UpdateGoldDisplayConfigR
   },
 };
 
-function createBaseUpdateGoldDisplayConfigResponse(): UpdateGoldDisplayConfigResponse {
+function createBaseUpdateAssetDisplayConfigResponse(): UpdateAssetDisplayConfigResponse {
   return { config: undefined };
 }
 
-export const UpdateGoldDisplayConfigResponse: MessageFns<UpdateGoldDisplayConfigResponse> = {
-  encode(message: UpdateGoldDisplayConfigResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const UpdateAssetDisplayConfigResponse: MessageFns<UpdateAssetDisplayConfigResponse> = {
+  encode(message: UpdateAssetDisplayConfigResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.config !== undefined) {
-      GoldDisplayConfig.encode(message.config, writer.uint32(10).fork()).join();
+      AssetDisplayConfig.encode(message.config, writer.uint32(10).fork()).join();
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): UpdateGoldDisplayConfigResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateAssetDisplayConfigResponse {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseUpdateGoldDisplayConfigResponse();
+    const message = createBaseUpdateAssetDisplayConfigResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -10733,7 +10937,7 @@ export const UpdateGoldDisplayConfigResponse: MessageFns<UpdateGoldDisplayConfig
             break;
           }
 
-          message.config = GoldDisplayConfig.decode(reader, reader.uint32());
+          message.config = AssetDisplayConfig.decode(reader, reader.uint32());
           continue;
         }
       }
@@ -10745,46 +10949,46 @@ export const UpdateGoldDisplayConfigResponse: MessageFns<UpdateGoldDisplayConfig
     return message;
   },
 
-  fromJSON(object: any): UpdateGoldDisplayConfigResponse {
-    return { config: isSet(object.config) ? GoldDisplayConfig.fromJSON(object.config) : undefined };
+  fromJSON(object: any): UpdateAssetDisplayConfigResponse {
+    return { config: isSet(object.config) ? AssetDisplayConfig.fromJSON(object.config) : undefined };
   },
 
-  toJSON(message: UpdateGoldDisplayConfigResponse): unknown {
+  toJSON(message: UpdateAssetDisplayConfigResponse): unknown {
     const obj: any = {};
     if (message.config !== undefined) {
-      obj.config = GoldDisplayConfig.toJSON(message.config);
+      obj.config = AssetDisplayConfig.toJSON(message.config);
     }
     return obj;
   },
 
-  create(base?: DeepPartial<UpdateGoldDisplayConfigResponse>): UpdateGoldDisplayConfigResponse {
-    return UpdateGoldDisplayConfigResponse.fromPartial(base ?? {});
+  create(base?: DeepPartial<UpdateAssetDisplayConfigResponse>): UpdateAssetDisplayConfigResponse {
+    return UpdateAssetDisplayConfigResponse.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<UpdateGoldDisplayConfigResponse>): UpdateGoldDisplayConfigResponse {
-    const message = createBaseUpdateGoldDisplayConfigResponse();
+  fromPartial(object: DeepPartial<UpdateAssetDisplayConfigResponse>): UpdateAssetDisplayConfigResponse {
+    const message = createBaseUpdateAssetDisplayConfigResponse();
     message.config = (object.config !== undefined && object.config !== null)
-      ? GoldDisplayConfig.fromPartial(object.config)
+      ? AssetDisplayConfig.fromPartial(object.config)
       : undefined;
     return message;
   },
 };
 
-function createBaseDeleteGoldDisplayConfigResponse(): DeleteGoldDisplayConfigResponse {
+function createBaseDeleteAssetDisplayConfigResponse(): DeleteAssetDisplayConfigResponse {
   return { success: false };
 }
 
-export const DeleteGoldDisplayConfigResponse: MessageFns<DeleteGoldDisplayConfigResponse> = {
-  encode(message: DeleteGoldDisplayConfigResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const DeleteAssetDisplayConfigResponse: MessageFns<DeleteAssetDisplayConfigResponse> = {
+  encode(message: DeleteAssetDisplayConfigResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.success !== false) {
       writer.uint32(8).bool(message.success);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): DeleteGoldDisplayConfigResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteAssetDisplayConfigResponse {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseDeleteGoldDisplayConfigResponse();
+    const message = createBaseDeleteAssetDisplayConfigResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -10805,11 +11009,11 @@ export const DeleteGoldDisplayConfigResponse: MessageFns<DeleteGoldDisplayConfig
     return message;
   },
 
-  fromJSON(object: any): DeleteGoldDisplayConfigResponse {
+  fromJSON(object: any): DeleteAssetDisplayConfigResponse {
     return { success: isSet(object.success) ? globalThis.Boolean(object.success) : false };
   },
 
-  toJSON(message: DeleteGoldDisplayConfigResponse): unknown {
+  toJSON(message: DeleteAssetDisplayConfigResponse): unknown {
     const obj: any = {};
     if (message.success !== false) {
       obj.success = message.success;
@@ -10817,12 +11021,648 @@ export const DeleteGoldDisplayConfigResponse: MessageFns<DeleteGoldDisplayConfig
     return obj;
   },
 
-  create(base?: DeepPartial<DeleteGoldDisplayConfigResponse>): DeleteGoldDisplayConfigResponse {
-    return DeleteGoldDisplayConfigResponse.fromPartial(base ?? {});
+  create(base?: DeepPartial<DeleteAssetDisplayConfigResponse>): DeleteAssetDisplayConfigResponse {
+    return DeleteAssetDisplayConfigResponse.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<DeleteGoldDisplayConfigResponse>): DeleteGoldDisplayConfigResponse {
-    const message = createBaseDeleteGoldDisplayConfigResponse();
+  fromPartial(object: DeepPartial<DeleteAssetDisplayConfigResponse>): DeleteAssetDisplayConfigResponse {
+    const message = createBaseDeleteAssetDisplayConfigResponse();
     message.success = object.success ?? false;
+    return message;
+  },
+};
+
+function createBaseAssetConfigFetchCode(): AssetConfigFetchCode {
+  return { id: 0, configId: 0, typeCode: "", priority: 0 };
+}
+
+export const AssetConfigFetchCode: MessageFns<AssetConfigFetchCode> = {
+  encode(message: AssetConfigFetchCode, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== 0) {
+      writer.uint32(8).int32(message.id);
+    }
+    if (message.configId !== 0) {
+      writer.uint32(16).int32(message.configId);
+    }
+    if (message.typeCode !== "") {
+      writer.uint32(26).string(message.typeCode);
+    }
+    if (message.priority !== 0) {
+      writer.uint32(32).int32(message.priority);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): AssetConfigFetchCode {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseAssetConfigFetchCode();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.id = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.configId = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.typeCode = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.priority = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): AssetConfigFetchCode {
+    return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      configId: isSet(object.configId)
+        ? globalThis.Number(object.configId)
+        : isSet(object.config_id)
+        ? globalThis.Number(object.config_id)
+        : 0,
+      typeCode: isSet(object.typeCode)
+        ? globalThis.String(object.typeCode)
+        : isSet(object.type_code)
+        ? globalThis.String(object.type_code)
+        : "",
+      priority: isSet(object.priority) ? globalThis.Number(object.priority) : 0,
+    };
+  },
+
+  toJSON(message: AssetConfigFetchCode): unknown {
+    const obj: any = {};
+    if (message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    if (message.configId !== 0) {
+      obj.configId = Math.round(message.configId);
+    }
+    if (message.typeCode !== "") {
+      obj.typeCode = message.typeCode;
+    }
+    if (message.priority !== 0) {
+      obj.priority = Math.round(message.priority);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<AssetConfigFetchCode>): AssetConfigFetchCode {
+    return AssetConfigFetchCode.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<AssetConfigFetchCode>): AssetConfigFetchCode {
+    const message = createBaseAssetConfigFetchCode();
+    message.id = object.id ?? 0;
+    message.configId = object.configId ?? 0;
+    message.typeCode = object.typeCode ?? "";
+    message.priority = object.priority ?? 0;
+    return message;
+  },
+};
+
+function createBaseListFetchCodesResponse(): ListFetchCodesResponse {
+  return { fetchCodes: [] };
+}
+
+export const ListFetchCodesResponse: MessageFns<ListFetchCodesResponse> = {
+  encode(message: ListFetchCodesResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.fetchCodes) {
+      AssetConfigFetchCode.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListFetchCodesResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListFetchCodesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.fetchCodes.push(AssetConfigFetchCode.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListFetchCodesResponse {
+    return {
+      fetchCodes: globalThis.Array.isArray(object?.fetchCodes)
+        ? object.fetchCodes.map((e: any) => AssetConfigFetchCode.fromJSON(e))
+        : globalThis.Array.isArray(object?.fetch_codes)
+        ? object.fetch_codes.map((e: any) => AssetConfigFetchCode.fromJSON(e))
+        : [],
+    };
+  },
+
+  toJSON(message: ListFetchCodesResponse): unknown {
+    const obj: any = {};
+    if (message.fetchCodes?.length) {
+      obj.fetchCodes = message.fetchCodes.map((e) => AssetConfigFetchCode.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ListFetchCodesResponse>): ListFetchCodesResponse {
+    return ListFetchCodesResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ListFetchCodesResponse>): ListFetchCodesResponse {
+    const message = createBaseListFetchCodesResponse();
+    message.fetchCodes = object.fetchCodes?.map((e) => AssetConfigFetchCode.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+function createBaseCreateFetchCodeRequest(): CreateFetchCodeRequest {
+  return { typeCode: "", priority: 0 };
+}
+
+export const CreateFetchCodeRequest: MessageFns<CreateFetchCodeRequest> = {
+  encode(message: CreateFetchCodeRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.typeCode !== "") {
+      writer.uint32(10).string(message.typeCode);
+    }
+    if (message.priority !== 0) {
+      writer.uint32(16).int32(message.priority);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CreateFetchCodeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreateFetchCodeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.typeCode = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.priority = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreateFetchCodeRequest {
+    return {
+      typeCode: isSet(object.typeCode)
+        ? globalThis.String(object.typeCode)
+        : isSet(object.type_code)
+        ? globalThis.String(object.type_code)
+        : "",
+      priority: isSet(object.priority) ? globalThis.Number(object.priority) : 0,
+    };
+  },
+
+  toJSON(message: CreateFetchCodeRequest): unknown {
+    const obj: any = {};
+    if (message.typeCode !== "") {
+      obj.typeCode = message.typeCode;
+    }
+    if (message.priority !== 0) {
+      obj.priority = Math.round(message.priority);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<CreateFetchCodeRequest>): CreateFetchCodeRequest {
+    return CreateFetchCodeRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<CreateFetchCodeRequest>): CreateFetchCodeRequest {
+    const message = createBaseCreateFetchCodeRequest();
+    message.typeCode = object.typeCode ?? "";
+    message.priority = object.priority ?? 0;
+    return message;
+  },
+};
+
+function createBaseCreateFetchCodeResponse(): CreateFetchCodeResponse {
+  return { fetchCode: undefined };
+}
+
+export const CreateFetchCodeResponse: MessageFns<CreateFetchCodeResponse> = {
+  encode(message: CreateFetchCodeResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.fetchCode !== undefined) {
+      AssetConfigFetchCode.encode(message.fetchCode, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): CreateFetchCodeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCreateFetchCodeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.fetchCode = AssetConfigFetchCode.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): CreateFetchCodeResponse {
+    return {
+      fetchCode: isSet(object.fetchCode)
+        ? AssetConfigFetchCode.fromJSON(object.fetchCode)
+        : isSet(object.fetch_code)
+        ? AssetConfigFetchCode.fromJSON(object.fetch_code)
+        : undefined,
+    };
+  },
+
+  toJSON(message: CreateFetchCodeResponse): unknown {
+    const obj: any = {};
+    if (message.fetchCode !== undefined) {
+      obj.fetchCode = AssetConfigFetchCode.toJSON(message.fetchCode);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<CreateFetchCodeResponse>): CreateFetchCodeResponse {
+    return CreateFetchCodeResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<CreateFetchCodeResponse>): CreateFetchCodeResponse {
+    const message = createBaseCreateFetchCodeResponse();
+    message.fetchCode = (object.fetchCode !== undefined && object.fetchCode !== null)
+      ? AssetConfigFetchCode.fromPartial(object.fetchCode)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseUpdateFetchCodeRequest(): UpdateFetchCodeRequest {
+  return { priority: 0 };
+}
+
+export const UpdateFetchCodeRequest: MessageFns<UpdateFetchCodeRequest> = {
+  encode(message: UpdateFetchCodeRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.priority !== 0) {
+      writer.uint32(8).int32(message.priority);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateFetchCodeRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateFetchCodeRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.priority = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateFetchCodeRequest {
+    return { priority: isSet(object.priority) ? globalThis.Number(object.priority) : 0 };
+  },
+
+  toJSON(message: UpdateFetchCodeRequest): unknown {
+    const obj: any = {};
+    if (message.priority !== 0) {
+      obj.priority = Math.round(message.priority);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UpdateFetchCodeRequest>): UpdateFetchCodeRequest {
+    return UpdateFetchCodeRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateFetchCodeRequest>): UpdateFetchCodeRequest {
+    const message = createBaseUpdateFetchCodeRequest();
+    message.priority = object.priority ?? 0;
+    return message;
+  },
+};
+
+function createBaseUpdateFetchCodeResponse(): UpdateFetchCodeResponse {
+  return { fetchCode: undefined };
+}
+
+export const UpdateFetchCodeResponse: MessageFns<UpdateFetchCodeResponse> = {
+  encode(message: UpdateFetchCodeResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.fetchCode !== undefined) {
+      AssetConfigFetchCode.encode(message.fetchCode, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UpdateFetchCodeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUpdateFetchCodeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.fetchCode = AssetConfigFetchCode.decode(reader, reader.uint32());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UpdateFetchCodeResponse {
+    return {
+      fetchCode: isSet(object.fetchCode)
+        ? AssetConfigFetchCode.fromJSON(object.fetchCode)
+        : isSet(object.fetch_code)
+        ? AssetConfigFetchCode.fromJSON(object.fetch_code)
+        : undefined,
+    };
+  },
+
+  toJSON(message: UpdateFetchCodeResponse): unknown {
+    const obj: any = {};
+    if (message.fetchCode !== undefined) {
+      obj.fetchCode = AssetConfigFetchCode.toJSON(message.fetchCode);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UpdateFetchCodeResponse>): UpdateFetchCodeResponse {
+    return UpdateFetchCodeResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UpdateFetchCodeResponse>): UpdateFetchCodeResponse {
+    const message = createBaseUpdateFetchCodeResponse();
+    message.fetchCode = (object.fetchCode !== undefined && object.fetchCode !== null)
+      ? AssetConfigFetchCode.fromPartial(object.fetchCode)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseDeleteFetchCodeResponse(): DeleteFetchCodeResponse {
+  return { success: false };
+}
+
+export const DeleteFetchCodeResponse: MessageFns<DeleteFetchCodeResponse> = {
+  encode(message: DeleteFetchCodeResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.success !== false) {
+      writer.uint32(8).bool(message.success);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): DeleteFetchCodeResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseDeleteFetchCodeResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.success = reader.bool();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): DeleteFetchCodeResponse {
+    return { success: isSet(object.success) ? globalThis.Boolean(object.success) : false };
+  },
+
+  toJSON(message: DeleteFetchCodeResponse): unknown {
+    const obj: any = {};
+    if (message.success !== false) {
+      obj.success = message.success;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<DeleteFetchCodeResponse>): DeleteFetchCodeResponse {
+    return DeleteFetchCodeResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<DeleteFetchCodeResponse>): DeleteFetchCodeResponse {
+    const message = createBaseDeleteFetchCodeResponse();
+    message.success = object.success ?? false;
+    return message;
+  },
+};
+
+function createBaseListAssetPriceTypeCodesRequest(): ListAssetPriceTypeCodesRequest {
+  return { assetType: "" };
+}
+
+export const ListAssetPriceTypeCodesRequest: MessageFns<ListAssetPriceTypeCodesRequest> = {
+  encode(message: ListAssetPriceTypeCodesRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.assetType !== "") {
+      writer.uint32(10).string(message.assetType);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListAssetPriceTypeCodesRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListAssetPriceTypeCodesRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.assetType = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListAssetPriceTypeCodesRequest {
+    return {
+      assetType: isSet(object.assetType)
+        ? globalThis.String(object.assetType)
+        : isSet(object.asset_type)
+        ? globalThis.String(object.asset_type)
+        : "",
+    };
+  },
+
+  toJSON(message: ListAssetPriceTypeCodesRequest): unknown {
+    const obj: any = {};
+    if (message.assetType !== "") {
+      obj.assetType = message.assetType;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ListAssetPriceTypeCodesRequest>): ListAssetPriceTypeCodesRequest {
+    return ListAssetPriceTypeCodesRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ListAssetPriceTypeCodesRequest>): ListAssetPriceTypeCodesRequest {
+    const message = createBaseListAssetPriceTypeCodesRequest();
+    message.assetType = object.assetType ?? "";
+    return message;
+  },
+};
+
+function createBaseListAssetPriceTypeCodesResponse(): ListAssetPriceTypeCodesResponse {
+  return { typeCodes: [] };
+}
+
+export const ListAssetPriceTypeCodesResponse: MessageFns<ListAssetPriceTypeCodesResponse> = {
+  encode(message: ListAssetPriceTypeCodesResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.typeCodes) {
+      writer.uint32(10).string(v!);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): ListAssetPriceTypeCodesResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseListAssetPriceTypeCodesResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.typeCodes.push(reader.string());
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ListAssetPriceTypeCodesResponse {
+    return {
+      typeCodes: globalThis.Array.isArray(object?.typeCodes)
+        ? object.typeCodes.map((e: any) => globalThis.String(e))
+        : globalThis.Array.isArray(object?.type_codes)
+        ? object.type_codes.map((e: any) => globalThis.String(e))
+        : [],
+    };
+  },
+
+  toJSON(message: ListAssetPriceTypeCodesResponse): unknown {
+    const obj: any = {};
+    if (message.typeCodes?.length) {
+      obj.typeCodes = message.typeCodes;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<ListAssetPriceTypeCodesResponse>): ListAssetPriceTypeCodesResponse {
+    return ListAssetPriceTypeCodesResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<ListAssetPriceTypeCodesResponse>): ListAssetPriceTypeCodesResponse {
+    const message = createBaseListAssetPriceTypeCodesResponse();
+    message.typeCodes = object.typeCodes?.map((e) => e) || [];
     return message;
   },
 };
