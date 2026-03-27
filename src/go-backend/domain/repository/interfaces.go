@@ -456,6 +456,10 @@ type AssetConfigFetchCodeRepository interface {
 	// Soft-deleted rows are excluded automatically.
 	ListByConfigID(ctx context.Context, configID int32) ([]*models.AssetConfigFetchCode, error)
 
+	// GetByID retrieves a single fetch code by primary key.
+	// Returns nil, nil if the record does not exist.
+	GetByID(ctx context.Context, id int32) (*models.AssetConfigFetchCode, error)
+
 	// Create inserts a new fetch code record.
 	Create(ctx context.Context, fc *models.AssetConfigFetchCode) error
 

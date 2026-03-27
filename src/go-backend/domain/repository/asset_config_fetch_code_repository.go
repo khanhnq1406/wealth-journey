@@ -2,10 +2,13 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"wealthjourney/domain/models"
 	apperrors "wealthjourney/pkg/errors"
 	"wealthjourney/pkg/database"
+
+	"gorm.io/gorm"
 )
 
 // assetConfigFetchCodeRepository implements AssetConfigFetchCodeRepository using GORM.
@@ -32,6 +35,20 @@ func (r *assetConfigFetchCodeRepository) ListByConfigID(ctx context.Context, con
 		return nil, apperrors.NewInternalErrorWithCause("failed to list fetch codes by config id", result.Error)
 	}
 	return fetchCodes, nil
+}
+
+// GetByID retrieves a single fetch code by primary key.
+// Returns nil, nil when no record is found — callers decide whether absence is an error.
+func (r *assetConfigFetchCodeRepository) GetByID(ctx context.Context, id int32) (*models.AssetConfigFetchCode, error) {
+	var fc models.AssetConfigFetchCode
+	result := r.db.DB.WithContext(ctx).First(&fc, id)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, apperrors.NewInternalErrorWithCause("failed to get asset config fetch code by id", result.Error)
+	}
+	return &fc, nil
 }
 
 // Create inserts a new fetch code record.

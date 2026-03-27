@@ -364,6 +364,53 @@ type AssetPriceService interface {
 	GetPriceByTypeCode(ctx context.Context, typeCode string) (*AssetPriceDTO, error)
 }
 
+// AssetDisplayConfigService manages the admin-configurable asset display config table.
+// It supersedes GoldDisplayConfigService and adds support for multiple asset types
+// (gold, silver, etc.) as well as fetch-code-based price resolution.
+type AssetDisplayConfigService interface {
+	// GetDisplayPrices returns enabled configs for assetType joined with latest prices via fetch codes.
+	GetDisplayPrices(ctx context.Context, assetType string) ([]*AssetDisplayPriceDTO, error)
+	// ListAll returns all configs (including disabled) for admin.
+	ListAll(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error)
+	// Create adds a new asset display config entry.
+	Create(ctx context.Context, typeCode, displayName, assetType string, displayOrder int32, enabled, showInInvestment bool) (*models.AssetDisplayConfig, error)
+	// Update modifies an existing config entry.
+	Update(ctx context.Context, id int32, displayName string, displayOrder int32, enabled, showInInvestment bool) (*models.AssetDisplayConfig, error)
+	// Delete soft-deletes a config entry.
+	Delete(ctx context.Context, id int32) error
+
+	// ResolvePrice resolves the best available price for a typeCode + assetType pair
+	// by iterating fetch codes in priority order. Returns isStale=true if all sources
+	// are stale. Returns an error if no fetch codes or no asset_price rows are found.
+	ResolvePrice(ctx context.Context, typeCode, assetType string) (price int64, isStale bool, err error)
+
+	// ListFetchCodes retrieves all active fetch codes for a config ordered by priority ASC.
+	ListFetchCodes(ctx context.Context, configID int32) ([]*models.AssetConfigFetchCode, error)
+	// CreateFetchCode adds a fetch code to a config. Validates type_code, priority, max 10 cap,
+	// and type_code existence in asset_price table.
+	CreateFetchCode(ctx context.Context, configID int32, typeCode string, priority int32) (*models.AssetConfigFetchCode, error)
+	// UpdateFetchCode updates the priority of an existing fetch code.
+	UpdateFetchCode(ctx context.Context, id int32, priority int32) (*models.AssetConfigFetchCode, error)
+	// DeleteFetchCode soft-deletes a fetch code by id.
+	DeleteFetchCode(ctx context.Context, id int32) error
+	// ListAvailableTypeCodes returns all distinct type_codes in the asset_price table
+	// that are relevant for the given assetType.
+	ListAvailableTypeCodes(ctx context.Context, assetType string) ([]string, error)
+}
+
+// AssetDisplayPriceDTO is the combined config + price data returned by the public endpoint.
+type AssetDisplayPriceDTO struct {
+	TypeCode         string
+	AssetType        string
+	DisplayName      string
+	DisplayOrder     int32
+	Enabled          bool
+	ShowInInvestment bool
+	Buy              int64
+	Sell             int64
+	IsStale          bool
+}
+
 // GoldDisplayConfigService manages the admin-configurable gold display config table.
 type GoldDisplayConfigService interface {
 	// GetDisplayPrices returns enabled gold configs joined with latest prices and admin overrides.

@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-27-asset-price-bridge-plan.md
 - **Spec file:** docs/specs/2026-03-27-asset-price-bridge-spec.md
 - **Started:** 2026-03-27T00:00:00Z
-- **Last updated:** 2026-03-27T02:00:00Z
+- **Last updated:** 2026-03-27T03:00:00Z
 - **Current state:** in_progress
-- **Current task:** 8
+- **Current task:** 9
 
 ## Task Progress
 
@@ -22,7 +22,7 @@
 | 5   | Backend Repository — AssetDisplayConfigRepository                      | done    | bc837ec6 | AssetDisplayConfigRepository interface + GORM impl (9 methods), 27 sqlmock tests |
 | 6   | Backend Repository — AssetConfigFetchCodeRepository                    | done    | bc837ec6 | AssetConfigFetchCodeRepository interface + GORM impl (5 methods), 15 sqlmock tests |
 | 7   | Backend Repository — Update InvestmentRepository for PriceUpdatedAt    | done    | bc837ec6 | UpdatePrices sets price_updated_at; 1 new test |
-| 8   | Backend Service — AssetDisplayConfigService (rename + ResolvePrice)    | pending | —      | —       |
+| 8   | Backend Service — AssetDisplayConfigService (rename + ResolvePrice)    | done    | 66f0bde4 | AssetDisplayConfigService: GetDisplayPrices, ResolvePrice (fetch-code priority), fetch code CRUD with validation, 24 tests |
 | 9   | Backend Service — Bridge MarketDataService (DB read)                   | pending | —      | —       |
 | 10  | Backend DI Wiring — Update providers, services, builder                | pending | —      | —       |
 | 11  | Backend Handler — AssetDisplayConfigHandler (rename + fetch codes)     | pending | —      | —       |
