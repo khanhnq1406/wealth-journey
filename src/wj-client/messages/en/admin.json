@@ -176,11 +176,11 @@
         "silver_usd": "World Silver (USD)"
       }
     },
-    "goldDisplayConfig": {
-      "title": "Gold Display Configs",
-      "addButton": "+ Add Gold Type",
-      "emptyMessage": "No gold display configs found",
-      "emptyDescription": "Add your first gold type config using the button above",
+    "assetDisplayConfig": {
+      "title": "Asset Display Configs",
+      "addButton": "+ Add Asset Type",
+      "emptyMessage": "No asset display configs found",
+      "emptyDescription": "Add your first asset type config using the button above",
       "columns": {
         "order": "Order",
         "typeCode": "Type Code",
@@ -195,8 +195,8 @@
         "less": "Less"
       },
       "modal": {
-        "addTitle": "Add Gold Type",
-        "editTitle": "Edit Gold Type"
+        "addTitle": "Add Asset Type",
+        "editTitle": "Edit Asset Type"
       },
       "form": {
         "typeCode": "Type Code",
@@ -209,13 +209,13 @@
         "enabled": "Enabled",
         "showInInvestment": "Show in Investment",
         "existingCodesLabel": "Existing codes in database — click to copy:",
-        "submitCreate": "Add Gold Type",
+        "submitCreate": "Add Asset Type",
         "submitEdit": "Save Changes",
         "createError": "Failed to create config",
         "updateError": "Failed to update config"
       },
       "delete": {
-        "title": "Delete Gold Type",
+        "title": "Delete Asset Type",
         "message": "Are you sure you want to delete {name} ({code})?",
         "confirm": "Delete"
       },
@@ -223,9 +223,42 @@
         "created": "Config created",
         "updated": "Config updated",
         "deleted": "Config deleted",
-        "loadFailed": "Failed to load gold display configs",
+        "loadFailed": "Failed to load asset display configs",
         "updateFailed": "Failed to update config",
         "deleteFailed": "Failed to delete config"
+      },
+      "fetchCodes": {
+        "title": "Fetch Codes",
+        "addButton": "+ Add Fetch Code",
+        "emptyMessage": "No fetch codes configured",
+        "emptyDescription": "Add fetch codes to resolve prices for this asset type",
+        "columns": {
+          "typeCode": "Type Code",
+          "priority": "Priority",
+          "actions": "Actions"
+        },
+        "form": {
+          "typeCode": "Type Code",
+          "typeCodePlaceholder": "Select or type a code...",
+          "typeCodeRequired": "Type code is required",
+          "priority": "Priority",
+          "priorityHelp": "Lower number = higher priority",
+          "add": "Add",
+          "adding": "Adding..."
+        },
+        "delete": {
+          "title": "Remove Fetch Code",
+          "message": "Are you sure you want to remove fetch code {code}?",
+          "confirm": "Remove"
+        },
+        "toast": {
+          "created": "Fetch code added",
+          "createFailed": "Failed to add fetch code",
+          "deleted": "Fetch code removed",
+          "deleteFailed": "Failed to remove fetch code",
+          "updated": "Priority updated",
+          "updateFailed": "Failed to update priority"
+        }
       }
     },
     "pagination": {

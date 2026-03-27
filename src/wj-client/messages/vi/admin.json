@@ -176,11 +176,11 @@
         "silver_usd": "Bạc thế giới (USD)"
       }
     },
-    "goldDisplayConfig": {
-      "title": "Cấu hình hiển thị vàng",
-      "addButton": "+ Thêm loại vàng",
-      "emptyMessage": "Chưa có cấu hình hiển thị vàng",
-      "emptyDescription": "Thêm loại vàng đầu tiên bằng nút bên trên",
+    "assetDisplayConfig": {
+      "title": "Cấu hình hiển thị tài sản",
+      "addButton": "+ Thêm loại tài sản",
+      "emptyMessage": "Chưa có cấu hình hiển thị tài sản",
+      "emptyDescription": "Thêm loại tài sản đầu tiên bằng nút bên trên",
       "columns": {
         "order": "Thứ tự",
         "typeCode": "Mã loại",
@@ -195,8 +195,8 @@
         "less": "Thu gọn"
       },
       "modal": {
-        "addTitle": "Thêm loại vàng",
-        "editTitle": "Sửa loại vàng"
+        "addTitle": "Thêm loại tài sản",
+        "editTitle": "Sửa loại tài sản"
       },
       "form": {
         "typeCode": "Mã loại",
@@ -209,13 +209,13 @@
         "enabled": "Kích hoạt",
         "showInInvestment": "Hiển thị trong đầu tư",
         "existingCodesLabel": "Mã hiện có trong cơ sở dữ liệu — nhấn để sao chép:",
-        "submitCreate": "Thêm loại vàng",
+        "submitCreate": "Thêm loại tài sản",
         "submitEdit": "Lưu thay đổi",
         "createError": "Không thể tạo cấu hình",
         "updateError": "Không thể cập nhật cấu hình"
       },
       "delete": {
-        "title": "Xóa loại vàng",
+        "title": "Xóa loại tài sản",
         "message": "Bạn có chắc chắn muốn xóa {name} ({code})?",
         "confirm": "Xóa"
       },
@@ -223,9 +223,42 @@
         "created": "Đã tạo cấu hình",
         "updated": "Đã cập nhật cấu hình",
         "deleted": "Đã xóa cấu hình",
-        "loadFailed": "Không thể tải cấu hình hiển thị vàng",
+        "loadFailed": "Không thể tải cấu hình hiển thị tài sản",
         "updateFailed": "Không thể cập nhật cấu hình",
         "deleteFailed": "Không thể xóa cấu hình"
+      },
+      "fetchCodes": {
+        "title": "Mã lấy giá",
+        "addButton": "+ Thêm mã lấy giá",
+        "emptyMessage": "Chưa có mã lấy giá nào",
+        "emptyDescription": "Thêm mã lấy giá để tra cứu giá cho loại tài sản này",
+        "columns": {
+          "typeCode": "Mã loại",
+          "priority": "Độ ưu tiên",
+          "actions": "Thao tác"
+        },
+        "form": {
+          "typeCode": "Mã loại",
+          "typeCodePlaceholder": "Chọn hoặc nhập mã...",
+          "typeCodeRequired": "Mã loại là bắt buộc",
+          "priority": "Độ ưu tiên",
+          "priorityHelp": "Số nhỏ hơn = ưu tiên cao hơn",
+          "add": "Thêm",
+          "adding": "Đang thêm..."
+        },
+        "delete": {
+          "title": "Xóa mã lấy giá",
+          "message": "Bạn có chắc chắn muốn xóa mã lấy giá {code}?",
+          "confirm": "Xóa"
+        },
+        "toast": {
+          "created": "Đã thêm mã lấy giá",
+          "createFailed": "Không thể thêm mã lấy giá",
+          "deleted": "Đã xóa mã lấy giá",
+          "deleteFailed": "Không thể xóa mã lấy giá",
+          "updated": "Đã cập nhật độ ưu tiên",
+          "updateFailed": "Không thể cập nhật độ ưu tiên"
+        }
       }
     },
     "pagination": {
