@@ -14,10 +14,11 @@ import (
 type PriceSource string
 
 const (
-	SourceVangSaiGon PriceSource = "vangsaigon"
-	SourceVangToday  PriceSource = "vangtoday"
-	SourceBTMC       PriceSource = "btmc"
-	SourceMihong     PriceSource = "mihong"
+	SourceVangSaiGon  PriceSource = "vangsaigon"
+	SourceVangToday   PriceSource = "vangtoday"
+	SourceBTMC        PriceSource = "btmc"
+	SourceMihong      PriceSource = "mihong"
+	SourceVietcombank PriceSource = "vietcombank"
 
 	// waterfallSourceTimeout is the per-source fetch timeout used by the waterfall fetchers.
 	waterfallSourceTimeout = 5 * time.Second
