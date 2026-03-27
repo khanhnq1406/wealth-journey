@@ -379,10 +379,10 @@ type AssetDisplayConfigService interface {
 	// Delete soft-deletes a config entry.
 	Delete(ctx context.Context, id int32) error
 
-	// ResolvePrice resolves the best available price for a typeCode + assetType pair
+	// ResolvePrice resolves the best available buy and sell prices for a typeCode + assetType pair
 	// by iterating fetch codes in priority order. Returns isStale=true if all sources
 	// are stale. Returns an error if no fetch codes or no asset_price rows are found.
-	ResolvePrice(ctx context.Context, typeCode, assetType string) (price int64, isStale bool, err error)
+	ResolvePrice(ctx context.Context, typeCode, assetType string) (buy int64, sell int64, isStale bool, err error)
 
 	// ListFetchCodes retrieves all active fetch codes for a config ordered by priority ASC.
 	ListFetchCodes(ctx context.Context, configID int32) ([]*models.AssetConfigFetchCode, error)

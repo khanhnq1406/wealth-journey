@@ -27,7 +27,7 @@ type mockAssetDisplayConfigService struct {
 	createFunc             func(ctx context.Context, typeCode, displayName, assetType string, displayOrder int32, enabled, showInInvestment bool) (*models.AssetDisplayConfig, error)
 	updateFunc             func(ctx context.Context, id int32, displayName string, displayOrder int32, enabled, showInInvestment bool) (*models.AssetDisplayConfig, error)
 	deleteFunc             func(ctx context.Context, id int32) error
-	resolvePriceFunc       func(ctx context.Context, typeCode, assetType string) (int64, bool, error)
+	resolvePriceFunc       func(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error)
 	listFetchCodesFunc     func(ctx context.Context, configID int32) ([]*models.AssetConfigFetchCode, error)
 	createFetchCodeFunc    func(ctx context.Context, configID int32, typeCode string, priority int32) (*models.AssetConfigFetchCode, error)
 	updateFetchCodeFunc    func(ctx context.Context, id int32, priority int32) (*models.AssetConfigFetchCode, error)
@@ -70,11 +70,11 @@ func (m *mockAssetDisplayConfigService) Delete(ctx context.Context, id int32) er
 	return nil
 }
 
-func (m *mockAssetDisplayConfigService) ResolvePrice(ctx context.Context, typeCode, assetType string) (int64, bool, error) {
+func (m *mockAssetDisplayConfigService) ResolvePrice(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
 	if m.resolvePriceFunc != nil {
 		return m.resolvePriceFunc(ctx, typeCode, assetType)
 	}
-	return 0, false, nil
+	return 0, 0, false, nil
 }
 
 func (m *mockAssetDisplayConfigService) ListFetchCodes(ctx context.Context, configID int32) ([]*models.AssetConfigFetchCode, error) {

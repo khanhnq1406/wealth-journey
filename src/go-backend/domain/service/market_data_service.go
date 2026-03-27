@@ -270,7 +270,7 @@ func (s *marketDataService) fetchPriceFromAPI(ctx context.Context, symbol, curre
 func (s *marketDataService) fetchGoldPriceFromDB(ctx context.Context, symbol, currency string, investmentType investmentv1.InvestmentType) (*models.MarketData, error) {
 	// Primary: DB cache via AssetDisplayConfigService.
 	if s.assetDisplayConfigService != nil {
-		rawPrice, _, resolveErr := s.assetDisplayConfigService.ResolvePrice(ctx, symbol, "gold")
+		rawPrice, _, _, resolveErr := s.assetDisplayConfigService.ResolvePrice(ctx, symbol, "gold")
 		if resolveErr == nil {
 			// Normalize per-lượng → per-gram (VND gold) or pass-through (USD gold).
 			normalizedPrice := s.goldConverter.ProcessMarketPrice(rawPrice, currency, investmentType)
@@ -319,7 +319,7 @@ func (s *marketDataService) fetchGoldPriceFromDB(ctx context.Context, symbol, cu
 func (s *marketDataService) fetchSilverPriceFromDB(ctx context.Context, symbol, currency string, investmentType investmentv1.InvestmentType) (*models.MarketData, error) {
 	// Primary: DB cache via AssetDisplayConfigService.
 	if s.assetDisplayConfigService != nil {
-		rawPrice, _, resolveErr := s.assetDisplayConfigService.ResolvePrice(ctx, symbol, "silver")
+		rawPrice, _, _, resolveErr := s.assetDisplayConfigService.ResolvePrice(ctx, symbol, "silver")
 		if resolveErr == nil {
 			// Normalize unit (per-tael → per-gram for VND silver, pass-through for USD).
 			normalizedPrice := s.silverConverter.ProcessMarketPrice(rawPrice, currency, investmentType, symbol)

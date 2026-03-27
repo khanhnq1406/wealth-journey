@@ -68,14 +68,14 @@ func (m *mdbMarketDataRepo) List(ctx context.Context, opts repository.ListOption
 // Only ResolvePrice is called by marketDataService — other methods panic to catch
 // unexpected calls.
 type mdbAssetDisplayConfigService struct {
-	resolvePriceFn func(ctx context.Context, typeCode, assetType string) (int64, bool, error)
+	resolvePriceFn func(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error)
 }
 
-func (m *mdbAssetDisplayConfigService) ResolvePrice(ctx context.Context, typeCode, assetType string) (int64, bool, error) {
+func (m *mdbAssetDisplayConfigService) ResolvePrice(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
 	if m.resolvePriceFn != nil {
 		return m.resolvePriceFn(ctx, typeCode, assetType)
 	}
-	return 0, false, errors.New("not configured")
+	return 0, 0, false, errors.New("not configured")
 }
 
 func (m *mdbAssetDisplayConfigService) GetDisplayPrices(ctx context.Context, assetType string) ([]*AssetDisplayPriceDTO, error) {
@@ -186,10 +186,10 @@ func TestBridgeGoldPriceFromDB(t *testing.T) {
 	pricePerLuong := int64(8_500_000_000) // 8,500,000 VND per lượng in smallest unit (VND × 1000)
 
 	adcSvc := &mdbAssetDisplayConfigService{
-		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, bool, error) {
+		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
 			assert.Equal(t, "SJC", typeCode)
 			assert.Equal(t, "gold", assetType)
-			return pricePerLuong, false, nil
+			return pricePerLuong, 0, false, nil
 		},
 	}
 
@@ -229,10 +229,10 @@ func TestBridgeSilverPriceFromDB(t *testing.T) {
 	pricePerTael := int64(2_000_000_000) // 2,000,000 VND per tael ×1000
 
 	adcSvc := &mdbAssetDisplayConfigService{
-		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, bool, error) {
+		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
 			assert.Equal(t, "AG_VND_Tael", typeCode)
 			assert.Equal(t, "silver", assetType)
-			return pricePerTael, false, nil
+			return pricePerTael, 0, false, nil
 		},
 	}
 
@@ -270,9 +270,9 @@ func TestBridgeRegularInvestmentStillUsesYahoo(t *testing.T) {
 
 	// adcSvc.ResolvePrice must NOT be called for a stock investment.
 	adcSvc := &mdbAssetDisplayConfigService{
-		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, bool, error) {
+		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
 			t.Errorf("AssetDisplayConfigService.ResolvePrice called unexpectedly for typeCode=%s", typeCode)
-			return 0, false, errors.New("should not be called")
+			return 0, 0, false, errors.New("should not be called")
 		},
 	}
 
@@ -310,8 +310,8 @@ func TestBridgeGoldFallbackToLiveAPI(t *testing.T) {
 
 	// ResolvePrice fails → cold start.
 	adcSvc := &mdbAssetDisplayConfigService{
-		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, bool, error) {
-			return 0, false, errors.New("cold start: no asset_price rows")
+		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
+			return 0, 0, false, errors.New("cold start: no asset_price rows")
 		},
 	}
 
@@ -351,8 +351,8 @@ func TestBridgeSilverFallbackToLiveAPI(t *testing.T) {
 	ctx := context.Background()
 
 	adcSvc := &mdbAssetDisplayConfigService{
-		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, bool, error) {
-			return 0, false, errors.New("cold start: no asset_price rows")
+		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
+			return 0, 0, false, errors.New("cold start: no asset_price rows")
 		},
 	}
 
@@ -398,8 +398,8 @@ func TestBridgeGoldPriceNormalizationApplied(t *testing.T) {
 	pricePerLuongVND := int64(37_500_000)
 
 	adcSvc := &mdbAssetDisplayConfigService{
-		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, bool, error) {
-			return pricePerLuongVND, false, nil
+		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
+			return pricePerLuongVND, 0, false, nil
 		},
 	}
 
@@ -426,9 +426,9 @@ func TestBridgeCacheHitSkipsResolvePrice(t *testing.T) {
 	ctx := context.Background()
 
 	adcSvc := &mdbAssetDisplayConfigService{
-		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, bool, error) {
+		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
 			t.Errorf("ResolvePrice called unexpectedly (should be cache hit)")
-			return 0, false, errors.New("should not be called")
+			return 0, 0, false, errors.New("should not be called")
 		},
 	}
 

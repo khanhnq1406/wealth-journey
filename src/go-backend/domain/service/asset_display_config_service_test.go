@@ -226,7 +226,7 @@ func TestResolvePrice_HappyPath_FirstNonStaleReturned(t *testing.T) {
 	}
 
 	svc := newTestAssetDisplayConfigService(cfgRepo, fcRepo, apRepo)
-	price, isStale, err := svc.ResolvePrice(ctx, "SJC_1L", "gold")
+	buy, sell, isStale, err := svc.ResolvePrice(ctx, "SJC_1L", "gold")
 
 	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
@@ -234,8 +234,11 @@ func TestResolvePrice_HappyPath_FirstNonStaleReturned(t *testing.T) {
 	if isStale {
 		t.Error("expected isStale=false")
 	}
-	if price != 9000000 {
-		t.Errorf("expected price=9000000, got=%d", price)
+	if buy != 9000000 {
+		t.Errorf("expected buy=9000000, got=%d", buy)
+	}
+	if sell != 9100000 {
+		t.Errorf("expected sell=9100000, got=%d", sell)
 	}
 }
 
@@ -269,7 +272,7 @@ func TestResolvePrice_AllStale_ReturnsFreshestWithIsStaleTrue(t *testing.T) {
 	}
 
 	svc := newTestAssetDisplayConfigService(cfgRepo, fcRepo, apRepo)
-	price, isStale, err := svc.ResolvePrice(ctx, "SJC_MAIN", "gold")
+	buy, _, isStale, err := svc.ResolvePrice(ctx, "SJC_MAIN", "gold")
 
 	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
@@ -278,8 +281,8 @@ func TestResolvePrice_AllStale_ReturnsFreshestWithIsStaleTrue(t *testing.T) {
 		t.Error("expected isStale=true when all prices are stale")
 	}
 	// Should return the freshest (newest FetchedAt) stale price.
-	if price != 9000000 {
-		t.Errorf("expected freshest stale price=9000000, got=%d", price)
+	if buy != 9000000 {
+		t.Errorf("expected freshest stale buy=9000000, got=%d", buy)
 	}
 }
 
@@ -308,7 +311,7 @@ func TestResolvePrice_NoAssetPriceRows_ReturnsError(t *testing.T) {
 	}
 
 	svc := newTestAssetDisplayConfigService(cfgRepo, fcRepo, apRepo)
-	_, _, err := svc.ResolvePrice(ctx, "SJC_MAIN", "gold")
+	_, _, _, err := svc.ResolvePrice(ctx, "SJC_MAIN", "gold")
 
 	if err == nil {
 		t.Fatal("expected error when no asset_price rows exist")
@@ -334,7 +337,7 @@ func TestResolvePrice_NoFetchCodes_ReturnsError(t *testing.T) {
 	apRepo := &adcAssetPriceRepo{}
 
 	svc := newTestAssetDisplayConfigService(cfgRepo, fcRepo, apRepo)
-	_, _, err := svc.ResolvePrice(ctx, "SJC_MAIN", "gold")
+	_, _, _, err := svc.ResolvePrice(ctx, "SJC_MAIN", "gold")
 
 	if err == nil {
 		t.Fatal("expected error when no fetch codes are configured")
@@ -354,7 +357,7 @@ func TestResolvePrice_ConfigNotFound_ReturnsError(t *testing.T) {
 	apRepo := &adcAssetPriceRepo{}
 
 	svc := newTestAssetDisplayConfigService(cfgRepo, fcRepo, apRepo)
-	_, _, err := svc.ResolvePrice(ctx, "SJC_MAIN", "gold")
+	_, _, _, err := svc.ResolvePrice(ctx, "SJC_MAIN", "gold")
 
 	if err == nil {
 		t.Fatal("expected error when config not found")
@@ -708,6 +711,9 @@ func TestGetDisplayPrices_MergesConfigAndPrice(t *testing.T) {
 	}
 	if dtos[0].Buy != 9000000 {
 		t.Errorf("expected Buy=9000000, got=%d", dtos[0].Buy)
+	}
+	if dtos[0].Sell != 9100000 {
+		t.Errorf("expected Sell=9100000, got=%d", dtos[0].Sell)
 	}
 	if dtos[0].IsStale {
 		t.Error("expected IsStale=false")

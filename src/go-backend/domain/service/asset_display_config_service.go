@@ -53,9 +53,10 @@ func (s *assetDisplayConfigService) GetDisplayPrices(ctx context.Context, assetT
 			IsStale: true,
 		}
 
-		price, isStale, resolveErr := s.ResolvePrice(ctx, cfg.TypeCode, assetType)
+		buy, sell, isStale, resolveErr := s.ResolvePrice(ctx, cfg.TypeCode, assetType)
 		if resolveErr == nil {
-			dto.Buy = price
+			dto.Buy = buy
+			dto.Sell = sell
 			dto.IsStale = isStale
 		}
 		// On resolve error, dto retains IsStale=true, Buy=0, Sell=0.
@@ -187,31 +188,31 @@ func (s *assetDisplayConfigService) Delete(ctx context.Context, id int32) error 
 //  5. For each fetch code (by priority): if found and not stale, return price.Buy, false, nil.
 //  6. If all are stale: return the freshest stale price.Buy, true, nil.
 //  7. If no asset_price rows match any fetch code: return error.
-func (s *assetDisplayConfigService) ResolvePrice(ctx context.Context, typeCode, assetType string) (int64, bool, error) {
+func (s *assetDisplayConfigService) ResolvePrice(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
 	// Step 1: Get config.
 	cfg, err := s.configRepo.GetByTypeCodeAndAssetType(ctx, typeCode, assetType)
 	if err != nil {
-		return 0, false, err
+		return 0, 0, false, err
 	}
 	if cfg == nil {
-		return 0, false, apperrors.NewNotFoundError(fmt.Sprintf("asset display config for type_code=%s asset_type=%s", typeCode, assetType))
+		return 0, 0, false, apperrors.NewNotFoundError(fmt.Sprintf("asset display config for type_code=%s asset_type=%s", typeCode, assetType))
 	}
 
 	// Step 2: Get fetch codes ordered by priority ASC.
 	fetchCodes, err := s.fetchCodeRepo.ListByConfigID(ctx, cfg.ID)
 	if err != nil {
-		return 0, false, err
+		return 0, 0, false, err
 	}
 
 	// Step 3: No fetch codes configured.
 	if len(fetchCodes) == 0 {
-		return 0, false, apperrors.NewValidationError(fmt.Sprintf("no fetch codes configured for type_code=%s", typeCode))
+		return 0, 0, false, apperrors.NewValidationError(fmt.Sprintf("no fetch codes configured for type_code=%s", typeCode))
 	}
 
 	// Step 4: Load all asset_price rows for this assetType once.
 	allPrices, err := s.assetPriceRepo.ListByAssetType(ctx, assetType)
 	if err != nil {
-		return 0, false, err
+		return 0, 0, false, err
 	}
 
 	// Build a lookup map: typeCode → price (take most recently fetched for each type_code).
@@ -234,8 +235,8 @@ func (s *assetDisplayConfigService) ResolvePrice(ctx context.Context, typeCode, 
 		}
 
 		if !p.IsStale {
-			// Found a non-stale price — return immediately.
-			return p.Buy, false, nil
+			// Found a non-stale price — return immediately with both buy and sell.
+			return p.Buy, p.Sell, false, nil
 		}
 
 		// Track freshest stale price.
@@ -244,13 +245,13 @@ func (s *assetDisplayConfigService) ResolvePrice(ctx context.Context, typeCode, 
 		}
 	}
 
-	// Step 6: All prices were stale — return freshest stale price.
+	// Step 6: All prices were stale — return freshest stale price (buy and sell).
 	if freshestStale != nil {
-		return freshestStale.Buy, true, nil
+		return freshestStale.Buy, freshestStale.Sell, true, nil
 	}
 
 	// Step 7: No matching asset_price rows at all.
-	return 0, false, apperrors.NewNotFoundError(fmt.Sprintf("no asset price found for fetch codes of type_code=%s", typeCode))
+	return 0, 0, false, apperrors.NewNotFoundError(fmt.Sprintf("no asset price found for fetch codes of type_code=%s", typeCode))
 }
 
 // ListFetchCodes retrieves all active fetch codes for a config ordered by priority ASC.
