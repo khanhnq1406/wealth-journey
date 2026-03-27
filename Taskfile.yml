@@ -202,6 +202,12 @@ tasks:
     cmds:
       - go run cmd/migrate-asset-display-config/main.go
 
+  backend:migrate-vietcombank-currency:
+    desc: "Seed asset_display_config + asset_config_fetch_code entries for Vietcombank direct-API currency sources (_VCB suffix)"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-vietcombank-currency/main.go
+
   backend:migrate-asset-config-fetch-code:
     desc: "Create asset_config_fetch_code table and seed default fetch codes"
     dir: src/go-backend

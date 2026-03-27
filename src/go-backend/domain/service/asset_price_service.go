@@ -25,16 +25,18 @@ var knownAssetTypes = []string{"gold", "silver", "currency"}
 //
 // Depguard: no gorm.io/gorm import — all DB access goes through the repository interface.
 type assetPriceService struct {
-	repo              repository.AssetPriceRepository
-	configRepo        repository.AssetDisplayConfigRepository // nil = no display filter; all rows returned
-	silverSvc         SilverPriceService
-	currencySvc       CurrencyPriceService
-	vangSaiGonFetcher GoldPriceFetcher // nil = not configured; source skipped
-	vangTodayFetcher  GoldPriceFetcher // nil = not configured; source skipped
-	sjcClient         *sjc.Client        // nil = not configured; source skipped
-	dojiClient        *doji.Client       // nil = not configured; source skipped
-	btmcClient        *btmcdirect.Client // nil = not configured; source skipped
-	pnjClient         *pnj.Client        // nil = not configured; source skipped
+	repo                      repository.AssetPriceRepository
+	configRepo                repository.AssetDisplayConfigRepository // nil = no display filter; all rows returned
+	silverSvc                 SilverPriceService
+	vangSaiGonFetcher         GoldPriceFetcher     // nil = not configured; source skipped
+	vangTodayFetcher          GoldPriceFetcher     // nil = not configured; source skipped
+	vangSaiGonCurrencyFetcher CurrencyPriceFetcher // nil = not configured; source skipped
+	vangTodayCurrencyFetcher  CurrencyPriceFetcher // nil = not configured; source skipped
+	vietcombankFetcher        CurrencyPriceFetcher // nil = not configured; source skipped
+	sjcClient                 *sjc.Client          // nil = not configured; source skipped
+	dojiClient                *doji.Client         // nil = not configured; source skipped
+	btmcClient                *btmcdirect.Client   // nil = not configured; source skipped
+	pnjClient                 *pnj.Client          // nil = not configured; source skipped
 }
 
 // NewAssetPriceService creates a new AssetPriceService with constructor injection.
@@ -44,25 +46,29 @@ func NewAssetPriceService(
 	repo repository.AssetPriceRepository,
 	configRepo repository.AssetDisplayConfigRepository,
 	silverSvc SilverPriceService,
-	currencySvc CurrencyPriceService,
 	vangSaiGonFetcher GoldPriceFetcher,
 	vangTodayFetcher GoldPriceFetcher,
+	vangSaiGonCurrencyFetcher CurrencyPriceFetcher,
+	vangTodayCurrencyFetcher CurrencyPriceFetcher,
+	vietcombankFetcher CurrencyPriceFetcher,
 	sjcClient *sjc.Client,
 	dojiClient *doji.Client,
 	btmcClient *btmcdirect.Client,
 	pnjClient *pnj.Client,
 ) AssetPriceService {
 	return &assetPriceService{
-		repo:              repo,
-		configRepo:        configRepo,
-		silverSvc:         silverSvc,
-		currencySvc:       currencySvc,
-		vangSaiGonFetcher: vangSaiGonFetcher,
-		vangTodayFetcher:  vangTodayFetcher,
-		sjcClient:         sjcClient,
-		dojiClient:        dojiClient,
-		btmcClient:        btmcClient,
-		pnjClient:         pnjClient,
+		repo:                      repo,
+		configRepo:                configRepo,
+		silverSvc:                 silverSvc,
+		vangSaiGonFetcher:         vangSaiGonFetcher,
+		vangTodayFetcher:          vangTodayFetcher,
+		vangSaiGonCurrencyFetcher: vangSaiGonCurrencyFetcher,
+		vangTodayCurrencyFetcher:  vangTodayCurrencyFetcher,
+		vietcombankFetcher:        vietcombankFetcher,
+		sjcClient:                 sjcClient,
+		dojiClient:                dojiClient,
+		btmcClient:                btmcClient,
+		pnjClient:                 pnjClient,
 	}
 }
 
@@ -87,14 +93,14 @@ type refreshResult struct {
 // Each source runs in its own goroutine. One failure marks only that source stale
 // and does not interrupt the others.
 //
-// Returns non-nil error only when every one of the 8 sources fails, so callers
+// Returns non-nil error only when every one of the 10 sources fails, so callers
 // can decide to retry or alert.
 //
 // Log summary format (for observability):
 //
-//	"[assetPriceService] Price cache job completed: gold_vangsaigon=OK(25), gold_vangtoday=FAIL(...), ..."
+//	"[assetPriceService] Price cache job completed: gold_vangsaigon=OK(25), gold_vangtoday=FAIL(...), currency_vangsaigon=OK(12), currency_vangtoday=OK(12), currency_vietcombank=OK(8), ..."
 func (s *assetPriceService) RefreshAllPrices(ctx context.Context) error {
-	results := make(chan refreshResult, 8)
+	results := make(chan refreshResult, 10)
 	var wg sync.WaitGroup
 
 	// 2 direct VangSaiGon / VangToday gold sources (replacing waterfall)
@@ -109,16 +115,21 @@ func (s *assetPriceService) RefreshAllPrices(ctx context.Context) error {
 	go func() { defer wg.Done(); results <- s.refreshGoldBTMC(ctx) }()
 	go func() { defer wg.Done(); results <- s.refreshGoldPNJ(ctx) }()
 
-	// Silver + currency (unchanged)
-	wg.Add(2)
+	// Silver (unchanged)
+	wg.Add(1)
 	go func() { defer wg.Done(); results <- s.refreshSilver(ctx) }()
-	go func() { defer wg.Done(); results <- s.refreshCurrency(ctx) }()
+
+	// 3 parallel currency sources (replacing single waterfall refreshCurrency)
+	wg.Add(3)
+	go func() { defer wg.Done(); results <- s.refreshCurrencyVangSaiGon(ctx) }()
+	go func() { defer wg.Done(); results <- s.refreshCurrencyVangToday(ctx) }()
+	go func() { defer wg.Done(); results <- s.refreshCurrencyVietcombank(ctx) }()
 
 	// Close channel once all goroutines complete.
 	go func() { wg.Wait(); close(results) }()
 
 	// Collect results and build log summary.
-	summaryParts := make([]string, 0, 8)
+	summaryParts := make([]string, 0, 10)
 	failCount := 0
 	for r := range results {
 		if r.err != nil {
@@ -131,7 +142,7 @@ func (s *assetPriceService) RefreshAllPrices(ctx context.Context) error {
 	log.Printf("[assetPriceService] Price cache job completed: %s", strings.Join(summaryParts, ", "))
 
 	// Return error only when ALL sources failed.
-	if failCount == 8 {
+	if failCount == 10 {
 		return fmt.Errorf("all price sources failed")
 	}
 	return nil
@@ -229,7 +240,7 @@ func (s *assetPriceService) refreshGoldVangToday(ctx context.Context) refreshRes
 }
 
 // ---------------------------------------------------------------------------
-// Waterfall refresh methods for silver and currency
+// Waterfall refresh method for silver
 // ---------------------------------------------------------------------------
 
 // refreshSilver fetches silver prices and upserts them. On failure it marks rows stale.
@@ -271,19 +282,27 @@ func (s *assetPriceService) refreshSilver(ctx context.Context) refreshResult {
 	return refreshResult{source: "silver_waterfall", count: len(batch), err: nil}
 }
 
-// refreshCurrency fetches currency prices and upserts them. On failure it marks rows stale.
-func (s *assetPriceService) refreshCurrency(ctx context.Context) refreshResult {
-	prices, err := s.currencySvc.FetchAllPrices(ctx)
-	if err != nil {
-		log.Printf("[assetPriceService] currency fetch failed: %v — marking stale", err)
-		if markErr := s.repo.MarkStaleByAssetType(ctx, "currency"); markErr != nil {
-			log.Printf("[assetPriceService] failed to mark currency stale: %v", markErr)
-		}
-		return refreshResult{source: "currency_waterfall", count: 0, err: err}
-	}
+// ---------------------------------------------------------------------------
+// Per-source currency refresh methods (replacing single waterfall refreshCurrency)
+// ---------------------------------------------------------------------------
 
+// refreshCurrencyVangSaiGon fetches currency prices directly from the VangSaiGon API (vangsaigon.vn)
+// and upserts them with source="vangsaigon". Marks stale independently on any failure.
+func (s *assetPriceService) refreshCurrencyVangSaiGon(ctx context.Context) refreshResult {
+	if s.vangSaiGonCurrencyFetcher == nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "currency", "vangsaigon")
+		return refreshResult{source: "currency_vangsaigon", count: 0, err: fmt.Errorf("vangsaigon currency fetcher not configured")}
+	}
+	prices, err := s.vangSaiGonCurrencyFetcher.FetchCurrencyPrices(ctx)
+	if err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "currency", "vangsaigon")
+		return refreshResult{source: "currency_vangsaigon", count: 0, err: err}
+	}
 	batch := make([]*models.AssetPrice, 0, len(prices))
 	for _, p := range prices {
+		if p.Buy <= 0 && p.Sell <= 0 {
+			continue
+		}
 		batch = append(batch, &models.AssetPrice{
 			TypeCode:   p.TypeCode,
 			AssetType:  "currency",
@@ -293,21 +312,105 @@ func (s *assetPriceService) refreshCurrency(ctx context.Context) refreshResult {
 			ChangeBuy:  p.ChangeBuy,
 			ChangeSell: p.ChangeSell,
 			Currency:   p.Currency,
-			Source:     "waterfall",
+			Source:     "vangsaigon",
 			IsStale:    false,
 			FetchedAt:  time.Now(),
 		})
 	}
-
-	if upsertErr := s.repo.UpsertBatch(ctx, batch); upsertErr != nil {
-		log.Printf("[assetPriceService] currency upsert failed: %v — marking stale", upsertErr)
-		if markErr := s.repo.MarkStaleByAssetType(ctx, "currency"); markErr != nil {
-			log.Printf("[assetPriceService] failed to mark currency stale after upsert failure: %v", markErr)
-		}
-		return refreshResult{source: "currency_waterfall", count: 0, err: upsertErr}
+	if len(batch) == 0 {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "currency", "vangsaigon")
+		return refreshResult{source: "currency_vangsaigon", count: 0, err: fmt.Errorf("vangsaigon currency: no valid prices")}
 	}
+	if err := s.repo.UpsertBatch(ctx, batch); err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "currency", "vangsaigon")
+		return refreshResult{source: "currency_vangsaigon", count: 0, err: err}
+	}
+	return refreshResult{source: "currency_vangsaigon", count: len(batch), err: nil}
+}
 
-	return refreshResult{source: "currency_waterfall", count: len(batch), err: nil}
+// refreshCurrencyVangToday fetches currency prices directly from the VangToday API (vang.today)
+// and upserts them with source="vangtoday". Marks stale independently on any failure.
+func (s *assetPriceService) refreshCurrencyVangToday(ctx context.Context) refreshResult {
+	if s.vangTodayCurrencyFetcher == nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "currency", "vangtoday")
+		return refreshResult{source: "currency_vangtoday", count: 0, err: fmt.Errorf("vangtoday currency fetcher not configured")}
+	}
+	prices, err := s.vangTodayCurrencyFetcher.FetchCurrencyPrices(ctx)
+	if err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "currency", "vangtoday")
+		return refreshResult{source: "currency_vangtoday", count: 0, err: err}
+	}
+	batch := make([]*models.AssetPrice, 0, len(prices))
+	for _, p := range prices {
+		if p.Buy <= 0 && p.Sell <= 0 {
+			continue
+		}
+		batch = append(batch, &models.AssetPrice{
+			TypeCode:   p.TypeCode,
+			AssetType:  "currency",
+			Name:       p.Name,
+			Buy:        p.Buy,
+			Sell:       p.Sell,
+			ChangeBuy:  p.ChangeBuy,
+			ChangeSell: p.ChangeSell,
+			Currency:   p.Currency,
+			Source:     "vangtoday",
+			IsStale:    false,
+			FetchedAt:  time.Now(),
+		})
+	}
+	if len(batch) == 0 {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "currency", "vangtoday")
+		return refreshResult{source: "currency_vangtoday", count: 0, err: fmt.Errorf("vangtoday currency: no valid prices")}
+	}
+	if err := s.repo.UpsertBatch(ctx, batch); err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "currency", "vangtoday")
+		return refreshResult{source: "currency_vangtoday", count: 0, err: err}
+	}
+	return refreshResult{source: "currency_vangtoday", count: len(batch), err: nil}
+}
+
+// refreshCurrencyVietcombank fetches currency prices from the Vietcombank public API
+// and upserts them with source="vietcombank". TypeCodes already carry _VCB suffix from
+// the fetcher adapter (e.g. "USD_VCB"). Marks stale independently on any failure.
+func (s *assetPriceService) refreshCurrencyVietcombank(ctx context.Context) refreshResult {
+	if s.vietcombankFetcher == nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "currency", "vietcombank")
+		return refreshResult{source: "currency_vietcombank", count: 0, err: fmt.Errorf("vietcombank currency fetcher not configured")}
+	}
+	prices, err := s.vietcombankFetcher.FetchCurrencyPrices(ctx)
+	if err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "currency", "vietcombank")
+		return refreshResult{source: "currency_vietcombank", count: 0, err: err}
+	}
+	batch := make([]*models.AssetPrice, 0, len(prices))
+	for _, p := range prices {
+		if p.Buy <= 0 && p.Sell <= 0 {
+			continue
+		}
+		batch = append(batch, &models.AssetPrice{
+			TypeCode:   p.TypeCode,
+			AssetType:  "currency",
+			Name:       p.Name,
+			Buy:        p.Buy,
+			Sell:       p.Sell,
+			ChangeBuy:  p.ChangeBuy,
+			ChangeSell: p.ChangeSell,
+			Currency:   p.Currency,
+			Source:     "vietcombank",
+			IsStale:    false,
+			FetchedAt:  time.Now(),
+		})
+	}
+	if len(batch) == 0 {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "currency", "vietcombank")
+		return refreshResult{source: "currency_vietcombank", count: 0, err: fmt.Errorf("vietcombank currency: no valid prices")}
+	}
+	if err := s.repo.UpsertBatch(ctx, batch); err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "currency", "vietcombank")
+		return refreshResult{source: "currency_vietcombank", count: 0, err: err}
+	}
+	return refreshResult{source: "currency_vietcombank", count: len(batch), err: nil}
 }
 
 // ---------------------------------------------------------------------------

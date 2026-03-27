@@ -168,7 +168,7 @@ flowchart LR
 
     subgraph PriceCache["Price Cache Job Detail (WRITER to asset_price)"]
         PC --> PC1["assetPriceSvc.RefreshAllPrices()"]
-        PC1 --> PC2["Fetch gold/silver/currency\nfrom live price services\n(8 parallel goroutines)"]
+        PC1 --> PC2["Fetch gold/silver/currency\nfrom live price services\n(10 parallel goroutines)"]
         PC2 --> PC3["Upsert into asset_price table\nMarkStale on fetch failure"]
         PC3 --> PC4["Log: completed or error"]
     end
@@ -1036,7 +1036,7 @@ flowchart TD
 **Trigger:** Application startup — runs every 15 minutes (10-second startup delay)
 **Source:** `internal/scheduler/price_cache_job.go`, `domain/service/asset_price_service.go`, `domain/repository/asset_price_repository.go`
 
-`PriceCacheJob` is the **sole writer** to the `asset_price` PostgreSQL table. It decouples all price consumers (HTTP handlers and the `PriceUpdateJob`) from live external APIs. The job fetches gold from 6 independent direct sources (VangSaiGon, VangToday, SJC, DOJI, BTMC, PNJ), silver, and currency prices in **8 parallel goroutines** and persists them to `asset_price`. All consumers then read from the DB exclusively, eliminating per-request external API calls.
+`PriceCacheJob` is the **sole writer** to the `asset_price` PostgreSQL table. It decouples all price consumers (HTTP handlers and the `PriceUpdateJob`) from live external APIs. The job fetches gold from 6 independent direct sources (VangSaiGon, VangToday, SJC, DOJI, BTMC, PNJ), silver, and currency prices from 3 independent sources (VangSaiGon, VangToday, Vietcombank direct API) in **10 parallel goroutines** and persists them to `asset_price`. All consumers then read from the DB exclusively, eliminating per-request external API calls.
 
 **Producer-consumer relationship:**
 - `PriceCacheJob` (this job) — **producer**: writes `asset_price` rows every 15 min
@@ -1051,7 +1051,9 @@ sequenceDiagram
     participant VSG as VangSaiGonFetcher
     participant VT as VangTodayFetcher
     participant SPS as SilverPriceService
-    participant CPS as CurrencyPriceService
+    participant CVSG as VangSaiGon<br/>CurrencyFetcher
+    participant CVT as VangToday<br/>CurrencyFetcher
+    participant CVCB as Vietcombank<br/>CurrencyFetcher
     participant SJC as pkg/sjc.Client
     participant DOJ as pkg/doji.Client
     participant BTC as pkg/btmcdirect.Client
@@ -1061,7 +1063,7 @@ sequenceDiagram
 
     SCH->>PCJ: Run(ctx) [every 15 min]
     PCJ->>APS: RefreshAllPrices(ctx)
-    Note over APS: Launches 8 goroutines into buffered channel<br/>WaitGroup closer goroutine drains when all done
+    Note over APS: Launches 10 goroutines into buffered channel<br/>WaitGroup closer goroutine drains when all done
 
     par VangSaiGon gold fetch [source="vangsaigon"]
         APS->>VSG: refreshGoldVangSaiGon(ctx)
@@ -1133,31 +1135,52 @@ sequenceDiagram
             SPS-->>APS: error
             APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "silver", "waterfall")
         end
-    and Currency fetch [source="waterfall"]
-        APS->>CPS: FetchAllPrices(ctx)
-        alt Fetch success
-            CPS-->>APS: []*CachedCurrencyPrice
-            Note over APS: Convert to []AssetPrice<br/>AssetType="currency", Source="waterfall", IsStale=false
-            APS->>APR: UpsertBatch(ctx, currencyPrices)
-        else Fetch failure
-            CPS-->>APS: error
-            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "currency", "waterfall")
+    and VangSaiGon currency fetch [source="vangsaigon"]
+        APS->>CVSG: refreshCurrencyVangSaiGon(ctx)
+        CVSG->>VangSaiGon API: GET /currency (vnprice.Client)
+        alt success
+            VangSaiGon API-->>CVSG: currency prices
+            Note over APS: Convert to []AssetPrice<br/>AssetType="currency", Source="vangsaigon", IsStale=false
+            APS->>APR: UpsertBatch(ctx, batch)
+        else fetch or upsert fails / nil fetcher
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "currency", "vangsaigon")
+        end
+    and VangToday currency fetch [source="vangtoday"]
+        APS->>CVT: refreshCurrencyVangToday(ctx)
+        CVT->>VangToday API: GET /currency (vangtoday.Client)
+        alt success
+            VangToday API-->>CVT: currency prices
+            Note over APS: Convert to []AssetPrice<br/>AssetType="currency", Source="vangtoday", IsStale=false
+            APS->>APR: UpsertBatch(ctx, batch)
+        else fetch or upsert fails / nil fetcher
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "currency", "vangtoday")
+        end
+    and Vietcombank currency fetch [source="vietcombank"]
+        APS->>CVCB: refreshCurrencyVietcombank(ctx)
+        CVCB->>Vietcombank API: GET /api/exchangerates?date=YYYY-MM-DD
+        alt success
+            Vietcombank API-->>CVCB: exchange rates (Transfer→Buy, TypeCode+"_VCB")
+            Note over APS: Convert to []AssetPrice<br/>AssetType="currency", Source="vietcombank"<br/>TypeCode has _VCB suffix (e.g. "USD_VCB"), IsStale=false
+            APS->>APR: UpsertBatch(ctx, batch)
+        else fetch or upsert fails / nil fetcher
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "currency", "vietcombank")
         end
     end
 
-    Note over APS: Collect all 8 refreshResult values from channel<br/>failCount < 8 → nil; failCount == 8 → error "all price sources failed"
-    APS-->>PCJ: nil (or error if all 8 failed)
+    Note over APS: Collect all 10 refreshResult values from channel<br/>failCount < 10 → nil; failCount == 10 → error "all price sources failed"
+    Note over APS: Log: "currency_vangsaigon=OK(18), currency_vangtoday=OK(18), currency_vietcombank=OK(13), ..."
+    APS-->>PCJ: nil (or error if all 10 failed)
     PCJ-->>SCH: Log result
 ```
 
 ### Key Invariants
 
 - **`PriceCacheJob` is the sole writer to `asset_price`** — no other job or handler writes to this table; all other consumers are read-only
-- All 8 fetches are **independent** — one failure does not prevent others from succeeding
+- All 10 fetches are **independent** — one failure does not prevent others from succeeding
 - On fetch success: `UpsertBatch` uses `ON CONFLICT (type_code, currency, source) DO UPDATE` — idempotent (3-column unique index)
 - On fetch failure: `MarkStaleByAssetTypeAndSource(ctx, assetType, source)` marks stale only for that source — other sources' rows for the same `asset_type` are unaffected
-- Nil client (e.g., no `BTMC_API_KEY`) → goroutine treats it as failure → marks stale for that source; the other 7 sources are unaffected
-- Error is returned only if **all 8** sources fail simultaneously
+- Nil fetcher/client (e.g., no `BTMC_API_KEY`, or `VIETCOMBANK_FX_ENABLED=false`) → goroutine treats it as failure → marks stale for that source; the other 9 sources are unaffected
+- Error is returned only if **all 10** sources fail simultaneously
 - The job never crashes the scheduler — all errors are logged and returned without panicking
 - `PriceCacheJob` has a 10-second startup delay so the app is fully initialized before the first fetch
 - **`PriceUpdateJob` is a consumer, not a writer**: it reads from `asset_price` via `AssetDisplayConfigService.ResolvePrice()` to resolve gold/silver prices for individual investments, then writes only to `investment.current_price` + `investment.price_updated_at`
@@ -1168,10 +1191,11 @@ sequenceDiagram
 
 | Condition | Response | User Impact |
 |-----------|----------|-------------|
-| One per-source client fails (e.g., SJC API down) | `MarkStaleByAssetTypeAndSource("gold", "sjc")` | SJC-sourced gold prices show `isStale: true`; other 7 sources unaffected |
-| VangSaiGon gold fails | `MarkStaleByAssetTypeAndSource("gold", "vangsaigon")` | VangSaiGon gold prices stale; other 7 sources unaffected |
-| VangToday gold fails | `MarkStaleByAssetTypeAndSource("gold", "vangtoday")` | VangToday gold prices stale; other 7 sources unaffected |
-| All 8 sources fail | `RefreshAllPrices` returns error | All price items have `isStale: true`; frontend displays `"--"` |
+| One per-source client fails (e.g., SJC API down) | `MarkStaleByAssetTypeAndSource("gold", "sjc")` | SJC-sourced gold prices show `isStale: true`; other 9 sources unaffected |
+| VangSaiGon gold fails | `MarkStaleByAssetTypeAndSource("gold", "vangsaigon")` | VangSaiGon gold prices stale; other 9 sources unaffected |
+| VangToday gold fails | `MarkStaleByAssetTypeAndSource("gold", "vangtoday")` | VangToday gold prices stale; other 9 sources unaffected |
+| Vietcombank currency fails (or `VIETCOMBANK_FX_ENABLED=false`) | `MarkStaleByAssetTypeAndSource("currency", "vietcombank")` | Vietcombank currency prices stale; vangsaigon and vangtoday currency unaffected |
+| All 10 sources fail | `RefreshAllPrices` returns error | All price items have `isStale: true`; frontend displays `"--"` |
 | DB write fails for one source | Error logged; that source's prices may lag | Next run retries; other sources update normally |
 | DB empty (first run not yet complete) | Handlers return empty arrays or static fallback | `GetPublicMarketTypes` falls back to static registries |
 

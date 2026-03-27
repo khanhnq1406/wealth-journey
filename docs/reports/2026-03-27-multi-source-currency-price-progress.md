@@ -16,7 +16,7 @@
 | --- | ------------------------------------------------------ | ---------- | ------ | ------- |
 | 0   | Update C4 Architecture Diagrams                        | done       | 948fde8c | Added VietcombankClient to c4-component-backend.md + Rels |
 | 1   | Create Vietcombank API Client (pkg/vietcombank/)       | done       | 948fde8c | types.go + client.go + client_test.go, 9 tests pass |
-| 2   | Create Vietcombank Currency Fetcher Adapter            | done       | TBD    | currency_fetcher_vietcombank.go + test, SourceVietcombank const, 7 tests pass |
+| 2   | Create Vietcombank Currency Fetcher Adapter            | done       | 5dd2a7f2 | currency_fetcher_vietcombank.go + test, SourceVietcombank const, 7 tests pass |
 | 3   | Replace Currency Waterfall with 3 Parallel Refresh     | pending    | —      | —       |
 | 4   | Wire Vietcombank Client + Currency Fetchers in DI      | pending    | —      | —       |
 | 5   | Seed Vietcombank Currency Display Config + Fetch Codes | pending    | —      | —       |

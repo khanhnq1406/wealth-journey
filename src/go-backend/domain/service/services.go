@@ -14,6 +14,7 @@ import (
 	pkgredis "wealthjourney/pkg/redis"
 	"wealthjourney/pkg/sjc"
 	"wealthjourney/pkg/storage"
+	"wealthjourney/pkg/vietcombank"
 )
 
 // Services holds all service instances.
@@ -53,7 +54,6 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	}
 	goldPriceSvc := NewGoldPriceService(redisClient, btmcAPIKey)
 	silverPriceSvc := NewSilverPriceService(redisClient)
-	currencyPriceSvc := NewCurrencyPriceService(redisClient)
 	// AssetDisplayConfigService — wires fetch-code-based price resolution.
 	// Provides the AssetDisplayConfigService to MarketDataService for DB-backed gold/silver prices.
 	assetDisplayConfigSvc := NewAssetDisplayConfigService(repos.AssetDisplayConfig, repos.AssetConfigFetchCode, repos.AssetPrice)
@@ -94,13 +94,24 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	btmcClient := btmcdirect.NewClient()
 	pnjClient := pnj.NewClient()
 
+	// Feature flag: VIETCOMBANK_FX_ENABLED (default true).
+	// Set to "false" to disable Vietcombank currency fetching entirely.
+	var vcbFetcher CurrencyPriceFetcher
+	if os.Getenv("VIETCOMBANK_FX_ENABLED") != "false" {
+		vcbFetcher = NewVietcombankCurrencyFetcher(vietcombank.NewClient())
+	} else {
+		log.Println("[NewServices] VIETCOMBANK_FX_ENABLED=false — Vietcombank currency fetcher disabled")
+	}
+
 	assetPriceSvc := NewAssetPriceService(
 		repos.AssetPrice,
 		repos.AssetDisplayConfig,
 		silverPriceSvc,
-		currencyPriceSvc,
 		NewVangSaiGonGoldFetcher(waterfallSourceTimeout),
 		NewVangTodayGoldFetcher(waterfallSourceTimeout),
+		NewVangSaiGonCurrencyFetcher(waterfallSourceTimeout),
+		NewVangTodayCurrencyFetcher(waterfallSourceTimeout),
+		vcbFetcher,
 		sjcClient,
 		dojiClient,
 		btmcClient,
