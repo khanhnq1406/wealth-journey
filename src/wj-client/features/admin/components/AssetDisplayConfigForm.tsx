@@ -285,7 +285,7 @@ export function AssetDisplayConfigForm({
       <div className="mt-6 pt-4 border-t border-v2-border-light">
         <FetchCodeList
           configId={initialValues.id}
-          assetType={initialValues.typeCode}
+          assetType={assetType ?? "gold"}
         />
       </div>
     )}

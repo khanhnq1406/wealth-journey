@@ -136,6 +136,49 @@ describe("AssetDisplayConfigForm — create mode asset type selector", () => {
   });
 });
 
+describe("AssetDisplayConfigForm — FetchCodeList receives correct assetType in edit mode", () => {
+  it("passes assetType prop (not typeCode) to FetchCodeList", () => {
+    renderWithProviders(
+      <AssetDisplayConfigForm
+        mode="edit"
+        assetType="gold"
+        initialValues={{
+          id: 1,
+          typeCode: "SJL1L10",
+          displayName: "SJC 1 lượng 10",
+          displayOrder: 1,
+          enabled: true,
+          showInInvestment: true,
+        }}
+      />
+    );
+
+    const fetchCodeList = screen.getByTestId("fetch-code-list");
+    // Must be "gold", NOT "SJL1L10" (the typeCode)
+    expect(fetchCodeList).toHaveAttribute("data-asset-type", "gold");
+  });
+
+  it("passes silver assetType when config is a silver entry", () => {
+    renderWithProviders(
+      <AssetDisplayConfigForm
+        mode="edit"
+        assetType="silver"
+        initialValues={{
+          id: 5,
+          typeCode: "XAG_VN",
+          displayName: "Bạc Việt Nam",
+          displayOrder: 1,
+          enabled: true,
+          showInInvestment: false,
+        }}
+      />
+    );
+
+    const fetchCodeList = screen.getByTestId("fetch-code-list");
+    expect(fetchCodeList).toHaveAttribute("data-asset-type", "silver");
+  });
+});
+
 describe("AssetDisplayConfigForm — onSuccess callback passes created id", () => {
   it("calls onSuccess with the created config id after successful create", async () => {
     const mockOnSuccess = jest.fn();

@@ -141,6 +141,7 @@ All CI checks pass on the final commit:
 | 2026-03-27 | Show available type codes from DB as selectable pills in FetchCodeList add form | Minor   | 4 files       |
 | 2026-03-27 | Apply `encodeURIComponent` to `assetType` in `AssetDisplayConfigTable` query URL (consistency with FetchCodeList) | Minor | 1 file |
 | 2026-03-27 | Replace read-only Asset Type badge with interactive Gold/Silver selector in create form; auto-open edit mode after create so fetch codes can be added immediately | Minor | 3 files |
+| 2026-03-27 | Fix `FetchCodeList` receiving `typeCode` instead of `assetType` — available DB codes never shown in edit mode | Minor | 2 files |
 
 ### Fix detail — Gold/Silver tab split
 
@@ -209,3 +210,20 @@ All CI checks pass on the final commit:
 **CI:** `npm test` — 462 pass, 5 skipped (pre-existing); `npm run lint` — 0 errors (89 pre-existing warnings in generated files).
 
 **Security review:** PASS — `selectedAssetType` is constrained to `["gold", "silver"] as const`; no user text can set it; `createdId` is a numeric DB ID used only for local modal state; no XSS, injection, or authorization bypass vectors. Admin-only route unchanged.
+
+### Fix detail — FetchCodeList receiving wrong `assetType` in edit mode
+
+**Issue:** When opening an asset display config in edit mode, the "Available codes" pill section above the "Mã loại" input was never shown. The backend endpoint existed and the frontend code to display pills was already implemented, but no pills appeared.
+
+**Root cause:** `AssetDisplayConfigForm.tsx` passed `assetType={initialValues.typeCode}` to `FetchCodeList` instead of the actual asset type. `initialValues.typeCode` contains values like `"SJL1L10"` or `"DOJI"` — not `"gold"` or `"silver"`. This caused `FetchCodeList` to query `/api/v1/admin/asset-price-type-codes?assetType=SJL1L10` which returns an empty list, so the pills section was always hidden.
+
+Additionally, `AssetDisplayConfigTable` did not pass an `assetType` prop to the edit-mode form at all, leaving `assetType` as `undefined` in the form, which further compounded the bug.
+
+**What changed:**
+- `AssetDisplayConfigForm.tsx` — Changed `assetType={initialValues.typeCode}` → `assetType={assetType ?? "gold"}` in the `FetchCodeList` render. The `assetType` prop is now correctly forwarded from the parent.
+- `AssetDisplayConfigTable.tsx` — Added `assetType={editTarget.assetType}` to the edit-mode `AssetDisplayConfigForm` render so the form receives the correct asset type from the DB record.
+- `AssetDisplayConfigForm.test.tsx` — Added 2 regression tests: (1) verifies `FetchCodeList` receives `"gold"` (not `"SJL1L10"`) when editing a gold config; (2) verifies `"silver"` for a silver config.
+
+**CI:** 26/26 tests pass in `AssetDisplayConfigForm` + `FetchCodeList` test suites.
+
+**Security review:** PASS — `assetType` value originates from server DB records; passed through `encodeURIComponent` before URL interpolation (already in place in `FetchCodeList`); no user-controlled text; no XSS, injection, or authorization bypass vectors. Admin-only route unchanged.

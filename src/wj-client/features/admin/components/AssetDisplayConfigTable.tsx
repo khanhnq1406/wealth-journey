@@ -374,6 +374,7 @@ export function AssetDisplayConfigTable() {
         {typeof modalState === "number" && editTarget && (
           <AssetDisplayConfigForm
             mode="edit"
+            assetType={editTarget.assetType}
             initialValues={editTarget}
             onSuccess={handleModalSuccess}
           />
