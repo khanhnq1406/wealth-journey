@@ -126,24 +126,6 @@ func newTestAssetDisplayConfigHandler(svc service.AssetDisplayConfigService) *As
 	return NewAssetDisplayConfigHandler(svc)
 }
 
-func runAssetDisplayConfigRequest(h *AssetDisplayConfigHandler, method, path, body string, params ...gin.Param) *httptest.ResponseRecorder {
-	gin.SetMode(gin.TestMode)
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
-	var reqBody *bytes.Reader
-	if body != "" {
-		reqBody = bytes.NewReader([]byte(body))
-	} else {
-		reqBody = bytes.NewReader([]byte{})
-	}
-	req, _ := http.NewRequest(method, path, reqBody)
-	req.Header.Set("Content-Type", "application/json")
-	c.Request = req
-	if len(params) > 0 {
-		c.Params = gin.Params(params)
-	}
-	return w
-}
 
 func runGetDisplayPricesAsset(h *AssetDisplayConfigHandler, assetType string) *httptest.ResponseRecorder {
 	gin.SetMode(gin.TestMode)
