@@ -337,3 +337,34 @@ if resolveErr == nil {
 **CI:** `go test -short ./...` — all pass; `task ci:backend-lint` — 0 issues. Commit: `a051a5d3`.
 
 **Security review:** PASS — `sell` is read from the same trusted `AssetPrice` DB record as `buy` (populated by background job, not user input); no arithmetic performed on sell in this path; `market_data_service.go` discarding sell with `_` is semantically correct (investment pricing uses buy only); no authorization bypass or cross-asset contamination possible since all queries are scoped by `assetType`.
+
+---
+
+## Post-Release Fix: display-config price filter
+
+**Issue:** Deleting or disabling an item in admin `asset_display_config` had no effect on the landing page silver table or home page price tables — the deleted/disabled item continued to appear after Cmd+Shift+R. The `PriceCacheJob` (write path) and the HTTP read path were fully independent: `GetAllPrices` and `GetMarketTypes` called `ListAll` / `ListByAssetType` with no filter against `asset_display_config`.
+
+**Spec:** `docs/specs/2026-03-27-display-config-price-filter-spec.md`
+
+**Root cause:** `AssetPriceService.GetAllPrices()` called `s.repo.ListAll(ctx)` — no awareness of `asset_display_config`. `GetMarketTypes()` had the same issue.
+
+**What changed:**
+
+- `domain/repository/asset_display_config_repository.go` — Added `ListEnabledTypeCodesByAssetType(ctx, assetType string) ([]string, error)` to interface + GORM implementation (`Pluck("type_code")` with `WHERE asset_type=? AND enabled=true AND deleted_at IS NULL`)
+- `domain/repository/asset_display_config_repository_test.go` — 4 new tests
+- `domain/repository/asset_price_repository.go` — Added `ListByAssetTypeFiltered(ctx, assetType string, enabledTypeCodes []string) ([]*models.AssetPrice, error)` to interface + GORM implementation (early-returns empty slice when `enabledTypeCodes` is empty; uses `WHERE asset_type=? AND type_code IN ?`)
+- `domain/repository/asset_price_repository_test.go` — 3 new tests
+- `domain/service/asset_price_service.go`:
+  - `assetPriceService` struct gains `configRepo repository.AssetDisplayConfigRepository` (second field)
+  - `NewAssetPriceService` accepts `configRepo` as second parameter
+  - Added `var knownAssetTypes = []string{"gold", "silver", "currency"}`
+  - `GetAllPrices`: replaced `ListAll` with per-type filter chain (`configRepo.ListEnabledTypeCodesByAssetType` → `repo.ListByAssetTypeFiltered`)
+  - `GetMarketTypes`: same filter chain with max `FetchedAt` tracking per type
+  - `GetPricesByAssetType` and `GetPriceByTypeCode` intentionally **not** filtered (ResolvePrice + investment pricing paths must remain unaffected)
+- `domain/service/asset_price_service_test.go` — Added `mockAssetDisplayConfigRepo` + 5 new filter tests (FiltersDisabledConfigs, EmptyDisplayConfig, ConfigRepoError for GetAllPrices; FiltersDisabledConfigs, EmptyDisplayConfig for GetMarketTypes)
+- `domain/service/services.go` — `NewAssetPriceService` call site updated: `repos.AssetDisplayConfig` passed as second arg
+- `docs/architecture/flow-cross-cutting.md` — §14 READER sequence diagram updated to show the two-step filter chain; key invariants updated
+
+**CI:** `go test -short ./domain/service/... ./domain/repository/...` — all pass; `task ci:backend-lint` — 0 issues. Commits: Tasks 1+2: `(see git log)`; Tasks 3+4+5: `4dd28713`.
+
+**Security review:** PASS — `enabledTypeCodes` originates from a trusted server-side DB read (`asset_display_config`), not from any user input. The SQL uses GORM parameterized `WHERE type_code IN ?` binding — no injection risk. No new trust boundaries crossed. Filter is server-side only; clients cannot opt out.

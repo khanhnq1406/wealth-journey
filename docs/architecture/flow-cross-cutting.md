@@ -280,18 +280,25 @@ sequenceDiagram
     participant C as Frontend
     participant H as MarketPricesHandler
     participant APS as AssetPriceService
+    participant ADCR as AssetDisplayConfigRepository
     participant APR as AssetPriceRepository
-    participant DB as PostgreSQL<br/>(asset_price table)
+    participant DB as PostgreSQL<br/>(asset_price + asset_display_config)
     participant POC as PriceOverrideCache
     participant R as Redis
 
     C->>H: GET /market-prices
 
     H->>APS: GetAllPrices(ctx)
-    APS->>APR: ListAll(ctx)
-    APR->>DB: SELECT * FROM asset_price WHERE deleted_at IS NULL
-    DB-->>APR: []AssetPrice rows
-    APR-->>APS: []AssetPrice
+    loop for each assetType in [gold, silver, currency]
+        APS->>ADCR: ListEnabledTypeCodesByAssetType(ctx, assetType)
+        ADCR->>DB: SELECT type_code FROM asset_display_config<br/>WHERE asset_type=? AND enabled=true AND deleted_at IS NULL
+        DB-->>ADCR: []enabledTypeCodes
+        ADCR-->>APS: []enabledTypeCodes
+        APS->>APR: ListByAssetTypeFiltered(ctx, assetType, enabledTypeCodes)
+        APR->>DB: SELECT * FROM asset_price<br/>WHERE asset_type=? AND type_code IN (?)
+        DB-->>APR: []AssetPrice rows (filtered)
+        APR-->>APS: []AssetPrice
+    end
     Note over APS: Group by asset_type<br/>Map to AssetPriceDTO[]
     APS-->>H: AllAssetPrices{Gold, Silver, Currency}
 
@@ -310,10 +317,12 @@ sequenceDiagram
 ### Key Invariants
 
 - `GetMarketPrices` never calls external APIs — all data comes from the DB-backed `asset_price` table
+- **Display config filter**: `GetAllPrices` and `GetMarketTypes` only return prices whose `type_code + asset_type` pair has a matching enabled, non-deleted `asset_display_config` row — deleted or disabled configs are excluded immediately on next request
 - `IsStale = true` on a price item means the last background fetch for that type failed; the price shown is the last known value
 - Admin price overrides (Redis) are applied on top of DB data at read time; override failures are graceful (original prices returned)
 - If `AssetPriceService` returns an error, `handler.HandleError` returns 500 (unlike the old flow which returned 503 only when all three failed)
 - Cold start (before first `PriceCacheJob` run): `asset_price` table is empty → `GetAllPrices` returns empty slices; `GetPublicMarketTypes` falls back to static registries
+- **ResolvePrice path unaffected**: `AssetDisplayConfigService.ResolvePrice()` calls `repo.ListByAssetType` directly (not via `GetAllPrices`); the display-config filter does NOT apply to investment price resolution
 
 ### Error Paths
 

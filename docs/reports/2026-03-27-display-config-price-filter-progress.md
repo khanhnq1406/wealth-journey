@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-27-display-config-price-filter-plan.md
 - **Spec file:** docs/specs/2026-03-27-display-config-price-filter-spec.md
 - **Started:** 2026-03-27T00:00:00Z
-- **Last updated:** 2026-03-27T17:30:00Z
-- **Current state:** in_progress
-- **Current task:** 6
+- **Last updated:** 2026-03-27T18:00:00Z
+- **Current state:** done
+- **Current task:** —
 
 ## Task Progress
 
@@ -21,8 +21,8 @@
 | 4   | Update GetMarketTypes filter                               | done        | committed | GetMarketTypes uses filter chain; existing tests migrated |
 | 5   | Wire DI in services.go                                     | done        | committed | repos.AssetDisplayConfig passed as second arg to NewAssetPriceService |
 | 6   | Run CI and lint                                            | done        | —      | 0 lint issues, build clean, all service+repo tests pass |
-| 7   | Update flow-cross-cutting.md                               | pending     | —      | —       |
-| 8   | Update implementation report                               | pending     | —      | —       |
+| 7   | Update flow-cross-cutting.md                               | done        | committed | §14 READER sequence diagram updated; two-step filter chain + ResolvePrice invariant added |
+| 8   | Update implementation report                               | done        | committed | Post-release fix section added to asset-price-bridge-report.md |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
