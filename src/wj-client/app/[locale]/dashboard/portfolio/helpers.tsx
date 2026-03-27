@@ -134,7 +134,7 @@ export const formatTimeAgo = (
   locale?: string,
 ): { text: string; colorClass: string } => {
   if (!timestamp) {
-    return { text: t ? t("timeAgo.never") : "Never", colorClass: "text-gray-400" };
+    return { text: t ? t("timeAgo.never") : "Never", colorClass: "text-v2-text-tertiary" };
   }
 
   const date = new Date(timestamp * 1000); // Convert Unix timestamp (seconds to ms)
@@ -148,27 +148,64 @@ export const formatTimeAgo = (
   if (diffMins < 1) {
     text = t ? t("timeAgo.justNow") : "Just now";
     colorClass = "text-v2-green-positive";
-  } else if (diffMins < 5) {
-    text = t ? t("timeAgo.minutesAgo", { count: diffMins }) : `${diffMins}m ago`;
-    colorClass = "text-v2-green-positive";
   } else if (diffMins < 15) {
     text = t ? t("timeAgo.minutesAgo", { count: diffMins }) : `${diffMins}m ago`;
     colorClass = "text-v2-green-positive";
   } else if (diffMins < 60) {
     text = t ? t("timeAgo.minutesAgo", { count: diffMins }) : `${diffMins}m ago`;
-    colorClass = "text-yellow-600";
+    colorClass = "text-yellow-400";
   } else if (diffMins < 1440) {
     // Less than 24 hours
     const hours = Math.floor(diffMins / 60);
     text = t ? t("timeAgo.hoursAgo", { count: hours }) : `${hours}h ago`;
-    colorClass = "text-orange-600";
+    colorClass = "text-orange-400";
   } else {
     text = date.toLocaleDateString(locale);
-    colorClass = "text-red-600";
+    colorClass = "text-v2-red-negative";
   }
 
   return { text, colorClass };
 };
+
+/**
+ * Returns a Tailwind background color class for the staleness indicator dot
+ * based on when the price was last updated from market data.
+ *
+ * Color tiers:
+ * - gray  (bg-v2-text-tertiary): null / 0 — never updated from market data
+ * - green (bg-v2-green-positive): < 15 minutes ago
+ * - yellow (bg-yellow-400): 15–60 minutes ago
+ * - orange (bg-orange-400): 1–24 hours ago
+ * - red (bg-v2-red-negative): > 24 hours ago
+ *
+ * @param priceUpdatedAt - Unix timestamp in seconds (0 or undefined = never updated)
+ * @param nowSeconds - Current time in Unix seconds (injectable for testing; defaults to Date.now()/1000)
+ */
+export function getPriceStaleClass(
+  priceUpdatedAt: number | undefined,
+  nowSeconds?: number,
+): string {
+  if (!priceUpdatedAt || priceUpdatedAt === 0) {
+    return "bg-v2-text-tertiary";
+  }
+
+  const now = nowSeconds ?? Date.now() / 1000;
+  const diffSeconds = now - priceUpdatedAt;
+
+  if (diffSeconds < 900) {
+    // < 15 minutes
+    return "bg-v2-green-positive";
+  } else if (diffSeconds < 3600) {
+    // 15–60 minutes
+    return "bg-yellow-400";
+  } else if (diffSeconds < 86400) {
+    // 1–24 hours
+    return "bg-orange-400";
+  } else {
+    // > 24 hours
+    return "bg-v2-red-negative";
+  }
+}
 
 // Gold-specific formatting functions
 

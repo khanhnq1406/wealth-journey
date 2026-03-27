@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-27-asset-price-bridge-plan.md
 - **Spec file:** docs/specs/2026-03-27-asset-price-bridge-spec.md
 - **Started:** 2026-03-27T00:00:00Z
-- **Last updated:** 2026-03-27T07:00:00Z
+- **Last updated:** 2026-03-27T08:00:00Z
 - **Current state:** in_progress
-- **Current task:** 18
+- **Current task:** 19
 
 ## Task Progress
 
@@ -32,7 +32,7 @@
 | 15  | Frontend — Rename admin components GoldDisplayConfig → AssetDisplayConfig | done    | 8fecc669 | Renamed 3 files (Form/Table/test), updated imports/endpoints/translations, deleted Gold* files, updated admin page |
 | 16  | Frontend — Update public price consumers                               | done    | ddbaf867 | Added useQueryGetAssetDisplayPrices to api.ts+hooks.ts; replaced hook in GoldPriceTable, LandingGoldPriceTable, AddInvestmentForm |
 | 17  | Frontend — FetchCodeList component for admin form                      | done    | c773a9e2 | FetchCodeList component (list, add, delete with confirmation); integrated in AssetDisplayConfigForm edit mode |
-| 18  | Frontend — Portfolio page PriceUpdatedAt staleness indicator           | pending | —      | —       |
+| 18  | Frontend — Portfolio page PriceUpdatedAt staleness indicator           | done    | 2b4e976e | 5-tier color system (green/yellow/orange/red/gray) based on priceUpdatedAt; tooltip; 13 tests |
 | 19  | E2E Tests — Update Playwright specs                                    | pending | —      | —       |
 | 20  | Create/Update Runtime Flow Diagrams                                    | pending | —      | —       |
 | 21  | Backend CI Verification                                                | pending | —      | —       |
