@@ -119,11 +119,15 @@ func migrateAssetConfigFetchCode(db *gorm.DB) error {
 		return nil
 	}
 
-	log.Println("Seeding default fetch codes for gold display configs...")
+	log.Println("Seeding default fetch codes for gold and silver display configs...")
 
 	// Each entry: display_name, asset_type, fetch_code, priority
 	// display_name is used to look up the config_id from asset_display_config.
 	// ON CONFLICT DO NOTHING makes the INSERT idempotent.
+	//
+	// Silver fetch codes: each silver config's type_code matches the asset_price
+	// type_code exactly (both derived from toTypeCode()), so priority=1 with
+	// fetch_code = type_code is the correct single mapping per config.
 	seeds := []struct {
 		DisplayName string
 		AssetType   string
@@ -154,6 +158,20 @@ func migrateAssetConfigFetchCode(db *gorm.DB) error {
 		// PNJ
 		{"PNJ", "gold", "PNJ", 1},
 		{"PNJ", "gold", "PNJ_SJC", 2},
+		// Silver — fetch_code == type_code (toTypeCode() output matches asset_price type_code)
+		{"Phú Quý thỏi 1L", "silver", "PH_QU_THI_1L", 1},
+		{"Phú Quý thỏi 5L,10L", "silver", "PH_QU_THI_5L_10L", 1},
+		{"Phú Quý 999 - 1Kg", "silver", "PH_QU_999_-_1KG", 1},
+		{"Bạc Mỹ nghệ Phú Quý", "silver", "BC_M_NGH_PH_QU", 1},
+		{"Ancarat Ngân Long 1L", "silver", "ANCARAT_NGN_LONG_1L", 1},
+		{"Ancarat Ngân Long 5L", "silver", "ANCARAT_NGN_LONG_5L", 1},
+		{"Ancarat Ngân Long 1kg", "silver", "ANCARAT_NGN_LONG_1KG", 1},
+		{"Ancarat thỏi 999 - 1kg", "silver", "ANCARAT_THI_999_-_1KG", 1},
+		{"SBJ 1L,10L,50L", "silver", "SBJ_1L_10L_50L", 1},
+		{"SBJ 1kg", "silver", "SBJ_1KG", 1},
+		{"DOJI 99.9 1L", "silver", "DOJI_99.9_1L", 1},
+		{"DOJI 99.9 5L", "silver", "DOJI_99.9_5L", 1},
+		{"Silver World (XAG/USD)", "silver", "XAGUSD", 1},
 	}
 
 	for _, s := range seeds {

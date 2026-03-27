@@ -144,6 +144,40 @@ All CI checks pass on the final commit:
 | 2026-03-27 | Fix `FetchCodeList` receiving `typeCode` instead of `assetType` — available DB codes never shown in edit mode | Minor | 2 files |
 | 2026-03-27 | Fix blank modal after create — spinner gated on `isLoading` (false during refetch) instead of `!editTarget` → Mã lấy giá never appeared after Thêm loại tài sản | Minor | 2 files |
 | 2026-03-27 | Fix Mã lấy giá (FetchCodeList) never appearing when created config's asset type differs from active tab — tab not switched before resolving editTarget | Minor | 3 files |
+| 2026-03-27 | Silver `asset_config_fetch_code` seed rows missing — migration only seeded gold; all 13 silver configs showed "Chưa có mã lấy giá nào" | Minor | 1 file |
+
+### Fix detail — Silver fetch code seed rows missing
+
+**Issue:** All 13 silver `asset_display_config` rows showed "Chưa có mã lấy giá nào / Thêm mã lấy giá để tra cứu giá cho loại tài sản này" in the admin panel — no fetch codes were configured. However, silver prices still appeared correctly in the public price tables.
+
+**Root cause:** The `migrate-asset-config-fetch-code` migration seeded 15 fetch code rows covering only 9 gold display configs. Zero rows were seeded for silver. Silver prices displayed correctly in the market price table because `GetMarketPrices` reads directly from `asset_price` (bypasses `asset_config_fetch_code` entirely). The "Chưa có mã lấy giá" empty state was accurate — the data was genuinely absent.
+
+The design intent for silver is simpler than gold: each silver `asset_display_config.type_code` already equals the `asset_price.type_code` (both are produced by the same `toTypeCode()` function in `silver_price_service.go`). So each silver config needs exactly one fetch code at priority 1 where `fetch_code = type_code`.
+
+**What changed:**
+- `src/go-backend/cmd/migrate-asset-config-fetch-code/main.go` — Added 13 silver entries to the `seeds` slice. Each entry maps a silver display config (looked up by `display_name + asset_type = "silver"`) to its corresponding `asset_price` type_code at priority 1. The INSERT SQL and idempotency logic (`ON CONFLICT DO NOTHING`) are unchanged.
+
+**TypeCode mapping (verified against `toTypeCode()`):**
+
+| Display name | Fetch code (= asset_price type_code) |
+|---|---|
+| Phú Quý thỏi 1L | `PH_QU_THI_1L` |
+| Phú Quý thỏi 5L,10L | `PH_QU_THI_5L_10L` |
+| Phú Quý 999 - 1Kg | `PH_QU_999_-_1KG` |
+| Bạc Mỹ nghệ Phú Quý | `BC_M_NGH_PH_QU` |
+| Ancarat Ngân Long 1L | `ANCARAT_NGN_LONG_1L` |
+| Ancarat Ngân Long 5L | `ANCARAT_NGN_LONG_5L` |
+| Ancarat Ngân Long 1kg | `ANCARAT_NGN_LONG_1KG` |
+| Ancarat thỏi 999 - 1kg | `ANCARAT_THI_999_-_1KG` |
+| SBJ 1L,10L,50L | `SBJ_1L_10L_50L` |
+| SBJ 1kg | `SBJ_1KG` |
+| DOJI 99.9 1L | `DOJI_99.9_1L` |
+| DOJI 99.9 5L | `DOJI_99.9_5L` |
+| Silver World (XAG/USD) | `XAGUSD` |
+
+**Security review:** PASS — all values are hardcoded Go literals; all four values pass through GORM `?` parameterization (no string interpolation); `asset_type = "silver"` WHERE clause prevents cross-asset contamination; no new DDL; idempotent on re-run.
+
+**To apply:** `task backend:migrate-asset-config-fetch-code` (re-running is safe — `ON CONFLICT DO NOTHING`).
 
 ### Fix detail — Gold/Silver tab split
 
