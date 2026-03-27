@@ -3,6 +3,7 @@ import { screen, waitFor, render } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextIntlClientProvider } from "next-intl";
 import { AssetDisplayConfigTable } from "../AssetDisplayConfigTable";
+import adminMessages from "../../../../messages/en/admin.json";
 
 // Simple render helper that wraps with QueryClientProvider + intl
 function renderWithProviders(ui: React.ReactElement) {
@@ -14,7 +15,7 @@ function renderWithProviders(ui: React.ReactElement) {
   });
   return render(
     <QueryClientProvider client={queryClient}>
-      <NextIntlClientProvider locale="en" messages={{}}>
+      <NextIntlClientProvider locale="en" messages={adminMessages}>
         {ui}
       </NextIntlClientProvider>
     </QueryClientProvider>
