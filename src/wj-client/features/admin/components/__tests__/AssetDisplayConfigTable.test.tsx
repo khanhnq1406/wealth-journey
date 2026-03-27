@@ -1,5 +1,5 @@
 import React from "react";
-import { screen, waitFor, render } from "@testing-library/react";
+import { screen, waitFor, render, fireEvent, act } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextIntlClientProvider } from "next-intl";
 import { AssetDisplayConfigTable } from "../AssetDisplayConfigTable";
@@ -170,5 +170,69 @@ describe("AssetDisplayConfigTable", () => {
     });
 
     expect(screen.getByText("DOJI_1L")).toBeInTheDocument();
+  });
+
+  it("shows loading spinner (not blank modal) when edit modal opens for an id not yet in the cached config list", async () => {
+    // Regression test for the create→auto-edit transition:
+    // After create, handleModalSuccess sets modalState=createdId (number).
+    // editTarget = configs.find(c => c.id === createdId) returns undefined because
+    // the refetch hasn't completed yet (new item not in cache).
+    // BUG: spinner was gated on `isLoading` (false during refetch) → blank modal body.
+    // FIX: show spinner whenever `typeof modalState === "number" && !editTarget`.
+
+    // Start with empty config list so any numeric modalState will have no editTarget.
+    mockGet.mockResolvedValue({ configs: [] });
+
+    renderWithProviders(<AssetDisplayConfigTable />);
+
+    // Wait for initial load with empty list
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalled();
+    });
+
+    // Now queue a slow refetch so the new item never arrives during the test window
+    mockGet.mockImplementation(
+      () => new Promise(() => {}) // never resolves
+    );
+
+    // Open the "Add Asset Type" modal and submit to trigger create→edit transition
+    // We simulate this by mocking post to resolve, triggering handleModalSuccess(createdId)
+    mockPost.mockResolvedValue({
+      config: { id: 99, typeCode: "NEW_CODE", assetType: "gold" },
+    });
+
+    // Click Add Asset Type button
+    fireEvent.click(screen.getByRole("button", { name: /add asset type/i }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("base-modal")).toBeInTheDocument();
+    });
+
+    // Fill required fields
+    fireEvent.change(screen.getByLabelText(/type code/i), {
+      target: { value: "NEW_CODE" },
+    });
+    fireEvent.change(screen.getByLabelText(/display name/i), {
+      target: { value: "New Display" },
+    });
+
+    // Submit the create form — there are two "Add Asset Type" buttons (table header + form submit).
+    // The form submit is the last one in the DOM.
+    const addButtons = screen.getAllByRole("button", { name: /add asset type/i });
+    const submitButton = addButtons[addButtons.length - 1];
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
+
+    // After create resolves: modalState transitions to 99, refetch is pending (never resolves).
+    // editTarget is undefined. The modal must still be visible and show a spinner, not be blank.
+    await waitFor(() => {
+      expect(screen.getByTestId("base-modal")).toBeInTheDocument();
+    });
+
+    // The modal body should contain a spinner, not be blank
+    // A spinner is a div with animate-spin class
+    const modal = screen.getByTestId("base-modal");
+    expect(modal.querySelector(".animate-spin")).toBeInTheDocument();
   });
 });

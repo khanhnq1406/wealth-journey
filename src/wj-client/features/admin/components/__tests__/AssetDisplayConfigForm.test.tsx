@@ -194,7 +194,7 @@ describe("AssetDisplayConfigForm — onSuccess callback passes created id", () =
     fireEvent.click(screen.getByRole("button", { name: /add asset type/i }));
 
     await waitFor(() => {
-      expect(mockOnSuccess).toHaveBeenCalledWith(99);
+      expect(mockOnSuccess).toHaveBeenCalledWith(99, "gold");
     });
   });
 

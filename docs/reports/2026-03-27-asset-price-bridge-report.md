@@ -142,6 +142,8 @@ All CI checks pass on the final commit:
 | 2026-03-27 | Apply `encodeURIComponent` to `assetType` in `AssetDisplayConfigTable` query URL (consistency with FetchCodeList) | Minor | 1 file |
 | 2026-03-27 | Replace read-only Asset Type badge with interactive Gold/Silver selector in create form; auto-open edit mode after create so fetch codes can be added immediately | Minor | 3 files |
 | 2026-03-27 | Fix `FetchCodeList` receiving `typeCode` instead of `assetType` — available DB codes never shown in edit mode | Minor | 2 files |
+| 2026-03-27 | Fix blank modal after create — spinner gated on `isLoading` (false during refetch) instead of `!editTarget` → Mã lấy giá never appeared after Thêm loại tài sản | Minor | 2 files |
+| 2026-03-27 | Fix Mã lấy giá (FetchCodeList) never appearing when created config's asset type differs from active tab — tab not switched before resolving editTarget | Minor | 3 files |
 
 ### Fix detail — Gold/Silver tab split
 
@@ -227,3 +229,46 @@ Additionally, `AssetDisplayConfigTable` did not pass an `assetType` prop to the 
 **CI:** 26/26 tests pass in `AssetDisplayConfigForm` + `FetchCodeList` test suites.
 
 **Security review:** PASS — `assetType` value originates from server DB records; passed through `encodeURIComponent` before URL interpolation (already in place in `FetchCodeList`); no user-controlled text; no XSS, injection, or authorization bypass vectors. Admin-only route unchanged.
+
+### Fix detail — Blank modal after create (Mã lấy giá not shown in Thêm loại tài sản)
+
+**Issue:** After clicking "+ Thêm loại tài sản" and submitting the create form, the modal body went blank instead of transitioning to the edit form (which contains the Mã lấy giá / FetchCodeList section). The user could not see or add fetch price codes after creating a new asset display config.
+
+**Root cause:** `AssetDisplayConfigTable.tsx` had a spinner condition gated on `isLoading`:
+
+```tsx
+{typeof modalState === "number" && !editTarget && isLoading && (
+  <div ...><div className="... animate-spin" /></div>
+)}
+```
+
+`isLoading` from React Query is only `true` during the **initial mount** of a query. After `createMutation.onSuccess` calls `queryClient.invalidateQueries(...)`, React Query transitions the query to **refetching** state — `isLoading` remains `false`. At that moment:
+- `modalState` = `createdId` (a number) ✓
+- `editTarget` = `undefined` (new item not yet in refetched cache) ✓
+- `isLoading` = `false` (refetch, not initial load) ← broke the spinner gate
+
+So neither the spinner branch nor the edit form branch evaluated to `true` → blank modal body.
+
+**What changed:**
+- `AssetDisplayConfigTable.tsx` — Removed `isLoading` from the spinner condition. Spinner now shows whenever `typeof modalState === "number" && !editTarget`, regardless of React Query's loading state. This is the correct semantic: "waiting for the new item to appear in cache."
+- `AssetDisplayConfigTable.test.tsx` — Added 1 regression test: renders the table with empty configs, triggers the create→edit transition (mocks `post` to return `id=99`, mocks `get` to never resolve), asserts `.animate-spin` is present in the modal body.
+
+**CI:** `npm test` — 465 pass, 5 skipped (pre-existing); 0 regressions.
+
+**Security review:** PASS — `modalState` is pure local React state set only by UI event handlers; removing `isLoading` introduces no new data flows or rendering surfaces; the spinner is a static `<div>` with no dynamic content; no XSS, injection, or authorization bypass vectors. Admin-only route unchanged.
+
+### Fix detail — FetchCodeList (Mã lấy giá) never appears after create when selected asset type differs from active tab
+
+**Issue:** After clicking "+ Thêm loại tài sản" and submitting, the modal transitioned to edit mode (spinner appeared then disappeared) but the Mã lấy giá / `FetchCodeList` section was never shown. The spinner kept spinning indefinitely.
+
+**Root cause:** `AssetDisplayConfigTable` resolves `editTarget` by searching `configs` — the current tab's fetched list. The query is filtered by `activeTab` (e.g., `?assetType=gold`). If the user switched the asset type pill selector in the create form to "silver" before submitting, the newly created silver config would never appear in the gold tab's refetched list. As a result, `editTarget` remained `undefined` indefinitely — the spinner never resolved, and `FetchCodeList` never rendered.
+
+Even when `selectedAssetType === activeTab` (the common case), the fix from the previous entry (removing `isLoading`) correctly shows the spinner during the refetch window — the issue was specifically the cross-tab scenario.
+
+**What changed:**
+
+- `AssetDisplayConfigForm.tsx` — Extended `onSuccess` callback signature: `(createdId?: number)` → `(createdId?: number, createdAssetType?: string)`. In `createMutation.onSuccess`, passes `selectedAssetType` as the second argument alongside the new config's id.
+- `AssetDisplayConfigTable.tsx` — `handleModalSuccess` now accepts `createdAssetType`. Before transitioning to edit mode, checks `if (createdAssetType === "gold" || createdAssetType === "silver") { setActiveTab(createdAssetType); }` — switching the active tab to match the created config's asset type. This ensures the subsequent refetch is for the correct tab, `editTarget` is found, and the edit form (including `FetchCodeList`) renders correctly.
+- `AssetDisplayConfigForm.test.tsx` — Updated the `onSuccess` assertion: `toHaveBeenCalledWith(99)` → `toHaveBeenCalledWith(99, "gold")` to match the extended signature.
+
+**Security review:** PASS — `createdAssetType` originates from `selectedAssetType` state (constrained to `["gold", "silver"] as const`, set only by hard-coded pill buttons); the consumption site has an explicit `=== "gold" || === "silver"` allowlist; value only reaches `setActiveTab` (local React state); never interpolated into URLs or DOM as raw HTML; no authorization bypass vectors. Admin-only route unchanged.

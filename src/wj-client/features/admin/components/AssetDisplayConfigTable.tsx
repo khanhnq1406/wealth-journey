@@ -162,9 +162,13 @@ export function AssetDisplayConfigTable() {
   );
 
   const handleModalSuccess = useCallback(
-    (createdId?: number) => {
+    (createdId?: number, createdAssetType?: string) => {
       if (typeof modalState === "string" && createdId !== undefined) {
-        // After create: switch to edit mode for the new config so fetch codes can be added
+        // After create: switch tab to match the created asset type (if different),
+        // then switch to edit mode so fetch codes can be added immediately.
+        if (createdAssetType && (createdAssetType === "gold" || createdAssetType === "silver")) {
+          setActiveTab(createdAssetType);
+        }
         setModalState(createdId);
         toast.success(t("toast.created"));
       } else {
@@ -366,7 +370,7 @@ export function AssetDisplayConfigTable() {
             onSuccess={handleModalSuccess}
           />
         )}
-        {typeof modalState === "number" && !editTarget && isLoading && (
+        {typeof modalState === "number" && !editTarget && (
           <div className="flex items-center justify-center py-8">
             <div className="h-6 w-6 rounded-full border-2 border-v2-gold-primary border-t-transparent animate-spin" />
           </div>
