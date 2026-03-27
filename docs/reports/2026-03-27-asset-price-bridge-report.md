@@ -145,6 +145,7 @@ All CI checks pass on the final commit:
 | 2026-03-27 | Fix blank modal after create — spinner gated on `isLoading` (false during refetch) instead of `!editTarget` → Mã lấy giá never appeared after Thêm loại tài sản | Minor | 2 files |
 | 2026-03-27 | Fix Mã lấy giá (FetchCodeList) never appearing when created config's asset type differs from active tab — tab not switched before resolving editTarget | Minor | 3 files |
 | 2026-03-27 | Silver `asset_config_fetch_code` seed rows missing — migration only seeded gold; all 13 silver configs showed "Chưa có mã lấy giá nào" | Minor | 1 file |
+| 2026-03-27 | `ResolvePrice` returned only `buy` price — `sell` always 0 in DTO; homepage sell column showed `--` for configs using fetch codes (e.g. VNGSJC) | Minor | 6 files |
 
 ### Fix detail — Silver fetch code seed rows missing
 
@@ -306,3 +307,33 @@ Even when `selectedAssetType === activeTab` (the common case), the fix from the 
 - `AssetDisplayConfigForm.test.tsx` — Updated the `onSuccess` assertion: `toHaveBeenCalledWith(99)` → `toHaveBeenCalledWith(99, "gold")` to match the extended signature.
 
 **Security review:** PASS — `createdAssetType` originates from `selectedAssetType` state (constrained to `["gold", "silver"] as const`, set only by hard-coded pill buttons); the consumption site has an explicit `=== "gold" || === "silver"` allowlist; value only reaches `setActiveTab` (local React state); never interpolated into URLs or DOM as raw HTML; no authorization bypass vectors. Admin-only route unchanged.
+
+### Fix detail — ResolvePrice only returned buy price (sell always 0)
+
+**Issue:** On the homepage gold price table, configs that used fetch codes (e.g. VNGSJC added to SJC TD) showed the correct buy price but `--` for the sell price. The DB (`asset_price` table) had valid sell data for VNGSJC.
+
+**Root cause:** `ResolvePrice` had the signature `(price int64, isStale bool, err error)` — it only returned the `Buy` field from the matched `AssetPrice` row. The `AssetDisplayPriceDTO` struct always had a `Sell int64` field, but `GetDisplayPrices` never populated it:
+
+```go
+// Before — sell was silently dropped
+price, isStale, resolveErr := s.ResolvePrice(ctx, cfg.TypeCode, assetType)
+if resolveErr == nil {
+    dto.Buy = price   // dto.Sell remained 0
+    dto.IsStale = isStale
+}
+```
+
+**What changed:**
+
+- `domain/service/interfaces.go` — `ResolvePrice` signature extended: `(buy int64, sell int64, isStale bool, err error)`
+- `domain/service/asset_display_config_service.go` — Two changes:
+  1. `ResolvePrice` impl: returns `p.Sell` on the non-stale path and `freshestStale.Sell` on the all-stale path
+  2. `GetDisplayPrices`: assigns both `dto.Buy = buy` and `dto.Sell = sell`
+- `domain/service/market_data_service.go` — 2 callers updated (`rawPrice, _, _, resolveErr`) — sell is intentionally ignored here since investment pricing only needs the buy/mid price
+- `domain/service/asset_display_config_service_test.go` — Existing `TestResolvePrice_HappyPath_FirstNonStaleReturned` extended to assert `sell=9100000`; existing `TestGetDisplayPrices_MergesConfigAndPrice` extended to assert `dto.Sell=9100000`; all 3 error-path callers updated to 4-value assignment
+- `domain/service/market_data_service_bridge_test.go` — Mock `resolvePriceFn` updated to return 4 values
+- `handlers/asset_display_config_test.go` — Mock `resolvePriceFunc` field and method updated to 4-value signature
+
+**CI:** `go test -short ./...` — all pass; `task ci:backend-lint` — 0 issues. Commit: `a051a5d3`.
+
+**Security review:** PASS — `sell` is read from the same trusted `AssetPrice` DB record as `buy` (populated by background job, not user input); no arithmetic performed on sell in this path; `market_data_service.go` discarding sell with `_` is semantically correct (investment pricing uses buy only); no authorization bypass or cross-asset contamination possible since all queries are scoped by `assetType`.
