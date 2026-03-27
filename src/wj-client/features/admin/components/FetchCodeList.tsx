@@ -78,7 +78,7 @@ export function FetchCodeList({ configId, assetType }: FetchCodeListProps) {
       queryKey: availableTypeCodesQueryKey(assetType),
       queryFn: async () => {
         const response = (await apiClient.get(
-          `/api/v1/admin/asset-price-type-codes?assetType=${assetType}`
+          `/api/v1/admin/asset-price-type-codes?assetType=${encodeURIComponent(assetType)}`
         )) as unknown as ListAvailableTypeCodesResponse;
         return response;
       },

@@ -57,7 +57,7 @@ export function AssetDisplayConfigTable() {
     queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG, activeTab],
     queryFn: async () => {
       const response = (await apiClient.get(
-        `/api/v1/admin/asset-display-config?assetType=${activeTab}`
+        `/api/v1/admin/asset-display-config?assetType=${encodeURIComponent(activeTab)}`
       )) as unknown as ListConfigsResponse;
       return response;
     },
@@ -161,14 +161,21 @@ export function AssetDisplayConfigTable() {
     [updateMutation]
   );
 
-  const handleModalSuccess = useCallback(() => {
-    setModalState(null);
-    toast.success(
-      typeof modalState === "number"
-        ? t("toast.updated")
-        : t("toast.created")
-    );
-  }, [modalState, toast, t]);
+  const handleModalSuccess = useCallback(
+    (createdId?: number) => {
+      if (typeof modalState === "string" && createdId !== undefined) {
+        // After create: switch to edit mode for the new config so fetch codes can be added
+        setModalState(createdId);
+        toast.success(t("toast.created"));
+      } else {
+        setModalState(null);
+        toast.success(
+          typeof modalState === "number" ? t("toast.updated") : t("toast.created")
+        );
+      }
+    },
+    [modalState, toast, t]
+  );
 
   const editTarget =
     typeof modalState === "number"
@@ -358,6 +365,11 @@ export function AssetDisplayConfigTable() {
             existingCodes={configs.map((c) => c.typeCode)}
             onSuccess={handleModalSuccess}
           />
+        )}
+        {typeof modalState === "number" && !editTarget && isLoading && (
+          <div className="flex items-center justify-center py-8">
+            <div className="h-6 w-6 rounded-full border-2 border-v2-gold-primary border-t-transparent animate-spin" />
+          </div>
         )}
         {typeof modalState === "number" && editTarget && (
           <AssetDisplayConfigForm

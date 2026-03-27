@@ -137,6 +137,9 @@ All CI checks pass on the final commit:
 | ---------- | ---------------------------------------------------------------------------- | -------- | ------------- |
 | 2026-03-27 | Split Gold / Silver tabs in admin config table and create form               | Minor    | 4 files       |
 | 2026-03-27 | Backend `ListAll` ignored `assetType` — both tabs returned identical data    | Major    | 4 files       |
+| 2026-03-27 | Show Asset Type badge in admin create form (Gold/Silver indicator missing)    | Minor    | 3 files       |
+| 2026-03-27 | Show available type codes from DB as selectable pills in FetchCodeList add form | Minor   | 4 files       |
+| 2026-03-27 | Apply `encodeURIComponent` to `assetType` in `AssetDisplayConfigTable` query URL (consistency with FetchCodeList) | Minor | 1 file |
 
 ### Fix detail — Gold/Silver tab split
 
@@ -161,3 +164,28 @@ All CI checks pass on the final commit:
 - `asset_display_config_service_test.go` — Updated `adcConfigRepo` mock signature + `TestListAll_DelegatesToRepo` now asserts `assetType` is forwarded to the repo for both `"gold"` and `"silver"`
 
 **CI:** `go test -short ./domain/repository/... ./domain/service/...` — all pass; `task ci:backend-lint` — 0 issues.
+
+### Fix detail — Asset Type badge in admin create form
+
+**Issue:** When clicking "+ Add Asset Type" in the admin panel, the create form showed no indicator of which asset type (Gold or Silver) the new entry would belong to. The asset type was silently determined by the active tab, leaving users unable to see at a glance which group they were creating for.
+
+**What changed:**
+- `AssetDisplayConfigForm.tsx` — Added a read-only pill badge at the top of the create-mode form displaying the active asset type ("Gold" / "Silver") using the existing `tabs.gold` / `tabs.silver` i18n keys; the badge uses `bg-v2-gold-primary/20` + `text-v2-gold-accent` + `border-v2-border-light` tokens; purely cosmetic — no logic change
+- `messages/en/admin.json` — Added `assetDisplayConfig.form.assetType` key: `"Asset Type"`
+- `messages/vi/admin.json` — Added `assetDisplayConfig.form.assetType` key: `"Loại tài sản"`
+
+**Security review:** PASS — `assetType` prop is application-controlled (`"gold" | "silver"` tab state); value is gated by ternary and never interpolated raw into the DOM; admin-only route; ESLint 0 errors; 6 existing tests pass.
+
+### Fix detail — Available type codes from DB in FetchCodeList add form
+
+**Issue:** When adding a fetch price code in the `FetchCodeList` admin component, the type code field was a free-text input only. Admins had no visibility into which type codes actually exist in the `asset_price` table, leading to trial-and-error entry. The backend already rejected invalid codes (via `ListAvailableTypeCodes` validation), but the error only appeared after submission.
+
+**Root cause:** The `assetType` prop was accepted by `FetchCodeList` but intentionally unused (`_assetType` rename). The backend endpoint `GET /api/v1/admin/asset-price-type-codes?assetType=` existed but was never called from the frontend.
+
+**What changed:**
+- `FetchCodeList.tsx` — Renamed `_assetType` → `assetType`; added a `useQuery` calling `GET /api/v1/admin/asset-price-type-codes?assetType={encodeURIComponent(assetType)}`; renders results as clickable monospace pills above the type code input; clicking a pill fills the input (no submit); hides the section when no codes are available; shows "Loading codes..." during fetch; `encodeURIComponent` added for URL safety
+- `FetchCodeList.test.tsx` — Added 5 new tests: endpoint called with `assetType` param; pills rendered from server data; pill click populates input; loading state shown; empty response hides section; 16/16 tests pass
+- `messages/en/admin.json` — Added `fetchCodes.form.availableCodes`: `"Available codes"` and `fetchCodes.form.availableCodesLoading`: `"Loading codes..."`
+- `messages/vi/admin.json` — Added same keys in Vietnamese: `"Mã khả dụng"` / `"Đang tải mã..."`
+
+**Security review:** PASS — `assetType` value originates from server config records (not a free-text user field); `encodeURIComponent` applied before URL interpolation; server data rendered via React JSX text (XSS-safe); pill-selected value POSTed as JSON body (no injection vector); endpoint is admin-only (`AuthMiddleware` + `AdminMiddleware` applied); ESLint 0 errors; all 16 tests pass.

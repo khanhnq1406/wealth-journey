@@ -34,7 +34,7 @@ export interface AssetDisplayConfigFormProps {
     showInInvestment: boolean;
   };
   existingCodes?: string[];
-  onSuccess?: () => void;
+  onSuccess?: (createdId?: number) => void;
 }
 
 interface CreateConfigRequest {
@@ -53,6 +53,18 @@ interface UpdateConfigRequest {
   showInInvestment: boolean;
 }
 
+interface CreateConfigResponse {
+  config: {
+    id: number;
+    typeCode: string;
+    assetType: string;
+    displayName: string;
+    displayOrder: number;
+    enabled: boolean;
+    showInInvestment: boolean;
+  };
+}
+
 export function AssetDisplayConfigForm({
   mode,
   assetType,
@@ -62,6 +74,7 @@ export function AssetDisplayConfigForm({
 }: AssetDisplayConfigFormProps) {
   const queryClient = useQueryClient();
   const [errorMessage, setErrorMessage] = useState<string>();
+  const [selectedAssetType, setSelectedAssetType] = useState<string>(assetType ?? "gold");
   const t = useTranslations("admin.assetDisplayConfig");
 
   const { register, handleSubmit, control, reset, setValue, formState: { errors } } =
@@ -92,10 +105,10 @@ export function AssetDisplayConfigForm({
 
   const createMutation = useMutation({
     mutationFn: (req: CreateConfigRequest) =>
-      apiClient.post("/api/v1/admin/asset-display-config", req),
-    onSuccess: () => {
+      apiClient.post<CreateConfigResponse>("/api/v1/admin/asset-display-config", req),
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG] });
-      onSuccess?.();
+      onSuccess?.((data as CreateConfigResponse)?.config?.id);
     },
     onError: (error: any) => {
       setErrorMessage(error.message || t("form.createError"));
@@ -107,7 +120,7 @@ export function AssetDisplayConfigForm({
       apiClient.put(`/api/v1/admin/asset-display-config/${initialValues!.id}`, req),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG] });
-      onSuccess?.();
+      onSuccess?.(undefined);
     },
     onError: (error: any) => {
       setErrorMessage(error.message || t("form.updateError"));
@@ -122,7 +135,7 @@ export function AssetDisplayConfigForm({
       createMutation.mutate({
         typeCode: values.typeCode.trim(),
         displayName: values.displayName.trim(),
-        assetType: assetType ?? "gold",
+        assetType: selectedAssetType,
         displayOrder: Number(values.displayOrder),
         enabled: values.enabled,
         showInInvestment: values.showInInvestment,
@@ -142,14 +155,28 @@ export function AssetDisplayConfigForm({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {mode === "create" && (
         <div className="space-y-2">
-          {/* Show which asset type (Gold / Silver) this entry will be created for */}
-          <div className="flex items-center gap-2 py-2">
+          {/* Asset type selector — user can pick Gold or Silver before submitting */}
+          <div className="space-y-1.5">
             <span className="text-sm font-medium text-v2-gold-accent">
-              {t("form.assetType")}:
+              {t("form.assetType")}
             </span>
-            <span className="px-3 py-0.5 text-sm font-semibold rounded-full bg-v2-gold-primary/20 text-v2-gold-accent border border-v2-border-light capitalize">
-              {assetType === "gold" ? t("tabs.gold") : t("tabs.silver")}
-            </span>
+            <div className="flex gap-1 p-1 rounded-lg bg-v2-bg-dark border border-v2-border-light w-fit">
+              {(["gold", "silver"] as const).map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  aria-pressed={selectedAssetType === type}
+                  onClick={() => setSelectedAssetType(type)}
+                  className={`min-h-[36px] px-4 py-1.5 text-sm font-medium rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-v2-gold-primary cursor-pointer capitalize ${
+                    selectedAssetType === type
+                      ? "bg-v2-gold-primary text-v2-bg-dark"
+                      : "text-v2-text-tertiary hover:text-v2-gold-accent hover:bg-v2-maroon-600"
+                  }`}
+                >
+                  {type === "gold" ? t("tabs.gold") : t("tabs.silver")}
+                </button>
+              ))}
+            </div>
           </div>
           <FormInput
             label={t("form.typeCode")}
