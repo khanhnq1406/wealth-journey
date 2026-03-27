@@ -12,7 +12,6 @@ import (
 	"wealthjourney/domain/repository"
 	"wealthjourney/pkg/btmcdirect"
 	"wealthjourney/pkg/doji"
-	"wealthjourney/pkg/gold"
 	"wealthjourney/pkg/pnj"
 	"wealthjourney/pkg/sjc"
 )
@@ -136,7 +135,7 @@ func (s *assetPriceService) RefreshAllPrices(ctx context.Context) error {
 // ---------------------------------------------------------------------------
 
 // refreshGoldVangSaiGon fetches gold prices directly from the VangSaiGon API (vangsaigon.vn)
-// and upserts them with source="vangsaigon". TypeCodes are normalized via gold.AliasToCanonical.
+// and upserts them with source="vangsaigon". TypeCodes are stored as returned by the API.
 func (s *assetPriceService) refreshGoldVangSaiGon(ctx context.Context) refreshResult {
 	if s.vangSaiGonFetcher == nil {
 		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "vangsaigon")
@@ -152,11 +151,9 @@ func (s *assetPriceService) refreshGoldVangSaiGon(ctx context.Context) refreshRe
 		if p.Buy <= 0 && p.Sell <= 0 {
 			continue
 		}
-		// Normalize alias TypeCode to canonical (e.g., "Vàng SJC 1L" → "SJC").
 		typeCode := p.TypeCode
-		if canonical, ok := gold.AliasToCanonical[typeCode]; ok {
-			typeCode = canonical
-		}
+		// No alias normalization — raw TypeCode is stored as-is.
+		// Admins configure mappings via asset_config_fetch_code.
 		batch = append(batch, &models.AssetPrice{
 			TypeCode:   typeCode,
 			AssetType:  "gold",

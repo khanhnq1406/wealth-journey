@@ -986,3 +986,42 @@ func TestRefreshAllPrices_VangSaiGonEmptyPrices_MarksStale(t *testing.T) {
 	}
 	assert.True(t, found, "expected gold to be marked stale when vangsaigon returns empty prices")
 }
+
+// ---------------------------------------------------------------------------
+// Tests: refreshGoldVangSaiGon — raw TypeCode stored as-is (no normalization)
+// ---------------------------------------------------------------------------
+
+// TestRefreshGoldVangSaiGon_StoresRawTypeCode verifies that raw TypeCodes returned
+// by the vangsaigon fetcher are written as-is to the asset_price table —
+// NOT normalized through AliasToCanonical.
+func TestRefreshGoldVangSaiGon_StoresRawTypeCode(t *testing.T) {
+	// "VNGSJC" is in AliasToCanonical (maps to "SJC").
+	// Before this fix, refreshGoldVangSaiGon would normalize it to "SJC".
+	// After the fix, it must be stored as raw "VNGSJC".
+	rawTypeCode := "VNGSJC"
+	repo := &mockAssetPriceRepo{}
+	svc := &assetPriceService{
+		repo: repo,
+		vangSaiGonFetcher: &mockSimpleGoldPriceFetcher{
+			source: SourceVangSaiGon,
+			prices: []*CachedGoldPrice{
+				{TypeCode: rawTypeCode, Name: "Vàng SJC VNG", Buy: 172_000_000, Sell: 175_000_000, Currency: "VND"},
+			},
+		},
+	}
+
+	result := svc.refreshGoldVangSaiGon(context.Background())
+
+	if result.err != nil {
+		t.Fatalf("unexpected error: %v", result.err)
+	}
+	if len(repo.upsertedBatches) != 1 {
+		t.Fatalf("expected 1 upsert batch, got %d", len(repo.upsertedBatches))
+	}
+	if len(repo.upsertedBatches[0]) != 1 {
+		t.Fatalf("expected 1 row upserted, got %d", len(repo.upsertedBatches[0]))
+	}
+	if got := repo.upsertedBatches[0][0].TypeCode; got != rawTypeCode {
+		t.Errorf("TypeCode: expected raw %q, got %q (normalization should be removed)", rawTypeCode, got)
+	}
+}
