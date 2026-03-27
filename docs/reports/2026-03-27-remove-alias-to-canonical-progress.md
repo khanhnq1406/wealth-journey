@@ -6,18 +6,18 @@
 - **Plan file:** `docs/plans/2026-03-27-remove-alias-to-canonical-plan.md`
 - **Spec file:** `docs/specs/2026-03-27-remove-alias-to-canonical-spec.md`
 - **Started:** 2026-03-27T00:00:00Z
-- **Last updated:** 2026-03-27T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 0 + 1 (parallel)
+- **Last updated:** 2026-03-27T12:00:00Z
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
-| #   | Task Name                                                  | Status      | Commit | Summary |
-| --- | ---------------------------------------------------------- | ----------- | ------ | ------- |
-| 0   | Remove normalization from `refreshGoldVangSaiGon`          | in_progress | —      | —       |
-| 1   | Remove normalization from WaterfallGoldFetcher + fix tests | in_progress | —      | —       |
-| 2   | Update AliasToCanonical comment + flow-investment.md       | pending     | —      | —       |
-| 3   | Backend CI verification                                    | pending     | —      | —       |
+| #   | Task Name                                                  | Status | Commit     | Summary |
+| --- | ---------------------------------------------------------- | ------ | ---------- | ------- |
+| 0   | Remove normalization from `refreshGoldVangSaiGon`          | done   | `c1e5663b` | Removed AliasToCanonical lookup from vangsaigon refresh; raw TypeCodes stored as-is |
+| 1   | Remove normalization from WaterfallGoldFetcher + fix tests | done   | `e1dd1dfb` | Removed normalization from FetchGoldPrices + FetchGoldPricesAllSources; updated 7 tests to assert raw pass-through |
+| 2   | Update AliasToCanonical comment + flow-investment.md       | done   | `9535a5a2` | Marked AliasToCanonical as reference-only in types.go; no flow-investment.md changes needed |
+| 3   | Backend CI verification                                    | done   | —          | task ci:backend-lint PASS; go test -short ./... all pass |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
