@@ -39,7 +39,7 @@ type AllHandlers struct {
 	Push               *PushHandler
 	Watchlist          *WatchlistHandler
 	UserPriceAlert     *UserPriceAlertHandlers
-	GoldDisplayConfig  *GoldDisplayConfigHandler
+	AssetDisplayConfig *GoldDisplayConfigHandler
 }
 
 // HandlerDeps holds the infrastructure dependencies needed by NewHandlers.
@@ -163,16 +163,11 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 			}
 			return nil
 		}(),
-		GoldDisplayConfig: func() *GoldDisplayConfigHandler {
-			if services.GoldDisplayConfig != nil {
-				var overrideCache *cache.PriceOverrideCache
-				if deps.RDB != nil {
-					overrideCache = cache.NewPriceOverrideCache(deps.RDB.GetClient())
-				}
-				return NewGoldDisplayConfigHandler(services.GoldDisplayConfig, overrideCache)
-			}
-			return nil
-		}(),
+		// AssetDisplayConfig handler: Task 11 will replace GoldDisplayConfigHandler with
+		// AssetDisplayConfigHandler once the proto rename is complete.
+		// Currently wired to nil — the old GoldDisplayConfigService has been removed.
+		// Routes guard with nil-check so the endpoints return 404 until Task 11 re-wires them.
+		AssetDisplayConfig: nil,
 		Public: NewPublicHandler(services.AssetPrice),
 	}
 }

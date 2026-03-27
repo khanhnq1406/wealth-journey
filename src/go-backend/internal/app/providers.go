@@ -116,6 +116,8 @@ func ProvideRepositories(db *database.Database) *service.Repositories {
 		UserPriceAlert:        repository.NewUserPriceAlertRepository(db),
 		AssetPrice:            repository.NewAssetPriceRepository(db),
 		GoldDisplayConfig:     repository.NewGoldDisplayConfigRepository(db),
+		AssetDisplayConfig:    repository.NewAssetDisplayConfigRepository(db),
+		AssetConfigFetchCode:  repository.NewAssetConfigFetchCodeRepository(db),
 	}
 }
 

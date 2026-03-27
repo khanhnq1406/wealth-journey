@@ -38,7 +38,7 @@ type Services struct {
 	Watchlist          WatchlistService
 	UserPriceAlert     UserPriceAlertService
 	AssetPrice         AssetPriceService
-	GoldDisplayConfig  GoldDisplayConfigService
+	AssetDisplayConfig AssetDisplayConfigService
 }
 
 // NewServices creates all service instances with proper dependency ordering.
@@ -54,10 +54,10 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	goldPriceSvc := NewGoldPriceService(redisClient, btmcAPIKey)
 	silverPriceSvc := NewSilverPriceService(redisClient)
 	currencyPriceSvc := NewCurrencyPriceService(redisClient)
-	// TODO(Task-10): pass AssetDisplayConfigService once repos are wired.
-	// nil is safe: fetchGoldPriceFromDB / fetchSilverPriceFromDB guard for nil and
-	// fall back to the live gold/silver APIs automatically.
-	marketDataSvc := NewMarketDataService(repos.MarketData, goldPriceSvc, silverPriceSvc, nil)
+	// AssetDisplayConfigService — wires fetch-code-based price resolution.
+	// Provides the AssetDisplayConfigService to MarketDataService for DB-backed gold/silver prices.
+	assetDisplayConfigSvc := NewAssetDisplayConfigService(repos.AssetDisplayConfig, repos.AssetConfigFetchCode, repos.AssetPrice)
+	marketDataSvc := NewMarketDataService(repos.MarketData, goldPriceSvc, silverPriceSvc, assetDisplayConfigSvc)
 	currencyCache := cache.NewCurrencyCache(redisClient)
 
 	// Phase 2: UserService (depends on categorySvc, fxRateSvc, currencyCache)
@@ -106,9 +106,6 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		pnjClient,
 	)
 
-	// Phase 1 (cont.): GoldDisplayConfigService — joins gold display configs with DB-cached prices
-	goldDisplayConfigSvc := NewGoldDisplayConfigService(repos.GoldDisplayConfig, assetPriceSvc)
-
 	// Phase 1 (cont.): PriceAlertService — reads from DB cache via AssetPriceService
 	var priceAlertSvc PriceAlertService
 	if rdb != nil {
@@ -154,8 +151,8 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		PriceAlert:       priceAlertSvc,
 		Watchlist:        watchlistSvc,
 		UserPriceAlert:    userPriceAlertSvc,
-		AssetPrice:        assetPriceSvc,
-		GoldDisplayConfig: goldDisplayConfigSvc,
+		AssetPrice:         assetPriceSvc,
+		AssetDisplayConfig: assetDisplayConfigSvc,
 	}
 }
 
@@ -194,6 +191,8 @@ type Repositories struct {
 	UserPriceAlert        repository.UserPriceAlertRepository
 	AssetPrice            repository.AssetPriceRepository
 	GoldDisplayConfig     repository.GoldDisplayConfigRepository
+	AssetDisplayConfig    repository.AssetDisplayConfigRepository
+	AssetConfigFetchCode  repository.AssetConfigFetchCodeRepository
 }
 
 // NewRepositories creates all repository instances.

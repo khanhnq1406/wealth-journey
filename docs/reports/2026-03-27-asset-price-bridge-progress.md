@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-27-asset-price-bridge-plan.md
 - **Spec file:** docs/specs/2026-03-27-asset-price-bridge-spec.md
 - **Started:** 2026-03-27T00:00:00Z
-- **Last updated:** 2026-03-27T04:00:00Z
+- **Last updated:** 2026-03-27T05:00:00Z
 - **Current state:** in_progress
-- **Current task:** 10
+- **Current task:** 11
 
 ## Task Progress
 
@@ -24,7 +24,7 @@
 | 7   | Backend Repository — Update InvestmentRepository for PriceUpdatedAt    | done    | bc837ec6 | UpdatePrices sets price_updated_at; 1 new test |
 | 8   | Backend Service — AssetDisplayConfigService (rename + ResolvePrice)    | done    | 66f0bde4 | AssetDisplayConfigService: GetDisplayPrices, ResolvePrice (fetch-code priority), fetch code CRUD with validation, 24 tests |
 | 9   | Backend Service — Bridge MarketDataService (DB read)                   | done    | 3aed84ba | MarketDataService uses ResolvePrice (DB-first) for gold/silver; nil-guard fallback to live API; 7 tests |
-| 10  | Backend DI Wiring — Update providers, services, builder                | pending | —      | —       |
+| 10  | Backend DI Wiring — Update providers, services, builder                | done    | a28c46d6 | AssetDisplayConfig wired in services/providers/builder/routes; MarketDataService receives real service |
 | 11  | Backend Handler — AssetDisplayConfigHandler (rename + fetch codes)     | pending | —      | —       |
 | 12  | Proto — Rename messages + add new fields                               | pending | —      | —       |
 | 13  | Backend — Update Investment.ToProto + PriceUpdatedAt                   | pending | —      | —       |
