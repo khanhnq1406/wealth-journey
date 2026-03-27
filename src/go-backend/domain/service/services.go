@@ -54,7 +54,10 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	goldPriceSvc := NewGoldPriceService(redisClient, btmcAPIKey)
 	silverPriceSvc := NewSilverPriceService(redisClient)
 	currencyPriceSvc := NewCurrencyPriceService(redisClient)
-	marketDataSvc := NewMarketDataService(repos.MarketData, goldPriceSvc, silverPriceSvc)
+	// TODO(Task-10): pass AssetDisplayConfigService once repos are wired.
+	// nil is safe: fetchGoldPriceFromDB / fetchSilverPriceFromDB guard for nil and
+	// fall back to the live gold/silver APIs automatically.
+	marketDataSvc := NewMarketDataService(repos.MarketData, goldPriceSvc, silverPriceSvc, nil)
 	currencyCache := cache.NewCurrencyCache(redisClient)
 
 	// Phase 2: UserService (depends on categorySvc, fxRateSvc, currencyCache)
