@@ -140,6 +140,7 @@ All CI checks pass on the final commit:
 | 2026-03-27 | Show Asset Type badge in admin create form (Gold/Silver indicator missing)    | Minor    | 3 files       |
 | 2026-03-27 | Show available type codes from DB as selectable pills in FetchCodeList add form | Minor   | 4 files       |
 | 2026-03-27 | Apply `encodeURIComponent` to `assetType` in `AssetDisplayConfigTable` query URL (consistency with FetchCodeList) | Minor | 1 file |
+| 2026-03-27 | Replace read-only Asset Type badge with interactive Gold/Silver selector in create form; auto-open edit mode after create so fetch codes can be added immediately | Minor | 3 files |
 
 ### Fix detail — Gold/Silver tab split
 
@@ -189,3 +190,22 @@ All CI checks pass on the final commit:
 - `messages/vi/admin.json` — Added same keys in Vietnamese: `"Mã khả dụng"` / `"Đang tải mã..."`
 
 **Security review:** PASS — `assetType` value originates from server config records (not a free-text user field); `encodeURIComponent` applied before URL interpolation; server data rendered via React JSX text (XSS-safe); pill-selected value POSTed as JSON body (no injection vector); endpoint is admin-only (`AuthMiddleware` + `AdminMiddleware` applied); ESLint 0 errors; all 16 tests pass.
+
+### Fix detail — Interactive asset type selector + auto-open edit after create
+
+**Issues:**
+1. The create form showed only a read-only badge for asset type. Users had to know to switch the table tab first, then click "+ Add", making the flow non-obvious.
+2. After creating a config, the modal closed. Users had to find the newly created row, click Edit, then scroll down to add fetch codes — three extra interactions.
+
+**Root cause:**
+- `assetType` was derived from the parent's `activeTab` state and passed as a prop — the form had no internal selector.
+- `FetchCodeList` is only rendered in `mode === "edit"` (requires a real `configId`). In create mode there is no `id` yet, so fetch codes cannot be added before the record exists. The form never re-opened in edit mode after creation.
+
+**What changed:**
+- `AssetDisplayConfigForm.tsx` — Replaced the read-only badge with an interactive Gold/Silver pill selector (same style as the table tabs). Added `selectedAssetType` local state defaulting to the `assetType` prop. `onSubmit` now uses `selectedAssetType` for the `assetType` field. `onSuccess` callback signature extended to `(createdId?: number) => void` — passes `data.config.id` from the create API response on success, `undefined` on edit.
+- `AssetDisplayConfigTable.tsx` — `handleModalSuccess` now accepts `(createdId?: number)`. When `createdId` is present (create flow), sets `modalState` to that ID instead of closing the modal, transitioning directly to edit mode. Added a loading spinner for the moment between state transition and query refetch completing.
+- `AssetDisplayConfigForm.test.tsx` (new) — 8 tests covering: Gold/Silver pills visible in create mode; correct default; pill switching; `assetType` in POST body reflects selected pill; no selector in edit mode; `onSuccess` called with `createdId` after create; `onSuccess` called with `undefined` after edit.
+
+**CI:** `npm test` — 462 pass, 5 skipped (pre-existing); `npm run lint` — 0 errors (89 pre-existing warnings in generated files).
+
+**Security review:** PASS — `selectedAssetType` is constrained to `["gold", "silver"] as const`; no user text can set it; `createdId` is a numeric DB ID used only for local modal state; no XSS, injection, or authorization bypass vectors. Admin-only route unchanged.
