@@ -196,6 +196,24 @@ tasks:
     cmds:
       - go run cmd/migrate-gold-display-config/main.go
 
+  backend:migrate-asset-display-config:
+    desc: "Rename gold_display_config → asset_display_config, add asset_type column, seed silver entries"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-asset-display-config/main.go
+
+  backend:migrate-asset-config-fetch-code:
+    desc: "Create asset_config_fetch_code table and seed default fetch codes"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-asset-config-fetch-code/main.go
+
+  backend:migrate-investment-price-updated-at:
+    desc: "Add price_updated_at column to investment table"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-investment-price-updated-at/main.go
+
   backend:migrate-all:
     desc: "Run all migrations in order (safe for fresh or existing databases)"
     dir: "{{.BACKEND_DIR}}"

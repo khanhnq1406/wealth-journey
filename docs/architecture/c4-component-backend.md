@@ -40,7 +40,7 @@ C4Component
         Component(push_h, "Push Handler", "handlers/push.go", "GET /push/vapid-key (public key), POST /push/subscribe (validates HTTPS endpoint, base64 keys, max 5 subs/user), DELETE /push/subscribe (by endpoint). Auth required for subscribe/unsubscribe.")
         Component(watchlist_h, "Watchlist Handler", "handlers/watchlist.go", "CRUD for user symbol watchlists. GET /watchlist (list), POST /watchlist (add symbol), DELETE /watchlist/{id} (remove). Auth required. Delegates to WatchlistService and fetches live prices on list.")
         Component(user_price_alert_h, "UserPriceAlert Handler", "handlers/user_price_alert.go", "CRUD for user-defined price alerts. GET /price-alerts (list), POST /price-alerts (create), PUT /price-alerts/{id} (update), DELETE /price-alerts/{id} (remove). Auth required. Delegates to UserPriceAlertService.")
-        Component(gold_display_config_h, "GoldDisplayConfig Handler", "handlers/gold_display_config.go", "Public GET /gold-display-prices returns enabled gold types joined with live prices and admin overrides. Admin CRUD: GET/POST /admin/gold-display-config (list/create), PUT/DELETE /admin/gold-display-config/{id} (update/soft-delete). Admin routes protected by AdminMiddleware.")
+        Component(gold_display_config_h, "AssetDisplayConfig Handler", "handlers/asset_display_config.go", "Public GET /asset-display-prices returns enabled asset types (gold/silver) joined with live prices and admin overrides. Admin CRUD: GET/POST /admin/asset-display-config (list/create), PUT/DELETE /admin/asset-display-config/{id} (update/soft-delete). Fetch code sub-resource: GET/POST /admin/asset-display-config/{id}/fetch-codes, DELETE /admin/asset-display-config/{id}/fetch-codes/{codeId}. Admin routes protected by AdminMiddleware.")
     }
 
     Container_Boundary(services, "Service Layer — TRUST BOUNDARY: Data considered validated after this point") {
@@ -51,7 +51,7 @@ C4Component
         Component(cat_svc, "Category Service", "domain/service", "Category CRUD, default category seeding for new users")
         Component(budget_svc, "Budget Service", "domain/service", "Budget lifecycle, budget item tracking, spending analysis")
         Component(invest_svc, "Investment Service", "domain/service", "Holdings management, FIFO cost basis, PNL calculation. Investments owned directly by user_id; wallet association is optional (walletId=0 means no wallet).")
-        Component(market_svc, "Market Data Service", "domain/service", "Price caching, Yahoo Finance integration, gold/silver normalization")
+        Component(market_svc, "Market Data Service", "domain/service", "Price caching, Yahoo Finance integration. Gold/silver prices resolved via AssetDisplayConfigService.ResolvePrice (DB-only, no live API calls for gold/silver). Stocks/crypto/ETF prices still fetched live from Yahoo Finance.")
         Component(currency_svc, "Currency Price Service", "domain/service", "Foreign currency price fetching using a 2-source waterfall fallback: vangsaigon.vn (primary, 5s timeout) → vang.today (fallback #1, 5s timeout). BTMC is excluded as it provides no currency data. Redis-cached.")
         Component(silver_ext, "External Silver Clients", "pkg/silverprice", "Multi-source silver prices: Phú Quý (HTML), Ancarat (JSON), DOJI (text)")
         Component(fx_svc, "FX Rate Service", "domain/service", "Currency conversion rates, cross-currency calculations")
@@ -69,7 +69,7 @@ C4Component
         Component(watchlist_svc, "Watchlist Service", "domain/service/watchlist_service.go", "User watchlist management: add/remove/list symbols with deduplication. Enriches list results with live prices by delegating to MarketDataService (stocks/crypto/ETFs) and AssetPriceService (gold/silver/currency type codes from DB cache). Validates symbol existence before adding.")
         Component(user_price_alert_svc, "UserPriceAlert Service", "domain/service/user_price_alert_service.go", "Manages user-defined price alerts: CRUD operations, threshold evaluation against prices from MarketDataService (stocks/crypto/ETF) and AssetPriceService (gold/silver from DB cache). Triggers notifications via NotificationRepository and push delivery via PushService when alert conditions are met.")
         Component(asset_price_svc, "AssetPrice Service", "domain/service/asset_price_service.go", "Reads cached prices from asset_price DB table. GetAllPrices returns gold/silver/currency grouped. GetMarketTypes returns type names + timestamps for public endpoint. RefreshAllPrices called by PriceCacheJob to orchestrate fetch from gold/silver/currency services and persist results.")
-        Component(gold_display_config_svc, "GoldDisplayConfig Service", "domain/service/gold_display_config_service.go", "Manages admin-configurable gold display config. GetDisplayPrices joins enabled configs from gold_display_config with latest prices from asset_price and applies PriceOverrideCache overrides. CRUD: Create validates type_code against gold registry and detects duplicates (409), Update fetches by ID (404 if not found), Delete soft-deletes.")
+        Component(gold_display_config_svc, "AssetDisplayConfig Service", "domain/service/asset_display_config_service.go", "Manages admin-configurable asset display config (gold and silver). GetDisplayPrices joins enabled configs from asset_display_config with latest prices from asset_price via fetch code priority mapping and applies PriceOverrideCache overrides. ResolvePrice(typeCode, currency) resolves price for a given display config entry using ordered fetch codes. CRUD: Create validates type_code + asset_type and detects duplicates (409), Update fetches by ID (404 if not found), Delete soft-deletes. Fetch code CRUD: add/remove/reorder AssetConfigFetchCode entries per config.")
     }
 
     Container_Boundary(repos, "Repository Layer (Data Access)") {
@@ -100,7 +100,8 @@ C4Component
         Component(watchlist_repo, "Watchlist Repository", "GORM", "watchlist table CRUD with user scoping. Enforces unique (user_id, symbol) constraint. Supports list by user_id with ordering by created_at.")
         Component(user_price_alert_repo, "UserPriceAlert Repository", "GORM", "user_price_alert table CRUD with user scoping. Stores per-user alert definitions (symbol, target_price, direction, trigger_mode, AlertStatus enum: active/triggered/paused). Supports list by user_id and lookup by id+user_id for ownership verification.")
         Component(asset_price_repo, "AssetPrice Repository", "GORM", "asset_price table CRUD. UpsertBatch via ON CONFLICT (type_code, currency) DO UPDATE for efficient bulk upsert. ListByAssetType and ListAll for handler reads. MarkStaleByAssetType sets is_stale=true for all rows of a given asset type when fetch fails.")
-        Component(gold_display_config_repo, "GoldDisplayConfig Repository", "GORM", "gold_display_config table CRUD. ListAll returns all entries including disabled (for admin). ListEnabled returns only enabled=true entries ordered by display_order (for public endpoint). GetByTypeCode for duplicate detection on create. Soft-delete via gorm.DeletedAt. Unique constraint on type_code.")
+        Component(gold_display_config_repo, "AssetDisplayConfig Repository", "GORM", "asset_display_config table CRUD. ListAll returns all entries including disabled (for admin). ListEnabled returns only enabled=true entries ordered by display_order (for public endpoint). GetByTypeCode for duplicate detection on create. Soft-delete via gorm.DeletedAt. Unique constraint on type_code. Supports filtering by asset_type (gold/silver).")
+        Component(asset_config_fetch_code_repo, "AssetConfigFetchCode Repository", "GORM", "asset_config_fetch_code join table CRUD. ListByConfigID returns ordered fetch codes for a given asset_display_config entry (ordered by priority ASC). Create/Delete for adding and removing fetch code mappings. Enforces unique (asset_display_config_id, type_code) constraint.")
     }
 
     Container_Boundary(scheduler, "Scheduler Layer — Background jobs") {
@@ -164,7 +165,7 @@ C4Component
     Rel(gin, price_alert_config_h, "Routes /admin/price-alert-config")
     Rel(gin, watchlist_h, "Routes /watchlist/*")
     Rel(gin, user_price_alert_h, "Routes /price-alerts/*")
-    Rel(gin, gold_display_config_h, "Routes /gold-display-prices (public) and /admin/gold-display-config/* (admin)")
+    Rel(gin, gold_display_config_h, "Routes /asset-display-prices (public) and /admin/asset-display-config/* (admin)")
 
     Rel(auth_h, auth_svc, "Delegates auth logic")
     Rel(user_h, user_svc, "Delegates user ops")
@@ -216,8 +217,8 @@ C4Component
     Rel(invest_svc, invest_txn_repo, "Persists inv transactions")
     Rel(invest_svc, market_svc, "Current prices for PNL")
     Rel(market_svc, market_repo, "Caches prices in DB")
-    Rel(market_svc, yahoo_client, "Fetches market prices")
-    Rel(market_svc, vang_client, "Fetches gold/silver prices")
+    Rel(market_svc, yahoo_client, "Fetches market prices (stocks/crypto/ETF)")
+    Rel(market_svc, gold_display_config_svc, "Resolves gold/silver prices via ResolvePrice (DB-only)")
     Rel(currency_svc, vang_client, "Fetches currency prices")
     Rel(gold_price_svc, vang_client, "Fetches gold prices [primary]")
     Rel(gold_price_svc, vangtoday_client, "Fetches gold prices [fallback #1]")
@@ -260,7 +261,7 @@ C4Component
     Rel(asset_price_repo, postgres, "SQL")
     Rel(watchlist_h, watchlist_svc, "Delegates watchlist ops")
     Rel(user_price_alert_h, user_price_alert_svc, "Delegates price alert ops")
-    Rel(gold_display_config_h, gold_display_config_svc, "Delegates display config ops")
+    Rel(gold_display_config_h, gold_display_config_svc, "Delegates asset display config ops")
     Rel(gold_display_config_h, price_override_cache, "Merges admin overrides into display prices")
     Rel(watchlist_svc, watchlist_repo, "Persists watchlist entries")
     Rel(watchlist_svc, market_svc, "Fetches live prices for stock/crypto/ETF symbols")
@@ -270,8 +271,9 @@ C4Component
     Rel(user_price_alert_svc, asset_price_svc, "Fetches cached gold/silver prices from DB for alert evaluation")
     Rel(user_price_alert_svc, notification_repo, "Creates notifications when alert conditions are met")
     Rel(user_price_alert_svc, push_svc, "Push delivery when alert conditions are met")
-    Rel(gold_display_config_svc, gold_display_config_repo, "Reads and persists display config entries")
-    Rel(gold_display_config_svc, asset_price_svc, "Reads cached gold prices for join with display config")
+    Rel(gold_display_config_svc, gold_display_config_repo, "Reads and persists asset display config entries")
+    Rel(gold_display_config_svc, asset_config_fetch_code_repo, "Reads and persists fetch code mappings per config")
+    Rel(gold_display_config_svc, asset_price_svc, "Reads cached gold/silver prices for price resolution via fetch codes")
     Rel(price_alert_svc, asset_price_svc, "Fetches cached gold/silver prices from DB for movement detection")
     Rel(push_svc, push_sub_repo, "Fetches subscriptions for delivery")
     Rel(push_sub_repo, postgres, "SQL")
@@ -279,6 +281,7 @@ C4Component
     Rel(watchlist_repo, postgres, "SQL")
     Rel(user_price_alert_repo, postgres, "SQL")
     Rel(gold_display_config_repo, postgres, "SQL")
+    Rel(asset_config_fetch_code_repo, postgres, "SQL")
     Rel(community_svc, post_repo, "Persists posts")
     Rel(community_svc, comment_repo, "Persists comments")
     Rel(community_svc, like_repo, "Persists likes")
