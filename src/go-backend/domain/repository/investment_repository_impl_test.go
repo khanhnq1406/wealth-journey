@@ -407,6 +407,49 @@ func TestInvestmentRepository_UpdatePrices(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
+// TestInvestmentRepository_UpdatePrices_SetsPriceUpdatedAt verifies that UpdatePrices
+// includes price_updated_at (derived from update.Timestamp) in the UPDATE statement.
+// The column must appear in the SQL so the DB records when the price was last set.
+func TestInvestmentRepository_UpdatePrices_SetsPriceUpdatedAt(t *testing.T) {
+	db, mock, database := setupMockDB(t)
+	defer func() {
+		sqlDB, _ := db.DB()
+		_ = sqlDB.Close()
+	}()
+
+	repo := NewInvestmentRepository(database)
+	ctx := context.Background()
+
+	ts := int64(1700000000) // fixed Unix timestamp
+	updates := []PriceUpdate{
+		{InvestmentID: 1, Price: 180000, Timestamp: ts},
+	}
+
+	// Fetch the investment first
+	rows1 := sqlmock.NewRows([]string{
+		"id", "wallet_id", "symbol", "name", "type", "quantity",
+		"average_cost", "total_cost", "currency", "current_price",
+		"current_value", "unrealized_pnl", "unrealized_pnl_percent",
+		"realized_pnl", "created_at", "updated_at",
+	}).AddRow(1, 5, "AAPL", "Apple", 0, 10000, 150000, 150000, "USD", 175000, 175000, 25000, 16.67, 0, time.Now(), time.Now())
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `investment` WHERE id = ? AND `investment`.`deleted_at` IS NULL ORDER BY `investment`.`id` LIMIT ?")).
+		WithArgs(1, 1).
+		WillReturnRows(rows1)
+
+	// Expect an UPDATE that includes the price_updated_at column.
+	// sqlmock.ExpectExec accepts a regexp string; we match any UPDATE on `investment`
+	// that contains the price_updated_at column name.
+	mock.ExpectBegin()
+	mock.ExpectExec("UPDATE `investment`.*`price_updated_at`").
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
+
+	err := repo.UpdatePrices(ctx, updates)
+
+	assert.NoError(t, err)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
 // TestInvestmentRepository_UpdatePrices_EmptyUpdates verifies early return on
 // an empty update slice.
 func TestInvestmentRepository_UpdatePrices_EmptyUpdates(t *testing.T) {

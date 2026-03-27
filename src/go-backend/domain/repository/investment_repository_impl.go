@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"time"
 
 	"wealthjourney/domain/models"
 	"wealthjourney/pkg/database"
@@ -185,6 +186,9 @@ func (r *investmentRepository) UpdatePrices(ctx context.Context, updates []Price
 		// Manually trigger recalculation to set derived fields
 		investment.Recalculate()
 
+		// Compute price_updated_at from the update timestamp (system-controlled, never user input).
+		priceUpdatedAt := time.Unix(update.Timestamp, 0)
+
 		// Update only the specific fields we need to change (avoid enum serialization)
 		if err := db.Model(&models.Investment{}).
 			Where("id = ?", update.InvestmentID).
@@ -193,6 +197,7 @@ func (r *investmentRepository) UpdatePrices(ctx context.Context, updates []Price
 				"current_value":          investment.CurrentValue,
 				"unrealized_pnl":         investment.UnrealizedPNL,
 				"unrealized_pnl_percent": investment.UnrealizedPNLPercent,
+				"price_updated_at":       priceUpdatedAt,
 			}).Error; err != nil {
 			return apperrors.NewInternalErrorWithCause("failed to update investment price", err)
 		}

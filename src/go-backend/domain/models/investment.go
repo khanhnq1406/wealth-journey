@@ -28,6 +28,7 @@ type Investment struct {
 	TotalDividends       int64                        `gorm:"type:bigint;default:0" json:"totalDividends"`
 	PurchaseUnit         string                       `gorm:"size:10;default:'gram'" json:"purchaseUnit"`
 	IsCustom             bool                         `gorm:"type:boolean;not null;default:false" json:"isCustom"`
+	PriceUpdatedAt       *time.Time                   `gorm:"index" json:"priceUpdatedAt,omitempty"`
 	CreatedAt            time.Time                    `json:"createdAt"`
 	UpdatedAt            time.Time                    `json:"updatedAt"`
 	DeletedAt            gorm.DeletedAt               `gorm:"index" json:"-"`

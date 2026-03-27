@@ -6,22 +6,22 @@
 - **Plan file:** docs/plans/2026-03-27-asset-price-bridge-plan.md
 - **Spec file:** docs/specs/2026-03-27-asset-price-bridge-spec.md
 - **Started:** 2026-03-27T00:00:00Z
-- **Last updated:** 2026-03-27T01:00:00Z
+- **Last updated:** 2026-03-27T02:00:00Z
 - **Current state:** in_progress
-- **Current task:** 4
+- **Current task:** 8
 
 ## Task Progress
 
 | #   | Task Name                                                              | Status  | Commit | Summary |
 | --- | ---------------------------------------------------------------------- | ------- | ------ | ------- |
-| 0   | Update C4 Architecture Diagrams                                        | done    | TBD    | Renamed GoldDisplayConfig*→AssetDisplayConfig* in C4 diagrams, added AssetConfigFetchCodeRepo, updated MarketDataService deps |
-| 1   | DB Migration — Rename gold_display_config → asset_display_config       | done    | TBD    | Idempotent migration: table rename, asset_type column, composite unique index, 13 silver seed rows |
-| 2   | DB Migration — Create asset_config_fetch_code table                    | done    | TBD    | Table + FK + index + 15 seed fetch code rows (9 gold display configs) |
-| 3   | DB Migration — Add price_updated_at to investment table                | done    | TBD    | Nullable TIMESTAMPTZ column, idempotent ADD COLUMN IF NOT EXISTS |
-| 4   | Backend Model — AssetDisplayConfig + AssetConfigFetchCode + PriceUpdatedAt | pending | —  | —       |
-| 5   | Backend Repository — AssetDisplayConfigRepository                      | pending | —      | —       |
-| 6   | Backend Repository — AssetConfigFetchCodeRepository                    | pending | —      | —       |
-| 7   | Backend Repository — Update InvestmentRepository for PriceUpdatedAt    | pending | —      | —       |
+| 0   | Update C4 Architecture Diagrams                                        | done    | b80ff04d | Renamed GoldDisplayConfig*→AssetDisplayConfig* in C4 diagrams, added AssetConfigFetchCodeRepo, updated MarketDataService deps |
+| 1   | DB Migration — Rename gold_display_config → asset_display_config       | done    | b80ff04d | Idempotent migration: table rename, asset_type column, composite unique index, 13 silver seed rows |
+| 2   | DB Migration — Create asset_config_fetch_code table                    | done    | b80ff04d | Table + FK + index + 15 seed fetch code rows (9 gold display configs) |
+| 3   | DB Migration — Add price_updated_at to investment table                | done    | b80ff04d | Nullable TIMESTAMPTZ column, idempotent ADD COLUMN IF NOT EXISTS |
+| 4   | Backend Model — AssetDisplayConfig + AssetConfigFetchCode + PriceUpdatedAt | done | bc837ec6 | AssetDisplayConfig + AssetConfigFetchCode models, PriceUpdatedAt *time.Time on Investment, 13 model tests |
+| 5   | Backend Repository — AssetDisplayConfigRepository                      | done    | bc837ec6 | AssetDisplayConfigRepository interface + GORM impl (9 methods), 27 sqlmock tests |
+| 6   | Backend Repository — AssetConfigFetchCodeRepository                    | done    | bc837ec6 | AssetConfigFetchCodeRepository interface + GORM impl (5 methods), 15 sqlmock tests |
+| 7   | Backend Repository — Update InvestmentRepository for PriceUpdatedAt    | done    | bc837ec6 | UpdatePrices sets price_updated_at; 1 new test |
 | 8   | Backend Service — AssetDisplayConfigService (rename + ResolvePrice)    | pending | —      | —       |
 | 9   | Backend Service — Bridge MarketDataService (DB read)                   | pending | —      | —       |
 | 10  | Backend DI Wiring — Update providers, services, builder                | pending | —      | —       |
