@@ -64,10 +64,10 @@ export function GoldPriceTable() {
                 <td className="px-5 py-3.5 font-roboto font-bold text-[14px] text-v2-maroon-900 border-r border-v2-gold-primary/10">
                   {item.displayName}
                 </td>
-                <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-v2-red-negative tabular-nums border-r border-v2-gold-primary/10">
+                <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-red-700 tabular-nums border-r border-v2-gold-primary/10">
                   {item.isStale ? "--" : formatPriceValue(item.buy, item.currency || "VND")}
                 </td>
-                <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-v2-green-positive tabular-nums">
+                <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-green-700 tabular-nums">
                   {item.isStale ? "--" : formatPriceValue(item.sell, item.currency || "VND")}
                 </td>
               </tr>
