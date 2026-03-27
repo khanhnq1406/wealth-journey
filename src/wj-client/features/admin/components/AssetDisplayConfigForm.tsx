@@ -9,6 +9,7 @@ import { FormNumberInput } from "@/components/forms/FormNumberInput";
 import { Button } from "@/components/Button";
 import { ButtonType } from "@/app/constants";
 import { apiClient } from "@/utils/api-client";
+import { FetchCodeList } from "./FetchCodeList";
 
 // Query key for invalidating the list after mutations
 export const QUERY_KEY_ASSET_DISPLAY_CONFIG = "admin-asset-display-config";
@@ -133,6 +134,7 @@ export function AssetDisplayConfigForm({
   };
 
   return (
+    <div className="space-y-0">
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {mode === "create" && (
         <div className="space-y-2">
@@ -238,5 +240,15 @@ export function AssetDisplayConfigForm({
         {mode === "create" ? t("form.submitCreate") : t("form.submitEdit")}
       </Button>
     </form>
+
+    {mode === "edit" && initialValues?.id && (
+      <div className="mt-6 pt-4 border-t border-v2-border-light">
+        <FetchCodeList
+          configId={initialValues.id}
+          assetType={initialValues.typeCode}
+        />
+      </div>
+    )}
+    </div>
   );
 }
