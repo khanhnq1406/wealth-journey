@@ -37,11 +37,19 @@ interface DeleteFetchCodeResponse {
   success: boolean;
 }
 
+interface ListAvailableTypeCodesResponse {
+  typeCodes: string[];
+}
+
 function fetchCodeQueryKey(configId: number) {
   return ["admin-fetch-codes", configId];
 }
 
-export function FetchCodeList({ configId, assetType: _assetType }: FetchCodeListProps) {
+function availableTypeCodesQueryKey(assetType: string) {
+  return ["admin-asset-price-type-codes", assetType];
+}
+
+export function FetchCodeList({ configId, assetType }: FetchCodeListProps) {
   const t = useTranslations("admin.assetDisplayConfig.fetchCodes");
   const { toast } = useNotification();
   const queryClient = useQueryClient();
@@ -64,6 +72,18 @@ export function FetchCodeList({ configId, assetType: _assetType }: FetchCodeList
     },
     enabled: configId > 0,
   });
+
+  const { data: availableCodesData, isLoading: availableCodesLoading } =
+    useQuery<ListAvailableTypeCodesResponse>({
+      queryKey: availableTypeCodesQueryKey(assetType),
+      queryFn: async () => {
+        const response = (await apiClient.get(
+          `/api/v1/admin/asset-price-type-codes?assetType=${assetType}`
+        )) as unknown as ListAvailableTypeCodesResponse;
+        return response;
+      },
+      enabled: !!assetType,
+    });
 
   useEffect(() => {
     if (error) {
@@ -195,6 +215,27 @@ export function FetchCodeList({ configId, assetType: _assetType }: FetchCodeList
         onSubmit={handleAddSubmit}
         className="space-y-3 pt-2 border-t border-v2-border-light"
       >
+        {/* Available codes from DB */}
+        {availableCodesLoading ? (
+          <p className="text-xs text-v2-text-tertiary">{t("form.availableCodesLoading")}</p>
+        ) : (availableCodesData?.typeCodes?.length ?? 0) > 0 ? (
+          <div className="space-y-1">
+            <p className="text-xs font-medium text-v2-gold-accent">{t("form.availableCodes")}</p>
+            <div className="flex flex-wrap gap-1.5">
+              {availableCodesData!.typeCodes.map((code) => (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => setTypeCodeInput(code)}
+                  className="px-2 py-0.5 text-xs font-mono rounded border border-v2-border-light bg-v2-bg-dark text-v2-text-secondary hover:border-v2-gold-primary hover:text-v2-gold-accent cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-v2-gold-primary"
+                >
+                  {code}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         <div className="flex flex-col sm:flex-row gap-2">
           {/* Type code input */}
           <div className="flex-1">

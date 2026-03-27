@@ -26,6 +26,8 @@ const messages = {
           priorityHelp: "Lower number = higher priority",
           add: "Add",
           adding: "Adding...",
+          availableCodes: "Available codes",
+          availableCodesLoading: "Loading codes...",
         },
         delete: {
           title: "Remove Fetch Code",
@@ -296,5 +298,83 @@ describe("FetchCodeList", () => {
     await waitFor(() => {
       expect(mockToast.success).toHaveBeenCalled();
     });
+  });
+
+  // --- Available type codes from DB ---
+
+  it("fetches available type codes using assetType param", async () => {
+    mockGet
+      .mockResolvedValueOnce({ fetchCodes: mockFetchCodes }) // fetch-codes list
+      .mockResolvedValueOnce({ typeCodes: ["SJC_1L", "SJC_R2", "DOJI_1L"] }); // available codes
+
+    renderWithProviders(<FetchCodeList configId={10} assetType="gold" />);
+
+    await waitFor(() => {
+      expect(mockGet).toHaveBeenCalledWith(
+        "/api/v1/admin/asset-price-type-codes?assetType=gold"
+      );
+    });
+  });
+
+  it("renders available type codes as selectable pills", async () => {
+    mockGet
+      .mockResolvedValueOnce({ fetchCodes: [] })
+      .mockResolvedValueOnce({ typeCodes: ["SJC_1L", "SJC_R2", "DOJI_1L"] });
+
+    renderWithProviders(<FetchCodeList configId={10} assetType="gold" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("SJC_1L")).toBeInTheDocument();
+      expect(screen.getByText("SJC_R2")).toBeInTheDocument();
+      expect(screen.getByText("DOJI_1L")).toBeInTheDocument();
+    });
+  });
+
+  it("clicking a pill fills the typeCode input", async () => {
+    mockGet
+      .mockResolvedValueOnce({ fetchCodes: [] })
+      .mockResolvedValueOnce({ typeCodes: ["SJC_1L", "SJC_R2"] });
+
+    renderWithProviders(<FetchCodeList configId={10} assetType="gold" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("SJC_R2")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("SJC_R2"));
+
+    const typeCodeInput = screen.getByPlaceholderText(/select or type a code/i);
+    expect((typeCodeInput as HTMLInputElement).value).toBe("SJC_R2");
+  });
+
+  it("shows loading label while available codes are loading", async () => {
+    // Delay the available codes response
+    mockGet
+      .mockResolvedValueOnce({ fetchCodes: [] })
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) =>
+            setTimeout(() => resolve({ typeCodes: ["SJC_1L"] }), 500)
+          )
+      );
+
+    renderWithProviders(<FetchCodeList configId={10} assetType="gold" />);
+
+    expect(screen.getByText(/loading codes/i)).toBeInTheDocument();
+  });
+
+  it("hides available codes section when no codes returned", async () => {
+    mockGet
+      .mockResolvedValueOnce({ fetchCodes: [] })
+      .mockResolvedValueOnce({ typeCodes: [] });
+
+    renderWithProviders(<FetchCodeList configId={10} assetType="gold" />);
+
+    await waitFor(() => {
+      // Wait for queries to settle
+      expect(mockGet).toHaveBeenCalledTimes(2);
+    });
+
+    expect(screen.queryByText("Available codes")).not.toBeInTheDocument();
   });
 });

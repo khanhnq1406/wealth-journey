@@ -24,6 +24,7 @@ interface AssetDisplayConfigFormValues {
 
 export interface AssetDisplayConfigFormProps {
   mode: "create" | "edit";
+  assetType?: string;
   initialValues?: {
     id: number;
     typeCode: string;
@@ -39,6 +40,7 @@ export interface AssetDisplayConfigFormProps {
 interface CreateConfigRequest {
   typeCode: string;
   displayName: string;
+  assetType: string;
   displayOrder: number;
   enabled: boolean;
   showInInvestment: boolean;
@@ -53,6 +55,7 @@ interface UpdateConfigRequest {
 
 export function AssetDisplayConfigForm({
   mode,
+  assetType,
   initialValues,
   existingCodes,
   onSuccess,
@@ -119,6 +122,7 @@ export function AssetDisplayConfigForm({
       createMutation.mutate({
         typeCode: values.typeCode.trim(),
         displayName: values.displayName.trim(),
+        assetType: assetType ?? "gold",
         displayOrder: Number(values.displayOrder),
         enabled: values.enabled,
         showInInvestment: values.showInInvestment,
@@ -138,6 +142,15 @@ export function AssetDisplayConfigForm({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {mode === "create" && (
         <div className="space-y-2">
+          {/* Show which asset type (Gold / Silver) this entry will be created for */}
+          <div className="flex items-center gap-2 py-2">
+            <span className="text-sm font-medium text-v2-gold-accent">
+              {t("form.assetType")}:
+            </span>
+            <span className="px-3 py-0.5 text-sm font-semibold rounded-full bg-v2-gold-primary/20 text-v2-gold-accent border border-v2-border-light capitalize">
+              {assetType === "gold" ? t("tabs.gold") : t("tabs.silver")}
+            </span>
+          </div>
           <FormInput
             label={t("form.typeCode")}
             placeholder={t("form.typeCodePlaceholder")}

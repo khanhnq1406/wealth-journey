@@ -16,9 +16,12 @@ import {
   QUERY_KEY_ASSET_DISPLAY_CONFIG,
 } from "./AssetDisplayConfigForm";
 
+type AssetTab = "gold" | "silver";
+
 interface AssetDisplayConfigItem {
   id: number;
   typeCode: string;
+  assetType: string;
   displayName: string;
   displayOrder: number;
   enabled: boolean;
@@ -41,6 +44,8 @@ export function AssetDisplayConfigTable() {
   const queryClient = useQueryClient();
   const t = useTranslations("admin.assetDisplayConfig");
 
+  // Active asset type tab
+  const [activeTab, setActiveTab] = useState<AssetTab>("gold");
   // Modal state: null = closed, "create" = create modal, number = edit modal for that id
   const [modalState, setModalState] = useState<null | "create" | number>(null);
   // Delete confirm state
@@ -49,10 +54,10 @@ export function AssetDisplayConfigTable() {
   const [toggleLoading, setToggleLoading] = useState<Set<string>>(new Set());
 
   const { data, isLoading, error } = useQuery<ListConfigsResponse>({
-    queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG],
+    queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG, activeTab],
     queryFn: async () => {
       const response = (await apiClient.get(
-        "/api/v1/admin/asset-display-config"
+        `/api/v1/admin/asset-display-config?assetType=${activeTab}`
       )) as unknown as ListConfigsResponse;
       return response;
     },
@@ -263,6 +268,11 @@ export function AssetDisplayConfigTable() {
     },
   ];
 
+  const TABS: { key: AssetTab; label: string }[] = [
+    { key: "gold", label: t("tabs.gold") },
+    { key: "silver", label: t("tabs.silver") },
+  ];
+
   return (
     <div className="space-y-4">
       {/* Header with Add button */}
@@ -279,6 +289,24 @@ export function AssetDisplayConfigTable() {
         >
           {t("addButton")}
         </Button>
+      </div>
+
+      {/* Asset type tabs */}
+      <div className="flex gap-1 p-1 rounded-lg bg-v2-bg-dark border border-v2-border-light w-fit">
+        {TABS.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setActiveTab(tab.key)}
+            className={`min-h-[36px] px-4 py-1.5 text-sm font-medium rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-v2-gold-primary cursor-pointer ${
+              activeTab === tab.key
+                ? "bg-v2-gold-primary text-v2-bg-dark"
+                : "text-v2-text-tertiary hover:text-v2-gold-accent hover:bg-v2-maroon-600"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Table */}
@@ -326,6 +354,7 @@ export function AssetDisplayConfigTable() {
         {modalState === "create" && (
           <AssetDisplayConfigForm
             mode="create"
+            assetType={activeTab}
             existingCodes={configs.map((c) => c.typeCode)}
             onSuccess={handleModalSuccess}
           />

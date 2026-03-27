@@ -16,7 +16,7 @@ import (
 
 // adcConfigRepo is a stub for repository.AssetDisplayConfigRepository.
 type adcConfigRepo struct {
-	listAllFn                   func(ctx context.Context) ([]*models.AssetDisplayConfig, error)
+	listAllFn                   func(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error)
 	listEnabledFn               func(ctx context.Context) ([]*models.AssetDisplayConfig, error)
 	getByIDFn                   func(ctx context.Context, id int32) (*models.AssetDisplayConfig, error)
 	getByTypeCodeFn             func(ctx context.Context, typeCode string) (*models.AssetDisplayConfig, error)
@@ -27,9 +27,9 @@ type adcConfigRepo struct {
 	getByTypeCodeAndAssetTypeFn func(ctx context.Context, typeCode, assetType string) (*models.AssetDisplayConfig, error)
 }
 
-func (m *adcConfigRepo) ListAll(ctx context.Context) ([]*models.AssetDisplayConfig, error) {
+func (m *adcConfigRepo) ListAll(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
 	if m.listAllFn != nil {
-		return m.listAllFn(ctx)
+		return m.listAllFn(ctx, assetType)
 	}
 	return nil, nil
 }
@@ -757,13 +757,15 @@ func TestGetDisplayPrices_ResolveFails_SetsIsStale(t *testing.T) {
 // ListAll tests
 // ---------------------------------------------------------------------------
 
-func TestListAll_DelegatesToRepo(t *testing.T) {
+func TestListAll_DelegatesToRepoWithAssetType(t *testing.T) {
 	ctx := context.Background()
+	capturedAssetType := ""
 
 	cfgRepo := &adcConfigRepo{
-		listAllFn: func(_ context.Context) ([]*models.AssetDisplayConfig, error) {
+		listAllFn: func(_ context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
+			capturedAssetType = assetType
 			return []*models.AssetDisplayConfig{
-				{ID: 1, TypeCode: "SJC_1L"},
+				{ID: 1, TypeCode: "SJC_1L", AssetType: assetType},
 			}, nil
 		},
 	}
@@ -771,12 +773,29 @@ func TestListAll_DelegatesToRepo(t *testing.T) {
 	apRepo := &adcAssetPriceRepo{}
 
 	svc := newTestAssetDisplayConfigService(cfgRepo, fcRepo, apRepo)
+
+	// Verify gold tab passes "gold" to repo
 	configs, err := svc.ListAll(ctx, "gold")
 	if err != nil {
 		t.Fatalf("expected no error, got: %v", err)
 	}
 	if len(configs) != 1 {
 		t.Errorf("expected 1 config, got=%d", len(configs))
+	}
+	if capturedAssetType != "gold" {
+		t.Errorf("expected assetType=gold to be passed to repo, got=%q", capturedAssetType)
+	}
+
+	// Verify silver tab passes "silver" to repo
+	configs, err = svc.ListAll(ctx, "silver")
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+	if len(configs) != 1 {
+		t.Errorf("expected 1 config, got=%d", len(configs))
+	}
+	if capturedAssetType != "silver" {
+		t.Errorf("expected assetType=silver to be passed to repo, got=%q", capturedAssetType)
 	}
 }
 

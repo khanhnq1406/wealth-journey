@@ -178,6 +178,10 @@
     },
     "assetDisplayConfig": {
       "title": "Asset Display Configs",
+      "tabs": {
+        "gold": "Gold",
+        "silver": "Silver"
+      },
       "addButton": "+ Add Asset Type",
       "emptyMessage": "No asset display configs found",
       "emptyDescription": "Add your first asset type config using the button above",
@@ -199,6 +203,7 @@
         "editTitle": "Edit Asset Type"
       },
       "form": {
+        "assetType": "Asset Type",
         "typeCode": "Type Code",
         "typeCodePlaceholder": "e.g. SJC_1L",
         "typeCodeRequired": "Type code is required",
@@ -244,7 +249,9 @@
           "priority": "Priority",
           "priorityHelp": "Lower number = higher priority",
           "add": "Add",
-          "adding": "Adding..."
+          "adding": "Adding...",
+          "availableCodes": "Available codes",
+          "availableCodesLoading": "Loading codes..."
         },
         "delete": {
           "title": "Remove Fetch Code",

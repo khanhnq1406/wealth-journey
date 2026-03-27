@@ -178,6 +178,10 @@
     },
     "assetDisplayConfig": {
       "title": "Cấu hình hiển thị tài sản",
+      "tabs": {
+        "gold": "Vàng",
+        "silver": "Bạc"
+      },
       "addButton": "+ Thêm loại tài sản",
       "emptyMessage": "Chưa có cấu hình hiển thị tài sản",
       "emptyDescription": "Thêm loại tài sản đầu tiên bằng nút bên trên",
@@ -199,6 +203,7 @@
         "editTitle": "Sửa loại tài sản"
       },
       "form": {
+        "assetType": "Loại tài sản",
         "typeCode": "Mã loại",
         "typeCodePlaceholder": "VD: SJC_1L",
         "typeCodeRequired": "Mã loại là bắt buộc",
@@ -244,7 +249,9 @@
           "priority": "Độ ưu tiên",
           "priorityHelp": "Số nhỏ hơn = ưu tiên cao hơn",
           "add": "Thêm",
-          "adding": "Đang thêm..."
+          "adding": "Đang thêm...",
+          "availableCodes": "Mã khả dụng",
+          "availableCodesLoading": "Đang tải mã..."
         },
         "delete": {
           "title": "Xóa mã lấy giá",

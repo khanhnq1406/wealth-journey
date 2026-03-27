@@ -118,11 +118,13 @@ describe("AssetDisplayConfigTable", () => {
     expect(screen.getByText("DOJI 1 Lượng")).toBeInTheDocument();
   });
 
-  it("calls the correct admin endpoint", async () => {
+  it("calls the correct admin endpoint with default gold tab", async () => {
     renderWithProviders(<AssetDisplayConfigTable />);
 
     await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith("/api/v1/admin/asset-display-config");
+      expect(mockGet).toHaveBeenCalledWith(
+        "/api/v1/admin/asset-display-config?assetType=gold"
+      );
     });
   });
 

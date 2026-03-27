@@ -66,9 +66,9 @@ func (s *assetDisplayConfigService) GetDisplayPrices(ctx context.Context, assetT
 	return result, nil
 }
 
-// ListAll returns all configs (including disabled) for admin management.
+// ListAll returns all configs (including disabled) for the given asset type, for admin management.
 func (s *assetDisplayConfigService) ListAll(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
-	return s.configRepo.ListAll(ctx)
+	return s.configRepo.ListAll(ctx, assetType)
 }
 
 // Create validates inputs and inserts a new asset display config entry.

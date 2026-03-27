@@ -16,9 +16,10 @@ import (
 // dashboard and the investment selection flow. This repository replaces the older
 // GoldDisplayConfigRepository and adds support for multiple asset types (gold, silver, etc.).
 type AssetDisplayConfigRepository interface {
-	// ListAll retrieves all asset display configs ordered by display_order ASC.
+	// ListAll retrieves all asset display configs for the given asset type ordered by display_order ASC.
 	// Soft-deleted rows are excluded by GORM automatically.
-	ListAll(ctx context.Context) ([]*models.AssetDisplayConfig, error)
+	// The assetType filter is applied in the DB WHERE clause — not post-fetch in Go.
+	ListAll(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error)
 
 	// ListEnabled retrieves only enabled configs ordered by display_order ASC.
 	// Filtering is performed in the DB query — not in application code.
@@ -66,10 +67,11 @@ func NewAssetDisplayConfigRepository(db *database.Database) AssetDisplayConfigRe
 	}
 }
 
-// ListAll retrieves all non-deleted asset display configs ordered by display_order ASC.
-func (r *assetDisplayConfigRepository) ListAll(ctx context.Context) ([]*models.AssetDisplayConfig, error) {
+// ListAll retrieves all non-deleted asset display configs for the given asset type, ordered by display_order ASC.
+func (r *assetDisplayConfigRepository) ListAll(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
 	var configs []*models.AssetDisplayConfig
 	result := r.db.DB.WithContext(ctx).
+		Where("asset_type = ?", assetType).
 		Order("display_order ASC").
 		Find(&configs)
 	if result.Error != nil {

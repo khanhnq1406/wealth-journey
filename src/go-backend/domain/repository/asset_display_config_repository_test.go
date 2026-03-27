@@ -55,10 +55,11 @@ func TestAssetDisplayConfigRepository_ListAll(t *testing.T) {
 		AddRow(int32(1), "SJC_1L", "gold", "SJC 1 Lượng", int32(1), true, true, now, now, nil).
 		AddRow(int32(2), "SJC_5C", "gold", "SJC 5 Chỉ", int32(2), true, true, now, now, nil)
 
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `asset_display_config` WHERE `asset_display_config`.`deleted_at` IS NULL ORDER BY display_order ASC")).
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `asset_display_config` WHERE asset_type = ? AND `asset_display_config`.`deleted_at` IS NULL ORDER BY display_order ASC")).
+		WithArgs("gold").
 		WillReturnRows(rows)
 
-	configs, err := repo.ListAll(ctx)
+	configs, err := repo.ListAll(ctx, "gold")
 
 	assert.NoError(t, err)
 	require.Len(t, configs, 2)
@@ -78,10 +79,11 @@ func TestAssetDisplayConfigRepository_ListAll_Empty(t *testing.T) {
 	repo := NewAssetDisplayConfigRepository(database)
 	ctx := context.Background()
 
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `asset_display_config` WHERE `asset_display_config`.`deleted_at` IS NULL ORDER BY display_order ASC")).
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `asset_display_config` WHERE asset_type = ? AND `asset_display_config`.`deleted_at` IS NULL ORDER BY display_order ASC")).
+		WithArgs("silver").
 		WillReturnRows(sqlmock.NewRows(assetDisplayConfigColumns))
 
-	configs, err := repo.ListAll(ctx)
+	configs, err := repo.ListAll(ctx, "silver")
 
 	assert.NoError(t, err)
 	assert.Empty(t, configs)
@@ -99,10 +101,11 @@ func TestAssetDisplayConfigRepository_ListAll_DBError(t *testing.T) {
 	repo := NewAssetDisplayConfigRepository(database)
 	ctx := context.Background()
 
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `asset_display_config` WHERE `asset_display_config`.`deleted_at` IS NULL ORDER BY display_order ASC")).
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `asset_display_config` WHERE asset_type = ? AND `asset_display_config`.`deleted_at` IS NULL ORDER BY display_order ASC")).
+		WithArgs("gold").
 		WillReturnError(gorm.ErrInvalidDB)
 
-	configs, err := repo.ListAll(ctx)
+	configs, err := repo.ListAll(ctx, "gold")
 
 	assert.Error(t, err)
 	assert.Nil(t, configs)
