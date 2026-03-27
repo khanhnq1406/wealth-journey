@@ -28,7 +28,7 @@ func RegisterRoutes(
 			publicGroup.GET("/site-settings", h.SiteSettings.GetSiteSettings)
 		}
 		if h.AssetDisplayConfig != nil {
-			publicGroup.GET("/gold-display-prices", h.AssetDisplayConfig.GetDisplayPrices)
+			publicGroup.GET("/asset-display-prices", h.AssetDisplayConfig.GetDisplayPrices)
 		}
 	}
 
@@ -95,12 +95,17 @@ func RegisterRoutes(
 		if h.PriceAlertTrigger != nil {
 			admin.POST("/price-alert-trigger", h.PriceAlertTrigger.TriggerCheck)
 		}
-		// Gold display config management
+		// Asset display config management (supersedes gold-display-config)
 		if h.AssetDisplayConfig != nil {
-			admin.GET("/gold-display-config", h.AssetDisplayConfig.ListAll)
-			admin.POST("/gold-display-config", h.AssetDisplayConfig.Create)
-			admin.PUT("/gold-display-config/:id", h.AssetDisplayConfig.Update)
-			admin.DELETE("/gold-display-config/:id", h.AssetDisplayConfig.Delete)
+			admin.GET("/asset-display-config", h.AssetDisplayConfig.ListAll)
+			admin.POST("/asset-display-config", h.AssetDisplayConfig.Create)
+			admin.PUT("/asset-display-config/:id", h.AssetDisplayConfig.Update)
+			admin.DELETE("/asset-display-config/:id", h.AssetDisplayConfig.Delete)
+			admin.GET("/asset-display-config/:id/fetch-codes", h.AssetDisplayConfig.ListFetchCodes)
+			admin.POST("/asset-display-config/:id/fetch-codes", h.AssetDisplayConfig.CreateFetchCode)
+			admin.PUT("/asset-display-config/:id/fetch-codes/:fcId", h.AssetDisplayConfig.UpdateFetchCode)
+			admin.DELETE("/asset-display-config/:id/fetch-codes/:fcId", h.AssetDisplayConfig.DeleteFetchCode)
+			admin.GET("/asset-price-type-codes", h.AssetDisplayConfig.ListAvailableTypeCodes)
 		}
 	}
 

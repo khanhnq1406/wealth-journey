@@ -39,7 +39,7 @@ type AllHandlers struct {
 	Push               *PushHandler
 	Watchlist          *WatchlistHandler
 	UserPriceAlert     *UserPriceAlertHandlers
-	AssetDisplayConfig *GoldDisplayConfigHandler
+	AssetDisplayConfig *AssetDisplayConfigHandler
 }
 
 // HandlerDeps holds the infrastructure dependencies needed by NewHandlers.
@@ -163,11 +163,14 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 			}
 			return nil
 		}(),
-		// AssetDisplayConfig handler: Task 11 will replace GoldDisplayConfigHandler with
-		// AssetDisplayConfigHandler once the proto rename is complete.
-		// Currently wired to nil — the old GoldDisplayConfigService has been removed.
-		// Routes guard with nil-check so the endpoints return 404 until Task 11 re-wires them.
-		AssetDisplayConfig: nil,
+		// AssetDisplayConfig handler: wired to AssetDisplayConfigService.
+		// Supports gold/silver/currency asset types with fetch-code-based price resolution.
+		AssetDisplayConfig: func() *AssetDisplayConfigHandler {
+			if services.AssetDisplayConfig != nil {
+				return NewAssetDisplayConfigHandler(services.AssetDisplayConfig)
+			}
+			return nil
+		}(),
 		Public: NewPublicHandler(services.AssetPrice),
 	}
 }
