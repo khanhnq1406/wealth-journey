@@ -1022,14 +1022,15 @@ flowchart TD
 **Trigger:** Application startup — runs every 15 minutes (10-second startup delay)
 **Source:** `internal/scheduler/price_cache_job.go`, `domain/service/asset_price_service.go`, `domain/repository/asset_price_repository.go`
 
-Decouples market price HTTP handlers from live external APIs. The job fetches gold (waterfall + 4 per-source direct), silver, and currency prices in **7 parallel goroutines** and persists them to the `asset_price` PostgreSQL table. Handlers then read from the DB exclusively, eliminating per-request external API calls.
+Decouples market price HTTP handlers from live external APIs. The job fetches gold from 6 independent direct sources (VangSaiGon, VangToday, SJC, DOJI, BTMC, PNJ), silver, and currency prices in **8 parallel goroutines** and persists them to the `asset_price` PostgreSQL table. Handlers then read from the DB exclusively, eliminating per-request external API calls.
 
 ```mermaid
 sequenceDiagram
     participant SCH as Scheduler
     participant PCJ as PriceCacheJob
     participant APS as AssetPriceService
-    participant GPS as GoldPriceService<br/>(waterfall)
+    participant VSG as VangSaiGonFetcher
+    participant VT as VangTodayFetcher
     participant SPS as SilverPriceService
     participant CPS as CurrencyPriceService
     participant SJC as pkg/sjc.Client
@@ -1041,20 +1042,27 @@ sequenceDiagram
 
     SCH->>PCJ: Run(ctx) [every 15 min]
     PCJ->>APS: RefreshAllPrices(ctx)
-    Note over APS: Launches 7 goroutines into buffered channel<br/>WaitGroup closer goroutine drains when all done
+    Note over APS: Launches 8 goroutines into buffered channel<br/>WaitGroup closer goroutine drains when all done
 
-    par Waterfall gold fetch [source="waterfall"]
-        APS->>GPS: FetchAllPrices(ctx)
-        alt Fetch success
-            GPS-->>APS: []*CachedGoldPrice (canonical TypeCodes)
-            Note over GPS: Alias normalization (e.g. VNGSJC→SJC)<br/>via gold.AliasToCanonical (pkg/gold/types.go)
-            Note over APS: Convert to []AssetPrice<br/>AssetType="gold", Source="waterfall", IsStale=false
-            APS->>APR: UpsertBatch(ctx, goldPrices)
-            APR->>DB: INSERT ... ON CONFLICT (type_code, currency, source) DO UPDATE
-        else Fetch failure
-            GPS-->>APS: error
-            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "gold", "waterfall")
-            APR->>DB: UPDATE asset_price SET is_stale=true<br/>WHERE asset_type='gold' AND source='waterfall'
+    par VangSaiGon gold fetch [source="vangsaigon"]
+        APS->>VSG: refreshGoldVangSaiGon(ctx)
+        VSG->>VangSaiGon API: GET /prices (vnprice.Client)
+        alt success
+            VangSaiGon API-->>VSG: gold prices
+            Note over APS: Normalize AliasToCanonical<br/>Convert to []AssetPrice<br/>AssetType="gold", Source="vangsaigon", IsStale=false
+            APS->>APR: UpsertBatch(ctx, batch)
+        else fetch or upsert fails
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "gold", "vangsaigon")
+        end
+    and VangToday gold fetch [source="vangtoday"]
+        APS->>VT: refreshGoldVangToday(ctx)
+        VT->>VangToday API: GET /prices (vangtoday.Client)
+        alt success
+            VangToday API-->>VT: gold prices (canonical TypeCodes)
+            Note over APS: Convert to []AssetPrice<br/>AssetType="gold", Source="vangtoday", IsStale=false
+            APS->>APR: UpsertBatch(ctx, batch)
+        else fetch or upsert fails
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "gold", "vangtoday")
         end
     and SJC direct fetch [source="sjc"]
         APS->>SJC: FetchGoldPrices(ctx)
@@ -1118,30 +1126,31 @@ sequenceDiagram
         end
     end
 
-    Note over APS: Collect all 7 refreshResult values from channel<br/>failCount < 7 → nil; failCount == 7 → error "all price sources failed"
-    APS-->>PCJ: nil (or error if all 7 failed)
+    Note over APS: Collect all 8 refreshResult values from channel<br/>failCount < 8 → nil; failCount == 8 → error "all price sources failed"
+    APS-->>PCJ: nil (or error if all 8 failed)
     PCJ-->>SCH: Log result
 ```
 
 ### Key Invariants
 
-- All 7 fetches are **independent** — one failure does not prevent others from succeeding
+- All 8 fetches are **independent** — one failure does not prevent others from succeeding
 - On fetch success: `UpsertBatch` uses `ON CONFLICT (type_code, currency, source) DO UPDATE` — idempotent (3-column unique index)
 - On fetch failure: `MarkStaleByAssetTypeAndSource(ctx, assetType, source)` marks stale only for that source — other sources' rows for the same `asset_type` are unaffected
-- Nil client (e.g., no `BTMC_API_KEY`) → goroutine treats it as failure → marks stale for that source; the other 6 sources are unaffected
-- Error is returned only if **all 7** sources fail simultaneously
+- Nil client (e.g., no `BTMC_API_KEY`) → goroutine treats it as failure → marks stale for that source; the other 7 sources are unaffected
+- Error is returned only if **all 8** sources fail simultaneously
 - The job never crashes the scheduler — all errors are logged and returned without panicking
 - `PriceCacheJob` has a 10-second startup delay so the app is fully initialized before the first fetch
-- **Alias normalization boundary**: `WaterfallGoldFetcher.FetchGoldPrices` normalizes vang.today alias TypeCodes to canonical codes via `gold.AliasToCanonical` (`pkg/gold/types.go`) before returning. `AssetPriceService.refreshGold` receives only canonical codes and only deduplicates — it no longer performs alias mapping.
-- **TypeCode namespacing**: waterfall codes are canonical (e.g., `SJC`, `DOJI`); per-source direct codes carry a source prefix (e.g., `SJC_1L10L1KG`, `DOJI_NHANVANG`). No collision possible due to the 3-column unique index including `source`.
+- **Alias normalization boundary**: vangsaigon TypeCodes are normalized via `gold.AliasToCanonical` before upsert; vangtoday TypeCodes are already canonical. `AssetPriceService` receives only canonical codes for both sources.
+- **TypeCode namespacing**: vangsaigon and vangtoday codes are canonical (e.g., `SJC`, `DOJI`); per-source direct codes carry a source prefix (e.g., `SJC_1L10L1KG`, `DOJI_NHANVANG`). No collision possible due to the 3-column unique index including `source`.
 
 ### Error Paths
 
 | Condition | Response | User Impact |
 |-----------|----------|-------------|
-| One per-source client fails (e.g., SJC API down) | `MarkStaleByAssetTypeAndSource("gold", "sjc")` | SJC-sourced gold prices show `isStale: true`; waterfall + other sources unaffected |
-| Waterfall gold fails | `MarkStaleByAssetTypeAndSource("gold", "waterfall")` | Waterfall gold prices stale; direct-source rows unaffected |
-| All 7 sources fail | `RefreshAllPrices` returns error | All price items have `isStale: true`; frontend displays `"--"` |
+| One per-source client fails (e.g., SJC API down) | `MarkStaleByAssetTypeAndSource("gold", "sjc")` | SJC-sourced gold prices show `isStale: true`; other 7 sources unaffected |
+| VangSaiGon gold fails | `MarkStaleByAssetTypeAndSource("gold", "vangsaigon")` | VangSaiGon gold prices stale; other 7 sources unaffected |
+| VangToday gold fails | `MarkStaleByAssetTypeAndSource("gold", "vangtoday")` | VangToday gold prices stale; other 7 sources unaffected |
+| All 8 sources fail | `RefreshAllPrices` returns error | All price items have `isStale: true`; frontend displays `"--"` |
 | DB write fails for one source | Error logged; that source's prices may lag | Next run retries; other sources update normally |
 | DB empty (first run not yet complete) | Handlers return empty arrays or static fallback | `GetPublicMarketTypes` falls back to static registries |
 
