@@ -166,17 +166,21 @@ flowchart LR
     Start --> FC["File Cleanup\n⏱ ~1 hour\n⏳ staggered"]
     Start --> PA["Price Alert\n⏱ 15 min\n⏳ 30s delay"]
 
-    subgraph PriceUpdate["Price Update Job Detail"]
-        PU --> PU1["List all users"]
-        PU1 --> PU2["For each user:\ninvestmentSvc.UpdatePrices()"]
-        PU2 --> PU3["Log: X updated, Y errors"]
-    end
-
-    subgraph PriceCache["Price Cache Job Detail"]
+    subgraph PriceCache["Price Cache Job Detail (WRITER to asset_price)"]
         PC --> PC1["assetPriceSvc.RefreshAllPrices()"]
-        PC1 --> PC2["Fetch gold/silver/currency\nfrom live price services"]
+        PC1 --> PC2["Fetch gold/silver/currency\nfrom live price services\n(8 parallel goroutines)"]
         PC2 --> PC3["Upsert into asset_price table\nMarkStale on fetch failure"]
         PC3 --> PC4["Log: completed or error"]
+    end
+
+    subgraph PriceUpdate["Price Update Job Detail (READER of asset_price)"]
+        PU --> PU1["List all users"]
+        PU1 --> PU2["For each user:\ninvestmentSvc.UpdatePrices()"]
+        PU2 --> PU2a["MarketDataService\n.UpdatePricesForInvestments()"]
+        PU2a --> PU2b["Gold/Silver: AssetDisplayConfigService\n.ResolvePrice() → reads asset_price DB"]
+        PU2b --> PU2c["Stocks/ETFs/Crypto:\nYahoo Finance live API"]
+        PU2c --> PU3["investmentRepo.UpdatePrices()\nwrites current_price + price_updated_at\nto investment table"]
+        PU3 --> PU4["Log: X updated, Y errors"]
     end
 
     subgraph PortfolioSnapshot["Portfolio Snapshot Job Detail"]
@@ -199,18 +203,19 @@ flowchart LR
 - Startup delays prevent thundering herd on application boot
 - `scheduler.Stop()` waits for all jobs to finish gracefully via `sync.WaitGroup`
 - Conditional jobs (Session Cleanup, File Cleanup) only run if enabled via environment variables
+- **Producer-consumer pattern for gold/silver prices**: `PriceCacheJob` (sole writer) writes to `asset_price` every 15 min; `PriceUpdateJob` (reader) reads from `asset_price` via `AssetDisplayConfigService.ResolvePrice()` — they operate independently; a `PriceUpdateJob` run with a stale or cold `asset_price` table falls back to live APIs
 
 ### Job Configuration
 
-| Job | Interval | Startup Delay | Condition |
-|-----|----------|---------------|-----------|
-| DB Keep-Alive | ~2 min | Immediate | Always |
-| Price Update | 15 min | 5 sec | Always |
-| Price Cache | 15 min | 10 sec | `AssetPriceService` available |
-| Portfolio Snapshot | 1 hour | 10 sec | Always |
-| Session Cleanup | ~6 hours | Staggered | `ENABLE_SESSION_CLEANUP` |
-| File Cleanup | ~1 hour | Staggered | `ENABLE_FILE_CLEANUP` |
-| Price Alert | 15 min | 30 sec | Redis available |
+| Job | Interval | Startup Delay | Condition | Role |
+|-----|----------|---------------|-----------|------|
+| DB Keep-Alive | ~2 min | Immediate | Always | — |
+| Price Cache | 15 min | 10 sec | `AssetPriceService` available | **Sole writer** to `asset_price` |
+| Price Update | 15 min | 5 sec | Always | **Reader** of `asset_price` (gold/silver); live Yahoo Finance (stocks) |
+| Portfolio Snapshot | 1 hour | 10 sec | Always | — |
+| Session Cleanup | ~6 hours | Staggered | `ENABLE_SESSION_CLEANUP` | — |
+| File Cleanup | ~1 hour | Staggered | `ENABLE_FILE_CLEANUP` | — |
+| Price Alert | 15 min | 30 sec | Redis available | Reader of `asset_price` |
 
 ---
 
@@ -1022,7 +1027,12 @@ flowchart TD
 **Trigger:** Application startup — runs every 15 minutes (10-second startup delay)
 **Source:** `internal/scheduler/price_cache_job.go`, `domain/service/asset_price_service.go`, `domain/repository/asset_price_repository.go`
 
-Decouples market price HTTP handlers from live external APIs. The job fetches gold from 6 independent direct sources (VangSaiGon, VangToday, SJC, DOJI, BTMC, PNJ), silver, and currency prices in **8 parallel goroutines** and persists them to the `asset_price` PostgreSQL table. Handlers then read from the DB exclusively, eliminating per-request external API calls.
+`PriceCacheJob` is the **sole writer** to the `asset_price` PostgreSQL table. It decouples all price consumers (HTTP handlers and the `PriceUpdateJob`) from live external APIs. The job fetches gold from 6 independent direct sources (VangSaiGon, VangToday, SJC, DOJI, BTMC, PNJ), silver, and currency prices in **8 parallel goroutines** and persists them to `asset_price`. All consumers then read from the DB exclusively, eliminating per-request external API calls.
+
+**Producer-consumer relationship:**
+- `PriceCacheJob` (this job) — **producer**: writes `asset_price` rows every 15 min
+- `MarketPricesHandler` / `PublicHandler` — **consumers**: read `asset_price` via `AssetPriceService.GetAllPrices()`
+- `PriceUpdateJob` → `MarketDataService` → `AssetDisplayConfigService.ResolvePrice()` — **consumer**: reads `asset_price` to update `investment.current_price` (see [Section 10 of flow-investment.md](flow-investment.md#10-goldsilver-price-resolution-via-fetch-codes))
 
 ```mermaid
 sequenceDiagram
@@ -1133,6 +1143,7 @@ sequenceDiagram
 
 ### Key Invariants
 
+- **`PriceCacheJob` is the sole writer to `asset_price`** — no other job or handler writes to this table; all other consumers are read-only
 - All 8 fetches are **independent** — one failure does not prevent others from succeeding
 - On fetch success: `UpsertBatch` uses `ON CONFLICT (type_code, currency, source) DO UPDATE` — idempotent (3-column unique index)
 - On fetch failure: `MarkStaleByAssetTypeAndSource(ctx, assetType, source)` marks stale only for that source — other sources' rows for the same `asset_type` are unaffected
@@ -1140,6 +1151,7 @@ sequenceDiagram
 - Error is returned only if **all 8** sources fail simultaneously
 - The job never crashes the scheduler — all errors are logged and returned without panicking
 - `PriceCacheJob` has a 10-second startup delay so the app is fully initialized before the first fetch
+- **`PriceUpdateJob` is a consumer, not a writer**: it reads from `asset_price` via `AssetDisplayConfigService.ResolvePrice()` to resolve gold/silver prices for individual investments, then writes only to `investment.current_price` + `investment.price_updated_at`
 - **Alias normalization boundary**: vangsaigon TypeCodes are normalized via `gold.AliasToCanonical` before upsert; vangtoday TypeCodes are already canonical. `AssetPriceService` receives only canonical codes for both sources.
 - **TypeCode namespacing**: vangsaigon and vangtoday codes are canonical (e.g., `SJC`, `DOJI`); per-source direct codes carry a source prefix (e.g., `SJC_1L10L1KG`, `DOJI_NHANVANG`). No collision possible due to the 3-column unique index including `source`.
 
@@ -1154,17 +1166,19 @@ sequenceDiagram
 | DB write fails for one source | Error logged; that source's prices may lag | Next run retries; other sources update normally |
 | DB empty (first run not yet complete) | Handlers return empty arrays or static fallback | `GetPublicMarketTypes` falls back to static registries |
 
-### DB-Backed Consumers of AssetPriceService
+### DB-Backed Consumers of asset_price Table
 
-Beyond `MarketPricesHandler` and `PublicHandler`, the following services also read gold/silver/currency prices from the `asset_price` DB cache via `AssetPriceService`. **None of them call live gold/silver/currency APIs directly.**
+`PriceCacheJob` is the sole writer. All of the following are read-only consumers. **None of them call live gold/silver/currency APIs directly** (except as cold-start fallbacks in `MarketDataService`).
 
-| Consumer | Method used | Stale handling |
+| Consumer | Access path | Stale handling |
 |----------|-------------|----------------|
+| `MarketPricesHandler` / `PublicHandler` | `AssetPriceService.GetAllPrices()` | `IsStale: true` → `isStale` field in response; frontend displays `"--"` |
+| `PriceUpdateJob` → `MarketDataService` → `AssetDisplayConfigService.ResolvePrice()` | `AssetPriceRepository.ListByAssetType()` + fetch code priority lookup | All stale → returns freshest stale price; no rows → falls back to live `GoldPriceService` / `SilverPriceService` |
 | `PriceAlertJob` → `PriceAlertService` | `GetPricesByAssetType("gold")`, `GetPricesByAssetType("silver")` | Rows with `IsStale: true` are skipped — no alert fired on stale price |
 | `UserPriceAlertJob` → `UserPriceAlertService` | `GetPriceByTypeCode(symbol)` (single alert), `GetPricesByAssetType` (batch) | Returns price 0 / skips map entry when stale — alert not triggered |
 | `WatchlistService.ListItems` | `GetAllPrices()` | Falls back to zero buy/sell prices on error; stale rows propagated to client as-is |
 
-**Yahoo Finance (`MarketDataService`) remains live** — `WatchlistService` still fetches market items (stocks, crypto, ETFs) from Yahoo Finance concurrently. Only the gold/silver/currency lookup in `WatchlistService.ListItems` uses the DB cache.
+**Yahoo Finance (`MarketDataService`) remains live** — `WatchlistService` still fetches market items (stocks, crypto, ETFs) from Yahoo Finance concurrently. Only the gold/silver/currency lookup in `WatchlistService.ListItems` uses the DB cache. `PriceUpdateJob` also calls Yahoo Finance live for stocks/ETFs/crypto investments (not gold/silver).
 
 ---
 

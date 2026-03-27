@@ -13,6 +13,7 @@ Investment portfolio management flows covering the most complex business logic i
 - [Period PnL Calculation](#7-period-pnl-calculation)
 - [Gold/Silver Chart Data Flow](#8-goldsilver-chart-data-flow)
 - [Edit Transaction (Delete-and-Recreate)](#9-edit-transaction-delete-and-recreate)
+- [Gold/Silver Price Resolution via Fetch Codes](#10-goldsilver-price-resolution-via-fetch-codes)
 
 ---
 
@@ -339,54 +340,48 @@ sequenceDiagram
 ## 5. Market Price Update Pipeline
 
 **Trigger:** Scheduled job (every 15 min) or manual `PUT /api/v1/investments/market-price`
-**Source:** `domain/service/market_data_service.go`, `domain/service/gold_price_service.go`, `domain/service/silver_price_service.go`
+**Source:** `domain/service/investment_service.go`, `domain/service/market_data_service.go`, `domain/service/asset_display_config_service.go`
 
 ```mermaid
 flowchart TD
-    A["UpdatePrices(userID)\nList all investments by user_id"] --> B["investmentRepo.ListByUserID(userID)"]
+    A["InvestmentService.UpdatePrices(userID)\nList all investments by user_id"] --> B["investmentRepo.ListByUserID(userID)"]
     B --> C["Filter out isCustom=true\n(manual price only)"]
     C --> D["Categorize by type"]
     D --> E["Return immediately to client\n'Price update started for N investments'"]
     E --> F["Run in background goroutine\n(5-minute timeout)"]
 
-    F --> G{Investment type?}
+    F --> G["MarketDataService\n.UpdatePricesForInvestments()"]
+    G --> H{Investment type?}
 
-    G -- "Stocks / ETFs / Crypto" --> H["Batch by 10 symbols"]
-    H --> I["yahoo.GetQuoteBatch()"]
-    I --> J["For each quote:\nToSmallestCurrencyUnit(price, currency)"]
-    J --> K["Create/update MarketData\n{symbol, price, change24h}"]
+    H -- "Stocks / ETFs / Crypto" --> I["Batch by 10 symbols"]
+    I --> J["yahoo.GetQuoteBatch()"]
+    J --> K["For each quote:\nToSmallestCurrencyUnit(price, currency)"]
+    K --> L["Update MarketData cache\n{symbol, price, change24h}"]
 
-    G -- "Gold (VND/USD)" --> L["goldPriceService.FetchPriceForSymbol()"]
-    L --> L1{"Waterfall:\nvangsaigon → vang.today → BTMC"}
-    L1 -- "First success" --> M["[]CachedGoldPrice\nfiltered by TypeCode"]
-    L1 -- "All fail" --> L2["Emergency cache\n(1-hour TTL)"]
-    L2 --> M
-    M --> N{"Gold type?"}
-    N -- "VND" --> O["Price per lượng →\ngoldConverter.ProcessMarketPrice()\n→ price per gram (storage format)"]
-    N -- "USD" --> P["Price per ounce × 100\n(convert to cents)"]
-    O --> K
-    P --> K
+    H -- "Gold (VND/USD)" --> M["fetchGoldPriceFromDB()\n→ AssetDisplayConfigService\n.ResolvePrice(symbol, 'gold')"]
+    M --> N{DB price\navailable?}
+    N -- "Yes (non-stale)" --> O["goldConverter.ProcessMarketPrice()\nper-lượng → per-gram (VND)\nor pass-through (USD)"]
+    N -- "No (cold start\nor no fetch codes)" --> P["Fallback: goldPriceService\n.FetchPriceForSymbol()\n(live API)"]
+    P --> O
+    O --> L
 
-    G -- "Silver (VND)" --> Q["silverPriceService.FetchPriceForSymbol()"]
-    Q --> R["vang.today API\nSilver prices"]
-    R --> S["silverConverter.ProcessMarketPrice()\n→ price per gram (storage format)"]
-    S --> K
+    H -- "Silver (VND/USD)" --> Q["fetchSilverPriceFromDB()\n→ AssetDisplayConfigService\n.ResolvePrice(symbol, 'silver')"]
+    Q --> R{DB price\navailable?}
+    R -- "Yes (non-stale)" --> S["silverConverter.ProcessMarketPrice()\nper-tael/kg → per-gram (VND)\nor pass-through (USD)"]
+    R -- "No (cold start\nor no fetch codes)" --> T["Fallback: silverPriceService\n.FetchPriceForSymbol()\n(live API)"]
+    T --> S
+    S --> L
 
-    G -- "Silver (USD)" --> T["Fallback to Yahoo Finance\nSI=F or XAGUSD=X"]
-    T --> U["ToSmallestCurrencyUnit(price, 'USD')"]
-    U --> K
+    L --> U["investmentRepo.UpdatePrices()\nBatch SQL update:\ncurrent_price + price_updated_at"]
 
-    K --> V["investmentRepo.UpdatePrices()\nBatch SQL update of current_price"]
-    V --> W["Invalidate wallet investment\nvalue cache (nil-guarded,\nskipped if no wallet)"]
-
-    subgraph CacheFallback["Cache + Fallback Logic"]
+    subgraph CacheFallback["MarketData Cache Layer (stocks/ETFs/crypto only)"]
         direction TB
-        CF1["Check MarketData cache\n(symbol + currency)"] --> CF2{Fresh < 15 min?}
-        CF2 -- Yes --> CF3["Return cached price"]
-        CF2 -- No --> CF4["Fetch from API"]
+        CF1["Check marketDataRepo\n(symbol + currency)"] --> CF2{Fresh < 15 min?}
+        CF2 -- Yes --> CF3["Return cached price\n(skip API call)"]
+        CF2 -- No --> CF4["Fetch from Yahoo Finance API"]
         CF4 --> CF5{API success?}
-        CF5 -- Yes --> CF6["Update cache + return"]
-        CF5 -- No --> CF7{Stale cache exists?}
+        CF5 -- Yes --> CF6["Update marketDataRepo + return"]
+        CF5 -- No --> CF7{Stale cache\nexists?}
         CF7 -- Yes --> CF8["Log warning\nReturn stale price"]
         CF7 -- No --> CF9["Return error"]:::error
     end
@@ -398,21 +393,20 @@ flowchart TD
 
 - Custom investments (`isCustom: true`) are excluded from automatic price updates — they use manual price via `UpdateInvestmentPriceForm`
 - Price update runs asynchronously to avoid HTTP timeouts; client is notified immediately
-- Stale cache is preferred over no data — API failures gracefully degrade
-- Gold VND prices require lượng-to-gram normalization before storage
-- Silver USD uses Yahoo Finance as a fallback since the primary silver API only covers VND
+- **Gold and silver prices are read from the `asset_price` DB table** (written by `PriceCacheJob` every 15 min), not from live APIs
+- Cold-start fallback: if `ResolvePrice` fails (DB empty, no fetch codes configured), `GoldPriceService`/`SilverPriceService` live APIs are called
+- `investmentRepo.UpdatePrices()` now also writes `price_updated_at` timestamp, enabling staleness indicators on the frontend
+- Gold VND prices require lượng-to-gram normalization before storage (applied in both DB and live-fallback paths)
+- Silver USD normalization depends on the symbol: per-tael (`AG_VND_Tael`), per-kg (`AG_VND_Kg`), or pass-through (`XAG`)
 
 ### Price Sources by Type
 
-| Investment Type | Primary Source | Fallback | Cache TTL |
-|----------------|---------------|----------|-----------|
-| Stocks / ETFs | Yahoo Finance | Stale cache | 15 min |
-| Crypto | Yahoo Finance | Stale cache | 15 min |
-| Gold (VND) | vangsaigon → vang.today → BTMC | Emergency cache (1h) | 15 min |
-| Gold (USD) | vangsaigon → vang.today → BTMC | Emergency cache (1h) | 15 min |
-| Silver (VND) | vang.today | Redis silver cache | 15 min |
-| Silver (USD) | Yahoo Finance (`SI=F`) | Stale cache | 15 min |
-| Custom | Manual only | N/A | N/A |
+| Investment Type | Primary Source | Fallback | Notes |
+|----------------|---------------|----------|-------|
+| Stocks / ETFs / Crypto | Yahoo Finance (batch, 10/req) | Stale MarketData cache | Live API per request |
+| Gold (VND/USD) | `asset_price` DB via `ResolvePrice()` | Live `GoldPriceService` (cold start only) | DB written by `PriceCacheJob` |
+| Silver (VND/USD) | `asset_price` DB via `ResolvePrice()` | Live `SilverPriceService` (cold start only) | DB written by `PriceCacheJob` |
+| Custom | Manual only (`UpdateInvestmentPriceForm`) | N/A | Excluded from job |
 
 ---
 
@@ -749,3 +743,136 @@ sequenceDiagram
 | BUY→SELL where qty after reversal < requested sell qty | 400 Bad Request (`INVESTMENT_EDIT_SELL_INSUFFICIENT_QTY`) — no DB writes |
 | Reversal failure (lot update or delete) | 500 Internal Server Error (no partial state committed) |
 | New transaction processing failure | 500 Internal Server Error (reversal already applied — inconsistency risk logged) |
+
+---
+
+## 10. Gold/Silver Price Resolution via Fetch Codes
+
+**Trigger:** `PriceUpdateJob` calls `InvestmentService.UpdatePrices()` → `MarketDataService.UpdatePricesForInvestments()` → `fetchGoldPriceFromDB()` / `fetchSilverPriceFromDB()`
+**Source:** `domain/service/market_data_service.go`, `domain/service/asset_display_config_service.go`, `domain/repository/asset_config_fetch_code_repository.go`, `domain/repository/asset_price_repository.go`
+
+This sequence describes the internal resolution logic that `AssetDisplayConfigService.ResolvePrice()` uses to find the best available price for a gold or silver investment symbol. It reads exclusively from the `asset_price` DB table (populated by `PriceCacheJob`). The live gold/silver APIs are only contacted as a cold-start fallback when no DB rows exist.
+
+```mermaid
+sequenceDiagram
+    participant PUJ as PriceUpdateJob
+    participant IS as InvestmentService
+    participant MDS as MarketDataService
+    participant ADCS as AssetDisplayConfigService
+    participant FCDB as asset_config_fetch_code<br/>(DB table)
+    participant APDB as asset_price<br/>(DB table)
+    participant GPS as GoldPriceService<br/>(live API — fallback only)
+
+    PUJ->>IS: UpdatePrices(userID)
+    IS->>IS: ListByUserID + filter isCustom=true
+    IS->>MDS: UpdatePricesForInvestments(investments, forceRefresh=false)
+
+    Note over MDS: Gold investments processed sequentially
+
+    loop For each gold/silver investment
+        MDS->>MDS: fetchGoldPriceFromDB(ctx, symbol, currency, type)<br/>or fetchSilverPriceFromDB(...)
+
+        MDS->>ADCS: ResolvePrice(ctx, symbol, "gold")
+
+        activate ADCS
+        ADCS->>ADCS: configRepo.GetByTypeCodeAndAssetType(symbol, "gold")
+        Note over ADCS: Lookup asset_display_config row
+
+        ADCS->>FCDB: fetchCodeRepo.ListByConfigID(configID)<br/>ORDER BY priority ASC
+        FCDB-->>ADCS: []AssetConfigFetchCode (ordered by priority)
+
+        alt No fetch codes configured
+            ADCS-->>MDS: error "no fetch codes configured"
+            Note over MDS: Falls through to live API fallback
+        end
+
+        ADCS->>APDB: assetPriceRepo.ListByAssetType("gold")
+        APDB-->>ADCS: []AssetPrice rows for this assetType
+        Note over ADCS: Build priceMap[typeCode]→AssetPrice<br/>(keep most recently fetched per typeCode)
+
+        loop For each fetch code (priority order)
+            ADCS->>ADCS: Look up priceMap[fetchCode.TypeCode]
+            alt Price row found AND not stale
+                ADCS-->>MDS: return price.Buy, isStale=false, nil
+                Note over MDS: Returns immediately — first non-stale hit wins
+            else Price row found but stale
+                ADCS->>ADCS: Track as freshestStale candidate
+            else Price row not found
+                Note over ADCS: Skip, try next fetch code
+            end
+        end
+
+        alt All fetch codes stale (freshestStale != nil)
+            ADCS-->>MDS: return freshestStale.Buy, isStale=true, nil
+        else No matching asset_price rows at all
+            ADCS-->>MDS: error "no asset price found"
+        end
+        deactivate ADCS
+
+        alt ResolvePrice succeeded (no error)
+            MDS->>MDS: goldConverter.ProcessMarketPrice(rawPrice, currency, type)<br/>VND gold: per-lượng → per-gram<br/>USD gold: pass-through (already per-ounce)
+            MDS-->>IS: &MarketData{Symbol, Currency, Price: normalizedPrice}
+        else ResolvePrice error (cold start or no fetch codes)
+            Note over MDS,GPS: Cold-start fallback — DB not yet populated by PriceCacheJob
+            MDS->>GPS: goldPriceService.FetchPriceForSymbol(ctx, symbol)
+            GPS-->>MDS: &CachedGoldPrice{Buy, UpdateTime}
+            MDS->>MDS: goldConverter.ProcessMarketPrice(price.Buy, currency, type)
+            MDS-->>IS: &MarketData{Symbol, Currency, Price: normalizedPrice}
+        end
+    end
+
+    IS->>IS: Collect priceUpdates map[investmentID]price
+    IS->>IS: investmentRepo.UpdatePrices([]PriceUpdate{...})<br/>Batch SQL: current_price + price_updated_at
+```
+
+### ResolvePrice Algorithm Summary
+
+```
+Input:  typeCode (investment symbol), assetType ("gold" or "silver")
+Output: (price int64, isStale bool, err error)
+
+1. configRepo.GetByTypeCodeAndAssetType(typeCode, assetType)
+   → 404 if no config row → caller falls back to live API
+
+2. fetchCodeRepo.ListByConfigID(configID) ORDER BY priority ASC
+   → validation error if empty → caller falls back to live API
+
+3. assetPriceRepo.ListByAssetType(assetType)
+   → build priceMap[typeCode] → most recently fetched per typeCode
+
+4. Iterate fetch codes (priority order):
+   → non-stale match found → return (price.Buy, false, nil)  ← early exit
+   → stale match → record as freshestStale candidate
+
+5. If freshestStale != nil → return (freshestStale.Buy, true, nil)
+
+6. If no matching rows at all → return (0, false, error) → caller falls back to live API
+```
+
+### Producer-Consumer Relationship
+
+| Role | Component | Frequency | Direction |
+|------|-----------|-----------|-----------|
+| **Writer (producer)** | `PriceCacheJob` → `AssetPriceService.RefreshAllPrices()` | Every 15 min | Writes `asset_price` table |
+| **Reader (consumer)** | `PriceUpdateJob` → `MarketDataService` → `AssetDisplayConfigService.ResolvePrice()` | Every 15 min | Reads `asset_price` table |
+
+`PriceCacheJob` is the **sole writer** to `asset_price`. `PriceUpdateJob` never writes to `asset_price` — it reads prices from it to update the `investment.current_price` column.
+
+### Key Invariants
+
+- **Priority order is respected**: fetch codes are ordered by `priority ASC` — lower number = higher priority (tried first)
+- **First non-stale price wins**: the loop returns immediately on the first fetch code whose `asset_price` row has `is_stale = false`
+- **Freshest stale fallback**: if all fetch codes resolve to stale rows, the most recently fetched stale price is returned (with `isStale=true`) rather than an error
+- **Single DB read for all fetch codes**: `ListByAssetType` loads all prices for the asset type once and builds an in-memory map — not one query per fetch code
+- **Cold-start safety**: if `ResolvePrice` returns any error, `MarketDataService` falls back to the live gold/silver API. This prevents portfolio prices from being blank on the very first run before `PriceCacheJob` has populated the table
+- **Normalization is always applied**: `goldConverter.ProcessMarketPrice()` is called regardless of whether the price came from the DB or the live API fallback
+
+### Error Paths
+
+| Condition | Response | Caller Action |
+|-----------|----------|--------------|
+| No `asset_display_config` row for typeCode | `NotFoundError` | Fall back to live `GoldPriceService` |
+| No fetch codes configured for config | `ValidationError` "no fetch codes configured" | Fall back to live `GoldPriceService` |
+| All fetch codes stale | Returns `(price, isStale=true, nil)` | Uses stale price (no fallback — still a valid price) |
+| No `asset_price` rows match any fetch code | `NotFoundError` "no asset price found" | Fall back to live `GoldPriceService` |
+| Live API fallback also fails | `fmt.Errorf("failed to fetch gold price: ...")` | `fetchAndUpdateSingle` logs warning, skips investment |
