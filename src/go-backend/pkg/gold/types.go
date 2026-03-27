@@ -204,16 +204,16 @@ var GoldTypes = []GoldType{
 	},
 }
 
-// AliasToCanonical maps external API alias TypeCodes to their canonical Code
-// as defined in GoldTypes above.
+// AliasToCanonical documents known mappings between external API alias TypeCodes
+// and their previously-used canonical codes. Retained as reference only.
 //
-// Maintenance: when a price source introduces a new TypeCode for an existing
-// gold product, add the mapping here. The canonical code is what callers
-// (portfolio valuation, price alerts, filterGoldPrices on the frontend) use.
+// IMPORTANT: As of 2026-03-27 this map is NO LONGER applied during DB writes.
+// Raw TypeCodes from all price sources are stored in the asset_price table as-is.
+// Admins configure source→display mappings via asset_config_fetch_code.
 //
-// Current sources:
-//   - vangsaigon.vn: uses canonical codes directly (entry.Name matches GoldTypes.Code)
-//   - vang.today:    returns uppercase API keys that differ from canonical codes
+// Historical note: vang.today returns source-specific codes (e.g. "DOHN", "DOHCM"
+// for DOJI Hanoi and HCM branches) that previously collapsed to one canonical "Doji"
+// row. They are now stored as separate rows, allowing admins to map each independently.
 var AliasToCanonical = map[string]string{
 	// vang.today SJC aliases
 	"VNGSJC":  "SJC",   // vang.today's main SJC bar code
