@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-27-asset-price-bridge-plan.md
 - **Spec file:** docs/specs/2026-03-27-asset-price-bridge-spec.md
 - **Started:** 2026-03-27T00:00:00Z
-- **Last updated:** 2026-03-27T10:00:00Z
-- **Current state:** in_progress
-- **Current task:** 21
+- **Last updated:** 2026-03-27T12:00:00Z
+- **Current state:** complete
+- **Current task:** 22
 
 ## Task Progress
 
@@ -35,8 +35,8 @@
 | 18  | Frontend — Portfolio page PriceUpdatedAt staleness indicator           | done    | 2b4e976e | 5-tier color system (green/yellow/orange/red/gray) based on priceUpdatedAt; tooltip; 13 tests |
 | 19  | E2E Tests — Update Playwright specs                                    | done    | bf6c7a68 | Renamed admin spec; updated route mocks gold→asset; updated home price table spec |
 | 20  | Create/Update Runtime Flow Diagrams                                    | done    | 10741acf | flow-investment.md §5 DB-backed flow + §10 fetch-code sequence diagram; flow-cross-cutting.md §3+§13 producer-consumer labels |
-| 21  | Backend CI Verification                                                | pending | —      | —       |
-| 22  | Frontend CI Verification                                               | pending | —      | —       |
+| 21  | Backend CI Verification                                                | done    | 705e53ea | Removed unused test helper; lint 0 issues, build pass, all tests pass |
+| 22  | Frontend CI Verification                                               | done    | 9f686638 | Fixed AssetDisplayConfigTable test i18n; lint 0 errors, build clean, 449 tests pass |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
