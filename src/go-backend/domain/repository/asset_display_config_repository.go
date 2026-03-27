@@ -53,6 +53,12 @@ type AssetDisplayConfigRepository interface {
 	// Returns nil, nil if no record matches — callers decide whether absence is an error.
 	// Uses exact equality (=) on both columns — no LIKE or partial matching.
 	GetByTypeCodeAndAssetType(ctx context.Context, typeCode, assetType string) (*models.AssetDisplayConfig, error)
+
+	// ListEnabledTypeCodesByAssetType returns the type_code values of all
+	// enabled, non-deleted configs for the given asset type.
+	// Returns an empty slice (not an error) when no matching configs exist.
+	// Used by AssetPriceService to filter the price read path.
+	ListEnabledTypeCodesByAssetType(ctx context.Context, assetType string) ([]string, error)
 }
 
 // assetDisplayConfigRepository implements AssetDisplayConfigRepository using GORM.
@@ -185,4 +191,19 @@ func (r *assetDisplayConfigRepository) GetByTypeCodeAndAssetType(ctx context.Con
 		return nil, apperrors.NewInternalErrorWithCause("failed to get asset display config by type code and asset type", result.Error)
 	}
 	return &config, nil
+}
+
+// ListEnabledTypeCodesByAssetType returns type_code strings for all
+// enabled, non-deleted configs of the given asset type.
+// GORM auto-adds WHERE deleted_at IS NULL via soft-delete.
+func (r *assetDisplayConfigRepository) ListEnabledTypeCodesByAssetType(ctx context.Context, assetType string) ([]string, error) {
+	var typeCodes []string
+	result := r.db.DB.WithContext(ctx).
+		Model(&models.AssetDisplayConfig{}).
+		Where("asset_type = ? AND enabled = true", assetType).
+		Pluck("type_code", &typeCodes)
+	if result.Error != nil {
+		return nil, apperrors.NewInternalErrorWithCause("failed to list enabled type codes by asset type", result.Error)
+	}
+	return typeCodes, nil
 }

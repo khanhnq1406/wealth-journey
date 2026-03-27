@@ -77,6 +77,29 @@ func (m *mockAssetPriceRepo) GetByTypeCodeAndCurrency(_ context.Context, _, _ st
 	return nil, nil
 }
 
+func (m *mockAssetPriceRepo) ListByAssetTypeFiltered(_ context.Context, assetType string, enabledTypeCodes []string) ([]*models.AssetPrice, error) {
+	if len(enabledTypeCodes) == 0 {
+		return []*models.AssetPrice{}, nil
+	}
+	if m.listByTypeErr != nil {
+		return nil, m.listByTypeErr
+	}
+	// Build a set for O(1) lookups
+	allowed := make(map[string]struct{}, len(enabledTypeCodes))
+	for _, tc := range enabledTypeCodes {
+		allowed[tc] = struct{}{}
+	}
+	var result []*models.AssetPrice
+	if m.listByTypeResults != nil {
+		for _, p := range m.listByTypeResults[assetType] {
+			if _, ok := allowed[p.TypeCode]; ok {
+				result = append(result, p)
+			}
+		}
+	}
+	return result, nil
+}
+
 // ---------------------------------------------------------------------------
 // Mock: SilverPriceService
 // ---------------------------------------------------------------------------
@@ -1024,4 +1047,74 @@ func TestRefreshGoldVangSaiGon_StoresRawTypeCode(t *testing.T) {
 	if got := repo.upsertedBatches[0][0].TypeCode; got != rawTypeCode {
 		t.Errorf("TypeCode: expected raw %q, got %q (normalization should be removed)", rawTypeCode, got)
 	}
+}
+
+// ---------------------------------------------------------------------------
+// Tests: mockAssetPriceRepo.ListByAssetTypeFiltered behavior contract
+// These tests verify the contract that will be relied upon by the service layer.
+// ---------------------------------------------------------------------------
+
+// TestListByAssetTypeFiltered_ReturnsMatchingRows verifies that only prices
+// whose TypeCode is in enabledTypeCodes are returned.
+func TestListByAssetTypeFiltered_ReturnsMatchingRows(t *testing.T) {
+	ctx := context.Background()
+	repo := &mockAssetPriceRepo{
+		listByTypeResults: map[string][]*models.AssetPrice{
+			"gold": {
+				{TypeCode: "SJC", AssetType: "gold", Buy: 1000000, Sell: 1010000},
+				{TypeCode: "DOJI", AssetType: "gold", Buy: 990000, Sell: 1005000},
+				{TypeCode: "PNJ", AssetType: "gold", Buy: 985000, Sell: 1000000},
+			},
+		},
+	}
+
+	prices, err := repo.ListByAssetTypeFiltered(ctx, "gold", []string{"SJC", "PNJ"})
+
+	require.NoError(t, err)
+	require.Len(t, prices, 2)
+	typeCodes := make(map[string]bool)
+	for _, p := range prices {
+		typeCodes[p.TypeCode] = true
+	}
+	assert.True(t, typeCodes["SJC"], "SJC should be included")
+	assert.True(t, typeCodes["PNJ"], "PNJ should be included")
+	assert.False(t, typeCodes["DOJI"], "DOJI should be excluded")
+}
+
+// TestListByAssetTypeFiltered_EmptyAllowlist_ReturnsImmediately verifies that
+// when enabledTypeCodes is empty, an empty slice is returned without touching
+// the underlying data source (early-return / no DB query path).
+func TestListByAssetTypeFiltered_EmptyAllowlist_ReturnsImmediately(t *testing.T) {
+	ctx := context.Background()
+	// listByTypeErr is set — if a DB call were made, it would propagate the error.
+	// The early-return must happen BEFORE any data access.
+	repo := &mockAssetPriceRepo{
+		listByTypeErr: fmt.Errorf("should not be called"),
+		listByTypeResults: map[string][]*models.AssetPrice{
+			"gold": {
+				{TypeCode: "SJC", AssetType: "gold", Buy: 1000000, Sell: 1010000},
+			},
+		},
+	}
+
+	prices, err := repo.ListByAssetTypeFiltered(ctx, "gold", []string{})
+
+	require.NoError(t, err, "empty allowlist must early-return with no error, even when DB would fail")
+	assert.Empty(t, prices, "empty allowlist must return empty slice")
+}
+
+// TestListByAssetTypeFiltered_DBError_Propagated verifies that errors from the
+// underlying store are propagated to the caller.
+func TestListByAssetTypeFiltered_DBError_Propagated(t *testing.T) {
+	ctx := context.Background()
+	dbErr := fmt.Errorf("connection refused")
+	repo := &mockAssetPriceRepo{
+		listByTypeErr: dbErr,
+	}
+
+	prices, err := repo.ListByAssetTypeFiltered(ctx, "gold", []string{"SJC"})
+
+	require.Error(t, err)
+	assert.Nil(t, prices)
+	assert.Contains(t, err.Error(), "connection refused")
 }

@@ -682,3 +682,104 @@ func TestAssetDisplayConfigRepository_GetByTypeCodeAndAssetType_ExactMatchOnly(t
 	assert.Nil(t, config) // empty rows → nil, nil
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
+
+// ---- ListEnabledTypeCodesByAssetType ----
+
+func TestAssetDisplayConfigRepository_ListEnabledTypeCodesByAssetType(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping DB mock test in short mode")
+	}
+
+	db, mock, database := setupMockDB(t)
+	defer func() { sqlDB, _ := db.DB(); _ = sqlDB.Close() }()
+
+	repo := NewAssetDisplayConfigRepository(database)
+	ctx := context.Background()
+
+	rows := sqlmock.NewRows([]string{"type_code"}).
+		AddRow("SJC_1L").
+		AddRow("SJC_5C")
+
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT `type_code` FROM `asset_display_config` WHERE (asset_type = ? AND enabled = true) AND `asset_display_config`.`deleted_at` IS NULL")).
+		WithArgs("gold").
+		WillReturnRows(rows)
+
+	typeCodes, err := repo.ListEnabledTypeCodesByAssetType(ctx, "gold")
+
+	assert.NoError(t, err)
+	require.Len(t, typeCodes, 2)
+	assert.Equal(t, "SJC_1L", typeCodes[0])
+	assert.Equal(t, "SJC_5C", typeCodes[1])
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestAssetDisplayConfigRepository_ListEnabledTypeCodesByAssetType_Empty(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping DB mock test in short mode")
+	}
+
+	db, mock, database := setupMockDB(t)
+	defer func() { sqlDB, _ := db.DB(); _ = sqlDB.Close() }()
+
+	repo := NewAssetDisplayConfigRepository(database)
+	ctx := context.Background()
+
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT `type_code` FROM `asset_display_config` WHERE (asset_type = ? AND enabled = true) AND `asset_display_config`.`deleted_at` IS NULL")).
+		WithArgs("currency").
+		WillReturnRows(sqlmock.NewRows([]string{"type_code"}))
+
+	typeCodes, err := repo.ListEnabledTypeCodesByAssetType(ctx, "currency")
+
+	// Empty slice, not error — contract requirement.
+	assert.NoError(t, err)
+	assert.NotNil(t, typeCodes)
+	assert.Empty(t, typeCodes)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestAssetDisplayConfigRepository_ListEnabledTypeCodesByAssetType_DBError(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping DB mock test in short mode")
+	}
+
+	db, mock, database := setupMockDB(t)
+	defer func() { sqlDB, _ := db.DB(); _ = sqlDB.Close() }()
+
+	repo := NewAssetDisplayConfigRepository(database)
+	ctx := context.Background()
+
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT `type_code` FROM `asset_display_config` WHERE (asset_type = ? AND enabled = true) AND `asset_display_config`.`deleted_at` IS NULL")).
+		WithArgs("gold").
+		WillReturnError(gorm.ErrInvalidDB)
+
+	typeCodes, err := repo.ListEnabledTypeCodesByAssetType(ctx, "gold")
+
+	assert.Error(t, err)
+	assert.Nil(t, typeCodes)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+// TestAssetDisplayConfigRepository_ListEnabledTypeCodesByAssetType_ExactMatchOnly verifies that
+// asset_type uses exact equality (=) — preventing SQL injection and accidental fuzzy lookups.
+func TestAssetDisplayConfigRepository_ListEnabledTypeCodesByAssetType_ExactMatchOnly(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping DB mock test in short mode")
+	}
+
+	db, mock, database := setupMockDB(t)
+	defer func() { sqlDB, _ := db.DB(); _ = sqlDB.Close() }()
+
+	repo := NewAssetDisplayConfigRepository(database)
+	ctx := context.Background()
+
+	// The query must use exact (=) — if implementation used LIKE, sqlmock would not match this pattern.
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT `type_code` FROM `asset_display_config` WHERE (asset_type = ? AND enabled = true) AND `asset_display_config`.`deleted_at` IS NULL")).
+		WithArgs("silver").
+		WillReturnRows(sqlmock.NewRows([]string{"type_code"}))
+
+	typeCodes, err := repo.ListEnabledTypeCodesByAssetType(ctx, "silver")
+
+	assert.NoError(t, err)
+	assert.Empty(t, typeCodes)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}

@@ -41,6 +41,11 @@ type AssetPriceRepository interface {
 	// Both assetType and source must be non-empty; callers are responsible for
 	// validating that source belongs to a known set before calling this method.
 	MarkStaleByAssetTypeAndSource(ctx context.Context, assetType string, source string) error
+
+	// ListByAssetTypeFiltered retrieves all non-deleted prices for the given asset type
+	// whose type_code is in enabledTypeCodes. Uses parameterized WHERE type_code IN (?).
+	// Returns an empty slice immediately when enabledTypeCodes is empty (no DB query).
+	ListByAssetTypeFiltered(ctx context.Context, assetType string, enabledTypeCodes []string) ([]*models.AssetPrice, error)
 }
 
 // assetPriceRepository implements AssetPriceRepository using GORM.
@@ -161,4 +166,21 @@ func (r *assetPriceRepository) MarkStaleByAssetTypeAndSource(ctx context.Context
 		return apperrors.NewInternalErrorWithCause("failed to mark asset prices stale by source", result.Error)
 	}
 	return nil
+}
+
+// ListByAssetTypeFiltered retrieves non-deleted asset prices for assetType
+// whose type_code is in enabledTypeCodes. Early-returns empty slice when
+// enabledTypeCodes is empty to avoid a DB round-trip with an empty IN clause.
+func (r *assetPriceRepository) ListByAssetTypeFiltered(ctx context.Context, assetType string, enabledTypeCodes []string) ([]*models.AssetPrice, error) {
+	if len(enabledTypeCodes) == 0 {
+		return []*models.AssetPrice{}, nil
+	}
+	var prices []*models.AssetPrice
+	result := r.db.DB.WithContext(ctx).
+		Where("asset_type = ? AND type_code IN ?", assetType, enabledTypeCodes).
+		Find(&prices)
+	if result.Error != nil {
+		return nil, apperrors.NewInternalErrorWithCause("failed to list asset prices filtered by type codes", result.Error)
+	}
+	return prices, nil
 }

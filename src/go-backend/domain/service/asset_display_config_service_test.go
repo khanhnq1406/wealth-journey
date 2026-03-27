@@ -24,7 +24,8 @@ type adcConfigRepo struct {
 	updateFn                    func(ctx context.Context, config *models.AssetDisplayConfig) error
 	deleteFn                    func(ctx context.Context, id int32) error
 	listByAssetTypeFn           func(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error)
-	getByTypeCodeAndAssetTypeFn func(ctx context.Context, typeCode, assetType string) (*models.AssetDisplayConfig, error)
+	getByTypeCodeAndAssetTypeFn           func(ctx context.Context, typeCode, assetType string) (*models.AssetDisplayConfig, error)
+	listEnabledTypeCodesByAssetTypeFn func(ctx context.Context, assetType string) ([]string, error)
 }
 
 func (m *adcConfigRepo) ListAll(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
@@ -78,6 +79,12 @@ func (m *adcConfigRepo) ListByAssetType(ctx context.Context, assetType string) (
 func (m *adcConfigRepo) GetByTypeCodeAndAssetType(ctx context.Context, typeCode, assetType string) (*models.AssetDisplayConfig, error) {
 	if m.getByTypeCodeAndAssetTypeFn != nil {
 		return m.getByTypeCodeAndAssetTypeFn(ctx, typeCode, assetType)
+	}
+	return nil, nil
+}
+func (m *adcConfigRepo) ListEnabledTypeCodesByAssetType(ctx context.Context, assetType string) ([]string, error) {
+	if m.listEnabledTypeCodesByAssetTypeFn != nil {
+		return m.listEnabledTypeCodesByAssetTypeFn(ctx, assetType)
 	}
 	return nil, nil
 }
@@ -174,6 +181,9 @@ func (m *adcAssetPriceRepo) MarkStaleByAssetTypeAndSource(ctx context.Context, a
 		return m.markStaleByAssetTypeAndSourceFn(ctx, assetType, source)
 	}
 	return nil
+}
+func (m *adcAssetPriceRepo) ListByAssetTypeFiltered(_ context.Context, _ string, _ []string) ([]*models.AssetPrice, error) {
+	return nil, nil
 }
 
 // Verify mocks satisfy their interfaces at compile time.
