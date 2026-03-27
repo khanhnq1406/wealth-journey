@@ -19,7 +19,7 @@ import { SymbolAutocomplete } from "@/features/investment/components/SymbolAutoc
 import {
   useMutationCreateInvestment,
   useQueryGetMarketPrice,
-  useQueryGetGoldDisplayPrices,
+  useQueryGetAssetDisplayPrices,
   EVENT_InvestmentCreateInvestment,
   EVENT_InvestmentListInvestments,
   EVENT_InvestmentGetPortfolioSummary,
@@ -255,10 +255,13 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
   );
 
   // Fetch gold types from backend API (dynamic, admin-managed list)
-  const goldDisplayPricesQuery = useQueryGetGoldDisplayPrices({
-    enabled: isGoldInvestment,
-    staleTime: 5 * 60 * 1000,
-  });
+  const goldDisplayPricesQuery = useQueryGetAssetDisplayPrices(
+    { assetType: "gold" },
+    {
+      enabled: isGoldInvestment,
+      staleTime: 5 * 60 * 1000,
+    },
+  );
 
   // Build gold type options: VND from API (filtered by showInInvestment), USD stays hardcoded
   const goldTypeOptions = useMemo((): GoldTypeOption[] => {

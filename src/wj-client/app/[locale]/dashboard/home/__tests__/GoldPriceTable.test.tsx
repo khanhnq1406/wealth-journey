@@ -1,5 +1,5 @@
 /**
- * Tests for GoldPriceTable — uses useQueryGetGoldDisplayPrices hook (Task 6)
+ * Tests for GoldPriceTable — uses useQueryGetAssetDisplayPrices hook
  *
  * Run: cd src/wj-client && npm test -- --watchAll=false --testPathPatterns="GoldPriceTable"
  */
@@ -14,7 +14,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 // ---------------------------------------------------------------------------
 
 jest.mock("@/utils/generated/hooks", () => ({
-  useQueryGetGoldDisplayPrices: jest.fn(() => ({
+  useQueryGetAssetDisplayPrices: jest.fn(() => ({
     data: undefined,
     isLoading: false,
     isError: false,
@@ -80,7 +80,7 @@ function renderTable() {
 // Tests
 // ---------------------------------------------------------------------------
 
-describe("GoldPriceTable — uses useQueryGetGoldDisplayPrices", () => {
+describe("GoldPriceTable — uses useQueryGetAssetDisplayPrices", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -103,8 +103,8 @@ describe("GoldPriceTable — uses useQueryGetGoldDisplayPrices", () => {
   });
 
   it("shows loading spinner text when isLoading is true", () => {
-    const { useQueryGetGoldDisplayPrices } = require("@/utils/generated/hooks");
-    useQueryGetGoldDisplayPrices.mockReturnValue({
+    const { useQueryGetAssetDisplayPrices } = require("@/utils/generated/hooks");
+    useQueryGetAssetDisplayPrices.mockReturnValue({
       data: undefined,
       isLoading: true,
       isError: false,
@@ -114,8 +114,8 @@ describe("GoldPriceTable — uses useQueryGetGoldDisplayPrices", () => {
   });
 
   it("renders displayName from API response for each row", () => {
-    const { useQueryGetGoldDisplayPrices } = require("@/utils/generated/hooks");
-    useQueryGetGoldDisplayPrices.mockReturnValue({
+    const { useQueryGetAssetDisplayPrices } = require("@/utils/generated/hooks");
+    useQueryGetAssetDisplayPrices.mockReturnValue({
       data: {
         prices: [
           {
@@ -155,8 +155,8 @@ describe("GoldPriceTable — uses useQueryGetGoldDisplayPrices", () => {
   });
 
   it("shows '--' for buy and sell when isStale is true", () => {
-    const { useQueryGetGoldDisplayPrices } = require("@/utils/generated/hooks");
-    useQueryGetGoldDisplayPrices.mockReturnValue({
+    const { useQueryGetAssetDisplayPrices } = require("@/utils/generated/hooks");
+    useQueryGetAssetDisplayPrices.mockReturnValue({
       data: {
         prices: [
           {
@@ -183,8 +183,8 @@ describe("GoldPriceTable — uses useQueryGetGoldDisplayPrices", () => {
   });
 
   it("renders formatted prices when isStale is false and buy/sell > 0", () => {
-    const { useQueryGetGoldDisplayPrices } = require("@/utils/generated/hooks");
-    useQueryGetGoldDisplayPrices.mockReturnValue({
+    const { useQueryGetAssetDisplayPrices } = require("@/utils/generated/hooks");
+    useQueryGetAssetDisplayPrices.mockReturnValue({
       data: {
         prices: [
           {

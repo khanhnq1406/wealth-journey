@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { formatPriceValue } from "../prices/helpers";
 import {
-  useQueryGetGoldDisplayPrices,
+  useQueryGetAssetDisplayPrices,
 } from "@/utils/generated/hooks";
 import {
   formatUpdateTimestamp,
@@ -13,9 +13,10 @@ import {
 export function GoldPriceTable() {
   const t = useTranslations("dashboard.home");
 
-  const { data, isLoading, isError } = useQueryGetGoldDisplayPrices({
-    staleTime: 5 * 60 * 1000,
-  });
+  const { data, isLoading, isError } = useQueryGetAssetDisplayPrices(
+    { assetType: "gold" },
+    { staleTime: 5 * 60 * 1000 },
+  );
 
   const prices = data?.prices ?? [];
   const updatedTime = formatUpdateTimestamp(getLatestTimestamp(prices));

@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useQueryGetGoldDisplayPrices } from "@/utils/generated/hooks";
+import { useQueryGetAssetDisplayPrices } from "@/utils/generated/hooks";
 import { formatUpdateTimestamp } from "@/features/market-prices/utils/format-update-time";
 
 export function LandingGoldPriceTable() {
   const t = useTranslations("landing.priceTeaser");
-  const { data, isLoading } = useQueryGetGoldDisplayPrices();
+  const { data, isLoading } = useQueryGetAssetDisplayPrices({ assetType: "gold" });
 
   const prices = data?.prices ?? [];
 

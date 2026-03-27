@@ -6,9 +6,9 @@
 - **Plan file:** docs/plans/2026-03-27-asset-price-bridge-plan.md
 - **Spec file:** docs/specs/2026-03-27-asset-price-bridge-spec.md
 - **Started:** 2026-03-27T00:00:00Z
-- **Last updated:** 2026-03-27T05:00:00Z
+- **Last updated:** 2026-03-27T06:00:00Z
 - **Current state:** in_progress
-- **Current task:** 16
+- **Current task:** 17
 
 ## Task Progress
 
@@ -29,8 +29,8 @@
 | 12  | Proto — Rename messages + add new fields                               | done    | —      | Renamed Gold*→Asset* (11 messages), added 9 fetch code messages, Investment.price_updated_at=29, task proto:all |
 | 13  | Backend — Update Investment.ToProto + PriceUpdatedAt                   | done    | c556e742 | ToProto() nil-guards PriceUpdatedAt *time.Time → int64 Unix; 2 new tests (nil+non-nil cases) |
 | 14  | Frontend — Update i18n translations                                    | done    | 82622f15 | goldDisplayConfig→assetDisplayConfig in en+vi; asset-generic text; added fetchCodes sub-namespace |
-| 15  | Frontend — Rename admin components GoldDisplayConfig → AssetDisplayConfig | done    | —      | Renamed 3 files (Form/Table/test), updated imports/endpoints/translations, deleted Gold* files, updated admin page |
-| 16  | Frontend — Update public price consumers                               | pending | —      | —       |
+| 15  | Frontend — Rename admin components GoldDisplayConfig → AssetDisplayConfig | done    | 8fecc669 | Renamed 3 files (Form/Table/test), updated imports/endpoints/translations, deleted Gold* files, updated admin page |
+| 16  | Frontend — Update public price consumers                               | done    | ddbaf867 | Added useQueryGetAssetDisplayPrices to api.ts+hooks.ts; replaced hook in GoldPriceTable, LandingGoldPriceTable, AddInvestmentForm |
 | 17  | Frontend — FetchCodeList component for admin form                      | pending | —      | —       |
 | 18  | Frontend — Portfolio page PriceUpdatedAt staleness indicator           | pending | —      | —       |
 | 19  | E2E Tests — Update Playwright specs                                    | pending | —      | —       |
