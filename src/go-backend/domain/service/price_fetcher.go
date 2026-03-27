@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"wealthjourney/pkg/cache"
-	"wealthjourney/pkg/gold"
 )
 
 // PriceSource identifies a price data source.
@@ -96,14 +95,8 @@ func (w *WaterfallGoldFetcher) FetchGoldPrices(ctx context.Context) ([]*CachedGo
 			continue
 		}
 
-		// Normalize alias TypeCodes to canonical before returning.
-		for i, p := range prices {
-			if canonical, ok := gold.AliasToCanonical[p.TypeCode]; ok {
-				normalized := *p
-				normalized.TypeCode = canonical
-				prices[i] = &normalized
-			}
-		}
+		// Raw TypeCodes are returned as-is. No alias normalization.
+		// Admins configure source→display mappings in asset_config_fetch_code.
 		return prices, nil
 	}
 
@@ -112,6 +105,7 @@ func (w *WaterfallGoldFetcher) FetchGoldPrices(ctx context.Context) ([]*CachedGo
 
 // FetchGoldPricesAllSources queries every configured source (ignoring health
 // status) and merges their results. First-source wins on TypeCode conflicts.
+// TypeCodes are passed through raw — no alias normalization is applied.
 // Sources that return an error are skipped; if ALL sources fail, an error is
 // returned. This is used by per-symbol lookups so that source-exclusive symbols
 // (e.g. BTMC_24K from the BTMC fetcher) are reachable even when an earlier
@@ -136,18 +130,11 @@ func (w *WaterfallGoldFetcher) FetchGoldPricesAllSources(ctx context.Context) ([
 		}
 
 		for _, p := range prices {
-			// Normalize alias TypeCode to canonical before merging.
-			typeCode := p.TypeCode
-			if canonical, ok := gold.AliasToCanonical[typeCode]; ok {
-				typeCode = canonical
-			}
-
 			// First-source-wins: don't overwrite an entry already set by a higher-priority source.
-			if _, exists := seen[typeCode]; !exists {
-				seen[typeCode] = struct{}{}
-				normalized := *p
-				normalized.TypeCode = typeCode
-				merged = append(merged, &normalized)
+			// TypeCodes are passed through raw — no alias normalization.
+			if _, exists := seen[p.TypeCode]; !exists {
+				seen[p.TypeCode] = struct{}{}
+				merged = append(merged, p)
 			}
 		}
 	}

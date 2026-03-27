@@ -471,11 +471,10 @@ func TestGoldPriceService_FetchPriceForSymbol_SymbolNotFound(t *testing.T) {
 // TestGoldPriceService_FetchPriceForSymbol_AliasFromVangToday
 // ---------------------------------------------------------------------------
 
-// TestGoldPriceService_FetchPriceForSymbol_AliasFromVangToday verifies the
-// end-to-end alias lookup path: vangsaigon is down, vang.today returns
-// "VNGSJC" for SJC gold, FetchPriceForSymbol("SJC") should find it via
-// the aliasToCanonical map applied inside FetchGoldPricesAllSources.
-func TestGoldPriceService_FetchPriceForSymbol_AliasFromVangToday(t *testing.T) {
+// TestGoldPriceService_FetchPriceForSymbol_RawCodeFromVangToday verifies that
+// when vangsaigon is down, vang.today's raw TypeCode "VNGSJC" is returned
+// as-is (no alias normalization). FetchPriceForSymbol("VNGSJC") must find it.
+func TestGoldPriceService_FetchPriceForSymbol_RawCodeFromVangToday(t *testing.T) {
 	ctx := context.Background()
 	client, _ := newMiniredisClient(t)
 	goldCache := cache.NewGoldPriceCache(client)
@@ -485,7 +484,7 @@ func TestGoldPriceService_FetchPriceForSymbol_AliasFromVangToday(t *testing.T) {
 		source: SourceVangSaiGon,
 		err:    fmt.Errorf("vangsaigon: connection refused"),
 	}
-	// vang.today returns "VNGSJC" — the alias for canonical "SJC".
+	// vang.today returns "VNGSJC" — raw TypeCode, passed through without normalization.
 	vangtodayFetcher := &mockGoldFetcher{
 		source: SourceVangToday,
 		prices: []*CachedGoldPrice{
@@ -497,11 +496,11 @@ func TestGoldPriceService_FetchPriceForSymbol_AliasFromVangToday(t *testing.T) {
 	waterfall := NewWaterfallGoldFetcher([]GoldPriceFetcher{vangsaigonFetcher, vangtodayFetcher}, health)
 	svc := newGoldPriceServiceForTest(waterfall, goldCache)
 
-	got, err := svc.FetchPriceForSymbol(ctx, "SJC")
+	got, err := svc.FetchPriceForSymbol(ctx, "VNGSJC")
 
-	require.NoError(t, err, "FetchPriceForSymbol('SJC') should succeed via VNGSJC alias")
+	require.NoError(t, err, "FetchPriceForSymbol('VNGSJC') should succeed — raw code passes through")
 	require.NotNil(t, got)
-	assert.Equal(t, "SJC", got.TypeCode, "TypeCode must be normalized to canonical 'SJC'")
+	assert.Equal(t, "VNGSJC", got.TypeCode, "TypeCode must remain 'VNGSJC' — no normalization in waterfall")
 	assert.Equal(t, int64(172_000_000), got.Buy, "Buy price must be preserved from vang.today source")
 }
 
