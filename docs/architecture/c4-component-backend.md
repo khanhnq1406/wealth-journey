@@ -68,7 +68,7 @@ C4Component
         Component(silver_price_svc, "Silver Price Service", "domain/service/silver_price_service.go", "Fetches and caches silver prices from multiple sources (Phú Quý, Ancarat, DOJI). Provides typed silver price lookup by type code. Redis-cached with 15-minute TTL.")
         Component(watchlist_svc, "Watchlist Service", "domain/service/watchlist_service.go", "User watchlist management: add/remove/list symbols with deduplication. Enriches list results with live prices by delegating to MarketDataService (stocks/crypto/ETFs) and AssetPriceService (gold/silver/currency type codes from DB cache). Validates symbol existence before adding.")
         Component(user_price_alert_svc, "UserPriceAlert Service", "domain/service/user_price_alert_service.go", "Manages user-defined price alerts: CRUD operations, threshold evaluation against prices from MarketDataService (stocks/crypto/ETF) and AssetPriceService (gold/silver from DB cache). Triggers notifications via NotificationRepository and push delivery via PushService when alert conditions are met.")
-        Component(asset_price_svc, "AssetPrice Service", "domain/service/asset_price_service.go", "Reads cached prices from asset_price DB table. GetAllPrices returns gold/silver/currency grouped. GetMarketTypes returns type names + timestamps for public endpoint. RefreshAllPrices called by PriceCacheJob to orchestrate fetch from gold/silver/currency services and persist results.")
+        Component(asset_price_svc, "AssetPrice Service", "domain/service/asset_price_service.go", "Reads cached prices from asset_price DB table. GetAllPrices and GetMarketTypes filter by enabled asset_display_config rows before returning results (disabled or deleted configs are excluded). GetPricesByAssetType and GetPriceByTypeCode are unfiltered (used by ResolvePrice / investment pricing paths). RefreshAllPrices called by PriceCacheJob to orchestrate fetch from gold/silver/currency services and persist results.")
         Component(gold_display_config_svc, "AssetDisplayConfig Service", "domain/service/asset_display_config_service.go", "Manages admin-configurable asset display config (gold and silver). GetDisplayPrices joins enabled configs from asset_display_config with latest prices from asset_price via fetch code priority mapping and applies PriceOverrideCache overrides. ResolvePrice(typeCode, currency) resolves price for a given display config entry using ordered fetch codes. CRUD: Create validates type_code + asset_type and detects duplicates (409), Update fetches by ID (404 if not found), Delete soft-deletes. Fetch code CRUD: add/remove/reorder AssetConfigFetchCode entries per config.")
     }
 
@@ -251,6 +251,7 @@ C4Component
     Rel(price_alert_svc, redis, "Baselines, cooldowns, SSE publish")
     Rel(price_cache_job, asset_price_svc, "Triggers RefreshAllPrices every 15 minutes")
     Rel(asset_price_svc, asset_price_repo, "Reads and upserts cached prices")
+    Rel(asset_price_svc, gold_display_config_repo, "Reads enabled type codes to filter display-facing responses")
     Rel(asset_price_svc, gold_price_svc, "Fetches live gold prices for cache refresh")
     Rel(asset_price_svc, silver_price_svc, "Fetches live silver prices for cache refresh")
     Rel(asset_price_svc, currency_svc, "Fetches live currency prices for cache refresh")
