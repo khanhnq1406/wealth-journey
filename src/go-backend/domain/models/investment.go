@@ -115,7 +115,7 @@ func DerefInt32(p *int32) int32 {
 
 // ToProto converts the model to protobuf message
 func (i *Investment) ToProto() *v1.Investment {
-	return &v1.Investment{
+	proto := &v1.Investment{
 		Id:                   i.ID,
 		UserId:               i.UserID,
 		WalletId:             DerefInt32(i.WalletID),
@@ -136,5 +136,10 @@ func (i *Investment) ToProto() *v1.Investment {
 		IsCustom:             i.IsCustom,
 		CreatedAt:            i.CreatedAt.Unix(),
 		UpdatedAt:            i.UpdatedAt.Unix(),
+		PriceUpdatedAt:       0,
 	}
+	if i.PriceUpdatedAt != nil {
+		proto.PriceUpdatedAt = i.PriceUpdatedAt.Unix()
+	}
+	return proto
 }
