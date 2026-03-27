@@ -15,8 +15,9 @@ import {
   AssetDisplayConfigForm,
   QUERY_KEY_ASSET_DISPLAY_CONFIG,
 } from "./AssetDisplayConfigForm";
+import { EVENT_InvestmentGetAssetDisplayPrices } from "@/utils/generated/hooks";
 
-type AssetTab = "gold" | "silver";
+type AssetTab = "gold" | "silver" | "currency";
 
 interface AssetDisplayConfigItem {
   id: number;
@@ -83,6 +84,11 @@ export function AssetDisplayConfigTable() {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG],
       });
+      // Invalidate the public price query so GoldPriceTable / LandingGoldPriceTable
+      // reflect the change immediately (enabled toggle affects what the public endpoint returns).
+      queryClient.invalidateQueries({
+        queryKey: [EVENT_InvestmentGetAssetDisplayPrices],
+      });
     },
     onError: (err: any) => {
       toast.error(err.message || t("toast.updateFailed"));
@@ -95,6 +101,11 @@ export function AssetDisplayConfigTable() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG],
+      });
+      // Invalidate the public price query so GoldPriceTable / LandingGoldPriceTable
+      // stop showing the deleted item immediately.
+      queryClient.invalidateQueries({
+        queryKey: [EVENT_InvestmentGetAssetDisplayPrices],
       });
       toast.success(t("toast.deleted"));
       setDeleteTarget(null);
@@ -166,7 +177,7 @@ export function AssetDisplayConfigTable() {
       if (typeof modalState === "string" && createdId !== undefined) {
         // After create: switch tab to match the created asset type (if different),
         // then switch to edit mode so fetch codes can be added immediately.
-        if (createdAssetType && (createdAssetType === "gold" || createdAssetType === "silver")) {
+        if (createdAssetType && (createdAssetType === "gold" || createdAssetType === "silver" || createdAssetType === "currency")) {
           setActiveTab(createdAssetType);
         }
         setModalState(createdId);
@@ -282,6 +293,7 @@ export function AssetDisplayConfigTable() {
   const TABS: { key: AssetTab; label: string }[] = [
     { key: "gold", label: t("tabs.gold") },
     { key: "silver", label: t("tabs.silver") },
+    { key: "currency", label: t("tabs.currency") },
   ];
 
   return (

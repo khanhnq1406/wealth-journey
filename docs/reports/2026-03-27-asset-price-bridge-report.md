@@ -146,6 +146,51 @@ All CI checks pass on the final commit:
 | 2026-03-27 | Fix Mã lấy giá (FetchCodeList) never appearing when created config's asset type differs from active tab — tab not switched before resolving editTarget | Minor | 3 files |
 | 2026-03-27 | Silver `asset_config_fetch_code` seed rows missing — migration only seeded gold; all 13 silver configs showed "Chưa có mã lấy giá nào" | Minor | 1 file |
 | 2026-03-27 | `ResolvePrice` returned only `buy` price — `sell` always 0 in DTO; homepage sell column showed `--` for configs using fetch codes (e.g. VNGSJC) | Minor | 6 files |
+| 2026-03-27 | Currency type had no `asset_display_config` or `asset_config_fetch_code` seed rows — currency price table showed empty on dashboard home and landing page; admin had no Currency tab | Minor | 4 files |
+
+### Fix detail — Currency display config and fetch code seed rows missing
+
+**Issue:** The currency price table on the dashboard home page and landing page showed no data ("Không có dữ liệu"). The admin `AssetDisplayConfigTable` had no Currency tab.
+
+**Root cause:** The `asset_display_config` table had zero rows for `asset_type = "currency"`. The `GetAllPrices` path filters prices through `ListEnabledTypeCodesByAssetType(ctx, "currency")` — with no enabled configs, it returns an empty slice, so `GetMarketPrices` always returned `currency: []`. Similarly, `GetMarketTypes` returned empty currency types for the `/api/v1/public/market-types` endpoint (used by the landing page). The `asset_price` table was being populated correctly by `PriceCacheJob` every 15 minutes, but nothing could be surfaced through the display-config filter.
+
+Additionally, the `AssetDisplayConfigTable` `AssetTab` type was `"gold" | "silver"` with no Currency tab, so admins could not manage currency configs via the UI.
+
+**What changed:**
+
+- `src/go-backend/cmd/migrate-asset-display-config/main.go` — Added 18 currency `seedEntry` rows (USD, USD Internalbank/Vietcombank, EUR, GBP, JPY, CHF, AUD, CAD, SGD, HKD, TWD, KRW, THB, CNY, MYR, SEK, DKK, INR) with `asset_type = "currency"`. Idempotent: each entry is guarded by `SELECT COUNT(*) WHERE type_code = ? AND asset_type = ?`. Uses GORM `?` parameterization throughout — no string interpolation. `ShowInInvestment: false` for all currency types (FX rates are not investment assets).
+- `src/go-backend/cmd/migrate-asset-config-fetch-code/main.go` — Added 18 currency fetch code entries to the `seeds` slice. Pattern identical to silver: `fetch_code = type_code` at `priority = 1`, looked up by `display_name + asset_type = "currency"`. Uses `ON CONFLICT DO NOTHING` for idempotency.
+- `src/wj-client/features/admin/components/AssetDisplayConfigTable.tsx` — Extended `AssetTab` type to `"gold" | "silver" | "currency"`. Added `{ key: "currency", label: t("tabs.currency") }` to the `TABS` array. Updated `handleModalSuccess` allowlist to include `"currency"` so the auto-open-edit-after-create flow works when an admin creates a currency config.
+- `messages/en/admin.json` + `messages/vi/admin.json` — Added `assetDisplayConfig.tabs.currency: "Currency"` / `"Ngoại tệ"`.
+
+**TypeCode mapping (18 entries, matching `pkg/currency/types.go` `CurrencyTypes`):**
+
+| Display name | TypeCode (= asset_price type_code) |
+|---|---|
+| USD Tự Do | `USD` |
+| USD Vietcombank | `USD Internalbank` |
+| EUR | `EUR` |
+| GBP | `GBP` |
+| JPY | `JPY` |
+| CHF | `CHF` |
+| AUD | `AUD` |
+| CAD | `CAD` |
+| SGD | `SGD` |
+| HKD | `HKD` |
+| TWD | `TWD` |
+| KRW | `KRW` |
+| THB | `THB` |
+| CNY | `CNY` |
+| MYR | `MYR` |
+| SEK | `SEK` |
+| DKK | `DKK` |
+| INR | `INR` |
+
+**Security review:** PASS — all DB values use `?` parameterization; `assetType` constrained to `"gold" | "silver" | "currency"` TypeScript union on frontend; `ShowInInvestment: false` prevents financial calculation contamination; `ON CONFLICT DO NOTHING` + existence guards ensure idempotency; admin-only routes unchanged. Low-severity observation: backend `Create` handler has no server-side `assetType` allowlist (future hardening opportunity).
+
+**To apply:** `task backend:migrate-asset-display-config && task backend:migrate-asset-config-fetch-code` (both are idempotent on re-run).
+
+**CI:** `go build ./cmd/migrate-asset-display-config/... ./cmd/migrate-asset-config-fetch-code/...` — clean; `npx jest AssetDisplayConfigTable` — 9/9 pass; `npx eslint AssetDisplayConfigTable.tsx` — 0 errors.
 
 ### Fix detail — Silver fetch code seed rows missing
 

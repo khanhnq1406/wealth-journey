@@ -180,7 +180,8 @@
       "title": "Cấu hình hiển thị tài sản",
       "tabs": {
         "gold": "Vàng",
-        "silver": "Bạc"
+        "silver": "Bạc",
+        "currency": "Ngoại tệ"
       },
       "addButton": "+ Thêm loại tài sản",
       "emptyMessage": "Chưa có cấu hình hiển thị tài sản",

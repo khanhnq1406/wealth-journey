@@ -180,7 +180,8 @@
       "title": "Asset Display Configs",
       "tabs": {
         "gold": "Gold",
-        "silver": "Silver"
+        "silver": "Silver",
+        "currency": "Currency"
       },
       "addButton": "+ Add Asset Type",
       "emptyMessage": "No asset display configs found",

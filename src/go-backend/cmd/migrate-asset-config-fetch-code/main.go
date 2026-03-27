@@ -158,6 +158,26 @@ func migrateAssetConfigFetchCode(db *gorm.DB) error {
 		// PNJ
 		{"PNJ", "gold", "PNJ", 1},
 		{"PNJ", "gold", "PNJ_SJC", 2},
+		// Currency — fetch_code == type_code (vangsaigon API Code field matches asset_price type_code)
+		// Each currency config uses a single fetch code at priority 1 where fetch_code = type_code.
+		{"USD Tự Do", "currency", "USD", 1},
+		{"USD Vietcombank", "currency", "USD Internalbank", 1},
+		{"EUR", "currency", "EUR", 1},
+		{"GBP", "currency", "GBP", 1},
+		{"JPY", "currency", "JPY", 1},
+		{"CHF", "currency", "CHF", 1},
+		{"AUD", "currency", "AUD", 1},
+		{"CAD", "currency", "CAD", 1},
+		{"SGD", "currency", "SGD", 1},
+		{"HKD", "currency", "HKD", 1},
+		{"TWD", "currency", "TWD", 1},
+		{"KRW", "currency", "KRW", 1},
+		{"THB", "currency", "THB", 1},
+		{"CNY", "currency", "CNY", 1},
+		{"MYR", "currency", "MYR", 1},
+		{"SEK", "currency", "SEK", 1},
+		{"DKK", "currency", "DKK", 1},
+		{"INR", "currency", "INR", 1},
 		// Silver — fetch_code == type_code (toTypeCode() output matches asset_price type_code)
 		{"Phú Quý thỏi 1L", "silver", "PH_QU_THI_1L", 1},
 		{"Phú Quý thỏi 5L,10L", "silver", "PH_QU_THI_5L_10L", 1},

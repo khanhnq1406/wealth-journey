@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextIntlClientProvider } from "next-intl";
 import { AssetDisplayConfigTable } from "../AssetDisplayConfigTable";
 import adminMessages from "../../../../messages/en/admin.json";
+import { EVENT_InvestmentGetAssetDisplayPrices } from "@/utils/generated/hooks";
 
 // Simple render helper that wraps with QueryClientProvider + intl
 function renderWithProviders(ui: React.ReactElement) {
@@ -20,6 +21,24 @@ function renderWithProviders(ui: React.ReactElement) {
       </NextIntlClientProvider>
     </QueryClientProvider>
   );
+}
+
+// Render helper that also returns the queryClient (for spy tests)
+function renderWithProvidersAndClient(ui: React.ReactElement) {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+  const result = render(
+    <QueryClientProvider client={queryClient}>
+      <NextIntlClientProvider locale="en" messages={adminMessages}>
+        {ui}
+      </NextIntlClientProvider>
+    </QueryClientProvider>
+  );
+  return { ...result, queryClient };
 }
 
 // Mock api-client
@@ -234,5 +253,66 @@ describe("AssetDisplayConfigTable", () => {
     // A spinner is a div with animate-spin class
     const modal = screen.getByTestId("base-modal");
     expect(modal.querySelector(".animate-spin")).toBeInTheDocument();
+  });
+
+  it("invalidates public price query (EVENT_InvestmentGetAssetDisplayPrices) after delete", async () => {
+    // Regression test: deleting a config must invalidate the public price query so
+    // GoldPriceTable and LandingGoldPriceTable stop showing the deleted item.
+    const { queryClient } = renderWithProvidersAndClient(<AssetDisplayConfigTable />);
+
+    // Wait for initial load
+    await waitFor(() => {
+      expect(screen.getByText("SJC 1 Lượng")).toBeInTheDocument();
+    });
+
+    const invalidateSpy = jest.spyOn(queryClient, "invalidateQueries");
+
+    mockDelete.mockResolvedValueOnce({});
+
+    // Click Delete on first row
+    const deleteButtons = screen.getAllByRole("button", { name: /delete sjc 1 lượng/i });
+    fireEvent.click(deleteButtons[0]);
+
+    // Confirm dialog appears — click confirm
+    await waitFor(() => {
+      expect(screen.getByTestId("confirmation-dialog")).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByRole("button", { name: /^confirm$/i }));
+
+    // After delete mutation resolves, the public price query must be invalidated
+    await waitFor(() => {
+      const calls = invalidateSpy.mock.calls.map((c) => JSON.stringify(c[0]));
+      const publicPriceInvalidated = calls.some((c) =>
+        c.includes(EVENT_InvestmentGetAssetDisplayPrices)
+      );
+      expect(publicPriceInvalidated).toBe(true);
+    });
+  });
+
+  it("invalidates public price query after toggling enabled (update)", async () => {
+    // Regression test: disabling a config must also invalidate the public price query so
+    // price tables reflect the change without waiting for staleTime to expire.
+    const { queryClient } = renderWithProvidersAndClient(<AssetDisplayConfigTable />);
+
+    await waitFor(() => {
+      expect(screen.getByText("SJC 1 Lượng")).toBeInTheDocument();
+    });
+
+    const invalidateSpy = jest.spyOn(queryClient, "invalidateQueries");
+    mockPut.mockResolvedValueOnce({});
+
+    // Toggle enabled on first row
+    const switches = screen.getAllByRole("switch");
+    await act(async () => {
+      fireEvent.click(switches[0]);
+    });
+
+    await waitFor(() => {
+      const calls = invalidateSpy.mock.calls.map((c) => JSON.stringify(c[0]));
+      const publicPriceInvalidated = calls.some((c) =>
+        c.includes(EVENT_InvestmentGetAssetDisplayPrices)
+      );
+      expect(publicPriceInvalidated).toBe(true);
+    });
   });
 });

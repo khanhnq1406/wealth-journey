@@ -108,7 +108,7 @@ func migrateAssetDisplayConfig(db *gorm.DB) error {
 	}
 
 	// Step 5: Seed silver display entries (if not exists)
-	log.Println("Step 5: Seeding silver display config entries...")
+	log.Println("Step 5: Seeding currency and silver display config entries...")
 	type seedEntry struct {
 		TypeCode         string
 		DisplayName      string
@@ -116,6 +116,52 @@ func migrateAssetDisplayConfig(db *gorm.DB) error {
 		Enabled          bool
 		ShowInInvestment bool
 		AssetType        string
+	}
+
+	// Currency type codes match the vangsaigon API's Code field exactly
+	// (same codes used in pkg/currency/types.go CurrencyTypes registry).
+	// Each currency config maps directly to its asset_price type_code via a fetch code at priority 1.
+	currencySeeds := []seedEntry{
+		{TypeCode: "USD", DisplayName: "USD Tự Do", DisplayOrder: 1, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "USD Internalbank", DisplayName: "USD Vietcombank", DisplayOrder: 2, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "EUR", DisplayName: "EUR", DisplayOrder: 3, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "GBP", DisplayName: "GBP", DisplayOrder: 4, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "JPY", DisplayName: "JPY", DisplayOrder: 5, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "CHF", DisplayName: "CHF", DisplayOrder: 6, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "AUD", DisplayName: "AUD", DisplayOrder: 7, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "CAD", DisplayName: "CAD", DisplayOrder: 8, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "SGD", DisplayName: "SGD", DisplayOrder: 9, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "HKD", DisplayName: "HKD", DisplayOrder: 10, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "TWD", DisplayName: "TWD", DisplayOrder: 11, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "KRW", DisplayName: "KRW", DisplayOrder: 12, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "THB", DisplayName: "THB", DisplayOrder: 13, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "CNY", DisplayName: "CNY", DisplayOrder: 14, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "MYR", DisplayName: "MYR", DisplayOrder: 15, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "SEK", DisplayName: "SEK", DisplayOrder: 16, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "DKK", DisplayName: "DKK", DisplayOrder: 17, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "INR", DisplayName: "INR", DisplayOrder: 18, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+	}
+
+	for _, seed := range currencySeeds {
+		var count int64
+		db.Raw(
+			"SELECT COUNT(*) FROM asset_display_config WHERE type_code = ? AND asset_type = ? AND deleted_at IS NULL",
+			seed.TypeCode, seed.AssetType,
+		).Scan(&count)
+
+		if count == 0 {
+			err := db.Exec(
+				`INSERT INTO asset_display_config (type_code, display_name, display_order, enabled, show_in_investment, asset_type, created_at, updated_at)
+				 VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+				seed.TypeCode, seed.DisplayName, seed.DisplayOrder, seed.Enabled, seed.ShowInInvestment, seed.AssetType,
+			).Error
+			if err != nil {
+				return fmt.Errorf("failed to seed currency entry %s: %w", seed.TypeCode, err)
+			}
+			log.Printf("  Seeded: %s (%s) [%s]", seed.TypeCode, seed.DisplayName, seed.AssetType)
+		} else {
+			log.Printf("  Exists: %s [%s]", seed.TypeCode, seed.AssetType)
+		}
 	}
 
 	// Silver type codes derived from silver_price_service.go toTypeCode() function
