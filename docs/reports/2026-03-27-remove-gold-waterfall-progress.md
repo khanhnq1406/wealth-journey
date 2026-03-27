@@ -6,9 +6,9 @@
 - **Plan file:** `docs/plans/2026-03-27-remove-gold-waterfall-plan.md`
 - **Spec file:** `docs/specs/2026-03-27-remove-gold-waterfall-spec.md`
 - **Started:** 2026-03-27T00:00:00Z
-- **Last updated:** 2026-03-27T10:15:00Z
-- **Current state:** in_progress
-- **Current task:** 6
+- **Last updated:** 2026-03-27T10:20:00Z
+- **Current state:** complete
+- **Current task:** —
 
 ## Task Progress
 
@@ -20,7 +20,7 @@
 | 3   | Update RefreshAllPrices 7→8 goroutines                           | done        | —      | Channel buffer 7→8, failCount 7→8, wired new goroutines |
 | 4   | Update services.go DI wiring                                     | done        | —      | Replaced goldPriceSvc with NewVangSaiGonGoldFetcher+NewVangTodayGoldFetcher |
 | 5   | Update flow-cross-cutting.md Section 13                          | done        | —      | Section 13 rewritten: GPS participant removed, VSG+VT participants added, 8 goroutines, waterfall par block replaced with two direct-source blocks |
-| 6   | Final CI verification + implementation report                    | in_progress | —      | —       |
+| 6   | Final CI verification + implementation report                    | done        | —      | lint+build+tests all pass; report written to docs/reports/2026-03-27-remove-gold-waterfall-report.md |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
