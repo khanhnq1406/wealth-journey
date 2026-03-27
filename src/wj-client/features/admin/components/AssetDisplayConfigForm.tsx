@@ -11,9 +11,9 @@ import { ButtonType } from "@/app/constants";
 import { apiClient } from "@/utils/api-client";
 
 // Query key for invalidating the list after mutations
-export const QUERY_KEY_GOLD_DISPLAY_CONFIG = "admin-gold-display-config";
+export const QUERY_KEY_ASSET_DISPLAY_CONFIG = "admin-asset-display-config";
 
-interface GoldDisplayConfigFormValues {
+interface AssetDisplayConfigFormValues {
   typeCode: string;
   displayName: string;
   displayOrder: number;
@@ -21,7 +21,7 @@ interface GoldDisplayConfigFormValues {
   showInInvestment: boolean;
 }
 
-export interface GoldDisplayConfigFormProps {
+export interface AssetDisplayConfigFormProps {
   mode: "create" | "edit";
   initialValues?: {
     id: number;
@@ -31,7 +31,6 @@ export interface GoldDisplayConfigFormProps {
     enabled: boolean;
     showInInvestment: boolean;
   };
-  /** Existing type codes from the database — shown as reference chips in create mode */
   existingCodes?: string[];
   onSuccess?: () => void;
 }
@@ -51,18 +50,18 @@ interface UpdateConfigRequest {
   showInInvestment: boolean;
 }
 
-export function GoldDisplayConfigForm({
+export function AssetDisplayConfigForm({
   mode,
   initialValues,
   existingCodes,
   onSuccess,
-}: GoldDisplayConfigFormProps) {
+}: AssetDisplayConfigFormProps) {
   const queryClient = useQueryClient();
   const [errorMessage, setErrorMessage] = useState<string>();
-  const t = useTranslations("admin.goldDisplayConfig");
+  const t = useTranslations("admin.assetDisplayConfig");
 
   const { register, handleSubmit, control, reset, setValue, formState: { errors } } =
-    useForm<GoldDisplayConfigFormValues>({
+    useForm<AssetDisplayConfigFormValues>({
       defaultValues: {
         typeCode: initialValues?.typeCode ?? "",
         displayName: initialValues?.displayName ?? "",
@@ -89,11 +88,9 @@ export function GoldDisplayConfigForm({
 
   const createMutation = useMutation({
     mutationFn: (req: CreateConfigRequest) =>
-      apiClient.post("/api/v1/admin/gold-display-config", req),
+      apiClient.post("/api/v1/admin/asset-display-config", req),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEY_GOLD_DISPLAY_CONFIG],
-      });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG] });
       onSuccess?.();
     },
     onError: (error: any) => {
@@ -103,14 +100,9 @@ export function GoldDisplayConfigForm({
 
   const updateMutation = useMutation({
     mutationFn: (req: UpdateConfigRequest) =>
-      apiClient.put(
-        `/api/v1/admin/gold-display-config/${initialValues!.id}`,
-        req
-      ),
+      apiClient.put(`/api/v1/admin/asset-display-config/${initialValues!.id}`, req),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEY_GOLD_DISPLAY_CONFIG],
-      });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG] });
       onSuccess?.();
     },
     onError: (error: any) => {
@@ -120,7 +112,7 @@ export function GoldDisplayConfigForm({
 
   const isPending = createMutation.isPending || updateMutation.isPending;
 
-  const onSubmit = (values: GoldDisplayConfigFormValues) => {
+  const onSubmit = (values: AssetDisplayConfigFormValues) => {
     setErrorMessage(undefined);
     if (mode === "create") {
       createMutation.mutate({
@@ -142,7 +134,6 @@ export function GoldDisplayConfigForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* typeCode — only shown on create */}
       {mode === "create" && (
         <div className="space-y-2">
           <FormInput
@@ -174,7 +165,6 @@ export function GoldDisplayConfigForm({
         </div>
       )}
 
-      {/* displayName */}
       <FormInput
         label={t("form.displayName")}
         placeholder={t("form.displayNamePlaceholder")}
@@ -183,7 +173,6 @@ export function GoldDisplayConfigForm({
         {...register("displayName", { required: t("form.displayNameRequired") })}
       />
 
-      {/* displayOrder */}
       <FormNumberInput
         name="displayOrder"
         control={control}
@@ -195,7 +184,6 @@ export function GoldDisplayConfigForm({
         min={0}
       />
 
-      {/* enabled toggle */}
       <div className="flex items-center justify-between py-2 border-b border-v2-border-light">
         <span className="text-sm font-medium text-v2-gold-accent">{t("form.enabled")}</span>
         <button
@@ -215,7 +203,6 @@ export function GoldDisplayConfigForm({
         </button>
       </div>
 
-      {/* showInInvestment toggle */}
       <div className="flex items-center justify-between py-2 border-b border-v2-border-light">
         <span className="text-sm font-medium text-v2-gold-accent">
           {t("form.showInInvestment")}
@@ -237,12 +224,10 @@ export function GoldDisplayConfigForm({
         </button>
       </div>
 
-      {/* Error */}
       {errorMessage && (
         <p className="text-sm text-v2-red-negative">{errorMessage}</p>
       )}
 
-      {/* Submit */}
       <Button
         type={ButtonType.PRIMARY}
         htmlType="submit"

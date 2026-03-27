@@ -12,11 +12,11 @@ import { ButtonType } from "@/app/constants";
 import { apiClient } from "@/utils/api-client";
 import { useNotification } from "@/contexts/NotificationContext";
 import {
-  GoldDisplayConfigForm,
-  QUERY_KEY_GOLD_DISPLAY_CONFIG,
-} from "./GoldDisplayConfigForm";
+  AssetDisplayConfigForm,
+  QUERY_KEY_ASSET_DISPLAY_CONFIG,
+} from "./AssetDisplayConfigForm";
 
-interface GoldDisplayConfigItem {
+interface AssetDisplayConfigItem {
   id: number;
   typeCode: string;
   displayName: string;
@@ -26,7 +26,7 @@ interface GoldDisplayConfigItem {
 }
 
 interface ListConfigsResponse {
-  configs: GoldDisplayConfigItem[];
+  configs: AssetDisplayConfigItem[];
 }
 
 interface UpdateConfigRequest {
@@ -36,23 +36,23 @@ interface UpdateConfigRequest {
   showInInvestment: boolean;
 }
 
-export function GoldDisplayConfigTable() {
+export function AssetDisplayConfigTable() {
   const { toast } = useNotification();
   const queryClient = useQueryClient();
-  const t = useTranslations("admin.goldDisplayConfig");
+  const t = useTranslations("admin.assetDisplayConfig");
 
   // Modal state: null = closed, "create" = create modal, number = edit modal for that id
   const [modalState, setModalState] = useState<null | "create" | number>(null);
   // Delete confirm state
-  const [deleteTarget, setDeleteTarget] = useState<GoldDisplayConfigItem | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<AssetDisplayConfigItem | null>(null);
   // Track which row's toggle is in flight: `enabled-{id}` or `showInInvestment-{id}`
   const [toggleLoading, setToggleLoading] = useState<Set<string>>(new Set());
 
   const { data, isLoading, error } = useQuery<ListConfigsResponse>({
-    queryKey: [QUERY_KEY_GOLD_DISPLAY_CONFIG],
+    queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG],
     queryFn: async () => {
       const response = (await apiClient.get(
-        "/api/v1/admin/gold-display-config"
+        "/api/v1/admin/asset-display-config"
       )) as unknown as ListConfigsResponse;
       return response;
     },
@@ -73,10 +73,10 @@ export function GoldDisplayConfigTable() {
     }: {
       id: number;
       req: UpdateConfigRequest;
-    }) => apiClient.put(`/api/v1/admin/gold-display-config/${id}`, req),
+    }) => apiClient.put(`/api/v1/admin/asset-display-config/${id}`, req),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEY_GOLD_DISPLAY_CONFIG],
+        queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG],
       });
     },
     onError: (err: any) => {
@@ -86,10 +86,10 @@ export function GoldDisplayConfigTable() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) =>
-      apiClient.delete(`/api/v1/admin/gold-display-config/${id}`),
+      apiClient.delete(`/api/v1/admin/asset-display-config/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEY_GOLD_DISPLAY_CONFIG],
+        queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG],
       });
       toast.success(t("toast.deleted"));
       setDeleteTarget(null);
@@ -101,7 +101,7 @@ export function GoldDisplayConfigTable() {
   });
 
   const handleToggleEnabled = useCallback(
-    (row: GoldDisplayConfigItem) => {
+    (row: AssetDisplayConfigItem) => {
       const key = `enabled-${row.id}`;
       setToggleLoading((prev) => new Set(prev).add(key));
       updateMutation.mutate(
@@ -129,7 +129,7 @@ export function GoldDisplayConfigTable() {
   );
 
   const handleToggleShowInInvestment = useCallback(
-    (row: GoldDisplayConfigItem) => {
+    (row: AssetDisplayConfigItem) => {
       const key = `showInInvestment-${row.id}`;
       setToggleLoading((prev) => new Set(prev).add(key));
       updateMutation.mutate(
@@ -170,7 +170,7 @@ export function GoldDisplayConfigTable() {
       ? configs.find((c) => c.id === modalState)
       : undefined;
 
-  const columns: MobileColumnDef<GoldDisplayConfigItem>[] = [
+  const columns: MobileColumnDef<AssetDisplayConfigItem>[] = [
     {
       id: "displayOrder",
       header: t("columns.order"),
@@ -324,14 +324,14 @@ export function GoldDisplayConfigTable() {
         maxWidth="max-w-md"
       >
         {modalState === "create" && (
-          <GoldDisplayConfigForm
+          <AssetDisplayConfigForm
             mode="create"
             existingCodes={configs.map((c) => c.typeCode)}
             onSuccess={handleModalSuccess}
           />
         )}
         {typeof modalState === "number" && editTarget && (
-          <GoldDisplayConfigForm
+          <AssetDisplayConfigForm
             mode="edit"
             initialValues={editTarget}
             onSuccess={handleModalSuccess}

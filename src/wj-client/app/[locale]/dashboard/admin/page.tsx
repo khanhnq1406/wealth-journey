@@ -21,7 +21,7 @@ import { AdminFeedbackTab } from "@/features/admin/components/AdminFeedbackTab";
 import { AdminBroadcastForm } from "@/features/admin/components/AdminBroadcastForm";
 import { PriceAlertConfigForm } from "@/features/admin/components/PriceAlertConfigForm";
 import { PriceAlertTriggerCard } from "@/features/admin/components/PriceAlertTriggerCard";
-import { GoldDisplayConfigTable } from "@/features/admin/components/GoldDisplayConfigTable";
+import { AssetDisplayConfigTable } from "@/features/admin/components/AssetDisplayConfigTable";
 
 interface SiteSetting {
   key: string;
@@ -443,7 +443,7 @@ export default function AdminCMSPage() {
             <PriceAlertTriggerCard />
           </div>
         )}
-        {activeTab === "gold-config" && <GoldDisplayConfigTable />}
+        {activeTab === "gold-config" && <AssetDisplayConfigTable />}
       </div>
     </AdminGuard>
   );

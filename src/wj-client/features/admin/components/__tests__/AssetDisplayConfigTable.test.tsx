@@ -2,7 +2,7 @@ import React from "react";
 import { screen, waitFor, render } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextIntlClientProvider } from "next-intl";
-import { GoldDisplayConfigTable } from "../GoldDisplayConfigTable";
+import { AssetDisplayConfigTable } from "../AssetDisplayConfigTable";
 
 // Simple render helper that wraps with QueryClientProvider + intl
 function renderWithProviders(ui: React.ReactElement) {
@@ -100,14 +100,14 @@ const mockConfigs = [
   },
 ];
 
-describe("GoldDisplayConfigTable", () => {
+describe("AssetDisplayConfigTable", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGet.mockResolvedValue({ configs: mockConfigs });
   });
 
   it("renders loading skeleton then config list", async () => {
-    renderWithProviders(<GoldDisplayConfigTable />);
+    renderWithProviders(<AssetDisplayConfigTable />);
 
     // Wait for data to load
     await waitFor(() => {
@@ -118,33 +118,33 @@ describe("GoldDisplayConfigTable", () => {
   });
 
   it("calls the correct admin endpoint", async () => {
-    renderWithProviders(<GoldDisplayConfigTable />);
+    renderWithProviders(<AssetDisplayConfigTable />);
 
     await waitFor(() => {
-      expect(mockGet).toHaveBeenCalledWith("/api/v1/admin/gold-display-config");
+      expect(mockGet).toHaveBeenCalledWith("/api/v1/admin/asset-display-config");
     });
   });
 
-  it("shows the Add Gold Type button", async () => {
-    renderWithProviders(<GoldDisplayConfigTable />);
+  it("shows the Add Asset Type button", async () => {
+    renderWithProviders(<AssetDisplayConfigTable />);
 
     await waitFor(() => {
       expect(screen.getByText("SJC 1 Lượng")).toBeInTheDocument();
     });
 
     expect(
-      screen.getByRole("button", { name: /add gold type/i })
+      screen.getByRole("button", { name: /add asset type/i })
     ).toBeInTheDocument();
   });
 
   it("renders empty state when no configs returned", async () => {
     mockGet.mockResolvedValueOnce({ configs: [] });
 
-    renderWithProviders(<GoldDisplayConfigTable />);
+    renderWithProviders(<AssetDisplayConfigTable />);
 
     await waitFor(() => {
       expect(
-        screen.getByText(/no gold display configs found/i)
+        screen.getByText(/no asset display configs found/i)
       ).toBeInTheDocument();
     });
   });
@@ -152,7 +152,7 @@ describe("GoldDisplayConfigTable", () => {
   it("shows error toast when fetch fails", async () => {
     mockGet.mockRejectedValueOnce(new Error("Network error"));
 
-    renderWithProviders(<GoldDisplayConfigTable />);
+    renderWithProviders(<AssetDisplayConfigTable />);
 
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalled();
@@ -160,7 +160,7 @@ describe("GoldDisplayConfigTable", () => {
   });
 
   it("shows type codes in the config list", async () => {
-    renderWithProviders(<GoldDisplayConfigTable />);
+    renderWithProviders(<AssetDisplayConfigTable />);
 
     await waitFor(() => {
       expect(screen.getByText("SJC_1L")).toBeInTheDocument();
