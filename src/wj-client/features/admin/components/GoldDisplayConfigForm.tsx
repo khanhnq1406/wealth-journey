@@ -61,7 +61,7 @@ export function GoldDisplayConfigForm({
   const [errorMessage, setErrorMessage] = useState<string>();
   const t = useTranslations("admin.goldDisplayConfig");
 
-  const { register, handleSubmit, control, reset, setValue } =
+  const { register, handleSubmit, control, reset, setValue, formState: { errors } } =
     useForm<GoldDisplayConfigFormValues>({
       defaultValues: {
         typeCode: initialValues?.typeCode ?? "",
@@ -149,7 +149,7 @@ export function GoldDisplayConfigForm({
             label={t("form.typeCode")}
             placeholder={t("form.typeCodePlaceholder")}
             required
-            error={undefined}
+            error={errors.typeCode?.message}
             {...register("typeCode", { required: t("form.typeCodeRequired") })}
           />
           {existingCodes && existingCodes.length > 0 && (
@@ -179,6 +179,7 @@ export function GoldDisplayConfigForm({
         label={t("form.displayName")}
         placeholder={t("form.displayNamePlaceholder")}
         required
+        error={errors.displayName?.message}
         {...register("displayName", { required: t("form.displayNameRequired") })}
       />
 
