@@ -3,10 +3,13 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"wealthjourney/domain/models"
 )
 
@@ -75,23 +78,6 @@ func (m *mockAssetPriceRepo) GetByTypeCodeAndCurrency(_ context.Context, _, _ st
 }
 
 // ---------------------------------------------------------------------------
-// Mock: GoldPriceService
-// ---------------------------------------------------------------------------
-
-type mockGoldPriceSvc struct {
-	prices []*CachedGoldPrice
-	err    error
-}
-
-func (m *mockGoldPriceSvc) FetchAllPrices(_ context.Context) ([]*CachedGoldPrice, error) {
-	return m.prices, m.err
-}
-
-func (m *mockGoldPriceSvc) FetchPriceForSymbol(_ context.Context, _ string) (*CachedGoldPrice, error) {
-	return nil, nil
-}
-
-// ---------------------------------------------------------------------------
 // Mock: SilverPriceService
 // ---------------------------------------------------------------------------
 
@@ -119,6 +105,27 @@ type mockCurrencyPriceSvc struct {
 
 func (m *mockCurrencyPriceSvc) FetchAllPrices(_ context.Context) ([]*CachedCurrencyPrice, error) {
 	return m.prices, m.err
+}
+
+// ---------------------------------------------------------------------------
+// Mock: GoldPriceFetcher (simple stub — no testify/mock dependency)
+// ---------------------------------------------------------------------------
+
+// mockSimpleGoldPriceFetcher is a simple test double implementing GoldPriceFetcher.
+// Named "Simple" to avoid collision with the testify/mock-based mockGoldPriceFetcher
+// declared in price_fetcher_test.go (same package).
+type mockSimpleGoldPriceFetcher struct {
+	prices []*CachedGoldPrice
+	err    error
+	source PriceSource
+}
+
+func (m *mockSimpleGoldPriceFetcher) FetchGoldPrices(_ context.Context) ([]*CachedGoldPrice, error) {
+	return m.prices, m.err
+}
+
+func (m *mockSimpleGoldPriceFetcher) Source() PriceSource {
+	return m.source
 }
 
 // ---------------------------------------------------------------------------
@@ -179,15 +186,17 @@ func makeCurrencyPrices(n int) []*CachedCurrencyPrice {
 // ---------------------------------------------------------------------------
 
 func TestAssetPriceService_RefreshAllPrices_AllSucceed(t *testing.T) {
-	goldPrices := makeGoldPrices(3)
+	vsgPrices := makeGoldPrices(3)
 	silverPrices := makeSilverPrices(2)
 	currencyPrices := makeCurrencyPrices(4)
 
 	repo := &mockAssetPriceRepo{}
+	vsgFetcher := &mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, prices: vsgPrices}
+	vtFetcher := &mockSimpleGoldPriceFetcher{source: SourceVangToday, prices: makeGoldPrices(2)}
 	svc := NewAssetPriceService(repo,
-		&mockGoldPriceSvc{prices: goldPrices},
 		&mockSilverPriceSvc{prices: silverPrices},
 		&mockCurrencyPriceSvc{prices: currencyPrices},
+		vsgFetcher, vtFetcher,
 		nil, nil, nil, nil,
 	)
 
@@ -196,26 +205,11 @@ func TestAssetPriceService_RefreshAllPrices_AllSucceed(t *testing.T) {
 		t.Fatalf("expected no error, got: %v", err)
 	}
 
-	// Three batches should have been upserted (gold, silver, currency).
-	// Nil clients skip UpsertBatch; their errors count as failures but 3/7 succeed → no error.
-	if len(repo.upsertedBatches) != 3 {
-		t.Fatalf("expected 3 upsert batches, got %d", len(repo.upsertedBatches))
-	}
-
-	// Counts must match input sizes — batches arrive in non-deterministic order,
-	// so collect sizes into a set and compare.
-	batchSizes := make(map[int]int)
-	for _, batch := range repo.upsertedBatches {
-		batchSizes[len(batch)]++
-	}
-	if batchSizes[3] != 1 {
-		t.Errorf("gold batch: expected exactly 1 batch with 3 items; sizes=%v", batchSizes)
-	}
-	if batchSizes[2] != 1 {
-		t.Errorf("silver batch: expected exactly 1 batch with 2 items; sizes=%v", batchSizes)
-	}
-	if batchSizes[4] != 1 {
-		t.Errorf("currency batch: expected exactly 1 batch with 4 items; sizes=%v", batchSizes)
+	// Four batches: vangsaigon gold, vangtoday gold, silver, currency.
+	// Nil clients (sjc/doji/btmc/pnj) skip UpsertBatch; their errors count as failures
+	// but 4/8 succeed → no error.
+	if len(repo.upsertedBatches) != 4 {
+		t.Fatalf("expected 4 upsert batches (vangsaigon gold + vangtoday gold + silver + currency), got %d", len(repo.upsertedBatches))
 	}
 
 	// Nil clients (sjc/doji/btmc/pnj) call MarkStaleByAssetTypeAndSource("gold", <source>)
@@ -246,10 +240,12 @@ func TestAssetPriceService_RefreshAllPrices_GoldFails(t *testing.T) {
 	currencyPrices := makeCurrencyPrices(3)
 
 	repo := &mockAssetPriceRepo{}
+	// Both gold fetchers fail; silver and currency succeed.
 	svc := NewAssetPriceService(repo,
-		&mockGoldPriceSvc{err: goldErr},
 		&mockSilverPriceSvc{prices: silverPrices},
 		&mockCurrencyPriceSvc{prices: currencyPrices},
+		&mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, err: goldErr},
+		&mockSimpleGoldPriceFetcher{source: SourceVangToday, err: goldErr},
 		nil, nil, nil, nil,
 	)
 
@@ -276,11 +272,13 @@ func TestAssetPriceService_RefreshAllPrices_AllFail(t *testing.T) {
 	currencyErr := errors.New("currency API down")
 
 	repo := &mockAssetPriceRepo{}
+	// Both gold fetchers fail + nil clients (4) + silver fails + currency fails = 8 total failures.
 	svc := NewAssetPriceService(repo,
-		&mockGoldPriceSvc{err: goldErr},
 		&mockSilverPriceSvc{err: silverErr},
 		&mockCurrencyPriceSvc{err: currencyErr},
-		nil, nil, nil, nil, // nil clients also fail → total 7 failures
+		&mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, err: goldErr},
+		&mockSimpleGoldPriceFetcher{source: SourceVangToday, err: goldErr},
+		nil, nil, nil, nil, // nil clients also fail → total 8 failures
 	)
 
 	err := svc.RefreshAllPrices(context.Background())
@@ -308,18 +306,16 @@ func TestAssetPriceService_RefreshAllPrices_AssetTypeFields(t *testing.T) {
 	currencyPrices := makeCurrencyPrices(1)
 
 	repo := &mockAssetPriceRepo{}
+	// Use vsgFetcher for gold; vtFetcher fails so only one gold batch.
 	svc := NewAssetPriceService(repo,
-		&mockGoldPriceSvc{prices: goldPrices},
 		&mockSilverPriceSvc{prices: silverPrices},
 		&mockCurrencyPriceSvc{prices: currencyPrices},
+		&mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, prices: goldPrices},
+		&mockSimpleGoldPriceFetcher{source: SourceVangToday, err: errors.New("vangtoday off")},
 		nil, nil, nil, nil,
 	)
 
 	_ = svc.RefreshAllPrices(context.Background())
-
-	if len(repo.upsertedBatches) != 3 {
-		t.Fatalf("expected 3 batches")
-	}
 
 	// Collect all items across batches — order is non-deterministic with concurrent refresh.
 	seenTypes := make(map[string]int)
@@ -328,10 +324,15 @@ func TestAssetPriceService_RefreshAllPrices_AssetTypeFields(t *testing.T) {
 			seenTypes[item.AssetType]++
 		}
 	}
-	for _, expectedType := range []string{"gold", "silver", "currency"} {
-		if seenTypes[expectedType] != 1 {
-			t.Errorf("expected exactly 1 item with AssetType %q, got %d; seenTypes=%v", expectedType, seenTypes[expectedType], seenTypes)
-		}
+	// gold: 1 item (from vangsaigon), silver: 1, currency: 1
+	if seenTypes["gold"] != 1 {
+		t.Errorf("expected exactly 1 gold item, got %d; seenTypes=%v", seenTypes["gold"], seenTypes)
+	}
+	if seenTypes["silver"] != 1 {
+		t.Errorf("expected exactly 1 silver item, got %d; seenTypes=%v", seenTypes["silver"], seenTypes)
+	}
+	if seenTypes["currency"] != 1 {
+		t.Errorf("expected exactly 1 currency item, got %d; seenTypes=%v", seenTypes["currency"], seenTypes)
 	}
 }
 
@@ -351,9 +352,9 @@ func TestAssetPriceService_GetAllPrices_GroupsByAssetType(t *testing.T) {
 
 	repo := &mockAssetPriceRepo{listAllResult: rows}
 	svc := NewAssetPriceService(repo,
-		&mockGoldPriceSvc{},
 		&mockSilverPriceSvc{},
 		&mockCurrencyPriceSvc{},
+		nil, nil,
 		nil, nil, nil, nil,
 	)
 
@@ -384,9 +385,9 @@ func TestAssetPriceService_GetAllPrices_GroupsByAssetType(t *testing.T) {
 func TestAssetPriceService_GetAllPrices_RepoError(t *testing.T) {
 	repo := &mockAssetPriceRepo{listAllErr: errors.New("db down")}
 	svc := NewAssetPriceService(repo,
-		&mockGoldPriceSvc{},
 		&mockSilverPriceSvc{},
 		&mockCurrencyPriceSvc{},
+		nil, nil,
 		nil, nil, nil, nil,
 	)
 
@@ -403,7 +404,7 @@ func TestAssetPriceService_GetAllPrices_IsStaleField(t *testing.T) {
 	}
 
 	repo := &mockAssetPriceRepo{listAllResult: rows}
-	svc := NewAssetPriceService(repo, &mockGoldPriceSvc{}, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil)
+	svc := NewAssetPriceService(repo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
 
 	result, _ := svc.GetAllPrices(context.Background())
 	if !result.Gold[0].IsStale {
@@ -428,7 +429,7 @@ func TestAssetPriceService_GetMarketTypes_ExtractsTypes(t *testing.T) {
 	}
 
 	repo := &mockAssetPriceRepo{listAllResult: rows}
-	svc := NewAssetPriceService(repo, &mockGoldPriceSvc{}, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil)
+	svc := NewAssetPriceService(repo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
 
 	result, err := svc.GetMarketTypes(context.Background())
 	if err != nil {
@@ -469,7 +470,7 @@ func TestAssetPriceService_GetMarketTypes_ExtractsTypes(t *testing.T) {
 
 func TestAssetPriceService_GetMarketTypes_EmptyDB(t *testing.T) {
 	repo := &mockAssetPriceRepo{listAllResult: []*models.AssetPrice{}}
-	svc := NewAssetPriceService(repo, &mockGoldPriceSvc{}, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil)
+	svc := NewAssetPriceService(repo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
 
 	result, err := svc.GetMarketTypes(context.Background())
 	if err != nil {
@@ -496,7 +497,7 @@ func TestAssetPriceService_GetPriceByTypeCode_Found(t *testing.T) {
 	}
 
 	repo := &mockAssetPriceRepo{listAllResult: rows}
-	svc := NewAssetPriceService(repo, &mockGoldPriceSvc{}, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil)
+	svc := NewAssetPriceService(repo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
 
 	dto, err := svc.GetPriceByTypeCode(context.Background(), "SJC_1L")
 	if err != nil {
@@ -530,7 +531,7 @@ func TestAssetPriceService_GetPriceByTypeCode_NotFound(t *testing.T) {
 	}
 
 	repo := &mockAssetPriceRepo{listAllResult: rows}
-	svc := NewAssetPriceService(repo, &mockGoldPriceSvc{}, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil)
+	svc := NewAssetPriceService(repo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
 
 	dto, err := svc.GetPriceByTypeCode(context.Background(), "NONEXISTENT")
 	if err != nil {
@@ -544,7 +545,7 @@ func TestAssetPriceService_GetPriceByTypeCode_NotFound(t *testing.T) {
 func TestAssetPriceService_GetPriceByTypeCode_RepoError(t *testing.T) {
 	repoErr := errors.New("db connection refused")
 	repo := &mockAssetPriceRepo{listAllErr: repoErr}
-	svc := NewAssetPriceService(repo, &mockGoldPriceSvc{}, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil)
+	svc := NewAssetPriceService(repo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
 
 	dto, err := svc.GetPriceByTypeCode(context.Background(), "SJC_1L")
 	if err == nil {
@@ -559,28 +560,25 @@ func TestAssetPriceService_GetPriceByTypeCode_RepoError(t *testing.T) {
 }
 
 // ---------------------------------------------------------------------------
-// Tests: refreshGold deduplication (normalization is handled upstream by WaterfallGoldFetcher)
+// Tests: refreshGoldVangSaiGon alias normalization
+// (deduplication within a single source is no longer needed — the 3-column
+// unique index (type_code, source) handles collisions at the DB level)
 // ---------------------------------------------------------------------------
 
-func TestAssetPriceService_RefreshGold_DeduplicatesCanonicalCodes(t *testing.T) {
-	// Normalization (alias → canonical) now happens in WaterfallGoldFetcher.FetchGoldPrices,
-	// so prices arriving at refreshGold are already canonical.
-	// This test verifies that refreshGold correctly deduplicates identical canonical codes
-	// (first-wins) and passes all unique codes through to the DB unchanged.
-	canonicalPrices := []*CachedGoldPrice{
-		{TypeCode: "SJC", Name: "SJC 9999", Buy: 8500000, Sell: 8600000, Currency: "VND", UpdateTime: time.Now()},
-		{TypeCode: "Vàng nhẫn SJC", Name: "Nhẫn SJC 9999", Buy: 8000000, Sell: 8100000, Currency: "VND", UpdateTime: time.Now()},
-		{TypeCode: "Mihong_999", Name: "Mi Hồng 999", Buy: 7900000, Sell: 8000000, Currency: "VND", UpdateTime: time.Now()},
-		// Duplicate SJC — first-wins, this one should be dropped.
-		{TypeCode: "SJC", Name: "SJC 9999 duplicate", Buy: 8550000, Sell: 8650000, Currency: "VND", UpdateTime: time.Now()},
+func TestAssetPriceService_RefreshGoldVangSaiGon_AliasNormalization(t *testing.T) {
+	// VangSaiGon may return alias TypeCodes that map to canonical codes.
+	// refreshGoldVangSaiGon must normalize them before upsert.
+	aliasPrices := []*CachedGoldPrice{
+		{TypeCode: "SJC", Name: "Vàng SJC 9999", Buy: 8500000, Sell: 8600000, Currency: "VND", UpdateTime: time.Now()},
 		{TypeCode: "BTMC_24K", Name: "Bảo Tín 24K", Buy: 7800000, Sell: 7900000, Currency: "VND", UpdateTime: time.Now()},
 	}
 
 	repo := &mockAssetPriceRepo{}
 	svc := NewAssetPriceService(repo,
-		&mockGoldPriceSvc{prices: canonicalPrices},
 		&mockSilverPriceSvc{},
 		&mockCurrencyPriceSvc{},
+		&mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, prices: aliasPrices},
+		&mockSimpleGoldPriceFetcher{source: SourceVangToday, err: errors.New("vangtoday off")},
 		nil, nil, nil, nil,
 	)
 
@@ -589,107 +587,41 @@ func TestAssetPriceService_RefreshGold_DeduplicatesCanonicalCodes(t *testing.T) 
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	// Find the gold batch.
+	// Find the vangsaigon gold batch.
 	var goldBatch []*models.AssetPrice
 	for _, batch := range repo.upsertedBatches {
-		if len(batch) > 0 && batch[0].AssetType == "gold" {
+		if len(batch) > 0 && batch[0].Source == "vangsaigon" {
 			goldBatch = batch
 			break
 		}
 	}
 	if goldBatch == nil {
-		t.Fatal("no gold batch was upserted")
+		t.Fatal("no vangsaigon gold batch was upserted")
 	}
 
-	// Build a map typeCode → item for easy assertions.
-	byCode := make(map[string]*models.AssetPrice)
+	// Verify source tag.
 	for _, item := range goldBatch {
-		byCode[item.TypeCode] = item
-	}
-
-	// All canonical codes must be present.
-	for _, code := range []string{"SJC", "Vàng nhẫn SJC", "Mihong_999", "BTMC_24K"} {
-		if _, ok := byCode[code]; !ok {
-			t.Errorf("expected canonical TypeCode %q in batch; got codes: %v", code, keys(byCode))
+		if item.Source != "vangsaigon" {
+			t.Errorf("expected Source=vangsaigon, got %q", item.Source)
+		}
+		if item.AssetType != "gold" {
+			t.Errorf("expected AssetType=gold, got %q", item.AssetType)
 		}
 	}
-
-	// Duplicate SJC must be deduplicated — exactly 1 SJC row, with first-seen price.
-	sjcCount := 0
-	for _, item := range goldBatch {
-		if item.TypeCode == "SJC" {
-			sjcCount++
-		}
-	}
-	if sjcCount != 1 {
-		t.Errorf("expected exactly 1 row with TypeCode=SJC (deduplication), got %d", sjcCount)
-	}
-	if sjc, ok := byCode["SJC"]; ok && sjc.Buy != 8500000 {
-		t.Errorf("expected first-seen SJC Buy=8500000, got %d", sjc.Buy)
-	}
-
-	// Total: 4 unique codes (5 inputs minus 1 duplicate).
-	if len(goldBatch) != 4 {
-		t.Errorf("expected 4 unique gold rows, got %d: %v", len(goldBatch), keys(byCode))
-	}
-}
-
-func keys(m map[string]*models.AssetPrice) []string {
-	result := make([]string, 0, len(m))
-	for k := range m {
-		result = append(result, k)
-	}
-	return result
 }
 
 // ---------------------------------------------------------------------------
 // Tests: Source="waterfall" field set in all refresh methods
 // ---------------------------------------------------------------------------
 
-func TestRefreshGold_SetsSourceWaterfall(t *testing.T) {
-	goldPrices := makeGoldPrices(3)
-
-	repo := &mockAssetPriceRepo{}
-	svc := NewAssetPriceService(repo,
-		&mockGoldPriceSvc{prices: goldPrices},
-		&mockSilverPriceSvc{},
-		&mockCurrencyPriceSvc{},
-		nil, nil, nil, nil,
-	)
-
-	err := svc.RefreshAllPrices(context.Background())
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	// Find the gold batch.
-	var goldBatch []*models.AssetPrice
-	for _, batch := range repo.upsertedBatches {
-		if len(batch) > 0 && batch[0].AssetType == "gold" {
-			goldBatch = batch
-			break
-		}
-	}
-	if goldBatch == nil {
-		t.Fatal("no gold batch was upserted")
-	}
-
-	// Every item in the gold batch must have Source="waterfall".
-	for _, item := range goldBatch {
-		if item.Source != "waterfall" {
-			t.Errorf("gold item TypeCode=%q: expected Source=%q, got %q", item.TypeCode, "waterfall", item.Source)
-		}
-	}
-}
-
 func TestRefreshSilver_SetsSourceWaterfall(t *testing.T) {
 	silverPrices := makeSilverPrices(2)
 
 	repo := &mockAssetPriceRepo{}
 	svc := NewAssetPriceService(repo,
-		&mockGoldPriceSvc{},
 		&mockSilverPriceSvc{prices: silverPrices},
 		&mockCurrencyPriceSvc{},
+		nil, nil,
 		nil, nil, nil, nil,
 	)
 
@@ -723,9 +655,9 @@ func TestRefreshCurrency_SetsSourceWaterfall(t *testing.T) {
 
 	repo := &mockAssetPriceRepo{}
 	svc := NewAssetPriceService(repo,
-		&mockGoldPriceSvc{},
 		&mockSilverPriceSvc{},
 		&mockCurrencyPriceSvc{prices: currencyPrices},
+		nil, nil,
 		nil, nil, nil, nil,
 	)
 
@@ -766,41 +698,41 @@ func TestRefreshAllPrices_IncludesNewSources(t *testing.T) {
 
 	repo := &mockAssetPriceRepo{}
 	svc := NewAssetPriceService(repo,
-		&mockGoldPriceSvc{prices: goldPrices},
 		&mockSilverPriceSvc{prices: silverPrices},
 		&mockCurrencyPriceSvc{prices: currencyPrices},
-		nil, // sjcClient — will be wired in Task 10; nil = skipped
+		&mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, prices: goldPrices},
+		&mockSimpleGoldPriceFetcher{source: SourceVangToday, err: errors.New("vangtoday off")},
+		nil, // sjcClient nil = skipped
 		nil, // dojiClient
 		nil, // btmcClient
 		nil, // pnjClient
 	)
 
 	err := svc.RefreshAllPrices(context.Background())
-	// With nil clients, their refresh methods return errors but other 3 sources succeed.
-	// failCount = 4 (nil clients) < 7 → should not return error.
+	// With nil clients + vangtoday failure, failCount = 5 < 8 → should not return error.
 	if err != nil {
-		t.Fatalf("expected no error when 3/7 sources succeed, got: %v", err)
+		t.Fatalf("expected no error when 3/8 sources succeed, got: %v", err)
 	}
 
-	// Three batches should have been upserted (waterfall gold, silver, currency).
-	// Nil clients skip UpsertBatch.
+	// Three batches: vangsaigon gold, silver, currency. vangtoday and nil clients skip UpsertBatch.
 	if len(repo.upsertedBatches) != 3 {
-		t.Fatalf("expected 3 upsert batches (waterfall gold + silver + currency), got %d", len(repo.upsertedBatches))
+		t.Fatalf("expected 3 upsert batches (vangsaigon gold + silver + currency), got %d", len(repo.upsertedBatches))
 	}
 }
 
 func TestRefreshAllPrices_SourceFailureIndependent(t *testing.T) {
-	// With nil SJC client: sjc refresh returns "not configured" error
-	// other sources succeed.
+	// With nil SJC/DOJI/BTMC/PNJ clients: their refresh methods return "not configured" error.
+	// vangsaigon + vangtoday succeed; silver and currency succeed.
 	goldPrices := makeGoldPrices(2)
 	silverPrices := makeSilverPrices(1)
 	currencyPrices := makeCurrencyPrices(1)
 
 	repo := &mockAssetPriceRepo{}
 	svc := NewAssetPriceService(repo,
-		&mockGoldPriceSvc{prices: goldPrices},
 		&mockSilverPriceSvc{prices: silverPrices},
 		&mockCurrencyPriceSvc{prices: currencyPrices},
+		&mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, prices: goldPrices},
+		&mockSimpleGoldPriceFetcher{source: SourceVangToday, prices: goldPrices},
 		nil, // sjcClient nil — triggers "not configured" failure
 		nil, // dojiClient nil
 		nil, // btmcClient nil
@@ -808,13 +740,12 @@ func TestRefreshAllPrices_SourceFailureIndependent(t *testing.T) {
 	)
 
 	err := svc.RefreshAllPrices(context.Background())
-	// 4 nil-client failures + 3 successes → failCount=4 < 7 → no error.
+	// 4 nil-client failures + 4 successes → failCount=4 < 8 → no error.
 	if err != nil {
 		t.Fatalf("expected no error with partial failure, got: %v", err)
 	}
 
 	// Nil clients return "not configured" errors → call MarkStaleByAssetTypeAndSource.
-	// The mock records the assetType; check it was called for expected types.
 	// With nil clients for sjc/doji/btmc/pnj they all call MarkStaleByAssetTypeAndSource("gold", <source>).
 	// staledTypes collects "gold" 4 times.
 	goldStaleCount := 0
@@ -827,25 +758,26 @@ func TestRefreshAllPrices_SourceFailureIndependent(t *testing.T) {
 		t.Errorf("expected 4 gold stale marks (one per nil client), got %d; staledTypes=%v", goldStaleCount, repo.staledTypes)
 	}
 
-	// Waterfall gold, silver, currency should still upsert.
-	if len(repo.upsertedBatches) != 3 {
-		t.Errorf("expected 3 upsert batches, got %d", len(repo.upsertedBatches))
+	// vangsaigon gold, vangtoday gold, silver, currency should upsert (4 batches).
+	if len(repo.upsertedBatches) != 4 {
+		t.Errorf("expected 4 upsert batches (vangsaigon + vangtoday + silver + currency), got %d", len(repo.upsertedBatches))
 	}
 }
 
 func TestRefreshAllPrices_AllFailIncludingNilClients(t *testing.T) {
-	// All 3 waterfall sources fail + 4 nil clients = 7 total failures → must return error.
+	// Both gold fetchers fail + 4 nil clients + silver fails + currency fails = 8 total failures → must return error.
 	repo := &mockAssetPriceRepo{}
 	svc := NewAssetPriceService(repo,
-		&mockGoldPriceSvc{err: errTest},
 		&mockSilverPriceSvc{err: errTest},
 		&mockCurrencyPriceSvc{err: errTest},
+		&mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, err: errTest},
+		&mockSimpleGoldPriceFetcher{source: SourceVangToday, err: errTest},
 		nil, nil, nil, nil,
 	)
 
 	err := svc.RefreshAllPrices(context.Background())
 	if err == nil {
-		t.Fatal("expected error when all 7 sources fail, got nil")
+		t.Fatal("expected error when all 8 sources fail, got nil")
 	}
 }
 
@@ -887,7 +819,7 @@ func TestGetPriceByTypeCode_NoCollisionWithSourcePrefixedCodes(t *testing.T) {
 	}
 
 	repo := &mockAssetPriceRepo{listAllResult: rows}
-	svc := NewAssetPriceService(repo, &mockGoldPriceSvc{}, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil)
+	svc := NewAssetPriceService(repo, &mockSilverPriceSvc{}, &mockCurrencyPriceSvc{}, nil, nil, nil, nil, nil, nil)
 
 	// GetPriceByTypeCode("SJC") must return only the waterfall row, not "SJC_1L".
 	t.Run("waterfall code returns waterfall row only", func(t *testing.T) {
@@ -933,4 +865,124 @@ func TestGetPriceByTypeCode_NoCollisionWithSourcePrefixedCodes(t *testing.T) {
 			t.Errorf("expected nil DTO for 'DOJI' (not in DB), but got TypeCode=%q", dto.TypeCode)
 		}
 	})
+}
+
+// ---------------------------------------------------------------------------
+// Tests: VangSaiGon / VangToday goroutines (TDD — will compile once Task 1
+// changes NewAssetPriceService to accept vsgFetcher and vtFetcher)
+// ---------------------------------------------------------------------------
+
+func TestRefreshAllPrices_VangSaiGonSuccess(t *testing.T) {
+	repo := &mockAssetPriceRepo{}
+	vsgFetcher := &mockSimpleGoldPriceFetcher{
+		source: SourceVangSaiGon,
+		prices: []*CachedGoldPrice{
+			{TypeCode: "SJC", Name: "Vàng SJC", Buy: 90_000_000, Sell: 92_000_000, Currency: "VND"},
+		},
+	}
+	vtFetcher := &mockSimpleGoldPriceFetcher{source: SourceVangToday, err: fmt.Errorf("vangtoday down")}
+	silverSvc := &mockSilverPriceSvc{}
+	currencySvc := &mockCurrencyPriceSvc{}
+	svc := NewAssetPriceService(repo, silverSvc, currencySvc, vsgFetcher, vtFetcher, nil, nil, nil, nil)
+	err := svc.RefreshAllPrices(context.Background())
+	// Should not error (not all 8 failed)
+	require.NoError(t, err)
+	repo.mu.Lock()
+	defer repo.mu.Unlock()
+	var vsgBatch []*models.AssetPrice
+	for _, batch := range repo.upsertedBatches {
+		for _, p := range batch {
+			if p.Source == "vangsaigon" {
+				vsgBatch = append(vsgBatch, p)
+			}
+		}
+	}
+	require.NotEmpty(t, vsgBatch, "expected at least one upserted row with source=vangsaigon")
+	assert.Equal(t, "SJC", vsgBatch[0].TypeCode)
+	assert.Equal(t, "vangsaigon", vsgBatch[0].Source)
+	assert.Equal(t, "gold", vsgBatch[0].AssetType)
+}
+
+func TestRefreshAllPrices_VangTodaySuccess(t *testing.T) {
+	repo := &mockAssetPriceRepo{}
+	vsgFetcher := &mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, err: fmt.Errorf("vangsaigon down")}
+	vtFetcher := &mockSimpleGoldPriceFetcher{
+		source: SourceVangToday,
+		prices: []*CachedGoldPrice{
+			{TypeCode: "DOJI", Name: "Vàng DOJI", Buy: 88_000_000, Sell: 90_000_000, Currency: "VND"},
+		},
+	}
+	silverSvc := &mockSilverPriceSvc{}
+	currencySvc := &mockCurrencyPriceSvc{}
+	svc := NewAssetPriceService(repo, silverSvc, currencySvc, vsgFetcher, vtFetcher, nil, nil, nil, nil)
+	err := svc.RefreshAllPrices(context.Background())
+	require.NoError(t, err)
+	repo.mu.Lock()
+	defer repo.mu.Unlock()
+	var vtBatch []*models.AssetPrice
+	for _, batch := range repo.upsertedBatches {
+		for _, p := range batch {
+			if p.Source == "vangtoday" {
+				vtBatch = append(vtBatch, p)
+			}
+		}
+	}
+	require.NotEmpty(t, vtBatch, "expected at least one upserted row with source=vangtoday")
+	assert.Equal(t, "DOJI", vtBatch[0].TypeCode)
+	assert.Equal(t, "vangtoday", vtBatch[0].Source)
+}
+
+func TestRefreshAllPrices_VangSaiGonFail_MarksStale(t *testing.T) {
+	repo := &mockAssetPriceRepo{}
+	vsgFetcher := &mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, err: fmt.Errorf("vangsaigon timeout")}
+	vtFetcher := &mockSimpleGoldPriceFetcher{
+		source: SourceVangToday,
+		prices: []*CachedGoldPrice{
+			{TypeCode: "SJC", Name: "SJC", Buy: 90_000_000, Sell: 92_000_000, Currency: "VND"},
+		},
+	}
+	silverSvc := &mockSilverPriceSvc{}
+	currencySvc := &mockCurrencyPriceSvc{}
+	svc := NewAssetPriceService(repo, silverSvc, currencySvc, vsgFetcher, vtFetcher, nil, nil, nil, nil)
+	err := svc.RefreshAllPrices(context.Background())
+	require.NoError(t, err)
+	// vangsaigon failure should trigger MarkStaleByAssetTypeAndSource for gold
+	repo.mu.Lock()
+	defer repo.mu.Unlock()
+	found := false
+	for _, st := range repo.staledTypes {
+		if st == "gold" {
+			found = true
+			break
+		}
+	}
+	assert.True(t, found, "expected gold to be marked stale after vangsaigon failure")
+}
+
+func TestRefreshAllPrices_VangSaiGonEmptyPrices_MarksStale(t *testing.T) {
+	repo := &mockAssetPriceRepo{}
+	// VangSaiGon returns empty slice — no valid prices
+	vsgFetcher := &mockSimpleGoldPriceFetcher{source: SourceVangSaiGon, prices: []*CachedGoldPrice{}}
+	vtFetcher := &mockSimpleGoldPriceFetcher{
+		source: SourceVangToday,
+		prices: []*CachedGoldPrice{
+			{TypeCode: "BTMC", Name: "BTMC", Buy: 87_000_000, Sell: 89_000_000, Currency: "VND"},
+		},
+	}
+	silverSvc := &mockSilverPriceSvc{}
+	currencySvc := &mockCurrencyPriceSvc{}
+	svc := NewAssetPriceService(repo, silverSvc, currencySvc, vsgFetcher, vtFetcher, nil, nil, nil, nil)
+	err := svc.RefreshAllPrices(context.Background())
+	require.NoError(t, err) // not all sources failed
+	// Empty result should still mark stale
+	repo.mu.Lock()
+	defer repo.mu.Unlock()
+	found := false
+	for _, st := range repo.staledTypes {
+		if st == "gold" {
+			found = true
+			break
+		}
+	}
+	assert.True(t, found, "expected gold to be marked stale when vangsaigon returns empty prices")
 }

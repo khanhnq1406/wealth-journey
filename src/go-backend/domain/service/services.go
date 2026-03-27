@@ -92,8 +92,15 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	pnjClient := pnj.NewClient()
 
 	assetPriceSvc := NewAssetPriceService(
-		repos.AssetPrice, goldPriceSvc, silverPriceSvc, currencyPriceSvc,
-		sjcClient, dojiClient, btmcClient, pnjClient,
+		repos.AssetPrice,
+		silverPriceSvc,
+		currencyPriceSvc,
+		NewVangSaiGonGoldFetcher(waterfallSourceTimeout),
+		NewVangTodayGoldFetcher(waterfallSourceTimeout),
+		sjcClient,
+		dojiClient,
+		btmcClient,
+		pnjClient,
 	)
 
 	// Phase 1 (cont.): GoldDisplayConfigService — joins gold display configs with DB-cached prices

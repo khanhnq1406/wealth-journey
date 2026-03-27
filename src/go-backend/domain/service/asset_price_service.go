@@ -12,6 +12,7 @@ import (
 	"wealthjourney/domain/repository"
 	"wealthjourney/pkg/btmcdirect"
 	"wealthjourney/pkg/doji"
+	"wealthjourney/pkg/gold"
 	"wealthjourney/pkg/pnj"
 	"wealthjourney/pkg/sjc"
 )
@@ -22,37 +23,40 @@ import (
 //
 // Depguard: no gorm.io/gorm import — all DB access goes through the repository interface.
 type assetPriceService struct {
-	repo        repository.AssetPriceRepository
-	goldSvc     GoldPriceService
-	silverSvc   SilverPriceService
-	currencySvc CurrencyPriceService
-	sjcClient   *sjc.Client        // nil = not configured; source skipped
-	dojiClient  *doji.Client       // nil = not configured; source skipped
-	btmcClient  *btmcdirect.Client // nil = not configured; source skipped
-	pnjClient   *pnj.Client        // nil = not configured; source skipped
+	repo              repository.AssetPriceRepository
+	silverSvc         SilverPriceService
+	currencySvc       CurrencyPriceService
+	vangSaiGonFetcher GoldPriceFetcher // nil = not configured; source skipped
+	vangTodayFetcher  GoldPriceFetcher // nil = not configured; source skipped
+	sjcClient         *sjc.Client        // nil = not configured; source skipped
+	dojiClient        *doji.Client       // nil = not configured; source skipped
+	btmcClient        *btmcdirect.Client // nil = not configured; source skipped
+	pnjClient         *pnj.Client        // nil = not configured; source skipped
 }
 
 // NewAssetPriceService creates a new AssetPriceService with constructor injection.
-// Pass nil for any of the new source clients to skip that source.
+// Pass nil for any of the fetcher or client arguments to skip that source.
 func NewAssetPriceService(
 	repo repository.AssetPriceRepository,
-	goldSvc GoldPriceService,
 	silverSvc SilverPriceService,
 	currencySvc CurrencyPriceService,
+	vangSaiGonFetcher GoldPriceFetcher,
+	vangTodayFetcher GoldPriceFetcher,
 	sjcClient *sjc.Client,
 	dojiClient *doji.Client,
 	btmcClient *btmcdirect.Client,
 	pnjClient *pnj.Client,
 ) AssetPriceService {
 	return &assetPriceService{
-		repo:        repo,
-		goldSvc:     goldSvc,
-		silverSvc:   silverSvc,
-		currencySvc: currencySvc,
-		sjcClient:   sjcClient,
-		dojiClient:  dojiClient,
-		btmcClient:  btmcClient,
-		pnjClient:   pnjClient,
+		repo:              repo,
+		silverSvc:         silverSvc,
+		currencySvc:       currencySvc,
+		vangSaiGonFetcher: vangSaiGonFetcher,
+		vangTodayFetcher:  vangTodayFetcher,
+		sjcClient:         sjcClient,
+		dojiClient:        dojiClient,
+		btmcClient:        btmcClient,
+		pnjClient:         pnjClient,
 	}
 }
 
@@ -77,34 +81,38 @@ type refreshResult struct {
 // Each source runs in its own goroutine. One failure marks only that source stale
 // and does not interrupt the others.
 //
-// Returns non-nil error only when every one of the 7 sources fails, so callers
+// Returns non-nil error only when every one of the 8 sources fails, so callers
 // can decide to retry or alert.
 //
 // Log summary format (for observability):
 //
-//	"[assetPriceService] Price cache job completed: gold_waterfall=OK(25), silver_waterfall=FAIL(...), ..."
+//	"[assetPriceService] Price cache job completed: gold_vangsaigon=OK(25), gold_vangtoday=FAIL(...), ..."
 func (s *assetPriceService) RefreshAllPrices(ctx context.Context) error {
-	results := make(chan refreshResult, 7)
+	results := make(chan refreshResult, 8)
 	var wg sync.WaitGroup
 
-	// Existing 3 waterfall sources
-	wg.Add(3)
-	go func() { defer wg.Done(); results <- s.refreshGold(ctx) }()
-	go func() { defer wg.Done(); results <- s.refreshSilver(ctx) }()
-	go func() { defer wg.Done(); results <- s.refreshCurrency(ctx) }()
+	// 2 direct VangSaiGon / VangToday gold sources (replacing waterfall)
+	wg.Add(2)
+	go func() { defer wg.Done(); results <- s.refreshGoldVangSaiGon(ctx) }()
+	go func() { defer wg.Done(); results <- s.refreshGoldVangToday(ctx) }()
 
-	// 4 new per-source gold clients
+	// 4 per-source gold clients (unchanged)
 	wg.Add(4)
 	go func() { defer wg.Done(); results <- s.refreshGoldSJC(ctx) }()
 	go func() { defer wg.Done(); results <- s.refreshGoldDOJI(ctx) }()
 	go func() { defer wg.Done(); results <- s.refreshGoldBTMC(ctx) }()
 	go func() { defer wg.Done(); results <- s.refreshGoldPNJ(ctx) }()
 
+	// Silver + currency (unchanged)
+	wg.Add(2)
+	go func() { defer wg.Done(); results <- s.refreshSilver(ctx) }()
+	go func() { defer wg.Done(); results <- s.refreshCurrency(ctx) }()
+
 	// Close channel once all goroutines complete.
 	go func() { wg.Wait(); close(results) }()
 
 	// Collect results and build log summary.
-	summaryParts := make([]string, 0, 7)
+	summaryParts := make([]string, 0, 8)
 	failCount := 0
 	for r := range results {
 		if r.err != nil {
@@ -117,38 +125,80 @@ func (s *assetPriceService) RefreshAllPrices(ctx context.Context) error {
 	log.Printf("[assetPriceService] Price cache job completed: %s", strings.Join(summaryParts, ", "))
 
 	// Return error only when ALL sources failed.
-	if failCount == 7 {
+	if failCount == 8 {
 		return fmt.Errorf("all price sources failed")
 	}
 	return nil
 }
 
 // ---------------------------------------------------------------------------
-// Existing waterfall refresh methods (refactored to return refreshResult)
+// Direct-source gold refresh methods (replacing waterfall)
 // ---------------------------------------------------------------------------
 
-// refreshGold fetches gold prices from the waterfall service and upserts them.
-// On failure it marks gold rows stale.
-func (s *assetPriceService) refreshGold(ctx context.Context) refreshResult {
-	prices, err := s.goldSvc.FetchAllPrices(ctx)
-	if err != nil {
-		log.Printf("[assetPriceService] gold fetch failed: %v — marking stale", err)
-		if markErr := s.repo.MarkStaleByAssetType(ctx, "gold"); markErr != nil {
-			log.Printf("[assetPriceService] failed to mark gold stale: %v", markErr)
-		}
-		return refreshResult{source: "gold_waterfall", count: 0, err: err}
+// refreshGoldVangSaiGon fetches gold prices directly from the VangSaiGon API (vangsaigon.vn)
+// and upserts them with source="vangsaigon". TypeCodes are normalized via gold.AliasToCanonical.
+func (s *assetPriceService) refreshGoldVangSaiGon(ctx context.Context) refreshResult {
+	if s.vangSaiGonFetcher == nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "vangsaigon")
+		return refreshResult{source: "gold_vangsaigon", count: 0, err: fmt.Errorf("vangsaigon fetcher not configured")}
 	}
-
-	// Normalization (alias → canonical) happens at the WaterfallGoldFetcher level,
-	// so prices here already carry canonical TypeCodes. Deduplication handles the
-	// rare case where two sources return the same canonical code; first-wins.
-	seen := make(map[string]struct{}, len(prices))
+	prices, err := s.vangSaiGonFetcher.FetchGoldPrices(ctx)
+	if err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "vangsaigon")
+		return refreshResult{source: "gold_vangsaigon", count: 0, err: err}
+	}
 	batch := make([]*models.AssetPrice, 0, len(prices))
 	for _, p := range prices {
-		if _, exists := seen[p.TypeCode]; exists {
-			continue // deduplicate: first-wins
+		if p.Buy <= 0 && p.Sell <= 0 {
+			continue
 		}
-		seen[p.TypeCode] = struct{}{}
+		// Normalize alias TypeCode to canonical (e.g., "Vàng SJC 1L" → "SJC").
+		typeCode := p.TypeCode
+		if canonical, ok := gold.AliasToCanonical[typeCode]; ok {
+			typeCode = canonical
+		}
+		batch = append(batch, &models.AssetPrice{
+			TypeCode:   typeCode,
+			AssetType:  "gold",
+			Name:       p.Name,
+			Buy:        p.Buy,
+			Sell:       p.Sell,
+			ChangeBuy:  p.ChangeBuy,
+			ChangeSell: p.ChangeSell,
+			Currency:   p.Currency,
+			Source:     "vangsaigon",
+			IsStale:    false,
+			FetchedAt:  time.Now(),
+		})
+	}
+	if len(batch) == 0 {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "vangsaigon")
+		return refreshResult{source: "gold_vangsaigon", count: 0, err: fmt.Errorf("vangsaigon: no valid prices")}
+	}
+	if err := s.repo.UpsertBatch(ctx, batch); err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "vangsaigon")
+		return refreshResult{source: "gold_vangsaigon", count: 0, err: err}
+	}
+	return refreshResult{source: "gold_vangsaigon", count: len(batch), err: nil}
+}
+
+// refreshGoldVangToday fetches gold prices directly from the VangToday API (vang.today)
+// and upserts them with source="vangtoday". TypeCodes are already canonical from the fetcher.
+func (s *assetPriceService) refreshGoldVangToday(ctx context.Context) refreshResult {
+	if s.vangTodayFetcher == nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "vangtoday")
+		return refreshResult{source: "gold_vangtoday", count: 0, err: fmt.Errorf("vangtoday fetcher not configured")}
+	}
+	prices, err := s.vangTodayFetcher.FetchGoldPrices(ctx)
+	if err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "vangtoday")
+		return refreshResult{source: "gold_vangtoday", count: 0, err: err}
+	}
+	batch := make([]*models.AssetPrice, 0, len(prices))
+	for _, p := range prices {
+		if p.Buy <= 0 && p.Sell <= 0 {
+			continue
+		}
 		batch = append(batch, &models.AssetPrice{
 			TypeCode:   p.TypeCode,
 			AssetType:  "gold",
@@ -158,22 +208,25 @@ func (s *assetPriceService) refreshGold(ctx context.Context) refreshResult {
 			ChangeBuy:  p.ChangeBuy,
 			ChangeSell: p.ChangeSell,
 			Currency:   p.Currency,
-			Source:     "waterfall",
+			Source:     "vangtoday",
 			IsStale:    false,
 			FetchedAt:  time.Now(),
 		})
 	}
-
-	if upsertErr := s.repo.UpsertBatch(ctx, batch); upsertErr != nil {
-		log.Printf("[assetPriceService] gold upsert failed: %v — marking stale", upsertErr)
-		if markErr := s.repo.MarkStaleByAssetType(ctx, "gold"); markErr != nil {
-			log.Printf("[assetPriceService] failed to mark gold stale after upsert failure: %v", markErr)
-		}
-		return refreshResult{source: "gold_waterfall", count: 0, err: upsertErr}
+	if len(batch) == 0 {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "vangtoday")
+		return refreshResult{source: "gold_vangtoday", count: 0, err: fmt.Errorf("vangtoday: no valid prices")}
 	}
-
-	return refreshResult{source: "gold_waterfall", count: len(batch), err: nil}
+	if err := s.repo.UpsertBatch(ctx, batch); err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "vangtoday")
+		return refreshResult{source: "gold_vangtoday", count: 0, err: err}
+	}
+	return refreshResult{source: "gold_vangtoday", count: len(batch), err: nil}
 }
+
+// ---------------------------------------------------------------------------
+// Waterfall refresh methods for silver and currency
+// ---------------------------------------------------------------------------
 
 // refreshSilver fetches silver prices and upserts them. On failure it marks rows stale.
 func (s *assetPriceService) refreshSilver(ctx context.Context) refreshResult {
