@@ -196,3 +196,26 @@ Key changed symbols and their d=1 dependents:
 
 1. Run `task backend:migrate-vietcombank-currency` twice.
 2. Expected: First run logs `Seeded: USD_VCB ...`; second run logs `Exists: USD_VCB ...` — no duplicate rows, no errors.
+
+## Fix History
+
+| Date       | Fix                                                                  | Severity | Root Cause                                                                                             |
+| ---------- | -------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------ |
+| 2026-03-28 | Vietcombank API response format changed — updated JSON parsing to match new envelope shape | Minor    | API changed from bare `[...]` array to `{"Count":N,"Data":[...]}` wrapper object; JSON field names changed from PascalCase to camelCase |
+
+### Fix Detail: 2026-03-28 — JSON Schema Mismatch
+
+**Symptom:** `currency_vietcombank=FAIL(fetch from vietcombank: parse json: json: cannot unmarshal object into Go value of type []vietcombank.apiExchangeRate)`
+
+**Root Cause:** The Vietcombank API changed its response format:
+- **Before:** Top-level JSON array `[{"CurrencyCode":"USD",...}]`
+- **After:** Wrapped object `{"Count":20,"Date":"...","UpdatedDate":"...","Data":[{"currencyCode":"USD",...}]}`
+- JSON field names also changed from PascalCase (`CurrencyCode`, `Transfer`, `Sell`) to camelCase (`currencyCode`, `transfer`, `sell`)
+- `Buy` field replaced by `Cash`; `Transfer` field preserved (still the correct buy rate for bank transfers)
+
+**Files Changed:**
+- `src/go-backend/pkg/vietcombank/types.go` — Added `apiResponse` wrapper struct; updated `apiExchangeRate` JSON tags to camelCase; renamed `Buy` field to `Cash`
+- `src/go-backend/pkg/vietcombank/client.go` — Unmarshal into `apiResponse` instead of `[]apiExchangeRate`; iterate over `parsed.Data`
+- `src/go-backend/pkg/vietcombank/client_test.go` — Updated all 9 test fixtures to use new API response format
+
+**Security Review:** Approved — no new attack surface; 1MB size limit, HTTPS, and timeout unchanged.

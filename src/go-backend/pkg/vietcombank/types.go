@@ -9,11 +9,16 @@ type CurrencyPrice struct {
 	Currency string // Always "VND"
 }
 
+// apiResponse mirrors the top-level Vietcombank JSON response envelope.
+type apiResponse struct {
+	Data []apiExchangeRate `json:"Data"`
+}
+
 // apiExchangeRate mirrors a single entry in the Vietcombank JSON response.
 type apiExchangeRate struct {
-	CurrencyCode string `json:"CurrencyCode"`
-	CurrencyName string `json:"CurrencyName"`
-	Buy          string `json:"Buy"`
-	Transfer     string `json:"Transfer"`
-	Sell         string `json:"Sell"`
+	CurrencyCode string `json:"currencyCode"`
+	CurrencyName string `json:"currencyName"`
+	Cash         string `json:"cash"`
+	Transfer     string `json:"transfer"`
+	Sell         string `json:"sell"`
 }

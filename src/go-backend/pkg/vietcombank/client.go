@@ -79,13 +79,13 @@ func (c *Client) FetchCurrencyPrices(ctx context.Context) ([]*CurrencyPrice, err
 		return nil, fmt.Errorf("response exceeds %d bytes", maxResponseSize)
 	}
 
-	var rates []apiExchangeRate
-	if err := json.Unmarshal(body, &rates); err != nil {
+	var parsed apiResponse
+	if err := json.Unmarshal(body, &parsed); err != nil {
 		return nil, fmt.Errorf("parse json: %w", err)
 	}
 
-	result := make([]*CurrencyPrice, 0, len(rates))
-	for _, rate := range rates {
+	result := make([]*CurrencyPrice, 0, len(parsed.Data))
+	for _, rate := range parsed.Data {
 		// Transfer rate is the standard bank-to-bank rate; we expose it as Buy.
 		buy := parseVND(rate.Transfer)
 		sell := parseVND(rate.Sell)

@@ -18,10 +18,10 @@ func newClientWithOptions(baseURL string, timeout time.Duration) *Client {
 }
 
 func TestFetchCurrencyPrices_Success(t *testing.T) {
-	body := `[
-		{"CurrencyCode":"USD","CurrencyName":"US DOLLAR","Buy":"24,590","Transfer":"24,610","Sell":"24,710"},
-		{"CurrencyCode":"EUR","CurrencyName":"EURO","Buy":"26,100","Transfer":"26,200","Sell":"26,400"}
-	]`
+	body := `{"Count":2,"Date":"2026-03-28T00:00:00","UpdatedDate":"2026-03-28T00:00:00","Data":[
+		{"currencyCode":"USD","currencyName":"US DOLLAR","cash":"24,590","transfer":"24,610","sell":"24,710","icon":""},
+		{"currencyCode":"EUR","currencyName":"EURO","cash":"26,100","transfer":"26,200","sell":"26,400","icon":""}
+	]}`
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -62,7 +62,7 @@ func TestFetchCurrencyPrices_Success(t *testing.T) {
 }
 
 func TestFetchCurrencyPrices_TypeCodeSuffix(t *testing.T) {
-	body := `[{"CurrencyCode":"USD","CurrencyName":"US DOLLAR","Buy":"24,590","Transfer":"24,610","Sell":"24,710"}]`
+	body := `{"Count":1,"Date":"2026-03-28T00:00:00","UpdatedDate":"2026-03-28T00:00:00","Data":[{"currencyCode":"USD","currencyName":"US DOLLAR","cash":"24,590","transfer":"24,610","sell":"24,710","icon":""}]}`
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(body))
@@ -136,12 +136,12 @@ func TestFetchCurrencyPrices_Timeout(t *testing.T) {
 }
 
 func TestFetchCurrencyPrices_FilterZeroPrices(t *testing.T) {
-	// Entries where both Buy (Transfer) and Sell are zero or empty should be skipped
-	body := `[
-		{"CurrencyCode":"USD","CurrencyName":"US DOLLAR","Buy":"24,590","Transfer":"24,610","Sell":"24,710"},
-		{"CurrencyCode":"XYZ","CurrencyName":"ZERO CURRENCY","Buy":"0","Transfer":"0","Sell":"0"},
-		{"CurrencyCode":"ABC","CurrencyName":"DASH CURRENCY","Buy":"-","Transfer":"-","Sell":"-"}
-	]`
+	// Entries where both Transfer and Sell are zero or empty should be skipped
+	body := `{"Count":3,"Date":"2026-03-28T00:00:00","UpdatedDate":"2026-03-28T00:00:00","Data":[
+		{"currencyCode":"USD","currencyName":"US DOLLAR","cash":"24,590","transfer":"24,610","sell":"24,710","icon":""},
+		{"currencyCode":"XYZ","currencyName":"ZERO CURRENCY","cash":"0","transfer":"0","sell":"0","icon":""},
+		{"currencyCode":"ABC","currencyName":"DASH CURRENCY","cash":"-","transfer":"-","sell":"-","icon":""}
+	]}`
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(body))
@@ -164,7 +164,7 @@ func TestFetchCurrencyPrices_FilterZeroPrices(t *testing.T) {
 
 func TestFetchCurrencyPrices_ResponseSizeLimit(t *testing.T) {
 	// Generate a body larger than 1MB
-	largeBody := "[" + strings.Repeat(`{"CurrencyCode":"X","CurrencyName":"X","Buy":"1","Transfer":"1","Sell":"1"},`, 20000) + `{"CurrencyCode":"Y","CurrencyName":"Y","Buy":"1","Transfer":"1","Sell":"1"}]`
+	largeBody := `{"Count":20001,"Date":"2026-03-28T00:00:00","UpdatedDate":"2026-03-28T00:00:00","Data":[` + strings.Repeat(`{"currencyCode":"X","currencyName":"X","cash":"1","transfer":"1","sell":"1","icon":""},`, 20000) + `{"currencyCode":"Y","currencyName":"Y","cash":"1","transfer":"1","sell":"1","icon":""}]}`
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(largeBody))
@@ -180,7 +180,7 @@ func TestFetchCurrencyPrices_ResponseSizeLimit(t *testing.T) {
 
 func TestFetchCurrencyPrices_NameMapping(t *testing.T) {
 	// "US DOLLAR" in CurrencyName should not affect the lookup — we use CurrencyCode
-	body := `[{"CurrencyCode":"USD","CurrencyName":"US DOLLAR","Buy":"24,590","Transfer":"24,610","Sell":"24,710"}]`
+	body := `{"Count":1,"Date":"2026-03-28T00:00:00","UpdatedDate":"2026-03-28T00:00:00","Data":[{"currencyCode":"USD","currencyName":"US DOLLAR","cash":"24,590","transfer":"24,610","sell":"24,710","icon":""}]}`
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(body))
@@ -203,7 +203,7 @@ func TestFetchCurrencyPrices_NameMapping(t *testing.T) {
 
 func TestFetchCurrencyPrices_UnknownCurrencyNameFallback(t *testing.T) {
 	// Unknown currency code not in our map → fallback "<CODE> Vietcombank"
-	body := `[{"CurrencyCode":"XYZ","CurrencyName":"MYSTERY","Buy":"0","Transfer":"1000","Sell":"1100"}]`
+	body := `{"Count":1,"Date":"2026-03-28T00:00:00","UpdatedDate":"2026-03-28T00:00:00","Data":[{"currencyCode":"XYZ","currencyName":"MYSTERY","cash":"0","transfer":"1000","sell":"1100","icon":""}]}`
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(body))
