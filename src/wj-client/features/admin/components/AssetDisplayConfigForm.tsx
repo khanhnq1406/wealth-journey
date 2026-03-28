@@ -108,7 +108,7 @@ export function AssetDisplayConfigForm({
       apiClient.post<CreateConfigResponse>("/api/v1/admin/asset-display-config", req),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG] });
-      onSuccess?.((data as CreateConfigResponse)?.config?.id, selectedAssetType);
+      onSuccess?.(data?.data?.config?.id, selectedAssetType);
     },
     onError: (error: any) => {
       setErrorMessage(error.message || t("form.createError"));

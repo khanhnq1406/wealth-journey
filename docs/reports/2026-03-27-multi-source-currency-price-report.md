@@ -204,6 +204,7 @@ Key changed symbols and their d=1 dependents:
 | 2026-03-28 | Vietcombank API response format changed — updated JSON parsing to match new envelope shape | Minor    | API changed from bare `[...]` array to `{"Count":N,"Data":[...]}` wrapper object; JSON field names changed from PascalCase to camelCase |
 | 2026-03-28 | Migration: set `_VCB` fetch codes as default (priority 1) for standard currency display configs | Minor    | `migrate-asset-config-fetch-code` seeded plain fetch codes (e.g. `"USD"`) as priority 1 for standard currency display configs; Vietcombank data was not set as default source |
 | 2026-03-28 | Landing page and home page currency table shows "Không có dữ liệu" — added per-asset static fallback in `GetPublicMarketTypes` | Minor | `public.go` fallback only fired when ALL three asset types (gold, silver, currency) were empty. If gold/silver had DB data but currency was empty (price cache unpopulated), currency fell back to `[]` with no fallback — causing "no data" display. |
+| 2026-03-28 | Frontend build fails: TypeScript error in `AssetDisplayConfigForm.tsx` — incorrect type cast on `createMutation` `onSuccess` data | Minor | `apiClient.post<T>()` returns `ApiResponse<T>` (envelope with `data?: T`), but the handler cast `data` directly to `CreateConfigResponse` and accessed `.config.id` — which is actually at `data.data?.config?.id`. Fixed by removing the bad cast and using correct optional chaining. |
 
 ### Fix Detail: 2026-03-28 — JSON Schema Mismatch
 
@@ -265,3 +266,29 @@ Extracted three package-level helpers (`staticGoldTypes`, `staticSilverTypes`, `
 - `src/go-backend/handlers/public.go` — Per-asset fallback logic; extracted `staticGoldTypes`, `staticSilverTypes`, `staticCurrencyTypes` helpers
 
 **Security Review:** Approved — no new attack surface, no information disclosure (static types are public display metadata), no injection risk (compile-time constant data).
+
+### Fix Detail: 2026-03-28 — TypeScript Build Error in AssetDisplayConfigForm
+
+**Symptom:** `yarn run build` fails with:
+```
+Type error: Conversion of type 'ApiResponse<CreateConfigResponse>' to type 'CreateConfigResponse'
+may be a mistake because neither type sufficiently overlaps with the other.
+Property 'config' is missing in type 'ApiResponse<CreateConfigResponse>'
+```
+
+**Root Cause:** `apiClient.post<T>()` always returns `Promise<ApiResponse<T>>`, where `ApiResponse<T>` is `{ success: boolean; data?: T; ... }`. The `createMutation` `onSuccess` callback received `data: ApiResponse<CreateConfigResponse>`, but the handler was casting it directly to `CreateConfigResponse` and accessing `.config.id` — which is one level too shallow. The actual path is `data.data?.config?.id`.
+
+**Fix:**
+
+```typescript
+// BEFORE — bad cast, wrong data shape
+onSuccess?.((data as CreateConfigResponse)?.config?.id, selectedAssetType);
+
+// AFTER — correct optional chaining through ApiResponse envelope
+onSuccess?.(data?.data?.config?.id, selectedAssetType);
+```
+
+**Files Changed:**
+- `src/wj-client/features/admin/components/AssetDisplayConfigForm.tsx` — Line 111: removed bad type cast, use `data?.data?.config?.id`
+
+**Security Review:** Approved — no new attack surface; `config.id` is a non-secret integer used only for admin UI navigation; optional chaining handles missing values safely with no exception propagation.
