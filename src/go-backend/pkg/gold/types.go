@@ -204,6 +204,39 @@ var GoldTypes = []GoldType{
 	},
 }
 
+// AliasToCanonical documents known mappings between external API alias TypeCodes
+// and their previously-used canonical codes. Retained as reference only.
+//
+// IMPORTANT: As of 2026-03-27 this map is NO LONGER applied during DB writes.
+// Raw TypeCodes from all price sources are stored in the asset_price table as-is.
+// Admins configure source→display mappings via asset_config_fetch_code.
+//
+// Historical note: vang.today returns source-specific codes (e.g. "DOHN", "DOHCM"
+// for DOJI Hanoi and HCM branches) that previously collapsed to one canonical "Doji"
+// row. They are now stored as separate rows, allowing admins to map each independently.
+var AliasToCanonical = map[string]string{
+	// vang.today SJC aliases
+	"VNGSJC":  "SJC",   // vang.today's main SJC bar code
+	"SJL1L10": "SJC",   // vang.today SJC 1L/10L bar variant
+
+	// vang.today SJC ring
+	"SJ9999": "Vàng nhẫn SJC", // vang.today SJC ring 9999
+
+	// vang.today Mihong
+	"MIHONG_999": "Mihong_999", // vang.today uppercases the underscore variant
+
+	// vang.today DOJI — HN and HCM branches both map to canonical "Doji"
+	"DOHN":  "Doji",
+	"DOHCM": "Doji",
+
+	// vang.today Bảo Tín Minh Châu
+	"BTSJC":  "BTMC",     // Bảo Tín SJC bar
+	"BT9999": "BTMC_24K", // Bảo Tín 24K bar
+
+	// vang.today VietinBank gold
+	"VIETTINM": "VietinGold",
+}
+
 // GetGoldTypeByCode returns the gold type definition for a given code
 func GetGoldTypeByCode(code string) *GoldType {
 	for _, gt := range GoldTypes {

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"wealthjourney/domain/models"
 	"wealthjourney/pkg/fx"
@@ -336,4 +337,143 @@ type WatchlistService interface {
 	DeleteItem(ctx context.Context, itemID int32, userID int32) (*v1.DeleteWatchlistItemResponse, error)
 	ReorderItems(ctx context.Context, userID int32, req *v1.ReorderWatchlistRequest) (*v1.ReorderWatchlistResponse, error)
 	CheckItem(ctx context.Context, userID int32, symbol string) (*v1.CheckWatchlistItemResponse, error)
+}
+
+// AssetPriceService manages the DB-backed price cache for gold, silver, and currency.
+// It is the single point of truth for the price cache job and for handlers that
+// serve prices from the database instead of live APIs.
+type AssetPriceService interface {
+	// RefreshAllPrices fetches fresh prices from gold/silver/currency price services
+	// and persists them in the asset_price table. Each asset type is fetched
+	// independently so a single-source failure does not abort the others.
+	// On failure for a type, that type's rows are marked stale.
+	RefreshAllPrices(ctx context.Context) error
+
+	// GetAllPrices reads all rows from the DB and groups them by asset type.
+	GetAllPrices(ctx context.Context) (*AllAssetPrices, error)
+
+	// GetPricesByAssetType reads DB rows for a single asset type ("gold", "silver", "currency").
+	GetPricesByAssetType(ctx context.Context, assetType string) ([]*AssetPriceDTO, error)
+
+	// GetMarketTypes reads all DB rows and returns the list of type codes per
+	// asset type together with the latest FetchedAt timestamp per group.
+	GetMarketTypes(ctx context.Context) (*MarketTypesDTO, error)
+
+	// GetPriceByTypeCode looks up a single cached price row by typeCode.
+	// Returns nil, nil when not found (cold-start: price not yet in DB).
+	GetPriceByTypeCode(ctx context.Context, typeCode string) (*AssetPriceDTO, error)
+}
+
+// AssetDisplayConfigService manages the admin-configurable asset display config table.
+// It supersedes GoldDisplayConfigService and adds support for multiple asset types
+// (gold, silver, etc.) as well as fetch-code-based price resolution.
+type AssetDisplayConfigService interface {
+	// GetDisplayPrices returns enabled configs for assetType joined with latest prices via fetch codes.
+	GetDisplayPrices(ctx context.Context, assetType string) ([]*AssetDisplayPriceDTO, error)
+	// ListAll returns all configs (including disabled) for admin.
+	ListAll(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error)
+	// Create adds a new asset display config entry.
+	Create(ctx context.Context, typeCode, displayName, assetType string, displayOrder int32, enabled, showInInvestment bool) (*models.AssetDisplayConfig, error)
+	// Update modifies an existing config entry.
+	Update(ctx context.Context, id int32, displayName string, displayOrder int32, enabled, showInInvestment bool) (*models.AssetDisplayConfig, error)
+	// Delete soft-deletes a config entry.
+	Delete(ctx context.Context, id int32) error
+
+	// ResolvePrice resolves the best available buy and sell prices for a typeCode + assetType pair
+	// by iterating fetch codes in priority order. Returns isStale=true if all sources
+	// are stale. Returns an error if no fetch codes or no asset_price rows are found.
+	ResolvePrice(ctx context.Context, typeCode, assetType string) (buy int64, sell int64, isStale bool, err error)
+
+	// ListFetchCodes retrieves all active fetch codes for a config ordered by priority ASC.
+	ListFetchCodes(ctx context.Context, configID int32) ([]*models.AssetConfigFetchCode, error)
+	// CreateFetchCode adds a fetch code to a config. Validates type_code, priority, max 10 cap,
+	// and type_code existence in asset_price table.
+	CreateFetchCode(ctx context.Context, configID int32, typeCode string, priority int32) (*models.AssetConfigFetchCode, error)
+	// UpdateFetchCode updates the priority of an existing fetch code.
+	UpdateFetchCode(ctx context.Context, id int32, priority int32) (*models.AssetConfigFetchCode, error)
+	// DeleteFetchCode soft-deletes a fetch code by id.
+	DeleteFetchCode(ctx context.Context, id int32) error
+	// ListAvailableTypeCodes returns all distinct type_codes in the asset_price table
+	// that are relevant for the given assetType.
+	ListAvailableTypeCodes(ctx context.Context, assetType string) ([]string, error)
+}
+
+// AssetDisplayPriceDTO is the combined config + price data returned by the public endpoint.
+type AssetDisplayPriceDTO struct {
+	TypeCode         string
+	AssetType        string
+	DisplayName      string
+	DisplayOrder     int32
+	Enabled          bool
+	ShowInInvestment bool
+	Buy              int64
+	Sell             int64
+	IsStale          bool
+}
+
+// GoldDisplayConfigService manages the admin-configurable gold display config table.
+type GoldDisplayConfigService interface {
+	// GetDisplayPrices returns enabled gold configs joined with latest prices and admin overrides.
+	GetDisplayPrices(ctx context.Context) ([]*GoldDisplayPriceDTO, error)
+	// ListAll returns all configs (including disabled) for admin.
+	ListAll(ctx context.Context) ([]*models.GoldDisplayConfig, error)
+	// Create adds a new gold display config entry.
+	Create(ctx context.Context, typeCode, displayName string, displayOrder int32, enabled, showInInvestment bool) (*models.GoldDisplayConfig, error)
+	// Update modifies an existing config entry.
+	Update(ctx context.Context, id int32, displayName string, displayOrder int32, enabled, showInInvestment bool) (*models.GoldDisplayConfig, error)
+	// Delete soft-deletes a config entry.
+	Delete(ctx context.Context, id int32) error
+}
+
+// GoldDisplayPriceDTO is the combined config + price data returned by the public endpoint.
+type GoldDisplayPriceDTO struct {
+	TypeCode         string
+	DisplayName      string
+	Buy              int64
+	Sell             int64
+	ChangeBuy        int64
+	ChangeSell       int64
+	Currency         string
+	UpdatedAt        int64
+	IsStale          bool
+	ShowInInvestment bool
+	DisplayOrder     int32
+}
+
+// AllAssetPrices groups DB-backed prices by asset class.
+type AllAssetPrices struct {
+	Gold     []*AssetPriceDTO
+	Silver   []*AssetPriceDTO
+	Currency []*AssetPriceDTO
+}
+
+// AssetPriceDTO is the service-layer view of a single asset price row.
+type AssetPriceDTO struct {
+	TypeCode   string
+	Name       string
+	Buy        int64
+	Sell       int64
+	ChangeBuy  int64
+	ChangeSell int64
+	Currency   string
+	IsStale    bool
+	FetchedAt  time.Time
+}
+
+// MarketTypeItem is a lightweight descriptor for a single tradable type.
+type MarketTypeItem struct {
+	Code     string
+	Name     string
+	Currency string
+}
+
+// MarketTypesDTO contains the full set of market types per asset class together
+// with the freshness timestamps (Unix seconds) for each group.
+type MarketTypesDTO struct {
+	Gold              []MarketTypeItem
+	Silver            []MarketTypeItem
+	Currency          []MarketTypeItem
+	GoldUpdatedAt     int64
+	SilverUpdatedAt   int64
+	CurrencyUpdatedAt int64
 }

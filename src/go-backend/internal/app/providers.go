@@ -114,6 +114,10 @@ func ProvideRepositories(db *database.Database) *service.Repositories {
 		PushSubscription:      repository.NewPushSubscriptionRepository(db),
 		Watchlist:             repository.NewWatchlistRepository(db),
 		UserPriceAlert:        repository.NewUserPriceAlertRepository(db),
+		AssetPrice:            repository.NewAssetPriceRepository(db),
+		GoldDisplayConfig:     repository.NewGoldDisplayConfigRepository(db),
+		AssetDisplayConfig:    repository.NewAssetDisplayConfigRepository(db),
+		AssetConfigFetchCode:  repository.NewAssetConfigFetchCodeRepository(db),
 	}
 }
 
@@ -258,6 +262,11 @@ func ProvideScheduler(
 	// User price alert evaluation job — runs every 15 minutes
 	if services.UserPriceAlert != nil {
 		backgroundJobs = append(backgroundJobs, scheduler.NewUserPriceAlertJob(services.UserPriceAlert))
+	}
+
+	// Price cache job — persists all prices to DB for fast handler reads
+	if services.AssetPrice != nil {
+		backgroundJobs = append(backgroundJobs, scheduler.NewPriceCacheJob(services.AssetPrice))
 	}
 
 	return scheduler.New(backgroundJobs...)

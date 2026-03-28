@@ -33,21 +33,30 @@ type MarketDataService interface {
 
 // marketDataService implements MarketDataService.
 type marketDataService struct {
-	marketDataRepo     repository.MarketDataRepository
-	goldPriceService   GoldPriceService
-	silverPriceService SilverPriceService
-	goldConverter      *gold.Converter
-	silverConverter    *silver.Converter
+	marketDataRepo            repository.MarketDataRepository
+	goldPriceService          GoldPriceService          // kept for cold-start fallback
+	silverPriceService        SilverPriceService        // kept for cold-start fallback
+	assetDisplayConfigService AssetDisplayConfigService // primary source for gold/silver prices
+	goldConverter             *gold.Converter
+	silverConverter           *silver.Converter
 }
 
 // NewMarketDataService creates a new MarketDataService.
-func NewMarketDataService(marketDataRepo repository.MarketDataRepository, goldPriceService GoldPriceService, silverPriceService SilverPriceService) MarketDataService {
+// assetDisplayConfigService is the primary source for gold and silver prices.
+// goldPriceService and silverPriceService are retained as cold-start fallbacks.
+func NewMarketDataService(
+	marketDataRepo repository.MarketDataRepository,
+	goldPriceService GoldPriceService,
+	silverPriceService SilverPriceService,
+	assetDisplayConfigService AssetDisplayConfigService,
+) MarketDataService {
 	return &marketDataService{
-		marketDataRepo:     marketDataRepo,
-		goldPriceService:   goldPriceService,
-		silverPriceService: silverPriceService,
-		goldConverter:      gold.NewGoldConverter(nil),   // Will be injected later if needed
-		silverConverter:    silver.NewSilverConverter(nil), // Will be injected later if needed
+		marketDataRepo:            marketDataRepo,
+		goldPriceService:          goldPriceService,
+		silverPriceService:        silverPriceService,
+		assetDisplayConfigService: assetDisplayConfigService,
+		goldConverter:             gold.NewGoldConverter(nil),
+		silverConverter:           silver.NewSilverConverter(nil),
 	}
 }
 
@@ -74,9 +83,9 @@ func (s *marketDataService) GetPrice(ctx context.Context, symbol, currency strin
 
 	// Check if this is a gold investment
 	if gold.IsGoldType(investmentType) {
-		priceData, err = s.fetchGoldPriceFromAPI(ctx, symbol, currency, investmentType)
+		priceData, err = s.fetchGoldPriceFromDB(ctx, symbol, currency, investmentType)
 	} else if silver.IsSilverType(investmentType) {
-		priceData, err = s.fetchSilverPriceFromAPI(ctx, symbol, currency, investmentType)
+		priceData, err = s.fetchSilverPriceFromDB(ctx, symbol, currency, investmentType)
 	} else {
 		priceData, err = s.fetchPriceFromAPI(ctx, symbol, currency)
 	}
@@ -248,13 +257,39 @@ func (s *marketDataService) fetchPriceFromAPI(ctx context.Context, symbol, curre
 	}, nil
 }
 
-// fetchGoldPriceFromAPI fetches gold price from vang.today API.
-// Used for Vietnamese gold (GOLD_VND) and world gold (GOLD_USD) investments.
-func (s *marketDataService) fetchGoldPriceFromAPI(ctx context.Context, symbol, currency string, investmentType investmentv1.InvestmentType) (*models.MarketData, error) {
-	// Fetch price from vang.today API
+// fetchGoldPriceFromDB fetches the gold price from the AssetDisplayConfigService DB cache.
+// This is the primary path — reads from the asset_price table (populated by the
+// PriceCacheJob) rather than calling the live gold API on every request.
+//
+// On cold start (ResolvePrice returns an error because the DB has no rows yet),
+// or when assetDisplayConfigService is nil (pre-Task-10 wiring), it falls back
+// to GoldPriceService.FetchPriceForSymbol (live API).
+//
+// Price normalization (per-lượng → per-gram for VND gold) is always applied
+// after the price is obtained, regardless of source.
+func (s *marketDataService) fetchGoldPriceFromDB(ctx context.Context, symbol, currency string, investmentType investmentv1.InvestmentType) (*models.MarketData, error) {
+	// Primary: DB cache via AssetDisplayConfigService.
+	if s.assetDisplayConfigService != nil {
+		rawPrice, _, _, resolveErr := s.assetDisplayConfigService.ResolvePrice(ctx, symbol, "gold")
+		if resolveErr == nil {
+			// Normalize per-lượng → per-gram (VND gold) or pass-through (USD gold).
+			normalizedPrice := s.goldConverter.ProcessMarketPrice(rawPrice, currency, investmentType)
+			return &models.MarketData{
+				Symbol:    symbol,
+				Currency:  currency,
+				Price:     normalizedPrice,
+				Change24h: 0,
+				Volume24h: 0,
+				Timestamp: time.Now(),
+			}, nil
+		}
+		// Cold-start fallback: DB cache not yet populated — call live gold API.
+		log.Printf("[marketDataService] gold DB cache miss for %s (cold start): %v — falling back to live API", symbol, resolveErr)
+	}
+
 	price, err := s.goldPriceService.FetchPriceForSymbol(ctx, symbol)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch gold price from vang.today: %w", err)
+		return nil, fmt.Errorf("failed to fetch gold price: %w", err)
 	}
 
 	// Convert market price to storage format
@@ -272,10 +307,35 @@ func (s *marketDataService) fetchGoldPriceFromAPI(ctx context.Context, symbol, c
 	}, nil
 }
 
-// fetchSilverPriceFromAPI fetches silver price from ancarat API.
-// Used for Vietnamese silver (SILVER_VND) and world silver (SILVER_USD) investments.
-func (s *marketDataService) fetchSilverPriceFromAPI(ctx context.Context, symbol, currency string, investmentType investmentv1.InvestmentType) (*models.MarketData, error) {
-	// Fetch price from ancarat API
+// fetchSilverPriceFromDB fetches the silver price from the AssetDisplayConfigService DB cache.
+// This is the primary path — reads from the asset_price table (populated by the
+// PriceCacheJob) rather than calling the live silver API on every request.
+//
+// On cold start (ResolvePrice returns an error), it falls back to
+// SilverPriceService.FetchPriceForSymbol (live API).
+//
+// Price normalization (per-tael/kg → per-gram for VND silver, pass-through for USD) is
+// always applied after the price is obtained, regardless of source.
+func (s *marketDataService) fetchSilverPriceFromDB(ctx context.Context, symbol, currency string, investmentType investmentv1.InvestmentType) (*models.MarketData, error) {
+	// Primary: DB cache via AssetDisplayConfigService.
+	if s.assetDisplayConfigService != nil {
+		rawPrice, _, _, resolveErr := s.assetDisplayConfigService.ResolvePrice(ctx, symbol, "silver")
+		if resolveErr == nil {
+			// Normalize unit (per-tael → per-gram for VND silver, pass-through for USD).
+			normalizedPrice := s.silverConverter.ProcessMarketPrice(rawPrice, currency, investmentType, symbol)
+			return &models.MarketData{
+				Symbol:    symbol,
+				Currency:  currency,
+				Price:     normalizedPrice,
+				Change24h: 0,
+				Volume24h: 0,
+				Timestamp: time.Now(),
+			}, nil
+		}
+		// Cold-start fallback: DB cache not yet populated — call live silver API.
+		log.Printf("[marketDataService] silver DB cache miss for %s (cold start): %v — falling back to live API", symbol, resolveErr)
+	}
+
 	price, err := s.silverPriceService.FetchPriceForSymbol(ctx, symbol)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch silver price from ancarat: %w", err)

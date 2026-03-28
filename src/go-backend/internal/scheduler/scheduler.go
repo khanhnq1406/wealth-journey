@@ -55,6 +55,12 @@ func (s *Scheduler) runJob(ctx context.Context, j Job) {
 
 	log.Printf("Background job '%s' started (runs every %v)", j.Name(), j.Interval())
 
+	// Run immediately on startup so the cache is populated before the first
+	// ticker fires (which would otherwise be a full Interval away).
+	if err := j.Run(ctx); err != nil {
+		log.Printf("ERROR: Job '%s' failed on startup run: %v", j.Name(), err)
+	}
+
 	ticker := time.NewTicker(j.Interval())
 	defer ticker.Stop()
 

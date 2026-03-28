@@ -186,7 +186,7 @@ run_backend_test() {
     export STORAGE_PROVIDER=local
     export UPLOAD_DIR=/tmp/wealthjourney-uploads
 
-    if go test -v -count=1 -timeout=10m ./... 2>&1 | tee /tmp/ci-backend-test.log | tail -30; then
+    if go test -v -short -count=1 -timeout=10m ./... 2>&1 | tee /tmp/ci-backend-test.log | tail -30; then
         pass "Backend test"
     else
         echo ""

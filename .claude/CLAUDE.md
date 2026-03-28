@@ -81,7 +81,8 @@ Personal_Financial_Management/
 │   │   │       ├── file_cleanup_job.go         # Orphaned uploads (1h)
 │   │   │       ├── db_keepalive_job.go         # Connection keepalive (2m)
 │   │   │       ├── price_alert_job.go          # System price alert evaluation
-│   │   │       └── user_price_alert_job.go     # User price alert evaluation (NEW)
+│   │   │       ├── user_price_alert_job.go     # User price alert evaluation (NEW)
+│   │   │       └── price_cache_job.go          # Asset price DB cache refresh (15m)
 │   │   ├── domain/                    # Domain layer (DDD pattern)
 │   │   │   ├── auth/                  # Authentication logic
 │   │   │   ├── gateway/               # gRPC-Gateway proxy
@@ -1024,6 +1025,34 @@ The `SymbolAutocomplete` component provides a user-friendly search interface:
 - Unit tests: `go test -short ./pkg/yahoo/...`
 - Integration tests: `go test -tags=integration ./domain/service/...`
 
+### Asset Price Cache
+
+- **Model**: [AssetPrice](src/go-backend/domain/models/asset_price.go) — `asset_price` table, composite unique index `(type_code, currency, source)`, `IsStale bool`, `FetchedAt time.Time`
+- **Service**: [AssetPriceService](src/go-backend/domain/service/asset_price_service.go)
+- **Repository**: [AssetPriceRepository](src/go-backend/domain/repository/asset_price_repository.go)
+- **Scheduler**: `internal/scheduler/price_cache_job.go` — runs every 15 minutes (10s startup delay)
+- **Handlers**: `GetMarketPrices` and `GetPublicMarketTypes` read from `asset_price` table (not live APIs)
+- **Migrations**: `task backend:migrate-asset-prices`, `task backend:migrate-vietcombank-currency`
+
+**Architecture pattern** — background-job-driven DB cache:
+1. `PriceCacheJob` calls `AssetPriceService.RefreshAllPrices()` every 15 minutes
+2. Service fetches from 10 parallel goroutines: 6 gold sources (VangSaiGon, VangToday, SJC, DOJI, BTMC, PNJ), 1 silver, 3 currency (VangSaiGon, VangToday, Vietcombank direct API)
+3. HTTP handlers read from DB — zero external API calls per HTTP request
+4. On fetch failure: `MarkStaleByAssetTypeAndSource` marks only that source stale; other sources unaffected
+5. Frontend displays `"--"` when `buy/sell === 0` OR `isStale === true`
+
+**Currency sources:**
+- `vangsaigon` — free-market aggregator rates; TypeCodes like `"USD"`, `"EUR"`
+- `vangtoday` — free-market aggregator rates; TypeCodes like `"USD"`, `"EUR"`
+- `vietcombank` — official bank rates via `pkg/vietcombank/`; TypeCodes carry `_VCB` suffix (e.g. `"USD_VCB"`) to avoid collision with free-market rows in the `(type_code, currency, source)` index
+- Feature flag: `VIETCOMBANK_FX_ENABLED=false` disables Vietcombank fetcher (default: enabled)
+
+**Key behavior:**
+- Each source fails independently — `MarkStaleByAssetTypeAndSource(ctx, assetType, source)` only marks that source stale
+- `GetPublicMarketTypes` falls back to static type registries on cold start (empty DB)
+- `GetMarketPrices` returns empty arrays (not error) on cold start
+- Admin price overrides applied at handler level, on top of DB data
+
 ### Gold Investment Management
 
 - **Models**: [Investment](src/go-backend/domain/models/investment.go) (extended with gold types)
@@ -1183,7 +1212,9 @@ task backend:migrate-sessions          # Create session tables
 task backend:migrate-import            # Create import tables
 task backend:migrate-fx                # Create FX rate tables
 task backend:migrate-portfolio-history # Create portfolio history tables
-task backend:migrate-user-price-alerts # Create user_price_alert table (NEW)
+task backend:migrate-user-price-alerts    # Create user_price_alert table
+task backend:migrate-asset-prices         # Create asset_price cache table
+task backend:migrate-vietcombank-currency # Seed VCB currency display config + fetch codes
 ```
 
 ### Adding a New Feature
@@ -1410,6 +1441,9 @@ task dev
 | [src/go-backend/domain/service/wallet_service.go](src/go-backend/domain/service/wallet_service.go) | Wallet business logic |
 | [src/go-backend/domain/service/investment_service.go](src/go-backend/domain/service/investment_service.go) | Investment business logic |
 | [src/go-backend/domain/service/market_data_service.go](src/go-backend/domain/service/market_data_service.go) | Market data & Yahoo Finance |
+| [src/go-backend/domain/service/asset_price_service.go](src/go-backend/domain/service/asset_price_service.go) | Asset price cache service (DB-backed) |
+| [src/go-backend/domain/repository/asset_price_repository.go](src/go-backend/domain/repository/asset_price_repository.go) | Asset price persistence (upsert, list, mark stale) |
+| [src/go-backend/internal/scheduler/price_cache_job.go](src/go-backend/internal/scheduler/price_cache_job.go) | Background price cache refresh job (15m) |
 | [src/go-backend/domain/service/gold_price_service.go](src/go-backend/domain/service/gold_price_service.go) | Gold price service |
 | [src/go-backend/domain/service/silver_price_service.go](src/go-backend/domain/service/silver_price_service.go) | Silver price service |
 | [src/go-backend/domain/service/fx_rate_service.go](src/go-backend/domain/service/fx_rate_service.go) | FX rate service |

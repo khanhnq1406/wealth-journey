@@ -14,6 +14,7 @@ import {
   isCustomInvestment,
   formatInvestmentPrice,
   formatUnrealizedPNL,
+  getPriceStaleClass,
 } from "../helpers";
 import { resources } from "@/app/constants";
 import Image from "next/image";
@@ -38,6 +39,8 @@ export interface InvestmentCardData {
   unrealizedPnl?: number;
   unrealizedPnlPercent?: number;
   updatedAt?: number;
+  /** Unix timestamp (seconds) when price was last updated from market data; 0 = never */
+  priceUpdatedAt?: number;
   currency?: string;
   purchaseUnit?: string;
   displayCurrentValue?: { amount: number; currency: string };
@@ -131,6 +134,7 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
     unrealizedPnl,
     unrealizedPnlPercent,
     updatedAt,
+    priceUpdatedAt,
     currency,
     purchaseUnit,
     displayCurrentValue,
@@ -149,11 +153,10 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
   // Use state to capture Date.now() once on mount to avoid impure function during render
   const [now] = useState(() => Date.now());
 
-  // Compute if data is recent (within 5 minutes)
-  const isRecent = useMemo(() => {
-    if (!updatedAt) return false;
-    return now / 1000 - updatedAt < 300;
-  }, [now, updatedAt]);
+  // Compute staleness dot color based on priceUpdatedAt (when market data last set the price)
+  const priceStaleClass = useMemo(() => {
+    return getPriceStaleClass(priceUpdatedAt, now / 1000);
+  }, [now, priceUpdatedAt]);
   const pnl = unrealizedPnl || 0;
   const pnlPercent = unrealizedPnlPercent || 0;
 
@@ -304,14 +307,23 @@ export const InvestmentCardEnhanced = memo(function InvestmentCardEnhanced({
           </div>
         </div>
 
-        {updatedAt && (
+        {!isCustom && (
           <div className="flex items-center justify-between pt-2 border-t border-v2-border-light">
-            <div className="flex items-center gap-1">
+            <div
+              className="flex items-center gap-1"
+              title={
+                priceUpdatedAt
+                  ? `Price last updated ${formatTimeAgo(priceUpdatedAt, t as any, locale).text}`
+                  : "Price never updated from market data"
+              }
+            >
               <div
-                className={`w-2 h-2 rounded-full ${isRecent ? "bg-v2-green-positive animate-pulse" : "bg-v2-text-tertiary"}`}
+                className={`w-2 h-2 rounded-full ${priceStaleClass} ${priceStaleClass === "bg-v2-green-positive" ? "animate-pulse" : ""}`}
               />
               <span className="text-xs text-v2-text-tertiary">
-                {formatTimeAgo(updatedAt, t as any, locale).text}
+                {priceUpdatedAt
+                  ? formatTimeAgo(priceUpdatedAt, t as any, locale).text
+                  : (t as any)("timeAgo.never") ?? "Never"}
               </span>
             </div>
 

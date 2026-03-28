@@ -19,6 +19,7 @@ import { SymbolAutocomplete } from "@/features/investment/components/SymbolAutoc
 import {
   useMutationCreateInvestment,
   useQueryGetMarketPrice,
+  useQueryGetAssetDisplayPrices,
   EVENT_InvestmentCreateInvestment,
   EVENT_InvestmentListInvestments,
   EVENT_InvestmentGetPortfolioSummary,
@@ -38,14 +39,13 @@ import { ErrorMessage } from "@/components/forms/ErrorMessage";
 import { CurrencyBadge } from "@/components/forms/CurrencyBadge";
 import { getTranslatedError } from "@/lib/utils/error-translator";
 import {
-  isGoldType,
-  getGoldTypeOptions,
   type GoldTypeOption,
   type GoldUnit,
   calculateGoldFromUserInput,
+  GRAMS_PER_MACE,
+  GOLD_USD_OPTIONS,
 } from "@/features/investment/utils/gold-calculator";
 import {
-  isSilverType,
   getSilverTypeOptions,
   type SilverTypeOption,
   type SilverUnit,
@@ -254,11 +254,31 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
     },
   );
 
-  // Get ALL gold type options (no currency filter — show all 19)
-  const goldTypeOptions = useMemo(() => {
+  // Fetch gold types from backend API (dynamic, admin-managed list)
+  const goldDisplayPricesQuery = useQueryGetAssetDisplayPrices(
+    { assetType: "gold" },
+    {
+      enabled: isGoldInvestment,
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
+  // Build gold type options: VND from API (filtered by showInInvestment), USD stays hardcoded
+  const goldTypeOptions = useMemo((): GoldTypeOption[] => {
     if (!isGoldInvestment) return [];
-    return getGoldTypeOptions(); // No currency filter
-  }, [isGoldInvestment]);
+    const vndOptions: GoldTypeOption[] = (goldDisplayPricesQuery.data?.prices ?? [])
+      .filter((p) => p.showInInvestment)
+      .map((p) => ({
+        value: p.typeCode,
+        label: p.displayName,
+        unit: "mace" as GoldUnit,
+        currency: "VND",
+        unitWeight: GRAMS_PER_MACE,
+        type: 8, // InvestmentType.INVESTMENT_TYPE_GOLD_VND
+      }));
+    // GOLD_USD_OPTIONS (XAU) remains hardcoded — out of scope for this feature
+    return [...vndOptions, ...GOLD_USD_OPTIONS];
+  }, [isGoldInvestment, goldDisplayPricesQuery.data]);
 
   // Get ALL silver type options (no currency filter — show all)
   const silverTypeOptions = useMemo(() => {
@@ -686,9 +706,19 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
               }
             }}
             placeholder={t("form.selectGoldTypePlaceholder")}
-            disabled={isSubmitting}
+            disabled={isSubmitting || goldDisplayPricesQuery.isLoading}
             required
           />
+          {goldDisplayPricesQuery.isLoading && !selectedGoldType && (
+            <p className="text-xs text-v2-text-tertiary mt-1 ml-1">
+              {t("form.loadingPrice")}
+            </p>
+          )}
+          {goldDisplayPricesQuery.isError && !selectedGoldType && (
+            <p className="text-xs text-v2-red-negative mt-1 ml-1">
+              {t("form.unableToFetchPrice")}
+            </p>
+          )}
           {selectedGoldType && (
             <div className="mt-2 space-y-1">
               <p className="text-xs text-v2-text-secondary ml-1">

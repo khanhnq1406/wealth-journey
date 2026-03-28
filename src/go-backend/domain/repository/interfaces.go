@@ -449,6 +449,31 @@ type PushSubscriptionRepository interface {
 	DeleteByID(ctx context.Context, id int32) error
 }
 
+// AssetConfigFetchCodeRepository defines the interface for asset config fetch code data operations.
+// It manages the ordered list of type codes used to resolve prices for a given asset display config.
+type AssetConfigFetchCodeRepository interface {
+	// ListByConfigID retrieves all active fetch codes for a config, ordered by priority ASC.
+	// Soft-deleted rows are excluded automatically.
+	ListByConfigID(ctx context.Context, configID int32) ([]*models.AssetConfigFetchCode, error)
+
+	// GetByID retrieves a single fetch code by primary key.
+	// Returns nil, nil if the record does not exist.
+	GetByID(ctx context.Context, id int32) (*models.AssetConfigFetchCode, error)
+
+	// Create inserts a new fetch code record.
+	Create(ctx context.Context, fc *models.AssetConfigFetchCode) error
+
+	// Update saves all fields of an existing fetch code record (e.g., priority change).
+	Update(ctx context.Context, fc *models.AssetConfigFetchCode) error
+
+	// Delete soft-deletes a fetch code by primary key.
+	// Returns apperrors.NotFoundError if no row was affected.
+	Delete(ctx context.Context, id int32) error
+
+	// CountByConfigID returns the count of active (non-deleted) fetch codes for a config.
+	CountByConfigID(ctx context.Context, configID int32) (int64, error)
+}
+
 // WatchlistRepository defines the interface for watchlist data operations.
 type WatchlistRepository interface {
 	// Create creates a new watchlist item.

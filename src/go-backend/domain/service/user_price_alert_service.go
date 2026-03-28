@@ -33,33 +33,30 @@ var symbolPattern = regexp.MustCompile(`^[a-zA-Z0-9.\-_]+$`)
 
 // userPriceAlertService implements UserPriceAlertService.
 type userPriceAlertService struct {
-	alertRepo      repository.UserPriceAlertRepository
-	goldPriceSvc   GoldPriceService
-	silverPriceSvc SilverPriceService
-	marketDataSvc  MarketDataService
-	notifRepo      repository.NotificationRepository
-	pushSvc        PushService
-	rdb            *pkgredis.RedisClient
+	alertRepo     repository.UserPriceAlertRepository
+	assetPriceSvc AssetPriceService
+	marketDataSvc MarketDataService
+	notifRepo     repository.NotificationRepository
+	pushSvc       PushService
+	rdb           *pkgredis.RedisClient
 }
 
 // NewUserPriceAlertService creates a new UserPriceAlertService.
 func NewUserPriceAlertService(
 	alertRepo repository.UserPriceAlertRepository,
-	goldPriceSvc GoldPriceService,
-	silverPriceSvc SilverPriceService,
+	assetPriceSvc AssetPriceService,
 	marketDataSvc MarketDataService,
 	notifRepo repository.NotificationRepository,
 	pushSvc PushService,
 	rdb *pkgredis.RedisClient,
 ) UserPriceAlertService {
 	return &userPriceAlertService{
-		alertRepo:      alertRepo,
-		goldPriceSvc:   goldPriceSvc,
-		silverPriceSvc: silverPriceSvc,
-		marketDataSvc:  marketDataSvc,
-		notifRepo:      notifRepo,
-		pushSvc:        pushSvc,
-		rdb:            rdb,
+		alertRepo:     alertRepo,
+		assetPriceSvc: assetPriceSvc,
+		marketDataSvc: marketDataSvc,
+		notifRepo:     notifRepo,
+		pushSvc:       pushSvc,
+		rdb:           rdb,
 	}
 }
 
@@ -462,41 +459,37 @@ func (s *userPriceAlertService) EvaluateAlerts(ctx context.Context) error {
 // --- helpers ---
 
 // fetchCurrentPrice fetches the current price for a single symbol/assetType combination.
-// Returns 0 on error (non-fatal; alert creation still proceeds).
+// Returns 0 on error or when price is stale (non-fatal; alert creation still proceeds).
 func (s *userPriceAlertService) fetchCurrentPrice(ctx context.Context, symbol, currency string, assetType v1.InvestmentType, priceSide string) int64 {
 	fetchCtx, cancel := context.WithTimeout(ctx, alertPriceFetchTimeout)
 	defer cancel()
 
 	switch {
 	case gold.IsGoldType(assetType):
-		prices, err := s.goldPriceSvc.FetchAllPrices(fetchCtx)
-		if err != nil {
-			log.Printf("Warning: failed to fetch gold prices for alert creation (symbol=%s): %v", symbol, err)
+		dto, err := s.assetPriceSvc.GetPriceByTypeCode(fetchCtx, symbol)
+		if err != nil || dto == nil || dto.IsStale {
+			if err != nil {
+				log.Printf("Warning: DB price lookup failed for %s: %v", symbol, err)
+			}
 			return 0
 		}
-		for _, p := range prices {
-			if p.TypeCode == symbol {
-				if priceSide == "sell" {
-					return p.Sell
-				}
-				return p.Buy
-			}
+		if priceSide == "sell" {
+			return dto.Sell
 		}
+		return dto.Buy
 
 	case silver.IsSilverType(assetType):
-		prices, err := s.silverPriceSvc.FetchAllPrices(fetchCtx)
-		if err != nil {
-			log.Printf("Warning: failed to fetch silver prices for alert creation (symbol=%s): %v", symbol, err)
+		dto, err := s.assetPriceSvc.GetPriceByTypeCode(fetchCtx, symbol)
+		if err != nil || dto == nil || dto.IsStale {
+			if err != nil {
+				log.Printf("Warning: DB price lookup failed for %s: %v", symbol, err)
+			}
 			return 0
 		}
-		for _, p := range prices {
-			if p.TypeCode == symbol {
-				if priceSide == "sell" {
-					return p.Sell
-				}
-				return p.Buy
-			}
+		if priceSide == "sell" {
+			return dto.Sell
 		}
+		return dto.Buy
 
 	default:
 		md, err := s.marketDataSvc.GetPrice(fetchCtx, symbol, currency, assetType, 15*time.Minute)
@@ -506,12 +499,11 @@ func (s *userPriceAlertService) fetchCurrentPrice(ctx context.Context, symbol, c
 		}
 		return md.Price
 	}
-
-	return 0
 }
 
 // fetchPricesForAlerts fetches current prices for a batch of alerts, grouped by asset type
 // to minimise external API calls. Returns a map keyed by "symbol|priceSide".
+// Stale prices are excluded from the map — callers treat missing entries as "price unavailable".
 func (s *userPriceAlertService) fetchPricesForAlerts(ctx context.Context, alerts []*models.UserPriceAlert) map[string]int64 {
 	priceMap := make(map[string]int64)
 	if len(alerts) == 0 {
@@ -536,30 +528,34 @@ func (s *userPriceAlertService) fetchPricesForAlerts(ctx context.Context, alerts
 	fetchCtx, cancel := context.WithTimeout(ctx, alertPriceFetchTimeout)
 	defer cancel()
 
-	// Fetch gold prices once
-	var goldByCode map[string]*CachedGoldPrice
+	// Fetch gold prices from DB cache (non-stale only)
+	var goldByCode map[string]*AssetPriceDTO
 	if hasGold {
-		prices, err := s.goldPriceSvc.FetchAllPrices(fetchCtx)
+		prices, err := s.assetPriceSvc.GetPricesByAssetType(fetchCtx, "gold")
 		if err != nil {
-			log.Printf("Warning: failed to fetch gold prices for list alerts: %v", err)
+			log.Printf("Warning: DB gold prices unavailable for alerts: %v", err)
 		} else {
-			goldByCode = make(map[string]*CachedGoldPrice, len(prices))
+			goldByCode = make(map[string]*AssetPriceDTO, len(prices))
 			for _, p := range prices {
-				goldByCode[p.TypeCode] = p
+				if !p.IsStale {
+					goldByCode[p.TypeCode] = p
+				}
 			}
 		}
 	}
 
-	// Fetch silver prices once
-	var silverByCode map[string]*CachedSilverPrice
+	// Fetch silver prices from DB cache (non-stale only)
+	var silverByCode map[string]*AssetPriceDTO
 	if hasSilver {
-		prices, err := s.silverPriceSvc.FetchAllPrices(fetchCtx)
+		prices, err := s.assetPriceSvc.GetPricesByAssetType(fetchCtx, "silver")
 		if err != nil {
-			log.Printf("Warning: failed to fetch silver prices for list alerts: %v", err)
+			log.Printf("Warning: DB silver prices unavailable for alerts: %v", err)
 		} else {
-			silverByCode = make(map[string]*CachedSilverPrice, len(prices))
+			silverByCode = make(map[string]*AssetPriceDTO, len(prices))
 			for _, p := range prices {
-				silverByCode[p.TypeCode] = p
+				if !p.IsStale {
+					silverByCode[p.TypeCode] = p
+				}
 			}
 		}
 	}
@@ -594,7 +590,7 @@ func (s *userPriceAlertService) fetchPricesForAlerts(ctx context.Context, alerts
 		}
 	}
 
-	// Fetch market prices individually (Yahoo Finance)
+	// Fetch market prices individually (Yahoo Finance — kept live, no DB cache for market data)
 	for _, a := range marketAlerts {
 		key := a.Symbol + "|" + a.PriceSide
 		md, err := s.marketDataSvc.GetPrice(fetchCtx, a.Symbol, a.Currency, v1.InvestmentType(a.AssetType), 15*time.Minute)

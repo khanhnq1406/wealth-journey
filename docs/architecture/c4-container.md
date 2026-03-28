@@ -33,6 +33,10 @@ C4Container
         System_Ext(yahoo, "Yahoo Finance", "Market data")
         System_Ext(vang247, "vang.today", "Gold/silver prices")
         System_Ext(supabase_storage, "Supabase Storage", "File storage")
+        System_Ext(sjc_website, "SJC Website", "SJC official gold price API")
+        System_Ext(doji_website, "DOJI Website", "DOJI official gold price website")
+        System_Ext(btmc_website, "BTMC Website", "BTMC official gold price website")
+        System_Ext(pnj_api, "PNJ API", "PNJ official gold price API")
     }
 
     Rel(user, spa, "Uses", "HTTPS/TLS")
@@ -51,6 +55,10 @@ C4Container
     Rel(scheduler, redis, "Price cache", "TCP/SSL")
     Rel(scheduler, yahoo, "Fetch prices", "HTTPS")
     Rel(scheduler, vang247, "Fetch gold/silver", "HTTPS")
+    Rel(rest, sjc_website, "fetches gold prices from", "HTTPS")
+    Rel(rest, doji_website, "fetches gold prices from", "HTTPS")
+    Rel(rest, btmc_website, "fetches gold prices from", "HTTPS")
+    Rel(rest, pnj_api, "fetches gold prices from", "HTTPS")
 
     Rel(worker, postgres, "Writes transactions", "TCP/SSL")
     Rel(worker, redis, "Dequeues jobs", "TCP/SSL")

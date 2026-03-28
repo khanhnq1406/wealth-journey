@@ -138,7 +138,7 @@ digraph implement {
     "Show user summary + auto-proceed" -> "More tasks?";
     "More tasks?" -> "Read progress file → next pending task" [label="yes"];
     "More tasks?" -> "Dispatch final cross-cutting review" [label="no"];
-    "Dispatch final cross-cutting review" -> "Write implementation report";
+    "Dispatch final cross-cutting review" -> "Write implementation report (Write tool → docs/reports/...)";
 }
 ```
 
@@ -242,7 +242,11 @@ After the reviewer returns APPROVED on all stages, the coordinator executes the 
 
 ### Implementation Report
 
+**MANDATORY: The coordinator MUST create this file on disk using the Write tool — do NOT just display it in chat.**
+
 Save to: `docs/reports/YYYY-MM-DD-<feature>-report.md`
+
+**After writing, commit:** Stage the report file along with the progress file and include in a final commit: `docs(report): complete <feature> implementation report`.
 
 ```markdown
 # [Feature Name] Implementation Report
@@ -338,7 +342,39 @@ Run after implementation to verify blast radius is covered:
 
 ### Manual Testing Steps
 
-[Manual testing steps for verification]
+**MANDATORY: Write concrete, numbered steps a human can follow without reading the code.**
+
+Each step must include:
+- **Preconditions** (logged in as which user, what data must exist)
+- **Action** (exact UI interactions or API calls)
+- **Expected result** (what should appear or happen)
+
+Structure per scenario:
+
+```
+#### Scenario: [Happy path name]
+**Preconditions:** [Describe required state]
+1. Navigate to [URL or screen]
+2. [Perform action] → Expected: [what to see]
+3. [Next action] → Expected: [what to see]
+
+#### Scenario: [Error / edge case name]
+**Preconditions:** [Describe required state]
+1. [Action that triggers the edge case]
+2. Expected: [error message, empty state, or boundary behavior]
+
+#### Scenario: [Authorization check]
+**Preconditions:** Logged in as a different user
+1. Attempt to access [resource owned by another user]
+2. Expected: 403 or resource not found — no data leakage
+```
+
+**Minimum required scenarios:**
+- Happy path (create/view/edit/delete as applicable)
+- Validation error (submit with invalid inputs)
+- Authorization boundary (access another user's resource)
+- Empty state (if feature shows a list or dashboard)
+- Mobile viewport (375px — verify layout and touch targets)
 ```
 
 ### Context Compaction Recovery (COORDINATOR)

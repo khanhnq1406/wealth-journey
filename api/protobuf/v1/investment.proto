@@ -38,6 +38,7 @@ message Investment {
   wealthjourney.common.v1.Money displayAverageCost = 26 [json_name = "displayAverageCost"];  // Average cost in user's preferred currency
   bool isCustom = 27 [json_name = "isCustom"];  // True if manual entry without market data validation
   int32 userId = 28 [json_name = "userId"];  // Owner user ID (read-only, set by server from JWT)
+  int64 price_updated_at = 29 [json_name = "priceUpdatedAt"];  // Unix timestamp when price was last updated by background job (0 if never)
 }
 
 enum InvestmentType {
@@ -238,6 +239,7 @@ message PriceItem {
   int64 updatedAt = 7 [json_name = "updatedAt"];
   string name = 8 [json_name = "name"];
   bool isOverridden = 9 [json_name = "isOverridden"];  // True if price was admin-overridden
+  bool isStale = 10 [json_name = "isStale"];  // True when price fetch failed
 }
 
 // GetMarketPricesRequest for fetching all gold and silver prices
@@ -824,4 +826,124 @@ message DeleteUserPriceAlertResponse {
   bool success = 1 [json_name = "success"];
   string message = 2 [json_name = "message"];
   string timestamp = 3 [json_name = "timestamp"];
+}
+
+// ── Asset Display Config Messages ──
+
+// AssetDisplayPrice represents an asset type (gold, silver, etc.) with live price data for display
+// Public endpoint: no internal DB IDs exposed
+message AssetDisplayPrice {
+  string type_code = 1 [json_name = "typeCode"];
+  string display_name = 2 [json_name = "displayName"];
+  int64 buy = 3 [json_name = "buy"];
+  int64 sell = 4 [json_name = "sell"];
+  int64 change_buy = 5 [json_name = "changeBuy"];
+  int64 change_sell = 6 [json_name = "changeSell"];
+  string currency = 7 [json_name = "currency"];
+  int64 updated_at = 8 [json_name = "updatedAt"];
+  bool is_stale = 9 [json_name = "isStale"];
+  bool show_in_investment = 10 [json_name = "showInInvestment"];
+  int32 display_order = 11 [json_name = "displayOrder"];
+  string asset_type = 12 [json_name = "assetType"];  // "gold", "silver", etc.
+  bool enabled = 13 [json_name = "enabled"];
+}
+
+message GetAssetDisplayPricesRequest {
+  string asset_type = 1 [json_name = "assetType"];  // Filter by asset type; empty = all
+}
+
+message GetAssetDisplayPricesResponse {
+  repeated AssetDisplayPrice prices = 1 [json_name = "prices"];
+}
+
+// AssetDisplayConfig represents an admin-managed asset type display configuration entry
+message AssetDisplayConfig {
+  int32 id = 1 [json_name = "id"];
+  string type_code = 2 [json_name = "typeCode"];
+  string display_name = 3 [json_name = "displayName"];
+  int32 display_order = 4 [json_name = "displayOrder"];
+  bool enabled = 5 [json_name = "enabled"];
+  bool show_in_investment = 6 [json_name = "showInInvestment"];
+  string asset_type = 7 [json_name = "assetType"];  // "gold", "silver", etc.
+}
+
+message ListAssetDisplayConfigRequest {
+  string asset_type = 1 [json_name = "assetType"];  // Filter by asset type; empty = all
+}
+
+message ListAssetDisplayConfigResponse {
+  repeated AssetDisplayConfig configs = 1 [json_name = "configs"];
+}
+
+message CreateAssetDisplayConfigRequest {
+  string type_code = 1 [json_name = "typeCode"];
+  string display_name = 2 [json_name = "displayName"];
+  int32 display_order = 3 [json_name = "displayOrder"];
+  bool enabled = 4 [json_name = "enabled"];
+  bool show_in_investment = 5 [json_name = "showInInvestment"];
+  string asset_type = 6 [json_name = "assetType"];  // "gold", "silver", etc.
+}
+
+message CreateAssetDisplayConfigResponse {
+  AssetDisplayConfig config = 1 [json_name = "config"];
+}
+
+message UpdateAssetDisplayConfigRequest {
+  string display_name = 1 [json_name = "displayName"];
+  int32 display_order = 2 [json_name = "displayOrder"];
+  bool enabled = 3 [json_name = "enabled"];
+  bool show_in_investment = 4 [json_name = "showInInvestment"];
+}
+
+message UpdateAssetDisplayConfigResponse {
+  AssetDisplayConfig config = 1 [json_name = "config"];
+}
+
+message DeleteAssetDisplayConfigResponse {
+  bool success = 1 [json_name = "success"];
+}
+
+// ── Asset Config Fetch Code Messages ──
+
+// AssetConfigFetchCode represents a source type_code attached to a display config entry
+message AssetConfigFetchCode {
+  int32 id = 1 [json_name = "id"];
+  int32 config_id = 2 [json_name = "configId"];
+  string type_code = 3 [json_name = "typeCode"];
+  int32 priority = 4 [json_name = "priority"];
+}
+
+message ListFetchCodesResponse {
+  repeated AssetConfigFetchCode fetch_codes = 1 [json_name = "fetchCodes"];
+}
+
+message CreateFetchCodeRequest {
+  string type_code = 1 [json_name = "typeCode"];
+  int32 priority = 2 [json_name = "priority"];
+}
+
+message CreateFetchCodeResponse {
+  AssetConfigFetchCode fetch_code = 1 [json_name = "fetchCode"];
+}
+
+message UpdateFetchCodeRequest {
+  int32 priority = 1 [json_name = "priority"];
+}
+
+message UpdateFetchCodeResponse {
+  AssetConfigFetchCode fetch_code = 1 [json_name = "fetchCode"];
+}
+
+message DeleteFetchCodeResponse {
+  bool success = 1 [json_name = "success"];
+}
+
+// ── Asset Price Type Codes Messages ──
+
+message ListAssetPriceTypeCodesRequest {
+  string asset_type = 1 [json_name = "assetType"];  // "gold", "silver", etc.
+}
+
+message ListAssetPriceTypeCodesResponse {
+  repeated string type_codes = 1 [json_name = "typeCodes"];
 }

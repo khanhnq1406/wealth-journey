@@ -21,27 +21,21 @@ const watchlistMaxItems = 50
 
 // watchlistService implements WatchlistService.
 type watchlistService struct {
-	watchlistRepo   repository.WatchlistRepository
-	goldPriceSvc    GoldPriceService
-	silverPriceSvc  SilverPriceService
-	currencyPriceSvc CurrencyPriceService
-	marketDataSvc   MarketDataService
+	watchlistRepo repository.WatchlistRepository
+	assetPriceSvc AssetPriceService
+	marketDataSvc MarketDataService
 }
 
 // NewWatchlistService creates a new WatchlistService.
 func NewWatchlistService(
 	watchlistRepo repository.WatchlistRepository,
-	goldPriceSvc GoldPriceService,
-	silverPriceSvc SilverPriceService,
-	currencyPriceSvc CurrencyPriceService,
+	assetPriceSvc AssetPriceService,
 	marketDataSvc MarketDataService,
 ) WatchlistService {
 	return &watchlistService{
-		watchlistRepo:   watchlistRepo,
-		goldPriceSvc:    goldPriceSvc,
-		silverPriceSvc:  silverPriceSvc,
-		currencyPriceSvc: currencyPriceSvc,
-		marketDataSvc:   marketDataSvc,
+		watchlistRepo: watchlistRepo,
+		assetPriceSvc: assetPriceSvc,
+		marketDataSvc: marketDataSvc,
 	}
 }
 
@@ -154,92 +148,68 @@ func (s *watchlistService) ListItems(ctx context.Context, userID int32) (*v1.Lis
 	var mu sync.Mutex
 	var wg sync.WaitGroup
 
-	// Fetch gold prices in parallel
-	if len(goldItems) > 0 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			allGoldPrices, err := s.goldPriceSvc.FetchAllPrices(ctx)
-			if err != nil {
-				log.Printf("Warning: failed to fetch gold prices for watchlist: %v", err)
-				return
-			}
-			// Build a lookup map by TypeCode
-			goldByCode := make(map[string]*CachedGoldPrice, len(allGoldPrices))
-			for _, gp := range allGoldPrices {
-				goldByCode[gp.TypeCode] = gp
-			}
-			mu.Lock()
-			defer mu.Unlock()
-			for _, item := range goldItems {
-				if gp, ok := goldByCode[item.Symbol]; ok {
-					priceMap[item.Symbol] = &priceInfo{
-						currentPrice: gp.Buy,
-						buyPrice:     gp.Buy,
-						sellPrice:    gp.Sell,
-					}
-				}
-			}
-		}()
+	// Fetch gold/silver/currency prices from DB cache in a single query.
+	allPrices, err := s.assetPriceSvc.GetAllPrices(ctx)
+	if err != nil {
+		log.Printf("Warning: failed to fetch asset prices from DB for watchlist: %v", err)
+		allPrices = &AllAssetPrices{
+			Gold:     []*AssetPriceDTO{},
+			Silver:   []*AssetPriceDTO{},
+			Currency: []*AssetPriceDTO{},
+		}
 	}
 
-	// Fetch silver prices in parallel
-	if len(silverItems) > 0 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			allSilverPrices, err := s.silverPriceSvc.FetchAllPrices(ctx)
-			if err != nil {
-				log.Printf("Warning: failed to fetch silver prices for watchlist: %v", err)
-				return
-			}
-			silverByCode := make(map[string]*CachedSilverPrice, len(allSilverPrices))
-			for _, sp := range allSilverPrices {
-				silverByCode[sp.TypeCode] = sp
-			}
-			mu.Lock()
-			defer mu.Unlock()
-			for _, item := range silverItems {
-				if sp, ok := silverByCode[item.Symbol]; ok {
-					priceMap[item.Symbol] = &priceInfo{
-						currentPrice: sp.Buy,
-						buyPrice:     sp.Buy,
-						sellPrice:    sp.Sell,
-					}
-				}
-			}
-		}()
+	// Build lookup maps by TypeCode for O(1) access.
+	goldByCode := make(map[string]*AssetPriceDTO, len(allPrices.Gold))
+	for _, p := range allPrices.Gold {
+		goldByCode[p.TypeCode] = p
 	}
 
-	// Fetch currency prices in parallel
-	if len(currencyItems) > 0 {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			allCurrencyPrices, err := s.currencyPriceSvc.FetchAllPrices(ctx)
-			if err != nil {
-				log.Printf("Warning: failed to fetch currency prices for watchlist: %v", err)
-				return
-			}
-			currencyByCode := make(map[string]*CachedCurrencyPrice, len(allCurrencyPrices))
-			for _, cp := range allCurrencyPrices {
-				currencyByCode[cp.TypeCode] = cp
-			}
-			mu.Lock()
-			defer mu.Unlock()
-			for _, item := range currencyItems {
-				if cp, ok := currencyByCode[item.Symbol]; ok {
-					priceMap[item.Symbol] = &priceInfo{
-						currentPrice: cp.Buy,
-						buyPrice:     cp.Buy,
-						sellPrice:    cp.Sell,
-					}
-				}
-			}
-		}()
+	silverByCode := make(map[string]*AssetPriceDTO, len(allPrices.Silver))
+	for _, p := range allPrices.Silver {
+		silverByCode[p.TypeCode] = p
 	}
 
-	// Fetch market (Yahoo Finance) prices — one goroutine per item for simplicity
+	currencyByCode := make(map[string]*AssetPriceDTO, len(allPrices.Currency))
+	for _, p := range allPrices.Currency {
+		currencyByCode[p.TypeCode] = p
+	}
+
+	// Enrich gold items synchronously from the map.
+	for _, item := range goldItems {
+		if p, ok := goldByCode[item.Symbol]; ok {
+			priceMap[item.Symbol] = &priceInfo{
+				currentPrice: p.Buy,
+				buyPrice:     p.Buy,
+				sellPrice:    p.Sell,
+			}
+		}
+	}
+
+	// Enrich silver items synchronously from the map.
+	for _, item := range silverItems {
+		if p, ok := silverByCode[item.Symbol]; ok {
+			priceMap[item.Symbol] = &priceInfo{
+				currentPrice: p.Buy,
+				buyPrice:     p.Buy,
+				sellPrice:    p.Sell,
+			}
+		}
+	}
+
+	// Enrich currency items synchronously from the map.
+	for _, item := range currencyItems {
+		if p, ok := currencyByCode[item.Symbol]; ok {
+			priceMap[item.Symbol] = &priceInfo{
+				currentPrice: p.Buy,
+				buyPrice:     p.Buy,
+				sellPrice:    p.Sell,
+			}
+		}
+	}
+
+	// Fetch market (Yahoo Finance) prices — one goroutine per item for simplicity.
+	// Yahoo Finance items are kept live (not cached in asset_price table).
 	for _, item := range marketItems {
 		item := item // capture loop variable
 		wg.Add(1)

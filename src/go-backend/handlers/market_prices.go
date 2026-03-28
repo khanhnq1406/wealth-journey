@@ -1,31 +1,31 @@
 package handlers
 
 import (
-	"net/http"
-	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
 
 	"wealthjourney/domain/service"
 	"wealthjourney/pkg/cache"
+	"wealthjourney/pkg/handler"
 	investmentv1 "wealthjourney/protobuf/v1"
 )
 
-// MarketPricesHandler handles the combined gold + silver + currency prices endpoint
+// MarketPricesHandler handles the combined gold + silver + currency prices endpoint.
+// It reads from the DB-backed asset price cache via AssetPriceService instead of
+// calling live price APIs directly.
 type MarketPricesHandler struct {
-	goldSvc       service.GoldPriceService
-	silverSvc     service.SilverPriceService
-	currencySvc   service.CurrencyPriceService
+	assetPriceSvc service.AssetPriceService
 	overrideCache *cache.PriceOverrideCache
 }
 
-// NewMarketPricesHandler creates a new market prices handler
-func NewMarketPricesHandler(goldSvc service.GoldPriceService, silverSvc service.SilverPriceService, currencySvc service.CurrencyPriceService, overrideCache *cache.PriceOverrideCache) *MarketPricesHandler {
+// NewMarketPricesHandler creates a new market prices handler.
+func NewMarketPricesHandler(
+	assetPriceSvc service.AssetPriceService,
+	overrideCache *cache.PriceOverrideCache,
+) *MarketPricesHandler {
 	return &MarketPricesHandler{
-		goldSvc:       goldSvc,
-		silverSvc:     silverSvc,
-		currencySvc:   currencySvc,
+		assetPriceSvc: assetPriceSvc,
 		overrideCache: overrideCache,
 	}
 }
@@ -35,85 +35,16 @@ func NewMarketPricesHandler(goldSvc service.GoldPriceService, silverSvc service.
 func (h *MarketPricesHandler) GetMarketPrices(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	var (
-		goldItems     []*investmentv1.PriceItem
-		silverItems   []*investmentv1.PriceItem
-		currencyItems []*investmentv1.PriceItem
-		goldErr       error
-		silverErr     error
-		currencyErr   error
-		wg            sync.WaitGroup
-	)
+	allPrices, err := h.assetPriceSvc.GetAllPrices(ctx)
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
 
-	wg.Add(3)
-
-	go func() {
-		defer wg.Done()
-		prices, err := h.goldSvc.FetchAllPrices(ctx)
-		if err != nil {
-			goldErr = err
-			return
-		}
-		goldItems = make([]*investmentv1.PriceItem, len(prices))
-		for i, p := range prices {
-			goldItems[i] = &investmentv1.PriceItem{
-				TypeCode:   p.TypeCode,
-				Buy:        p.Buy,
-				Sell:       p.Sell,
-				ChangeBuy:  p.ChangeBuy,
-				ChangeSell: p.ChangeSell,
-				Currency:   p.Currency,
-				UpdatedAt:  p.UpdateTime.Unix(),
-				Name:       p.Name,
-			}
-		}
-	}()
-
-	go func() {
-		defer wg.Done()
-		prices, err := h.silverSvc.FetchAllPrices(ctx)
-		if err != nil {
-			silverErr = err
-			return
-		}
-		silverItems = make([]*investmentv1.PriceItem, len(prices))
-		for i, p := range prices {
-			silverItems[i] = &investmentv1.PriceItem{
-				TypeCode:   p.TypeCode,
-				Buy:        p.Buy,
-				Sell:       p.Sell,
-				ChangeBuy:  p.ChangeBuy,
-				ChangeSell: p.ChangeSell,
-				Currency:   p.Currency,
-				UpdatedAt:  p.UpdateTime.Unix(),
-				Name:       p.Name,
-			}
-		}
-	}()
-
-	go func() {
-		defer wg.Done()
-		prices, err := h.currencySvc.FetchAllPrices(ctx)
-		if err != nil {
-			currencyErr = err
-			return
-		}
-		currencyItems = make([]*investmentv1.PriceItem, len(prices))
-		for i, p := range prices {
-			currencyItems[i] = &investmentv1.PriceItem{
-				TypeCode:   p.TypeCode,
-				Buy:        p.Buy,
-				Sell:       p.Sell,
-				ChangeBuy:  p.ChangeBuy,
-				ChangeSell: p.ChangeSell,
-				Currency:   p.Currency,
-				UpdatedAt:  p.UpdateTime.Unix(),
-				Name:       p.Name,
-			}
-		}
-	}()
-
-	wg.Wait()
+	// Convert DTOs to proto PriceItems
+	goldItems := convertToPriceItems(allPrices.Gold)
+	silverItems := convertToPriceItems(allPrices.Silver)
+	currencyItems := convertToPriceItems(allPrices.Currency)
 
 	// Apply admin price overrides (graceful — skip if Redis fails)
 	if h.overrideCache != nil {
@@ -130,34 +61,31 @@ func (h *MarketPricesHandler) GetMarketPrices(c *gin.Context) {
 		}
 	}
 
-	// All three failed — return error
-	if goldErr != nil && silverErr != nil && currencyErr != nil {
-		c.JSON(http.StatusServiceUnavailable, gin.H{
-			"success": false,
-			"message": "Failed to fetch prices",
-		})
-		return
-	}
-
-	// Partial success: return empty slice (never null) for failed ones
-	if goldItems == nil {
-		goldItems = []*investmentv1.PriceItem{}
-	}
-	if silverItems == nil {
-		silverItems = []*investmentv1.PriceItem{}
-	}
-	if currencyItems == nil {
-		currencyItems = []*investmentv1.PriceItem{}
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"success":   true,
-		"message":   "Market prices retrieved successfully",
+	handler.Success(c, gin.H{
 		"gold":      goldItems,
 		"silver":    silverItems,
 		"currency":  currencyItems,
 		"timestamp": time.Now().Format(time.RFC3339),
 	})
+}
+
+// convertToPriceItems converts a slice of AssetPriceDTOs to proto PriceItems.
+func convertToPriceItems(dtos []*service.AssetPriceDTO) []*investmentv1.PriceItem {
+	items := make([]*investmentv1.PriceItem, len(dtos))
+	for i, d := range dtos {
+		items[i] = &investmentv1.PriceItem{
+			TypeCode:   d.TypeCode,
+			Buy:        d.Buy,
+			Sell:       d.Sell,
+			ChangeBuy:  d.ChangeBuy,
+			ChangeSell: d.ChangeSell,
+			Currency:   d.Currency,
+			UpdatedAt:  d.FetchedAt.Unix(),
+			Name:       d.Name,
+			IsStale:    d.IsStale,
+		}
+	}
+	return items
 }
 
 // applyOverrides merges admin price overrides into price items.

@@ -15,6 +15,10 @@ Infrastructure-level flows that are referenced by multiple domain flows. Read th
 - [Admin Price Alert Config Flow](#9-admin-price-alert-config-flow)
 - [Error Code Translation Flow](#10-error-code-translation-flow)
 - [FetchAllPrices Aggregate Cache Flow](#11-fetchallprices-aggregate-cache-flow)
+- [Price Fallback Chain](#12-price-fallback-chain)
+- [Price Cache Background Job](#13-price-cache-background-job)
+- [Gold Display Prices Read Flow](#14-gold-display-prices-read-flow)
+- [Admin Gold Display Config CRUD Flow](#15-admin-gold-display-config-crud-flow)
 
 ---
 
@@ -156,15 +160,27 @@ flowchart LR
 
     Start --> KA["DB Keep-Alive\n⏱ ~2 min\n⏳ immediate"]
     Start --> PU["Price Update\n⏱ 15 min\n⏳ 5s delay"]
+    Start --> PC["Price Cache\n⏱ 15 min\n⏳ 10s delay"]
     Start --> PS["Portfolio Snapshot\n⏱ 1 hour\n⏳ 10s delay"]
     Start --> SC["Session Cleanup\n⏱ ~6 hours\n⏳ staggered"]
     Start --> FC["File Cleanup\n⏱ ~1 hour\n⏳ staggered"]
     Start --> PA["Price Alert\n⏱ 15 min\n⏳ 30s delay"]
 
-    subgraph PriceUpdate["Price Update Job Detail"]
+    subgraph PriceCache["Price Cache Job Detail (WRITER to asset_price)"]
+        PC --> PC1["assetPriceSvc.RefreshAllPrices()"]
+        PC1 --> PC2["Fetch gold/silver/currency\nfrom live price services\n(10 parallel goroutines)"]
+        PC2 --> PC3["Upsert into asset_price table\nMarkStale on fetch failure"]
+        PC3 --> PC4["Log: completed or error"]
+    end
+
+    subgraph PriceUpdate["Price Update Job Detail (READER of asset_price)"]
         PU --> PU1["List all users"]
         PU1 --> PU2["For each user:\ninvestmentSvc.UpdatePrices()"]
-        PU2 --> PU3["Log: X updated, Y errors"]
+        PU2 --> PU2a["MarketDataService\n.UpdatePricesForInvestments()"]
+        PU2a --> PU2b["Gold/Silver: AssetDisplayConfigService\n.ResolvePrice() → reads asset_price DB"]
+        PU2b --> PU2c["Stocks/ETFs/Crypto:\nYahoo Finance live API"]
+        PU2c --> PU3["investmentRepo.UpdatePrices()\nwrites current_price + price_updated_at\nto investment table"]
+        PU3 --> PU4["Log: X updated, Y errors"]
     end
 
     subgraph PortfolioSnapshot["Portfolio Snapshot Job Detail"]
@@ -187,17 +203,19 @@ flowchart LR
 - Startup delays prevent thundering herd on application boot
 - `scheduler.Stop()` waits for all jobs to finish gracefully via `sync.WaitGroup`
 - Conditional jobs (Session Cleanup, File Cleanup) only run if enabled via environment variables
+- **Producer-consumer pattern for gold/silver prices**: `PriceCacheJob` (sole writer) writes to `asset_price` every 15 min; `PriceUpdateJob` (reader) reads from `asset_price` via `AssetDisplayConfigService.ResolvePrice()` — they operate independently; a `PriceUpdateJob` run with a stale or cold `asset_price` table falls back to live APIs
 
 ### Job Configuration
 
-| Job | Interval | Startup Delay | Condition |
-|-----|----------|---------------|-----------|
-| DB Keep-Alive | ~2 min | Immediate | Always |
-| Price Update | 15 min | 5 sec | Always |
-| Portfolio Snapshot | 1 hour | 10 sec | Always |
-| Session Cleanup | ~6 hours | Staggered | `ENABLE_SESSION_CLEANUP` |
-| File Cleanup | ~1 hour | Staggered | `ENABLE_FILE_CLEANUP` |
-| Price Alert | 15 min | 30 sec | Redis available |
+| Job | Interval | Startup Delay | Condition | Role |
+|-----|----------|---------------|-----------|------|
+| DB Keep-Alive | ~2 min | Immediate | Always | — |
+| Price Cache | 15 min | 10 sec | `AssetPriceService` available | **Sole writer** to `asset_price` |
+| Price Update | 15 min | 5 sec | Always | **Reader** of `asset_price` (gold/silver); live Yahoo Finance (stocks) |
+| Portfolio Snapshot | 1 hour | 10 sec | Always | — |
+| Session Cleanup | ~6 hours | Staggered | `ENABLE_SESSION_CLEANUP` | — |
+| File Cleanup | ~1 hour | Staggered | `ENABLE_FILE_CLEANUP` | — |
+| Price Alert | 15 min | 30 sec | Redis available | Reader of `asset_price` |
 
 ---
 
@@ -253,87 +271,67 @@ flowchart TD
 ## 5. Market Prices Aggregation Flow
 
 **Trigger:** `GET /api/v1/investments/market-prices` (authenticated) or `GET /api/v1/public/market-types` (public)
-**Source:** `handlers/market_prices.go`, `handlers/public.go`
+**Source:** `handlers/market_prices.go`, `handlers/public.go`, `domain/service/asset_price_service.go`
+
+Handlers now read from the DB-backed `asset_price` table via `AssetPriceService`. Live external API calls happen only in the background `PriceCacheJob` (see [Section 13](#13-price-cache-background-job)), not on every HTTP request.
 
 ```mermaid
 sequenceDiagram
     participant C as Frontend
     participant H as MarketPricesHandler
-    participant G as GoldPriceService
-    participant S as SilverPriceService
-    participant CR as CurrencyPriceService
-    participant PQ as Phú Quý Client
-    participant AN as Ancarat Client
-    participant DJ as DOJI Client
-    participant V as vangsaigon.vn
+    participant APS as AssetPriceService
+    participant ADCR as AssetDisplayConfigRepository
+    participant APR as AssetPriceRepository
+    participant DB as PostgreSQL<br/>(asset_price + asset_display_config)
+    participant POC as PriceOverrideCache
     participant R as Redis
 
     C->>H: GET /market-prices
 
-    par Gold prices
-        H->>G: FetchAllPrices(ctx)
-        G->>R: Check cache
-        alt Cache hit
-            R-->>G: Cached gold prices
-        else Cache miss
-            G->>V: Fetch gold prices
-            V-->>G: Gold price data
-            G->>R: Cache async (15min TTL)
-        end
-        G-->>H: []*CachedGoldPrice
-    and Silver prices (multi-source)
-        H->>S: FetchAllPrices(ctx)
-        par Phú Quý
-            S->>PQ: FetchPrices(ctx)
-            PQ-->>S: 4 silver prices (HTML)
-        and Ancarat
-            S->>AN: FetchPrices(ctx)
-            AN-->>S: 4 silver prices (JSON)
-        and DOJI
-            S->>DJ: FetchPrices(ctx)
-            DJ-->>S: 2 silver prices (text)
-        end
-        Note over S: Merge into 12 ordered rows:<br/>4 Phú Quý + 4 Ancarat + 2 SBJ (static) + 2 DOJI
-        S->>R: Cache each price async
-        S-->>H: []*CachedSilverPrice
-    and Currency prices
-        H->>CR: FetchAllPrices(ctx)
-        CR->>R: Check cache
-        alt Cache hit
-            R-->>CR: Cached currency prices
-        else Cache miss
-            CR->>V: Fetch currency prices
-            V-->>CR: Currency nationwide data
-            CR->>R: Cache async (15min TTL)
-        end
-        CR-->>H: []*CachedCurrencyPrice
+    H->>APS: GetAllPrices(ctx)
+    loop for each assetType in [gold, silver, currency]
+        APS->>ADCR: ListEnabledTypeCodesByAssetType(ctx, assetType)
+        ADCR->>DB: SELECT type_code FROM asset_display_config<br/>WHERE asset_type=? AND enabled=true AND deleted_at IS NULL
+        DB-->>ADCR: []enabledTypeCodes
+        ADCR-->>APS: []enabledTypeCodes
+        APS->>APR: ListByAssetTypeFiltered(ctx, assetType, enabledTypeCodes)
+        APR->>DB: SELECT * FROM asset_price<br/>WHERE asset_type=? AND type_code IN (?)
+        DB-->>APR: []AssetPrice rows (filtered)
+        APR-->>APS: []AssetPrice
+    end
+    Note over APS: Group by asset_type<br/>Map to AssetPriceDTO[]
+    APS-->>H: AllAssetPrices{Gold, Silver, Currency}
+
+    Note over H: Convert DTOs → PriceItem proto<br/>(includes IsStale field)
+
+    opt Redis available
+        H->>POC: GetAll(ctx)
+        POC->>R: SCAN price_override:*
+        R-->>POC: []PriceOverride
+        Note over H: Merge overrides into items<br/>(IsOverridden = true)
     end
 
-    alt All three failed
-        H-->>C: 503 Service Unavailable
-    else Partial or full success
-        Note over H: Empty slice for failed categories<br/>(never null)
-        H-->>C: 200 {gold, silver, currency, timestamp}
-    end
+    H-->>C: 200 {gold, silver, currency, timestamp}
 ```
 
 ### Key Invariants
 
-- Gold, silver, and currency are fetched in parallel via `sync.WaitGroup` — one failure does not block others
-- Silver aggregates from 4 sources (Phú Quý, Ancarat, DOJI, SBJ); SBJ entries are static (prices = 0, displayed as "—")
-- Currency prices come from vangsaigon's `currencyNationWide` field — raw VND values (no ×1000 multiplier)
-- 503 is returned only if ALL THREE categories fail; partial success returns empty slices for failed categories
-- All prices are cached in Redis with 15-minute TTL; cache writes are non-blocking goroutines
+- `GetMarketPrices` never calls external APIs — all data comes from the DB-backed `asset_price` table
+- **Display config filter**: `GetAllPrices` and `GetMarketTypes` only return prices whose `type_code + asset_type` pair has a matching enabled, non-deleted `asset_display_config` row — deleted or disabled configs are excluded immediately on next request
+- `IsStale = true` on a price item means the last background fetch for that type failed; the price shown is the last known value
+- Admin price overrides (Redis) are applied on top of DB data at read time; override failures are graceful (original prices returned)
+- If `AssetPriceService` returns an error, `handler.HandleError` returns 500 (unlike the old flow which returned 503 only when all three failed)
+- Cold start (before first `PriceCacheJob` run): `asset_price` table is empty → `GetAllPrices` returns empty slices; `GetPublicMarketTypes` falls back to static registries
+- **ResolvePrice path unaffected**: `AssetDisplayConfigService.ResolvePrice()` calls `repo.ListByAssetType` directly (not via `GetAllPrices`); the display-config filter does NOT apply to investment price resolution
 
 ### Error Paths
 
 | Condition | Response | Fallback |
 |-----------|----------|----------|
-| One category fails (e.g., silver) | 200 with empty `silver: []` | Other categories still returned |
-| All three categories fail | 503 Service Unavailable | No fallback |
-| Individual silver source fails (e.g., Phú Quý down) | Rows from that source omitted | Other sources still included |
-| Redis cache write fails | Logged warning | Next request re-fetches from source |
-| vangsaigon.vn timeout | Gold/currency return empty | Stale cache if available |
+| DB read error | 500 Internal Server Error | None — handler returns error |
+| `IsStale = true` on price item | 200 with item in response, `isStale: true` | Frontend displays `"--"` for stale values |
+| Redis override cache unavailable | 200 without overrides applied | Graceful degradation |
+| DB empty (cold start) | 200 with empty arrays (authenticated); static registry fallback (public) | Public endpoint always returns data |
 
 ---
 
@@ -870,51 +868,498 @@ sequenceDiagram
 **Trigger:** `GET /api/v1/investments/market-prices` (Prices page load or manual refresh)
 **Source:** `domain/service/gold_price_service.go`, `domain/service/silver_price_service.go`, `domain/service/currency_price_service.go`
 
-This flow applies identically to all three price services. The aggregate cache key prevents repeated calls to the vangsaigon external API when users reload the Prices page.
+Gold and currency services use a multi-source waterfall with emergency cache. Silver service uses a direct aggregation (unchanged). The aggregate cache key prevents repeated API calls on page reload.
 
 ```mermaid
 sequenceDiagram
     participant H as MarketPricesHandler
-    participant S as GoldPriceService<br/>(Silver / Currency identical)
+    participant S as GoldPriceService<br/>(CurrencyPriceService identical)
     participant R as Redis
-    participant A as vangsaigon API<br/>(external)
+    participant V1 as vangsaigon API
+    participant V2 as vang.today API
+    participant BT as BTMC API<br/>(gold only, optional)
 
     H->>S: FetchAllPrices(ctx)
     S->>R: GET gold_price:all
     alt Cache hit (within 5 min TTL)
         R-->>S: []CachedGoldPrice (JSON)
         S-->>H: []CachedGoldPrice (no external call)
-    else Cache miss (first call or TTL expired)
+    else Cache miss
         R-->>S: redis.Nil
-        S->>A: HTTP GET vangsaigon API
-        alt API success
-            A-->>S: PricesResponse
-            S->>S: build []CachedGoldPrice
+        S->>V1: FetchGoldPrices (5s timeout)
+        alt vangsaigon success
+            V1-->>S: []CachedGoldPrice
             S-->>H: []CachedGoldPrice
-            S-)R: SET gold_price:all TTL=5m (async goroutine)
-            S-)R: SET gold_price:<symbol> TTL=15m per symbol (async goroutines)
-        else API error
-            A-->>S: error
-            S-->>H: error (propagated to caller)
+            S-)R: SET gold_price:all TTL=5m (async)
+            S-)R: SET gold_price:emergency TTL=1h (async)
+            S-)R: SET gold_price:<symbol> TTL=15m (async)
+        else vangsaigon fails → try vang.today
+            V1-->>S: error (mark unhealthy 2min)
+            S->>V2: FetchGoldPrices (5s timeout)
+            alt vang.today success
+                V2-->>S: []CachedGoldPrice
+                S-->>H: []CachedGoldPrice
+                S-)R: SET gold_price:all + emergency + per-symbol (async)
+            else vang.today fails → try BTMC (gold only)
+                V2-->>S: error (mark unhealthy 2min)
+                S->>BT: FetchGoldPrices (5s timeout)
+                alt BTMC success
+                    BT-->>S: []CachedGoldPrice
+                    S-->>H: []CachedGoldPrice
+                    S-)R: SET gold_price:all + emergency + per-symbol (async)
+                else all sources fail → try emergency cache
+                    BT-->>S: error
+                    S->>R: GET gold_price:emergency
+                    alt Emergency cache valid (< 1h)
+                        R-->>S: []CachedGoldPrice (stale)
+                        S-->>H: []CachedGoldPrice (stale, warning logged)
+                    else Emergency cache expired
+                        R-->>S: redis.Nil
+                        S-->>H: error
+                    end
+                end
+            end
         end
     end
 ```
 
 ### Key Invariants
 
-- The aggregate cache key (`gold_price:all`, `silver_price:all`, `currency_price:all`) is **global** (not user-scoped) — market prices are public data
-- Aggregate cache TTL is **5 minutes** (`AllGoldPricesCacheTTL`, `AllSilverPricesCacheTTL`, `AllCurrencyPricesCacheTTL`), matching the frontend `staleTime: 5 * 60 * 1000`
-- Individual per-symbol cache TTL remains **15 minutes** (used by `FetchPriceForSymbol` for watchlist enrichment)
+- The aggregate cache key (`gold_price:all`, `currency_price:all`) is **global** (not user-scoped) — market prices are public data
+- Aggregate cache TTL is **5 minutes**; individual per-symbol TTL is **15 minutes**; emergency cache TTL is **1 hour**
+- Unhealthy sources are **skipped for 2 minutes** (Redis TTL on health key) — the last source in the chain is always tried
+- Emergency cache is updated on **every successful fetch** (any source) — ensures freshness within the hour
 - Cache write failures are **non-fatal** — logged as warnings, response returned to caller regardless
-- The aggregate cache stores the **fully assembled result** including SBJ static rows (silver service) — not raw per-source data
-- On cache hit the external API is **never called**, regardless of how many concurrent users reload the page
+- BTMC is **optional** — if `BTMC_API_KEY` is absent, gold chain runs with 2 sources (vangsaigon → vang.today)
+- Currency service uses **2 sources only** (vangsaigon → vang.today) — BTMC has no currency data
 
 ### Error Paths
 
 | Condition | Response | Notes |
 |-----------|----------|-------|
-| Redis unavailable on GET | Cache miss → proceed to API | `redis.Nil` or network error treated as miss |
+| Redis unavailable on GET | Cache miss → proceed to waterfall | `redis.Nil` treated as miss |
 | Redis unavailable on SET | Warning logged; result returned normally | Non-fatal |
-| External API error, cache warm | Returns cached data (key still within TTL) | Transparent to caller |
-| External API error, cache cold | Error propagated to `MarketPricesHandler` | Handler returns partial success or 503 |
-| Silver partial source failure (e.g., Phú Quý down) | Best-effort result cached | Existing behaviour unchanged |
+| Single source fails | Next source tried; failing source marked unhealthy | Self-healing after 2-min TTL |
+| All live sources fail, emergency cache warm | Stale data returned with warning | Graceful degradation |
+| All live sources fail, emergency cache cold | Error propagated to `MarketPricesHandler` | Handler returns 503 |
+| Silver partial source failure (e.g., Phú Quý down) | Best-effort result cached | Silver service unchanged |
+
+---
+
+## 12. Price Fallback Chain
+
+**Source:** `domain/service/price_fetcher.go`, `domain/service/gold_price_service.go`, `domain/service/currency_price_service.go`
+**Added:** 2026-03-25 (price-fallback feature)
+
+```mermaid
+flowchart TD
+    A[FetchAllPrices called] --> B{Aggregate\ncache hit?}
+    B -->|Yes| C[Return cached data]
+    B -->|No| D[Get source list\nvangsaigon→vang.today→BTMC→Mihong]
+    D --> E{More sources?}
+    E -->|No| K{Emergency\ncache valid?}
+    E -->|Yes, pick next| F{Source\nhealthy?}
+    F -->|No - skip\nunless last| E
+    F -->|Yes| G[Fetch with 5s timeout]
+    G -->|Success| H[Cache: regular +\nemergency + per-symbol]
+    H --> C
+    G -->|Fail| I[Log failure\nMark unhealthy 2min]
+    I --> E
+    K -->|Yes < 1h| L[Log warning\nReturn stale data]
+    K -->|No, expired| M[Return error]:::error
+
+    classDef error fill:#fee,stroke:#c00,color:#900
+```
+
+### Source Health State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> Healthy : initial state
+    Healthy --> Unhealthy : fetch fails\n(MarkUnhealthy TTL=2min)
+    Unhealthy --> Healthy : Redis TTL expires\n(self-healing)
+    Unhealthy --> Healthy : IsHealthy Redis error\n(fail-open)
+```
+
+### FetchPriceForSymbol Flow
+
+```mermaid
+flowchart TD
+    A[FetchPriceForSymbol\ncalled with symbol S] --> B{Per-symbol\ncache hit?}
+    B -->|Yes| C[Return cached price]
+    B -->|No| D[FetchGoldPricesAllSources\nquery ALL sources, merge]
+    D --> E{Source returned\nTypeCode = S\ndirect match?}
+    E -->|Yes| F[Return price\nwith TypeCode = S]
+    E -->|No| G{aliasToCanonical\ncontains fetched TypeCode?}
+    G -->|Yes — normalize| H[Replace alias TypeCode\nwith canonical S\nin merged results]
+    H --> F
+    G -->|No match in either| I{Waterfall\nfailed entirely?}
+    I -->|No - symbol just absent| J[Return error:\n'not found in live data']:::error
+    I -->|Yes - all sources failed| K{Emergency\ncache has S?}
+    K -->|Yes| L[Return stale price\nwith warning log]
+    K -->|No| M[Return error]:::error
+
+    classDef error fill:#fee,stroke:#c00,color:#900
+```
+
+> **Note:** Alias normalization happens inside `WaterfallGoldFetcher.FetchGoldPrices` (and `FetchGoldPricesAllSources`) before returning — the result always contains canonical TypeCodes. `FetchPriceForSymbol`'s exact-match loop at `gold_price_service.go:144` finds `"SJC"` regardless of which source served it.
+>
+> **Alias map (`gold.AliasToCanonical` in `pkg/gold/types.go` — single source of truth alongside canonical definitions):**
+>
+> | Source TypeCode | Canonical TypeCode | Notes |
+> |---|---|---|
+> | `VNGSJC` | `SJC` | vang.today main SJC bar code |
+> | `SJL1L10` | `SJC` | vang.today SJC 1L/10L bar variant |
+> | `SJ9999` | `Vàng nhẫn SJC` | vang.today SJC ring 9999 |
+> | `MIHONG_999` | `Mihong_999` | vang.today uppercases the underscore variant |
+> | `DOHN` | `Doji` | DOJI Hanoi branch |
+> | `DOHCM` | `Doji` | DOJI HCM branch |
+> | `BTSJC` | `BTMC` | Bảo Tín SJC bar |
+> | `BT9999` | `BTMC_24K` | Bảo Tín 24K bar |
+> | `VIETTINM` | `VietinGold` | VietinBank gold |
+
+### Key Invariants
+
+- **Fail-open**: if Redis is unavailable, `IsHealthy` returns `true` — never block all sources
+- **Last-source guarantee**: the last fetcher in the slice is **always tried** regardless of health status
+- **Emergency cache**: written asynchronously on every successful fetch; read synchronously only when all live sources fail
+- **BTMC key rotation**: if the API key changes, restart the service — the key is read once at startup via `os.Getenv`
+- **Mihong source**: `api.mihong.vn/v1/gold-prices?market=domestic` (requires `x-market: mihong` header) — carries Mihong-exclusive products (e.g., `Mihong_999`) not available from any other source
+- **Canonical TypeCodes always returned**: both `FetchGoldPrices` (waterfall single-source) and `FetchGoldPricesAllSources` (all-sources merge) normalize alias TypeCodes via `gold.AliasToCanonical` (`pkg/gold/types.go`); callers always see canonical codes regardless of which source provided the price
+- **Alias map lives in `pkg/gold/types.go`**: co-located with canonical `GoldTypes` definitions — single source of truth; add new aliases there when a price source introduces a new code
+- **Alias staleness degrades gracefully**: if a source renames a TypeCode, the alias miss falls through to the emergency cache — no user-visible error beyond the existing "not found in live data" warning
+
+---
+
+## 13. Price Cache Background Job
+
+**Trigger:** Application startup — runs every 15 minutes (10-second startup delay)
+**Source:** `internal/scheduler/price_cache_job.go`, `domain/service/asset_price_service.go`, `domain/repository/asset_price_repository.go`
+
+`PriceCacheJob` is the **sole writer** to the `asset_price` PostgreSQL table. It decouples all price consumers (HTTP handlers and the `PriceUpdateJob`) from live external APIs. The job fetches gold from 6 independent direct sources (VangSaiGon, VangToday, SJC, DOJI, BTMC, PNJ), silver, and currency prices from 3 independent sources (VangSaiGon, VangToday, Vietcombank direct API) in **10 parallel goroutines** and persists them to `asset_price`. All consumers then read from the DB exclusively, eliminating per-request external API calls.
+
+**Producer-consumer relationship:**
+- `PriceCacheJob` (this job) — **producer**: writes `asset_price` rows every 15 min
+- `MarketPricesHandler` / `PublicHandler` — **consumers**: read `asset_price` via `AssetPriceService.GetAllPrices()`
+- `PriceUpdateJob` → `MarketDataService` → `AssetDisplayConfigService.ResolvePrice()` — **consumer**: reads `asset_price` to update `investment.current_price` (see [Section 10 of flow-investment.md](flow-investment.md#10-goldsilver-price-resolution-via-fetch-codes))
+
+```mermaid
+sequenceDiagram
+    participant SCH as Scheduler
+    participant PCJ as PriceCacheJob
+    participant APS as AssetPriceService
+    participant VSG as VangSaiGonFetcher
+    participant VT as VangTodayFetcher
+    participant SPS as SilverPriceService
+    participant CVSG as VangSaiGon<br/>CurrencyFetcher
+    participant CVT as VangToday<br/>CurrencyFetcher
+    participant CVCB as Vietcombank<br/>CurrencyFetcher
+    participant SJC as pkg/sjc.Client
+    participant DOJ as pkg/doji.Client
+    participant BTC as pkg/btmcdirect.Client
+    participant PNJ as pkg/pnj.Client
+    participant APR as AssetPriceRepository
+    participant DB as PostgreSQL<br/>(asset_price table)
+
+    SCH->>PCJ: Run(ctx) [every 15 min]
+    PCJ->>APS: RefreshAllPrices(ctx)
+    Note over APS: Launches 10 goroutines into buffered channel<br/>WaitGroup closer goroutine drains when all done
+
+    par VangSaiGon gold fetch [source="vangsaigon"]
+        APS->>VSG: refreshGoldVangSaiGon(ctx)
+        VSG->>VangSaiGon API: GET /prices (vnprice.Client)
+        alt success
+            VangSaiGon API-->>VSG: gold prices
+            Note over APS: Normalize AliasToCanonical<br/>Convert to []AssetPrice<br/>AssetType="gold", Source="vangsaigon", IsStale=false
+            APS->>APR: UpsertBatch(ctx, batch)
+        else fetch or upsert fails
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "gold", "vangsaigon")
+        end
+    and VangToday gold fetch [source="vangtoday"]
+        APS->>VT: refreshGoldVangToday(ctx)
+        VT->>VangToday API: GET /prices (vangtoday.Client)
+        alt success
+            VangToday API-->>VT: gold prices (canonical TypeCodes)
+            Note over APS: Convert to []AssetPrice<br/>AssetType="gold", Source="vangtoday", IsStale=false
+            APS->>APR: UpsertBatch(ctx, batch)
+        else fetch or upsert fails
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "gold", "vangtoday")
+        end
+    and SJC direct fetch [source="sjc"]
+        APS->>SJC: FetchGoldPrices(ctx)
+        alt Fetch success
+            SJC-->>APS: []*sjc.GoldPrice (TypeCode="SJC_*", Buy/Sell int64)
+            Note over APS: Convert to []AssetPrice<br/>Source="sjc", IsStale=false
+            APS->>APR: UpsertBatch(ctx, sjcPrices)
+        else Fetch failure / nil client
+            SJC-->>APS: error
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "gold", "sjc")
+        end
+    and DOJI direct fetch [source="doji"]
+        APS->>DOJ: FetchGoldPrices(ctx)
+        alt Fetch success
+            DOJ-->>APS: []*doji.GoldPrice (TypeCode="DOJI_*", ×1,000,000 applied)
+            Note over APS: Convert to []AssetPrice<br/>Source="doji", IsStale=false
+            APS->>APR: UpsertBatch(ctx, dojiPrices)
+        else Fetch failure / nil client
+            DOJ-->>APS: error
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "gold", "doji")
+        end
+    and BTMC direct fetch [source="btmc"]
+        APS->>BTC: FetchGoldPrices(ctx)
+        alt Fetch success
+            BTC-->>APS: []*btmcdirect.GoldPrice (TypeCode="BTMC_*", ×1,000 applied)
+            Note over APS: Convert to []AssetPrice<br/>Source="btmc", IsStale=false
+            APS->>APR: UpsertBatch(ctx, btmcPrices)
+        else Fetch failure / nil client
+            BTC-->>APS: error
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "gold", "btmc")
+        end
+    and PNJ direct fetch [source="pnj"]
+        APS->>PNJ: FetchGoldPrices(ctx)
+        alt Fetch success
+            PNJ-->>APS: []*pnj.GoldPrice (TypeCode="PNJ_*", ×1,000 applied, TPHCM region)
+            Note over APS: Convert to []AssetPrice<br/>Source="pnj", IsStale=false
+            APS->>APR: UpsertBatch(ctx, pnjPrices)
+        else Fetch failure / nil client
+            PNJ-->>APS: error
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "gold", "pnj")
+        end
+    and Silver fetch [source="waterfall"]
+        APS->>SPS: FetchAllPrices(ctx)
+        alt Fetch success
+            SPS-->>APS: []*CachedSilverPrice
+            Note over APS: Convert to []AssetPrice<br/>AssetType="silver", Source="waterfall", IsStale=false
+            APS->>APR: UpsertBatch(ctx, silverPrices)
+        else Fetch failure
+            SPS-->>APS: error
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "silver", "waterfall")
+        end
+    and VangSaiGon currency fetch [source="vangsaigon"]
+        APS->>CVSG: refreshCurrencyVangSaiGon(ctx)
+        CVSG->>VangSaiGon API: GET /currency (vnprice.Client)
+        alt success
+            VangSaiGon API-->>CVSG: currency prices
+            Note over APS: Convert to []AssetPrice<br/>AssetType="currency", Source="vangsaigon", IsStale=false
+            APS->>APR: UpsertBatch(ctx, batch)
+        else fetch or upsert fails / nil fetcher
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "currency", "vangsaigon")
+        end
+    and VangToday currency fetch [source="vangtoday"]
+        APS->>CVT: refreshCurrencyVangToday(ctx)
+        CVT->>VangToday API: GET /currency (vangtoday.Client)
+        alt success
+            VangToday API-->>CVT: currency prices
+            Note over APS: Convert to []AssetPrice<br/>AssetType="currency", Source="vangtoday", IsStale=false
+            APS->>APR: UpsertBatch(ctx, batch)
+        else fetch or upsert fails / nil fetcher
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "currency", "vangtoday")
+        end
+    and Vietcombank currency fetch [source="vietcombank"]
+        APS->>CVCB: refreshCurrencyVietcombank(ctx)
+        CVCB->>Vietcombank API: GET /api/exchangerates?date=YYYY-MM-DD
+        alt success
+            Vietcombank API-->>CVCB: exchange rates (Transfer→Buy, TypeCode+"_VCB")
+            Note over APS: Convert to []AssetPrice<br/>AssetType="currency", Source="vietcombank"<br/>TypeCode has _VCB suffix (e.g. "USD_VCB"), IsStale=false
+            APS->>APR: UpsertBatch(ctx, batch)
+        else fetch or upsert fails / nil fetcher
+            APS->>APR: MarkStaleByAssetTypeAndSource(ctx, "currency", "vietcombank")
+        end
+    end
+
+    Note over APS: Collect all 10 refreshResult values from channel<br/>failCount < 10 → nil; failCount == 10 → error "all price sources failed"
+    Note over APS: Log: "currency_vangsaigon=OK(18), currency_vangtoday=OK(18), currency_vietcombank=OK(13), ..."
+    APS-->>PCJ: nil (or error if all 10 failed)
+    PCJ-->>SCH: Log result
+```
+
+### Key Invariants
+
+- **`PriceCacheJob` is the sole writer to `asset_price`** — no other job or handler writes to this table; all other consumers are read-only
+- All 10 fetches are **independent** — one failure does not prevent others from succeeding
+- On fetch success: `UpsertBatch` uses `ON CONFLICT (type_code, currency, source) DO UPDATE` — idempotent (3-column unique index)
+- On fetch failure: `MarkStaleByAssetTypeAndSource(ctx, assetType, source)` marks stale only for that source — other sources' rows for the same `asset_type` are unaffected
+- Nil fetcher/client (e.g., no `BTMC_API_KEY`, or `VIETCOMBANK_FX_ENABLED=false`) → goroutine treats it as failure → marks stale for that source; the other 9 sources are unaffected
+- Error is returned only if **all 10** sources fail simultaneously
+- The job never crashes the scheduler — all errors are logged and returned without panicking
+- `PriceCacheJob` has a 10-second startup delay so the app is fully initialized before the first fetch
+- **`PriceUpdateJob` is a consumer, not a writer**: it reads from `asset_price` via `AssetDisplayConfigService.ResolvePrice()` to resolve gold/silver prices for individual investments, then writes only to `investment.current_price` + `investment.price_updated_at`
+- **Alias normalization boundary**: vangsaigon TypeCodes are normalized via `gold.AliasToCanonical` before upsert; vangtoday TypeCodes are already canonical. `AssetPriceService` receives only canonical codes for both sources.
+- **TypeCode namespacing**: vangsaigon and vangtoday codes are canonical (e.g., `SJC`, `DOJI`); per-source direct codes carry a source prefix (e.g., `SJC_1L10L1KG`, `DOJI_NHANVANG`). No collision possible due to the 3-column unique index including `source`.
+
+### Error Paths
+
+| Condition | Response | User Impact |
+|-----------|----------|-------------|
+| One per-source client fails (e.g., SJC API down) | `MarkStaleByAssetTypeAndSource("gold", "sjc")` | SJC-sourced gold prices show `isStale: true`; other 9 sources unaffected |
+| VangSaiGon gold fails | `MarkStaleByAssetTypeAndSource("gold", "vangsaigon")` | VangSaiGon gold prices stale; other 9 sources unaffected |
+| VangToday gold fails | `MarkStaleByAssetTypeAndSource("gold", "vangtoday")` | VangToday gold prices stale; other 9 sources unaffected |
+| Vietcombank currency fails (or `VIETCOMBANK_FX_ENABLED=false`) | `MarkStaleByAssetTypeAndSource("currency", "vietcombank")` | Vietcombank currency prices stale; vangsaigon and vangtoday currency unaffected |
+| All 10 sources fail | `RefreshAllPrices` returns error | All price items have `isStale: true`; frontend displays `"--"` |
+| DB write fails for one source | Error logged; that source's prices may lag | Next run retries; other sources update normally |
+| DB empty (first run not yet complete) | Handlers return empty arrays or static fallback | `GetPublicMarketTypes` falls back to static registries |
+
+### DB-Backed Consumers of asset_price Table
+
+`PriceCacheJob` is the sole writer. All of the following are read-only consumers. **None of them call live gold/silver/currency APIs directly** (except as cold-start fallbacks in `MarketDataService`).
+
+| Consumer | Access path | Stale handling |
+|----------|-------------|----------------|
+| `MarketPricesHandler` / `PublicHandler` | `AssetPriceService.GetAllPrices()` | `IsStale: true` → `isStale` field in response; frontend displays `"--"` |
+| `PriceUpdateJob` → `MarketDataService` → `AssetDisplayConfigService.ResolvePrice()` | `AssetPriceRepository.ListByAssetType()` + fetch code priority lookup | All stale → returns freshest stale price; no rows → falls back to live `GoldPriceService` / `SilverPriceService` |
+| `PriceAlertJob` → `PriceAlertService` | `GetPricesByAssetType("gold")`, `GetPricesByAssetType("silver")` | Rows with `IsStale: true` are skipped — no alert fired on stale price |
+| `UserPriceAlertJob` → `UserPriceAlertService` | `GetPriceByTypeCode(symbol)` (single alert), `GetPricesByAssetType` (batch) | Returns price 0 / skips map entry when stale — alert not triggered |
+| `WatchlistService.ListItems` | `GetAllPrices()` | Falls back to zero buy/sell prices on error; stale rows propagated to client as-is |
+
+**Yahoo Finance (`MarketDataService`) remains live** — `WatchlistService` still fetches market items (stocks, crypto, ETFs) from Yahoo Finance concurrently. Only the gold/silver/currency lookup in `WatchlistService.ListItems` uses the DB cache. `PriceUpdateJob` also calls Yahoo Finance live for stocks/ETFs/crypto investments (not gold/silver).
+
+---
+
+## 14. Gold Display Prices Read Flow
+
+**Trigger:** Any component calls `useQueryGetGoldDisplayPrices()`
+**Sources:** `handlers/gold_display_config.go`, `domain/service/gold_display_config_service.go`, `domain/repository/gold_display_config_repository.go`
+
+```mermaid
+flowchart TD
+    A["Component calls\nuseQueryGetGoldDisplayPrices()"] --> B["GET /api/v1/public/gold-display-prices"]
+    B --> C["GoldDisplayConfigHandler\n.GetDisplayPrices"]
+
+    C --> D["GoldDisplayConfigService\n.GetDisplayPrices(ctx)"]
+
+    D --> E["repo.ListEnabled(ctx)\nReturns enabled configs\nsorted by display_order"]
+    D --> F["AssetPriceService\n.GetPricesByAssetType(ctx, 'gold')\nBuilds priceMap[typeCode]→price"]
+
+    E --> G["Join: for each config,\nlook up TypeCode in priceMap"]
+    F --> G
+
+    G --> H{TypeCode found\nin priceMap?}
+    H -- Yes --> I["Populate buy/sell/currency\nupdatedAt/isStale from price row"]
+    H -- No --> J["buy=0, sell=0\nisStale=true (safe default)"]
+
+    I --> K["Service returns\n[]GoldDisplayPrice"]
+    J --> K
+
+    K --> L["Handler: PriceOverrideCache\n.GetAll(ctx)\n(graceful skip if Redis nil)"]
+    L --> M["Build overrideMap\n[typeCode:currency]→override"]
+    M --> N["Apply override if\ntypeCode:currency key present"]
+    N --> O["Return GetGoldDisplayPricesResponse\n{Prices: [...]}"]
+
+    O --> P["Frontend receives prices array\nsorted by displayOrder"]
+    P --> Q{isStale || buy === 0?}
+    Q -- Yes --> R["Display '--'"]
+    Q -- No --> S["Format and display price"]
+
+    classDef service fill:#ddf,stroke:#66c,color:#003
+    classDef handler fill:#dfd,stroke:#6a6,color:#030
+    classDef repo fill:#ffd,stroke:#aa6,color:#330
+    classDef frontend fill:#fdf,stroke:#c6c,color:#303
+    classDef default_node fill:#eee,stroke:#999,color:#333
+
+    class C,N handler
+    class D,K service
+    class E,F repo
+    class A,P,Q,R,S frontend
+```
+
+### Key Invariants
+
+- Missing prices never block the response — zero prices with `isStale=true` are safe defaults for configs with no matching price row in the DB cache
+- Redis overrides are applied at handler level, not service level (same pattern as `market_prices.go`)
+- Response is sorted by `displayOrder` from the DB config — the order is fully admin-controlled
+- Frontend stale check: `isStale || buy === 0` → display `"--"` (same convention as market prices page)
+- `GetAll` on the override cache uses a graceful skip if `PriceOverrideCache` is nil — no panic on cold start
+
+---
+
+## 15. Admin Gold Display Config CRUD Flow
+
+**Trigger:** Admin opens the `GoldDisplayConfigTable` or submits `GoldDisplayConfigForm`
+**Sources:** `handlers/gold_display_config.go`, `domain/service/gold_display_config_service.go`, `domain/repository/gold_display_config_repository.go`
+
+### Diagram A — Read: ListAll
+
+```mermaid
+flowchart TD
+    A["Admin opens\nGoldDisplayConfigTable"] --> B["GET /api/v1/admin/gold-display-config"]
+    B --> C["GoldDisplayConfigHandler\n.ListAll"]
+    C --> D["GoldDisplayConfigService\n.ListAll(ctx)"]
+    D --> E["repo.ListAll(ctx)\nIncludes disabled entries\nNo soft-delete filter"]
+    E --> F["Returns all configs\n(enabled + disabled)"]
+    F --> G["ListGoldDisplayConfigResponse\n{Configs: [...]}"]
+    G --> H["GoldDisplayConfigTable\nrenders rows"]
+
+    classDef handler fill:#dfd,stroke:#6a6,color:#030
+    classDef service fill:#ddf,stroke:#66c,color:#003
+    classDef repo fill:#ffd,stroke:#aa6,color:#330
+    classDef frontend fill:#fdf,stroke:#c6c,color:#303
+
+    class C handler
+    class D,F service
+    class E repo
+    class A,H frontend
+```
+
+### Diagram B — Write: Create / Update / Delete
+
+```mermaid
+flowchart TD
+    A["Admin submits\nGoldDisplayConfigForm"] --> B{Operation?}
+
+    B -- Create --> C["POST /api/v1/admin/gold-display-config"]
+    B -- Update --> D["PUT /api/v1/admin/gold-display-config/{id}"]
+    B -- Delete --> E["DELETE /api/v1/admin/gold-display-config/{id}"]
+
+    D --> F["Parse id from path\nid ≤ 0 → 400 Bad Request"]
+    E --> F
+
+    C --> G["handler.BindAndValidate\n(request body)"]
+    F --> G
+
+    G --> H["Service validates:\n• typeCode ≤ 50 chars\n• displayName trimmed + ≤ 100 chars\n• displayOrder ≥ 0\n• duplicate typeCode check (Create only)"]
+
+    H --> I{Validation\npassed?}
+    I -- No --> J["400 Bad Request\n(validation error)"]
+
+    I -- Yes --> K{Operation?}
+
+    K -- Create --> L["repo.Create(ctx, config)"]
+    K -- Update --> M["repo.Update(ctx, config)\n(typeCode field ignored)"]
+    K -- Delete --> N["repo.Delete(ctx, id)\nGORM soft delete\n(sets deleted_at)"]
+
+    L --> O{Duplicate\ntypeCode?}
+    O -- Yes --> P["409 Conflict"]
+    O -- No --> Q["Returns created config proto"]
+
+    M --> R{Record\nexists?}
+    R -- No --> S["404 Not Found"]
+    R -- Yes --> T["Returns updated config proto"]
+
+    N --> U{Record\nexists?}
+    U -- No --> S
+    U -- Yes --> V["Returns success response"]
+
+    Q --> W["Frontend: React Query cache\ninvalidation (QUERY_KEY_GOLD_DISPLAY_CONFIG)\n→ table re-fetches"]
+    T --> W
+    V --> W
+
+    classDef handler fill:#dfd,stroke:#6a6,color:#030
+    classDef service fill:#ddf,stroke:#66c,color:#003
+    classDef repo fill:#ffd,stroke:#aa6,color:#330
+    classDef frontend fill:#fdf,stroke:#c6c,color:#303
+    classDef error fill:#fee,stroke:#c00,color:#900
+
+    class G,F handler
+    class H,I service
+    class L,M,N,O,R,U repo
+    class A,W frontend
+    class J,P,S error
+```
+
+### Key Invariants
+
+- `typeCode` is immutable after creation — the Update endpoint does not accept a `typeCode` field; any value sent is ignored
+- Soft deletes via GORM `DeletedAt` — deleted records remain in the DB but are hidden from `ListEnabled` (the public read path)
+- Admin CRUD endpoints do NOT use generated proto hooks — the frontend uses `apiClient` directly (no RPCs defined for these endpoints in the proto file)
+- `ListAll` (admin) includes disabled entries; `ListEnabled` (public) filters to `is_enabled = true` only
+- React Query cache invalidation key `QUERY_KEY_GOLD_DISPLAY_CONFIG` is shared across the table and any other consumers of the admin list endpoint

@@ -1,12 +1,20 @@
 package service
 
 import (
+	"log"
+	"os"
+
 	"github.com/go-redis/redis/v8"
 
 	"wealthjourney/domain/repository"
+	"wealthjourney/pkg/btmcdirect"
 	"wealthjourney/pkg/cache"
+	"wealthjourney/pkg/doji"
+	"wealthjourney/pkg/pnj"
 	pkgredis "wealthjourney/pkg/redis"
+	"wealthjourney/pkg/sjc"
 	"wealthjourney/pkg/storage"
+	"wealthjourney/pkg/vietcombank"
 )
 
 // Services holds all service instances.
@@ -30,6 +38,8 @@ type Services struct {
 	PriceAlert         PriceAlertService
 	Watchlist          WatchlistService
 	UserPriceAlert     UserPriceAlertService
+	AssetPrice         AssetPriceService
+	AssetDisplayConfig AssetDisplayConfigService
 }
 
 // NewServices creates all service instances with proper dependency ordering.
@@ -38,10 +48,16 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	// Phase 1: Services with no service dependencies
 	categorySvc := NewCategoryService(repos.Category)
 	fxRateSvc := NewFXRateService(repos.FXRate, redisClient)
-	goldPriceSvc := NewGoldPriceService(redisClient)
+	btmcAPIKey := os.Getenv("BTMC_API_KEY")
+	if btmcAPIKey == "" {
+		log.Println("[NewServices] Warning: BTMC_API_KEY not set — gold price fallback chain reduced to 2 sources")
+	}
+	goldPriceSvc := NewGoldPriceService(redisClient, btmcAPIKey)
 	silverPriceSvc := NewSilverPriceService(redisClient)
-	currencyPriceSvc := NewCurrencyPriceService(redisClient)
-	marketDataSvc := NewMarketDataService(repos.MarketData, goldPriceSvc, silverPriceSvc)
+	// AssetDisplayConfigService — wires fetch-code-based price resolution.
+	// Provides the AssetDisplayConfigService to MarketDataService for DB-backed gold/silver prices.
+	assetDisplayConfigSvc := NewAssetDisplayConfigService(repos.AssetDisplayConfig, repos.AssetConfigFetchCode, repos.AssetPrice)
+	marketDataSvc := NewMarketDataService(repos.MarketData, goldPriceSvc, silverPriceSvc, assetDisplayConfigSvc)
 	currencyCache := cache.NewCurrencyCache(redisClient)
 
 	// Phase 2: UserService (depends on categorySvc, fxRateSvc, currencyCache)
@@ -71,22 +87,52 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	// Phase 1 (cont.): PushService — depends on push subscription repo
 	pushSvc := NewPushService(repos.PushSubscription)
 
-	// Phase 1 (cont.): PriceAlertService — depends on gold/silver price services, notification repo, user repo, Redis, push service
-	var priceAlertSvc PriceAlertService
-	if rdb != nil {
-		priceAlertSvc = NewPriceAlertService(goldPriceSvc, silverPriceSvc, repos.Notification, repos.User, rdb, pushSvc)
+	// Phase 1 (cont.): AssetPriceService — depends on asset price repo and price services.
+	// Real per-source gold clients wired here for direct (non-waterfall) DB cache rows.
+	sjcClient := sjc.NewClient()
+	dojiClient := doji.NewClient()
+	btmcClient := btmcdirect.NewClient()
+	pnjClient := pnj.NewClient()
+
+	// Feature flag: VIETCOMBANK_FX_ENABLED (default true).
+	// Set to "false" to disable Vietcombank currency fetching entirely.
+	var vcbFetcher CurrencyPriceFetcher
+	if os.Getenv("VIETCOMBANK_FX_ENABLED") != "false" {
+		vcbFetcher = NewVietcombankCurrencyFetcher(vietcombank.NewClient())
+	} else {
+		log.Println("[NewServices] VIETCOMBANK_FX_ENABLED=false — Vietcombank currency fetcher disabled")
 	}
 
-	// Phase 1 (cont.): WatchlistService — depends on watchlist repo, gold/silver/currency price services, market data service
-	watchlistSvc := NewWatchlistService(repos.Watchlist, goldPriceSvc, silverPriceSvc, currencyPriceSvc, marketDataSvc)
+	assetPriceSvc := NewAssetPriceService(
+		repos.AssetPrice,
+		repos.AssetDisplayConfig,
+		silverPriceSvc,
+		NewVangSaiGonGoldFetcher(waterfallSourceTimeout),
+		NewVangTodayGoldFetcher(waterfallSourceTimeout),
+		NewVangSaiGonCurrencyFetcher(waterfallSourceTimeout),
+		NewVangTodayCurrencyFetcher(waterfallSourceTimeout),
+		vcbFetcher,
+		sjcClient,
+		dojiClient,
+		btmcClient,
+		pnjClient,
+	)
 
-	// Phase 1 (cont.): UserPriceAlertService — depends on alert repo, price services, notification repo, push service, Redis
+	// Phase 1 (cont.): PriceAlertService — reads from DB cache via AssetPriceService
+	var priceAlertSvc PriceAlertService
+	if rdb != nil {
+		priceAlertSvc = NewPriceAlertService(assetPriceSvc, repos.Notification, repos.User, rdb, pushSvc)
+	}
+
+	// Phase 1 (cont.): WatchlistService — reads from DB cache via AssetPriceService
+	watchlistSvc := NewWatchlistService(repos.Watchlist, assetPriceSvc, marketDataSvc)
+
+	// Phase 1 (cont.): UserPriceAlertService — depends on alert repo, asset price DB cache, market data, notification repo, push service, Redis
 	var userPriceAlertSvc UserPriceAlertService
 	if rdb != nil {
 		userPriceAlertSvc = NewUserPriceAlertService(
 			repos.UserPriceAlert,
-			goldPriceSvc,
-			silverPriceSvc,
+			assetPriceSvc,
 			marketDataSvc,
 			repos.Notification,
 			pushSvc,
@@ -116,7 +162,9 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		Push:             pushSvc,
 		PriceAlert:       priceAlertSvc,
 		Watchlist:        watchlistSvc,
-		UserPriceAlert:   userPriceAlertSvc,
+		UserPriceAlert:    userPriceAlertSvc,
+		AssetPrice:         assetPriceSvc,
+		AssetDisplayConfig: assetDisplayConfigSvc,
 	}
 }
 
@@ -153,6 +201,10 @@ type Repositories struct {
 	PushSubscription      repository.PushSubscriptionRepository
 	Watchlist             repository.WatchlistRepository
 	UserPriceAlert        repository.UserPriceAlertRepository
+	AssetPrice            repository.AssetPriceRepository
+	GoldDisplayConfig     repository.GoldDisplayConfigRepository
+	AssetDisplayConfig    repository.AssetDisplayConfigRepository
+	AssetConfigFetchCode  repository.AssetConfigFetchCodeRepository
 }
 
 // NewRepositories creates all repository instances.

@@ -111,13 +111,11 @@ export default function Home() {
   const monthPnl = parseAmount(summary1M?.data?.periodPnl);
   const monthPnlPercent = Number(summary1M?.data?.periodPnlPercent ?? 0);
 
-  // Gold/silver/currency prices
-  const goldPrices = marketPrices?.gold ?? [];
+  // Silver/currency prices (gold prices now fetched directly by GoldPriceTable)
   const silverPrices = marketPrices?.silver ?? [];
   const currencyPrices = marketPrices?.currency ?? [];
 
   // Update timestamps from API data
-  const goldUpdatedTime = formatUpdateTimestamp(getLatestTimestamp(goldPrices));
   const silverUpdatedTime = formatUpdateTimestamp(
     getLatestTimestamp(silverPrices),
   );
@@ -182,7 +180,7 @@ export default function Home() {
         <OrnateDivider variant="diamond" className="my-4" />
 
         {/* 3. Gold Price Table */}
-        <GoldPriceTable prices={goldPrices} updatedTime={goldUpdatedTime} isAdmin={isAdmin} isLoading={marketPricesLoading} />
+        <GoldPriceTable />
 
         {/* 4. Gold Price Chart */}
         <GoldPriceChart />
@@ -256,12 +254,7 @@ export default function Home() {
 
         {/* Row 3: Gold Table + Gold Chart */}
         <div className="grid grid-cols-2 gap-6">
-          <GoldPriceTable
-            prices={goldPrices}
-            updatedTime={goldUpdatedTime}
-            isAdmin={isAdmin}
-            isLoading={marketPricesLoading}
-          />
+          <GoldPriceTable />
           <GoldPriceChart />
         </div>
 

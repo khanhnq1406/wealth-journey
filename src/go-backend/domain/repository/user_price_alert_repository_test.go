@@ -300,7 +300,7 @@ func TestUserPriceAlertRepository_CountActiveByUserID(t *testing.T) {
 	ctx := context.Background()
 
 	countRows := sqlmock.NewRows([]string{"count"}).AddRow(3)
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `user_price_alert` WHERE user_id = ? AND status = 'active' AND `user_price_alert`.`deleted_at` IS NULL")).
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `user_price_alert` WHERE (user_id = ? AND status = 'active') AND `user_price_alert`.`deleted_at` IS NULL")).
 		WithArgs(int32(5)).
 		WillReturnRows(countRows)
 

@@ -554,6 +554,49 @@ func TestInvestmentRecalculate_CorrectedTests(t *testing.T) {
 	}
 }
 
+func TestInvestment_ToProto_WithPriceUpdatedAt(t *testing.T) {
+	now := time.Now()
+	ts := time.Unix(1711584000, 0) // fixed timestamp: 2024-03-28 00:00:00 UTC
+	inv := &models.Investment{
+		ID:             1,
+		WalletID:       int32Ptr(10),
+		Symbol:         "AAPL",
+		Name:           "Apple Inc.",
+		Type:           int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
+		Currency:       "USD",
+		CreatedAt:      now,
+		UpdatedAt:      now,
+		PriceUpdatedAt: &ts,
+	}
+
+	proto := inv.ToProto()
+
+	if proto.PriceUpdatedAt != ts.Unix() {
+		t.Errorf("Expected PriceUpdatedAt %d, got %d", ts.Unix(), proto.PriceUpdatedAt)
+	}
+}
+
+func TestInvestment_ToProto_WithNilPriceUpdatedAt(t *testing.T) {
+	now := time.Now()
+	inv := &models.Investment{
+		ID:             2,
+		WalletID:       int32Ptr(10),
+		Symbol:         "GOOG",
+		Name:           "Alphabet Inc.",
+		Type:           int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
+		Currency:       "USD",
+		CreatedAt:      now,
+		UpdatedAt:      now,
+		PriceUpdatedAt: nil,
+	}
+
+	proto := inv.ToProto()
+
+	if proto.PriceUpdatedAt != 0 {
+		t.Errorf("Expected PriceUpdatedAt 0 when nil, got %d", proto.PriceUpdatedAt)
+	}
+}
+
 func TestInvestmentRecalculate_CorrectedEdgeCases(t *testing.T) {
 	tests := []struct {
 		name              string

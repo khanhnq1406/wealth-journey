@@ -39,6 +39,7 @@ type AllHandlers struct {
 	Push               *PushHandler
 	Watchlist          *WatchlistHandler
 	UserPriceAlert     *UserPriceAlertHandlers
+	AssetDisplayConfig *AssetDisplayConfigHandler
 }
 
 // HandlerDeps holds the infrastructure dependencies needed by NewHandlers.
@@ -64,15 +65,15 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 		adaptedQueue = jobs.NewImportQueueAdapter(redisQueue)
 	}
 
-	// Create market prices handler (requires Redis for price caching)
+	// Create market prices handler — reads from DB-backed cache via AssetPriceService.
+	// overrideCache is nil-safe: if Redis is unavailable the handler skips overrides gracefully.
 	var marketPricesHandler *MarketPricesHandler
-	if deps.RDB != nil {
-		marketPricesHandler = NewMarketPricesHandler(
-			service.NewGoldPriceService(deps.RDB.GetClient()),
-			service.NewSilverPriceService(deps.RDB.GetClient()),
-			service.NewCurrencyPriceService(deps.RDB.GetClient()),
-			cache.NewPriceOverrideCache(deps.RDB.GetClient()),
-		)
+	if services.AssetPrice != nil {
+		var overrideCache *cache.PriceOverrideCache
+		if deps.RDB != nil {
+			overrideCache = cache.NewPriceOverrideCache(deps.RDB.GetClient())
+		}
+		marketPricesHandler = NewMarketPricesHandler(services.AssetPrice, overrideCache)
 	}
 
 	// Create price override handler (requires Redis for override storage)
@@ -162,25 +163,14 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 			}
 			return nil
 		}(),
-		Public: NewPublicHandler(
-			func() service.GoldPriceService {
-				if deps.RDB != nil {
-					return service.NewGoldPriceService(deps.RDB.GetClient())
-				}
-				return nil
-			}(),
-			func() service.SilverPriceService {
-				if deps.RDB != nil {
-					return service.NewSilverPriceService(deps.RDB.GetClient())
-				}
-				return nil
-			}(),
-			func() service.CurrencyPriceService {
-				if deps.RDB != nil {
-					return service.NewCurrencyPriceService(deps.RDB.GetClient())
-				}
-				return nil
-			}(),
-		),
+		// AssetDisplayConfig handler: wired to AssetDisplayConfigService.
+		// Supports gold/silver/currency asset types with fetch-code-based price resolution.
+		AssetDisplayConfig: func() *AssetDisplayConfigHandler {
+			if services.AssetDisplayConfig != nil {
+				return NewAssetDisplayConfigHandler(services.AssetDisplayConfig)
+			}
+			return nil
+		}(),
+		Public: NewPublicHandler(services.AssetPrice),
 	}
 }

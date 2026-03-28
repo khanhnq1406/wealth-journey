@@ -19,12 +19,11 @@ import (
 )
 
 type priceAlertService struct {
-	goldPriceSvc   GoldPriceService
-	silverPriceSvc SilverPriceService
-	notifRepo      repository.NotificationRepository
-	userRepo       repository.UserRepository
-	redisClient    *pkgredis.RedisClient
-	pushSvc        PushService
+	assetPriceSvc AssetPriceService
+	notifRepo     repository.NotificationRepository
+	userRepo      repository.UserRepository
+	redisClient   *pkgredis.RedisClient
+	pushSvc       PushService
 }
 
 type priceMover struct {
@@ -38,20 +37,18 @@ type priceMover struct {
 }
 
 func NewPriceAlertService(
-	goldPriceSvc GoldPriceService,
-	silverPriceSvc SilverPriceService,
+	assetPriceSvc AssetPriceService,
 	notifRepo repository.NotificationRepository,
 	userRepo repository.UserRepository,
 	rdb *pkgredis.RedisClient,
 	pushSvc PushService,
 ) PriceAlertService {
 	return &priceAlertService{
-		goldPriceSvc:   goldPriceSvc,
-		silverPriceSvc: silverPriceSvc,
-		notifRepo:      notifRepo,
-		userRepo:       userRepo,
-		redisClient:    rdb,
-		pushSvc:        pushSvc,
+		assetPriceSvc: assetPriceSvc,
+		notifRepo:     notifRepo,
+		userRepo:      userRepo,
+		redisClient:   rdb,
+		pushSvc:       pushSvc,
 	}
 }
 
@@ -83,13 +80,17 @@ func (s *priceAlertService) doCheckAndAlert(ctx context.Context, force bool) err
 
 	var allCategories []categoryMovers
 
-	// Fetch gold prices
-	goldPrices, err := s.goldPriceSvc.FetchAllPrices(ctx)
+	// Fetch gold prices from DB cache
+	goldPrices, err := s.assetPriceSvc.GetPricesByAssetType(ctx, "gold")
 	if err != nil {
 		log.Printf("Price alert: failed to fetch gold prices: %v", err)
 	} else {
 		var goldVND, goldUSD []priceMover
 		for _, p := range goldPrices {
+			if p.IsStale {
+				log.Printf("Price alert: skipping stale gold price for %s", p.TypeCode)
+				continue
+			}
 			var mover *priceMover
 			if force {
 				mover = s.checkPriceForce(ctx, p.TypeCode, p.Buy)
@@ -118,13 +119,17 @@ func (s *priceAlertService) doCheckAndAlert(ctx context.Context, force bool) err
 		}
 	}
 
-	// Fetch silver prices
-	silverPrices, err := s.silverPriceSvc.FetchAllPrices(ctx)
+	// Fetch silver prices from DB cache
+	silverPrices, err := s.assetPriceSvc.GetPricesByAssetType(ctx, "silver")
 	if err != nil {
 		log.Printf("Price alert: failed to fetch silver prices: %v", err)
 	} else {
 		var silverVND, silverUSD []priceMover
 		for _, p := range silverPrices {
+			if p.IsStale {
+				log.Printf("Price alert: skipping stale silver price for %s", p.TypeCode)
+				continue
+			}
 			var mover *priceMover
 			if force {
 				mover = s.checkPriceForce(ctx, p.TypeCode, p.Buy)
