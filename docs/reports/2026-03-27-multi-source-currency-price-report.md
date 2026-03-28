@@ -202,6 +202,8 @@ Key changed symbols and their d=1 dependents:
 | Date       | Fix                                                                  | Severity | Root Cause                                                                                             |
 | ---------- | -------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------ |
 | 2026-03-28 | Vietcombank API response format changed — updated JSON parsing to match new envelope shape | Minor    | API changed from bare `[...]` array to `{"Count":N,"Data":[...]}` wrapper object; JSON field names changed from PascalCase to camelCase |
+| 2026-03-28 | Migration: set `_VCB` fetch codes as default (priority 1) for standard currency display configs | Minor    | `migrate-asset-config-fetch-code` seeded plain fetch codes (e.g. `"USD"`) as priority 1 for standard currency display configs; Vietcombank data was not set as default source |
+| 2026-03-28 | Landing page and home page currency table shows "Không có dữ liệu" — added per-asset static fallback in `GetPublicMarketTypes` | Minor | `public.go` fallback only fired when ALL three asset types (gold, silver, currency) were empty. If gold/silver had DB data but currency was empty (price cache unpopulated), currency fell back to `[]` with no fallback — causing "no data" display. |
 
 ### Fix Detail: 2026-03-28 — JSON Schema Mismatch
 
@@ -219,3 +221,47 @@ Key changed symbols and their d=1 dependents:
 - `src/go-backend/pkg/vietcombank/client_test.go` — Updated all 9 test fixtures to use new API response format
 
 **Security Review:** Approved — no new attack surface; 1MB size limit, HTTPS, and timeout unchanged.
+
+### Fix Detail: 2026-03-28 — Currency Table Shows "Không có dữ liệu" on Landing Page and Home Page
+
+**Symptom:** Both `LandingCurrencyPriceTable` (landing page, `usePublicMarketTypes` hook) and `CurrencyPriceTable` (home page, `useQueryGetMarketPrices` hook) display "Không có dữ liệu" even after the multi-source currency feature is deployed.
+
+**Root Cause:** `GetPublicMarketTypes` in `handlers/public.go` had an "all-or-nothing" static fallback condition:
+
+```go
+// BEFORE — only falls back when ALL three are empty
+if len(goldTypes) == 0 && len(silverTypes) == 0 && len(currencyTypes) == 0 {
+    h.fallbackStaticTypes(c)
+    return
+}
+```
+
+Gold and silver price rows in `asset_price` are populated by the pre-existing price cache job. Currency rows are only populated after:
+1. `task backend:migrate-asset-display-config` (seeds `asset_display_config` entries for currency), AND
+2. The `PriceCacheJob` runs and successfully fetches from VangSaiGon or VangToday currency APIs.
+
+If either step hasn't happened yet (first deploy, migration not run, or all fetchers fail), currency rows in `asset_price` are empty. Since gold/silver have data, the "all-or-nothing" condition evaluates to `false` — the handler returns `currency: []` from the DB path with no fallback. The frontend components display "Không có dữ liệu".
+
+**Fix:** Added per-asset-type independent fallback so each asset type falls back to its static registry when empty, regardless of the other two:
+
+```go
+// AFTER — per-asset fallback
+if len(goldTypes) == 0 {
+    goldTypes = staticGoldTypes()
+}
+if len(silverTypes) == 0 {
+    silverTypes = staticSilverTypes()
+}
+if len(currencyTypes) == 0 {
+    currencyTypes = staticCurrencyTypes()
+}
+```
+
+Extracted three package-level helpers (`staticGoldTypes`, `staticSilverTypes`, `staticCurrencyTypes`) to share the logic with the existing `fallbackStaticTypes` method.
+
+**Note on home page:** `GetMarketPrices` (authenticated endpoint) has no static fallback — it only serves DB data. If `asset_price` has no currency rows, the home page correctly shows "Không có dữ liệu" there until the price cache is populated. Running `task backend:migrate-asset-display-config` and waiting for the `PriceCacheJob` to run (or restarting the backend) resolves the home page display.
+
+**Files Changed:**
+- `src/go-backend/handlers/public.go` — Per-asset fallback logic; extracted `staticGoldTypes`, `staticSilverTypes`, `staticCurrencyTypes` helpers
+
+**Security Review:** Approved — no new attack surface, no information disclosure (static types are public display metadata), no injection risk (compile-time constant data).
