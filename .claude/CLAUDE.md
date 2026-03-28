@@ -108,7 +108,8 @@ Personal_Financial_Management/
 │   │   │   ├── silver.go             # Silver types
 │   │   │   ├── import.go             # Bank statement import
 │   │   │   ├── session.go            # Session management
-│   │   │   ├── user_price_alert.go   # Price alert CRUD (NEW)
+│   │   │   ├── user_price_alert.go   # Price alert CRUD
+│   │   │   ├── asset_display_config.go # Admin asset display config CRUD + public price endpoint
 │   │   │   ├── community.go          # Community features
 │   │   │   ├── admin_user.go         # Admin user management
 │   │   │   ├── feedback.go           # Feedback submission
@@ -123,7 +124,15 @@ Personal_Financial_Management/
 │   │       ├── gold/                  # Gold conversion utilities
 │   │       ├── silver/                # Silver conversion utilities
 │   │       ├── cache/                 # Redis caching
-│   │       └── metrics/               # Prometheus metrics
+│   │       ├── metrics/               # Prometheus metrics
+│   │       ├── btmc/                  # BTMC gold price client
+│   │       ├── btmcdirect/            # BTMC direct API client
+│   │       ├── doji/                  # DOJI gold price client
+│   │       ├── pnj/                   # PNJ gold price client
+│   │       ├── sjc/                   # SJC gold price client
+│   │       ├── vangtoday/             # VangToday gold/currency API client
+│   │       ├── vietcombank/           # Vietcombank official FX rates client
+│   │       └── mihong/                # Mihong (PNJ) gold price client
 │   │
 │   ├── wj-client/                     # Next.js frontend (feature-based, ADR-003)
 │   │   ├── app/                       # Next.js App Router pages
@@ -908,11 +917,25 @@ func (Wallet) TableName() string {
 
 **Models:**
 
-- **Investment**: Individual holdings (symbol, name, type, exchange, quantity, average price)
+- **Investment**: Individual holdings (symbol, name, type, exchange, quantity, average price, `PriceUpdatedAt *time.Time` — nullable, set by `UpdatePrices` when price refreshed)
 - **InvestmentTransaction**: Transaction records (buy/sell/dividend with quantity, price, date)
 - **InvestmentLot**: FIFO cost basis tracking (purchase price, remaining quantity, cost basis)
 - **MarketData**: Cached price data for PNL calculations
 - **PortfolioHistory**: Historical portfolio values for performance tracking
+
+**Price Staleness Indicator:**
+
+`Investment.PriceUpdatedAt` is exposed as `priceUpdatedAt` (Unix seconds, nullable) on the portfolio frontend. The helper `getPriceStaleClass(priceUpdatedAt, nowSeconds?)` in `app/[locale]/dashboard/portfolio/helpers.tsx` returns a Tailwind class for a 5-tier color indicator:
+
+| Age | Color class | Meaning |
+|-----|-------------|---------|
+| < 15 min | `bg-v2-green-positive` | Fresh |
+| 15–60 min | `bg-yellow-400` | Slightly stale |
+| 1–24 hrs | `bg-orange-400` | Stale |
+| > 24 hrs | `bg-v2-red-negative` | Very stale |
+| null / 0 | `bg-v2-text-tertiary` | Never updated |
+
+Used in `InvestmentCardEnhanced.tsx` as a colored dot with tooltip. Tests: `portfolio/__tests__/staleness.test.ts` (13 boundary cases).
 
 **API Endpoints:**
 
@@ -1052,6 +1075,41 @@ The `SymbolAutocomplete` component provides a user-friendly search interface:
 - `GetPublicMarketTypes` falls back to static type registries on cold start (empty DB)
 - `GetMarketPrices` returns empty arrays (not error) on cold start
 - Admin price overrides applied at handler level, on top of DB data
+
+### Asset Display Configuration
+
+Admin-configurable system that controls which prices are shown to users and which source each display config uses.
+
+- **Models**: [AssetDisplayConfig](src/go-backend/domain/models/asset_display_config.go) — `asset_display_config` table, composite unique index `(type_code, asset_type)`; [AssetConfigFetchCode](src/go-backend/domain/models/asset_config_fetch_code.go) — `asset_config_fetch_code` table, FK to `asset_display_config`, priority index
+- **Service**: [AssetDisplayConfigService](src/go-backend/domain/service/asset_display_config_service.go) — `GetDisplayPrices`, `ResolvePrice`, full CRUD for configs and fetch codes
+- **Repositories**: [AssetDisplayConfigRepository](src/go-backend/domain/repository/asset_display_config_repository.go), [AssetConfigFetchCodeRepository](src/go-backend/domain/repository/asset_config_fetch_code_repository.go)
+- **Handler**: [asset_display_config.go](src/go-backend/handlers/asset_display_config.go) — 10 endpoints (public GET + admin CRUD)
+- **Migrations**: `task backend:migrate-asset-display-config`, `task backend:migrate-asset-config-fetch-code`
+
+**Public endpoint**: `GET /api/v1/public/asset-display-prices?assetType=gold` — returns enabled display configs with resolved prices + admin overrides. No auth required.
+
+**Admin endpoints** (require `AuthMiddleware` + `AdminMiddleware`):
+- `GET/POST /api/v1/admin/asset-display-config` — list/create display configs
+- `PUT/DELETE /api/v1/admin/asset-display-config/:id` — update/delete display config
+- `GET/POST /api/v1/admin/asset-display-config/:id/fetch-codes` — list/add fetch codes for a config
+- `DELETE /api/v1/admin/asset-display-config/:id/fetch-codes/:codeId` — remove fetch code
+
+**ResolvePrice algorithm** — for each display config, picks the best available price from the DB:
+1. Load all `asset_price` rows for the given `assetType`
+2. Get fetch codes for this config (ordered by `priority` ASC)
+3. If no fetch codes → error (fallback to live API in `MarketDataService`)
+4. If no asset_price rows → error (fallback to live API on cold start)
+5. Iterate fetch codes in priority order; skip if no matching price row
+6. Return first **non-stale** price found; track `freshestStale` as backup
+7. If all stale → return `freshestStale` with `isStale=true`
+8. If none found → error
+
+**Frontend admin components** (`features/admin/components/`):
+- `AssetDisplayConfigTable.tsx` — list and manage display configs
+- `AssetDisplayConfigForm.tsx` — create/edit a display config
+- `FetchCodeList.tsx` — manage fetch code priorities per config
+
+**Hook**: `useQueryGetAssetDisplayPrices({ assetType: "gold" })` → `data?.prices` (array of `AssetDisplayPrice`).
 
 ### Gold Investment Management
 
@@ -1214,6 +1272,8 @@ task backend:migrate-fx                # Create FX rate tables
 task backend:migrate-portfolio-history # Create portfolio history tables
 task backend:migrate-user-price-alerts    # Create user_price_alert table
 task backend:migrate-asset-prices         # Create asset_price cache table
+task backend:migrate-asset-display-config    # Create asset_display_config table
+task backend:migrate-asset-config-fetch-code # Create asset_config_fetch_code table
 task backend:migrate-vietcombank-currency # Seed VCB currency display config + fetch codes
 ```
 
@@ -1390,6 +1450,7 @@ task dev
 **Notes:**
 - Category management is integrated into `transaction.proto`, not a separate file
 - Price alert RPCs (`CreateUserPriceAlert` etc.) are in `investment.proto`
+- Asset display config RPCs (`GetAssetDisplayPrices`, `AssetDisplayConfig` CRUD, `AssetConfigFetchCode` CRUD) are in `investment.proto`
 
 ### Frontend (wj-client)
 
@@ -1424,7 +1485,7 @@ task dev
 | Settings | `features/settings/` | Settings page components |
 | Watchlist | `features/watchlist/` | Symbol watchlist |
 | Community | `features/community/` | Posts, comments, likes, follows |
-| Admin | `features/admin/` | Admin panel |
+| Admin | `features/admin/` | AssetDisplayConfigTable, AssetDisplayConfigForm, FetchCodeList, admin user management |
 | Feedback | `features/feedback/` | Feedback forms |
 | Report | `features/report/` | Financial tables, CSV/PDF export utils |
 
@@ -1441,9 +1502,21 @@ task dev
 | [src/go-backend/domain/service/wallet_service.go](src/go-backend/domain/service/wallet_service.go) | Wallet business logic |
 | [src/go-backend/domain/service/investment_service.go](src/go-backend/domain/service/investment_service.go) | Investment business logic |
 | [src/go-backend/domain/service/market_data_service.go](src/go-backend/domain/service/market_data_service.go) | Market data & Yahoo Finance |
-| [src/go-backend/domain/service/asset_price_service.go](src/go-backend/domain/service/asset_price_service.go) | Asset price cache service (DB-backed) |
-| [src/go-backend/domain/repository/asset_price_repository.go](src/go-backend/domain/repository/asset_price_repository.go) | Asset price persistence (upsert, list, mark stale) |
+| [src/go-backend/domain/service/asset_price_service.go](src/go-backend/domain/service/asset_price_service.go) | Asset price cache service — `RefreshAllPrices` (10 parallel goroutines) |
+| [src/go-backend/domain/service/asset_display_config_service.go](src/go-backend/domain/service/asset_display_config_service.go) | Asset display config service — `GetDisplayPrices`, `ResolvePrice`, CRUD |
+| [src/go-backend/domain/repository/asset_price_repository.go](src/go-backend/domain/repository/asset_price_repository.go) | Asset price persistence (upsert, list, mark stale by source) |
+| [src/go-backend/domain/repository/asset_display_config_repository.go](src/go-backend/domain/repository/asset_display_config_repository.go) | Display config CRUD (list, get, create, update, delete, filter by assetType) |
+| [src/go-backend/domain/repository/asset_config_fetch_code_repository.go](src/go-backend/domain/repository/asset_config_fetch_code_repository.go) | Fetch code CRUD (list by config ID, create, update, delete) |
+| [src/go-backend/handlers/asset_display_config.go](src/go-backend/handlers/asset_display_config.go) | 10 REST endpoints — public `GetDisplayPrices` + admin config/fetch code CRUD |
 | [src/go-backend/internal/scheduler/price_cache_job.go](src/go-backend/internal/scheduler/price_cache_job.go) | Background price cache refresh job (15m) |
+| [src/go-backend/pkg/btmc/](src/go-backend/pkg/btmc/) | BTMC gold price HTTP client (5s timeout) |
+| [src/go-backend/pkg/btmcdirect/](src/go-backend/pkg/btmcdirect/) | BTMC direct API client (alternative endpoint) |
+| [src/go-backend/pkg/doji/](src/go-backend/pkg/doji/) | DOJI gold price HTTP client |
+| [src/go-backend/pkg/pnj/](src/go-backend/pkg/pnj/) | PNJ gold price HTTP client |
+| [src/go-backend/pkg/sjc/](src/go-backend/pkg/sjc/) | SJC gold price HTTP client |
+| [src/go-backend/pkg/vangtoday/](src/go-backend/pkg/vangtoday/) | VangToday gold + currency API client |
+| [src/go-backend/pkg/vietcombank/](src/go-backend/pkg/vietcombank/) | Vietcombank official FX rates client (TypeCodes use `_VCB` suffix) |
+| [src/go-backend/pkg/mihong/](src/go-backend/pkg/mihong/) | Mihong (PNJ) alternative gold price client |
 | [src/go-backend/domain/service/gold_price_service.go](src/go-backend/domain/service/gold_price_service.go) | Gold price service |
 | [src/go-backend/domain/service/silver_price_service.go](src/go-backend/domain/service/silver_price_service.go) | Silver price service |
 | [src/go-backend/domain/service/fx_rate_service.go](src/go-backend/domain/service/fx_rate_service.go) | FX rate service |
