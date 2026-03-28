@@ -2,22 +2,21 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import type { MarketTypeItem } from "@/features/market-prices/hooks/usePublicMarketTypes";
+import { useQueryGetAssetDisplayPrices } from "@/utils/generated/hooks";
+import { formatUpdateTimestamp } from "@/features/market-prices/utils/format-update-time";
 
-interface LandingSilverPriceTableProps {
-  types: MarketTypeItem[];
-  isLoading?: boolean;
-  updatedTime?: string;
-}
-
-export function LandingSilverPriceTable({
-  types,
-  isLoading,
-  updatedTime,
-}: LandingSilverPriceTableProps) {
+export function LandingSilverPriceTable() {
   const t = useTranslations("landing.priceTeaser");
+  const { data, isLoading } = useQueryGetAssetDisplayPrices({ assetType: "silver" });
 
-  if (isLoading) {
+  const prices = data?.prices ?? [];
+
+  const updatedTime = (() => {
+    const entry = prices.find((p) => p.updatedAt && p.updatedAt > 0);
+    return entry?.updatedAt ? formatUpdateTimestamp(entry.updatedAt) : undefined;
+  })();
+
+  if (isLoading && prices.length === 0) {
     return (
       <div className="rounded-lg border-2 border-v2-silver-primary/30 overflow-hidden shadow-v2-card">
         <div className="bg-gradient-to-r from-v2-silver-primary via-gray-300 to-v2-silver-primary px-5 py-3">
@@ -71,13 +70,13 @@ export function LandingSilverPriceTable({
             </tr>
           </thead>
           <tbody>
-            {types.map((item, index) => (
+            {prices.map((item, index) => (
               <tr
-                key={item.code}
+                key={item.typeCode}
                 className={`border-b border-v2-silver-primary/10 ${index % 2 === 0 ? "bg-v2-cream-200" : "bg-v2-cream-300"}`}
               >
                 <td className="px-5 py-3.5 font-roboto font-bold text-[14px] text-v2-maroon-900 border-r border-v2-silver-primary/10">
-                  {item.name || item.code}
+                  {item.displayName}
                 </td>
                 <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-green-700 border-r border-v2-silver-primary/10">
                   {t.rich("loginPrompt", {
@@ -105,7 +104,7 @@ export function LandingSilverPriceTable({
                 </td>
               </tr>
             ))}
-            {types.length === 0 && (
+            {prices.length === 0 && (
               <tr>
                 <td
                   colSpan={3}

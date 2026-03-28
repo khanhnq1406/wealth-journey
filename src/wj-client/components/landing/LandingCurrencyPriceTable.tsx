@@ -2,22 +2,21 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import type { MarketTypeItem } from "@/features/market-prices/hooks/usePublicMarketTypes";
+import { useQueryGetAssetDisplayPrices } from "@/utils/generated/hooks";
+import { formatUpdateTimestamp } from "@/features/market-prices/utils/format-update-time";
 
-interface LandingCurrencyPriceTableProps {
-  types: MarketTypeItem[];
-  isLoading?: boolean;
-  updatedTime?: string;
-}
-
-export function LandingCurrencyPriceTable({
-  types,
-  isLoading,
-  updatedTime,
-}: LandingCurrencyPriceTableProps) {
+export function LandingCurrencyPriceTable() {
   const t = useTranslations("landing.priceTeaser");
+  const { data, isLoading } = useQueryGetAssetDisplayPrices({ assetType: "currency" });
 
-  if (isLoading) {
+  const prices = data?.prices ?? [];
+
+  const updatedTime = (() => {
+    const entry = prices.find((p) => p.updatedAt && p.updatedAt > 0);
+    return entry?.updatedAt ? formatUpdateTimestamp(entry.updatedAt) : undefined;
+  })();
+
+  if (isLoading && prices.length === 0) {
     return (
       <div className="rounded-lg border-2 border-v2-currency-primary/30 overflow-hidden shadow-v2-card">
         <div className="bg-gradient-to-r from-v2-currency-primary via-v2-currency-accent to-v2-currency-primary px-5 py-3">
@@ -65,13 +64,13 @@ export function LandingCurrencyPriceTable({
             </tr>
           </thead>
           <tbody>
-            {types.map((item, index) => (
+            {prices.map((item, index) => (
               <tr
-                key={item.code}
+                key={item.typeCode}
                 className={`border-b border-v2-currency-primary/10 ${index % 2 === 0 ? "bg-v2-cream-200" : "bg-v2-cream-300"}`}
               >
                 <td className="px-5 py-3.5 font-roboto font-bold text-[14px] text-v2-maroon-900 border-r border-v2-currency-primary/10">
-                  {item.name || item.code}
+                  {item.displayName}
                 </td>
                 <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-green-700 border-r border-v2-currency-primary/10">
                   {t.rich("loginPrompt", {
@@ -99,7 +98,7 @@ export function LandingCurrencyPriceTable({
                 </td>
               </tr>
             ))}
-            {types.length === 0 && (
+            {prices.length === 0 && (
               <tr>
                 <td
                   colSpan={3}

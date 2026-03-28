@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl";
 import { store } from "@/features/auth/store/store";
 import {
   useQueryListWallets,
-  useQueryGetMarketPrices,
   useQueryGetAggregatedPortfolioSummary,
 } from "@/utils/generated/hooks";
 import { PnlPeriod } from "@/gen/protobuf/v1/investment";
@@ -21,11 +20,6 @@ import {
 } from "@/utils/generated/hooks";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { parseAmount } from "@/utils/currency-formatter";
-import {
-  formatUpdateTimestamp,
-  getLatestTimestamp,
-} from "@/features/market-prices/utils/format-update-time";
-import { useAuth } from "@/features/auth/hooks/useAuth";
 import { NetWorthDisplay } from "./NetWorthDisplay";
 import { PNLCard } from "./PNLCard";
 import { GoldPriceTable } from "./GoldPriceTable";
@@ -46,8 +40,6 @@ export default function Home() {
   const queryClient = useQueryClient();
   const [modalType, setModalType] = useState<ModalType>(null);
   const user = store.getState().setAuthReducer;
-  const { user: authUser } = useAuth();
-  const isAdmin = authUser?.isAdmin ?? false;
   const { currency } = useCurrency();
   const pnlRef = useRef<HTMLDivElement>(null);
   const [pnlHeight, setPnlHeight] = useState<number | undefined>(undefined);
@@ -66,11 +58,6 @@ export default function Home() {
   const { data: walletsData, isLoading: walletsLoading } = useQueryListWallets(
     { pagination: { page: 1, pageSize: 20, orderBy: "", order: "" } },
     { refetchOnMount: "always" },
-  );
-
-  const { data: marketPrices, isLoading: marketPricesLoading } = useQueryGetMarketPrices(
-    {},
-    { staleTime: 5 * 60 * 1000 },
   );
 
   const { data: portfolioSummary } = useQueryGetAggregatedPortfolioSummary(
@@ -110,18 +97,6 @@ export default function Home() {
   const weekPnlPercent = Number(summary1W?.data?.periodPnlPercent ?? 0);
   const monthPnl = parseAmount(summary1M?.data?.periodPnl);
   const monthPnlPercent = Number(summary1M?.data?.periodPnlPercent ?? 0);
-
-  // Silver/currency prices (gold prices now fetched directly by GoldPriceTable)
-  const silverPrices = marketPrices?.silver ?? [];
-  const currencyPrices = marketPrices?.currency ?? [];
-
-  // Update timestamps from API data
-  const silverUpdatedTime = formatUpdateTimestamp(
-    getLatestTimestamp(silverPrices),
-  );
-  const currencyUpdatedTime = formatUpdateTimestamp(
-    getLatestTimestamp(currencyPrices),
-  );
 
   // Wallets for WalletsSection
   const wallets = (walletsData?.wallets ?? []).map((w) => ({
@@ -189,12 +164,7 @@ export default function Home() {
         <SentimentCard variant="home" asset="gold" />
 
         {/* 6. Silver Price Table */}
-        <SilverPriceTable
-          prices={silverPrices}
-          updatedTime={silverUpdatedTime}
-          isAdmin={isAdmin}
-          isLoading={marketPricesLoading}
-        />
+        <SilverPriceTable />
 
         {/* 7. Silver Price Chart */}
         <SilverPriceChart />
@@ -203,7 +173,7 @@ export default function Home() {
         <SentimentCard variant="home" asset="silver" />
 
         {/* 9. Currency Price Table */}
-        <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} isAdmin={isAdmin} isLoading={marketPricesLoading} />
+        <CurrencyPriceTable />
 
         {/* 10. Dollar Index Chart */}
         <DollarIndexChart />
@@ -263,12 +233,7 @@ export default function Home() {
 
         {/* Row 4: Silver Table + Silver Chart */}
         <div className="grid grid-cols-2 gap-6">
-          <SilverPriceTable
-            prices={silverPrices}
-            updatedTime={silverUpdatedTime}
-            isAdmin={isAdmin}
-            isLoading={marketPricesLoading}
-          />
+          <SilverPriceTable />
           <SilverPriceChart />
         </div>
 
@@ -277,7 +242,7 @@ export default function Home() {
 
         {/* Row 5: Currency Table + Dollar Index Chart */}
         <div className="grid grid-cols-2 gap-6">
-          <CurrencyPriceTable prices={currencyPrices} updatedTime={currencyUpdatedTime} isAdmin={isAdmin} isLoading={marketPricesLoading} />
+          <CurrencyPriceTable />
           <DollarIndexChart />
         </div>
       </div>

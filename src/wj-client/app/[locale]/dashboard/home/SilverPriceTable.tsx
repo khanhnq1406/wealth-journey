@@ -2,26 +2,48 @@
 
 import { useTranslations } from "next-intl";
 import { formatPriceValue } from "../prices/helpers";
-import type { PriceItem } from "@/gen/protobuf/v1/investment";
+import {
+  useQueryGetAssetDisplayPrices,
+} from "@/utils/generated/hooks";
+import {
+  formatUpdateTimestamp,
+  getLatestTimestamp,
+} from "@/features/market-prices/utils/format-update-time";
 import {
   InlinePriceEdit,
   OverrideIndicator,
 } from "@/features/market-prices/components/InlinePriceEdit";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import type { AssetDisplayPrice } from "@/gen/protobuf/v1/investment";
+import type { PriceItem } from "@/gen/protobuf/v1/investment";
 
-interface SilverPriceTableProps {
-  prices: PriceItem[];
-  updatedTime?: string;
-  isAdmin?: boolean;
-  isLoading?: boolean;
+function toAdminPriceItem(item: AssetDisplayPrice): PriceItem {
+  return {
+    typeCode: item.typeCode,
+    name: item.displayName,
+    buy: item.buy,
+    sell: item.sell,
+    changeBuy: item.changeBuy,
+    changeSell: item.changeSell,
+    currency: item.currency,
+    updatedAt: item.updatedAt,
+    isOverridden: false,
+    isStale: item.isStale,
+  };
 }
 
-export function SilverPriceTable({
-  prices,
-  updatedTime,
-  isAdmin = false,
-  isLoading = false,
-}: SilverPriceTableProps) {
+export function SilverPriceTable() {
   const t = useTranslations("dashboard.home");
+  const { user } = useAuth();
+  const isAdmin = user?.isAdmin ?? false;
+
+  const { data, isLoading } = useQueryGetAssetDisplayPrices(
+    { assetType: "silver" },
+    { staleTime: 5 * 60 * 1000 },
+  );
+
+  const prices = data?.prices ?? [];
+  const updatedTime = formatUpdateTimestamp(getLatestTimestamp(prices));
 
   return (
     <div className="rounded-lg border-2 border-v2-silver-primary/30 overflow-hidden shadow-v2-card">
@@ -31,7 +53,7 @@ export function SilverPriceTable({
           <h3 className="font-roboto font-bold text-[16px] text-v2-maroon-900">
             {t("silverPriceTitle")}
           </h3>
-          {updatedTime && (
+          {prices.length > 0 && (
             <span className="font-roboto text-[11px] text-v2-maroon-800/70">
               {t("updated", { time: updatedTime })}
             </span>
@@ -64,22 +86,22 @@ export function SilverPriceTable({
                 className={`border-b border-v2-silver-primary/10 ${index % 2 === 0 ? "bg-v2-cream-200" : "bg-v2-cream-300"}`}
               >
                 <td className="px-5 py-3.5 font-roboto font-bold text-[14px] text-v2-maroon-900 border-r border-v2-silver-primary/10">
-                  {item.name || item.typeCode}
+                  {item.displayName}
                   <OverrideIndicator
-                    item={item}
+                    item={toAdminPriceItem(item)}
                     category="silver"
                     isAdmin={isAdmin}
                   />
                 </td>
                 <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-red-700 tabular-nums border-r border-v2-silver-primary/10">
-                  {formatPriceValue(item.buy, item.currency || "VND")}
+                  {item.isStale ? "--" : formatPriceValue(item.buy, item.currency || "VND")}
                 </td>
                 <td className="px-5 py-3.5 text-right font-roboto font-bold text-[14px] text-green-700 tabular-nums">
-                  {formatPriceValue(item.sell, item.currency || "VND")}
+                  {item.isStale ? "--" : formatPriceValue(item.sell, item.currency || "VND")}
                 </td>
                 {isAdmin && (
                   <td className="px-2 py-3.5">
-                    <InlinePriceEdit item={item} category="silver" />
+                    <InlinePriceEdit item={toAdminPriceItem(item)} category="silver" />
                   </td>
                 )}
               </tr>

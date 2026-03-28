@@ -205,6 +205,7 @@ Key changed symbols and their d=1 dependents:
 | 2026-03-28 | Migration: set `_VCB` fetch codes as default (priority 1) for standard currency display configs | Minor    | `migrate-asset-config-fetch-code` seeded plain fetch codes (e.g. `"USD"`) as priority 1 for standard currency display configs; Vietcombank data was not set as default source |
 | 2026-03-28 | Landing page and home page currency table shows "Không có dữ liệu" — added per-asset static fallback in `GetPublicMarketTypes` | Minor | `public.go` fallback only fired when ALL three asset types (gold, silver, currency) were empty. If gold/silver had DB data but currency was empty (price cache unpopulated), currency fell back to `[]` with no fallback — causing "no data" display. |
 | 2026-03-28 | Frontend build fails: TypeScript error in `AssetDisplayConfigForm.tsx` — incorrect type cast on `createMutation` `onSuccess` data | Minor | `apiClient.post<T>()` returns `ApiResponse<T>` (envelope with `data?: T`), but the handler cast `data` directly to `CreateConfigResponse` and accessed `.config.id` — which is actually at `data.data?.config?.id`. Fixed by removing the bad cast and using correct optional chaining. |
+| 2026-03-28 | Silver and currency tables on landing and home pages did not use `asset-display-prices` API — migrated to `useQueryGetAssetDisplayPrices` | Major | Gold table already used `GET /api/v1/public/asset-display-prices?assetType=gold` (admin-configured, stale-aware, source-resolved). Silver/currency tables still used `usePublicMarketTypes` (names only, no prices) and `useQueryGetMarketPrices` (raw `asset_price` rows without admin config). Migrated 4 components to self-fetch via `useQueryGetAssetDisplayPrices`; removed `usePublicMarketTypes` and SSR `fetchMarketTypes()` from landing page; simplified `home/page.tsx`. |
 
 ### Fix Detail: 2026-03-28 — JSON Schema Mismatch
 
@@ -292,3 +293,36 @@ onSuccess?.(data?.data?.config?.id, selectedAssetType);
 - `src/wj-client/features/admin/components/AssetDisplayConfigForm.tsx` — Line 111: removed bad type cast, use `data?.data?.config?.id`
 
 **Security Review:** Approved — no new attack surface; `config.id` is a non-secret integer used only for admin UI navigation; optional chaining handles missing values safely with no exception propagation.
+
+### Fix Detail: 2026-03-28 — Silver & Currency Tables Not Using Asset Display Prices API
+
+**Symptom:** Gold price tables on landing page and home page used the admin-configured `GET /api/v1/public/asset-display-prices?assetType=gold` endpoint (stale-aware, source-resolved, admin overrides applied). Silver and currency tables used older endpoints: landing page used `GET /api/v1/public/market-types` (returns display names only, no prices); home page used `GET /api/v1/investments/market-prices` (raw `asset_price` rows without admin display config resolution).
+
+**Root Cause:** The `feat/price-page` feature that introduced `GoldPriceTable` self-fetching was implemented for gold only. The landing and home page silver/currency tables were not updated to use the same endpoint pattern when the `asset-display-prices` API was added. This meant:
+- Silver/currency prices on the landing page showed no prices at all (login prompt only, but the row data came from `market-types` which has no prices)
+- Silver/currency on the home page bypassed admin display configuration, source resolution, stale marking per source, and admin overrides
+
+**Fix:** Migrated 4 components to self-fetch via `useQueryGetAssetDisplayPrices`:
+
+1. `LandingSilverPriceTable` — removed `types`/`isLoading`/`updatedTime` props; now self-fetches `assetType: "silver"`; shows `item.displayName`
+2. `LandingCurrencyPriceTable` — same migration for `assetType: "currency"`
+3. `SilverPriceTable` (home) — removed `prices`/`updatedTime`/`isAdmin`/`isLoading` props; self-fetches `assetType: "silver"`; derives `isAdmin` from `useAuth()` internally; shows `"--"` for stale prices
+4. `CurrencyPriceTable` (home) — same migration for `assetType: "currency"`
+
+Cleanup:
+- `LandingContent.tsx` — removed `usePublicMarketTypes` hook, all silver/currency state vars, `initialData` prop
+- `landing/page.tsx` — removed SSR `fetchMarketTypes()` (was fetching `/api/v1/public/market-types` with ISR); landing now renders client-side only (consistent with gold/silver/currency all self-fetching)
+- `home/page.tsx` — removed `useQueryGetMarketPrices`, silver/currency derived vars and props
+
+**Note on `toAdminPriceItem` adapter:** `InlinePriceEdit` and `OverrideIndicator` accept `PriceItem` type (which has `name`, `isOverridden` fields absent from `AssetDisplayPrice`). A thin `toAdminPriceItem()` adapter is added in each home table component that sets `isOverridden: false` (hardcoded). This means the "remove override" gold dot indicator won't appear for silver/currency rows even when an override is set — a cosmetic gap only. The admin override write/delete endpoints remain fully auth-guarded server-side.
+
+**Files Changed:**
+- `src/wj-client/components/landing/LandingSilverPriceTable.tsx` — rewritten to self-fetch
+- `src/wj-client/components/landing/LandingCurrencyPriceTable.tsx` — rewritten to self-fetch
+- `src/wj-client/app/[locale]/landing/LandingContent.tsx` — removed `usePublicMarketTypes`, simplified
+- `src/wj-client/app/[locale]/landing/page.tsx` — removed SSR fetch, simplified
+- `src/wj-client/app/[locale]/dashboard/home/SilverPriceTable.tsx` — rewritten to self-fetch
+- `src/wj-client/app/[locale]/dashboard/home/CurrencyPriceTable.tsx` — rewritten to self-fetch
+- `src/wj-client/app/[locale]/dashboard/home/page.tsx` — removed `useQueryGetMarketPrices` for silver/currency
+
+**Security Review:** Approved — no new attack surface; endpoint already existed and was used by gold; `assetType` is hardcoded (no user input); `isAdmin` derived from same trusted `useAuth()` source; `item.displayName` rendered as React JSX text node (XSS-safe); removing SSR for public data has no security impact.
