@@ -44,10 +44,23 @@ func (h *PublicHandler) GetPublicMarketTypes(c *gin.Context) {
 	silverTypes := convertMarketTypeItems(marketTypes.Silver)
 	currencyTypes := convertMarketTypeItems(marketTypes.Currency)
 
-	// If all empty, fallback to static (cold start: PriceCacheJob hasn't run yet)
+	// If ALL empty, full fallback to static (cold start before first PriceCacheJob run).
 	if len(goldTypes) == 0 && len(silverTypes) == 0 && len(currencyTypes) == 0 {
 		h.fallbackStaticTypes(c)
 		return
+	}
+
+	// Per-asset fallback: if a specific asset type has no DB rows (e.g. currency fetcher
+	// hasn't run yet or migration not applied), fall back to its static registry so the
+	// landing page never shows "Không có dữ liệu" for a structurally-present asset type.
+	if len(goldTypes) == 0 {
+		goldTypes = staticGoldTypes()
+	}
+	if len(silverTypes) == 0 {
+		silverTypes = staticSilverTypes()
+	}
+	if len(currencyTypes) == 0 {
+		currencyTypes = staticCurrencyTypes()
 	}
 
 	handler.Success(c, gin.H{
@@ -79,40 +92,37 @@ func convertMarketTypeItems(items []service.MarketTypeItem) []gin.H {
 // Used when the DB cache is empty (cold start before first PriceCacheJob run)
 // or when AssetPriceService returns an error.
 func (h *PublicHandler) fallbackStaticTypes(c *gin.Context) {
-	goldTypes := make([]gin.H, len(gold.GoldTypes))
-	for i, gt := range gold.GoldTypes {
-		goldTypes[i] = gin.H{
-			"code":     gt.Code,
-			"name":     gt.Name,
-			"currency": gt.Currency,
-		}
-	}
-
-	silverTypes := make([]gin.H, len(silver.SilverTypes))
-	for i, st := range silver.SilverTypes {
-		silverTypes[i] = gin.H{
-			"code":     st.Code,
-			"name":     st.Name,
-			"currency": st.Currency,
-		}
-	}
-
-	currencyTypes := make([]gin.H, len(currency.CurrencyTypes))
-	for i, ct := range currency.CurrencyTypes {
-		currencyTypes[i] = gin.H{
-			"code":     ct.Code,
-			"name":     ct.Name,
-			"currency": ct.Currency,
-		}
-	}
-
 	handler.Success(c, gin.H{
-		"gold":              goldTypes,
-		"silver":            silverTypes,
-		"currency":          currencyTypes,
+		"gold":              staticGoldTypes(),
+		"silver":            staticSilverTypes(),
+		"currency":          staticCurrencyTypes(),
 		"goldUpdatedAt":     int64(0),
 		"silverUpdatedAt":   int64(0),
 		"currencyUpdatedAt": int64(0),
 		"timestamp":         time.Now().Format(time.RFC3339),
 	})
+}
+
+func staticGoldTypes() []gin.H {
+	result := make([]gin.H, len(gold.GoldTypes))
+	for i, gt := range gold.GoldTypes {
+		result[i] = gin.H{"code": gt.Code, "name": gt.Name, "currency": gt.Currency}
+	}
+	return result
+}
+
+func staticSilverTypes() []gin.H {
+	result := make([]gin.H, len(silver.SilverTypes))
+	for i, st := range silver.SilverTypes {
+		result[i] = gin.H{"code": st.Code, "name": st.Name, "currency": st.Currency}
+	}
+	return result
+}
+
+func staticCurrencyTypes() []gin.H {
+	result := make([]gin.H, len(currency.CurrencyTypes))
+	for i, ct := range currency.CurrencyTypes {
+		result[i] = gin.H{"code": ct.Code, "name": ct.Name, "currency": ct.Currency}
+	}
+	return result
 }
