@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { ConfirmationDialog } from "@/components/modals/ConfirmationDialog";
+import { FilterableAutocomplete } from "@/components/forms/FilterableAutocomplete";
 import { apiClient } from "@/utils/api-client";
 import { useNotification } from "@/contexts/NotificationContext";
 
@@ -215,39 +216,19 @@ export function FetchCodeList({ configId, assetType }: FetchCodeListProps) {
         onSubmit={handleAddSubmit}
         className="space-y-3 pt-2 border-t border-v2-border-light"
       >
-        {/* Available codes from DB */}
-        {availableCodesLoading ? (
-          <p className="text-xs text-v2-text-tertiary">{t("form.availableCodesLoading")}</p>
-        ) : (availableCodesData?.typeCodes?.length ?? 0) > 0 ? (
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-v2-gold-accent">{t("form.availableCodes")}</p>
-            <div className="flex flex-wrap gap-1.5">
-              {availableCodesData!.typeCodes.map((code) => (
-                <button
-                  key={code}
-                  type="button"
-                  onClick={() => setTypeCodeInput(code)}
-                  className="px-2 py-0.5 text-xs font-mono rounded border border-v2-border-light bg-v2-bg-dark text-v2-text-secondary hover:border-v2-gold-primary hover:text-v2-gold-accent cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-v2-gold-primary"
-                >
-                  {code}
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : null}
-
         <div className="flex flex-col sm:flex-row gap-2">
-          {/* Type code input */}
+          {/* Type code input with autocomplete */}
           <div className="flex-1">
             <label className="block text-xs font-medium text-v2-gold-accent mb-1">
               {t("form.typeCode")}
             </label>
-            <input
-              type="text"
+            <FilterableAutocomplete
+              suggestions={availableCodesData?.typeCodes ?? []}
               value={typeCodeInput}
-              onChange={(e) => setTypeCodeInput(e.target.value)}
+              onChange={setTypeCodeInput}
               placeholder={t("form.typeCodePlaceholder")}
-              className="w-full px-3 py-2 min-h-[44px] rounded-md bg-v2-bg-dark border border-v2-border text-v2-text-secondary placeholder:text-v2-text-placeholder text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-v2-gold-primary"
+              isLoading={availableCodesLoading}
+              disabled={createMutation.isPending}
             />
           </div>
 

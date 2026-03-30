@@ -316,38 +316,59 @@ describe("FetchCodeList", () => {
     });
   });
 
-  it("renders available type codes as selectable pills", async () => {
+  it("renders available type codes as suggestions in the autocomplete", async () => {
     mockGet
       .mockResolvedValueOnce({ fetchCodes: [] })
       .mockResolvedValueOnce({ typeCodes: ["SJC_1L", "SJC_R2", "DOJI_1L"] });
 
     renderWithProviders(<FetchCodeList configId={10} assetType="gold" />);
 
+    // The combobox should be present immediately
+    const combobox = screen.getByRole("combobox");
+    expect(combobox).toBeInTheDocument();
+
+    // Open the dropdown by focusing the input
+    fireEvent.focus(combobox);
+
+    // Suggestions should appear in the dropdown
     await waitFor(() => {
-      expect(screen.getByText("SJC_1L")).toBeInTheDocument();
-      expect(screen.getByText("SJC_R2")).toBeInTheDocument();
-      expect(screen.getByText("DOJI_1L")).toBeInTheDocument();
+      expect(screen.getByRole("listbox")).toBeInTheDocument();
+      expect(screen.getByRole("option", { name: "SJC_1L" })).toBeInTheDocument();
+      expect(screen.getByRole("option", { name: "SJC_R2" })).toBeInTheDocument();
+      expect(screen.getByRole("option", { name: "DOJI_1L" })).toBeInTheDocument();
     });
   });
 
-  it("clicking a pill fills the typeCode input", async () => {
+  it("selecting a suggestion from autocomplete fills the typeCode input", async () => {
     mockGet
       .mockResolvedValueOnce({ fetchCodes: [] })
       .mockResolvedValueOnce({ typeCodes: ["SJC_1L", "SJC_R2"] });
 
     renderWithProviders(<FetchCodeList configId={10} assetType="gold" />);
 
+    const combobox = screen.getByRole("combobox");
+
+    // Wait for available codes to load before opening the dropdown
     await waitFor(() => {
-      expect(screen.getByText("SJC_R2")).toBeInTheDocument();
+      expect(mockGet).toHaveBeenCalledTimes(2);
     });
 
-    fireEvent.click(screen.getByText("SJC_R2"));
+    // Open dropdown by focusing
+    fireEvent.focus(combobox);
 
-    const typeCodeInput = screen.getByPlaceholderText(/select or type a code/i);
-    expect((typeCodeInput as HTMLInputElement).value).toBe("SJC_R2");
+    // Wait for listbox to appear with options
+    await waitFor(() => {
+      expect(screen.getByRole("listbox")).toBeInTheDocument();
+      expect(screen.getByRole("option", { name: "SJC_R2" })).toBeInTheDocument();
+    });
+
+    // Click the SJC_R2 option
+    fireEvent.mouseDown(screen.getByRole("option", { name: "SJC_R2" }));
+
+    expect((combobox as HTMLInputElement).value).toBe("SJC_R2");
   });
 
-  it("shows loading label while available codes are loading", async () => {
+  it("shows loading spinner in autocomplete while available codes are loading", async () => {
     // Delay the available codes response
     mockGet
       .mockResolvedValueOnce({ fetchCodes: [] })
@@ -360,7 +381,10 @@ describe("FetchCodeList", () => {
 
     renderWithProviders(<FetchCodeList configId={10} assetType="gold" />);
 
-    expect(screen.getByText(/loading codes/i)).toBeInTheDocument();
+    // The combobox is still rendered while loading
+    expect(screen.getByRole("combobox")).toBeInTheDocument();
+    // The old "loading codes..." text label should NOT appear
+    expect(screen.queryByText(/loading codes/i)).not.toBeInTheDocument();
   });
 
   it("hides available codes section when no codes returned", async () => {
@@ -376,5 +400,15 @@ describe("FetchCodeList", () => {
     });
 
     expect(screen.queryByText("Available codes")).not.toBeInTheDocument();
+  });
+
+  // --- FilterableAutocomplete integration ---
+
+  it("renders FilterableAutocomplete instead of button grid for typeCode input", () => {
+    renderWithProviders(<FetchCodeList configId={1} assetType="gold" />);
+    // Should find combobox (FilterableAutocomplete)
+    expect(screen.getByRole("combobox")).toBeInTheDocument();
+    // Should NOT find the old "Available Codes:" label
+    expect(screen.queryByText("Available Codes:")).not.toBeInTheDocument();
   });
 });

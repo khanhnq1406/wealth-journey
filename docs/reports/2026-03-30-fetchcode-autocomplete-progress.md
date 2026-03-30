@@ -7,15 +7,15 @@
 - **Spec file:** docs/specs/2026-03-30-fetchcode-autocomplete-spec.md
 - **Started:** 2026-03-30T00:00:00Z
 - **Last updated:** 2026-03-30T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 2
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | #   | Task Name                                      | Status      | Commit | Summary |
 | --- | ---------------------------------------------- | ----------- | ------ | ------- |
-| 1   | Create FilterableAutocomplete component        | done        | —      | Created shared FilterableAutocomplete in components/forms/ with 13 passing tests |
-| 2   | Integrate FilterableAutocomplete into FetchCodeList | pending | —      | —       |
+| 1   | Create FilterableAutocomplete component        | done        | a474394d | Created shared FilterableAutocomplete in components/forms/ with 13 passing tests |
+| 2   | Integrate FilterableAutocomplete into FetchCodeList | done    | —      | Replaced button grid + plain input in FetchCodeList with FilterableAutocomplete; 17 tests passing |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
