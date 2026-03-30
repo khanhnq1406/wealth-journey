@@ -66,7 +66,7 @@ func newTestAssetPriceServiceCurrency(
 		vsgCurrency,
 		vtCurrency,
 		vcbCurrency,
-		nil, nil, nil, nil, // sjc/doji/btmc/pnj nil — each fails independently
+		nil, nil, nil, nil, nil, // sjc/doji/btmc/pnj/mihong nil — each fails independently
 	)
 }
 
@@ -355,7 +355,7 @@ func TestRefreshAllPrices_10Sources(t *testing.T) {
 		&mockSimpleCurrencyFetcher{source: SourceVangSaiGon, prices: vsgCurrencyPrices},
 		&mockSimpleCurrencyFetcher{source: SourceVangToday, prices: vtCurrencyPrices},
 		&mockSimpleCurrencyFetcher{source: SourceVietcombank, prices: vcbPrices},
-		nil, nil, nil, nil, // sjc/doji/btmc/pnj nil
+		nil, nil, nil, nil, nil, // sjc/doji/btmc/pnj/mihong nil
 	)
 
 	err := svc.RefreshAllPrices(context.Background())
@@ -369,9 +369,9 @@ func TestRefreshAllPrices_10Sources(t *testing.T) {
 	}
 }
 
-func TestRefreshAllPrices_AllFail_10Sources(t *testing.T) {
-	// All 10 sources fail → returns error "all price sources failed".
-	// 2 gold fetchers fail + 4 nil gold clients fail + 1 silver fail + 3 currency fail = 10.
+func TestRefreshAllPrices_AllFail_11Sources(t *testing.T) {
+	// All 11 sources fail → returns error "all price sources failed".
+	// 2 gold fetchers fail + 5 nil gold clients fail + 1 silver fail + 3 currency fail = 11.
 	repo := &mockAssetPriceRepo{}
 	svc := NewAssetPriceService(
 		repo,
@@ -382,12 +382,12 @@ func TestRefreshAllPrices_AllFail_10Sources(t *testing.T) {
 		&mockSimpleCurrencyFetcher{source: SourceVangSaiGon, err: errTest},
 		&mockSimpleCurrencyFetcher{source: SourceVangToday, err: errTest},
 		&mockSimpleCurrencyFetcher{source: SourceVietcombank, err: errTest},
-		nil, nil, nil, nil, // sjc/doji/btmc/pnj nil — also fail
+		nil, nil, nil, nil, nil, // sjc/doji/btmc/pnj/mihong nil — also fail
 	)
 
 	err := svc.RefreshAllPrices(context.Background())
 	if err == nil {
-		t.Fatal("expected error when all 10 sources fail, got nil")
+		t.Fatal("expected error when all 11 sources fail, got nil")
 	}
 	if err.Error() != "all price sources failed" {
 		t.Errorf("expected 'all price sources failed', got: %q", err.Error())
@@ -413,7 +413,7 @@ func TestRefreshAllPrices_VCBFailOthersSucceed(t *testing.T) {
 		&mockSimpleCurrencyFetcher{source: SourceVangSaiGon, prices: vsgCurrencyPrices},
 		&mockSimpleCurrencyFetcher{source: SourceVangToday, prices: vtCurrencyPrices},
 		&mockSimpleCurrencyFetcher{source: SourceVietcombank, err: errors.New("vcb down")},
-		nil, nil, nil, nil, // sjc/doji/btmc/pnj nil
+		nil, nil, nil, nil, nil, // sjc/doji/btmc/pnj/mihong nil
 	)
 
 	err := svc.RefreshAllPrices(context.Background())

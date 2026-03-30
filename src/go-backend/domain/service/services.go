@@ -10,6 +10,7 @@ import (
 	"wealthjourney/pkg/btmcdirect"
 	"wealthjourney/pkg/cache"
 	"wealthjourney/pkg/doji"
+	"wealthjourney/pkg/mihong"
 	"wealthjourney/pkg/pnj"
 	pkgredis "wealthjourney/pkg/redis"
 	"wealthjourney/pkg/sjc"
@@ -93,6 +94,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	dojiClient := doji.NewClient()
 	btmcClient := btmcdirect.NewClient()
 	pnjClient := pnj.NewClient()
+	mihongClient := mihong.NewClient(waterfallSourceTimeout)
 
 	// Feature flag: VIETCOMBANK_FX_ENABLED (default true).
 	// Set to "false" to disable Vietcombank currency fetching entirely.
@@ -116,6 +118,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		dojiClient,
 		btmcClient,
 		pnjClient,
+		mihongClient,
 	)
 
 	// Phase 1 (cont.): PriceAlertService — reads from DB cache via AssetPriceService

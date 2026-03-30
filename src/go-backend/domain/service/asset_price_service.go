@@ -12,6 +12,7 @@ import (
 	"wealthjourney/domain/repository"
 	"wealthjourney/pkg/btmcdirect"
 	"wealthjourney/pkg/doji"
+	"wealthjourney/pkg/mihong"
 	"wealthjourney/pkg/pnj"
 	"wealthjourney/pkg/sjc"
 )
@@ -37,6 +38,7 @@ type assetPriceService struct {
 	dojiClient                *doji.Client         // nil = not configured; source skipped
 	btmcClient                *btmcdirect.Client   // nil = not configured; source skipped
 	pnjClient                 *pnj.Client          // nil = not configured; source skipped
+	mihongClient              *mihong.Client       // nil = not configured; source skipped
 }
 
 // NewAssetPriceService creates a new AssetPriceService with constructor injection.
@@ -55,6 +57,7 @@ func NewAssetPriceService(
 	dojiClient *doji.Client,
 	btmcClient *btmcdirect.Client,
 	pnjClient *pnj.Client,
+	mihongClient *mihong.Client,
 ) AssetPriceService {
 	return &assetPriceService{
 		repo:                      repo,
@@ -69,6 +72,7 @@ func NewAssetPriceService(
 		dojiClient:                dojiClient,
 		btmcClient:                btmcClient,
 		pnjClient:                 pnjClient,
+		mihongClient:              mihongClient,
 	}
 }
 
@@ -93,14 +97,14 @@ type refreshResult struct {
 // Each source runs in its own goroutine. One failure marks only that source stale
 // and does not interrupt the others.
 //
-// Returns non-nil error only when every one of the 10 sources fails, so callers
+// Returns non-nil error only when every one of the 11 sources fails, so callers
 // can decide to retry or alert.
 //
 // Log summary format (for observability):
 //
 //	"[assetPriceService] Price cache job completed: gold_vangsaigon=OK(25), gold_vangtoday=FAIL(...), currency_vangsaigon=OK(12), currency_vangtoday=OK(12), currency_vietcombank=OK(8), ..."
 func (s *assetPriceService) RefreshAllPrices(ctx context.Context) error {
-	results := make(chan refreshResult, 10)
+	results := make(chan refreshResult, 11)
 	var wg sync.WaitGroup
 
 	// 2 direct VangSaiGon / VangToday gold sources (replacing waterfall)
@@ -108,12 +112,13 @@ func (s *assetPriceService) RefreshAllPrices(ctx context.Context) error {
 	go func() { defer wg.Done(); results <- s.refreshGoldVangSaiGon(ctx) }()
 	go func() { defer wg.Done(); results <- s.refreshGoldVangToday(ctx) }()
 
-	// 4 per-source gold clients (unchanged)
-	wg.Add(4)
+	// 5 per-source gold clients
+	wg.Add(5)
 	go func() { defer wg.Done(); results <- s.refreshGoldSJC(ctx) }()
 	go func() { defer wg.Done(); results <- s.refreshGoldDOJI(ctx) }()
 	go func() { defer wg.Done(); results <- s.refreshGoldBTMC(ctx) }()
 	go func() { defer wg.Done(); results <- s.refreshGoldPNJ(ctx) }()
+	go func() { defer wg.Done(); results <- s.refreshGoldMihong(ctx) }()
 
 	// Silver (unchanged)
 	wg.Add(1)
@@ -142,7 +147,7 @@ func (s *assetPriceService) RefreshAllPrices(ctx context.Context) error {
 	log.Printf("[assetPriceService] Price cache job completed: %s", strings.Join(summaryParts, ", "))
 
 	// Return error only when ALL sources failed.
-	if failCount == 10 {
+	if failCount == 11 {
 		return fmt.Errorf("all price sources failed")
 	}
 	return nil
@@ -583,6 +588,48 @@ func (s *assetPriceService) refreshGoldPNJ(ctx context.Context) refreshResult {
 		return refreshResult{source: "gold_pnj", count: 0, err: err}
 	}
 	return refreshResult{source: "gold_pnj", count: len(batch), err: nil}
+}
+
+// refreshGoldMihong fetches gold prices from the Mihong (Mi Hồng) API and upserts them.
+// Mihong GoldPrice does not have ChangeBuy/ChangeSell fields; those default to 0.
+func (s *assetPriceService) refreshGoldMihong(ctx context.Context) refreshResult {
+	if s.mihongClient == nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "mihong")
+		return refreshResult{source: "gold_mihong", count: 0, err: fmt.Errorf("mihong client not configured")}
+	}
+	prices, err := s.mihongClient.FetchGoldPrices(ctx)
+	if err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "mihong")
+		return refreshResult{source: "gold_mihong", count: 0, err: err}
+	}
+	batch := make([]*models.AssetPrice, 0, len(prices))
+	for _, p := range prices {
+		if p.Buy <= 0 && p.Sell <= 0 {
+			continue
+		}
+		batch = append(batch, &models.AssetPrice{
+			TypeCode:   p.TypeCode,
+			AssetType:  "gold",
+			Name:       p.Name,
+			Buy:        p.Buy,
+			Sell:       p.Sell,
+			ChangeBuy:  0,
+			ChangeSell: 0,
+			Currency:   p.Currency,
+			Source:     "mihong",
+			IsStale:    false,
+			FetchedAt:  time.Now(),
+		})
+	}
+	if len(batch) == 0 {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "mihong")
+		return refreshResult{source: "gold_mihong", count: 0, err: fmt.Errorf("mihong: no valid prices")}
+	}
+	if err := s.repo.UpsertBatch(ctx, batch); err != nil {
+		_ = s.repo.MarkStaleByAssetTypeAndSource(ctx, "gold", "mihong")
+		return refreshResult{source: "gold_mihong", count: 0, err: err}
+	}
+	return refreshResult{source: "gold_mihong", count: len(batch), err: nil}
 }
 
 // ---------------------------------------------------------------------------
