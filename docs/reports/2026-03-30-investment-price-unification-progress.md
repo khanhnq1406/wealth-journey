@@ -23,7 +23,7 @@
 | 6   | Frontend — Silver Investment Form Reads from Admin Config API | done    | — | silverDisplayPricesQuery + inferSilverUnits, 12 tests |
 | 7   | Frontend — Remove Hardcoded VND Option Arrays          | done        | —      | GOLD/SILVER_VND_OPTIONS de-exported, getXTypeOptions returns [] for VND |
 | 8   | Frontend — Watchlist and Price Alert Forms Use Admin Config | done    | —      | useQueryGetAssetDisplayPrices in watchlist+price-alert forms, 14 tests |
-| 9   | Backend Lint + Frontend Lint + Full Build Verification | pending     | —      | —       |
+| 9   | Backend Lint + Frontend Lint + Full Build Verification | done        | —      | golangci-lint 0 issues, go build clean, all Go tests pass; frontend 1 pre-existing lint error (FilterableAutocomplete, not from this feature) |
 | 10  | Create/Update Runtime Flow Diagrams                    | pending     | —      | —       |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
