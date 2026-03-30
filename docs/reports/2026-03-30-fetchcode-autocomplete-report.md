@@ -121,3 +121,9 @@ Changed files:
 1. Open admin page at 375px viewport
 2. Click the typeCode combobox → Expected: full-width input, dropdown appears below, scrollable if many suggestions
 3. Touch target height ≥ 44px → Expected: input is tall enough to tap comfortably
+
+## Fix History
+
+| Date       | Fix                                                                          | Severity | Commit |
+| ---------- | ---------------------------------------------------------------------------- | -------- | ------ |
+| 2026-03-30 | Portal-render dropdown via `createPortal(…, document.body)` so it escapes overflow:hidden parent containers; position computed from `getBoundingClientRect` on open | Minor | — |

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useMemo, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 export interface FilterableAutocompleteProps {
   suggestions: string[];
@@ -25,6 +26,7 @@ export function FilterableAutocomplete({
 }: FilterableAutocompleteProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
   const containerRef = useRef<HTMLDivElement>(null);
   const listboxRef = useRef<HTMLUListElement>(null);
 
@@ -104,6 +106,33 @@ export function FilterableAutocomplete({
     }
   }, [highlightedIndex]);
 
+  // Compute portal dropdown position from the input's bounding rect.
+  // Mirrors FormSelect pattern: scroll-aware + updates on scroll/resize.
+  useEffect(() => {
+    if (!isOpen || !containerRef.current) return;
+
+    const updatePosition = () => {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      setDropdownStyle({
+        position: "fixed",
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+        zIndex: 9999,
+      });
+    };
+
+    updatePosition();
+
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+    return () => {
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [isOpen]);
+
   const listboxId = "filterable-autocomplete-listbox";
 
   return (
@@ -162,41 +191,45 @@ export function FilterableAutocomplete({
         )}
       </div>
 
-      {isOpen && !disabled && (
-        <ul
-          id={listboxId}
-          ref={listboxRef}
-          role="listbox"
-          className="absolute z-dropdown w-full mt-1 bg-v2-bg-surface border border-v2-border-light rounded-md shadow-dropdown max-h-60 overflow-auto"
-        >
-          {filtered.length === 0 ? (
-            <li className="px-3 py-2 text-v2-text-tertiary text-sm">
-              {noMatchText}
-            </li>
-          ) : (
-            filtered.map((item, index) => (
-              <li
-                key={item}
-                id={`autocomplete-option-${index}`}
-                role="option"
-                aria-selected={highlightedIndex === index}
-                className={`px-3 py-2 text-sm font-mono cursor-pointer transition-colors ${
-                  highlightedIndex === index
-                    ? "bg-v2-bg-surface-tint text-v2-gold-primary"
-                    : "text-v2-text-secondary hover:bg-v2-bg-surface-tint hover:text-v2-gold-accent"
-                }`}
-                onMouseDown={(e) => {
-                  e.preventDefault(); // Prevent blur before click
-                  handleSelect(item);
-                }}
-                onMouseEnter={() => setHighlightedIndex(index)}
-              >
-                {item}
+      {isOpen &&
+        !disabled &&
+        createPortal(
+          <ul
+            id={listboxId}
+            ref={listboxRef}
+            role="listbox"
+            style={dropdownStyle}
+            className="bg-v2-bg-surface border border-v2-border-light rounded-md shadow-dropdown max-h-60 overflow-auto"
+          >
+            {filtered.length === 0 ? (
+              <li className="px-3 py-2 text-v2-text-tertiary text-sm">
+                {noMatchText}
               </li>
-            ))
-          )}
-        </ul>
-      )}
+            ) : (
+              filtered.map((item, index) => (
+                <li
+                  key={item}
+                  id={`autocomplete-option-${index}`}
+                  role="option"
+                  aria-selected={highlightedIndex === index}
+                  className={`px-3 py-2 text-sm font-mono cursor-pointer transition-colors ${
+                    highlightedIndex === index
+                      ? "bg-v2-bg-surface-tint text-v2-gold-primary"
+                      : "text-v2-text-secondary hover:bg-v2-bg-surface-tint hover:text-v2-gold-accent"
+                  }`}
+                  onMouseDown={(e) => {
+                    e.preventDefault(); // Prevent blur before click
+                    handleSelect(item);
+                  }}
+                  onMouseEnter={() => setHighlightedIndex(index)}
+                >
+                  {item}
+                </li>
+              ))
+            )}
+          </ul>,
+          document.body,
+        )}
     </div>
   );
 }
