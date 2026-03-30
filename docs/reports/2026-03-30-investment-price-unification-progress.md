@@ -7,8 +7,8 @@
 - **Spec file:** docs/specs/2026-03-30-investment-price-unification-spec.md
 - **Started:** 2026-03-30T00:00:00Z
 - **Last updated:** 2026-03-30T12:00:00Z
-- **Current state:** in_progress
-- **Current task:** 9
+- **Current state:** done
+- **Current task:** —
 
 ## Task Progress
 
@@ -24,7 +24,7 @@
 | 7   | Frontend — Remove Hardcoded VND Option Arrays          | done        | —      | GOLD/SILVER_VND_OPTIONS de-exported, getXTypeOptions returns [] for VND |
 | 8   | Frontend — Watchlist and Price Alert Forms Use Admin Config | done    | —      | useQueryGetAssetDisplayPrices in watchlist+price-alert forms, 14 tests |
 | 9   | Backend Lint + Frontend Lint + Full Build Verification | done        | —      | golangci-lint 0 issues, go build clean, all Go tests pass; frontend 1 pre-existing lint error (FilterableAutocomplete, not from this feature) |
-| 10  | Create/Update Runtime Flow Diagrams                    | pending     | —      | —       |
+| 10  | Create/Update Runtime Flow Diagrams                    | done        | —      | flow-investment.md section 11 added: VND type selection via admin config |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 

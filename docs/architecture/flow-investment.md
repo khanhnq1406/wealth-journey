@@ -14,6 +14,7 @@ Investment portfolio management flows covering the most complex business logic i
 - [Gold/Silver Chart Data Flow](#8-goldsilver-chart-data-flow)
 - [Edit Transaction (Delete-and-Recreate)](#9-edit-transaction-delete-and-recreate)
 - [Gold/Silver Price Resolution via Fetch Codes](#10-goldsilver-price-resolution-via-fetch-codes)
+- [Gold/Silver VND Investment Type Selection (Admin Config–Driven)](#11-goldsilver-vnd-investment-type-selection-admin-configdriven)
 
 ---
 
@@ -876,3 +877,72 @@ Output: (price int64, isStale bool, err error)
 | All fetch codes stale | Returns `(price, isStale=true, nil)` | Uses stale price (no fallback — still a valid price) |
 | No `asset_price` rows match any fetch code | `NotFoundError` "no asset price found" | Fall back to live `GoldPriceService` |
 | Live API fallback also fails | `fmt.Errorf("failed to fetch gold price: ...")` | `fetchAndUpdateSingle` logs warning, skips investment |
+
+---
+
+## 11. Gold/Silver VND Investment Type Selection (Admin Config–Driven)
+
+**Trigger:** User opens the Add Investment modal and selects "Gold (VND)" or "Silver (VND)" as the investment type.
+**Source:** `handlers/gold.go`, `handlers/silver.go`, `domain/service/asset_display_config_service.go`, `domain/repository/asset_display_config_repository.go`
+
+This flow replaces the former static registry approach where `GoldTypes` and `SilverTypes` arrays hardcoded all VND type options. VND types are now served dynamically from the `asset_display_config` table, controlled by admins. USD types remain statically registered (`XAUUSD` / `XAGUSD`).
+
+```mermaid
+sequenceDiagram
+    participant SPA as Next.js SPA<br/>(AddInvestmentForm)
+    participant GH as GoldHandler<br/>/ SilverHandler
+    participant ADCS as AssetDisplayConfigService
+    participant ADCR as AssetDisplayConfigRepository<br/>(asset_display_config table)
+
+    Note over SPA: User selects "Gold VND" or "Silver VND"<br/>form mounts, enabled=true triggers query
+
+    SPA->>GH: GET /api/v1/investments/gold-types?currency=VND
+    GH->>GH: Whitelist check: VND | USD | "" accepted<br/>any other value → 400 Bad Request
+
+    GH->>ADCS: ListForInvestment(ctx, "gold")
+    ADCS->>ADCR: ListForInvestment(ctx, "gold")<br/>WHERE asset_type='gold'<br/>AND enabled=true<br/>AND show_in_investment=true<br/>ORDER BY display_order ASC
+    ADCR-->>ADCS: []AssetDisplayConfig
+    ADCS-->>GH: []AssetDisplayConfig
+
+    GH->>GH: mapVNDConfigsToResponse():<br/>each → {code: TypeCode, name: DisplayName,<br/>currency: "VND", unit: "mace",<br/>unitWeight: 3.75, type: 8}
+
+    GH-->>SPA: 200 OK — []goldTypeResponse
+
+    Note over SPA: silverTypeOptions useMemo merges:<br/>API VND types + static SILVER_USD_OPTIONS
+
+    SPA->>SPA: Render dropdown with admin-controlled VND types
+
+    Note over SPA,GH: Parallel call for USD (if needed)
+
+    SPA->>GH: GET /api/v1/investments/gold-types?currency=USD
+    GH->>GH: gold.GetGoldTypesByCurrency("USD")<br/>returns only XAUUSD (static registry)
+    GH->>GH: mapUSDStaticToResponse():<br/>{code: "XAUUSD", currency: "USD",<br/>unit: "oz", unitWeight: 31.1034768, type: 9}
+    GH-->>SPA: 200 OK — []goldTypeResponse (USD only)
+```
+
+### Key Invariants
+
+- **VND types are admin-controlled**: adding/removing/reordering VND gold or silver investment options requires no code change — admins update `asset_display_config` rows via the admin panel
+- **USD types remain static**: `XAUUSD` (gold) and `XAGUSD` (silver) are hardcoded; they do not appear in `GoldTypes`/`SilverTypes` static arrays and are not managed via admin config
+- **Currency whitelist**: `GoldHandler` and `SilverHandler` reject any `currency` param that is not `"VND"`, `"USD"`, or empty — returning `400 Bad Request`
+- **Empty currency = merged**: omitting `?currency` returns VND (from DB) + USD (static) concatenated, in that order
+- **show_in_investment flag**: `AssetDisplayConfigRepository.ListForInvestment()` requires both `enabled = true` AND `show_in_investment = true` — investment forms and the prices page use different flags; a config shown in prices but not investments will not appear here
+- **display_order controls sort**: returned types appear in `display_order ASC` sequence, matching the admin-configured ordering
+
+### Frontend Integration
+
+| Form | Hook | Behavior |
+|------|------|----------|
+| `AddInvestmentForm` | `useQueryGetAssetDisplayPrices({ assetType: "silver" })` | Enabled only when Silver VND selected; `inferSilverUnits(typeCode)` maps type to unit array |
+| `AddToWatchlistForm` | `useQueryGetAssetDisplayPrices({ assetType: "gold|silver" })` | Both hooks always active; VND options populated from API response |
+| `CreatePriceAlertForm` | `useQueryGetAssetDisplayPrices({ assetType: "gold|silver" })` | API-driven select options; `useRef` one-shot init prevents infinite re-render |
+| Gold investment type (USD) | Static `GOLD_USD_OPTIONS` | Not API-driven; `XAUUSD` only |
+| Silver investment type (USD) | Static `SILVER_USD_OPTIONS` | Not API-driven; `XAGUSD` only |
+
+### Error Paths
+
+| Condition | Response | Caller Action |
+|-----------|----------|--------------|
+| Unknown `currency` param (e.g. `EUR`) | `400 Bad Request` "invalid currency 'EUR': must be VND, USD, or omitted" | Frontend shows validation error |
+| `ListForInvestment` DB error | `500 Internal Server Error` | Frontend shows generic error state |
+| Admin config empty (no matching rows) | `200 OK — []` (empty array) | Dropdown shows no VND options; user can still select USD |
