@@ -6,23 +6,23 @@
 - **Plan file:** docs/plans/2026-03-30-investment-price-unification-plan.md
 - **Spec file:** docs/specs/2026-03-30-investment-price-unification-spec.md
 - **Started:** 2026-03-30T00:00:00Z
-- **Last updated:** 2026-03-30T00:00:00Z
+- **Last updated:** 2026-03-30T12:00:00Z
 - **Current state:** in_progress
-- **Current task:** 4
+- **Current task:** 9
 
 ## Task Progress
 
 | #   | Task Name                                              | Status      | Commit | Summary |
 | --- | ------------------------------------------------------ | ----------- | ------ | ------- |
-| 0   | Update C4 Architecture Diagrams                        | pending     | —      | —       |
-| 1   | Add ListForInvestment Method to Service + Repository   | pending     | —      | —       |
+| 0   | Update C4 Architecture Diagrams                        | done        | —      | c4-component-backend + c4-component-frontend updated |
+| 1   | Add ListForInvestment Method to Service + Repository   | done        | —      | ListForInvestment in repo + service interface + implementation |
 | 2   | Refactor Gold Handler to Read VND Types from DB        | done        | —      | GoldHandler reads VND from DB via ListForInvestment, 5 tests |
 | 3   | Refactor Silver Handler to Read VND Types from DB      | done        | —      | SilverHandler reads VND from DB via ListForInvestment, 9 tests |
 | 4   | Remove VND Entries from Static Registries              | done        | —      | GoldTypes/SilverTypes USD-only; AliasToCanonical removed |
 | 5   | Seed Migration — Update Silver Configs show_in_investment = true | done | — | Migration cmd + Taskfile entry, idempotent UPDATE |
 | 6   | Frontend — Silver Investment Form Reads from Admin Config API | done    | — | silverDisplayPricesQuery + inferSilverUnits, 12 tests |
 | 7   | Frontend — Remove Hardcoded VND Option Arrays          | done        | —      | GOLD/SILVER_VND_OPTIONS de-exported, getXTypeOptions returns [] for VND |
-| 8   | Frontend — Watchlist and Price Alert Forms Use Admin Config | pending | —   | —       |
+| 8   | Frontend — Watchlist and Price Alert Forms Use Admin Config | done    | —      | useQueryGetAssetDisplayPrices in watchlist+price-alert forms, 14 tests |
 | 9   | Backend Lint + Frontend Lint + Full Build Verification | pending     | —      | —       |
 | 10  | Create/Update Runtime Flow Diagrams                    | pending     | —      | —       |
 

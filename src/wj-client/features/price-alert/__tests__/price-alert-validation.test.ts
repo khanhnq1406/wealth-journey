@@ -1,14 +1,17 @@
 /**
- * Tests for price-alert validation schema (TDD - RED phase)
+ * Tests for price-alert validation schema.
  *
- * Run: cd src/wj-client && npm test -- --watchAll=false --testPathPatterns="price-alert-validation"
+ * Run: cd src/wj-client && npm test -- --watchAll=false --testPathPattern="price-alert-validation"
+ *
+ * NOTE: GOLD_VND_ALERT_OPTIONS and SILVER_VND_ALERT_OPTIONS have been removed
+ * from this utils file. Gold/silver options are now fetched from the admin
+ * config API (useQueryGetAssetDisplayPrices) at runtime. The Zod schema
+ * validates format only — server validates symbol existence.
  */
 
 import { describe, it, expect } from "@jest/globals";
 import {
   createPriceAlertSchema,
-  GOLD_VND_ALERT_OPTIONS,
-  SILVER_VND_ALERT_OPTIONS,
 } from "../utils/price-alert-validation";
 import { AlertDirection, AlertTriggerMode } from "@/gen/protobuf/v1/investment";
 
@@ -51,6 +54,15 @@ describe("createPriceAlertSchema", () => {
       symbol: "A".repeat(51),
     });
     expect(result.success).toBe(false);
+  });
+
+  it("accepts any non-empty symbol string (format-only validation, no symbol list)", () => {
+    // Schema does not validate against a static symbol list — any valid string passes
+    const result = createPriceAlertSchema.safeParse({
+      ...validBase,
+      symbol: "ARBITRARY_SYMBOL_NOT_IN_ANY_LIST",
+    });
+    expect(result.success).toBe(true);
   });
 
   it("rejects empty name", () => {
@@ -159,57 +171,5 @@ describe("createPriceAlertSchema", () => {
       direction: AlertDirection.ALERT_DIRECTION_BELOW,
     });
     expect(result.success).toBe(true);
-  });
-});
-
-describe("GOLD_VND_ALERT_OPTIONS", () => {
-  it("is a non-empty array", () => {
-    expect(Array.isArray(GOLD_VND_ALERT_OPTIONS)).toBe(true);
-    expect(GOLD_VND_ALERT_OPTIONS.length).toBeGreaterThan(0);
-  });
-
-  it("each option has value and label string fields", () => {
-    for (const opt of GOLD_VND_ALERT_OPTIONS) {
-      expect(typeof opt.value).toBe("string");
-      expect(typeof opt.label).toBe("string");
-    }
-  });
-
-  it("each option has assetType = 8 (GOLD_VND)", () => {
-    for (const opt of GOLD_VND_ALERT_OPTIONS) {
-      expect(opt.assetType).toBe(8);
-    }
-  });
-
-  it("each option has currency = VND", () => {
-    for (const opt of GOLD_VND_ALERT_OPTIONS) {
-      expect(opt.currency).toBe("VND");
-    }
-  });
-});
-
-describe("SILVER_VND_ALERT_OPTIONS", () => {
-  it("is a non-empty array", () => {
-    expect(Array.isArray(SILVER_VND_ALERT_OPTIONS)).toBe(true);
-    expect(SILVER_VND_ALERT_OPTIONS.length).toBeGreaterThan(0);
-  });
-
-  it("each option has value and label string fields", () => {
-    for (const opt of SILVER_VND_ALERT_OPTIONS) {
-      expect(typeof opt.value).toBe("string");
-      expect(typeof opt.label).toBe("string");
-    }
-  });
-
-  it("each option has assetType = 10 (SILVER_VND)", () => {
-    for (const opt of SILVER_VND_ALERT_OPTIONS) {
-      expect(opt.assetType).toBe(10);
-    }
-  });
-
-  it("each option has currency = VND", () => {
-    for (const opt of SILVER_VND_ALERT_OPTIONS) {
-      expect(opt.currency).toBe("VND");
-    }
   });
 });

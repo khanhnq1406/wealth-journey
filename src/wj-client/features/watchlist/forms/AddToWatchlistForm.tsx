@@ -1,40 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/Button";
 import { FormInput } from "@/components/forms/FormInput";
 import { Success } from "@/components/modals/Success";
 import { Select } from "@/components/select/Select";
 import { ButtonType } from "@/app/constants";
-import { useMutationCreateWatchlistItem, useQueryGetMarketPrices } from "@/utils/generated/hooks";
+import {
+  useMutationCreateWatchlistItem,
+  useQueryGetMarketPrices,
+  useQueryGetAssetDisplayPrices,
+} from "@/utils/generated/hooks";
 import { InvestmentType, SearchResult } from "@/gen/protobuf/v1/investment";
-// TODO: Task 8 — replace these local fallback arrays with useQueryGetAssetDisplayPrices API data.
-// GOLD_VND_OPTIONS and SILVER_VND_OPTIONS are no longer exported from their source files.
-const GOLD_VND_OPTIONS = [
-  { value: "SJC", label: "SJC", currency: "VND" },
-  { value: "Vàng nhẫn SJC", label: "Nhẫn SJC 9999", currency: "VND" },
-  { value: "Doji_24K", label: "Nhẫn Doji 9999", currency: "VND" },
-  { value: "Mi hồng", label: "SJC Mi Hồng", currency: "VND" },
-  { value: "Mihong_999", label: "Nhẫn Mi Hồng 9999", currency: "VND" },
-  { value: "BTMC", label: "SJC BTMC", currency: "VND" },
-  { value: "BTMC_24K", label: "Nhẫn BTMC", currency: "VND" },
-  { value: "PNJ HCM", label: "PNJ", currency: "VND" },
-];
-
-const SILVER_VND_OPTIONS = [
-  { value: "PH_QU_THI_1L", label: "Phú Quý thỏi 1L", currency: "VND" },
-  { value: "PH_QU_THI_5L_10L", label: "Phú Quý thỏi 5L,10L", currency: "VND" },
-  { value: "BC_M_NGH_PH_QU", label: "Bạc Mỹ nghệ Phú Quý", currency: "VND" },
-  { value: "ANCARAT_NGN_LONG_1L", label: "Ancarat Ngân Long 1L", currency: "VND" },
-  { value: "ANCARAT_NGN_LONG_5L", label: "Ancarat Ngân Long 5L", currency: "VND" },
-  { value: "SBJ_1L_10L_50L", label: "SBJ 1L,10L,50L", currency: "VND" },
-  { value: "DOJI_99.9_1L", label: "DOJI 99.9 1L", currency: "VND" },
-  { value: "DOJI_99.9_5L", label: "DOJI 99.9 5L", currency: "VND" },
-  { value: "ANCARAT_NGN_LONG_1KG", label: "Ancarat Ngân Long 1kg", currency: "VND" },
-  { value: "ANCARAT_THI_999_-_1KG", label: "Ancarat thỏi 999 - 1kg", currency: "VND" },
-  { value: "SBJ_1KG", label: "SBJ 1kg", currency: "VND" },
-];
 // eslint-disable-next-line no-restricted-imports
 import { SymbolAutocomplete } from "@/features/investment/components/SymbolAutocomplete";
 
@@ -81,11 +59,31 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
 
   const { data: marketData } = useQueryGetMarketPrices({}, { staleTime: 5 * 60 * 1000 });
 
+  // Fetch gold and silver options from admin config API
+  const goldQuery = useQueryGetAssetDisplayPrices({ assetType: "gold" });
+  const silverQuery = useQueryGetAssetDisplayPrices({ assetType: "silver" });
+
+  const goldVndOptions = useMemo(
+    () =>
+      (goldQuery.data?.prices ?? [])
+        .filter((p) => p.showInInvestment)
+        .map((p) => ({ value: p.typeCode, label: p.displayName, currency: "VND" })),
+    [goldQuery.data]
+  );
+
+  const silverVndOptions = useMemo(
+    () =>
+      (silverQuery.data?.prices ?? [])
+        .filter((p) => p.showInInvestment)
+        .map((p) => ({ value: p.typeCode, label: p.displayName, currency: "VND" })),
+    [silverQuery.data]
+  );
+
   // Assembled watchlist item fields
-  const [symbol, setSymbol] = useState(GOLD_VND_OPTIONS[0]?.value ?? "");
-  const [name, setName] = useState(GOLD_VND_OPTIONS[0]?.label ?? "");
+  const [symbol, setSymbol] = useState("");
+  const [name, setName] = useState("");
   const [assetType, setAssetType] = useState<InvestmentType>(InvestmentType.INVESTMENT_TYPE_GOLD_VND);
-  const [currency, setCurrency] = useState(GOLD_VND_OPTIONS[0]?.currency ?? "VND");
+  const [currency, setCurrency] = useState("VND");
   const [note, setNote] = useState("");
 
   const [errorKey, setErrorKey] = useState<"alreadyInWatchlist" | "limitReached" | "failedToAdd" | undefined>();
@@ -108,20 +106,26 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
     setNote("");
     setErrorKey(undefined);
     if (cat === "gold") {
-      const first = GOLD_VND_OPTIONS[0];
+      const first = goldVndOptions[0];
       if (first) {
         setSymbol(first.value);
         setName(first.label);
         setAssetType(InvestmentType.INVESTMENT_TYPE_GOLD_VND);
         setCurrency(first.currency);
+      } else {
+        setAssetType(InvestmentType.INVESTMENT_TYPE_GOLD_VND);
+        setCurrency("VND");
       }
     } else if (cat === "silver") {
-      const first = SILVER_VND_OPTIONS[0];
+      const first = silverVndOptions[0];
       if (first) {
         setSymbol(first.value);
         setName(first.label);
         setAssetType(InvestmentType.INVESTMENT_TYPE_SILVER_VND);
         setCurrency(first.currency);
+      } else {
+        setAssetType(InvestmentType.INVESTMENT_TYPE_SILVER_VND);
+        setCurrency("VND");
       }
     } else if (cat === "currency") {
       setAssetType(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY);
@@ -138,7 +142,7 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
   };
 
   const handleGoldSelect = (value: string) => {
-    const opt = GOLD_VND_OPTIONS.find((o) => o.value === value);
+    const opt = goldVndOptions.find((o) => o.value === value);
     if (opt) {
       setSymbol(opt.value);
       setName(opt.label);
@@ -148,7 +152,7 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
   };
 
   const handleSilverSelect = (value: string) => {
-    const opt = SILVER_VND_OPTIONS.find((o) => o.value === value);
+    const opt = silverVndOptions.find((o) => o.value === value);
     if (opt) {
       setSymbol(opt.value);
       setName(opt.label);
@@ -202,6 +206,9 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
     { value: "other", label: t("otherAssets") },
   ];
 
+  const isGoldLoading = category === "gold" && goldQuery.isLoading;
+  const isSilverLoading = category === "silver" && silverQuery.isLoading;
+
   return (
     <div className="flex flex-col gap-4">
       {/* Category tabs */}
@@ -229,13 +236,15 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
             {t("goldType")}
           </label>
           <Select
-            options={GOLD_VND_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label }))}
+            options={goldVndOptions.map((opt) => ({ value: opt.value, label: opt.label }))}
             value={symbol}
             onChange={handleGoldSelect}
             disableInput
             disableFilter
             clearable={false}
             usePortal
+            disabled={isGoldLoading}
+            placeholder={isGoldLoading ? "Loading..." : undefined}
           />
         </div>
       )}
@@ -246,13 +255,15 @@ export function AddToWatchlistForm({ onSuccess }: AddToWatchlistFormProps) {
             {t("silverType")}
           </label>
           <Select
-            options={SILVER_VND_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label }))}
+            options={silverVndOptions.map((opt) => ({ value: opt.value, label: opt.label }))}
             value={symbol}
             onChange={handleSilverSelect}
             disableInput
             disableFilter
             clearable={false}
             usePortal
+            disabled={isSilverLoading}
+            placeholder={isSilverLoading ? "Loading..." : undefined}
           />
         </div>
       )}

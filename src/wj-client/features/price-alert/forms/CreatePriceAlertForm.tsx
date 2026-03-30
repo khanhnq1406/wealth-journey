@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -18,6 +18,7 @@ import { SymbolAutocomplete } from "@/features/investment/components/SymbolAutoc
 
 import {
   useMutationCreateUserPriceAlert,
+  useQueryGetAssetDisplayPrices,
   EVENT_InvestmentListUserPriceAlerts,
 } from "@/utils/generated/hooks";
 import {
@@ -31,12 +32,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   createPriceAlertSchema,
   CreatePriceAlertFormValues,
-  GOLD_VND_ALERT_OPTIONS,
-  SILVER_VND_ALERT_OPTIONS,
   getDirectionOptions,
   getTriggerModeOptions,
   getPriceSideOptions,
-  PriceAlertAssetOption,
 } from "../utils/price-alert-validation";
 
 // ---------------------------------------------------------------------------
@@ -63,22 +61,10 @@ export interface CreatePriceAlertFormProps {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const GOLD_SELECT_OPTIONS = GOLD_VND_ALERT_OPTIONS.map((o) => ({
-  value: o.value,
-  label: o.label,
-}));
-
-const SILVER_SELECT_OPTIONS = SILVER_VND_ALERT_OPTIONS.map((o) => ({
-  value: o.value,
-  label: o.label,
-}));
-
-/** Return the PriceAlertAssetOption that matches value within an options array */
-function findOption(
-  options: PriceAlertAssetOption[],
-  value: string
-): PriceAlertAssetOption | undefined {
-  return options.find((o) => o.value === value);
+/** Select option shape used by BasicFormSelect */
+interface SelectOption {
+  value: string;
+  label: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -116,6 +102,28 @@ export function CreatePriceAlertForm({
   const PRICE_SIDE_OPTIONS = useMemo(() => getPriceSideOptions(t), [t]);
 
   // ------------------------------------------------------------------
+  // Asset display price queries (admin config API)
+  // ------------------------------------------------------------------
+  const goldQuery = useQueryGetAssetDisplayPrices({ assetType: "gold" });
+  const silverQuery = useQueryGetAssetDisplayPrices({ assetType: "silver" });
+
+  const goldSelectOptions = useMemo<SelectOption[]>(
+    () =>
+      (goldQuery.data?.prices ?? [])
+        .filter((p) => p.showInInvestment)
+        .map((p) => ({ value: p.typeCode, label: p.displayName })),
+    [goldQuery.data]
+  );
+
+  const silverSelectOptions = useMemo<SelectOption[]>(
+    () =>
+      (silverQuery.data?.prices ?? [])
+        .filter((p) => p.showInInvestment)
+        .map((p) => ({ value: p.typeCode, label: p.displayName })),
+    [silverQuery.data]
+  );
+
+  // ------------------------------------------------------------------
   // UI state
   // ------------------------------------------------------------------
   const [category, setCategory] = useState<AssetCategory>(defaultCategory);
@@ -139,19 +147,6 @@ export function CreatePriceAlertForm({
   );
 
   // ------------------------------------------------------------------
-  // Derived defaults for gold/silver based on pre-fill props
-  // ------------------------------------------------------------------
-  const goldDefault =
-    defaultCategory === "gold" && defaultSymbol
-      ? defaultSymbol
-      : GOLD_VND_ALERT_OPTIONS[0].value;
-
-  const silverDefault =
-    defaultCategory === "silver" && defaultSymbol
-      ? defaultSymbol
-      : SILVER_VND_ALERT_OPTIONS[0].value;
-
-  // ------------------------------------------------------------------
   // Form
   // ------------------------------------------------------------------
   const {
@@ -164,13 +159,9 @@ export function CreatePriceAlertForm({
   } = useForm<CreatePriceAlertFormValues>({
     resolver: zodResolver(createPriceAlertSchema),
     defaultValues: {
-      symbol: goldDefault,
-      name:
-        defaultCategory === "gold"
-          ? (findOption(GOLD_VND_ALERT_OPTIONS, goldDefault)?.label ?? "SJC")
-          : defaultCategory === "silver"
-            ? (findOption(SILVER_VND_ALERT_OPTIONS, silverDefault)?.label ?? "")
-            : (defaultName ?? ""),
+      // symbol/name start empty; populated once API data loads (see useEffect below)
+      symbol: defaultCategory === "other" ? (defaultSymbol ?? "") : "",
+      name: defaultCategory === "other" ? (defaultName ?? "") : "",
       assetType:
         defaultCategory === "gold"
           ? InvestmentType.INVESTMENT_TYPE_GOLD_VND
@@ -189,6 +180,42 @@ export function CreatePriceAlertForm({
       note: "",
     },
   });
+
+  // Ref flags: populate gold/silver symbol once API data first loads (one-shot init)
+  const goldInitialized = useRef(false);
+  const silverInitialized = useRef(false);
+
+  useEffect(() => {
+    if (!goldInitialized.current && category === "gold" && goldSelectOptions.length > 0) {
+      goldInitialized.current = true;
+      const preferredSymbol =
+        defaultCategory === "gold" && defaultSymbol
+          ? defaultSymbol
+          : goldSelectOptions[0].value;
+      const opt = goldSelectOptions.find((o) => o.value === preferredSymbol) ?? goldSelectOptions[0];
+      setValue("symbol", opt.value);
+      setValue("name", opt.label);
+      setValue("assetType", InvestmentType.INVESTMENT_TYPE_GOLD_VND);
+      setValue("currency", "VND");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [goldSelectOptions.length]);
+
+  useEffect(() => {
+    if (!silverInitialized.current && category === "silver" && silverSelectOptions.length > 0) {
+      silverInitialized.current = true;
+      const preferredSymbol =
+        defaultCategory === "silver" && defaultSymbol
+          ? defaultSymbol
+          : silverSelectOptions[0].value;
+      const opt = silverSelectOptions.find((o) => o.value === preferredSymbol) ?? silverSelectOptions[0];
+      setValue("symbol", opt.value);
+      setValue("name", opt.label);
+      setValue("assetType", InvestmentType.INVESTMENT_TYPE_SILVER_VND);
+      setValue("currency", "VND");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [silverSelectOptions.length]);
 
   const watchedTriggerMode = watch("triggerMode");
   const isRepeat =
@@ -221,16 +248,26 @@ export function CreatePriceAlertForm({
       setErrorMessage(undefined);
 
       if (cat === "gold") {
-        const first = GOLD_VND_ALERT_OPTIONS[0];
-        setValue("symbol", first.value);
-        setValue("name", first.label);
+        const first = goldSelectOptions[0];
+        if (first) {
+          setValue("symbol", first.value);
+          setValue("name", first.label);
+        } else {
+          setValue("symbol", "");
+          setValue("name", "");
+        }
         setValue("assetType", InvestmentType.INVESTMENT_TYPE_GOLD_VND);
         setValue("currency", "VND");
         setValue("priceSide", "buy");
       } else if (cat === "silver") {
-        const first = SILVER_VND_ALERT_OPTIONS[0];
-        setValue("symbol", first.value);
-        setValue("name", first.label);
+        const first = silverSelectOptions[0];
+        if (first) {
+          setValue("symbol", first.value);
+          setValue("name", first.label);
+        } else {
+          setValue("symbol", "");
+          setValue("name", "");
+        }
         setValue("assetType", InvestmentType.INVESTMENT_TYPE_SILVER_VND);
         setValue("currency", "VND");
         setValue("priceSide", "buy");
@@ -246,35 +283,35 @@ export function CreatePriceAlertForm({
         setValue("priceSide", "buy");
       }
     },
-    [otherSymbol, otherName, otherAssetType, otherCurrency, setValue]
+    [goldSelectOptions, silverSelectOptions, otherSymbol, otherName, otherAssetType, otherCurrency, setValue]
   );
 
   /** When a gold type is selected from the dropdown */
   const handleGoldTypeChange = useCallback(
     (value: string) => {
-      const opt = findOption(GOLD_VND_ALERT_OPTIONS, value);
+      const opt = goldSelectOptions.find((o) => o.value === value);
       if (opt) {
         setValue("symbol", opt.value);
         setValue("name", opt.label);
-        setValue("assetType", opt.assetType);
-        setValue("currency", opt.currency);
+        setValue("assetType", InvestmentType.INVESTMENT_TYPE_GOLD_VND);
+        setValue("currency", "VND");
       }
     },
-    [setValue]
+    [goldSelectOptions, setValue]
   );
 
   /** When a silver type is selected from the dropdown */
   const handleSilverTypeChange = useCallback(
     (value: string) => {
-      const opt = findOption(SILVER_VND_ALERT_OPTIONS, value);
+      const opt = silverSelectOptions.find((o) => o.value === value);
       if (opt) {
         setValue("symbol", opt.value);
         setValue("name", opt.label);
-        setValue("assetType", opt.assetType);
-        setValue("currency", opt.currency);
+        setValue("assetType", InvestmentType.INVESTMENT_TYPE_SILVER_VND);
+        setValue("currency", "VND");
       }
     },
-    [setValue]
+    [silverSelectOptions, setValue]
   );
 
   /** When a symbol is picked from SymbolAutocomplete */
@@ -397,11 +434,12 @@ export function CreatePriceAlertForm({
           </Label>
           <BasicFormSelect
             id="gold-type-select"
-            options={GOLD_SELECT_OPTIONS}
+            options={goldSelectOptions}
             value={currentGoldSymbol}
             onChange={handleGoldTypeChange}
-            placeholder={t("goldTypePlaceholder")}
+            placeholder={goldQuery.isLoading ? "Loading..." : t("goldTypePlaceholder")}
             className="mt-1"
+            disabled={goldQuery.isLoading}
           />
         </div>
       )}
@@ -413,11 +451,12 @@ export function CreatePriceAlertForm({
           </Label>
           <BasicFormSelect
             id="silver-type-select"
-            options={SILVER_SELECT_OPTIONS}
+            options={silverSelectOptions}
             value={currentSilverSymbol}
             onChange={handleSilverTypeChange}
-            placeholder={t("silverTypePlaceholder")}
+            placeholder={silverQuery.isLoading ? "Loading..." : t("silverTypePlaceholder")}
             className="mt-1"
+            disabled={silverQuery.isLoading}
           />
         </div>
       )}

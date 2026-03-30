@@ -45,6 +45,32 @@ jest.mock("@/utils/generated/hooks", () => ({
     isLoading: false,
     error: null,
   })),
+  useQueryGetAssetDisplayPrices: jest.fn((req: { assetType: string }) => {
+    if (req.assetType === "gold") {
+      return {
+        data: {
+          prices: [
+            { typeCode: "SJC", displayName: "SJC", showInInvestment: true },
+            { typeCode: "BTMC", displayName: "SJC BTMC", showInInvestment: true },
+          ],
+        },
+        isLoading: false,
+        error: null,
+      };
+    }
+    if (req.assetType === "silver") {
+      return {
+        data: {
+          prices: [
+            { typeCode: "PH_QU_THI_1L", displayName: "Phú Quý thỏi 1L", showInInvestment: true },
+          ],
+        },
+        isLoading: false,
+        error: null,
+      };
+    }
+    return { data: null, isLoading: false, error: null };
+  }),
   EVENT_InvestmentListUserPriceAlerts: "api.investment.listUserPriceAlerts",
 }));
 
