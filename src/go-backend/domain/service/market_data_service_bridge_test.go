@@ -108,6 +108,9 @@ func (m *mdbAssetDisplayConfigService) DeleteFetchCode(ctx context.Context, id i
 func (m *mdbAssetDisplayConfigService) ListAvailableTypeCodes(ctx context.Context, assetType string) ([]string, error) {
 	panic("mdbAssetDisplayConfigService.ListAvailableTypeCodes not expected")
 }
+func (m *mdbAssetDisplayConfigService) ListForInvestment(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
+	panic("mdbAssetDisplayConfigService.ListForInvestment not expected")
+}
 
 // mdbGoldPriceService is a stub for GoldPriceService (fallback path).
 type mdbGoldPriceService struct {

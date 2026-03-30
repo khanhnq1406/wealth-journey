@@ -16,16 +16,17 @@ import (
 
 // adcConfigRepo is a stub for repository.AssetDisplayConfigRepository.
 type adcConfigRepo struct {
-	listAllFn                   func(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error)
-	listEnabledFn               func(ctx context.Context) ([]*models.AssetDisplayConfig, error)
-	getByIDFn                   func(ctx context.Context, id int32) (*models.AssetDisplayConfig, error)
-	getByTypeCodeFn             func(ctx context.Context, typeCode string) (*models.AssetDisplayConfig, error)
-	createFn                    func(ctx context.Context, config *models.AssetDisplayConfig) error
-	updateFn                    func(ctx context.Context, config *models.AssetDisplayConfig) error
-	deleteFn                    func(ctx context.Context, id int32) error
-	listByAssetTypeFn           func(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error)
-	getByTypeCodeAndAssetTypeFn           func(ctx context.Context, typeCode, assetType string) (*models.AssetDisplayConfig, error)
+	listAllFn                         func(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error)
+	listEnabledFn                     func(ctx context.Context) ([]*models.AssetDisplayConfig, error)
+	getByIDFn                         func(ctx context.Context, id int32) (*models.AssetDisplayConfig, error)
+	getByTypeCodeFn                   func(ctx context.Context, typeCode string) (*models.AssetDisplayConfig, error)
+	createFn                          func(ctx context.Context, config *models.AssetDisplayConfig) error
+	updateFn                          func(ctx context.Context, config *models.AssetDisplayConfig) error
+	deleteFn                          func(ctx context.Context, id int32) error
+	listByAssetTypeFn                 func(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error)
+	getByTypeCodeAndAssetTypeFn       func(ctx context.Context, typeCode, assetType string) (*models.AssetDisplayConfig, error)
 	listEnabledTypeCodesByAssetTypeFn func(ctx context.Context, assetType string) ([]string, error)
+	listForInvestmentFn               func(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error)
 }
 
 func (m *adcConfigRepo) ListAll(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
@@ -85,6 +86,12 @@ func (m *adcConfigRepo) GetByTypeCodeAndAssetType(ctx context.Context, typeCode,
 func (m *adcConfigRepo) ListEnabledTypeCodesByAssetType(ctx context.Context, assetType string) ([]string, error) {
 	if m.listEnabledTypeCodesByAssetTypeFn != nil {
 		return m.listEnabledTypeCodesByAssetTypeFn(ctx, assetType)
+	}
+	return nil, nil
+}
+func (m *adcConfigRepo) ListForInvestment(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
+	if m.listForInvestmentFn != nil {
+		return m.listForInvestmentFn(ctx, assetType)
 	}
 	return nil, nil
 }
@@ -928,5 +935,93 @@ func TestDelete_DelegatesToRepo(t *testing.T) {
 	}
 	if !deleted {
 		t.Error("expected Delete to have been called on repo")
+	}
+}
+
+// ---------------------------------------------------------------------------
+// ListForInvestment service tests
+// ---------------------------------------------------------------------------
+
+func TestAssetDisplayConfigService_ListForInvestment_DelegatesToRepo(t *testing.T) {
+	ctx := context.Background()
+
+	expected := []*models.AssetDisplayConfig{
+		{ID: 1, TypeCode: "SJC_1L", AssetType: "gold", DisplayName: "SJC 1 Lượng", DisplayOrder: 1, Enabled: true, ShowInInvestment: true},
+		{ID: 2, TypeCode: "SJC_5C", AssetType: "gold", DisplayName: "SJC 5 Chỉ", DisplayOrder: 2, Enabled: true, ShowInInvestment: true},
+	}
+
+	cfgRepo := &adcConfigRepo{
+		listForInvestmentFn: func(_ context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
+			if assetType != "gold" {
+				t.Errorf("expected assetType=gold, got %q", assetType)
+			}
+			return expected, nil
+		},
+	}
+	fcRepo := &adcFetchCodeRepo{}
+	apRepo := &adcAssetPriceRepo{}
+
+	svc := newTestAssetDisplayConfigService(cfgRepo, fcRepo, apRepo)
+	result, err := svc.ListForInvestment(ctx, "gold")
+
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+	if len(result) != 2 {
+		t.Fatalf("expected 2 configs, got %d", len(result))
+	}
+	if result[0].TypeCode != "SJC_1L" {
+		t.Errorf("expected first TypeCode=SJC_1L, got %q", result[0].TypeCode)
+	}
+	if result[1].TypeCode != "SJC_5C" {
+		t.Errorf("expected second TypeCode=SJC_5C, got %q", result[1].TypeCode)
+	}
+}
+
+func TestAssetDisplayConfigService_ListForInvestment_EmptyResult(t *testing.T) {
+	ctx := context.Background()
+
+	cfgRepo := &adcConfigRepo{
+		listForInvestmentFn: func(_ context.Context, _ string) ([]*models.AssetDisplayConfig, error) {
+			return []*models.AssetDisplayConfig{}, nil
+		},
+	}
+	fcRepo := &adcFetchCodeRepo{}
+	apRepo := &adcAssetPriceRepo{}
+
+	svc := newTestAssetDisplayConfigService(cfgRepo, fcRepo, apRepo)
+	result, err := svc.ListForInvestment(ctx, "silver")
+
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+	if len(result) != 0 {
+		t.Errorf("expected empty slice, got %d items", len(result))
+	}
+}
+
+func TestAssetDisplayConfigService_ListForInvestment_PropagatesRepoError(t *testing.T) {
+	ctx := context.Background()
+
+	repoErr := errors.New("db connection failed")
+	cfgRepo := &adcConfigRepo{
+		listForInvestmentFn: func(_ context.Context, _ string) ([]*models.AssetDisplayConfig, error) {
+			return nil, repoErr
+		},
+	}
+	fcRepo := &adcFetchCodeRepo{}
+	apRepo := &adcAssetPriceRepo{}
+
+	svc := newTestAssetDisplayConfigService(cfgRepo, fcRepo, apRepo)
+	result, err := svc.ListForInvestment(ctx, "gold")
+
+	if err == nil {
+		t.Fatal("expected error to be propagated, got nil")
+	}
+	if result != nil {
+		t.Errorf("expected nil result on error, got %v", result)
+	}
+	if !errors.Is(err, repoErr) {
+		t.Errorf("expected wrapped repo error, got: %v", err)
 	}
 }

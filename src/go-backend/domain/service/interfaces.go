@@ -396,6 +396,10 @@ type AssetDisplayConfigService interface {
 	// ListAvailableTypeCodes returns all distinct type_codes in the asset_price table
 	// that are relevant for the given assetType.
 	ListAvailableTypeCodes(ctx context.Context, assetType string) ([]string, error)
+
+	// ListForInvestment returns enabled configs where show_in_investment = true for the given assetType,
+	// ordered by display_order ASC. Used by gold/silver investment handlers to populate type options.
+	ListForInvestment(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error)
 }
 
 // AssetDisplayPriceDTO is the combined config + price data returned by the public endpoint.

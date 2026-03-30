@@ -367,6 +367,12 @@ func (s *assetDisplayConfigService) DeleteFetchCode(ctx context.Context, id int3
 	return s.fetchCodeRepo.Delete(ctx, id)
 }
 
+// ListForInvestment returns enabled configs where show_in_investment = true for the given assetType,
+// ordered by display_order ASC. Delegates to the repository which enforces the filter in SQL.
+func (s *assetDisplayConfigService) ListForInvestment(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
+	return s.configRepo.ListForInvestment(ctx, assetType)
+}
+
 // ListAvailableTypeCodes returns all distinct type_codes from the asset_price table
 // that are relevant for the given assetType.
 func (s *assetDisplayConfigService) ListAvailableTypeCodes(ctx context.Context, assetType string) ([]string, error) {

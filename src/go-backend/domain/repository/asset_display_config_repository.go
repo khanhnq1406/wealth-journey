@@ -59,6 +59,12 @@ type AssetDisplayConfigRepository interface {
 	// Returns an empty slice (not an error) when no matching configs exist.
 	// Used by AssetPriceService to filter the price read path.
 	ListEnabledTypeCodesByAssetType(ctx context.Context, assetType string) ([]string, error)
+
+	// ListForInvestment returns enabled configs where show_in_investment = true,
+	// ordered by display_order ASC. Both enabled and show_in_investment filters are
+	// enforced in the DB WHERE clause — not post-fetch in application code.
+	// Uses exact equality (=) — no LIKE or partial matching.
+	ListForInvestment(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error)
 }
 
 // assetDisplayConfigRepository implements AssetDisplayConfigRepository using GORM.
@@ -206,4 +212,20 @@ func (r *assetDisplayConfigRepository) ListEnabledTypeCodesByAssetType(ctx conte
 		return nil, apperrors.NewInternalErrorWithCause("failed to list enabled type codes by asset type", result.Error)
 	}
 	return typeCodes, nil
+}
+
+// ListForInvestment returns enabled configs where show_in_investment = true for the given asset type,
+// ordered by display_order ASC. All three filters (asset_type, enabled, show_in_investment) are
+// applied in the DB WHERE clause — never post-fetch in application code.
+// Uses exact equality (=) — never LIKE or partial matching.
+func (r *assetDisplayConfigRepository) ListForInvestment(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
+	var configs []*models.AssetDisplayConfig
+	result := r.db.DB.WithContext(ctx).
+		Where("asset_type = ? AND enabled = ? AND show_in_investment = ?", assetType, true, true).
+		Order("display_order ASC").
+		Find(&configs)
+	if result.Error != nil {
+		return nil, apperrors.NewInternalErrorWithCause("failed to list asset display configs for investment", result.Error)
+	}
+	return configs, nil
 }

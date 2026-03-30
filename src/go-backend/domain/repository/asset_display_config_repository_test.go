@@ -783,3 +783,136 @@ func TestAssetDisplayConfigRepository_ListEnabledTypeCodesByAssetType_ExactMatch
 	assert.Empty(t, typeCodes)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
+
+// ---- ListForInvestment ----
+
+func TestAssetDisplayConfigRepository_ListForInvestment(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping DB mock test in short mode")
+	}
+
+	db, mock, database := setupMockDB(t)
+	defer func() { sqlDB, _ := db.DB(); _ = sqlDB.Close() }()
+
+	repo := NewAssetDisplayConfigRepository(database)
+	ctx := context.Background()
+
+	now := time.Now()
+	rows := sqlmock.NewRows(assetDisplayConfigColumns).
+		AddRow(int32(1), "SJC_1L", "gold", "SJC 1 Lượng", int32(1), true, true, now, now, nil).
+		AddRow(int32(2), "SJC_5C", "gold", "SJC 5 Chỉ", int32(2), true, true, now, now, nil)
+
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `asset_display_config` WHERE (asset_type = ? AND enabled = ? AND show_in_investment = ?) AND `asset_display_config`.`deleted_at` IS NULL ORDER BY display_order ASC")).
+		WithArgs("gold", true, true).
+		WillReturnRows(rows)
+
+	configs, err := repo.ListForInvestment(ctx, "gold")
+
+	assert.NoError(t, err)
+	require.Len(t, configs, 2)
+	assert.Equal(t, "SJC_1L", configs[0].TypeCode)
+	assert.Equal(t, "gold", configs[0].AssetType)
+	assert.True(t, configs[0].Enabled)
+	assert.True(t, configs[0].ShowInInvestment)
+	assert.Equal(t, int32(1), configs[0].DisplayOrder)
+	assert.Equal(t, int32(2), configs[1].DisplayOrder)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestAssetDisplayConfigRepository_ListForInvestment_OnlyShowInInvestmentTrue(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping DB mock test in short mode")
+	}
+
+	db, mock, database := setupMockDB(t)
+	defer func() { sqlDB, _ := db.DB(); _ = sqlDB.Close() }()
+
+	repo := NewAssetDisplayConfigRepository(database)
+	ctx := context.Background()
+
+	// Only one config has show_in_investment=true; the DB query filters it so only 1 row is returned.
+	now := time.Now()
+	rows := sqlmock.NewRows(assetDisplayConfigColumns).
+		AddRow(int32(1), "SJC_1L", "gold", "SJC 1 Lượng", int32(1), true, true, now, now, nil)
+
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `asset_display_config` WHERE (asset_type = ? AND enabled = ? AND show_in_investment = ?) AND `asset_display_config`.`deleted_at` IS NULL ORDER BY display_order ASC")).
+		WithArgs("gold", true, true).
+		WillReturnRows(rows)
+
+	configs, err := repo.ListForInvestment(ctx, "gold")
+
+	assert.NoError(t, err)
+	require.Len(t, configs, 1)
+	assert.True(t, configs[0].ShowInInvestment)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestAssetDisplayConfigRepository_ListForInvestment_Empty(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping DB mock test in short mode")
+	}
+
+	db, mock, database := setupMockDB(t)
+	defer func() { sqlDB, _ := db.DB(); _ = sqlDB.Close() }()
+
+	repo := NewAssetDisplayConfigRepository(database)
+	ctx := context.Background()
+
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `asset_display_config` WHERE (asset_type = ? AND enabled = ? AND show_in_investment = ?) AND `asset_display_config`.`deleted_at` IS NULL ORDER BY display_order ASC")).
+		WithArgs("silver", true, true).
+		WillReturnRows(sqlmock.NewRows(assetDisplayConfigColumns))
+
+	configs, err := repo.ListForInvestment(ctx, "silver")
+
+	assert.NoError(t, err)
+	assert.Empty(t, configs)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestAssetDisplayConfigRepository_ListForInvestment_DBError(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping DB mock test in short mode")
+	}
+
+	db, mock, database := setupMockDB(t)
+	defer func() { sqlDB, _ := db.DB(); _ = sqlDB.Close() }()
+
+	repo := NewAssetDisplayConfigRepository(database)
+	ctx := context.Background()
+
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `asset_display_config` WHERE (asset_type = ? AND enabled = ? AND show_in_investment = ?) AND `asset_display_config`.`deleted_at` IS NULL ORDER BY display_order ASC")).
+		WithArgs("gold", true, true).
+		WillReturnError(gorm.ErrInvalidDB)
+
+	configs, err := repo.ListForInvestment(ctx, "gold")
+
+	assert.Error(t, err)
+	assert.Nil(t, configs)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+// TestAssetDisplayConfigRepository_ListForInvestment_ExactMatchOnly verifies that
+// asset_type uses exact equality (=) — preventing SQL injection and accidental fuzzy lookups.
+// It also verifies that enabled and show_in_investment are both enforced in the DB query.
+func TestAssetDisplayConfigRepository_ListForInvestment_ExactMatchOnly(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping DB mock test in short mode")
+	}
+
+	db, mock, database := setupMockDB(t)
+	defer func() { sqlDB, _ := db.DB(); _ = sqlDB.Close() }()
+
+	repo := NewAssetDisplayConfigRepository(database)
+	ctx := context.Background()
+
+	// The query must use exact (=) for all three WHERE conditions.
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `asset_display_config` WHERE (asset_type = ? AND enabled = ? AND show_in_investment = ?) AND `asset_display_config`.`deleted_at` IS NULL ORDER BY display_order ASC")).
+		WithArgs("gold", true, true).
+		WillReturnRows(sqlmock.NewRows(assetDisplayConfigColumns))
+
+	configs, err := repo.ListForInvestment(ctx, "gold")
+
+	assert.NoError(t, err)
+	assert.Empty(t, configs)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}

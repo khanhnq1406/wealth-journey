@@ -151,6 +151,9 @@ func (m *mockAssetDisplayConfigRepo) ListByAssetType(_ context.Context, _ string
 func (m *mockAssetDisplayConfigRepo) GetByTypeCodeAndAssetType(_ context.Context, _, _ string) (*models.AssetDisplayConfig, error) {
 	return nil, nil
 }
+func (m *mockAssetDisplayConfigRepo) ListForInvestment(_ context.Context, _ string) ([]*models.AssetDisplayConfig, error) {
+	return nil, nil
+}
 
 // ---------------------------------------------------------------------------
 // Mock: SilverPriceService
