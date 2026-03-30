@@ -46,10 +46,10 @@ import {
   GOLD_USD_OPTIONS,
 } from "@/features/investment/utils/gold-calculator";
 import {
-  getSilverTypeOptions,
   type SilverTypeOption,
   type SilverUnit,
   calculateSilverFromUserInput,
+  SILVER_USD_OPTIONS,
 } from "@/features/investment/utils/silver-calculator";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
@@ -57,6 +57,16 @@ import { useExchangeRate } from "@/hooks/useExchangeRate";
 // UI-only type values for merged gold/silver dropdowns
 const GOLD_UI_TYPE = "GOLD_MERGED";
 const SILVER_UI_TYPE = "SILVER_MERGED";
+
+/**
+ * Infer the available quantity units for a silver type based on its typeCode.
+ * KG-based types expose "kg"; tael-based types expose "tael".
+ */
+function inferSilverUnits(typeCode: string): SilverUnit[] {
+  if (typeCode.endsWith("KG") || typeCode.includes("1KG")) return ["kg"];
+  if (typeCode.endsWith("L") || typeCode.includes("_1L") || typeCode.includes("_5L")) return ["tael"];
+  return ["tael"]; // default
+}
 
 interface AddInvestmentFormProps {
   onSuccess?: () => void;
@@ -263,6 +273,15 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
     },
   );
 
+  // Fetch silver types from backend API (dynamic, admin-managed list)
+  const silverDisplayPricesQuery = useQueryGetAssetDisplayPrices(
+    { assetType: "silver" },
+    {
+      enabled: isSilverInvestment,
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
   // Build gold type options: VND from API (filtered by showInInvestment), USD stays hardcoded
   const goldTypeOptions = useMemo((): GoldTypeOption[] => {
     if (!isGoldInvestment) return [];
@@ -280,11 +299,20 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
     return [...vndOptions, ...GOLD_USD_OPTIONS];
   }, [isGoldInvestment, goldDisplayPricesQuery.data]);
 
-  // Get ALL silver type options (no currency filter — show all)
-  const silverTypeOptions = useMemo(() => {
+  // Build silver type options: VND from API (filtered by showInInvestment), USD stays hardcoded
+  const silverTypeOptions = useMemo((): SilverTypeOption[] => {
     if (!isSilverInvestment) return [];
-    return getSilverTypeOptions(); // No currency filter
-  }, [isSilverInvestment]);
+    const vndOptions: SilverTypeOption[] = (silverDisplayPricesQuery.data?.prices ?? [])
+      .filter((p) => p.showInInvestment)
+      .map((p) => ({
+        value: p.typeCode,
+        label: p.displayName,
+        currency: "VND",
+        type: 10, // InvestmentType.INVESTMENT_TYPE_SILVER_VND
+        availableUnits: inferSilverUnits(p.typeCode),
+      }));
+    return [...vndOptions, ...SILVER_USD_OPTIONS];
+  }, [isSilverInvestment, silverDisplayPricesQuery.data]);
 
   // Dynamic price per unit label: "Đơn giá (đ/lượng)" for gold VND, etc.
   const pricePerUnitLabel = useMemo(() => {
@@ -776,9 +804,19 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
               }
             }}
             placeholder={t("form.selectSilverTypePlaceholder")}
-            disabled={isSubmitting}
+            disabled={isSubmitting || silverDisplayPricesQuery.isLoading}
             required
           />
+          {silverDisplayPricesQuery.isLoading && !selectedSilverType && (
+            <p className="text-xs text-v2-text-tertiary mt-1 ml-1">
+              {t("form.loadingPrice")}
+            </p>
+          )}
+          {silverDisplayPricesQuery.isError && !selectedSilverType && (
+            <p className="text-xs text-v2-red-negative mt-1 ml-1">
+              {t("form.unableToFetchPrice")}
+            </p>
+          )}
           {selectedSilverType && (
             <div className="mt-2 space-y-1">
               <p className="text-xs text-v2-text-secondary ml-1">

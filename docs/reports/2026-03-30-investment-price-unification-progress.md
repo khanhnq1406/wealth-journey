@@ -20,7 +20,7 @@
 | 3   | Refactor Silver Handler to Read VND Types from DB      | done        | —      | SilverHandler reads VND from DB via ListForInvestment, 9 tests |
 | 4   | Remove VND Entries from Static Registries              | done        | —      | GoldTypes/SilverTypes USD-only; AliasToCanonical removed |
 | 5   | Seed Migration — Update Silver Configs show_in_investment = true | done | — | Migration cmd + Taskfile entry, idempotent UPDATE |
-| 6   | Frontend — Silver Investment Form Reads from Admin Config API | pending | — | — |
+| 6   | Frontend — Silver Investment Form Reads from Admin Config API | done    | — | silverDisplayPricesQuery + inferSilverUnits, 12 tests |
 | 7   | Frontend — Remove Hardcoded VND Option Arrays          | pending     | —      | —       |
 | 8   | Frontend — Watchlist and Price Alert Forms Use Admin Config | pending | —   | —       |
 | 9   | Backend Lint + Frontend Lint + Full Build Verification | pending     | —      | —       |
