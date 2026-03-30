@@ -36,11 +36,6 @@ export function FilterableAutocomplete({
     return suggestions.filter((s) => s.toLowerCase().includes(lower));
   }, [suggestions, value]);
 
-  // Reset highlight when filtered list changes
-  useEffect(() => {
-    setHighlightedIndex(-1);
-  }, [filtered]);
-
   const handleSelect = useCallback(
     (item: string) => {
       onChange(item);

@@ -29,6 +29,7 @@ jest.mock("@/utils/generated/hooks", () => {
     useQuerySearchSymbols: jest.fn(noopQuery),
     useQueryGetHistoricalPortfolioValues: jest.fn(noopQuery),
     useQueryGetAuth: jest.fn(noopQuery),
+    useQueryGetAssetDisplayPrices: jest.fn(noopQuery),
     // Mutation hooks
     useMutationUpdatePrices: jest.fn(noopMutation),
     useMutationCreateInvestment: jest.fn(noopMutation),

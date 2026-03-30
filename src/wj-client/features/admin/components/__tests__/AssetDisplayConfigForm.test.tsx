@@ -182,7 +182,7 @@ describe("AssetDisplayConfigForm — FetchCodeList receives correct assetType in
 describe("AssetDisplayConfigForm — onSuccess callback passes created id", () => {
   it("calls onSuccess with the created config id after successful create", async () => {
     const mockOnSuccess = jest.fn();
-    mockPost.mockResolvedValue({ config: { id: 99, typeCode: "DOJI", assetType: "gold" } });
+    mockPost.mockResolvedValue({ success: true, data: { config: { id: 99, typeCode: "DOJI", assetType: "gold" } } });
 
     renderWithProviders(
       <AssetDisplayConfigForm mode="create" assetType="gold" onSuccess={mockOnSuccess} />
