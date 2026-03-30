@@ -314,16 +314,16 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
     return [...vndOptions, ...SILVER_USD_OPTIONS];
   }, [isSilverInvestment, silverDisplayPricesQuery.data]);
 
-  // Dynamic price per unit label: "Đơn giá (đ/lượng)" for gold VND, etc.
+  // Dynamic price per unit label: "Đơn giá (đ/chỉ)" for gold VND, etc.
   const pricePerUnitLabel = useMemo(() => {
     const baseLabel = t("form.pricePerUnitLabel");
     const currencySymbol =
       currency === "VND" ? "đ" : currency === "USD" ? "$" : currency || "";
 
     if (isGoldInvestment && selectedGoldType) {
-      // Gold VND prices are per lượng (tael), Gold USD prices are per oz
+      // Gold VND prices are per chỉ (mace), Gold USD prices are per oz
       const unitLabel =
-        selectedGoldType.currency === "USD" ? "oz" : t("form.taelUnitLong");
+        selectedGoldType.currency === "USD" ? "oz" : t("form.maceUnitLong");
       return `${baseLabel} (${currencySymbol}/${unitLabel})`;
     }
     if (isSilverInvestment && selectedSilverType) {

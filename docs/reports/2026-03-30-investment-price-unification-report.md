@@ -155,3 +155,9 @@ ListForInvestment(ctx context.Context, assetType string) ([]*models.AssetDisplay
 | `go test -short ./...` | All pass |
 | `tsc --noEmit` | Clean |
 | `npm run lint` | 1 pre-existing error in `FilterableAutocomplete.tsx` (not from this feature) |
+
+## Fix History
+
+| Date | Fix | Severity | Files |
+|------|-----|----------|-------|
+| 2026-03-30 | Gold VND price-per-unit label: "đ/lượng" → "đ/chỉ" — `t("form.taelUnitLong")` → `t("form.maceUnitLong")` in `pricePerUnitLabel` memo | Minor | `AddInvestmentForm.tsx` |
