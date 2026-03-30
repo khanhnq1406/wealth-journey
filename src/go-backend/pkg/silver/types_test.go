@@ -4,14 +4,12 @@ import (
 	"testing"
 )
 
-func TestGetSilverTypeByCode_NewTypes(t *testing.T) {
+func TestGetSilverTypeByCode_USDType(t *testing.T) {
 	tests := []struct {
 		code     string
 		wantName string
 		wantCurr string
 	}{
-		{"GOLDENFUND_1L", "Golden Fund 1 Lượng", "VND"},
-		{"ANCARAT_1KG", "Ancarat 1 Kg", "VND"},
 		{"XAGUSD", "Silver World (XAG/USD)", "USD"},
 	}
 
@@ -31,6 +29,26 @@ func TestGetSilverTypeByCode_NewTypes(t *testing.T) {
 	}
 }
 
+func TestGetSilverTypeByCode_VNDTypesReturnNil(t *testing.T) {
+	// VND entries have been removed from SilverTypes — they are now served
+	// dynamically via AssetDisplayConfigService.ListForInvestment().
+	vndCodes := []string{
+		"GOLDENFUND_1L", "GOLDENFUND_5L", "GOLDENFUND_10L",
+		"PHUQUY_1L", "PHUQUY_5L",
+		"ANCARAT_1L", "ANCARAT_5L",
+		"GOLDENFUND_1KG", "PHUQUY_1KG", "ANCARAT_1KG",
+	}
+
+	for _, code := range vndCodes {
+		t.Run(code, func(t *testing.T) {
+			st := GetSilverTypeByCode(code)
+			if st != nil {
+				t.Errorf("Expected nil for removed VND type %q, got %+v", code, st)
+			}
+		})
+	}
+}
+
 func TestGetSilverTypeByCode_RemovedTypes(t *testing.T) {
 	removedCodes := []string{"AG_VND_Tael", "AG_VND_Kg", "AG_VND"}
 
@@ -41,6 +59,24 @@ func TestGetSilverTypeByCode_RemovedTypes(t *testing.T) {
 				t.Errorf("Expected nil for removed type %s, got %+v", code, st)
 			}
 		})
+	}
+}
+
+func TestGetSilverTypesByCurrency_VNDReturnsEmpty(t *testing.T) {
+	// VND entries have been removed — GetSilverTypesByCurrency("VND") must return empty.
+	vndTypes := GetSilverTypesByCurrency("VND")
+	if len(vndTypes) != 0 {
+		t.Errorf("Expected 0 VND silver types, got %d: %+v", len(vndTypes), vndTypes)
+	}
+}
+
+func TestGetSilverTypesByCurrency_USDReturnsXAGUSD(t *testing.T) {
+	usdTypes := GetSilverTypesByCurrency("USD")
+	if len(usdTypes) != 1 {
+		t.Fatalf("Expected 1 USD silver type, got %d", len(usdTypes))
+	}
+	if usdTypes[0].Code != "XAGUSD" {
+		t.Errorf("Expected XAGUSD, got %q", usdTypes[0].Code)
 	}
 }
 
@@ -64,4 +100,3 @@ func TestGetPriceUnitForMarketData_NewTypes(t *testing.T) {
 		})
 	}
 }
-

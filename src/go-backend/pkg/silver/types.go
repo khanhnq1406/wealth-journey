@@ -24,69 +24,11 @@ type SilverType struct {
 	Type     investmentv1.InvestmentType // Enum value
 }
 
+// SilverTypes is the registry of supported silver types.
+// VND silver types are no longer listed here — they are served dynamically from the
+// asset_display_config table via AssetDisplayConfigService.ListForInvestment().
+// GetSilverTypesByCurrency("VND") intentionally returns an empty slice.
 var SilverTypes = []SilverType{
-	// Tael-based (lượng) - VND × 1000
-	{
-		Code:     "GOLDENFUND_1L",
-		Name:     "Golden Fund 1 Lượng",
-		Currency: "VND",
-		Type:     investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND,
-	},
-	{
-		Code:     "GOLDENFUND_5L",
-		Name:     "Golden Fund 5 Lượng",
-		Currency: "VND",
-		Type:     investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND,
-	},
-	{
-		Code:     "GOLDENFUND_10L",
-		Name:     "Golden Fund 10 Lượng",
-		Currency: "VND",
-		Type:     investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND,
-	},
-	{
-		Code:     "PHUQUY_1L",
-		Name:     "Phú Quý 1 Lượng",
-		Currency: "VND",
-		Type:     investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND,
-	},
-	{
-		Code:     "PHUQUY_5L",
-		Name:     "Phú Quý 5 Lượng",
-		Currency: "VND",
-		Type:     investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND,
-	},
-	{
-		Code:     "ANCARAT_1L",
-		Name:     "Ancarat 1 Lượng",
-		Currency: "VND",
-		Type:     investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND,
-	},
-	{
-		Code:     "ANCARAT_5L",
-		Name:     "Ancarat 5 Lượng",
-		Currency: "VND",
-		Type:     investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND,
-	},
-	// Kg-based - VND × 1000
-	{
-		Code:     "GOLDENFUND_1KG",
-		Name:     "Golden Fund 1 Kg",
-		Currency: "VND",
-		Type:     investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND,
-	},
-	{
-		Code:     "PHUQUY_1KG",
-		Name:     "Phú Quý 1 Kg",
-		Currency: "VND",
-		Type:     investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND,
-	},
-	{
-		Code:     "ANCARAT_1KG",
-		Name:     "Ancarat 1 Kg",
-		Currency: "VND",
-		Type:     investmentv1.InvestmentType_INVESTMENT_TYPE_SILVER_VND,
-	},
 	// Ounce-based - USD (use Yahoo Finance)
 	{
 		Code:     "XAGUSD",

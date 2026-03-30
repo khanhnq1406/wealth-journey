@@ -2,26 +2,14 @@ package gold
 
 import (
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
-func TestGetGoldTypeByCode_NewTypes(t *testing.T) {
+func TestGetGoldTypeByCode_USDType(t *testing.T) {
 	tests := []struct {
 		code     string
 		wantName string
 		wantCurr string
 	}{
-		{"SJC", "SJC 9999", "VND"},
-		{"SJC TD", "SJC Tự Do", "VND"},
-		{"Eximbank", "Eximbank SJC", "VND"},
-		{"Doji", "DOJI", "VND"},
-		{"999,9 TD", "Vàng 999.9 Tự Do", "VND"},
-		{"99,9 TD", "Vàng 99.9 Tự Do", "VND"},
-		{"Vàng 95%", "Vàng 95%", "VND"},
-		{"BTMC_24K", "Bảo Tín 24K", "VND"},
-		{"99,99% GF", "Golden Fund 99.99%", "VND"},
-		{"95% GF", "Golden Fund 95%", "VND"},
 		{"XAUUSD", "Gold World (XAU/USD)", "USD"},
 	}
 
@@ -41,6 +29,26 @@ func TestGetGoldTypeByCode_NewTypes(t *testing.T) {
 	}
 }
 
+func TestGetGoldTypeByCode_VNDTypesReturnNil(t *testing.T) {
+	// VND entries have been removed from GoldTypes — they are now served
+	// dynamically via AssetDisplayConfigService.ListForInvestment().
+	vndCodes := []string{
+		"SJC", "SJC TD", "Eximbank", "TPBank", "Doji", "VietinGold",
+		"ACBBank", "Mi hồng", "Vàng nhẫn SJC", "BTMC", "PNJ HCM",
+		"999,9 TD", "99,9 TD", "Vàng 95%", "Doji_24K", "BTMC_24K",
+		"Mihong_999", "99,99% GF", "95% GF",
+	}
+
+	for _, code := range vndCodes {
+		t.Run(code, func(t *testing.T) {
+			gt := GetGoldTypeByCode(code)
+			if gt != nil {
+				t.Errorf("Expected nil for removed VND type %q, got %+v", code, gt)
+			}
+		})
+	}
+}
+
 func TestGetGoldTypeByCode_RemovedTypes(t *testing.T) {
 	removedCodes := []string{"SJ9999", "DOHNL", "DOHCML", "DOJINHTV", "PQHNVM", "PQHN24NTT", "VIETTINMSJC"}
 
@@ -54,42 +62,20 @@ func TestGetGoldTypeByCode_RemovedTypes(t *testing.T) {
 	}
 }
 
-// TestAliasToCanonical_AllTargetsExistInGoldTypes verifies that every canonical
-// code referenced by AliasToCanonical is present in the GoldTypes registry.
-// This prevents phantom aliases that point to non-existent codes.
-func TestAliasToCanonical_AllTargetsExistInGoldTypes(t *testing.T) {
-	canonicalCodes := make(map[string]struct{}, len(GoldTypes))
-	for _, gt := range GoldTypes {
-		canonicalCodes[gt.Code] = struct{}{}
-	}
-	for alias, canonical := range AliasToCanonical {
-		_, exists := canonicalCodes[canonical]
-		assert.True(t, exists,
-			"AliasToCanonical[%q] = %q but %q is not in GoldTypes", alias, canonical, canonical)
+func TestGetGoldTypesByCurrency_VNDReturnsEmpty(t *testing.T) {
+	// VND entries have been removed — GetGoldTypesByCurrency("VND") must return empty.
+	vndTypes := GetGoldTypesByCurrency("VND")
+	if len(vndTypes) != 0 {
+		t.Errorf("Expected 0 VND gold types, got %d: %+v", len(vndTypes), vndTypes)
 	}
 }
 
-// TestAliasToCanonical_KnownMappings verifies specific known mappings.
-func TestAliasToCanonical_KnownMappings(t *testing.T) {
-	cases := []struct {
-		alias     string
-		canonical string
-	}{
-		{"VNGSJC", "SJC"},
-		{"MIHONG_999", "Mihong_999"},
-		{"SJ9999", "Vàng nhẫn SJC"},
-		{"SJL1L10", "SJC"},
-		{"DOHN", "Doji"},
-		{"DOHCM", "Doji"},
-		{"BTSJC", "BTMC"},
-		{"BT9999", "BTMC_24K"},
-		{"VIETTINM", "VietinGold"},
+func TestGetGoldTypesByCurrency_USDReturnsXAUUSD(t *testing.T) {
+	usdTypes := GetGoldTypesByCurrency("USD")
+	if len(usdTypes) != 1 {
+		t.Fatalf("Expected 1 USD gold type, got %d", len(usdTypes))
 	}
-	for _, tc := range cases {
-		t.Run(tc.alias, func(t *testing.T) {
-			got, ok := AliasToCanonical[tc.alias]
-			assert.True(t, ok, "missing alias %q", tc.alias)
-			assert.Equal(t, tc.canonical, got)
-		})
+	if usdTypes[0].Code != "XAUUSD" {
+		t.Errorf("Expected XAUUSD, got %q", usdTypes[0].Code)
 	}
 }
