@@ -8,7 +8,7 @@
 - **Started:** 2026-03-30T00:00:00Z
 - **Last updated:** 2026-03-30T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 0
+- **Current task:** 4
 
 ## Task Progress
 
@@ -16,10 +16,10 @@
 | --- | ------------------------------------------------------ | ----------- | ------ | ------- |
 | 0   | Update C4 Architecture Diagrams                        | pending     | —      | —       |
 | 1   | Add ListForInvestment Method to Service + Repository   | pending     | —      | —       |
-| 2   | Refactor Gold Handler to Read VND Types from DB        | pending     | —      | —       |
-| 3   | Refactor Silver Handler to Read VND Types from DB      | pending     | —      | —       |
+| 2   | Refactor Gold Handler to Read VND Types from DB        | done        | —      | GoldHandler reads VND from DB via ListForInvestment, 5 tests |
+| 3   | Refactor Silver Handler to Read VND Types from DB      | done        | —      | SilverHandler reads VND from DB via ListForInvestment, 9 tests |
 | 4   | Remove VND Entries from Static Registries              | pending     | —      | —       |
-| 5   | Seed Migration — Update Silver Configs show_in_investment = true | pending | — | — |
+| 5   | Seed Migration — Update Silver Configs show_in_investment = true | done | — | Migration cmd + Taskfile entry, idempotent UPDATE |
 | 6   | Frontend — Silver Investment Form Reads from Admin Config API | pending | — | — |
 | 7   | Frontend — Remove Hardcoded VND Option Arrays          | pending     | —      | —       |
 | 8   | Frontend — Watchlist and Price Alert Forms Use Admin Config | pending | —   | —       |

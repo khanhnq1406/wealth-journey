@@ -220,6 +220,12 @@ tasks:
     cmds:
       - go run cmd/migrate-investment-price-updated-at/main.go
 
+  backend:migrate-silver-show-in-investment:
+    desc: "Update all silver display configs to show_in_investment = true"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-silver-show-in-investment/main.go
+
   backend:migrate-all:
     desc: "Run all migrations in order (safe for fresh or existing databases)"
     dir: "{{.BACKEND_DIR}}"

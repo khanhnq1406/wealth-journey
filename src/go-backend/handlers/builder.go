@@ -11,29 +11,29 @@ import (
 
 // AllHandlers contains all handler instances.
 type AllHandlers struct {
-	Wallet       *WalletHandlers
-	User         *UserHandlers
-	Auth         *AuthHandlers
-	Session      *SessionHandlers
-	Transaction  *TransactionHandlers
-	Category     *CategoryHandlers
-	Budget       *BudgetHandlers
-	Investment   *InvestmentHandlers
-	Gold         *GoldHandler
-	Silver       *SilverHandler
-	MarketPrices *MarketPricesHandler
-	GoldChart    *GoldChartHandler
-	SilverChart  *SilverChartHandler
-	Import       *ImportHandler
-	Community      *CommunityHandler
-	Public         *PublicHandler
-	GoldSentiment  *GoldSentimentHandler
-	PriceOverride  *PriceOverrideHandler
-	Feedback       *FeedbackHandlers
-	SiteSettings   *SiteSettingsHandler
-	AdminUser      *AdminUserHandler
-	AdminFeedback  *AdminFeedbackHandler
-	AdminBroadcast   *AdminBroadcastHandler
+	Wallet             *WalletHandlers
+	User               *UserHandlers
+	Auth               *AuthHandlers
+	Session            *SessionHandlers
+	Transaction        *TransactionHandlers
+	Category           *CategoryHandlers
+	Budget             *BudgetHandlers
+	Investment         *InvestmentHandlers
+	Gold               *GoldHandler
+	Silver             *SilverHandler
+	MarketPrices       *MarketPricesHandler
+	GoldChart          *GoldChartHandler
+	SilverChart        *SilverChartHandler
+	Import             *ImportHandler
+	Community          *CommunityHandler
+	Public             *PublicHandler
+	GoldSentiment      *GoldSentimentHandler
+	PriceOverride      *PriceOverrideHandler
+	Feedback           *FeedbackHandlers
+	SiteSettings       *SiteSettingsHandler
+	AdminUser          *AdminUserHandler
+	AdminFeedback      *AdminFeedbackHandler
+	AdminBroadcast     *AdminBroadcastHandler
 	PriceAlertConfig   *PriceAlertConfigHandler
 	PriceAlertTrigger  *PriceAlertTriggerHandler
 	Push               *PushHandler
@@ -111,21 +111,21 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 	)
 
 	return &AllHandlers{
-		Wallet:       NewWalletHandlers(services.Wallet),
-		User:         NewUserHandlers(services.User),
-		Auth:         NewAuthHandlers(deps.AuthSrv),
-		Session:      NewSessionHandlers(deps.AuthSrv, deps.RDB),
-		Transaction:  NewTransactionHandlers(services.Transaction),
-		Category:     NewCategoryHandlers(services.Category),
-		Budget:       NewBudgetHandlers(services.Budget),
-		Investment:   NewInvestmentHandlers(services.Investment, services.PortfolioHistory, services.MarketData),
-		Gold:         NewGoldHandler(),
-		Silver:       NewSilverHandler(),
-		MarketPrices: marketPricesHandler,
-		GoldChart:    goldChartHandler,
-		SilverChart:  silverChartHandler,
-		Import:       NewImportHandler(repos.Import, importService),
-		Community:     NewCommunityHandler(services.Community, deps.RDB, deps.AuthSrv),
+		Wallet:         NewWalletHandlers(services.Wallet),
+		User:           NewUserHandlers(services.User),
+		Auth:           NewAuthHandlers(deps.AuthSrv),
+		Session:        NewSessionHandlers(deps.AuthSrv, deps.RDB),
+		Transaction:    NewTransactionHandlers(services.Transaction),
+		Category:       NewCategoryHandlers(services.Category),
+		Budget:         NewBudgetHandlers(services.Budget),
+		Investment:     NewInvestmentHandlers(services.Investment, services.PortfolioHistory, services.MarketData),
+		Gold:           NewGoldHandler(services.AssetDisplayConfig),
+		Silver:         NewSilverHandler(services.AssetDisplayConfig),
+		MarketPrices:   marketPricesHandler,
+		GoldChart:      goldChartHandler,
+		SilverChart:    silverChartHandler,
+		Import:         NewImportHandler(repos.Import, importService),
+		Community:      NewCommunityHandler(services.Community, deps.RDB, deps.AuthSrv),
 		GoldSentiment:  NewGoldSentimentHandler(services.GoldSentiment, deps.AuthSrv),
 		PriceOverride:  priceOverrideHandler,
 		Feedback:       NewFeedbackHandlers(services.Feedback),

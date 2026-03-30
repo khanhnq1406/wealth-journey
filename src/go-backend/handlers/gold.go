@@ -1,63 +1,115 @@
 package handlers
 
 import (
-	"net/http"
-	"time"
-
 	"github.com/gin-gonic/gin"
 
+	"wealthjourney/domain/models"
+	"wealthjourney/domain/service"
 	"wealthjourney/pkg/gold"
+	handler "wealthjourney/pkg/handler"
 )
 
-// GoldHandler handles gold-related endpoints
-type GoldHandler struct{}
-
-// NewGoldHandler creates a new gold handler
-func NewGoldHandler() *GoldHandler {
-	return &GoldHandler{}
+// goldTypeResponse is the JSON shape returned per gold type.
+// Remains backward-compatible with existing frontend consumers.
+type goldTypeResponse struct {
+	Code       string  `json:"code"`
+	Name       string  `json:"name"`
+	Currency   string  `json:"currency"`
+	Unit       string  `json:"unit"`
+	UnitWeight float64 `json:"unitWeight"`
+	Type       int     `json:"type"`
 }
 
-// GetGoldTypeCodes returns available gold type codes for investment creation
+// GoldHandler handles gold-related endpoints
+type GoldHandler struct {
+	displayConfigSvc service.AssetDisplayConfigService
+}
+
+// NewGoldHandler creates a new gold handler with AssetDisplayConfigService for DB-backed VND type lookup.
+func NewGoldHandler(displayConfigSvc service.AssetDisplayConfigService) *GoldHandler {
+	return &GoldHandler{displayConfigSvc: displayConfigSvc}
+}
+
+// mapVNDConfigsToResponse maps AssetDisplayConfig rows to the goldTypeResponse shape.
+func mapVNDConfigsToResponse(configs []*models.AssetDisplayConfig) []goldTypeResponse {
+	result := make([]goldTypeResponse, 0, len(configs))
+	for _, cfg := range configs {
+		result = append(result, goldTypeResponse{
+			Code:       cfg.TypeCode,
+			Name:       cfg.DisplayName,
+			Currency:   "VND",
+			Unit:       "mace",
+			UnitWeight: gold.GramsPerMace,
+			Type:       8, // investmentv1.InvestmentType_INVESTMENT_TYPE_GOLD_VND
+		})
+	}
+	return result
+}
+
+// mapUSDStaticToResponse maps the static USD gold types to the goldTypeResponse shape.
+func mapUSDStaticToResponse() []goldTypeResponse {
+	usdTypes := gold.GetGoldTypesByCurrency("USD")
+	result := make([]goldTypeResponse, 0, len(usdTypes))
+	for _, gt := range usdTypes {
+		result = append(result, goldTypeResponse{
+			Code:       gt.Code,
+			Name:       gt.Name,
+			Currency:   gt.Currency,
+			Unit:       string(gt.Unit),
+			UnitWeight: gt.UnitWeight,
+			Type:       int(gt.Type),
+		})
+	}
+	return result
+}
+
+// GetGoldTypeCodes returns available gold type codes for investment creation.
 // GET /api/v1/investments/gold-types
+//
+// Query params:
+//   - currency (optional): "VND" → DB configs, "USD" → static registry, empty → both merged.
+//     Any other value returns 400 Bad Request.
 func (h *GoldHandler) GetGoldTypeCodes(c *gin.Context) {
-	currency := c.Query("currency") // Optional filter: "VND", "USD", or empty for all
+	currency := c.Query("currency")
 
-	var result []map[string]interface{}
-
-	// Use gold types from the gold package
-	if currency != "" {
-		// Filter by currency
-		goldTypes := gold.GetGoldTypesByCurrency(currency)
-		result = make([]map[string]interface{}, len(goldTypes))
-		for i, gt := range goldTypes {
-			result[i] = map[string]interface{}{
-				"code":       gt.Code,
-				"name":       gt.Name,
-				"currency":   gt.Currency,
-				"unit":       string(gt.Unit),
-				"unitWeight": gt.UnitWeight,
-				"type":       int32(gt.Type),
-			}
-		}
-	} else {
-		// Return all gold types
-		result = make([]map[string]interface{}, len(gold.GoldTypes))
-		for i, gt := range gold.GoldTypes {
-			result[i] = map[string]interface{}{
-				"code":       gt.Code,
-				"name":       gt.Name,
-				"currency":   gt.Currency,
-				"unit":       string(gt.Unit),
-				"unitWeight": gt.UnitWeight,
-				"type":       int32(gt.Type),
-			}
-		}
+	// Whitelist: only VND, USD, or empty are accepted.
+	if currency != "" && currency != "VND" && currency != "USD" {
+		handler.BadRequest(c, &badCurrencyError{currency: currency})
+		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"success":   true,
-		"message":   "Gold type codes retrieved successfully",
-		"data":      result,
-		"timestamp": time.Now().Format(time.RFC3339),
-	})
+	var result []goldTypeResponse
+
+	switch currency {
+	case "USD":
+		result = mapUSDStaticToResponse()
+
+	case "VND":
+		configs, err := h.displayConfigSvc.ListForInvestment(c.Request.Context(), "gold")
+		if err != nil {
+			handler.HandleError(c, err)
+			return
+		}
+		result = mapVNDConfigsToResponse(configs)
+
+	default:
+		// Merge: VND from DB + USD from static registry
+		configs, err := h.displayConfigSvc.ListForInvestment(c.Request.Context(), "gold")
+		if err != nil {
+			handler.HandleError(c, err)
+			return
+		}
+		result = append(mapVNDConfigsToResponse(configs), mapUSDStaticToResponse()...)
+	}
+
+	handler.Success(c, result)
+}
+
+// badCurrencyError is a simple error used for invalid currency param validation.
+type badCurrencyError struct {
+	currency string
+}
+
+func (e *badCurrencyError) Error() string {
+	return "invalid currency '" + e.currency + "': must be VND, USD, or omitted"
 }

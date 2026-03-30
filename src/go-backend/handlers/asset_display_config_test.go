@@ -33,6 +33,7 @@ type mockAssetDisplayConfigService struct {
 	updateFetchCodeFunc    func(ctx context.Context, id int32, priority int32) (*models.AssetConfigFetchCode, error)
 	deleteFetchCodeFunc    func(ctx context.Context, id int32) error
 	listAvailableTypeCodes func(ctx context.Context, assetType string) ([]string, error)
+	listForInvestmentFunc  func(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error)
 }
 
 func (m *mockAssetDisplayConfigService) GetDisplayPrices(ctx context.Context, assetType string) ([]*service.AssetDisplayPriceDTO, error) {
@@ -110,6 +111,13 @@ func (m *mockAssetDisplayConfigService) ListAvailableTypeCodes(ctx context.Conte
 		return m.listAvailableTypeCodes(ctx, assetType)
 	}
 	return []string{}, nil
+}
+
+func (m *mockAssetDisplayConfigService) ListForInvestment(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
+	if m.listForInvestmentFunc != nil {
+		return m.listForInvestmentFunc(ctx, assetType)
+	}
+	return []*models.AssetDisplayConfig{}, nil
 }
 
 // ---------------------------------------------------------------------------

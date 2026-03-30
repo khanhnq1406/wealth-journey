@@ -2,34 +2,55 @@ package handlers
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 
+	handler "wealthjourney/pkg/handler"
+	"wealthjourney/domain/service"
 	"wealthjourney/pkg/silver"
 )
 
 // SilverHandler handles silver-related endpoints
-type SilverHandler struct{}
-
-// NewSilverHandler creates a new silver handler
-func NewSilverHandler() *SilverHandler {
-	return &SilverHandler{}
+type SilverHandler struct {
+	displayConfigSvc service.AssetDisplayConfigService
 }
 
-// GetSilverTypeCodes returns available silver type codes for investment creation
+// NewSilverHandler creates a new silver handler
+func NewSilverHandler(displayConfigSvc service.AssetDisplayConfigService) *SilverHandler {
+	return &SilverHandler{displayConfigSvc: displayConfigSvc}
+}
+
+// GetSilverTypeCodes returns available silver type codes for investment creation.
 // GET /api/v1/investments/silver-types
+//
+// Query params:
+//   - currency: optional filter — "VND", "USD", or empty for all.
+//
+// Behaviour:
+//   - currency=USD  → static registry (silver package)
+//   - currency=VND  → DB via AssetDisplayConfigService.ListForInvestment("silver")
+//   - (empty)       → VND from DB merged with USD from static
+//
+// Currency is whitelisted to "VND", "USD", or empty; any other value returns 400.
 func (h *SilverHandler) GetSilverTypeCodes(c *gin.Context) {
-	currency := c.Query("currency") // Optional filter: "VND", "USD", or empty for all
+	currency := c.Query("currency")
+
+	// Whitelist currency param (security: prevent arbitrary values reaching service layer)
+	if currency != "" && currency != "VND" && currency != "USD" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid currency parameter: must be 'VND', 'USD', or empty",
+		})
+		return
+	}
 
 	var result []map[string]interface{}
 
-	// Use silver types from the silver package
-	if currency != "" {
-		// Filter by currency
-		silverTypes := silver.GetSilverTypesByCurrency(currency)
-		result = make([]map[string]interface{}, len(silverTypes))
-		for i, st := range silverTypes {
+	switch currency {
+	case "USD":
+		// USD silver — always from the static registry (Yahoo Finance symbols)
+		usdTypes := silver.GetSilverTypesByCurrency("USD")
+		result = make([]map[string]interface{}, len(usdTypes))
+		for i, st := range usdTypes {
 			result[i] = map[string]interface{}{
 				"code":     st.Code,
 				"name":     st.Name,
@@ -37,23 +58,56 @@ func (h *SilverHandler) GetSilverTypeCodes(c *gin.Context) {
 				"type":     int32(st.Type),
 			}
 		}
-	} else {
-		// Return all silver types
-		result = make([]map[string]interface{}, len(silver.SilverTypes))
-		for i, st := range silver.SilverTypes {
+
+	case "VND":
+		// VND silver — sourced from DB (admin-configurable via AssetDisplayConfig)
+		configs, err := h.displayConfigSvc.ListForInvestment(c.Request.Context(), "silver")
+		if err != nil {
+			handler.HandleError(c, err)
+			return
+		}
+		result = make([]map[string]interface{}, len(configs))
+		for i, cfg := range configs {
 			result[i] = map[string]interface{}{
+				"code":     cfg.TypeCode,
+				"name":     cfg.DisplayName,
+				"currency": "VND",
+				"type":     int32(10), // INVESTMENT_TYPE_SILVER_VND enum value
+			}
+		}
+
+	default: // empty — merge VND from DB + USD from static
+		configs, err := h.displayConfigSvc.ListForInvestment(c.Request.Context(), "silver")
+		if err != nil {
+			handler.HandleError(c, err)
+			return
+		}
+
+		vndItems := make([]map[string]interface{}, len(configs))
+		for i, cfg := range configs {
+			vndItems[i] = map[string]interface{}{
+				"code":     cfg.TypeCode,
+				"name":     cfg.DisplayName,
+				"currency": "VND",
+				"type":     int32(10), // INVESTMENT_TYPE_SILVER_VND
+			}
+		}
+
+		usdTypes := silver.GetSilverTypesByCurrency("USD")
+		usdItems := make([]map[string]interface{}, len(usdTypes))
+		for i, st := range usdTypes {
+			usdItems[i] = map[string]interface{}{
 				"code":     st.Code,
 				"name":     st.Name,
 				"currency": st.Currency,
 				"type":     int32(st.Type),
 			}
 		}
+
+		result = append(vndItems, usdItems...)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"success":   true,
-		"message":   "Silver type codes retrieved successfully",
-		"data":      result,
-		"timestamp": time.Now().Format(time.RFC3339),
+	handler.Success(c, gin.H{
+		"data": result,
 	})
 }
