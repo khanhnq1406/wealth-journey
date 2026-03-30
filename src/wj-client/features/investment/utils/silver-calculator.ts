@@ -31,8 +31,10 @@ export interface SilverTypeOption {
   availableUnits: SilverUnit[]; // Units user can input
 }
 
-// Vietnamese silver type options — aligned with silver price API
-export const SILVER_VND_OPTIONS: SilverTypeOption[] = [
+// Vietnamese silver type options — no longer exported; VND options now come
+// from the admin config API (useQueryGetAssetDisplayPrices).
+// Kept as internal reference only; not used by any exported function.
+const _SILVER_VND_OPTIONS_INTERNAL: SilverTypeOption[] = [
   // Tael-based (lượng)
   { value: "PH_QU_THI_1L", label: "Phú Quý thỏi 1L", currency: "VND", type: 10, availableUnits: ['tael'] },
   { value: "PH_QU_THI_5L_10L", label: "Phú Quý thỏi 5L,10L", currency: "VND", type: 10, availableUnits: ['tael'] },
@@ -351,13 +353,15 @@ export function getSilverTypeLabel(type: InvestmentType): string {
 }
 
 /**
- * Get silver type options for a given currency
+ * Get silver type options for a given currency.
+ * VND options are now sourced from the admin config API
+ * (useQueryGetAssetDisplayPrices). This function only returns USD options.
  */
 export function getSilverTypeOptions(currency?: string): SilverTypeOption[] {
-  if (currency === "USD") {
+  if (currency === "USD" || !currency) {
     return SILVER_USD_OPTIONS;
   }
-  return SILVER_VND_OPTIONS;
+  return []; // VND options now come from API (useQueryGetAssetDisplayPrices)
 }
 
 /**

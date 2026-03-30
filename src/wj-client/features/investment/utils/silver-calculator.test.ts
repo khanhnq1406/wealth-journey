@@ -8,7 +8,26 @@ import { InvestmentType } from '@/gen/protobuf/v1/investment';
 import {
   formatSilverQuantityDisplay,
   formatSilverQuantity,
+  getSilverTypeOptions,
+  SILVER_USD_OPTIONS,
 } from './silver-calculator';
+
+describe('getSilverTypeOptions', () => {
+  it('should return empty array when filtering by VND (VND options now come from API)', () => {
+    const options = getSilverTypeOptions('VND');
+    expect(options).toEqual([]);
+  });
+
+  it('should return USD options when filtering by USD', () => {
+    const options = getSilverTypeOptions('USD');
+    expect(options).toEqual(SILVER_USD_OPTIONS);
+  });
+
+  it('should return USD options when no filter (default to USD)', () => {
+    const options = getSilverTypeOptions();
+    expect(options).toEqual(SILVER_USD_OPTIONS);
+  });
+});
 
 describe('formatSilverQuantityDisplay - null/zero guard', () => {
   it('should return 0 value (not NaN) when storedQuantity is null', () => {

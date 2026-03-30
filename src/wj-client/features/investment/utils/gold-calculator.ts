@@ -29,8 +29,10 @@ export interface GoldTypeOption {
   type: number;      // InvestmentType enum value
 }
 
-// Vietnamese gold type options for frontend dropdowns
-export const GOLD_VND_OPTIONS: GoldTypeOption[] = [
+// Vietnamese gold type options — no longer exported; VND options now come from
+// the admin config API (useQueryGetAssetDisplayPrices). Kept as internal
+// fallback for getGoldTypeByCode lookups only.
+const GOLD_VND_OPTIONS_INTERNAL: GoldTypeOption[] = [
   { value: "SJC", label: "SJC", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
   { value: "Vàng nhẫn SJC", label: "Nhẫn SJC 9999", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
   { value: "Doji_24K", label: "Nhẫn Doji 9999", unit: "mace" as GoldUnit, currency: "VND", unitWeight: GRAMS_PER_MACE, type: 8 },
@@ -362,15 +364,17 @@ export function formatGoldPriceDisplay(
 }
 
 /**
- * Get gold options by currency for filtering
- * @param currency - Currency filter ("VND", "USD", or undefined for all)
+ * Get gold options by currency for filtering.
+ * VND options are now sourced from the admin config API
+ * (useQueryGetAssetDisplayPrices). This function only returns USD options.
+ * @param currency - Currency filter ("USD", or undefined)
  * @returns Array of gold type options
  */
 export function getGoldTypeOptions(currency?: string): GoldTypeOption[] {
-  if (currency === 'USD') {
+  if (currency === 'USD' || !currency) {
     return GOLD_USD_OPTIONS;
   }
-  return GOLD_VND_OPTIONS;
+  return []; // VND options now come from API (useQueryGetAssetDisplayPrices)
 }
 
 /**
@@ -379,7 +383,7 @@ export function getGoldTypeOptions(currency?: string): GoldTypeOption[] {
  * @returns The gold type option or undefined
  */
 export function getGoldTypeByCode(code: string): GoldTypeOption | undefined {
-  return [...GOLD_VND_OPTIONS, ...GOLD_USD_OPTIONS].find(opt => opt.value === code);
+  return [...GOLD_VND_OPTIONS_INTERNAL, ...GOLD_USD_OPTIONS].find(opt => opt.value === code);
 }
 
 /**

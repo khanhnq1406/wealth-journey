@@ -9,8 +9,32 @@ import { Select } from "@/components/select/Select";
 import { ButtonType } from "@/app/constants";
 import { useMutationCreateWatchlistItem, useQueryGetMarketPrices } from "@/utils/generated/hooks";
 import { InvestmentType, SearchResult } from "@/gen/protobuf/v1/investment";
-import { GOLD_VND_OPTIONS } from "@/features/investment/utils/gold-calculator";
-import { SILVER_VND_OPTIONS } from "@/features/investment/utils/silver-calculator";
+// TODO: Task 8 — replace these local fallback arrays with useQueryGetAssetDisplayPrices API data.
+// GOLD_VND_OPTIONS and SILVER_VND_OPTIONS are no longer exported from their source files.
+const GOLD_VND_OPTIONS = [
+  { value: "SJC", label: "SJC", currency: "VND" },
+  { value: "Vàng nhẫn SJC", label: "Nhẫn SJC 9999", currency: "VND" },
+  { value: "Doji_24K", label: "Nhẫn Doji 9999", currency: "VND" },
+  { value: "Mi hồng", label: "SJC Mi Hồng", currency: "VND" },
+  { value: "Mihong_999", label: "Nhẫn Mi Hồng 9999", currency: "VND" },
+  { value: "BTMC", label: "SJC BTMC", currency: "VND" },
+  { value: "BTMC_24K", label: "Nhẫn BTMC", currency: "VND" },
+  { value: "PNJ HCM", label: "PNJ", currency: "VND" },
+];
+
+const SILVER_VND_OPTIONS = [
+  { value: "PH_QU_THI_1L", label: "Phú Quý thỏi 1L", currency: "VND" },
+  { value: "PH_QU_THI_5L_10L", label: "Phú Quý thỏi 5L,10L", currency: "VND" },
+  { value: "BC_M_NGH_PH_QU", label: "Bạc Mỹ nghệ Phú Quý", currency: "VND" },
+  { value: "ANCARAT_NGN_LONG_1L", label: "Ancarat Ngân Long 1L", currency: "VND" },
+  { value: "ANCARAT_NGN_LONG_5L", label: "Ancarat Ngân Long 5L", currency: "VND" },
+  { value: "SBJ_1L_10L_50L", label: "SBJ 1L,10L,50L", currency: "VND" },
+  { value: "DOJI_99.9_1L", label: "DOJI 99.9 1L", currency: "VND" },
+  { value: "DOJI_99.9_5L", label: "DOJI 99.9 5L", currency: "VND" },
+  { value: "ANCARAT_NGN_LONG_1KG", label: "Ancarat Ngân Long 1kg", currency: "VND" },
+  { value: "ANCARAT_THI_999_-_1KG", label: "Ancarat thỏi 999 - 1kg", currency: "VND" },
+  { value: "SBJ_1KG", label: "SBJ 1kg", currency: "VND" },
+];
 // eslint-disable-next-line no-restricted-imports
 import { SymbolAutocomplete } from "@/features/investment/components/SymbolAutocomplete";
 

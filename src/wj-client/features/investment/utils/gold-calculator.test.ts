@@ -23,7 +23,6 @@ import {
   getGoldTypeLabel,
   GRAMS_PER_MACE,
   GRAMS_PER_OUNCE,
-  GOLD_VND_OPTIONS,
   GOLD_USD_OPTIONS,
   type GoldUnit,
   type GoldCalculationInput,
@@ -185,10 +184,9 @@ describe('Gold Calculator - Display Functions', () => {
 
 describe('Gold Calculator - Utility Functions', () => {
   describe('getGoldTypeOptions', () => {
-    it('should return VND options when filtering by VND', () => {
+    it('should return empty array when filtering by VND (VND options now come from API)', () => {
       const options = getGoldTypeOptions('VND');
-      expect(options).toEqual(GOLD_VND_OPTIONS);
-      expect(options.every(opt => opt.currency === 'VND'));
+      expect(options).toEqual([]);
     });
 
     it('should return USD options when filtering by USD', () => {
@@ -197,9 +195,9 @@ describe('Gold Calculator - Utility Functions', () => {
       expect(options.every(opt => opt.currency === 'USD'));
     });
 
-    it('should return VND options when no filter', () => {
+    it('should return USD options when no filter (default to USD)', () => {
       const options = getGoldTypeOptions();
-      expect(options).toEqual(GOLD_VND_OPTIONS);
+      expect(options).toEqual(GOLD_USD_OPTIONS);
     });
   });
 
