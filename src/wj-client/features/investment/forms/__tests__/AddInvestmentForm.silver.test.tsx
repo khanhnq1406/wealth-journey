@@ -5,7 +5,7 @@
  *  1. silverDisplayPricesQuery is called with assetType=silver
  *  2. When silver is not selected, silverDisplayPricesQuery enabled=false
  *  3. Silver VND options are built from API data (filtered by showInInvestment)
- *  4. SILVER_USD_OPTIONS (XAGUSD) always appears regardless of API data
+ *  4. Silver type options contain only VND options from API (no hardcoded USD)
  *  5. Silver VND options not shown when showInInvestment = false
  *  6. inferSilverUnits: KG codes → ["kg"], L codes → ["tael"], default → ["tael"]
  *  7. Form renders without crashing regardless of silver query state
@@ -253,10 +253,9 @@ describe("AddInvestmentForm — silverDisplayPricesQuery hook wiring", () => {
 // ---------------------------------------------------------------------------
 
 describe("inferSilverUnits logic (indirect via silver-calculator)", () => {
-  // Import and test the module-level function logic indirectly by verifying
-  // the SILVER_USD_OPTIONS import is preserved (Task 7 will remove VND statics)
+  // Test the inferSilverUnits helper logic indirectly via the expected behavior
 
-  it("SILVER_USD_OPTIONS contains XAGUSD with oz unit", async () => {
+  it("SILVER_USD_OPTIONS still exported from silver-calculator (for other consumers)", async () => {
     const { SILVER_USD_OPTIONS } = await import(
       "@/features/investment/utils/silver-calculator"
     );

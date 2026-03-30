@@ -49,7 +49,6 @@ import {
   type SilverTypeOption,
   type SilverUnit,
   calculateSilverFromUserInput,
-  SILVER_USD_OPTIONS,
 } from "@/features/investment/utils/silver-calculator";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useExchangeRate } from "@/hooks/useExchangeRate";
@@ -299,10 +298,10 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
     return [...vndOptions, ...GOLD_USD_OPTIONS];
   }, [isGoldInvestment, goldDisplayPricesQuery.data]);
 
-  // Build silver type options: VND from API (filtered by showInInvestment), USD stays hardcoded
+  // Build silver type options: VND from API only (filtered by showInInvestment)
   const silverTypeOptions = useMemo((): SilverTypeOption[] => {
     if (!isSilverInvestment) return [];
-    const vndOptions: SilverTypeOption[] = (silverDisplayPricesQuery.data?.prices ?? [])
+    return (silverDisplayPricesQuery.data?.prices ?? [])
       .filter((p) => p.showInInvestment)
       .map((p) => ({
         value: p.typeCode,
@@ -311,7 +310,6 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
         type: 10, // InvestmentType.INVESTMENT_TYPE_SILVER_VND
         availableUnits: inferSilverUnits(p.typeCode),
       }));
-    return [...vndOptions, ...SILVER_USD_OPTIONS];
   }, [isSilverInvestment, silverDisplayPricesQuery.data]);
 
   // Dynamic price per unit label: "Đơn giá (đ/chỉ)" for gold VND, etc.

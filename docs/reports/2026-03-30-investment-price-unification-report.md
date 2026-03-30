@@ -161,3 +161,4 @@ ListForInvestment(ctx context.Context, assetType string) ([]*models.AssetDisplay
 | Date | Fix | Severity | Files |
 |------|-----|----------|-------|
 | 2026-03-30 | Gold VND price-per-unit label: "đ/lượng" → "đ/chỉ" — `t("form.taelUnitLong")` → `t("form.maceUnitLong")` in `pricePerUnitLabel` memo | Minor | `AddInvestmentForm.tsx` |
+| 2026-03-30 | Remove hardcoded world silver (XAGUSD) from AddInvestmentForm silver dropdown — `silverTypeOptions` now returns VND-only API options; `SILVER_USD_OPTIONS` removed from import and useMemo spread | Minor | `AddInvestmentForm.tsx`, `AddInvestmentForm.silver.test.tsx` |
