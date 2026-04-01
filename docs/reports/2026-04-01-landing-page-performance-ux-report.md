@@ -146,6 +146,8 @@ GitNexus not available — manual blast radius review performed:
 | Date       | Fix                                                                           | Severity | Files Changed                             |
 | ---------- | ----------------------------------------------------------------------------- | -------- | ----------------------------------------- |
 | 2026-04-01 | `/vi` route showed blank dark red screen — replaced `return null` with gold spinner in `app/[locale]/page.tsx` | Minor    | `src/wj-client/app/[locale]/page.tsx` |
+| 2026-04-01 | Loading screens were spinner-only — added static brand block (logo, tagline, contact) to `loading.tsx` and `page.tsx` | Minor    | `src/wj-client/app/[locale]/loading.tsx`, `src/wj-client/app/[locale]/page.tsx` |
+| 2026-04-01 | Enhanced all loading screens: logo + spinning ring orbit + brand block; also applied to root `app/loading.tsx` | Minor    | `src/wj-client/app/loading.tsx`, `src/wj-client/app/[locale]/loading.tsx`, `src/wj-client/app/[locale]/page.tsx` |
 
 ### Fix Detail — 2026-04-01
 
@@ -156,3 +158,26 @@ GitNexus not available — manual blast radius review performed:
 **Fix:** Replace `return null` with the branded gold spinner (identical JSX to `app/[locale]/loading.tsx`). The spinner is displayed during the brief client-side redirect, eliminating the blank flash.
 
 **Security Review:** Approved — no XSS risk, no auth bypass, no information disclosure. Auth redirect logic unchanged.
+
+### Fix Detail — 2026-04-01 (brand block)
+
+**Issue:** Both locale loading screens (`app/[locale]/loading.tsx` and `app/[locale]/page.tsx`) showed only the gold spinner with no brand identity or context. Users had no visual anchor while waiting.
+
+**Fix:** Added a static brand block below the spinner in both files:
+- Site name: `congdongvang.com` (gold accent, bold)
+- Tagline: "Sân chơi giao lưu, trao đổi, kiến thức về thị trường đầu tư tài chính" (tertiary text)
+- Advertising contact: "Liên hệ quảng cáo: 076.897.2512" (placeholder text, xs)
+
+All strings are hardcoded literals — no dynamic data, no new imports, no new dependencies. Layout changed from `flex items-center justify-center` to `flex flex-col items-center justify-center gap-6` to accommodate the brand block.
+
+**Security Review:** Approved — all strings are build-time literals; no XSS surface, no auth changes, no information disclosure. Auth logic in `page.tsx` untouched.
+
+### Fix Detail — 2026-04-01 (logo orbit spinner)
+
+**Issue:** Spinner and logo were stacked vertically (spinner below logo). User requested the spinner ring orbit around the logo. Additionally the spinner stroke was too thick and wide at larger sizes, and `app/loading.tsx` (root-level) was missing the brand block entirely.
+
+**Fix:**
+- Wrapped logo + SVG spinner in a `relative` container (`h-32 w-32`); spinner uses `absolute inset-0 h-full w-full` to overlay the logo
+- Replaced path-based spinner with two `<circle>` elements using `strokeDasharray` for a clean thin arc: full-circle track at 25% opacity + 25% arc dash (`strokeDasharray="17.28 51.84"`, `r="11"`, `strokeWidth="1.5"`, `strokeLinecap="round"`)
+- Applied identical treatment to `app/loading.tsx` (root loading) including brand block
+- No new imports beyond `next/image` (already added in prior fix)
