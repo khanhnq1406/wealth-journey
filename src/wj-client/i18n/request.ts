@@ -26,6 +26,7 @@ const messageGroups = [
   'errors',      // error code translations for i18n error display
   'community',   // community.profile (edit profile, bio, etc.)
   'validation',  // Zod validation message translations
+  'guide',       // guide.* (user guide page content)
 ] as const;
 
 export default getRequestConfig(async ({ requestLocale }) => {

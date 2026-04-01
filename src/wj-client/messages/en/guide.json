@@ -1,0 +1,223 @@
+{
+  "title": "User Guide",
+  "subtitle": "Learn how to use congdongvang.com to manage your finances and investments effectively.",
+  "toc": {
+    "homepage": "Homepage",
+    "netWorth": "Net Worth",
+    "wallets": "Wallet Management",
+    "priceTables": "Market Price Tables",
+    "pnlTracking": "PNL Tracking",
+    "investment": "Investment Portfolio",
+    "addingInvestments": "Adding Investments",
+    "transactionTypes": "Transaction Types",
+    "fifoAccounting": "FIFO Accounting",
+    "goldSilver": "Gold & Silver",
+    "priceAlerts": "Price Alerts",
+    "community": "Community",
+    "creatingPosts": "Creating Posts",
+    "interactions": "Interactions",
+    "sentimentVoting": "Sentiment Voting"
+  },
+  "homepage": {
+    "title": "Dashboard Homepage",
+    "description": "The dashboard homepage gives you a complete overview of your financial situation — from net worth and wallet balances to live market prices and investment PNL tracking.",
+    "netWorth": {
+      "title": "Net Worth",
+      "description": "The net worth card at the top of the page shows the total value of all your wallets converted to a single currency. This figure updates automatically whenever you add or modify a transaction.",
+      "tip": "Click the net worth card to see a detailed breakdown by wallet and asset category."
+    },
+    "wallets": {
+      "title": "Wallet Management",
+      "description": "Wallets are the basic unit for organizing your assets. You can create multiple wallets for different purposes: cash, bank accounts, investment portfolios, and more.",
+      "createWallet": {
+        "title": "Creating a New Wallet",
+        "steps": [
+          "Click the '+' or 'Add Wallet' button on the Wallets page.",
+          "Choose the wallet type: BASIC (for expense tracking) or INVESTMENT (for portfolio tracking).",
+          "Enter a name for the wallet and set the initial balance.",
+          "Choose a currency (VND, USD, EUR, ...).",
+          "Click 'Save' to create the wallet."
+        ]
+      },
+      "transferMoney": {
+        "title": "Transferring Money Between Wallets",
+        "steps": [
+          "On the Wallets page, click the 'Transfer Money' button.",
+          "Select the source wallet and destination wallet.",
+          "Enter the amount to transfer.",
+          "The system automatically creates two offsetting transactions to maintain balance totals.",
+          "Click 'Confirm' to complete the transfer."
+        ]
+      },
+      "tip": "Consider creating a separate INVESTMENT wallet for each asset group (stocks, gold) to track the performance of each group independently."
+    },
+    "priceTables": {
+      "title": "Market Price Tables",
+      "description": "The homepage displays gold, silver, and currency price tables automatically updated from trusted sources (SJC, DOJI, PNJ, Vietcombank...). Prices refresh every 15 minutes.",
+      "goldTable": "The gold price table shows buy/sell prices for each gold type (SJC, DOJI, PNJ...) in thousands of VND per tael.",
+      "silverTable": "The silver price table shows buy/sell prices in thousands of VND per tael.",
+      "currencyTable": "The currency table shows USD, EUR, and other exchange rates from the free market and Vietcombank.",
+      "staleIndicator": "Prices display '--' when a data source is temporarily unavailable. The system restores data automatically when the source comes back online.",
+      "tip": "Click the 'Gold', 'Silver', or 'Currency' tabs to switch between price tables."
+    },
+    "pnlTracking": {
+      "title": "PNL Tracking (Profit & Loss)",
+      "description": "The PNL card on the homepage shows the total unrealized profit/loss of your entire investment portfolio in real time.",
+      "unrealized": "Unrealized PNL is the difference between the current market price and the average cost basis of the investments you are currently holding.",
+      "realized": "Realized PNL is the profit or loss locked in when you sell part or all of an investment.",
+      "tip": "Green color indicates a gain, red indicates a loss relative to your cost basis."
+    }
+  },
+  "investment": {
+    "title": "Investment Portfolio",
+    "description": "The Portfolio page lets you track all your investments in a unified interface — stocks, ETFs, cryptocurrency, gold, silver, and custom assets.",
+    "addingInvestments": {
+      "title": "Adding Investments",
+      "description": "To add an investment, you need at least one INVESTMENT-type wallet.",
+      "steps": [
+        "Select an investment wallet from the wallet list.",
+        "Click the 'Add Investment' button or the '+' icon.",
+        "Search for a ticker symbol (e.g. VCB, BTC-USD, AAPL) or enter details manually.",
+        "Fill in the quantity, purchase price, and transaction date.",
+        "Click 'Save' to record the investment."
+      ],
+      "symbolSearch": {
+        "title": "Symbol Search",
+        "description": "Type at least 2 characters in the search box and the system will show suggestions from Yahoo Finance. Suggestions include the ticker, company name, exchange, and asset type.",
+        "tip": "Search supports Vietnamese stocks (HOSE, HNX), international stocks, ETFs, and cryptocurrency."
+      },
+      "customInvestments": {
+        "title": "Custom Assets",
+        "description": "For assets not traded on any market (real estate, private equity...), you can create a 'custom investment'. Select 'Custom' when adding an investment and enter the name and current value manually.",
+        "tip": "You can update the price manually at any time using the 'Set Price' tab inside the investment detail modal."
+      }
+    },
+    "transactionTypes": {
+      "title": "Investment Transaction Types",
+      "description": "Each investment supports three transaction types:",
+      "buy": {
+        "title": "Buy",
+        "description": "Records a purchase. The system creates a new 'lot' with the specified price and quantity, used for FIFO cost basis calculation."
+      },
+      "sell": {
+        "title": "Sell",
+        "description": "Records a sale. The system applies FIFO to determine the cost basis of the units sold and calculates the realized profit or loss."
+      },
+      "dividend": {
+        "title": "Dividend",
+        "description": "Records a dividend received. Does not affect the quantity held but is counted toward total income."
+      },
+      "tip": "Click on an investment, then select the 'Transactions' tab to view history and add new transactions."
+    },
+    "fifoAccounting": {
+      "title": "FIFO Accounting (First-In, First-Out)",
+      "description": "The system uses the FIFO method to calculate cost basis when you sell. This means units purchased first are treated as sold first.",
+      "example": {
+        "title": "Example",
+        "description": "Suppose you buy 100 VCB shares at 85,000 VND, then buy 50 more at 90,000 VND. When you sell 80 shares, the system calculates the cost basis as 80 × 85,000 VND = 6,800,000 VND (taken from the first purchase lot per FIFO)."
+      },
+      "benefits": [
+        "Accurately reflects actual buy/sell history.",
+        "Calculates realized PNL precisely per lot.",
+        "Tracks remaining quantity and current average cost basis."
+      ]
+    },
+    "goldSilver": {
+      "title": "Gold & Silver Investments",
+      "description": "congdongvang.com provides specialized support for gold and silver investments with automatic unit conversion.",
+      "goldVnd": {
+        "title": "Vietnamese Gold (VND)",
+        "description": "Supports SJC gold varieties (SJL1L10, SJL1C, SJR2...). Quantities are stored in grams, but the interface displays values in tael (lượng / chỉ). 1 tael = 37.5 grams."
+      },
+      "goldUsd": {
+        "title": "World Gold (USD)",
+        "description": "Track XAU gold at international prices in USD per ounce. The system automatically updates prices from Yahoo Finance."
+      },
+      "silverVnd": {
+        "title": "Silver (VND)",
+        "description": "Similar to Vietnamese gold, domestic silver is tracked per tael with prices from domestic sources."
+      },
+      "tip": "When entering VND gold quantities, enter in tael (lượng). The system automatically converts to grams when saving."
+    },
+    "priceAlerts": {
+      "title": "Price Alerts",
+      "description": "The price alerts feature notifies you when an asset's price reaches a threshold you define.",
+      "setup": {
+        "title": "Setting Up an Alert",
+        "steps": [
+          "Go to Settings → Price Alerts.",
+          "Click 'Create New Alert'.",
+          "Select the asset to monitor.",
+          "Set the price threshold (above or below).",
+          "Activate the alert."
+        ]
+      },
+      "status": {
+        "active": "Active — the system is actively monitoring.",
+        "triggered": "Triggered — the price has reached the threshold and a notification was sent.",
+        "paused": "Paused — the alert is inactive until you reactivate it."
+      },
+      "tip": "You can pause an alert without deleting it so you can reuse it later."
+    }
+  },
+  "community": {
+    "title": "Community Forum",
+    "description": "The Community page is where you share market insights, discuss investments, and connect with fellow investors.",
+    "creatingPosts": {
+      "title": "Creating Posts",
+      "description": "Share analysis, news, or investment experience with the community.",
+      "steps": [
+        "Click the 'Create Post' button on the Community page.",
+        "Enter your post content (plain text supported).",
+        "Add hashtags to categorize your post (e.g. #gold, #stocks).",
+        "Click 'Post' to publish."
+      ],
+      "hashtags": {
+        "title": "Hashtags",
+        "description": "Use hashtags to categorize posts and help others find related content. Click a hashtag to filter all posts with that tag."
+      },
+      "tip": "High-quality posts with specific analysis tend to receive more engagement from the community."
+    },
+    "interactions": {
+      "title": "Community Interactions",
+      "description": "Engage with the community in multiple ways:",
+      "commenting": {
+        "title": "Commenting",
+        "description": "Click on a post to view details and leave a comment. Comments support plain text and are ordered chronologically."
+      },
+      "liking": {
+        "title": "Liking Posts",
+        "description": "Click the heart icon to like a post. The like count is displayed publicly on each post."
+      },
+      "following": {
+        "title": "Following Users",
+        "description": "Click 'Follow' on a user's profile to follow investors you're interested in. Your feed will prioritize posts from people you follow."
+      },
+      "savedPosts": {
+        "title": "Saving Posts",
+        "description": "Click the bookmark icon to save important posts. View your saved posts from your profile page."
+      },
+      "tip": "Follow experienced investors to get notified when they publish new posts."
+    },
+    "sentimentVoting": {
+      "title": "Market Sentiment Voting",
+      "description": "The sentiment voting feature lets the community express their view on the direction of gold and silver prices.",
+      "howToVote": {
+        "title": "How to Vote",
+        "steps": [
+          "On the Community page, find the 'Market Sentiment' section.",
+          "Select 'Bull' if you expect prices to rise.",
+          "Select 'Bear' if you expect prices to fall.",
+          "The community's aggregated vote results are displayed in real time."
+        ]
+      },
+      "interpretation": "The vote distribution reflects the overall community sentiment — it is not investment advice. Always do your own research before making any decisions.",
+      "tip": "Votes are periodically reset to reflect current market sentiment rather than long-term historical bias."
+    }
+  },
+  "cta": {
+    "goToDashboard": "Go to Dashboard",
+    "getStartedFree": "Get Started Free",
+    "backToTop": "Back to Top"
+  }
+}

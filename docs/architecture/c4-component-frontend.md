@@ -8,6 +8,7 @@ C4Component
 
     Container_Boundary(app, "App Router (Pages)") {
         Component(landing, "Landing Page", "app/landing", "Price teaser page: gold/silver/currency type tables with login links. Live TradingView gold/silver charts (no login required). Fetches from public /api/v1/public/market-types endpoint (no auth).")
+        Component(guide_page, "Guide Page", "app/[locale]/guide", "Public (no auth) user guide page at /[locale]/guide. Single scrollable page with sticky TOC sidebar (desktop) / collapsible pill nav (mobile). Three main sections: Homepage, Investment Portfolio, Community. Static content only — no API calls. Supports i18n (vi/en) via next-intl. Full SEO metadata + JSON-LD HowTo schema.")
         Component(auth_pages, "Auth Pages", "app/auth", "Login and register with Google OAuth + email/password forms")
         Component(dashboard, "Dashboard Home", "app/dashboard/home", "V2 Crimson & Gold: net worth, PNL card (self-contained with 1D/1W/1M/ALL period tabs), gold/silver TradingView charts (XAUUSD, XAGUSD), currency price table, wallets")
         Component(finance_page, "Finance Page", "app/dashboard/finance", "Unified tabbed view: FinanceTabBar switches between TransactionContent, ReportContent, BudgetContent via URL query params (?tab=transaction|report|budget). Content lazy-loaded via next/dynamic. Old routes (/transaction, /report, /budget) redirect here via middleware.")
@@ -143,6 +144,7 @@ C4Component
     Rel(landing, gen_hooks, "fetchSiteSettings (SSR: generateMetadata + LandingFooter)")
     Rel(landing, prices_feat, "usePublicMarketTypes hook — fetches gold/silver/currency type names (no auth)")
     Rel(landing, gen_hooks, "useQueryGetAssetDisplayPrices — fetches admin-configured asset types (gold/silver) with prices (public, no auth)")
+    Rel(guide_page, layout, "Uses LandingNavbar (components/landing/) for top nav and LandingFooter for footer; page-specific GuideContent, GuideTOC, GuideSection components co-located under app/[locale]/guide/; OrnateHeading + OrnateDivider (components/decorative/) for section headings")
     Rel(dashboard, gen_hooks, "useQueryGetAssetDisplayPrices — fetches admin-configured asset types (gold/silver) with prices for home page gold/silver table")
 ```
 

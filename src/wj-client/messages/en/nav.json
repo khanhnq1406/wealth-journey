@@ -17,7 +17,8 @@
     "toggleMenu": "Toggle menu",
     "closeMenu": "Close menu",
     "mainNavigation": "Main navigation",
-    "mobileNavigation": "Mobile navigation"
+    "mobileNavigation": "Mobile navigation",
+    "guide": "Guide"
   },
   "landing": {
     "hero": {

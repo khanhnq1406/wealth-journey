@@ -89,6 +89,7 @@ export const routes = {
   communityProfile: `/dashboard/community?view=profile`,
   feedback: `/dashboard/feedback`,
   admin: `/dashboard/admin`,
+  guide: "/guide",
 };
 
 export const resources = "/resources/icons/";
