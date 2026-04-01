@@ -28,7 +28,7 @@ func newTestClient(url string) *Client {
 
 // TestFetchGoldPrices_ParsesHTML verifies that a well-formed HTML table is parsed
 // into the correct GoldPrice structs with DOJI_ prefixed type codes and price
-// values multiplied by 1,000,000.
+// values multiplied by 10_000 (vạn VND per lượng → full VND per lượng).
 func TestFetchGoldPrices_ParsesHTML(t *testing.T) {
 	html := `<html><body>
 <table>
@@ -62,12 +62,12 @@ func TestFetchGoldPrices_ParsesHTML(t *testing.T) {
 	if sjc == nil {
 		t.Fatalf("expected DOJI_SJC_BAN_LE, not found in results: %v", typeCodeList(prices))
 	}
-	// 8250 * 1_000_000 = 8_250_000_000
-	if sjc.Buy != 8_250_000_000 {
-		t.Errorf("SJC Buy: got %d, want 8_250_000_000", sjc.Buy)
+	// 8250 * 10_000 = 82_500_000 (vạn VND per lượng → full VND per lượng)
+	if sjc.Buy != 82_500_000 {
+		t.Errorf("SJC Buy: got %d, want 82_500_000", sjc.Buy)
 	}
-	if sjc.Sell != 8_270_000_000 {
-		t.Errorf("SJC Sell: got %d, want 8_270_000_000", sjc.Sell)
+	if sjc.Sell != 82_700_000 {
+		t.Errorf("SJC Sell: got %d, want 82_700_000", sjc.Sell)
 	}
 	if sjc.Currency != "VND" {
 		t.Errorf("SJC Currency: got %q, want VND", sjc.Currency)
@@ -83,11 +83,11 @@ func TestFetchGoldPrices_ParsesHTML(t *testing.T) {
 	if nhan == nil {
 		t.Fatalf("expected DOJI_NHAN_TRON_9999, not found in results: %v", typeCodeList(prices))
 	}
-	if nhan.Buy != 7_800_000_000 {
-		t.Errorf("Nhan Buy: got %d, want 7_800_000_000", nhan.Buy)
+	if nhan.Buy != 78_000_000 {
+		t.Errorf("Nhan Buy: got %d, want 78_000_000", nhan.Buy)
 	}
-	if nhan.Sell != 7_850_000_000 {
-		t.Errorf("Nhan Sell: got %d, want 7_850_000_000", nhan.Sell)
+	if nhan.Sell != 78_500_000 {
+		t.Errorf("Nhan Sell: got %d, want 78_500_000", nhan.Sell)
 	}
 }
 
@@ -247,8 +247,8 @@ func TestFetchGoldPrices_CommaInPrice(t *testing.T) {
 	if len(prices) != 1 {
 		t.Fatalf("expected 1 price, got %d", len(prices))
 	}
-	if prices[0].Buy != 8_250_000_000 {
-		t.Errorf("Buy with comma: got %d, want 8_250_000_000", prices[0].Buy)
+	if prices[0].Buy != 82_500_000 {
+		t.Errorf("Buy with comma: got %d, want 82_500_000", prices[0].Buy)
 	}
 }
 
@@ -258,13 +258,14 @@ func TestParsePrice(t *testing.T) {
 		input string
 		want  int64
 	}{
-		{"8250", 8_250_000_000},
-		{"8,250", 8_250_000_000},
+		{"17300", 173_000_000},
+		{"8250", 82_500_000},
+		{"8,250", 82_500_000},
 		{"0", 0},
 		{"", 0},
 		{"-", 0},
 		{"N/A", 0},
-		{"  8250  ", 8_250_000_000},
+		{"  8250  ", 82_500_000},
 	}
 
 	for _, tt := range tests {

@@ -14,7 +14,7 @@ DB_NAME="${DB_NAME:-wealthjourney}"
 
 echo "==> Seeding demo data into ${DB_NAME} on ${DB_HOST}:${DB_PORT} ..."
 
-PGPASSWORD="$DB_PASSWORD" psql \
+PGPASSWORD="$DB_PASSWORD" PAGER=cat psql \
   --host="$DB_HOST" \
   --port="$DB_PORT" \
   --username="$DB_USER" \

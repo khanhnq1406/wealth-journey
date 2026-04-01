@@ -134,6 +134,16 @@ DELETE FROM category WHERE user_id = (SELECT uid FROM _demo_user);
 -- Delete portfolio history
 DELETE FROM portfolio_history WHERE user_id = (SELECT uid FROM _demo_user);
 
+-- Delete community data
+DELETE FROM post_like   WHERE user_id = (SELECT uid FROM _demo_user);
+DELETE FROM post_hashtag WHERE post_id IN (SELECT id FROM post WHERE user_id = (SELECT uid FROM _demo_user));
+DELETE FROM comment     WHERE user_id = (SELECT uid FROM _demo_user);
+DELETE FROM post        WHERE user_id = (SELECT uid FROM _demo_user);
+
+-- Delete gold/silver sentiment data
+DELETE FROM gold_vote_comment WHERE user_id = (SELECT uid FROM _demo_user);
+DELETE FROM gold_vote         WHERE user_id = (SELECT uid FROM _demo_user);
+
 -- Delete wallets
 DELETE FROM wallet WHERE user_id = (SELECT uid FROM _demo_user);
 
@@ -1051,3 +1061,303 @@ ORDER BY ts;
 COMMIT;
 
 SELECT 'Portfolio History', COUNT(*) FROM portfolio_history WHERE user_id = (SELECT uid FROM _demo_user);
+
+-- ============================================================================
+-- STEP 10: CREATE COMMUNITY POSTS & COMMENTS
+-- ============================================================================
+-- Posts from the demo user covering gold/silver investment topics.
+-- We also add post_hashtag rows and a few post_like + comment rows.
+-- Note: like_count / comment_count are denormalized counters updated below.
+
+BEGIN;
+
+-- -----------------------------------------------------------------------
+-- Posts
+-- -----------------------------------------------------------------------
+INSERT INTO post (user_id, content, image_url, like_count, comment_count, share_count, created_at, updated_at)
+SELECT uid, content, '', likes, cmt_cnt, shares, created_at, NOW()
+FROM _demo_user
+CROSS JOIN (VALUES
+    (
+        '📈 Vàng SJC hôm nay tiếp tục tăng mạnh lên ~110 triệu/lượng. Mình đã tích lũy được 3 lượng từ hồi tháng 10 năm ngoái, hiện lãi hơn 40%. Anh em ai đang nắm giữ vàng SJC không? Theo mình, xu hướng ngắn hạn vẫn còn tăng nhẹ do Fed chưa có tín hiệu cắt giảm lãi suất.',
+        42, 6, 3,
+        NOW() - INTERVAL '2 hours'
+    ),
+    (
+        '🪙 Nhẫn vàng 9999 đang là lựa chọn hấp dẫn hơn SJC vì chênh lệch mua-bán thấp hơn. Mình vừa bổ sung thêm 2 lượng Nhẫn SJC hồi tháng 2 @ 98 triệu. Giờ giá ~107 triệu rồi 😊 Ai có kinh nghiệm mua nhẫn 9999 chia sẻ nào!',
+        67, 5, 5,
+        NOW() - INTERVAL '5 hours'
+    ),
+    (
+        '🥈 Bạc đang được chú ý nhiều hơn trong danh mục đầu tư của mình. Tỷ lệ Vàng/Bạc (Gold-Silver ratio) hiện ~80 — lịch sử cho thấy khi ratio > 80 thì bạc thường outperform về sau. Mình đang giữ 10 lượng bạc Phú Quý và 5 lượng Doji 99.9.',
+        28, 5, 2,
+        NOW() - INTERVAL '1 day'
+    ),
+    (
+        '💰 Chiến lược DCA (Dollar Cost Averaging) với vàng thực sự hiệu quả. Mình mua đều đặn mỗi tháng 1 lượng kể từ tháng 7/2025, giá trung bình chỉ ~95 triệu/lượng, trong khi giá thị trường hiện là ~110 triệu. Lãi 15.8% chỉ sau ~9 tháng!',
+        95, 23, 11,
+        NOW() - INTERVAL '2 days'
+    ),
+    (
+        '📊 Review danh mục đầu tư Q1/2026 của mình:\n✅ Vàng SJC: +25.3%\n✅ Nhẫn 9999: +20.1%\n✅ Bạc vật chất: +18.5%\n✅ Cổ phiếu VCB: +12.4%\n\nTổng danh mục tăng ~21% so với đầu năm. Cảm ơn cộng đồng đã chia sẻ nhiều insights hay 🙏',
+        134, 31, 18,
+        NOW() - INTERVAL '3 days'
+    ),
+    (
+        '❓ Hỏi anh em: nên mua BTMC hay PNJ cho kênh tích lũy dài hạn? Mình đang phân vân vì BTMC có phí thấp hơn nhưng PNJ có thanh khoản tốt hơn ở TPHCM. Mọi người có kinh nghiệm gì không?',
+        19, 14, 2,
+        NOW() - INTERVAL '4 days'
+    )
+) AS p(content, likes, cmt_cnt, shares, created_at);
+
+-- -----------------------------------------------------------------------
+-- Hashtags (attach to posts by content snippet match)
+-- -----------------------------------------------------------------------
+INSERT INTO post_hashtag (post_id, hashtag, created_at)
+SELECT p.id, h.tag, p.created_at
+FROM post p
+CROSS JOIN (VALUES ('vàng'), ('đầutư')) AS h(tag)
+WHERE p.user_id = (SELECT uid FROM _demo_user)
+  AND p.content LIKE '%SJC%'
+  AND p.like_count = 42;
+
+INSERT INTO post_hashtag (post_id, hashtag, created_at)
+SELECT p.id, h.tag, p.created_at
+FROM post p
+CROSS JOIN (VALUES ('nhẫnvàng'), ('9999'), ('đầutư')) AS h(tag)
+WHERE p.user_id = (SELECT uid FROM _demo_user)
+  AND p.like_count = 67;
+
+INSERT INTO post_hashtag (post_id, hashtag, created_at)
+SELECT p.id, h.tag, p.created_at
+FROM post p
+CROSS JOIN (VALUES ('bạc'), ('goldsilverpatio'), ('đầutư')) AS h(tag)
+WHERE p.user_id = (SELECT uid FROM _demo_user)
+  AND p.like_count = 28;
+
+INSERT INTO post_hashtag (post_id, hashtag, created_at)
+SELECT p.id, h.tag, p.created_at
+FROM post p
+CROSS JOIN (VALUES ('DCA'), ('vàng'), ('tíchlũy')) AS h(tag)
+WHERE p.user_id = (SELECT uid FROM _demo_user)
+  AND p.like_count = 95;
+
+INSERT INTO post_hashtag (post_id, hashtag, created_at)
+SELECT p.id, h.tag, p.created_at
+FROM post p
+CROSS JOIN (VALUES ('review'), ('danh mục'), ('Q12026')) AS h(tag)
+WHERE p.user_id = (SELECT uid FROM _demo_user)
+  AND p.like_count = 134;
+
+INSERT INTO post_hashtag (post_id, hashtag, created_at)
+SELECT p.id, h.tag, p.created_at
+FROM post p
+CROSS JOIN (VALUES ('BTMC'), ('PNJ'), ('vàng')) AS h(tag)
+WHERE p.user_id = (SELECT uid FROM _demo_user)
+  AND p.like_count = 19;
+
+-- -----------------------------------------------------------------------
+-- Comments (on the highest-engagement DCA post and Q1 review post)
+-- -----------------------------------------------------------------------
+-- Comments on SJC post (like_count = 42)
+INSERT INTO comment (post_id, user_id, content, reply_count, created_at, updated_at)
+SELECT p.id, (SELECT uid FROM _demo_user), c.content, c.replies, p.created_at + c.offset_interval, NOW()
+FROM post p
+CROSS JOIN (VALUES
+    ('Mình cũng đang giữ SJC, tình hình địa chính trị căng thẳng nên vàng vẫn là kênh trú ẩn tốt nhất!', 1, INTERVAL '20 minutes'),
+    ('SJC chênh lệch mua-bán còn cao quá, anh em cân nhắc thêm nhẫn 9999 cho dễ thanh khoản.', 2, INTERVAL '45 minutes'),
+    ('Fed chưa cắt lãi suất thì vàng còn tăng. Mình target 115M cuối Q2.', 0, INTERVAL '1 hour 10 minutes'),
+    ('Cho hỏi bạn mua ở đâu? SJC hay qua ngân hàng?', 1, INTERVAL '1 hour 30 minutes'),
+    ('Cảm ơn bạn đã chia sẻ! Mình mới vào thị trường vàng, đang tìm hiểu SJC vs nhẫn.', 0, INTERVAL '2 hours'),
+    ('Tin tức Fed tuần này sẽ quyết định hướng đi của vàng. Mọi người chú ý theo dõi nhé.', 0, INTERVAL '2 hours 30 minutes')
+) AS c(content, replies, offset_interval)
+WHERE p.user_id = (SELECT uid FROM _demo_user)
+  AND p.like_count = 42;
+
+-- Comments on nhẫn vàng post (like_count = 67)
+INSERT INTO comment (post_id, user_id, content, reply_count, created_at, updated_at)
+SELECT p.id, (SELECT uid FROM _demo_user), c.content, c.replies, p.created_at + c.offset_interval, NOW()
+FROM post p
+CROSS JOIN (VALUES
+    ('Nhẫn 9999 thanh khoản tốt hơn SJC nhiều, mình cũng đang ưu tiên nhẫn cho danh mục mới.', 3, INTERVAL '30 minutes'),
+    ('Bạn mua nhẫn SJC hay DOJI? Theo mình DOJI có uy tín và giá cạnh tranh hơn một chút.', 2, INTERVAL '1 hour'),
+    ('Chênh lệch mua-bán nhẫn hiện ~1-1.5 triệu, khá ổn so với SJC chênh 3-4 triệu.', 1, INTERVAL '1 hour 45 minutes'),
+    ('Mình giữ mix cả SJC lẫn nhẫn 9999 để phân tán. SJC cho dài hạn, nhẫn cho linh hoạt.', 0, INTERVAL '2 hours 20 minutes'),
+    ('Hỏi nhỏ: nhẫn 9999 của PNJ có được công nhận như SJC không bạn?', 1, INTERVAL '3 hours')
+) AS c(content, replies, offset_interval)
+WHERE p.user_id = (SELECT uid FROM _demo_user)
+  AND p.like_count = 67;
+
+-- Comments on silver ratio post (like_count = 28)
+INSERT INTO comment (post_id, user_id, content, reply_count, created_at, updated_at)
+SELECT p.id, (SELECT uid FROM _demo_user), c.content, c.replies, p.created_at + c.offset_interval, NOW()
+FROM post p
+CROSS JOIN (VALUES
+    ('Ratio vàng/bạc ~80 thực sự là tín hiệu tốt cho bạc. Mình đang dần tăng tỷ trọng bạc từ 5% lên 15%.', 2, INTERVAL '1 hour'),
+    ('Nhu cầu bạc từ ngành pin mặt trời và xe điện đang tăng rất mạnh, fundamental rất tốt.', 1, INTERVAL '2 hours'),
+    ('Mua bạc vật chất thì nên mua thỏi hay xu bạc? Loại nào dễ bán lại hơn bạn ơi?', 3, INTERVAL '3 hours'),
+    ('Bạc 99.9 thanh khoản kém hơn vàng nhiều, anh em lưu ý spread khi mua-bán nhé.', 0, INTERVAL '4 hours'),
+    ('Cảm ơn phân tích hay! Mình chưa nghĩ đến ratio này bao giờ, sẽ theo dõi thêm.', 0, INTERVAL '5 hours')
+) AS c(content, replies, offset_interval)
+WHERE p.user_id = (SELECT uid FROM _demo_user)
+  AND p.like_count = 28;
+
+-- Comments on DCA post (like_count = 95)
+INSERT INTO comment (post_id, user_id, content, reply_count, created_at, updated_at)
+SELECT p.id, (SELECT uid FROM _demo_user), c.content, c.replies, p.created_at + c.offset_interval, NOW()
+FROM post p
+CROSS JOIN (VALUES
+    ('Chiến lược DCA với vàng rất hay! Mình cũng đang làm tương tự nhưng mua mỗi quý thay vì mỗi tháng.', 2, INTERVAL '1 hour'),
+    ('Mua SJC hay nhẫn 9999 bạn ơi? Mình nghe nói nhẫn 9999 linh hoạt hơn?', 3, INTERVAL '2 hours'),
+    ('Cảm ơn bạn đã chia sẻ! Mình mới bắt đầu đầu tư vàng, có thể hỏi thêm về cách chọn điểm mua không?', 1, INTERVAL '4 hours'),
+    ('Với lãi suất Fed còn cao, vàng vẫn là kênh trú ẩn tốt. +1 cho chiến lược của bạn!', 0, INTERVAL '5 hours')
+) AS c(content, replies, offset_interval)
+WHERE p.user_id = (SELECT uid FROM _demo_user)
+  AND p.like_count = 95;
+
+-- Comments on Q1 review post (like_count = 134)
+INSERT INTO comment (post_id, user_id, content, reply_count, created_at, updated_at)
+SELECT p.id, (SELECT uid FROM _demo_user), c.content, c.replies, p.created_at + c.offset_interval, NOW()
+FROM post p
+CROSS JOIN (VALUES
+    ('Kết quả Q1 ấn tượng quá! Bạn có thể chia sẻ tỷ trọng phân bổ không? Bao nhiêu % vàng, bao nhiêu % cổ phiếu?', 4, INTERVAL '30 minutes'),
+    ('VCB +12.4% cũng rất ổn rồi. Mình đang cân nhắc thêm VCB vào danh mục dài hạn.', 1, INTERVAL '1 hour'),
+    ('Bạc 18.5% — mình cũng ngạc nhiên với bạc vật chất. Có vẻ thị trường đang dần chú ý đến bạc hơn rồi.', 2, INTERVAL '2 hours'),
+    ('Tuyệt vời! Cảm ơn bạn đã minh bạch chia sẻ hiệu suất. Mọi người thường chỉ khoe lãi chứ không nói rõ số liệu 😄', 0, INTERVAL '3 hours'),
+    ('Danh mục đa dạng rất tốt. Bạn có dùng app nào để theo dõi portfolio không?', 5, INTERVAL '4 hours')
+) AS c(content, replies, offset_interval)
+WHERE p.user_id = (SELECT uid FROM _demo_user)
+  AND p.like_count = 134;
+
+-- Comments on BTMC vs PNJ post (like_count = 19)
+INSERT INTO comment (post_id, user_id, content, reply_count, created_at, updated_at)
+SELECT p.id, (SELECT uid FROM _demo_user), c.content, c.replies, p.created_at + c.offset_interval, NOW()
+FROM post p
+CROSS JOIN (VALUES
+    ('Mình ở HCM chọn PNJ vì cửa hàng nhiều, dễ bán lại. BTMC thì phí mua rẻ hơn một chút.', 2, INTERVAL '1 hour'),
+    ('Nếu dài hạn thì BTMC ok vì chi phí thấp. Nhưng nếu cần thanh khoản nhanh thì PNJ tốt hơn.', 1, INTERVAL '2 hours'),
+    ('Mình đang giữ cả hai để phân tán rủi ro 😄', 0, INTERVAL '3 hours')
+) AS c(content, replies, offset_interval)
+WHERE p.user_id = (SELECT uid FROM _demo_user)
+  AND p.like_count = 19;
+
+-- -----------------------------------------------------------------------
+-- Post likes (demo user likes their own popular posts — realistic for demo)
+-- -----------------------------------------------------------------------
+INSERT INTO post_like (user_id, post_id, created_at)
+SELECT (SELECT uid FROM _demo_user), p.id, NOW()
+FROM post p
+WHERE p.user_id = (SELECT uid FROM _demo_user)
+  AND p.like_count IN (95, 134);
+
+COMMIT;
+
+-- ============================================================================
+-- STEP 11: GOLD & SILVER SENTIMENT VOTES + COMMENTS
+-- ============================================================================
+-- Simulate today's sentiment: ~65% bullish gold, ~60% bullish silver.
+-- We insert the demo user's vote + comment, plus a set of anonymous votes
+-- to build a realistic percentage distribution.
+
+BEGIN;
+
+-- Demo user votes BULLISH on gold today
+INSERT INTO gold_vote (user_id, anonymous_id, vote_date, direction, category, created_at, updated_at)
+SELECT uid, NULL, CURRENT_DATE, 1, 0, NOW(), NOW()
+FROM _demo_user
+ON CONFLICT DO NOTHING;
+
+-- Demo user votes BULLISH on silver today
+INSERT INTO gold_vote (user_id, anonymous_id, vote_date, direction, category, created_at, updated_at)
+SELECT uid, NULL, CURRENT_DATE, 1, 1, NOW(), NOW()
+FROM _demo_user
+ON CONFLICT DO NOTHING;
+
+-- Anonymous votes for gold (direction 1=BULLISH, 2=BEARISH)
+-- 13 bullish + 7 bearish = 20 anon votes → total with demo user: 14 bull / 7 bear = 67% bullish
+INSERT INTO gold_vote (user_id, anonymous_id, vote_date, direction, category, created_at, updated_at)
+SELECT NULL, gen.anon_id, CURRENT_DATE, gen.dir, 0, NOW() - gen.ago, NOW()
+FROM (VALUES
+    ('anon-gold-001', 1, INTERVAL '10 minutes'),
+    ('anon-gold-002', 1, INTERVAL '15 minutes'),
+    ('anon-gold-003', 1, INTERVAL '20 minutes'),
+    ('anon-gold-004', 1, INTERVAL '25 minutes'),
+    ('anon-gold-005', 2, INTERVAL '30 minutes'),
+    ('anon-gold-006', 1, INTERVAL '35 minutes'),
+    ('anon-gold-007', 1, INTERVAL '40 minutes'),
+    ('anon-gold-008', 2, INTERVAL '45 minutes'),
+    ('anon-gold-009', 1, INTERVAL '50 minutes'),
+    ('anon-gold-010', 2, INTERVAL '55 minutes'),
+    ('anon-gold-011', 1, INTERVAL '60 minutes'),
+    ('anon-gold-012', 2, INTERVAL '65 minutes'),
+    ('anon-gold-013', 1, INTERVAL '70 minutes'),
+    ('anon-gold-014', 2, INTERVAL '75 minutes'),
+    ('anon-gold-015', 1, INTERVAL '80 minutes'),
+    ('anon-gold-016', 1, INTERVAL '85 minutes'),
+    ('anon-gold-017', 2, INTERVAL '90 minutes'),
+    ('anon-gold-018', 1, INTERVAL '95 minutes'),
+    ('anon-gold-019', 1, INTERVAL '100 minutes'),
+    ('anon-gold-020', 2, INTERVAL '105 minutes')
+) AS gen(anon_id, dir, ago)
+ON CONFLICT DO NOTHING;
+
+-- Anonymous votes for silver (direction 1=BULLISH, 2=BEARISH)
+-- 11 bullish + 7 bearish = 18 anon votes → total with demo user: 12 bull / 7 bear = 63% bullish
+INSERT INTO gold_vote (user_id, anonymous_id, vote_date, direction, category, created_at, updated_at)
+SELECT NULL, gen.anon_id, CURRENT_DATE, gen.dir, 1, NOW() - gen.ago, NOW()
+FROM (VALUES
+    ('anon-silver-001', 1, INTERVAL '12 minutes'),
+    ('anon-silver-002', 1, INTERVAL '18 minutes'),
+    ('anon-silver-003', 2, INTERVAL '22 minutes'),
+    ('anon-silver-004', 1, INTERVAL '28 minutes'),
+    ('anon-silver-005', 2, INTERVAL '33 minutes'),
+    ('anon-silver-006', 1, INTERVAL '38 minutes'),
+    ('anon-silver-007', 1, INTERVAL '43 minutes'),
+    ('anon-silver-008', 2, INTERVAL '48 minutes'),
+    ('anon-silver-009', 1, INTERVAL '53 minutes'),
+    ('anon-silver-010', 2, INTERVAL '58 minutes'),
+    ('anon-silver-011', 1, INTERVAL '63 minutes'),
+    ('anon-silver-012', 2, INTERVAL '68 minutes'),
+    ('anon-silver-013', 1, INTERVAL '73 minutes'),
+    ('anon-silver-014', 2, INTERVAL '78 minutes'),
+    ('anon-silver-015', 1, INTERVAL '83 minutes'),
+    ('anon-silver-016', 2, INTERVAL '88 minutes'),
+    ('anon-silver-017', 1, INTERVAL '93 minutes'),
+    ('anon-silver-018', 1, INTERVAL '98 minutes')
+) AS gen(anon_id, dir, ago)
+ON CONFLICT DO NOTHING;
+
+-- -----------------------------------------------------------------------
+-- Sentiment comments (gold & silver) — from the demo user
+-- -----------------------------------------------------------------------
+INSERT INTO gold_vote_comment (user_id, vote_date, content, category, created_at)
+SELECT uid, CURRENT_DATE, content, cat, NOW() - ago
+FROM _demo_user
+CROSS JOIN (VALUES
+    -- Gold comments (category = 0)
+    ('Fed vẫn chưa có dấu hiệu cắt lãi suất, dòng tiền tiếp tục chảy vào vàng. Kỳ vọng SJC sẽ chạm 115 triệu trong Q2/2026.', 0, INTERVAL '5 minutes'),
+    ('Căng thẳng địa chính trị ở Trung Đông và tình hình USD yếu đang hỗ trợ vàng tốt. Mình BULLISH ngắn hạn nhưng cẩn thận nếu Fed bất ngờ tăng lãi.', 0, INTERVAL '30 minutes'),
+    -- Silver comments (category = 1)
+    ('Bạc đang được hưởng lợi kép: cả nhu cầu công nghiệp (pin mặt trời) lẫn dòng tiền trú ẩn. Ratio vàng/bạc ~80 là dấu hiệu bạc đang undervalue.', 1, INTERVAL '8 minutes'),
+    ('Với xu hướng năng lượng xanh đang tăng tốc, nhu cầu bạc cho tấm pin mặt trời sẽ còn tăng mạnh trong 2–3 năm tới.', 1, INTERVAL '45 minutes')
+) AS c(content, cat, ago);
+
+COMMIT;
+
+-- ============================================================================
+-- VERIFICATION: COMMUNITY & SENTIMENT
+-- ============================================================================
+
+SELECT 'Posts'             AS table_name, COUNT(*) AS count FROM post         WHERE user_id = (SELECT uid FROM _demo_user)
+UNION ALL
+SELECT 'Post Hashtags',    COUNT(*) FROM post_hashtag WHERE post_id IN (SELECT id FROM post WHERE user_id = (SELECT uid FROM _demo_user))
+UNION ALL
+SELECT 'Comments',         COUNT(*) FROM comment      WHERE user_id = (SELECT uid FROM _demo_user)
+UNION ALL
+SELECT 'Post Likes',       COUNT(*) FROM post_like    WHERE user_id = (SELECT uid FROM _demo_user)
+UNION ALL
+SELECT 'Gold Votes (gold)',   COUNT(*) FROM gold_vote WHERE category = 0 AND vote_date = CURRENT_DATE
+UNION ALL
+SELECT 'Gold Votes (silver)', COUNT(*) FROM gold_vote WHERE category = 1 AND vote_date = CURRENT_DATE
+UNION ALL
+SELECT 'Sentiment Comments',  COUNT(*) FROM gold_vote_comment WHERE user_id = (SELECT uid FROM _demo_user);

@@ -21,18 +21,20 @@ func newTestClient(url string) *Client {
 // TestFetchGoldPrices_ParsesJSON verifies that a well-formed PNJ response is
 // parsed into the correct GoldPrice structs.
 //
-// Price math: "173,500" (nghìn VND) → strip comma → 173500 → × 1000 = 173_500_000 VND
-// This matches the per-lượng convention used by SJC and BTMC adapters.
+// Price math: "173.500" (nghìn VND, dot separator) → strip dot → 173500 → × 1000 = 173_500_000 VND
+// PNJ switched from comma to dot as thousand separator as of 2026-04.
+// Field names changed from buy/sell to gia_mua/gia_ban (Vietnamese).
+// Top-level array key changed from "regions" to "locations" as of 2026-04.
 func TestFetchGoldPrices_ParsesJSON(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{
-			"regions": [
+			"locations": [
 				{
 					"name": "TPHCM",
 					"gold_type": [
-						{"name": "999.9", "buy": "173,500", "sell": "175,000"}
+						{"name": "999.9", "gia_mua": "173.500", "gia_ban": "175.000"}
 					]
 				}
 			]
@@ -65,7 +67,7 @@ func TestFetchGoldPrices_ParsesJSON(t *testing.T) {
 		t.Errorf("TypeCode %q exceeds 50 chars (len=%d)", p.TypeCode, len(p.TypeCode))
 	}
 
-	// Price: "173,500" (nghìn VND) → 173500 × 1000 = 173_500_000
+	// Price: "173.500" (nghìn VND, dot separator) → strip dot → 173500 × 1000 = 173_500_000
 	if p.Buy != 173_500_000 {
 		t.Errorf("Buy: want 173500000, got %d", p.Buy)
 	}
@@ -91,11 +93,11 @@ func TestFetchGoldPrices_FallbackFirstRegion(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{
-			"regions": [
+			"locations": [
 				{
 					"name": "HAN",
 					"gold_type": [
-						{"name": "SJC", "buy": "10,000", "sell": "10,500"}
+						{"name": "SJC", "gia_mua": "10.000", "gia_ban": "10.500"}
 					]
 				}
 			]
@@ -123,17 +125,17 @@ func TestFetchGoldPrices_PrefersTphcmOverOtherRegions(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{
-			"regions": [
+			"locations": [
 				{
 					"name": "HAN",
 					"gold_type": [
-						{"name": "HAN_GOLD", "buy": "1,000", "sell": "1,050"}
+						{"name": "HAN_GOLD", "gia_mua": "1.000", "gia_ban": "1.050"}
 					]
 				},
 				{
 					"name": "TPHCM",
 					"gold_type": [
-						{"name": "HCM_GOLD", "buy": "2,000", "sell": "2,050"}
+						{"name": "HCM_GOLD", "gia_mua": "2.000", "gia_ban": "2.050"}
 					]
 				}
 			]
@@ -154,19 +156,19 @@ func TestFetchGoldPrices_PrefersTphcmOverOtherRegions(t *testing.T) {
 	}
 }
 
-// TestFetchGoldPrices_FiltersZeroPrices verifies that gold types with buy="0" sell="0"
+// TestFetchGoldPrices_FiltersZeroPrices verifies that gold types with gia_mua="0" gia_ban="0"
 // are filtered out and not returned.
 func TestFetchGoldPrices_FiltersZeroPrices(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{
-			"regions": [
+			"locations": [
 				{
 					"name": "TPHCM",
 					"gold_type": [
-						{"name": "ZeroGold", "buy": "0", "sell": "0"},
-						{"name": "ValidGold", "buy": "10,000", "sell": "10,500"}
+						{"name": "ZeroGold", "gia_mua": "0", "gia_ban": "0"},
+						{"name": "ValidGold", "gia_mua": "10.000", "gia_ban": "10.500"}
 					]
 				}
 			]
@@ -195,12 +197,12 @@ func TestFetchGoldPrices_DeduplicatesTypeCode(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 		// Both "999.9" entries will sanitize to the same TypeCode
 		_, _ = w.Write([]byte(`{
-			"regions": [
+			"locations": [
 				{
 					"name": "TPHCM",
 					"gold_type": [
-						{"name": "999.9", "buy": "10,000", "sell": "10,500"},
-						{"name": "999.9", "buy": "11,000", "sell": "11,500"}
+						{"name": "999.9", "gia_mua": "10.000", "gia_ban": "10.500"},
+						{"name": "999.9", "gia_mua": "11.000", "gia_ban": "11.500"}
 					]
 				}
 			]
@@ -262,7 +264,7 @@ func TestFetchGoldPrices_EmptyRegions(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"regions": []}`))
+		_, _ = w.Write([]byte(`{"locations": []}`))
 	}))
 	defer srv.Close()
 
@@ -300,7 +302,7 @@ func TestFetchGoldPrices_NullRegions(t *testing.T) {
 func TestFetchGoldPrices_ContextCancellation(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"regions": []}`))
+		_, _ = w.Write([]byte(`{"locations": []}`))
 	}))
 	defer srv.Close()
 
@@ -325,7 +327,7 @@ func TestFetchGoldPrices_Timeout(t *testing.T) {
 			return
 		case <-time.After(10 * time.Second):
 			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte(`{"regions": []}`))
+			_, _ = w.Write([]byte(`{"locations": []}`))
 		}
 	}))
 	defer srv.Close()
@@ -343,8 +345,8 @@ func TestFetchGoldPrices_Timeout(t *testing.T) {
 // TestSelectRegion_WithTphcm verifies TPHCM region is selected when present.
 func TestSelectRegion_WithTphcm(t *testing.T) {
 	regions := []apiRegion{
-		{Name: "HAN", GoldTypes: []apiGoldType{{Name: "HAN_GOLD", Buy: "1,000", Sell: "1,050"}}},
-		{Name: "TPHCM", GoldTypes: []apiGoldType{{Name: "HCM_GOLD", Buy: "2,000", Sell: "2,050"}}},
+		{Name: "HAN", GoldTypes: []apiGoldType{{Name: "HAN_GOLD", Buy: "1.000", Sell: "1.050"}}},
+		{Name: "TPHCM", GoldTypes: []apiGoldType{{Name: "HCM_GOLD", Buy: "2.000", Sell: "2.050"}}},
 	}
 	r := selectRegion(regions)
 	if r == nil {
@@ -358,7 +360,7 @@ func TestSelectRegion_WithTphcm(t *testing.T) {
 // TestSelectRegion_FallbackFirst verifies the first region is returned when TPHCM is absent.
 func TestSelectRegion_FallbackFirst(t *testing.T) {
 	regions := []apiRegion{
-		{Name: "HAN", GoldTypes: []apiGoldType{{Name: "HAN_GOLD", Buy: "1,000", Sell: "1,050"}}},
+		{Name: "HAN", GoldTypes: []apiGoldType{{Name: "HAN_GOLD", Buy: "1.000", Sell: "1.050"}}},
 		{Name: "DN", GoldTypes: []apiGoldType{{Name: "DN_GOLD", Buy: "900", Sell: "950"}}},
 	}
 	r := selectRegion(regions)
@@ -381,7 +383,7 @@ func TestSelectRegion_Empty(t *testing.T) {
 // TestSelectRegion_CaseInsensitiveTphcm verifies TPHCM matching is case-insensitive.
 func TestSelectRegion_CaseInsensitiveTphcm(t *testing.T) {
 	regions := []apiRegion{
-		{Name: "tphcm", GoldTypes: []apiGoldType{{Name: "GOLD", Buy: "5,000", Sell: "5,500"}}},
+		{Name: "tphcm", GoldTypes: []apiGoldType{{Name: "GOLD", Buy: "5.000", Sell: "5.500"}}},
 	}
 	r := selectRegion(regions)
 	if r == nil {
@@ -393,19 +395,24 @@ func TestSelectRegion_CaseInsensitiveTphcm(t *testing.T) {
 }
 
 // TestParsePrice verifies various price string formats are parsed correctly.
+// PNJ switched from comma to dot as thousand separator as of 2026-04.
+// Both formats must work for backward compatibility.
 func TestParsePrice(t *testing.T) {
 	tests := []struct {
 		input string
 		want  int64
 	}{
-		{"173,500", 173_500_000},  // standard PNJ format: nghìn VND × 1000
+		{"176.700", 176_700_000},  // new PNJ format: dot separator, nghìn VND × 1000
+		{"173.700", 173_700_000},  // new PNJ format
+		{"173,500", 173_500_000},  // old PNJ format: comma separator (backward compat)
 		{"10,000", 10_000_000},
+		{"10.000", 10_000_000},    // dot separator equivalent
 		{"0", 0},
 		{"", 0},
 		{"abc", 0},
-		{"1000", 1_000_000},      // no comma: still multiplied by 1000
-		{" 5,000 ", 5_000_000},   // whitespace trimmed
-		{"-1", 0},                 // negative → treated as 0
+		{"1000", 1_000_000},       // no separator: still multiplied by 1000
+		{" 5.000 ", 5_000_000},    // whitespace trimmed, dot separator
+		{"-1", 0},                  // negative → treated as 0
 	}
 
 	for _, tc := range tests {

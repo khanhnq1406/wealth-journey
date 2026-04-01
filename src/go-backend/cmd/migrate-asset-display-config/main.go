@@ -123,7 +123,7 @@ func migrateAssetDisplayConfig(db *gorm.DB) error {
 	// Each currency config maps directly to its asset_price type_code via a fetch code at priority 1.
 	currencySeeds := []seedEntry{
 		{TypeCode: "USD", DisplayName: "USD Tự Do", DisplayOrder: 1, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
-		{TypeCode: "USD Internalbank", DisplayName: "USD Vietcombank", DisplayOrder: 2, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
+		{TypeCode: "USD Internalbank", DisplayName: "USD Internalbank", DisplayOrder: 2, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
 		{TypeCode: "EUR", DisplayName: "EUR", DisplayOrder: 3, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
 		{TypeCode: "GBP", DisplayName: "GBP", DisplayOrder: 4, Enabled: true, ShowInInvestment: false, AssetType: "currency"},
 		{TypeCode: "JPY", DisplayName: "JPY", DisplayOrder: 5, Enabled: true, ShowInInvestment: false, AssetType: "currency"},

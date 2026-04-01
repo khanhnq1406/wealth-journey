@@ -21,14 +21,12 @@ func buildTestServer(t *testing.T, status int, body string) *httptest.Server {
 }
 
 // sjcJSON builds a minimal SJC-like JSON payload with the given rows.
+// As of 2026-04 the SJC API uses a top-level "data" array (lowercase).
 func sjcJSON(rows []apiRow) string {
 	type wrapper struct {
-		DataList struct {
-			Data []apiRow `json:"Data"`
-		} `json:"DataList"`
+		Data []apiRow `json:"data"`
 	}
-	w := wrapper{}
-	w.DataList.Data = rows
+	w := wrapper{Data: rows}
 	b, _ := json.Marshal(w)
 	return string(b)
 }
@@ -167,7 +165,7 @@ func TestFetchGoldPrices_DeduplicatesTypeCode(t *testing.T) {
 	}
 }
 
-// TestFetchGoldPrices_EmptyDataList verifies that an empty DataList returns no error and empty slice.
+// TestFetchGoldPrices_EmptyDataList verifies that an empty data array returns no error and empty slice.
 func TestFetchGoldPrices_EmptyDataList(t *testing.T) {
 	rows := []apiRow{}
 	srv := buildTestServer(t, http.StatusOK, sjcJSON(rows))

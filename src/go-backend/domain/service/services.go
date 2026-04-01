@@ -112,7 +112,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 		NewVangSaiGonGoldFetcher(waterfallSourceTimeout),
 		NewVangTodayGoldFetcher(waterfallSourceTimeout),
 		NewVangSaiGonCurrencyFetcher(waterfallSourceTimeout),
-		NewVangTodayCurrencyFetcher(waterfallSourceTimeout),
+		nil, // VangToday no longer provides currency data as of 2026-04
 		vcbFetcher,
 		sjcClient,
 		dojiClient,

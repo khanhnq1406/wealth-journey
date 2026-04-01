@@ -30,8 +30,9 @@ type GoldPrice struct {
 }
 
 // apiResponse is the top-level structure of the PNJ JSON response.
+// As of 2026-04 the top-level array key changed from "regions" to "locations".
 type apiResponse struct {
-	Regions []apiRegion `json:"regions"`
+	Locations []apiRegion `json:"locations"`
 }
 
 // apiRegion represents a city/region entry in the PNJ response.
@@ -41,10 +42,11 @@ type apiRegion struct {
 }
 
 // apiGoldType represents one gold product entry within a region.
-// Buy and Sell are quoted as string numbers with commas as thousand separators,
-// e.g. "173,500" meaning 173 500 nghìn VND (173,500,000 VND).
+// Buy and Sell use Vietnamese field names: gia_mua (buy price), gia_ban (sell price).
+// Values are quoted as string numbers with dots as thousand separators,
+// e.g. "176.700" meaning 176,700 nghìn VND (176,700,000 VND).
 type apiGoldType struct {
 	Name string `json:"name"`
-	Buy  string `json:"buy"`
-	Sell string `json:"sell"`
+	Buy  string `json:"gia_mua"`
+	Sell string `json:"gia_ban"`
 }
