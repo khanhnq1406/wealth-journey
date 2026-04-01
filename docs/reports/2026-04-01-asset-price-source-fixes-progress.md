@@ -8,14 +8,14 @@
 - **Started:** 2026-04-01T00:00:00Z
 - **Last updated:** 2026-04-01T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 2
+- **Current task:** 3
 
 ## Task Progress
 
 | #   | Task Name                            | Status     | Commit | Summary |
 | --- | ------------------------------------ | ---------- | ------ | ------- |
 | 1   | Fix DOJI parsePrice multiplier       | done       | b7521247 | Changed multiplier ×1,000,000 → ×10; updated comments + test expectations |
-| 2   | Fix Mihong SJC TypeCode to Mihong_SJC | pending   | —      | —       |
+| 2   | Fix Mihong SJC TypeCode to Mihong_SJC | done      | —      | Changed "SJC"→"Mihong_SJC" in codeToTypeCode map; added SJCTypeCode test |
 | 3   | Run full backend lint + test suite   | pending    | —      | —       |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`

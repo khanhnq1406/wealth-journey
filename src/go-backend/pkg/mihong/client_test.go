@@ -128,3 +128,27 @@ func TestClient_FetchGoldPrices_Timeout(t *testing.T) {
 		t.Fatal("expected non-nil error for timeout, got nil")
 	}
 }
+
+func TestClient_FetchGoldPrices_SJCTypeCode(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(`[{"buyingPrice":17150000,"sellingPrice":17500000,"code":"SJC","dateTime":"01/04/2026 10:00","sellChange":0,"buyChange":0,"buyChangePercent":0,"sellChangePercent":0}]`))
+	}))
+	defer srv.Close()
+
+	c := &Client{httpClient: &http.Client{}, baseURL: srv.URL}
+	prices, err := c.FetchGoldPrices(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(prices) != 1 {
+		t.Fatalf("expected 1 price, got %d", len(prices))
+	}
+	if prices[0].TypeCode != "Mihong_SJC" {
+		t.Errorf("TypeCode: want Mihong_SJC, got %s", prices[0].TypeCode)
+	}
+	if prices[0].Name != "SJC 9999" {
+		t.Errorf("Name: want 'SJC 9999', got %s", prices[0].Name)
+	}
+}

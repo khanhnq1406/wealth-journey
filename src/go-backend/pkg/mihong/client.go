@@ -26,7 +26,7 @@ const (
 
 // codeToTypeCode maps Mihong API code strings to canonical TypeCodes.
 var codeToTypeCode = map[string]string{
-	"SJC": "SJC",
+	"SJC": "Mihong_SJC",
 	"999": "Mihong_999",
 	"985": "Mihong_985",
 	"980": "Mihong_980",
