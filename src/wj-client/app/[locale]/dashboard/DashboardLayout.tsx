@@ -43,6 +43,7 @@ import {
   MessageCircle,
   Shield,
   TrendingUp,
+  BookOpen,
 } from "lucide-react";
 
 export function DashboardLayout({
@@ -253,7 +254,7 @@ export function DashboardLayout({
           ))}
         </div>
 
-        {/* Divider + Settings + Logout */}
+        {/* Divider + Settings + Guide + Logout */}
         <div>
           <div className="border-t border-v2-border-light mb-1" />
           <ActiveLink
@@ -268,6 +269,14 @@ export function DashboardLayout({
           >
             <Settings size={22} />
             <span>{t("settings")}</span>
+          </ActiveLink>
+          <ActiveLink
+            href={routes.guide}
+            disableBuiltInActive
+            className="flex items-center gap-3 py-3 px-3.5 rounded-xl font-roboto text-[15px] font-medium text-v2-text-secondary hover:bg-v2-bg-primary transition-colors duration-200 touch-target"
+          >
+            <BookOpen size={22} />
+            <span>{t("guide")}</span>
           </ActiveLink>
           {user?.isAdmin && (
             <ActiveLink
@@ -464,13 +473,22 @@ export function DashboardLayout({
                   icon={<Settings size={20} />}
                   isActive={path.startsWith("/dashboard/settings")}
                 />
+                <NavItem
+                  href={routes.guide}
+                  label={t("guide")}
+                  isExpanded={isExpanded}
+                  showTooltip={!isExpanded}
+                  animationDelay={270}
+                  icon={<BookOpen size={20} />}
+                  isActive={false}
+                />
                 {user?.isAdmin && (
                   <NavItem
                     href={routes.admin}
                     label="Admin"
                     isExpanded={isExpanded}
                     showTooltip={!isExpanded}
-                    animationDelay={270}
+                    animationDelay={300}
                     icon={<Shield size={20} />}
                     isActive={path.startsWith(routes.admin)}
                   />

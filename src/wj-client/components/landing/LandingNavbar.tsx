@@ -92,6 +92,12 @@ export default function LandingNavbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
+            <Link
+              href="/guide"
+              className="text-v2-gold-accent hover:text-v2-gold-primary transition-colors duration-200 font-medium focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 rounded-md px-2 py-1 min-h-[44px] flex items-center"
+            >
+              {t("navbar.guide")}
+            </Link>
             {isAuthenticated ? (
               <Link
                 href="/dashboard/home"
@@ -157,13 +163,29 @@ export default function LandingNavbar() {
           >
             <div className="py-4 sm:py-6">
               <div className="flex flex-col space-y-3 sm:space-y-4">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{
+                    duration: 0.2,
+                    delay: 0,
+                  }}
+                >
+                  <Link
+                    href="/guide"
+                    className="text-v2-gold-accent hover:text-v2-gold-primary transition-colors duration-200 font-medium px-3 py-2 focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 rounded-md min-h-[44px] flex items-center"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t("navbar.guide")}
+                  </Link>
+                </motion.div>
                 {isAuthenticated ? (
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{
                       duration: 0.2,
-                      delay: 0,
+                      delay: 0.05,
                     }}
                   >
                     <Link
@@ -181,7 +203,7 @@ export default function LandingNavbar() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{
                         duration: 0.2,
-                        delay: 0,
+                        delay: 0.05,
                       }}
                     >
                       <Link
@@ -197,7 +219,7 @@ export default function LandingNavbar() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{
                         duration: 0.2,
-                        delay: 0.05,
+                        delay: 0.1,
                       }}
                     >
                       <Link

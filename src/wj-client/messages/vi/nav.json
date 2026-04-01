@@ -274,7 +274,8 @@
       "dashboard": "Bảng điều khiển",
       "signIn": "Đăng nhập",
       "skipToMainContent": "Chuyển đến nội dung chính",
-      "toggleMenu": "Bật/tắt menu"
+      "toggleMenu": "Bật/tắt menu",
+      "guide": "Hướng dẫn"
     },
     "priceTeaser": {
       "goldTableTitle": "Giá Vàng",

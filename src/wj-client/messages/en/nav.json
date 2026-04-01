@@ -274,7 +274,8 @@
       "dashboard": "Dashboard",
       "signIn": "Sign In",
       "skipToMainContent": "Skip to main content",
-      "toggleMenu": "Toggle menu"
+      "toggleMenu": "Toggle menu",
+      "guide": "Guide"
     },
     "priceTeaser": {
       "goldTableTitle": "Gold Prices",

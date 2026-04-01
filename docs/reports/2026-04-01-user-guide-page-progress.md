@@ -8,7 +8,7 @@
 - **Started:** 2026-04-01T00:00:00Z
 - **Last updated:** 2026-04-01T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 6
+- **Current task:** 9
 
 ## Task Progress
 
@@ -17,12 +17,12 @@
 | 0   | Update C4 Architecture Diagram                   | done    | babab9c3 | Added GuidePage to c4-component-frontend.md as peer of LandingPage |
 | 1   | Add i18n Translation Files for Guide Content     | done    | babab9c3 | Created vi/en guide.json, registered 'guide' in i18n/request.ts, added nav labels |
 | 2   | Add /guide Route to Constants                    | done    | babab9c3 | Added routes.guide = "/guide" to constants.tsx |
-| 3   | Create Guide Page Layout with SEO Metadata       | done    | —      | Created layout.tsx with generateMetadata, HowTo JSON-LD, canonical/alternates |
-| 4   | Create GuideTOC Component                        | done    | —      | Created GuideTOC with dual-render CSS responsive, scroll-spy, v2 tokens |
-| 5   | Create GuideSection Component                    | done    | —      | Created GuideSection with h2/h3 variants, OrnateHeading, OrnateDivider, anchor id |
-| 6   | Create GuideContent Client Component + page.tsx  | pending | —      | —       |
-| 7   | Add Guide Link to Landing Page Navbar            | pending | —      | —       |
-| 8   | Add Guide Link to Dashboard Sidebar              | pending | —      | —       |
+| 3   | Create Guide Page Layout with SEO Metadata       | done    | ed28ac6b | Created layout.tsx with generateMetadata, HowTo JSON-LD, canonical/alternates |
+| 4   | Create GuideTOC Component                        | done    | ed28ac6b | Created GuideTOC with dual-render CSS responsive, scroll-spy, v2 tokens |
+| 5   | Create GuideSection Component                    | done    | ed28ac6b | Created GuideSection with h2/h3 variants, OrnateHeading, OrnateDivider, anchor id |
+| 6   | Create GuideContent Client Component + page.tsx  | done    | —      | Created GuideContent with IntersectionObserver scroll spy, all 15 sections, CTA |
+| 7   | Add Guide Link to Landing Page Navbar            | done    | —      | Added Guide link to desktop nav and mobile menu in LandingNavbar.tsx |
+| 8   | Add Guide Link to Dashboard Sidebar              | done    | —      | Added Guide link (BookOpen icon) to desktop sidebar and mobile slide-out |
 | 9   | Frontend Lint & Build Verification               | pending | —      | —       |
 | 10  | Playwright E2E Test for Guide Page               | pending | —      | —       |
 
