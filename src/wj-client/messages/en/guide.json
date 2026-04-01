@@ -34,7 +34,6 @@
           "title": "Creating a New Wallet",
           "steps": [
             "Click the '+' or 'Add Wallet' button on the Wallets page.",
-            "Choose the wallet type: BASIC (for expense tracking) or INVESTMENT (for portfolio tracking).",
             "Enter a name for the wallet and set the initial balance.",
             "Choose a currency (VND, USD, EUR, ...).",
             "Click 'Save' to create the wallet."

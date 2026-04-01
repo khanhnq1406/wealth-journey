@@ -34,7 +34,6 @@
           "title": "Tạo ví mới",
           "steps": [
             "Bấm nút '+' hoặc 'Thêm ví' trên trang Ví.",
-            "Chọn loại ví: CƠ BẢN (để theo dõi chi tiêu) hoặc ĐẦU TƯ (để theo dõi danh mục đầu tư).",
             "Nhập tên ví và số dư ban đầu.",
             "Chọn đơn vị tiền tệ (VND, USD, EUR, ...).",
             "Bấm 'Lưu' để tạo ví."

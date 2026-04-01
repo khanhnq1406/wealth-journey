@@ -161,6 +161,46 @@ describe('guide translation files', () => {
     });
   });
 
+  describe('createWallet steps — no wallet type selection (hidden feature)', () => {
+    it('vi createWallet steps do not mention wallet type selection', () => {
+      const homepage = viGuide.homepage as Record<string, unknown>;
+      const wallets = homepage.wallets as Record<string, unknown>;
+      const createWallet = wallets.createWallet as Record<string, unknown>;
+      const steps = createWallet.steps as string[];
+      const hasTypeStep = steps.some(
+        (s) => s.includes('CƠ BẢN') || s.includes('ĐẦU TƯ') || s.includes('loại ví'),
+      );
+      expect(hasTypeStep).toBe(false);
+    });
+
+    it('en createWallet steps do not mention wallet type selection', () => {
+      const homepage = enGuide.homepage as Record<string, unknown>;
+      const wallets = homepage.wallets as Record<string, unknown>;
+      const createWallet = wallets.createWallet as Record<string, unknown>;
+      const steps = createWallet.steps as string[];
+      const hasTypeStep = steps.some(
+        (s) => s.includes('BASIC') || s.includes('INVESTMENT') || s.includes('wallet type'),
+      );
+      expect(hasTypeStep).toBe(false);
+    });
+
+    it('vi createWallet steps still has 4 steps after removal', () => {
+      const homepage = viGuide.homepage as Record<string, unknown>;
+      const wallets = homepage.wallets as Record<string, unknown>;
+      const createWallet = wallets.createWallet as Record<string, unknown>;
+      const steps = createWallet.steps as string[];
+      expect(steps).toHaveLength(4);
+    });
+
+    it('en createWallet steps still has 4 steps after removal', () => {
+      const homepage = enGuide.homepage as Record<string, unknown>;
+      const wallets = homepage.wallets as Record<string, unknown>;
+      const createWallet = wallets.createWallet as Record<string, unknown>;
+      const steps = createWallet.steps as string[];
+      expect(steps).toHaveLength(4);
+    });
+  });
+
   describe('string values are non-empty', () => {
     it('vi title is a non-empty string', () => {
       expect(typeof viGuide.title).toBe('string');
