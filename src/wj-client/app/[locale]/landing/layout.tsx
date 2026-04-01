@@ -84,11 +84,14 @@ const FALLBACK_METADATA: Metadata = {
 };
 
 async function fetchSiteSettings(): Promise<Record<string, string> | null> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3000);
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL;
     if (!apiUrl) return null;
     const res = await fetch(`${apiUrl}/api/v1/public/site-settings`, {
       next: { revalidate: 300 },
+      signal: controller.signal,
     });
     if (!res.ok) return null;
     const data = await res.json();
@@ -102,6 +105,8 @@ async function fetchSiteSettings(): Promise<Record<string, string> | null> {
     return map;
   } catch {
     return null;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 

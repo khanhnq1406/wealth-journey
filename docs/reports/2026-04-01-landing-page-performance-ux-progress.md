@@ -15,10 +15,10 @@
 | #   | Task Name                                   | Status      | Commit | Summary |
 | --- | ------------------------------------------- | ----------- | ------ | ------- |
 | 0   | Update C4 Architecture Diagrams             | done        | 64db4b10 | Added locale_loading + landing_loading Component entries to App Router boundary |
-| 1   | Add 3-second timeout to fetchSiteSettings() | in_progress | —      | —       |
+| 1   | Add 3-second timeout to fetchSiteSettings() | done        | —      | AbortController + 3s timeout added; clearTimeout in finally; test written |
 | 2   | Create Locale Root Loading Splash           | in_progress | —      | —       |
-| 3   | Create Landing Page Skeleton                | in_progress | —      | —       |
-| 4   | Update Runtime Flow Diagram                 | done        | —      | Added section 16: Landing Page Load with Timeout + Skeleton sequence diagram |
+| 3   | Create Landing Page Skeleton                | done        | —      | Full shimmer skeleton with navbar/tables/charts/sentiment/footer |
+| 4   | Update Runtime Flow Diagram                 | done        | cf1dd6cf | Added section 16: Landing Page Load with Timeout + Skeleton sequence diagram |
 | 5   | Lint + Build Verification                   | pending     | —      | —       |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
