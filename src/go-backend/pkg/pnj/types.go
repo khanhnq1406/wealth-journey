@@ -30,8 +30,9 @@ type GoldPrice struct {
 }
 
 // apiResponse is the top-level structure of the PNJ JSON response.
+// As of 2026-04 the top-level array key changed from "regions" to "locations".
 type apiResponse struct {
-	Regions []apiRegion `json:"regions"`
+	Locations []apiRegion `json:"locations"`
 }
 
 // apiRegion represents a city/region entry in the PNJ response.

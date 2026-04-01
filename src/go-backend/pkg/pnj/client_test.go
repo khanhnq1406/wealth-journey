@@ -24,12 +24,13 @@ func newTestClient(url string) *Client {
 // Price math: "173.500" (nghìn VND, dot separator) → strip dot → 173500 → × 1000 = 173_500_000 VND
 // PNJ switched from comma to dot as thousand separator as of 2026-04.
 // Field names changed from buy/sell to gia_mua/gia_ban (Vietnamese).
+// Top-level array key changed from "regions" to "locations" as of 2026-04.
 func TestFetchGoldPrices_ParsesJSON(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{
-			"regions": [
+			"locations": [
 				{
 					"name": "TPHCM",
 					"gold_type": [
@@ -92,7 +93,7 @@ func TestFetchGoldPrices_FallbackFirstRegion(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{
-			"regions": [
+			"locations": [
 				{
 					"name": "HAN",
 					"gold_type": [
@@ -124,7 +125,7 @@ func TestFetchGoldPrices_PrefersTphcmOverOtherRegions(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{
-			"regions": [
+			"locations": [
 				{
 					"name": "HAN",
 					"gold_type": [
@@ -162,7 +163,7 @@ func TestFetchGoldPrices_FiltersZeroPrices(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{
-			"regions": [
+			"locations": [
 				{
 					"name": "TPHCM",
 					"gold_type": [
@@ -196,7 +197,7 @@ func TestFetchGoldPrices_DeduplicatesTypeCode(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 		// Both "999.9" entries will sanitize to the same TypeCode
 		_, _ = w.Write([]byte(`{
-			"regions": [
+			"locations": [
 				{
 					"name": "TPHCM",
 					"gold_type": [
@@ -263,7 +264,7 @@ func TestFetchGoldPrices_EmptyRegions(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"regions": []}`))
+		_, _ = w.Write([]byte(`{"locations": []}`))
 	}))
 	defer srv.Close()
 
@@ -301,7 +302,7 @@ func TestFetchGoldPrices_NullRegions(t *testing.T) {
 func TestFetchGoldPrices_ContextCancellation(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"regions": []}`))
+		_, _ = w.Write([]byte(`{"locations": []}`))
 	}))
 	defer srv.Close()
 
@@ -326,7 +327,7 @@ func TestFetchGoldPrices_Timeout(t *testing.T) {
 			return
 		case <-time.After(10 * time.Second):
 			w.WriteHeader(http.StatusOK)
-			_, _ = w.Write([]byte(`{"regions": []}`))
+			_, _ = w.Write([]byte(`{"locations": []}`))
 		}
 	}))
 	defer srv.Close()
