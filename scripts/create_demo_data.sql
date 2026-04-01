@@ -1,6 +1,38 @@
--- Demo Data Script for User ID=10
+-- Demo Data Script
 -- Purpose: Create comprehensive demo data for screenshots
--- Date: 2026-02-23
+-- User: congdongvang.com / Cộng Đồng Vàng
+-- Date: 2026-04-01
+
+-- ============================================================================
+-- STEP 0: CREATE / UPSERT DEMO USER
+-- ============================================================================
+
+BEGIN;
+
+-- Insert user if username doesn't exist; capture the ID into a temp table
+-- so all subsequent steps reference it dynamically (no hardcoded user_id).
+-- Password hash: bcrypt cost 12 of "Congdongvang.1"
+INSERT INTO "user" (name, username, password_hash, auth_provider, preferred_currency, preferred_language, created_at, updated_at)
+VALUES (
+    'Cộng Đồng Vàng',
+    'congdongvang.com',
+    '$2a$12$oeQABzWqKSc0Ho1Rn4gUJOt.bDE6GAfV40bR2G3/YYaEON.MfQd7e',
+    'password',
+    'VND',
+    'vi',
+    NOW(),
+    NOW()
+)
+ON CONFLICT (username) DO UPDATE
+    SET name          = EXCLUDED.name,
+        password_hash = EXCLUDED.password_hash,
+        updated_at    = NOW();
+
+-- Capture user ID for use in all subsequent steps
+CREATE TEMP TABLE _demo_user AS
+SELECT id AS uid FROM "user" WHERE username = 'congdongvang.com';
+
+COMMIT;
 
 -- ============================================================================
 -- STEP 1: DELETE EXISTING DATA (in order to respect foreign keys)
@@ -15,7 +47,7 @@ WHERE
         SELECT id
         FROM category
         WHERE
-            user_id = 10
+            user_id = (SELECT uid FROM _demo_user)
     );
 
 -- Delete merchant category rules
@@ -25,7 +57,7 @@ WHERE
         SELECT id
         FROM category
         WHERE
-            user_id = 10
+            user_id = (SELECT uid FROM _demo_user)
     );
 
 -- Delete import batches
@@ -35,7 +67,7 @@ WHERE
         SELECT id
         FROM wallet
         WHERE
-            user_id = 10
+            user_id = (SELECT uid FROM _demo_user)
     );
 
 -- Delete investment transactions first
@@ -45,7 +77,7 @@ WHERE
         SELECT id
         FROM wallet
         WHERE
-            user_id = 10
+            user_id = (SELECT uid FROM _demo_user)
     );
 
 -- Delete investment lots
@@ -59,7 +91,7 @@ WHERE
                 SELECT id
                 FROM wallet
                 WHERE
-                    user_id = 10
+                    user_id = (SELECT uid FROM _demo_user)
             )
     );
 
@@ -70,7 +102,7 @@ WHERE
         SELECT id
         FROM wallet
         WHERE
-            user_id = 10
+            user_id = (SELECT uid FROM _demo_user)
     );
 
 -- Delete transactions
@@ -80,7 +112,7 @@ WHERE
         SELECT id
         FROM wallet
         WHERE
-            user_id = 10
+            user_id = (SELECT uid FROM _demo_user)
     );
 
 -- Delete budget items
@@ -90,17 +122,17 @@ WHERE
         SELECT id
         FROM budget
         WHERE
-            user_id = 10
+            user_id = (SELECT uid FROM _demo_user)
     );
 
 -- Delete budgets
-DELETE FROM budget WHERE user_id = 10;
+DELETE FROM budget WHERE user_id = (SELECT uid FROM _demo_user);
 
 -- Delete categories
-DELETE FROM category WHERE user_id = 10;
+DELETE FROM category WHERE user_id = (SELECT uid FROM _demo_user);
 
 -- Delete wallets
-DELETE FROM wallet WHERE user_id = 10;
+DELETE FROM wallet WHERE user_id = (SELECT uid FROM _demo_user);
 
 COMMIT;
 
@@ -111,98 +143,32 @@ COMMIT;
 BEGIN;
 
 -- Income Categories (type=1)
-INSERT INTO
-    category (
-        user_id,
-        name,
-        type,
-        created_at,
-        updated_at
-    )
-VALUES (10, 'Lương', 1, NOW(), NOW()),
-    (
-        10,
-        'Freelance',
-        1,
-        NOW(),
-        NOW()
-    ),
-    (
-        10,
-        'Thu nhập đầu tư',
-        1,
-        NOW(),
-        NOW()
-    ),
-    (
-        10,
-        'Thu nhập khác',
-        1,
-        NOW(),
-        NOW()
-    );
+INSERT INTO category (user_id, name, type, created_at, updated_at)
+SELECT uid, name, type, NOW(), NOW()
+FROM _demo_user
+CROSS JOIN (VALUES
+    ('Lương',          1),
+    ('Freelance',      1),
+    ('Thu nhập đầu tư',1),
+    ('Thu nhập khác',  1)
+) AS c(name, type);
 
 -- Expense Categories (type=2)
-INSERT INTO
-    category (
-        user_id,
-        name,
-        type,
-        created_at,
-        updated_at
-    )
-VALUES (
-        10,
-        'Ăn uống',
-        2,
-        NOW(),
-        NOW()
-    ),
-    (
-        10,
-        'Di chuyển',
-        2,
-        NOW(),
-        NOW()
-    ),
-    (
-        10,
-        'Mua sắm',
-        2,
-        NOW(),
-        NOW()
-    ),
-    (
-        10,
-        'Giải trí',
-        2,
-        NOW(),
-        NOW()
-    ),
-    (10, 'Y tế', 2, NOW(), NOW()),
-    (
-        10,
-        'Giáo dục',
-        2,
-        NOW(),
-        NOW()
-    ),
-    (
-        10,
-        'Hóa đơn',
-        2,
-        NOW(),
-        NOW()
-    ),
-    (10, 'Nhà ở', 2, NOW(), NOW()),
-    (
-        10,
-        'Bảo hiểm',
-        2,
-        NOW(),
-        NOW()
-    ),
-    (10, 'Đầu tư', 2, NOW(), NOW());
+INSERT INTO category (user_id, name, type, created_at, updated_at)
+SELECT uid, name, type, NOW(), NOW()
+FROM _demo_user
+CROSS JOIN (VALUES
+    ('Ăn uống',  2),
+    ('Di chuyển',2),
+    ('Mua sắm',  2),
+    ('Giải trí', 2),
+    ('Y tế',     2),
+    ('Giáo dục', 2),
+    ('Hóa đơn',  2),
+    ('Nhà ở',    2),
+    ('Bảo hiểm', 2),
+    ('Đầu tư',   2)
+) AS c(name, type);
 
 COMMIT;
 
@@ -212,53 +178,15 @@ COMMIT;
 
 BEGIN;
 
-INSERT INTO
-    wallet (
-        user_id,
-        wallet_name,
-        balance,
-        currency,
-        type,
-        created_at,
-        updated_at
-    )
-VALUES (
-        10,
-        'Tiền mặt',
-        500000,
-        'VND',
-        0,
-        NOW(),
-        NOW()
-    ), -- 5,000 VND
-    (
-        10,
-        'Techcombank',
-        5000000,
-        'VND',
-        0,
-        NOW(),
-        NOW()
-    ), -- 50,000 VND
-    (
-        10,
-        'Vietcombank',
-        3000000,
-        'VND',
-        0,
-        NOW(),
-        NOW()
-    ), -- 30,000 VND
-    (
-        10,
-        'Danh mục đầu tư',
-        15000000,
-        'VND',
-        1,
-        NOW(),
-        NOW()
-    );
--- 150,000 VND (INVESTMENT type)
+INSERT INTO wallet (user_id, wallet_name, balance, currency, type, created_at, updated_at)
+SELECT uid, wallet_name, balance, 'VND', type, NOW(), NOW()
+FROM _demo_user
+CROSS JOIN (VALUES
+    ('Tiền mặt',        12500000,   0), -- 12,500,000 VND cash on hand
+    ('Techcombank',    285000000,   0), -- 285,000,000 VND
+    ('Vietcombank',    156000000,   0), -- 156,000,000 VND
+    ('Danh mục đầu tư',1419000000, 1)  -- 1,419,000,000 VND (INVESTMENT wallet)
+) AS w(wallet_name, balance, type);
 
 COMMIT;
 
@@ -273,10 +201,10 @@ BEGIN;
 
 
 WITH wallet_ids AS (
-    SELECT id, wallet_name FROM wallet WHERE user_id = 10
+    SELECT id, wallet_name FROM wallet WHERE user_id = (SELECT uid FROM _demo_user)
 ),
 category_ids AS (
-    SELECT id, name FROM category WHERE user_id = 10
+    SELECT id, name FROM category WHERE user_id = (SELECT uid FROM _demo_user)
 ),
 -- Base date: Start of 2026 (January 1, 2026)
 base_date AS (
@@ -531,7 +459,7 @@ SELECT 'Vietcombank', 'Đầu tư', -500000, 'Mua cổ phiếu VCB', DATE '2026-
 
     UNION ALL
 
-    SELECT 'Vietcombank', 'Đầu tư', -820000, 'Mua vàng SJC', DATE '2026-08-15'
+    SELECT 'Vietcombank', 'Đầu tư', -113000000, 'Mua vàng SJC 1 lượng', DATE '2026-03-15'
 ) t(wallet_name, category_name, amount, note, transaction_date)
 WHERE w.wallet_name = t.wallet_name AND c.name = t.category_name;
 
@@ -555,14 +483,8 @@ WITH
                 created_at,
                 updated_at
             )
-        VALUES (
-                10,
-                'Ngân sách tháng 2/2026',
-                3000000,
-                'VND',
-                NOW(),
-                NOW()
-            )
+        SELECT uid, 'Ngân sách tháng 2/2026', 3000000, 'VND', NOW(), NOW()
+        FROM _demo_user
         RETURNING
             id
     )
@@ -587,15 +509,33 @@ COMMIT;
 -- ============================================================================
 -- STEP 6: CREATE DEMO INVESTMENTS
 -- ============================================================================
+-- Gold VND (type=8): quantity in grams×10000, price in raw VND per gram
+--   1 lượng = 37.5g → quantity per lượng = 375,000
+--   avg_cost = price_per_luong / 37.5  (e.g. 108,000,000 / 37.5 = 2,880,000)
+--   total_cost = grams × avg_cost_per_gram
+--   current_price = current market price per gram (raw VND)
+--   current_value = (quantity/10000) × current_price  [computed by GORM hook]
+--
+-- Holdings (realistic April 2026 SJC market ~108–110M/lượng):
+--   SJC          : 3 lượng (112.5g)  bought Jan @ 103M  → avg 2,746,667/g  total 309,000,000
+--   Nhẫn SJC 9999: 5 lượng (187.5g) bought Feb @ 98M   → avg 2,613,333/g  total 489,750,000
+--   Nhẫn Doji 9999: 2 lượng (75g)   bought Mar @ 96M   → avg 2,560,000/g  total 192,000,000
+--   BTMC SJC     : 1 lượng (37.5g)  bought Dec @ 88M   → avg 2,346,667/g  total 87,999,750 ≈ 88,000,000
+--   PNJ          : 4 lượng (150g)   bought Oct @ 85M   → avg 2,266,667/g  total 340,000,050 ≈ 340,000,000
+-- Current prices (Apr 2026): SJC 110M, Nhẫn 9999 108M, Doji 108M, BTMC 110M, PNJ 108M
+-- ============================================================================
 
 BEGIN;
 
--- Get the investment wallet ID
 WITH investment_wallet AS (
-    SELECT id FROM wallet WHERE user_id = 10 AND wallet_name = 'Danh mục đầu tư'
+    SELECT id FROM wallet WHERE user_id = (SELECT uid FROM _demo_user) AND wallet_name = 'Danh mục đầu tư'
 )
-INSERT INTO investment (wallet_id, symbol, name, type, quantity, average_cost, total_cost, currency, is_custom, current_price, created_at, updated_at)
+INSERT INTO investment (
+    user_id, wallet_id, symbol, name, type, quantity, average_cost, total_cost, currency,
+    is_custom, current_price, current_value, unrealized_pnl, unrealized_pnl_percent, purchase_unit, created_at, updated_at
+)
 SELECT
+    (SELECT uid FROM _demo_user),
     w.id,
     t.symbol,
     t.name,
@@ -606,53 +546,29 @@ SELECT
     t.currency,
     t.is_custom,
     t.current_price,
+    -- current_value = (quantity / 10000) * current_price
+    (t.quantity / 10000.0 * t.current_price)::bigint,
+    -- unrealized_pnl = current_value - total_cost
+    (t.quantity / 10000.0 * t.current_price)::bigint - t.total_cost,
+    -- unrealized_pnl_percent
+    ((t.quantity / 10000.0 * t.current_price - t.total_cost) / t.total_cost::float * 100),
+    t.purchase_unit,
     NOW(),
     NOW()
 FROM investment_wallet w
 CROSS JOIN (VALUES
--- Gold (VND)
-    ('SJL1L10', 'Vàng SJC 1L-10L', 8, 750000, 2194667, 164600000, 'VND', false, 4842667),
-
--- Stock VN
-(
-    'VCB.VN',
-    'JS COMM BANK FOREIGN TRADE VIET',
-    2,
-    1000000,
-    60000,
-    6000000,
-    'VND',
-    false,
-    66100
-),
-(
-    'VNM.VN',
-    'VIETNAM DAIRY PRODUCTS JSC',
-    2,
-    1000000,
-    40000,
-    4000000,
-    'VND',
-    false,
-    70000
-),
-
--- Crypto USD
-(
-    'BTC-USD',
-    'Bitcoin USD',
-    1,
-    1000000,
-    5000000,
-    50000,
-    'USD',
-    false,
-    6578512
-),
-
--- Fund
-('FUEDCMID.VN', 'DRAGON CAPITAL VIETNAM FUND MGM', 3, 10000000, 13000, 13000000, 'VND', false, 14250)
-) t(symbol, name, type, quantity, average_cost, total_cost, currency, is_custom, current_price);
+    -- symbol, name, type, quantity(g×10000), avg_cost(VND/g), total_cost, currency, is_custom, current_price(VND/g), purchase_unit
+    -- SJC: 3 lượng=112.5g  bought @103M/lượng now 110M/lượng
+    ('SJC',           'Vàng SJC',       8, 1125000, 2746667, 309000000, 'VND', false, 2933333, 'gram'),
+    -- Nhẫn SJC 9999: 5 lượng=187.5g bought @98M now 108M
+    ('Vàng nhẫn SJC', 'Nhẫn SJC 9999',  8, 1875000, 2613333, 490000000, 'VND', false, 2880000, 'gram'),
+    -- Nhẫn Doji 9999: 2 lượng=75g bought @96M now 108M
+    ('Doji_24K',       'Nhẫn Doji 9999', 8,  750000, 2560000, 192000000, 'VND', false, 2880000, 'gram'),
+    -- BTMC SJC: 1 lượng=37.5g bought @88M now 110M
+    ('BTMC',           'SJC BTMC',       8,  375000, 2346667,  88000000, 'VND', false, 2933333, 'gram'),
+    -- PNJ: 4 lượng=150g bought @85M now 108M
+    ('PNJ HCM',        'Vàng PNJ',       8, 1500000, 2266667, 340000000, 'VND', false, 2880000, 'gram')
+) t(symbol, name, type, quantity, average_cost, total_cost, currency, is_custom, current_price, purchase_unit);
 
 COMMIT;
 
@@ -662,291 +578,151 @@ COMMIT;
 
 BEGIN;
 
--- Create a temporary table to store investment IDs for reuse
-CREATE TEMP TABLE temp_investment_ids AS
-SELECT i.id, i.symbol, w.id as wallet_id
+CREATE TEMP TABLE temp_gold_ids AS
+SELECT i.id, i.symbol, w.id AS wallet_id
 FROM investment i
-    JOIN wallet w ON i.wallet_id = w.id
-WHERE
-    w.user_id = 10
-    AND w.wallet_name = 'Danh mục đầu tư';
+JOIN wallet w ON i.wallet_id = w.id
+WHERE w.user_id = (SELECT uid FROM _demo_user) AND w.wallet_name = 'Danh mục đầu tư'
+  AND i.type = 8; -- GOLD_VND only
 
--- Gold Transaction (VND)
-INSERT INTO
-    investment_transaction (
-        investment_id,
-        wallet_id,
-        type,
-        quantity,
-        price,
-        cost,
-        currency,
-        transaction_date,
-        remaining_quantity,
-        created_at,
-        updated_at
-    )
-SELECT i.id, i.wallet_id, 0, -- BUY
-    750000, -- 75 grams
-    2194667, -- 21,947 VND/gram
-    164600000, -- 1,646,000 VND
-    'VND', DATE '2026-08-15', 750000, NOW(), NOW()
-FROM temp_investment_ids i
-WHERE
-    i.symbol = 'SJL1L10';
+-- -----------------------------------------------------------------------
+-- SJC: 3 transactions — bought in 3 batches across 2025
+--   Lot 1: 1 lượng (37.5g) @ 90M  → 2025-10-05
+--   Lot 2: 1 lượng (37.5g) @ 106M → 2026-01-10
+--   Lot 3: 1 lượng (37.5g) @ 113M → 2026-03-15
+-- -----------------------------------------------------------------------
+INSERT INTO investment_transaction (investment_id, user_id, wallet_id, type, quantity, price, cost, currency, transaction_date, remaining_quantity, created_at, updated_at)
+SELECT i.id, (SELECT uid FROM _demo_user), i.wallet_id,
+    0,      -- BUY
+    375000, -- 37.5g × 10000
+    2400000, -- 90,000,000 / 37.5
+    90000000,
+    'VND', DATE '2025-10-05', 375000, NOW(), NOW()
+FROM temp_gold_ids i WHERE i.symbol = 'SJC';
 
--- VCB.VN
-INSERT INTO
-    investment_transaction (
-        investment_id,
-        wallet_id,
-        type,
-        quantity,
-        price,
-        cost,
-        currency,
-        transaction_date,
-        remaining_quantity,
-        created_at,
-        updated_at
-    )
-SELECT i.id, i.wallet_id, 1, -- SELL (using type 1 as per actual data)
-    1000000, -- 100 shares
-    60000, -- 600 VND/share
-    6000000, -- 60,000 VND
-    'USD', DATE '2026-01-15', 1000000, NOW(), NOW()
-FROM temp_investment_ids i
-WHERE
-    i.symbol = 'VCB.VN';
+INSERT INTO investment_transaction (investment_id, user_id, wallet_id, type, quantity, price, cost, currency, transaction_date, remaining_quantity, created_at, updated_at)
+SELECT i.id, (SELECT uid FROM _demo_user), i.wallet_id,
+    0,
+    375000,
+    2826667, -- 106,000,000 / 37.5
+    106000000,
+    'VND', DATE '2026-01-10', 375000, NOW(), NOW()
+FROM temp_gold_ids i WHERE i.symbol = 'SJC';
 
--- VNM.VN
-INSERT INTO
-    investment_transaction (
-        investment_id,
-        wallet_id,
-        type,
-        quantity,
-        price,
-        cost,
-        currency,
-        transaction_date,
-        remaining_quantity,
-        created_at,
-        updated_at
-    )
-SELECT i.id, i.wallet_id, 1, -- SELL
-    1000000, -- 100 shares
-    40000, -- 400 VND/share
-    4000000, -- 40,000 VND
-    'USD', DATE '2026-01-18', 1000000, NOW(), NOW()
-FROM temp_investment_ids i
-WHERE
-    i.symbol = 'VNM.VN';
+INSERT INTO investment_transaction (investment_id, user_id, wallet_id, type, quantity, price, cost, currency, transaction_date, remaining_quantity, created_at, updated_at)
+SELECT i.id, (SELECT uid FROM _demo_user), i.wallet_id,
+    0,
+    375000,
+    3013333, -- 113,000,000 / 37.5
+    113000000,
+    'VND', DATE '2026-03-15', 375000, NOW(), NOW()
+FROM temp_gold_ids i WHERE i.symbol = 'SJC';
 
--- BTC-USD Transactions
-INSERT INTO
-    investment_transaction (
-        investment_id,
-        wallet_id,
-        type,
-        quantity,
-        price,
-        cost,
-        currency,
-        transaction_date,
-        remaining_quantity,
-        created_at,
-        updated_at
-    )
-WITH
-    btc_usd_investments AS (
-        SELECT id, wallet_id, ROW_NUMBER() OVER (
-                ORDER BY id
-            ) as rn
-        FROM temp_investment_ids
-        WHERE
-            symbol = 'BTC-USD'
-    )
-SELECT
-    id,
-    wallet_id,
-    1, -- SELL
-    CASE
-        WHEN rn = 1 THEN 100
-        ELSE 1000000
-    END,
-    CASE
-        WHEN rn = 1 THEN 4999700
-        ELSE 5000000
-    END,
-    CASE
-        WHEN rn = 1 THEN 49997
-        ELSE 50000
-    END,
-    'USD',
-    CASE
-        WHEN rn = 1 THEN DATE '2026-02-01'
-        ELSE DATE '2026-02-05'
-    END,
-    CASE
-        WHEN rn = 1 THEN 100
-        ELSE 1000000
-    END,
-    NOW(),
-    NOW()
-FROM btc_usd_investments;
+-- -----------------------------------------------------------------------
+-- Nhẫn SJC 9999: 2 transactions
+--   Lot 1: 3 lượng (112.5g) @ 96M  → 2025-11-20
+--   Lot 2: 2 lượng (75g)    @ 101M → 2026-02-08
+-- -----------------------------------------------------------------------
+INSERT INTO investment_transaction (investment_id, user_id, wallet_id, type, quantity, price, cost, currency, transaction_date, remaining_quantity, created_at, updated_at)
+SELECT i.id, (SELECT uid FROM _demo_user), i.wallet_id,
+    0,
+    1125000, -- 112.5g × 10000
+    2560000, -- 96,000,000 / 37.5
+    288000000,
+    'VND', DATE '2025-11-20', 1125000, NOW(), NOW()
+FROM temp_gold_ids i WHERE i.symbol = 'Vàng nhẫn SJC';
 
--- FUEDCMID.VN Fund Transaction
-INSERT INTO
-    investment_transaction (
-        investment_id,
-        wallet_id,
-        type,
-        quantity,
-        price,
-        cost,
-        currency,
-        transaction_date,
-        remaining_quantity,
-        created_at,
-        updated_at
-    )
-SELECT i.id, i.wallet_id, 1, -- SELL
-    10000000, -- 1000 units
-    13000, -- 130 VND/unit
-    13000000, -- 130,000 VND
-    'USD', DATE '2026-03-10', 10000000, NOW(), NOW()
-FROM temp_investment_ids i
-WHERE
-    i.symbol = 'FUEDCMID.VN';
+INSERT INTO investment_transaction (investment_id, user_id, wallet_id, type, quantity, price, cost, currency, transaction_date, remaining_quantity, created_at, updated_at)
+SELECT i.id, (SELECT uid FROM _demo_user), i.wallet_id,
+    0,
+    750000, -- 75g × 10000
+    2693333, -- 101,000,000 / 37.5
+    202000000,
+    'VND', DATE '2026-02-08', 750000, NOW(), NOW()
+FROM temp_gold_ids i WHERE i.symbol = 'Vàng nhẫn SJC';
 
--- Create investment lots (FIFO tracking) - 2026 dates
--- Gold Lot (VND)
-INSERT INTO
-    investment_lot (
-        investment_id,
-        quantity,
-        average_cost,
-        purchased_at,
-        remaining_quantity,
-        total_cost,
-        currency,
-        created_at,
-        updated_at
-    )
-SELECT i.id, 750000, -- 75 grams
-    2194667, DATE '2026-08-15', 750000, 164600000, 'VND', NOW(), NOW()
-FROM temp_investment_ids i
-WHERE
-    i.symbol = 'SJL1L10';
+-- -----------------------------------------------------------------------
+-- Nhẫn Doji 9999: 1 transaction
+--   Lot 1: 2 lượng (75g) @ 96M → 2026-03-01
+-- -----------------------------------------------------------------------
+INSERT INTO investment_transaction (investment_id, user_id, wallet_id, type, quantity, price, cost, currency, transaction_date, remaining_quantity, created_at, updated_at)
+SELECT i.id, (SELECT uid FROM _demo_user), i.wallet_id,
+    0,
+    750000,
+    2560000, -- 96,000,000 / 37.5
+    192000000,
+    'VND', DATE '2026-03-01', 750000, NOW(), NOW()
+FROM temp_gold_ids i WHERE i.symbol = 'Doji_24K';
 
--- VCB.VN
-INSERT INTO
-    investment_lot (
-        investment_id,
-        quantity,
-        average_cost,
-        purchased_at,
-        remaining_quantity,
-        total_cost,
-        currency,
-        created_at,
-        updated_at
-    )
-SELECT i.id, 1000000, -- 100 shares
-    60000, DATE '2026-01-15', 1000000, 6000000, 'USD', NOW(), NOW()
-FROM temp_investment_ids i
-WHERE
-    i.symbol = 'VCB.VN';
+-- -----------------------------------------------------------------------
+-- BTMC SJC: 1 transaction
+--   Lot 1: 1 lượng (37.5g) @ 88M → 2025-12-12
+-- -----------------------------------------------------------------------
+INSERT INTO investment_transaction (investment_id, user_id, wallet_id, type, quantity, price, cost, currency, transaction_date, remaining_quantity, created_at, updated_at)
+SELECT i.id, (SELECT uid FROM _demo_user), i.wallet_id,
+    0,
+    375000,
+    2346667, -- 88,000,000 / 37.5
+    88000000,
+    'VND', DATE '2025-12-12', 375000, NOW(), NOW()
+FROM temp_gold_ids i WHERE i.symbol = 'BTMC';
 
--- VNM.VN
-INSERT INTO
-    investment_lot (
-        investment_id,
-        quantity,
-        average_cost,
-        purchased_at,
-        remaining_quantity,
-        total_cost,
-        currency,
-        created_at,
-        updated_at
-    )
-SELECT i.id, 1000000, -- 100 shares
-    40000, DATE '2026-01-18', 1000000, 4000000, 'USD', NOW(), NOW()
-FROM temp_investment_ids i
-WHERE
-    i.symbol = 'VNM.VN';
+-- -----------------------------------------------------------------------
+-- PNJ: 2 transactions
+--   Lot 1: 2 lượng (75g)  @ 84M → 2025-09-18
+--   Lot 2: 2 lượng (75g)  @ 86M → 2025-12-28
+-- -----------------------------------------------------------------------
+INSERT INTO investment_transaction (investment_id, user_id, wallet_id, type, quantity, price, cost, currency, transaction_date, remaining_quantity, created_at, updated_at)
+SELECT i.id, (SELECT uid FROM _demo_user), i.wallet_id,
+    0,
+    750000,
+    2240000, -- 84,000,000 / 37.5
+    168000000,
+    'VND', DATE '2025-09-18', 750000, NOW(), NOW()
+FROM temp_gold_ids i WHERE i.symbol = 'PNJ HCM';
 
--- BTC-USD Lots (2 separate investments)
-INSERT INTO
-    investment_lot (
-        investment_id,
-        quantity,
-        average_cost,
-        purchased_at,
-        remaining_quantity,
-        total_cost,
-        currency,
-        created_at,
-        updated_at
-    )
-WITH
-    btc_usd_investments AS (
-        SELECT id, ROW_NUMBER() OVER (
-                ORDER BY id
-            ) as rn
-        FROM temp_investment_ids
-        WHERE
-            symbol = 'BTC-USD'
-    )
-SELECT
-    id,
-    CASE
-        WHEN rn = 1 THEN 100
-        ELSE 1000000
-    END,
-    CASE
-        WHEN rn = 1 THEN 4999700
-        ELSE 5000000
-    END,
-    CASE
-        WHEN rn = 1 THEN DATE '2026-02-01'
-        ELSE DATE '2026-02-05'
-    END,
-    CASE
-        WHEN rn = 1 THEN 100
-        ELSE 1000000
-    END,
-    CASE
-        WHEN rn = 1 THEN 49997
-        ELSE 50000
-    END,
-    'USD',
-    NOW(),
-    NOW()
-FROM btc_usd_investments;
+INSERT INTO investment_transaction (investment_id, user_id, wallet_id, type, quantity, price, cost, currency, transaction_date, remaining_quantity, created_at, updated_at)
+SELECT i.id, (SELECT uid FROM _demo_user), i.wallet_id,
+    0,
+    750000,
+    2293333, -- 86,000,000 / 37.5
+    172000000,
+    'VND', DATE '2025-12-28', 750000, NOW(), NOW()
+FROM temp_gold_ids i WHERE i.symbol = 'PNJ HCM';
 
--- FUEDCMID.VN Fund Lot
-INSERT INTO
-    investment_lot (
-        investment_id,
-        quantity,
-        average_cost,
-        purchased_at,
-        remaining_quantity,
-        total_cost,
-        currency,
-        created_at,
-        updated_at
-    )
-SELECT i.id, 10000000, 13000, DATE '2026-03-10', 10000000, 13000000, 'USD', NOW(), NOW()
-FROM temp_investment_ids i
-WHERE
-    i.symbol = 'FUEDCMID.VN';
+-- ============================================================================
+-- INVESTMENT LOTS (FIFO tracking — one lot per transaction batch)
+-- ============================================================================
 
--- Clean up temp table
-DROP TABLE temp_investment_ids;
+-- SJC lots
+INSERT INTO investment_lot (investment_id, quantity, average_cost, purchased_at, remaining_quantity, total_cost, currency, created_at, updated_at)
+SELECT i.id, 375000, 2400000, DATE '2025-10-05', 375000, 90000000,  'VND', NOW(), NOW() FROM temp_gold_ids i WHERE i.symbol = 'SJC';
+INSERT INTO investment_lot (investment_id, quantity, average_cost, purchased_at, remaining_quantity, total_cost, currency, created_at, updated_at)
+SELECT i.id, 375000, 2826667, DATE '2026-01-10', 375000, 106000000, 'VND', NOW(), NOW() FROM temp_gold_ids i WHERE i.symbol = 'SJC';
+INSERT INTO investment_lot (investment_id, quantity, average_cost, purchased_at, remaining_quantity, total_cost, currency, created_at, updated_at)
+SELECT i.id, 375000, 3013333, DATE '2026-03-15', 375000, 113000000, 'VND', NOW(), NOW() FROM temp_gold_ids i WHERE i.symbol = 'SJC';
+
+-- Nhẫn SJC 9999 lots
+INSERT INTO investment_lot (investment_id, quantity, average_cost, purchased_at, remaining_quantity, total_cost, currency, created_at, updated_at)
+SELECT i.id, 1125000, 2560000, DATE '2025-11-20', 1125000, 288000000, 'VND', NOW(), NOW() FROM temp_gold_ids i WHERE i.symbol = 'Vàng nhẫn SJC';
+INSERT INTO investment_lot (investment_id, quantity, average_cost, purchased_at, remaining_quantity, total_cost, currency, created_at, updated_at)
+SELECT i.id, 750000,  2693333, DATE '2026-02-08', 750000,  202000000, 'VND', NOW(), NOW() FROM temp_gold_ids i WHERE i.symbol = 'Vàng nhẫn SJC';
+
+-- Nhẫn Doji lot
+INSERT INTO investment_lot (investment_id, quantity, average_cost, purchased_at, remaining_quantity, total_cost, currency, created_at, updated_at)
+SELECT i.id, 750000, 2560000, DATE '2026-03-01', 750000, 192000000, 'VND', NOW(), NOW() FROM temp_gold_ids i WHERE i.symbol = 'Doji_24K';
+
+-- BTMC lot
+INSERT INTO investment_lot (investment_id, quantity, average_cost, purchased_at, remaining_quantity, total_cost, currency, created_at, updated_at)
+SELECT i.id, 375000, 2346667, DATE '2025-12-12', 375000, 88000000, 'VND', NOW(), NOW() FROM temp_gold_ids i WHERE i.symbol = 'BTMC';
+
+-- PNJ lots
+INSERT INTO investment_lot (investment_id, quantity, average_cost, purchased_at, remaining_quantity, total_cost, currency, created_at, updated_at)
+SELECT i.id, 750000, 2240000, DATE '2025-09-18', 750000, 168000000, 'VND', NOW(), NOW() FROM temp_gold_ids i WHERE i.symbol = 'PNJ HCM';
+INSERT INTO investment_lot (investment_id, quantity, average_cost, purchased_at, remaining_quantity, total_cost, currency, created_at, updated_at)
+SELECT i.id, 750000, 2293333, DATE '2025-12-28', 750000, 172000000, 'VND', NOW(), NOW() FROM temp_gold_ids i WHERE i.symbol = 'PNJ HCM';
+
+DROP TABLE temp_gold_ids;
 
 COMMIT;
 
@@ -958,12 +734,12 @@ COMMIT;
 SELECT 'Categories' as table_name, COUNT(*) as count
 FROM category
 WHERE
-    user_id = 10
+    user_id = (SELECT uid FROM _demo_user)
 UNION ALL
 SELECT 'Wallets', COUNT(*)
 FROM wallet
 WHERE
-    user_id = 10
+    user_id = (SELECT uid FROM _demo_user)
 UNION ALL
 SELECT 'Transactions', COUNT(*)
 FROM transaction
@@ -972,13 +748,13 @@ WHERE
         SELECT id
         FROM wallet
         WHERE
-            user_id = 10
+            user_id = (SELECT uid FROM _demo_user)
     )
 UNION ALL
 SELECT 'Budgets', COUNT(*)
 FROM budget
 WHERE
-    user_id = 10
+    user_id = (SELECT uid FROM _demo_user)
 UNION ALL
 SELECT 'Budget Items', COUNT(*)
 FROM budget_item
@@ -987,7 +763,7 @@ WHERE
         SELECT id
         FROM budget
         WHERE
-            user_id = 10
+            user_id = (SELECT uid FROM _demo_user)
     )
 UNION ALL
 SELECT 'Investments', COUNT(*)
@@ -997,7 +773,7 @@ WHERE
         SELECT id
         FROM wallet
         WHERE
-            user_id = 10
+            user_id = (SELECT uid FROM _demo_user)
     )
 UNION ALL
 SELECT 'Investment Transactions', COUNT(*)
@@ -1007,7 +783,7 @@ WHERE
         SELECT id
         FROM wallet
         WHERE
-            user_id = 10
+            user_id = (SELECT uid FROM _demo_user)
     )
 UNION ALL
 SELECT 'Investment Lots', COUNT(*)
@@ -1021,7 +797,7 @@ WHERE
                 SELECT id
                 FROM wallet
                 WHERE
-                    user_id = 10
+                    user_id = (SELECT uid FROM _demo_user)
             )
     );
 
@@ -1035,7 +811,7 @@ SELECT
     END as wallet_type
 FROM wallet
 WHERE
-    user_id = 10
+    user_id = (SELECT uid FROM _demo_user)
 ORDER BY id;
 
 -- Summary of investments
@@ -1046,13 +822,18 @@ SELECT
     i.average_cost / 100.0 as avg_cost_vnd,
     i.total_cost / 100.0 as total_cost_vnd,
     CASE i.type
-        WHEN 0 THEN 'STOCK'
-        WHEN 1 THEN 'ETF'
-        WHEN 3 THEN 'CRYPTO'
-        WHEN 8 THEN 'GOLD_VND'
+        WHEN 1  THEN 'CRYPTOCURRENCY'
+        WHEN 2  THEN 'STOCK'
+        WHEN 3  THEN 'ETF'
+        WHEN 4  THEN 'MUTUAL_FUND'
+        WHEN 8  THEN 'GOLD_VND'
+        WHEN 9  THEN 'GOLD_USD'
+        WHEN 10 THEN 'SILVER_VND'
+        WHEN 11 THEN 'SILVER_USD'
+        ELSE 'OTHER'
     END as investment_type
 FROM investment i
     JOIN wallet w ON i.wallet_id = w.id
 WHERE
-    w.user_id = 10
+    w.user_id = (SELECT uid FROM _demo_user)
 ORDER BY i.id;
