@@ -116,6 +116,35 @@ Both changes are confined to leaf packages (`pkg/doji/`, `pkg/mihong/`) that are
 3. In admin panel → Asset Display Config, check fetch codes for DOJI SJC and Mihong SJC.
 4. Expected: each config resolves independently to its own `asset_price` row — no upsert collision.
 
+## Fix History
+
+| Date       | Fix                                                     | Severity | Files                                    |
+| ---------- | ------------------------------------------------------- | -------- | ---------------------------------------- |
+| 2026-04-01 | PNJ API: rename `regions` → `locations` top-level key  | Minor    | `pkg/pnj/types.go`, `client.go`, `client_test.go` |
+| 2026-04-01 | DOJI parsePrice multiplier `×10` → `×10_000` (vạn VND) | Minor    | `pkg/doji/client.go`, `pkg/doji/client_test.go` |
+
+### Fix: PNJ `regions` → `locations` (2026-04-01)
+
+**Root cause:** PNJ changed the top-level JSON array key from `"regions"` to `"locations"` as of 2026-04. The `apiResponse` struct mapped `json:"regions"` so `apiResp.Regions` was always nil after unmarshal, causing `selectRegion` to return nil and `FetchGoldPrices` to return an empty slice — triggering `pnj: no valid prices` on every `PriceCacheJob` run.
+
+**Fix:** Renamed `apiResponse.Regions` field to `Locations` with `json:"locations"` tag. Updated the single call site in `client.go` and all test fixtures.
+
+**Tests:** 17/17 pass. Full suite: 0 failures.
+
+**Security review:** APPROVED — no security impact. Static JSON field name change in a background scheduler-only package.
+
+### Fix: DOJI parsePrice multiplier `×10` → `×10_000` (2026-04-01)
+
+**Root cause:** The previous fix changed the DOJI multiplier from `×1_000_000` to `×10`, based on an incorrect assumption that DOJI HTML prices are in VND/chỉ. Live scraping of `giavang.doji.vn` reveals prices are in **vạn VND** (ten-thousands of VND) per lượng — e.g. `17300` means 17,300 × 10,000 = 173,000,000 VND/lượng. The `×10` multiplier produced `158,500` instead of `158,500,000`.
+
+**Fix:** Changed multiplier to `×10_000`. Updated comments to document the unit (vạn VND per lượng). Updated 8 test expectations accordingly.
+
+**Tests:** 10/10 pass. Full suite: 0 failures.
+
+**Security review:** APPROVED — static numeric constant change in a background scheduler-only package. No auth, authorization, or injection surfaces affected. `int64` overflow not possible for realistic VND gold prices (max ~300,000 × 10,000 = 3,000,000,000 — well within int64 range).
+
+---
+
 #### Scenario: No regression on gold price display
 
 **Preconditions:** Backend running post-deployment.
