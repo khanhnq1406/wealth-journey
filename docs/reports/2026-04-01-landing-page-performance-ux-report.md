@@ -140,3 +140,19 @@ GitNexus not available — manual blast radius review performed:
 
 1. Navigate to `/landing` while page is loading — Expected: shimmer skeleton uses `sm:hidden` mobile layout (stacked sections, no side-by-side grid)
 2. No horizontal scroll
+
+## Fix History
+
+| Date       | Fix                                                                           | Severity | Files Changed                             |
+| ---------- | ----------------------------------------------------------------------------- | -------- | ----------------------------------------- |
+| 2026-04-01 | `/vi` route showed blank dark red screen — replaced `return null` with gold spinner in `app/[locale]/page.tsx` | Minor    | `src/wj-client/app/[locale]/page.tsx` |
+
+### Fix Detail — 2026-04-01
+
+**Issue:** Navigating to `/vi` (or any locale root, e.g. `/en`) showed only the dark maroon background with no visible loading indicator.
+
+**Root Cause:** `app/[locale]/page.tsx` is a client component that returns `null` while its `useEffect` redirect runs. Next.js `loading.tsx` only activates for async server-side work (SSR Suspense boundaries) — it does not cover synchronous client component renders. So the page rendered nothing (blank red screen) for the ~100ms before the client-side router redirect fired.
+
+**Fix:** Replace `return null` with the branded gold spinner (identical JSX to `app/[locale]/loading.tsx`). The spinner is displayed during the brief client-side redirect, eliminating the blank flash.
+
+**Security Review:** Approved — no XSS risk, no auth bypass, no information disclosure. Auth redirect logic unchanged.
