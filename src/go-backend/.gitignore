@@ -38,6 +38,7 @@ Thumbs.db
 .vercel
 .env*.local
 
-server
-main
-migrate-*
+# Compiled binaries (root-level build outputs)
+/server
+/main
+/migrate-*
