@@ -1,0 +1,1 @@
+Allow user cancel Google account connection in security page
