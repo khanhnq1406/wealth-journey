@@ -7,8 +7,8 @@
 - **Spec file:** docs/specs/2026-04-01-landing-page-performance-ux-spec.md
 - **Started:** 2026-04-01T00:00:00Z
 - **Last updated:** 2026-04-01T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 0,1,2,3,4 (parallel)
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -16,10 +16,10 @@
 | --- | ------------------------------------------- | ----------- | ------ | ------- |
 | 0   | Update C4 Architecture Diagrams             | done        | 64db4b10 | Added locale_loading + landing_loading Component entries to App Router boundary |
 | 1   | Add 3-second timeout to fetchSiteSettings() | done        | 5ad88c64 | AbortController + 3s timeout added; clearTimeout in finally; test written |
-| 2   | Create Locale Root Loading Splash           | done        | —      | Gold spinner splash; no imports; pure server component |
+| 2   | Create Locale Root Loading Splash           | done        | 09dc3412 | Gold spinner splash; no imports; pure server component |
 | 3   | Create Landing Page Skeleton                | done        | 5ad88c64 | Full shimmer skeleton with navbar/tables/charts/sentiment/footer |
 | 4   | Update Runtime Flow Diagram                 | done        | cf1dd6cf | Added section 16: Landing Page Load with Timeout + Skeleton sequence diagram |
-| 5   | Lint + Build Verification                   | pending     | —      | —       |
+| 5   | Lint + Build Verification                   | done        | —      | 0 ESLint errors in new files; tsc --noEmit clean; file set verified |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
