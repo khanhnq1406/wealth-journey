@@ -19,6 +19,7 @@ Infrastructure-level flows that are referenced by multiple domain flows. Read th
 - [Price Cache Background Job](#13-price-cache-background-job)
 - [Gold Display Prices Read Flow](#14-gold-display-prices-read-flow)
 - [Admin Gold Display Config CRUD Flow](#15-admin-gold-display-config-crud-flow)
+- [Landing Page Load with Timeout + Skeleton](#16-landing-page-load-with-timeout--skeleton)
 
 ---
 
@@ -1363,3 +1364,99 @@ flowchart TD
 - Admin CRUD endpoints do NOT use generated proto hooks — the frontend uses `apiClient` directly (no RPCs defined for these endpoints in the proto file)
 - `ListAll` (admin) includes disabled entries; `ListEnabled` (public) filters to `is_enabled = true` only
 - React Query cache invalidation key `QUERY_KEY_GOLD_DISPLAY_CONFIG` is shared across the table and any other consumers of the admin list endpoint
+
+---
+
+## 16. Landing Page Load with Timeout + Skeleton
+
+**Trigger:** Browser navigates to `/[locale]/landing`
+**Sources:** `app/[locale]/landing/layout.tsx` (`generateMetadata`, `fetchSiteSettings`), `app/[locale]/landing/loading.tsx` (LandingLoading skeleton), `app/[locale]/landing/page.tsx` → `LandingContent.tsx`
+
+This flow covers two parallel paths that happen on every landing page request:
+1. **SSR path** — Next.js executes `generateMetadata()` server-side with a 3-second timeout guard
+2. **Streaming path** — Next.js immediately streams `loading.tsx` to the browser while the page component mounts
+
+```mermaid
+sequenceDiagram
+    participant BR as Browser
+    participant VE as Vercel Edge
+    participant SSR as Next.js SSR<br/>(Node.js)
+    participant AC as AbortController<br/>(3s timer)
+    participant BE as Go Backend<br/>/api/v1/public/site-settings
+    participant RQ as React Query<br/>(client-side)
+    participant API as Go Backend<br/>/api/v1/public/asset-display-prices
+
+    BR->>VE: GET /vi/landing
+    VE->>SSR: Route to Next.js App Router
+
+    Note over SSR: generateMetadata() runs server-side<br/>before streaming begins
+
+    SSR->>AC: new AbortController()<br/>setTimeout(abort, 3000)
+
+    SSR->>BE: fetch(site-settings, { signal, revalidate: 300 })
+
+    alt Happy path — backend responds within 3 seconds
+        BE-->>SSR: 200 { settings: {...} }
+        SSR->>AC: clearTimeout(timeoutId)
+        SSR->>SSR: Build metadata from settings<br/>(title, description, OG tags)
+        SSR-->>BR: <head> with real metadata
+    else Timeout path — backend takes > 3 seconds
+        AC->>BE: abort() signal fired
+        BE-->>SSR: AbortError (fetch aborted)
+        SSR->>AC: clearTimeout(timeoutId) [in finally]
+        SSR->>SSR: catch AbortError → return null<br/>generateMetadata uses FALLBACK_METADATA
+        SSR-->>BR: <head> with fallback metadata<br/>(static title/description)
+    else Error path — backend unreachable
+        BE-->>SSR: Network error / non-2xx
+        SSR->>AC: clearTimeout(timeoutId) [in finally]
+        SSR->>SSR: catch error → return null<br/>generateMetadata uses FALLBACK_METADATA
+        SSR-->>BR: <head> with fallback metadata
+    end
+
+    Note over SSR,BR: Next.js streams loading.tsx immediately<br/>(Suspense boundary — no waiting for page data)
+
+    SSR-->>BR: Stream: LandingLoading skeleton<br/>(shimmer cards for gold/silver/currency tables,<br/>hero section placeholder)
+
+    Note over BR: Browser renders skeleton instantly<br/>— user sees branded loading state
+
+    SSR-->>BR: Stream: LandingContent mounts<br/>(replaces skeleton when ready)
+
+    BR->>RQ: LandingContent hydrates<br/>React Query hooks fire in parallel
+
+    par Fetch gold display prices
+        RQ->>API: GET /api/v1/public/asset-display-prices?assetType=gold
+        API-->>RQ: { prices: [...] }
+        RQ-->>BR: Gold price table renders
+    and Fetch silver display prices
+        RQ->>API: GET /api/v1/public/asset-display-prices?assetType=silver
+        API-->>RQ: { prices: [...] }
+        RQ-->>BR: Silver price table renders
+    and Fetch currency display prices
+        RQ->>API: GET /api/v1/public/asset-display-prices?assetType=currency
+        API-->>RQ: { prices: [...] }
+        RQ-->>BR: Currency table renders
+    end
+
+    Note over BR: Skeleton replaced by real content<br/>Full landing page is interactive
+```
+
+### Key Invariants
+
+- `fetchSiteSettings()` is the **only** SSR-blocking call in the landing layout — all price data is fetched client-side via React Query after hydration
+- The `AbortController` timeout is **3 seconds** — chosen to be longer than typical Go backend cold-start (~1–2s) but short enough to avoid user-visible TTFB degradation
+- `clearTimeout` is always called in a `finally` block — prevents timer leaks on both success and failure paths
+- `FALLBACK_METADATA` is a static constant in `landing/layout.tsx` — no external call required; always safe to use
+- `loading.tsx` (LandingLoading) streams to the browser **before** `LandingContent` mounts — the skeleton is visible from the very first byte of HTML (Next.js Suspense streaming)
+- `generateMetadata()` and `loading.tsx` streaming are independent — metadata timeout does not delay the skeleton render
+- All three React Query fetches (`gold`, `silver`, `currency`) are parallel — they race independently; a slow currency fetch does not block the gold table from rendering
+- Backend `asset-display-prices` endpoint reads from the `asset_price` DB table (pre-populated by `PriceCacheJob`) — no live external API call per HTTP request
+
+### Error Paths
+
+| Condition | SSR Behaviour | User Impact |
+|-----------|---------------|-------------|
+| Backend responds in < 3s | Real metadata used | SEO-optimised `<head>` |
+| Backend timeout (> 3s) | `FALLBACK_METADATA` used | Static fallback title/description; page still renders normally |
+| Backend unreachable / 5xx | `FALLBACK_METADATA` used | Same as timeout — graceful degradation |
+| `asset-display-prices` API fails client-side | React Query error state | Individual price table shows error/empty state; rest of page unaffected |
+| All three React Query fetches fail | Each table shows error state independently | Skeleton is replaced by error states; hero section still renders |
