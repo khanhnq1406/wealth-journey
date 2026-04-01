@@ -131,6 +131,9 @@ DELETE FROM budget WHERE user_id = (SELECT uid FROM _demo_user);
 -- Delete categories
 DELETE FROM category WHERE user_id = (SELECT uid FROM _demo_user);
 
+-- Delete portfolio history
+DELETE FROM portfolio_history WHERE user_id = (SELECT uid FROM _demo_user);
+
 -- Delete wallets
 DELETE FROM wallet WHERE user_id = (SELECT uid FROM _demo_user);
 
@@ -523,6 +526,17 @@ COMMIT;
 --   BTMC SJC     : 1 lượng (37.5g)  bought Dec @ 88M   → avg 2,346,667/g  total 87,999,750 ≈ 88,000,000
 --   PNJ          : 4 lượng (150g)   bought Oct @ 85M   → avg 2,266,667/g  total 340,000,050 ≈ 340,000,000
 -- Current prices (Apr 2026): SJC 110M, Nhẫn 9999 108M, Doji 108M, BTMC 110M, PNJ 108M
+--
+-- Silver VND (type=10): quantity in grams×10000, price in raw VND per gram
+--   1 lượng = 37.5g → quantity per lượng = 375,000
+--   price per gram = luong_price / 37.5
+--   (Apr 2026 market: ~2,800,000 VND/lượng → ~74,667 VND/gram)
+--
+-- Silver holdings:
+--   Phú Quý thỏi 1L  : 10 lượng (375g)  bought @ 2,200,000/L → avg 58,667/g  total 22,000,000
+--   DOJI 99.9 1L      :  5 lượng (187.5g) bought @ 2,400,000/L → avg 64,000/g  total 12,000,000
+--   Ancarat Ngân Long : 20 lượng (750g)  bought @ 2,100,000/L → avg 56,000/g  total 42,000,000
+-- Current prices (Apr 2026): Phú Quý 2,795,000/L=74,533/g, DOJI 2,805,000/L=74,800/g, Ancarat 2,794,000/L=74,507/g
 -- ============================================================================
 
 BEGIN;
@@ -567,7 +581,23 @@ CROSS JOIN (VALUES
     -- BTMC SJC: 1 lượng=37.5g bought @88M now 110M
     ('BTMC',           'SJC BTMC',       8,  375000, 2346667,  88000000, 'VND', false, 2933333, 'gram'),
     -- PNJ: 4 lượng=150g bought @85M now 108M
-    ('PNJ HCM',        'Vàng PNJ',       8, 1500000, 2266667, 340000000, 'VND', false, 2880000, 'gram')
+    ('PNJ HCM',        'Vàng PNJ',       8, 1500000, 2266667, 340000000, 'VND', false, 2880000, 'gram'),
+
+    -- Silver VND (type=10) ---------------------------------------------------
+    -- Phú Quý thỏi 1L: 10 lượng=375g bought @2,200,000/L now 2,795,000/L
+    -- avg_cost = 2,200,000 / 37.5 = 58,667/g  total = 375 * 58,667 = 22,000,125 ≈ 22,000,000
+    -- current_price = 2,795,000 / 37.5 = 74,533/g
+    ('PH_QU_THI_1L',        'Bạc Phú Quý thỏi 1L',   10, 3750000, 58667,  22000000, 'VND', false, 74533, 'gram'),
+
+    -- DOJI 99.9 1L: 5 lượng=187.5g bought @2,400,000/L now 2,805,000/L
+    -- avg_cost = 2,400,000 / 37.5 = 64,000/g  total = 187.5 * 64,000 = 12,000,000
+    -- current_price = 2,805,000 / 37.5 = 74,800/g
+    ('DOJI_99.9_1L',        'Bạc DOJI 99.9 1L',       10, 1875000, 64000,  12000000, 'VND', false, 74800, 'gram'),
+
+    -- Ancarat Ngân Long 1L: 20 lượng=750g bought @2,100,000/L now 2,794,000/L
+    -- avg_cost = 2,100,000 / 37.5 = 56,000/g  total = 750 * 56,000 = 42,000,000
+    -- current_price = 2,794,000 / 37.5 = 74,507/g
+    ('ANCARAT_NGN_LONG_1L', 'Bạc Ancarat Ngân Long 1L', 10, 7500000, 56000, 42000000, 'VND', false, 74507, 'gram')
 ) t(symbol, name, type, quantity, average_cost, total_cost, currency, is_custom, current_price, purchase_unit);
 
 COMMIT;
@@ -724,6 +754,61 @@ SELECT i.id, 750000, 2293333, DATE '2025-12-28', 750000, 172000000, 'VND', NOW()
 
 DROP TABLE temp_gold_ids;
 
+-- ============================================================================
+-- SILVER TRANSACTIONS AND LOTS
+-- ============================================================================
+
+CREATE TEMP TABLE temp_silver_ids AS
+SELECT i.id, i.symbol, w.id AS wallet_id
+FROM investment i
+JOIN wallet w ON i.wallet_id = w.id
+WHERE w.user_id = (SELECT uid FROM _demo_user)
+  AND i.type = 10; -- SILVER_VND
+
+-- Phú Quý thỏi 1L: 2 buy lots
+-- Lot 1: 5 lượng (187.5g) @ 2,000,000/L → 53,333/g  → 2025-08-10
+-- Lot 2: 5 lượng (187.5g) @ 2,400,000/L → 64,000/g  → 2026-01-15
+INSERT INTO investment_transaction (investment_id, user_id, wallet_id, type, quantity, price, cost, currency, transaction_date, remaining_quantity, created_at, updated_at)
+SELECT i.id, (SELECT uid FROM _demo_user), i.wallet_id, 0, 1875000, 53333, 10000000, 'VND', DATE '2025-08-10', 1875000, NOW(), NOW()
+FROM temp_silver_ids i WHERE i.symbol = 'PH_QU_THI_1L';
+
+INSERT INTO investment_transaction (investment_id, user_id, wallet_id, type, quantity, price, cost, currency, transaction_date, remaining_quantity, created_at, updated_at)
+SELECT i.id, (SELECT uid FROM _demo_user), i.wallet_id, 0, 1875000, 64000, 12000000, 'VND', DATE '2026-01-15', 1875000, NOW(), NOW()
+FROM temp_silver_ids i WHERE i.symbol = 'PH_QU_THI_1L';
+
+-- DOJI 99.9 1L: 1 buy lot
+-- 5 lượng (187.5g) @ 2,400,000/L → 64,000/g → 2025-11-05
+INSERT INTO investment_transaction (investment_id, user_id, wallet_id, type, quantity, price, cost, currency, transaction_date, remaining_quantity, created_at, updated_at)
+SELECT i.id, (SELECT uid FROM _demo_user), i.wallet_id, 0, 1875000, 64000, 12000000, 'VND', DATE '2025-11-05', 1875000, NOW(), NOW()
+FROM temp_silver_ids i WHERE i.symbol = 'DOJI_99.9_1L';
+
+-- Ancarat Ngân Long 1L: 2 buy lots
+-- Lot 1: 10 lượng (375g) @ 2,050,000/L → 54,667/g → 2025-07-20
+-- Lot 2: 10 lượng (375g) @ 2,150,000/L → 57,333/g → 2025-12-01
+INSERT INTO investment_transaction (investment_id, user_id, wallet_id, type, quantity, price, cost, currency, transaction_date, remaining_quantity, created_at, updated_at)
+SELECT i.id, (SELECT uid FROM _demo_user), i.wallet_id, 0, 3750000, 54667, 20500000, 'VND', DATE '2025-07-20', 3750000, NOW(), NOW()
+FROM temp_silver_ids i WHERE i.symbol = 'ANCARAT_NGN_LONG_1L';
+
+INSERT INTO investment_transaction (investment_id, user_id, wallet_id, type, quantity, price, cost, currency, transaction_date, remaining_quantity, created_at, updated_at)
+SELECT i.id, (SELECT uid FROM _demo_user), i.wallet_id, 0, 3750000, 57333, 21500000, 'VND', DATE '2025-12-01', 3750000, NOW(), NOW()
+FROM temp_silver_ids i WHERE i.symbol = 'ANCARAT_NGN_LONG_1L';
+
+-- Silver FIFO lots
+INSERT INTO investment_lot (investment_id, quantity, average_cost, purchased_at, remaining_quantity, total_cost, currency, created_at, updated_at)
+SELECT i.id, 1875000, 53333, DATE '2025-08-10', 1875000, 10000000, 'VND', NOW(), NOW() FROM temp_silver_ids i WHERE i.symbol = 'PH_QU_THI_1L';
+INSERT INTO investment_lot (investment_id, quantity, average_cost, purchased_at, remaining_quantity, total_cost, currency, created_at, updated_at)
+SELECT i.id, 1875000, 64000, DATE '2026-01-15', 1875000, 12000000, 'VND', NOW(), NOW() FROM temp_silver_ids i WHERE i.symbol = 'PH_QU_THI_1L';
+
+INSERT INTO investment_lot (investment_id, quantity, average_cost, purchased_at, remaining_quantity, total_cost, currency, created_at, updated_at)
+SELECT i.id, 1875000, 64000, DATE '2025-11-05', 1875000, 12000000, 'VND', NOW(), NOW() FROM temp_silver_ids i WHERE i.symbol = 'DOJI_99.9_1L';
+
+INSERT INTO investment_lot (investment_id, quantity, average_cost, purchased_at, remaining_quantity, total_cost, currency, created_at, updated_at)
+SELECT i.id, 3750000, 54667, DATE '2025-07-20', 3750000, 20500000, 'VND', NOW(), NOW() FROM temp_silver_ids i WHERE i.symbol = 'ANCARAT_NGN_LONG_1L';
+INSERT INTO investment_lot (investment_id, quantity, average_cost, purchased_at, remaining_quantity, total_cost, currency, created_at, updated_at)
+SELECT i.id, 3750000, 57333, DATE '2025-12-01', 3750000, 21500000, 'VND', NOW(), NOW() FROM temp_silver_ids i WHERE i.symbol = 'ANCARAT_NGN_LONG_1L';
+
+DROP TABLE temp_silver_ids;
+
 COMMIT;
 
 -- ============================================================================
@@ -837,3 +922,132 @@ FROM investment i
 WHERE
     w.user_id = (SELECT uid FROM _demo_user)
 ORDER BY i.id;
+
+-- ============================================================================
+-- STEP 9: CREATE PORTFOLIO HISTORY (90 days — for PNL chart)
+-- ============================================================================
+-- Strategy: generate 1 row per day for the investment wallet.
+-- Total cost stays constant (we only bought, no sells).
+-- total_cost = gold 1,419,000,000 + silver 76,000,000 = 1,495,000,000 VND
+--
+-- Gold price trend (VND/lượng): started ~88M in Jan, rose to ~110M by Apr 2026
+-- Silver price trend (VND/lượng): started ~2,100,000 in Jan, rose to ~2,800,000 by Apr
+-- We model both as smooth upward curves with realistic daily noise.
+-- total_value per day = Σ (qty_grams / 37.5 * lượng_price_that_day) for each holding
+--
+-- Simplified daily value = interpolated between anchor points + small noise term.
+-- Anchors (total portfolio market value):
+-- By Jan 1 already holding PNJ(2L), Ancarat(1lot), Phú Quý(1lot), BTMC, Nhẫn SJC(3L)
+-- → ~780M cost, gold up ~8% → ~840M value already in profit
+--   2026-01-01:  840,000,000  (portfolio already in profit, 7.7% gain)
+--   2026-01-15:  980,000,000  (after SJC lot 2 + Phú Quý lot 2 added)
+--   2026-02-08: 1,150,000,000 (after Nhẫn SJC lot 2 added)
+--   2026-03-01: 1,320,000,000 (after Doji gold added)
+--   2026-03-15: 1,450,000,000 (after final SJC lot)
+--   2026-04-01: 1,628,855,076 (current, all positions × current prices)
+-- ============================================================================
+
+BEGIN;
+
+INSERT INTO portfolio_history (user_id, wallet_id, total_value, total_cost, total_pnl, currency, timestamp, created_at, updated_at)
+WITH
+-- Investment wallet id
+inv_wallet AS (
+    SELECT w.id AS wid
+    FROM wallet w
+    WHERE w.user_id = (SELECT uid FROM _demo_user)
+      AND w.wallet_name = 'Danh mục đầu tư'
+),
+-- Generate one row per day for last 90 days (~ Jan 1 → Apr 1 2026)
+days AS (
+    SELECT generate_series(0, 89) AS d
+),
+-- Piecewise-linear interpolation + deterministic noise
+-- Anchor total_values at key dates (day 0 = 2026-01-01)
+anchors(day_offset, value) AS (
+    VALUES
+        (0,   840000000),    -- 2026-01-01
+        (14,  980000000),    -- 2026-01-15
+        (38,  1150000000),   -- 2026-02-08
+        (59,  1320000000),   -- 2026-03-01
+        (73,  1450000000),   -- 2026-03-15
+        (90,  1628855076)    -- 2026-04-01 (current)
+),
+-- Map each generated day to calendar date (origin = 2025-10-03, so day 0 = that date,
+-- and day 89 = 2026-01-01 ... actually let's use origin = 2025-12-31 so day 89 = 2026-03-30)
+-- Simpler: day 0 = 2026-01-01, generate 90 days forward to 2026-04-01
+dated AS (
+    SELECT
+        d,
+        DATE '2026-01-01' + d * INTERVAL '1 day' AS ts
+    FROM days
+),
+-- Interpolate value between the two nearest anchors
+interpolated AS (
+    SELECT
+        d.d,
+        d.ts,
+        (
+            SELECT
+                a1.value + (a2.value - a1.value)::float
+                    * (d.d - a1.day_offset)::float
+                    / NULLIF((a2.day_offset - a1.day_offset)::float, 0)
+            FROM anchors a1
+            JOIN anchors a2 ON a2.day_offset = (
+                SELECT MIN(day_offset) FROM anchors WHERE day_offset > a1.day_offset
+            )
+            WHERE a1.day_offset <= d.d
+              AND a2.day_offset >  d.d
+            ORDER BY a1.day_offset DESC
+            LIMIT 1
+        ) AS base_value
+    FROM dated d
+),
+-- Add deterministic daily noise (±0.4% using sine wave to look natural)
+with_noise AS (
+    SELECT
+        d,
+        ts,
+        COALESCE(base_value, 1628855076) AS base_value,
+        COALESCE(base_value, 1628855076)
+            * (1 + 0.004 * SIN(d * 2.3)) AS noisy_value
+    FROM interpolated
+)
+-- Cumulative cost: grows as each lot is purchased (day offsets from 2026-01-01)
+-- day  0 (Jan 01): existing lots = PNJ 2L + Ancarat + Phú Quý lot1 + BTMC + Nhẫn SJC 3L + SJC lot1 = ~780M
+-- day 10 (Jan 10): + SJC lot2 106M → 886M
+-- day 14 (Jan 15): + Phú Quý lot2 12M → 898M
+-- day 38 (Feb 08): + Nhẫn SJC lot2 202M → 1100M
+-- day 59 (Mar 01): + Doji gold 192M + DOJI silver 12M → 1304M
+-- day 73 (Mar 15): + SJC lot3 113M + PNJ lot2 172M = 285M → 1495M (final)
+SELECT
+    (SELECT uid FROM _demo_user),
+    (SELECT wid FROM inv_wallet),
+    noisy_value::bigint AS total_value,
+    CASE
+        WHEN d <  10 THEN  780000000
+        WHEN d <  14 THEN  886000000
+        WHEN d <  38 THEN  898000000
+        WHEN d <  59 THEN 1100000000
+        WHEN d <  73 THEN 1304000000
+        ELSE               1495000000
+    END AS total_cost,
+    (noisy_value - CASE
+        WHEN d <  10 THEN  780000000
+        WHEN d <  14 THEN  886000000
+        WHEN d <  38 THEN  898000000
+        WHEN d <  59 THEN 1100000000
+        WHEN d <  73 THEN 1304000000
+        ELSE               1495000000
+    END)::bigint AS total_pnl,
+    'VND',
+    ts + INTERVAL '17 hours',
+    NOW(),
+    NOW()
+FROM with_noise
+WHERE base_value IS NOT NULL
+ORDER BY ts;
+
+COMMIT;
+
+SELECT 'Portfolio History', COUNT(*) FROM portfolio_history WHERE user_id = (SELECT uid FROM _demo_user);
