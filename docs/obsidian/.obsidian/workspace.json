@@ -11,21 +11,14 @@
             "id": "b114d52973a28f85",
             "type": "leaf",
             "state": {
-              "type": "kanban",
+              "type": "markdown",
               "state": {
-                "file": "Kanban Board.md",
-                "kanbanViewState": {
-                  "kanban-plugin": "board",
-                  "list-collapse": [
-                    false,
-                    false,
-                    false,
-                    false
-                  ]
-                }
+                "file": "Terms & Privacy.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-trello",
-              "title": "Kanban Board"
+              "icon": "lucide-file",
+              "title": "Terms & Privacy"
             }
           }
         ]
@@ -101,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Kanban Board.md",
+                "file": "Terms & Privacy.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -111,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Kanban Board"
+              "title": "Backlinks for Terms & Privacy"
             }
           },
           {
@@ -120,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Kanban Board.md",
+                "file": "Terms & Privacy.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from Kanban Board"
+              "title": "Outgoing links from Terms & Privacy"
             }
           },
           {
@@ -163,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Kanban Board.md",
+                "file": "Terms & Privacy.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of Kanban Board"
+              "title": "Outline of Terms & Privacy"
             }
           }
         ]
@@ -193,12 +186,14 @@
   },
   "active": "b114d52973a28f85",
   "lastOpenFiles": [
-    "Fix auto open popup.md",
     "Kanban Board.md",
+    "Improve all tab selection overload on mobile view.md",
     "Add button group to finance page.md",
+    "Terms & Privacy.md",
+    "pictures/price_alert.png",
+    "Fix auto open popup.md",
     "Fix user price alert in Vietnamese.md",
     "Fix user price alert in Vietnamese 1.md",
-    "pictures/price_alert.png",
     "pictures",
     "Cancel Google connection.md"
   ]
