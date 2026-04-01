@@ -72,8 +72,8 @@ func (c *Client) FetchGoldPrices(ctx context.Context) ([]*GoldPrice, error) {
 
 // parseHTML extracts gold price rows from an HTML string.
 // Each <tr> must contain at least 3 <td> cells: name, buy, sell.
-// Prices are in "nghìn/chỉ" (thousands per mace); multiply by 1,000,000
-// to convert to VND per lượng (tael).
+// Prices are in VND per mace (chỉ); multiply by 10 to convert to VND per
+// lượng (tael), since 1 lượng = 10 chỉ.
 func parseHTML(html string) []*GoldPrice {
 	var results []*GoldPrice
 	seen := make(map[string]bool)
@@ -117,8 +117,8 @@ func parseHTML(html string) []*GoldPrice {
 	return results
 }
 
-// parsePrice converts a price string in nghìn/chỉ (thousands per mace) to
-// VND per lượng (tael) by multiplying by 1,000,000.
+// parsePrice converts a price string in VND per mace (chỉ) to VND per
+// lượng (tael) by multiplying by 10 (1 lượng = 10 chỉ).
 // Returns 0 for empty, dash, "N/A", or unparseable inputs.
 // Negative values are treated as 0.
 func parsePrice(s string) int64 {
@@ -134,5 +134,5 @@ func parsePrice(s string) int64 {
 	if v <= 0 {
 		return 0
 	}
-	return int64(v) * 1_000_000
+	return int64(v) * 10
 }
