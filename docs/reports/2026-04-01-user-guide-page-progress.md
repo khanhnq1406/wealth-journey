@@ -8,7 +8,7 @@
 - **Started:** 2026-04-01T00:00:00Z
 - **Last updated:** 2026-04-01T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 9
+- **Current task:** 10
 
 ## Task Progress
 
@@ -20,10 +20,10 @@
 | 3   | Create Guide Page Layout with SEO Metadata       | done    | ed28ac6b | Created layout.tsx with generateMetadata, HowTo JSON-LD, canonical/alternates |
 | 4   | Create GuideTOC Component                        | done    | ed28ac6b | Created GuideTOC with dual-render CSS responsive, scroll-spy, v2 tokens |
 | 5   | Create GuideSection Component                    | done    | ed28ac6b | Created GuideSection with h2/h3 variants, OrnateHeading, OrnateDivider, anchor id |
-| 6   | Create GuideContent Client Component + page.tsx  | done    | —      | Created GuideContent with IntersectionObserver scroll spy, all 15 sections, CTA |
-| 7   | Add Guide Link to Landing Page Navbar            | done    | —      | Added Guide link to desktop nav and mobile menu in LandingNavbar.tsx |
-| 8   | Add Guide Link to Dashboard Sidebar              | done    | —      | Added Guide link (BookOpen icon) to desktop sidebar and mobile slide-out |
-| 9   | Frontend Lint & Build Verification               | pending | —      | —       |
+| 6   | Create GuideContent Client Component + page.tsx  | done    | 1c55dd9b | Created GuideContent with IntersectionObserver scroll spy, all 15 sections, CTA |
+| 7   | Add Guide Link to Landing Page Navbar            | done    | 1c55dd9b | Added Guide link to desktop nav and mobile menu in LandingNavbar.tsx |
+| 8   | Add Guide Link to Dashboard Sidebar              | done    | 1c55dd9b | Added Guide link (BookOpen icon) to desktop sidebar and mobile slide-out |
+| 9   | Frontend Lint & Build Verification               | done    | —      | 0 lint errors, 673 tests pass, Next.js build succeeds with /[locale]/guide route |
 | 10  | Playwright E2E Test for Guide Page               | pending | —      | —       |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
