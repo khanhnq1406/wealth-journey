@@ -15,11 +15,10 @@ type GoldPrice struct {
 }
 
 // SJC API response structures (unexported — internal parsing only)
+// As of 2026-04, the SJC API changed from {"DataList":{"Data":[...]}} to {"data":[...]}.
 
 type apiResponse struct {
-	DataList struct {
-		Data []apiRow `json:"Data"`
-	} `json:"DataList"`
+	Data []apiRow `json:"data"`
 }
 
 type apiRow struct {

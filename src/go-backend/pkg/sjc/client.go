@@ -70,7 +70,7 @@ func (c *Client) FetchGoldPrices(ctx context.Context) ([]*GoldPrice, error) {
 
 	var results []*GoldPrice
 	seen := make(map[string]bool)
-	for _, row := range apiResp.DataList.Data {
+	for _, row := range apiResp.Data {
 		buy := int64(row.BuyValue)
 		sell := int64(row.SellValue)
 		if buy <= 0 && sell <= 0 {

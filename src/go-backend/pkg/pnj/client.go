@@ -130,16 +130,19 @@ func selectRegion(regions []apiRegion) *apiRegion {
 	return nil
 }
 
-// parsePrice parses a PNJ price string such as "173,500" (nghìn VND per lượng).
+// parsePrice parses a PNJ price string in nghìn VND (thousands of VND) per lượng.
 //
-// The string may contain commas as thousand separators. After stripping commas
-// and whitespace the value is parsed as a float64. Non-positive values return 0.
+// The string may use commas or dots as thousand separators (PNJ switched from
+// comma to dot separators as of 2026-04, e.g. "176.700" = 176,700 nghìn VND).
+// After stripping separators and whitespace the value is parsed as a float64.
+// Non-positive values return 0.
 //
 // The parsed value is multiplied by 1000 to convert from nghìn VND to full VND,
 // consistent with the price scale used by other adapters (SJC, BTMC) in this codebase.
 func parsePrice(s string) int64 {
 	s = strings.TrimSpace(s)
 	s = strings.ReplaceAll(s, ",", "")
+	s = strings.ReplaceAll(s, ".", "")
 	if s == "" || s == "0" {
 		return 0
 	}
