@@ -1,223 +1,225 @@
 {
-  "title": "Hướng dẫn sử dụng",
-  "subtitle": "Tìm hiểu cách sử dụng congdongvang.com để quản lý tài chính và đầu tư hiệu quả.",
-  "toc": {
-    "homepage": "Trang chủ",
-    "netWorth": "Tài sản ròng",
-    "wallets": "Quản lý ví",
-    "priceTables": "Bảng giá thị trường",
-    "pnlTracking": "Theo dõi lãi/lỗ",
-    "investment": "Danh mục đầu tư",
-    "addingInvestments": "Thêm khoản đầu tư",
-    "transactionTypes": "Loại giao dịch",
-    "fifoAccounting": "Kế toán FIFO",
-    "goldSilver": "Vàng & Bạc",
-    "priceAlerts": "Cảnh báo giá",
-    "community": "Diễn đàn",
-    "creatingPosts": "Tạo bài viết",
-    "interactions": "Tương tác",
-    "sentimentVoting": "Bình chọn xu hướng"
-  },
-  "homepage": {
-    "title": "Trang chủ Dashboard",
-    "description": "Trang chủ dashboard cung cấp cái nhìn tổng quan về toàn bộ tình hình tài chính của bạn — từ tài sản ròng, số dư ví đến bảng giá thị trường và theo dõi lãi/lỗ đầu tư.",
-    "netWorth": {
-      "title": "Tài sản ròng",
-      "description": "Thẻ tài sản ròng ở đầu trang hiển thị tổng giá trị tất cả các ví của bạn được quy về một đơn vị tiền tệ. Số liệu này được cập nhật tự động mỗi khi bạn thêm hoặc sửa giao dịch.",
-      "tip": "Bấm vào thẻ tài sản ròng để xem phân tích chi tiết theo từng ví và danh mục tài sản."
+  "guide": {
+    "title": "Hướng dẫn sử dụng",
+    "subtitle": "Tìm hiểu cách sử dụng congdongvang.com để quản lý tài chính và đầu tư hiệu quả.",
+    "toc": {
+      "homepage": "Trang chủ",
+      "netWorth": "Tài sản ròng",
+      "wallets": "Quản lý ví",
+      "priceTables": "Bảng giá thị trường",
+      "pnlTracking": "Theo dõi lãi/lỗ",
+      "investment": "Danh mục đầu tư",
+      "addingInvestments": "Thêm khoản đầu tư",
+      "transactionTypes": "Loại giao dịch",
+      "fifoAccounting": "Kế toán FIFO",
+      "goldSilver": "Vàng & Bạc",
+      "priceAlerts": "Cảnh báo giá",
+      "community": "Diễn đàn",
+      "creatingPosts": "Tạo bài viết",
+      "interactions": "Tương tác",
+      "sentimentVoting": "Bình chọn xu hướng"
     },
-    "wallets": {
-      "title": "Quản lý ví",
-      "description": "Ví là đơn vị cơ bản để tổ chức tài sản. Bạn có thể tạo nhiều ví cho các mục đích khác nhau: tiền mặt, tài khoản ngân hàng, ví đầu tư v.v.",
-      "createWallet": {
-        "title": "Tạo ví mới",
-        "steps": [
-          "Bấm nút '+' hoặc 'Thêm ví' trên trang Ví.",
-          "Chọn loại ví: CƠ BẢN (để theo dõi chi tiêu) hoặc ĐẦU TƯ (để theo dõi danh mục đầu tư).",
-          "Nhập tên ví và số dư ban đầu.",
-          "Chọn đơn vị tiền tệ (VND, USD, EUR, ...).",
-          "Bấm 'Lưu' để tạo ví."
-        ]
+    "homepage": {
+      "title": "Trang chủ Dashboard",
+      "description": "Trang chủ dashboard cung cấp cái nhìn tổng quan về toàn bộ tình hình tài chính của bạn — từ tài sản ròng, số dư ví đến bảng giá thị trường và theo dõi lãi/lỗ đầu tư.",
+      "netWorth": {
+        "title": "Tài sản ròng",
+        "description": "Thẻ tài sản ròng ở đầu trang hiển thị tổng giá trị tất cả các ví của bạn được quy về một đơn vị tiền tệ. Số liệu này được cập nhật tự động mỗi khi bạn thêm hoặc sửa giao dịch.",
+        "tip": "Bấm vào thẻ tài sản ròng để xem phân tích chi tiết theo từng ví và danh mục tài sản."
       },
-      "transferMoney": {
-        "title": "Chuyển tiền giữa các ví",
-        "steps": [
-          "Trên trang Ví, bấm nút 'Chuyển tiền'.",
-          "Chọn ví nguồn và ví đích.",
-          "Nhập số tiền cần chuyển.",
-          "Hệ thống tự động tạo hai giao dịch đối nhau để giữ nguyên số dư tổng.",
-          "Bấm 'Xác nhận' để hoàn tất."
-        ]
+      "wallets": {
+        "title": "Quản lý ví",
+        "description": "Ví là đơn vị cơ bản để tổ chức tài sản. Bạn có thể tạo nhiều ví cho các mục đích khác nhau: tiền mặt, tài khoản ngân hàng, ví đầu tư v.v.",
+        "createWallet": {
+          "title": "Tạo ví mới",
+          "steps": [
+            "Bấm nút '+' hoặc 'Thêm ví' trên trang Ví.",
+            "Chọn loại ví: CƠ BẢN (để theo dõi chi tiêu) hoặc ĐẦU TƯ (để theo dõi danh mục đầu tư).",
+            "Nhập tên ví và số dư ban đầu.",
+            "Chọn đơn vị tiền tệ (VND, USD, EUR, ...).",
+            "Bấm 'Lưu' để tạo ví."
+          ]
+        },
+        "transferMoney": {
+          "title": "Chuyển tiền giữa các ví",
+          "steps": [
+            "Trên trang Ví, bấm nút 'Chuyển tiền'.",
+            "Chọn ví nguồn và ví đích.",
+            "Nhập số tiền cần chuyển.",
+            "Hệ thống tự động tạo hai giao dịch đối nhau để giữ nguyên số dư tổng.",
+            "Bấm 'Xác nhận' để hoàn tất."
+          ]
+        },
+        "tip": "Nên tạo một ví ĐẦU TƯ riêng cho mỗi nhóm tài sản (cổ phiếu, vàng) để dễ theo dõi hiệu suất từng nhóm."
       },
-      "tip": "Nên tạo một ví ĐẦU TƯ riêng cho mỗi nhóm tài sản (cổ phiếu, vàng) để dễ theo dõi hiệu suất từng nhóm."
-    },
-    "priceTables": {
-      "title": "Bảng giá thị trường",
-      "description": "Trang chủ hiển thị bảng giá vàng, bạc và ngoại tệ được cập nhật tự động từ nhiều nguồn uy tín (SJC, DOJI, PNJ, Vietcombank...). Giá được làm mới mỗi 15 phút.",
-      "goldTable": "Bảng giá vàng hiển thị giá mua/bán của từng loại vàng (SJC, DOJI, PNJ...) theo đơn vị nghìn đồng/lượng.",
-      "silverTable": "Bảng giá bạc hiển thị giá mua/bán theo đơn vị nghìn đồng/lượng.",
-      "currencyTable": "Bảng ngoại tệ hiển thị tỷ giá USD, EUR, và các đồng tiền khác từ thị trường tự do và Vietcombank.",
-      "staleIndicator": "Giá hiển thị dấu '--' khi nguồn dữ liệu bị lỗi tạm thời. Hệ thống sẽ tự động khôi phục khi nguồn hoạt động trở lại.",
-      "tip": "Bấm vào tab 'Vàng', 'Bạc' hoặc 'Ngoại tệ' để chuyển đổi giữa các bảng giá."
-    },
-    "pnlTracking": {
-      "title": "Theo dõi lãi/lỗ (PNL)",
-      "description": "Thẻ PNL trên trang chủ cho thấy tổng lãi/lỗ chưa thực hiện của toàn bộ danh mục đầu tư theo thời gian thực.",
-      "unrealized": "Lãi/lỗ chưa thực hiện là sự chênh lệch giữa giá thị trường hiện tại và giá vốn bình quân của các khoản đầu tư bạn đang nắm giữ.",
-      "realized": "Lãi/lỗ đã thực hiện là lợi nhuận/lỗ khi bạn đã bán một phần hoặc toàn bộ khoản đầu tư.",
-      "tip": "Màu xanh nghĩa là đang lãi, màu đỏ nghĩa là đang lỗ so với giá vốn."
-    }
-  },
-  "investment": {
-    "title": "Danh mục đầu tư",
-    "description": "Trang Portfolio giúp bạn theo dõi tất cả khoản đầu tư trong một giao diện thống nhất — cổ phiếu, ETF, tiền điện tử, vàng, bạc và các tài sản tùy chỉnh.",
-    "addingInvestments": {
-      "title": "Thêm khoản đầu tư",
-      "description": "Để thêm một khoản đầu tư, bạn cần có ít nhất một ví loại ĐẦU TƯ.",
-      "steps": [
-        "Chọn ví đầu tư từ danh sách ví.",
-        "Bấm nút 'Thêm đầu tư' hoặc dấu '+'.",
-        "Tìm kiếm mã chứng khoán (vd: VCB, BTC-USD, AAPL) hoặc nhập thủ công.",
-        "Điền số lượng, giá mua và ngày giao dịch.",
-        "Bấm 'Lưu' để ghi nhận khoản đầu tư."
-      ],
-      "symbolSearch": {
-        "title": "Tìm kiếm mã chứng khoán",
-        "description": "Nhập ít nhất 2 ký tự vào ô tìm kiếm, hệ thống sẽ hiển thị gợi ý từ Yahoo Finance. Gợi ý bao gồm mã, tên công ty, sàn giao dịch và loại tài sản.",
-        "tip": "Tìm kiếm hỗ trợ cổ phiếu Việt Nam (HOSE, HNX), cổ phiếu quốc tế, ETF, và tiền điện tử."
+      "priceTables": {
+        "title": "Bảng giá thị trường",
+        "description": "Trang chủ hiển thị bảng giá vàng, bạc và ngoại tệ được cập nhật tự động từ nhiều nguồn uy tín (SJC, DOJI, PNJ, Vietcombank...). Giá được làm mới mỗi 15 phút.",
+        "goldTable": "Bảng giá vàng hiển thị giá mua/bán của từng loại vàng (SJC, DOJI, PNJ...) theo đơn vị nghìn đồng/lượng.",
+        "silverTable": "Bảng giá bạc hiển thị giá mua/bán theo đơn vị nghìn đồng/lượng.",
+        "currencyTable": "Bảng ngoại tệ hiển thị tỷ giá USD, EUR, và các đồng tiền khác từ thị trường tự do và Vietcombank.",
+        "staleIndicator": "Giá hiển thị dấu '--' khi nguồn dữ liệu bị lỗi tạm thời. Hệ thống sẽ tự động khôi phục khi nguồn hoạt động trở lại.",
+        "tip": "Bấm vào tab 'Vàng', 'Bạc' hoặc 'Ngoại tệ' để chuyển đổi giữa các bảng giá."
       },
-      "customInvestments": {
-        "title": "Tài sản tùy chỉnh",
-        "description": "Với các tài sản không có trên thị trường (bất động sản, góp vốn...), bạn có thể tạo 'tài sản tùy chỉnh'. Chọn 'Tùy chỉnh' khi thêm đầu tư, nhập tên và giá trị hiện tại thủ công.",
-        "tip": "Bạn có thể cập nhật giá thủ công bất kỳ lúc nào trong tab 'Cập nhật giá' của khoản đầu tư."
+      "pnlTracking": {
+        "title": "Theo dõi lãi/lỗ (PNL)",
+        "description": "Thẻ PNL trên trang chủ cho thấy tổng lãi/lỗ chưa thực hiện của toàn bộ danh mục đầu tư theo thời gian thực.",
+        "unrealized": "Lãi/lỗ chưa thực hiện là sự chênh lệch giữa giá thị trường hiện tại và giá vốn bình quân của các khoản đầu tư bạn đang nắm giữ.",
+        "realized": "Lãi/lỗ đã thực hiện là lợi nhuận/lỗ khi bạn đã bán một phần hoặc toàn bộ khoản đầu tư.",
+        "tip": "Màu xanh nghĩa là đang lãi, màu đỏ nghĩa là đang lỗ so với giá vốn."
       }
     },
-    "transactionTypes": {
-      "title": "Loại giao dịch đầu tư",
-      "description": "Mỗi khoản đầu tư hỗ trợ ba loại giao dịch:",
-      "buy": {
-        "title": "Mua (Buy)",
-        "description": "Ghi nhận việc mua thêm. Hệ thống tạo một 'lô mua' mới với giá và số lượng tương ứng, dùng để tính giá vốn FIFO."
-      },
-      "sell": {
-        "title": "Bán (Sell)",
-        "description": "Ghi nhận việc bán. Hệ thống áp dụng phương pháp FIFO để xác định giá vốn của số đơn vị bán ra và tính lãi/lỗ đã thực hiện."
-      },
-      "dividend": {
-        "title": "Cổ tức (Dividend)",
-        "description": "Ghi nhận cổ tức nhận được. Không ảnh hưởng đến số lượng đang nắm giữ nhưng được tính vào tổng thu nhập."
-      },
-      "tip": "Bấm vào một khoản đầu tư rồi chọn tab 'Giao dịch' để xem lịch sử và thêm giao dịch mới."
-    },
-    "fifoAccounting": {
-      "title": "Kế toán FIFO (Nhập trước — Xuất trước)",
-      "description": "Hệ thống sử dụng phương pháp FIFO để tính giá vốn khi bán. Điều này có nghĩa là các đơn vị mua trước sẽ được tính là bán trước.",
-      "example": {
-        "title": "Ví dụ minh họa",
-        "description": "Giả sử bạn mua 100 cổ phiếu VCB ở 85.000đ, sau đó mua thêm 50 cổ phiếu ở 90.000đ. Khi bán 80 cổ phiếu, hệ thống tính giá vốn là 80 × 85.000đ = 6.800.000đ (lấy từ lô mua đầu tiên theo FIFO)."
-      },
-      "benefits": [
-        "Phản ánh chính xác lịch sử mua bán.",
-        "Tính lãi/lỗ đã thực hiện chính xác theo từng lô.",
-        "Theo dõi số lượng còn lại và giá vốn bình quân hiện tại."
-      ]
-    },
-    "goldSilver": {
-      "title": "Đầu tư vàng & bạc",
-      "description": "congdongvang.com hỗ trợ chuyên biệt cho đầu tư vàng và bạc với chuyển đổi đơn vị tự động.",
-      "goldVnd": {
-        "title": "Vàng Việt Nam (VND)",
-        "description": "Hỗ trợ các loại vàng SJC (SJL1L10, SJL1C, SJR2...). Số lượng được lưu bằng gram, nhưng giao diện hiển thị theo đơn vị chỉ (lượng). 1 lượng = 37,5 gram."
-      },
-      "goldUsd": {
-        "title": "Vàng thế giới (USD)",
-        "description": "Theo dõi vàng XAU theo giá quốc tế tính bằng USD/ounce. Hệ thống tự động cập nhật giá từ Yahoo Finance."
-      },
-      "silverVnd": {
-        "title": "Bạc (VND)",
-        "description": "Tương tự vàng VND, bạc Việt Nam được theo dõi theo đơn vị chỉ với giá từ các nguồn trong nước."
-      },
-      "tip": "Khi nhập số lượng vàng VND, hãy nhập theo đơn vị chỉ (lượng). Hệ thống tự động chuyển đổi sang gram khi lưu."
-    },
-    "priceAlerts": {
-      "title": "Cảnh báo giá",
-      "description": "Tính năng cảnh báo giá giúp bạn nhận thông báo khi giá tài sản đạt ngưỡng bạn đặt ra.",
-      "setup": {
-        "title": "Thiết lập cảnh báo",
+    "investment": {
+      "title": "Danh mục đầu tư",
+      "description": "Trang Portfolio giúp bạn theo dõi tất cả khoản đầu tư trong một giao diện thống nhất — cổ phiếu, ETF, tiền điện tử, vàng, bạc và các tài sản tùy chỉnh.",
+      "addingInvestments": {
+        "title": "Thêm khoản đầu tư",
+        "description": "Để thêm một khoản đầu tư, bạn cần có ít nhất một ví loại ĐẦU TƯ.",
         "steps": [
-          "Vào Cài đặt → Cảnh báo giá.",
-          "Bấm 'Tạo cảnh báo mới'.",
-          "Chọn tài sản cần theo dõi.",
-          "Đặt ngưỡng giá (cao hơn hoặc thấp hơn).",
-          "Kích hoạt cảnh báo."
+          "Chọn ví đầu tư từ danh sách ví.",
+          "Bấm nút 'Thêm đầu tư' hoặc dấu '+'.",
+          "Tìm kiếm mã chứng khoán (vd: VCB, BTC-USD, AAPL) hoặc nhập thủ công.",
+          "Điền số lượng, giá mua và ngày giao dịch.",
+          "Bấm 'Lưu' để ghi nhận khoản đầu tư."
+        ],
+        "symbolSearch": {
+          "title": "Tìm kiếm mã chứng khoán",
+          "description": "Nhập ít nhất 2 ký tự vào ô tìm kiếm, hệ thống sẽ hiển thị gợi ý từ Yahoo Finance. Gợi ý bao gồm mã, tên công ty, sàn giao dịch và loại tài sản.",
+          "tip": "Tìm kiếm hỗ trợ cổ phiếu Việt Nam (HOSE, HNX), cổ phiếu quốc tế, ETF, và tiền điện tử."
+        },
+        "customInvestments": {
+          "title": "Tài sản tùy chỉnh",
+          "description": "Với các tài sản không có trên thị trường (bất động sản, góp vốn...), bạn có thể tạo 'tài sản tùy chỉnh'. Chọn 'Tùy chỉnh' khi thêm đầu tư, nhập tên và giá trị hiện tại thủ công.",
+          "tip": "Bạn có thể cập nhật giá thủ công bất kỳ lúc nào trong tab 'Cập nhật giá' của khoản đầu tư."
+        }
+      },
+      "transactionTypes": {
+        "title": "Loại giao dịch đầu tư",
+        "description": "Mỗi khoản đầu tư hỗ trợ ba loại giao dịch:",
+        "buy": {
+          "title": "Mua (Buy)",
+          "description": "Ghi nhận việc mua thêm. Hệ thống tạo một 'lô mua' mới với giá và số lượng tương ứng, dùng để tính giá vốn FIFO."
+        },
+        "sell": {
+          "title": "Bán (Sell)",
+          "description": "Ghi nhận việc bán. Hệ thống áp dụng phương pháp FIFO để xác định giá vốn của số đơn vị bán ra và tính lãi/lỗ đã thực hiện."
+        },
+        "dividend": {
+          "title": "Cổ tức (Dividend)",
+          "description": "Ghi nhận cổ tức nhận được. Không ảnh hưởng đến số lượng đang nắm giữ nhưng được tính vào tổng thu nhập."
+        },
+        "tip": "Bấm vào một khoản đầu tư rồi chọn tab 'Giao dịch' để xem lịch sử và thêm giao dịch mới."
+      },
+      "fifoAccounting": {
+        "title": "Kế toán FIFO (Nhập trước — Xuất trước)",
+        "description": "Hệ thống sử dụng phương pháp FIFO để tính giá vốn khi bán. Điều này có nghĩa là các đơn vị mua trước sẽ được tính là bán trước.",
+        "example": {
+          "title": "Ví dụ minh họa",
+          "description": "Giả sử bạn mua 100 cổ phiếu VCB ở 85.000đ, sau đó mua thêm 50 cổ phiếu ở 90.000đ. Khi bán 80 cổ phiếu, hệ thống tính giá vốn là 80 × 85.000đ = 6.800.000đ (lấy từ lô mua đầu tiên theo FIFO)."
+        },
+        "benefits": [
+          "Phản ánh chính xác lịch sử mua bán.",
+          "Tính lãi/lỗ đã thực hiện chính xác theo từng lô.",
+          "Theo dõi số lượng còn lại và giá vốn bình quân hiện tại."
         ]
       },
-      "status": {
-        "active": "Đang hoạt động — hệ thống đang theo dõi.",
-        "triggered": "Đã kích hoạt — giá đã đạt ngưỡng, thông báo đã được gửi.",
-        "paused": "Tạm dừng — cảnh báo không hoạt động cho đến khi bạn kích hoạt lại."
+      "goldSilver": {
+        "title": "Đầu tư vàng & bạc",
+        "description": "congdongvang.com hỗ trợ chuyên biệt cho đầu tư vàng và bạc với chuyển đổi đơn vị tự động.",
+        "goldVnd": {
+          "title": "Vàng Việt Nam (VND)",
+          "description": "Hỗ trợ các loại vàng SJC (SJL1L10, SJL1C, SJR2...). Số lượng được lưu bằng gram, nhưng giao diện hiển thị theo đơn vị chỉ (lượng). 1 lượng = 37,5 gram."
+        },
+        "goldUsd": {
+          "title": "Vàng thế giới (USD)",
+          "description": "Theo dõi vàng XAU theo giá quốc tế tính bằng USD/ounce. Hệ thống tự động cập nhật giá từ Yahoo Finance."
+        },
+        "silverVnd": {
+          "title": "Bạc (VND)",
+          "description": "Tương tự vàng VND, bạc Việt Nam được theo dõi theo đơn vị chỉ với giá từ các nguồn trong nước."
+        },
+        "tip": "Khi nhập số lượng vàng VND, hãy nhập theo đơn vị chỉ (lượng). Hệ thống tự động chuyển đổi sang gram khi lưu."
       },
-      "tip": "Bạn có thể tạm dừng cảnh báo mà không cần xóa để dùng lại sau."
-    }
-  },
-  "community": {
-    "title": "Diễn đàn cộng đồng",
-    "description": "Trang Diễn đàn là nơi để bạn chia sẻ nhận định thị trường, thảo luận về đầu tư và kết nối với cộng đồng nhà đầu tư.",
-    "creatingPosts": {
-      "title": "Tạo bài viết",
-      "description": "Chia sẻ phân tích, tin tức hoặc kinh nghiệm đầu tư với cộng đồng.",
-      "steps": [
-        "Bấm nút 'Tạo bài viết' trên trang Diễn đàn.",
-        "Nhập nội dung bài viết (hỗ trợ văn bản thuần).",
-        "Thêm hashtag để phân loại bài viết (vd: #vàng, #cổphiếu).",
-        "Bấm 'Đăng bài' để xuất bản."
-      ],
-      "hashtags": {
-        "title": "Hashtag",
-        "description": "Dùng hashtag để phân loại bài viết và giúp người khác tìm thấy nội dung liên quan. Bấm vào một hashtag để lọc tất cả bài viết có hashtag đó."
-      },
-      "tip": "Bài viết chất lượng cao với phân tích cụ thể sẽ nhận được nhiều lượt tương tác hơn."
+      "priceAlerts": {
+        "title": "Cảnh báo giá",
+        "description": "Tính năng cảnh báo giá giúp bạn nhận thông báo khi giá tài sản đạt ngưỡng bạn đặt ra.",
+        "setup": {
+          "title": "Thiết lập cảnh báo",
+          "steps": [
+            "Vào Cài đặt → Cảnh báo giá.",
+            "Bấm 'Tạo cảnh báo mới'.",
+            "Chọn tài sản cần theo dõi.",
+            "Đặt ngưỡng giá (cao hơn hoặc thấp hơn).",
+            "Kích hoạt cảnh báo."
+          ]
+        },
+        "status": {
+          "active": "Đang hoạt động — hệ thống đang theo dõi.",
+          "triggered": "Đã kích hoạt — giá đã đạt ngưỡng, thông báo đã được gửi.",
+          "paused": "Tạm dừng — cảnh báo không hoạt động cho đến khi bạn kích hoạt lại."
+        },
+        "tip": "Bạn có thể tạm dừng cảnh báo mà không cần xóa để dùng lại sau."
+      }
     },
-    "interactions": {
-      "title": "Tương tác cộng đồng",
-      "description": "Tương tác với cộng đồng qua nhiều hình thức:",
-      "commenting": {
-        "title": "Bình luận",
-        "description": "Bấm vào bài viết để xem chi tiết và bình luận. Bình luận hỗ trợ văn bản thuần và được sắp xếp theo thời gian."
-      },
-      "liking": {
-        "title": "Thích bài viết",
-        "description": "Bấm biểu tượng tim để thích một bài viết. Số lượt thích hiển thị công khai trên mỗi bài."
-      },
-      "following": {
-        "title": "Theo dõi người dùng",
-        "description": "Bấm 'Theo dõi' trên trang hồ sơ để theo dõi các nhà đầu tư bạn quan tâm. Feed của bạn sẽ ưu tiên hiển thị bài viết từ những người bạn theo dõi."
-      },
-      "savedPosts": {
-        "title": "Lưu bài viết",
-        "description": "Bấm biểu tượng bookmark để lưu bài viết quan trọng. Xem lại bài đã lưu trong trang hồ sơ của bạn."
-      },
-      "tip": "Theo dõi các nhà đầu tư kinh nghiệm để nhận thông báo khi họ đăng bài mới."
-    },
-    "sentimentVoting": {
-      "title": "Bình chọn xu hướng thị trường",
-      "description": "Tính năng bình chọn xu hướng cho phép cộng đồng thể hiện quan điểm về chiều hướng giá vàng và bạc.",
-      "howToVote": {
-        "title": "Cách bình chọn",
+    "community": {
+      "title": "Diễn đàn cộng đồng",
+      "description": "Trang Diễn đàn là nơi để bạn chia sẻ nhận định thị trường, thảo luận về đầu tư và kết nối với cộng đồng nhà đầu tư.",
+      "creatingPosts": {
+        "title": "Tạo bài viết",
+        "description": "Chia sẻ phân tích, tin tức hoặc kinh nghiệm đầu tư với cộng đồng.",
         "steps": [
-          "Trên trang Diễn đàn, tìm khu vực 'Xu hướng thị trường'.",
-          "Chọn 'Tăng' (Bull) nếu bạn dự đoán giá sẽ tăng.",
-          "Chọn 'Giảm' (Bear) nếu bạn dự đoán giá sẽ giảm.",
-          "Kết quả bình chọn tổng hợp của cộng đồng được hiển thị theo thời gian thực."
-        ]
+          "Bấm nút 'Tạo bài viết' trên trang Diễn đàn.",
+          "Nhập nội dung bài viết (hỗ trợ văn bản thuần).",
+          "Thêm hashtag để phân loại bài viết (vd: #vàng, #cổphiếu).",
+          "Bấm 'Đăng bài' để xuất bản."
+        ],
+        "hashtags": {
+          "title": "Hashtag",
+          "description": "Dùng hashtag để phân loại bài viết và giúp người khác tìm thấy nội dung liên quan. Bấm vào một hashtag để lọc tất cả bài viết có hashtag đó."
+        },
+        "tip": "Bài viết chất lượng cao với phân tích cụ thể sẽ nhận được nhiều lượt tương tác hơn."
       },
-      "interpretation": "Tỷ lệ bình chọn phản ánh tâm lý tổng thể của cộng đồng — không phải lời khuyên đầu tư. Luôn tự nghiên cứu trước khi đưa ra quyết định.",
-      "tip": "Bình chọn được đặt lại định kỳ để phản ánh xu hướng thị trường hiện tại, không phải lịch sử dài hạn."
+      "interactions": {
+        "title": "Tương tác cộng đồng",
+        "description": "Tương tác với cộng đồng qua nhiều hình thức:",
+        "commenting": {
+          "title": "Bình luận",
+          "description": "Bấm vào bài viết để xem chi tiết và bình luận. Bình luận hỗ trợ văn bản thuần và được sắp xếp theo thời gian."
+        },
+        "liking": {
+          "title": "Thích bài viết",
+          "description": "Bấm biểu tượng tim để thích một bài viết. Số lượt thích hiển thị công khai trên mỗi bài."
+        },
+        "following": {
+          "title": "Theo dõi người dùng",
+          "description": "Bấm 'Theo dõi' trên trang hồ sơ để theo dõi các nhà đầu tư bạn quan tâm. Feed của bạn sẽ ưu tiên hiển thị bài viết từ những người bạn theo dõi."
+        },
+        "savedPosts": {
+          "title": "Lưu bài viết",
+          "description": "Bấm biểu tượng bookmark để lưu bài viết quan trọng. Xem lại bài đã lưu trong trang hồ sơ của bạn."
+        },
+        "tip": "Theo dõi các nhà đầu tư kinh nghiệm để nhận thông báo khi họ đăng bài mới."
+      },
+      "sentimentVoting": {
+        "title": "Bình chọn xu hướng thị trường",
+        "description": "Tính năng bình chọn xu hướng cho phép cộng đồng thể hiện quan điểm về chiều hướng giá vàng và bạc.",
+        "howToVote": {
+          "title": "Cách bình chọn",
+          "steps": [
+            "Trên trang Diễn đàn, tìm khu vực 'Xu hướng thị trường'.",
+            "Chọn 'Tăng' (Bull) nếu bạn dự đoán giá sẽ tăng.",
+            "Chọn 'Giảm' (Bear) nếu bạn dự đoán giá sẽ giảm.",
+            "Kết quả bình chọn tổng hợp của cộng đồng được hiển thị theo thời gian thực."
+          ]
+        },
+        "interpretation": "Tỷ lệ bình chọn phản ánh tâm lý tổng thể của cộng đồng — không phải lời khuyên đầu tư. Luôn tự nghiên cứu trước khi đưa ra quyết định.",
+        "tip": "Bình chọn được đặt lại định kỳ để phản ánh xu hướng thị trường hiện tại, không phải lịch sử dài hạn."
+      }
+    },
+    "cta": {
+      "goToDashboard": "Vào Dashboard",
+      "getStartedFree": "Bắt đầu miễn phí",
+      "backToTop": "Về đầu trang"
     }
-  },
-  "cta": {
-    "goToDashboard": "Vào Dashboard",
-    "getStartedFree": "Bắt đầu miễn phí",
-    "backToTop": "Về đầu trang"
   }
 }

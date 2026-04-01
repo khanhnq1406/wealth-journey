@@ -7,8 +7,8 @@
 - **Spec file:** docs/specs/2026-04-01-user-guide-page-spec.md
 - **Started:** 2026-04-01T00:00:00Z
 - **Last updated:** 2026-04-01T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 10
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -24,7 +24,7 @@
 | 7   | Add Guide Link to Landing Page Navbar            | done    | 1c55dd9b | Added Guide link to desktop nav and mobile menu in LandingNavbar.tsx |
 | 8   | Add Guide Link to Dashboard Sidebar              | done    | 1c55dd9b | Added Guide link (BookOpen icon) to desktop sidebar and mobile slide-out |
 | 9   | Frontend Lint & Build Verification               | done    | —      | 0 lint errors, 673 tests pass, Next.js build succeeds with /[locale]/guide route |
-| 10  | Playwright E2E Test for Guide Page               | pending | —      | —       |
+| 10  | Playwright E2E Test for Guide Page               | done    | —      | 19 E2E tests pass; fixed guide.json namespace + updated guide-translations.test.ts |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 

@@ -7,21 +7,25 @@
  * - Required sections exist: title, subtitle, toc, homepage, investment, community
  */
 
-import viGuide from '../messages/vi/guide.json';
-import enGuide from '../messages/en/guide.json';
+import viGuideFile from '../messages/vi/guide.json';
+import enGuideFile from '../messages/en/guide.json';
+
+// Files are wrapped under the "guide" namespace key for next-intl support
+const viGuide = (viGuideFile as any).guide as Record<string, unknown>;
+const enGuide = (enGuideFile as any).guide as Record<string, unknown>;
 
 describe('guide translation files', () => {
   describe('file existence and validity', () => {
     it('vi/guide.json is a non-null object', () => {
-      expect(viGuide).toBeDefined();
-      expect(typeof viGuide).toBe('object');
-      expect(viGuide).not.toBeNull();
+      expect(viGuideFile).toBeDefined();
+      expect(typeof viGuideFile).toBe('object');
+      expect(viGuideFile).not.toBeNull();
     });
 
     it('en/guide.json is a non-null object', () => {
-      expect(enGuide).toBeDefined();
-      expect(typeof enGuide).toBe('object');
-      expect(enGuide).not.toBeNull();
+      expect(enGuideFile).toBeDefined();
+      expect(typeof enGuideFile).toBe('object');
+      expect(enGuideFile).not.toBeNull();
     });
   });
 
@@ -47,26 +51,26 @@ describe('guide translation files', () => {
     });
 
     it('toc section has the same keys in both locales', () => {
-      const viTocKeys = Object.keys((viGuide as Record<string, unknown>).toc as Record<string, unknown>).sort();
-      const enTocKeys = Object.keys((enGuide as Record<string, unknown>).toc as Record<string, unknown>).sort();
+      const viTocKeys = Object.keys(viGuide.toc as Record<string, unknown>).sort();
+      const enTocKeys = Object.keys(enGuide.toc as Record<string, unknown>).sort();
       expect(viTocKeys).toEqual(enTocKeys);
     });
 
     it('homepage section has the same keys in both locales', () => {
-      const viKeys = Object.keys((viGuide as Record<string, unknown>).homepage as Record<string, unknown>).sort();
-      const enKeys = Object.keys((enGuide as Record<string, unknown>).homepage as Record<string, unknown>).sort();
+      const viKeys = Object.keys(viGuide.homepage as Record<string, unknown>).sort();
+      const enKeys = Object.keys(enGuide.homepage as Record<string, unknown>).sort();
       expect(viKeys).toEqual(enKeys);
     });
 
     it('investment section has the same keys in both locales', () => {
-      const viKeys = Object.keys((viGuide as Record<string, unknown>).investment as Record<string, unknown>).sort();
-      const enKeys = Object.keys((enGuide as Record<string, unknown>).investment as Record<string, unknown>).sort();
+      const viKeys = Object.keys(viGuide.investment as Record<string, unknown>).sort();
+      const enKeys = Object.keys(enGuide.investment as Record<string, unknown>).sort();
       expect(viKeys).toEqual(enKeys);
     });
 
     it('community section has the same keys in both locales', () => {
-      const viKeys = Object.keys((viGuide as Record<string, unknown>).community as Record<string, unknown>).sort();
-      const enKeys = Object.keys((enGuide as Record<string, unknown>).community as Record<string, unknown>).sort();
+      const viKeys = Object.keys(viGuide.community as Record<string, unknown>).sort();
+      const enKeys = Object.keys(enGuide.community as Record<string, unknown>).sort();
       expect(viKeys).toEqual(enKeys);
     });
   });
@@ -92,11 +96,11 @@ describe('guide translation files', () => {
 
     expectedTocKeys.forEach((key) => {
       it(`toc has key "${key}" in vi`, () => {
-        expect((viGuide as Record<string, unknown>).toc).toHaveProperty(key);
+        expect(viGuide.toc).toHaveProperty(key);
       });
 
       it(`toc has key "${key}" in en`, () => {
-        expect((enGuide as Record<string, unknown>).toc).toHaveProperty(key);
+        expect(enGuide.toc).toHaveProperty(key);
       });
     });
   });
@@ -106,11 +110,11 @@ describe('guide translation files', () => {
 
     expectedKeys.forEach((key) => {
       it(`homepage has sub-key "${key}" in vi`, () => {
-        expect((viGuide as Record<string, unknown>).homepage).toHaveProperty(key);
+        expect(viGuide.homepage).toHaveProperty(key);
       });
 
       it(`homepage has sub-key "${key}" in en`, () => {
-        expect((enGuide as Record<string, unknown>).homepage).toHaveProperty(key);
+        expect(enGuide.homepage).toHaveProperty(key);
       });
     });
   });
@@ -128,11 +132,11 @@ describe('guide translation files', () => {
 
     expectedKeys.forEach((key) => {
       it(`investment has sub-key "${key}" in vi`, () => {
-        expect((viGuide as Record<string, unknown>).investment).toHaveProperty(key);
+        expect(viGuide.investment).toHaveProperty(key);
       });
 
       it(`investment has sub-key "${key}" in en`, () => {
-        expect((enGuide as Record<string, unknown>).investment).toHaveProperty(key);
+        expect(enGuide.investment).toHaveProperty(key);
       });
     });
   });
@@ -148,30 +152,28 @@ describe('guide translation files', () => {
 
     expectedKeys.forEach((key) => {
       it(`community has sub-key "${key}" in vi`, () => {
-        expect((viGuide as Record<string, unknown>).community).toHaveProperty(key);
+        expect(viGuide.community).toHaveProperty(key);
       });
 
       it(`community has sub-key "${key}" in en`, () => {
-        expect((enGuide as Record<string, unknown>).community).toHaveProperty(key);
+        expect(enGuide.community).toHaveProperty(key);
       });
     });
   });
 
   describe('string values are non-empty', () => {
     it('vi title is a non-empty string', () => {
-      expect(typeof (viGuide as Record<string, unknown>).title).toBe('string');
-      expect(((viGuide as Record<string, unknown>).title as string).length).toBeGreaterThan(0);
+      expect(typeof viGuide.title).toBe('string');
+      expect((viGuide.title as string).length).toBeGreaterThan(0);
     });
 
     it('en title is a non-empty string', () => {
-      expect(typeof (enGuide as Record<string, unknown>).title).toBe('string');
-      expect(((enGuide as Record<string, unknown>).title as string).length).toBeGreaterThan(0);
+      expect(typeof enGuide.title).toBe('string');
+      expect((enGuide.title as string).length).toBeGreaterThan(0);
     });
 
     it('vi and en titles are different (localised)', () => {
-      expect((viGuide as Record<string, unknown>).title).not.toEqual(
-        (enGuide as Record<string, unknown>).title
-      );
+      expect(viGuide.title).not.toEqual(enGuide.title);
     });
   });
 });
