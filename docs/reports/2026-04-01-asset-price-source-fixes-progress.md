@@ -17,6 +17,7 @@
 | 1   | Fix DOJI parsePrice multiplier       | done       | b7521247 | Changed multiplier ×1,000,000 → ×10; updated comments + test expectations |
 | 2   | Fix Mihong SJC TypeCode to Mihong_SJC | done      | —      | Changed "SJC"→"Mihong_SJC" in codeToTypeCode map; added SJCTypeCode test |
 | 3   | Run full backend lint + test suite   | done       | —      | lint: 0 issues; full short test suite: all pass |
+| 4   | Simplify Vietcombank migration + fix USD Internalbank display name | done | — | Removed Steps 1 & 2 (no _VCB display config seeding); kept fetch-code wiring only; added USD Internalbank → USD_VCB seed; renamed display name USD Vietcombank → USD Internalbank |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 

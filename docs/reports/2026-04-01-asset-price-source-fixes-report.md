@@ -122,6 +122,7 @@ Both changes are confined to leaf packages (`pkg/doji/`, `pkg/mihong/`) that are
 | ---------- | ------------------------------------------------------- | -------- | ---------------------------------------- |
 | 2026-04-01 | PNJ API: rename `regions` → `locations` top-level key  | Minor    | `pkg/pnj/types.go`, `client.go`, `client_test.go` |
 | 2026-04-01 | DOJI parsePrice multiplier `×10` → `×10_000` (vạn VND) | Minor    | `pkg/doji/client.go`, `pkg/doji/client_test.go` |
+| 2026-04-01 | Vietcombank migration: remove `_VCB` display config seeding; set VCB as default fetch source only; rename `USD Internalbank` display name | Minor | `cmd/migrate-vietcombank-currency/main.go`, `cmd/migrate-asset-display-config/main.go` |
 
 ### Fix: PNJ `regions` → `locations` (2026-04-01)
 
@@ -151,3 +152,15 @@ Both changes are confined to leaf packages (`pkg/doji/`, `pkg/mihong/`) that are
 
 1. Navigate to `/dashboard/prices` → Gold tab.
 2. Expected: all non-DOJI gold prices (SJC, DOJI from other sources, Mihong) display correctly; no `"--"` where data should exist.
+
+### Fix: Vietcombank migration simplification + `USD Internalbank` display name (2026-04-01)
+
+**Root cause / motivation:** The `migrate-vietcombank-currency` migration was over-seeding: it created 13 new `_VCB`-suffixed `asset_display_config` rows (e.g. `"USD_VCB"`, `"EUR_VCB"`) that are not needed — these are internal price-cache identifiers, not display entries. Only the fetch-code wiring (Step 3 of the original migration) is required to make Vietcombank the default source for existing standard display configs. Additionally, the `"USD Internalbank"` display config (type_code `"USD Internalbank"`) had its `display_name` set to `"USD Vietcombank"`, which conflicted with the intent of the entry name.
+
+**Fix:**
+1. **`cmd/migrate-vietcombank-currency/main.go`** — Removed Steps 1 & 2 entirely (seeding `_VCB` `asset_display_config` rows and their fetch codes). Kept only the fetch-code default assignment (formerly Step 3). Added a new seed entry `{DisplayName: "USD Internalbank", VCBFetchCode: "USD_VCB", PlainCode: "USD Internalbank"}` so the `USD Internalbank` display config gets `USD_VCB` as its priority-1 fetch code.
+2. **`cmd/migrate-asset-display-config/main.go`** — Changed `DisplayName` for `TypeCode: "USD Internalbank"` from `"USD Vietcombank"` to `"USD Internalbank"` so the display name matches the type code.
+
+**Tests:** No new unit tests needed — migration scripts are idempotent SQL-only; no logic change to Go packages with existing test coverage.
+
+**Security review:** APPROVED — idempotent SQL migrations only; no authentication, authorization, or injection surfaces affected.
