@@ -8,18 +8,18 @@
 - **Started:** 2026-04-01T00:00:00Z
 - **Last updated:** 2026-04-01T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 3 (Group B: Tasks 3, 4, 5 in parallel)
+- **Current task:** 6
 
 ## Task Progress
 
 | #   | Task Name                                        | Status  | Commit | Summary |
 | --- | ------------------------------------------------ | ------- | ------ | ------- |
-| 0   | Update C4 Architecture Diagram                   | done    | —      | Added GuidePage to c4-component-frontend.md as peer of LandingPage |
-| 1   | Add i18n Translation Files for Guide Content     | done    | —      | Created vi/en guide.json, registered 'guide' in i18n/request.ts, added nav labels |
-| 2   | Add /guide Route to Constants                    | done    | —      | Added routes.guide = "/guide" to constants.tsx |
-| 3   | Create Guide Page Layout with SEO Metadata       | pending | —      | —       |
-| 4   | Create GuideTOC Component                        | pending | —      | —       |
-| 5   | Create GuideSection Component                    | pending | —      | —       |
+| 0   | Update C4 Architecture Diagram                   | done    | babab9c3 | Added GuidePage to c4-component-frontend.md as peer of LandingPage |
+| 1   | Add i18n Translation Files for Guide Content     | done    | babab9c3 | Created vi/en guide.json, registered 'guide' in i18n/request.ts, added nav labels |
+| 2   | Add /guide Route to Constants                    | done    | babab9c3 | Added routes.guide = "/guide" to constants.tsx |
+| 3   | Create Guide Page Layout with SEO Metadata       | done    | —      | Created layout.tsx with generateMetadata, HowTo JSON-LD, canonical/alternates |
+| 4   | Create GuideTOC Component                        | done    | —      | Created GuideTOC with dual-render CSS responsive, scroll-spy, v2 tokens |
+| 5   | Create GuideSection Component                    | done    | —      | Created GuideSection with h2/h3 variants, OrnateHeading, OrnateDivider, anchor id |
 | 6   | Create GuideContent Client Component + page.tsx  | pending | —      | —       |
 | 7   | Add Guide Link to Landing Page Navbar            | pending | —      | —       |
 | 8   | Add Guide Link to Dashboard Sidebar              | pending | —      | —       |
