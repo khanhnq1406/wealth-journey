@@ -20,6 +20,8 @@ C4Component
         Component(alerts_page, "Alerts Settings Redirect", "app/dashboard/settings/alerts", "Server-side redirect to /dashboard/prices. Price alert management was moved to the Prices page (Price Alerts tab). This route is kept for backward compatibility / bookmarked links.")
         Component(feedback_page, "Feedback Page", "app/dashboard/feedback", "Submit feedback form and view personal feedback history with status badges")
         Component(admin_page, "Admin CMS Page", "app/dashboard/admin", "Tabbed admin dashboard (SEO/Users/Feedback/Notifications). SEO tab: metadata editor (title, description, keywords, OG tags, Twitter cards, robots directives) and footer editor. Users tab: search users, toggle admin roles with self-protection. Feedback tab: status filter, view/update feedback with admin notes, soft-delete. Notifications tab: broadcast form (500 char limit) + price alert config form (global settings, per-category thresholds/templates/enable-disable). Admin-only access via AdminGuard.")
+        Component(locale_loading, "Locale Root Loading", "app/[locale]/loading.tsx", "Branded loading splash for the [locale] route segment. Shown by Next.js Suspense boundary while the locale subtree hydrates. Renders a centered gold spinner on dark-maroon background using v2 design tokens.")
+        Component(landing_loading, "Landing Page Loading", "app/[locale]/landing/loading.tsx", "Landing page skeleton shown while landing page content loads. Inline shimmer blocks (no Skeleton import — i18n provider not yet mounted) for navbar, gold/silver/currency price tables, chart placeholders, sentiment section, and footer.")
     }
 
     Container_Boundary(features, "Feature Modules (Target State)") {
