@@ -7,8 +7,8 @@
 - **Spec file:** docs/specs/2026-04-01-asset-price-source-fixes-spec.md
 - **Started:** 2026-04-01T00:00:00Z
 - **Last updated:** 2026-04-01T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 3
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -16,7 +16,7 @@
 | --- | ------------------------------------ | ---------- | ------ | ------- |
 | 1   | Fix DOJI parsePrice multiplier       | done       | b7521247 | Changed multiplier ×1,000,000 → ×10; updated comments + test expectations |
 | 2   | Fix Mihong SJC TypeCode to Mihong_SJC | done      | —      | Changed "SJC"→"Mihong_SJC" in codeToTypeCode map; added SJCTypeCode test |
-| 3   | Run full backend lint + test suite   | pending    | —      | —       |
+| 3   | Run full backend lint + test suite   | done       | —      | lint: 0 issues; full short test suite: all pass |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
