@@ -68,7 +68,7 @@ jest.mock("../GuideSection", () => ({
     children?: React.ReactNode;
     icon?: React.ReactNode;
   }) => {
-    const Tag = (level === "h3" ? "h3" : "h2") as keyof JSX.IntrinsicElements;
+    const Tag = (level === "h3" ? "h3" : "h2") as React.ElementType;
     return (
       <section id={id} data-testid={`guide-section-${id}`}>
         <Tag>{title}</Tag>
