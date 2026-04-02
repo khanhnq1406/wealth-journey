@@ -18,10 +18,10 @@ kanban-plugin: board
 
 ## Spec
 
-- [ ] [[2026-04-02-table-ui-enhancements|Enhance TanStackTable desktop design + SortableList component]]
-
 
 ## Plan
+
+- [ ] [[2026-04-02-table-ui-enhancements|Enhance TanStackTable desktop design + SortableList component]]
 
 - [ ] [[2026-04-02-price-alert-bugs|Fix price alert bugs (USD value + Vietnamese symbol)]]
 

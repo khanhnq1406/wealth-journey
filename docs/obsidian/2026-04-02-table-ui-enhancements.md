@@ -1,6 +1,6 @@
 ---
 type: feature
-status: Not Started
+status: Next
 ---
 
 ## Overview
@@ -18,4 +18,4 @@ Two related UI improvements targeting the shared table infrastructure: align `Ta
 | Artifact | File |
 | -------- | ---- |
 | Spec     | `docs/specs/2026-04-02-table-ui-enhancements-spec.md` |
-| Plan     | _(not yet created)_ |
+| Plan     | `docs/plans/2026-04-02-table-ui-enhancements-plan.md` |
