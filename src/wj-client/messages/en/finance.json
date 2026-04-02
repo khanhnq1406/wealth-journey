@@ -4,6 +4,11 @@
       "transaction": "Transactions",
       "report": "Reports",
       "budget": "Budget"
+    },
+    "actions": {
+      "addTransaction": "Add Transaction",
+      "transferMoney": "Transfer Money",
+      "createWallet": "Create Wallet"
     }
   }
 }
