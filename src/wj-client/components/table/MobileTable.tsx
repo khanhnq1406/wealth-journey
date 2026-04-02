@@ -185,9 +185,9 @@ const MobileTableRow = memo(function MobileTableRow<T>({
             <p className="text-v2-gold-accent text-sm font-bold shrink-0">
               {headerContent}
             </p>
-            <p className="text-v2-gold-accent text-sm font-light text-right min-w-0">
+            <div className="text-v2-gold-accent text-sm font-light text-right min-w-0">
               {displayValue ?? "-"}
-            </p>
+            </div>
           </div>
         </React.Fragment>
       );
@@ -200,9 +200,9 @@ const MobileTableRow = memo(function MobileTableRow<T>({
             <p className="text-v2-gold-accent text-sm font-bold mb-1">
               {headerContent}
             </p>
-            <p className="text-v2-gold-accent text-sm font-light text-right">
+            <div className="text-v2-gold-accent text-sm font-light text-right">
               {displayValue ?? "-"}
-            </p>
+            </div>
           </div>
         </div>
       </React.Fragment>
