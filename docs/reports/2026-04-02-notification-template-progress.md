@@ -7,19 +7,19 @@
 - **Spec file:** docs/specs/2026-04-02-notification-template-spec.md
 - **Started:** 2026-04-02T00:00:00Z
 - **Last updated:** 2026-04-02T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 1
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | #   | Task Name                                              | Status      | Commit | Summary |
 | --- | ------------------------------------------------------ | ----------- | ------ | ------- |
 | 0   | Update C4 Architecture Diagrams                        | skipped     | —      | Spec explicitly states no architecture changes needed |
-| 1   | Extend PriceAlertConfig Struct + Defaults + Validation | pending     | —      | —       |
-| 2   | Extend mergeConfig for User Alert Templates            | pending     | —      | —       |
-| 3   | Wire Templates into EvaluateAlerts                     | pending     | —      | —       |
-| 4   | Admin UI — User Alert Templates Section                | pending     | —      | —       |
-| 5   | End-to-End Verification & Lint                         | pending     | —      | —       |
+| 1   | Extend PriceAlertConfig Struct + Defaults + Validation | done        | 6218e1a2 | Added 3 template fields, defaults, envString, LoadPriceAlertConfig compat, Validate/Sanitize extensions, FormatUserAlertPrice, priceSideDisplayName |
+| 2   | Extend mergeConfig for User Alert Templates            | done        | e1465f0f | Extended mergeConfig() with empty-means-keep semantics for 3 template fields; created handler test file |
+| 3   | Wire Templates into EvaluateAlerts                     | done        | e6881ed6 | LoadPriceAlertConfig once per cycle, placeholder map, ResolvePlaceholders, rune-safe truncation, resolved push title/body |
+| 4   | Admin UI — User Alert Templates Section                | done        | 48a97ee7 | Extended PriceAlertConfigForm with 3 template inputs, chips, previews, guide; i18n translations; 13 unit tests; E2E spec |
+| 5   | End-to-End Verification & Lint                         | done        | —      | Backend lint: 2/2 passed. Backend tests: all ok. Frontend lint: 0 errors. Frontend tests: 725 passed. |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
