@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { EmptyState } from "@/components/feedback/EmptyState";
@@ -86,6 +86,16 @@ export function FetchCodeList({ configId, assetType }: FetchCodeListProps) {
       enabled: !!assetType,
     });
 
+  const nextPriority = useMemo(() => {
+    const codes = data?.fetchCodes ?? [];
+    if (codes.length === 0) return 1;
+    return Math.max(...codes.map((fc) => fc.priority)) + 1;
+  }, [data?.fetchCodes]);
+
+  useEffect(() => {
+    setPriorityInput(nextPriority);
+  }, [nextPriority]);
+
   useEffect(() => {
     if (error) {
       toast.error(t("toast.createFailed"));
@@ -102,7 +112,6 @@ export function FetchCodeList({ configId, assetType }: FetchCodeListProps) {
       queryClient.invalidateQueries({ queryKey: fetchCodeQueryKey(configId) });
       toast.success(t("toast.created"));
       setTypeCodeInput("");
-      setPriorityInput(1);
       setAddError(undefined);
     },
     onError: (err: any) => {

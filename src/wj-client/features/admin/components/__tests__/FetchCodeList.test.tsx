@@ -411,4 +411,98 @@ describe("FetchCodeList", () => {
     // Should NOT find the old "Available Codes:" label
     expect(screen.queryByText("Available Codes:")).not.toBeInTheDocument();
   });
+
+  // --- Auto-increment priority ---
+
+  it("priority input defaults to max(existing priorities) + 1 when fetch codes exist", async () => {
+    // mockFetchCodes has priorities 1 and 2, so next should be 3
+    renderWithProviders(<FetchCodeList configId={10} assetType="gold" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("SJC_1L")).toBeInTheDocument();
+    });
+
+    const priorityInput = screen.getByRole("spinbutton") as HTMLInputElement;
+    expect(priorityInput.value).toBe("3");
+  });
+
+  it("priority input defaults to 1 when no fetch codes exist", async () => {
+    mockGet.mockResolvedValueOnce({ fetchCodes: [] });
+
+    renderWithProviders(<FetchCodeList configId={10} assetType="gold" />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/no fetch codes configured/i)).toBeInTheDocument();
+    });
+
+    const priorityInput = screen.getByRole("spinbutton") as HTMLInputElement;
+    expect(priorityInput.value).toBe("1");
+  });
+
+  it("admin can manually change the priority value", async () => {
+    renderWithProviders(<FetchCodeList configId={10} assetType="gold" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("SJC_1L")).toBeInTheDocument();
+    });
+
+    const priorityInput = screen.getByRole("spinbutton") as HTMLInputElement;
+    // Should auto-default to 3
+    expect(priorityInput.value).toBe("3");
+
+    // Admin overrides to 5
+    fireEvent.change(priorityInput, { target: { value: "5" } });
+    expect(priorityInput.value).toBe("5");
+  });
+
+  it("priority input resets to new max+1 after query data changes (simulated refetch)", async () => {
+    // Start with priorities 1, 2 → next = 3
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    });
+
+    mockGet.mockResolvedValue({ fetchCodes: mockFetchCodes });
+
+    const { rerender } = render(
+      <QueryClientProvider client={queryClient}>
+        <NextIntlClientProvider locale="en" messages={messages}>
+          <FetchCodeList configId={10} assetType="gold" />
+        </NextIntlClientProvider>
+      </QueryClientProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("SJC_1L")).toBeInTheDocument();
+    });
+
+    const priorityInput = screen.getByRole("spinbutton") as HTMLInputElement;
+    expect(priorityInput.value).toBe("3");
+
+    // Simulate data update: a new fetch code with priority 3 was added
+    const updatedFetchCodes = [
+      ...mockFetchCodes,
+      { id: 3, configId: 10, typeCode: "SJC_R2", priority: 3 },
+    ];
+    mockGet.mockResolvedValue({ fetchCodes: updatedFetchCodes });
+
+    // Invalidate the query to trigger a refetch
+    queryClient.invalidateQueries({ queryKey: ["admin-fetch-codes", 10] });
+
+    await waitFor(() => {
+      expect(screen.getByText("SJC_R2")).toBeInTheDocument();
+    });
+
+    // After refetch with 3 items (max priority = 3), next should be 4
+    await waitFor(() => {
+      expect((screen.getByRole("spinbutton") as HTMLInputElement).value).toBe("4");
+    });
+
+    rerender(
+      <QueryClientProvider client={queryClient}>
+        <NextIntlClientProvider locale="en" messages={messages}>
+          <FetchCodeList configId={10} assetType="gold" />
+        </NextIntlClientProvider>
+      </QueryClientProvider>
+    );
+  });
 });
