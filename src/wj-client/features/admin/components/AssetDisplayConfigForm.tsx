@@ -34,6 +34,7 @@ export interface AssetDisplayConfigFormProps {
     showInInvestment: boolean;
   };
   existingCodes?: string[];
+  nextDisplayOrder?: number;
   onSuccess?: (createdId?: number, createdAssetType?: string) => void;
 }
 
@@ -70,6 +71,7 @@ export function AssetDisplayConfigForm({
   assetType,
   initialValues,
   existingCodes,
+  nextDisplayOrder,
   onSuccess,
 }: AssetDisplayConfigFormProps) {
   const queryClient = useQueryClient();
@@ -82,7 +84,7 @@ export function AssetDisplayConfigForm({
       defaultValues: {
         typeCode: initialValues?.typeCode ?? "",
         displayName: initialValues?.displayName ?? "",
-        displayOrder: initialValues?.displayOrder ?? 0,
+        displayOrder: initialValues?.displayOrder ?? nextDisplayOrder ?? 1,
         enabled: initialValues?.enabled ?? true,
         showInInvestment: initialValues?.showInInvestment ?? true,
       },
@@ -99,6 +101,12 @@ export function AssetDisplayConfigForm({
       });
     }
   }, [initialValues, reset]);
+
+  useEffect(() => {
+    if (mode === "create" && nextDisplayOrder !== undefined) {
+      setValue("displayOrder", nextDisplayOrder);
+    }
+  }, [nextDisplayOrder, mode, setValue]);
 
   const enabledValue = useWatch({ control, name: "enabled" });
   const showInInvestmentValue = useWatch({ control, name: "showInInvestment" });

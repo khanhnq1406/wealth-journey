@@ -8,14 +8,14 @@
 - **Started:** 2026-04-02T00:00:00Z
 - **Last updated:** 2026-04-02T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 2
+- **Current task:** 3
 
 ## Task Progress
 
 | #   | Task Name                                           | Status      | Commit | Summary |
 | --- | --------------------------------------------------- | ----------- | ------ | ------- |
 | 1   | Auto-increment fetch code priority in FetchCodeList | done        | ed774a70 | useMemo+useEffect in FetchCodeList.tsx; 4 new tests (21/21 pass) |
-| 2   | Pass nextDisplayOrder from Table to Form            | in_progress | —      | —       |
+| 2   | Pass nextDisplayOrder from Table to Form            | done        | 63c2da06 | nextDisplayOrder prop in Form + useMemo in Table; 4 new tests (14/14 pass) |
 | 3   | Update Kanban and write report                      | pending     | —      | —       |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`

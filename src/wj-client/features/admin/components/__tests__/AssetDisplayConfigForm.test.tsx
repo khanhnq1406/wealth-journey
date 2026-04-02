@@ -179,6 +179,93 @@ describe("AssetDisplayConfigForm — FetchCodeList receives correct assetType in
   });
 });
 
+describe("AssetDisplayConfigForm — nextDisplayOrder prop", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("pre-fills displayOrder with nextDisplayOrder in create mode", async () => {
+    renderWithProviders(
+      <AssetDisplayConfigForm mode="create" assetType="gold" nextDisplayOrder={5} />
+    );
+
+    // The displayOrder input should show 5 (async due to queueMicrotask in FormNumberInput)
+    await waitFor(() => {
+      const displayOrderInput = screen.getByLabelText(/display order/i) as HTMLInputElement;
+      expect(displayOrderInput.value).toBe("5");
+    });
+  });
+
+  it("defaults displayOrder to 1 when nextDisplayOrder is not provided in create mode", async () => {
+    renderWithProviders(
+      <AssetDisplayConfigForm mode="create" assetType="gold" />
+    );
+
+    await waitFor(() => {
+      const displayOrderInput = screen.getByLabelText(/display order/i) as HTMLInputElement;
+      expect(displayOrderInput.value).toBe("1");
+    });
+  });
+
+  it("ignores nextDisplayOrder in edit mode — keeps initialValues.displayOrder", async () => {
+    renderWithProviders(
+      <AssetDisplayConfigForm
+        mode="edit"
+        assetType="gold"
+        nextDisplayOrder={10}
+        initialValues={{
+          id: 1,
+          typeCode: "SJC_1L",
+          displayName: "SJC 1 Lượng",
+          displayOrder: 3,
+          enabled: true,
+          showInInvestment: true,
+        }}
+      />
+    );
+
+    // Should be 3 (initialValues), not 10 (nextDisplayOrder)
+    await waitFor(() => {
+      const displayOrderInput = screen.getByLabelText(/display order/i) as HTMLInputElement;
+      expect(displayOrderInput.value).toBe("3");
+    });
+  });
+
+  it("updates displayOrder when nextDisplayOrder prop changes in create mode", async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    });
+
+    const { rerender } = render(
+      <QueryClientProvider client={queryClient}>
+        <NextIntlClientProvider locale="en" messages={adminMessages}>
+          <AssetDisplayConfigForm mode="create" assetType="gold" nextDisplayOrder={3} />
+        </NextIntlClientProvider>
+      </QueryClientProvider>
+    );
+
+    // Wait for initial value to render
+    await waitFor(() => {
+      const displayOrderInput = screen.getByLabelText(/display order/i) as HTMLInputElement;
+      expect(displayOrderInput.value).toBe("3");
+    });
+
+    // Simulate asset type switch causing nextDisplayOrder to change
+    rerender(
+      <QueryClientProvider client={queryClient}>
+        <NextIntlClientProvider locale="en" messages={adminMessages}>
+          <AssetDisplayConfigForm mode="create" assetType="silver" nextDisplayOrder={7} />
+        </NextIntlClientProvider>
+      </QueryClientProvider>
+    );
+
+    await waitFor(() => {
+      const updatedInput = screen.getByLabelText(/display order/i) as HTMLInputElement;
+      expect(updatedInput.value).toBe("7");
+    });
+  });
+});
+
 describe("AssetDisplayConfigForm — onSuccess callback passes created id", () => {
   it("calls onSuccess with the created config id after successful create", async () => {
     const mockOnSuccess = jest.fn();

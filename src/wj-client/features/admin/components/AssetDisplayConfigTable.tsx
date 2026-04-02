@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { MobileTable } from "@/components/table/MobileTable";
@@ -71,6 +71,11 @@ export function AssetDisplayConfigTable() {
   }, [error, toast, t]);
 
   const configs = data?.configs ?? [];
+
+  const nextDisplayOrder = useMemo(() => {
+    if (!configs || configs.length === 0) return 1;
+    return Math.max(...configs.map((c) => c.displayOrder)) + 1;
+  }, [configs]);
 
   const updateMutation = useMutation({
     mutationFn: ({
@@ -379,6 +384,7 @@ export function AssetDisplayConfigTable() {
             mode="create"
             assetType={activeTab}
             existingCodes={configs.map((c) => c.typeCode)}
+            nextDisplayOrder={nextDisplayOrder}
             onSuccess={handleModalSuccess}
           />
         )}
