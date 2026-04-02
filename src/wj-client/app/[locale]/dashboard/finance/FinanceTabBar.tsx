@@ -50,7 +50,7 @@ export function FinanceTabBar({ activeTab, onTabChange }: FinanceTabBarProps) {
     <div
       role="tablist"
       aria-label="Finance sections"
- className="sticky top-0 z-[5] bg-v2-maroon-800 border-b border-v2-maroon-600"
+ className="sticky top-0 z-[5] bg-v2-bg-surface border-b border-v2-border-light"
     >
       <div className="flex">
         {FINANCE_TABS.map((tab, index) => (
@@ -70,14 +70,11 @@ export function FinanceTabBar({ activeTab, onTabChange }: FinanceTabBarProps) {
               "flex-1 sm:flex-initial sm:px-6 py-3 text-sm font-medium transition-colors relative",
               "min-h-[44px]",
               activeTab === tab
-                ? "text-bg font-semibold"
- : "text-v2-cream-100 hover:text-v2-gold-accent"
+                ? "border-b-2 border-v2-gold-primary text-v2-gold-accent font-semibold"
+                : "text-v2-text-tertiary hover:text-v2-gold-accent"
             )}
           >
             {t(tab)}
-            {activeTab === tab && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-bg transition-all duration-200" />
-            )}
           </button>
         ))}
       </div>

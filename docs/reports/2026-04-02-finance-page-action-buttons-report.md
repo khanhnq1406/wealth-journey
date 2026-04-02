@@ -50,6 +50,12 @@ APPROVED — Pattern exactly matches home page. TypeScript strict mode, direct i
 
 None.
 
+## Fix History
+
+| Date       | Fix                             | Severity | Files Changed |
+| ---------- | ------------------------------- | -------- | ------------- |
+| 2026-04-02 | Tab colors aligned to mihong design (gold underline + correct text tokens); transaction header background unified across mobile and desktop | Minor | `FinanceTabBar.tsx`, `transaction/page.tsx` |
+
 ## Files Changed
 
 | File | Change |
