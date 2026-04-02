@@ -469,7 +469,7 @@ export function PriceAlertConfigForm() {
                           <span className="font-roboto text-xs font-medium text-v2-text-tertiary">
                             {t("preview")}:
                           </span>
-                          <p className="font-roboto text-sm text-v2-text-primary mt-0.5">
+                          <p className="font-roboto text-sm text-v2-text-primary mt-0.5 break-words">
                             {resolvePlaceholders(
                               catConfig.titleTemplate,
                               SAMPLE_VALUES[cat] ?? SAMPLE_VALUES.gold_vnd,
@@ -521,7 +521,7 @@ export function PriceAlertConfigForm() {
                           <span className="font-roboto text-xs font-medium text-v2-text-tertiary">
                             {t("preview")}:
                           </span>
-                          <p className="font-roboto text-sm text-v2-text-primary mt-0.5 whitespace-pre-wrap">
+                          <p className="font-roboto text-sm text-v2-text-primary mt-0.5 whitespace-pre-wrap break-words">
                             {resolvePlaceholders(
                               catConfig.bodyTemplate,
                               SAMPLE_VALUES[cat] ?? SAMPLE_VALUES.gold_vnd,
@@ -588,7 +588,7 @@ export function PriceAlertConfigForm() {
                 <span className="font-roboto text-xs font-medium text-v2-text-tertiary">
                   {t("preview")}:
                 </span>
-                <p className="font-roboto text-sm text-v2-text-secondary mt-0.5">
+                <p className="font-roboto text-sm text-v2-text-secondary mt-0.5 break-words">
                   {resolvePlaceholders(
                     config.userAlertTitleTemplate,
                     USER_ALERT_SAMPLE_VALUES,
@@ -638,7 +638,7 @@ export function PriceAlertConfigForm() {
                 <span className="font-roboto text-xs font-medium text-v2-text-tertiary">
                   {t("preview")}:
                 </span>
-                <p className="font-roboto text-sm text-v2-text-secondary mt-0.5 whitespace-pre-wrap">
+                <p className="font-roboto text-sm text-v2-text-secondary mt-0.5 whitespace-pre-wrap break-words">
                   {resolvePlaceholders(
                     config.userAlertAboveBodyTemplate,
                     USER_ALERT_SAMPLE_VALUES,
@@ -688,7 +688,7 @@ export function PriceAlertConfigForm() {
                 <span className="font-roboto text-xs font-medium text-v2-text-tertiary">
                   {t("preview")}:
                 </span>
-                <p className="font-roboto text-sm text-v2-text-secondary mt-0.5 whitespace-pre-wrap">
+                <p className="font-roboto text-sm text-v2-text-secondary mt-0.5 whitespace-pre-wrap break-words">
                   {resolvePlaceholders(
                     config.userAlertBelowBodyTemplate,
                     USER_ALERT_SAMPLE_VALUES,

@@ -122,9 +122,9 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
 
     // Use resolved title/body from metadata (admin-configured templates),
     // falling back to raw fields for older notifications without them
-    const title = meta?.resolvedTitle || (meta?.symbol ? `${meta.symbol} — ${meta.name}` : "Price alert");
+    const title = meta?.resolvedTitle || (meta?.symbol ? `${meta.symbol} — ${meta.name}` : "Cảnh báo giá");
     const body = meta?.resolvedBody || (meta
-      ? `${isAbove ? "↑ Above" : "↓ Below"} ${meta.targetPrice.toLocaleString()} — now ${meta.currentPrice.toLocaleString()} ${meta.currency}`
+      ? `${isAbove ? "↑ Tăng vượt" : "↓ Giảm dưới"} ${meta.targetPrice.toLocaleString()} — hiện tại ${meta.currentPrice.toLocaleString()} ${meta.currency}`
       : undefined);
 
     return (

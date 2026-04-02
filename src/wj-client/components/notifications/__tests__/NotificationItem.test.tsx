@@ -68,7 +68,8 @@ describe("NotificationItem — user_price_alert", () => {
       />
     );
 
-    // Falls back to symbol + name display
+    // Falls back to symbol + name display (Vietnamese fallback)
     expect(screen.getByText(/SJC/)).toBeInTheDocument();
+    expect(screen.getByText(/Tăng vượt/)).toBeInTheDocument();
   });
 });
