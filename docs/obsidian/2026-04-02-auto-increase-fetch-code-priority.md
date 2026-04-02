@@ -1,12 +1,16 @@
 ---
 type: feature
-status: Not Started
+status: Spec
 ---
 
 ## Overview
 
-When editing an asset's type code configuration, users need the priority of the newly added fetcher to be automatically incremented so they don't have to manually assign a priority number each time. This reduces friction and prevents accidental duplicate or conflicting priority values.
+When an admin adds a new fetch code or creates a new asset display config, the priority/display-order field should auto-populate with the next available value (current max + 1) for all asset types (gold, silver, currency). The admin can still manually override the suggested value.
 
-## Details
+## Pipeline Artifacts
 
-When a user adds a new fetch code entry in the edit asset type code form, the priority field should auto-populate with the next available priority value (current highest priority + 1). The user should still be able to manually override the suggested value. The auto-increment should reflect the current list of fetch codes already assigned to that asset display config.
+| Artifact | File |
+| -------- | ---- |
+| Spec     | `docs/specs/2026-04-02-auto-increase-fetch-code-priority-spec.md` |
+| Plan     | _(pending step 2)_ |
+| Report   | _(pending step 3)_ |
