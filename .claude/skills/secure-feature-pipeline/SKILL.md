@@ -62,12 +62,24 @@ Example: spec is `docs/specs/2026-04-02-price-alert-bugs-spec.md` → task note 
 - [ ] [[YYYY-MM-DD-<feature>|<Human-Readable Title>]]
 ```
 
+### Kanban columns
+
+The board has **5 columns** in order:
+
+| Column | Meaning |
+| ------ | ------- |
+| `## Not Started` | Task created, no work begun |
+| `## Spec` | Brainstorm/spec step in progress or done |
+| `## Plan` | Plan step in progress or done |
+| `## Implement` | Implementation in progress or done |
+| `## Done` | Reviewed and approved |
+
 ### Task note template
 
 ```markdown
 ---
 type: <bug|feature>
-status: <Not Started|Next|In Progress|Done>
+status: <Not Started|Spec|Plan|Implement|Done>
 ---
 
 ## Overview
@@ -89,12 +101,13 @@ status: <Not Started|Next|In Progress|Done>
 | After step | Action | Status to set |
 | ---------- | ------ | ------------- |
 | 1 — Brainstorm | **Create** task note with spec link. **Add** Kanban entry under `## Not Started`. | `Not Started` |
-| 2 — Plan | **Update** task note: add plan link to Pipeline Artifacts table. | `Next` (move Kanban entry) |
-| 3 — Implement (start) | **Update** task note: add progress file link. Move entry to `## In Progress`. | `In Progress` |
-| 3 — Implement (done) | **Update** task note: add report link. | `In Progress` |
-| 4 — Review (approved) | **Update** task note status to `Done`. Move Kanban entry to `## Done`, mark `[x]`. | `Done` |
+| 1 — Brainstorm (spec written) | **Move** Kanban entry to `## Spec`. Update task note status. | `Spec` |
+| 2 — Plan | **Update** task note: add plan link to Pipeline Artifacts table. **Move** Kanban entry to `## Plan`. | `Plan` |
+| 3 — Implement (start) | **Update** task note: add progress file link. **Move** entry to `## Implement`. | `Implement` |
+| 3 — Implement (done) | **Update** task note: add report link. | `Implement` |
+| 4 — Review (approved) | **Update** task note status to `Done`. **Move** Kanban entry to `## Done`, mark `[x]`. | `Done` |
 
-**Moving a Kanban entry:** remove the `- [ ] [[...]]` line from the old column and insert it in the new column (newest at top). Update `status` in the task note frontmatter to match.
+**Moving a Kanban entry:** remove the `- [ ] [[...]]` line from the old column and insert it in the new column (newest at top). Update `status` in the task note frontmatter to match the column name (`Not Started` → `Spec` → `Plan` → `Implement` → `Done`).
 
 **Do NOT create a duplicate Kanban entry** — if one already exists for this feature slug, update it in place.
 
