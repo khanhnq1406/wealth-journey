@@ -265,6 +265,7 @@ const messages = {
     showDetails: "Show Details",
     hideDetails: "Hide Details",
     loading: "Loading",
+    close: "Close",
   },
   priceAlerts: {
     title: "Price Alerts",
