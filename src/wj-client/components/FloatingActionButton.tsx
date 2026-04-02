@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils/cn";
 import React, { useState, useCallback, useEffect } from "react";
 import { ZIndex } from "@/lib/utils/z-index";
 import { XIcon, PlusIcon } from "@/components/icons";
+import { Skeleton } from "@/components/loading/Skeleton";
 
 interface FABAction {
   label: string;
@@ -15,12 +16,14 @@ interface FABProps {
   actions: FABAction[];
   introContent?: { title: string; text: string; contactInfo: string };
   autoOpen?: boolean;
+  isLoading?: boolean;
 }
 
 export function FloatingActionButton({
   actions,
   introContent,
   autoOpen,
+  isLoading,
 }: FABProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -80,6 +83,17 @@ export function FloatingActionButton({
                 "0 0 20px rgba(212, 175, 55, 0.3), 0 8px 32px rgba(0, 0, 0, 0.4)",
             }}
           >
+            {/* Loading skeleton */}
+            {isOpen && isLoading && !introContent && (
+              <div className="px-5 pt-4 pb-3" aria-busy="true">
+                <Skeleton className="h-5 w-32 mb-2" />
+                <Skeleton className="h-4 w-full mb-1" />
+                <div className="border-t border-v2-gold-primary/20 mt-3 pt-3">
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+              </div>
+            )}
+
             {/* Intro section */}
             {isOpen && introContent && (
               <div className="px-5 pt-4 pb-3">
