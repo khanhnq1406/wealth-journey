@@ -7,8 +7,8 @@
 - **Spec file:** `docs/specs/2026-04-02-auto-increase-fetch-code-priority-spec.md`
 - **Started:** 2026-04-02T00:00:00Z
 - **Last updated:** 2026-04-02T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 3
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -16,7 +16,7 @@
 | --- | --------------------------------------------------- | ----------- | ------ | ------- |
 | 1   | Auto-increment fetch code priority in FetchCodeList | done        | ed774a70 | useMemo+useEffect in FetchCodeList.tsx; 4 new tests (21/21 pass) |
 | 2   | Pass nextDisplayOrder from Table to Form            | done        | 63c2da06 | nextDisplayOrder prop in Form + useMemo in Table; 4 new tests (14/14 pass) |
-| 3   | Update Kanban and write report                      | pending     | —      | —       |
+| 3   | Update Kanban and write report                      | done        | —      | Kanban moved to Done; report written |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
