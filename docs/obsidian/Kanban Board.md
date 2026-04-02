@@ -7,25 +7,27 @@ kanban-plugin: board
 ## Not Started
 
 - [ ] [[Cancel Google connection]]
-- [ ] [[Terms & Privacy]]
 - [ ] [[Fix admin nav items not showing after login]]
 - [ ] [[Improve all tab selection overload on mobile view]]
+- [ ] [[Terms & Privacy]]
 
 
 ## Next
 
-- [ ] [[Fix user price alert in Vietnamese]]
+- [ ] [[Fix price alert symbol validation rejects Vietnamese gold asset names]]
+- [ ] [[Fix price alert notification shows wrong USD value]]
 
 
 ## In Progress
 
-- [ ] [[Add button group to finance page]]
-- [ ] [[Fix auto open popup]]
+- [ ] [[Fix user price alert in Vietnamese]]
 
 
 ## Done
 
 **Complete**
+- [x] [[Add button group to finance page]]
+- [x] [[Fix auto open popup]]
 
 
 

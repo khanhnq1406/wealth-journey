@@ -167,3 +167,9 @@ Changed files and their downstream consumers:
 1. Navigate to admin config page
 2. Scroll to User Alert Templates section
 3. Expected: inputs stack vertically, chip buttons wrap and are ≥ 44px height, no horizontal scroll
+
+## Fix History
+
+| Date       | Fix                                                                                          | Severity | Files Changed                                         |
+| ---------- | -------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------- |
+| 2026-04-02 | Add `break-words` to all 5 preview `<p>` elements to prevent overflow when input has no whitespace | Minor    | `features/admin/components/PriceAlertConfigForm.tsx` |
