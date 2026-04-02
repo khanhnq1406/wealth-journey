@@ -1,24 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, startTransition } from "react";
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  useSortable,
-  arrayMove,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { WatchlistItem } from "@/gen/protobuf/v1/watchlist";
 import { AssetTypeBadge } from "@/features/watchlist/components/AssetTypeBadge";
@@ -26,6 +8,7 @@ import {
   formatWatchlistPrice,
   formatWatchlistChange,
 } from "@/features/watchlist/utils/watchlist-helpers";
+import { SortableList } from "@/components/table/SortableList";
 
 interface DraggableWatchlistTableProps {
   items: WatchlistItem[];
@@ -34,7 +17,8 @@ interface DraggableWatchlistTableProps {
   isDeleting?: boolean;
 }
 
-const GRID_COLS = "grid-cols-[32px_2fr_1.5fr_1fr_1fr_1.5fr_48px]";
+// Grid columns for the row content (excluding the drag handle which is managed by SortableList)
+const GRID_COLS = "grid-cols-[2fr_1.5fr_1fr_1fr_1.5fr_48px]";
 
 function ChangeCell({ item }: { item: WatchlistItem }) {
   const change = formatWatchlistChange(item);
@@ -67,79 +51,6 @@ function RowContent({ item, t }: { item: WatchlistItem; t: ReturnType<typeof use
   );
 }
 
-function SortableRow({
-  item,
-  onDelete,
-  isDeleting,
-  t,
-}: {
-  item: WatchlistItem;
-  onDelete: (id: number) => void;
-  isDeleting: boolean;
-  t: ReturnType<typeof useTranslations>;
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.4 : 1,
-    position: "relative" as const,
-    zIndex: isDragging ? 1 : "auto" as const,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`grid ${GRID_COLS} items-center border-b border-v2-border-light last:border-0 bg-[var(--v2-bg-surface,transparent)] hover:bg-v2-bg-surface-tint transition-colors duration-150 cursor-default`}
-      role="row"
-    >
-      <div className="py-3 px-2 w-8" role="cell">
-        <span
-          {...attributes}
-          {...listeners}
-          className="flex items-center justify-center min-w-[44px] min-h-[44px] cursor-grab active:cursor-grabbing text-v2-text-tertiary hover:text-v2-text-secondary transition-colors duration-150"
-          style={{ touchAction: "none" }}
-          aria-label="Drag to reorder"
-        >
-          <GripVertical className="w-4 h-4" aria-hidden="true" />
-        </span>
-      </div>
-      <RowContent item={item} t={t} />
-      <div className="py-3 px-3 w-12" role="cell">
-        <button
-          type="button"
-          onClick={() => onDelete(item.id)}
-          disabled={isDeleting}
-          className="flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md text-v2-text-tertiary hover:text-v2-red-negative hover:bg-v2-red-negative/10 active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label={`Remove ${item.symbol} from watchlist`}
-        >
-          <Trash2 className="w-4 h-4" aria-hidden="true" />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function DragOverlayRow({ item, t }: { item: WatchlistItem; t: ReturnType<typeof useTranslations> }) {
-  return (
-    <div
-      className={`grid ${GRID_COLS} items-center border border-v2-border-light rounded shadow-xl bg-v2-bg-surface-tint cursor-grabbing`}
-      style={{ zIndex: 100 }}
-      role="row"
-    >
-      <div className="py-3 px-2 w-8" role="cell">
-        <span className="flex items-center justify-center min-w-[44px] min-h-[44px] text-v2-text-secondary">
-          <GripVertical className="w-4 h-4" aria-hidden="true" />
-        </span>
-      </div>
-      <RowContent item={item} t={t} />
-      <div className="py-3 px-3 w-12" role="cell" />
-    </div>
-  );
-}
-
 export function DraggableWatchlistTable({
   items,
   onReorderCommit,
@@ -148,77 +59,55 @@ export function DraggableWatchlistTable({
 }: DraggableWatchlistTableProps) {
   const t = useTranslations("prices.watchlist.column");
 
-  const [localItems, setLocalItems] = useState<WatchlistItem[]>(items);
-  const isDraggingRef = useRef(false);
-  const [activeItem, setActiveItem] = useState<WatchlistItem | null>(null);
-
-  useEffect(() => {
-    if (!isDraggingRef.current) {
-      startTransition(() => {
-        setLocalItems(items);
-      });
-    }
-  }, [items]);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
-  );
-
-  const handleDragStart = (event: DragStartEvent) => {
-    isDraggingRef.current = true;
-    const dragged = localItems.find((i) => i.id === event.active.id);
-    setActiveItem(dragged ?? null);
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    isDraggingRef.current = false;
-    setActiveItem(null);
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    const oldIndex = localItems.findIndex((i) => i.id === active.id);
-    const newIndex = localItems.findIndex((i) => i.id === over.id);
-    const newOrder = arrayMove(localItems, oldIndex, newIndex);
-    setLocalItems(newOrder);
-    onReorderCommit(newOrder);
-  };
-
   return (
     <div className="w-full" role="table">
-      {/* Header */}
-      <div className={`grid ${GRID_COLS} border-b border-v2-border-light`} role="row">
-        <div className="py-2 px-2 w-8" role="columnheader" aria-label="Drag to reorder" />
-        <div className="py-2 px-3 font-semibold text-v2-text-secondary text-sm" role="columnheader">{t("symbol")}</div>
-        <div className="py-2 px-3 font-semibold text-v2-text-secondary text-sm" role="columnheader">{t("price")}</div>
-        <div className="py-2 px-3 font-semibold text-v2-text-secondary text-sm" role="columnheader">{t("change")}</div>
-        <div className="py-2 px-3 font-semibold text-v2-text-secondary text-sm" role="columnheader">{t("type")}</div>
-        <div className="py-2 px-3 font-semibold text-v2-text-secondary text-sm" role="columnheader">{t("note")}</div>
-        <div className="py-2 px-3 w-12" role="columnheader" aria-label="Actions" />
+      {/* Header row — aligned to match SortableList's 44px handle + grid content */}
+      <div className="flex items-center border-b border-v2-border-light" role="row">
+        {/* Spacer matching SortableList drag handle width */}
+        <div className="w-[44px] flex-shrink-0" role="columnheader" />
+        <div className={`flex-1 grid ${GRID_COLS}`}>
+          <div className="py-2 px-3 font-semibold text-v2-text-secondary text-sm" role="columnheader">{t("symbol")}</div>
+          <div className="py-2 px-3 font-semibold text-v2-text-secondary text-sm" role="columnheader">{t("price")}</div>
+          <div className="py-2 px-3 font-semibold text-v2-text-secondary text-sm" role="columnheader">{t("change")}</div>
+          <div className="py-2 px-3 font-semibold text-v2-text-secondary text-sm" role="columnheader">{t("type")}</div>
+          <div className="py-2 px-3 font-semibold text-v2-text-secondary text-sm" role="columnheader">{t("note")}</div>
+          <div className="py-2 px-3 w-12" role="columnheader" aria-label="Actions" />
+        </div>
       </div>
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext items={localItems.map((i) => i.id)} strategy={verticalListSortingStrategy}>
-          <div role="rowgroup">
-            {localItems.map((item) => (
-              <SortableRow
-                key={item.id}
-                item={item}
-                onDelete={onDelete}
-                isDeleting={isDeleting}
-                t={t}
-              />
-            ))}
+      {/* Body — SortableList handles all DnD logic */}
+      <SortableList<WatchlistItem>
+        items={items}
+        onReorder={onReorderCommit}
+        renderItem={(item, isDragging) => (
+          <div
+            className={`grid ${GRID_COLS} items-center border-b border-v2-border-light last:border-0 bg-[var(--v2-bg-surface,transparent)] hover:bg-v2-bg-surface-tint transition-colors duration-150 cursor-default${isDragging ? " opacity-40" : ""}`}
+            role="row"
+          >
+            <RowContent item={item} t={t} />
+            <div className="py-3 px-3 w-12" role="cell">
+              <button
+                type="button"
+                onClick={() => onDelete(item.id)}
+                disabled={isDeleting}
+                className="flex items-center justify-center min-w-[44px] min-h-[44px] rounded-md text-v2-text-tertiary hover:text-v2-red-negative hover:bg-v2-red-negative/10 active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                aria-label={`Remove ${item.symbol} from watchlist`}
+              >
+                <Trash2 className="w-4 h-4" aria-hidden="true" />
+              </button>
+            </div>
           </div>
-        </SortableContext>
-
-        <DragOverlay>
-          {activeItem ? <DragOverlayRow item={activeItem} t={t} /> : null}
-        </DragOverlay>
-      </DndContext>
+        )}
+        renderOverlay={(item) => (
+          <div
+            className={`grid ${GRID_COLS} items-center border border-v2-border-light rounded bg-v2-bg-surface-tint cursor-grabbing`}
+            role="row"
+          >
+            <RowContent item={item} t={t} />
+            <div className="py-3 px-3 w-12" role="cell" />
+          </div>
+        )}
+      />
     </div>
   );
 }

@@ -7,17 +7,17 @@
 - **Spec file:** `docs/specs/2026-04-02-table-ui-enhancements-spec.md`
 - **Started:** 2026-04-02T00:00:00Z
 - **Last updated:** 2026-04-02T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 3
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | #   | Task Name                                     | Status      | Commit | Summary |
 | --- | --------------------------------------------- | ----------- | ------ | ------- |
-| 0   | Update C4 Architecture Diagrams               | done        | pending| Add SortableList to c4-component-frontend.md tables entry |
-| 1   | TanStackTable Desktop Styling Alignment       | done        | pending| Aligned all TanStackTable styles with v2 tokens; 5 tests pass |
-| 2   | Create Generic SortableList Component         | done        | pending| Generic dnd-kit SortableList created; 4 tests pass |
-| 3   | Refactor DraggableWatchlistTable to SortableList | pending  | —      | —       |
+| 0   | Update C4 Architecture Diagrams               | done        | 471b0dbd | Add SortableList to c4-component-frontend.md tables entry |
+| 1   | TanStackTable Desktop Styling Alignment       | done        | 471b0dbd | Aligned all TanStackTable styles with v2 tokens; 5 tests pass |
+| 2   | Create Generic SortableList Component         | done        | 471b0dbd | Generic dnd-kit SortableList created; 4 tests pass |
+| 3   | Refactor DraggableWatchlistTable to SortableList | done     | pending| Removed internal dnd-kit; delegates to SortableList; 3 tests pass |
 | 4   | Create/Update Runtime Flow Diagrams           | skipped     | —      | Per spec: no flow diagram updates required |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
