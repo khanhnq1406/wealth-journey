@@ -46,7 +46,7 @@ C4Component
         Component(modals, "Modal Components", "shared/components/modals", "BaseModal, BottomSheet, ConfirmationDialog, Success")
         Component(selects, "Select Components", "shared/components/select", "Select, CreatableSelect, MultiSelect, CurrencySelector")
         Component(charts, "Chart Components", "shared/components/charts", "BarChart, LineChart, DonutChart, Sparkline, TradingViewChart (embeds TradingView Advanced Chart widget for XAUUSD/XAGUSD)")
-        Component(tables, "Table Components", "shared/components/table", "MobileTable, TanStackTable, VirtualizedList")
+        Component(tables, "Table Components", "shared/components/table", "MobileTable, TanStackTable, VirtualizedList, SortableList")
         Component(loading, "Loading Components", "shared/components/loading", "LoadingSpinner, FullPageLoading, Skeleton variants")
         Component(feedback, "Feedback Components", "shared/components/feedback", "EmptyState, ErrorState, Toast, Notification")
         Component(notifications, "Notification Components", "shared/components/notifications", "NotificationBell, NotificationPanel, NotificationItem (supports price_alert amber + admin_broadcast blue + default community green rendering), PushPermissionBanner (iOS-aware push opt-in with platform detection, install-first logic, 7-day/permanent dismissal) — shared bell+panel widget used in dashboard layout")

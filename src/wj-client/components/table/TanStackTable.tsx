@@ -99,7 +99,7 @@ export const TablePagination = memo(({
   );
 
   return (
-    <div className="flex items-center justify-between p-4 border-t border-v2-maroon-600">
+    <div className="flex items-center justify-between p-4 border-t border-v2-border-light">
       <p className="text-v2-gold-accent text-base font-light">
         Showing {startRecord} to {endRecord} of {totalCount} results
       </p>
@@ -112,7 +112,7 @@ export const TablePagination = memo(({
                 name="rows-per-page"
                 value={pageSize.toString()}
                 onChange={handlePageSizeChange}
-                className="appearance-none bg-neutral-50 border-2 border-black/50 rounded px-3 py-1 pr-8 text-gray-900 text-sm font-bold cursor-pointer focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 focus:border-v2-gold-primary"
+                className="appearance-none bg-v2-bg-dark border border-v2-border-light rounded px-3 py-1 pr-8 text-v2-text-secondary text-sm font-bold cursor-pointer focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus-visible:ring-offset-2 focus:border-v2-gold-primary"
               >
                 {memoizedPageSizeOptions.map((size) => (
                   <option key={size} value={size}>
@@ -136,7 +136,7 @@ export const TablePagination = memo(({
             <button
               onClick={handlePreviousPage}
               disabled={currentPage === 1}
-              className="px-3 py-1 rounded border border-v2-maroon-600 text-v2-gold-accent disabled:opacity-50 disabled:cursor-not-allowed hover:bg-v2-maroon-700"
+              className="px-3 py-1 rounded border border-v2-border-light text-v2-gold-accent disabled:opacity-50 disabled:cursor-not-allowed hover:bg-v2-bg-surface-tint"
             >
               Previous
             </button>
@@ -146,7 +146,7 @@ export const TablePagination = memo(({
             <button
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 rounded border border-v2-maroon-600 text-v2-gold-accent disabled:opacity-50 disabled:cursor-not-allowed hover:bg-v2-maroon-700"
+              className="px-3 py-1 rounded border border-v2-border-light text-v2-gold-accent disabled:opacity-50 disabled:cursor-not-allowed hover:bg-v2-bg-surface-tint"
             >
               Next
             </button>
@@ -198,7 +198,7 @@ const MobileExpandedRow = memo(function MobileExpandedRow<T>({
   return (
     <tr className="sm:hidden">
       <td colSpan={999} className="p-0 border-0">
-        <div className="p-4 bg-neutral-50 border-t border-v2-gold-primary/20 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="p-4 bg-v2-bg-dark border-t border-v2-border-light animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="space-y-3">
             {allCells.slice(startIndex).map((cell, cellIndex) => {
               const column = cell.column;
@@ -209,10 +209,10 @@ const MobileExpandedRow = memo(function MobileExpandedRow<T>({
 
               return (
                 <div key={`${column.id}-${cellIndex}`} className="flex flex-col">
-                  <span className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mb-1">
+                  <span className="text-xs font-semibold text-v2-text-tertiary uppercase tracking-wide mb-1">
                     {headerText}
                   </span>
-                  <span className="text-sm text-neutral-900 font-medium">
+                  <span className="text-sm text-v2-text-secondary font-medium">
                     {flexRender(column.columnDef.cell, cell.getContext())}
                   </span>
                 </div>
@@ -292,15 +292,15 @@ export const TanStackTable = memo(function TanStackTable<T>({
 
   // Memoize loading skeleton to avoid recreating on every render
   const loadingSkeleton = useMemo(() => (
-    <div className={cn("overflow-x-auto", className)}>
+    <div className={cn("rounded-lg border border-v2-border-light overflow-x-auto", className)}>
       <table className="w-full">
-        <thead className="sticky top-0 bg-v2-maroon-800 z-10 border-b-2 border-v2-maroon-600">
+        <thead className="sticky top-0 bg-v2-bg-surface-tint z-10 border-b border-v2-border-light">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="text-left py-3 px-4 text-v2-gold-accent text-base font-bold"
+                  className="text-left py-3 px-4 text-v2-text-secondary text-xs font-semibold uppercase tracking-wider"
                 >
                   {header.isPlaceholder
                     ? null
@@ -315,10 +315,10 @@ export const TanStackTable = memo(function TanStackTable<T>({
         </thead>
         <tbody>
           {Array.from({ length: loadingRowCount }).map((_, index) => (
-            <tr key={`loading-${index}`} className="border-b border-v2-maroon-600">
+            <tr key={`loading-${index}`} className="border-b border-v2-border-light">
               {columns.map((_, cellIndex) => (
                 <td key={`loading-cell-${cellIndex}`} className="py-3 px-4">
-                  <div className="h-4 bg-v2-maroon-600 rounded animate-pulse" />
+                  <div className="h-4 bg-v2-bg-dark rounded animate-pulse" />
                 </td>
               ))}
             </tr>
@@ -362,15 +362,15 @@ export const TanStackTable = memo(function TanStackTable<T>({
   }
 
   return (
-    <div className={cn("overflow-x-auto", className)}>
+    <div className={cn("rounded-lg border border-v2-border-light overflow-x-auto", className)}>
       <table className="w-full">
-        <thead className="sticky top-0 bg-v2-maroon-800 z-10 border-b-2 border-v2-maroon-600">
+        <thead className="sticky top-0 bg-v2-bg-surface-tint z-10 border-b border-v2-border-light">
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="border-b-2 border-v2-maroon-600">
+            <tr key={headerGroup.id} className="border-b border-v2-border-light">
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="text-left py-3 px-4 text-v2-gold-accent text-base font-bold cursor-pointer hover:bg-v2-maroon-700 select-none"
+                  className="text-left py-3 px-4 text-v2-text-secondary text-xs font-semibold uppercase tracking-wider cursor-pointer hover:bg-v2-maroon-600 select-none"
                   onClick={header.column.getToggleSortingHandler()}
                 >
                   {header.isPlaceholder
@@ -403,8 +403,8 @@ export const TanStackTable = memo(function TanStackTable<T>({
               <React.Fragment key={row.id}>
                 <tr
                   className={cn(
-                    index < table.getRowModel().rows.length - 1 && "border-b border-v2-maroon-600",
-                    showExpandable && "cursor-pointer hover:bg-neutral-50 transition-colors duration-150"
+                    index < table.getRowModel().rows.length - 1 && "border-b border-v2-border-light",
+                    showExpandable && "cursor-pointer hover:bg-v2-bg-surface-tint transition-colors duration-150"
                   )}
                   onClick={() => showExpandable && toggleRowExpansion(row.id)}
                   aria-expanded={isExpanded}
@@ -422,7 +422,7 @@ export const TanStackTable = memo(function TanStackTable<T>({
                     <td className="py-3 px-2 sm:hidden">
                       <button
                         type="button"
-                        className="min-h-[44px] min-w-[44px] flex items-center justify-center text-neutral-600 hover:text-primary-600 transition-colors duration-200 rounded-full hover:bg-neutral-100"
+                        className="min-h-[44px] min-w-[44px] flex items-center justify-center text-v2-text-tertiary hover:text-v2-gold-accent transition-colors duration-200 rounded-full hover:bg-v2-bg-surface-tint"
                         aria-label={isExpanded ? "Collapse row" : "Expand row"}
                         aria-expanded={isExpanded}
                         onClick={(e) => {
