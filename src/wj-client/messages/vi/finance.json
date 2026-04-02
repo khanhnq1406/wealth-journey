@@ -4,6 +4,11 @@
       "transaction": "Giao dịch",
       "report": "Báo cáo",
       "budget": "Ngân sách"
+    },
+    "actions": {
+      "addTransaction": "Thêm giao dịch",
+      "transferMoney": "Chuyển tiền",
+      "createWallet": "Tạo ví"
     }
   }
 }

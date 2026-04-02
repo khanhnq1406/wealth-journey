@@ -503,7 +503,7 @@ export function TransactionContent() {
   return (
     <div className="h-full flex flex-col">
       {/* Header with Balance */}
-      <div className="flex-shrink-0 bg-v2-red-primary rounded-md sm:bg-v2-bg-surface border-b sm:border-b-v2-border-light">
+      <div className="flex-shrink-0 bg-v2-bg-surface border-b border-b-v2-border-light">
         <div className="p-3 sm:p-4 md:px-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3 sm:mb-0">
             <h1 className="text-v2-gold-accent text-2xl sm:text-3xl lg:text-4xl font-bold">

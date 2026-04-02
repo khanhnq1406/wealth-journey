@@ -6,20 +6,21 @@ kanban-plugin: board
 
 ## Not Started
 
-- [ ] [[Fix auto open popup]]
-- [ ] [[Fix user price alert in Vietnamese]]
 - [ ] [[Cancel Google connection]]
 - [ ] [[Terms & Privacy]]
+- [ ] [[Fix admin nav items not showing after login]]
 - [ ] [[Improve all tab selection overload on mobile view]]
 
 
 ## Next
 
-- [ ] [[Add button group to finance page]]
+- [ ] [[Fix user price alert in Vietnamese]]
 
 
 ## In Progress
 
+- [ ] [[Add button group to finance page]]
+- [ ] [[Fix auto open popup]]
 
 
 ## Done
