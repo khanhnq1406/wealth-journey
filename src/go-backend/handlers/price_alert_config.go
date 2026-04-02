@@ -125,5 +125,16 @@ func mergeConfig(current, update service.PriceAlertConfig) service.PriceAlertCon
 		}
 	}
 
+	// Merge user alert templates (empty string = keep current)
+	if update.UserAlertTitleTemplate != "" {
+		result.UserAlertTitleTemplate = update.UserAlertTitleTemplate
+	}
+	if update.UserAlertAboveBodyTemplate != "" {
+		result.UserAlertAboveBodyTemplate = update.UserAlertAboveBodyTemplate
+	}
+	if update.UserAlertBelowBodyTemplate != "" {
+		result.UserAlertBelowBodyTemplate = update.UserAlertBelowBodyTemplate
+	}
+
 	return result
 }

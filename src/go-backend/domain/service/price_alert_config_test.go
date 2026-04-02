@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"strings"
 	"testing"
 
 	pkgredis "wealthjourney/pkg/redis"
@@ -337,4 +338,105 @@ func TestDeletePriceAlertConfig(t *testing.T) {
 	assert.Equal(t, defaults.CooldownMinutes, loaded.CooldownMinutes)
 	assert.Equal(t, defaults.TopMoversCount, loaded.TopMoversCount)
 	assert.True(t, loaded.Categories["gold_vnd"].Enabled)
+}
+
+func TestDefaultPriceAlertConfig_HasUserAlertTemplates(t *testing.T) {
+	cfg := DefaultPriceAlertConfig()
+	assert.NotEmpty(t, cfg.UserAlertTitleTemplate)
+	assert.NotEmpty(t, cfg.UserAlertAboveBodyTemplate)
+	assert.NotEmpty(t, cfg.UserAlertBelowBodyTemplate)
+}
+
+func TestValidatePriceAlertConfig_UserAlertTemplates(t *testing.T) {
+	cfg := DefaultPriceAlertConfig()
+
+	// Valid defaults pass
+	errs := ValidatePriceAlertConfig(cfg)
+	assert.Nil(t, errs)
+
+	// Title too long (>200 chars)
+	cfg.UserAlertTitleTemplate = strings.Repeat("a", 201)
+	errs = ValidatePriceAlertConfig(cfg)
+	assert.NotNil(t, errs)
+	assert.Contains(t, errs, "userAlertTitleTemplate")
+
+	// Body too long (>500 chars)
+	cfg2 := DefaultPriceAlertConfig()
+	cfg2.UserAlertAboveBodyTemplate = strings.Repeat("b", 501)
+	errs = ValidatePriceAlertConfig(cfg2)
+	assert.NotNil(t, errs)
+	assert.Contains(t, errs, "userAlertAboveBodyTemplate")
+
+	// Below body too long
+	cfg3 := DefaultPriceAlertConfig()
+	cfg3.UserAlertBelowBodyTemplate = strings.Repeat("c", 501)
+	errs = ValidatePriceAlertConfig(cfg3)
+	assert.NotNil(t, errs)
+	assert.Contains(t, errs, "userAlertBelowBodyTemplate")
+
+	// HTML stripped before validation — "<b>x</b>" → "x" (1 char, valid)
+	cfg4 := DefaultPriceAlertConfig()
+	cfg4.UserAlertTitleTemplate = "<b>test</b>"
+	SanitizePriceAlertConfig(&cfg4)
+	errs = ValidatePriceAlertConfig(cfg4)
+	assert.Nil(t, errs)
+	assert.Equal(t, "test", cfg4.UserAlertTitleTemplate)
+}
+
+func TestSanitizePriceAlertConfig_UserAlertTemplates(t *testing.T) {
+	cfg := DefaultPriceAlertConfig()
+	cfg.UserAlertTitleTemplate = "<script>alert('xss')</script>Price: {name}"
+	cfg.UserAlertAboveBodyTemplate = "<b>{name}</b> above <i>{price}</i>"
+	cfg.UserAlertBelowBodyTemplate = "{name} below {price}"
+	SanitizePriceAlertConfig(&cfg)
+	assert.Equal(t, "alert('xss')Price: {name}", cfg.UserAlertTitleTemplate)
+	assert.Equal(t, "{name} above {price}", cfg.UserAlertAboveBodyTemplate)
+	assert.Equal(t, "{name} below {price}", cfg.UserAlertBelowBodyTemplate)
+}
+
+func TestLoadPriceAlertConfig_BackwardsCompatible(t *testing.T) {
+	// JSON without user alert fields should get defaults
+	oldJSON := `{"cooldownMinutes":60,"topMoversCount":3,"categories":{}}`
+	var cfg PriceAlertConfig
+	if err := json.Unmarshal([]byte(oldJSON), &cfg); err != nil {
+		t.Fatalf("unexpected unmarshal error: %v", err)
+	}
+	// Simulate what LoadPriceAlertConfig does post-unmarshal
+	defaults := DefaultPriceAlertConfig()
+	if cfg.UserAlertTitleTemplate == "" {
+		cfg.UserAlertTitleTemplate = defaults.UserAlertTitleTemplate
+	}
+	if cfg.UserAlertAboveBodyTemplate == "" {
+		cfg.UserAlertAboveBodyTemplate = defaults.UserAlertAboveBodyTemplate
+	}
+	if cfg.UserAlertBelowBodyTemplate == "" {
+		cfg.UserAlertBelowBodyTemplate = defaults.UserAlertBelowBodyTemplate
+	}
+	assert.NotEmpty(t, cfg.UserAlertTitleTemplate)
+	assert.NotEmpty(t, cfg.UserAlertAboveBodyTemplate)
+	assert.NotEmpty(t, cfg.UserAlertBelowBodyTemplate)
+}
+
+func TestFormatUserAlertPrice(t *testing.T) {
+	tests := []struct {
+		price    int64
+		currency string
+		expected string
+	}{
+		{50000, "VND", "50,000 VND"},
+		{1234567, "VND", "1,234,567 VND"},
+		{5000000, "USD", "50,000.00 USD"},
+		{5050, "USD", "50.50 USD"},
+		{0, "VND", "0 VND"},
+	}
+	for _, tt := range tests {
+		result := FormatUserAlertPrice(tt.price, tt.currency)
+		assert.Equal(t, tt.expected, result, "price=%d currency=%s", tt.price, tt.currency)
+	}
+}
+
+func TestPriceSideDisplayName(t *testing.T) {
+	assert.Equal(t, "mua", priceSideDisplayName("buy"))
+	assert.Equal(t, "bán", priceSideDisplayName("sell"))
+	assert.Equal(t, "unknown", priceSideDisplayName("unknown"))
 }

@@ -39,6 +39,8 @@ interface UserPriceAlertMetadata {
   currentPrice: number;
   priceSide: string;
   currency: string;
+  resolvedTitle?: string;
+  resolvedBody?: string;
 }
 
 function parseMetadata<T>(metadata?: string): T | null {
@@ -118,6 +120,13 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
     const meta = parseMetadata<UserPriceAlertMetadata>(notification.metadata);
     const isAbove = meta?.direction === "above";
 
+    // Use resolved title/body from metadata (admin-configured templates),
+    // falling back to raw fields for older notifications without them
+    const title = meta?.resolvedTitle || (meta?.symbol ? `${meta.symbol} — ${meta.name}` : "Cảnh báo giá");
+    const body = meta?.resolvedBody || (meta
+      ? `${isAbove ? "↑ Tăng vượt" : "↓ Giảm dưới"} ${meta.targetPrice.toLocaleString()} — hiện tại ${meta.currentPrice.toLocaleString()} ${meta.currency}`
+      : undefined);
+
     return (
       <button
         onClick={() => onClick?.(notification)}
@@ -138,11 +147,11 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-roboto text-sm text-v2-gold-accent leading-snug font-medium">
-            {meta?.symbol ?? "Price alert"} triggered
+            {title}
           </p>
-          {meta && (
+          {body && (
             <p className="mt-0.5 font-roboto text-xs text-v2-text-secondary leading-snug">
-              {isAbove ? "↑ Above" : "↓ Below"} {meta.targetPrice.toLocaleString()} — now {meta.currentPrice.toLocaleString()} {meta.currency}
+              {body}
             </p>
           )}
           <p className="mt-1 font-roboto text-xs text-v2-text-tertiary">{timeAgo}</p>

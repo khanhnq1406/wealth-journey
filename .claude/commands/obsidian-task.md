@@ -37,19 +37,13 @@ template — without the user having to touch the files manually.
 
    ## Details
 
-   <For bugs: describe the exact symptom, where it occurs, steps to reproduce if known, and the expected vs actual behavior.>
-   <For features: describe the user need, how it should work, and any relevant UI/UX or technical context.>
-
-   ## Acceptance Criteria
-
-   - [ ] <Criterion 1>
-   - [ ] <Criterion 2>
+   <For bugs: describe the exact symptom, where it occurs, steps to reproduce if known, and the expected vs actual behavior. Do NOT suggest causes or fixes.>
+   <For features: describe the user need and how it should behave from the user's perspective. Do NOT reference code, files, or implementation approach.>
    ```
 
    **Description quality rules:**
    - **Overview** must answer *what* and *why* in plain language (not bullet points)
-   - **Details** must be specific — mention component names, routes, or behavior when known
-   - **Acceptance Criteria** must be checkable, concrete items (≥ 2)
+   - **Details** stays at the behavior/experience level — no code references, no file paths, no implementation suggestions
    - Derive as much detail as possible from the user's message; ask follow-up questions only for critical missing info
 
 3. **Add the task line** to `docs/obsidian/Kanban Board.md` in the correct
@@ -91,19 +85,10 @@ template — without the user having to touch the files manually.
 
   ## Details
 
-  On hard reload, the browser renders unstyled HTML before the theme CSS is
-  applied, resulting in a white flash. This is likely caused by the theme class
-  being applied via JavaScript after paint rather than via a server-side class
-  on `<html>`. Affects all pages; most visible on dark-themed dashboard routes.
+  Occurs on hard reload across all pages, most noticeable on dark-themed screens.
 
-  Expected: Theme applies immediately with no flash.
-  Actual: ~200ms white flash visible before dark theme kicks in.
-
-  ## Acceptance Criteria
-
-  - [ ] No white flash is visible on hard reload in any supported browser
-  - [ ] Theme class is applied before first paint (e.g., via SSR or inline script)
-  - [ ] Verified on Chrome, Safari, and Firefox
+  Expected: Theme applies immediately with no visible flash.
+  Actual: ~200ms white flash appears before the dark theme kicks in.
   ```
 - Add `- [ ] [[Fix dark mode flash on reload]]` under `## Not Started` in Kanban Board.md
 - Reply: "✅ Task added: **Fix dark mode flash on reload** (bug · Not Started)"
@@ -131,16 +116,9 @@ template — without the user having to touch the files manually.
 
   ## Details
 
-  Add a "Download CSV" button to the `/dashboard/report` page. The export
-  should include all visible transactions respecting the current date range
-  and filter state. Columns: Date, Description, Category, Amount, Currency,
-  Wallet. Use the existing `csv-export.ts` utility in `features/report/`.
-
-  ## Acceptance Criteria
-
-  - [ ] "Download CSV" button visible on the report page
-  - [ ] Exported file includes correct columns and respects active filters
-  - [ ] File is named `transactions-<date-range>.csv`
+  Users should be able to download their transaction report as a CSV file.
+  The export should respect the current date range and active filters.
+  Exported columns should include: Date, Description, Category, Amount, Currency, Wallet.
   ```
 - Add `- [ ] [[Add CSV export to reports]]` under `## Not Started` in Kanban Board.md
 
@@ -149,7 +127,7 @@ template — without the user having to touch the files manually.
 **User:** "add feature task: Dark mode toggle, it's already in progress — let users switch between light and dark themes"
 
 **Action:**
-- Create note with detailed Overview / Details / Acceptance Criteria
+- Create note with detailed Overview / Details
 - Add to `## In Progress` column.
 
 # Constraints

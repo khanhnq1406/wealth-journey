@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"regexp"
 	"strings"
 
@@ -23,9 +24,12 @@ type PriceAlertCategoryConfig struct {
 
 // PriceAlertConfig holds the full configuration.
 type PriceAlertConfig struct {
-	CooldownMinutes int                                 `json:"cooldownMinutes"`
-	TopMoversCount  int                                 `json:"topMoversCount"`
-	Categories      map[string]PriceAlertCategoryConfig `json:"categories"`
+	CooldownMinutes            int                                 `json:"cooldownMinutes"`
+	TopMoversCount             int                                 `json:"topMoversCount"`
+	Categories                 map[string]PriceAlertCategoryConfig `json:"categories"`
+	UserAlertTitleTemplate     string                              `json:"userAlertTitleTemplate"`
+	UserAlertAboveBodyTemplate string                              `json:"userAlertAboveBodyTemplate"`
+	UserAlertBelowBodyTemplate string                              `json:"userAlertBelowBodyTemplate"`
 }
 
 // DefaultPriceAlertConfig returns the default config built from env vars.
@@ -59,7 +63,18 @@ func DefaultPriceAlertConfig() PriceAlertConfig {
 				BodyTemplate:  "{moverName} {direction} {baselinePrice}->{currentPrice}",
 			},
 		},
+		UserAlertTitleTemplate:     envString("USER_ALERT_TITLE_TEMPLATE", "Cảnh báo giá {name}"),
+		UserAlertAboveBodyTemplate: envString("USER_ALERT_ABOVE_BODY_TEMPLATE", "{name} tăng vượt mức {price}"),
+		UserAlertBelowBodyTemplate: envString("USER_ALERT_BELOW_BODY_TEMPLATE", "{name} giảm dưới mức {price}"),
 	}
+}
+
+// envString returns env var value or fallback.
+func envString(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
 }
 
 // LoadPriceAlertConfig reads config from Redis, falling back to defaults.
@@ -89,6 +104,17 @@ func LoadPriceAlertConfig(ctx context.Context, rdb *pkgredis.RedisClient) PriceA
 			}
 			cfg.Categories[cat] = def
 		}
+	}
+
+	// Backwards compatibility: fill in user alert templates if missing from stored config
+	if cfg.UserAlertTitleTemplate == "" {
+		cfg.UserAlertTitleTemplate = defaults.UserAlertTitleTemplate
+	}
+	if cfg.UserAlertAboveBodyTemplate == "" {
+		cfg.UserAlertAboveBodyTemplate = defaults.UserAlertAboveBodyTemplate
+	}
+	if cfg.UserAlertBelowBodyTemplate == "" {
+		cfg.UserAlertBelowBodyTemplate = defaults.UserAlertBelowBodyTemplate
 	}
 
 	return cfg
@@ -149,6 +175,19 @@ func ValidatePriceAlertConfig(cfg PriceAlertConfig) map[string]string {
 		}
 	}
 
+	titleText := stripHTML(cfg.UserAlertTitleTemplate)
+	if len(titleText) == 0 || len(titleText) > 200 {
+		errors["userAlertTitleTemplate"] = "must be 1-200 characters (no HTML)"
+	}
+	aboveText := stripHTML(cfg.UserAlertAboveBodyTemplate)
+	if len(aboveText) == 0 || len(aboveText) > 500 {
+		errors["userAlertAboveBodyTemplate"] = "must be 1-500 characters (no HTML)"
+	}
+	belowText := stripHTML(cfg.UserAlertBelowBodyTemplate)
+	if len(belowText) == 0 || len(belowText) > 500 {
+		errors["userAlertBelowBodyTemplate"] = "must be 1-500 characters (no HTML)"
+	}
+
 	if len(errors) > 0 {
 		return errors
 	}
@@ -162,6 +201,9 @@ func SanitizePriceAlertConfig(cfg *PriceAlertConfig) {
 		catCfg.BodyTemplate = stripHTML(catCfg.BodyTemplate)
 		cfg.Categories[cat] = catCfg
 	}
+	cfg.UserAlertTitleTemplate = stripHTML(cfg.UserAlertTitleTemplate)
+	cfg.UserAlertAboveBodyTemplate = stripHTML(cfg.UserAlertAboveBodyTemplate)
+	cfg.UserAlertBelowBodyTemplate = stripHTML(cfg.UserAlertBelowBodyTemplate)
 }
 
 // ResolvePlaceholders replaces {placeholder} tokens in a template string.
@@ -252,6 +294,32 @@ func categoryCurrency(cat string) string {
 		return "USD"
 	default:
 		return ""
+	}
+}
+
+// FormatUserAlertPrice formats a price (int64) with currency suffix for user alerts.
+// VND: no decimals, comma thousands → "1,234,567 VND"
+// USD: 2 decimals, comma thousands → "50,000.00 USD"
+func FormatUserAlertPrice(price int64, currency string) string {
+	switch strings.ToUpper(currency) {
+	case "USD":
+		dollars := price / 100
+		cents := price % 100
+		return fmt.Sprintf("%s.%02d %s", FormatWithThousandSeparators(dollars), cents, currency)
+	default:
+		return fmt.Sprintf("%s %s", FormatWithThousandSeparators(price), currency)
+	}
+}
+
+// priceSideDisplayName returns Vietnamese display name for buy/sell side.
+func priceSideDisplayName(side string) string {
+	switch side {
+	case "buy":
+		return "mua"
+	case "sell":
+		return "bán"
+	default:
+		return side
 	}
 }
 

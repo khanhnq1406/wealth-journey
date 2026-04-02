@@ -318,6 +318,10 @@ func (s *userPriceAlertService) EvaluateAlerts(ctx context.Context) error {
 		return nil
 	}
 
+	// Load notification templates once per cycle (not per alert).
+	// Falls back to hardcoded Vietnamese defaults if Redis is unavailable or config is missing.
+	cfg := LoadPriceAlertConfig(ctx, s.rdb)
+
 	// Build price map grouped by asset type to avoid redundant API calls
 	fetchCtx, cancel := context.WithTimeout(ctx, alertEvalPriceFetchTimeout)
 	defer cancel()
@@ -366,16 +370,43 @@ func (s *userPriceAlertService) EvaluateAlerts(ctx context.Context) error {
 			}
 		}
 
+		// Resolve notification templates using the config loaded once at the top of EvaluateAlerts.
+		placeholders := map[string]string{
+			"name":         alert.Name,
+			"symbol":       alert.Symbol,
+			"price":        FormatUserAlertPrice(alert.TargetPrice, alert.Currency),
+			"currentPrice": FormatUserAlertPrice(currentPrice, alert.Currency),
+			"currency":     alert.Currency,
+			"priceSide":    priceSideDisplayName(alert.PriceSide),
+		}
+		resolvedTitle := ResolvePlaceholders(cfg.UserAlertTitleTemplate, placeholders)
+		// Truncate title to 65 chars to respect mobile push notification limits
+		if len([]rune(resolvedTitle)) > 65 {
+			runes := []rune(resolvedTitle)
+			resolvedTitle = string(runes[:62]) + "…"
+		}
+		var resolvedBody string
+		switch alert.Direction {
+		case "above":
+			resolvedBody = ResolvePlaceholders(cfg.UserAlertAboveBodyTemplate, placeholders)
+		case "below":
+			resolvedBody = ResolvePlaceholders(cfg.UserAlertBelowBodyTemplate, placeholders)
+		default:
+			resolvedBody = ResolvePlaceholders(cfg.UserAlertAboveBodyTemplate, placeholders)
+		}
+
 		// Build notification metadata
 		metadata := map[string]interface{}{
-			"alertId":      alert.ID,
-			"symbol":       alert.Symbol,
-			"name":         alert.Name,
-			"direction":    alert.Direction,
-			"targetPrice":  alert.TargetPrice,
-			"currentPrice": currentPrice,
-			"priceSide":    alert.PriceSide,
-			"currency":     alert.Currency,
+			"alertId":       alert.ID,
+			"symbol":        alert.Symbol,
+			"name":          alert.Name,
+			"direction":     alert.Direction,
+			"targetPrice":   alert.TargetPrice,
+			"currentPrice":  currentPrice,
+			"priceSide":     alert.PriceSide,
+			"currency":      alert.Currency,
+			"resolvedTitle": resolvedTitle,
+			"resolvedBody":  resolvedBody,
 		}
 		metadataJSON, err := json.Marshal(metadata)
 		if err != nil {
@@ -408,15 +439,9 @@ func (s *userPriceAlertService) EvaluateAlerts(ctx context.Context) error {
 			_ = rdb.Publish(channel, ssePayload)
 		}
 
-		// Send push notification (truncate name to avoid exceeding mobile push limits)
+		// Send push notification using resolved template title and body
 		if s.pushSvc != nil {
-			shortName := alert.Name
-			if len(shortName) > 30 {
-				shortName = shortName[:30] + "…"
-			}
-			title := fmt.Sprintf("Price Alert: %s", shortName)
-			body := fmt.Sprintf("%s has gone %s %d", shortName, alert.Direction, alert.TargetPrice)
-			_ = s.pushSvc.SendToUser(ctx, alert.UserID, title, body, "/dashboard/settings/alerts")
+			_ = s.pushSvc.SendToUser(ctx, alert.UserID, resolvedTitle, resolvedBody, "/dashboard/settings/alerts")
 		}
 
 		// Update alert status and counters

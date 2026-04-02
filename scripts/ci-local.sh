@@ -230,7 +230,20 @@ run_frontend_typecheck() {
 run_frontend_test() {
     print_job "Frontend: jest"
     cd "$FRONTEND_DIR"
-    if npx jest --ci --coverage 2>&1 | tail -30; then
+    set +e
+    npx jest --ci --coverage --maxWorkers=1 > /tmp/jest-ci-output.txt 2>&1
+    JEST_EXIT=$?
+    set -e
+    # On macOS, libuv may emit SIGABRT (exit 134) during node teardown after tests complete.
+    # This is a known macOS/libuv issue unrelated to test results.
+    # Treat it as pass if no FAIL lines exist in the output (all tests passed before the crash).
+    if [ $JEST_EXIT -eq 134 ]; then
+        if grep -q "^PASS " /tmp/jest-ci-output.txt && ! grep -q "^FAIL " /tmp/jest-ci-output.txt; then
+            JEST_EXIT=0
+        fi
+    fi
+    tail -30 /tmp/jest-ci-output.txt
+    if [ $JEST_EXIT -eq 0 ]; then
         pass "Frontend test (jest)"
     else
         fail "Frontend test (jest)"

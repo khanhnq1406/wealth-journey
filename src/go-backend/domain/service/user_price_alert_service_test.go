@@ -971,6 +971,132 @@ func TestUserPriceAlertService_EvaluateAlerts_GoldAlert_StalePrice_NotTriggered(
 	alertRepo.AssertNotCalled(t, "UpdateStatus")
 }
 
+// --- Tests: EvaluateAlerts template resolution ---
+
+func TestEvaluateAlerts_UsesTemplateFromConfig(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	notifRepo := new(mockAlertNotifRepo)
+	pushSvc := new(mockAlertPushSvc)
+	svc := &userPriceAlertService{
+		alertRepo:     alertRepo,
+		assetPriceSvc: assetPriceSvc,
+		marketDataSvc: &mockAlertMarketDataSvc{},
+		notifRepo:     notifRepo,
+		pushSvc:       pushSvc,
+		rdb:           nil, // nil rdb → LoadPriceAlertConfig returns defaults
+	}
+	ctx := context.Background()
+
+	now := time.Now()
+	activeAlerts := []*models.UserPriceAlert{
+		{
+			ID:          20,
+			UserID:      2,
+			Symbol:      "SJL1L10",
+			Name:        "SJC Gold",
+			AssetType:   int32(v1.InvestmentType_INVESTMENT_TYPE_GOLD_VND),
+			Currency:    "VND",
+			PriceSide:   "buy",
+			Direction:   "above",
+			TargetPrice: 9000000000,
+			TriggerMode: "once",
+			Status:      "active",
+			CreatedAt:   now,
+			UpdatedAt:   now,
+		},
+	}
+
+	alertRepo.On("ListActive", ctx).Return(activeAlerts, nil)
+	assetPriceSvc.On("GetPricesByAssetType", mock.Anything, "gold").
+		Return([]*AssetPriceDTO{
+			{TypeCode: "SJL1L10", Buy: 9100000000, Sell: 9200000000, IsStale: false},
+		}, nil)
+	notifRepo.On("Create", mock.Anything, mock.AnythingOfType("*models.Notification")).Return(nil)
+	// Capture the title and body passed to SendToUser
+	var capturedTitle, capturedBody string
+	pushSvc.On("SendToUser", mock.Anything, int32(2), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Run(func(args mock.Arguments) {
+			capturedTitle = args.String(2)
+			capturedBody = args.String(3)
+		}).Return(nil)
+	alertRepo.On("UpdateStatus", mock.Anything, int32(20), "triggered", mock.Anything, int32(1)).Return(nil)
+
+	err := svc.EvaluateAlerts(ctx)
+
+	assert.NoError(t, err)
+	// Title must come from the default template "Cảnh báo giá {name}" resolved with name="SJC Gold"
+	// NOT the old hardcoded "Price Alert: ..." format
+	assert.Contains(t, capturedTitle, "SJC Gold")
+	assert.NotContains(t, capturedTitle, "Price Alert:")
+	// Body must come from the above template "..{name}..{price}.." resolved
+	assert.Contains(t, capturedBody, "SJC Gold")
+	alertRepo.AssertExpectations(t)
+	pushSvc.AssertExpectations(t)
+}
+
+func TestEvaluateAlerts_FallsBackToDefaults_WhenConfigMissing(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	notifRepo := new(mockAlertNotifRepo)
+	pushSvc := new(mockAlertPushSvc)
+	// rdb is nil → LoadPriceAlertConfig returns hardcoded defaults (Vietnamese templates)
+	svc := &userPriceAlertService{
+		alertRepo:     alertRepo,
+		assetPriceSvc: assetPriceSvc,
+		marketDataSvc: &mockAlertMarketDataSvc{},
+		notifRepo:     notifRepo,
+		pushSvc:       pushSvc,
+		rdb:           nil,
+	}
+	ctx := context.Background()
+
+	now := time.Now()
+	activeAlerts := []*models.UserPriceAlert{
+		{
+			ID:          30,
+			UserID:      3,
+			Symbol:      "VCB",
+			Name:        "Vietcombank",
+			AssetType:   int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK),
+			Currency:    "VND",
+			PriceSide:   "buy",
+			Direction:   "below",
+			TargetPrice: 80000,
+			TriggerMode: "once",
+			Status:      "active",
+			CreatedAt:   now,
+			UpdatedAt:   now,
+		},
+	}
+	marketSvc := new(mockAlertMarketDataSvc)
+	svc.marketDataSvc = marketSvc
+
+	alertRepo.On("ListActive", ctx).Return(activeAlerts, nil)
+	// market price below target → alert fires
+	marketSvc.On("GetPrice", mock.Anything, "VCB", "VND", v1.InvestmentType_INVESTMENT_TYPE_STOCK, mock.AnythingOfType("time.Duration")).
+		Return(&models.MarketData{Price: 75000}, nil)
+	notifRepo.On("Create", mock.Anything, mock.AnythingOfType("*models.Notification")).Return(nil)
+	var capturedTitle, capturedBody string
+	pushSvc.On("SendToUser", mock.Anything, int32(3), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).
+		Run(func(args mock.Arguments) {
+			capturedTitle = args.String(2)
+			capturedBody = args.String(3)
+		}).Return(nil)
+	alertRepo.On("UpdateStatus", mock.Anything, int32(30), "triggered", mock.Anything, int32(1)).Return(nil)
+
+	err := svc.EvaluateAlerts(ctx)
+
+	assert.NoError(t, err)
+	// Default Vietnamese title template: "Cảnh báo giá {name}" → resolved to contain "Vietcombank"
+	assert.Contains(t, capturedTitle, "Vietcombank")
+	assert.NotContains(t, capturedTitle, "Price Alert:")
+	// Default Vietnamese below body template: "{name} giảm dưới mức {price}"
+	assert.Contains(t, capturedBody, "Vietcombank")
+	alertRepo.AssertExpectations(t)
+	pushSvc.AssertExpectations(t)
+}
+
 // --- Security checks ---
 
 func TestUserPriceAlertService_CreateAlert_InvalidUserID(t *testing.T) {
