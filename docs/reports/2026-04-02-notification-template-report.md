@@ -89,6 +89,12 @@ All tasks passed Stage 3. Minor observations (non-blocking):
 - `docs/reports/2026-04-02-notification-template-progress.md` — created; progress tracking
 - `docs/reports/2026-04-02-notification-template-report.md` — this file
 
+## Fix History
+
+| Date       | Fix                                                                                                  | Severity | Commit  |
+| ---------- | ---------------------------------------------------------------------------------------------------- | -------- | ------- |
+| 2026-04-02 | `NotificationItem.tsx`: in-app web notification for `user_price_alert` now uses `resolvedTitle`/`resolvedBody` from metadata (same configurable templates as push notifications), with fallback for older notifications without those fields | Minor | pending |
+
 ## How to Test
 
 ### Unit & Integration Tests
