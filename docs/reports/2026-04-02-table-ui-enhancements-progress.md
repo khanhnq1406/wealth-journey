@@ -17,7 +17,7 @@
 | 0   | Update C4 Architecture Diagrams               | done        | 471b0dbd | Add SortableList to c4-component-frontend.md tables entry |
 | 1   | TanStackTable Desktop Styling Alignment       | done        | 471b0dbd | Aligned all TanStackTable styles with v2 tokens; 5 tests pass |
 | 2   | Create Generic SortableList Component         | done        | 471b0dbd | Generic dnd-kit SortableList created; 4 tests pass |
-| 3   | Refactor DraggableWatchlistTable to SortableList | done     | pending| Removed internal dnd-kit; delegates to SortableList; 3 tests pass |
+| 3   | Refactor DraggableWatchlistTable to SortableList | done     | d70ef655 | Removed internal dnd-kit; delegates to SortableList; 3 tests pass |
 | 4   | Create/Update Runtime Flow Diagrams           | skipped     | —      | Per spec: no flow diagram updates required |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
