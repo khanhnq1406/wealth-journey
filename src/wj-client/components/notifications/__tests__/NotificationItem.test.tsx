@@ -9,6 +9,7 @@ function makeNotification(
   return {
     id: 1,
     type: "user_price_alert",
+    actorId: 0,
     isRead: false,
     createdAt: Math.floor(Date.now() / 1000),
     actorName: "",
