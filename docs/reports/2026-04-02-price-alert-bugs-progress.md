@@ -6,9 +6,9 @@
 - **Plan file:** `docs/plans/2026-04-02-price-alert-bugs-plan.md`
 - **Spec file:** `docs/specs/2026-04-02-price-alert-bugs-spec.md`
 - **Started:** 2026-04-02T00:00:00Z
-- **Last updated:** 2026-04-02T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 1
+- **Last updated:** 2026-04-02T02:00:00Z
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -16,9 +16,9 @@
 | --- | -------------------------------------------------- | ---------- | ------ | ------- |
 | 0   | Update C4 Architecture Diagrams                    | skipped    | —      | No architecture changes |
 | N-1 | Create/Update Runtime Flow Diagrams                | skipped    | —      | No flow changes |
-| 1   | Fix USD Price Formatting in FormatUserAlertPrice   | in_progress | —      | — |
-| 2   | Allow Vietnamese Characters in Symbol Validation   | pending    | —      | — |
-| 3   | Final Verification — Lint & Build                  | pending    | —      | — |
+| 1   | Fix USD Price Formatting in FormatUserAlertPrice   | done        | 3e08de91 | Remove /100 division; uniform whole-unit formatting for all currencies |
+| 2   | Allow Vietnamese Characters in Symbol Validation   | done        | 3e08de91 | Expand symbolPattern to \p{L}\p{N} + space; blocks injection chars |
+| 3   | Final Verification — Lint & Build                  | done        | —      | golangci-lint: 0 issues; go test -short ./...: all pass |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
