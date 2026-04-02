@@ -398,7 +398,9 @@ func TestLoadPriceAlertConfig_BackwardsCompatible(t *testing.T) {
 	// JSON without user alert fields should get defaults
 	oldJSON := `{"cooldownMinutes":60,"topMoversCount":3,"categories":{}}`
 	var cfg PriceAlertConfig
-	json.Unmarshal([]byte(oldJSON), &cfg)
+	if err := json.Unmarshal([]byte(oldJSON), &cfg); err != nil {
+		t.Fatalf("unexpected unmarshal error: %v", err)
+	}
 	// Simulate what LoadPriceAlertConfig does post-unmarshal
 	defaults := DefaultPriceAlertConfig()
 	if cfg.UserAlertTitleTemplate == "" {
