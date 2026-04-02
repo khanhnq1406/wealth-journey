@@ -758,6 +758,7 @@ export function DashboardLayout({
           ]}
           autoOpen={path === routes.home}
           introContent={fabIntroContent}
+          isLoading={fabSettings.isPending}
         />
 
         {/* Global Modals */}

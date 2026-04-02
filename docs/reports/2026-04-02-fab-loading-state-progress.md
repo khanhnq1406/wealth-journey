@@ -8,7 +8,7 @@
 - **Started:** 2026-04-02T00:00:00Z
 - **Last updated:** 2026-04-02T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 2
+- **Current task:** 3
 
 ## Task Progress
 
@@ -16,7 +16,7 @@
 | --- | ------------------------------------------------------- | ----------- | ------ | ------- |
 | 0   | Update C4 Architecture Diagrams                         | skipped     | —      | No architectural changes per plan |
 | 1   | Add isLoading prop and skeleton to FloatingActionButton | done        | f850933f | Added isLoading prop, Skeleton import, 3-line skeleton render, 12 unit tests |
-| 2   | Pass isPending from DashboardLayout to FAB              | pending     | —      | — |
+| 2   | Pass isPending from DashboardLayout to FAB              | done        | 9421806e | Added isLoading={fabSettings.isPending} to FAB in DashboardLayout, 2 unit tests |
 | 3   | Manual verification and edge case testing               | pending     | —      | — |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
