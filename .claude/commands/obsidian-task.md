@@ -13,6 +13,20 @@ Quickly add a new task to the Obsidian Kanban board at
 `docs/obsidian/Kanban Board.md`, creating a linked note with a standard
 template — without the user having to touch the files manually.
 
+# Naming Convention
+
+Task note filenames follow the same `YYYY-MM-DD-<feature-slug>` pattern used
+by spec, plan, progress, and report files. This keeps all artifacts for a
+feature consistently named.
+
+- **Date**: today's date in `YYYY-MM-DD` format
+- **Feature slug**: kebab-case imperative phrase derived from the title
+  - e.g. "Fix dark mode flash on reload" → `fix-dark-mode-flash-on-reload`
+  - e.g. "Add CSV export to reports" → `add-csv-export-to-reports`
+
+**Full filename:** `YYYY-MM-DD-<feature-slug>.md`
+**Kanban link display text:** the original human-readable title (alias syntax)
+
 # Instructions
 
 1. **Collect task info** — ask for any missing fields:
@@ -23,7 +37,12 @@ template — without the user having to touch the files manually.
 
    If the user's message already contains enough info, skip asking and proceed.
 
-2. **Create the linked note** at `docs/obsidian/<Title>.md` using this template:
+2. **Derive the slug and filename:**
+   - Slug: lowercase the title, replace spaces and special chars with `-`, strip leading/trailing `-`
+   - Filename: `YYYY-MM-DD-<slug>.md` (use today's date)
+   - Example: title "Fix dark mode flash on reload" → slug `fix-dark-mode-flash-on-reload` → file `2026-04-02-fix-dark-mode-flash-on-reload.md`
+
+3. **Create the linked note** at `docs/obsidian/YYYY-MM-DD-<slug>.md` using this template:
 
    ```
    ---
@@ -46,12 +65,15 @@ template — without the user having to touch the files manually.
    - **Details** stays at the behavior/experience level — no code references, no file paths, no implementation suggestions
    - Derive as much detail as possible from the user's message; ask follow-up questions only for critical missing info
 
-3. **Add the task line** to `docs/obsidian/Kanban Board.md` in the correct
+4. **Add the task line** to `docs/obsidian/Kanban Board.md` in the correct
    status column, immediately after the column header line (before the blank
-   line or next item):
+   line or next item).
+
+   Use Obsidian alias syntax so the board shows the human-readable title but
+   links to the dated file:
 
    ```
-   - [ ] [[<Title>]]
+   - [ ] [[YYYY-MM-DD-<slug>|<Title>]]
    ```
 
    Column header format in the file:
@@ -60,8 +82,8 @@ template — without the user having to touch the files manually.
    - `## In Progress`
    - `## Done`
 
-4. **Confirm** to the user: show the task title, type, status, and the two
-   files that were created/modified.
+5. **Confirm** to the user: show the task title, slug filename, type, status,
+   and the two files that were created/modified.
 
 # Examples
 
@@ -69,8 +91,11 @@ template — without the user having to touch the files manually.
 
 **User:** "add a bug task: Fix dark mode flash on reload — it flickers white for 200ms before applying the theme"
 
+**Slug:** `fix-dark-mode-flash-on-reload`
+**Filename:** `2026-04-02-fix-dark-mode-flash-on-reload.md`
+
 **Action:**
-- Create `docs/obsidian/Fix dark mode flash on reload.md`:
+- Create `docs/obsidian/2026-04-02-fix-dark-mode-flash-on-reload.md`:
   ```
   ---
   type: bug
@@ -90,8 +115,8 @@ template — without the user having to touch the files manually.
   Expected: Theme applies immediately with no visible flash.
   Actual: ~200ms white flash appears before the dark theme kicks in.
   ```
-- Add `- [ ] [[Fix dark mode flash on reload]]` under `## Not Started` in Kanban Board.md
-- Reply: "✅ Task added: **Fix dark mode flash on reload** (bug · Not Started)"
+- Add `- [ ] [[2026-04-02-fix-dark-mode-flash-on-reload|Fix dark mode flash on reload]]` under `## Not Started` in Kanban Board.md
+- Reply: "✅ Task added: **Fix dark mode flash on reload** (`2026-04-02-fix-dark-mode-flash-on-reload`) · bug · Not Started"
 
 ## Example 2: User provides partial info
 
@@ -101,8 +126,11 @@ template — without the user having to touch the files manually.
 
 **User:** "feature — users should be able to download their transaction report as a CSV file"
 
+**Slug:** `add-csv-export-to-reports`
+**Filename:** `2026-04-02-add-csv-export-to-reports.md`
+
 **Action:**
-- Create `docs/obsidian/Add CSV export to reports.md`:
+- Create `docs/obsidian/2026-04-02-add-csv-export-to-reports.md`:
   ```
   ---
   type: feature
@@ -120,24 +148,25 @@ template — without the user having to touch the files manually.
   The export should respect the current date range and active filters.
   Exported columns should include: Date, Description, Category, Amount, Currency, Wallet.
   ```
-- Add `- [ ] [[Add CSV export to reports]]` under `## Not Started` in Kanban Board.md
+- Add `- [ ] [[2026-04-02-add-csv-export-to-reports|Add CSV export to reports]]` under `## Not Started` in Kanban Board.md
 
 ## Example 3: User specifies status
 
 **User:** "add feature task: Dark mode toggle, it's already in progress — let users switch between light and dark themes"
 
 **Action:**
+- Filename: `2026-04-02-dark-mode-toggle.md`
 - Create note with detailed Overview / Details
-- Add to `## In Progress` column.
+- Add `- [ ] [[2026-04-02-dark-mode-toggle|Dark mode toggle]]` to `## In Progress` column.
 
 # Constraints
 
-- Title must be a valid filename (no `/`, `\`, `:`, `*`, `?`, `"`, `<`, `>`, `|`)
-- If title contains invalid chars, sanitize silently (replace with `-` or remove)
+- Slug must be a valid filename (no `/`, `\`, `:`, `*`, `?`, `"`, `<`, `>`, `|`)
+- If the title contains invalid chars, sanitize silently when building the slug (replace with `-` or remove)
 - Always insert the new task line AFTER the `## <Status>` header, before any existing tasks in that column — newest tasks go to the top
 - Never modify the `%% kanban:settings` block at the bottom of Kanban Board.md
 - Kanban Board path: `docs/obsidian/Kanban Board.md` (relative to project root)
-- Task notes path: `docs/obsidian/<Title>.md`
-- If a note with that title already exists, warn the user before overwriting
+- Task notes path: `docs/obsidian/YYYY-MM-DD-<slug>.md`
+- If a note with that filename already exists, warn the user before overwriting
 
 <!-- Generated by Skill Creator Ultra v1.0 -->

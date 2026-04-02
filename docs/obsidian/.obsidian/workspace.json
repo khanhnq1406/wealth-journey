@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "daa360b7f2300f00",
+        "id": "91ffca39ccb4b426",
         "type": "tabs",
         "children": [
           {
-            "id": "b114d52973a28f85",
+            "id": "c1a649a975fff14d",
             "type": "leaf",
             "state": {
               "type": "kanban",
@@ -17,6 +17,7 @@
                 "kanbanViewState": {
                   "kanban-plugin": "board",
                   "list-collapse": [
+                    false,
                     false,
                     false,
                     false,
@@ -191,13 +192,28 @@
       "obsidian-kanban:Create new board": false
     }
   },
-  "active": "b114d52973a28f85",
+  "active": "c1a649a975fff14d",
   "lastOpenFiles": [
-    "Fix price alert notification shows wrong USD value.md",
-    "Fix price alert symbol validation rejects Vietnamese gold asset names.md",
-    "Terms & Privacy.md",
-    "Improve all tab selection overload on mobile view.md",
+    "2026-04-02-improve-mobile-tab-overflow.md",
     "Kanban Board.md",
+    "2026-04-02-auto-increase-fetch-code-priority.md",
+    "2026-04-02-enhance-ui-admin-gold-config.md",
+    "2026-04-02-fix-auto-open-popup.md",
+    "2026-04-02-add-button-group-to-finance-page.md",
+    "2026-04-02-terms-and-privacy.md",
+    "2026-04-02-fix-admin-nav-items-not-showing.md",
+    "2026-04-02-cancel-google-connection.md",
+    "Improve all tab selection overload on mobile view.md",
+    "Terms & Privacy.md",
+    "2026-03-24-user-price-alerts.md",
+    "2026-04-02-table-ui-enhancements.md",
+    "2026-04-02-price-alert-bugs.md",
+    "Fix price alert symbol validation rejects Vietnamese gold asset names.md",
+    "Fix price alert notification shows wrong USD value.md",
+    "Create drag and drop component for common use.md",
+    "Enhance UI in admin gold config tab.md",
+    "Enhance TanStackTable desktop design to match price alert table.md",
+    "Auto increase priority of type code fetcher in edit asset type code.md",
     "Fix admin nav items not showing after login.md",
     "Fix user price alert in Vietnamese.md",
     "Fix auto open popup.md",

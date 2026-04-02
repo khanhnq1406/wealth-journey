@@ -46,6 +46,58 @@ This skill is invoked with one of 5 command steps. The user passes the required 
 | 4    | `review`     | Implementation report path              | Review verdict (approve / issues found)                               |
 | 5    | `fix`        | Issue description OR report with issues | Loops back to step 1 (brainstorm the fix)                             |
 
+## Kanban Task Integration
+
+**After completing each step, create or update the Obsidian Kanban task for this feature.** This keeps the board in sync with pipeline progress automatically.
+
+### Task note location
+
+`docs/obsidian/YYYY-MM-DD-<feature>.md` — same date and slug as the spec/plan/report files, no suffix.
+
+Example: spec is `docs/specs/2026-04-02-price-alert-bugs-spec.md` → task note is `docs/obsidian/2026-04-02-price-alert-bugs.md`
+
+### Kanban board entry (alias syntax)
+
+```
+- [ ] [[YYYY-MM-DD-<feature>|<Human-Readable Title>]]
+```
+
+### Task note template
+
+```markdown
+---
+type: <bug|feature>
+status: <Not Started|Next|In Progress|Done>
+---
+
+## Overview
+
+<1–3 sentences: what the feature/bug is and why it matters>
+
+## Pipeline Artifacts
+
+| Artifact | File |
+| -------- | ---- |
+| Spec     | `docs/specs/YYYY-MM-DD-<feature>-spec.md` |
+| Plan     | `docs/plans/YYYY-MM-DD-<feature>-plan.md` _(added after step 2)_ |
+| Progress | `docs/reports/YYYY-MM-DD-<feature>-progress.md` _(added after step 3 starts)_ |
+| Report   | `docs/reports/YYYY-MM-DD-<feature>-report.md` _(added after step 3 completes)_ |
+```
+
+### When to create/update
+
+| After step | Action | Status to set |
+| ---------- | ------ | ------------- |
+| 1 — Brainstorm | **Create** task note with spec link. **Add** Kanban entry under `## Not Started`. | `Not Started` |
+| 2 — Plan | **Update** task note: add plan link to Pipeline Artifacts table. | `Next` (move Kanban entry) |
+| 3 — Implement (start) | **Update** task note: add progress file link. Move entry to `## In Progress`. | `In Progress` |
+| 3 — Implement (done) | **Update** task note: add report link. | `In Progress` |
+| 4 — Review (approved) | **Update** task note status to `Done`. Move Kanban entry to `## Done`, mark `[x]`. | `Done` |
+
+**Moving a Kanban entry:** remove the `- [ ] [[...]]` line from the old column and insert it in the new column (newest at top). Update `status` in the task note frontmatter to match.
+
+**Do NOT create a duplicate Kanban entry** — if one already exists for this feature slug, update it in place.
+
 ---
 
 ## Step Routing
