@@ -18,6 +18,9 @@ interface CategoryConfig {
 interface PriceAlertConfig {
   cooldownMinutes: number;
   topMoversCount: number;
+  userAlertTitleTemplate: string;
+  userAlertAboveBodyTemplate: string;
+  userAlertBelowBodyTemplate: string;
   categories: Record<string, CategoryConfig>;
 }
 
@@ -108,6 +111,24 @@ const SAMPLE_VALUES: Record<string, Record<string, string>> = {
   },
 };
 
+const USER_ALERT_PLACEHOLDERS = [
+  "name",
+  "symbol",
+  "price",
+  "currentPrice",
+  "currency",
+  "priceSide",
+] as const;
+
+const USER_ALERT_SAMPLE_VALUES: Record<string, string> = {
+  name: "SJC 9999",
+  symbol: "SJC",
+  price: "50,000 VND",
+  currentPrice: "51,200 VND",
+  currency: "VND",
+  priceSide: "mua",
+};
+
 function resolvePlaceholders(
   template: string,
   values: Record<string, string>,
@@ -151,10 +172,14 @@ export function PriceAlertConfigForm() {
     "gold_vnd",
   );
   const [showPlaceholders, setShowPlaceholders] = useState(false);
+  const [showUserAlertPlaceholders, setShowUserAlertPlaceholders] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const titleRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const bodyRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
+  const userTitleRef = useRef<HTMLInputElement>(null);
+  const userAboveBodyRef = useRef<HTMLTextAreaElement>(null);
+  const userBelowBodyRef = useRef<HTMLTextAreaElement>(null);
 
   const fetchConfig = useCallback(async () => {
     try {
@@ -233,6 +258,11 @@ export function PriceAlertConfigForm() {
   ) => {
     if (!config) return;
     setConfig({ ...config, [key]: value });
+  };
+
+  const updateUserAlertField = (field: string, value: string) => {
+    if (!config) return;
+    setConfig({ ...config, [field]: value });
   };
 
   const updateCategory = (
@@ -505,6 +535,204 @@ export function PriceAlertConfigForm() {
               </div>
             );
           })}
+        </div>
+
+        {/* User Alert Templates */}
+        <div className="space-y-4">
+          <div>
+            <h4 className="font-roboto font-medium text-base text-v2-gold-accent">
+              {t("userAlertTemplates")}
+            </h4>
+            <p className="font-roboto text-sm text-v2-text-tertiary mt-0.5">
+              {t("userAlertTemplatesDesc")}
+            </p>
+          </div>
+
+          {/* Title Template */}
+          <div>
+            <label className="block font-roboto text-sm font-medium text-v2-gold-accent mb-1">
+              {t("userAlertTitleTemplate")}
+            </label>
+            <input
+              ref={userTitleRef}
+              type="text"
+              maxLength={200}
+              value={config.userAlertTitleTemplate ?? ""}
+              onChange={(e) =>
+                updateUserAlertField("userAlertTitleTemplate", e.target.value)
+              }
+              className="w-full rounded-lg border border-v2-border bg-v2-bg-dark px-3 py-2 font-roboto text-sm text-v2-text-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus:border-v2-gold-primary min-h-[44px]"
+            />
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
+              {USER_ALERT_PLACEHOLDERS.map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  title={t(`userAlertPlaceholders.${p}`)}
+                  onClick={() =>
+                    insertAtCursor(
+                      userTitleRef,
+                      `{${p}}`,
+                      config.userAlertTitleTemplate ?? "",
+                      (v) => updateUserAlertField("userAlertTitleTemplate", v),
+                    )
+                  }
+                  className="font-mono text-[11px] leading-tight bg-v2-bg-dark hover:bg-v2-maroon-600 text-v2-text-secondary hover:text-v2-gold-accent px-1.5 py-0.5 rounded border border-v2-border-light transition-colors cursor-pointer min-h-[44px] flex items-center"
+                >
+                  {`{${p}}`}
+                </button>
+              ))}
+            </div>
+            {config.userAlertTitleTemplate && (
+              <div className="rounded-md bg-v2-bg-dark mt-1.5 px-2 py-1.5 border border-v2-border-light">
+                <span className="font-roboto text-xs font-medium text-v2-text-tertiary">
+                  {t("preview")}:
+                </span>
+                <p className="font-roboto text-sm text-v2-text-secondary mt-0.5">
+                  {resolvePlaceholders(
+                    config.userAlertTitleTemplate,
+                    USER_ALERT_SAMPLE_VALUES,
+                  )}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Above Body Template */}
+          <div>
+            <label className="block font-roboto text-sm font-medium text-v2-gold-accent mb-1">
+              {t("userAlertAboveBodyTemplate")}
+            </label>
+            <textarea
+              ref={userAboveBodyRef}
+              maxLength={500}
+              rows={2}
+              value={config.userAlertAboveBodyTemplate ?? ""}
+              onChange={(e) =>
+                updateUserAlertField("userAlertAboveBodyTemplate", e.target.value)
+              }
+              className="w-full rounded-lg border border-v2-border bg-v2-bg-dark px-3 py-2 font-roboto text-sm text-v2-text-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus:border-v2-gold-primary resize-none"
+            />
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
+              {USER_ALERT_PLACEHOLDERS.map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  title={t(`userAlertPlaceholders.${p}`)}
+                  onClick={() =>
+                    insertAtCursor(
+                      userAboveBodyRef,
+                      `{${p}}`,
+                      config.userAlertAboveBodyTemplate ?? "",
+                      (v) => updateUserAlertField("userAlertAboveBodyTemplate", v),
+                    )
+                  }
+                  className="font-mono text-[11px] leading-tight bg-v2-bg-dark hover:bg-v2-maroon-600 text-v2-text-secondary hover:text-v2-gold-accent px-1.5 py-0.5 rounded border border-v2-border-light transition-colors cursor-pointer min-h-[44px] flex items-center"
+                >
+                  {`{${p}}`}
+                </button>
+              ))}
+            </div>
+            {config.userAlertAboveBodyTemplate && (
+              <div className="rounded-md bg-v2-bg-dark mt-1.5 px-2 py-1.5 border border-v2-border-light">
+                <span className="font-roboto text-xs font-medium text-v2-text-tertiary">
+                  {t("preview")}:
+                </span>
+                <p className="font-roboto text-sm text-v2-text-secondary mt-0.5 whitespace-pre-wrap">
+                  {resolvePlaceholders(
+                    config.userAlertAboveBodyTemplate,
+                    USER_ALERT_SAMPLE_VALUES,
+                  )}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Below Body Template */}
+          <div>
+            <label className="block font-roboto text-sm font-medium text-v2-gold-accent mb-1">
+              {t("userAlertBelowBodyTemplate")}
+            </label>
+            <textarea
+              ref={userBelowBodyRef}
+              maxLength={500}
+              rows={2}
+              value={config.userAlertBelowBodyTemplate ?? ""}
+              onChange={(e) =>
+                updateUserAlertField("userAlertBelowBodyTemplate", e.target.value)
+              }
+              className="w-full rounded-lg border border-v2-border bg-v2-bg-dark px-3 py-2 font-roboto text-sm text-v2-text-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-v2-gold-primary focus:border-v2-gold-primary resize-none"
+            />
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
+              {USER_ALERT_PLACEHOLDERS.map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  title={t(`userAlertPlaceholders.${p}`)}
+                  onClick={() =>
+                    insertAtCursor(
+                      userBelowBodyRef,
+                      `{${p}}`,
+                      config.userAlertBelowBodyTemplate ?? "",
+                      (v) => updateUserAlertField("userAlertBelowBodyTemplate", v),
+                    )
+                  }
+                  className="font-mono text-[11px] leading-tight bg-v2-bg-dark hover:bg-v2-maroon-600 text-v2-text-secondary hover:text-v2-gold-accent px-1.5 py-0.5 rounded border border-v2-border-light transition-colors cursor-pointer min-h-[44px] flex items-center"
+                >
+                  {`{${p}}`}
+                </button>
+              ))}
+            </div>
+            {config.userAlertBelowBodyTemplate && (
+              <div className="rounded-md bg-v2-bg-dark mt-1.5 px-2 py-1.5 border border-v2-border-light">
+                <span className="font-roboto text-xs font-medium text-v2-text-tertiary">
+                  {t("preview")}:
+                </span>
+                <p className="font-roboto text-sm text-v2-text-secondary mt-0.5 whitespace-pre-wrap">
+                  {resolvePlaceholders(
+                    config.userAlertBelowBodyTemplate,
+                    USER_ALERT_SAMPLE_VALUES,
+                  )}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* User Alert Placeholder Guide */}
+          <div className="border border-v2-border-light rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowUserAlertPlaceholders(!showUserAlertPlaceholders)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-v2-bg-surface hover:bg-v2-bg-surface-tint transition-colors min-h-[44px] cursor-pointer"
+            >
+              <span className="font-roboto text-sm font-medium text-v2-text-secondary">
+                {t("userAlertPlaceholderGuide")}
+              </span>
+              <span
+                className={`text-v2-text-tertiary transition-transform ${
+                  showUserAlertPlaceholders ? "rotate-180" : ""
+                }`}
+              >
+                ▾
+              </span>
+            </button>
+            {showUserAlertPlaceholders && (
+              <div className="px-4 py-3 border-t border-v2-border-light">
+                <div className="space-y-1.5">
+                  {USER_ALERT_PLACEHOLDERS.map((p) => (
+                    <div key={p} className="flex gap-2">
+                      <code className="font-mono text-xs bg-v2-bg-dark px-1.5 py-0.5 rounded text-v2-gold-accent whitespace-nowrap">
+                        {`{${p}}`}
+                      </code>
+                      <span className="font-roboto text-xs text-v2-text-tertiary">
+                        {t(`userAlertPlaceholders.${p}`)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Placeholder Guide */}

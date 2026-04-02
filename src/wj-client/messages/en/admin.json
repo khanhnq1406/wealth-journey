@@ -174,6 +174,20 @@
         "gold_usd": "World Gold (USD)",
         "silver_vnd": "Domestic Silver (VND)",
         "silver_usd": "World Silver (USD)"
+      },
+      "userAlertTemplates": "User Price Alert Templates",
+      "userAlertTemplatesDesc": "Configure notification messages for individual user price alerts",
+      "userAlertTitleTemplate": "Title Template",
+      "userAlertAboveBodyTemplate": "Body Template (Above Target)",
+      "userAlertBelowBodyTemplate": "Body Template (Below Target)",
+      "userAlertPlaceholderGuide": "User Alert Placeholder Guide",
+      "userAlertPlaceholders": {
+        "name": "Asset name (e.g., SJC 9999)",
+        "symbol": "Symbol code (e.g., SJC)",
+        "price": "Target price with currency",
+        "currentPrice": "Current market price with currency",
+        "currency": "Currency code (e.g., VND)",
+        "priceSide": "Buy/Sell side (mua/bán)"
       }
     },
     "assetDisplayConfig": {
