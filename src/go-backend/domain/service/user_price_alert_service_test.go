@@ -1136,3 +1136,32 @@ func TestUserPriceAlertService_UpdateAlert_InvalidUserID(t *testing.T) {
 	assert.Error(t, err)
 	alertRepo.AssertNotCalled(t, "GetByIDForUser")
 }
+
+func TestSymbolPattern_VietnameseCharacters(t *testing.T) {
+	tests := []struct {
+		symbol string
+		valid  bool
+	}{
+		// Vietnamese gold names (must pass)
+		{"Vàng nhẫn SJC", true},
+		{"SJL1L10", true},
+		{"XAU", true},
+		{"Bạc Phú Quý 1L", true},
+		{"Vàng SJC 9999", true},
+
+		// Existing valid patterns (unchanged)
+		{"BTC-USD", true},
+		{"GOLD.VN", true},
+		{"my_symbol", true},
+
+		// Invalid patterns (must fail)
+		{"", false},                         // empty
+		{"<script>alert(1)</script>", false}, // injection attempt
+		{"symbol;DROP TABLE", false},         // SQL-like injection
+		{"name\"with'quotes", false},         // quotes
+	}
+	for _, tt := range tests {
+		result := symbolPattern.MatchString(tt.symbol)
+		assert.Equal(t, tt.valid, result, "symbol=%q", tt.symbol)
+	}
+}

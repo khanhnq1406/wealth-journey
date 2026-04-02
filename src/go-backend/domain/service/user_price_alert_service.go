@@ -28,8 +28,11 @@ const (
 	alertPriceFetchTimeout = 5 * time.Second
 )
 
-// symbolPattern validates alert symbols: alphanumeric plus dots, dashes, underscores.
-var symbolPattern = regexp.MustCompile(`^[a-zA-Z0-9.\-_]+$`)
+// symbolPattern validates alert symbols: Unicode letters, digits, dots, dashes, underscores, spaces.
+// \p{L} matches any Unicode letter (covers Vietnamese diacritics: à, ẫ, ạ, ơ, etc.).
+// \p{N} matches any Unicode digit. Spaces are explicitly allowed for multi-word gold names
+// like "Vàng nhẫn SJC". Special characters (<, >, ", ', ;, {, }) remain blocked.
+var symbolPattern = regexp.MustCompile(`^[\p{L}\p{N}.\-_ ]+$`)
 
 // userPriceAlertService implements UserPriceAlertService.
 type userPriceAlertService struct {
@@ -72,7 +75,7 @@ func (s *userPriceAlertService) CreateAlert(ctx context.Context, userID int32, r
 		return nil, apperrors.NewValidationError("symbol must be between 1 and 50 characters")
 	}
 	if !symbolPattern.MatchString(symbol) {
-		return nil, apperrors.NewValidationError("symbol must contain only alphanumeric characters, dots, dashes, or underscores")
+		return nil, apperrors.NewValidationError("symbol contains invalid characters")
 	}
 
 	// Validate and sanitize name

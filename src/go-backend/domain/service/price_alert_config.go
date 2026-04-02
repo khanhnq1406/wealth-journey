@@ -298,17 +298,10 @@ func categoryCurrency(cat string) string {
 }
 
 // FormatUserAlertPrice formats a price (int64) with currency suffix for user alerts.
-// VND: no decimals, comma thousands → "1,234,567 VND"
-// USD: 2 decimals, comma thousands → "50,000.00 USD"
+// User alert prices are stored as whole units (not cents) — e.g., 50000 means $50,000.
+// Both VND and USD: comma thousands, no decimal division.
 func FormatUserAlertPrice(price int64, currency string) string {
-	switch strings.ToUpper(currency) {
-	case "USD":
-		dollars := price / 100
-		cents := price % 100
-		return fmt.Sprintf("%s.%02d %s", FormatWithThousandSeparators(dollars), cents, currency)
-	default:
-		return fmt.Sprintf("%s %s", FormatWithThousandSeparators(price), currency)
-	}
+	return fmt.Sprintf("%s %s", FormatWithThousandSeparators(price), strings.ToUpper(currency))
 }
 
 // priceSideDisplayName returns Vietnamese display name for buy/sell side.
