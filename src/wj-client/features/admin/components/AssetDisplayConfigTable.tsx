@@ -3,8 +3,7 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { MobileTable } from "@/components/table/MobileTable";
-import type { MobileColumnDef } from "@/components/table/MobileTable";
+import { SortableList } from "@/components/table/SortableList";
 import { BaseModal } from "@/components/modals/BaseModal";
 import { ConfirmationDialog } from "@/components/modals/ConfirmationDialog";
 import { Button } from "@/components/Button";
@@ -53,6 +52,7 @@ export function AssetDisplayConfigTable() {
   const [deleteTarget, setDeleteTarget] = useState<AssetDisplayConfigItem | null>(null);
   // Track which row's toggle is in flight: `enabled-{id}` or `showInInvestment-{id}`
   const [toggleLoading, setToggleLoading] = useState<Set<string>>(new Set());
+  const [isReordering, setIsReordering] = useState(false);
 
   const { data, isLoading, error } = useQuery<ListConfigsResponse>({
     queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG, activeTab],
@@ -177,6 +177,39 @@ export function AssetDisplayConfigTable() {
     [updateMutation]
   );
 
+  const handleReorder = useCallback(
+    async (newOrder: AssetDisplayConfigItem[]) => {
+      setIsReordering(true);
+      // Compute which items changed displayOrder
+      const updates = newOrder.map((item, index) => ({
+        id: item.id,
+        newOrder: index + 1,
+      }));
+      try {
+        await Promise.all(
+          updates.map(({ id, newOrder: displayOrder }) => {
+            const item = newOrder.find((c) => c.id === id)!;
+            return apiClient.put(`/api/v1/admin/asset-display-config/${id}`, {
+              displayName: item.displayName,
+              displayOrder,
+              enabled: item.enabled,
+              showInInvestment: item.showInInvestment,
+            } satisfies UpdateConfigRequest);
+          })
+        );
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG] });
+        queryClient.invalidateQueries({ queryKey: [EVENT_InvestmentGetAssetDisplayPrices] });
+        toast.success(t("toast.updated"));
+      } catch {
+        toast.error(t("toast.updateFailed"));
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG] });
+      } finally {
+        setIsReordering(false);
+      }
+    },
+    [queryClient, toast, t]
+  );
+
   const handleModalSuccess = useCallback(
     (createdId?: number, createdAssetType?: string) => {
       if (typeof modalState === "string" && createdId !== undefined) {
@@ -201,99 +234,6 @@ export function AssetDisplayConfigTable() {
     typeof modalState === "number"
       ? configs.find((c) => c.id === modalState)
       : undefined;
-
-  const columns: MobileColumnDef<AssetDisplayConfigItem>[] = [
-    {
-      id: "displayOrder",
-      header: t("columns.order"),
-      accessorKey: "displayOrder",
-      showInCollapsed: true,
-    },
-    {
-      id: "typeCode",
-      header: t("columns.typeCode"),
-      accessorKey: "typeCode",
-      showInCollapsed: true,
-    },
-    {
-      id: "displayName",
-      header: t("columns.displayName"),
-      accessorKey: "displayName",
-      showInCollapsed: true,
-    },
-    {
-      id: "enabled",
-      header: t("columns.enabled"),
-      showInCollapsed: true,
-      cell: ({ row }) => {
-        const key = `enabled-${row.id}`;
-        const isInFlight = toggleLoading.has(key);
-        return (
-          <button
-            type="button"
-            role="switch"
-            aria-checked={row.enabled}
-            disabled={isInFlight}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleToggleEnabled(row);
-            }}
-            className={`inline-flex items-center justify-center min-h-[44px] min-w-[44px] cursor-pointer focus-visible:ring-2 focus-visible:ring-v2-gold-primary rounded-md ${
-              isInFlight ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            <span
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                row.enabled ? "bg-v2-green-positive/60" : "bg-v2-bg-dark"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  row.enabled ? "translate-x-6" : "translate-x-1"
-                }`}
-              />
-            </span>
-          </button>
-        );
-      },
-    },
-    {
-      id: "showInInvestment",
-      header: t("columns.inInvestment"),
-      showInCollapsed: false,
-      cell: ({ row }) => {
-        const key = `showInInvestment-${row.id}`;
-        const isInFlight = toggleLoading.has(key);
-        return (
-          <button
-            type="button"
-            role="switch"
-            aria-checked={row.showInInvestment}
-            disabled={isInFlight}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleToggleShowInInvestment(row);
-            }}
-            className={`inline-flex items-center justify-center min-h-[44px] min-w-[44px] cursor-pointer focus-visible:ring-2 focus-visible:ring-v2-gold-primary rounded-md ${
-              isInFlight ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            <span
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                row.showInInvestment ? "bg-v2-green-positive/60" : "bg-v2-bg-dark"
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  row.showInInvestment ? "translate-x-6" : "translate-x-1"
-                }`}
-              />
-            </span>
-          </button>
-        );
-      },
-    },
-  ];
 
   const TABS: { key: AssetTab; label: string }[] = [
     { key: "gold", label: t("tabs.gold") },
@@ -337,38 +277,97 @@ export function AssetDisplayConfigTable() {
         ))}
       </div>
 
-      {/* Table */}
-      <MobileTable
-        data={configs}
-        columns={columns}
-        getKey={(item) => item.id}
-        isLoading={isLoading}
-        emptyMessage={t("emptyMessage")}
-        emptyDescription={t("emptyDescription")}
-        expandable
-        expandButtonLabel={t("actions.more")}
-        collapseButtonLabel={t("actions.less")}
-        renderActions={(row) => (
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setModalState(row.id)}
-              className="min-h-[44px] px-3 py-1 text-sm font-medium text-v2-gold-accent border border-v2-border rounded-md hover:bg-v2-maroon-600 cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-v2-gold-primary"
-              aria-label={`${t("actions.edit")} ${row.displayName}`}
-            >
-              {t("actions.edit")}
-            </button>
-            <button
-              type="button"
-              onClick={() => setDeleteTarget(row)}
-              className="min-h-[44px] px-3 py-1 text-sm font-medium text-v2-red-negative border border-v2-red-negative/40 rounded-md hover:bg-v2-red-negative/10 cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-v2-red-negative"
-              aria-label={`${t("actions.delete")} ${row.displayName}`}
-            >
-              {t("actions.delete")}
-            </button>
+      {/* Reorder loading overlay wrapper */}
+      <div className={`relative ${isReordering ? "animate-pulse opacity-50 pointer-events-none" : ""}`}>
+        {isLoading ? (
+          <div className="space-y-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-14 rounded-md bg-v2-bg-dark animate-pulse" />
+            ))}
           </div>
+        ) : configs.length === 0 ? (
+          <div className="py-8 text-center text-v2-text-tertiary text-sm">
+            <p className="font-medium">{t("emptyMessage")}</p>
+            <p className="mt-1">{t("emptyDescription")}</p>
+          </div>
+        ) : (
+          <SortableList
+            items={configs}
+            onReorder={handleReorder}
+            renderItem={(row, isDragging) => (
+              <div
+                className={`flex flex-wrap items-center gap-2 px-3 py-3 rounded-md bg-v2-bg-dark border border-v2-border-light ${
+                  isDragging ? "opacity-40" : ""
+                }`}
+              >
+                {/* Order number */}
+                <span className="text-sm font-mono text-v2-text-tertiary w-6 text-center flex-shrink-0">
+                  {row.displayOrder}
+                </span>
+                {/* Type code */}
+                <span className="text-xs font-mono text-v2-text-secondary bg-v2-bg-primary/40 px-1.5 py-0.5 rounded flex-shrink-0">
+                  {row.typeCode}
+                </span>
+                {/* Display name */}
+                <span className="text-sm text-v2-gold-accent flex-1 min-w-0 truncate">
+                  {row.displayName}
+                </span>
+                {/* Enabled toggle */}
+                {(() => {
+                  const key = `enabled-${row.id}`;
+                  const isInFlight = toggleLoading.has(key);
+                  return (
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={row.enabled}
+                      disabled={isInFlight}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleEnabled(row);
+                      }}
+                      className={`inline-flex items-center justify-center min-h-[44px] min-w-[44px] cursor-pointer focus-visible:ring-2 focus-visible:ring-v2-gold-primary rounded-md flex-shrink-0 ${
+                        isInFlight ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                    >
+                      <span
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                          row.enabled ? "bg-v2-green-positive/60" : "bg-v2-bg-primary"
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            row.enabled ? "translate-x-6" : "translate-x-1"
+                          }`}
+                        />
+                      </span>
+                    </button>
+                  );
+                })()}
+                {/* Actions */}
+                <div className="flex gap-1 flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setModalState(row.id)}
+                    className="min-h-[44px] px-3 py-1 text-sm font-medium text-v2-gold-accent border border-v2-border rounded-md hover:bg-v2-maroon-600 cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-v2-gold-primary"
+                    aria-label={`${t("actions.edit")} ${row.displayName}`}
+                  >
+                    {t("actions.edit")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDeleteTarget(row)}
+                    className="min-h-[44px] px-3 py-1 text-sm font-medium text-v2-red-negative border border-v2-red-negative/40 rounded-md hover:bg-v2-red-negative/10 cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-v2-red-negative"
+                    aria-label={`${t("actions.delete")} ${row.displayName}`}
+                  >
+                    {t("actions.delete")}
+                  </button>
+                </div>
+              </div>
+            )}
+          />
         )}
-      />
+      </div>
 
       {/* Create / Edit Modal */}
       <BaseModal
