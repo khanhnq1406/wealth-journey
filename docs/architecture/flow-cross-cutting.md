@@ -20,6 +20,7 @@ Infrastructure-level flows that are referenced by multiple domain flows. Read th
 - [Gold Display Prices Read Flow](#14-gold-display-prices-read-flow)
 - [Admin Gold Display Config CRUD Flow](#15-admin-gold-display-config-crud-flow)
 - [Landing Page Load with Timeout + Skeleton](#16-landing-page-load-with-timeout--skeleton)
+- [Admin Drag-to-Reorder Batch Update](#17-admin-drag-to-reorder-batch-update)
 
 ---
 
@@ -1464,4 +1465,44 @@ sequenceDiagram
 | Backend timeout (> 3s) | `FALLBACK_METADATA` used | Static fallback title/description; page still renders normally |
 | Backend unreachable / 5xx | `FALLBACK_METADATA` used | Same as timeout — graceful degradation |
 | `asset-display-prices` API fails client-side | React Query error state | Individual price table shows error/empty state; rest of page unaffected |
-| All three React Query fetches fail | Each table shows error state independently | Skeleton is replaced by error states; hero section still renders |
+
+---
+
+## 17. Admin Drag-to-Reorder Batch Update
+
+Applies to: `AssetDisplayConfigTable` (displayOrder) and `FetchCodeList` (priority).
+
+```mermaid
+sequenceDiagram
+  participant Admin
+  participant Component
+  participant Backend
+
+  Admin->>Component: Drag item to new position
+  Component->>Component: Optimistic reorder (SortableList.onReorder)
+  Component->>Component: setIsReordering(true) → overlay shown
+  Component->>Backend: PUT /.../:id (priority/displayOrder=new) × N (parallel)
+  alt All succeed
+    Backend-->>Component: 200 OK × N
+    Component->>Component: invalidateQueries → server state refetched
+    Component->>Admin: toast.success("updated")
+  else Any fail
+    Backend-->>Component: error
+    Component->>Admin: toast.error("updateFailed")
+    Component->>Component: invalidateQueries → server state reverts UI
+  end
+  Component->>Component: setIsReordering(false) → overlay removed
+```
+
+**Key Invariants:**
+- Optimistic update always applied first (zero-lag UX)
+- On any batch failure, `invalidateQueries` forces re-fetch (server wins over optimistic state)
+- `isReordering` flag prevents concurrent drag while batch is in flight (`pointer-events-none`)
+- Each batch PUT is independent; no transaction — partial failure leaves server in inconsistent order until re-fetch corrects it
+
+**Error Paths:**
+
+| Condition | Response | Rollback |
+|-----------|----------|---------|
+| Any PUT fails | `toast.error` | `invalidateQueries` — server order restored on next render |
+| All PUTs succeed | `toast.success` | `invalidateQueries` — canonical order confirmed |

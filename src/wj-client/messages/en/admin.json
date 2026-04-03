@@ -8,7 +8,8 @@
         "users": "Users",
         "feedback": "Feedback",
         "broadcast": "Broadcast",
-        "notifications": "Notifications"
+        "notifications": "Notifications",
+        "goldConfig": "Price Config"
       },
       "loading": "Loading settings..."
     },

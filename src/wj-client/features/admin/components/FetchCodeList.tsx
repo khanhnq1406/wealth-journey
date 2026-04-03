@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { EmptyState } from "@/components/feedback/EmptyState";
 import { ConfirmationDialog } from "@/components/modals/ConfirmationDialog";
 import { FilterableAutocomplete } from "@/components/forms/FilterableAutocomplete";
+import { SortableList } from "@/components/table/SortableList";
 import { apiClient } from "@/utils/api-client";
 import { useNotification } from "@/contexts/NotificationContext";
 
@@ -62,6 +63,9 @@ export function FetchCodeList({ configId, assetType }: FetchCodeListProps) {
 
   // Delete confirmation state
   const [deleteTarget, setDeleteTarget] = useState<AssetConfigFetchCode | null>(null);
+
+  // Reorder loading state
+  const [isReordering, setIsReordering] = useState(false);
 
   const { data, isLoading, error } = useQuery<ListFetchCodesResponse>({
     queryKey: fetchCodeQueryKey(configId),
@@ -136,6 +140,30 @@ export function FetchCodeList({ configId, assetType }: FetchCodeListProps) {
     },
   });
 
+  const handleReorder = useCallback(
+    async (newOrder: AssetConfigFetchCode[]) => {
+      setIsReordering(true);
+      try {
+        await Promise.all(
+          newOrder.map((fc, index) =>
+            apiClient.put(
+              `/api/v1/admin/asset-display-config/${configId}/fetch-codes/${fc.id}`,
+              { typeCode: fc.typeCode, priority: index + 1 }
+            )
+          )
+        );
+        queryClient.invalidateQueries({ queryKey: fetchCodeQueryKey(configId) });
+        toast.success(t("toast.updated"));
+      } catch {
+        toast.error(t("toast.updateFailed"));
+        queryClient.invalidateQueries({ queryKey: fetchCodeQueryKey(configId) });
+      } finally {
+        setIsReordering(false);
+      }
+    },
+    [configId, queryClient, toast, t]
+  );
+
   const handleAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setAddError(undefined);
@@ -181,9 +209,10 @@ export function FetchCodeList({ configId, assetType }: FetchCodeListProps) {
           size="sm"
         />
       ) : (
-        <div className="space-y-2">
+        /* Reorder loading overlay */
+        <div className={`relative ${isReordering ? "animate-pulse opacity-50 pointer-events-none" : ""}`}>
           {/* Column headers */}
-          <div className="grid grid-cols-[2rem_1fr_auto] gap-2 px-3 py-1">
+          <div className="grid grid-cols-[2rem_1fr_auto] gap-2 px-3 py-1 ml-11">
             <span className="text-xs font-medium text-v2-text-tertiary">
               {t("columns.priority")}
             </span>
@@ -195,28 +224,28 @@ export function FetchCodeList({ configId, assetType }: FetchCodeListProps) {
             </span>
           </div>
 
-          {/* Rows */}
-          {fetchCodes.map((fc) => (
-            <div
-              key={fc.id}
-              className="grid grid-cols-[2rem_1fr_auto] gap-2 items-center px-3 py-2 rounded-md bg-v2-bg-dark border border-v2-border-light"
-            >
-              <span className="text-sm font-mono text-v2-text-secondary text-center">
-                {fc.priority}
-              </span>
-              <span className="text-sm font-mono text-v2-text-secondary truncate">
-                {fc.typeCode}
-              </span>
-              <button
-                type="button"
-                onClick={() => setDeleteTarget(fc)}
-                aria-label={`${t("delete.confirm")} ${fc.typeCode}`}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-center px-2 text-sm font-medium text-v2-red-negative border border-v2-red-negative/30 rounded-md hover:bg-v2-red-negative/10 cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-v2-red-negative"
-              >
-                {t("delete.confirm")}
-              </button>
-            </div>
-          ))}
+          <SortableList
+            items={fetchCodes}
+            onReorder={handleReorder}
+            renderItem={(fc, _isDragging) => (
+              <div className="grid grid-cols-[2rem_1fr_auto] gap-2 items-center px-3 py-2 rounded-md bg-v2-bg-dark border border-v2-border-light">
+                <span className="text-sm font-mono text-v2-text-secondary text-center">
+                  {fc.priority}
+                </span>
+                <span className="text-sm font-mono text-v2-text-secondary truncate">
+                  {fc.typeCode}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setDeleteTarget(fc)}
+                  aria-label={`${t("delete.confirm")} ${fc.typeCode}`}
+                  className="min-h-[44px] min-w-[44px] flex items-center justify-center px-2 text-sm font-medium text-v2-red-negative border border-v2-red-negative/30 rounded-md hover:bg-v2-red-negative/10 cursor-pointer transition-colors focus-visible:ring-2 focus-visible:ring-v2-red-negative"
+                >
+                  {t("delete.confirm")}
+                </button>
+              </div>
+            )}
+          />
         </div>
       )}
 
