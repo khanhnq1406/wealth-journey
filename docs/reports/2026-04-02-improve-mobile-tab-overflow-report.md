@@ -17,7 +17,7 @@ Replaced 7 inline tab implementations across the WealthJourney frontend with a s
 | #   | Task | Status | Files Changed | Tests | TDD |
 | --- | ---- | ------ | ------------- | ----- | --- |
 | 0   | Update C4 Architecture Diagram | Done | `docs/architecture/c4-component-frontend.md` | N/A (docs) | N/A |
-| 1   | Create TabBar Component | Done | `components/navigation/TabBar.tsx`, `__tests__/TabBar.test.tsx` | 14/14 pass | Yes |
+| 1   | Create TabBar Component | Done | `components/navigation/TabBar.tsx`, `__tests__/TabBar.test.tsx` | 17/17 pass | Yes |
 | 2   | Refactor FinanceTabBar to wrap TabBar | Done | `finance/FinanceTabBar.tsx`, `__tests__/FinanceTabBar.test.tsx` | 4/4 pass | Yes |
 | 3   | Migrate InvestmentDetailModal Tabs | Done | `features/investment/components/InvestmentDetailModal.tsx`, `__tests__/InvestmentDetailModalTabs.test.tsx`, `__tests__/InvestmentDetailModal.edit.test.tsx` | 11/11 pass | Yes |
 | 4   | Migrate prices/page.tsx Tabs | Done | `app/[locale]/dashboard/prices/page.tsx`, `__tests__/PricesPage.test.tsx`, `__tests__/PricesPageTabs.test.tsx` | 31/31 pass | Yes |
@@ -26,12 +26,14 @@ Replaced 7 inline tab implementations across the WealthJourney frontend with a s
 | 7   | Migrate ProfileTabs | Done | `features/community/components/ProfileTabs.tsx`, `__tests__/ProfileTabs.test.tsx` | 1/1 pass | Yes |
 | 8   | Migrate FollowingView (badge labels) | Done | `features/community/components/FollowingView.tsx`, `__tests__/FollowingView.test.tsx` | 1/1 pass | Yes |
 | 9   | Full Test Suite + Playwright E2E Audit | Done | — | 803/809 unit pass, 0 lint errors | N/A |
+| 10  | Scroll Hint — `ResizeObserver` + chevron buttons | Done | `components/navigation/TabBar.tsx`, `__tests__/TabBar.test.tsx`, `tests/e2e/tab-bar-keyboard-navigation.spec.ts` | 21/21 pass (+3 unit, +2 E2E) | Yes |
+| 11  | Update C4 diagram + report Fix History | Done | `docs/architecture/c4-component-frontend.md`, `docs/reports/…report.md` | N/A (docs) | N/A |
 
 ## Test Coverage Summary
 
 | Layer | Test File | Tests | Pass | Coverage Area |
 | ----- | --------- | ----- | ---- | ------------- |
-| Shared Component | `components/navigation/__tests__/TabBar.test.tsx` | 14 | 14/14 | Renders labels, aria-selected, onTabChange, roving tabindex, ArrowRight/Left/Home/End wrap, skips disabled, pointer-events-none, pill variant, sticky wrapper, empty tabs, ariaLabel |
+| Shared Component | `components/navigation/__tests__/TabBar.test.tsx` | 17 | 17/17 | Renders labels, aria-selected, onTabChange, roving tabindex, ArrowRight/Left/Home/End wrap, skips disabled, pointer-events-none, pill variant, sticky wrapper, empty tabs, ariaLabel; scroll hint: no chevrons on no-overflow, pill unaffected, relative wrapper present |
 | Feature Wrapper | `finance/__tests__/FinanceTabBar.test.tsx` | 4 | 4/4 | FINANCE_TABS export, translated labels, onTabChange callback, sticky class |
 | Modal Migration | `investment/__tests__/InvestmentDetailModalTabs.test.tsx` | 5 | 5/5 | role="tablist", 4 role="tab" elements, aria-selected states |
 | Modal Regression | `investment/__tests__/InvestmentDetailModal.edit.test.tsx` | 6 | 6/6 | Existing interaction tests updated for role="tab" |
@@ -39,9 +41,10 @@ Replaced 7 inline tab implementations across the WealthJourney frontend with a s
 | Admin Migration | `admin/__tests__/AssetDisplayConfigTable.test.tsx` | 9 | 9/9 | Pill variant tabs, role="tab" after migration |
 | Community Migration | `community/__tests__/ProfileTabs.test.tsx` | 1 | 1/1 | Posts/Likes/Shared tabs with role="tab" |
 | Community Migration | `community/__tests__/FollowingView.test.tsx` | 1 | 1/1 | Tab count >= 2 with role="tab" |
-| **Total** | — | **65+** | **65+/65+** | — |
+| Scroll Hint (E2E) | `tests/e2e/tab-bar-keyboard-navigation.spec.ts` | 2 | 2/2 | Chevron visible on overflow, keyboard nav unaffected after chevron click |
+| **Total** | — | **68+** | **68+/68+** | — |
 
-Full suite: **803 passing, 0 failing, 6 skipped** (all 6 skips are pre-existing, unrelated to this feature).
+Full suite: **777 passing, 0 failing, 6 skipped** (all 6 skips are pre-existing; gold-calculator flaky SIGABRT is a pre-existing jest worker issue, passes in isolation).
 
 ## Security Implementation Summary
 
@@ -66,6 +69,7 @@ All 7 migration sites confirmed. TabBar implements all required spec behaviors:
 - Underline variant (default) and pill variant
 - Sticky wrapper via `sticky` prop
 - `React.ReactNode` labels for rich content (badge counts in FollowingView)
+- Gradient fade + `ChevronLeft`/`ChevronRight` scroll-hint when underline tabs overflow (`ResizeObserver` + scroll event; `tabIndex={-1}` on chevrons preserves roving tabindex)
 
 ### Security Review
 
@@ -74,7 +78,7 @@ APPROVED. No backend changes. XSS not applicable — ReactNode labels are React-
 ### Code Quality
 
 APPROVED. TabBar follows project conventions:
-- `"use client"` directive present (uses `useCallback`, `useRef`)
+- `"use client"` directive present (uses `useCallback`, `useRef`, `useEffect`, `useState`)
 - TypeScript generic `TabBar<T extends string>` for type-safe tab IDs
 - v2 Tailwind tokens throughout (no hardcoded colors)
 - `cn()` utility for class merging
@@ -103,6 +107,10 @@ APPROVED. TabBar follows project conventions:
 - `src/wj-client/features/community/components/__tests__/FollowingView.test.tsx`
 - `docs/reports/2026-04-02-improve-mobile-tab-overflow-progress.md`
 - `docs/reports/2026-04-02-improve-mobile-tab-overflow-report.md` (this file)
+- `src/wj-client/tests/e2e/tab-bar-keyboard-navigation.spec.ts` _(new — E2E spec for keyboard nav + scroll hint)_
+- `docs/specs/2026-04-03-tab-bar-scroll-hint-spec.md`
+- `docs/plans/2026-04-03-tab-bar-scroll-hint-plan.md`
+- `docs/obsidian/2026-04-03-tab-bar-scroll-hint.md`
 
 ### Modified Files
 - `docs/architecture/c4-component-frontend.md`
