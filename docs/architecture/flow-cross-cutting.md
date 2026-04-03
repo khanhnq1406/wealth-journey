@@ -525,6 +525,7 @@ sequenceDiagram
     participant SCH as Scheduler
     participant PAJ as PriceAlertJob
     participant PAS as PriceAlertService
+    participant ADCS as AssetDisplayConfigService
     participant GPS as GoldPriceService
     participant SPS as SilverPriceService
     participant R as Redis
@@ -556,6 +557,9 @@ sequenceDiagram
         alt Category disabled
             Note over PAS: Skip this category
         else Category enabled
+            PAS->>ADCS: ListAll(assetType)
+            ADCS-->>PAS: []AssetDisplayConfig (admin-enabled type codes)
+            PAS->>PAS: Build enabledCodes set from configs<br/>Filter fetched prices to enabled type codes only
             PAS->>R: GET price_alert:baseline:{category}
             alt No baseline
                 PAS->>R: SET price_alert:baseline:{category}
@@ -603,6 +607,7 @@ sequenceDiagram
 
 - Each category is checked independently — a gold alert does not affect silver alerts
 - Categories can be individually enabled/disabled via admin config (`catCfg.Enabled`)
+- Before evaluating prices for a category, `PriceAlertService` calls `AssetDisplayConfigService.ListAll(assetType)` to obtain the set of admin-enabled type codes; prices not in that set are filtered out and never trigger alerts
 - Baselines are set on first run and updated only after an alert is sent
 - Cooldown period is configurable via admin UI (`cfg.CooldownMinutes`, default 120 min)
 - Thresholds are configurable per category via admin UI (`catCfg.ThresholdPct`), with env var fallback defaults

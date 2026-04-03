@@ -1,12 +1,17 @@
 ---
 type: feature
-status: Not Started
+status: Spec
 ---
 
 ## Overview
 
 Allow users to disconnect their linked Google account from the security settings page, giving them full control over their connected authentication methods.
 
-## Details
+## Pipeline Artifacts
 
-Users should be able to cancel (unlink) a Google account connection from within the Security settings page. Once disconnected, the user can no longer log in with that Google account unless they reconnect it.
+| Artifact | File |
+| -------- | ---- |
+| Spec     | `docs/specs/2026-04-03-cancel-google-connection-spec.md` |
+| Plan     | _(added after step 2)_ |
+| Progress | _(added after step 3 starts)_ |
+| Report   | _(added after step 3 completes)_ |

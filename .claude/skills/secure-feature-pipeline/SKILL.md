@@ -1,6 +1,6 @@
 ---
 name: secure-feature-pipeline
-description: "Use when implementing a new feature from requirement to production in this financial application. Covers the full lifecycle: brainstorm, plan, implement, review, and fix. Invoked with command steps: brainstorm, plan, implement, review, fix."
+description: "Use when implementing a new feature from requirement to production in this financial application. Covers the full lifecycle: task, brainstorm, plan, implement, review, and fix. Invoked with command steps: task, brainstorm, plan, implement, review, fix."
 ---
 
 # Secure Feature Pipeline
@@ -36,15 +36,18 @@ End-to-end feature delivery pipeline for the WealthJourney financial application
 
 ## Command Steps
 
-This skill is invoked with one of 5 command steps. The user passes the required input for each step.
+This skill is invoked with one of 6 command steps. The user passes the required input for each step.
 
 | Step | Command      | Input                                   | Output                                                                |
 | ---- | ------------ | --------------------------------------- | --------------------------------------------------------------------- |
-| 1    | `brainstorm` | Feature requirement (text)              | Spec file (`docs/specs/YYYY-MM-DD-<feature>-spec.md`)                 |
+| 0    | `task`       | Title, type, description (text)         | Task note (`docs/obsidian/YYYY-MM-DD-<feature>.md`) + Kanban entry   |
+| 1    | `brainstorm` | Feature requirement (text) + task note  | Spec file (`docs/specs/YYYY-MM-DD-<feature>-spec.md`)                 |
 | 2    | `plan`       | Spec file path                          | Plan file (`docs/plans/YYYY-MM-DD-<feature>-plan.md`)                 |
 | 3    | `implement`  | Plan file path                          | Implementation report (`docs/reports/YYYY-MM-DD-<feature>-report.md`) |
 | 4    | `review`     | Implementation report path              | Review verdict (approve / issues found)                               |
 | 5    | `fix`        | Issue description OR report with issues | Loops back to step 1 (brainstorm the fix)                             |
+
+**Step 0 is optional** — use it when you want to register a task on the Kanban board before committing to brainstorming. You can also skip it and start directly at Step 1; the brainstorm step will create the task note automatically.
 
 ## Kanban Task Integration
 
@@ -77,6 +80,8 @@ The board has **6 columns** in order:
 
 ### Task note template
 
+**IMPORTANT:** The task note is a **bookmark only** — it captures what is observed and why it matters. It does NOT contain root cause analysis, solution ideas, or implementation approach. Those belong exclusively in the spec file produced by Step 1 (Brainstorm). Writing solutions here short-circuits the brainstorm's question-asking and approach-selection flow.
+
 ```markdown
 ---
 type: <bug|feature>
@@ -85,7 +90,7 @@ status: <Not Started|Spec|Plan|Implement|Review|Done>
 
 ## Overview
 
-<1–3 sentences: what the feature/bug is and why it matters>
+<1–3 sentences: what the feature/bug is and why it matters — observable symptoms/needs only, no root cause or solution>
 
 ## Pipeline Artifacts
 
@@ -120,6 +125,7 @@ status: <Not Started|Spec|Plan|Implement|Review|Done>
 
 | Step | File to Read |
 | ---- | ------------ |
+| 0 — Task | `./step-0-task.md` |
 | 1 — Brainstorm | `./step-1-brainstorm.md` |
 | 2 — Plan | `./step-2-plan.md` |
 | 3 — Implement | `./step-3-implement.md` |

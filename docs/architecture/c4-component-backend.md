@@ -252,6 +252,7 @@ C4Component
     Rel(price_alert_svc, notification_repo, "BatchCreate price alert notifications")
     Rel(price_alert_svc, user_repo, "Gets all user IDs")
     Rel(price_alert_svc, redis, "Baselines, cooldowns, SSE publish")
+    Rel(price_alert_svc, gold_display_config_svc, "ListAll(assetType) — filters to admin-enabled type codes before evaluation")
     Rel(price_cache_job, asset_price_svc, "Triggers RefreshAllPrices every 15 minutes")
     Rel(asset_price_svc, asset_price_repo, "Reads and upserts cached prices")
     Rel(asset_price_svc, gold_display_config_repo, "Reads enabled type codes to filter display-facing responses")
