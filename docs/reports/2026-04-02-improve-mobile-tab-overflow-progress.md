@@ -14,8 +14,8 @@
 
 | #   | Task Name                                     | Status     | Commit | Summary |
 | --- | --------------------------------------------- | ---------- | ------ | ------- |
-| 0   | Update C4 Architecture Diagram                | pending    | —      | —       |
-| 1   | Create TabBar Component (TDD)                 | pending    | —      | —       |
+| 0   | Update C4 Architecture Diagram                | done       | b065e105 | Added TabBar Component entry to c4-component-frontend.md |
+| 1   | Create TabBar Component (TDD)                 | in_progress| —      | —       |
 | 2   | Refactor FinanceTabBar to wrap TabBar         | pending    | —      | —       |
 | 3   | Migrate InvestmentDetailModal Tabs            | pending    | —      | —       |
 | 4   | Migrate prices/page.tsx Tabs                  | pending    | —      | —       |
