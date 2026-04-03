@@ -1,83 +1,85 @@
 {
-  "terms": {
-    "title": "Điều khoản dịch vụ",
-    "subtitle": "Vui lòng đọc kỹ các điều khoản này trước khi sử dụng congdongvang.com.",
-    "lastUpdated": "Cập nhật lần cuối: Tháng 4 năm 2026",
-    "sections": {
-      "introduction": {
-        "title": "1. Giới thiệu",
-        "content": "Chào mừng bạn đến với congdongvang.com (\"Dịch vụ\"), được vận hành bởi congdongvang.com. Bằng cách truy cập hoặc sử dụng Dịch vụ, bạn đồng ý bị ràng buộc bởi các Điều khoản Dịch vụ này. Nếu bạn không đồng ý với các điều khoản này, vui lòng không sử dụng Dịch vụ."
-      },
-      "acceptance": {
-        "title": "2. Chấp nhận điều khoản",
-        "content": "Bằng cách tạo tài khoản hoặc sử dụng Dịch vụ theo bất kỳ cách nào, bạn xác nhận rằng bạn ít nhất 18 tuổi, đã đọc và hiểu các Điều khoản này, và đồng ý bị ràng buộc bởi chúng."
-      },
-      "userResponsibilities": {
-        "title": "3. Trách nhiệm của người dùng",
-        "content": "Bạn có trách nhiệm bảo mật thông tin đăng nhập tài khoản và chịu trách nhiệm về mọi hoạt động xảy ra dưới tài khoản của bạn. Bạn đồng ý cung cấp thông tin chính xác và đầy đủ khi đăng ký và cập nhật thông tin kịp thời."
-      },
-      "disclaimer": {
-        "title": "4. Tuyên bố miễn trừ trách nhiệm — Đầu tư & Quyết định tài chính",
-        "content": "congdongvang.com chỉ là công cụ theo dõi tài chính cá nhân. Dịch vụ không cung cấp tư vấn tài chính, khuyến nghị đầu tư, hay bất kỳ hướng dẫn tài chính nào. Mọi quyết định đầu tư, hoạt động giao dịch và hành động tài chính bạn thực hiện đều hoàn toàn là trách nhiệm của bạn. Dịch vụ không chịu trách nhiệm về bất kỳ tổn thất tài chính, thiệt hại hoặc kết quả bất lợi nào bạn có thể gặp phải do sử dụng thông tin hiển thị trong ứng dụng. Kết quả hoạt động trong quá khứ không đảm bảo cho kết quả trong tương lai. Bạn nên tham khảo ý kiến của chuyên gia tài chính có chuyên môn trước khi đưa ra quyết định đầu tư."
-      },
-      "intellectualProperty": {
-        "title": "5. Quyền sở hữu trí tuệ",
-        "content": "Tất cả nội dung, tính năng và chức năng của Dịch vụ — bao gồm nhưng không giới hạn ở văn bản, đồ họa, logo và phần mềm — là tài sản độc quyền của congdongvang.com và được bảo vệ theo luật sở hữu trí tuệ hiện hành."
-      },
-      "termination": {
-        "title": "6. Chấm dứt",
-        "content": "Chúng tôi có quyền đình chỉ hoặc chấm dứt quyền truy cập của bạn vào Dịch vụ bất cứ lúc nào, có hoặc không có lý do, có hoặc không có thông báo. Khi chấm dứt, quyền sử dụng Dịch vụ của bạn sẽ lập tức chấm dứt."
-      },
-      "changes": {
-        "title": "7. Thay đổi điều khoản",
-        "content": "Chúng tôi có thể cập nhật các Điều khoản này theo thời gian. Chúng tôi sẽ thông báo về những thay đổi quan trọng bằng cách cập nhật ngày \"Cập nhật lần cuối\". Việc tiếp tục sử dụng Dịch vụ sau khi có thay đổi đồng nghĩa với việc bạn chấp nhận các Điều khoản mới."
-      },
-      "contact": {
-        "title": "8. Liên hệ",
-        "content": "Nếu bạn có câu hỏi về Điều khoản Dịch vụ này, vui lòng liên hệ chúng tôi qua tính năng phản hồi trong ứng dụng hoặc tại thông tin liên hệ trên trang web của chúng tôi."
+  "legal": {
+    "terms": {
+      "title": "Điều khoản dịch vụ",
+      "subtitle": "Vui lòng đọc kỹ các điều khoản này trước khi sử dụng congdongvang.com.",
+      "lastUpdated": "Cập nhật lần cuối: Tháng 4 năm 2026",
+      "sections": {
+        "introduction": {
+          "title": "1. Giới thiệu",
+          "content": "Chào mừng bạn đến với congdongvang.com (\"Dịch vụ\"), được vận hành bởi congdongvang.com. Bằng cách truy cập hoặc sử dụng Dịch vụ, bạn đồng ý bị ràng buộc bởi các Điều khoản Dịch vụ này. Nếu bạn không đồng ý với các điều khoản này, vui lòng không sử dụng Dịch vụ."
+        },
+        "acceptance": {
+          "title": "2. Chấp nhận điều khoản",
+          "content": "Bằng cách tạo tài khoản hoặc sử dụng Dịch vụ theo bất kỳ cách nào, bạn xác nhận rằng bạn ít nhất 18 tuổi, đã đọc và hiểu các Điều khoản này, và đồng ý bị ràng buộc bởi chúng."
+        },
+        "userResponsibilities": {
+          "title": "3. Trách nhiệm của người dùng",
+          "content": "Bạn có trách nhiệm bảo mật thông tin đăng nhập tài khoản và chịu trách nhiệm về mọi hoạt động xảy ra dưới tài khoản của bạn. Bạn đồng ý cung cấp thông tin chính xác và đầy đủ khi đăng ký và cập nhật thông tin kịp thời."
+        },
+        "disclaimer": {
+          "title": "4. Tuyên bố miễn trừ trách nhiệm — Đầu tư & Quyết định tài chính",
+          "content": "congdongvang.com chỉ là công cụ theo dõi tài chính cá nhân. Dịch vụ không cung cấp tư vấn tài chính, khuyến nghị đầu tư, hay bất kỳ hướng dẫn tài chính nào. Mọi quyết định đầu tư, hoạt động giao dịch và hành động tài chính bạn thực hiện đều hoàn toàn là trách nhiệm của bạn. Dịch vụ không chịu trách nhiệm về bất kỳ tổn thất tài chính, thiệt hại hoặc kết quả bất lợi nào bạn có thể gặp phải do sử dụng thông tin hiển thị trong ứng dụng. Kết quả hoạt động trong quá khứ không đảm bảo cho kết quả trong tương lai. Bạn nên tham khảo ý kiến của chuyên gia tài chính có chuyên môn trước khi đưa ra quyết định đầu tư."
+        },
+        "intellectualProperty": {
+          "title": "5. Quyền sở hữu trí tuệ",
+          "content": "Tất cả nội dung, tính năng và chức năng của Dịch vụ — bao gồm nhưng không giới hạn ở văn bản, đồ họa, logo và phần mềm — là tài sản độc quyền của congdongvang.com và được bảo vệ theo luật sở hữu trí tuệ hiện hành."
+        },
+        "termination": {
+          "title": "6. Chấm dứt",
+          "content": "Chúng tôi có quyền đình chỉ hoặc chấm dứt quyền truy cập của bạn vào Dịch vụ bất cứ lúc nào, có hoặc không có lý do, có hoặc không có thông báo. Khi chấm dứt, quyền sử dụng Dịch vụ của bạn sẽ lập tức chấm dứt."
+        },
+        "changes": {
+          "title": "7. Thay đổi điều khoản",
+          "content": "Chúng tôi có thể cập nhật các Điều khoản này theo thời gian. Chúng tôi sẽ thông báo về những thay đổi quan trọng bằng cách cập nhật ngày \"Cập nhật lần cuối\". Việc tiếp tục sử dụng Dịch vụ sau khi có thay đổi đồng nghĩa với việc bạn chấp nhận các Điều khoản mới."
+        },
+        "contact": {
+          "title": "8. Liên hệ",
+          "content": "Nếu bạn có câu hỏi về Điều khoản Dịch vụ này, vui lòng liên hệ chúng tôi qua tính năng phản hồi trong ứng dụng hoặc tại thông tin liên hệ trên trang web của chúng tôi."
+        }
       }
-    }
-  },
-  "privacy": {
-    "title": "Chính sách bảo mật",
-    "subtitle": "Quyền riêng tư của bạn rất quan trọng với chúng tôi. Chính sách này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ dữ liệu của bạn.",
-    "lastUpdated": "Cập nhật lần cuối: Tháng 4 năm 2026",
-    "sections": {
-      "introduction": {
-        "title": "1. Giới thiệu",
-        "content": "congdongvang.com (\"chúng tôi\") cam kết bảo vệ quyền riêng tư của bạn. Chính sách Bảo mật này giải thích những thông tin chúng tôi thu thập, cách chúng tôi sử dụng và quyền của bạn đối với dữ liệu cá nhân."
-      },
-      "dataCollection": {
-        "title": "2. Thông tin chúng tôi thu thập",
-        "content": "Chúng tôi thu thập thông tin bạn cung cấp trực tiếp: thông tin tài khoản (tên, email), dữ liệu tài chính bạn nhập (ví, giao dịch, đầu tư, ngân sách) và dữ liệu sử dụng (hoạt động đăng nhập, thông tin phiên). Chúng tôi không thu thập thông tin thẻ thanh toán."
-      },
-      "dataUse": {
-        "title": "3. Cách chúng tôi sử dụng thông tin",
-        "content": "Chúng tôi sử dụng thông tin của bạn để cung cấp và cải thiện Dịch vụ, xác thực danh tính, hiển thị dữ liệu tài chính trong ứng dụng, gửi thông báo dịch vụ quan trọng và phân tích mẫu sử dụng tổng hợp để cải thiện tính năng. Chúng tôi không bán dữ liệu cá nhân của bạn cho bên thứ ba."
-      },
-      "dataStorage": {
-        "title": "4. Lưu trữ & Bảo mật dữ liệu",
-        "content": "Dữ liệu của bạn được lưu trữ trong cơ sở dữ liệu PostgreSQL được lưu trữ trên Supabase và được lưu cache trong Redis. Tất cả dữ liệu được truyền qua HTTPS/TLS. Token xác thực (JWT) được lưu trong localStorage của trình duyệt. Chúng tôi áp dụng các biện pháp bảo mật tiêu chuẩn ngành, nhưng không có phương thức truyền tải hay lưu trữ nào an toàn 100%."
-      },
-      "thirdParties": {
-        "title": "5. Dịch vụ bên thứ ba",
-        "content": "Chúng tôi sử dụng các dịch vụ bên thứ ba sau: Google OAuth (để xác thực tài khoản — tuân theo Chính sách Bảo mật của Google), Supabase (lưu trữ cơ sở dữ liệu) và các nhà cung cấp dữ liệu thị trường để lấy thông tin giá đầu tư. Mỗi nhà cung cấp có chính sách bảo mật riêng."
-      },
-      "userRights": {
-        "title": "6. Quyền của bạn",
-        "content": "Bạn có quyền truy cập, chỉnh sửa hoặc xóa dữ liệu cá nhân của mình bất cứ lúc nào. Bạn có thể xuất dữ liệu giao dịch qua tính năng xuất của ứng dụng. Để yêu cầu xóa tài khoản hoàn toàn, sử dụng trang cài đặt hoặc liên hệ trực tiếp với chúng tôi. Chúng tôi sẽ xử lý yêu cầu xóa trong vòng 30 ngày."
-      },
-      "cookies": {
-        "title": "7. Cookie & Local Storage",
-        "content": "Chúng tôi sử dụng localStorage của trình duyệt để lưu trữ token xác thực (JWT) và tùy chọn người dùng. Chúng tôi không sử dụng cookie theo dõi của bên thứ ba. Bạn có thể xóa localStorage bất cứ lúc nào qua cài đặt trình duyệt, điều này sẽ đăng xuất bạn khỏi Dịch vụ."
-      },
-      "changes": {
-        "title": "8. Thay đổi chính sách",
-        "content": "Chúng tôi có thể cập nhật Chính sách Bảo mật này định kỳ. Chúng tôi sẽ thông báo về những thay đổi quan trọng bằng cách cập nhật ngày \"Cập nhật lần cuối\". Việc tiếp tục sử dụng Dịch vụ sau khi có thay đổi đồng nghĩa với việc bạn chấp nhận chính sách đã cập nhật."
-      },
-      "contact": {
-        "title": "9. Liên hệ",
-        "content": "Để biết thêm về quyền riêng tư, yêu cầu truy cập dữ liệu hoặc thực hiện quyền của bạn, vui lòng liên hệ chúng tôi qua tính năng phản hồi trong ứng dụng hoặc tại thông tin liên hệ trên trang web."
+    },
+    "privacy": {
+      "title": "Chính sách bảo mật",
+      "subtitle": "Quyền riêng tư của bạn rất quan trọng với chúng tôi. Chính sách này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ dữ liệu của bạn.",
+      "lastUpdated": "Cập nhật lần cuối: Tháng 4 năm 2026",
+      "sections": {
+        "introduction": {
+          "title": "1. Giới thiệu",
+          "content": "congdongvang.com (\"chúng tôi\") cam kết bảo vệ quyền riêng tư của bạn. Chính sách Bảo mật này giải thích những thông tin chúng tôi thu thập, cách chúng tôi sử dụng và quyền của bạn đối với dữ liệu cá nhân."
+        },
+        "dataCollection": {
+          "title": "2. Thông tin chúng tôi thu thập",
+          "content": "Chúng tôi thu thập thông tin bạn cung cấp trực tiếp: thông tin tài khoản (tên, email), dữ liệu tài chính bạn nhập (ví, giao dịch, đầu tư, ngân sách) và dữ liệu sử dụng (hoạt động đăng nhập, thông tin phiên). Chúng tôi không thu thập thông tin thẻ thanh toán."
+        },
+        "dataUse": {
+          "title": "3. Cách chúng tôi sử dụng thông tin",
+          "content": "Chúng tôi sử dụng thông tin của bạn để cung cấp và cải thiện Dịch vụ, xác thực danh tính, hiển thị dữ liệu tài chính trong ứng dụng, gửi thông báo dịch vụ quan trọng và phân tích mẫu sử dụng tổng hợp để cải thiện tính năng. Chúng tôi không bán dữ liệu cá nhân của bạn cho bên thứ ba."
+        },
+        "dataStorage": {
+          "title": "4. Lưu trữ & Bảo mật dữ liệu",
+          "content": "Dữ liệu của bạn được lưu trữ trong cơ sở dữ liệu PostgreSQL được lưu trữ trên Supabase và được lưu cache trong Redis. Tất cả dữ liệu được truyền qua HTTPS/TLS. Token xác thực (JWT) được lưu trong localStorage của trình duyệt. Chúng tôi áp dụng các biện pháp bảo mật tiêu chuẩn ngành, nhưng không có phương thức truyền tải hay lưu trữ nào an toàn 100%."
+        },
+        "thirdParties": {
+          "title": "5. Dịch vụ bên thứ ba",
+          "content": "Chúng tôi sử dụng các dịch vụ bên thứ ba sau: Google OAuth (để xác thực tài khoản — tuân theo Chính sách Bảo mật của Google), Supabase (lưu trữ cơ sở dữ liệu) và các nhà cung cấp dữ liệu thị trường để lấy thông tin giá đầu tư. Mỗi nhà cung cấp có chính sách bảo mật riêng."
+        },
+        "userRights": {
+          "title": "6. Quyền của bạn",
+          "content": "Bạn có quyền truy cập, chỉnh sửa hoặc xóa dữ liệu cá nhân của mình bất cứ lúc nào. Bạn có thể xuất dữ liệu giao dịch qua tính năng xuất của ứng dụng. Để yêu cầu xóa tài khoản hoàn toàn, sử dụng trang cài đặt hoặc liên hệ trực tiếp với chúng tôi. Chúng tôi sẽ xử lý yêu cầu xóa trong vòng 30 ngày."
+        },
+        "cookies": {
+          "title": "7. Cookie & Local Storage",
+          "content": "Chúng tôi sử dụng localStorage của trình duyệt để lưu trữ token xác thực (JWT) và tùy chọn người dùng. Chúng tôi không sử dụng cookie theo dõi của bên thứ ba. Bạn có thể xóa localStorage bất cứ lúc nào qua cài đặt trình duyệt, điều này sẽ đăng xuất bạn khỏi Dịch vụ."
+        },
+        "changes": {
+          "title": "8. Thay đổi chính sách",
+          "content": "Chúng tôi có thể cập nhật Chính sách Bảo mật này định kỳ. Chúng tôi sẽ thông báo về những thay đổi quan trọng bằng cách cập nhật ngày \"Cập nhật lần cuối\". Việc tiếp tục sử dụng Dịch vụ sau khi có thay đổi đồng nghĩa với việc bạn chấp nhận chính sách đã cập nhật."
+        },
+        "contact": {
+          "title": "9. Liên hệ",
+          "content": "Để biết thêm về quyền riêng tư, yêu cầu truy cập dữ liệu hoặc thực hiện quyền của bạn, vui lòng liên hệ chúng tôi qua tính năng phản hồi trong ứng dụng hoặc tại thông tin liên hệ trên trang web."
+        }
       }
     }
   }

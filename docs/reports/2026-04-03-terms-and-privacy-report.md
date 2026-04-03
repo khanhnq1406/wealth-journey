@@ -77,6 +77,7 @@ Both pages are:
 | Date | Fix | Severity | Files Changed |
 | --- | --- | --- | --- |
 | 2026-04-03 | Replace all "WealthJourney" branding with "congdongvang.com" in legal content; remove `governingLaw` section (section 8) from Terms of Service in both locales; renumber Contact from section 9 → 8 | Minor | `messages/en/legal.json`, `messages/vi/legal.json`, `TermsContent.tsx`, `TermsContent.test.tsx` |
+| 2026-04-03 | Fix `MISSING_MESSAGE: Could not resolve 'legal' in messages for locale 'vi'` — wrapped both `en/legal.json` and `vi/legal.json` content under a top-level `"legal"` key to match the `useTranslations("legal")` namespace expected by next-intl | Minor | `messages/en/legal.json`, `messages/vi/legal.json` |
 
 ## Non-Issues Noted During Review
 
