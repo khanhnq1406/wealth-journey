@@ -1,6 +1,6 @@
 ---
 type: feature
-status: Plan
+status: Review
 ---
 
 ## Overview
@@ -13,5 +13,5 @@ status: Plan
 | -------- | ---- |
 | Spec     | `docs/specs/2026-04-02-improve-mobile-tab-overflow-spec.md` |
 | Plan     | `docs/plans/2026-04-02-improve-mobile-tab-overflow-plan.md` |
-| Progress | `docs/reports/2026-04-02-improve-mobile-tab-overflow-progress.md` _(added after step 3 starts)_ |
-| Report   | `docs/reports/2026-04-02-improve-mobile-tab-overflow-report.md` _(added after step 3 completes)_ |
+| Progress | `docs/reports/2026-04-02-improve-mobile-tab-overflow-progress.md` |
+| Report   | `docs/reports/2026-04-02-improve-mobile-tab-overflow-report.md` |

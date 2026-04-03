@@ -10,14 +10,12 @@ kanban-plugin: board
 
 ## Spec
 
-- [ ] [[2026-04-03-feat-asset-display-config-safe-disable-delete|Add safe disable/delete for asset display config when users are using that asset code]]
-
 
 
 ## Plan
 
+- [ ] [[2026-04-03-feat-asset-display-config-safe-disable-delete|Add safe disable/delete for asset display config when users are using that asset code]]
 - [ ] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
-- [ ] [[2026-04-02-improve-mobile-tab-overflow|Improve all tab selection]]
 
 
 ## Implement
@@ -26,12 +24,14 @@ kanban-plugin: board
 
 ## Review
 
-- [ ] [[2026-04-02-cancel-google-connection|Cancel Google connection]]
+- [ ] [[2026-04-02-improve-mobile-tab-overflow|Improve all tab selection]]
+
 
 
 ## Done
 
 **Complete**
+- [x] [[2026-04-02-cancel-google-connection|Cancel Google connection]]
 - [x] [[2026-04-03-add-cors-allow-from-backend|Add CORS allow from the backend to prevent other clients get api data]]
 - [x] [[2026-04-02-fix-admin-nav-items-not-showing|Fix admin nav items not showing after login]]
 - [x] [[2026-04-02-enhance-ui-admin-gold-config|Enhance UI in admin gold config tab]]
