@@ -8,14 +8,14 @@
 - **Started:** 2026-04-03T00:00:00+07:00
 - **Last updated:** 2026-04-03T00:00:00+07:00
 - **Current state:** in_progress
-- **Current task:** 0
+- **Current task:** 2
 
 ## Task Progress
 
 | #     | Task Name                                   | Status      | Commit | Summary |
 | ----- | ------------------------------------------- | ----------- | ------ | ------- |
-| 0     | Update C4 Architecture Diagrams             | in_progress | —      | —       |
-| 1     | Proto — Add UnlinkGoogle RPC and Messages   | pending     | —      | —       |
+| 0     | Update C4 Architecture Diagrams             | done        | ddf4b4a8 | Added UnlinkGoogle to AuthHandler (backend C4) and DisconnectGoogleDialog note to AuthMethodsCard (frontend C4) |
+| 1     | Proto — Add UnlinkGoogle RPC and Messages   | done        | TBD    | Added UnlinkGoogle RPC + messages to auth.proto; restored missing GetAssetDisplayPrices RPC to investment.proto; both builds pass |
 | 2     | Backend — UnlinkGoogle Service Method       | pending     | —      | —       |
 | 3     | Backend — UnlinkGoogle Handler and Route    | pending     | —      | —       |
 | 4+5   | Frontend — i18n Keys + Error Mapper         | pending     | —      | —       |

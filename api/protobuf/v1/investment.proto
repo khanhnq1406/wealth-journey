@@ -486,6 +486,11 @@ service InvestmentService {
   rpc DeleteUserPriceAlert(DeleteUserPriceAlertRequest) returns (DeleteUserPriceAlertResponse) {
     option (google.api.http) = { delete: "/api/v1/price-alerts/{id}" };
   }
+
+  // Get asset display prices (public endpoint — no auth required)
+  rpc GetAssetDisplayPrices(GetAssetDisplayPricesRequest) returns (GetAssetDisplayPricesResponse) {
+    option (google.api.http) = { get: "/api/v1/public/asset-display-prices" };
+  }
 }
 
 // Request/Response messages

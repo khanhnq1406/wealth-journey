@@ -30,6 +30,7 @@ const (
 	AuthService_ChangePassword_FullMethodName       = "/wealthjourney.auth.v1.AuthService/ChangePassword"
 	AuthService_GetAuthMethods_FullMethodName       = "/wealthjourney.auth.v1.AuthService/GetAuthMethods"
 	AuthService_LinkGoogle_FullMethodName           = "/wealthjourney.auth.v1.AuthService/LinkGoogle"
+	AuthService_UnlinkGoogle_FullMethodName         = "/wealthjourney.auth.v1.AuthService/UnlinkGoogle"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -58,6 +59,9 @@ type AuthServiceClient interface {
 	GetAuthMethods(ctx context.Context, in *GetAuthMethodsRequest, opts ...grpc.CallOption) (*GetAuthMethodsResponse, error)
 	// Link Google account to existing user (authenticated)
 	LinkGoogle(ctx context.Context, in *LinkGoogleRequest, opts ...grpc.CallOption) (*LinkGoogleResponse, error)
+	// Unlink Google account from existing user (authenticated)
+	// Requires password set on account. Revokes all other sessions.
+	UnlinkGoogle(ctx context.Context, in *UnlinkGoogleRequest, opts ...grpc.CallOption) (*UnlinkGoogleResponse, error)
 }
 
 type authServiceClient struct {
@@ -167,6 +171,15 @@ func (c *authServiceClient) LinkGoogle(ctx context.Context, in *LinkGoogleReques
 	return out, nil
 }
 
+func (c *authServiceClient) UnlinkGoogle(ctx context.Context, in *UnlinkGoogleRequest, opts ...grpc.CallOption) (*UnlinkGoogleResponse, error) {
+	out := new(UnlinkGoogleResponse)
+	err := c.cc.Invoke(ctx, AuthService_UnlinkGoogle_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility
@@ -193,6 +206,9 @@ type AuthServiceServer interface {
 	GetAuthMethods(context.Context, *GetAuthMethodsRequest) (*GetAuthMethodsResponse, error)
 	// Link Google account to existing user (authenticated)
 	LinkGoogle(context.Context, *LinkGoogleRequest) (*LinkGoogleResponse, error)
+	// Unlink Google account from existing user (authenticated)
+	// Requires password set on account. Revokes all other sessions.
+	UnlinkGoogle(context.Context, *UnlinkGoogleRequest) (*UnlinkGoogleResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -232,6 +248,9 @@ func (UnimplementedAuthServiceServer) GetAuthMethods(context.Context, *GetAuthMe
 }
 func (UnimplementedAuthServiceServer) LinkGoogle(context.Context, *LinkGoogleRequest) (*LinkGoogleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LinkGoogle not implemented")
+}
+func (UnimplementedAuthServiceServer) UnlinkGoogle(context.Context, *UnlinkGoogleRequest) (*UnlinkGoogleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnlinkGoogle not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 
@@ -444,6 +463,24 @@ func _AuthService_LinkGoogle_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_UnlinkGoogle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UnlinkGoogleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).UnlinkGoogle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_UnlinkGoogle_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).UnlinkGoogle(ctx, req.(*UnlinkGoogleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -494,6 +531,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LinkGoogle",
 			Handler:    _AuthService_LinkGoogle_Handler,
+		},
+		{
+			MethodName: "UnlinkGoogle",
+			Handler:    _AuthService_UnlinkGoogle_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
