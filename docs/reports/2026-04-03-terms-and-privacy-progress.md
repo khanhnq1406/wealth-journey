@@ -6,9 +6,9 @@
 - **Plan file:** `docs/plans/2026-04-03-terms-and-privacy-plan.md`
 - **Spec file:** `docs/specs/2026-04-03-terms-and-privacy-spec.md`
 - **Started:** 2026-04-03T00:00:00Z
-- **Last updated:** 2026-04-03T02:00:00Z
+- **Last updated:** 2026-04-03T03:00:00Z
 - **Current state:** in_progress
-- **Current task:** 3+4
+- **Current task:** 5+6+7
 
 ## Task Progress
 
@@ -16,8 +16,8 @@
 | ---- | ----------------------------------------------- | ---------- | ------ | ------- |
 | 0+1  | Register i18n namespace + create message files  | done       | 0a6dce06 | Registered legal namespace in i18n/request.ts; created en/legal.json and vi/legal.json with 9 terms + 9 privacy sections |
 | 2    | Create shared legal layout                      | done       | bd25ca9e | Created app/[locale]/legal/layout.tsx with SEO metadata (canonical, hreflang, robots) + children passthrough |
-| 3    | Create Terms of Service page                    | pending    | —      | —       |
-| 4    | Create Privacy Policy page                      | pending    | —      | —       |
+| 3    | Create Terms of Service page                    | done       | ab0a8169 | Created terms layout, page, TermsContent (9 sections, disclaimer highlighted), tests + E2E spec |
+| 4    | Create Privacy Policy page                      | done       | ab0a8169 | Created privacy layout, page, PrivacyContent (9 sections, uniform styling), tests + E2E spec |
 | 5    | Fix auth page broken links                      | pending    | —      | —       |
 | 6    | Update LandingFooter — add legal links          | pending    | —      | —       |
 | 7    | Update Settings Hub — add Legal section         | pending    | —      | —       |
