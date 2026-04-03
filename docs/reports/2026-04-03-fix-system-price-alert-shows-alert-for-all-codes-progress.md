@@ -7,8 +7,8 @@
 - **Spec file:** docs/specs/2026-04-03-fix-system-price-alert-shows-alert-for-all-codes-spec.md
 - **Started:** 2026-04-03T00:00:00Z
 - **Last updated:** 2026-04-03T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 3 (diagrams)
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -17,7 +17,7 @@
 | 1   | Inject AssetDisplayConfigService into priceAlertService  | done        | 1907bbe0 | Added configSvc field + 6th param to NewPriceAlertService; wired in services.go; full mock + helper updated in tests |
 | 2   | Implement enabled-code filter in doCheckAndAlert         | done        | 7da688f3 | Added buildEnabledSet closure; filter before price loops for gold+silver; 3 new tests; existing tests updated |
 | 4   | Update existing tests to include configSvc in all helpers | done       | 7da688f3 | Covered in Task 2 commit — all 13 existing tests updated with ListAll mock expectations |
-| 3   | Update C4 component + runtime flow diagrams              | pending     | —      | —       |
+| 3   | Update C4 component + runtime flow diagrams              | done        | c7580d96 | Added PriceAlertService→AssetDisplayConfigService arrow in C4; updated flow-cross-cutting.md with ListAll step |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
