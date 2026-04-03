@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQueryGetFollowing, useQueryGetFollowers } from "@/utils/generated/hooks";
 import { UserListItem } from "./UserListItem";
 import { Users, ArrowLeft } from "lucide-react";
-import { cn } from "@/lib/utils/cn";
+import { TabBar } from "@/components/navigation/TabBar";
 
 interface FollowingViewProps {
   currentUser: { id: number; name: string; picture: string };
@@ -54,28 +54,22 @@ export function FollowingView({ currentUser, targetUserId, onUserClick, initialT
         </div>
       )}
       {/* Tabs */}
-      <div className="flex border-b border-v2-gold-primary/30">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={cn(
-              "flex-1 py-3 font-roboto text-sm font-medium transition-colors relative",
-              activeTab === tab.key
-                ? "text-v2-gold-primary"
-                : "text-v2-text-tertiary hover:text-v2-text-secondary"
-            )}
-          >
-            {tab.label}
-            {tab.count !== undefined && tab.count > 0 && (
-              <span className="ml-1 text-xs">({tab.count})</span>
-            )}
-            {activeTab === tab.key && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-v2-gold-primary" />
-            )}
-          </button>
-        ))}
-      </div>
+      <TabBar
+        tabs={tabs.map((tab) => ({
+          id: tab.key,
+          label: (
+            <>
+              {tab.label}
+              {tab.count !== undefined && tab.count > 0 && (
+                <span className="ml-1 text-xs">({tab.count})</span>
+              )}
+            </>
+          ),
+        }))}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        className="border-v2-gold-primary/30"
+      />
 
       {/* Content */}
       {isLoading ? (

@@ -195,8 +195,9 @@
   },
   "active": "c1a649a975fff14d",
   "lastOpenFiles": [
-    "2026-04-03-add-cors-allow-from-backend.md",
+    "2026-04-03-tab-bar-scroll-hint.md",
     "2026-04-03-fix-dashboard-navbar-cannot-scroll-in-desktop-view.md",
+    "2026-04-03-add-cors-allow-from-backend.md",
     "2026-04-02-improve-mobile-tab-overflow.md",
     "Kanban Board.md",
     "2026-04-03-feat-asset-display-config-safe-disable-delete.md",
@@ -220,7 +221,6 @@
     "Enhance TanStackTable desktop design to match price alert table.md",
     "Auto increase priority of type code fetcher in edit asset type code.md",
     "Fix admin nav items not showing after login.md",
-    "Fix user price alert in Vietnamese.md",
     "pictures/price_alert.png",
     "pictures"
   ]

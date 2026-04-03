@@ -266,7 +266,7 @@ describe("InvestmentDetailModal — Edit Button and State", () => {
       renderModal();
 
       // Switch to transactions tab
-      const transactionsTab = screen.getByRole("button", {
+      const transactionsTab = screen.getByRole("tab", {
         name: /transactions/i,
       });
       fireEvent.click(transactionsTab);
@@ -287,7 +287,7 @@ describe("InvestmentDetailModal — Edit Button and State", () => {
       renderModal();
 
       // Switch to transactions tab first
-      fireEvent.click(screen.getByRole("button", { name: /transactions/i }));
+      fireEvent.click(screen.getByRole("tab", { name: /transactions/i }));
 
       await waitFor(() => {
         expect(
@@ -311,7 +311,7 @@ describe("InvestmentDetailModal — Edit Button and State", () => {
       renderModal();
 
       // Switch to transactions tab
-      fireEvent.click(screen.getByRole("button", { name: /transactions/i }));
+      fireEvent.click(screen.getByRole("tab", { name: /transactions/i }));
 
       await waitFor(() => {
         expect(
@@ -339,7 +339,7 @@ describe("InvestmentDetailModal — Edit Button and State", () => {
       renderModal();
 
       // Go to transactions tab and click edit
-      fireEvent.click(screen.getByRole("button", { name: /transactions/i }));
+      fireEvent.click(screen.getByRole("tab", { name: /transactions/i }));
 
       await waitFor(() => {
         expect(
@@ -356,9 +356,9 @@ describe("InvestmentDetailModal — Edit Button and State", () => {
 
       await waitFor(() => {
         // The tab label should now read "Edit Transaction"
-        // It appears as a tab navigation button
+        // It appears as a tab navigation element (role="tab" via TabBar)
         const tabButtons = screen
-          .getAllByRole("button")
+          .getAllByRole("tab")
           .filter((b) => b.textContent?.trim() === "Edit Transaction");
         expect(tabButtons.length).toBeGreaterThanOrEqual(1);
       });
@@ -370,7 +370,7 @@ describe("InvestmentDetailModal — Edit Button and State", () => {
       renderModal();
 
       // Navigate to transactions and click edit
-      fireEvent.click(screen.getByRole("button", { name: /transactions/i }));
+      fireEvent.click(screen.getByRole("tab", { name: /transactions/i }));
 
       await waitFor(() => {
         expect(
@@ -405,7 +405,7 @@ describe("InvestmentDetailModal — Edit Button and State", () => {
       // Clicking the add-transaction tab now should show form without editTransaction
       // (edit state was cleared on success)
       fireEvent.click(
-        screen.getAllByRole("button").find(
+        screen.getAllByRole("tab").find(
           (b) => b.textContent?.trim() === "Add Transaction",
         )!,
       );
@@ -423,7 +423,7 @@ describe("InvestmentDetailModal — Edit Button and State", () => {
       renderModal();
 
       // Go to transactions and click edit
-      fireEvent.click(screen.getByRole("button", { name: /transactions/i }));
+      fireEvent.click(screen.getByRole("tab", { name: /transactions/i }));
 
       await waitFor(() => {
         expect(
@@ -441,7 +441,7 @@ describe("InvestmentDetailModal — Edit Button and State", () => {
       });
 
       // Switch to overview tab manually
-      fireEvent.click(screen.getByRole("button", { name: /overview/i }));
+      fireEvent.click(screen.getByRole("tab", { name: /overview/i }));
 
       // Form should disappear
       await waitFor(() => {
@@ -452,7 +452,7 @@ describe("InvestmentDetailModal — Edit Button and State", () => {
 
       // If we switch back to add-transaction, editTransaction should be cleared (undefined)
       fireEvent.click(
-        screen.getAllByRole("button").find(
+        screen.getAllByRole("tab").find(
           (b) => b.textContent?.trim() === "Add Transaction",
         )!,
       );

@@ -15,6 +15,7 @@ import {
   QUERY_KEY_ASSET_DISPLAY_CONFIG,
 } from "./AssetDisplayConfigForm";
 import { EVENT_InvestmentGetAssetDisplayPrices } from "@/utils/generated/hooks";
+import { TabBar } from "@/components/navigation/TabBar";
 
 type AssetTab = "gold" | "silver" | "currency";
 
@@ -233,22 +234,13 @@ export function AssetDisplayConfigTable() {
       </div>
 
       {/* Asset type tabs */}
-      <div className="flex gap-1 p-1 rounded-lg bg-v2-bg-dark border border-v2-border-light w-fit">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => setActiveTab(tab.key)}
-            className={`min-h-[36px] px-4 py-1.5 text-sm font-medium rounded-md transition-colors focus-visible:ring-2 focus-visible:ring-v2-gold-primary cursor-pointer ${
-              activeTab === tab.key
-                ? "bg-v2-gold-primary text-v2-bg-dark"
-                : "text-v2-text-tertiary hover:text-v2-gold-accent hover:bg-v2-maroon-600"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <TabBar
+        tabs={TABS.map((tab) => ({ id: tab.key, label: tab.label }))}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        variant="pill"
+        size="sm"
+      />
 
       {/* Reorder loading overlay wrapper */}
       <div className={`relative ${isReordering ? "animate-pulse opacity-50 pointer-events-none" : ""}`}>

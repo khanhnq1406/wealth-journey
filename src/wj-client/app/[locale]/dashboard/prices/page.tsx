@@ -35,6 +35,7 @@ import { WatchlistTab } from "@/features/watchlist/components/WatchlistTab";
 import { AddToWatchlistForm } from "@/features/watchlist/forms/AddToWatchlistForm";
 import { CreatePriceAlertForm } from "@/features/price-alert/forms/CreatePriceAlertForm";
 import type { AssetCategory } from "@/features/price-alert/forms/CreatePriceAlertForm";
+import { TabBar } from "@/components/navigation/TabBar";
 
 type Tab = "priceAlerts" | "watchlist" | "gold" | "silver" | "currency" | "symbol";
 
@@ -1005,21 +1006,11 @@ export default function PricesPage() {
 
       <BaseCard padding="none">
         {/* Tab bar */}
-        <div className="flex border-b border-v2-border-light overflow-x-auto scrollbar-hide">
-          {TABS.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
-                activeTab === tab.key
-                  ? "border-b-2 border-v2-gold-primary text-v2-gold-accent"
-                  : "text-v2-text-tertiary hover:text-v2-gold-accent"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        <TabBar
+          tabs={TABS.map((tab) => ({ id: tab.key, label: tab.label }))}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
 
         <div className="p-4">
           {activeTab === "priceAlerts" && (

@@ -22,6 +22,7 @@ import { AdminBroadcastForm } from "@/features/admin/components/AdminBroadcastFo
 import { PriceAlertConfigForm } from "@/features/admin/components/PriceAlertConfigForm";
 import { PriceAlertTriggerCard } from "@/features/admin/components/PriceAlertTriggerCard";
 import { AssetDisplayConfigTable } from "@/features/admin/components/AssetDisplayConfigTable";
+import { TabBar } from "@/components/navigation/TabBar";
 
 interface SiteSetting {
   key: string;
@@ -414,20 +415,12 @@ export default function AdminCMSPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 border-b border-v2-border-light mb-6">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => handleTabChange(tab.id)}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === tab.id
-                  ? "border-v2-gold-primary text-bg"
-                  : "border-transparent text-v2-text-tertiary hover:text-v2-text-secondary"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="mb-6">
+          <TabBar
+            tabs={TABS.map((tab) => ({ id: tab.id, label: tab.label }))}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+          />
         </div>
 
         {/* Tab content */}

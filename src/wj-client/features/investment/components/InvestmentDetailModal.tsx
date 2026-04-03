@@ -43,6 +43,7 @@ import {
 } from "@/app/[locale]/dashboard/portfolio/helpers";
 import { isGoldType } from "@/features/investment/utils/gold-calculator";
 import { isSilverType } from "@/features/investment/utils/silver-calculator";
+import { TabBar } from "@/components/navigation/TabBar";
 
 export type TabType =
   | "overview"
@@ -573,50 +574,23 @@ export function InvestmentDetailModal({
       ) : investment ? (
         <div className="space-y-4">
           {/* Tabs */}
-          <div className="flex border-b border-v2-gold-primary/20 overflow-x-auto scrollbar-hide">
-            <button
-              onClick={() => handleTabChange("overview")}
-              className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
-                activeTab === "overview"
-                  ? "border-b-2 border-v2-gold-primary text-v2-gold-primary"
-                  : "text-v2-text-secondary hover:text-v2-gold-accent"
-              }`}
-            >
-              {t("detail.overview")}
-            </button>
-            <button
-              onClick={() => handleTabChange("transactions")}
-              className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
-                activeTab === "transactions"
-                  ? "border-b-2 border-v2-gold-primary text-v2-gold-primary"
-                  : "text-v2-text-secondary hover:text-v2-gold-accent"
-              }`}
-            >
-              {t("detail.transactions")}
-            </button>
-            <button
-              onClick={() => handleTabChange("add-transaction")}
-              className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
-                activeTab === "add-transaction"
-                  ? "border-b-2 border-v2-gold-primary text-v2-gold-primary"
-                  : "text-v2-text-secondary hover:text-v2-gold-accent"
-              }`}
-            >
-              {editingTransaction
-                ? t("detail.editTransaction")
-                : t("detail.addTransaction")}
-            </button>
-            <button
-              onClick={() => handleTabChange("set-price")}
-              className={`whitespace-nowrap px-3 py-2 font-medium text-sm sm:px-4 sm:text-base ${
-                activeTab === "set-price"
-                  ? "border-b-2 border-v2-gold-primary text-v2-gold-primary"
-                  : "text-v2-text-secondary hover:text-v2-gold-accent"
-              }`}
-            >
-              {t("detail.setPrice")}
-            </button>
-          </div>
+          <TabBar
+            tabs={[
+              { id: "overview" as TabType, label: t("detail.overview") },
+              { id: "transactions" as TabType, label: t("detail.transactions") },
+              {
+                id: "add-transaction" as TabType,
+                label: editingTransaction
+                  ? t("detail.editTransaction")
+                  : t("detail.addTransaction"),
+              },
+              { id: "set-price" as TabType, label: t("detail.setPrice") },
+            ]}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+            size="sm"
+            fullWidthOnMobile={false}
+          />
 
           {/* Overview Tab */}
           {activeTab === "overview" && (

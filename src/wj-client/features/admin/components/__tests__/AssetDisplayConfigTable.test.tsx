@@ -289,6 +289,16 @@ describe("AssetDisplayConfigTable", () => {
     });
   });
 
+  it("tab buttons have role=tab after migration", async () => {
+    renderWithProviders(<AssetDisplayConfigTable />);
+
+    // Wait for initial render
+    await waitFor(() => {
+      const tabs = screen.getAllByRole("tab");
+      expect(tabs.length).toBeGreaterThan(0);
+    });
+  });
+
   it("invalidates public price query after toggling enabled (update)", async () => {
     // Regression test: disabling a config must also invalidate the public price query so
     // price tables reflect the change without waiting for staleTime to expire.
