@@ -6,9 +6,9 @@
 - **Plan file:** `docs/plans/2026-04-03-terms-and-privacy-plan.md`
 - **Spec file:** `docs/specs/2026-04-03-terms-and-privacy-spec.md`
 - **Started:** 2026-04-03T00:00:00Z
-- **Last updated:** 2026-04-03T03:00:00Z
-- **Current state:** in_progress
-- **Current task:** 5+6+7
+- **Last updated:** 2026-04-03T06:00:00Z
+- **Current state:** done
+- **Current task:** —
 
 ## Task Progress
 
@@ -18,10 +18,10 @@
 | 2    | Create shared legal layout                      | done       | bd25ca9e | Created app/[locale]/legal/layout.tsx with SEO metadata (canonical, hreflang, robots) + children passthrough |
 | 3    | Create Terms of Service page                    | done       | ab0a8169 | Created terms layout, page, TermsContent (9 sections, disclaimer highlighted), tests + E2E spec |
 | 4    | Create Privacy Policy page                      | done       | ab0a8169 | Created privacy layout, page, PrivacyContent (9 sections, uniform styling), tests + E2E spec |
-| 5    | Fix auth page broken links                      | pending    | —      | —       |
-| 6    | Update LandingFooter — add legal links          | pending    | —      | —       |
-| 7    | Update Settings Hub — add Legal section         | pending    | —      | —       |
-| 8    | Update C4 frontend diagram                      | pending    | —      | —       |
+| 5    | Fix auth page broken links                      | done       | 29e22a41 | Fixed #terms/#privacy anchor hrefs → /legal/terms and /legal/privacy in login + register pages |
+| 6    | Update LandingFooter — add legal links          | done       | 29e22a41 | Added ToS + Privacy Link elements with v2 text tokens; used existing nav.json translation keys |
+| 7    | Update Settings Hub — add Legal section         | done       | 29e22a41 | Added Legal section with inline SVG icons (scale + shield-check) and i18n keys in en + vi settings.json |
+| 8    | Update C4 frontend diagram                      | done       | 32e18034 | Added TermsPage and PrivacyPolicyPage nodes to App Router container; added Rel to LandingNavbar+Footer |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 

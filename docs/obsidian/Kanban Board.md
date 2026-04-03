@@ -19,11 +19,11 @@ kanban-plugin: board
 
 ## Implement
 
-- [ ] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
-
 
 
 ## Review
+
+- [ ] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
 
 
 
