@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback, memo } from "react";
+import React, { useState, useEffect, useRef, useCallback, memo, startTransition } from "react";
 import {
   DndContext,
   closestCenter,
@@ -90,7 +90,9 @@ export const SortableList = memo(function SortableList<
 
   useEffect(() => {
     if (!isDraggingRef.current) {
-      setLocalItems(items);
+      startTransition(() => {
+        setLocalItems(items);
+      });
     }
   }, [items]);
 
