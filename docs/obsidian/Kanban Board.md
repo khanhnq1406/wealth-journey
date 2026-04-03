@@ -6,20 +6,21 @@ kanban-plugin: board
 
 ## Not Started
 
-- [ ] [[2026-04-02-enhance-ui-admin-gold-config|Enhance UI in admin gold config tab]]
 - [ ] [[2026-04-02-cancel-google-connection|Cancel Google connection]]
 - [ ] [[2026-04-02-fix-admin-nav-items-not-showing|Fix admin nav items not showing after login]]
 - [ ] [[2026-04-02-improve-mobile-tab-overflow|NEED TO RECHECK THIS TASK! Improve all tab selection overload on mobile view]]
 - [ ] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
-- [ ] System price alert shows alert for all code (not in admin config)
 - [ ] Add CORS allow from the backend to prevent other clients get api data
 
 
 ## Spec
 
 
-
 ## Plan
+
+- [ ] [[2026-04-03-fix-system-price-alert-shows-alert-for-all-codes|Fix system price alert showing alerts for all codes (not in admin config)]]
+
+- [ ] [[2026-04-02-enhance-ui-admin-gold-config|Enhance UI in admin gold config tab]]
 
 
 
