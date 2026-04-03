@@ -17,22 +17,26 @@ kanban-plugin: board
 
 ## Spec
 
-- [ ] [[2026-04-02-auto-increase-fetch-code-priority|Auto increase priority of type code fetcher in edit asset type code]]
+
 
 ## Plan
 
-- [ ] [[2026-04-02-table-ui-enhancements|Enhance TanStackTable desktop design + SortableList component]]
-
-- [ ] [[2026-04-02-price-alert-bugs|Fix price alert bugs (USD value + Vietnamese symbol)]]
 
 
 ## Implement
 
 
 
+## Review
+
+
+
 ## Done
 
 **Complete**
+- [x] [[2026-04-02-auto-increase-fetch-code-priority|Auto increase priority of type code fetcher in edit asset type code]]
+- [x] [[2026-04-02-price-alert-bugs|Fix price alert bugs (USD value + Vietnamese symbol)]]
+- [x] [[2026-04-02-table-ui-enhancements|Enhance TanStackTable desktop design + SortableList component]]
 - [x] [[2026-03-24-user-price-alerts|Fix user price alert in Vietnamese]]
 - [x] [[2026-04-02-add-button-group-to-finance-page|Add button group to finance page]]
 - [x] [[2026-04-02-fix-auto-open-popup|Fix auto open popup]]
@@ -42,6 +46,6 @@ kanban-plugin: board
 
 %% kanban:settings
 ```
-{"kanban-plugin":"board","list-collapse":[false,false,false,false,false]}
+{"kanban-plugin":"board","list-collapse":[false,false,false,false,false,false]}
 ```
 %%

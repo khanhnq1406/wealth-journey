@@ -1,6 +1,6 @@
 ---
 type: feature
-status: Spec
+status: Done
 ---
 
 ## Overview
@@ -12,5 +12,6 @@ When an admin adds a new fetch code or creates a new asset display config, the p
 | Artifact | File |
 | -------- | ---- |
 | Spec     | `docs/specs/2026-04-02-auto-increase-fetch-code-priority-spec.md` |
-| Plan     | _(pending step 2)_ |
-| Report   | _(pending step 3)_ |
+| Plan     | `docs/plans/2026-04-02-auto-increase-fetch-code-priority-plan.md` |
+| Progress | `docs/reports/2026-04-02-auto-increase-fetch-code-priority-progress.md` |
+| Report   | `docs/reports/2026-04-02-auto-increase-fetch-code-priority-report.md` |

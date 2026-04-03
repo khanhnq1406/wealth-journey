@@ -425,9 +425,10 @@ func TestFormatUserAlertPrice(t *testing.T) {
 	}{
 		{50000, "VND", "50,000 VND"},
 		{1234567, "VND", "1,234,567 VND"},
-		{5000000, "USD", "50,000.00 USD"},
-		{5050, "USD", "50.50 USD"},
+		{50000, "USD", "50,000 USD"},      // prices stored as whole dollars, not cents
+		{1234567, "USD", "1,234,567 USD"}, // prices stored as whole dollars, not cents
 		{0, "VND", "0 VND"},
+		{0, "USD", "0 USD"},
 	}
 	for _, tt := range tests {
 		result := FormatUserAlertPrice(tt.price, tt.currency)

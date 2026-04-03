@@ -1,6 +1,6 @@
 ---
 type: feature
-status: Next
+status: Done
 ---
 
 ## Overview
@@ -19,3 +19,5 @@ Two related UI improvements targeting the shared table infrastructure: align `Ta
 | -------- | ---- |
 | Spec     | `docs/specs/2026-04-02-table-ui-enhancements-spec.md` |
 | Plan     | `docs/plans/2026-04-02-table-ui-enhancements-plan.md` |
+| Progress | `docs/reports/2026-04-02-table-ui-enhancements-progress.md` |
+| Report   | `docs/reports/2026-04-02-table-ui-enhancements-report.md` |

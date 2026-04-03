@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { FormInput } from "@/components/forms/FormInput";
 import { FormNumberInput } from "@/components/forms/FormNumberInput";
@@ -34,6 +34,7 @@ export interface AssetDisplayConfigFormProps {
     showInInvestment: boolean;
   };
   existingCodes?: string[];
+  nextDisplayOrder?: number;
   onSuccess?: (createdId?: number, createdAssetType?: string) => void;
 }
 
@@ -65,11 +66,16 @@ interface CreateConfigResponse {
   };
 }
 
+interface ListConfigsResponse {
+  configs: { id: number; displayOrder: number }[];
+}
+
 export function AssetDisplayConfigForm({
   mode,
   assetType,
   initialValues,
   existingCodes,
+  nextDisplayOrder,
   onSuccess,
 }: AssetDisplayConfigFormProps) {
   const queryClient = useQueryClient();
@@ -77,12 +83,31 @@ export function AssetDisplayConfigForm({
   const [selectedAssetType, setSelectedAssetType] = useState<string>(assetType ?? "gold");
   const t = useTranslations("admin.assetDisplayConfig");
 
+  // Fetch configs for the currently selected asset type so we can compute
+  // nextDisplayOrder dynamically when the user switches types inside the form.
+  const { data: typeConfigsData } = useQuery<ListConfigsResponse>({
+    queryKey: [QUERY_KEY_ASSET_DISPLAY_CONFIG, selectedAssetType],
+    queryFn: async () => {
+      const response = (await apiClient.get(
+        `/api/v1/admin/asset-display-config?assetType=${encodeURIComponent(selectedAssetType)}`
+      )) as unknown as ListConfigsResponse;
+      return response;
+    },
+    enabled: mode === "create",
+  });
+
+  const computedNextDisplayOrder = useMemo(() => {
+    const configs = typeConfigsData?.configs ?? [];
+    if (configs.length === 0) return 1;
+    return Math.max(...configs.map((c) => c.displayOrder)) + 1;
+  }, [typeConfigsData?.configs]);
+
   const { register, handleSubmit, control, reset, setValue, formState: { errors } } =
     useForm<AssetDisplayConfigFormValues>({
       defaultValues: {
         typeCode: initialValues?.typeCode ?? "",
         displayName: initialValues?.displayName ?? "",
-        displayOrder: initialValues?.displayOrder ?? 0,
+        displayOrder: initialValues?.displayOrder ?? nextDisplayOrder ?? 1,
         enabled: initialValues?.enabled ?? true,
         showInInvestment: initialValues?.showInInvestment ?? true,
       },
@@ -99,6 +124,13 @@ export function AssetDisplayConfigForm({
       });
     }
   }, [initialValues, reset]);
+
+  // Sync displayOrder when the computed value changes (asset type switch or data load)
+  useEffect(() => {
+    if (mode === "create") {
+      setValue("displayOrder", computedNextDisplayOrder);
+    }
+  }, [computedNextDisplayOrder, mode, setValue]);
 
   const enabledValue = useWatch({ control, name: "enabled" });
   const showInInvestmentValue = useWatch({ control, name: "showInInvestment" });
@@ -155,13 +187,13 @@ export function AssetDisplayConfigForm({
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {mode === "create" && (
         <div className="space-y-2">
-          {/* Asset type selector — user can pick Gold or Silver before submitting */}
+          {/* Asset type selector — user can pick Gold, Silver, or Currency before submitting */}
           <div className="space-y-1.5">
             <span className="text-sm font-medium text-v2-gold-accent">
               {t("form.assetType")}
             </span>
             <div className="flex gap-1 p-1 rounded-lg bg-v2-bg-dark border border-v2-border-light w-fit">
-              {(["gold", "silver"] as const).map((type) => (
+              {(["gold", "silver", "currency"] as const).map((type) => (
                 <button
                   key={type}
                   type="button"
@@ -173,7 +205,7 @@ export function AssetDisplayConfigForm({
                       : "text-v2-text-tertiary hover:text-v2-gold-accent hover:bg-v2-maroon-600"
                   }`}
                 >
-                  {type === "gold" ? t("tabs.gold") : t("tabs.silver")}
+                  {type === "gold" ? t("tabs.gold") : type === "silver" ? t("tabs.silver") : t("tabs.currency")}
                 </button>
               ))}
             </div>

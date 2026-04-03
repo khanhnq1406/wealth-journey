@@ -1,6 +1,6 @@
 ---
 type: bug
-status: Next
+status: Done
 ---
 
 ## Overview
@@ -19,3 +19,4 @@ Two bugs in the user price alert system prevent correct operation: USD price ale
 | -------- | ---- |
 | Spec     | `docs/specs/2026-04-02-price-alert-bugs-spec.md` |
 | Plan     | `docs/plans/2026-04-02-price-alert-bugs-plan.md` |
+| Report   | `docs/reports/2026-04-02-price-alert-bugs-report.md` |
