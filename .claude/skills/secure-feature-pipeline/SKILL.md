@@ -64,7 +64,7 @@ Example: spec is `docs/specs/2026-04-02-price-alert-bugs-spec.md` → task note 
 
 ### Kanban columns
 
-The board has **5 columns** in order:
+The board has **6 columns** in order:
 
 | Column | Meaning |
 | ------ | ------- |
@@ -72,6 +72,7 @@ The board has **5 columns** in order:
 | `## Spec` | Brainstorm/spec step in progress or done |
 | `## Plan` | Plan step in progress or done |
 | `## Implement` | Implementation in progress or done |
+| `## Review` | Implementation done, awaiting review |
 | `## Done` | Reviewed and approved |
 
 ### Task note template
@@ -79,7 +80,7 @@ The board has **5 columns** in order:
 ```markdown
 ---
 type: <bug|feature>
-status: <Not Started|Spec|Plan|Implement|Done>
+status: <Not Started|Spec|Plan|Implement|Review|Done>
 ---
 
 ## Overview
@@ -104,10 +105,10 @@ status: <Not Started|Spec|Plan|Implement|Done>
 | 1 — Brainstorm (spec written) | **Move** Kanban entry to `## Spec`. Update task note status. | `Spec` |
 | 2 — Plan | **Update** task note: add plan link to Pipeline Artifacts table. **Move** Kanban entry to `## Plan`. | `Plan` |
 | 3 — Implement (start) | **Update** task note: add progress file link. **Move** entry to `## Implement`. | `Implement` |
-| 3 — Implement (done) | **Update** task note: add report link. | `Implement` |
-| 4 — Review (approved) | **Update** task note status to `Done`. **Move** Kanban entry to `## Done`, mark `[x]`. | `Done` |
+| 3 — Implement (done) | **Update** task note: add report link. **Move** Kanban entry to `## Review`. Update task note status. | `Review` |
+| 4 — Review (approved) | No automatic Kanban move — user moves entry to `## Done` manually. | (unchanged) |
 
-**Moving a Kanban entry:** remove the `- [ ] [[...]]` line from the old column and insert it in the new column (newest at top). Update `status` in the task note frontmatter to match the column name (`Not Started` → `Spec` → `Plan` → `Implement` → `Done`).
+**Moving a Kanban entry:** remove the `- [ ] [[...]]` line from the old column and insert it in the new column (newest at top). Update `status` in the task note frontmatter to match the column name (`Not Started` → `Spec` → `Plan` → `Implement` → `Review` → `Done`).
 
 **Do NOT create a duplicate Kanban entry** — if one already exists for this feature slug, update it in place.
 
