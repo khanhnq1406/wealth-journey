@@ -358,7 +358,7 @@ export function DashboardLayout({
               className="flex-1 overflow-y-auto px-3 overflow-x-hidden"
               aria-label={t("mainNavigation")}
             >
-              <div className="flex flex-col h-full">
+              <div className="flex flex-col">
                 {/* Premium Card — Home + Portfolio + Community */}
                 <div
                   className="rounded-2xl border border-v2-border-light p-1.5 flex flex-col gap-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
@@ -454,10 +454,8 @@ export function DashboardLayout({
                   />
                 </div>
 
-                {/* Spacer + Divider + Settings */}
-                <div className="flex-1" />
-                <div className="border-t border-v2-border-light" />
-                <div className="h-2" />
+                {/* Settings */}
+                <div className={cn(isExpanded ? "mt-3" : "mt-4")} />
                 <NavItem
                   href="/dashboard/settings"
                   label={t("settings")}
