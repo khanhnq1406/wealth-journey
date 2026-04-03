@@ -1,6 +1,6 @@
 ---
 type: feature
-status: Spec
+status: Plan
 ---
 
 ## Overview
@@ -9,9 +9,9 @@ Admins currently can disable or delete an asset display config even when users h
 
 ## Pipeline Artifacts
 
-| Artifact | File |
-| -------- | ---- |
+| Artifact | File                                                                          |
+| -------- | ----------------------------------------------------------------------------- |
 | Spec     | `docs/specs/2026-04-03-feat-asset-display-config-safe-disable-delete-spec.md` |
-| Plan     | _(added after step 2)_ |
-| Progress | _(added after step 3 starts)_ |
-| Report   | _(added after step 3 completes)_ |
+| Plan     | `docs/plans/2026-04-03-feat-asset-display-config-safe-disable-delete-plan.md` |
+| Progress | _(added after step 3 starts)_                                                 |
+| Report   | _(added after step 3 completes)_                                              |
