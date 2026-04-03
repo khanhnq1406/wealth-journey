@@ -159,6 +159,12 @@ func (s *Server) RegisterWithDevice(ctx context.Context, googleToken string, dev
 		if err := s.db.DB.Where("email = ?", email).First(&user).Error; err != nil {
 			return nil, fmt.Errorf("failed to retrieve created user: %w", err)
 		}
+
+		// CreateUser does not set AuthProvider — set it now so Google login works on subsequent sign-ins.
+		if err := s.db.DB.Model(&user).Update("auth_provider", "google").Error; err != nil {
+			return nil, fmt.Errorf("failed to set auth provider: %w", err)
+		}
+		user.AuthProvider = "google"
 	} else {
 		user = models.User{
 			Email:        &email,
