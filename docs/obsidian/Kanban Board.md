@@ -24,6 +24,7 @@ kanban-plugin: board
 
 ## Review
 
+- [ ] [[2026-04-03-tab-bar-scroll-hint|TabBar scroll hint — gradient + chevron when tabs overflow]]
 - [ ] [[2026-04-02-improve-mobile-tab-overflow|Improve all tab selection]]
 
 

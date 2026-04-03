@@ -42,7 +42,7 @@ C4Component
 
     Container_Boundary(shared, "Shared Layer") {
         Component(layout, "Layout Components", "shared/components/layout", "Dashboard layout, sidebar (includes Prices nav item), bottom nav (includes Prices as 7th item, replacing earlier 6-item cap), mobile slide-out menu (includes Prices), active link")
-        Component(tab_bar, "TabBar", "shared/components/navigation/TabBar", "Generic reusable tab bar with WCAG 2.1 keyboard navigation, horizontal scroll overflow, disabled tabs, underline/pill variants. Replaces inline tab implementations in Investment, Prices, Admin, and Community feature modules.")
+        Component(tab_bar, "TabBar", "shared/components/navigation/TabBar", "Generic reusable tab bar with WCAG 2.1 keyboard navigation, horizontal scroll overflow, disabled tabs, underline/pill variants. Underline variant shows gradient fade + clickable chevron scroll-hint buttons when tabs overflow (ResizeObserver-driven; tabIndex=-1 on chevrons preserves roving tabindex). Replaces inline tab implementations in Investment, Prices, Admin, and Community feature modules.")
         Component(forms, "Form Components", "shared/components/forms", "FormInput, FormSelect, FormNumberInput, DatePicker, Textarea, TagInput")
         Component(modals, "Modal Components", "shared/components/modals", "BaseModal, BottomSheet, ConfirmationDialog, Success")
         Component(selects, "Select Components", "shared/components/select", "Select, CreatableSelect, MultiSelect, CurrencySelector")

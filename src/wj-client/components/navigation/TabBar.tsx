@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 export interface TabItem<T extends string = string> {
@@ -21,6 +22,8 @@ export interface TabBarProps<T extends string = string> {
   ariaLabel?: string;
 }
 
+const SCROLL_AMOUNT = 120;
+
 export function TabBar<T extends string = string>({
   tabs,
   activeTab,
@@ -33,6 +36,36 @@ export function TabBar<T extends string = string>({
   ariaLabel,
 }: TabBarProps<T>) {
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const isPill = variant === "pill";
+  const isSm = size === "sm";
+
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  }, []);
+
+  useEffect(() => {
+    if (isPill) return;
+    const el = scrollRef.current;
+    if (!el) return;
+
+    updateScrollState();
+    el.addEventListener("scroll", updateScrollState, { passive: true });
+
+    const ro = new ResizeObserver(updateScrollState);
+    ro.observe(el);
+
+    return () => {
+      el.removeEventListener("scroll", updateScrollState);
+      ro.disconnect();
+    };
+  }, [isPill, updateScrollState]);
 
   const enabledIndexes = tabs
     .map((tab, i) => (!tab.disabled ? i : -1))
@@ -72,9 +105,6 @@ export function TabBar<T extends string = string>({
     [enabledIndexes, onTabChange, tabs]
   );
 
-  const isPill = variant === "pill";
-  const isSm = size === "sm";
-
   const tablistClasses = isPill
     ? cn(
         "flex gap-1 p-1 bg-v2-bg-dark rounded-lg border border-v2-border-light w-fit",
@@ -90,7 +120,12 @@ export function TabBar<T extends string = string>({
     : undefined;
 
   const tablist = (
-    <div role="tablist" aria-label={ariaLabel} className={tablistClasses}>
+    <div
+      role="tablist"
+      aria-label={ariaLabel}
+      className={tablistClasses}
+      ref={isPill ? undefined : scrollRef}
+    >
       {tabs.map((tab, index) => {
         const isActive = activeTab === tab.id;
 
@@ -139,9 +174,62 @@ export function TabBar<T extends string = string>({
     </div>
   );
 
-  if (stickyWrapper) {
-    return <div className={stickyWrapper}>{tablist}</div>;
+  // Pill variant: no scroll hint wrapper
+  if (isPill) {
+    if (stickyWrapper) {
+      return <div className={stickyWrapper}>{tablist}</div>;
+    }
+    return tablist;
   }
 
-  return tablist;
+  // Underline variant: wrap in relative container for scroll hints
+  const scrollHintWrapper = (
+    <div className="relative">
+      {tablist}
+
+      {/* Left gradient + chevron */}
+      {canScrollLeft && (
+        <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-v2-bg-surface to-transparent pointer-events-none flex items-center">
+          <button
+            aria-label="Scroll tabs left"
+            tabIndex={-1}
+            className="pointer-events-auto min-h-[44px] min-w-[44px] flex items-center justify-center text-v2-gold-accent hover:text-v2-gold-primary transition-colors"
+            onClick={() =>
+              scrollRef.current?.scrollBy({
+                left: -SCROLL_AMOUNT,
+                behavior: "smooth",
+              })
+            }
+          >
+            <ChevronLeft size={16} aria-hidden="true" />
+          </button>
+        </div>
+      )}
+
+      {/* Right gradient + chevron */}
+      {canScrollRight && (
+        <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-v2-bg-surface to-transparent pointer-events-none flex items-center justify-end">
+          <button
+            aria-label="Scroll tabs right"
+            tabIndex={-1}
+            className="pointer-events-auto min-h-[44px] min-w-[44px] flex items-center justify-center text-v2-gold-accent hover:text-v2-gold-primary transition-colors"
+            onClick={() =>
+              scrollRef.current?.scrollBy({
+                left: SCROLL_AMOUNT,
+                behavior: "smooth",
+              })
+            }
+          >
+            <ChevronRight size={16} aria-hidden="true" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
+  if (stickyWrapper) {
+    return <div className={stickyWrapper}>{scrollHintWrapper}</div>;
+  }
+
+  return scrollHintWrapper;
 }

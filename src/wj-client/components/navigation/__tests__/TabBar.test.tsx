@@ -117,4 +117,29 @@ describe("TabBar", () => {
     );
     expect(screen.getByRole("tablist", { name: "Test navigation" })).toBeInTheDocument();
   });
+
+  // Scroll hint tests
+  it("does not render scroll hint chevrons when there is no overflow (jsdom default)", () => {
+    const { container } = render(
+      <TabBar tabs={TABS} activeTab="a" onTabChange={jest.fn()} />
+    );
+    expect(container.querySelector('[aria-label="Scroll tabs right"]')).toBeNull();
+    expect(container.querySelector('[aria-label="Scroll tabs left"]')).toBeNull();
+  });
+
+  it("pill variant does not render scroll hint chevrons", () => {
+    const { container } = render(
+      <TabBar tabs={TABS} activeTab="a" onTabChange={jest.fn()} variant="pill" />
+    );
+    expect(container.querySelector('[aria-label="Scroll tabs right"]')).toBeNull();
+    expect(container.querySelector('[aria-label="Scroll tabs left"]')).toBeNull();
+  });
+
+  it("underline variant wraps tablist in a relative container", () => {
+    const { container } = render(
+      <TabBar tabs={TABS} activeTab="a" onTabChange={jest.fn()} />
+    );
+    // The scroll hint wrapper is a div with class "relative"
+    expect(container.querySelector(".relative")).toBeInTheDocument();
+  });
 });

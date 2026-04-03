@@ -189,3 +189,19 @@ All d=1 dependents tested and verified compatible.
 **Preconditions:** Browser or devtools set to 375px width
 
 1. Open any page with a TabBar → Expected: Tabs are horizontally scrollable if they overflow; no content is cut off; touch targets are ≥ 44px tall
+
+## Fix History
+
+| Date       | Fix                                                                                                                                          | Severity | Tests                                           |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------- |
+| 2026-04-03 | Add gradient fade + clickable chevron scroll-hint to `TabBar` underline variant. `ResizeObserver` + `scroll` event track `canScrollLeft`/`canScrollRight`. Chevrons have `tabIndex={-1}` to preserve roving tabindex. Pill variant unaffected. | Major    | 21/21 TabBar unit tests pass (3 new); 0 regressions |
+
+**Spec:** `docs/specs/2026-04-03-tab-bar-scroll-hint-spec.md`
+**Plan:** `docs/plans/2026-04-03-tab-bar-scroll-hint-plan.md`
+
+### Files Changed
+
+- **Modified:** `src/wj-client/components/navigation/TabBar.tsx` — added `ResizeObserver` + scroll event, `canScrollLeft`/`canScrollRight` state, gradient overlay divs, chevron buttons
+- **Modified:** `src/wj-client/components/navigation/__tests__/TabBar.test.tsx` — 3 new scroll hint tests
+- **Modified:** `src/wj-client/tests/e2e/tab-bar-keyboard-navigation.spec.ts` — 2 new E2E scroll hint tests
+- **Modified:** `docs/architecture/c4-component-frontend.md` — updated TabBar description
