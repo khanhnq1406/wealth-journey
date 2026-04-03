@@ -115,6 +115,8 @@ TypeScript: 0 errors (`npx tsc --noEmit`)
 | Date | Fix | Severity | Commit |
 |------|-----|----------|--------|
 | 2026-04-03 | Block Google login/register after unlink; remove silent auto-relink; stop leaking internal error messages; add `AUTH_GOOGLE_NOT_LINKED` error code with i18n (EN+VI) on login and register pages | Major | `974dc864` |
+| 2026-04-03 | Update VI `googleNotLinked` copy to past tense ("đã bị huỷ liên kết") in both login and register namespaces | Minor | pending |
+| 2026-04-03 | Fix first-time Google sign-in: `Login` handler now calls `RegisterWithDevice` (auto-register + login) instead of `LoginWithDeviceInfo` (login-only); new users no longer get 401 | Minor | `ad3e85dd` |
 
 ### Fix Details (commit `974dc864`)
 
@@ -139,3 +141,17 @@ TypeScript: 0 errors (`npx tsc --noEmit`)
 - `src/wj-client/features/auth/utils/error-mapper.ts` — added `mapGoogleLoginError()` (code-based)
 - `src/wj-client/app/[locale]/auth/login/page.tsx` — uses mapper
 - `src/wj-client/app/[locale]/auth/register/page.tsx` — uses mapper
+
+### Fix Details (commit `ad3e85dd`)
+
+**Root cause:** Commit `974dc864` hardened `LoginWithDeviceInfo` to return `NewUnauthorizedError("invalid credentials")` when the user is not found (to prevent leaking user existence info). This was correct for the unlink guard scenario, but it also broke first-time Google sign-in: new users attempting to login via Google received 401 instead of being auto-registered.
+
+**Fix:** `handlers/auth.go` `Login` handler now calls `RegisterWithDevice` instead of `LoginWithDeviceInfo`. `RegisterWithDevice` is the canonical Google OAuth entry point — it handles both cases in one function:
+- New user (not found) → creates account with `AuthProvider="google"`, creates default categories, issues JWT session
+- Existing user → checks unlink guard (`strings.Contains(user.AuthProvider, "google")`), then issues JWT session
+
+The unlink guard is fully preserved: users who unlinked Google still receive `AUTH_GOOGLE_NOT_LINKED` (401).
+
+**Files changed:**
+- `src/go-backend/handlers/auth.go` — `Login` calls `RegisterWithDevice` (was `LoginWithDeviceInfo`)
+- `src/go-backend/handlers/auth_login_test.go` — 3 new handler tests (new user 200, unlinked 401, missing token 400)
