@@ -149,33 +149,6 @@ export function AssetDisplayConfigTable() {
     [updateMutation]
   );
 
-  const handleToggleShowInInvestment = useCallback(
-    (row: AssetDisplayConfigItem) => {
-      const key = `showInInvestment-${row.id}`;
-      setToggleLoading((prev) => new Set(prev).add(key));
-      updateMutation.mutate(
-        {
-          id: row.id,
-          req: {
-            displayName: row.displayName,
-            displayOrder: row.displayOrder,
-            enabled: row.enabled,
-            showInInvestment: !row.showInInvestment,
-          },
-        },
-        {
-          onSettled: () => {
-            setToggleLoading((prev) => {
-              const next = new Set(prev);
-              next.delete(key);
-              return next;
-            });
-          },
-        }
-      );
-    },
-    [updateMutation]
-  );
 
   const handleReorder = useCallback(
     async (newOrder: AssetDisplayConfigItem[]) => {
