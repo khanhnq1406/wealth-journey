@@ -6,12 +6,12 @@ kanban-plugin: board
 
 ## Not Started
 
-- [ ] [[2026-04-03-add-cors-allow-from-backend|Add CORS allow from the backend to prevent other clients get api data]]
-- [ ] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
 - [ ] [[2026-04-03-feat-asset-display-config-safe-disable-delete|Add safe disable/delete for asset display config when users are using that asset code]]
 
 
 ## Spec
+
+- [ ] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
 
 
 
@@ -27,6 +27,7 @@ kanban-plugin: board
 
 ## Review
 
+- [ ] [[2026-04-03-add-cors-allow-from-backend|Add CORS allow from the backend to prevent other clients get api data]]
 - [ ] [[2026-04-03-fix-dashboard-navbar-cannot-scroll-in-desktop-view|Fix dashboard navbar cannot scroll in desktop view]]
 
 
