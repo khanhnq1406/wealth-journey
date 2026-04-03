@@ -190,6 +190,17 @@ jest.mock("@/lib/utils/cn", () => ({
       .join(" "),
 }));
 
+// react-redux
+jest.mock("react-redux", () => ({
+  useSelector: jest.fn(() => ({
+    picture: null,
+    fullname: "Test User",
+    email: "test@example.com",
+    username: "testuser",
+    isAdmin: false,
+  })),
+}));
+
 // ---------------------------------------------------------------------------
 // Component under test
 // ---------------------------------------------------------------------------

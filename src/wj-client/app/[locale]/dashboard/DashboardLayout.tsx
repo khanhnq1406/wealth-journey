@@ -3,8 +3,8 @@ import ActiveLink from "@/components/ActiveLink";
 import { logout } from "../auth/utils/logout";
 import { routes, ModalType } from "@/app/constants";
 import { AuthCheck } from "../auth/utils/AuthCheck";
-import { store } from "@/features/auth/store/store";
 import { useState, useMemo, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { usePathname } from "@/lib/navigation";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -59,7 +59,7 @@ export function DashboardLayout({
   const tHome = useTranslations("dashboard.home");
   const tQuickActions = useTranslations("dashboard.quickActions");
   const tSearch = useTranslations("search.globalSearch");
-  const [user, setUser] = useState(store.getState().setAuthReducer);
+  const user = useSelector((state: any) => state.setAuthReducer);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -88,12 +88,6 @@ export function DashboardLayout({
     if (!title && !text && !contactInfo) return undefined;
     return { title: title || "", text: text || "", contactInfo: contactInfo || "" };
   }, [fabSettings.data]);
-
-  store.subscribe(() => {
-    if (!user.picture) {
-      setUser(store.getState().setAuthReducer);
-    }
-  });
 
   // Global search keyboard shortcut (Cmd/Ctrl + K)
   useEffect(() => {
