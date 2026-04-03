@@ -310,7 +310,7 @@ export function DashboardLayout({
           {/* Desktop Sidebar - Maroon with Gold accents */}
           <aside
             className={cn(
-              "hidden sm:flex flex-col bg-v2-bg-primary border-r border-v2-border-light min-h-screen fixed left-0 top-0 z-sidebar transition-all duration-300 ease-in-out",
+              "hidden sm:flex flex-col bg-v2-bg-primary border-r border-v2-border-light h-dvh fixed left-0 top-0 z-sidebar transition-all duration-300 ease-in-out",
               isExpanded ? "sm:w-64 lg:w-72" : "sm:w-20",
             )}
           >

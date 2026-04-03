@@ -53,6 +53,20 @@ APPROVED — changes are minimal and correct. `cn()` used properly for condition
 
 None. Two-line removal with no deferred work.
 
+## Fix History
+
+| Date | Fix | Severity | File |
+| ---- | --- | -------- | ---- |
+| 2026-04-03 | Replace `min-h-screen` with `h-dvh` on `<aside>` (line 313) — `min-h-screen` only set a minimum height, never constraining the aside to viewport height; the `overflow-y-auto` on `<nav>` could never activate because the parent grew unbounded instead of clipping | Minor | `src/wj-client/app/[locale]/dashboard/DashboardLayout.tsx` |
+
+### Root Cause of Regression
+
+The original fix removed `h-full` from the inner nav wrapper and enabled `overflow-y-auto` on `<nav>` — correct. However, `overflow-y-auto` only activates when the scrollable element's content exceeds its **constrained** height. For that constraint to exist, the element's ancestors must have a fixed height, not just a minimum.
+
+The `<aside>` had `min-h-screen` (≥100vh) but no maximum height constraint. With `fixed` positioning and `flex-col` layout, the aside simply grew taller than the viewport when nav items were plentiful — the browser never clipped it, so `overflow-y-auto` on `<nav>` saw no overflow to handle.
+
+**Fix:** `min-h-screen` → `h-dvh` on `<aside>`. This locks the aside to exactly the dynamic viewport height, creating the height constraint that forces `overflow-y-auto` to kick in.
+
 ## Files Changed
 
 | File | Change |
