@@ -1,6 +1,6 @@
 ---
 type: bug
-status: Implement
+status: Review
 ---
 
 ## Overview
@@ -14,4 +14,4 @@ The dashboard sidebar navbar on desktop does not scroll when navigation items ov
 | Spec     | `docs/specs/2026-04-03-fix-dashboard-navbar-cannot-scroll-in-desktop-view-spec.md` |
 | Plan     | `docs/plans/2026-04-03-fix-dashboard-navbar-cannot-scroll-in-desktop-view-plan.md` |
 | Progress | `docs/reports/2026-04-03-fix-dashboard-navbar-cannot-scroll-in-desktop-view-progress.md` |
-| Report   | _(added after step 3 completes)_ |
+| Report   | `docs/reports/2026-04-03-fix-dashboard-navbar-cannot-scroll-in-desktop-view-report.md` |
