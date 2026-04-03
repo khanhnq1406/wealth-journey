@@ -249,12 +249,12 @@ const columnHelper = createColumnHelper<PriceItem>();
 
 // Desktop (cream/parchment rows) — dark colors for readability
 const TAB_TYPE_COLOR_DESKTOP: Record<Tab, string> = {
-  priceAlerts: "text-v2-maroon-900",
-  watchlist: "text-v2-maroon-900",
-  gold: "text-v2-maroon-900",
-  silver: "text-v2-maroon-900",
-  currency: "text-v2-maroon-900",
-  symbol: "text-v2-maroon-900",
+  priceAlerts: "text-v2-gold-accent",
+  watchlist: "text-v2-gold-accent",
+  gold: "text-v2-gold-accent",
+  silver: "text-v2-silver-primary",
+  currency: "text-v2-currency-accent",
+  symbol: "text-v2-gold-accent",
 };
 
 // Mobile (dark BaseCard rows) — bright colors for readability
@@ -288,7 +288,7 @@ function buildTanstackColumns(
           <span className={`font-bold ${typeColor}`}>
             {row.original.name || row.original.typeCode}
           </span>
-          <span className="ml-1.5 text-xs text-v2-maroon-800/60">
+          <span className="ml-1.5 text-xs text-v2-text-tertiary">
             {row.original.currency}
           </span>
           <OverrideIndicator
@@ -313,7 +313,7 @@ function buildTanstackColumns(
         </div>
       ),
       cell: ({ row }) => (
-        <span className="font-bold text-red-700 tabular-nums">
+        <span className="font-bold text-v2-red-negative tabular-nums">
           {formatPriceValue(row.original.buy, row.original.currency, {
             divide: divideValues,
           })}
@@ -334,7 +334,7 @@ function buildTanstackColumns(
         </div>
       ),
       cell: ({ row }) => (
-        <span className="font-bold text-green-700 tabular-nums">
+        <span className="font-bold text-v2-green-positive tabular-nums">
           {formatPriceValue(row.original.sell, row.original.currency, {
             divide: divideValues,
           })}
@@ -348,76 +348,65 @@ function buildTanstackColumns(
           value={row.original.changeBuy}
           currency={row.original.currency}
           divide={divideValues}
-          upColor="text-green-700"
-          downColor="text-red-700"
         />
       ),
     }),
   ];
 
-  if (isAdmin) {
-    cols.push(
-      columnHelper.display({
-        id: "admin",
-        header: "",
-        cell: ({ row }) => (
-          <InlinePriceEdit item={row.original} category={tab} />
-        ),
-      }),
-    );
-  }
+  const hasActions =
+    isAdmin ||
+    tab === "gold" ||
+    tab === "silver" ||
+    tab === "currency";
 
-  if (tab === "gold" || tab === "silver" || tab === "currency") {
-    const assetType =
+  if (hasActions) {
+    const starAssetType =
       tab === "gold"
         ? InvestmentType.INVESTMENT_TYPE_GOLD_VND
         : tab === "silver"
           ? InvestmentType.INVESTMENT_TYPE_SILVER_VND
           : InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY;
-
-    cols.push(
-      columnHelper.display({
-        id: "star",
-        header: "",
-        cell: ({ row }) => (
-          <StarToggleButton
-            symbol={row.original.typeCode}
-            name={row.original.name || row.original.typeCode}
-            assetType={assetType}
-            currency={row.original.currency}
-            watchlistItemId={watchedSymbolToId?.get(row.original.typeCode)}
-            onAddSuccess={onStarAddSuccess ?? (() => {})}
-            onRemoveSuccess={onStarRemoveSuccess ?? (() => {})}
-          />
-        ),
-      }),
-    );
-  }
-
-  if ((tab === "gold" || tab === "silver") && onSetAlert) {
-    const category: AssetCategory = tab === "gold" ? "gold" : "silver";
-    const assetType =
+    const bellCategory: AssetCategory = tab === "gold" ? "gold" : "silver";
+    const bellAssetType =
       tab === "gold"
         ? InvestmentType.INVESTMENT_TYPE_GOLD_VND
         : InvestmentType.INVESTMENT_TYPE_SILVER_VND;
 
     cols.push(
       columnHelper.display({
-        id: "bell",
+        id: "actions",
         header: "",
         cell: ({ row }) => (
-          <BellButton
-            ariaLabel={t("setAlert")}
-            onClick={() =>
-              onSetAlert({
-                category,
-                symbol: row.original.typeCode,
-                name: row.original.name || row.original.typeCode,
-                assetType,
-                currency: row.original.currency,
-              })
-            }
-          />
+          <div className="flex items-center">
+            {isAdmin && (
+              <InlinePriceEdit item={row.original} category={tab} />
+            )}
+            {(tab === "gold" || tab === "silver" || tab === "currency") && (
+              <StarToggleButton
+                symbol={row.original.typeCode}
+                name={row.original.name || row.original.typeCode}
+                assetType={starAssetType}
+                currency={row.original.currency}
+                watchlistItemId={watchedSymbolToId?.get(row.original.typeCode)}
+                onAddSuccess={onStarAddSuccess ?? (() => {})}
+                onRemoveSuccess={onStarRemoveSuccess ?? (() => {})}
+              />
+            )}
+            {(tab === "gold" || tab === "silver") && onSetAlert && (
+              <BellButton
+                ariaLabel={t("setAlert")}
+                onClick={() =>
+                  onSetAlert({
+                    category: bellCategory,
+                    symbol: row.original.typeCode,
+                    name: row.original.name || row.original.typeCode,
+                    assetType: bellAssetType,
+                    currency: row.original.currency,
+                  })
+                }
+              />
+            )}
+          </div>
         ),
       }),
     );
@@ -505,69 +494,68 @@ function buildMobileColumns(
     },
   ];
 
-  if (isAdmin) {
-    cols.push({
-      id: "admin",
-      header: "",
-      cell: ({ row }) => <InlinePriceEdit item={row} category={tab} />,
-    });
-  }
+  return cols;
+}
 
-  if (tab === "gold" || tab === "silver" || tab === "currency") {
-    const assetType =
-      tab === "gold"
-        ? InvestmentType.INVESTMENT_TYPE_GOLD_VND
-        : tab === "silver"
-          ? InvestmentType.INVESTMENT_TYPE_SILVER_VND
-          : InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY;
+function buildMobileActions(
+  t: (key: string) => string,
+  tab: Tab,
+  isAdmin: boolean,
+  watchedSymbolToId?: Map<string, number>,
+  onStarAddSuccess?: () => void,
+  onStarRemoveSuccess?: () => void,
+  onSetAlert?: (target: PriceAlertTarget) => void,
+): ((row: PriceItem) => React.ReactNode) | undefined {
+  const hasActions =
+    isAdmin ||
+    tab === "gold" ||
+    tab === "silver" ||
+    tab === "currency";
 
-    cols.push({
-      id: "star",
-      header: "",
-      showInCollapsed: true,
-      cell: ({ row }) => (
+  if (!hasActions) return undefined;
+
+  const starAssetType =
+    tab === "gold"
+      ? InvestmentType.INVESTMENT_TYPE_GOLD_VND
+      : tab === "silver"
+        ? InvestmentType.INVESTMENT_TYPE_SILVER_VND
+        : InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY;
+  const bellCategory: AssetCategory = tab === "gold" ? "gold" : "silver";
+  const bellAssetType =
+    tab === "gold"
+      ? InvestmentType.INVESTMENT_TYPE_GOLD_VND
+      : InvestmentType.INVESTMENT_TYPE_SILVER_VND;
+
+  return (row: PriceItem) => (
+    <div className="flex items-center">
+      {isAdmin && <InlinePriceEdit item={row} category={tab} />}
+      {(tab === "gold" || tab === "silver" || tab === "currency") && (
         <StarToggleButton
           symbol={row.typeCode}
           name={row.name || row.typeCode}
-          assetType={assetType}
+          assetType={starAssetType}
           currency={row.currency}
           watchlistItemId={watchedSymbolToId?.get(row.typeCode)}
           onAddSuccess={onStarAddSuccess ?? (() => {})}
           onRemoveSuccess={onStarRemoveSuccess ?? (() => {})}
         />
-      ),
-    });
-  }
-
-  if ((tab === "gold" || tab === "silver") && onSetAlert) {
-    const category: AssetCategory = tab === "gold" ? "gold" : "silver";
-    const assetType =
-      tab === "gold"
-        ? InvestmentType.INVESTMENT_TYPE_GOLD_VND
-        : InvestmentType.INVESTMENT_TYPE_SILVER_VND;
-
-    cols.push({
-      id: "bell",
-      header: "",
-      showInCollapsed: true,
-      cell: ({ row }) => (
+      )}
+      {(tab === "gold" || tab === "silver") && onSetAlert && (
         <BellButton
           ariaLabel={t("setAlert")}
           onClick={() =>
             onSetAlert({
-              category,
+              category: bellCategory,
               symbol: row.typeCode,
               name: row.name || row.typeCode,
-              assetType,
+              assetType: bellAssetType,
               currency: row.currency,
             })
           }
         />
-      ),
-    });
-  }
-
-  return cols;
+      )}
+    </div>
+  );
 }
 
 function mapQuoteTypeToInvestmentTypeLocal(quoteType: string): InvestmentType {
@@ -909,6 +897,19 @@ export default function PricesPage() {
       ),
     [t, activeTab, isAdmin, watchedSymbolToId, handleStarSuccess, handleSetAlert],
   );
+  const mobileActions = useMemo(
+    () =>
+      buildMobileActions(
+        t as (key: string) => string,
+        activeTab,
+        isAdmin,
+        watchedSymbolToId,
+        handleStarSuccess,
+        handleStarSuccess,
+        handleSetAlert,
+      ),
+    [t, activeTab, isAdmin, watchedSymbolToId, handleStarSuccess, handleSetAlert],
+  );
   const [symbolInput, setSymbolInput] = useState("");
   const [querySymbol, setQuerySymbol] = useState("");
 
@@ -1086,7 +1087,7 @@ export default function PricesPage() {
                   {t("gold.failedToLoad")}
                 </p>
               )}
-              {/* Desktop: TanStack Table with cream parchment style */}
+              {/* Desktop: TanStack Table */}
               <div className="hidden md:block">
                 <TanStackTable<PriceItem>
                   data={data?.gold ?? []}
@@ -1096,7 +1097,6 @@ export default function PricesPage() {
                   emptyMessage={t("gold.emptyMessage")}
                   emptyDescription={t("gold.emptyDescription")}
                   enableMobileExpansion={false}
-                  className="price-table-override"
                 />
               </div>
               {/* Mobile: card-based list */}
@@ -1109,6 +1109,8 @@ export default function PricesPage() {
                   getKey={(item) => item.typeCode}
                   emptyMessage={t("gold.emptyMessage")}
                   emptyDescription={t("gold.emptyDescription")}
+                  renderActions={mobileActions}
+                  actionsPosition="top"
                   expandable
                   expandButtonLabel={tc("showDetails")}
                   collapseButtonLabel={tc("hideDetails")}
@@ -1128,7 +1130,7 @@ export default function PricesPage() {
                   {t("silver.failedToLoad")}
                 </p>
               )}
-              {/* Desktop: TanStack Table with cream parchment style */}
+              {/* Desktop: TanStack Table */}
               <div className="hidden md:block">
                 <TanStackTable<PriceItem>
                   data={data?.silver ?? []}
@@ -1138,7 +1140,6 @@ export default function PricesPage() {
                   emptyMessage={t("silver.emptyMessage")}
                   emptyDescription={t("silver.emptyDescription")}
                   enableMobileExpansion={false}
-                  className="price-table-override price-table-silver"
                 />
               </div>
               {/* Mobile: card-based list */}
@@ -1151,6 +1152,8 @@ export default function PricesPage() {
                   getKey={(item) => item.typeCode}
                   emptyMessage={t("silver.emptyMessage")}
                   emptyDescription={t("silver.emptyDescription")}
+                  renderActions={mobileActions}
+                  actionsPosition="top"
                   expandable
                   expandButtonLabel={tc("showDetails")}
                   collapseButtonLabel={tc("hideDetails")}
@@ -1170,7 +1173,7 @@ export default function PricesPage() {
                   {t("currency.failedToLoad")}
                 </p>
               )}
-              {/* Desktop: TanStack Table with cream parchment style */}
+              {/* Desktop: TanStack Table */}
               <div className="hidden md:block">
                 <TanStackTable<PriceItem>
                   data={data?.currency ?? []}
@@ -1180,7 +1183,6 @@ export default function PricesPage() {
                   emptyMessage={t("currency.emptyMessage")}
                   emptyDescription={t("currency.emptyDescription")}
                   enableMobileExpansion={false}
-                  className="price-table-override price-table-currency"
                 />
               </div>
               {/* Mobile: card-based list */}
@@ -1193,6 +1195,8 @@ export default function PricesPage() {
                   getKey={(item) => item.typeCode}
                   emptyMessage={t("currency.emptyMessage")}
                   emptyDescription={t("currency.emptyDescription")}
+                  renderActions={mobileActions}
+                  actionsPosition="top"
                   expandable
                   expandButtonLabel={tc("showDetails")}
                   collapseButtonLabel={tc("hideDetails")}

@@ -61,6 +61,29 @@ All tasks approved. Cross-cutting review found two minor notes (non-blocking):
 
 Both are pre-existing patterns or cosmetic deviations; neither blocks quality approval.
 
+## Fix History
+
+| Date       | Fix                                                                 | Severity | Files Changed |
+| ---------- | ------------------------------------------------------------------- | -------- | ------------- |
+| 2026-04-03 | Align gold/silver/currency price page table design with price alert table — remove CSS overrides, replace hardcoded colors with v2 tokens | Minor | `app/globals.css`, `app/[locale]/dashboard/prices/page.tsx` |
+
+### Fix Detail: Price Page Table v2 Design Alignment
+
+**Issue:** Gold/silver/currency TanStackTable instances on the prices page used a custom CSS override (`price-table-override` and variants) that applied cream/parchment gradient headers and alternating tan/cream row backgrounds — inconsistent with the dark maroon & gold v2 theme used by the price alert table.
+
+**Root cause:** The CSS override class was applied at the TanStack table component level to achieve a "gold shop" aesthetic that predated the v2 token system migration.
+
+**Fix applied:**
+- Removed all three CSS classes (`.price-table-override`, `.price-table-silver`, `.price-table-currency`) from `globals.css` — 57 lines
+- Removed `className="price-table-override"` (and variants) from the 3 TanStackTable instances in `prices/page.tsx`
+- Updated `TAB_TYPE_COLOR_DESKTOP` — all tabs now use proper v2 asset-type tokens (`text-v2-gold-accent`, `text-v2-silver-primary`, `text-v2-currency-accent`) instead of `text-v2-maroon-900` (which was only readable on the cream background)
+- Buy cell: `text-red-700` → `text-v2-red-negative`
+- Sell cell: `text-green-700` → `text-v2-green-positive`
+- `ChangeCell` up/down color props removed — component defaults (`text-v2-green-positive` / `text-v2-red-negative`) now apply
+- Currency code label: `text-v2-maroon-800/60` → `text-v2-text-tertiary` (visible on dark rows)
+
+**Tests:** All 12 existing table tests pass. Security review: APPROVED (pure styling changes, no security impact).
+
 ## Known Issues / Technical Debt
 
 1. **SortableList `onReorder` callback coverage gap**: No test exercises the callback being fired after a drag sequence (dnd-kit requires PointerEvents not available in jsdom). Behavioral coverage relies on the 3 DraggableWatchlistTable tests for the integration.
