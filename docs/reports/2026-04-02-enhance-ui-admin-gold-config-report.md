@@ -147,3 +147,9 @@ Changed files and their dependents:
 No existing admin E2E spec — manual verification required. Per plan: "No existing E2E spec for admin page. Verify manually."
 
 Playwright E2E test creation is deferred (no existing admin spec to base new tests on, and DnD automation is non-trivial). This is documented as known technical debt.
+
+## Fix History
+
+| Date       | Fix                                                                                                          | Severity | Commit |
+| ---------- | ------------------------------------------------------------------------------------------------------------ | -------- | ------ |
+| 2026-04-03 | FetchCodeList drag item jumps far on click — added `MeasuringStrategy.Always` to `SortableList` `DndContext` to fix coordinate offset inside modal with CSS `transform` | Minor    | TBD    |

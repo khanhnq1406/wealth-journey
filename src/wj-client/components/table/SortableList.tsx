@@ -8,8 +8,7 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
+  MeasuringStrategy,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -80,13 +79,11 @@ export const SortableList = memo(function SortableList<
   items,
   onReorder,
   renderItem,
-  renderOverlay,
   className,
   hideDragHandle,
 }: SortableListProps<T>) {
   const [localItems, setLocalItems] = useState<T[]>(items);
   const isDraggingRef = useRef(false);
-  const [activeItem, setActiveItem] = useState<T | null>(null);
 
   useEffect(() => {
     if (!isDraggingRef.current) {
@@ -100,19 +97,13 @@ export const SortableList = memo(function SortableList<
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
   );
 
-  const handleDragStart = useCallback(
-    (event: DragStartEvent) => {
-      isDraggingRef.current = true;
-      const dragged = localItems.find((i) => i.id === event.active.id);
-      setActiveItem(dragged ?? null);
-    },
-    [localItems]
-  );
+  const handleDragStart = useCallback(() => {
+    isDraggingRef.current = true;
+  }, []);
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       isDraggingRef.current = false;
-      setActiveItem(null);
       const { active, over } = event;
       if (!over || active.id === over.id) return;
       const oldIndex = localItems.findIndex((i) => i.id === active.id);
@@ -131,6 +122,7 @@ export const SortableList = memo(function SortableList<
         collisionDetection={closestCenter}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
+        measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
       >
         <SortableContext
           items={localItems.map((i) => i.id)}
@@ -145,28 +137,6 @@ export const SortableList = memo(function SortableList<
             />
           ))}
         </SortableContext>
-
-        <DragOverlay>
-          {activeItem ? (
-            <div className="shadow-modal border border-v2-border-light bg-v2-bg-surface-tint rounded cursor-grabbing">
-              <div className="flex items-center">
-                {!hideDragHandle && (
-                  <span className="flex items-center justify-center min-w-[44px] min-h-[44px] text-v2-text-secondary flex-shrink-0">
-                    <GripVertical
-                      className="w-4 h-4"
-                      aria-hidden="true"
-                    />
-                  </span>
-                )}
-                <div className="flex-1 min-w-0">
-                  {renderOverlay
-                    ? renderOverlay(activeItem)
-                    : renderItem(activeItem, true)}
-                </div>
-              </div>
-            </div>
-          ) : null}
-        </DragOverlay>
       </DndContext>
     </div>
   );
