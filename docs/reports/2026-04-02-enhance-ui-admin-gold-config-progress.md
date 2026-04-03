@@ -17,7 +17,7 @@
 | 1   | i18n — Add goldConfig tab key                      | done        | 06fa33a6 | Added goldConfig key to en/vi admin.json, replaced hardcoded tab label |
 | 2   | AssetDisplayConfigTable — drag-and-drop reorder    | done        | 4d31841a | Replaced MobileTable with SortableList; handleReorder with Promise.all PUT calls |
 | 3   | FetchCodeList — drag-and-drop priority reorder     | done        | 34d2b5a2 | Replaced static rows with SortableList; handleReorder with parallel PUT + fc.priority display |
-| 4   | Flow diagram update                                | done        | pending | Added section 17 with sequenceDiagram + invariants + error paths to flow-cross-cutting.md |
+| 4   | Flow diagram update                                | done        | de362fb9 | Added section 17 with sequenceDiagram + invariants + error paths to flow-cross-cutting.md |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 

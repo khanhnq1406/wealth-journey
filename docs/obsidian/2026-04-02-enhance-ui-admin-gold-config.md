@@ -1,6 +1,6 @@
 ---
 type: feature
-status: Plan
+status: Review
 ---
 
 ## Overview
@@ -13,4 +13,5 @@ The admin gold config tab needs UI enhancements: the tab label is hardcoded in E
 | -------- | ---- |
 | Spec     | `docs/specs/2026-04-02-enhance-ui-admin-gold-config-spec.md` |
 | Plan     | `docs/plans/2026-04-02-enhance-ui-admin-gold-config-plan.md` |
-| Report   | `docs/reports/2026-04-02-enhance-ui-admin-gold-config-report.md` _(added after step 3)_ |
+| Progress | `docs/reports/2026-04-02-enhance-ui-admin-gold-config-progress.md` |
+| Report   | `docs/reports/2026-04-02-enhance-ui-admin-gold-config-report.md` |
