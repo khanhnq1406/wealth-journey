@@ -54,7 +54,7 @@ func (h *AuthHandlers) Register(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// Login handles user login with Google OAuth
+// Login handles user login with Google OAuth — auto-registers new users on first sign-in.
 func (h *AuthHandlers) Login(c *gin.Context) {
 	var req struct {
 		Token string `json:"token" binding:"required"`
@@ -65,7 +65,7 @@ func (h *AuthHandlers) Login(c *gin.Context) {
 	}
 
 	deviceInfo := device.ExtractDeviceInfo(c)
-	result, err := h.authSrv.LoginWithDeviceInfo(c.Request.Context(), req.Token, deviceInfo)
+	result, err := h.authSrv.RegisterWithDevice(c.Request.Context(), req.Token, deviceInfo)
 
 	if err != nil {
 		log.Printf("[AUTH] Login failed: %v", err)
