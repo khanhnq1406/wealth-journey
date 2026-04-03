@@ -40,7 +40,7 @@ test("renders disclaimer section", () => {
   ).toBeInTheDocument();
 });
 
-test("renders all 9 section titles", () => {
+test("renders all 8 section titles", () => {
   render(<TermsContent />);
   const sections = [
     "introduction",
@@ -50,7 +50,6 @@ test("renders all 9 section titles", () => {
     "intellectualProperty",
     "termination",
     "changes",
-    "governingLaw",
     "contact",
   ];
   sections.forEach((section) => {

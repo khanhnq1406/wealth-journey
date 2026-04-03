@@ -1,12 +1,12 @@
 {
   "terms": {
     "title": "Điều khoản dịch vụ",
-    "subtitle": "Vui lòng đọc kỹ các điều khoản này trước khi sử dụng WealthJourney.",
+    "subtitle": "Vui lòng đọc kỹ các điều khoản này trước khi sử dụng congdongvang.com.",
     "lastUpdated": "Cập nhật lần cuối: Tháng 4 năm 2026",
     "sections": {
       "introduction": {
         "title": "1. Giới thiệu",
-        "content": "Chào mừng bạn đến với WealthJourney (\"Dịch vụ\"), được vận hành bởi congdongvang.com. Bằng cách truy cập hoặc sử dụng Dịch vụ, bạn đồng ý bị ràng buộc bởi các Điều khoản Dịch vụ này. Nếu bạn không đồng ý với các điều khoản này, vui lòng không sử dụng Dịch vụ."
+        "content": "Chào mừng bạn đến với congdongvang.com (\"Dịch vụ\"), được vận hành bởi congdongvang.com. Bằng cách truy cập hoặc sử dụng Dịch vụ, bạn đồng ý bị ràng buộc bởi các Điều khoản Dịch vụ này. Nếu bạn không đồng ý với các điều khoản này, vui lòng không sử dụng Dịch vụ."
       },
       "acceptance": {
         "title": "2. Chấp nhận điều khoản",
@@ -18,7 +18,7 @@
       },
       "disclaimer": {
         "title": "4. Tuyên bố miễn trừ trách nhiệm — Đầu tư & Quyết định tài chính",
-        "content": "WealthJourney chỉ là công cụ theo dõi tài chính cá nhân. Dịch vụ không cung cấp tư vấn tài chính, khuyến nghị đầu tư, hay bất kỳ hướng dẫn tài chính nào. Mọi quyết định đầu tư, hoạt động giao dịch và hành động tài chính bạn thực hiện đều hoàn toàn là trách nhiệm của bạn. Dịch vụ không chịu trách nhiệm về bất kỳ tổn thất tài chính, thiệt hại hoặc kết quả bất lợi nào bạn có thể gặp phải do sử dụng thông tin hiển thị trong ứng dụng. Kết quả hoạt động trong quá khứ không đảm bảo cho kết quả trong tương lai. Bạn nên tham khảo ý kiến của chuyên gia tài chính có chuyên môn trước khi đưa ra quyết định đầu tư."
+        "content": "congdongvang.com chỉ là công cụ theo dõi tài chính cá nhân. Dịch vụ không cung cấp tư vấn tài chính, khuyến nghị đầu tư, hay bất kỳ hướng dẫn tài chính nào. Mọi quyết định đầu tư, hoạt động giao dịch và hành động tài chính bạn thực hiện đều hoàn toàn là trách nhiệm của bạn. Dịch vụ không chịu trách nhiệm về bất kỳ tổn thất tài chính, thiệt hại hoặc kết quả bất lợi nào bạn có thể gặp phải do sử dụng thông tin hiển thị trong ứng dụng. Kết quả hoạt động trong quá khứ không đảm bảo cho kết quả trong tương lai. Bạn nên tham khảo ý kiến của chuyên gia tài chính có chuyên môn trước khi đưa ra quyết định đầu tư."
       },
       "intellectualProperty": {
         "title": "5. Quyền sở hữu trí tuệ",
@@ -32,12 +32,8 @@
         "title": "7. Thay đổi điều khoản",
         "content": "Chúng tôi có thể cập nhật các Điều khoản này theo thời gian. Chúng tôi sẽ thông báo về những thay đổi quan trọng bằng cách cập nhật ngày \"Cập nhật lần cuối\". Việc tiếp tục sử dụng Dịch vụ sau khi có thay đổi đồng nghĩa với việc bạn chấp nhận các Điều khoản mới."
       },
-      "governingLaw": {
-        "title": "8. Luật áp dụng",
-        "content": "Các Điều khoản này được điều chỉnh bởi pháp luật Việt Nam. Mọi tranh chấp phát sinh từ các Điều khoản này hoặc việc bạn sử dụng Dịch vụ sẽ thuộc thẩm quyền xét xử độc quyền của tòa án Việt Nam."
-      },
       "contact": {
-        "title": "9. Liên hệ",
+        "title": "8. Liên hệ",
         "content": "Nếu bạn có câu hỏi về Điều khoản Dịch vụ này, vui lòng liên hệ chúng tôi qua tính năng phản hồi trong ứng dụng hoặc tại thông tin liên hệ trên trang web của chúng tôi."
       }
     }
@@ -49,7 +45,7 @@
     "sections": {
       "introduction": {
         "title": "1. Giới thiệu",
-        "content": "WealthJourney (\"chúng tôi\") cam kết bảo vệ quyền riêng tư của bạn. Chính sách Bảo mật này giải thích những thông tin chúng tôi thu thập, cách chúng tôi sử dụng và quyền của bạn đối với dữ liệu cá nhân."
+        "content": "congdongvang.com (\"chúng tôi\") cam kết bảo vệ quyền riêng tư của bạn. Chính sách Bảo mật này giải thích những thông tin chúng tôi thu thập, cách chúng tôi sử dụng và quyền của bạn đối với dữ liệu cá nhân."
       },
       "dataCollection": {
         "title": "2. Thông tin chúng tôi thu thập",

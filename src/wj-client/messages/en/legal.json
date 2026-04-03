@@ -1,12 +1,12 @@
 {
   "terms": {
     "title": "Terms of Service",
-    "subtitle": "Please read these terms carefully before using WealthJourney.",
+    "subtitle": "Please read these terms carefully before using congdongvang.com.",
     "lastUpdated": "Last updated: April 2026",
     "sections": {
       "introduction": {
         "title": "1. Introduction",
-        "content": "Welcome to WealthJourney (\"the Service\"), operated by congdongvang.com. By accessing or using the Service, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service."
+        "content": "Welcome to congdongvang.com (\"the Service\"), operated by congdongvang.com. By accessing or using the Service, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service."
       },
       "acceptance": {
         "title": "2. Acceptance of Terms",
@@ -18,7 +18,7 @@
       },
       "disclaimer": {
         "title": "4. Disclaimer of Liability — Investments & Financial Decisions",
-        "content": "WealthJourney is a personal finance tracking tool only. The Service does not provide financial advice, investment recommendations, or any form of financial guidance. All investment decisions, trading activities, and financial actions you take are solely your own responsibility. The Service is not liable for any financial losses, damages, or adverse outcomes you may experience as a result of using information displayed within the application. Past performance of any investment is not indicative of future results. You should consult a qualified financial advisor before making any investment decisions."
+        "content": "congdongvang.com is a personal finance tracking tool only. The Service does not provide financial advice, investment recommendations, or any form of financial guidance. All investment decisions, trading activities, and financial actions you take are solely your own responsibility. The Service is not liable for any financial losses, damages, or adverse outcomes you may experience as a result of using information displayed within the application. Past performance of any investment is not indicative of future results. You should consult a qualified financial advisor before making any investment decisions."
       },
       "intellectualProperty": {
         "title": "5. Intellectual Property",
@@ -32,12 +32,8 @@
         "title": "7. Changes to Terms",
         "content": "We may update these Terms from time to time. We will notify you of significant changes by updating the \"Last updated\" date. Your continued use of the Service after changes constitutes your acceptance of the new Terms."
       },
-      "governingLaw": {
-        "title": "8. Governing Law",
-        "content": "These Terms are governed by the laws of Vietnam. Any disputes arising from these Terms or your use of the Service shall be subject to the exclusive jurisdiction of the courts of Vietnam."
-      },
       "contact": {
-        "title": "9. Contact Us",
+        "title": "8. Contact Us",
         "content": "If you have any questions about these Terms of Service, please contact us through the app's feedback feature or at the contact information provided on our website."
       }
     }
@@ -49,7 +45,7 @@
     "sections": {
       "introduction": {
         "title": "1. Introduction",
-        "content": "WealthJourney (\"we\", \"our\", or \"the Service\") is committed to protecting your privacy. This Privacy Policy explains what information we collect, how we use it, and your rights regarding your personal data."
+        "content": "congdongvang.com (\"we\", \"our\", or \"the Service\") is committed to protecting your privacy. This Privacy Policy explains what information we collect, how we use it, and your rights regarding your personal data."
       },
       "dataCollection": {
         "title": "2. Information We Collect",

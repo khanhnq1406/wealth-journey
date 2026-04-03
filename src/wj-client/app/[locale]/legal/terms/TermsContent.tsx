@@ -14,7 +14,6 @@ const SECTIONS = [
   "intellectualProperty",
   "termination",
   "changes",
-  "governingLaw",
   "contact",
 ] as const;
 

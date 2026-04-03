@@ -72,6 +72,12 @@ Both pages are:
 
 4. **Disclaimer styling** — The Terms disclaimer section uses `border-l-4 border-v2-red-negative bg-v2-red-light/10` to draw attention to the "not financial advice" clause.
 
+## Fix History
+
+| Date | Fix | Severity | Files Changed |
+| --- | --- | --- | --- |
+| 2026-04-03 | Replace all "WealthJourney" branding with "congdongvang.com" in legal content; remove `governingLaw` section (section 8) from Terms of Service in both locales; renumber Contact from section 9 → 8 | Minor | `messages/en/legal.json`, `messages/vi/legal.json`, `TermsContent.tsx`, `TermsContent.test.tsx` |
+
 ## Non-Issues Noted During Review
 
 - `OrnateHeading` uses `size` prop (not `level`) — plan spec suggested `level`; implementer corrected after reading the actual component
