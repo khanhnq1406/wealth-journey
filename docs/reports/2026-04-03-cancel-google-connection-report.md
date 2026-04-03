@@ -117,6 +117,7 @@ TypeScript: 0 errors (`npx tsc --noEmit`)
 | 2026-04-03 | Block Google login/register after unlink; remove silent auto-relink; stop leaking internal error messages; add `AUTH_GOOGLE_NOT_LINKED` error code with i18n (EN+VI) on login and register pages | Major | `974dc864` |
 | 2026-04-03 | Update VI `googleNotLinked` copy to past tense ("đã bị huỷ liên kết") in both login and register namespaces | Minor | pending |
 | 2026-04-03 | Fix first-time Google sign-in: `Login` handler now calls `RegisterWithDevice` (auto-register + login) instead of `LoginWithDeviceInfo` (login-only); new users no longer get 401 | Minor | `ad3e85dd` |
+| 2026-04-03 | Fix second Google login after auto-register: `CreateUser` (UserService path) did not set `AuthProvider`, causing `GoogleNotLinkedError` on next login. Now explicitly updates `auth_provider="google"` after creation in `RegisterWithDevice` | Minor | `c902f9ff` |
 
 ### Fix Details (commit `974dc864`)
 
