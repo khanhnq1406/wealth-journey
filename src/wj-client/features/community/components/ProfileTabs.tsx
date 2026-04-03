@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useQueryGetUserPosts, useQueryGetLikedPosts } from "@/utils/generated/hooks";
+import { TabBar } from "@/components/navigation/TabBar";
 import { PostCard } from "./PostCard";
 
 type TabType = "posts" | "likes" | "shared";
@@ -63,21 +64,12 @@ export function ProfileTabs({ userId, currentUser, onUserClick, onHashtagClick }
   return (
     <div>
       {/* Tab bar */}
-      <div className="flex border-b border-v2-border-light bg-v2-maroon-800 sm:rounded-t-2xl overflow-hidden">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`flex-1 py-3 text-sm font-medium transition-colors ${
-              activeTab === tab.key
-                ? "text-v2-gold-primary border-b-2 border-v2-gold-primary"
-                : "text-v2-text-tertiary hover:text-v2-text-primary"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <TabBar
+        tabs={tabs.map((tab) => ({ id: tab.key, label: tab.label }))}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        className="bg-v2-maroon-800 sm:rounded-t-2xl"
+      />
 
       {/* Content */}
       <div className="mt-2">
