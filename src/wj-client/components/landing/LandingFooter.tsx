@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface FooterSettings {
   brandName: string;
@@ -15,6 +17,7 @@ const DEFAULTS: FooterSettings = {
 };
 
 export default function LandingFooter() {
+  const tNav = useTranslations("landing.footer");
   const [footer, setFooter] = useState<FooterSettings>(DEFAULTS);
 
   useEffect(() => {
@@ -51,6 +54,20 @@ export default function LandingFooter() {
         <p className="text-v2-gold-accent text-sm whitespace-nowrap">
           {footer.contactInfo}
         </p>
+        <div className="flex gap-4 mt-4 text-xs justify-center">
+          <Link
+            href="/legal/terms"
+            className="text-v2-text-tertiary hover:text-v2-gold-accent transition-colors underline underline-offset-2"
+          >
+            {tNav("termsOfService")}
+          </Link>
+          <Link
+            href="/legal/privacy"
+            className="text-v2-text-tertiary hover:text-v2-gold-accent transition-colors underline underline-offset-2"
+          >
+            {tNav("privacyPolicy")}
+          </Link>
+        </div>
       </div>
     </footer>
   );

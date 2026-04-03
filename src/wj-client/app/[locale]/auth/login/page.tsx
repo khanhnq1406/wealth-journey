@@ -206,14 +206,14 @@ export default function Login() {
           <p className="mt-6 sm:mt-8 text-xs sm:text-sm text-v2-text-tertiary text-center">
             {t("termsAgreement")}{" "}
             <Link
-              href="#terms"
+              href="/legal/terms"
               className="underline hover:text-v2-text-secondary transition-colors"
             >
               {t("termsOfService")}
             </Link>{" "}
             {tCommon("and")}{" "}
             <Link
-              href="#privacy"
+              href="/legal/privacy"
               className="underline hover:text-v2-text-secondary transition-colors"
             >
               {t("privacyPolicy")}
