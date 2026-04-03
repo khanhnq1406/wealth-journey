@@ -195,6 +195,7 @@
   },
   "active": "c1a649a975fff14d",
   "lastOpenFiles": [
+    "2026-04-03-feat-asset-display-config-safe-disable-delete.md",
     "2026-04-03-fix-system-price-alert-shows-alert-for-all-codes.md",
     "2026-04-02-improve-mobile-tab-overflow.md",
     "Kanban Board.md",
@@ -221,7 +222,6 @@
     "Fix auto open popup.md",
     "Add button group to finance page.md",
     "pictures/price_alert.png",
-    "Fix user price alert in Vietnamese 1.md",
     "pictures"
   ]
 }

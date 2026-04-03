@@ -5,7 +5,7 @@ status: Not Started
 
 ## Overview
 
-Add Terms of Service and Privacy Policy pages to the application so that users can review the legal terms governing their use of WealthJourney.
+Add Terms of Service and Privacy Policy pages to the application so that users can review the legal terms governing their use of congdongvang.com.
 
 ## Details
 

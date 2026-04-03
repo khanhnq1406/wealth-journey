@@ -1,22 +1,17 @@
 ---
 type: bug
-status: Not Started
+status: Spec
 ---
 
 ## Overview
 
-After logging in as an admin and navigating to the dashboard, the admin-specific navigation items sometimes fail to appear in the navbar. This creates a broken experience where admins cannot access admin-only routes without a manual page refresh.
+After a fresh Google OAuth login and redirect to the dashboard, admin-specific navigation items (e.g., the Admin panel link) intermittently fail to appear in the navbar. A hard page refresh resolves the issue. The bug is caused by a broken `store.subscribe` pattern in `DashboardLayout` with a stale closure guard.
 
-## Details
+## Pipeline Artifacts
 
-The issue occurs intermittently after admin login when redirected to the dashboard. The navbar renders without the admin nav items (e.g., Admin panel link), even though the user has admin privileges. This is likely a race condition where the navbar component renders before the auth/user state (including the admin role) has fully propagated — possibly the Redux auth store or the session query hasn't resolved by the time the sidebar/nav component mounts.
-
-**Route affected:** `/dashboard/*` (sidebar and/or top nav)
-**Expected:** Admin nav items appear immediately after login redirect.
-**Actual:** Admin nav items are missing; a hard refresh resolves the issue.
-
-## Acceptance Criteria
-
-- [ ] Admin nav items consistently appear after admin login without requiring a page refresh
-- [ ] Auth/role state is fully resolved before the navbar renders admin-conditional items
-- [ ] Verified on both desktop sidebar and mobile slide-out navigation
+| Artifact | File |
+| -------- | ---- |
+| Spec     | `docs/specs/2026-04-03-fix-admin-nav-items-not-showing-spec.md` |
+| Plan     | `docs/plans/2026-04-03-fix-admin-nav-items-not-showing-plan.md` _(added after step 2)_ |
+| Progress | `docs/reports/2026-04-03-fix-admin-nav-items-not-showing-progress.md` _(added after step 3 starts)_ |
+| Report   | `docs/reports/2026-04-03-fix-admin-nav-items-not-showing-report.md` _(added after step 3 completes)_ |
