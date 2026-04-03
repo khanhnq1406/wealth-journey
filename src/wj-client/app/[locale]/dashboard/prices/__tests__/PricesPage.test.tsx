@@ -325,8 +325,8 @@ describe("PricesPage — Set Alert bell buttons", () => {
   describe("Gold tab", () => {
     it("renders bell icon buttons with aria-label 'Set Alert' for gold rows", () => {
       renderPage();
-      // Switch to gold tab
-      fireEvent.click(screen.getByRole("button", { name: "Gold" }));
+      // Switch to gold tab — tabs now have role="tab" after TabBar migration
+      fireEvent.click(screen.getByRole("tab", { name: "Gold" }));
       const bellButtons = screen.getAllByRole("button", {
         name: /set alert/i,
       });
@@ -335,7 +335,7 @@ describe("PricesPage — Set Alert bell buttons", () => {
 
     it("opens CreatePriceAlertForm modal when bell is clicked on gold row", () => {
       renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "Gold" }));
+      fireEvent.click(screen.getByRole("tab", { name: "Gold" }));
       const bellBtn = screen.getAllByRole("button", { name: /set alert/i })[0];
       fireEvent.click(bellBtn);
       expect(screen.getByTestId("create-price-alert-form")).toBeInTheDocument();
@@ -343,7 +343,7 @@ describe("PricesPage — Set Alert bell buttons", () => {
 
     it("pre-fills gold form with correct category and symbol", () => {
       renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "Gold" }));
+      fireEvent.click(screen.getByRole("tab", { name: "Gold" }));
       const bellBtn = screen.getAllByRole("button", { name: /set alert/i })[0];
       fireEvent.click(bellBtn);
       const form = screen.getByTestId("create-price-alert-form");
@@ -353,7 +353,7 @@ describe("PricesPage — Set Alert bell buttons", () => {
 
     it("pre-fills gold form with assetType 8 (GOLD_VND)", () => {
       renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "Gold" }));
+      fireEvent.click(screen.getByRole("tab", { name: "Gold" }));
       const bellBtn = screen.getAllByRole("button", { name: /set alert/i })[0];
       fireEvent.click(bellBtn);
       const form = screen.getByTestId("create-price-alert-form");
@@ -362,7 +362,7 @@ describe("PricesPage — Set Alert bell buttons", () => {
 
     it("pre-fills gold form with currency VND", () => {
       renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "Gold" }));
+      fireEvent.click(screen.getByRole("tab", { name: "Gold" }));
       const bellBtn = screen.getAllByRole("button", { name: /set alert/i })[0];
       fireEvent.click(bellBtn);
       const form = screen.getByTestId("create-price-alert-form");
@@ -373,14 +373,14 @@ describe("PricesPage — Set Alert bell buttons", () => {
   describe("Silver tab", () => {
     it("renders bell icon buttons with aria-label 'Set Alert' for silver rows", () => {
       renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "Silver" }));
+      fireEvent.click(screen.getByRole("tab", { name: "Silver" }));
       const bellButtons = screen.getAllByRole("button", { name: /set alert/i });
       expect(bellButtons.length).toBeGreaterThan(0);
     });
 
     it("opens CreatePriceAlertForm modal when bell is clicked on silver row", () => {
       renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "Silver" }));
+      fireEvent.click(screen.getByRole("tab", { name: "Silver" }));
       const bellBtn = screen.getAllByRole("button", { name: /set alert/i })[0];
       fireEvent.click(bellBtn);
       expect(screen.getByTestId("create-price-alert-form")).toBeInTheDocument();
@@ -388,7 +388,7 @@ describe("PricesPage — Set Alert bell buttons", () => {
 
     it("pre-fills silver form with correct category and symbol", () => {
       renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "Silver" }));
+      fireEvent.click(screen.getByRole("tab", { name: "Silver" }));
       const bellBtn = screen.getAllByRole("button", { name: /set alert/i })[0];
       fireEvent.click(bellBtn);
       const form = screen.getByTestId("create-price-alert-form");
@@ -398,7 +398,7 @@ describe("PricesPage — Set Alert bell buttons", () => {
 
     it("pre-fills silver form with assetType 10 (SILVER_VND)", () => {
       renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "Silver" }));
+      fireEvent.click(screen.getByRole("tab", { name: "Silver" }));
       const bellBtn = screen.getAllByRole("button", { name: /set alert/i })[0];
       fireEvent.click(bellBtn);
       const form = screen.getByTestId("create-price-alert-form");
@@ -416,7 +416,7 @@ describe("PricesPage — Set Alert bell buttons", () => {
 
     it("modal closes when BaseModal onClose is called (Escape key)", () => {
       renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "Gold" }));
+      fireEvent.click(screen.getByRole("tab", { name: "Gold" }));
       const bellBtn = screen.getAllByRole("button", { name: /set alert/i })[0];
       fireEvent.click(bellBtn);
       expect(screen.getByTestId("create-price-alert-form")).toBeInTheDocument();
@@ -446,7 +446,7 @@ describe("PricesPage — Set Alert bell buttons", () => {
       });
 
       renderPage();
-      fireEvent.click(screen.getByRole("button", { name: "Symbol Lookup" }));
+      fireEvent.click(screen.getByRole("tab", { name: "Symbol Lookup" }));
 
       // Type a symbol and search
       const autocomplete = screen.getByTestId("symbol-autocomplete");
@@ -464,12 +464,8 @@ describe("PricesPage — Set Alert bell buttons", () => {
   describe("Price Alerts tab (first tab)", () => {
     it("renders Price Alerts as the first tab in the tab bar", () => {
       renderPage();
-      const allTabButtons = screen.getAllByRole("button");
-      const tabBarButtons = allTabButtons.filter((btn) =>
-        /price alerts|watchlist|gold|silver|currency|symbol lookup/i.test(
-          btn.textContent ?? ""
-        )
-      );
+      // Tabs now use role="tab" after TabBar migration
+      const tabBarButtons = screen.getAllByRole("tab");
       expect(tabBarButtons[0]).toHaveTextContent(/price alerts/i);
     });
 
