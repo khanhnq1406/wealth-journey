@@ -8,7 +8,7 @@
 - **Started:** 2026-04-03T00:00:00+07:00
 - **Last updated:** 2026-04-03T00:00:00+07:00
 - **Current state:** in_progress
-- **Current task:** 3
+- **Current task:** 4+5
 
 ## Task Progress
 
@@ -16,8 +16,8 @@
 | ----- | ------------------------------------------- | ----------- | ------ | ------- |
 | 0     | Update C4 Architecture Diagrams             | done        | ddf4b4a8 | Added UnlinkGoogle to AuthHandler (backend C4) and DisconnectGoogleDialog note to AuthMethodsCard (frontend C4) |
 | 1     | Proto — Add UnlinkGoogle RPC and Messages   | done        | d52ea534 | Added UnlinkGoogle RPC + messages to auth.proto; restored missing GetAssetDisplayPrices RPC to investment.proto; both builds pass |
-| 2     | Backend — UnlinkGoogle Service Method       | done        | TBD    | UnlinkGoogle method in auth.go with guards, provider strip, session revocation; 5 passing unit tests |
-| 3     | Backend — UnlinkGoogle Handler and Route    | pending     | —      | —       |
+| 2     | Backend — UnlinkGoogle Service Method       | done        | 80b2a85d | UnlinkGoogle method in auth.go with guards, provider strip, session revocation; 5 passing unit tests |
+| 3     | Backend — UnlinkGoogle Handler and Route    | done        | TBD    | UnlinkGoogle handler in auth.go + POST /unlink-google route; 3 passing handler tests |
 | 4+5   | Frontend — i18n Keys + Error Mapper         | pending     | —      | —       |
 | 6+7   | Frontend — DisconnectGoogleDialog + Card    | pending     | —      | —       |
 | 8     | Update Runtime Flow Diagram (flow-auth.md)  | pending     | —      | —       |

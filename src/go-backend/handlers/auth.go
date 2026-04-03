@@ -296,6 +296,35 @@ func (h *AuthHandlers) LinkGoogle(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
+// UnlinkGoogle handles unlinking a Google account from an existing user
+func (h *AuthHandlers) UnlinkGoogle(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.UnauthorizedWithPath(c, "User not authenticated")
+		return
+	}
+
+	// Extract session ID from JWT token (same as ChangePassword pattern)
+	token, ok := ExtractBearerToken(c)
+	if !ok {
+		return
+	}
+	claims, err := h.authSrv.ParseToken(token)
+	if err != nil {
+		handler.HandleError(c, apperrors.NewUnauthorizedErrorWithCode(apperrors.Codes.AuthInvalidToken, "invalid token"))
+		return
+	}
+
+	result, err := h.authSrv.UnlinkGoogle(c.Request.Context(), userID, claims.SessionID)
+	if err != nil {
+		log.Printf("[AUTH] Unlink Google failed: %v", err)
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, result)
+}
+
 // GetAuth handles GET /auth - returns user information for authenticated user
 func (h *AuthHandlers) GetAuth(c *gin.Context) {
 	// Extract userID from context (set by AuthMiddleware)

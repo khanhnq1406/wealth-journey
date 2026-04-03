@@ -147,6 +147,7 @@ func RegisterRoutes(
 		authProtected.GET("", h.Auth.GetAuth) // Get current authenticated user
 		authProtected.POST("/link-password", h.Auth.LinkPassword)
 		authProtected.POST("/link-google", h.Auth.LinkGoogle)
+		authProtected.POST("/unlink-google", h.Auth.UnlinkGoogle)
 		authProtected.POST("/change-password", h.Auth.ChangePassword)
 		authProtected.GET("/methods", h.Auth.GetAuthMethods)
 	}
