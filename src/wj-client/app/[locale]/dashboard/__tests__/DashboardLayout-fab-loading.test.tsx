@@ -200,6 +200,17 @@ jest.mock("@/lib/utils/cn", () => ({
   cn: (...args: unknown[]) => args.filter(Boolean).join(" "),
 }));
 
+// react-redux
+jest.mock("react-redux", () => ({
+  useSelector: jest.fn(() => ({
+    picture: null,
+    fullname: "Test User",
+    email: "test@example.com",
+    username: "testuser",
+    isAdmin: false,
+  })),
+}));
+
 // ---------------------------------------------------------------------------
 // FloatingActionButton spy — capture props passed to it
 // ---------------------------------------------------------------------------
