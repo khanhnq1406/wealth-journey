@@ -7,8 +7,8 @@
 - **Spec file:** `docs/specs/2026-04-03-add-cors-allow-from-backend-spec.md`
 - **Started:** 2026-04-03T00:00:00Z
 - **Last updated:** 2026-04-03T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 2
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -16,7 +16,7 @@
 | --- | ------------------------------------------------------------ | ----------- | ------ | ------- |
 | 0   | Skip — No C4 or flow diagrams to update                      | skipped     | —      | Per spec: no structural change, no new runtime flow |
 | 1   | Add CORS sub-struct to Config and parse CORS_ALLOWED_ORIGINS | done        | 6ffcf7c3 | Added CORS struct, parseCORSAllowedOrigins helper, wired into Load() with default localhost:3000 |
-| 2   | Replace wildcard with cfg.CORS.AllowedOrigins in setupGinEngine | in_progress | —      | — |
+| 2   | Replace wildcard with cfg.CORS.AllowedOrigins in setupGinEngine | done        | 7b97d580 | Replaced wildcard with cfg.CORS.AllowedOrigins, added startup log + wildcard warning |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
