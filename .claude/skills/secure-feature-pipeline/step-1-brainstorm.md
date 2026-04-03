@@ -1,10 +1,12 @@
 # Step 1: Brainstorm
 
-**Input:** Feature requirement text from user.
+**Input:** Feature requirement text from user (may also include an Obsidian task note path).
 
 **Goal:** Deeply understand the feature, find risks/issues/security concerns, and produce a precise spec file that serves as the contract for planning.
 
 **This is the most important step.** Take your time. Be thorough. A bad spec cascades into bad planning and bad code.
+
+**If an Obsidian task note already exists:** Read it for context (what/why the task was created), but treat it as a starting point only — NOT as a pre-made spec. The task note intentionally contains no root cause, no approach, and no solution. The full brainstorm process below (clarifying questions → propose approaches → user selects → write spec) MUST still run in full regardless of what is in the task note.
 
 ### Process
 
