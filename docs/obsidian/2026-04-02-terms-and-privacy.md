@@ -1,12 +1,16 @@
 ---
 type: feature
-status: Not Started
+status: Plan
 ---
 
 ## Overview
 
 Add Terms of Service and Privacy Policy pages to the application so that users can review the legal terms governing their use of congdongvang.com.
 
-## Details
+## Pipeline Artifacts
 
-Two new static pages need to be created: a Terms of Service page and a Privacy Policy page. Both should be accessible from the landing page footer and the app's settings or navigation. Content should follow standard SaaS terms format appropriate for a personal finance application handling user financial data.
+| Artifact | File |
+| -------- | ---- |
+| Spec     | `docs/specs/2026-04-03-terms-and-privacy-spec.md` |
+| Plan     | `docs/plans/2026-04-03-terms-and-privacy-plan.md` |
+| Report   | `docs/reports/2026-04-03-terms-and-privacy-report.md` _(added after step 3 completes)_ |

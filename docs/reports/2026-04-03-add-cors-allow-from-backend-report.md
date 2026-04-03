@@ -73,6 +73,12 @@ None. The change is minimal and self-contained.
 | `src/go-backend/internal/app/app.go` | Replaced `[]string{"*"}` with `cfg.CORS.AllowedOrigins`, added startup log + wildcard warning |
 | `src/go-backend/internal/app/app_cors_test.go` | Created with 2 CORS smoke tests |
 
+## Fix History
+
+| Date       | Fix                                              | Severity | Files Changed |
+| ---------- | ------------------------------------------------ | -------- | ------------- |
+| 2026-04-03 | Added `CORS_ALLOWED_ORIGINS` example to `.env.example` with usage comments and wildcard warning | Minor | `src/go-backend/.env.example` |
+
 ## How to Test
 
 ### Unit & Integration Tests
