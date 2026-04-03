@@ -6,16 +6,16 @@
 - **Plan file:** `docs/plans/2026-04-03-terms-and-privacy-plan.md`
 - **Spec file:** `docs/specs/2026-04-03-terms-and-privacy-spec.md`
 - **Started:** 2026-04-03T00:00:00Z
-- **Last updated:** 2026-04-03T01:00:00Z
+- **Last updated:** 2026-04-03T02:00:00Z
 - **Current state:** in_progress
-- **Current task:** 2
+- **Current task:** 3+4
 
 ## Task Progress
 
 | #    | Task Name                                       | Status     | Commit | Summary |
 | ---- | ----------------------------------------------- | ---------- | ------ | ------- |
 | 0+1  | Register i18n namespace + create message files  | done       | 0a6dce06 | Registered legal namespace in i18n/request.ts; created en/legal.json and vi/legal.json with 9 terms + 9 privacy sections |
-| 2    | Create shared legal layout                      | pending    | —      | —       |
+| 2    | Create shared legal layout                      | done       | bd25ca9e | Created app/[locale]/legal/layout.tsx with SEO metadata (canonical, hreflang, robots) + children passthrough |
 | 3    | Create Terms of Service page                    | pending    | —      | —       |
 | 4    | Create Privacy Policy page                      | pending    | —      | —       |
 | 5    | Fix auth page broken links                      | pending    | —      | —       |
