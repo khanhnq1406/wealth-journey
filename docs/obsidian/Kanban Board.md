@@ -6,7 +6,7 @@ kanban-plugin: board
 
 ## Not Started
 
-- [ ] [[2026-04-02-improve-mobile-tab-overflow|NEED TO RECHECK THIS TASK! Improve all tab selection overload on mobile view]]
+- [ ] [[2026-04-02-improve-mobile-tab-overflow|Improve all tab selection]]
 - [ ] Add CORS allow from the backend to prevent other clients get api data
 - [ ] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
 - [ ] [[2026-04-03-feat-asset-display-config-safe-disable-delete|Add safe disable/delete for asset display config when users are using that asset code]]
@@ -14,14 +14,13 @@ kanban-plugin: board
 
 ## Spec
 
-- [ ] [[2026-04-02-fix-admin-nav-items-not-showing|Fix admin nav items not showing after login]]
 - [ ] [[2026-04-02-cancel-google-connection|Cancel Google connection]]
 
 
 ## Plan
 
-- [ ] [[2026-04-03-fix-system-price-alert-shows-alert-for-all-codes|Fix system price alert showing alerts for all codes (not in admin config)]]
-- [ ] [[2026-04-02-enhance-ui-admin-gold-config|Enhance UI in admin gold config tab]]
+- [ ] [[2026-04-02-fix-admin-nav-items-not-showing|Fix admin nav items not showing after login]]
+
 
 
 ## Implement
@@ -30,11 +29,13 @@ kanban-plugin: board
 
 ## Review
 
+- [ ] [[2026-04-02-enhance-ui-admin-gold-config|Enhance UI in admin gold config tab]]
 
 
 ## Done
 
 **Complete**
+- [x] [[2026-04-03-fix-system-price-alert-shows-alert-for-all-codes|Fix system price alert showing alerts for all codes (not in admin config)]]
 - [x] [[2026-04-02-auto-increase-fetch-code-priority|Auto increase priority of type code fetcher in edit asset type code]]
 - [x] [[2026-04-02-price-alert-bugs|Fix price alert bugs (USD value + Vietnamese symbol)]]
 - [x] [[2026-04-02-table-ui-enhancements|Enhance TanStackTable desktop design + SortableList component]]
