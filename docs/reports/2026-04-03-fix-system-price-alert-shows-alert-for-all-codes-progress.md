@@ -8,14 +8,14 @@
 - **Started:** 2026-04-03T00:00:00Z
 - **Last updated:** 2026-04-03T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 1
+- **Current task:** 2
 
 ## Task Progress
 
 | #   | Task Name                                                | Status      | Commit | Summary |
 | --- | -------------------------------------------------------- | ----------- | ------ | ------- |
-| 1   | Inject AssetDisplayConfigService into priceAlertService  | in_progress | —      | —       |
-| 2   | Implement enabled-code filter in doCheckAndAlert         | pending     | —      | —       |
+| 1   | Inject AssetDisplayConfigService into priceAlertService  | done        | 1907bbe0 | Added configSvc field + 6th param to NewPriceAlertService; wired in services.go; full mock + helper updated in tests |
+| 2   | Implement enabled-code filter in doCheckAndAlert         | in_progress | —      | —       |
 | 4   | Update existing tests to include configSvc in all helpers | pending    | —      | —       |
 | 3   | Update C4 component + runtime flow diagrams              | pending     | —      | —       |
 

@@ -83,13 +83,43 @@ func (s *priceAlertService) doCheckAndAlert(ctx context.Context, force bool) err
 
 	var allCategories []categoryMovers
 
+	// buildEnabledSet returns a set of enabled TypeCodes from AssetDisplayConfig.
+	// Returns (nil, false) if the config lookup fails — caller should skip the asset type.
+	// Returns (empty map, true) if config is empty — no codes are enabled (cold-start / unconfigured).
+	buildEnabledSet := func(assetType string) (map[string]bool, bool) {
+		configs, err := s.configSvc.ListAll(ctx, assetType)
+		if err != nil {
+			log.Printf("Price alert: failed to fetch %s display configs: %v — skipping asset type", assetType, err)
+			return nil, false
+		}
+		if len(configs) == 0 {
+			log.Printf("Price alert: no enabled configs for %s — skipping (cold-start or unconfigured)", assetType)
+			return map[string]bool{}, true
+		}
+		enabled := make(map[string]bool, len(configs))
+		for _, c := range configs {
+			if c.Enabled {
+				enabled[c.TypeCode] = true
+			}
+		}
+		return enabled, true
+	}
+
 	// Fetch gold prices from DB cache
 	goldPrices, err := s.assetPriceSvc.GetPricesByAssetType(ctx, "gold")
 	if err != nil {
 		log.Printf("Price alert: failed to fetch gold prices: %v", err)
 	} else {
+		enabledGold, ok := buildEnabledSet("gold")
+		if !ok {
+			// config lookup failed — skip gold entirely
+			goto silverSection
+		}
 		var goldVND, goldUSD []priceMover
 		for _, p := range goldPrices {
+			if !enabledGold[p.TypeCode] {
+				continue // filtered: not in admin config or disabled
+			}
 			if p.IsStale {
 				log.Printf("Price alert: skipping stale gold price for %s", p.TypeCode)
 				continue
@@ -122,13 +152,22 @@ func (s *priceAlertService) doCheckAndAlert(ctx context.Context, force bool) err
 		}
 	}
 
+silverSection:
 	// Fetch silver prices from DB cache
 	silverPrices, err := s.assetPriceSvc.GetPricesByAssetType(ctx, "silver")
 	if err != nil {
 		log.Printf("Price alert: failed to fetch silver prices: %v", err)
 	} else {
+		enabledSilver, ok := buildEnabledSet("silver")
+		if !ok {
+			// config lookup failed — skip silver entirely
+			goto processCategories
+		}
 		var silverVND, silverUSD []priceMover
 		for _, p := range silverPrices {
+			if !enabledSilver[p.TypeCode] {
+				continue // filtered: not in admin config or disabled
+			}
 			if p.IsStale {
 				log.Printf("Price alert: skipping stale silver price for %s", p.TypeCode)
 				continue
@@ -160,6 +199,8 @@ func (s *priceAlertService) doCheckAndAlert(ctx context.Context, force bool) err
 			})
 		}
 	}
+
+processCategories:
 
 	// Process each category
 	for _, cat := range allCategories {
