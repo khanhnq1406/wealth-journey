@@ -793,6 +793,48 @@ func (s *Server) LinkGoogle(ctx context.Context, userID int32, googleToken strin
 	}, nil
 }
 
+// UnlinkGoogle removes Google auth from a user's account.
+// Requires the user to have a password set to prevent lockout.
+// Revokes all sessions except the current one.
+func (s *Server) UnlinkGoogle(ctx context.Context, userID int32, currentSessionID string) (*authv1.UnlinkGoogleResponse, error) {
+	var user models.User
+	if err := s.db.DB.First(&user, userID).Error; err != nil {
+		return nil, fmt.Errorf("user not found: %w", err)
+	}
+
+	// Guard: Google must be linked
+	if !strings.Contains(user.AuthProvider, "google") {
+		return nil, apperrors.NewValidationError("Google account is not linked")
+	}
+
+	// Guard: Password must be set (prevent lockout)
+	if user.PasswordHash == "" {
+		return nil, apperrors.NewValidationError("Please set a password before disconnecting Google")
+	}
+
+	// Strip "google" (and any "+" separator) from AuthProvider.
+	// Handles all variants: "google+password" → "password", "password+google" → "password"
+	newProvider := strings.ReplaceAll(user.AuthProvider, "google+", "")
+	newProvider = strings.ReplaceAll(newProvider, "+google", "")
+	newProvider = strings.ReplaceAll(newProvider, "google", "")
+
+	if err := s.db.DB.Model(&user).Update("auth_provider", newProvider).Error; err != nil {
+		return nil, fmt.Errorf("failed to update auth provider: %w", err)
+	}
+
+	// Revoke all other sessions (best-effort, consistent with ChangePassword).
+	// DB is updated first; session revocation failure is non-fatal.
+	s.invalidateOtherSessions(userID, currentSessionID)
+
+	log.Printf("[AUTH] User %d unlinked Google account", userID)
+
+	return &authv1.UnlinkGoogleResponse{
+		Success:   true,
+		Message:   "Google account disconnected successfully",
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
 // LoginWithDevice is a helper for testing multi-device login
 // In production, device info is extracted from HTTP headers
 func (s *Server) LoginWithDevice(ctx context.Context, email string, deviceInfo *redis.SessionData) (string, string, error) {
