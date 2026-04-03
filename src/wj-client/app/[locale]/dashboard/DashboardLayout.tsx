@@ -361,7 +361,10 @@ export function DashboardLayout({
               <div className="flex flex-col">
                 {/* Premium Card — Home + Portfolio + Community */}
                 <div
-                  className="rounded-2xl border border-v2-border-light p-1.5 flex flex-col gap-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                  className={cn(
+                    "rounded-2xl border border-v2-border-light flex flex-col gap-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
+                    isExpanded ? "p-1.5" : "py-1.5 px-0",
+                  )}
                   style={{
                     background:
                       "linear-gradient(180deg, rgba(95,2,2,1) 0%, rgba(155,1,17,0.15) 50%, rgba(215,139,28,0.08) 100%)",

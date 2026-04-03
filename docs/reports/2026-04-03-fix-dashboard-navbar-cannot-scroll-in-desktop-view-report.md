@@ -58,6 +58,7 @@ None. Two-line removal with no deferred work.
 | Date | Fix | Severity | File |
 | ---- | --- | -------- | ---- |
 | 2026-04-03 | Replace `min-h-screen` with `h-dvh` on `<aside>` (line 313) — `min-h-screen` only set a minimum height, never constraining the aside to viewport height; the `overflow-y-auto` on `<nav>` could never activate because the parent grew unbounded instead of clipping | Minor | `src/wj-client/app/[locale]/dashboard/DashboardLayout.tsx` |
+| 2026-04-03 | Remove horizontal padding on premium nav card in collapsed state — `p-1.5` on the premium card container consumed 12px of horizontal space that pushed the 44px icon container off-center when a scrollbar (≈15px) was present in the nav. Fix: `p-1.5` when expanded, `py-1.5 px-0` when collapsed, so the NavItem's `justify-center` can use the full available width regardless of scrollbar presence | Minor | `src/wj-client/app/[locale]/dashboard/DashboardLayout.tsx` |
 
 ### Root Cause of Regression
 
