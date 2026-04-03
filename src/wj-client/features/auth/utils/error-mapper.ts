@@ -71,6 +71,13 @@ const LINK_GOOGLE_ERROR_MAP: Record<string, string> = {
   "google account does not have an email": "invalidGoogleToken",
 };
 
+/** Error map for unlink Google action (uses settings.security.errors namespace) */
+const UNLINK_GOOGLE_ERROR_MAP: Record<string, string> = {
+  "google account is not linked": "googleNotLinked",
+  "please set a password before disconnecting google":
+    "disconnectRequiresPassword",
+};
+
 /**
  * Maps a server error message to an i18n key for the register form.
  * Returns the i18n key if found, or null for the fallback.
@@ -117,4 +124,16 @@ export function mapLinkGoogleError(
   if (!serverMessage) return null;
   const lower = serverMessage.toLowerCase();
   return LINK_GOOGLE_ERROR_MAP[lower] ?? null;
+}
+
+/**
+ * Maps a server error message to an i18n key for the unlink Google action.
+ * Returns the i18n key if found, or null for the fallback.
+ */
+export function mapUnlinkGoogleError(
+  serverMessage: string | undefined
+): string | null {
+  if (!serverMessage) return null;
+  const lower = serverMessage.toLowerCase();
+  return UNLINK_GOOGLE_ERROR_MAP[lower] ?? null;
 }

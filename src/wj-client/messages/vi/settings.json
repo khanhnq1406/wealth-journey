@@ -32,6 +32,12 @@
       "setPassword": "Đặt mật khẩu",
       "changePassword": "Đổi mật khẩu",
       "username": "Tên người dùng",
+      "disconnectGoogle": "Ngắt kết nối",
+      "disconnectGoogleTitle": "Ngắt kết nối Google?",
+      "disconnectGoogleMessage": "Tài khoản Google của bạn sẽ bị hủy liên kết. Tất cả phiên hoạt động khác sẽ bị đăng xuất. Bạn có thể kết nối lại Google bất kỳ lúc nào.",
+      "disconnectGoogleConfirm": "Ngắt kết nối",
+      "disconnectGoogleSuccess": "Đã ngắt kết nối tài khoản Google",
+      "disconnectGoogleHint": "Hãy đặt mật khẩu trước khi ngắt kết nối Google",
       "currentPassword": "Mật khẩu hiện tại",
       "newPassword": "Mật khẩu mới",
       "confirmNewPassword": "Xác nhận mật khẩu mới",
@@ -66,6 +72,9 @@
         "googleEmailMismatch": "Email Google không khớp với email tài khoản của bạn",
         "invalidGoogleToken": "Xác thực Google thất bại. Vui lòng thử lại.",
         "linkGoogleFailed": "Liên kết Google thất bại. Vui lòng thử lại.",
+        "googleNotLinked": "Tài khoản Google chưa được liên kết",
+        "unlinkGoogleFailed": "Ngắt kết nối Google thất bại. Vui lòng thử lại.",
+        "disconnectRequiresPassword": "Vui lòng đặt mật khẩu trước khi ngắt kết nối Google.",
         "genericError": "Đã xảy ra lỗi. Vui lòng thử lại."
       }
     },
