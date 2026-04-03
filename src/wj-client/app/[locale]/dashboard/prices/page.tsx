@@ -526,7 +526,8 @@ function buildMobileActions(
       ? InvestmentType.INVESTMENT_TYPE_GOLD_VND
       : InvestmentType.INVESTMENT_TYPE_SILVER_VND;
 
-  return (row: PriceItem) => (
+  function MobileActionsCell(row: PriceItem) {
+    return (
     <div className="flex items-center">
       {isAdmin && <InlinePriceEdit item={row} category={tab} />}
       {(tab === "gold" || tab === "silver" || tab === "currency") && (
@@ -555,7 +556,9 @@ function buildMobileActions(
         />
       )}
     </div>
-  );
+    );
+  }
+  return MobileActionsCell;
 }
 
 function mapQuoteTypeToInvestmentTypeLocal(quoteType: string): InvestmentType {
