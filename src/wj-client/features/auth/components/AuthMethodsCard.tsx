@@ -12,6 +12,7 @@ import {
 } from "@/utils/generated/hooks";
 import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
 import { mapLinkGoogleError } from "@/features/auth/utils/error-mapper";
+import { DisconnectGoogleDialog } from "@/features/auth/components/DisconnectGoogleDialog";
 
 interface AuthMethodsCardProps {
   onSetPassword?: () => void;
@@ -24,7 +25,7 @@ function StatusBadge({ linked }: { linked: boolean }) {
     <span
       className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${
         linked
-          ? "bg-green-500/20 text-green-400"
+          ? "bg-v2-green-light text-v2-green-positive"
           : "bg-v2-bg-dark text-v2-text-tertiary"
       }`}
     >
@@ -130,6 +131,7 @@ export function AuthMethodsCard({
   const methods = data?.data;
 
   const [linkGoogleError, setLinkGoogleError] = useState<string | null>(null);
+  const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
 
   const linkGoogle = useMutationLinkGoogle({
     onSuccess() {
@@ -185,6 +187,42 @@ export function AuthMethodsCard({
               onSuccess={handleGoogleLink}
               onError={() => setLinkGoogleError(t("errors.linkGoogleFailed"))}
             />
+          </div>
+        )}
+
+        {methods?.hasGoogle && (
+          <div className="mt-2 pl-12">
+            <button
+              onClick={() =>
+                methods?.hasPassword
+                  ? setShowDisconnectDialog(true)
+                  : undefined
+              }
+              disabled={!methods?.hasPassword}
+              title={
+                !methods?.hasPassword ? t("disconnectGoogleHint") : undefined
+              }
+              className={`inline-flex items-center gap-1.5 text-sm font-medium transition-colors py-1 min-h-[44px] ${
+                methods?.hasPassword
+                  ? "text-v2-red-negative hover:text-v2-red-negative/80 active:text-v2-red-negative/60 cursor-pointer"
+                  : "text-v2-text-tertiary cursor-not-allowed opacity-50"
+              }`}
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 4.411m0 0L21 21"
+                />
+              </svg>
+              {t("disconnectGoogle")}
+            </button>
           </div>
         )}
 
@@ -291,6 +329,11 @@ export function AuthMethodsCard({
           </div>
         </div>
       )}
+
+      <DisconnectGoogleDialog
+        isOpen={showDisconnectDialog}
+        onClose={() => setShowDisconnectDialog(false)}
+      />
     </BaseCard>
   );
 }

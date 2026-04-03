@@ -93,6 +93,15 @@ service AuthService {
       body: "*"
     };
   }
+
+  // Unlink Google account from existing user (authenticated)
+  // Requires password set on account. Revokes all other sessions.
+  rpc UnlinkGoogle(UnlinkGoogleRequest) returns (UnlinkGoogleResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/auth/unlink-google"
+      body: "*"
+    };
+  }
 }
 
 // User data message
@@ -266,6 +275,16 @@ message LinkGoogleRequest {
 
 // LinkGoogle response
 message LinkGoogleResponse {
+  bool success = 1 [json_name = "success"];
+  string message = 2 [json_name = "message"];
+  string timestamp = 3 [json_name = "timestamp"];
+}
+
+// UnlinkGoogle request (authenticated) — no body fields needed
+message UnlinkGoogleRequest {}
+
+// UnlinkGoogle response
+message UnlinkGoogleResponse {
   bool success = 1 [json_name = "success"];
   string message = 2 [json_name = "message"];
   string timestamp = 3 [json_name = "timestamp"];

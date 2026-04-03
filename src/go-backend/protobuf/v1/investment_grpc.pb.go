@@ -45,6 +45,7 @@ const (
 	InvestmentService_ListUserPriceAlerts_FullMethodName           = "/wealthjourney.investment.v1.InvestmentService/ListUserPriceAlerts"
 	InvestmentService_UpdateUserPriceAlert_FullMethodName          = "/wealthjourney.investment.v1.InvestmentService/UpdateUserPriceAlert"
 	InvestmentService_DeleteUserPriceAlert_FullMethodName          = "/wealthjourney.investment.v1.InvestmentService/DeleteUserPriceAlert"
+	InvestmentService_GetAssetDisplayPrices_FullMethodName         = "/wealthjourney.investment.v1.InvestmentService/GetAssetDisplayPrices"
 )
 
 // InvestmentServiceClient is the client API for InvestmentService service.
@@ -101,6 +102,8 @@ type InvestmentServiceClient interface {
 	ListUserPriceAlerts(ctx context.Context, in *ListUserPriceAlertsRequest, opts ...grpc.CallOption) (*ListUserPriceAlertsResponse, error)
 	UpdateUserPriceAlert(ctx context.Context, in *UpdateUserPriceAlertRequest, opts ...grpc.CallOption) (*UpdateUserPriceAlertResponse, error)
 	DeleteUserPriceAlert(ctx context.Context, in *DeleteUserPriceAlertRequest, opts ...grpc.CallOption) (*DeleteUserPriceAlertResponse, error)
+	// Get asset display prices (public endpoint — no auth required)
+	GetAssetDisplayPrices(ctx context.Context, in *GetAssetDisplayPricesRequest, opts ...grpc.CallOption) (*GetAssetDisplayPricesResponse, error)
 }
 
 type investmentServiceClient struct {
@@ -345,6 +348,15 @@ func (c *investmentServiceClient) DeleteUserPriceAlert(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *investmentServiceClient) GetAssetDisplayPrices(ctx context.Context, in *GetAssetDisplayPricesRequest, opts ...grpc.CallOption) (*GetAssetDisplayPricesResponse, error) {
+	out := new(GetAssetDisplayPricesResponse)
+	err := c.cc.Invoke(ctx, InvestmentService_GetAssetDisplayPrices_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InvestmentServiceServer is the server API for InvestmentService service.
 // All implementations must embed UnimplementedInvestmentServiceServer
 // for forward compatibility
@@ -399,6 +411,8 @@ type InvestmentServiceServer interface {
 	ListUserPriceAlerts(context.Context, *ListUserPriceAlertsRequest) (*ListUserPriceAlertsResponse, error)
 	UpdateUserPriceAlert(context.Context, *UpdateUserPriceAlertRequest) (*UpdateUserPriceAlertResponse, error)
 	DeleteUserPriceAlert(context.Context, *DeleteUserPriceAlertRequest) (*DeleteUserPriceAlertResponse, error)
+	// Get asset display prices (public endpoint — no auth required)
+	GetAssetDisplayPrices(context.Context, *GetAssetDisplayPricesRequest) (*GetAssetDisplayPricesResponse, error)
 	mustEmbedUnimplementedInvestmentServiceServer()
 }
 
@@ -483,6 +497,9 @@ func (UnimplementedInvestmentServiceServer) UpdateUserPriceAlert(context.Context
 }
 func (UnimplementedInvestmentServiceServer) DeleteUserPriceAlert(context.Context, *DeleteUserPriceAlertRequest) (*DeleteUserPriceAlertResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUserPriceAlert not implemented")
+}
+func (UnimplementedInvestmentServiceServer) GetAssetDisplayPrices(context.Context, *GetAssetDisplayPricesRequest) (*GetAssetDisplayPricesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAssetDisplayPrices not implemented")
 }
 func (UnimplementedInvestmentServiceServer) mustEmbedUnimplementedInvestmentServiceServer() {}
 
@@ -965,6 +982,24 @@ func _InvestmentService_DeleteUserPriceAlert_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _InvestmentService_GetAssetDisplayPrices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAssetDisplayPricesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InvestmentServiceServer).GetAssetDisplayPrices(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InvestmentService_GetAssetDisplayPrices_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InvestmentServiceServer).GetAssetDisplayPrices(ctx, req.(*GetAssetDisplayPricesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // InvestmentService_ServiceDesc is the grpc.ServiceDesc for InvestmentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1075,6 +1110,10 @@ var InvestmentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteUserPriceAlert",
 			Handler:    _InvestmentService_DeleteUserPriceAlert_Handler,
+		},
+		{
+			MethodName: "GetAssetDisplayPrices",
+			Handler:    _InvestmentService_GetAssetDisplayPrices_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

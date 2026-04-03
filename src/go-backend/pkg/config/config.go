@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -21,6 +22,11 @@ type Config struct {
 	FX           FX
 	Import       Import
 	Storage      Storage
+	CORS         CORS
+}
+
+type CORS struct {
+	AllowedOrigins []string
 }
 
 type Server struct {
@@ -262,6 +268,9 @@ func Load() (*Config, error) {
 			SupabaseCommunityBucket: getEnv("SUPABASE_COMMUNITY_BUCKET", "community"),
 			UploadDir:               getEnv("UPLOAD_DIR", "/tmp/wealthjourney-uploads"),
 		},
+		CORS: CORS{
+			AllowedOrigins: parseCORSAllowedOrigins(getEnv("CORS_ALLOWED_ORIGINS", "http://localhost:3000")),
+		},
 	}
 
 	// Validate configuration (skip validation in Vercel environment to allow graceful degradation)
@@ -313,4 +322,18 @@ func getEnv(key, defaultValue string) string {
 		return value
 	}
 	return defaultValue
+}
+
+// parseCORSAllowedOrigins splits a comma-separated list of origins, trims whitespace,
+// and drops empty entries.
+func parseCORSAllowedOrigins(raw string) []string {
+	parts := strings.Split(raw, ",")
+	result := make([]string, 0, len(parts))
+	for _, p := range parts {
+		trimmed := strings.TrimSpace(p)
+		if trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
 }

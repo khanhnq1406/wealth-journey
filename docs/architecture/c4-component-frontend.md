@@ -25,7 +25,7 @@ C4Component
     }
 
     Container_Boundary(features, "Feature Modules (Target State)") {
-        Component(auth_feat, "Auth Feature", "features/auth", "Login/register forms (Google OAuth + password), PasswordInput, PasswordStrengthIndicator, LinkPasswordForm, ChangePasswordForm, AuthMethodsCard, auth hooks, Redux auth state")
+        Component(auth_feat, "Auth Feature", "features/auth", "Login/register forms (Google OAuth + password), PasswordInput, PasswordStrengthIndicator, LinkPasswordForm, ChangePasswordForm, AuthMethodsCard (includes DisconnectGoogleDialog sub-component for unlinking Google account), auth hooks, Redux auth state")
         Component(wallet_feat, "Wallet Feature", "features/wallet", "Wallet CRUD forms (type always BASIC, no type selector), wallet cards, balance display")
         Component(txn_feat, "Transaction Feature", "features/transaction", "Transaction forms, filters, cards, category management")
         Component(budget_feat, "Budget Feature", "features/budget", "Budget forms, progress cards, category breakdown")

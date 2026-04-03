@@ -310,7 +310,7 @@ export function DashboardLayout({
           {/* Desktop Sidebar - Maroon with Gold accents */}
           <aside
             className={cn(
-              "hidden sm:flex flex-col bg-v2-bg-primary border-r border-v2-border-light min-h-screen fixed left-0 top-0 z-sidebar transition-all duration-300 ease-in-out",
+              "hidden sm:flex flex-col bg-v2-bg-primary border-r border-v2-border-light h-dvh fixed left-0 top-0 z-sidebar transition-all duration-300 ease-in-out",
               isExpanded ? "sm:w-64 lg:w-72" : "sm:w-20",
             )}
           >
@@ -358,10 +358,13 @@ export function DashboardLayout({
               className="flex-1 overflow-y-auto px-3 overflow-x-hidden"
               aria-label={t("mainNavigation")}
             >
-              <div className="flex flex-col h-full">
+              <div className="flex flex-col">
                 {/* Premium Card — Home + Portfolio + Community */}
                 <div
-                  className="rounded-2xl border border-v2-border-light p-1.5 flex flex-col gap-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                  className={cn(
+                    "rounded-2xl border border-v2-border-light flex flex-col gap-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
+                    isExpanded ? "p-1.5" : "py-1.5 px-0",
+                  )}
                   style={{
                     background:
                       "linear-gradient(180deg, rgba(95,2,2,1) 0%, rgba(155,1,17,0.15) 50%, rgba(215,139,28,0.08) 100%)",
@@ -454,10 +457,8 @@ export function DashboardLayout({
                   />
                 </div>
 
-                {/* Spacer + Divider + Settings */}
-                <div className="flex-1" />
-                <div className="border-t border-v2-border-light" />
-                <div className="h-2" />
+                {/* Settings */}
+                <div className={cn(isExpanded ? "mt-3" : "mt-4")} />
                 <NavItem
                   href="/dashboard/settings"
                   label={t("settings")}

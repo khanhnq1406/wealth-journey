@@ -1,6 +1,6 @@
 ---
 type: feature
-status: Not Started
+status: Spec
 ---
 
 ## Overview
@@ -11,7 +11,7 @@ Admins currently can disable or delete an asset display config even when users h
 
 | Artifact | File |
 | -------- | ---- |
-| Spec     | _(added after step 1)_ |
+| Spec     | `docs/specs/2026-04-03-feat-asset-display-config-safe-disable-delete-spec.md` |
 | Plan     | _(added after step 2)_ |
 | Progress | _(added after step 3 starts)_ |
 | Report   | _(added after step 3 completes)_ |

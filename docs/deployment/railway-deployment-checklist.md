@@ -30,6 +30,10 @@ Use this checklist when deploying the WealthJourney Go backend to Railway.
 - [ ] `DB_CONN_MAX_LIFETIME=30m` (default: 1h)
 - [ ] `DB_CONN_MAX_IDLE_TIME=5m` (default: 10m)
 
+### CORS
+
+- [ ] `CORS_ALLOWED_ORIGINS` - Comma-separated list of allowed frontend origins (e.g. `https://your-app.vercel.app,https://www.your-app.com`). Defaults to `http://localhost:3000` if not set. Do **not** use `*` — it is incompatible with `AllowCredentials: true` and will be rejected by browsers.
+
 ### Optional Variables
 
 - [ ] `PORT` - Auto-detected by Railway (default: 8080)

@@ -215,8 +215,15 @@ func setupGinEngine(
 	app := gin.New()
 
 	app.Use(appmiddleware.SecurityHeaders())
+	// Log CORS allowlist at startup for operator audit
+	log.Printf("CORS AllowedOrigins: %v", cfg.CORS.AllowedOrigins)
+	for _, origin := range cfg.CORS.AllowedOrigins {
+		if origin == "*" {
+			log.Printf("WARNING: CORS_ALLOWED_ORIGINS contains '*' — this is insecure with AllowCredentials: true and will be rejected by browsers")
+		}
+	}
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
+		AllowOrigins:     cfg.CORS.AllowedOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length", "X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset", "Retry-After"},

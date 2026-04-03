@@ -628,3 +628,89 @@ sequenceDiagram
 | Email belongs to different user | 400 "Linked to a different user" | None |
 | Email mismatch (user has different email) | 400 "Email mismatch" | None |
 | Database error | 500 Internal Error | None (no partial state) |
+
+---
+
+## 9. Unlink Google (Account Unlinking)
+
+**Trigger:** User with Google linked AND password set clicks "Disconnect" in Security Settings and confirms
+**Endpoint:** `POST /api/v1/auth/unlink-google` (authenticated)
+**Source:** `domain/auth/auth.go`, `handlers/auth.go`
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant SPA as Next.js SPA
+    participant Handler as AuthHandler
+    participant AuthMW as AuthMiddleware
+    participant Auth as AuthService
+    participant Redis
+    participant DB as PostgreSQL
+
+    Browser->>SPA: Click "Disconnect" button
+    Note over SPA: Button only enabled when hasPassword=true<br/>(client-side UX guard)
+    SPA->>SPA: Show DisconnectGoogleDialog
+
+    Browser->>SPA: Confirm dialog
+    SPA->>Handler: POST /api/v1/auth/unlink-google
+    Handler->>AuthMW: Validate JWT
+    AuthMW-->>Handler: user_id from context
+
+    Handler->>Handler: ParseToken(token) → sessionID
+    activate Auth
+    Handler->>Auth: UnlinkGoogle(ctx, userID, sessionID)
+
+    Auth->>DB: SELECT * FROM user WHERE id = userID
+    DB-->>Auth: User record
+
+    Auth->>Auth: Check AuthProvider contains "google"
+    alt Google not linked
+        Auth-->>Handler: 400 "Google account is not linked"
+        Handler-->>SPA: Error in dialog
+    end
+
+    Auth->>Auth: Check PasswordHash != ""
+    alt No password set (server-side guard)
+        Auth-->>Handler: 400 "Please set a password before disconnecting Google"
+        Handler-->>SPA: Error in dialog
+    end
+
+    Auth->>DB: UPDATE user SET auth_provider = stripped_value
+    DB-->>Auth: OK
+
+    Note over Auth,Redis: Revoke all OTHER sessions (best-effort)
+    Auth->>Redis: SMembers(session:user:{userID})
+    loop Each session except current
+        Auth->>Redis: SRem + Del session_meta + Del session_token
+    end
+    Auth->>DB: DELETE sessions WHERE user_id=? AND session_id != currentSessionID
+    deactivate Auth
+
+    Auth-->>Handler: {success: true, message: "Google account disconnected successfully"}
+    Handler-->>SPA: 200 OK
+
+    SPA->>SPA: Close dialog
+    SPA->>SPA: toast.success("Google account disconnected")
+    SPA->>SPA: Invalidate useQueryGetAuthMethods cache
+    SPA-->>Browser: AuthMethodsCard refreshes — Google row shows "Not linked"
+```
+
+### Key Invariants
+
+- Server-side password guard is authoritative — client-side disabled button is UX only
+- userID always from JWT context, never from request body
+- AuthProvider stripping handles all valid formats: `"google+password"` → `"password"`, `"password+google"` → `"password"`
+- DB update applies BEFORE session revocation — no partial state if revocation partially fails
+- Session revocation is best-effort (failures logged); consistent with ChangePassword pattern
+- Current session preserved — user stays logged in after disconnecting Google
+
+### Error Paths
+
+| Condition | Response | Effect on State |
+|-----------|----------|-----------------|
+| Not authenticated | 401 Unauthorized | No change |
+| Invalid token in ParseToken | 401 Invalid token | No change |
+| Google not linked | 400 "Google account is not linked" | No change |
+| No password set (server guard) | 400 "Please set a password..." | No change |
+| Database update fails | 500 Internal Error | No change |
+| Redis session revocation partially fails | Warning logged | Some other sessions may remain active |

@@ -195,6 +195,7 @@ type ErrorCodes struct {
 	AuthLoginFailed        string
 	AuthLogoutFailed       string
 	AuthRegistrationFailed string
+	AuthGoogleNotLinked    string
 
 	// Forbidden Errors (403)
 	AuthAdminRequired         string
@@ -437,6 +438,7 @@ var Codes = ErrorCodes{
 	AuthLoginFailed:        "AUTH_LOGIN_FAILED",
 	AuthLogoutFailed:       "AUTH_LOGOUT_FAILED",
 	AuthRegistrationFailed: "AUTH_REGISTRATION_FAILED",
+	AuthGoogleNotLinked:    "AUTH_GOOGLE_NOT_LINKED",
 
 	// Forbidden Errors (403)
 	AuthAdminRequired:        "AUTH_ADMIN_REQUIRED",
