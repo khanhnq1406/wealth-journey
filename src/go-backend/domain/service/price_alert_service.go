@@ -20,6 +20,7 @@ import (
 
 type priceAlertService struct {
 	assetPriceSvc AssetPriceService
+	configSvc     AssetDisplayConfigService
 	notifRepo     repository.NotificationRepository
 	userRepo      repository.UserRepository
 	redisClient   *pkgredis.RedisClient
@@ -42,9 +43,11 @@ func NewPriceAlertService(
 	userRepo repository.UserRepository,
 	rdb *pkgredis.RedisClient,
 	pushSvc PushService,
+	configSvc AssetDisplayConfigService,
 ) PriceAlertService {
 	return &priceAlertService{
 		assetPriceSvc: assetPriceSvc,
+		configSvc:     configSvc,
 		notifRepo:     notifRepo,
 		userRepo:      userRepo,
 		redisClient:   rdb,

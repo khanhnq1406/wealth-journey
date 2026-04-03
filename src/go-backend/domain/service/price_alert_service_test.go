@@ -178,6 +178,97 @@ func (m *mockPAPushSvc) GetVAPIDPublicKey() string {
 	return args.String(0)
 }
 
+type mockPAConfigSvc struct {
+	mock.Mock
+}
+
+func (m *mockPAConfigSvc) GetDisplayPrices(ctx context.Context, assetType string) ([]*AssetDisplayPriceDTO, error) {
+	args := m.Called(ctx, assetType)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*AssetDisplayPriceDTO), args.Error(1)
+}
+
+func (m *mockPAConfigSvc) ListAll(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
+	args := m.Called(ctx, assetType)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*models.AssetDisplayConfig), args.Error(1)
+}
+
+func (m *mockPAConfigSvc) Create(ctx context.Context, typeCode, displayName, assetType string, displayOrder int32, enabled, showInInvestment bool) (*models.AssetDisplayConfig, error) {
+	args := m.Called(ctx, typeCode, displayName, assetType, displayOrder, enabled, showInInvestment)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.AssetDisplayConfig), args.Error(1)
+}
+
+func (m *mockPAConfigSvc) Update(ctx context.Context, id int32, displayName string, displayOrder int32, enabled, showInInvestment bool) (*models.AssetDisplayConfig, error) {
+	args := m.Called(ctx, id, displayName, displayOrder, enabled, showInInvestment)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.AssetDisplayConfig), args.Error(1)
+}
+
+func (m *mockPAConfigSvc) Delete(ctx context.Context, id int32) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
+func (m *mockPAConfigSvc) ResolvePrice(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
+	args := m.Called(ctx, typeCode, assetType)
+	return args.Get(0).(int64), args.Get(1).(int64), args.Bool(2), args.Error(3)
+}
+
+func (m *mockPAConfigSvc) ListFetchCodes(ctx context.Context, configID int32) ([]*models.AssetConfigFetchCode, error) {
+	args := m.Called(ctx, configID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*models.AssetConfigFetchCode), args.Error(1)
+}
+
+func (m *mockPAConfigSvc) CreateFetchCode(ctx context.Context, configID int32, typeCode string, priority int32) (*models.AssetConfigFetchCode, error) {
+	args := m.Called(ctx, configID, typeCode, priority)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.AssetConfigFetchCode), args.Error(1)
+}
+
+func (m *mockPAConfigSvc) UpdateFetchCode(ctx context.Context, id int32, priority int32) (*models.AssetConfigFetchCode, error) {
+	args := m.Called(ctx, id, priority)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.AssetConfigFetchCode), args.Error(1)
+}
+
+func (m *mockPAConfigSvc) DeleteFetchCode(ctx context.Context, id int32) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
+func (m *mockPAConfigSvc) ListForInvestment(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
+	args := m.Called(ctx, assetType)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*models.AssetDisplayConfig), args.Error(1)
+}
+
+func (m *mockPAConfigSvc) ListAvailableTypeCodes(ctx context.Context, assetType string) ([]string, error) {
+	args := m.Called(ctx, assetType)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]string), args.Error(1)
+}
+
 // ---------------------------------------------------------------------------
 // Helper: create a PriceAlertService backed by an in-memory Redis (miniredis).
 // Returns the service, the miniredis server (for pre-seeding keys), and a
@@ -190,6 +281,7 @@ func newPriceAlertServiceWithMiniredis(
 	notifRepo repository.NotificationRepository,
 	userRepo repository.UserRepository,
 	pushSvc PushService,
+	configSvc AssetDisplayConfigService,
 ) (PriceAlertService, *miniredis.Miniredis) {
 	t.Helper()
 
@@ -206,7 +298,7 @@ func newPriceAlertServiceWithMiniredis(
 
 	rdb := pkgredis.NewFromClient(redisClient)
 
-	svc := NewPriceAlertService(assetPriceSvc, notifRepo, userRepo, rdb, pushSvc)
+	svc := NewPriceAlertService(assetPriceSvc, notifRepo, userRepo, rdb, pushSvc, configSvc)
 	return svc, mr
 }
 
@@ -245,7 +337,8 @@ func TestPriceAlertService_FirstRun_SetsBaselines(t *testing.T) {
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	configSvc := new(mockPAConfigSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc, configSvc)
 	ctx := context.Background()
 
 	goldPrices := []*AssetPriceDTO{
@@ -284,8 +377,9 @@ func TestPriceAlertService_SignificantChange_TriggersAlert(t *testing.T) {
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
+	configSvc := new(mockPAConfigSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc, configSvc)
 	ctx := context.Background()
 
 	// Baseline: 8,500,000,000 VND. New price is ~3% higher → should trigger.
@@ -346,8 +440,9 @@ func TestPriceAlertService_BelowThreshold_NoAlert(t *testing.T) {
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
+	configSvc := new(mockPAConfigSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc, configSvc)
 	ctx := context.Background()
 
 	// Baseline: 8,500,000,000. New price is ~0.5% higher → below 2% threshold.
@@ -382,8 +477,9 @@ func TestPriceAlertService_Cooldown_SkipsAlert(t *testing.T) {
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
+	configSvc := new(mockPAConfigSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc, configSvc)
 	ctx := context.Background()
 
 	// Set baseline and a large price change (3%)
@@ -423,8 +519,9 @@ func TestPriceAlertService_GoldFetchError_ContinuesToSilver(t *testing.T) {
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
+	configSvc := new(mockPAConfigSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc, configSvc)
 	ctx := context.Background()
 
 	// Silver: 3% change above threshold
@@ -461,8 +558,9 @@ func TestPriceAlertService_NoUsers_NoNotifications(t *testing.T) {
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
+	configSvc := new(mockPAConfigSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc, configSvc)
 	ctx := context.Background()
 
 	baselinePrice := int64(8_500_000_000)
@@ -509,8 +607,9 @@ func TestPriceAlertService_ForceCheck_AlwaysSendsAlert(t *testing.T) {
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
+	configSvc := new(mockPAConfigSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc, configSvc)
 	ctx := context.Background()
 
 	// Set baseline with only 0.5% change — below threshold for normal check
@@ -569,8 +668,9 @@ func TestPriceAlertService_ForceCheck_RateLimit(t *testing.T) {
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
+	configSvc := new(mockPAConfigSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc, configSvc)
 	ctx := context.Background()
 
 	setBaseline(mr, "SJL1L10", 8_500_000_000)
@@ -607,8 +707,9 @@ func TestPriceAlertService_ForceCheck_NoBaseline_StillSendsAlert(t *testing.T) {
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
+	configSvc := new(mockPAConfigSvc)
 
-	svc, _ := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	svc, _ := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc, configSvc)
 	ctx := context.Background()
 
 	// NO baseline set — first run scenario
@@ -659,8 +760,9 @@ func TestPriceAlertService_ForceCheck_SilverUSD_IncludedInAlert(t *testing.T) {
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
+	configSvc := new(mockPAConfigSvc)
 
-	svc, _ := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	svc, _ := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc, configSvc)
 	ctx := context.Background()
 
 	// Gold: empty (we only care about silver_usd here)
@@ -719,8 +821,9 @@ func TestPriceAlertService_StaleGoldPrices_NoAlert(t *testing.T) {
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
+	configSvc := new(mockPAConfigSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc, configSvc)
 	ctx := context.Background()
 
 	// Set baseline and a large price change — but price is stale
@@ -759,8 +862,9 @@ func TestPriceAlertService_PartialStale_NonStaleFiresAlert(t *testing.T) {
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
+	configSvc := new(mockPAConfigSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc, configSvc)
 	ctx := context.Background()
 
 	// Gold: stale — significant price change should be ignored
@@ -815,8 +919,9 @@ func TestPriceAlertService_ForceCheck_StaleSkipped(t *testing.T) {
 	notifRepo := new(mockPANotifRepo)
 	userRepo := new(mockPAUserRepo)
 	pushSvc := new(mockPAPushSvc)
+	configSvc := new(mockPAConfigSvc)
 
-	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc)
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc, configSvc)
 	ctx := context.Background()
 
 	// Set a baseline — force check would normally fire but price is stale

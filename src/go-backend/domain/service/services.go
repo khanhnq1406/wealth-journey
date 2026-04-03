@@ -124,7 +124,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	// Phase 1 (cont.): PriceAlertService — reads from DB cache via AssetPriceService
 	var priceAlertSvc PriceAlertService
 	if rdb != nil {
-		priceAlertSvc = NewPriceAlertService(assetPriceSvc, repos.Notification, repos.User, rdb, pushSvc)
+		priceAlertSvc = NewPriceAlertService(assetPriceSvc, repos.Notification, repos.User, rdb, pushSvc, assetDisplayConfigSvc)
 	}
 
 	// Phase 1 (cont.): WatchlistService — reads from DB cache via AssetPriceService
