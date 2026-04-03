@@ -7,17 +7,17 @@
 - **Spec file:** `docs/specs/2026-04-02-enhance-ui-admin-gold-config-spec.md`
 - **Started:** 2026-04-03T00:00:00Z
 - **Last updated:** 2026-04-03T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 2 and 3 (parallel)
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | #   | Task Name                                          | Status      | Commit | Summary |
 | --- | -------------------------------------------------- | ----------- | ------ | ------- |
 | 1   | i18n — Add goldConfig tab key                      | done        | 06fa33a6 | Added goldConfig key to en/vi admin.json, replaced hardcoded tab label |
-| 2   | AssetDisplayConfigTable — drag-and-drop reorder    | pending     | —      | —       |
-| 3   | FetchCodeList — drag-and-drop priority reorder     | pending     | —      | —       |
-| 4   | Flow diagram update                                | pending     | —      | —       |
+| 2   | AssetDisplayConfigTable — drag-and-drop reorder    | done        | 4d31841a | Replaced MobileTable with SortableList; handleReorder with Promise.all PUT calls |
+| 3   | FetchCodeList — drag-and-drop priority reorder     | done        | 34d2b5a2 | Replaced static rows with SortableList; handleReorder with parallel PUT + fc.priority display |
+| 4   | Flow diagram update                                | done        | pending | Added section 17 with sequenceDiagram + invariants + error paths to flow-cross-cutting.md |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
