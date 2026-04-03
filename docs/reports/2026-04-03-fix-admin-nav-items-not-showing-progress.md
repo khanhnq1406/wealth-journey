@@ -14,7 +14,7 @@
 
 | #   | Task Name                                                | Status      | Commit | Summary |
 | --- | -------------------------------------------------------- | ----------- | ------ | ------- |
-| 1   | Replace store.subscribe with useSelector in DashboardLayout | done        | TBD    | Replaced store.subscribe + useState with useSelector; added admin-nav test; updated fab-loading and guide tests with react-redux mock |
+| 1   | Replace store.subscribe with useSelector in DashboardLayout | done        | 9b52d6bc | Replaced store.subscribe + useState with useSelector; added admin-nav test; updated fab-loading and guide tests with react-redux mock |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
