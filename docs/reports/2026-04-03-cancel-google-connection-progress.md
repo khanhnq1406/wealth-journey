@@ -20,7 +20,7 @@
 | 3     | Backend — UnlinkGoogle Handler and Route    | done        | 0d9b4777 | UnlinkGoogle handler in auth.go + POST /unlink-google route; 3 passing handler tests |
 | 4+5   | Frontend — i18n Keys + Error Mapper         | done        | 9371d23f | 9 i18n keys (en+vi); mapUnlinkGoogleError with 13-test suite; TS compiles clean |
 | 6+7   | Frontend — DisconnectGoogleDialog + Card    | done        | 8244dede | DisconnectGoogleDialog + Disconnect button in AuthMethodsCard; 8 tests passing; TS clean; fixed color token violations |
-| 8     | Update Runtime Flow Diagram (flow-auth.md)  | done        | —      | Added §9 Unlink Google sequence diagram with key invariants and error paths to flow-auth.md |
+| 8     | Update Runtime Flow Diagram (flow-auth.md)  | done        | 6231ee11 | Added §9 Unlink Google sequence diagram with key invariants and error paths to flow-auth.md |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 

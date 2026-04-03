@@ -11,22 +11,21 @@ kanban-plugin: board
 
 ## Spec
 
-- [ ] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
-
 
 
 ## Plan
 
+- [ ] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
 - [ ] [[2026-04-02-improve-mobile-tab-overflow|Improve all tab selection]]
 
 
 ## Implement
 
-- [ ] [[2026-04-02-cancel-google-connection|Cancel Google connection]]
 
 
 ## Review
 
+- [ ] [[2026-04-02-cancel-google-connection|Cancel Google connection]]
 - [ ] [[2026-04-03-add-cors-allow-from-backend|Add CORS allow from the backend to prevent other clients get api data]]
 - [ ] [[2026-04-03-fix-dashboard-navbar-cannot-scroll-in-desktop-view|Fix dashboard navbar cannot scroll in desktop view]]
 
