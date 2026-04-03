@@ -59,6 +59,22 @@ Both tasks passed Stage 3 (APPROVED). Key strengths noted by reviewers:
 
 None. The pre-existing `console.error` about `act()` in `AssetDisplayConfigForm` tests is caused by `FormNumberInput`'s `queueMicrotask` pattern (introduced before this feature) and does not affect test correctness.
 
+## Fix History
+
+| Date       | Fix                                                       | Severity | Tests        |
+| ---------- | --------------------------------------------------------- | -------- | ------------ |
+| 2026-04-03 | Add "Currency" to asset type selector in create form; fix displayOrder not updating when switching asset type inside the form | Minor | 19/19 pass |
+
+### Fix 2026-04-03 — Details
+
+**Issues fixed:**
+1. Asset type toggle in create form only showed Gold and Silver — Currency was missing. Fixed by adding `"currency"` to the `["gold", "silver", "currency"]` array in `AssetDisplayConfigForm.tsx`.
+2. `displayOrder` did not update when switching from Gold → Silver → Currency inside the create form. Root cause: `nextDisplayOrder` was computed by the parent (`AssetDisplayConfigTable`) based on its `activeTab`, which doesn't change when the user switches types inside the form. Fixed by adding an internal `useQuery` inside `AssetDisplayConfigForm` (create mode only) that fetches configs for the currently `selectedAssetType` and computes `max(displayOrders) + 1` via `useMemo`. The query uses the same React Query cache key as the table, so no redundant network calls when that type was already loaded.
+
+**Files changed:**
+- `src/wj-client/features/admin/components/AssetDisplayConfigForm.tsx` — add `"currency"` to type array; add `useQuery` + `useMemo` for per-type `computedNextDisplayOrder`; replace prop-driven `useEffect` with computed-value-driven one
+- `src/wj-client/features/admin/components/__tests__/AssetDisplayConfigForm.test.tsx` — update existing `nextDisplayOrder` prop tests to use `mockGet`; add 4 new tests (currency pill, currency submission, displayOrder updates on type switch, empty-list fallback)
+
 ## Files Changed
 
 | File | Change |
