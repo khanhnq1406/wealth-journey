@@ -213,3 +213,13 @@ All d=1 dependents tested and verified compatible.
 - **Modified:** `src/wj-client/components/navigation/__tests__/TabBar.test.tsx` — 3 new scroll hint tests
 - **Modified:** `src/wj-client/tests/e2e/tab-bar-keyboard-navigation.spec.ts` — 2 new E2E scroll hint tests
 - **Modified:** `docs/architecture/c4-component-frontend.md` — updated TabBar description
+
+---
+
+| Date       | Fix                                                                                                                                          | Severity | Tests                                           |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------- |
+| 2026-04-03 | (1) Add `gap-2` between tab items in underline variant tablist. (2) Replace plain text chevron buttons with gold circular buttons (`bg-v2-gold-primary/90`, `rounded-full`, `shadow-md`) with a wider gradient overlay (`w-14`, `via-v2-bg-surface/80`) for improved visibility. | Minor    | 21/21 TabBar tests pass; 0 regressions |
+
+### Files Changed
+
+- **Modified:** `src/wj-client/components/navigation/TabBar.tsx` — `gap-2` on underline tablist; chevron buttons restyled with gold circular background + shadow

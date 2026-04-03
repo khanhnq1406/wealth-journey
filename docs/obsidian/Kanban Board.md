@@ -24,14 +24,13 @@ kanban-plugin: board
 
 ## Review
 
-- [ ] [[2026-04-03-tab-bar-scroll-hint|TabBar scroll hint — gradient + chevron when tabs overflow]]
-- [ ] [[2026-04-02-improve-mobile-tab-overflow|Improve all tab selection]]
-
 
 
 ## Done
 
 **Complete**
+- [x] [[2026-04-02-improve-mobile-tab-overflow|Improve all tab selection]]
+- [x] [[2026-04-03-tab-bar-scroll-hint|TabBar scroll hint — gradient + chevron when tabs overflow]]
 - [x] [[2026-04-02-cancel-google-connection|Cancel Google connection]]
 - [x] [[2026-04-03-add-cors-allow-from-backend|Add CORS allow from the backend to prevent other clients get api data]]
 - [x] [[2026-04-02-fix-admin-nav-items-not-showing|Fix admin nav items not showing after login]]

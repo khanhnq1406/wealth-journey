@@ -111,7 +111,7 @@ export function TabBar<T extends string = string>({
         className
       )
     : cn(
-        "flex overflow-x-auto scrollbar-hide border-b border-v2-border-light",
+        "flex gap-2 px-1 overflow-x-auto scrollbar-hide border-b border-v2-border-light",
         className
       );
 
@@ -189,11 +189,11 @@ export function TabBar<T extends string = string>({
 
       {/* Left gradient + chevron */}
       {canScrollLeft && (
-        <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-v2-bg-surface to-transparent pointer-events-none flex items-center">
+        <div className="absolute inset-y-0 left-0 w-14 bg-gradient-to-r from-v2-bg-surface via-v2-bg-surface/80 to-transparent pointer-events-none flex items-center pl-1">
           <button
             aria-label="Scroll tabs left"
             tabIndex={-1}
-            className="pointer-events-auto min-h-[44px] min-w-[44px] flex items-center justify-center text-v2-gold-accent hover:text-v2-gold-primary transition-colors"
+            className="pointer-events-auto min-h-[32px] min-w-[32px] flex items-center justify-center text-v2-gold-accent hover:text-v2-bg-dark bg-v2-gold-primary/90 hover:bg-v2-gold-primary rounded-full shadow-md transition-colors"
             onClick={() =>
               scrollRef.current?.scrollBy({
                 left: -SCROLL_AMOUNT,
@@ -201,18 +201,18 @@ export function TabBar<T extends string = string>({
               })
             }
           >
-            <ChevronLeft size={16} aria-hidden="true" />
+            <ChevronLeft size={14} aria-hidden="true" />
           </button>
         </div>
       )}
 
       {/* Right gradient + chevron */}
       {canScrollRight && (
-        <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-v2-bg-surface to-transparent pointer-events-none flex items-center justify-end">
+        <div className="absolute inset-y-0 right-0 w-14 bg-gradient-to-l from-v2-bg-surface via-v2-bg-surface/80 to-transparent pointer-events-none flex items-center justify-end pr-1">
           <button
             aria-label="Scroll tabs right"
             tabIndex={-1}
-            className="pointer-events-auto min-h-[44px] min-w-[44px] flex items-center justify-center text-v2-gold-accent hover:text-v2-gold-primary transition-colors"
+            className="pointer-events-auto min-h-[32px] min-w-[32px] flex items-center justify-center text-v2-gold-accent hover:text-v2-bg-dark bg-v2-gold-primary/90 hover:bg-v2-gold-primary rounded-full shadow-md transition-colors"
             onClick={() =>
               scrollRef.current?.scrollBy({
                 left: SCROLL_AMOUNT,
@@ -220,7 +220,7 @@ export function TabBar<T extends string = string>({
               })
             }
           >
-            <ChevronRight size={16} aria-hidden="true" />
+            <ChevronRight size={14} aria-hidden="true" />
           </button>
         </div>
       )}
