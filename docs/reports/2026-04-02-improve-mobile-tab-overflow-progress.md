@@ -6,24 +6,24 @@
 - **Plan file:** `docs/plans/2026-04-02-improve-mobile-tab-overflow-plan.md`
 - **Spec file:** `docs/specs/2026-04-02-improve-mobile-tab-overflow-spec.md`
 - **Started:** 2026-04-03T00:00:00Z
-- **Last updated:** 2026-04-03T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** Task 0
+- **Last updated:** 2026-04-03T12:00:00Z
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | #   | Task Name                                     | Status     | Commit | Summary |
 | --- | --------------------------------------------- | ---------- | ------ | ------- |
 | 0   | Update C4 Architecture Diagram                | done       | b065e105 | Added TabBar Component entry to c4-component-frontend.md |
-| 1   | Create TabBar Component (TDD)                 | in_progress| —      | —       |
-| 2   | Refactor FinanceTabBar to wrap TabBar         | pending    | —      | —       |
-| 3   | Migrate InvestmentDetailModal Tabs            | pending    | —      | —       |
-| 4   | Migrate prices/page.tsx Tabs                  | pending    | —      | —       |
-| 5   | Migrate admin/page.tsx Tabs (fix text-bg typo)| pending    | —      | —       |
-| 6   | Migrate AssetDisplayConfigTable Tabs (pill)   | pending    | —      | —       |
-| 7   | Migrate ProfileTabs Component                 | pending    | —      | —       |
-| 8   | Migrate FollowingView Component (badge labels)| pending    | —      | —       |
-| 9   | Full Test Suite + Playwright E2E Audit        | pending    | —      | —       |
+| 1   | Create TabBar Component (TDD)                 | done       | d322a877 | Created TabBar.tsx + 14 unit tests all passing |
+| 2   | Refactor FinanceTabBar to wrap TabBar         | done       | 90cc465b | FinanceTabBar refactored to wrap TabBar; 4 tests pass |
+| 3   | Migrate InvestmentDetailModal Tabs            | done       | b530ecd5 | 4-tab inline block replaced; 11 tests pass |
+| 4   | Migrate prices/page.tsx Tabs                  | done       | efed4b77 | TABS mapped to TabBar; 31 tests pass |
+| 5   | Migrate admin/page.tsx Tabs (fix text-bg typo)| done       | c095ea01 | text-bg typo fixed via migration |
+| 6   | Migrate AssetDisplayConfigTable Tabs (pill)   | done       | 704e7318 | Pill variant migrated; 9 tests pass |
+| 7   | Migrate ProfileTabs Component                 | done       | 8b1ca520 | ProfileTabs migrated; 1 test pass |
+| 8   | Migrate FollowingView Component (badge labels)| done       | 87659d76 | Badge label React nodes; 1 test pass |
+| 9   | Full Test Suite + Playwright E2E Audit        | done       | (see report) | 803/809 unit tests pass, 0 lint errors, pre-existing E2E failures documented |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
