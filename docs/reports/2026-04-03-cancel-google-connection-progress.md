@@ -6,9 +6,9 @@
 - **Plan file:** `docs/plans/2026-04-03-cancel-google-connection-plan.md`
 - **Spec file:** `docs/specs/2026-04-03-cancel-google-connection-spec.md`
 - **Started:** 2026-04-03T00:00:00+07:00
-- **Last updated:** 2026-04-03T00:00:00+07:00
+- **Last updated:** 2026-04-03T12:00:00+07:00
 - **Current state:** in_progress
-- **Current task:** 6+7
+- **Current task:** 8
 
 ## Task Progress
 
@@ -18,8 +18,8 @@
 | 1     | Proto — Add UnlinkGoogle RPC and Messages   | done        | d52ea534 | Added UnlinkGoogle RPC + messages to auth.proto; restored missing GetAssetDisplayPrices RPC to investment.proto; both builds pass |
 | 2     | Backend — UnlinkGoogle Service Method       | done        | 80b2a85d | UnlinkGoogle method in auth.go with guards, provider strip, session revocation; 5 passing unit tests |
 | 3     | Backend — UnlinkGoogle Handler and Route    | done        | 0d9b4777 | UnlinkGoogle handler in auth.go + POST /unlink-google route; 3 passing handler tests |
-| 4+5   | Frontend — i18n Keys + Error Mapper         | done        | TBD    | 9 i18n keys (en+vi); mapUnlinkGoogleError with 13-test suite; TS compiles clean |
-| 6+7   | Frontend — DisconnectGoogleDialog + Card    | pending     | —      | —       |
+| 4+5   | Frontend — i18n Keys + Error Mapper         | done        | 9371d23f | 9 i18n keys (en+vi); mapUnlinkGoogleError with 13-test suite; TS compiles clean |
+| 6+7   | Frontend — DisconnectGoogleDialog + Card    | done        | —      | DisconnectGoogleDialog + Disconnect button in AuthMethodsCard; 8 tests passing; TS clean; fixed color token violations |
 | 8     | Update Runtime Flow Diagram (flow-auth.md)  | pending     | —      | —       |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
