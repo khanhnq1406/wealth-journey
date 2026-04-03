@@ -107,3 +107,35 @@ TypeScript: 0 errors (`npx tsc --noEmit`)
 2. **Auth domain direct DB access:** `domain/auth/auth.go` uses `s.db.DB` (GORM) directly — this is intentional and matches the existing pattern in this file (exception to the repository pattern for the auth domain).
 
 3. **Color token fixes (Task 6+7):** Reviewer caught two color violations. Both fixed before commit — pre-existing `bg-green-500/20 text-green-400` and newly introduced `hover:text-red-400 active:text-red-500`.
+
+---
+
+## Fix History
+
+| Date | Fix | Severity | Commit |
+|------|-----|----------|--------|
+| 2026-04-03 | Block Google login/register after unlink; remove silent auto-relink; stop leaking internal error messages; add `AUTH_GOOGLE_NOT_LINKED` error code with i18n (EN+VI) on login and register pages | Major | `974dc864` |
+
+### Fix Details (commit `974dc864`)
+
+**Root causes fixed:**
+
+1. `LoginWithDeviceInfo` never checked `AuthProvider` — after unlink, Google OAuth still issued a session. Fixed: added `!strings.Contains(user.AuthProvider, "google")` guard returning `NewGoogleNotLinkedError()`.
+2. `RegisterWithDevice` auto-relinked Google when `AuthProvider == "password"` — silently undid the unlink. Fixed: removed the auto-relink block; same guard applied.
+3. "user not found. Please register first" leaked through handler's `NewLoginErrorWithCause` wrapper. Fixed: replaced with generic `apperrors.NewUnauthorizedError("invalid credentials")`.
+4. Login/Register handlers wrapped `UnauthorizedError` in generic 500 error, discarding the specific code. Fixed: handlers now pass `UnauthorizedError` through directly.
+
+**UX choice (Option C):** When a user tries Google sign-in/register after unlinking, instead of a generic 401, they receive a specific `AUTH_GOOGLE_NOT_LINKED` code. The frontend maps this to a localized message:
+- 🇬🇧 "Google sign-in is not linked to this account. Please sign in with your password instead."
+- 🇻🇳 "Tài khoản Google chưa được liên kết. Vui lòng đăng nhập bằng mật khẩu."
+
+**Files changed:**
+- `src/go-backend/pkg/errors/codes.go` — added `AuthGoogleNotLinked`
+- `src/go-backend/pkg/errors/errors.go` — added `NewGoogleNotLinkedError()`
+- `src/go-backend/domain/auth/auth.go` — fixed `LoginWithDeviceInfo` + `RegisterWithDevice`
+- `src/go-backend/handlers/auth.go` — fixed Login/Register handlers
+- `src/wj-client/messages/en/auth.json` — added `googleNotLinked` in `login` + `register` namespaces
+- `src/wj-client/messages/vi/auth.json` — same in Vietnamese
+- `src/wj-client/features/auth/utils/error-mapper.ts` — added `mapGoogleLoginError()` (code-based)
+- `src/wj-client/app/[locale]/auth/login/page.tsx` — uses mapper
+- `src/wj-client/app/[locale]/auth/register/page.tsx` — uses mapper
