@@ -60,21 +60,14 @@ jest.mock("@/components/ActiveLink", () => ({
   ),
 }));
 
-// Auth utilities — use paths relative to the component being tested (from dashboard/ dir)
-// jest.mock paths are resolved from the test file location, so we use the full path
-jest.mock(
-  "/Users/admin/Desktop/khanh/workspace/Personal_Financial_Management/src/wj-client/app/[locale]/auth/utils/logout",
-  () => ({
-    logout: jest.fn(),
-  }),
-);
+// Auth utilities — use relative paths from the test file location
+jest.mock("../../auth/utils/logout", () => ({
+  logout: jest.fn(),
+}));
 
-jest.mock(
-  "/Users/admin/Desktop/khanh/workspace/Personal_Financial_Management/src/wj-client/app/[locale]/auth/utils/AuthCheck",
-  () => ({
-    AuthCheck: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  }),
-);
+jest.mock("../../auth/utils/AuthCheck", () => ({
+  AuthCheck: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
 
 // Redux store
 jest.mock("@/features/auth/store/store", () => ({
