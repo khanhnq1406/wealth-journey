@@ -139,9 +139,10 @@ func (s *Server) RegisterWithDevice(ctx context.Context, googleToken string, dev
 	// Check if user exists
 	result := s.db.DB.Where("email = ?", email).First(&user)
 	if result.Error == nil {
-		// User exists - auto-link Google if user registered with password only
-		if user.AuthProvider == "password" {
-			s.db.DB.Model(&user).Update("auth_provider", "google+password")
+		// User exists — Google must be an active auth provider.
+		// We do NOT auto-relink Google here; use LinkGoogle endpoint to reconnect.
+		if !strings.Contains(user.AuthProvider, "google") {
+			return nil, apperrors.NewGoogleNotLinkedError()
 		}
 		return s.generateLoginResponse(ctx, user, deviceInfo)
 	} else if result.Error != gorm.ErrRecordNotFound {
@@ -289,9 +290,14 @@ func (s *Server) LoginWithDeviceInfo(ctx context.Context, googleToken string, de
 	var user models.User
 	result := s.db.DB.Where("email = ?", email).First(&user)
 	if result.Error == gorm.ErrRecordNotFound {
-		return nil, fmt.Errorf("user not found. Please register first")
+		return nil, apperrors.NewUnauthorizedError("invalid credentials")
 	} else if result.Error != nil {
 		return nil, fmt.Errorf("database error: %w", result.Error)
+	}
+
+	// Guard: Google must be an active auth provider for this user
+	if !strings.Contains(user.AuthProvider, "google") {
+		return nil, apperrors.NewGoogleNotLinkedError()
 	}
 
 	// Generate response with device info

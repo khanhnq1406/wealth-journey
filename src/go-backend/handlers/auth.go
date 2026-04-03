@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"log"
 	"net/http"
 
@@ -40,6 +41,12 @@ func (h *AuthHandlers) Register(c *gin.Context) {
 
 	if err != nil {
 		log.Printf("[AUTH] Registration failed: %v", err)
+		// Preserve specific auth errors (e.g. AUTH_GOOGLE_NOT_LINKED) — don't wrap them.
+		var unauthorizedErr apperrors.UnauthorizedError
+		if errors.As(err, &unauthorizedErr) {
+			handler.HandleError(c, err)
+			return
+		}
 		handler.HandleError(c, apperrors.NewRegistrationErrorWithCause(err))
 		return
 	}
@@ -62,6 +69,12 @@ func (h *AuthHandlers) Login(c *gin.Context) {
 
 	if err != nil {
 		log.Printf("[AUTH] Login failed: %v", err)
+		// Preserve specific auth errors (e.g. AUTH_GOOGLE_NOT_LINKED) — don't wrap them.
+		var unauthorizedErr apperrors.UnauthorizedError
+		if errors.As(err, &unauthorizedErr) {
+			handler.HandleError(c, err)
+			return
+		}
 		handler.HandleError(c, apperrors.NewLoginErrorWithCause(err))
 		return
 	}
