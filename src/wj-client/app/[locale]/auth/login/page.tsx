@@ -10,6 +10,7 @@ import { Link, useRouter } from "@/lib/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useMutationLogin } from "@/utils/generated/hooks";
+import { mapGoogleLoginError } from "@/features/auth/utils/error-mapper";
 import { updateAuthTokenCache } from "@/utils/api-client";
 import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
 import { LoginPasswordForm } from "@/features/auth/forms/LoginPasswordForm";
@@ -24,7 +25,8 @@ export default function Login() {
   const login = useMutationLogin({
     onError(error) {
       console.error("Login error:", error);
-      setError(error.message || t("genericError"));
+      const i18nKey = mapGoogleLoginError(error.code);
+      setError(i18nKey ? t(i18nKey) : t("genericError"));
       setIsLoading(false);
     },
     onSuccess(data) {

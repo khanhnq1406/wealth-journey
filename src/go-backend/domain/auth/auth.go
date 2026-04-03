@@ -139,9 +139,10 @@ func (s *Server) RegisterWithDevice(ctx context.Context, googleToken string, dev
 	// Check if user exists
 	result := s.db.DB.Where("email = ?", email).First(&user)
 	if result.Error == nil {
-		// User exists - auto-link Google if user registered with password only
-		if user.AuthProvider == "password" {
-			s.db.DB.Model(&user).Update("auth_provider", "google+password")
+		// User exists — Google must be an active auth provider.
+		// We do NOT auto-relink Google here; use LinkGoogle endpoint to reconnect.
+		if !strings.Contains(user.AuthProvider, "google") {
+			return nil, apperrors.NewGoogleNotLinkedError()
 		}
 		return s.generateLoginResponse(ctx, user, deviceInfo)
 	} else if result.Error != gorm.ErrRecordNotFound {
@@ -158,6 +159,12 @@ func (s *Server) RegisterWithDevice(ctx context.Context, googleToken string, dev
 		if err := s.db.DB.Where("email = ?", email).First(&user).Error; err != nil {
 			return nil, fmt.Errorf("failed to retrieve created user: %w", err)
 		}
+
+		// CreateUser does not set AuthProvider — set it now so Google login works on subsequent sign-ins.
+		if err := s.db.DB.Model(&user).Update("auth_provider", "google").Error; err != nil {
+			return nil, fmt.Errorf("failed to set auth provider: %w", err)
+		}
+		user.AuthProvider = "google"
 	} else {
 		user = models.User{
 			Email:        &email,
@@ -289,9 +296,14 @@ func (s *Server) LoginWithDeviceInfo(ctx context.Context, googleToken string, de
 	var user models.User
 	result := s.db.DB.Where("email = ?", email).First(&user)
 	if result.Error == gorm.ErrRecordNotFound {
-		return nil, fmt.Errorf("user not found. Please register first")
+		return nil, apperrors.NewUnauthorizedError("invalid credentials")
 	} else if result.Error != nil {
 		return nil, fmt.Errorf("database error: %w", result.Error)
+	}
+
+	// Guard: Google must be an active auth provider for this user
+	if !strings.Contains(user.AuthProvider, "google") {
+		return nil, apperrors.NewGoogleNotLinkedError()
 	}
 
 	// Generate response with device info
@@ -789,6 +801,48 @@ func (s *Server) LinkGoogle(ctx context.Context, userID int32, googleToken strin
 	return &authv1.LinkGoogleResponse{
 		Success:   true,
 		Message:   "Google account linked successfully",
+		Timestamp: time.Now().Format(time.RFC3339),
+	}, nil
+}
+
+// UnlinkGoogle removes Google auth from a user's account.
+// Requires the user to have a password set to prevent lockout.
+// Revokes all sessions except the current one.
+func (s *Server) UnlinkGoogle(ctx context.Context, userID int32, currentSessionID string) (*authv1.UnlinkGoogleResponse, error) {
+	var user models.User
+	if err := s.db.DB.First(&user, userID).Error; err != nil {
+		return nil, fmt.Errorf("user not found: %w", err)
+	}
+
+	// Guard: Google must be linked
+	if !strings.Contains(user.AuthProvider, "google") {
+		return nil, apperrors.NewValidationError("Google account is not linked")
+	}
+
+	// Guard: Password must be set (prevent lockout)
+	if user.PasswordHash == "" {
+		return nil, apperrors.NewValidationError("Please set a password before disconnecting Google")
+	}
+
+	// Strip "google" (and any "+" separator) from AuthProvider.
+	// Handles all variants: "google+password" → "password", "password+google" → "password"
+	newProvider := strings.ReplaceAll(user.AuthProvider, "google+", "")
+	newProvider = strings.ReplaceAll(newProvider, "+google", "")
+	newProvider = strings.ReplaceAll(newProvider, "google", "")
+
+	if err := s.db.DB.Model(&user).Update("auth_provider", newProvider).Error; err != nil {
+		return nil, fmt.Errorf("failed to update auth provider: %w", err)
+	}
+
+	// Revoke all other sessions (best-effort, consistent with ChangePassword).
+	// DB is updated first; session revocation failure is non-fatal.
+	s.invalidateOtherSessions(userID, currentSessionID)
+
+	log.Printf("[AUTH] User %d unlinked Google account", userID)
+
+	return &authv1.UnlinkGoogleResponse{
+		Success:   true,
+		Message:   "Google account disconnected successfully",
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
 }

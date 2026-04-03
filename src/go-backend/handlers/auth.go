@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"log"
 	"net/http"
 
@@ -40,6 +41,12 @@ func (h *AuthHandlers) Register(c *gin.Context) {
 
 	if err != nil {
 		log.Printf("[AUTH] Registration failed: %v", err)
+		// Preserve specific auth errors (e.g. AUTH_GOOGLE_NOT_LINKED) — don't wrap them.
+		var unauthorizedErr apperrors.UnauthorizedError
+		if errors.As(err, &unauthorizedErr) {
+			handler.HandleError(c, err)
+			return
+		}
 		handler.HandleError(c, apperrors.NewRegistrationErrorWithCause(err))
 		return
 	}
@@ -47,7 +54,7 @@ func (h *AuthHandlers) Register(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// Login handles user login with Google OAuth
+// Login handles user login with Google OAuth — auto-registers new users on first sign-in.
 func (h *AuthHandlers) Login(c *gin.Context) {
 	var req struct {
 		Token string `json:"token" binding:"required"`
@@ -58,10 +65,16 @@ func (h *AuthHandlers) Login(c *gin.Context) {
 	}
 
 	deviceInfo := device.ExtractDeviceInfo(c)
-	result, err := h.authSrv.LoginWithDeviceInfo(c.Request.Context(), req.Token, deviceInfo)
+	result, err := h.authSrv.RegisterWithDevice(c.Request.Context(), req.Token, deviceInfo)
 
 	if err != nil {
 		log.Printf("[AUTH] Login failed: %v", err)
+		// Preserve specific auth errors (e.g. AUTH_GOOGLE_NOT_LINKED) — don't wrap them.
+		var unauthorizedErr apperrors.UnauthorizedError
+		if errors.As(err, &unauthorizedErr) {
+			handler.HandleError(c, err)
+			return
+		}
 		handler.HandleError(c, apperrors.NewLoginErrorWithCause(err))
 		return
 	}
@@ -294,6 +307,35 @@ func (h *AuthHandlers) LinkGoogle(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, result)
+}
+
+// UnlinkGoogle handles unlinking a Google account from an existing user
+func (h *AuthHandlers) UnlinkGoogle(c *gin.Context) {
+	userID, ok := handler.GetUserID(c)
+	if !ok {
+		handler.UnauthorizedWithPath(c, "User not authenticated")
+		return
+	}
+
+	// Extract session ID from JWT token (same as ChangePassword pattern)
+	token, ok := ExtractBearerToken(c)
+	if !ok {
+		return
+	}
+	claims, err := h.authSrv.ParseToken(token)
+	if err != nil {
+		handler.HandleError(c, apperrors.NewUnauthorizedErrorWithCode(apperrors.Codes.AuthInvalidToken, "invalid token"))
+		return
+	}
+
+	result, err := h.authSrv.UnlinkGoogle(c.Request.Context(), userID, claims.SessionID)
+	if err != nil {
+		log.Printf("[AUTH] Unlink Google failed: %v", err)
+		handler.HandleError(c, err)
+		return
+	}
+
+	handler.Success(c, result)
 }
 
 // GetAuth handles GET /auth - returns user information for authenticated user

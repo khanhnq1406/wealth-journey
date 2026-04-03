@@ -8004,7 +8004,7 @@ var file_protobuf_v1_investment_proto_rawDesc = []byte{
 	0x49, 0x56, 0x45, 0x10, 0x01, 0x12, 0x1a, 0x0a, 0x16, 0x41, 0x4c, 0x45, 0x52, 0x54, 0x5f, 0x53,
 	0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x54, 0x52, 0x49, 0x47, 0x47, 0x45, 0x52, 0x45, 0x44, 0x10,
 	0x02, 0x12, 0x17, 0x0a, 0x13, 0x41, 0x4c, 0x45, 0x52, 0x54, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55,
-	0x53, 0x5f, 0x50, 0x41, 0x55, 0x53, 0x45, 0x44, 0x10, 0x03, 0x32, 0xab, 0x24, 0x0a, 0x11, 0x49,
+	0x53, 0x5f, 0x50, 0x41, 0x55, 0x53, 0x45, 0x44, 0x10, 0x03, 0x32, 0xe9, 0x25, 0x0a, 0x11, 0x49,
 	0x6e, 0x76, 0x65, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
 	0x12, 0xac, 0x01, 0x0a, 0x0f, 0x4c, 0x69, 0x73, 0x74, 0x49, 0x6e, 0x76, 0x65, 0x73, 0x74, 0x6d,
 	0x65, 0x6e, 0x74, 0x73, 0x12, 0x33, 0x2e, 0x77, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x6a, 0x6f, 0x75,
@@ -8295,8 +8295,20 @@ var file_protobuf_v1_investment_proto_rawDesc = []byte{
 	0x73, 0x65, 0x72, 0x50, 0x72, 0x69, 0x63, 0x65, 0x41, 0x6c, 0x65, 0x72, 0x74, 0x52, 0x65, 0x73,
 	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x21, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x1b, 0x2a, 0x19, 0x2f,
 	0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x2f, 0x70, 0x72, 0x69, 0x63, 0x65, 0x2d, 0x61, 0x6c, 0x65,
-	0x72, 0x74, 0x73, 0x2f, 0x7b, 0x69, 0x64, 0x7d, 0x42, 0x0d, 0x5a, 0x0b, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x62, 0x75, 0x66, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x74, 0x73, 0x2f, 0x7b, 0x69, 0x64, 0x7d, 0x12, 0xbb, 0x01, 0x0a, 0x15, 0x47, 0x65, 0x74,
+	0x41, 0x73, 0x73, 0x65, 0x74, 0x44, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x50, 0x72, 0x69, 0x63,
+	0x65, 0x73, 0x12, 0x39, 0x2e, 0x77, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x6a, 0x6f, 0x75, 0x72, 0x6e,
+	0x65, 0x79, 0x2e, 0x69, 0x6e, 0x76, 0x65, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x76, 0x31,
+	0x2e, 0x47, 0x65, 0x74, 0x41, 0x73, 0x73, 0x65, 0x74, 0x44, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79,
+	0x50, 0x72, 0x69, 0x63, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x3a, 0x2e,
+	0x77, 0x65, 0x61, 0x6c, 0x74, 0x68, 0x6a, 0x6f, 0x75, 0x72, 0x6e, 0x65, 0x79, 0x2e, 0x69, 0x6e,
+	0x76, 0x65, 0x73, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x41,
+	0x73, 0x73, 0x65, 0x74, 0x44, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x50, 0x72, 0x69, 0x63, 0x65,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2b, 0x82, 0xd3, 0xe4, 0x93, 0x02,
+	0x25, 0x12, 0x23, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x2f, 0x70, 0x75, 0x62, 0x6c, 0x69,
+	0x63, 0x2f, 0x61, 0x73, 0x73, 0x65, 0x74, 0x2d, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x2d,
+	0x70, 0x72, 0x69, 0x63, 0x65, 0x73, 0x42, 0x0d, 0x5a, 0x0b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
+	0x75, 0x66, 0x2f, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -8523,34 +8535,36 @@ var file_protobuf_v1_investment_proto_depIdxs = []int32{
 	65,  // 110: wealthjourney.investment.v1.InvestmentService.ListUserPriceAlerts:input_type -> wealthjourney.investment.v1.ListUserPriceAlertsRequest
 	67,  // 111: wealthjourney.investment.v1.InvestmentService.UpdateUserPriceAlert:input_type -> wealthjourney.investment.v1.UpdateUserPriceAlertRequest
 	69,  // 112: wealthjourney.investment.v1.InvestmentService.DeleteUserPriceAlert:input_type -> wealthjourney.investment.v1.DeleteUserPriceAlertRequest
-	32,  // 113: wealthjourney.investment.v1.InvestmentService.ListInvestments:output_type -> wealthjourney.investment.v1.ListInvestmentsResponse
-	34,  // 114: wealthjourney.investment.v1.InvestmentService.GetInvestment:output_type -> wealthjourney.investment.v1.GetInvestmentResponse
-	36,  // 115: wealthjourney.investment.v1.InvestmentService.CreateInvestment:output_type -> wealthjourney.investment.v1.CreateInvestmentResponse
-	38,  // 116: wealthjourney.investment.v1.InvestmentService.UpdateInvestment:output_type -> wealthjourney.investment.v1.UpdateInvestmentResponse
-	40,  // 117: wealthjourney.investment.v1.InvestmentService.DeleteInvestment:output_type -> wealthjourney.investment.v1.DeleteInvestmentResponse
-	42,  // 118: wealthjourney.investment.v1.InvestmentService.AddInvestmentTransaction:output_type -> wealthjourney.investment.v1.AddTransactionResponse
-	44,  // 119: wealthjourney.investment.v1.InvestmentService.ListInvestmentTransactions:output_type -> wealthjourney.investment.v1.ListInvestmentTransactionsResponse
-	46,  // 120: wealthjourney.investment.v1.InvestmentService.EditInvestmentTransaction:output_type -> wealthjourney.investment.v1.EditInvestmentTransactionResponse
-	48,  // 121: wealthjourney.investment.v1.InvestmentService.DeleteInvestmentTransaction:output_type -> wealthjourney.investment.v1.DeleteInvestmentTransactionResponse
-	50,  // 122: wealthjourney.investment.v1.InvestmentService.GetPortfolioSummary:output_type -> wealthjourney.investment.v1.GetPortfolioSummaryResponse
-	52,  // 123: wealthjourney.investment.v1.InvestmentService.UpdatePrices:output_type -> wealthjourney.investment.v1.UpdatePricesResponse
-	55,  // 124: wealthjourney.investment.v1.InvestmentService.SearchSymbols:output_type -> wealthjourney.investment.v1.SearchSymbolsResponse
-	57,  // 125: wealthjourney.investment.v1.InvestmentService.ListUserInvestments:output_type -> wealthjourney.investment.v1.ListUserInvestmentsResponse
-	50,  // 126: wealthjourney.investment.v1.InvestmentService.GetAggregatedPortfolioSummary:output_type -> wealthjourney.investment.v1.GetPortfolioSummaryResponse
-	16,  // 127: wealthjourney.investment.v1.InvestmentService.GetGoldTypeCodes:output_type -> wealthjourney.investment.v1.GetGoldTypeCodesResponse
-	19,  // 128: wealthjourney.investment.v1.InvestmentService.GetSilverTypeCodes:output_type -> wealthjourney.investment.v1.GetSilverTypeCodesResponse
-	13,  // 129: wealthjourney.investment.v1.InvestmentService.GetHistoricalPortfolioValues:output_type -> wealthjourney.investment.v1.GetHistoricalPortfolioValuesResponse
-	21,  // 130: wealthjourney.investment.v1.InvestmentService.GetMarketPrice:output_type -> wealthjourney.investment.v1.GetMarketPriceResponse
-	24,  // 131: wealthjourney.investment.v1.InvestmentService.GetMarketPrices:output_type -> wealthjourney.investment.v1.GetMarketPricesResponse
-	28,  // 132: wealthjourney.investment.v1.InvestmentService.GetGoldChart:output_type -> wealthjourney.investment.v1.GetGoldChartResponse
-	30,  // 133: wealthjourney.investment.v1.InvestmentService.GetSilverChart:output_type -> wealthjourney.investment.v1.GetSilverChartResponse
-	61,  // 134: wealthjourney.investment.v1.InvestmentService.GetPublicMarketTypes:output_type -> wealthjourney.investment.v1.GetPublicMarketTypesResponse
-	64,  // 135: wealthjourney.investment.v1.InvestmentService.CreateUserPriceAlert:output_type -> wealthjourney.investment.v1.CreateUserPriceAlertResponse
-	66,  // 136: wealthjourney.investment.v1.InvestmentService.ListUserPriceAlerts:output_type -> wealthjourney.investment.v1.ListUserPriceAlertsResponse
-	68,  // 137: wealthjourney.investment.v1.InvestmentService.UpdateUserPriceAlert:output_type -> wealthjourney.investment.v1.UpdateUserPriceAlertResponse
-	70,  // 138: wealthjourney.investment.v1.InvestmentService.DeleteUserPriceAlert:output_type -> wealthjourney.investment.v1.DeleteUserPriceAlertResponse
-	113, // [113:139] is the sub-list for method output_type
-	87,  // [87:113] is the sub-list for method input_type
+	72,  // 113: wealthjourney.investment.v1.InvestmentService.GetAssetDisplayPrices:input_type -> wealthjourney.investment.v1.GetAssetDisplayPricesRequest
+	32,  // 114: wealthjourney.investment.v1.InvestmentService.ListInvestments:output_type -> wealthjourney.investment.v1.ListInvestmentsResponse
+	34,  // 115: wealthjourney.investment.v1.InvestmentService.GetInvestment:output_type -> wealthjourney.investment.v1.GetInvestmentResponse
+	36,  // 116: wealthjourney.investment.v1.InvestmentService.CreateInvestment:output_type -> wealthjourney.investment.v1.CreateInvestmentResponse
+	38,  // 117: wealthjourney.investment.v1.InvestmentService.UpdateInvestment:output_type -> wealthjourney.investment.v1.UpdateInvestmentResponse
+	40,  // 118: wealthjourney.investment.v1.InvestmentService.DeleteInvestment:output_type -> wealthjourney.investment.v1.DeleteInvestmentResponse
+	42,  // 119: wealthjourney.investment.v1.InvestmentService.AddInvestmentTransaction:output_type -> wealthjourney.investment.v1.AddTransactionResponse
+	44,  // 120: wealthjourney.investment.v1.InvestmentService.ListInvestmentTransactions:output_type -> wealthjourney.investment.v1.ListInvestmentTransactionsResponse
+	46,  // 121: wealthjourney.investment.v1.InvestmentService.EditInvestmentTransaction:output_type -> wealthjourney.investment.v1.EditInvestmentTransactionResponse
+	48,  // 122: wealthjourney.investment.v1.InvestmentService.DeleteInvestmentTransaction:output_type -> wealthjourney.investment.v1.DeleteInvestmentTransactionResponse
+	50,  // 123: wealthjourney.investment.v1.InvestmentService.GetPortfolioSummary:output_type -> wealthjourney.investment.v1.GetPortfolioSummaryResponse
+	52,  // 124: wealthjourney.investment.v1.InvestmentService.UpdatePrices:output_type -> wealthjourney.investment.v1.UpdatePricesResponse
+	55,  // 125: wealthjourney.investment.v1.InvestmentService.SearchSymbols:output_type -> wealthjourney.investment.v1.SearchSymbolsResponse
+	57,  // 126: wealthjourney.investment.v1.InvestmentService.ListUserInvestments:output_type -> wealthjourney.investment.v1.ListUserInvestmentsResponse
+	50,  // 127: wealthjourney.investment.v1.InvestmentService.GetAggregatedPortfolioSummary:output_type -> wealthjourney.investment.v1.GetPortfolioSummaryResponse
+	16,  // 128: wealthjourney.investment.v1.InvestmentService.GetGoldTypeCodes:output_type -> wealthjourney.investment.v1.GetGoldTypeCodesResponse
+	19,  // 129: wealthjourney.investment.v1.InvestmentService.GetSilverTypeCodes:output_type -> wealthjourney.investment.v1.GetSilverTypeCodesResponse
+	13,  // 130: wealthjourney.investment.v1.InvestmentService.GetHistoricalPortfolioValues:output_type -> wealthjourney.investment.v1.GetHistoricalPortfolioValuesResponse
+	21,  // 131: wealthjourney.investment.v1.InvestmentService.GetMarketPrice:output_type -> wealthjourney.investment.v1.GetMarketPriceResponse
+	24,  // 132: wealthjourney.investment.v1.InvestmentService.GetMarketPrices:output_type -> wealthjourney.investment.v1.GetMarketPricesResponse
+	28,  // 133: wealthjourney.investment.v1.InvestmentService.GetGoldChart:output_type -> wealthjourney.investment.v1.GetGoldChartResponse
+	30,  // 134: wealthjourney.investment.v1.InvestmentService.GetSilverChart:output_type -> wealthjourney.investment.v1.GetSilverChartResponse
+	61,  // 135: wealthjourney.investment.v1.InvestmentService.GetPublicMarketTypes:output_type -> wealthjourney.investment.v1.GetPublicMarketTypesResponse
+	64,  // 136: wealthjourney.investment.v1.InvestmentService.CreateUserPriceAlert:output_type -> wealthjourney.investment.v1.CreateUserPriceAlertResponse
+	66,  // 137: wealthjourney.investment.v1.InvestmentService.ListUserPriceAlerts:output_type -> wealthjourney.investment.v1.ListUserPriceAlertsResponse
+	68,  // 138: wealthjourney.investment.v1.InvestmentService.UpdateUserPriceAlert:output_type -> wealthjourney.investment.v1.UpdateUserPriceAlertResponse
+	70,  // 139: wealthjourney.investment.v1.InvestmentService.DeleteUserPriceAlert:output_type -> wealthjourney.investment.v1.DeleteUserPriceAlertResponse
+	73,  // 140: wealthjourney.investment.v1.InvestmentService.GetAssetDisplayPrices:output_type -> wealthjourney.investment.v1.GetAssetDisplayPricesResponse
+	114, // [114:141] is the sub-list for method output_type
+	87,  // [87:114] is the sub-list for method input_type
 	87,  // [87:87] is the sub-list for extension type_name
 	87,  // [87:87] is the sub-list for extension extendee
 	0,   // [0:87] is the sub-list for field type_name

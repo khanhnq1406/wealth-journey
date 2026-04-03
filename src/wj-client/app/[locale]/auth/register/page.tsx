@@ -10,6 +10,7 @@ import { Link, useRouter } from "@/lib/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useMutationRegister } from "@/utils/generated/hooks";
+import { mapGoogleLoginError } from "@/features/auth/utils/error-mapper";
 import { updateAuthTokenCache } from "@/utils/api-client";
 import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
 import { RegisterPasswordForm } from "@/features/auth/forms/RegisterPasswordForm";
@@ -25,7 +26,8 @@ export default function Register() {
   const register = useMutationRegister({
     onError(error) {
       console.error("Registration error:", error);
-      setError(error.message || t("registrationFailed"));
+      const i18nKey = mapGoogleLoginError(error.code);
+      setError(i18nKey ? t(i18nKey) : t("registrationFailed"));
       setIsLoading(false);
     },
     onSuccess(data) {

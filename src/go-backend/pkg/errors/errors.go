@@ -311,6 +311,14 @@ func NewLoginErrorWithCause(cause error) LoginError {
 	}
 }
 
+// NewGoogleNotLinkedError returns a 401 error with a specific code so the
+// frontend can display a localized "please use password login" message.
+func NewGoogleNotLinkedError() UnauthorizedError {
+	return UnauthorizedError{
+		BaseError: NewError(Codes.AuthGoogleNotLinked, "Google sign-in is not linked to this account", http.StatusUnauthorized),
+	}
+}
+
 // LogoutError represents a logout failure.
 type LogoutError struct {
 	BaseError
