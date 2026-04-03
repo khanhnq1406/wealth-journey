@@ -392,7 +392,7 @@ export default function AdminCMSPage() {
     { id: "users", label: t("page.tabs.users") },
     { id: "feedback", label: t("page.tabs.feedback") },
     { id: "notifications", label: t("page.tabs.notifications") },
-    { id: "gold-config", label: "Gold Config" },
+    { id: "gold-config", label: t("page.tabs.goldConfig") },
   ];
 
   const handleTabChange = (tab: AdminTab) => {
