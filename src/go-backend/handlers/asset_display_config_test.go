@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	apperrors "wealthjourney/pkg/errors"
 	"wealthjourney/domain/models"
 	"wealthjourney/domain/service"
 )
@@ -491,6 +492,63 @@ func TestAssetDisplayConfig_Delete_ServiceError(t *testing.T) {
 	w := runDeleteAsset(h, "3")
 
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
+}
+
+// ---------------------------------------------------------------------------
+// Guard error propagation tests
+// ---------------------------------------------------------------------------
+
+// TestAssetDisplayConfig_Update_Returns400_WhenDisableGuardBlocks verifies that
+// when the service returns a ValidationError (guard blocks disabling a config in
+// use by active investments), the Update handler propagates it as HTTP 400.
+func TestAssetDisplayConfig_Update_Returns400_WhenDisableGuardBlocks(t *testing.T) {
+	mockSvc := &mockAssetDisplayConfigService{
+		updateFunc: func(ctx context.Context, id int32, displayName string, displayOrder int32, enabled, showInInvestment bool) (*models.AssetDisplayConfig, error) {
+			// Simulate guard: service rejects disabling an asset type that has active investments.
+			return nil, apperrors.NewValidationError("Cannot disable: 3 active investment(s) use asset type SJL1L10")
+		},
+	}
+
+	h := newTestAssetDisplayConfigHandler(mockSvc)
+	w := runUpdateAsset(h, "1", `{"displayName":"SJC 1L-10L","displayOrder":1,"enabled":false,"showInInvestment":true}`)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	var body map[string]interface{}
+	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
+
+	assert.Equal(t, false, body["success"])
+
+	errObj, ok := body["error"].(map[string]interface{})
+	require.True(t, ok, "error field should be an object")
+	assert.Contains(t, errObj["message"], "Cannot disable")
+}
+
+// TestAssetDisplayConfig_Delete_Returns400_WhenDeleteGuardBlocks verifies that
+// when the service returns a ValidationError (guard blocks deleting a config
+// whose asset type is still referenced by active investments), the Delete handler
+// propagates it as HTTP 400.
+func TestAssetDisplayConfig_Delete_Returns400_WhenDeleteGuardBlocks(t *testing.T) {
+	mockSvc := &mockAssetDisplayConfigService{
+		deleteFunc: func(ctx context.Context, id int32) error {
+			// Simulate guard: service rejects deleting an asset type with active investments.
+			return apperrors.NewValidationError("Cannot delete: 2 active investment(s) use asset type XAU")
+		},
+	}
+
+	h := newTestAssetDisplayConfigHandler(mockSvc)
+	w := runDeleteAsset(h, "2")
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	var body map[string]interface{}
+	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &body))
+
+	assert.Equal(t, false, body["success"])
+
+	errObj, ok := body["error"].(map[string]interface{})
+	require.True(t, ok, "error field should be an object")
+	assert.Contains(t, errObj["message"], "Cannot delete")
 }
 
 // ---------------------------------------------------------------------------
