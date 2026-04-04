@@ -14,7 +14,6 @@ kanban-plugin: board
 
 ## Plan
 
-- [ ] [[2026-04-03-feat-asset-display-config-safe-disable-delete|Add safe disable/delete for asset display config when users are using that asset code]]
 
 
 ## Implement
@@ -23,13 +22,13 @@ kanban-plugin: board
 
 ## Review
 
-- [ ] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
-
 
 
 ## Done
 
 **Complete**
+- [x] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
+- [x] [[2026-04-03-feat-asset-display-config-safe-disable-delete|Add safe disable/delete for asset display config when users are using that asset code]]
 - [x] [[2026-04-02-improve-mobile-tab-overflow|Improve all tab selection]]
 - [x] [[2026-04-03-tab-bar-scroll-hint|TabBar scroll hint — gradient + chevron when tabs overflow]]
 - [x] [[2026-04-02-cancel-google-connection|Cancel Google connection]]

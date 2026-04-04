@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ad Renderer</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: transparent; font-family: 'Segoe UI', Arial, sans-serif; }
+
+  /* ─── AD CARD ─── */
+  .ad-card {
+    width: 1080px;
+    height: 1080px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ─── BACKGROUND GRADIENT ─── */
+  .bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 20% 20%, #7a0505 0%, #4a0101 40%, #1e0000 100%);
+  }
+  .bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 80% 10%, rgba(212,163,40,0.18) 0%, transparent 50%),
+      radial-gradient(circle at 10% 90%, rgba(150,10,10,0.3) 0%, transparent 50%);
+  }
+  /* decorative gold blobs */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.25;
+  }
+  .blob-1 { width: 500px; height: 500px; background: #D4A028; top: -150px; right: -150px; }
+  .blob-2 { width: 400px; height: 400px; background: #8B0000; bottom: -120px; left: -100px; }
+  .blob-3 { width: 300px; height: 300px; background: #F1BD61; bottom: 100px; right: 50px; opacity: 0.12; }
+
+  /* ─── LOGO BAR ─── */
+  .logo-bar {
+    position: absolute;
+    top: 48px;
+    left: 60px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    z-index: 10;
+  }
+  .logo-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(212,160,40,0.5);
+    flex-shrink: 0;
+    background: transparent;
+  }
+  .logo-icon img {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: block;
+  }
+  .logo-text {
+    font-size: 22px;
+    font-weight: 700;
+    color: #F1BD61;
+    letter-spacing: 0.5px;
+  }
+
+  /* ─── TAGLINE (top right) ─── */
+  .tagline-badge {
+    position: absolute;
+    top: 52px;
+    right: 60px;
+    background: rgba(241,189,97,0.12);
+    border: 1px solid rgba(241,189,97,0.35);
+    border-radius: 100px;
+    padding: 8px 20px;
+    font-size: 15px;
+    color: #F1BD61;
+    letter-spacing: 0.5px;
+    z-index: 10;
+  }
+
+  /* ─── PHONE MOCKUP ─── */
+  .phone-wrap {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .phone-frame {
+    width: 300px;
+    height: 620px;
+    background: #1a0000;
+    border-radius: 44px;
+    border: 2.5px solid rgba(241,189,97,0.45);
+    box-shadow:
+      0 0 0 6px rgba(241,189,97,0.08),
+      0 40px 100px rgba(0,0,0,0.7),
+      inset 0 1px 0 rgba(241,189,97,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  .phone-notch {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100px; height: 28px;
+    background: #1a0000;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    z-index: 10;
+  }
+  .phone-screen {
+    width: 100%; height: 100%;
+    border-radius: 42px;
+    overflow: hidden;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  /* ─── DESKTOP MOCKUP ─── */
+  .desktop-frame {
+    width: 740px;
+    background: #1a0000;
+    border-radius: 14px;
+    border: 2px solid rgba(241,189,97,0.35);
+    box-shadow:
+      0 0 0 5px rgba(241,189,97,0.06),
+      0 40px 100px rgba(0,0,0,0.7);
+    overflow: hidden;
+    position: relative;
+    z-index: 5;
+  }
+  .desktop-topbar {
+    height: 34px;
+    background: rgba(241,189,97,0.08);
+    border-bottom: 1px solid rgba(241,189,97,0.2);
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    gap: 8px;
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #ffbd2e; }
+  .dot-g { background: #28c840; }
+  .url-bar {
+    flex: 1;
+    margin: 0 16px;
+    height: 20px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 4px;
+    border: 1px solid rgba(241,189,97,0.15);
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    font-size: 11px;
+    color: rgba(241,189,97,0.5);
+  }
+  .desktop-screen {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  /* ─── HEADLINE ─── */
+  .headline-block {
+    position: absolute;
+    z-index: 10;
+    text-align: center;
+  }
+  .headline-block.bottom {
+    bottom: 80px;
+    left: 0; right: 0;
+  }
+  .headline-block.left {
+    left: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: left;
+    max-width: 360px;
+  }
+  .headline-eyebrow {
+    font-size: 15px;
+    font-weight: 600;
+    color: #F1BD61;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.8;
+  }
+  .headline-title {
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #fff;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+  }
+  .headline-title span {
+    color: #F1BD61;
+  }
+  .headline-sub {
+    margin-top: 16px;
+    font-size: 19px;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.5;
+  }
+  .cta-btn {
+    display: inline-block;
+    margin-top: 28px;
+    padding: 14px 36px;
+    background: linear-gradient(135deg, #D4A028, #F1BD61);
+    color: #3A0101;
+    font-size: 17px;
+    font-weight: 700;
+    border-radius: 100px;
+    box-shadow: 0 8px 30px rgba(212,160,40,0.4);
+    letter-spacing: 0.3px;
+  }
+
+  /* ─── GOLD DIVIDER ─── */
+  .gold-divider {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #F1BD61, transparent);
+    margin: 16px auto;
+  }
+
+  /* ─── FEATURE PILLS ─── */
+  .pills {
+    position: absolute;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .pill {
+    background: rgba(241,189,97,0.1);
+    border: 1px solid rgba(241,189,97,0.3);
+    border-radius: 100px;
+    padding: 10px 20px;
+    font-size: 15px;
+    color: #F1BD61;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(8px);
+    white-space: nowrap;
+  }
+  .pill-icon { font-size: 18px; }
+
+  /* ─── STAT CARDS ─── */
+  .stats-row {
+    position: absolute;
+    bottom: 90px;
+    left: 0; right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    z-index: 10;
+  }
+  .stat-card {
+    background: rgba(241,189,97,0.08);
+    border: 1px solid rgba(241,189,97,0.25);
+    border-radius: 16px;
+    padding: 18px 28px;
+    text-align: center;
+    backdrop-filter: blur(8px);
+  }
+  .stat-value {
+    font-size: 26px;
+    font-weight: 800;
+    color: #F1BD61;
+  }
+  .stat-label {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    margin-top: 4px;
+  }
+
+  /* ─── BOTTOM BRAND ─── */
+  .bottom-brand {
+    position: absolute;
+    bottom: 36px;
+    left: 0; right: 0;
+    text-align: center;
+    font-size: 15px;
+    color: rgba(241,189,97,0.5);
+    letter-spacing: 1px;
+    z-index: 10;
+  }
+
+  /* dual phone layout */
+  .dual-phone {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+  }
+  .dual-phone .phone-frame:last-child {
+    margin-top: 60px;
+    opacity: 0.85;
+    transform: scale(0.93);
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     AD 1 — Hero: Dashboard (Desktop) 1080×1080
+     ══════════════════════════════════════════════ -->
+<div class="ad-card" id="ad1">
+  <div class="bg"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div class="logo-bar">
+    <div class="logo-icon"><img src="logo.svg" alt="logo" /></div>
+    <div class="logo-text">congdongvang.com</div>
+  </div>
+  <div class="tagline-badge">Nền tảng đầu tư vàng #1</div>
+
+  <div style="position:relative; z-index:5; margin-top:30px;">
+    <div class="desktop-frame">
+      <div class="desktop-topbar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <div class="url-bar">congdongvang.com</div>
+      </div>
+      <img class="desktop-screen" src="../09.png" style="max-height:480px;" />
+    </div>
+  </div>
+
+  <div class="headline-block bottom">
+    <div class="gold-divider"></div>
+    <div class="headline-eyebrow">Quản lý tài sản thông minh</div>
+    <div class="headline-title">Theo dõi <span>Vàng & Đầu Tư</span><br>mọi lúc mọi nơi</div>
+  </div>
+
+  <div class="bottom-brand">congdongvang.com</div>
+</div>
+
+<br style="display:block; height:60px;">
+
+<!-- ══════════════════════════════════════════════
+     AD 2 — Mobile Hero: Tổng tài sản 1080×1080
+     ══════════════════════════════════════════════ -->
+<div class="ad-card" id="ad2">
+  <div class="bg"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <div class="logo-bar">
+    <div class="logo-icon"><img src="logo.svg" alt="logo" /></div>
+    <div class="logo-text">congdongvang.com</div>
+  </div>
+
+  <div style="position:relative; z-index:5; margin-top:40px;">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <img class="phone-screen" src="../08.png" />
+    </div>
+  </div>
+
+  <div class="headline-block bottom">
+    <div class="gold-divider"></div>
+    <div class="headline-title" style="font-size:44px;">Tổng tài sản của bạn<br><span>luôn trong tầm tay</span></div>
+    <div class="headline-sub">Biểu đồ tăng trưởng · Theo dõi lãi/lỗ · Realtime</div>
+  </div>
+
+  <div class="bottom-brand">congdongvang.com</div>
+</div>
+
+<br style="display:block; height:60px;">
+
+<!-- ══════════════════════════════════════════════
+     AD 3 — Dual Phone: Mobile screens 1080×1080
+     ══════════════════════════════════════════════ -->
+<div class="ad-card" id="ad3">
+  <div class="bg"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <div class="logo-bar">
+    <div class="logo-icon"><img src="logo.svg" alt="logo" /></div>
+    <div class="logo-text">congdongvang.com</div>
+  </div>
+
+  <div style="position:relative; z-index:5; margin-top:20px;">
+    <div class="dual-phone">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <img class="phone-screen" src="../19.png" />
+      </div>
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <img class="phone-screen" src="../14.png" />
+      </div>
+    </div>
+  </div>
+
+  <div class="headline-block bottom">
+    <div class="gold-divider"></div>
+    <div class="headline-title" style="font-size:42px;"><span>Giá Vàng</span> & <span>Đầu Tư Tích Lũy</span><br>trên một ứng dụng</div>
+  </div>
+
+  <div class="bottom-brand">congdongvang.com</div>
+</div>
+
+<br style="display:block; height:60px;">
+
+<!-- ══════════════════════════════════════════════
+     AD 4 — Left text + Right phone 1080×1080
+     ══════════════════════════════════════════════ -->
+<div class="ad-card" id="ad4">
+  <div class="bg"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <div class="logo-bar">
+    <div class="logo-icon"><img src="logo.svg" alt="logo" /></div>
+    <div class="logo-text">congdongvang.com</div>
+  </div>
+
+  <div style="position:relative; z-index:5; display:flex; align-items:center; gap:60px; margin-top:60px; padding:0 60px;">
+    <!-- Left: text -->
+    <div style="flex:1; text-align:left;">
+      <div class="headline-eyebrow" style="text-align:left;">Đầu tư tích lũy</div>
+      <div class="headline-title" style="font-size:48px; text-align:left;">Theo dõi<br><span>danh mục vàng</span><br>của bạn</div>
+      <div class="gold-divider" style="margin:20px 0;"></div>
+      <div class="headline-sub" style="text-align:left; font-size:17px;">Lãi/lỗ realtime · Phân bổ tài sản<br>Tất cả sàn vàng Việt Nam</div>
+      <div class="cta-btn" style="display:inline-block; margin-top:28px;">Tham gia ngay →</div>
+    </div>
+    <!-- Right: phone -->
+    <div style="flex:0 0 auto;">
+      <div class="phone-frame" style="width:280px; height:580px;">
+        <div class="phone-notch"></div>
+        <img class="phone-screen" src="../14.png" />
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-brand">congdongvang.com</div>
+</div>
+
+<br style="display:block; height:60px;">
+
+<!-- ══════════════════════════════════════════════
+     AD 5 — Feature Pills layout 1080×1080
+     ══════════════════════════════════════════════ -->
+<div class="ad-card" id="ad5">
+  <div class="bg"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <div class="logo-bar">
+    <div class="logo-icon"><img src="logo.svg" alt="logo" /></div>
+    <div class="logo-text">congdongvang.com</div>
+  </div>
+
+  <div style="position:relative; z-index:5; display:flex; align-items:center; gap:50px; padding:0 60px; margin-top:60px;">
+    <!-- Left: phone -->
+    <div style="flex:0 0 auto;">
+      <div class="phone-frame" style="width:265px; height:550px;">
+        <div class="phone-notch"></div>
+        <img class="phone-screen" src="../08.png" />
+      </div>
+    </div>
+    <!-- Right: pills -->
+    <div style="flex:1; display:flex; flex-direction:column; gap:16px;">
+      <div class="headline-title" style="font-size:42px; text-align:left; margin-bottom:8px;">Tính năng<br><span>nổi bật</span></div>
+      <div class="pill"><span class="pill-icon">📊</span> Biểu đồ giá vàng realtime</div>
+      <div class="pill"><span class="pill-icon">💼</span> Quản lý danh mục đầu tư</div>
+      <div class="pill"><span class="pill-icon">🔔</span> Cảnh báo giá tự động</div>
+      <div class="pill"><span class="pill-icon">👥</span> Cộng đồng chia sẻ kiến thức</div>
+      <div class="pill"><span class="pill-icon">📱</span> Ứng dụng mobile & web</div>
+      <div class="pill"><span class="pill-icon">🏅</span> Hỗ trợ SJC, DOJI, PNJ, BTMC</div>
+    </div>
+  </div>
+
+  <div class="bottom-brand">congdongvang.com</div>
+</div>
+
+<br style="display:block; height:60px;">
+
+<!-- ══════════════════════════════════════════════
+     AD 6 — Community focus 1080×1080
+     ══════════════════════════════════════════════ -->
+<div class="ad-card" id="ad6">
+  <div class="bg"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <div class="logo-bar">
+    <div class="logo-icon"><img src="logo.svg" alt="logo" /></div>
+    <div class="logo-text">congdongvang.com</div>
+  </div>
+
+  <div style="position:relative; z-index:5; margin-top:40px;">
+    <div class="desktop-frame" style="width:820px;">
+      <div class="desktop-topbar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <div class="url-bar">congdongvang.com/community</div>
+      </div>
+      <img class="desktop-screen" src="../16.png" style="max-height:430px;" />
+    </div>
+  </div>
+
+  <div class="headline-block bottom">
+    <div class="gold-divider"></div>
+    <div class="headline-title" style="font-size:44px;"><span>Cộng đồng</span> chia sẻ<br>kiến thức tài chính</div>
+    <div class="headline-sub">Hàng nghìn nhà đầu tư vàng cùng nhau phân tích thị trường</div>
+  </div>
+
+  <div class="bottom-brand">congdongvang.com</div>
+</div>
+
+<br style="display:block; height:60px;">
+
+<!-- ══════════════════════════════════════════════
+     AD 7 — Gold prices table 1080×1080
+     ══════════════════════════════════════════════ -->
+<div class="ad-card" id="ad7">
+  <div class="bg"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <div class="logo-bar">
+    <div class="logo-icon"><img src="logo.svg" alt="logo" /></div>
+    <div class="logo-text">congdongvang.com</div>
+  </div>
+
+  <div style="position:relative; z-index:5; display:flex; align-items:center; gap:40px; padding:0 50px; margin-top:60px;">
+    <div style="flex:0 0 auto;">
+      <div class="phone-frame" style="width:270px; height:560px;">
+        <div class="phone-notch"></div>
+        <img class="phone-screen" src="../19.png" />
+      </div>
+    </div>
+    <div style="flex:1; text-align:left;">
+      <div class="headline-eyebrow" style="text-align:left;">Cập nhật mỗi 15 phút</div>
+      <div class="headline-title" style="font-size:46px; text-align:left;"><span>Giá Vàng</span><br>hôm nay</div>
+      <div class="gold-divider" style="margin:20px 0;"></div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div style="display:flex; justify-content:space-between; padding:12px 16px; background:rgba(241,189,97,0.08); border-radius:10px; border:1px solid rgba(241,189,97,0.2);">
+          <span style="color:#F1BD61; font-size:15px; font-weight:600;">SJC</span>
+          <span style="color:#4ADE80; font-size:15px; font-weight:700;">171.500 / 174.500</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:12px 16px; background:rgba(241,189,97,0.08); border-radius:10px; border:1px solid rgba(241,189,97,0.2);">
+          <span style="color:#F1BD61; font-size:15px; font-weight:600;">Nhẫn SJC 9999</span>
+          <span style="color:#4ADE80; font-size:15px; font-weight:700;">171.300 / 174.300</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:12px 16px; background:rgba(241,189,97,0.08); border-radius:10px; border:1px solid rgba(241,189,97,0.2);">
+          <span style="color:#F1BD61; font-size:15px; font-weight:600;">PNJ</span>
+          <span style="color:#4ADE80; font-size:15px; font-weight:700;">169.400 / 172.900</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:12px 16px; background:rgba(241,189,97,0.08); border-radius:10px; border:1px solid rgba(241,189,97,0.2);">
+          <span style="color:#F1BD61; font-size:15px; font-weight:600;">DOJI</span>
+          <span style="color:#4ADE80; font-size:15px; font-weight:700;">171.000 / 174.300</span>
+        </div>
+      </div>
+      <div class="cta-btn" style="margin-top:24px; display:inline-block; font-size:15px;">Xem đầy đủ →</div>
+    </div>
+  </div>
+
+  <div class="bottom-brand">congdongvang.com</div>
+</div>
+
+<br style="display:block; height:60px;">
+
+<!-- ══════════════════════════════════════════════
+     AD 8 — Stats showcase 1080×1080
+     ══════════════════════════════════════════════ -->
+<div class="ad-card" id="ad8">
+  <div class="bg"></div>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <div class="logo-bar">
+    <div class="logo-icon"><img src="logo.svg" alt="logo" /></div>
+    <div class="logo-text">congdongvang.com</div>
+  </div>
+
+  <div style="position:relative; z-index:5; text-align:center; padding:0 80px; margin-top:50px;">
+    <div class="headline-eyebrow">Nền tảng đầu tư vàng</div>
+    <div class="headline-title" style="font-size:58px;">Quản lý tài chính<br><span>chuyên nghiệp</span></div>
+    <div class="gold-divider" style="width:100px; margin:24px auto;"></div>
+
+    <div style="margin-top:40px;">
+      <div class="desktop-frame" style="width:880px; margin:0 auto;">
+        <div class="desktop-topbar">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <div class="url-bar">congdongvang.com/dashboard</div>
+        </div>
+        <img class="desktop-screen" src="../12.png" style="max-height:360px;" />
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-value">10+</div>
+      <div class="stat-label">Nguồn giá vàng</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">Realtime</div>
+      <div class="stat-label">Cập nhật giá</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">Miễn phí</div>
+      <div class="stat-label">Sử dụng ngay</div>
+    </div>
+  </div>
+
+  <div class="bottom-brand">congdongvang.com</div>
+</div>
+
+</body>
+</html>
