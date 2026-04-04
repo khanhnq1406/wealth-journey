@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"wealthjourney/domain/models"
 	"wealthjourney/domain/repository"
 	v1 "wealthjourney/protobuf/v1"
@@ -258,6 +260,137 @@ func newTestAssetDisplayConfigService(
 	apRepo repository.AssetPriceRepository,
 ) AssetDisplayConfigService {
 	return NewAssetDisplayConfigService(cfgRepo, fcRepo, apRepo, &adcInvestmentRepo{})
+}
+
+func newTestADCServiceWithInvestmentRepo(
+	cfgRepo repository.AssetDisplayConfigRepository,
+	fcRepo repository.AssetConfigFetchCodeRepository,
+	apRepo repository.AssetPriceRepository,
+	invRepo repository.InvestmentRepository,
+) AssetDisplayConfigService {
+	return NewAssetDisplayConfigService(cfgRepo, fcRepo, apRepo, invRepo)
+}
+
+// ---------------------------------------------------------------------------
+// Update guard tests — disable protection
+// ---------------------------------------------------------------------------
+
+func TestUpdate_DisableBlocked_WhenActiveInvestmentsExist(t *testing.T) {
+	ctx := context.Background()
+
+	cfgRepo := &adcConfigRepo{
+		getByIDFn: func(_ context.Context, id int32) (*models.AssetDisplayConfig, error) {
+			return &models.AssetDisplayConfig{
+				ID:       id,
+				TypeCode: "SJL1L10",
+				Enabled:  true, // currently enabled
+			}, nil
+		},
+	}
+	invRepo := &adcInvestmentRepo{
+		countBySymbolFn: func(_ context.Context, symbol string) (int64, error) {
+			assert.Equal(t, "SJL1L10", symbol)
+			return 3, nil // 3 active investments
+		},
+	}
+
+	svc := newTestADCServiceWithInvestmentRepo(cfgRepo, &adcFetchCodeRepo{}, &adcAssetPriceRepo{}, invRepo)
+	_, err := svc.Update(ctx, 1, "SJC 1L 10L", 0, false, true)
+
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "Cannot disable")
+	assert.Contains(t, err.Error(), "3")
+	assert.Contains(t, err.Error(), "SJL1L10")
+}
+
+func TestUpdate_DisableAllowed_WhenNoActiveInvestments(t *testing.T) {
+	ctx := context.Background()
+
+	cfgRepo := &adcConfigRepo{
+		getByIDFn: func(_ context.Context, id int32) (*models.AssetDisplayConfig, error) {
+			return &models.AssetDisplayConfig{
+				ID:       id,
+				TypeCode: "SJL1L10",
+				Enabled:  true,
+			}, nil
+		},
+		updateFn: func(_ context.Context, config *models.AssetDisplayConfig) error {
+			return nil
+		},
+	}
+	invRepo := &adcInvestmentRepo{
+		countBySymbolFn: func(_ context.Context, _ string) (int64, error) {
+			return 0, nil
+		},
+	}
+
+	svc := newTestADCServiceWithInvestmentRepo(cfgRepo, &adcFetchCodeRepo{}, &adcAssetPriceRepo{}, invRepo)
+	result, err := svc.Update(ctx, 1, "SJC 1L 10L", 0, false, true)
+
+	require.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.False(t, result.Enabled)
+}
+
+func TestUpdate_NoGuard_WhenEnabledStaysTrue(t *testing.T) {
+	ctx := context.Background()
+	countCalled := false
+
+	cfgRepo := &adcConfigRepo{
+		getByIDFn: func(_ context.Context, id int32) (*models.AssetDisplayConfig, error) {
+			return &models.AssetDisplayConfig{
+				ID:       id,
+				TypeCode: "SJL1L10",
+				Enabled:  true,
+			}, nil
+		},
+		updateFn: func(_ context.Context, _ *models.AssetDisplayConfig) error {
+			return nil
+		},
+	}
+	invRepo := &adcInvestmentRepo{
+		countBySymbolFn: func(_ context.Context, _ string) (int64, error) {
+			countCalled = true
+			return 5, nil
+		},
+	}
+
+	svc := newTestADCServiceWithInvestmentRepo(cfgRepo, &adcFetchCodeRepo{}, &adcAssetPriceRepo{}, invRepo)
+	result, err := svc.Update(ctx, 1, "SJC 1L 10L", 0, true, true) // enabled stays true
+
+	require.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.False(t, countCalled, "CountBySymbol should NOT be called when enabled stays true")
+}
+
+func TestUpdate_NoGuard_WhenAlreadyDisabled(t *testing.T) {
+	ctx := context.Background()
+	countCalled := false
+
+	cfgRepo := &adcConfigRepo{
+		getByIDFn: func(_ context.Context, id int32) (*models.AssetDisplayConfig, error) {
+			return &models.AssetDisplayConfig{
+				ID:       id,
+				TypeCode: "SJL1L10",
+				Enabled:  false, // already disabled
+			}, nil
+		},
+		updateFn: func(_ context.Context, _ *models.AssetDisplayConfig) error {
+			return nil
+		},
+	}
+	invRepo := &adcInvestmentRepo{
+		countBySymbolFn: func(_ context.Context, _ string) (int64, error) {
+			countCalled = true
+			return 5, nil
+		},
+	}
+
+	svc := newTestADCServiceWithInvestmentRepo(cfgRepo, &adcFetchCodeRepo{}, &adcAssetPriceRepo{}, invRepo)
+	_, err := svc.Update(ctx, 1, "SJC 1L 10L", 0, false, true)
+
+	require.NoError(t, err)
+	assert.False(t, countCalled, "CountBySymbol should NOT be called when config is already disabled")
 }
 
 // ---------------------------------------------------------------------------

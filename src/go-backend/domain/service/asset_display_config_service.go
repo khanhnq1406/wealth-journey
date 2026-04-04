@@ -162,6 +162,19 @@ func (s *assetDisplayConfigService) Update(
 		return nil, apperrors.NewNotFoundError("asset display config")
 	}
 
+	// Guard: if this update disables a currently-enabled config, check for active investments.
+	if config.Enabled && !enabled {
+		count, countErr := s.investmentRepo.CountBySymbol(ctx, config.TypeCode)
+		if countErr != nil {
+			return nil, countErr
+		}
+		if count > 0 {
+			return nil, apperrors.NewValidationError(
+				fmt.Sprintf("Cannot disable: %d active investment(s) use asset type %s", count, config.TypeCode),
+			)
+		}
+	}
+
 	config.DisplayName = displayName
 	config.DisplayOrder = displayOrder
 	config.Enabled = enabled
