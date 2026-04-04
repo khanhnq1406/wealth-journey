@@ -182,6 +182,10 @@ func (m *MockInvestmentRepository) GetInvestmentValuesByWalletIDs(ctx context.Co
 	return args.Get(0).(map[int32]int64), args.Error(1)
 }
 
+func (m *MockInvestmentRepository) CountBySymbol(ctx context.Context, symbol string) (int64, error) {
+	return 0, nil
+}
+
 type MockInvestmentTransactionRepository struct {
 	mock.Mock
 }

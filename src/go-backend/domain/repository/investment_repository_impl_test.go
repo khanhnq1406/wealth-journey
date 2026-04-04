@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"regexp"
 	"testing"
 	"time"
@@ -617,5 +618,69 @@ func TestInvestmentRepository_ListByUserID_Empty(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, investments, 0)
 	assert.Equal(t, 0, total)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestInvestmentRepository_CountBySymbol(t *testing.T) {
+	db, mock, database := setupMockDB(t)
+	defer func() {
+		sqlDB, _ := db.DB()
+		_ = sqlDB.Close()
+	}()
+
+	repo := NewInvestmentRepository(database)
+	ctx := context.Background()
+
+	// Expect COUNT query with soft-delete scope
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `investment` WHERE symbol = ? AND `investment`.`deleted_at` IS NULL")).
+		WithArgs("SJL1L10").
+		WillReturnRows(sqlmock.NewRows([]string{"count(*)"}).AddRow(3))
+
+	count, err := repo.CountBySymbol(ctx, "SJL1L10")
+
+	require.NoError(t, err)
+	assert.Equal(t, int64(3), count)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestInvestmentRepository_CountBySymbol_Zero(t *testing.T) {
+	db, mock, database := setupMockDB(t)
+	defer func() {
+		sqlDB, _ := db.DB()
+		_ = sqlDB.Close()
+	}()
+
+	repo := NewInvestmentRepository(database)
+	ctx := context.Background()
+
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `investment` WHERE symbol = ? AND `investment`.`deleted_at` IS NULL")).
+		WithArgs("UNKNOWN").
+		WillReturnRows(sqlmock.NewRows([]string{"count(*)"}).AddRow(0))
+
+	count, err := repo.CountBySymbol(ctx, "UNKNOWN")
+
+	require.NoError(t, err)
+	assert.Equal(t, int64(0), count)
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
+
+func TestInvestmentRepository_CountBySymbol_DBError(t *testing.T) {
+	db, mock, database := setupMockDB(t)
+	defer func() {
+		sqlDB, _ := db.DB()
+		_ = sqlDB.Close()
+	}()
+
+	repo := NewInvestmentRepository(database)
+	ctx := context.Background()
+
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `investment` WHERE symbol = ? AND `investment`.`deleted_at` IS NULL")).
+		WithArgs("SJL1L10").
+		WillReturnError(errors.New("db error"))
+
+	count, err := repo.CountBySymbol(ctx, "SJL1L10")
+
+	require.Error(t, err)
+	assert.Equal(t, int64(0), count)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }

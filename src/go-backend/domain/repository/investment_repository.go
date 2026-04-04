@@ -33,6 +33,10 @@ type InvestmentRepository interface {
 	// Delete soft deletes an investment by ID.
 	Delete(ctx context.Context, id int32) error
 
+	// CountBySymbol returns the count of non-deleted investments where symbol = the given value.
+	// Uses a SQL COUNT(*) query with the GORM soft-delete scope applied automatically.
+	CountBySymbol(ctx context.Context, symbol string) (int64, error)
+
 	// UpdatePrices updates current prices for multiple investments.
 	UpdatePrices(ctx context.Context, updates []PriceUpdate) error
 

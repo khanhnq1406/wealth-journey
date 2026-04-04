@@ -1,11 +1,12 @@
 # Admin CMS Domain — Runtime Flows
 
-Admin content management flows covering site settings retrieval (public, cached) and updates (admin-only, validated). The public GET endpoint powers the landing page's dynamic SEO metadata and footer content. The admin PUT endpoint allows admin users to edit settings through the CMS page.
+Admin content management flows covering site settings retrieval (public, cached), updates (admin-only, validated), and asset display config disable/delete with active-investment guard.
 
 ## Table of Contents
 
 - [Public Site Settings Fetch](#1-public-site-settings-fetch)
 - [Admin Update Site Settings](#2-admin-update-site-settings)
+- [Asset Display Config Disable/Delete Guard](#3-asset-display-config-disabledelete-guard)
 
 ---
 
@@ -185,3 +186,68 @@ sequenceDiagram
 | Invalid JSON in seo.keywords | 400 validation error | None (no DB write attempted) |
 | DB upsert fails | 500 Internal Server Error | Cache not invalidated (stale cache acceptable) |
 | Cache invalidation fails | Logged as warning | Stale cache expires in 5min via TTL |
+
+---
+
+## 3. Asset Display Config Disable/Delete Guard
+
+**Trigger:** Admin calls PUT (with `enabled: false`) or DELETE on `/api/v1/admin/asset-display-config/:id`
+**Endpoints:**
+- `PUT /api/v1/admin/asset-display-config/:id` — Update (disable guard fires when `enabled` flips true→false)
+- `DELETE /api/v1/admin/asset-display-config/:id` — Delete (guard always fires)
+**Source:** `domain/service/asset_display_config_service.go`, `domain/repository/investment_repository_impl.go`
+
+```mermaid
+flowchart TD
+    A([Admin: PUT enabled=false\nor DELETE /asset-display-config/:id]) --> B[AuthMiddleware + AdminMiddleware\nvalidate JWT and admin role]
+    B -->|401/403| Z1([Return 401 Unauthorized\nor 403 Forbidden])
+    B -->|Authenticated Admin| C[Handler parses :id path param\nand request body]
+    C --> D[Service: GetByID\nconfigRepo.GetByID ctx, id]
+    D -->|Not found| Z2([Return 404 Not Found])
+    D -->|Found: config with TypeCode| E{Operation type?}
+
+    E -->|PUT: check if enabled\nflips true → false| F{config.Enabled == true\nAND new enabled == false?}
+    E -->|DELETE| G[investmentRepo.CountBySymbol\nctx, config.TypeCode]
+
+    F -->|No: enabled stays true\nor config already disabled| H[Skip guard\nProceed with update]
+    F -->|Yes: disabling an enabled config| G
+
+    G -->|DB error| Z3([Return 500 Internal Server Error])
+    G -->|count returned| I{count > 0?}
+
+    I -->|count > 0| Z4([Return 400 Bad Request\n'Cannot disable/delete: N active investment s\nuse asset type TypeCode'])
+    I -->|count == 0| J{Operation type?}
+
+    H --> K[configRepo.Update ctx, config\nApply new displayName, displayOrder,\nenabled, showInInvestment]
+    J -->|PUT: disable| K
+    J -->|DELETE| L[configRepo.Delete ctx, id\nSoft-delete: UPDATE SET deleted_at=NOW ]
+
+    K -->|DB error| Z5([Return 500 Internal Server Error])
+    K -->|OK| M([Return 200 OK\nUpdated config payload])
+
+    L -->|DB error| Z6([Return 500 Internal Server Error])
+    L -->|OK| N([Return 200 OK\nsuccess: true])
+```
+
+### Key Invariants
+
+- **Guard fires only on true→false flip:** `CountBySymbol` is skipped when `enabled` stays `true` or the config is already disabled — avoids unnecessary DB round-trips on non-disabling updates
+- **Delete always guarded:** Every `DELETE` triggers `CountBySymbol` regardless of the current `enabled` state
+- **404 before count check:** `GetByID` runs first; a missing config returns 404 without querying investments
+- **Parameterized query:** `CountBySymbol` uses `WHERE symbol = ?` — GORM parameterized query, no SQL injection risk
+- **GORM soft-delete scope:** Count query automatically includes `AND deleted_at IS NULL`, excluding soft-deleted investments
+- **Error message reveals only count and TypeCode:** Safe for admin context — TypeCode is a market symbol (e.g., `SJL1L10`), not sensitive data
+- **Admin-only:** Both endpoints require `AuthMiddleware` + `AdminMiddleware` — no auth changes needed
+
+### Error Paths
+
+| Condition | Response | Details |
+|-----------|----------|---------|
+| JWT invalid/expired | 401 Unauthorized | AuthMiddleware rejects before handler |
+| User not admin | 403 Forbidden | AdminMiddleware rejects before handler |
+| Config not found | 404 Not Found | GetByID returns NotFoundError |
+| count > 0 (disable) | 400 Bad Request | "Cannot disable: N active investment(s) use asset type TypeCode" |
+| count > 0 (delete) | 400 Bad Request | "Cannot delete: N active investment(s) use asset type TypeCode" |
+| CountBySymbol DB error | 500 Internal Server Error | Wrapped internal error, details not exposed |
+| configRepo.Update fails | 500 Internal Server Error | Standard handler error propagation |
+| configRepo.Delete fails | 500 Internal Server Error | Standard handler error propagation |

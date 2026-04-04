@@ -6,8 +6,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"wealthjourney/domain/models"
 	"wealthjourney/domain/repository"
+	apperrors "wealthjourney/pkg/errors"
+	v1 "wealthjourney/protobuf/v1"
 )
 
 // ---------------------------------------------------------------------------
@@ -193,10 +197,59 @@ func (m *adcAssetPriceRepo) ListByAssetTypeFiltered(_ context.Context, _ string,
 	return nil, nil
 }
 
+// adcInvestmentRepo is a minimal stub for repository.InvestmentRepository used in these tests.
+// Only CountBySymbol is wired; all other methods are no-ops (unused by AssetDisplayConfigService).
+type adcInvestmentRepo struct {
+	countBySymbolFn func(ctx context.Context, symbol string) (int64, error)
+}
+
+func (m *adcInvestmentRepo) CountBySymbol(ctx context.Context, symbol string) (int64, error) {
+	if m.countBySymbolFn != nil {
+		return m.countBySymbolFn(ctx, symbol)
+	}
+	return 0, nil
+}
+
+// Remaining interface methods — not used by AssetDisplayConfigService tests.
+func (m *adcInvestmentRepo) Create(_ context.Context, _ *models.Investment) error { return nil }
+func (m *adcInvestmentRepo) GetByID(_ context.Context, _ int32) (*models.Investment, error) {
+	return nil, nil
+}
+func (m *adcInvestmentRepo) GetByIDForUser(_ context.Context, _, _ int32) (*models.Investment, error) {
+	return nil, nil
+}
+func (m *adcInvestmentRepo) GetByUserAndSymbol(_ context.Context, _ int32, _ string) (*models.Investment, error) {
+	return nil, nil
+}
+func (m *adcInvestmentRepo) ListByUserID(_ context.Context, _ int32, _ repository.ListOptions, _ v1.InvestmentType) ([]*models.Investment, int, error) {
+	return nil, 0, nil
+}
+func (m *adcInvestmentRepo) ListByWalletID(_ context.Context, _ int32, _ repository.ListOptions, _ v1.InvestmentType) ([]*models.Investment, int, error) {
+	return nil, 0, nil
+}
+func (m *adcInvestmentRepo) Update(_ context.Context, _ *models.Investment) error { return nil }
+func (m *adcInvestmentRepo) Delete(_ context.Context, _ int32) error               { return nil }
+func (m *adcInvestmentRepo) UpdatePrices(_ context.Context, _ []repository.PriceUpdate) error {
+	return nil
+}
+func (m *adcInvestmentRepo) GetPortfolioSummary(_ context.Context, _ int32) (*repository.PortfolioSummary, error) {
+	return nil, nil
+}
+func (m *adcInvestmentRepo) GetAggregatedPortfolioSummary(_ context.Context, _ int32, _ v1.InvestmentType) (*repository.PortfolioSummary, error) {
+	return nil, nil
+}
+func (m *adcInvestmentRepo) GetInvestmentValue(_ context.Context, _ int32) (int64, error) {
+	return 0, nil
+}
+func (m *adcInvestmentRepo) GetInvestmentValuesByWalletIDs(_ context.Context, _ []int32) (map[int32]int64, error) {
+	return nil, nil
+}
+
 // Verify mocks satisfy their interfaces at compile time.
 var _ repository.AssetDisplayConfigRepository = (*adcConfigRepo)(nil)
 var _ repository.AssetConfigFetchCodeRepository = (*adcFetchCodeRepo)(nil)
 var _ repository.AssetPriceRepository = (*adcAssetPriceRepo)(nil)
+var _ repository.InvestmentRepository = (*adcInvestmentRepo)(nil)
 
 // ---------------------------------------------------------------------------
 // Helper constructor
@@ -207,7 +260,138 @@ func newTestAssetDisplayConfigService(
 	fcRepo repository.AssetConfigFetchCodeRepository,
 	apRepo repository.AssetPriceRepository,
 ) AssetDisplayConfigService {
-	return NewAssetDisplayConfigService(cfgRepo, fcRepo, apRepo)
+	return NewAssetDisplayConfigService(cfgRepo, fcRepo, apRepo, &adcInvestmentRepo{})
+}
+
+func newTestADCServiceWithInvestmentRepo(
+	cfgRepo repository.AssetDisplayConfigRepository,
+	fcRepo repository.AssetConfigFetchCodeRepository,
+	apRepo repository.AssetPriceRepository,
+	invRepo repository.InvestmentRepository,
+) AssetDisplayConfigService {
+	return NewAssetDisplayConfigService(cfgRepo, fcRepo, apRepo, invRepo)
+}
+
+// ---------------------------------------------------------------------------
+// Update guard tests — disable protection
+// ---------------------------------------------------------------------------
+
+func TestUpdate_DisableBlocked_WhenActiveInvestmentsExist(t *testing.T) {
+	ctx := context.Background()
+
+	cfgRepo := &adcConfigRepo{
+		getByIDFn: func(_ context.Context, id int32) (*models.AssetDisplayConfig, error) {
+			return &models.AssetDisplayConfig{
+				ID:       id,
+				TypeCode: "SJL1L10",
+				Enabled:  true, // currently enabled
+			}, nil
+		},
+	}
+	invRepo := &adcInvestmentRepo{
+		countBySymbolFn: func(_ context.Context, symbol string) (int64, error) {
+			assert.Equal(t, "SJL1L10", symbol)
+			return 3, nil // 3 active investments
+		},
+	}
+
+	svc := newTestADCServiceWithInvestmentRepo(cfgRepo, &adcFetchCodeRepo{}, &adcAssetPriceRepo{}, invRepo)
+	_, err := svc.Update(ctx, 1, "SJC 1L 10L", 0, false, true)
+
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "Cannot disable")
+	assert.Contains(t, err.Error(), "3")
+	assert.Contains(t, err.Error(), "SJL1L10")
+}
+
+func TestUpdate_DisableAllowed_WhenNoActiveInvestments(t *testing.T) {
+	ctx := context.Background()
+
+	cfgRepo := &adcConfigRepo{
+		getByIDFn: func(_ context.Context, id int32) (*models.AssetDisplayConfig, error) {
+			return &models.AssetDisplayConfig{
+				ID:       id,
+				TypeCode: "SJL1L10",
+				Enabled:  true,
+			}, nil
+		},
+		updateFn: func(_ context.Context, config *models.AssetDisplayConfig) error {
+			return nil
+		},
+	}
+	invRepo := &adcInvestmentRepo{
+		countBySymbolFn: func(_ context.Context, _ string) (int64, error) {
+			return 0, nil
+		},
+	}
+
+	svc := newTestADCServiceWithInvestmentRepo(cfgRepo, &adcFetchCodeRepo{}, &adcAssetPriceRepo{}, invRepo)
+	result, err := svc.Update(ctx, 1, "SJC 1L 10L", 0, false, true)
+
+	require.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.False(t, result.Enabled)
+}
+
+func TestUpdate_NoGuard_WhenEnabledStaysTrue(t *testing.T) {
+	ctx := context.Background()
+	countCalled := false
+
+	cfgRepo := &adcConfigRepo{
+		getByIDFn: func(_ context.Context, id int32) (*models.AssetDisplayConfig, error) {
+			return &models.AssetDisplayConfig{
+				ID:       id,
+				TypeCode: "SJL1L10",
+				Enabled:  true,
+			}, nil
+		},
+		updateFn: func(_ context.Context, _ *models.AssetDisplayConfig) error {
+			return nil
+		},
+	}
+	invRepo := &adcInvestmentRepo{
+		countBySymbolFn: func(_ context.Context, _ string) (int64, error) {
+			countCalled = true
+			return 5, nil
+		},
+	}
+
+	svc := newTestADCServiceWithInvestmentRepo(cfgRepo, &adcFetchCodeRepo{}, &adcAssetPriceRepo{}, invRepo)
+	result, err := svc.Update(ctx, 1, "SJC 1L 10L", 0, true, true) // enabled stays true
+
+	require.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.False(t, countCalled, "CountBySymbol should NOT be called when enabled stays true")
+}
+
+func TestUpdate_NoGuard_WhenAlreadyDisabled(t *testing.T) {
+	ctx := context.Background()
+	countCalled := false
+
+	cfgRepo := &adcConfigRepo{
+		getByIDFn: func(_ context.Context, id int32) (*models.AssetDisplayConfig, error) {
+			return &models.AssetDisplayConfig{
+				ID:       id,
+				TypeCode: "SJL1L10",
+				Enabled:  false, // already disabled
+			}, nil
+		},
+		updateFn: func(_ context.Context, _ *models.AssetDisplayConfig) error {
+			return nil
+		},
+	}
+	invRepo := &adcInvestmentRepo{
+		countBySymbolFn: func(_ context.Context, _ string) (int64, error) {
+			countCalled = true
+			return 5, nil
+		},
+	}
+
+	svc := newTestADCServiceWithInvestmentRepo(cfgRepo, &adcFetchCodeRepo{}, &adcAssetPriceRepo{}, invRepo)
+	_, err := svc.Update(ctx, 1, "SJC 1L 10L", 0, false, true)
+
+	require.NoError(t, err)
+	assert.False(t, countCalled, "CountBySymbol should NOT be called when config is already disabled")
 }
 
 // ---------------------------------------------------------------------------
@@ -920,6 +1104,9 @@ func TestDelete_DelegatesToRepo(t *testing.T) {
 
 	deleted := false
 	cfgRepo := &adcConfigRepo{
+		getByIDFn: func(_ context.Context, id int32) (*models.AssetDisplayConfig, error) {
+			return &models.AssetDisplayConfig{ID: id, TypeCode: "SJL1L10"}, nil
+		},
 		deleteFn: func(_ context.Context, id int32) error {
 			deleted = true
 			return nil
@@ -936,6 +1123,106 @@ func TestDelete_DelegatesToRepo(t *testing.T) {
 	if !deleted {
 		t.Error("expected Delete to have been called on repo")
 	}
+}
+
+// ---------------------------------------------------------------------------
+// Delete guard tests — prevent deletion when active investments exist
+// ---------------------------------------------------------------------------
+
+func TestDelete_BlockedWhenActiveInvestmentsExist(t *testing.T) {
+	ctx := context.Background()
+
+	cfgRepo := &adcConfigRepo{
+		getByIDFn: func(_ context.Context, id int32) (*models.AssetDisplayConfig, error) {
+			return &models.AssetDisplayConfig{ID: id, TypeCode: "SJL1L10"}, nil
+		},
+	}
+	invRepo := &adcInvestmentRepo{
+		countBySymbolFn: func(_ context.Context, symbol string) (int64, error) {
+			assert.Equal(t, "SJL1L10", symbol)
+			return 2, nil
+		},
+	}
+
+	svc := newTestADCServiceWithInvestmentRepo(cfgRepo, &adcFetchCodeRepo{}, &adcAssetPriceRepo{}, invRepo)
+	err := svc.Delete(ctx, 1)
+
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "Cannot delete")
+	assert.Contains(t, err.Error(), "2")
+	assert.Contains(t, err.Error(), "SJL1L10")
+}
+
+func TestDelete_AllowedWhenNoActiveInvestments(t *testing.T) {
+	ctx := context.Background()
+	deleteCalled := false
+
+	cfgRepo := &adcConfigRepo{
+		getByIDFn: func(_ context.Context, id int32) (*models.AssetDisplayConfig, error) {
+			return &models.AssetDisplayConfig{ID: id, TypeCode: "SJL1L10"}, nil
+		},
+		deleteFn: func(_ context.Context, _ int32) error {
+			deleteCalled = true
+			return nil
+		},
+	}
+	invRepo := &adcInvestmentRepo{
+		countBySymbolFn: func(_ context.Context, _ string) (int64, error) {
+			return 0, nil
+		},
+	}
+
+	svc := newTestADCServiceWithInvestmentRepo(cfgRepo, &adcFetchCodeRepo{}, &adcAssetPriceRepo{}, invRepo)
+	err := svc.Delete(ctx, 1)
+
+	require.NoError(t, err)
+	assert.True(t, deleteCalled, "repo.Delete should be called when count=0")
+}
+
+func TestDelete_ConfigNotFound_ReturnsNotFoundBeforeCountCheck(t *testing.T) {
+	ctx := context.Background()
+	countCalled := false
+
+	cfgRepo := &adcConfigRepo{
+		getByIDFn: func(_ context.Context, _ int32) (*models.AssetDisplayConfig, error) {
+			return nil, apperrors.NewNotFoundError("asset display config")
+		},
+	}
+	invRepo := &adcInvestmentRepo{
+		countBySymbolFn: func(_ context.Context, _ string) (int64, error) {
+			countCalled = true
+			return 0, nil
+		},
+	}
+
+	svc := newTestADCServiceWithInvestmentRepo(cfgRepo, &adcFetchCodeRepo{}, &adcAssetPriceRepo{}, invRepo)
+	err := svc.Delete(ctx, 99)
+
+	require.Error(t, err)
+	assert.False(t, countCalled, "CountBySymbol should NOT be called when config not found")
+}
+
+func TestDelete_ErrorMessageDistinguishesDeleteFromDisable(t *testing.T) {
+	ctx := context.Background()
+
+	cfgRepo := &adcConfigRepo{
+		getByIDFn: func(_ context.Context, id int32) (*models.AssetDisplayConfig, error) {
+			return &models.AssetDisplayConfig{ID: id, TypeCode: "XAU"}, nil
+		},
+	}
+	invRepo := &adcInvestmentRepo{
+		countBySymbolFn: func(_ context.Context, _ string) (int64, error) {
+			return 1, nil
+		},
+	}
+
+	svc := newTestADCServiceWithInvestmentRepo(cfgRepo, &adcFetchCodeRepo{}, &adcAssetPriceRepo{}, invRepo)
+	err := svc.Delete(ctx, 1)
+
+	require.Error(t, err)
+	// Must say "Cannot delete", NOT "Cannot disable"
+	assert.Contains(t, err.Error(), "Cannot delete")
+	assert.NotContains(t, err.Error(), "Cannot disable")
 }
 
 // ---------------------------------------------------------------------------

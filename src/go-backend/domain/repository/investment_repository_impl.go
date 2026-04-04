@@ -319,6 +319,20 @@ func (r *investmentRepository) GetAggregatedPortfolioSummary(ctx context.Context
 	return summary, nil
 }
 
+// CountBySymbol returns the count of non-deleted investments where symbol = the given value.
+// Uses SQL COUNT(*) with GORM soft-delete scope applied automatically (deleted_at IS NULL).
+func (r *investmentRepository) CountBySymbol(ctx context.Context, symbol string) (int64, error) {
+	var count int64
+	result := r.db.DB.WithContext(ctx).
+		Model(&models.Investment{}).
+		Where("symbol = ?", symbol).
+		Count(&count)
+	if result.Error != nil {
+		return 0, apperrors.NewInternalErrorWithCause("failed to count investments by symbol", result.Error)
+	}
+	return count, nil
+}
+
 // GetInvestmentValue aggregates total current value of all investments in a wallet.
 //
 // IMPORTANT: We simply SUM the stored current_value field, which is auto-maintained by GORM hooks.

@@ -13,9 +13,10 @@ import (
 // assetDisplayConfigService implements AssetDisplayConfigService.
 // Depguard: no gorm.io/gorm import — all DB access goes through the repository interfaces.
 type assetDisplayConfigService struct {
-	configRepo    repository.AssetDisplayConfigRepository
-	fetchCodeRepo repository.AssetConfigFetchCodeRepository
+	configRepo     repository.AssetDisplayConfigRepository
+	fetchCodeRepo  repository.AssetConfigFetchCodeRepository
 	assetPriceRepo repository.AssetPriceRepository
+	investmentRepo repository.InvestmentRepository // NEW — used for guard logic (Tasks 4+)
 }
 
 // NewAssetDisplayConfigService creates a new AssetDisplayConfigService with constructor injection.
@@ -23,11 +24,13 @@ func NewAssetDisplayConfigService(
 	configRepo repository.AssetDisplayConfigRepository,
 	fetchCodeRepo repository.AssetConfigFetchCodeRepository,
 	assetPriceRepo repository.AssetPriceRepository,
+	investmentRepo repository.InvestmentRepository, // NEW
 ) AssetDisplayConfigService {
 	return &assetDisplayConfigService{
-		configRepo:    configRepo,
-		fetchCodeRepo: fetchCodeRepo,
+		configRepo:     configRepo,
+		fetchCodeRepo:  fetchCodeRepo,
 		assetPriceRepo: assetPriceRepo,
+		investmentRepo: investmentRepo, // NEW
 	}
 }
 
@@ -159,6 +162,19 @@ func (s *assetDisplayConfigService) Update(
 		return nil, apperrors.NewNotFoundError("asset display config")
 	}
 
+	// Guard: if this update disables a currently-enabled config, check for active investments.
+	if config.Enabled && !enabled {
+		count, countErr := s.investmentRepo.CountBySymbol(ctx, config.TypeCode)
+		if countErr != nil {
+			return nil, countErr
+		}
+		if count > 0 {
+			return nil, apperrors.NewValidationError(
+				fmt.Sprintf("Cannot disable: %d active investment(s) use asset type %s", count, config.TypeCode),
+			)
+		}
+	}
+
 	config.DisplayName = displayName
 	config.DisplayOrder = displayOrder
 	config.Enabled = enabled
@@ -172,8 +188,26 @@ func (s *assetDisplayConfigService) Update(
 }
 
 // Delete soft-deletes a config entry by id.
-// Delegates entirely to the repository which returns NotFoundError if absent.
+// Blocks deletion if any non-deleted investments reference this config's TypeCode.
 func (s *assetDisplayConfigService) Delete(ctx context.Context, id int32) error {
+	config, err := s.configRepo.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if config == nil {
+		return apperrors.NewNotFoundError("asset display config")
+	}
+
+	count, err := s.investmentRepo.CountBySymbol(ctx, config.TypeCode)
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		return apperrors.NewValidationError(
+			fmt.Sprintf("Cannot delete: %d active investment(s) use asset type %s", count, config.TypeCode),
+		)
+	}
+
 	return s.configRepo.Delete(ctx, id)
 }
 
