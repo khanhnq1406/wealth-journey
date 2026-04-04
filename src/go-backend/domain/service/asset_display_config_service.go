@@ -13,9 +13,10 @@ import (
 // assetDisplayConfigService implements AssetDisplayConfigService.
 // Depguard: no gorm.io/gorm import — all DB access goes through the repository interfaces.
 type assetDisplayConfigService struct {
-	configRepo    repository.AssetDisplayConfigRepository
-	fetchCodeRepo repository.AssetConfigFetchCodeRepository
+	configRepo     repository.AssetDisplayConfigRepository
+	fetchCodeRepo  repository.AssetConfigFetchCodeRepository
 	assetPriceRepo repository.AssetPriceRepository
+	investmentRepo repository.InvestmentRepository // NEW — used for guard logic (Tasks 4+)
 }
 
 // NewAssetDisplayConfigService creates a new AssetDisplayConfigService with constructor injection.
@@ -23,11 +24,13 @@ func NewAssetDisplayConfigService(
 	configRepo repository.AssetDisplayConfigRepository,
 	fetchCodeRepo repository.AssetConfigFetchCodeRepository,
 	assetPriceRepo repository.AssetPriceRepository,
+	investmentRepo repository.InvestmentRepository, // NEW
 ) AssetDisplayConfigService {
 	return &assetDisplayConfigService{
-		configRepo:    configRepo,
-		fetchCodeRepo: fetchCodeRepo,
+		configRepo:     configRepo,
+		fetchCodeRepo:  fetchCodeRepo,
 		assetPriceRepo: assetPriceRepo,
+		investmentRepo: investmentRepo, // NEW
 	}
 }
 

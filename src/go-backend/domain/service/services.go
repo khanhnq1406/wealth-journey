@@ -57,7 +57,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	silverPriceSvc := NewSilverPriceService(redisClient)
 	// AssetDisplayConfigService — wires fetch-code-based price resolution.
 	// Provides the AssetDisplayConfigService to MarketDataService for DB-backed gold/silver prices.
-	assetDisplayConfigSvc := NewAssetDisplayConfigService(repos.AssetDisplayConfig, repos.AssetConfigFetchCode, repos.AssetPrice)
+	assetDisplayConfigSvc := NewAssetDisplayConfigService(repos.AssetDisplayConfig, repos.AssetConfigFetchCode, repos.AssetPrice, repos.Investment)
 	marketDataSvc := NewMarketDataService(repos.MarketData, goldPriceSvc, silverPriceSvc, assetDisplayConfigSvc)
 	currencyCache := cache.NewCurrencyCache(redisClient)
 

@@ -8,6 +8,7 @@ import (
 
 	"wealthjourney/domain/models"
 	"wealthjourney/domain/repository"
+	v1 "wealthjourney/protobuf/v1"
 )
 
 // ---------------------------------------------------------------------------
@@ -193,10 +194,59 @@ func (m *adcAssetPriceRepo) ListByAssetTypeFiltered(_ context.Context, _ string,
 	return nil, nil
 }
 
+// adcInvestmentRepo is a minimal stub for repository.InvestmentRepository used in these tests.
+// Only CountBySymbol is wired; all other methods are no-ops (unused by AssetDisplayConfigService).
+type adcInvestmentRepo struct {
+	countBySymbolFn func(ctx context.Context, symbol string) (int64, error)
+}
+
+func (m *adcInvestmentRepo) CountBySymbol(ctx context.Context, symbol string) (int64, error) {
+	if m.countBySymbolFn != nil {
+		return m.countBySymbolFn(ctx, symbol)
+	}
+	return 0, nil
+}
+
+// Remaining interface methods — not used by AssetDisplayConfigService tests.
+func (m *adcInvestmentRepo) Create(_ context.Context, _ *models.Investment) error { return nil }
+func (m *adcInvestmentRepo) GetByID(_ context.Context, _ int32) (*models.Investment, error) {
+	return nil, nil
+}
+func (m *adcInvestmentRepo) GetByIDForUser(_ context.Context, _, _ int32) (*models.Investment, error) {
+	return nil, nil
+}
+func (m *adcInvestmentRepo) GetByUserAndSymbol(_ context.Context, _ int32, _ string) (*models.Investment, error) {
+	return nil, nil
+}
+func (m *adcInvestmentRepo) ListByUserID(_ context.Context, _ int32, _ repository.ListOptions, _ v1.InvestmentType) ([]*models.Investment, int, error) {
+	return nil, 0, nil
+}
+func (m *adcInvestmentRepo) ListByWalletID(_ context.Context, _ int32, _ repository.ListOptions, _ v1.InvestmentType) ([]*models.Investment, int, error) {
+	return nil, 0, nil
+}
+func (m *adcInvestmentRepo) Update(_ context.Context, _ *models.Investment) error { return nil }
+func (m *adcInvestmentRepo) Delete(_ context.Context, _ int32) error               { return nil }
+func (m *adcInvestmentRepo) UpdatePrices(_ context.Context, _ []repository.PriceUpdate) error {
+	return nil
+}
+func (m *adcInvestmentRepo) GetPortfolioSummary(_ context.Context, _ int32) (*repository.PortfolioSummary, error) {
+	return nil, nil
+}
+func (m *adcInvestmentRepo) GetAggregatedPortfolioSummary(_ context.Context, _ int32, _ v1.InvestmentType) (*repository.PortfolioSummary, error) {
+	return nil, nil
+}
+func (m *adcInvestmentRepo) GetInvestmentValue(_ context.Context, _ int32) (int64, error) {
+	return 0, nil
+}
+func (m *adcInvestmentRepo) GetInvestmentValuesByWalletIDs(_ context.Context, _ []int32) (map[int32]int64, error) {
+	return nil, nil
+}
+
 // Verify mocks satisfy their interfaces at compile time.
 var _ repository.AssetDisplayConfigRepository = (*adcConfigRepo)(nil)
 var _ repository.AssetConfigFetchCodeRepository = (*adcFetchCodeRepo)(nil)
 var _ repository.AssetPriceRepository = (*adcAssetPriceRepo)(nil)
+var _ repository.InvestmentRepository = (*adcInvestmentRepo)(nil)
 
 // ---------------------------------------------------------------------------
 // Helper constructor
@@ -207,7 +257,7 @@ func newTestAssetDisplayConfigService(
 	fcRepo repository.AssetConfigFetchCodeRepository,
 	apRepo repository.AssetPriceRepository,
 ) AssetDisplayConfigService {
-	return NewAssetDisplayConfigService(cfgRepo, fcRepo, apRepo)
+	return NewAssetDisplayConfigService(cfgRepo, fcRepo, apRepo, &adcInvestmentRepo{})
 }
 
 // ---------------------------------------------------------------------------
