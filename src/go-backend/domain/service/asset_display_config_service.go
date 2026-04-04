@@ -188,8 +188,26 @@ func (s *assetDisplayConfigService) Update(
 }
 
 // Delete soft-deletes a config entry by id.
-// Delegates entirely to the repository which returns NotFoundError if absent.
+// Blocks deletion if any non-deleted investments reference this config's TypeCode.
 func (s *assetDisplayConfigService) Delete(ctx context.Context, id int32) error {
+	config, err := s.configRepo.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if config == nil {
+		return apperrors.NewNotFoundError("asset display config")
+	}
+
+	count, err := s.investmentRepo.CountBySymbol(ctx, config.TypeCode)
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		return apperrors.NewValidationError(
+			fmt.Sprintf("Cannot delete: %d active investment(s) use asset type %s", count, config.TypeCode),
+		)
+	}
+
 	return s.configRepo.Delete(ctx, id)
 }
 
