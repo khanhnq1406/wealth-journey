@@ -15,7 +15,6 @@ kanban-plugin: board
 ## Plan
 
 - [ ] [[2026-04-03-feat-asset-display-config-safe-disable-delete|Add safe disable/delete for asset display config when users are using that asset code]]
-- [ ] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
 
 
 ## Implement
@@ -23,6 +22,8 @@ kanban-plugin: board
 
 
 ## Review
+
+- [ ] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
 
 
 

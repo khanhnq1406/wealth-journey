@@ -15,3 +15,5 @@ status: Review
 | Plan     | `docs/plans/2026-04-02-improve-mobile-tab-overflow-plan.md` |
 | Progress | `docs/reports/2026-04-02-improve-mobile-tab-overflow-progress.md` |
 | Report   | `docs/reports/2026-04-02-improve-mobile-tab-overflow-report.md` |
+# Resource
+https://www.nngroup.com/articles/tabs-used-right/

@@ -84,6 +84,11 @@
       "strong": "Strong",
       "veryStrong": "Very Strong"
     },
+    "legal": {
+      "title": "Legal",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy"
+    },
     "importTemplates": {
       "title": "Import Templates",
       "description": "Manage your saved import templates for reuse",

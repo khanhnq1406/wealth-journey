@@ -27,6 +27,7 @@ const messageGroups = [
   'community',   // community.profile (edit profile, bio, etc.)
   'validation',  // Zod validation message translations
   'guide',       // guide.* (user guide page content)
+  'legal',       // legal.* (terms of service and privacy policy)
 ] as const;
 
 export default getRequestConfig(async ({ requestLocale }) => {

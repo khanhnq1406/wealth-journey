@@ -84,6 +84,11 @@
       "strong": "Mạnh",
       "veryStrong": "Rất mạnh"
     },
+    "legal": {
+      "title": "Pháp lý",
+      "terms": "Điều khoản dịch vụ",
+      "privacy": "Chính sách bảo mật"
+    },
     "importTemplates": {
       "title": "Mẫu nhập",
       "description": "Quản lý các mẫu nhập đã lưu để sử dụng lại",

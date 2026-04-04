@@ -1,0 +1,453 @@
+Test ID,Feature Area,Test Suite,Test Case Name,Preconditions,Test Steps,Expected Result,Priority,Type,Notes
+TC-AUTH-001,Authentication,Registration,Register with valid Google OAuth token,"App is running, user is not logged in","1. Navigate to /auth/login
+2. Click 'Sign in with Google'
+3. Select a valid Google account","User is registered and logged in, redirected to /dashboard/home. Default currency VND and language EN are set.",P1,Happy Path,
+TC-AUTH-002,Authentication,Registration,Register with already-used Google email,"App is running, Google email already registered","1. Navigate to /auth/login
+2. Click 'Sign in with Google'
+3. Select an already-registered Google account","Error message shown: 'Email already exists'",P1,Error Case,
+TC-AUTH-003,Authentication,Registration,Register with username and password,"App is running, user is not logged in","1. Navigate to /auth/register
+2. Enter a valid unique username
+3. Enter a password meeting requirements
+4. Enter display name
+5. Click Submit","Account created, user auto-logged in, redirected to /dashboard/home",P1,Happy Path,
+TC-AUTH-004,Authentication,Registration,Register with duplicate username,"App is running, username already exists","1. Navigate to /auth/register
+2. Enter an existing username
+3. Enter valid password and display name
+4. Click Submit","Error shown: 'Username already exists'. Form remains open.",P1,Error Case,
+TC-AUTH-005,Authentication,Registration,Register with short password,"App is running, user is not logged in","1. Navigate to /auth/register
+2. Enter valid unique username
+3. Enter a password shorter than minimum length
+4. Click Submit","Validation error shown on password field. Form does not submit.",P1,Validation,
+TC-AUTH-006,Authentication,Registration,Register with mismatched password confirmation,"App is running, user is not logged in","1. Navigate to /auth/register
+2. Enter valid username
+3. Enter password
+4. Enter different value in confirm password field
+5. Click Submit","Error: 'Passwords do not match'. Form does not submit.",P2,Validation,
+TC-AUTH-007,Authentication,Login,Login with valid Google token,"App is running, user has a registered Google account","1. Navigate to /auth/login
+2. Click 'Sign in with Google'
+3. Select registered Google account","User logged in, JWT stored in localStorage, redirected to /dashboard/home",P1,Happy Path,
+TC-AUTH-008,Authentication,Login,Login with invalid Google token,"App is running","1. Simulate an invalid/expired Google token login attempt","Error message shown. User remains on login page.",P1,Error Case,
+TC-AUTH-009,Authentication,Login,Login with valid username and password,"App is running, user has password auth method set","1. Navigate to /auth/login
+2. Enter valid username and password
+3. Click Submit","User logged in, JWT stored, redirected to /dashboard/home",P1,Happy Path,
+TC-AUTH-010,Authentication,Login,Login with wrong password,"App is running, user has password auth method","1. Navigate to /auth/login
+2. Enter valid username
+3. Enter incorrect password
+4. Click Submit","Error message shown (generic: 'Invalid credentials'). User remains on login.",P1,Error Case,
+TC-AUTH-011,Authentication,Logout,Logout from current session,"User is logged in","1. Click user menu/avatar
+2. Click 'Logout'","User logged out, JWT cleared from localStorage, redirected to /auth/login",P1,Happy Path,
+TC-AUTH-012,Authentication,Auth State,Access protected route without token,"User is not logged in","1. Navigate directly to /dashboard/home","User redirected to /auth/login",P1,Security,
+TC-AUTH-013,Authentication,Auth State,Access admin route as regular user,"User is logged in as non-admin","1. Navigate to /dashboard/admin","User sees access denied message or redirected away",P1,Security,
+TC-AUTH-014,Authentication,Password Ops,Change password with valid inputs,"User logged in, has password auth method","1. Go to /dashboard/settings/security
+2. Click 'Change Password'
+3. Enter current password
+4. Enter new valid password
+5. Confirm new password
+6. Click Submit","Password changed successfully. Success message shown.",P1,Happy Path,
+TC-AUTH-015,Authentication,Password Ops,Change password with wrong current password,"User logged in, has password auth method","1. Go to /dashboard/settings/security
+2. Click 'Change Password'
+3. Enter incorrect current password
+4. Enter new password
+5. Submit","Error: 'Current password is incorrect'",P1,Error Case,
+TC-AUTH-016,Authentication,Password Ops,Link Google to password-only account,"User logged in with username/password only","1. Go to /dashboard/settings/security
+2. Click 'Link Google Account'
+3. Complete Google OAuth flow","Google linked to account. Both auth methods available.",P2,Happy Path,
+TC-AUTH-017,Authentication,Sessions,View active sessions list,"User logged in, has sessions on multiple devices","1. Navigate to /dashboard/settings/sessions","List of active sessions shown with: device info, IP, last active time. Current session labeled 'This device'.",P1,Happy Path,
+TC-AUTH-018,Authentication,Sessions,Revoke a specific session,"User logged in, has at least 2 active sessions","1. Navigate to /dashboard/settings/sessions
+2. Click 'Revoke' on a non-current session
+3. Confirm revocation","Session removed from list. User on that device is logged out.",P1,Happy Path,
+TC-AUTH-019,Authentication,Sessions,Revoke all sessions,"User logged in, has multiple sessions","1. Navigate to /dashboard/settings/sessions
+2. Click 'Logout from all devices'
+3. Confirm","All OTHER sessions revoked. User redirected to login.",P1,Happy Path,
+TC-WALLET-001,Wallet Management,Create Wallet,Create a basic wallet with valid data,"User is logged in","1. Navigate to /dashboard/wallets
+2. Click 'Create Wallet'
+3. Enter wallet name (e.g., 'Main Account')
+4. Enter initial balance (e.g., 1000000)
+5. Select currency (VND)
+6. Click Submit","Wallet created. Modal closes. New wallet appears in wallet list with correct name and balance.",P1,Happy Path,
+TC-WALLET-002,Wallet Management,Create Wallet,Create investment wallet,"User is logged in","1. Navigate to /dashboard/wallets
+2. Click 'Create Wallet'
+3. Enter wallet name
+4. Select type: INVESTMENT
+5. Enter initial balance and currency
+6. Submit","Investment wallet created and shown in list.",P1,Happy Path,
+TC-WALLET-003,Wallet Management,Create Wallet,Create wallet with empty name,"User is logged in","1. Open 'Create Wallet' modal
+2. Leave wallet name empty
+3. Enter balance and currency
+4. Click Submit","Validation error: 'Wallet name is required'. Modal stays open.",P1,Validation,
+TC-WALLET-004,Wallet Management,Create Wallet,Create wallet with negative initial balance,"User is logged in","1. Open 'Create Wallet' modal
+2. Enter wallet name
+3. Enter negative balance (e.g., -1000)
+4. Submit","Validation error: 'Balance must be 0 or greater'. Form does not submit.",P1,Validation,
+TC-WALLET-005,Wallet Management,Create Wallet,Create wallet with name over 50 characters,"User is logged in","1. Open 'Create Wallet' modal
+2. Enter 51+ character wallet name
+3. Submit","Validation error on name field. Form does not submit.",P2,Validation,
+TC-WALLET-006,Wallet Management,List Wallets,View wallet list with multiple wallets,"User has 3+ wallets","1. Navigate to /dashboard/wallets","All wallets shown with: name, balance, currency. No errors.",P1,Happy Path,
+TC-WALLET-007,Wallet Management,List Wallets,View wallet list when no wallets exist,"User has no wallets","1. Navigate to /dashboard/wallets","Empty state shown: 'No wallets yet' message with 'Create Wallet' CTA",P1,Empty State,
+TC-WALLET-008,Wallet Management,Edit Wallet,Edit wallet name successfully,"User has at least one wallet","1. Click edit icon on a wallet
+2. Change the wallet name
+3. Submit","Wallet name updated in the list. Success confirmation shown.",P1,Happy Path,
+TC-WALLET-009,Wallet Management,Delete Wallet,Archive a wallet,"User has at least 2 wallets","1. Click delete/options on a wallet
+2. Select 'Archive'
+3. Confirm","Wallet archived and hidden from active list. Success toast shown.",P1,Happy Path,
+TC-WALLET-010,Wallet Management,Delete Wallet,Delete wallet with transfer of transactions,"User has at least 2 wallets with same currency","1. Open delete options on wallet
+2. Select 'Transfer & Delete'
+3. Select target wallet
+4. Confirm","Transactions moved to target wallet. Source wallet deleted. Target balance updated.",P2,Happy Path,
+TC-WALLET-011,Wallet Management,Fund Operations,Add funds to a wallet,"User has a wallet","1. Open wallet options
+2. Click 'Add Funds'
+3. Enter amount (e.g., 500000)
+4. Submit","Wallet balance increased by the amount. Transaction created. Success toast shown.",P1,Happy Path,
+TC-WALLET-012,Wallet Management,Fund Operations,Add zero or negative amount,"User has a wallet","1. Open 'Add Funds' modal
+2. Enter 0 or negative amount
+3. Submit","Validation error: 'Amount must be greater than 0'",P1,Validation,
+TC-WALLET-013,Wallet Management,Fund Operations,Withdraw from wallet with sufficient balance,"User has a wallet with balance >= withdrawal amount","1. Open wallet options
+2. Click 'Withdraw'
+3. Enter amount less than current balance
+4. Submit","Balance decreased by amount. Transaction recorded. Success shown.",P1,Happy Path,
+TC-WALLET-014,Wallet Management,Fund Operations,Withdraw more than wallet balance,"User has a wallet with insufficient balance","1. Open 'Withdraw' modal
+2. Enter amount greater than wallet balance
+3. Submit","Error: 'Insufficient balance'. Form does not submit.",P1,Error Case,
+TC-WALLET-015,Wallet Management,Transfer,Transfer between wallets of same currency,"User has 2+ wallets with same currency","1. Click 'Transfer' button
+2. Select source wallet
+3. Select destination wallet (different from source)
+4. Enter transfer amount
+5. Confirm","Transfer completed. Source balance decreased. Destination balance increased. Transfer transaction recorded.",P1,Happy Path,
+TC-WALLET-016,Wallet Management,Transfer,Transfer between wallets of different currencies,"User has wallets in VND and USD","1. Open Transfer modal
+2. Select VND wallet as source
+3. Select USD wallet as destination
+4. Enter amount in VND
+5. Confirm","FX rate applied. Source decreases by VND amount. Destination increases by converted USD amount. Rate displayed during confirmation.",P2,Happy Path,
+TC-WALLET-017,Wallet Management,Transfer,Transfer to same wallet,"User has a wallet","1. Open Transfer modal
+2. Select same wallet as both source and destination
+3. Enter amount","Validation error: 'Source and destination wallets must be different'",P1,Validation,
+TC-WALLET-018,Wallet Management,Analytics,View total balance across all wallets,"User has multiple wallets","1. Navigate to /dashboard/home or /dashboard/wallets","Total balance shown in user's preferred currency. Sum is correct.",P1,Happy Path,
+TC-TXN-001,Transaction Management,Create Transaction,Create an expense transaction,"User has wallet and categories","1. Click 'Add Transaction'
+2. Select type: Expense
+3. Enter amount (e.g., 200000)
+4. Select a wallet
+5. Select an expense category
+6. Select date (today)
+7. Add description (optional)
+8. Submit","Transaction created. Wallet balance decreased by amount. Transaction appears in list.",P1,Happy Path,
+TC-TXN-002,Transaction Management,Create Transaction,Create an income transaction,"User has wallet and income categories","1. Click 'Add Transaction'
+2. Select type: Income
+3. Enter amount
+4. Select wallet
+5. Select income category
+6. Date: today
+7. Submit","Transaction created. Wallet balance increased. Transaction in list.",P1,Happy Path,
+TC-TXN-003,Transaction Management,Create Transaction,Submit transaction with missing required fields,"User has wallet","1. Open 'Add Transaction' modal
+2. Leave amount empty
+3. Leave category unselected
+4. Click Submit","Validation errors on required fields. Form does not submit.",P1,Validation,
+TC-TXN-004,Transaction Management,Create Transaction,Enter amount with thousand separator,"User has wallet","1. Open Add Transaction modal
+2. Type '1000000' in amount field","Field shows '1,000,000' with thousand separators. Submits as numeric value 1000000.",P1,UX,
+TC-TXN-005,Transaction Management,List Transactions,View transaction list,"User has 10+ transactions","1. Navigate to /dashboard/transaction","Transaction list shown: date, description, category, wallet, amount. Sorted by newest first.",P1,Happy Path,
+TC-TXN-006,Transaction Management,List Transactions,Filter transactions by date range,"User has transactions","1. Navigate to transactions
+2. Set From date to 1st of current month
+3. Set To date to today
+4. Apply filter","Only transactions within the date range shown.",P1,Happy Path,
+TC-TXN-007,Transaction Management,List Transactions,Filter transactions by category,"User has transactions with multiple categories","1. Navigate to transactions
+2. Select a specific category from filter
+3. Apply","Only transactions with that category shown.",P1,Happy Path,
+TC-TXN-008,Transaction Management,List Transactions,Filter transactions by type (Income only),"User has income and expense transactions","1. Navigate to transactions
+2. Set type filter to 'Income'","Only income transactions shown in list.",P1,Happy Path,
+TC-TXN-009,Transaction Management,List Transactions,Search transactions by description,"User has transactions with descriptions","1. Navigate to transactions
+2. Type a keyword in search field","Only transactions containing the keyword in description are shown.",P1,Happy Path,
+TC-TXN-010,Transaction Management,List Transactions,View empty transaction list with filter applied,"User has transactions but none match filter","1. Apply a filter that matches no transactions","Empty state shown: 'No transactions match your filters'",P1,Empty State,
+TC-TXN-011,Transaction Management,Edit Transaction,Edit existing transaction,"User has a transaction","1. Click edit on a transaction
+2. Change the amount
+3. Change the description
+4. Submit","Transaction updated. Wallet balance recalculated. Updated values shown in list.",P1,Happy Path,
+TC-TXN-012,Transaction Management,Delete Transaction,Delete a transaction with confirmation,"User has at least one transaction","1. Click delete on a transaction
+2. Confirmation modal appears
+3. Click 'Confirm Delete'","Transaction removed from list. Wallet balance recalculated.",P1,Happy Path,
+TC-TXN-013,Transaction Management,Delete Transaction,Cancel transaction deletion,"User has a transaction","1. Click delete on a transaction
+2. Confirmation modal appears
+3. Click 'Cancel'","Modal closed. Transaction not deleted. Balance unchanged.",P1,Happy Path,
+TC-TXN-014,Transaction Management,Categories,Create a new expense category,"User is logged in","1. Go to category management (transaction page)
+2. Click 'Add Category'
+3. Enter category name
+4. Select type: Expense
+5. Submit","New category created. Appears in expense category list and transaction dropdown.",P1,Happy Path,
+TC-TXN-015,Transaction Management,Categories,Create duplicate category name,"User has existing category","1. Try to create a category with same name and type as existing one","Error: 'Category name already exists'",P1,Error Case,
+TC-TXN-016,Transaction Management,Categories,Delete category in use by transactions,"User has transactions with a category","1. Try to delete the category used in transactions","Error: 'Cannot delete category with existing transactions'. Category preserved.",P1,Error Case,
+TC-TXN-017,Transaction Management,Analytics,View monthly financial report,"User has transactions across multiple months","1. Navigate to /dashboard/report
+2. Select a year with transactions","Report table shows income, expense, net per month. Totals correct.",P1,Happy Path,
+TC-TXN-018,Transaction Management,Analytics,View category expense breakdown,"User has expenses in multiple categories","1. Navigate to report/transaction page
+2. View category breakdown chart","Pie/bar chart shows % of expense per category. Percentages sum to 100%.",P1,Happy Path,
+TC-TXN-019,Transaction Management,Export,Export transactions to CSV,"User has transactions","1. Navigate to transactions
+2. Click 'Export CSV'
+3. Confirm download","CSV file downloaded with all transaction fields: date, type, description, category, wallet, amount",P2,Happy Path,
+TC-BUDGET-001,Budget Management,Create Budget,Create a monthly budget,"User is logged in","1. Navigate to /dashboard/budget
+2. Click 'Create Budget'
+3. Enter budget name
+4. Enter budget limit (e.g., 5000000)
+5. Select period: Monthly
+6. Set start date
+7. Submit","Budget created. Appears in budget list with 0 spent / 5,000,000 limit.",P1,Happy Path,
+TC-BUDGET-002,Budget Management,Create Budget,Create budget with zero limit,"User is logged in","1. Open 'Create Budget' modal
+2. Enter name
+3. Enter limit: 0
+4. Submit","Validation error: 'Budget limit must be greater than 0'",P1,Validation,
+TC-BUDGET-003,Budget Management,Budget Items,Add a category to a budget,"User has a budget and expense categories","1. Open a budget
+2. Click 'Add Category'
+3. Select an expense category
+4. Optionally set a per-category limit
+5. Submit","Category added to budget. Shows 0 spent for that category.",P1,Happy Path,
+TC-BUDGET-004,Budget Management,Budget Items,Add same category twice to a budget,"User has a budget with a category already added","1. Try to add the same category that is already in the budget","Error: 'Category already in this budget'",P1,Error Case,
+TC-BUDGET-005,Budget Management,Budget Items,Add income category to expense budget,"User has a budget and income categories","1. Try to add an income category to an expense budget","Error shown or income categories filtered out of selection",P2,Validation,
+TC-BUDGET-006,Budget Management,Spending Tracking,View budget spending progress,"User has budget with transactions in budgeted categories","1. Navigate to /dashboard/budget
+2. View budget card","Progress bar shows spent vs limit. % used shown. Color: green < 70%, yellow 70-90%, red > 90%.",P1,Happy Path,
+TC-BUDGET-007,Budget Management,Spending Tracking,Budget overspent indicator,"User has a budget where spending > limit","1. Navigate to budget page
+2. View an over-limit budget","Progress bar at 100%+ and red. 'Over budget' indicator shown.",P1,Happy Path,
+TC-BUDGET-008,Budget Management,Edit Budget,Edit budget name and limit,"User has a budget","1. Click edit on a budget
+2. Change name
+3. Change limit
+4. Submit","Budget updated with new values.",P1,Happy Path,
+TC-BUDGET-009,Budget Management,Delete Budget,Delete a budget,"User has a budget","1. Click delete on a budget
+2. Confirm deletion","Budget deleted. Removed from list. Transactions are not affected.",P1,Happy Path,
+TC-INVEST-001,Investment,Create Investment,Create a stock investment,"User has an INVESTMENT wallet","1. Navigate to /dashboard/portfolio
+2. Click 'Add Investment'
+3. Enter symbol (e.g., AAPL)
+4. Select type: Stock
+5. Enter quantity
+6. Enter purchase price
+7. Select investment wallet
+8. Submit","Investment created. Appears in portfolio. Quantity and value calculated correctly.",P1,Happy Path,
+TC-INVEST-002,Investment,Create Investment,Search for a symbol using autocomplete,"User is on Add Investment form","1. Click symbol input field
+2. Type 'VCB' (at least 2 chars)","Autocomplete dropdown appears with matching symbols from Yahoo Finance. Shows: symbol, exchange, company name.",P1,Happy Path,
+TC-INVEST-003,Investment,Create Investment,Create a gold (VND) investment,"User has an INVESTMENT wallet","1. Open Add Investment form
+2. Select type: Gold VND
+3. Select a gold type (e.g., SJC)
+4. Enter quantity in grams
+5. Enter purchase price
+6. Submit","Gold investment created with correct quantity stored in grams × 10000.",P1,Happy Path,
+TC-INVEST-004,Investment,Create Investment,Create custom investment (non-market asset),"User has an INVESTMENT wallet","1. Open Add Investment form
+2. Check 'Custom investment' option
+3. Enter custom name
+4. Enter quantity and price
+5. Submit","Custom investment created. priceUpdatedAt is null (never updated from market).",P2,Happy Path,
+TC-INVEST-005,Investment,Create Investment,Create investment with zero quantity,"User has INVESTMENT wallet","1. Open Add Investment form
+2. Enter symbol, price
+3. Enter quantity: 0
+4. Submit","Validation error: 'Quantity must be greater than 0'",P1,Validation,
+TC-INVEST-006,Investment,Portfolio View,View portfolio summary,"User has investments with prices","1. Navigate to /dashboard/portfolio","Portfolio summary shown: total invested, current value, total PNL (absolute + %), individual investment cards.",P1,Happy Path,
+TC-INVEST-007,Investment,Portfolio View,View empty portfolio,"User has INVESTMENT wallet but no investments","1. Navigate to /dashboard/portfolio
+2. Select an investment wallet","Empty state: 'No investments yet' with 'Add Investment' CTA.",P1,Empty State,
+TC-INVEST-008,Investment,Portfolio View,Price staleness indicator,"User has investment with old price data","1. Navigate to /dashboard/portfolio
+2. View an investment whose price hasn't been updated in 24+ hours","Investment card shows red staleness indicator dot with tooltip explaining price is stale.",P2,Happy Path,
+TC-INVEST-009,Investment,Portfolio View,Price freshness indicator,"User has investment with recent price","1. Navigate to /dashboard/portfolio
+2. View investment updated within 15 min","Green staleness indicator dot shown.",P2,Happy Path,
+TC-INVEST-010,Investment,Investment Detail,View investment detail modal,"User has an investment","1. Click on an investment card
+2. Investment detail modal opens","Modal shows tabs: Overview, Transactions, Add Transaction, Set Price. Overview shows holdings summary.",P1,Happy Path,
+TC-INVEST-011,Investment,Investment Detail,View transaction history in detail modal,"User has investment with transactions","1. Open investment detail modal
+2. Click 'Transactions' tab","List of buy/sell/dividend transactions shown with date, type, quantity, price, total.",P1,Happy Path,
+TC-INVEST-012,Investment,Transaction,Add a buy transaction,"User has an investment","1. Open investment detail modal
+2. Click 'Add Transaction'
+3. Select type: Buy
+4. Enter quantity
+5. Enter price
+6. Enter date
+7. Submit","Buy transaction recorded. Investment quantity updated. Average price recalculated (FIFO).",P1,Happy Path,
+TC-INVEST-013,Investment,Transaction,Add a sell transaction,"User has investment with holdings","1. Open investment detail modal
+2. Add Transaction: Sell
+3. Enter quantity to sell (less than holdings)
+4. Enter sell price
+5. Submit","Sell recorded. Quantity reduced. Realized PNL calculated. Wallet balance updated.",P1,Happy Path,
+TC-INVEST-014,Investment,Transaction,Sell more than available quantity,"User has investment","1. Open Add Transaction (Sell)
+2. Enter quantity > current holdings
+3. Submit","Error: 'Insufficient holdings to sell'. Transaction not created.",P1,Error Case,
+TC-INVEST-015,Investment,Transaction,Add a dividend transaction,"User has stock investment","1. Open Add Transaction
+2. Select type: Dividend
+3. Enter dividend amount
+4. Enter date
+5. Submit","Dividend recorded. Wallet receives the dividend amount. Investment history updated.",P2,Happy Path,
+TC-INVEST-016,Investment,Price Update,Manually set price for custom investment,"User has custom investment","1. Open investment detail modal
+2. Click 'Set Price' tab
+3. Enter new current price
+4. Submit","Investment current price updated. PNL recalculated with new price.",P1,Happy Path,
+TC-INVEST-017,Investment,Portfolio History,View portfolio performance chart,"User has investments over multiple days","1. Navigate to /dashboard/portfolio
+2. View performance chart","Line chart shows portfolio value over time. Multiple time ranges available.",P2,Happy Path,
+TC-INVEST-018,Investment,Gold Investment,View gold investment in grams,"User has gold VND investment","1. Navigate to portfolio
+2. View gold investment card","Quantity shown in grams (converted from stored value). Price shown per tael.",P2,Happy Path,
+TC-MARKET-001,Market Prices,Gold Prices,View gold prices table,"User is logged in","1. Navigate to /dashboard/prices
+2. Click 'Gold' tab","Table shows gold prices from multiple sources (SJC, DOJI, BTMC, PNJ, etc.) with buy/sell columns.",P1,Happy Path,
+TC-MARKET-002,Market Prices,Silver Prices,View silver prices table,"User is logged in","1. Navigate to /dashboard/prices
+2. Click 'Silver' tab","Silver prices shown from available sources.",P1,Happy Path,
+TC-MARKET-003,Market Prices,Symbol Lookup,Search for a stock symbol price,"User is on prices page","1. Click 'Symbol Lookup' tab
+2. Type a stock symbol (e.g., 'VNM')
+3. Wait for results","Symbol search results shown with current price, change, change %.",P1,Happy Path,
+TC-MARKET-004,Market Prices,Stale Data,View stale price indicator,"Price data is older than threshold","1. Navigate to /dashboard/prices
+2. View a price entry marked stale","Stale entries show '--' or 'stale' indicator instead of price.",P1,Happy Path,
+TC-MARKET-005,Market Prices,Symbol Lookup,Search with less than 2 characters,"User is on symbol lookup","1. Type 1 character in search","No search triggered. Minimum 2 chars message or no results.",P2,Validation,
+TC-ALERT-001,Price Alerts,Create Alert,Create a price alert for a stock,"User is logged in","1. Navigate to /dashboard/settings/alerts
+2. Click 'Create Alert'
+3. Step 1: Search and select a symbol
+4. Step 2: Set target price and direction (ABOVE/BELOW)
+5. Step 3: Set cooldown period and confirm
+6. Submit","Alert created with ACTIVE status. Appears in alerts list.",P1,Happy Path,
+TC-ALERT-002,Price Alerts,Create Alert,Create alert with target price of 0,"User is logged in","1. Open Create Alert form
+2. Enter target price: 0
+3. Submit","Validation error: 'Target price must be greater than 0'",P1,Validation,
+TC-ALERT-003,Price Alerts,List Alerts,View alerts list with status filter,"User has alerts in different statuses","1. Navigate to /dashboard/settings/alerts
+2. Filter by status: Active","Only ACTIVE alerts shown.",P1,Happy Path,
+TC-ALERT-004,Price Alerts,Alert Management,Pause an active alert,"User has an ACTIVE alert","1. Navigate to alerts list
+2. Click 'Pause' on an active alert","Alert status changed to PAUSED.",P1,Happy Path,
+TC-ALERT-005,Price Alerts,Alert Management,Delete an alert,"User has an alert","1. Navigate to alerts list
+2. Click 'Delete' on an alert
+3. Confirm","Alert deleted and removed from list.",P1,Happy Path,
+TC-ALERT-006,Price Alerts,Alert Management,Edit an alert target price,"User has an active alert","1. Click 'Edit' on an alert
+2. Change target price
+3. Submit","Alert updated with new target price.",P1,Happy Path,
+TC-ALERT-007,Price Alerts,Alert Status,View triggered alert,"Alert has been triggered by price crossing target","1. Navigate to alerts list","Triggered alert shows TRIGGERED status badge. Shows when triggered.",P2,Happy Path,
+TC-COMMUNITY-001,Community,Posts,Create a text post,"User is logged in","1. Navigate to /dashboard/community
+2. Click 'Create Post'
+3. Enter post content
+4. Submit","Post created and appears at top of community feed.",P1,Happy Path,
+TC-COMMUNITY-002,Community,Posts,Create a post with empty content,"User is logged in","1. Open Create Post form
+2. Leave content empty
+3. Submit","Validation error: 'Post content is required'",P1,Validation,
+TC-COMMUNITY-003,Community,Posts,Like a post,"User is logged in, viewing community feed","1. Navigate to /dashboard/community
+2. Click the like button on a post","Like count increases by 1. Like button visually changes to indicate liked state.",P1,Happy Path,
+TC-COMMUNITY-004,Community,Posts,Unlike a post (toggle),"User has already liked a post","1. Navigate to /dashboard/community
+2. Click the like button on a post already liked by user","Like removed. Count decreases by 1. Button reverts to unliked state.",P1,Happy Path,
+TC-COMMUNITY-005,Community,Comments,Add a comment to a post,"User is logged in","1. Open a community post
+2. Type a comment in the comment field
+3. Submit","Comment appears below the post. Comment count increases.",P1,Happy Path,
+TC-COMMUNITY-006,Community,Comments,Add empty comment,"User is viewing a post","1. Click comment input
+2. Submit without typing anything","Validation: comment not submitted. Error or button disabled.",P1,Validation,
+TC-COMMUNITY-007,Community,Follow,Follow another user,"User is logged in, viewing another user's profile","1. Navigate to community
+2. Click on another user
+3. Click 'Follow'","Follow relationship created. Following count increases for current user. Follower count increases for target user.",P2,Happy Path,
+TC-COMMUNITY-008,Community,Follow,Unfollow a user,"User is following someone","1. View the followed user's profile
+2. Click 'Unfollow'","Follow relationship removed. Counts updated.",P2,Happy Path,
+TC-IMPORT-001,Bank Import,Upload,Upload valid bank CSV file,"User is logged in, has a bank template","1. Navigate to /dashboard (or Import modal)
+2. Click 'Import Transactions'
+3. Select/upload a CSV file
+4. Submit","CSV parsed successfully. Preview of transactions shown.",P1,Happy Path,
+TC-IMPORT-002,Bank Import,Upload,Upload invalid file format,"User tries to import non-CSV file","1. Open Import Transactions
+2. Upload a .xlsx or .pdf file","Error: 'Invalid file format. Please upload a CSV file.'",P1,Error Case,
+TC-IMPORT-003,Bank Import,Process,Process imported transactions,"User has uploaded and previewed CSV","1. Review imported transactions in preview
+2. Map categories if needed
+3. Click 'Process Import'","All transactions imported to selected wallet. Count shown. Balance updated.",P1,Happy Path,
+TC-IMPORT-004,Bank Import,Templates,Create a bank template,"User is logged in","1. Navigate to /dashboard/settings/import-templates
+2. Click 'Create Template'
+3. Enter template name
+4. Map CSV columns to fields (date, amount, description)
+5. Save","Template saved. Available in import wizard.",P1,Happy Path,
+TC-IMPORT-005,Bank Import,Templates,Delete a bank template,"User has an import template","1. Navigate to import-templates settings
+2. Click delete on a template
+3. Confirm","Template deleted and removed from list.",P1,Happy Path,
+TC-SETTINGS-001,Settings,General,Change preferred currency,"User is logged in","1. Navigate to /dashboard/settings
+2. Change preferred currency from VND to USD
+3. Save","All wallet balances and totals displayed in USD. Settings saved.",P1,Happy Path,
+TC-SETTINGS-002,Settings,General,Change language to Vietnamese,"User is logged in, language is English","1. Navigate to settings
+2. Change language to Vietnamese (vi)
+3. Save","UI language switches to Vietnamese. URL changes to /vi/. All labels in Vietnamese.",P1,Happy Path,
+TC-SETTINGS-003,Settings,Profile,Update display name,"User is logged in","1. Navigate to settings
+2. Update display name
+3. Save","Display name updated. Shown in header/avatar.",P2,Happy Path,
+TC-ADMIN-001,Admin,User Management,View all users as admin,"User has admin privileges","1. Navigate to /dashboard/admin","List of all registered users shown with: username, email, role, created date.",P1,Happy Path,
+TC-ADMIN-002,Admin,User Management,Toggle user admin status,"Admin user is viewing user list","1. Navigate to /dashboard/admin
+2. Click 'Toggle Admin' on a user","User's admin status toggled. Confirmation shown.",P2,Happy Path,
+TC-ADMIN-003,Admin,Asset Display Config,Create asset display config,"Admin user logged in","1. Navigate to admin panel
+2. Open Asset Display Config section
+3. Click 'Create Config'
+4. Enter type code, asset type
+5. Save","Config created. Available in admin list.",P2,Happy Path,
+TC-ADMIN-004,Admin,Asset Display Config,Add fetch code to config,"Admin user, has display config","1. Select a display config
+2. Click 'Add Fetch Code'
+3. Enter source and priority
+4. Save","Fetch code added. Price resolution uses this code in priority order.",P2,Happy Path,
+TC-ADMIN-005,Admin,Asset Display Config,Access admin panel as non-admin,"Regular user (non-admin) logged in","1. Navigate to /dashboard/admin","Access denied. Error message or redirect to dashboard.",P1,Security,
+TC-FEEDBACK-001,Feedback,Submission,Submit feedback as logged-in user,"User is logged in","1. Navigate to /dashboard/feedback
+2. Enter feedback text
+3. Optionally rate experience
+4. Submit","Feedback submitted. Success message shown.",P2,Happy Path,
+TC-FEEDBACK-002,Feedback,Submission,Submit empty feedback,"User is on feedback page","1. Leave feedback text empty
+2. Click Submit","Validation error: 'Feedback is required'",P2,Validation,
+TC-WATCHLIST-001,Watchlist,Add Symbol,Add a symbol to watchlist,"User is logged in","1. Navigate to market prices or portfolio
+2. Click 'Add to Watchlist' on a symbol","Symbol added to user's watchlist. Appears on watchlist page/widget.",P2,Happy Path,
+TC-WATCHLIST-002,Watchlist,Remove Symbol,Remove a symbol from watchlist,"User has symbols in watchlist","1. View watchlist
+2. Click remove on a symbol","Symbol removed from watchlist.",P2,Happy Path,
+TC-PWA-001,PWA,Install Prompt,PWA install prompt appears on first visit,"Using Chrome on Android, first visit","1. Navigate to the app in Chrome
+2. Wait a moment","PWA install banner/modal appears offering to install the app.",P2,Happy Path,
+TC-PWA-002,PWA,Install Prompt,Dismiss install prompt for 7 days,"PWA prompt visible","1. Click 'Not now' or dismiss the install prompt","Prompt dismissed. Does not reappear for 7 days.",P2,Happy Path,
+TC-PWA-003,PWA,Mobile Nav,Bottom navigation works on mobile,"App on mobile device","1. View any dashboard page on mobile","6 bottom nav items visible: Home, Transactions, Wallets, Portfolio, Report, Budget. Active tab highlighted.",P1,Mobile,
+TC-PWA-004,PWA,Mobile Nav,Navigate between tabs on mobile,"App on mobile","1. Click 'Wallets' in bottom nav
+2. Click 'Portfolio' in bottom nav","Pages navigate correctly. Active tab indicator moves.",P1,Mobile,
+TC-PWA-005,PWA,Responsive,Transaction list on mobile,"App on mobile (< 768px)","1. Navigate to /dashboard/transaction on mobile device","Transaction list is in mobile-friendly format (MobileTable). No horizontal scroll. All content readable.",P1,Mobile,
+TC-PWA-006,PWA,Responsive,Portfolio cards on mobile,"App on mobile","1. Navigate to /dashboard/portfolio on mobile","Investment cards stack vertically. All info visible. No overflow.",P1,Mobile,
+TC-I18N-001,Internationalization,Language Switch,Switch to Vietnamese locale,"User on English version","1. Navigate to settings
+2. Change language to Vietnamese","URL changes to /vi/. All UI text changes to Vietnamese. Number/date formats adapt.",P1,i18n,
+TC-I18N-002,Internationalization,Language Switch,Switch back to English from Vietnamese,"User on Vietnamese version","1. Navigate to settings
+2. Change language to English","URL changes to /en/. All text in English.",P1,i18n,
+TC-I18N-003,Internationalization,Number Format,Numbers display with locale formatting,"User has locale set to vi","1. Navigate to any page with numbers","Numbers formatted: 1.000.000 (dot as thousands, comma as decimal) for Vietnamese locale.",P2,i18n,
+TC-I18N-004,Internationalization,Date Format,Dates display in locale format,"User has locale set to different regions","1. View transaction dates with different locale","Date format matches locale: DD/MM/YYYY for vi, MM/DD/YYYY for en-US",P2,i18n,
+TC-LEGAL-001,Legal Pages,Terms,View Terms of Service page,"App is running","1. Navigate to /en/legal/terms (or from footer link)","Terms of Service page renders with content. No errors.",P2,Happy Path,
+TC-LEGAL-002,Legal Pages,Privacy,View Privacy Policy page,"App is running","1. Navigate to /en/legal/privacy","Privacy Policy page renders with content. No errors.",P2,Happy Path,
+TC-LEGAL-003,Legal Pages,i18n,Legal pages in Vietnamese,"App is running","1. Navigate to /vi/legal/terms","Vietnamese version of Terms page renders.",P2,i18n,
+TC-GOLD-001,Gold Sentiment,Vote,Submit a gold sentiment vote,"User is logged in","1. Navigate to gold price or community area
+2. Find gold sentiment voting section
+3. Click 'Bull' (bullish) vote","Vote recorded. Sentiment count/percentage updates.",P3,Happy Path,
+TC-GOLD-002,Gold Sentiment,Vote,Change an existing vote,"User has voted","1. Click a different sentiment option","Previous vote removed. New vote counted. Percentages update.",P3,Happy Path,
+TC-PERF-001,Performance,Loading,Dashboard home loads within 3 seconds,"App deployed, user logged in","1. Log in and navigate to /dashboard/home
+2. Time the page load","All critical content renders within 3 seconds on a standard connection.",P2,Performance,
+TC-PERF-002,Performance,Loading,Skeleton loaders appear during fetch,"Network is throttled to Slow 3G","1. Use Chrome DevTools to throttle network
+2. Navigate to /dashboard/transaction","Skeleton loaders appear immediately while data is loading. No blank screen.",P2,Performance,
+TC-PERF-003,Performance,Large Data,Paginate through many transactions,"User has 100+ transactions","1. Navigate to transaction list
+2. Go to page 2, then page 3","Pagination works correctly. Correct transactions shown per page. Page controls respond.",P2,Performance,
+TC-ERR-001,Error Handling,Network Error,API call fails with network error,"App running, simulate network disconnect","1. Disable network
+2. Try to add a transaction","Error toast shown: 'Network error, please check your connection'. Form stays open.",P1,Error Case,
+TC-ERR-002,Error Handling,Session Expiry,Session expires during active use,"User was active for extended period, token expires","1. Let session expire (or clear JWT manually)
+2. Try to navigate to a protected route","Redirected to /auth/login. Error message: 'Session expired, please log in again'",P1,Error Case,
+TC-ERR-003,Error Handling,404 Page,Navigate to non-existent page,"App is running","1. Navigate to /dashboard/nonexistent","404 page shown with navigation back to dashboard.",P2,Error Case,
+TC-ERR-004,Error Handling,Server Error,API returns 500 error,"App running, server side issue simulated","1. Any API call that returns 500","User-friendly error message shown. No raw stack trace exposed to user.",P1,Security,
+TC-ACC-001,Accessibility,Keyboard Nav,Navigate modals with keyboard,"App is running on desktop","1. Open 'Add Transaction' modal
+2. Tab through form fields
+3. Press Escape","Tab moves focus through form fields in logical order. Escape closes the modal.",P1,Accessibility,
+TC-ACC-002,Accessibility,Keyboard Nav,Focus trap in modal,"App is running on desktop","1. Open any modal
+2. Tab to the last focusable element
+3. Press Tab again","Focus returns to first focusable element in modal (focus trap active).",P1,Accessibility,
+TC-ACC-003,Accessibility,Color Contrast,Verify text is readable on dark background,"App is running","1. View any dashboard page
+2. Inspect text contrast","Text using v2-text-secondary and v2-gold-accent on dark backgrounds meets WCAG AA (4.5:1 contrast ratio).",P2,Accessibility,
+TC-ACC-004,Accessibility,Focus Ring,Focus ring visible on interactive elements,"App is running on desktop","1. Tab through the page","All buttons, inputs, and links show visible gold focus ring (focus-visible:ring-2 focus-visible:ring-v2-gold-primary).",P2,Accessibility,
+TC-SEC-001,Security,XSS,Text inputs sanitize HTML tags,"App is running","1. Enter '<script>alert(1)</script>' in description field of a transaction
+2. Save and view the transaction","Script tags are displayed as plain text, not executed. No XSS vulnerability.",P1,Security,
+TC-SEC-002,Security,Auth,Unauthenticated API call rejected,"No valid JWT present","1. Make a direct API call to GET /api/v1/wallets without Authorization header","API returns 401 Unauthorized. No data exposed.",P1,Security,
+TC-SEC-003,Security,Auth,Access another user's wallet,"User is logged in as User A","1. Make API call to GET /api/v1/wallets/<User B's wallet ID>","API returns 404 Not Found (not exposing other user's data exists).",P1,Security,
+TC-SEC-004,Security,CSRF,Prevent cross-site request forgery,"App is running","1. Attempt an API call from a different origin without CORS headers","Request rejected. CORS policy blocks unauthorized origins.",P2,Security,
+TC-HOME-001,Dashboard Home,Summary,View financial summary on home page,"User is logged in with wallets and transactions","1. Navigate to /dashboard/home","Total balance across wallets shown. Recent transactions listed. Quick action buttons visible.",P1,Happy Path,
+TC-HOME-002,Dashboard Home,Summary,View empty home page (new user),"Brand new user with no wallets or transactions","1. Log in as new user
+2. Navigate to /dashboard/home","Empty state with onboarding prompts to create first wallet and add first transaction.",P1,Empty State,
+TC-HOME-003,Dashboard Home,Quick Actions,Add transaction from home page,"User has wallets and categories","1. Navigate to /dashboard/home
+2. Click 'Add Transaction' quick action button","Transaction modal opens. Can complete add transaction flow.",P1,Happy Path,
+TC-GOLD-PRICE-001,Asset Prices,Gold Price Display,View gold prices from admin config,"Admin has configured asset display config","1. Navigate to /dashboard/prices (or home page gold widget)","Gold prices displayed using admin-configured sources. Prices from DB cache shown.",P1,Happy Path,
+TC-GOLD-PRICE-002,Asset Prices,Currency Prices,View currency exchange rates,"User is logged in","1. Navigate to /dashboard/prices
+2. View currency section","Currency rates shown from multiple sources (VangToday, VangSaiGon, Vietcombank official).",P1,Happy Path,
+TC-GOLD-PRICE-003,Asset Prices,Price Freshness,Stale currency rate indicator,"Currency data hasn't been updated in >15 min","1. View currency rates","Stale rates show '--' or stale indicator. Non-stale rates show values normally.",P2,Happy Path,
+TC-SESSION-001,Session Management,Multi-Device,Login from multiple devices,"User has accounts on two different browsers","1. Log in on Browser A
+2. Log in on Browser B
+3. View sessions on Browser A","Both sessions visible in sessions list. Each device shown separately.",P1,Happy Path,
+TC-SESSION-002,Session Management,Revoke,Revoke session from another device,"User logged in on two devices","1. On Device A: go to /dashboard/settings/sessions
+2. Find Device B session
+3. Click Revoke","Device B is logged out. Device A session remains active.",P1,Happy Path,
+TC-SIDEBAR-001,Navigation,Desktop Sidebar,Sidebar collapses on click,"App on desktop","1. Click the hamburger/toggle button on sidebar","Sidebar collapses to icon-only view. Main content expands.",P2,Happy Path,
+TC-SIDEBAR-002,Navigation,Desktop Sidebar,Navigate to all sections from sidebar,"App on desktop","1. Click each sidebar nav item: Home, Transactions, Wallets, Portfolio, Budget, Report, Prices, Community, Settings","Each navigation item loads the correct page.",P1,Happy Path,
+TC-SIDEBAR-003,Navigation,Desktop Sidebar,Active nav item highlighted,"App on desktop","1. Navigate to /dashboard/wallets","Wallets nav item in sidebar is highlighted/active.",P1,Happy Path,
+TC-DATA-001,Data Integrity,Monetary Values,Large monetary amounts display correctly,"User has a very large balance","1. Create a wallet with balance 999,999,999,999
+2. View the wallet","Balance displays correctly with thousand separators. No overflow or truncation in UI.",P2,Edge Case,
+TC-DATA-002,Data Integrity,Empty States,All empty states handled gracefully,"New user with no data","1. Navigate to: home, wallets, transactions, portfolio, budget, report","Each page shows appropriate empty state message and CTA. No errors thrown.",P1,Empty State,
+TC-DATA-003,Data Integrity,Unicode,Special characters in wallet/transaction names,"User is creating wallet","1. Enter wallet name with special chars: 'Tiết kiệm & Đầu tư 💰'
+2. Save","Name saved and displayed correctly. Unicode and emoji handled.",P2,Edge Case,
+TC-DATA-004,Data Integrity,Concurrency,Concurrent transactions don't corrupt balance,"Two tabs open, both performing transactions","1. Open two browser tabs
+2. Add a transaction in Tab 1
+3. Simultaneously add a transaction in Tab 2","Both transactions saved correctly. Balance reflects both operations accurately.",P2,Edge Case,
+TC-NOTIFICATION-001,Notifications,Toast Success,Success notification on wallet creation,"User creates a wallet","1. Create a new wallet successfully","Green success toast appears briefly, then auto-dismisses after ~3 seconds.",P1,UX,
+TC-NOTIFICATION-002,Notifications,Toast Error,Error notification on API failure,"API request fails","1. Trigger any API error (e.g., duplicate wallet name)","Red error toast appears and persists until dismissed by user or timeout.",P1,UX,
+TC-CHART-001,Charts,Portfolio Chart,Portfolio history chart renders,"User has portfolio with history data","1. Navigate to /dashboard/portfolio
+2. View performance chart section","Line chart renders with portfolio value over time. Axes labeled correctly. No errors.",P1,Happy Path,
+TC-CHART-002,Charts,Budget Chart,Budget progress bars render correctly,"User has budgets with spending","1. Navigate to /dashboard/budget","Progress bars for each budget show correct percentage. Color coding correct (green/yellow/red).",P1,Happy Path,
+TC-CHART-003,Charts,Report Charts,Monthly income/expense chart renders,"User has transactions in multiple months","1. Navigate to /dashboard/report","Bar chart shows income and expense per month. Values match the table below.",P1,Happy Path,

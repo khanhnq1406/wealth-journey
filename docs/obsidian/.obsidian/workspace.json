@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "91ffca39ccb4b426",
+        "id": "d6c6b217169c0247",
         "type": "tabs",
         "children": [
           {
-            "id": "c1a649a975fff14d",
+            "id": "ac6f5885c440af8a",
             "type": "leaf",
             "state": {
               "type": "kanban",
@@ -193,13 +193,15 @@
       "obsidian-kanban:Create new board": false
     }
   },
-  "active": "c1a649a975fff14d",
+  "active": "ac6f5885c440af8a",
   "lastOpenFiles": [
+    "Kanban Board.md",
+    "test-plans/manual-test-cases.csv",
+    "test-plans",
+    "2026-04-02-improve-mobile-tab-overflow.md",
     "2026-04-03-tab-bar-scroll-hint.md",
     "2026-04-03-fix-dashboard-navbar-cannot-scroll-in-desktop-view.md",
     "2026-04-03-add-cors-allow-from-backend.md",
-    "2026-04-02-improve-mobile-tab-overflow.md",
-    "Kanban Board.md",
     "2026-04-03-feat-asset-display-config-safe-disable-delete.md",
     "2026-04-03-fix-system-price-alert-shows-alert-for-all-codes.md",
     "2026-04-02-auto-increase-fetch-code-priority.md",
@@ -220,7 +222,6 @@
     "Enhance UI in admin gold config tab.md",
     "Enhance TanStackTable desktop design to match price alert table.md",
     "Auto increase priority of type code fetcher in edit asset type code.md",
-    "Fix admin nav items not showing after login.md",
     "pictures/price_alert.png",
     "pictures"
   ]
