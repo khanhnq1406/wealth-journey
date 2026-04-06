@@ -361,12 +361,12 @@ func TestPriceAlertService_FirstRun_SetsBaselines(t *testing.T) {
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
 
 	// Config: all type codes are enabled so filter passes
-	configSvc.On("ListAll", ctx, "gold").Return([]*models.AssetDisplayConfig{
-		{TypeCode: "SJL1L10", AssetType: "gold", Enabled: true},
-		{TypeCode: "XAU", AssetType: "gold", Enabled: true},
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{
+		"SJL1L10": {ID: 1, TypeCode: "SJC-display", AssetType: "gold", DisplayName: "SJC 1L-10L", Enabled: true},
+		"XAU":     {ID: 2, TypeCode: "XAU-display", AssetType: "gold", DisplayName: "Gold World", Enabled: true},
 	}, nil)
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{
-		{TypeCode: "AGV", AssetType: "silver", Enabled: true},
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{
+		"AGV": {ID: 3, TypeCode: "AGV-display", AssetType: "silver", DisplayName: "Silver VND", Enabled: true},
 	}, nil)
 
 	// BatchCreate must NOT be called — no alerts on first run
@@ -411,10 +411,10 @@ func TestPriceAlertService_SignificantChange_TriggersAlert(t *testing.T) {
 
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
-	configSvc.On("ListAll", ctx, "gold").Return([]*models.AssetDisplayConfig{
-		{TypeCode: "SJL1L10", AssetType: "gold", Enabled: true},
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{
+		"SJL1L10": {ID: 1, TypeCode: "SJC-display", AssetType: "gold", DisplayName: "SJC 1L-10L", Enabled: true},
 	}, nil)
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{}, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1, 2, 3}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
 	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
@@ -478,10 +478,10 @@ func TestPriceAlertService_BelowThreshold_NoAlert(t *testing.T) {
 
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
-	configSvc.On("ListAll", ctx, "gold").Return([]*models.AssetDisplayConfig{
-		{TypeCode: "SJL1L10", AssetType: "gold", Enabled: true},
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{
+		"SJL1L10": {ID: 1, TypeCode: "SJC-display", AssetType: "gold", DisplayName: "SJC 1L-10L", Enabled: true},
 	}, nil)
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{}, nil)
 
 	err := svc.CheckAndAlert(ctx)
 
@@ -522,10 +522,10 @@ func TestPriceAlertService_Cooldown_SkipsAlert(t *testing.T) {
 
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
-	configSvc.On("ListAll", ctx, "gold").Return([]*models.AssetDisplayConfig{
-		{TypeCode: "SJL1L10", AssetType: "gold", Enabled: true},
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{
+		"SJL1L10": {ID: 1, TypeCode: "SJC-display", AssetType: "gold", DisplayName: "SJC 1L-10L", Enabled: true},
 	}, nil)
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{}, nil)
 
 	err := svc.CheckAndAlert(ctx)
 
@@ -562,9 +562,9 @@ func TestPriceAlertService_GoldFetchError_ContinuesToSilver(t *testing.T) {
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return([]*AssetPriceDTO{
 		{TypeCode: "AGV", Name: "Silver VND", Buy: silverNewPrice, Sell: silverNewPrice + 10_000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
 	}, nil)
-	// Gold fetch error → configSvc.ListAll for gold is NOT called (skipped before config lookup)
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{
-		{TypeCode: "AGV", AssetType: "silver", Enabled: true},
+	// Gold fetch error → configSvc.GetFetchCodesByAssetType for gold is NOT called (skipped before config lookup)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{
+		"AGV": {ID: 3, TypeCode: "AGV-display", AssetType: "silver", DisplayName: "Silver VND", Enabled: true},
 	}, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{10, 20}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
@@ -604,10 +604,10 @@ func TestPriceAlertService_NoUsers_NoNotifications(t *testing.T) {
 		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: newPrice, Sell: newPrice + 100_000_000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
 	}, nil)
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return([]*AssetPriceDTO{}, nil)
-	configSvc.On("ListAll", ctx, "gold").Return([]*models.AssetDisplayConfig{
-		{TypeCode: "SJL1L10", AssetType: "gold", Enabled: true},
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{
+		"SJL1L10": {ID: 1, TypeCode: "SJC-display", AssetType: "gold", DisplayName: "SJC 1L-10L", Enabled: true},
 	}, nil)
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{}, nil)
 
 	// No users registered in the system
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{}, nil)
@@ -664,10 +664,10 @@ func TestPriceAlertService_ForceCheck_AlwaysSendsAlert(t *testing.T) {
 
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
-	configSvc.On("ListAll", ctx, "gold").Return([]*models.AssetDisplayConfig{
-		{TypeCode: "SJL1L10", AssetType: "gold", Enabled: true},
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{
+		"SJL1L10": {ID: 1, TypeCode: "SJC-display", AssetType: "gold", DisplayName: "SJC 1L-10L", Enabled: true},
 	}, nil)
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{}, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1, 2}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
 	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
@@ -723,10 +723,10 @@ func TestPriceAlertService_ForceCheck_RateLimit(t *testing.T) {
 
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
-	configSvc.On("ListAll", ctx, "gold").Return([]*models.AssetDisplayConfig{
-		{TypeCode: "SJL1L10", AssetType: "gold", Enabled: true},
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{
+		"SJL1L10": {ID: 1, TypeCode: "SJC-display", AssetType: "gold", DisplayName: "SJC 1L-10L", Enabled: true},
 	}, nil)
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{}, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
 	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
@@ -765,10 +765,10 @@ func TestPriceAlertService_ForceCheck_NoBaseline_StillSendsAlert(t *testing.T) {
 
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
-	configSvc.On("ListAll", ctx, "gold").Return([]*models.AssetDisplayConfig{
-		{TypeCode: "SJL1L10", AssetType: "gold", Enabled: true},
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{
+		"SJL1L10": {ID: 1, TypeCode: "SJC-display", AssetType: "gold", DisplayName: "SJC 1L-10L", Enabled: true},
 	}, nil)
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{}, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
 	pushSvc.On("SendToAll", ctx, mock.AnythingOfType("string"), mock.AnythingOfType("string"), "/dashboard/home").Return(nil)
@@ -823,10 +823,10 @@ func TestPriceAlertService_ForceCheck_SilverUSD_IncludedInAlert(t *testing.T) {
 		{TypeCode: "XAGUSD", Name: "Silver World (XAG/USD)", Buy: 3200, Sell: 3200, Currency: "USD", IsStale: false, FetchedAt: time.Now()},
 	}
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
-	configSvc.On("ListAll", ctx, "gold").Return([]*models.AssetDisplayConfig{}, nil)
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{
-		{TypeCode: "PHU_QUY_THOI_1L", AssetType: "silver", Enabled: true},
-		{TypeCode: "XAGUSD", AssetType: "silver", Enabled: true},
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{
+		"PHU_QUY_THOI_1L": {ID: 4, TypeCode: "PHU_QUY-display", AssetType: "silver", DisplayName: "Phú Quý thỏi 1L", Enabled: true},
+		"XAGUSD":          {ID: 5, TypeCode: "XAGUSD-display", AssetType: "silver", DisplayName: "Silver World (XAG/USD)", Enabled: true},
 	}, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
@@ -892,10 +892,10 @@ func TestPriceAlertService_StaleGoldPrices_NoAlert(t *testing.T) {
 
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
-	configSvc.On("ListAll", ctx, "gold").Return([]*models.AssetDisplayConfig{
-		{TypeCode: "SJL1L10", AssetType: "gold", Enabled: true},
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{
+		"SJL1L10": {ID: 1, TypeCode: "SJC-display", AssetType: "gold", DisplayName: "SJC 1L-10L", Enabled: true},
 	}, nil)
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{}, nil)
 
 	err := svc.CheckAndAlert(ctx)
 
@@ -944,11 +944,11 @@ func TestPriceAlertService_PartialStale_NonStaleFiresAlert(t *testing.T) {
 
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
-	configSvc.On("ListAll", ctx, "gold").Return([]*models.AssetDisplayConfig{
-		{TypeCode: "SJL1L10", AssetType: "gold", Enabled: true},
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{
+		"SJL1L10": {ID: 1, TypeCode: "SJC-display", AssetType: "gold", DisplayName: "SJC 1L-10L", Enabled: true},
 	}, nil)
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{
-		{TypeCode: "AGV", AssetType: "silver", Enabled: true},
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{
+		"AGV": {ID: 3, TypeCode: "AGV-display", AssetType: "silver", DisplayName: "Silver VND", Enabled: true},
 	}, nil)
 	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1, 2}, nil)
 	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
@@ -999,10 +999,10 @@ func TestPriceAlertService_ForceCheck_StaleSkipped(t *testing.T) {
 
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
-	configSvc.On("ListAll", ctx, "gold").Return([]*models.AssetDisplayConfig{
-		{TypeCode: "SJL1L10", AssetType: "gold", Enabled: true},
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{
+		"SJL1L10": {ID: 1, TypeCode: "SJC-display", AssetType: "gold", DisplayName: "SJC 1L-10L", Enabled: true},
 	}, nil)
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{}, nil)
 
 	err := svc.ForceCheckAndAlert(ctx)
 
@@ -1041,12 +1041,11 @@ func TestPriceAlertService_DisabledCodeExcluded(t *testing.T) {
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return([]*AssetPriceDTO{}, nil)
 
-	// Config: only SJC_1L is enabled; SJC_RING is absent from config entirely
-	goldConfigs := []*models.AssetDisplayConfig{
-		{TypeCode: "SJC_1L", AssetType: "gold", Enabled: true},
-	}
-	configSvc.On("ListAll", ctx, "gold").Return(goldConfigs, nil)
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{}, nil)
+	// Config: only SJC_1L is enabled; SJC_RING is absent from fetch code map entirely
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{
+		"SJC_1L": {ID: 1, TypeCode: "SJC_1L-display", AssetType: "gold", DisplayName: "SJC 1 lượng", Enabled: true},
+	}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{}, nil)
 
 	// Set baseline for SJC_1L so checkPrice returns a mover (6.25% change → above 2% threshold)
 	setBaseline(mr, "SJC_1L", 8000000)
@@ -1090,9 +1089,9 @@ func TestPriceAlertService_ConfigSvcError_SkipsAssetType(t *testing.T) {
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return([]*AssetPriceDTO{}, nil)
 
-	// ListAll returns error for gold
-	configSvc.On("ListAll", ctx, "gold").Return(nil, fmt.Errorf("db timeout"))
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{}, nil)
+	// GetFetchCodesByAssetType returns error for gold
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(nil, fmt.Errorf("db timeout"))
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{}, nil)
 
 	setBaseline(mr, "SJL1L10", 8000000)
 
@@ -1127,8 +1126,8 @@ func TestPriceAlertService_EmptyConfig_NoAlerts(t *testing.T) {
 	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return([]*AssetPriceDTO{}, nil)
 
 	// Config is empty for both asset types
-	configSvc.On("ListAll", ctx, "gold").Return([]*models.AssetDisplayConfig{}, nil)
-	configSvc.On("ListAll", ctx, "silver").Return([]*models.AssetDisplayConfig{}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{}, nil)
 
 	setBaseline(mr, "SJL1L10", 8000000)
 
@@ -1136,4 +1135,111 @@ func TestPriceAlertService_EmptyConfig_NoAlerts(t *testing.T) {
 	assert.NoError(t, err)
 
 	notifRepo.AssertNotCalled(t, "BatchCreate", mock.Anything, mock.Anything)
+}
+
+// ---------------------------------------------------------------------------
+// New tests: Fetch-code-based matching (Task 1 — FR-1, FR-2, FR-3)
+// ---------------------------------------------------------------------------
+
+// TestPriceAlertService_FetchCodeMatching verifies the fixed buildEnabledSet
+// correctly maps fetch codes (asset_price.type_code) to display configs.
+func TestPriceAlertService_FetchCodeMatching(t *testing.T) {
+	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "2.0")
+	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
+
+	assetPriceSvc := new(mockPAAssetPriceSvc)
+	notifRepo := new(mockPANotifRepo)
+	userRepo := new(mockPAUserRepo)
+	pushSvc := new(mockPAPushSvc)
+	configSvc := new(mockPAConfigSvc)
+
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc, configSvc)
+	ctx := context.Background()
+
+	baselinePrice := int64(8_500_000_000)
+	newPrice := int64(8_755_000_000) // ~3% increase
+	setBaseline(mr, "DOJI_AVPL_BAN_LE", baselinePrice) // fetch code, not display code
+
+	// asset_price has internal fetch code "DOJI_AVPL_BAN_LE"
+	goldPrices := []*AssetPriceDTO{
+		{TypeCode: "DOJI_AVPL_BAN_LE", Name: "DOJI AVPL", Buy: newPrice, Sell: newPrice + 10_000_000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
+	}
+	silverPrices := []*AssetPriceDTO{}
+
+	// GetFetchCodesByAssetType returns fetch code → config map
+	dojiConfig := &models.AssetDisplayConfig{ID: 1, TypeCode: "Doji_24K", AssetType: "gold", DisplayName: "Doji 24K", Enabled: true}
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{
+		"DOJI_AVPL_BAN_LE": dojiConfig,
+	}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{}, nil)
+
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
+	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1}, nil)
+	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
+	pushSvc.On("SendToAll", ctx, mock.Anything, mock.Anything, "/dashboard/home").Return(nil)
+
+	err := svc.CheckAndAlert(ctx)
+
+	assert.NoError(t, err)
+	// Verify notification body contains display name (not internal code)
+	capturedNotifs := notifRepo.Calls[0].Arguments[1].([]*models.Notification)
+	var meta map[string]interface{}
+	_ = json.Unmarshal(capturedNotifs[0].Metadata, &meta)
+	movers := meta["movers"].([]interface{})
+	firstMover := movers[0].(map[string]interface{})
+	assert.Equal(t, "Doji 24K", firstMover["name"], "mover name must be DisplayName, not raw fetch code")
+}
+
+// TestPriceAlertService_FetchCodeDeduplication verifies FR-3: multiple fetch codes
+// for the same display config produce only one mover.
+func TestPriceAlertService_FetchCodeDeduplication(t *testing.T) {
+	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "0.5") // low threshold
+	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
+
+	assetPriceSvc := new(mockPAAssetPriceSvc)
+	notifRepo := new(mockPANotifRepo)
+	userRepo := new(mockPAUserRepo)
+	pushSvc := new(mockPAPushSvc)
+	configSvc := new(mockPAConfigSvc)
+
+	svc, mr := newPriceAlertServiceWithMiniredis(t, assetPriceSvc, notifRepo, userRepo, pushSvc, configSvc)
+	ctx := context.Background()
+
+	baselinePrice := int64(8_500_000_000)
+	newPrice := int64(8_755_000_000) // ~3% increase
+	setBaseline(mr, "SJC_CODE_A", baselinePrice)
+	setBaseline(mr, "SJC_CODE_B", baselinePrice)
+
+	sjcConfig := &models.AssetDisplayConfig{ID: 2, TypeCode: "SJC TD", AssetType: "gold", DisplayName: "Vàng SJC", Enabled: true}
+	goldPrices := []*AssetPriceDTO{
+		{TypeCode: "SJC_CODE_A", Name: "SJC A", Buy: newPrice, Sell: newPrice + 5_000_000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
+		{TypeCode: "SJC_CODE_B", Name: "SJC B", Buy: newPrice + 1_000_000, Sell: newPrice + 6_000_000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
+	}
+	silverPrices := []*AssetPriceDTO{}
+
+	// Both fetch codes map to the SAME display config → should deduplicate
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{
+		"SJC_CODE_A": sjcConfig,
+		"SJC_CODE_B": sjcConfig,
+	}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{}, nil)
+
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
+	userRepo.On("GetAllUserIDs", ctx).Return([]int32{1}, nil)
+	notifRepo.On("BatchCreate", ctx, mock.AnythingOfType("[]*models.Notification")).Return(nil)
+	pushSvc.On("SendToAll", ctx, mock.Anything, mock.Anything, "/dashboard/home").Return(nil)
+
+	err := svc.CheckAndAlert(ctx)
+	assert.NoError(t, err)
+
+	// Verify only 1 mover (deduplication by config ID)
+	capturedNotifs := notifRepo.Calls[0].Arguments[1].([]*models.Notification)
+	var meta map[string]interface{}
+	_ = json.Unmarshal(capturedNotifs[0].Metadata, &meta)
+	movers := meta["movers"].([]interface{})
+	assert.Len(t, movers, 1, "expected exactly 1 mover (deduplicated by display config ID)")
+	firstMover := movers[0].(map[string]interface{})
+	assert.Equal(t, "Vàng SJC", firstMover["name"])
 }
