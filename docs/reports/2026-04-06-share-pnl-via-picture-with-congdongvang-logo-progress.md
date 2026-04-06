@@ -8,7 +8,7 @@
 - **Started:** 2026-04-06T00:00:00Z
 - **Last updated:** 2026-04-06T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 3
+- **Current task:** 4
 
 ## Task Progress
 
@@ -17,7 +17,7 @@
 | 0   | Add i18n keys (en + vi)                              | done        | 458b0f1c | Added sharePnl keys (8 keys × 2 locales), 16 tests pass |
 | 1   | Create PnlShareModal component                       | done        | e810cdd4 | PnlShareModal with html2canvas, logo compositing, 7 tests pass |
 | 2   | Add share button and data-pnl-card to NetWorthDisplay | done        | 35b4aa77 | Share button + data-pnl-card on both mobile/desktop cards, 4 tests pass |
-| 3   | Wire PnlShareModal to home page                      | pending     | —      | —       |
+| 3   | Wire PnlShareModal to home page                      | done        | b9dc8f12 | cardRef + isPnlShareOpen wired, page test + E2E spec created, 38 tests pass |
 | 4   | Update C4 frontend component diagram                 | pending     | —      | —       |
 | 5   | Update flow-cross-cutting.md                         | pending     | —      | —       |
 
