@@ -1,6 +1,6 @@
 ---
 type: feature
-status: Not Started
+status: Review
 ---
 
 ## Overview
@@ -11,7 +11,7 @@ Users want to share their investment PNL (profit and loss) results as a branded 
 
 | Artifact | File |
 | -------- | ---- |
-| Spec     | _(added after step 1)_ |
-| Plan     | _(added after step 2)_ |
-| Progress | _(added after step 3 starts)_ |
-| Report   | _(added after step 3 completes)_ |
+| Spec     | `docs/specs/2026-04-06-share-pnl-via-picture-with-congdongvang-logo-spec.md` |
+| Plan     | `docs/plans/2026-04-06-share-pnl-via-picture-with-congdongvang-logo-plan.md` |
+| Progress | `docs/reports/2026-04-06-share-pnl-via-picture-with-congdongvang-logo-progress.md` |
+| Report   | `docs/reports/2026-04-06-share-pnl-via-picture-with-congdongvang-logo-report.md` |

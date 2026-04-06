@@ -7,15 +7,12 @@ kanban-plugin: board
 ## Not Started
 
 
-## Spec
 
-- [ ] [[2026-04-06-price-alert-not-running-prod|Price Alert Not Running on Production]]
+## Spec
 
 
 
 ## Plan
-
-- [ ] [[2026-04-06-share-pnl-via-picture-with-congdongvang-logo|Share PNL via picture with CongDongVang logo]]
 
 
 
@@ -25,11 +22,14 @@ kanban-plugin: board
 
 ## Review
 
+- [ ] [[2026-04-06-share-pnl-via-picture-with-congdongvang-logo|Share PNL via picture with CongDongVang logo]]
+
 
 
 ## Done
 
 **Complete**
+- [x] [[2026-04-06-price-alert-not-running-prod|Price Alert Not Running on Production]]
 - [x] [[2026-04-06-fix-push-price-notification-auto-trigger|Fix push price notification auto-trigger in production]]
 - [x] [[2026-04-06-fix-asset-display-prices-same-value-bug|Fix asset display prices returning same values for all asset types]]
 - [x] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
