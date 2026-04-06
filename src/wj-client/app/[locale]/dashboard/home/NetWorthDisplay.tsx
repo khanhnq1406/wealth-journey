@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Share2 } from "lucide-react";
 import Image from "next/image";
 
 const textShadow = "0 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(0,0,0,0.25)";
@@ -23,6 +23,7 @@ interface NetWorthDisplayProps {
   monthPnlPercent?: number;
   monthPnl?: number;
   userName?: string;
+  onShareClick?: () => void;
 }
 
 interface PnlValueProps {
@@ -81,6 +82,7 @@ export function NetWorthDisplay({
   monthPnlPercent = 0,
   monthPnl = 0,
   userName,
+  onShareClick,
 }: NetWorthDisplayProps) {
   const t = useTranslations("dashboard.home");
 
@@ -101,6 +103,18 @@ export function NetWorthDisplay({
   };
 
   const isMonthPositive = monthPnlPercent >= 0;
+
+  // Share button shared between mobile and desktop
+  const shareButton = onShareClick ? (
+    <button
+      type="button"
+      onClick={onShareClick}
+      aria-label={t("sharePnl.buttonAriaLabel")}
+      className="absolute bottom-3 right-3 z-20 sm:top-3 sm:bottom-auto flex items-center justify-center min-h-[44px] min-w-[44px] w-9 h-9 rounded-full bg-black/30 hover:bg-black/50 transition-colors focus-visible:ring-2 focus-visible:ring-v2-gold-primary cursor-pointer"
+    >
+      <Share2 size={18} className="text-v2-text-tertiary" />
+    </button>
+  ) : null;
 
   // PnL bar shared between mobile and desktop
   const pnlBar = (
@@ -135,6 +149,7 @@ export function NetWorthDisplay({
     <div className="relative z-0 isolate">
       {/* Mobile version — gold gradient card with transparent dragon */}
       <div
+        data-pnl-card
         className="sm:hidden relative overflow-hidden rounded-2xl"
         style={{
           background: goldGradient,
@@ -203,10 +218,12 @@ export function NetWorthDisplay({
         </div>
 
         <div className="mt-3">{pnlBar}</div>
+        {shareButton}
       </div>
 
       {/* Desktop version — gold gradient card with transparent dragon */}
       <div
+        data-pnl-card
         className="hidden sm:block relative overflow-hidden rounded-2xl"
         style={{
           background: goldGradient,
@@ -288,6 +305,7 @@ export function NetWorthDisplay({
             />
           </div>
         </div>
+        {shareButton}
       </div>
     </div>
   );
