@@ -1,6 +1,6 @@
 ---
 type: bug
-status: Not Started
+status: Implement
 ---
 
 ## Overview
@@ -11,7 +11,7 @@ The scheduled push price notification does not fire automatically in production,
 
 | Artifact | File |
 | -------- | ---- |
-| Spec     | _(added after step 1)_ |
-| Plan     | _(added after step 2)_ |
-| Progress | _(added after step 3 starts)_ |
+| Spec     | `docs/specs/2026-04-06-fix-push-price-notification-auto-trigger-spec.md` |
+| Plan     | `docs/plans/2026-04-06-fix-push-price-notification-auto-trigger-plan.md` |
+| Progress | `docs/reports/2026-04-06-fix-push-price-notification-auto-trigger-progress.md` |
 | Report   | _(added after step 3 completes)_ |

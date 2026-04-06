@@ -6,7 +6,6 @@ kanban-plugin: board
 
 ## Not Started
 
-- [ ] [[2026-04-06-fix-push-price-notification-auto-trigger|Fix push price notification auto-trigger in production]]
 - [ ] [[2026-04-06-share-pnl-via-picture-with-congdongvang-logo|Share PNL via picture with CongDongVang logo]]
 
 
@@ -19,6 +18,8 @@ kanban-plugin: board
 
 
 ## Implement
+
+- [ ] [[2026-04-06-fix-push-price-notification-auto-trigger|Fix push price notification auto-trigger in production]]
 
 
 

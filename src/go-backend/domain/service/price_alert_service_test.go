@@ -269,6 +269,14 @@ func (m *mockPAConfigSvc) ListAvailableTypeCodes(ctx context.Context, assetType 
 	return args.Get(0).([]string), args.Error(1)
 }
 
+func (m *mockPAConfigSvc) GetFetchCodesByAssetType(ctx context.Context, assetType string) (map[string]*models.AssetDisplayConfig, error) {
+	args := m.Called(ctx, assetType)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(map[string]*models.AssetDisplayConfig), args.Error(1)
+}
+
 // ---------------------------------------------------------------------------
 // Helper: create a PriceAlertService backed by an in-memory Redis (miniredis).
 // Returns the service, the miniredis server (for pre-seeding keys), and a

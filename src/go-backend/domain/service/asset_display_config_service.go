@@ -407,6 +407,34 @@ func (s *assetDisplayConfigService) ListForInvestment(ctx context.Context, asset
 	return s.configRepo.ListForInvestment(ctx, assetType)
 }
 
+// GetFetchCodesByAssetType returns a map from fetch code (asset_price.type_code) to the
+// AssetDisplayConfig that owns it, for all enabled configs of the given assetType.
+// Configs with no fetch codes are excluded (they cannot resolve a price).
+// Returns empty map on cold-start (no configs found).
+func (s *assetDisplayConfigService) GetFetchCodesByAssetType(ctx context.Context, assetType string) (map[string]*models.AssetDisplayConfig, error) {
+	configs, err := s.configRepo.ListAll(ctx, assetType)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make(map[string]*models.AssetDisplayConfig)
+	for _, cfg := range configs {
+		if !cfg.Enabled {
+			continue
+		}
+		fetchCodes, err := s.fetchCodeRepo.ListByConfigID(ctx, cfg.ID)
+		if err != nil {
+			return nil, err
+		}
+		cfgCopy := cfg // capture loop variable
+		for _, fc := range fetchCodes {
+			result[fc.TypeCode] = cfgCopy
+		}
+	}
+
+	return result, nil
+}
+
 // ListAvailableTypeCodes returns all distinct type_codes from the asset_price table
 // that are relevant for the given assetType.
 func (s *assetDisplayConfigService) ListAvailableTypeCodes(ctx context.Context, assetType string) ([]string, error) {

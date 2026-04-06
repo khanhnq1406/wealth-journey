@@ -397,6 +397,12 @@ type AssetDisplayConfigService interface {
 	// that are relevant for the given assetType.
 	ListAvailableTypeCodes(ctx context.Context, assetType string) ([]string, error)
 
+	// GetFetchCodesByAssetType returns a map from fetch code (asset_price.type_code) to the
+	// AssetDisplayConfig that owns it, for all enabled configs of the given assetType.
+	// Configs with no fetch codes are excluded.
+	// Returns empty map (not error) if no configs are found (cold-start / unconfigured).
+	GetFetchCodesByAssetType(ctx context.Context, assetType string) (map[string]*models.AssetDisplayConfig, error)
+
 	// ListForInvestment returns enabled configs where show_in_investment = true for the given assetType,
 	// ordered by display_order ASC. Used by gold/silver investment handlers to populate type options.
 	ListForInvestment(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error)
