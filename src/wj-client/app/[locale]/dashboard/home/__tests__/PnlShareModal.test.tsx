@@ -41,36 +41,38 @@ jest.mock("@/contexts/NotificationContext", () => ({
 }));
 
 // Mock Canvas 2D context — jsdom does not implement canvas drawing
-const mockCtx = {
-  scale: jest.fn(),
-  save: jest.fn(),
-  restore: jest.fn(),
-  beginPath: jest.fn(),
-  moveTo: jest.fn(),
-  lineTo: jest.fn(),
-  quadraticCurveTo: jest.fn(),
-  closePath: jest.fn(),
-  clip: jest.fn(),
-  arc: jest.fn(),
-  fill: jest.fn(),
-  stroke: jest.fn(),
-  fillRect: jest.fn(),
-  fillText: jest.fn(),
-  measureText: jest.fn(() => ({ width: 100 })),
-  createLinearGradient: jest.fn(() => ({ addColorStop: jest.fn() })),
-  drawImage: jest.fn(),
-  fillStyle: "",
-  strokeStyle: "",
-  lineWidth: 0,
-  lineCap: "",
-  lineJoin: "",
-  shadowColor: "",
-  shadowBlur: 0,
-  font: "",
-  textAlign: "",
-};
-HTMLCanvasElement.prototype.getContext = jest.fn(() => mockCtx) as any;
-HTMLCanvasElement.prototype.toDataURL = jest.fn(() => "data:image/png;base64,canvas-drawn");
+// These are set in beforeEach (not module-level) so jest.restoreAllMocks() in afterEach
+// doesn't break subsequent tests.
+function makeMockCtx() {
+  return {
+    scale: jest.fn(),
+    save: jest.fn(),
+    restore: jest.fn(),
+    beginPath: jest.fn(),
+    moveTo: jest.fn(),
+    lineTo: jest.fn(),
+    quadraticCurveTo: jest.fn(),
+    closePath: jest.fn(),
+    clip: jest.fn(),
+    arc: jest.fn(),
+    fill: jest.fn(),
+    stroke: jest.fn(),
+    fillRect: jest.fn(),
+    fillText: jest.fn(),
+    measureText: jest.fn(() => ({ width: 100 })),
+    createLinearGradient: jest.fn(() => ({ addColorStop: jest.fn() })),
+    drawImage: jest.fn(),
+    fillStyle: "",
+    strokeStyle: "",
+    lineWidth: 0,
+    lineCap: "",
+    lineJoin: "",
+    shadowColor: "",
+    shadowBlur: 0,
+    font: "",
+    textAlign: "",
+  };
+}
 
 // Default props
 const defaultProps = {
@@ -86,6 +88,13 @@ const defaultProps = {
 describe("PnlShareModal", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Re-apply canvas mocks each test since afterEach restoreAllMocks() removes them
+    const mockCtx = makeMockCtx();
+    HTMLCanvasElement.prototype.getContext = jest.fn(() => mockCtx) as any;
+    HTMLCanvasElement.prototype.toDataURL = jest.fn(
+      () => "data:image/png;base64,canvas-drawn",
+    );
 
     // Mock Image loading for logo
     Object.defineProperty(global, "Image", {
@@ -134,8 +143,8 @@ describe("PnlShareModal", () => {
     render(<PnlShareModal {...defaultProps} />);
     await waitFor(() => {
       expect(screen.queryByTestId("loading-spinner")).not.toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /download/i })).toBeInTheDocument();
     });
-    expect(screen.getByRole("button", { name: /download/i })).toBeInTheDocument();
   });
 
   it("re-draws image each time modal opens", async () => {

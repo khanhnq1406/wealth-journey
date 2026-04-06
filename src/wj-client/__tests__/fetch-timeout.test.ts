@@ -4,10 +4,24 @@ describe("fetchSiteSettings timeout pattern", () => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 50); // 50ms for test speed
 
+    // Use a mock fetch to avoid real network requests that conflict with MSW interceptors
+    const mockFetch = jest.fn(() =>
+      new Promise<Response>((_, reject) => {
+        const handler = () => {
+          reject(
+            Object.assign(new Error("The operation was aborted"), {
+              name: "AbortError",
+            }),
+          );
+        };
+        controller.signal.addEventListener("abort", handler);
+      }),
+    );
+
     try {
-      await fetch("http://localhost:1", { signal: controller.signal });
+      await mockFetch();
     } catch (e: unknown) {
-      // Should be either AbortError or connection refused
+      // Should be AbortError
       expect(e).toBeDefined();
     } finally {
       clearTimeout(timeoutId);
