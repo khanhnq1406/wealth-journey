@@ -114,6 +114,10 @@ func (m *mockAssetDisplayConfigService) ListAvailableTypeCodes(ctx context.Conte
 	return []string{}, nil
 }
 
+func (m *mockAssetDisplayConfigService) GetFetchCodesByAssetType(ctx context.Context, assetType string) (map[string]*models.AssetDisplayConfig, error) {
+	return map[string]*models.AssetDisplayConfig{}, nil
+}
+
 func (m *mockAssetDisplayConfigService) ListForInvestment(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
 	if m.listForInvestmentFunc != nil {
 		return m.listForInvestmentFunc(ctx, assetType)

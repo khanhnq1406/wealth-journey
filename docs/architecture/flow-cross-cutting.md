@@ -527,6 +527,7 @@ sequenceDiagram
     participant PAJ as PriceAlertJob
     participant PAS as PriceAlertService
     participant ADCS as AssetDisplayConfigService
+    participant DB as asset_config_fetch_code (DB)
     participant GPS as GoldPriceService
     participant SPS as SilverPriceService
     participant R as Redis
@@ -547,10 +548,10 @@ sequenceDiagram
 
     par Fetch gold prices
         PAS->>GPS: FetchAllPrices(ctx)
-        GPS-->>PAS: []*CachedGoldPrice
+        GPS-->>PAS: []*CachedGoldPrice (asset_price.type_code values)
     and Fetch silver prices
         PAS->>SPS: FetchAllPrices(ctx)
-        SPS-->>PAS: []*CachedSilverPrice
+        SPS-->>PAS: []*CachedSilverPrice (asset_price.type_code values)
     end
 
     loop For each category (gold_vnd, gold_usd, silver_vnd, silver_usd)
@@ -558,18 +559,32 @@ sequenceDiagram
         alt Category disabled
             Note over PAS: Skip this category
         else Category enabled
-            PAS->>ADCS: ListAll(assetType)
-            ADCS-->>PAS: []AssetDisplayConfig (admin-enabled type codes)
-            PAS->>PAS: Build enabledCodes set from configs<br/>Filter fetched prices to enabled type codes only
+            Note over PAS,DB: buildEnabledSet — fetch codes, not display configs
+            PAS->>ADCS: GetFetchCodesByAssetType(ctx, assetType)
+            ADCS->>DB: SELECT * FROM asset_config_fetch_code<br/>JOIN asset_display_config WHERE asset_type = assetType
+            DB-->>ADCS: []AssetConfigFetchCode with parent AssetDisplayConfig
+            ADCS-->>PAS: map[fetchCode → AssetDisplayConfig]
+            Note over PAS: enabledMap key = asset_config_fetch_code.type_code<br/>which matches asset_price.type_code — namespace aligned
+            PAS->>PAS: Filter fetched prices: keep only p where<br/>enabledMap[p.TypeCode] exists
             PAS->>R: GET price_alert:baseline:{category}
             alt No baseline
                 PAS->>R: SET price_alert:baseline:{category}
                 Note over PAS: First run — set baseline, skip alert
             else Baseline exists
                 PAS->>PAS: Compare current vs baseline<br/>Calculate % change per item
-                PAS->>PAS: Filter items exceeding catCfg.ThresholdPct<br/>Take top cfg.TopMoversCount movers
+                PAS->>PAS: Filter items exceeding catCfg.ThresholdPct<br/>Sort by |changePct| descending
 
-                alt Significant movers found
+                loop For each candidate mover (until TopMoversCount reached)
+                    PAS->>PAS: cfg = enabledMap[p.TypeCode]
+                    alt cfg.ID already in seenConfigIDs (FR-3: dedup)
+                        Note over PAS: Skip — same display config already represented
+                    else New config ID
+                        PAS->>PAS: mover.Name = cfg.DisplayName (FR-2: human-readable name)<br/>seenConfigIDs[cfg.ID] = true
+                        Note over PAS: Append mover to top movers list
+                    end
+                end
+
+                alt Significant movers found (len > 0)
                     PAS->>R: GET price_alert:cooldown:{category}
                     alt Cooldown active (< cfg.CooldownMinutes)
                         Note over PAS: Skip this category
@@ -578,7 +593,7 @@ sequenceDiagram
                         UR-->>PAS: []int32
 
                         PAS->>PAS: ResolvePlaceholders(catCfg.TitleTemplate, values)<br/>ResolvePlaceholders(catCfg.BodyTemplate, values)
-                        PAS->>PAS: Build notifications with metadata JSON<br/>{category, movers: [{typeCode, name, direction, changePct, priceDiff}]}
+                        PAS->>PAS: Build notifications with metadata JSON<br/>{category, movers: [{typeCode, name, direction, changePct, priceDiff}]}<br/>name = cfg.DisplayName (FR-2)
                         PAS->>NR: BatchCreate(ctx, notifications)
 
                         par SSE delivery
@@ -608,14 +623,16 @@ sequenceDiagram
 
 - Each category is checked independently — a gold alert does not affect silver alerts
 - Categories can be individually enabled/disabled via admin config (`catCfg.Enabled`)
-- Before evaluating prices for a category, `PriceAlertService` calls `AssetDisplayConfigService.ListAll(assetType)` to obtain the set of admin-enabled type codes; prices not in that set are filtered out and never trigger alerts
+- **`buildEnabledSet` correctness (fix):** Before evaluating prices for a category, `PriceAlertService` calls `AssetDisplayConfigService.GetFetchCodesByAssetType(ctx, assetType)` which reads `asset_config_fetch_code.type_code` values from the DB. The returned map has keys in the same namespace as `asset_price.type_code` (e.g. `"SJC_1L"`, `"DOJI_999"`), so the lookup `enabledMap[p.TypeCode]` correctly matches and filters prices. The previous broken approach read `asset_display_config.type_code` values (a different, human-readable namespace) which never matched `asset_price.type_code`, causing all prices to be filtered out and no alerts to fire.
+- **FR-2 (DisplayName):** The `mover.Name` field in notification metadata is set to `cfg.DisplayName` (the admin-configured human-readable label from `asset_display_config`), not the raw `type_code`. This ensures notification bodies show friendly names like "Vàng SJC 1L" rather than internal codes.
+- **FR-3 (dedup by config ID):** The mover-building loop tracks `seenConfigIDs` (a `map[int32]bool`). When multiple fetch codes belong to the same `AssetDisplayConfig`, only the first (highest `|changePct|`) mover per config ID is included. This prevents duplicate display configs from generating multiple notification entries for the same logical asset.
 - Baselines are set on first run and updated only after an alert is sent
 - Cooldown period is configurable via admin UI (`cfg.CooldownMinutes`, default 120 min)
 - Thresholds are configurable per category via admin UI (`catCfg.ThresholdPct`), with env var fallback defaults
 - Notification title and body use template resolution with placeholders (`{moverName}`, `{changePct}`, `{direction}`, etc.)
 - Config is loaded from Redis at runtime via `LoadPriceAlertConfig(ctx, rdb)` — falls back to `DefaultPriceAlertConfig()` which reads env vars
 - Push delivery failures are non-fatal — SSE and DB notifications still persist
-- Only the top N movers (`cfg.TopMoversCount`, default 5) are included in notification metadata
+- Only the top N movers (`cfg.TopMoversCount`, default 5) are included in notification metadata after dedup (FR-3)
 - Notification metadata includes `priceDiff` (absolute price change) in addition to `changePct`
 
 ### Error Paths
@@ -624,6 +641,7 @@ sequenceDiagram
 |-----------|----------|----------|
 | Gold price fetch failure | Skip gold categories | Silver categories still checked |
 | Silver price fetch failure | Skip silver categories | Gold categories still checked |
+| `GetFetchCodesByAssetType` failure | Skip that category (enabledMap empty) | Other categories still checked |
 | Redis baseline read failure | Skip that category | Other categories still checked |
 | BatchCreate failure | Error logged, alert not sent | Next run retries |
 | SSE publish failure | Non-fatal, logged | DB notification persists |

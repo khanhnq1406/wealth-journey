@@ -83,26 +83,21 @@ func (s *priceAlertService) doCheckAndAlert(ctx context.Context, force bool) err
 
 	var allCategories []categoryMovers
 
-	// buildEnabledSet returns a set of enabled TypeCodes from AssetDisplayConfig.
+	// buildEnabledSet returns a map of fetch code → AssetDisplayConfig for a given asset type.
+	// The map key is the asset_price.type_code (internal fetch code), not the display TypeCode.
 	// Returns (nil, false) if the config lookup fails — caller should skip the asset type.
-	// Returns (empty map, true) if config is empty — no codes are enabled (cold-start / unconfigured).
-	buildEnabledSet := func(assetType string) (map[string]bool, bool) {
-		configs, err := s.configSvc.ListAll(ctx, assetType)
+	// Returns (empty map, true) if no fetch codes are configured — cold-start / unconfigured.
+	buildEnabledSet := func(assetType string) (map[string]*models.AssetDisplayConfig, bool) {
+		fcMap, err := s.configSvc.GetFetchCodesByAssetType(ctx, assetType)
 		if err != nil {
-			log.Printf("Price alert: failed to fetch %s display configs: %v — skipping asset type", assetType, err)
+			log.Printf("Price alert: failed to fetch %s fetch codes: %v — skipping asset type", assetType, err)
 			return nil, false
 		}
-		if len(configs) == 0 {
-			log.Printf("Price alert: no enabled configs for %s — skipping (cold-start or unconfigured)", assetType)
-			return map[string]bool{}, true
+		if len(fcMap) == 0 {
+			log.Printf("Price alert: no enabled configs with fetch codes for %s — skipping (cold-start or unconfigured)", assetType)
+			return map[string]*models.AssetDisplayConfig{}, true
 		}
-		enabled := make(map[string]bool, len(configs))
-		for _, c := range configs {
-			if c.Enabled {
-				enabled[c.TypeCode] = true
-			}
-		}
-		return enabled, true
+		return fcMap, true
 	}
 
 	// Fetch gold prices from DB cache
@@ -112,13 +107,17 @@ func (s *priceAlertService) doCheckAndAlert(ctx context.Context, force bool) err
 	} else {
 		enabledGold, ok := buildEnabledSet("gold")
 		if !ok {
-			// config lookup failed — skip gold entirely
 			goto silverSection
 		}
 		var goldVND, goldUSD []priceMover
+		seenGoldConfigIDs := make(map[int32]bool)
 		for _, p := range goldPrices {
-			if !enabledGold[p.TypeCode] {
-				continue // filtered: not in admin config or disabled
+			cfg, matched := enabledGold[p.TypeCode]
+			if !matched {
+				continue // filtered: fetch code not in any enabled display config
+			}
+			if seenGoldConfigIDs[cfg.ID] {
+				continue // dedup: one mover per display config (FR-3)
 			}
 			if p.IsStale {
 				log.Printf("Price alert: skipping stale gold price for %s", p.TypeCode)
@@ -133,7 +132,8 @@ func (s *priceAlertService) doCheckAndAlert(ctx context.Context, force bool) err
 			if mover == nil {
 				continue
 			}
-			mover.Name = p.Name
+			mover.Name = cfg.DisplayName // FR-2: use display name from config
+			seenGoldConfigIDs[cfg.ID] = true
 			if p.Currency == "VND" {
 				goldVND = append(goldVND, *mover)
 			} else {
@@ -160,13 +160,17 @@ silverSection:
 	} else {
 		enabledSilver, ok := buildEnabledSet("silver")
 		if !ok {
-			// config lookup failed — skip silver entirely
 			goto processCategories
 		}
 		var silverVND, silverUSD []priceMover
+		seenSilverConfigIDs := make(map[int32]bool)
 		for _, p := range silverPrices {
-			if !enabledSilver[p.TypeCode] {
-				continue // filtered: not in admin config or disabled
+			cfg, matched := enabledSilver[p.TypeCode]
+			if !matched {
+				continue // filtered: fetch code not in any enabled display config
+			}
+			if seenSilverConfigIDs[cfg.ID] {
+				continue // dedup: one mover per display config (FR-3)
 			}
 			if p.IsStale {
 				log.Printf("Price alert: skipping stale silver price for %s", p.TypeCode)
@@ -181,7 +185,8 @@ silverSection:
 			if mover == nil {
 				continue
 			}
-			mover.Name = p.Name
+			mover.Name = cfg.DisplayName // FR-2: use display name from config
+			seenSilverConfigIDs[cfg.ID] = true
 			if p.Currency == "VND" {
 				silverVND = append(silverVND, *mover)
 			} else {
