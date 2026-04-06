@@ -23,13 +23,12 @@ kanban-plugin: board
 
 ## Review
 
-- [ ] [[2026-04-06-fix-push-price-notification-auto-trigger|Fix push price notification auto-trigger in production]]
-
 
 
 ## Done
 
 **Complete**
+- [x] [[2026-04-06-fix-push-price-notification-auto-trigger|Fix push price notification auto-trigger in production]]
 - [x] [[2026-04-06-fix-asset-display-prices-same-value-bug|Fix asset display prices returning same values for all asset types]]
 - [x] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
 - [x] [[2026-04-03-feat-asset-display-config-safe-disable-delete|Add safe disable/delete for asset display config when users are using that asset code]]
