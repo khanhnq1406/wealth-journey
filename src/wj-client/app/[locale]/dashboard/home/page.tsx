@@ -32,6 +32,7 @@ import { WalletsSection } from "./WalletsSection";
 import { BaseCard } from "@/components/BaseCard";
 import { SentimentCard } from "@/components/GoldSentimentCard";
 import { OrnateDivider } from "@/components/decorative/OrnateDivider";
+import { PnlShareModal } from "./PnlShareModal";
 
 type ModalType = "add-transaction" | "transfer-money" | "create-wallet" | null;
 
@@ -43,6 +44,8 @@ export default function Home() {
   const { currency } = useCurrency();
   const pnlRef = useRef<HTMLDivElement>(null);
   const [pnlHeight, setPnlHeight] = useState<number | undefined>(undefined);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isPnlShareOpen, setIsPnlShareOpen] = useState(false);
 
   useEffect(() => {
     const el = pnlRef.current;
@@ -141,13 +144,16 @@ export default function Home() {
       {/* Mobile Layout */}
       <div className="sm:hidden px-4 py-4 pb-24 space-y-6">
         {/* 1. Net Worth */}
-        <NetWorthDisplay
-          totalNetWorth={totalNetWorth}
-          currency={currency}
-          monthPnlPercent={monthPnlPercent}
-          monthPnl={monthPnl}
-          userName={user.fullname ?? undefined}
-        />
+        <div ref={cardRef}>
+          <NetWorthDisplay
+            totalNetWorth={totalNetWorth}
+            currency={currency}
+            monthPnlPercent={monthPnlPercent}
+            monthPnl={monthPnl}
+            userName={user.fullname ?? undefined}
+            onShareClick={() => setIsPnlShareOpen(true)}
+          />
+        </div>
 
         {/* 2. PNL Card */}
         <PNLCard currency={currency} />
@@ -197,6 +203,7 @@ export default function Home() {
           monthPnlPercent={monthPnlPercent}
           monthPnl={monthPnl}
           userName={user.fullname ?? undefined}
+          onShareClick={() => setIsPnlShareOpen(true)}
         />
 
         {/* Row 2: PNL Chart + Wallets */}
@@ -263,6 +270,16 @@ export default function Home() {
           <CreateWalletForm onSuccess={handleModalSuccess} />
         )}
       </BaseModal>
+
+      <PnlShareModal
+        isOpen={isPnlShareOpen}
+        onClose={() => setIsPnlShareOpen(false)}
+        totalNetWorth={totalNetWorth}
+        currency={currency}
+        monthPnl={monthPnl}
+        monthPnlPercent={monthPnlPercent}
+        userName={user.fullname ?? undefined}
+      />
     </div>
   );
 }

@@ -499,44 +499,64 @@ func TestUserPriceAlertService_CreateAlert_GoldPrice_Stale_ReturnsZero(t *testin
 	alertRepo.AssertExpectations(t)
 }
 
-func TestUserPriceAlertService_CreateAlert_GoldPrice_NotFound_ReturnsZero(t *testing.T) {
+func TestUserPriceAlertService_CreateAlert_GoldPrice_NotFound_RejectsCreation(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
 	assetPriceSvc := new(mockAlertAssetPriceSvc)
 	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
 	ctx := context.Background()
 
 	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
-	// DB returns nil (not found)
+	// DB returns nil (not found) — symbol does not match any known type code
 	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "SJL1L10").
 		Return(nil, nil)
-	alertRepo.On("Create", ctx, mock.AnythingOfType("*models.UserPriceAlert")).Return(nil)
 
 	resp, err := svc.CreateAlert(ctx, 1, validGoldCreateReq())
 
-	assert.NoError(t, err)
-	// not found → 0
-	assert.Equal(t, int64(0), resp.Alert.CurrentPriceAtCreation)
-	alertRepo.AssertExpectations(t)
+	// Must reject: gold symbol must resolve to a known fetch code
+	assert.Error(t, err)
+	assert.Nil(t, resp)
+	alertRepo.AssertNotCalled(t, "Create")
 }
 
-func TestUserPriceAlertService_CreateAlert_GoldPrice_DBError_ReturnsZero(t *testing.T) {
+func TestUserPriceAlertService_CreateAlert_GoldPrice_DBError_RejectsCreation(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
 	assetPriceSvc := new(mockAlertAssetPriceSvc)
 	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
 	ctx := context.Background()
 
 	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
-	// DB returns an error — should return 0 (best-effort)
+	// DB returns an error — symbol cannot be validated, reject creation
 	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "SJL1L10").
 		Return(nil, apperrors.NewValidationError("db error"))
-	alertRepo.On("Create", ctx, mock.AnythingOfType("*models.UserPriceAlert")).Return(nil)
 
 	resp, err := svc.CreateAlert(ctx, 1, validGoldCreateReq())
 
-	assert.NoError(t, err)
-	// db error → 0, alert still created
-	assert.Equal(t, int64(0), resp.Alert.CurrentPriceAtCreation)
-	alertRepo.AssertExpectations(t)
+	// Must reject: cannot verify gold symbol against known fetch codes
+	assert.Error(t, err)
+	assert.Nil(t, resp)
+	alertRepo.AssertNotCalled(t, "Create")
+}
+
+func TestUserPriceAlertService_CreateAlert_GoldDisplayName_RejectsCreation(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	ctx := context.Background()
+
+	// Simulate the production bug: user submits a display name instead of a fetch code
+	req := validGoldCreateReq()
+	req.Symbol = "Vàng nhẫn SJC" // display name — not a valid asset_price.type_code
+
+	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
+	// DB returns nil: "Vàng nhẫn SJC" does not exist in asset_price.type_code
+	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "Vàng nhẫn SJC").
+		Return(nil, nil)
+
+	resp, err := svc.CreateAlert(ctx, 1, req)
+
+	assert.Error(t, err)
+	assert.Nil(t, resp)
+	alertRepo.AssertNotCalled(t, "Create")
 }
 
 func TestUserPriceAlertService_CreateAlert_SilverPrice_NonStale_ReturnsSell(t *testing.T) {

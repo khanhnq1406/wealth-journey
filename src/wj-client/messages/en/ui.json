@@ -337,7 +337,17 @@
       "retry": "Retry",
       "unitC": "Chỉ",
       "unitL": "Lượng",
-      "unitKG": "KG"
+      "unitKG": "KG",
+      "sharePnl": {
+        "buttonAriaLabel": "Share PNL",
+        "modalTitle": "Share Investment Results",
+        "generating": "Generating image...",
+        "download": "Download PNG",
+        "share": "Share",
+        "shareTitle": "Investment Results - CongDongVang",
+        "errorCapture": "Could not generate image. Please try again.",
+        "errorShare": "Could not share. Please download instead."
+      }
     },
     "quickActions": {
       "addInvestment": "Add Investment"

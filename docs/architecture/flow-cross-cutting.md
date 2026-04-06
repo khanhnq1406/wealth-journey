@@ -21,6 +21,7 @@ Infrastructure-level flows that are referenced by multiple domain flows. Read th
 - [Admin Gold Display Config CRUD Flow](#15-admin-gold-display-config-crud-flow)
 - [Landing Page Load with Timeout + Skeleton](#16-landing-page-load-with-timeout--skeleton)
 - [Admin Drag-to-Reorder Batch Update](#17-admin-drag-to-reorder-batch-update)
+- [Share PNL as Image](#18-share-pnl-as-image)
 
 ---
 
@@ -1524,3 +1525,51 @@ sequenceDiagram
 |-----------|----------|---------|
 | Any PUT fails | `toast.error` | `invalidateQueries` — server order restored on next render |
 | All PUTs succeed | `toast.success` | `invalidateQueries` — canonical order confirmed |
+
+---
+
+## 18. Share PNL as Image
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant NetWorthDisplay
+    participant PnlShareModal
+    participant html2canvas
+    participant Canvas
+    participant OSShareSheet
+
+    User->>NetWorthDisplay: Tap share button
+    NetWorthDisplay->>PnlShareModal: setIsPnlShareOpen(true)
+    PnlShareModal->>PnlShareModal: useEffect triggers captureImage()
+    PnlShareModal->>html2canvas: dynamic import("html2canvas")
+    html2canvas-->>PnlShareModal: module loaded
+    PnlShareModal->>html2canvas: html2canvas(cardRef, { scale: 2 })
+    html2canvas->>NetWorthDisplay: Reads DOM element (data-pnl-card)
+    html2canvas-->>PnlShareModal: canvas (2x pixel ratio)
+    PnlShareModal->>Canvas: Create output canvas
+    PnlShareModal->>Canvas: drawImage(capturedCanvas)
+    PnlShareModal->>Canvas: Load /icons/icon-192x192.png
+    PnlShareModal->>Canvas: drawImage(logo, bottom-right)
+    Canvas-->>PnlShareModal: outputCanvas.toDataURL("image/png")
+    PnlShareModal->>PnlShareModal: setDataURL(dataURL), setStatus("success")
+    PnlShareModal->>User: Show preview image + Download/Share buttons
+
+    alt User clicks Download
+        User->>PnlShareModal: Click "Download PNG"
+        PnlShareModal->>PnlShareModal: Create <a download> element
+        PnlShareModal->>User: Browser saves pnl-congdongvang-YYYY-MM-DD.png
+    else User clicks Share (if navigator.canShare({files}) = true)
+        User->>PnlShareModal: Click "Share"
+        PnlShareModal->>PnlShareModal: Convert dataURL → File
+        PnlShareModal->>OSShareSheet: navigator.share({ files: [file], title })
+        OSShareSheet->>User: Native OS share sheet appears
+    end
+```
+
+**Key Invariants:**
+- Image is never sent to any server — lives only in browser memory.
+- html2canvas is dynamically imported — zero impact on initial page load bundle.
+- Share button hidden on browsers where `navigator.canShare({ files })` is false.
+- Download is always available as fallback.
+- Logo load failure is gracefully handled — image still shown without logo.

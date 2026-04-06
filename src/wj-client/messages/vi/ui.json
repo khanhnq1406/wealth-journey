@@ -337,7 +337,17 @@
       "retry": "Thử lại",
       "unitC": "Chỉ",
       "unitL": "Lượng",
-      "unitKG": "KG"
+      "unitKG": "KG",
+      "sharePnl": {
+        "buttonAriaLabel": "Chia sẻ kết quả",
+        "modalTitle": "Chia sẻ kết quả đầu tư",
+        "generating": "Đang tạo ảnh...",
+        "download": "Tải về",
+        "share": "Chia sẻ",
+        "shareTitle": "Kết quả đầu tư - CongDongVang",
+        "errorCapture": "Không thể tạo ảnh. Vui lòng thử lại.",
+        "errorShare": "Không thể chia sẻ. Vui lòng tải về."
+      }
     },
     "quickActions": {
       "addInvestment": "Thêm khoản đầu tư"
