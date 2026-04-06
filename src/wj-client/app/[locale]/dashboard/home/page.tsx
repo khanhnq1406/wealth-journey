@@ -274,7 +274,11 @@ export default function Home() {
       <PnlShareModal
         isOpen={isPnlShareOpen}
         onClose={() => setIsPnlShareOpen(false)}
-        cardRef={cardRef}
+        totalNetWorth={totalNetWorth}
+        currency={currency}
+        monthPnl={monthPnl}
+        monthPnlPercent={monthPnlPercent}
+        userName={user.fullname ?? undefined}
       />
     </div>
   );

@@ -10,20 +10,6 @@ jest.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
-// Mock html2canvas
-jest.mock(
-  "html2canvas",
-  () => ({
-    __esModule: true,
-    default: jest.fn().mockResolvedValue({
-      width: 800,
-      height: 320,
-      toDataURL: () => "data:image/png;base64,abc123",
-    }),
-  }),
-  { virtual: true }
-);
-
 // Mock BaseModal to render children directly
 jest.mock("@/components/modals/BaseModal", () => ({
   BaseModal: ({ isOpen, children, title }: any) =>
@@ -51,57 +37,57 @@ jest.mock("@/components/feedback/ErrorState", () => ({
 
 // Mock useNotification
 jest.mock("@/contexts/NotificationContext", () => ({
-  useNotification: () => ({
-    toast: {
-      error: jest.fn(),
-    },
-  }),
+  useNotification: () => ({ toast: { error: jest.fn() } }),
 }));
 
-// Mock HTMLCanvasElement.getContext — jsdom does not implement canvas 2D
+// Mock Canvas 2D context — jsdom does not implement canvas drawing
 const mockCtx = {
-  drawImage: jest.fn(),
+  scale: jest.fn(),
   save: jest.fn(),
   restore: jest.fn(),
   beginPath: jest.fn(),
+  moveTo: jest.fn(),
+  lineTo: jest.fn(),
+  quadraticCurveTo: jest.fn(),
+  closePath: jest.fn(),
+  clip: jest.fn(),
   arc: jest.fn(),
   fill: jest.fn(),
+  stroke: jest.fn(),
+  fillRect: jest.fn(),
+  fillText: jest.fn(),
+  measureText: jest.fn(() => ({ width: 100 })),
+  createLinearGradient: jest.fn(() => ({ addColorStop: jest.fn() })),
+  drawImage: jest.fn(),
   fillStyle: "",
+  strokeStyle: "",
+  lineWidth: 0,
+  lineCap: "",
+  lineJoin: "",
+  shadowColor: "",
+  shadowBlur: 0,
+  font: "",
+  textAlign: "",
 };
 HTMLCanvasElement.prototype.getContext = jest.fn(() => mockCtx) as any;
-HTMLCanvasElement.prototype.toDataURL = jest.fn(
-  () => "data:image/png;base64,composited"
-);
+HTMLCanvasElement.prototype.toDataURL = jest.fn(() => "data:image/png;base64,canvas-drawn");
+
+// Default props
+const defaultProps = {
+  isOpen: true,
+  onClose: jest.fn(),
+  totalNetWorth: 85610004,
+  currency: "VND",
+  monthPnl: -22589982,
+  monthPnlPercent: -20.67,
+  userName: "Quốc Khánh Nguyễn",
+};
 
 describe("PnlShareModal", () => {
-  const mockCardRef = { current: document.createElement("div") };
-  const mockOnClose = jest.fn();
-  let pnlCardEl: HTMLElement;
-
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Add a [data-pnl-card] element to the DOM so captureImage can find it
-    pnlCardEl = document.createElement("div");
-    pnlCardEl.setAttribute("data-pnl-card", "");
-    document.body.appendChild(pnlCardEl);
-
-    // Mock getBoundingClientRect to return non-zero dimensions for the pnl card
-    jest.spyOn(pnlCardEl, "getBoundingClientRect").mockReturnValue({
-      width: 400, height: 160, x: 0, y: 0, top: 0, left: 0, right: 400, bottom: 160,
-      toJSON: () => ({}),
-    } as DOMRect);
-
-    // Mock window.getComputedStyle to return display:block for the pnl card
-    const origGetComputedStyle = window.getComputedStyle;
-    jest.spyOn(window, "getComputedStyle").mockImplementation((el) => {
-      if (el === pnlCardEl) {
-        return { display: "block" } as CSSStyleDeclaration;
-      }
-      return origGetComputedStyle(el);
-    });
-
-    // Mock Image loading — naturalWidth/Height needed for canvas compositing step
+    // Mock Image loading for logo
     Object.defineProperty(global, "Image", {
       writable: true,
       value: class {
@@ -110,108 +96,61 @@ describe("PnlShareModal", () => {
         src = "";
         crossOrigin = "";
         complete = true;
-        naturalWidth = 400;
-        naturalHeight = 160;
+        naturalWidth = 192;
+        naturalHeight = 192;
         constructor() {
           setTimeout(() => this.onload?.(), 0);
         }
       },
     });
-    // Mock URL.createObjectURL
+
     global.URL.createObjectURL = jest.fn(() => "blob:mock-url");
     global.URL.revokeObjectURL = jest.fn();
   });
 
   afterEach(() => {
-    // Clean up the pnl card element
-    if (pnlCardEl && pnlCardEl.parentNode) {
-      pnlCardEl.parentNode.removeChild(pnlCardEl);
-    }
     jest.restoreAllMocks();
   });
 
   it("renders nothing when closed", () => {
-    render(
-      <PnlShareModal isOpen={false} onClose={mockOnClose} cardRef={mockCardRef} />
-    );
+    render(<PnlShareModal {...defaultProps} isOpen={false} />);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("shows loading spinner when open (capture in progress)", async () => {
-    render(
-      <PnlShareModal isOpen={true} onClose={mockOnClose} cardRef={mockCardRef} />
-    );
-    // Loading spinner should appear immediately on open
+  it("shows loading spinner when open (draw in progress)", () => {
+    render(<PnlShareModal {...defaultProps} />);
     expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
   });
 
-  it("shows generated image after successful capture", async () => {
-    render(
-      <PnlShareModal isOpen={true} onClose={mockOnClose} cardRef={mockCardRef} />
-    );
+  it("shows generated image after successful draw", async () => {
+    render(<PnlShareModal {...defaultProps} />);
     await waitFor(() => {
       expect(screen.queryByTestId("loading-spinner")).not.toBeInTheDocument();
     });
-    const img = screen.getByRole("img", { name: /pnl preview/i });
-    expect(img).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /pnl preview/i })).toBeInTheDocument();
   });
 
-  it("shows download button after capture", async () => {
-    render(
-      <PnlShareModal isOpen={true} onClose={mockOnClose} cardRef={mockCardRef} />
-    );
+  it("shows download button after successful draw", async () => {
+    render(<PnlShareModal {...defaultProps} />);
     await waitFor(() => {
       expect(screen.queryByTestId("loading-spinner")).not.toBeInTheDocument();
     });
     expect(screen.getByRole("button", { name: /download/i })).toBeInTheDocument();
   });
 
-  it("shows error state when capture fails", async () => {
-    const html2canvas = require("html2canvas");
-    html2canvas.default.mockRejectedValueOnce(new Error("Canvas failed"));
-
-    render(
-      <PnlShareModal isOpen={true} onClose={mockOnClose} cardRef={mockCardRef} />
-    );
-    await waitFor(() => {
-      expect(screen.getByTestId("error-state")).toBeInTheDocument();
-    });
-  });
-
-  it("retries capture when retry button clicked", async () => {
-    const html2canvas = require("html2canvas");
-    html2canvas.default
-      .mockRejectedValueOnce(new Error("Canvas failed"))
-      .mockResolvedValueOnce({ width: 800, height: 320, toDataURL: () => "data:image/png;base64,retry" });
-
-    render(
-      <PnlShareModal isOpen={true} onClose={mockOnClose} cardRef={mockCardRef} />
-    );
-    await waitFor(() => {
-      expect(screen.getByTestId("error-state")).toBeInTheDocument();
+  it("re-draws image each time modal opens", async () => {
+    let drawCount = 0;
+    (HTMLCanvasElement.prototype.toDataURL as jest.Mock).mockImplementation(() => {
+      drawCount++;
+      return `data:image/png;base64,draw-${drawCount}`;
     });
 
-    fireEvent.click(screen.getByRole("button", { name: /retry/i }));
+    const { rerender } = render(<PnlShareModal {...defaultProps} isOpen={true} />);
+    await waitFor(() => expect(drawCount).toBeGreaterThanOrEqual(1));
+    const countAfterFirst = drawCount;
 
-    await waitFor(() => {
-      expect(screen.queryByTestId("error-state")).not.toBeInTheDocument();
-    });
-  });
-
-  it("re-captures image each time modal opens", async () => {
-    const html2canvas = require("html2canvas");
-    const { rerender } = render(
-      <PnlShareModal isOpen={true} onClose={mockOnClose} cardRef={mockCardRef} />
-    );
-    await waitFor(() => expect(html2canvas.default).toHaveBeenCalledTimes(1));
-
-    // Close and reopen
-    rerender(
-      <PnlShareModal isOpen={false} onClose={mockOnClose} cardRef={mockCardRef} />
-    );
-    rerender(
-      <PnlShareModal isOpen={true} onClose={mockOnClose} cardRef={mockCardRef} />
-    );
-    await waitFor(() => expect(html2canvas.default).toHaveBeenCalledTimes(2));
+    rerender(<PnlShareModal {...defaultProps} isOpen={false} />);
+    rerender(<PnlShareModal {...defaultProps} isOpen={true} />);
+    await waitFor(() => expect(drawCount).toBeGreaterThan(countAfterFirst));
   });
 });
