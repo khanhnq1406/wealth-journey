@@ -195,6 +195,7 @@
   },
   "active": "ac6f5885c440af8a",
   "lastOpenFiles": [
+    "2026-04-06-fix-push-price-notification-auto-trigger.md",
     "2026-04-06-fix-asset-display-prices-same-value-bug.md",
     "2026-04-06-share-pnl-via-picture-with-congdongvang-logo.md",
     "Kanban Board.md",
@@ -222,7 +223,6 @@
     "Fix price alert notification shows wrong USD value.md",
     "Create drag and drop component for common use.md",
     "Enhance UI in admin gold config tab.md",
-    "Enhance TanStackTable desktop design to match price alert table.md",
     "pictures/price_alert.png",
     "pictures"
   ]
