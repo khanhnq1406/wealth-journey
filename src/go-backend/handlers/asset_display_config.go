@@ -114,6 +114,9 @@ func (h *AssetDisplayConfigHandler) GetDisplayPrices(c *gin.Context) {
 
 	assetType := c.Query("assetType")
 	if assetType == "" {
+		assetType = c.Query("asset_type") // Fallback: generated client sends snake_case
+	}
+	if assetType == "" {
 		assetType = "gold"
 	}
 
@@ -147,6 +150,9 @@ func (h *AssetDisplayConfigHandler) ListAll(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	assetType := c.Query("assetType")
+	if assetType == "" {
+		assetType = c.Query("asset_type") // Fallback: generated client sends snake_case
+	}
 	if assetType == "" {
 		assetType = "gold"
 	}
@@ -352,6 +358,9 @@ func (h *AssetDisplayConfigHandler) ListAvailableTypeCodes(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	assetType := c.Query("assetType")
+	if assetType == "" {
+		assetType = c.Query("asset_type") // Fallback: generated client sends snake_case
+	}
 	if assetType == "" {
 		assetType = "gold"
 	}

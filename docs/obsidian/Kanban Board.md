@@ -6,6 +6,8 @@ kanban-plugin: board
 
 ## Not Started
 
+- [ ] [[2026-04-06-fix-push-price-notification-auto-trigger|Fix push price notification auto-trigger in production]]
+- [ ] [[2026-04-06-share-pnl-via-picture-with-congdongvang-logo|Share PNL via picture with CongDongVang logo]]
 
 
 ## Spec
@@ -27,6 +29,7 @@ kanban-plugin: board
 ## Done
 
 **Complete**
+- [x] [[2026-04-06-fix-asset-display-prices-same-value-bug|Fix asset display prices returning same values for all asset types]]
 - [x] [[2026-04-02-terms-and-privacy|Terms & Privacy]]
 - [x] [[2026-04-03-feat-asset-display-config-safe-disable-delete|Add safe disable/delete for asset display config when users are using that asset code]]
 - [x] [[2026-04-02-improve-mobile-tab-overflow|Improve all tab selection]]
