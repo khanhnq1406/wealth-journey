@@ -22,7 +22,7 @@ interface PnlShareModalProps {
 }
 
 // Card dimensions (logical px — output is 2x for retina)
-const W = 900;
+const W = 700;
 const H = 300;
 const SCALE = 2;
 
@@ -123,7 +123,30 @@ export function PnlShareModal({
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
-    // ── 2. Dark overlay for text readability ──
+    // ── 2. SJC gold bar watermark — right side, semi-transparent ──
+    try {
+      const sjc = new Image();
+      sjc.crossOrigin = "anonymous";
+      await new Promise<void>((resolve) => {
+        sjc.onload = () => resolve();
+        sjc.onerror = () => resolve();
+        sjc.src = "/sjc3d.webp";
+      });
+      if (sjc.complete && sjc.naturalWidth > 0) {
+        // Natural aspect ratio ~2.7:1 (width:height); render at fixed height
+        const sjcH = H;
+        const sjcW = sjcH * (sjc.naturalWidth / sjc.naturalHeight);
+        const sjcX = W - sjcW - 20; // shifted left, no bleed
+        const sjcY = (H - sjcH) / 2;
+        ctx.globalAlpha = 0.55;
+        ctx.drawImage(sjc, sjcX, sjcY, sjcW, sjcH);
+        ctx.globalAlpha = 1;
+      }
+    } catch {
+      // skip sjc watermark
+    }
+
+    // ── 3. Dark overlay for text readability ──
     const overlay = ctx.createLinearGradient(0, 0, W, H);
     overlay.addColorStop(0, "rgba(0,0,0,0.38)");
     overlay.addColorStop(0.5, "rgba(0,0,0,0.18)");
@@ -131,7 +154,7 @@ export function PnlShareModal({
     ctx.fillStyle = overlay;
     ctx.fillRect(0, 0, W, H);
 
-    // ── 3. PNL bar strip at bottom ──
+    // ── 4. PNL bar strip ──
     const barH = 72;
     const barY = H - barH;
     ctx.fillStyle = "rgba(0,0,0,0.18)";
