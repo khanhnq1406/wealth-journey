@@ -7,17 +7,17 @@
 - **Spec file:** `docs/specs/2026-04-06-fix-asset-display-prices-same-value-bug-spec.md`
 - **Started:** 2026-04-06T00:00:00Z
 - **Last updated:** 2026-04-06T01:00:00Z
-- **Current state:** in_progress
-- **Current task:** 4
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | #   | Task Name                                              | Status | Commit | Summary |
 | --- | ------------------------------------------------------ | ------ | ------ | ------- |
-| 1   | Fix GetDisplayPrices handler — add snake_case fallback | done   | —      | Added snake_case fallback + 2 TDD tests; reviewer APPROVED |
-| 2   | Fix ListAll handler — add snake_case fallback          | done   | —      | Added snake_case fallback + 1 TDD test; reviewer APPROVED |
-| 3   | Fix ListAvailableTypeCodes handler — snake_case fallback | done | —      | Added snake_case fallback + 1 TDD test; reviewer APPROVED |
-| 4   | Full verification — all tests, lint, smoke test, commit | in_progress | — | — |
+| 1   | Fix GetDisplayPrices handler — add snake_case fallback | done   | ec8a64fd | Added snake_case fallback + 2 TDD tests; reviewer APPROVED |
+| 2   | Fix ListAll handler — add snake_case fallback          | done   | ec8a64fd | Added snake_case fallback + 1 TDD test; reviewer APPROVED |
+| 3   | Fix ListAvailableTypeCodes handler — snake_case fallback | done | ec8a64fd | Added snake_case fallback + 1 TDD test; reviewer APPROVED |
+| 4   | Full verification — all tests, lint, smoke test, commit | done  | ec8a64fd | All 102 handler tests pass, lint clean, committed |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 

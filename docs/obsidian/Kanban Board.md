@@ -20,11 +20,11 @@ kanban-plugin: board
 
 ## Implement
 
-- [ ] [[2026-04-06-fix-asset-display-prices-same-value-bug|Fix asset display prices returning same values for all asset types]]
-
 
 
 ## Review
+
+- [ ] [[2026-04-06-fix-asset-display-prices-same-value-bug|Fix asset display prices returning same values for all asset types]]
 
 
 

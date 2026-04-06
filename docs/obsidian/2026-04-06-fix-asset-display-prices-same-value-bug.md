@@ -1,6 +1,6 @@
 ---
 type: bug
-status: Implement
+status: Review
 ---
 
 ## Overview
@@ -14,4 +14,4 @@ The public asset display prices endpoint (`GET /api/v1/public/asset-display-pric
 | Spec     | `docs/specs/2026-04-06-fix-asset-display-prices-same-value-bug-spec.md` |
 | Plan     | `docs/plans/2026-04-06-fix-asset-display-prices-same-value-bug-plan.md` |
 | Progress | `docs/reports/2026-04-06-fix-asset-display-prices-same-value-bug-progress.md` |
-| Report   | _(added after step 3 completes)_ |
+| Report   | `docs/reports/2026-04-06-fix-asset-display-prices-same-value-bug-report.md` |
