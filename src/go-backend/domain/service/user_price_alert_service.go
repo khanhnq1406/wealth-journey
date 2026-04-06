@@ -30,8 +30,9 @@ const (
 
 // symbolPattern validates alert symbols: Unicode letters, digits, dots, dashes, underscores, spaces.
 // \p{L} matches any Unicode letter (covers Vietnamese diacritics: à, ẫ, ạ, ơ, etc.).
-// \p{N} matches any Unicode digit. Spaces are explicitly allowed for multi-word gold names
-// like "Vàng nhẫn SJC". Special characters (<, >, ", ', ;, {, }) remain blocked.
+// \p{N} matches any Unicode digit. Spaces are allowed for market ticker names.
+// Gold/silver symbols are further validated against asset_price.type_code after this check.
+// Special characters (<, >, ", ', ;, {, }) remain blocked.
 var symbolPattern = regexp.MustCompile(`^[\p{L}\p{N}.\-_ ]+$`)
 
 // userPriceAlertService implements UserPriceAlertService.
@@ -145,8 +146,31 @@ func (s *userPriceAlertService) CreateAlert(ctx context.Context, userID int32, r
 		return nil, apperrors.NewValidationError("Maximum of 30 alerts reached")
 	}
 
-	// Fetch current price for context (best-effort; failure does not block creation)
-	currentPrice := s.fetchCurrentPrice(ctx, symbol, currency, req.AssetType, priceSide)
+	// For gold/silver, validate that symbol matches a known asset_price.type_code.
+	// This prevents alerts being created with display names (e.g. "Vàng nhẫn SJC") that
+	// can never match the internal fetch codes used by fetchPricesForAlerts at evaluation time.
+	// We reuse the lookup result as the creation-time price to avoid a second DB round-trip.
+	var currentPrice int64
+	if gold.IsGoldType(req.AssetType) || silver.IsSilverType(req.AssetType) {
+		validateCtx, validateCancel := context.WithTimeout(ctx, alertPriceFetchTimeout)
+		dto, lookupErr := s.assetPriceSvc.GetPriceByTypeCode(validateCtx, symbol)
+		validateCancel()
+		if lookupErr != nil || dto == nil {
+			return nil, apperrors.NewValidationError(
+				fmt.Sprintf("symbol '%s' does not match any known price code — use the internal type code (e.g. SJ9999, DOHCML)", symbol),
+			)
+		}
+		if !dto.IsStale {
+			if priceSide == "sell" {
+				currentPrice = dto.Sell
+			} else {
+				currentPrice = dto.Buy
+			}
+		}
+	} else {
+		// Market assets (stocks, crypto): fetch best-effort; failure does not block creation
+		currentPrice = s.fetchCurrentPrice(ctx, symbol, currency, req.AssetType, priceSide)
+	}
 
 	// Create model
 	alert := &models.UserPriceAlert{
