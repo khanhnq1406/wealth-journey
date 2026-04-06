@@ -16,6 +16,8 @@ jest.mock(
   () => ({
     __esModule: true,
     default: jest.fn().mockResolvedValue({
+      width: 800,
+      height: 320,
       toDataURL: () => "data:image/png;base64,abc123",
     }),
   }),
@@ -99,7 +101,7 @@ describe("PnlShareModal", () => {
       return origGetComputedStyle(el);
     });
 
-    // Mock Image loading
+    // Mock Image loading — naturalWidth/Height needed for canvas compositing step
     Object.defineProperty(global, "Image", {
       writable: true,
       value: class {
@@ -107,6 +109,9 @@ describe("PnlShareModal", () => {
         onerror: (() => void) | null = null;
         src = "";
         crossOrigin = "";
+        complete = true;
+        naturalWidth = 400;
+        naturalHeight = 160;
         constructor() {
           setTimeout(() => this.onload?.(), 0);
         }
@@ -177,7 +182,7 @@ describe("PnlShareModal", () => {
     const html2canvas = require("html2canvas");
     html2canvas.default
       .mockRejectedValueOnce(new Error("Canvas failed"))
-      .mockResolvedValueOnce({ toDataURL: () => "data:image/png;base64,retry" });
+      .mockResolvedValueOnce({ width: 800, height: 320, toDataURL: () => "data:image/png;base64,retry" });
 
     render(
       <PnlShareModal isOpen={true} onClose={mockOnClose} cardRef={mockCardRef} />

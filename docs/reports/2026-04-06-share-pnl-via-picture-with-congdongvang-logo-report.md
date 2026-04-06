@@ -179,3 +179,8 @@ This feature captures only DOM content already rendered for the authenticated us
 | 2026-04-06 | Share button: move from `bottom-3 sm:top-3` to `top-3` on both mobile and desktop | Minor | `NetWorthDisplay.tsx` |
 | 2026-04-06 | Share button: add `data-html2canvas-ignore` to exclude it from captured image | Minor | `NetWorthDisplay.tsx` |
 | 2026-04-06 | Error state: show error (not silent return) when no visible `[data-pnl-card]` found | Minor | `PnlShareModal.tsx` |
+| 2026-04-06 | Fidelity attempt #1: switched to `dom-to-image-more` — produced broken output (dark maroon bg instead of gold, white boxes behind text). Reverted. | Minor | reverted |
+| 2026-04-06 | Fidelity fix: reverted to `html2canvas`; added `onclone` rewrite of `/_next/image?url=...` URLs back to original asset paths (fixes missing/white WebP watermark); explicitly removes `[data-html2canvas-ignore]` nodes in clone; sets `imageTimeout: 10000` | Minor | `PnlShareModal.tsx`, `PnlShareModal.test.tsx` |
+| 2026-04-06 | Gradient border: set `borderRadius: 0` on cloned element in `onclone` — eliminates transparent corner pixels that showed the maroon page background as a dark border around the captured gold card | Minor | `PnlShareModal.tsx` |
+| 2026-04-06 | Right-side clip: pass `width: scrollWidth, height: scrollHeight, windowWidth: scrollWidth` to html2canvas so the full card width is captured even when it overflows the viewport on desktop | Minor | `PnlShareModal.tsx` |
+| 2026-04-06 | White box: hide all `<img>` in entire cloned document (`clonedDoc.querySelectorAll`) not just `clonedEl` — html2canvas clones the full page (7 imgs total, only 1 inside target); images outside target bleed into captured area | Minor | `PnlShareModal.tsx` |

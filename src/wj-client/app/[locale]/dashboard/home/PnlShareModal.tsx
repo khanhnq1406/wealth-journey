@@ -58,11 +58,6 @@ export function PnlShareModal({ isOpen, onClose, cardRef }: PnlShareModalProps) 
     // Find the visible [data-pnl-card] element — works for both mobile and desktop
     // On mobile the sm:hidden wrapper is visible; on desktop the sm:block wrapper is visible.
     const allCards = document.querySelectorAll<HTMLElement>("[data-pnl-card]");
-    console.log("[PnlShare] querySelectorAll [data-pnl-card] count:", allCards.length);
-    Array.from(allCards).forEach((el, i) => {
-      const style = window.getComputedStyle(el);
-      console.log(`[PnlShare] card[${i}] display="${style.display}" className="${el.className}" rect=`, el.getBoundingClientRect());
-    });
 
     const targetEl = Array.from(allCards).find((el) => {
       const style = window.getComputedStyle(el);
@@ -71,10 +66,7 @@ export function PnlShareModal({ isOpen, onClose, cardRef }: PnlShareModalProps) 
       return style.display !== "none" && rect.width > 0 && rect.height > 0;
     });
 
-    console.log("[PnlShare] targetEl:", targetEl);
-
     if (!targetEl) {
-      console.error("[PnlShare] No visible [data-pnl-card] found — showing error");
       setStatus("error");
       return;
     }
@@ -83,28 +75,50 @@ export function PnlShareModal({ isOpen, onClose, cardRef }: PnlShareModalProps) 
     setDataURL(null);
 
     try {
-      // Dynamically import html2canvas — keeps it out of the initial bundle (SSR-safe)
+      // Dynamically import html2canvas — keeps it out of the initial bundle (SSR-safe).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const html2canvas = (await import("html2canvas")).default;
-      console.log("[PnlShare] html2canvas loaded, starting capture of:", targetEl);
 
-      // Step 1: Capture the visible card DOM element at retina quality
-      // useCORS + allowTaint: true so sjc3d.webp (same-origin) loads correctly
-      // imageTimeout: 8000ms to wait for next/image to fully render
+      // Step 1: Capture the card at retina quality.
+      // Key fixes for the NetWorthDisplay card:
+      //   1. onclone: rewrite next/image optimized URLs (/_next/image?url=...) back to
+      //      the original asset path so html2canvas can fetch them directly.
+      //   2. onclone: explicitly remove [data-html2canvas-ignore] nodes from the clone.
+      //   3. useCORS + allowTaint: allow same-origin WebP assets to load.
+      //   4. scale: 2 for retina/HiDPI output.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const canvas = await html2canvas(targetEl, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
         logging: false,
-        imageTimeout: 8000,
-        onclone: (_doc: Document, clone: HTMLElement) => {
-          // Ensure cloned element is fully visible for capture
-          clone.style.display = "block";
-          clone.style.visibility = "visible";
-          clone.style.opacity = "1";
+        imageTimeout: 10000,
+        backgroundColor: null,
+        onclone: (_clonedDoc: Document, clonedEl: HTMLElement) => {
+          // Hide ALL <img> elements — next/image WebP assets fail to load in the clone
+          _clonedDoc.querySelectorAll<HTMLImageElement>("img").forEach((img) => {
+            img.style.display = "none";
+            const span = img.closest("span");
+            if (span) span.style.display = "none";
+          });
+          // Remove the share button
+          clonedEl
+            .querySelectorAll<HTMLElement>("[data-html2canvas-ignore]")
+            .forEach((el) => el.remove());
+          // Detach from page layout: position at top-left with explicit size so
+          // html2canvas sees no surrounding page content bleeding in from the sides.
+          clonedEl.style.position = "fixed";
+          clonedEl.style.top = "0";
+          clonedEl.style.left = "0";
+          clonedEl.style.margin = "0";
+          clonedEl.style.borderRadius = "0";
+          clonedEl.style.width = `${targetEl.scrollWidth}px`;
+          clonedEl.style.height = `${targetEl.scrollHeight}px`;
+          clonedEl.style.display = "block";
+          clonedEl.style.visibility = "visible";
+          clonedEl.style.opacity = "1";
         },
-      } as any);
-      console.log("[PnlShare] html2canvas done, canvas size:", canvas.width, "x", canvas.height);
+      } as Parameters<typeof html2canvas>[1]);
 
       // Step 2: Composite the app logo onto a second canvas
       const outputCanvas = document.createElement("canvas");
@@ -130,7 +144,7 @@ export function PnlShareModal({ isOpen, onClose, cardRef }: PnlShareModalProps) 
         });
         if (logo.complete && logo.naturalWidth > 0) {
           const x = outputCanvas.width - logoSize - margin;
-          const y = margin; // top-right corner (was bottom-right)
+          const y = margin; // top-right corner
           // Dark semi-transparent circle behind logo for readability
           ctx.save();
           ctx.beginPath();
@@ -145,7 +159,6 @@ export function PnlShareModal({ isOpen, onClose, cardRef }: PnlShareModalProps) 
       }
 
       const finalDataURL = outputCanvas.toDataURL("image/png");
-      console.log("[PnlShare] capture success, dataURL length:", finalDataURL.length);
       setDataURL(finalDataURL);
       setStatus("success");
     } catch (err) {
