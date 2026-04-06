@@ -7,16 +7,16 @@
 - **Spec file:** `docs/specs/2026-04-06-fix-push-price-notification-auto-trigger-spec.md`
 - **Started:** 2026-04-06T00:00:00Z
 - **Last updated:** 2026-04-06T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 0
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | #   | Task Name                                             | Status      | Commit | Summary |
 | --- | ----------------------------------------------------- | ----------- | ------ | ------- |
-| 0   | Add GetFetchCodesByAssetType to AssetDisplayConfigService | pending | —      | —       |
-| 1   | Fix buildEnabledSet in price_alert_service.go         | pending     | —      | —       |
-| 2   | Update Runtime Flow Diagram                           | pending     | —      | —       |
+| 0   | Add GetFetchCodesByAssetType to AssetDisplayConfigService | done | e73d6c75 | Added interface method + implementation + mocks in 6 files |
+| 1   | Fix buildEnabledSet in price_alert_service.go         | done        | 12b7ea02 | Replaced buildEnabledSet with GetFetchCodesByAssetType; FR-1/2/3 + 18 tests |
+| 2   | Update Runtime Flow Diagram                           | done        | 4496a3e8 | Updated flow-cross-cutting.md price alert section for FR-1/2/3 |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 

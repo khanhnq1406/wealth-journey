@@ -19,11 +19,11 @@ kanban-plugin: board
 
 ## Implement
 
-- [ ] [[2026-04-06-fix-push-price-notification-auto-trigger|Fix push price notification auto-trigger in production]]
-
 
 
 ## Review
+
+- [ ] [[2026-04-06-fix-push-price-notification-auto-trigger|Fix push price notification auto-trigger in production]]
 
 
 
