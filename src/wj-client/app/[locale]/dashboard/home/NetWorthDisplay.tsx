@@ -110,7 +110,8 @@ export function NetWorthDisplay({
       type="button"
       onClick={onShareClick}
       aria-label={t("sharePnl.buttonAriaLabel")}
-      className="absolute bottom-3 right-3 z-20 sm:top-3 sm:bottom-auto flex items-center justify-center min-h-[44px] min-w-[44px] w-9 h-9 rounded-full bg-black/30 hover:bg-black/50 transition-colors focus-visible:ring-2 focus-visible:ring-v2-gold-primary cursor-pointer"
+      data-html2canvas-ignore="true"
+      className="absolute top-3 right-3 z-20 flex items-center justify-center min-h-[44px] min-w-[44px] w-9 h-9 rounded-full bg-black/30 hover:bg-black/50 transition-colors focus-visible:ring-2 focus-visible:ring-v2-gold-primary cursor-pointer"
     >
       <Share2 size={18} className="text-v2-text-tertiary" />
     </button>

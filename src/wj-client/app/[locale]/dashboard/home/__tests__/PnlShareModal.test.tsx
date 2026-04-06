@@ -74,9 +74,31 @@ HTMLCanvasElement.prototype.toDataURL = jest.fn(
 describe("PnlShareModal", () => {
   const mockCardRef = { current: document.createElement("div") };
   const mockOnClose = jest.fn();
+  let pnlCardEl: HTMLElement;
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Add a [data-pnl-card] element to the DOM so captureImage can find it
+    pnlCardEl = document.createElement("div");
+    pnlCardEl.setAttribute("data-pnl-card", "");
+    document.body.appendChild(pnlCardEl);
+
+    // Mock getBoundingClientRect to return non-zero dimensions for the pnl card
+    jest.spyOn(pnlCardEl, "getBoundingClientRect").mockReturnValue({
+      width: 400, height: 160, x: 0, y: 0, top: 0, left: 0, right: 400, bottom: 160,
+      toJSON: () => ({}),
+    } as DOMRect);
+
+    // Mock window.getComputedStyle to return display:block for the pnl card
+    const origGetComputedStyle = window.getComputedStyle;
+    jest.spyOn(window, "getComputedStyle").mockImplementation((el) => {
+      if (el === pnlCardEl) {
+        return { display: "block" } as CSSStyleDeclaration;
+      }
+      return origGetComputedStyle(el);
+    });
+
     // Mock Image loading
     Object.defineProperty(global, "Image", {
       writable: true,
@@ -93,6 +115,14 @@ describe("PnlShareModal", () => {
     // Mock URL.createObjectURL
     global.URL.createObjectURL = jest.fn(() => "blob:mock-url");
     global.URL.revokeObjectURL = jest.fn();
+  });
+
+  afterEach(() => {
+    // Clean up the pnl card element
+    if (pnlCardEl && pnlCardEl.parentNode) {
+      pnlCardEl.parentNode.removeChild(pnlCardEl);
+    }
+    jest.restoreAllMocks();
   });
 
   it("renders nothing when closed", () => {

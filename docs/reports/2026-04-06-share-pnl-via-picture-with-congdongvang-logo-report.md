@@ -168,3 +168,14 @@ Changes affect:
 
 #### Scenario: Authorization boundary
 This feature captures only DOM content already rendered for the authenticated user. No authorization boundary to test beyond existing page auth — the share button doesn't make any API calls.
+
+## Fix History
+
+| Date       | Fix                                                                                 | Severity | Files Changed |
+| ---------- | ----------------------------------------------------------------------------------- | -------- | ------------- |
+| 2026-04-06 | Desktop capture: switch from cardRef to `document.querySelectorAll('[data-pnl-card]')` + `getComputedStyle` to find visible card on any viewport | Minor | `PnlShareModal.tsx`, `PnlShareModal.test.tsx` |
+| 2026-04-06 | Logo position: move from bottom-right to top-right (`y = margin` instead of `y = height - size - margin`) | Minor | `PnlShareModal.tsx` |
+| 2026-04-06 | Image quality: hide sjc3d watermark during html2canvas capture via `onclone` + `img[alt='sjc']` | Minor | `PnlShareModal.tsx` |
+| 2026-04-06 | Share button: move from `bottom-3 sm:top-3` to `top-3` on both mobile and desktop | Minor | `NetWorthDisplay.tsx` |
+| 2026-04-06 | Share button: add `data-html2canvas-ignore` to exclude it from captured image | Minor | `NetWorthDisplay.tsx` |
+| 2026-04-06 | Error state: show error (not silent return) when no visible `[data-pnl-card]` found | Minor | `PnlShareModal.tsx` |

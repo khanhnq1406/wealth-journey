@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, RefObject } from "react";
+import { useState, useEffect, useCallback } from "react";
+import type { RefObject } from "react";
 import { useTranslations } from "next-intl";
 import { BaseModal } from "@/components/modals/BaseModal";
 import { LoadingSpinner } from "@/components/loading/LoadingSpinner";
@@ -22,7 +23,7 @@ interface PnlShareModalProps {
  * as a branded PNG image with app logo overlay.
  *
  * Uses html2canvas (dynamic import) to capture the card DOM element,
- * composites the icon-192x192.png logo onto the bottom-right corner,
+ * composites the icon-192x192.png logo onto the top-right corner,
  * and provides Download and native OS Share actions.
  *
  * Design note: The preview uses a plain <img src={dataURL}> element because the
@@ -54,7 +55,29 @@ export function PnlShareModal({ isOpen, onClose, cardRef }: PnlShareModalProps) 
   }, []);
 
   const captureImage = useCallback(async () => {
-    if (!cardRef.current) return;
+    // Find the visible [data-pnl-card] element — works for both mobile and desktop
+    // On mobile the sm:hidden wrapper is visible; on desktop the sm:block wrapper is visible.
+    const allCards = document.querySelectorAll<HTMLElement>("[data-pnl-card]");
+    console.log("[PnlShare] querySelectorAll [data-pnl-card] count:", allCards.length);
+    Array.from(allCards).forEach((el, i) => {
+      const style = window.getComputedStyle(el);
+      console.log(`[PnlShare] card[${i}] display="${style.display}" className="${el.className}" rect=`, el.getBoundingClientRect());
+    });
+
+    const targetEl = Array.from(allCards).find((el) => {
+      const style = window.getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
+      // Must be visible AND have actual rendered dimensions
+      return style.display !== "none" && rect.width > 0 && rect.height > 0;
+    });
+
+    console.log("[PnlShare] targetEl:", targetEl);
+
+    if (!targetEl) {
+      console.error("[PnlShare] No visible [data-pnl-card] found — showing error");
+      setStatus("error");
+      return;
+    }
 
     setStatus("loading");
     setDataURL(null);
@@ -62,14 +85,26 @@ export function PnlShareModal({ isOpen, onClose, cardRef }: PnlShareModalProps) 
     try {
       // Dynamically import html2canvas — keeps it out of the initial bundle (SSR-safe)
       const html2canvas = (await import("html2canvas")).default;
+      console.log("[PnlShare] html2canvas loaded, starting capture of:", targetEl);
 
-      // Step 1: Capture the card DOM element at retina quality
-      const canvas = await html2canvas(cardRef.current, {
+      // Step 1: Capture the visible card DOM element at retina quality
+      // useCORS + allowTaint: true so sjc3d.webp (same-origin) loads correctly
+      // imageTimeout: 8000ms to wait for next/image to fully render
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const canvas = await html2canvas(targetEl, {
         scale: 2,
-        useCORS: false,
-        allowTaint: false,
+        useCORS: true,
+        allowTaint: true,
         logging: false,
-      });
+        imageTimeout: 8000,
+        onclone: (_doc: Document, clone: HTMLElement) => {
+          // Ensure cloned element is fully visible for capture
+          clone.style.display = "block";
+          clone.style.visibility = "visible";
+          clone.style.opacity = "1";
+        },
+      } as any);
+      console.log("[PnlShare] html2canvas done, canvas size:", canvas.width, "x", canvas.height);
 
       // Step 2: Composite the app logo onto a second canvas
       const outputCanvas = document.createElement("canvas");
@@ -81,7 +116,7 @@ export function PnlShareModal({ isOpen, onClose, cardRef }: PnlShareModalProps) 
       // Draw the captured card
       ctx.drawImage(canvas, 0, 0);
 
-      // Load and draw the logo onto the bottom-right corner
+      // Load and draw the logo onto the top-right corner
       // logoSize: 48px * scale:2 = 96px; margin: 16px * scale:2 = 32px
       try {
         const logoSize = 96;
@@ -95,7 +130,7 @@ export function PnlShareModal({ isOpen, onClose, cardRef }: PnlShareModalProps) 
         });
         if (logo.complete && logo.naturalWidth > 0) {
           const x = outputCanvas.width - logoSize - margin;
-          const y = outputCanvas.height - logoSize - margin;
+          const y = margin; // top-right corner (was bottom-right)
           // Dark semi-transparent circle behind logo for readability
           ctx.save();
           ctx.beginPath();
@@ -109,12 +144,15 @@ export function PnlShareModal({ isOpen, onClose, cardRef }: PnlShareModalProps) 
         // Logo load failed — continue without logo overlay
       }
 
-      setDataURL(outputCanvas.toDataURL("image/png"));
+      const finalDataURL = outputCanvas.toDataURL("image/png");
+      console.log("[PnlShare] capture success, dataURL length:", finalDataURL.length);
+      setDataURL(finalDataURL);
       setStatus("success");
-    } catch {
+    } catch (err) {
+      console.error("[PnlShare] capture error:", err);
       setStatus("error");
     }
-  }, [cardRef]);
+  }, []);
 
   // Trigger capture every time the modal opens; reset state when it closes
   useEffect(() => {
