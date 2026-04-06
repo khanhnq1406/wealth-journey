@@ -37,7 +37,7 @@ jobs:
 
       - name: Run golangci-lint
         id: golangci
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v9
         with:
           version: latest
           working-directory: src/go-backend
