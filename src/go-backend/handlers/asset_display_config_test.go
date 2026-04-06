@@ -324,6 +324,50 @@ func TestAssetDisplayConfig_GetDisplayPrices_DefaultAssetType(t *testing.T) {
 	assert.True(t, called)
 }
 
+// TestGetDisplayPrices_SnakeCaseAssetTypeParam verifies that the snake_case query
+// param asset_type=silver is accepted as a fallback when camelCase assetType is absent.
+func TestGetDisplayPrices_SnakeCaseAssetTypeParam(t *testing.T) {
+	capturedAssetType := ""
+	h := NewAssetDisplayConfigHandler(&mockAssetDisplayConfigService{
+		getDisplayPricesFunc: func(ctx context.Context, assetType string) ([]*service.AssetDisplayPriceDTO, error) {
+			capturedAssetType = assetType
+			return []*service.AssetDisplayPriceDTO{}, nil
+		},
+	})
+
+	gin.SetMode(gin.TestMode)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	req, _ := http.NewRequest(http.MethodGet, "/api/v1/public/asset-display-prices?asset_type=silver", nil)
+	c.Request = req
+	h.GetDisplayPrices(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "silver", capturedAssetType, "snake_case asset_type=silver must be passed through as 'silver'")
+}
+
+// TestGetDisplayPrices_SnakeCaseAssetTypeCurrency verifies that the snake_case query
+// param asset_type=currency is accepted as a fallback when camelCase assetType is absent.
+func TestGetDisplayPrices_SnakeCaseAssetTypeCurrency(t *testing.T) {
+	capturedAssetType := ""
+	h := NewAssetDisplayConfigHandler(&mockAssetDisplayConfigService{
+		getDisplayPricesFunc: func(ctx context.Context, assetType string) ([]*service.AssetDisplayPriceDTO, error) {
+			capturedAssetType = assetType
+			return []*service.AssetDisplayPriceDTO{}, nil
+		},
+	})
+
+	gin.SetMode(gin.TestMode)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	req, _ := http.NewRequest(http.MethodGet, "/api/v1/public/asset-display-prices?asset_type=currency", nil)
+	c.Request = req
+	h.GetDisplayPrices(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "currency", capturedAssetType, "snake_case asset_type=currency must be passed through as 'currency'")
+}
+
 // TestAssetDisplayConfig_GetDisplayPrices_ServiceError verifies service errors
 // produce a non-200 response.
 func TestAssetDisplayConfig_GetDisplayPrices_ServiceError(t *testing.T) {
@@ -366,6 +410,29 @@ func TestAssetDisplayConfig_ListAll_HappyPath(t *testing.T) {
 	configs, ok := body["configs"].([]interface{})
 	require.True(t, ok, "configs should be an array")
 	assert.Len(t, configs, 2)
+}
+
+// TestListAll_SnakeCaseAssetTypeParam verifies that the ListAll handler correctly
+// reads the snake_case ?asset_type= query param as a fallback when assetType is absent.
+// This covers the case where the generated TS client sends snake_case via toQueryParams().
+func TestListAll_SnakeCaseAssetTypeParam(t *testing.T) {
+	capturedAssetType := ""
+	h := NewAssetDisplayConfigHandler(&mockAssetDisplayConfigService{
+		listAllFunc: func(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
+			capturedAssetType = assetType
+			return []*models.AssetDisplayConfig{}, nil
+		},
+	})
+
+	gin.SetMode(gin.TestMode)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	req, _ := http.NewRequest(http.MethodGet, "/api/v1/admin/asset-display-config?asset_type=silver", nil)
+	c.Request = req
+	h.ListAll(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "silver", capturedAssetType)
 }
 
 // ---------------------------------------------------------------------------
@@ -808,4 +875,26 @@ func TestAssetDisplayConfig_ListAvailableTypeCodes_ServiceError(t *testing.T) {
 	h := newTestAssetDisplayConfigHandler(mockSvc)
 	w := runListAvailableTypeCodes(h, "gold")
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
+}
+
+// TestListAvailableTypeCodes_SnakeCaseAssetTypeParam verifies that the snake_case query
+// param asset_type=silver is accepted as a fallback when camelCase assetType is absent.
+func TestListAvailableTypeCodes_SnakeCaseAssetTypeParam(t *testing.T) {
+	capturedAssetType := ""
+	h := NewAssetDisplayConfigHandler(&mockAssetDisplayConfigService{
+		listAvailableTypeCodes: func(ctx context.Context, assetType string) ([]string, error) {
+			capturedAssetType = assetType
+			return []string{}, nil
+		},
+	})
+
+	gin.SetMode(gin.TestMode)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	req, _ := http.NewRequest(http.MethodGet, "/api/v1/admin/asset-price-type-codes?asset_type=silver", nil)
+	c.Request = req
+	h.ListAvailableTypeCodes(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "silver", capturedAssetType)
 }
