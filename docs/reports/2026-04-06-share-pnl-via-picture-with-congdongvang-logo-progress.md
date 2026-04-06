@@ -7,8 +7,8 @@
 - **Spec file:** `docs/specs/2026-04-06-share-pnl-via-picture-with-congdongvang-logo-spec.md`
 - **Started:** 2026-04-06T00:00:00Z
 - **Last updated:** 2026-04-06T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 4
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -18,8 +18,8 @@
 | 1   | Create PnlShareModal component                       | done        | e810cdd4 | PnlShareModal with html2canvas, logo compositing, 7 tests pass |
 | 2   | Add share button and data-pnl-card to NetWorthDisplay | done        | 35b4aa77 | Share button + data-pnl-card on both mobile/desktop cards, 4 tests pass |
 | 3   | Wire PnlShareModal to home page                      | done        | b9dc8f12 | cardRef + isPnlShareOpen wired, page test + E2E spec created, 38 tests pass |
-| 4   | Update C4 frontend component diagram                 | pending     | —      | —       |
-| 5   | Update flow-cross-cutting.md                         | pending     | —      | —       |
+| 4   | Update C4 frontend component diagram                 | done        | a3d378d9 | PnlShareModal added to App Router boundary + 2 Rel lines |
+| 5   | Update flow-cross-cutting.md                         | done        | a3d378d9 | Share PNL sequence diagram added as section 18 |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
