@@ -488,6 +488,7 @@
     "colActions": "Thao tác",
     "emptyTitle": "Chưa có cảnh báo",
     "emptyDescription": "Tạo cảnh báo giá để nhận thông báo",
+    "allTriggeredHint": "Tất cả cảnh báo của bạn đã được kích hoạt. Tạo cảnh báo mới để tiếp tục theo dõi giá.",
     "deleteLabel": "Xóa",
     "pauseLabel": "Tạm dừng",
     "activateLabel": "Kích hoạt",

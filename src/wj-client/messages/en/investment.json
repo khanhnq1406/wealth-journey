@@ -488,6 +488,7 @@
     "colActions": "Actions",
     "emptyTitle": "No alerts yet",
     "emptyDescription": "Create a price alert to get notified",
+    "allTriggeredHint": "All your alerts have been triggered. Create new alerts to continue monitoring prices.",
     "deleteLabel": "Delete",
     "pauseLabel": "Pause",
     "activateLabel": "Activate",
