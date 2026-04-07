@@ -6,7 +6,6 @@ kanban-plugin: board
 
 ## Not Started
 
-- [ ] [[2026-04-06-fix-price-alert-cannot-use-home-page-prices|Fix price alert cannot use home page prices]]
 
 
 ## Spec
@@ -22,6 +21,9 @@ kanban-plugin: board
 
 
 ## Review
+
+- [ ] [[2026-04-07-fix-alert-auto-trigger-not-working|Fix alert auto-trigger not working]]
+- [ ] [[2026-04-06-fix-price-alert-cannot-use-home-page-prices|Fix price alert cannot use home page prices]]
 
 
 

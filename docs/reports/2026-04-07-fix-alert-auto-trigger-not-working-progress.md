@@ -6,9 +6,9 @@
 - **Plan file:** `docs/plans/2026-04-07-fix-alert-auto-trigger-not-working-plan.md`
 - **Spec file:** `docs/specs/2026-04-07-fix-alert-auto-trigger-not-working-spec.md`
 - **Started:** 2026-04-07T00:00:00Z
-- **Last updated:** 2026-04-07T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 1
+- **Last updated:** 2026-04-07T12:00:00Z
+- **Current state:** done
+- **Current task:** 6
 
 ## Task Progress
 
@@ -19,7 +19,7 @@
 | 3   | Fix fetchPricesForAlerts — Remove inner timeout wrapper         | done        | 58037a74 | Removed inner 5s WithTimeout, replaced fetchCtx→ctx, added comment |
 | 4   | Add TTL to baseline Redis keys                                  | done        | 7e59c27b | All 3 baseline Set calls changed to 24h TTL, 1 new test |
 | 5   | Update runtime flow diagram                                     | done        | f46535ac | Added baseline/cooldown mechanism note to flow-cross-cutting.md |
-| 6   | Investigate FR-6 — root cause of 0 active alerts               | pending     | —      | —       |
+| 6   | Investigate FR-6 — root cause of 0 active alerts               | done        | 5dca3183 | Root cause: once-mode alerts become "triggered" after firing. Fix: all-triggered hint banner in PriceAlertList (en+vi i18n) |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
