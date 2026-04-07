@@ -1,6 +1,6 @@
 ---
 type: bug
-status: Implement
+status: Review
 ---
 
 ## Overview
@@ -14,4 +14,4 @@ Creating a gold/silver price alert fails or silently never triggers because `Ass
 | Spec     | `docs/specs/2026-04-07-price-alert-symbol-mismatch-spec.md` |
 | Plan     | `docs/plans/2026-04-07-price-alert-symbol-mismatch-plan.md` |
 | Progress | `docs/reports/2026-04-07-price-alert-symbol-mismatch-progress.md` |
-| Report   | `docs/reports/2026-04-07-price-alert-symbol-mismatch-report.md` _(added after step 3 completes)_ |
+| Report   | `docs/reports/2026-04-07-price-alert-symbol-mismatch-report.md` |

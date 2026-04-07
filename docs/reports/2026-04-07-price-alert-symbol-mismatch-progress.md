@@ -6,9 +6,8 @@
 - **Plan file:** docs/plans/2026-04-07-price-alert-symbol-mismatch-plan.md
 - **Spec file:** docs/specs/2026-04-07-price-alert-symbol-mismatch-spec.md
 - **Started:** 2026-04-07T00:00:00Z
-- **Last updated:** 2026-04-07T02:00:00Z
-- **Current state:** in_progress
-- **Current task:** 4
+- **Last updated:** 2026-04-07T03:00:00Z
+- **Current state:** done
 
 ## Task Progress
 
@@ -16,11 +15,11 @@
 | --- | ------------------------------------------------ | ----------- | ------ | ------- |
 | 0   | Update C4 Architecture Diagram                   | done        | d17284fa | Added UserPriceAlertService→AssetDisplayConfigService Rel |
 | 1   | Add displayConfigSvc to UserPriceAlertService    | done        | 17d7665b | Added field, constructor param, mock, test helper |
-| 2   | Fix Bug 1 — CreateAlert uses ResolvePrice        | done        | pending | CreateAlert calls ResolvePrice; stale non-fatal; assetTypeToString helper |
-| 3   | Fix Bug 2 — fetchPricesForAlerts uses ResolvePrice | done      | pending | Per-alert ResolvePrice loop; stale fatal in evaluation |
-| 4   | Wire AssetDisplayConfigService into DI           | pending     | —      | —       |
+| 2   | Fix Bug 1 — CreateAlert uses ResolvePrice        | done        | 111f0dc8 | CreateAlert calls ResolvePrice; stale non-fatal; assetTypeToString helper |
+| 3   | Fix Bug 2 — fetchPricesForAlerts uses ResolvePrice | done      | 111f0dc8 | Per-alert ResolvePrice loop; stale fatal in evaluation |
+| 4   | Wire AssetDisplayConfigService into DI           | done        | 17d7665b | Already wired in Task 1 — assetDisplayConfigSvc passed to NewUserPriceAlertService |
 | 5   | Update runtime flow diagram                      | skipped     | —      | No alert evaluation sequence in flow-investment.md |
-| 6   | Run full CI + E2E verification                   | pending     | —      | —       |
+| 6   | Run full CI + E2E verification                   | done        | —      | ci:backend passed (lint + build + tests); E2E skipped per user request |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
