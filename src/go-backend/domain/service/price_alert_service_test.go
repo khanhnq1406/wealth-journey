@@ -1343,3 +1343,26 @@ func TestDoCheckAndAlert_CategoryNotEnabled_Logs(t *testing.T) {
 	// Log must contain the skip message for disabled category
 	assert.Contains(t, buf.String(), "not enabled — skipping")
 }
+
+// TestCheckPrice_BaselineKey_HasTTL verifies that when checkPrice stores the
+// initial baseline in Redis, the key is written with a TTL (24h) so it will
+// eventually self-expire instead of living forever.
+func TestCheckPrice_BaselineKey_HasTTL(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("failed to start miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+
+	redisClient := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = redisClient.Close() })
+
+	pkgRDB := pkgredis.NewFromClient(redisClient)
+	svc := &priceAlertService{redisClient: pkgRDB}
+
+	svc.checkPrice(context.Background(), "SJ9999", 9_000_000)
+
+	// Verify TTL is set (should be ~24h, not 0)
+	ttl := mr.TTL("price_alert:baseline:SJ9999")
+	assert.Greater(t, int(ttl.Hours()), 0, "baseline key should have a TTL > 0")
+}

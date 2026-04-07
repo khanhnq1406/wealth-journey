@@ -334,7 +334,7 @@ processCategories:
 			// Update baselines (skip in force mode to not affect scheduled alerts)
 			for _, m := range cat.movers {
 				baselineKey := fmt.Sprintf("price_alert:baseline:%s", m.TypeCode)
-				s.redisClient.GetClient().Set(ctx, baselineKey, m.Current, 0)
+				s.redisClient.GetClient().Set(ctx, baselineKey, m.Current, 24*time.Hour)
 			}
 		}
 
@@ -388,14 +388,14 @@ func (s *priceAlertService) checkPrice(ctx context.Context, typeCode string, cur
 	baselineStr, err := s.redisClient.GetClient().Get(ctx, baselineKey).Result()
 	if err != nil {
 		// First run: store baseline and skip
-		s.redisClient.GetClient().Set(ctx, baselineKey, currentBuy, 0)
+		s.redisClient.GetClient().Set(ctx, baselineKey, currentBuy, 24*time.Hour)
 		log.Printf("Price alert: set initial baseline for %s = %d (first run)", typeCode, currentBuy)
 		return nil
 	}
 
 	baseline, err := strconv.ParseInt(baselineStr, 10, 64)
 	if err != nil || baseline <= 0 {
-		s.redisClient.GetClient().Set(ctx, baselineKey, currentBuy, 0)
+		s.redisClient.GetClient().Set(ctx, baselineKey, currentBuy, 24*time.Hour)
 		log.Printf("Price alert: reset invalid baseline for %s = %d", typeCode, currentBuy)
 		return nil
 	}
