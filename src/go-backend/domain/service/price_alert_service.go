@@ -211,6 +211,7 @@ processCategories:
 	for _, cat := range allCategories {
 		catCfg, ok := cfg.Categories[cat.category]
 		if !ok || !catCfg.Enabled {
+			log.Printf("Price alert: category '%s' not enabled — skipping", cat.category)
 			continue
 		}
 
@@ -227,6 +228,8 @@ processCategories:
 			}
 		}
 		if len(significant) == 0 {
+			log.Printf("Price alert: category '%s' — %d movers, none exceed %.1f%% threshold",
+				cat.category, len(cat.movers), catCfg.ThresholdPct)
 			continue
 		}
 
@@ -235,6 +238,7 @@ processCategories:
 		if !force {
 			exists, _ := s.redisClient.GetClient().Exists(ctx, cooldownKey).Result()
 			if exists > 0 {
+				log.Printf("Price alert: category '%s' skipped — cooldown active", cat.category)
 				continue
 			}
 		}
@@ -385,12 +389,14 @@ func (s *priceAlertService) checkPrice(ctx context.Context, typeCode string, cur
 	if err != nil {
 		// First run: store baseline and skip
 		s.redisClient.GetClient().Set(ctx, baselineKey, currentBuy, 0)
+		log.Printf("Price alert: set initial baseline for %s = %d (first run)", typeCode, currentBuy)
 		return nil
 	}
 
 	baseline, err := strconv.ParseInt(baselineStr, 10, 64)
 	if err != nil || baseline <= 0 {
 		s.redisClient.GetClient().Set(ctx, baselineKey, currentBuy, 0)
+		log.Printf("Price alert: reset invalid baseline for %s = %d", typeCode, currentBuy)
 		return nil
 	}
 

@@ -1,9 +1,12 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
+	"os"
 	"testing"
 	"time"
 
@@ -1242,4 +1245,101 @@ func TestPriceAlertService_FetchCodeDeduplication(t *testing.T) {
 	assert.Len(t, movers, 1, "expected exactly 1 mover (deduplicated by display config ID)")
 	firstMover := movers[0].(map[string]interface{})
 	assert.Equal(t, "Vàng SJC", firstMover["name"])
+}
+
+// ---------------------------------------------------------------------------
+// Diagnostic logging tests
+// ---------------------------------------------------------------------------
+
+// TestCheckPrice_FirstRun_LogsBaselineSet verifies that on the first run
+// (no baseline in Redis), checkPrice logs a message indicating the baseline
+// was set for the given type code.
+func TestCheckPrice_FirstRun_LogsBaselineSet(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("failed to start miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+
+	redisClient := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = redisClient.Close() })
+
+	pkgRDB := pkgredis.NewFromClient(redisClient)
+	svc := &priceAlertService{redisClient: pkgRDB}
+
+	// Capture log output
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
+	defer log.SetOutput(os.Stderr)
+
+	result := svc.checkPrice(context.Background(), "SJ9999", 9_000_000)
+	assert.Nil(t, result, "first run should return nil (baseline not set yet)")
+	assert.Contains(t, buf.String(), "set initial baseline for SJ9999")
+}
+
+// TestDoCheckAndAlert_CategoryNotEnabled_Logs verifies that when a category
+// has Enabled=false in the alert config, doCheckAndAlert logs a "not enabled"
+// skip message.
+func TestDoCheckAndAlert_CategoryNotEnabled_Logs(t *testing.T) {
+	t.Setenv("PRICE_ALERT_GOLD_VND_PCT", "0.1")
+	t.Setenv("PRICE_ALERT_COOLDOWN_MINUTES", "120")
+
+	assetPriceSvc := new(mockPAAssetPriceSvc)
+	notifRepo := new(mockPANotifRepo)
+	userRepo := new(mockPAUserRepo)
+	pushSvc := new(mockPAPushSvc)
+	configSvc := new(mockPAConfigSvc)
+
+	ctx := context.Background()
+
+	// Set up miniredis manually so we can seed the config
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("failed to start miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+
+	redisClient := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = redisClient.Close() })
+	rdb := pkgredis.NewFromClient(redisClient)
+
+	// Seed Redis config with gold_vnd disabled so the category-enabled check fires
+	disabledCfg := DefaultPriceAlertConfig()
+	goldVndCat := disabledCfg.Categories["gold_vnd"]
+	goldVndCat.Enabled = false
+	disabledCfg.Categories["gold_vnd"] = goldVndCat
+	if saveErr := SavePriceAlertConfig(ctx, rdb, disabledCfg); saveErr != nil {
+		t.Fatalf("failed to seed config: %v", saveErr)
+	}
+
+	svc := NewPriceAlertService(assetPriceSvc, notifRepo, userRepo, rdb, pushSvc, configSvc)
+
+	// Baseline set — so checkPrice returns a mover (not first-run skip)
+	baselinePrice := int64(8_500_000_000)
+	newPrice := int64(8_755_000_000) // ~3% — above any reasonable threshold
+	setBaseline(mr, "SJL1L10", baselinePrice)
+
+	goldPrices := []*AssetPriceDTO{
+		{TypeCode: "SJL1L10", Name: "SJC 1L-10L", Buy: newPrice, Sell: newPrice + 100_000_000, Currency: "VND", IsStale: false, FetchedAt: time.Now()},
+	}
+	silverPrices := []*AssetPriceDTO{}
+
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "gold").Return(goldPrices, nil)
+	assetPriceSvc.On("GetPricesByAssetType", ctx, "silver").Return(silverPrices, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "gold").Return(map[string]*models.AssetDisplayConfig{
+		"SJL1L10": {ID: 1, TypeCode: "SJC-display", AssetType: "gold", DisplayName: "SJC 1L-10L", Enabled: true},
+	}, nil)
+	configSvc.On("GetFetchCodesByAssetType", ctx, "silver").Return(map[string]*models.AssetDisplayConfig{}, nil)
+
+	// Capture log output
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
+	defer log.SetOutput(os.Stderr)
+
+	checkErr := svc.CheckAndAlert(ctx)
+
+	assert.NoError(t, checkErr)
+	notifRepo.AssertNotCalled(t, "BatchCreate", mock.Anything, mock.Anything)
+	// Log must contain the skip message for disabled category
+	assert.Contains(t, buf.String(), "not enabled — skipping")
 }
