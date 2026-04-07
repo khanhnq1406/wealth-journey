@@ -342,6 +342,7 @@ func (s *userPriceAlertService) EvaluateAlerts(ctx context.Context) error {
 		return fmt.Errorf("EvaluateAlerts: failed to list active alerts: %w", err)
 	}
 	if len(alerts) == 0 {
+		log.Println("EvaluateAlerts: no active alerts found — skipping evaluation")
 		return nil
 	}
 

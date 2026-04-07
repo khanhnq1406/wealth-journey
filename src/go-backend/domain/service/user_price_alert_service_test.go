@@ -1,7 +1,10 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"log"
+	"os"
 	"testing"
 	"time"
 
@@ -1184,4 +1187,21 @@ func TestSymbolPattern_VietnameseCharacters(t *testing.T) {
 		result := symbolPattern.MatchString(tt.symbol)
 		assert.Equal(t, tt.valid, result, "symbol=%q", tt.symbol)
 	}
+}
+
+// --- EvaluateAlerts zero-alerts log test ---
+
+func TestEvaluateAlerts_ZeroActiveAlerts_Logs(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	alertRepo.On("ListActive", mock.Anything).Return([]*models.UserPriceAlert{}, nil)
+
+	svc := &userPriceAlertService{alertRepo: alertRepo}
+
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
+	defer log.SetOutput(os.Stderr)
+
+	err := svc.EvaluateAlerts(context.Background())
+	assert.NoError(t, err)
+	assert.Contains(t, buf.String(), "no active alerts found")
 }
