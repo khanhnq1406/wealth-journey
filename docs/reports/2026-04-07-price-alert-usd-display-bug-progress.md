@@ -7,16 +7,16 @@
 - **Spec file:** docs/specs/2026-04-07-price-alert-usd-display-bug-spec.md
 - **Started:** 2026-04-07T00:00:00Z
 - **Last updated:** 2026-04-07T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 1
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | #   | Task Name                                                | Status      | Commit | Summary |
 | --- | -------------------------------------------------------- | ----------- | ------ | ------- |
-| 1   | Fix formatPrice() with currency divisor + unit tests     | in_progress | —      | —       |
-| 2   | Audit CreatePriceAlertForm step-3 (read-only)            | pending     | —      | —       |
-| 3   | Playwright E2E audit for price display fix               | pending     | —      | —       |
+| 1   | Fix formatPrice() with currency divisor + unit tests     | done        | 6cd981e5 | Added CURRENCY_DIVISORS map, getCurrencyDivisor(), fixed formatPrice() to divide by divisor, 9 tests green |
+| 2   | Audit CreatePriceAlertForm step-3 (read-only)            | done        | —      | No int64 display found — Success component only shows string message, no proto price values |
+| 3   | Playwright E2E audit for price display fix               | done        | —      | No price display assertions in spec — no changes needed; failures are dev server offline (pre-existing) |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
