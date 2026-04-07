@@ -627,6 +627,12 @@ sequenceDiagram
 - **`buildEnabledSet` correctness (fix):** Before evaluating prices for a category, `PriceAlertService` calls `AssetDisplayConfigService.GetFetchCodesByAssetType(ctx, assetType)` which reads `asset_config_fetch_code.type_code` values from the DB. The returned map has keys in the same namespace as `asset_price.type_code` (e.g. `"SJC_1L"`, `"DOJI_999"`), so the lookup `enabledMap[p.TypeCode]` correctly matches and filters prices. The previous broken approach read `asset_display_config.type_code` values (a different, human-readable namespace) which never matched `asset_price.type_code`, causing all prices to be filtered out and no alerts to fire.
 - **FR-2 (DisplayName):** The `mover.Name` field in notification metadata is set to `cfg.DisplayName` (the admin-configured human-readable label from `asset_display_config`), not the raw `type_code`. This ensures notification bodies show friendly names like "Vàng SJC 1L" rather than internal codes.
 - **FR-3 (dedup by config ID):** The mover-building loop tracks `seenConfigIDs` (a `map[int32]bool`). When multiple fetch codes belong to the same `AssetDisplayConfig`, only the first (highest `|changePct|`) mover per config ID is included. This prevents duplicate display configs from generating multiple notification entries for the same logical asset.
+- **Baseline/Cooldown mechanism (normal mode only):**
+  - **First run (cold-start):** Baseline Redis keys are set from current price; no alert fires for this cycle. Log: `"Price alert: set initial baseline for X"`. Baselines expire after **24 hours** (TTL).
+  - **Subsequent runs:** Change% is computed vs baseline. Alert fires only if `change% >= threshold` (default: 2%) AND no cooldown key active.
+  - **After alert fires:** Cooldown key set for 120 minutes (8 cycles). Baseline updated to current price with 24-hour TTL.
+  - **Force-trigger mode (admin):** Bypasses threshold filter and cooldown; never updates baselines or sets cooldowns.
+  - **Silent skip paths are logged** (added 2026-04-07): category not enabled, threshold not met, cooldown active, invalid baseline reset.
 - Baselines are set on first run and updated only after an alert is sent
 - Cooldown period is configurable via admin UI (`cfg.CooldownMinutes`, default 120 min)
 - Thresholds are configurable per category via admin UI (`catCfg.ThresholdPct`), with env var fallback defaults

@@ -26,7 +26,9 @@ func (j *UserPriceAlertJob) StartupDelay() time.Duration { return 45 * time.Seco
 func (j *UserPriceAlertJob) Run(ctx context.Context) error {
 	log.Println("Running user price alert evaluation...")
 	if err := j.alertService.EvaluateAlerts(ctx); err != nil {
+		log.Printf("User price alert evaluation failed: %v", err)
 		return err
 	}
+	log.Println("User price alert evaluation completed")
 	return nil
 }

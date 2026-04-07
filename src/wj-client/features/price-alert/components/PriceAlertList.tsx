@@ -258,6 +258,10 @@ export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
 
   const alerts: UserPriceAlert[] = data?.alerts ?? [];
 
+  const allTriggered =
+    alerts.length > 0 &&
+    alerts.every((a) => a.status === AlertStatus.ALERT_STATUS_TRIGGERED);
+
   // ------------------------------------------------------------------
   // Mutations
   // ------------------------------------------------------------------
@@ -408,6 +412,11 @@ export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
     <>
       {/* Mobile view (< 800px) */}
       <div className="sm:hidden">
+        {allTriggered && (
+          <div className="mb-3 px-4 py-2 rounded-md bg-v2-bg-dark border border-v2-border-light text-sm text-v2-text-tertiary">
+            {t("allTriggeredHint")}
+          </div>
+        )}
         <MobileTable
           data={alerts}
           columns={mobileColumns}
@@ -442,6 +451,12 @@ export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
             size="md"
           />
         ) : (
+          <>
+            {allTriggered && (
+              <div className="mb-3 px-4 py-2 rounded-md bg-v2-bg-dark border border-v2-border-light text-sm text-v2-text-tertiary">
+                {t("allTriggeredHint")}
+              </div>
+            )}
           <div className="overflow-x-auto rounded-lg border border-v2-border-light">
             <table className="w-full text-sm">
               <thead>
@@ -481,6 +496,7 @@ export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
 

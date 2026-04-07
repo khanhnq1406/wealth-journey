@@ -110,7 +110,7 @@ export function CreatePriceAlertForm({
   const goldSelectOptions = useMemo<SelectOption[]>(
     () =>
       (goldQuery.data?.prices ?? [])
-        .filter((p) => p.showInInvestment)
+        .filter((p) => p.enabled)
         .map((p) => ({ value: p.typeCode, label: p.displayName })),
     [goldQuery.data]
   );
@@ -118,7 +118,7 @@ export function CreatePriceAlertForm({
   const silverSelectOptions = useMemo<SelectOption[]>(
     () =>
       (silverQuery.data?.prices ?? [])
-        .filter((p) => p.showInInvestment)
+        .filter((p) => p.enabled)
         .map((p) => ({ value: p.typeCode, label: p.displayName })),
     [silverQuery.data]
   );

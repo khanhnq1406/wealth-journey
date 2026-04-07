@@ -342,6 +342,7 @@ func (s *userPriceAlertService) EvaluateAlerts(ctx context.Context) error {
 		return fmt.Errorf("EvaluateAlerts: failed to list active alerts: %w", err)
 	}
 	if len(alerts) == 0 {
+		log.Println("EvaluateAlerts: no active alerts found — skipping evaluation")
 		return nil
 	}
 
@@ -577,13 +578,13 @@ func (s *userPriceAlertService) fetchPricesForAlerts(ctx context.Context, alerts
 		}
 	}
 
-	fetchCtx, cancel := context.WithTimeout(ctx, alertPriceFetchTimeout)
-	defer cancel()
+	// No inner timeout — caller (EvaluateAlerts) already wraps with a 30s context.
+	// Using the caller ctx directly gives the full budget to price fetches.
 
 	// Fetch gold prices from DB cache (non-stale only)
 	var goldByCode map[string]*AssetPriceDTO
 	if hasGold {
-		prices, err := s.assetPriceSvc.GetPricesByAssetType(fetchCtx, "gold")
+		prices, err := s.assetPriceSvc.GetPricesByAssetType(ctx, "gold")
 		if err != nil {
 			log.Printf("Warning: DB gold prices unavailable for alerts: %v", err)
 		} else {
@@ -599,7 +600,7 @@ func (s *userPriceAlertService) fetchPricesForAlerts(ctx context.Context, alerts
 	// Fetch silver prices from DB cache (non-stale only)
 	var silverByCode map[string]*AssetPriceDTO
 	if hasSilver {
-		prices, err := s.assetPriceSvc.GetPricesByAssetType(fetchCtx, "silver")
+		prices, err := s.assetPriceSvc.GetPricesByAssetType(ctx, "silver")
 		if err != nil {
 			log.Printf("Warning: DB silver prices unavailable for alerts: %v", err)
 		} else {
@@ -645,7 +646,7 @@ func (s *userPriceAlertService) fetchPricesForAlerts(ctx context.Context, alerts
 	// Fetch market prices individually (Yahoo Finance — kept live, no DB cache for market data)
 	for _, a := range marketAlerts {
 		key := a.Symbol + "|" + a.PriceSide
-		md, err := s.marketDataSvc.GetPrice(fetchCtx, a.Symbol, a.Currency, v1.InvestmentType(a.AssetType), 15*time.Minute)
+		md, err := s.marketDataSvc.GetPrice(ctx, a.Symbol, a.Currency, v1.InvestmentType(a.AssetType), 15*time.Minute)
 		if err != nil {
 			log.Printf("Warning: failed to fetch market price for alert (symbol=%s): %v", a.Symbol, err)
 			continue
