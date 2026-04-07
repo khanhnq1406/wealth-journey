@@ -50,8 +50,8 @@ jest.mock("@/utils/generated/hooks", () => ({
       return {
         data: {
           prices: [
-            { typeCode: "SJC", displayName: "SJC", showInInvestment: true },
-            { typeCode: "BTMC", displayName: "SJC BTMC", showInInvestment: true },
+            { typeCode: "SJC", displayName: "SJC", showInInvestment: true, enabled: true },
+            { typeCode: "BTMC", displayName: "SJC BTMC", showInInvestment: true, enabled: true },
           ],
         },
         isLoading: false,
@@ -62,7 +62,7 @@ jest.mock("@/utils/generated/hooks", () => ({
       return {
         data: {
           prices: [
-            { typeCode: "PH_QU_THI_1L", displayName: "Phú Quý thỏi 1L", showInInvestment: true },
+            { typeCode: "PH_QU_THI_1L", displayName: "Phú Quý thỏi 1L", showInInvestment: true, enabled: true },
           ],
         },
         isLoading: false,
@@ -389,6 +389,39 @@ describe("CreatePriceAlertForm", () => {
       expect(
         screen.getByRole("button", { name: /create alert/i })
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("Gold type dropdown — enabled filter", () => {
+    it("includes gold prices with enabled=true even when showInInvestment=false", () => {
+      const { useQueryGetAssetDisplayPrices } = require("@/utils/generated/hooks");
+      useQueryGetAssetDisplayPrices.mockImplementation((req: { assetType: string }) => {
+        if (req.assetType === "gold") {
+          return {
+            data: {
+              prices: [
+                { typeCode: "SJC", displayName: "SJC", showInInvestment: true, enabled: true },
+                { typeCode: "DOJI_24K", displayName: "Doji 24K", showInInvestment: false, enabled: true },
+                { typeCode: "DISABLED", displayName: "Disabled Item", showInInvestment: true, enabled: false },
+              ],
+            },
+            isLoading: false,
+            error: null,
+          };
+        }
+        return { data: null, isLoading: false, error: null };
+      });
+
+      renderForm({ defaultCategory: "gold" });
+
+      // Open the gold type dropdown
+      const goldTypeSelect = screen.getByRole("button", { name: /gold type/i });
+      fireEvent.click(goldTypeSelect);
+
+      // Doji 24K (showInInvestment: false, enabled: true) must appear
+      expect(screen.getByRole("option", { name: "Doji 24K" })).toBeInTheDocument();
+      // Disabled Item (enabled: false) must NOT appear
+      expect(screen.queryByRole("option", { name: "Disabled Item" })).not.toBeInTheDocument();
     });
   });
 });
