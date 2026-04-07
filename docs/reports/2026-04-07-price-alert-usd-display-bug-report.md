@@ -48,6 +48,12 @@ APPROVED. Display-only fix. `Intl.NumberFormat` is XSS-safe. Raw `rawInt64` inpu
 
 APPROVED. `CURRENCY_DIVISORS` and `getCurrencyDivisor()` co-located correctly in the feature module. Single source of truth: divisor governs both arithmetic conversion and decimal display precision. Test names are behavioral and specific. Edge cases well-covered (zero values, unknown currency fallback, all three decimal tiers).
 
+## Fix History
+
+| Date       | Fix                                                                                                      | Severity | Commit        |
+| ---------- | -------------------------------------------------------------------------------------------------------- | -------- | ------------- |
+| 2026-04-07 | Added `formatTargetPrice()` for target price display (no divisor); `formatPrice()` retained for current price column only | Minor    | pending       |
+
 ## Known Issues / Technical Debt
 
 None. The `export` on `formatPrice` technically expands the module's public surface, but the ESLint `no-restricted-imports` rule guards against cross-feature usage at the boundary level.

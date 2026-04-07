@@ -1,11 +1,11 @@
 /**
- * Unit tests for formatPrice() in PriceAlertList.tsx
+ * Unit tests for formatPrice() and formatTargetPrice() in PriceAlertList.tsx
  *
  * Run: cd src/wj-client && npm test -- --watchAll=false --testPathPatterns="formatPrice"
  */
 
-// Import the helper via a named export (see Step 3 — we'll export it)
-import { formatPrice } from "../components/PriceAlertList";
+// Import the helpers via named exports
+import { formatPrice, formatTargetPrice } from "../components/PriceAlertList";
 
 describe("formatPrice", () => {
   describe("USD (2 decimal places, divisor 100)", () => {
@@ -59,6 +59,44 @@ describe("formatPrice", () => {
       const result = formatPrice(10000, "SGD");
       // 10000 / 100 = 100.00 SGD
       expect(result).toContain("100");
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// formatTargetPrice — target prices stored as whole units (no divisor applied)
+// User inputs $100,000 → stored as 100000 → must display as $100,000.00
+// ---------------------------------------------------------------------------
+describe("formatTargetPrice", () => {
+  describe("USD — stored as whole dollars, no divisor", () => {
+    it("displays $100,000 target correctly: 100000 → $100,000.00", () => {
+      expect(formatTargetPrice(100000, "USD")).toBe("$100,000.00");
+    });
+
+    it("displays $50,000 target correctly: 50000 → $50,000.00", () => {
+      expect(formatTargetPrice(50000, "USD")).toBe("$50,000.00");
+    });
+
+    it("displays $1 target correctly: 1 → $1.00", () => {
+      expect(formatTargetPrice(1, "USD")).toBe("$1.00");
+    });
+  });
+
+  describe("VND — no divisor, no decimals", () => {
+    it("displays 85000 VND target correctly", () => {
+      const result = formatTargetPrice(85000, "VND");
+      expect(result).toContain("85.000");
+      expect(result).toContain("₫");
+    });
+  });
+
+  describe("Zero / edge cases", () => {
+    it("returns '-' for target price = 0", () => {
+      expect(formatTargetPrice(0, "USD")).toBe("-");
+    });
+
+    it("returns '-' for target price = 0 in VND", () => {
+      expect(formatTargetPrice(0, "VND")).toBe("-");
     });
   });
 });

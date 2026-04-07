@@ -78,6 +78,30 @@ export function formatPrice(rawInt64: number, currency: string): string {
   }).format(price);
 }
 
+/**
+ * Formats a target price for display. Target prices are stored as whole units
+ * (not smallest currency unit) — e.g. 100000 means $100,000, not $1,000.00.
+ * No divisor is applied; only locale formatting.
+ */
+export function formatTargetPrice(rawValue: number, currency: string): string {
+  if (!rawValue) return "-";
+  if (currency === "VND") {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      maximumFractionDigits: 0,
+    }).format(rawValue);
+  }
+  const divisor = getCurrencyDivisor(currency);
+  const decimalPlaces = divisor === 1 ? 0 : divisor === 1000 ? 3 : 2;
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency || "USD",
+    minimumFractionDigits: decimalPlaces,
+    maximumFractionDigits: decimalPlaces,
+  }).format(rawValue);
+}
+
 function directionLabel(
   direction: AlertDirection,
   t: (key: string) => string
@@ -212,7 +236,7 @@ function DesktopAlertRow({
         >
           {directionLabel(alert.direction, t)}
         </span>{" "}
-        {formatPrice(alert.targetPrice, alert.currency)}
+        {formatTargetPrice(alert.targetPrice, alert.currency)}
       </td>
       <td className="py-3 px-4 text-sm text-v2-text-secondary">
         {formatPrice(alert.currentPrice, alert.currency)}
@@ -365,7 +389,7 @@ export function PriceAlertList({ statusFilter }: PriceAlertListProps) {
             >
               {directionLabel(row.direction, t)}
             </span>{" "}
-            {formatPrice(row.targetPrice, row.currency)}
+            {formatTargetPrice(row.targetPrice, row.currency)}
           </span>
         ),
       },
