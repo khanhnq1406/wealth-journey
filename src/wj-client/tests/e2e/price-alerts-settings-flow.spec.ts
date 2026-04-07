@@ -297,6 +297,85 @@ test.describe("Price Alerts Settings Flow", () => {
       .first();
     await expect(alertsLink).toBeVisible({ timeout: 10000 });
   });
+
+  test("filter tabs change displayed alerts — sends correct status_filter query param", async ({
+    page,
+  }) => {
+    // The price alerts section lives on the /dashboard/prices page (the
+    // /settings/alerts route simply redirects there). Mock the real API
+    // endpoint that PriceAlertList calls.
+    await page.route("**/api/v1/price-alerts**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(MOCK_LIST_RESPONSE),
+      });
+    });
+
+    // Navigate to the prices page which hosts the Price Alerts tab
+    await page.goto("/dashboard/prices");
+    await page.waitForLoadState("networkidle");
+
+    // Ensure the "Price Alerts" main tab is active (it is the default)
+    await page.waitForFunction(
+      () =>
+        document.body.innerText.includes("Price Alerts") ||
+        document.body.innerText.includes("Create Alert"),
+      { timeout: 15000 },
+    );
+
+    // Verify the three filter tabs are present (en locale)
+    const allTab = page
+      .locator("button[aria-pressed]")
+      .filter({ hasText: /^All$/ })
+      .first();
+    const activeTab = page
+      .locator("button[aria-pressed]")
+      .filter({ hasText: /^Active$/ })
+      .first();
+    const triggeredTab = page
+      .locator("button[aria-pressed]")
+      .filter({ hasText: /^Triggered$/ })
+      .first();
+
+    await expect(allTab).toBeVisible({ timeout: 10000 });
+    await expect(activeTab).toBeVisible({ timeout: 10000 });
+    await expect(triggeredTab).toBeVisible({ timeout: 10000 });
+
+    // Click "Active" tab — verify the network request includes statusFilter=1
+    // (proto camelCase serialisation) or status_filter=1 (snake_case fallback).
+    const [activeRequest] = await Promise.all([
+      page.waitForRequest(
+        (req) =>
+          req.url().includes("/api/v1/price-alerts") &&
+          (req.url().includes("statusFilter=1") ||
+            req.url().includes("status_filter=1")),
+        { timeout: 8000 },
+      ),
+      activeTab.click(),
+    ]);
+    expect(activeRequest).toBeTruthy();
+
+    // Active tab should now be the pressed one
+    await expect(activeTab).toHaveAttribute("aria-pressed", "true");
+
+    // Click "Triggered" tab — verify the network request includes statusFilter=2
+    // or status_filter=2.
+    const [triggeredRequest] = await Promise.all([
+      page.waitForRequest(
+        (req) =>
+          req.url().includes("/api/v1/price-alerts") &&
+          (req.url().includes("statusFilter=2") ||
+            req.url().includes("status_filter=2")),
+        { timeout: 8000 },
+      ),
+      triggeredTab.click(),
+    ]);
+    expect(triggeredRequest).toBeTruthy();
+
+    // Triggered tab should now be the pressed one
+    await expect(triggeredTab).toHaveAttribute("aria-pressed", "true");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -379,5 +458,44 @@ test.describe("Price Alerts Settings Flow - Mobile", () => {
       .filter({ hasText: /^All$/ })
       .first();
     await expect(allTab).toBeVisible({ timeout: 10000 });
+  });
+
+  test("filter tabs send correct status_filter on mobile", async ({ page }) => {
+    // Mock the price-alerts endpoint for mobile as well
+    await page.route("**/api/v1/price-alerts**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(MOCK_LIST_RESPONSE),
+      });
+    });
+
+    await page.goto("/dashboard/prices");
+    await page.waitForLoadState("networkidle");
+    await page.waitForFunction(
+      () =>
+        document.body.innerText.includes("Price Alerts") ||
+        document.body.innerText.includes("Create Alert"),
+      { timeout: 15000 },
+    );
+
+    const activeTab = page
+      .locator("button[aria-pressed]")
+      .filter({ hasText: /^Active$/ })
+      .first();
+    await expect(activeTab).toBeVisible({ timeout: 10000 });
+
+    const [req] = await Promise.all([
+      page.waitForRequest(
+        (r) =>
+          r.url().includes("/api/v1/price-alerts") &&
+          (r.url().includes("statusFilter=1") ||
+            r.url().includes("status_filter=1")),
+        { timeout: 8000 },
+      ),
+      activeTab.click(),
+    ]);
+    expect(req).toBeTruthy();
+    await expect(activeTab).toHaveAttribute("aria-pressed", "true");
   });
 });
