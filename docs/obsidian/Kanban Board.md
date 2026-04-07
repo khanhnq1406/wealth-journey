@@ -10,27 +10,27 @@ kanban-plugin: board
 
 ## Spec
 
-- [ ] [[2026-04-07-price-alert-usd-display-bug|Fix price alert USD price display showing 100× wrong value]]
 
 
 ## Plan
+
+- [ ] [[2026-04-07-price-alert-usd-display-bug|Fix price alert USD price display showing 100× wrong value]]
+
+
+## Implement
 
 - [ ] [[2026-04-07-price-alert-symbol-mismatch|Fix price alert symbol/TypeCode mismatch (gold/silver alert creation & evaluation broken)]]
 
 
 
-## Implement
-
-
-
 ## Review
 
-- [ ] [[2026-04-07-price-alert-filter-bug|Fix price alert status filter not working (Tất cả / Đang hoạt động / Đã kích hoạt)]]
 
 
 ## Done
 
 **Complete**
+- [x] [[2026-04-07-price-alert-filter-bug|Fix price alert status filter not working (Tất cả / Đang hoạt động / Đã kích hoạt)]]
 - [x] [[2026-04-06-fix-price-alert-cannot-use-home-page-prices|Fix price alert cannot use home page prices]]
 - [x] [[2026-04-07-fix-alert-auto-trigger-not-working|Fix alert auto-trigger not working]]
 - [x] [[2026-04-06-share-pnl-via-picture-with-congdongvang-logo|Share PNL via picture with CongDongVang logo]]
