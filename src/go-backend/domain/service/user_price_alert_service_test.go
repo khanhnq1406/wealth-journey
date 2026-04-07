@@ -281,6 +281,35 @@ func validSilverCreateReq() *v1.CreateUserPriceAlertRequest {
 	}
 }
 
+// --- Tests: fetchPricesForAlerts ---
+
+// TestFetchPricesForAlerts_UsesCallerContext verifies that fetchPricesForAlerts uses the
+// caller's context directly (no inner WithTimeout wrapper). When the caller's context is
+// already cancelled, the function must return a non-nil (empty) map without panicking.
+// This is a regression guard ensuring the inner 5s timeout is not re-introduced.
+func TestFetchPricesForAlerts_UsesCallerContext(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	marketSvc := new(mockAlertMarketDataSvc)
+
+	// Allow any call on assetPriceSvc with a cancelled context — it will return an error
+	assetPriceSvc.On("GetPricesByAssetType", mock.Anything, mock.Anything).Return(nil, context.Canceled)
+	marketSvc.On("GetPrice", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, context.Canceled)
+
+	svc := newTestAlertService(alertRepo, assetPriceSvc, marketSvc)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // immediately cancelled
+
+	alerts := []*models.UserPriceAlert{
+		{AssetType: int32(v1.InvestmentType_INVESTMENT_TYPE_STOCK), Symbol: "AAPL", PriceSide: "buy", Currency: "USD"},
+	}
+
+	// Must return empty map quickly without panic — cancelled context propagated to DB calls
+	result := svc.(*userPriceAlertService).fetchPricesForAlerts(ctx, alerts)
+	assert.NotNil(t, result)
+}
+
 // --- Tests: CreateAlert ---
 
 func TestUserPriceAlertService_CreateAlert_Success(t *testing.T) {

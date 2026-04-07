@@ -15,7 +15,7 @@
 | #   | Task Name                                                      | Status      | Commit | Summary |
 | --- | -------------------------------------------------------------- | ----------- | ------ | ------- |
 | 1   | Add diagnostic logging to checkPrice and doCheckAndAlert        | done        | 0e2f5d8f | 5 log points added to checkPrice + doCheckAndAlert, 2 tests |
-| 2   | Add summary logging to UserPriceAlertJob and EvaluateAlerts    | pending     | —      | —       |
+| 2   | Add summary logging to UserPriceAlertJob and EvaluateAlerts    | done        | 6467cabb | Log lines in Run() + EvaluateAlerts zero-alerts path, 4 new tests |
 | 3   | Fix fetchPricesForAlerts — Remove inner timeout wrapper         | pending     | —      | —       |
 | 4   | Add TTL to baseline Redis keys                                  | pending     | —      | —       |
 | 5   | Update runtime flow diagram                                     | pending     | —      | —       |
