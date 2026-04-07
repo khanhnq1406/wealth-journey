@@ -17,7 +17,7 @@
 | 1   | Add diagnostic logging to checkPrice and doCheckAndAlert        | done        | 0e2f5d8f | 5 log points added to checkPrice + doCheckAndAlert, 2 tests |
 | 2   | Add summary logging to UserPriceAlertJob and EvaluateAlerts    | done        | 6467cabb | Log lines in Run() + EvaluateAlerts zero-alerts path, 4 new tests |
 | 3   | Fix fetchPricesForAlerts — Remove inner timeout wrapper         | done        | 58037a74 | Removed inner 5s WithTimeout, replaced fetchCtx→ctx, added comment |
-| 4   | Add TTL to baseline Redis keys                                  | pending     | —      | —       |
+| 4   | Add TTL to baseline Redis keys                                  | done        | 7e59c27b | All 3 baseline Set calls changed to 24h TTL, 1 new test |
 | 5   | Update runtime flow diagram                                     | pending     | —      | —       |
 | 6   | Investigate FR-6 — root cause of 0 active alerts               | pending     | —      | —       |
 
