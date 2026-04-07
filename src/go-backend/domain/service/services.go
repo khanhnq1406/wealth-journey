@@ -137,6 +137,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 			repos.UserPriceAlert,
 			assetPriceSvc,
 			marketDataSvc,
+			assetDisplayConfigSvc,
 			repos.Notification,
 			pushSvc,
 			rdb,

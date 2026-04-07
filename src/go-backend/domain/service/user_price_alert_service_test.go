@@ -16,6 +16,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 // --- Mock: UserPriceAlertRepository ---
@@ -210,7 +211,138 @@ func (m *mockAlertPushSvc) GetVAPIDPublicKey() string {
 	return args.String(0)
 }
 
+// --- Mock: AssetDisplayConfigService (alert-scope) ---
+
+type mockAlertDisplayConfigSvc struct {
+	mock.Mock
+}
+
+func (m *mockAlertDisplayConfigSvc) GetDisplayPrices(ctx context.Context, assetType string) ([]*AssetDisplayPriceDTO, error) {
+	args := m.Called(ctx, assetType)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*AssetDisplayPriceDTO), args.Error(1)
+}
+
+func (m *mockAlertDisplayConfigSvc) ListAll(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
+	args := m.Called(ctx, assetType)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*models.AssetDisplayConfig), args.Error(1)
+}
+
+func (m *mockAlertDisplayConfigSvc) Create(ctx context.Context, typeCode, displayName, assetType string, displayOrder int32, enabled, showInInvestment bool) (*models.AssetDisplayConfig, error) {
+	args := m.Called(ctx, typeCode, displayName, assetType, displayOrder, enabled, showInInvestment)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.AssetDisplayConfig), args.Error(1)
+}
+
+func (m *mockAlertDisplayConfigSvc) Update(ctx context.Context, id int32, displayName string, displayOrder int32, enabled, showInInvestment bool) (*models.AssetDisplayConfig, error) {
+	args := m.Called(ctx, id, displayName, displayOrder, enabled, showInInvestment)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.AssetDisplayConfig), args.Error(1)
+}
+
+func (m *mockAlertDisplayConfigSvc) Delete(ctx context.Context, id int32) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
+func (m *mockAlertDisplayConfigSvc) ResolvePrice(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
+	args := m.Called(ctx, typeCode, assetType)
+	return int64(args.Int(0)), int64(args.Int(1)), args.Bool(2), args.Error(3)
+}
+
+func (m *mockAlertDisplayConfigSvc) ListFetchCodes(ctx context.Context, configID int32) ([]*models.AssetConfigFetchCode, error) {
+	args := m.Called(ctx, configID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*models.AssetConfigFetchCode), args.Error(1)
+}
+
+func (m *mockAlertDisplayConfigSvc) CreateFetchCode(ctx context.Context, configID int32, typeCode string, priority int32) (*models.AssetConfigFetchCode, error) {
+	args := m.Called(ctx, configID, typeCode, priority)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.AssetConfigFetchCode), args.Error(1)
+}
+
+func (m *mockAlertDisplayConfigSvc) UpdateFetchCode(ctx context.Context, id int32, priority int32) (*models.AssetConfigFetchCode, error) {
+	args := m.Called(ctx, id, priority)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.AssetConfigFetchCode), args.Error(1)
+}
+
+func (m *mockAlertDisplayConfigSvc) DeleteFetchCode(ctx context.Context, id int32) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
+func (m *mockAlertDisplayConfigSvc) ListAvailableTypeCodes(ctx context.Context, assetType string) ([]string, error) {
+	args := m.Called(ctx, assetType)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]string), args.Error(1)
+}
+
+func (m *mockAlertDisplayConfigSvc) GetFetchCodesByAssetType(ctx context.Context, assetType string) (map[string]*models.AssetDisplayConfig, error) {
+	args := m.Called(ctx, assetType)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(map[string]*models.AssetDisplayConfig), args.Error(1)
+}
+
+func (m *mockAlertDisplayConfigSvc) ListForInvestment(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
+	args := m.Called(ctx, assetType)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*models.AssetDisplayConfig), args.Error(1)
+}
+
 // --- Helpers ---
+
+// newTestAlertServiceWithDisplayConfig creates a UserPriceAlertService backed by the provided mocks,
+// including an optional AssetDisplayConfigService dependency.
+func newTestAlertServiceWithDisplayConfig(
+	alertRepo *mockUserPriceAlertRepo,
+	assetPriceSvc AssetPriceService,
+	marketSvc MarketDataService,
+	displayConfigSvc AssetDisplayConfigService,
+) UserPriceAlertService {
+	ap := assetPriceSvc
+	mkt := marketSvc
+	if ap == nil {
+		ap = &mockAlertAssetPriceSvc{}
+	}
+	if mkt == nil {
+		mkt = &mockAlertMarketDataSvc{}
+	}
+	if displayConfigSvc == nil {
+		displayConfigSvc = &mockAlertDisplayConfigSvc{}
+	}
+	return &userPriceAlertService{
+		alertRepo:        alertRepo,
+		assetPriceSvc:    ap,
+		marketDataSvc:    mkt,
+		displayConfigSvc: displayConfigSvc,
+		notifRepo:        &mockAlertNotifRepo{},
+		pushSvc:          &mockAlertPushSvc{},
+		rdb:              nil,
+	}
+}
 
 // newTestAlertService creates a UserPriceAlertService backed by the provided mocks.
 // Passing nil for assetPriceSvc/marketSvc is fine for tests that don't need price fetching.
@@ -219,24 +351,7 @@ func newTestAlertService(
 	assetPriceSvc AssetPriceService,
 	marketSvc MarketDataService,
 ) UserPriceAlertService {
-	ap := assetPriceSvc
-	mkt := marketSvc
-
-	if ap == nil {
-		ap = &mockAlertAssetPriceSvc{}
-	}
-	if mkt == nil {
-		mkt = &mockAlertMarketDataSvc{}
-	}
-
-	return &userPriceAlertService{
-		alertRepo:     alertRepo,
-		assetPriceSvc: ap,
-		marketDataSvc: mkt,
-		notifRepo:     &mockAlertNotifRepo{},
-		pushSvc:       &mockAlertPushSvc{},
-		rdb:           nil,
-	}
+	return newTestAlertServiceWithDisplayConfig(alertRepo, assetPriceSvc, marketSvc, nil)
 }
 
 // validStockCreateReq returns a minimal valid CreateUserPriceAlertRequest for a stock (non-gold/silver).
@@ -1233,4 +1348,29 @@ func TestEvaluateAlerts_ZeroActiveAlerts_Logs(t *testing.T) {
 	err := svc.EvaluateAlerts(context.Background())
 	assert.NoError(t, err)
 	assert.Contains(t, buf.String(), "no active alerts found")
+}
+
+// --- Tests: AssetDisplayConfigService dependency (Task 1) ---
+
+// TestCreateAlert_GoldWithDisplayConfig_Success verifies that once CreateAlert is updated
+// (Task 2) to call ResolvePrice for gold/silver, the buy price from ResolvePrice is stored
+// as CurrentPriceAtCreation. This test is intentionally written before the Task 2
+// implementation (TDD RED phase for Task 2).
+func TestCreateAlert_GoldWithDisplayConfig_Success(t *testing.T) {
+	repo := &mockUserPriceAlertRepo{}
+	displayConfigSvc := &mockAlertDisplayConfigSvc{}
+	repo.On("CountActiveByUserID", mock.Anything, int32(1)).Return(0, nil)
+	repo.On("Create", mock.Anything, mock.Anything).Return(nil)
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "SJL1L10", "gold").
+		Return(9500000000, 9600000000, false, nil)
+
+	svc := newTestAlertServiceWithDisplayConfig(repo, nil, nil, displayConfigSvc)
+	resp, err := svc.CreateAlert(context.Background(), 1, validGoldCreateReq())
+
+	require.NoError(t, err)
+	require.NotNil(t, resp)
+	assert.True(t, resp.Success)
+	assert.Equal(t, int64(9500000000), resp.Alert.CurrentPriceAtCreation,
+		"should use resolved buy price from ResolvePrice")
+	displayConfigSvc.AssertExpectations(t)
 }

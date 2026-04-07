@@ -37,12 +37,13 @@ var symbolPattern = regexp.MustCompile(`^[\p{L}\p{N}.\-_ ]+$`)
 
 // userPriceAlertService implements UserPriceAlertService.
 type userPriceAlertService struct {
-	alertRepo     repository.UserPriceAlertRepository
-	assetPriceSvc AssetPriceService
-	marketDataSvc MarketDataService
-	notifRepo     repository.NotificationRepository
-	pushSvc       PushService
-	rdb           *pkgredis.RedisClient
+	alertRepo        repository.UserPriceAlertRepository
+	assetPriceSvc    AssetPriceService
+	marketDataSvc    MarketDataService
+	displayConfigSvc AssetDisplayConfigService
+	notifRepo        repository.NotificationRepository
+	pushSvc          PushService
+	rdb              *pkgredis.RedisClient
 }
 
 // NewUserPriceAlertService creates a new UserPriceAlertService.
@@ -50,17 +51,19 @@ func NewUserPriceAlertService(
 	alertRepo repository.UserPriceAlertRepository,
 	assetPriceSvc AssetPriceService,
 	marketDataSvc MarketDataService,
+	displayConfigSvc AssetDisplayConfigService,
 	notifRepo repository.NotificationRepository,
 	pushSvc PushService,
 	rdb *pkgredis.RedisClient,
 ) UserPriceAlertService {
 	return &userPriceAlertService{
-		alertRepo:     alertRepo,
-		assetPriceSvc: assetPriceSvc,
-		marketDataSvc: marketDataSvc,
-		notifRepo:     notifRepo,
-		pushSvc:       pushSvc,
-		rdb:           rdb,
+		alertRepo:        alertRepo,
+		assetPriceSvc:    assetPriceSvc,
+		marketDataSvc:    marketDataSvc,
+		displayConfigSvc: displayConfigSvc,
+		notifRepo:        notifRepo,
+		pushSvc:          pushSvc,
+		rdb:              rdb,
 	}
 }
 
