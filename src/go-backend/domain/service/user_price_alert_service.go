@@ -14,6 +14,7 @@ import (
 	"wealthjourney/domain/models"
 	"wealthjourney/domain/repository"
 	apperrors "wealthjourney/pkg/errors"
+	"wealthjourney/pkg/fx"
 	"wealthjourney/pkg/gold"
 	pkgredis "wealthjourney/pkg/redis"
 	"wealthjourney/pkg/silver"
@@ -368,13 +369,19 @@ func (s *userPriceAlertService) EvaluateAlerts(ctx context.Context) error {
 			continue
 		}
 
+		// Normalize currentPrice from smallest currency units to whole units.
+		// targetPrice is always stored in whole units (user input convention).
+		// GetDecimalMultiplier("VND") = 1 (no-op). GetDecimalMultiplier("USD") = 100.
+		multiplier := fx.GetDecimalMultiplier(alert.Currency)
+		normalizedPrice := currentPrice / multiplier
+
 		// Check trigger condition
 		var fired bool
 		switch alert.Direction {
 		case "above":
-			fired = currentPrice >= alert.TargetPrice
+			fired = normalizedPrice >= alert.TargetPrice
 		case "below":
-			fired = currentPrice <= alert.TargetPrice
+			fired = normalizedPrice <= alert.TargetPrice
 		}
 		if !fired {
 			continue

@@ -1427,3 +1427,114 @@ func TestFetchPricesForAlerts_SJCDirectMatch_NoRegression(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, int64(9200000000), price)
 }
+
+// --- Tests: EvaluateAlerts USD price normalization ---
+
+// TestUserPriceAlertService_EvaluateAlerts_CryptoUSD_NoFalsePositive verifies that a
+// BTC-USD alert set to fire "above $100,000" does NOT fire when the raw price from the
+// market data service is 6852028 cents ($68,520.28), which is below the threshold.
+func TestUserPriceAlertService_EvaluateAlerts_CryptoUSD_NoFalsePositive(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	marketDataSvc := new(mockAlertMarketDataSvc)
+	notifRepo := new(mockAlertNotifRepo)
+	pushSvc := new(mockAlertPushSvc)
+	svc := &userPriceAlertService{
+		alertRepo:        alertRepo,
+		assetPriceSvc:    &mockAlertAssetPriceSvc{},
+		marketDataSvc:    marketDataSvc,
+		displayConfigSvc: &mockAlertDisplayConfigSvc{},
+		notifRepo:        notifRepo,
+		pushSvc:          pushSvc,
+		rdb:              nil,
+	}
+	ctx := context.Background()
+
+	now := time.Now()
+	// BTC-USD alert: fires "above $100,000"
+	activeAlerts := []*models.UserPriceAlert{
+		{
+			ID:          20,
+			UserID:      1,
+			Symbol:      "BTC-USD",
+			Name:        "Bitcoin",
+			AssetType:   int32(v1.InvestmentType_INVESTMENT_TYPE_CRYPTOCURRENCY),
+			Currency:    "USD",
+			PriceSide:   "buy",
+			Direction:   "above",
+			TargetPrice: 100000, // $100,000 whole units
+			TriggerMode: "once",
+			Status:      "active",
+			CreatedAt:   now,
+			UpdatedAt:   now,
+		},
+	}
+
+	alertRepo.On("ListActive", ctx).Return(activeAlerts, nil)
+	// currentPrice = 6852028 cents = $68,520.28 — BELOW threshold of $100,000
+	marketDataSvc.On("GetPrice", mock.Anything, "BTC-USD", "USD",
+		v1.InvestmentType_INVESTMENT_TYPE_CRYPTOCURRENCY, 15*time.Minute).
+		Return(&models.MarketData{Price: 6852028}, nil)
+
+	err := svc.EvaluateAlerts(ctx)
+
+	assert.NoError(t, err)
+	// Alert must NOT fire — no notification, no status update
+	notifRepo.AssertNotCalled(t, "Create")
+	alertRepo.AssertNotCalled(t, "UpdateStatus")
+}
+
+// TestUserPriceAlertService_EvaluateAlerts_CryptoUSD_CorrectlyFires verifies that a
+// BTC-USD alert set to fire "above $100,000" DOES fire when the raw price from the
+// market data service is 10000001 cents ($100,000.01), which is above the threshold.
+func TestUserPriceAlertService_EvaluateAlerts_CryptoUSD_CorrectlyFires(t *testing.T) {
+	alertRepo := new(mockUserPriceAlertRepo)
+	marketDataSvc := new(mockAlertMarketDataSvc)
+	notifRepo := new(mockAlertNotifRepo)
+	pushSvc := new(mockAlertPushSvc)
+	svc := &userPriceAlertService{
+		alertRepo:        alertRepo,
+		assetPriceSvc:    &mockAlertAssetPriceSvc{},
+		marketDataSvc:    marketDataSvc,
+		displayConfigSvc: &mockAlertDisplayConfigSvc{},
+		notifRepo:        notifRepo,
+		pushSvc:          pushSvc,
+		rdb:              nil,
+	}
+	ctx := context.Background()
+
+	now := time.Now()
+	// BTC-USD alert: fires "above $100,000"
+	activeAlerts := []*models.UserPriceAlert{
+		{
+			ID:          21,
+			UserID:      1,
+			Symbol:      "BTC-USD",
+			Name:        "Bitcoin",
+			AssetType:   int32(v1.InvestmentType_INVESTMENT_TYPE_CRYPTOCURRENCY),
+			Currency:    "USD",
+			PriceSide:   "buy",
+			Direction:   "above",
+			TargetPrice: 100000, // $100,000 whole units
+			TriggerMode: "once",
+			Status:      "active",
+			CreatedAt:   now,
+			UpdatedAt:   now,
+		},
+	}
+
+	alertRepo.On("ListActive", ctx).Return(activeAlerts, nil)
+	// currentPrice = 10000001 cents = $100,000.01 — ABOVE threshold of $100,000
+	marketDataSvc.On("GetPrice", mock.Anything, "BTC-USD", "USD",
+		v1.InvestmentType_INVESTMENT_TYPE_CRYPTOCURRENCY, 15*time.Minute).
+		Return(&models.MarketData{Price: 10000001}, nil)
+	notifRepo.On("Create", mock.Anything, mock.AnythingOfType("*models.Notification")).Return(nil)
+	pushSvc.On("SendToUser", mock.Anything, int32(1), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(nil)
+	alertRepo.On("UpdateStatus", mock.Anything, int32(21), "triggered", mock.Anything, int32(1)).Return(nil)
+
+	err := svc.EvaluateAlerts(ctx)
+
+	assert.NoError(t, err)
+	// Alert MUST fire
+	notifRepo.AssertCalled(t, "Create", mock.Anything, mock.AnythingOfType("*models.Notification"))
+	alertRepo.AssertCalled(t, "UpdateStatus", mock.Anything, int32(21), "triggered", mock.Anything, int32(1))
+}

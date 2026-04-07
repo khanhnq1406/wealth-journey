@@ -6,6 +6,7 @@ kanban-plugin: board
 
 ## Not Started
 
+- [ ] [[2026-04-07-fix-og-image-not-rendering-on-share|Fix OG image not rendering on share]]
 
 
 ## Spec
@@ -14,22 +15,22 @@ kanban-plugin: board
 
 ## Plan
 
-- [ ] [[2026-04-07-price-alert-usd-display-bug|Fix price alert USD price display showing 100× wrong value]]
 
 
 ## Implement
 
-- [ ] [[2026-04-07-price-alert-symbol-mismatch|Fix price alert symbol/TypeCode mismatch (gold/silver alert creation & evaluation broken)]]
-
+- [ ] [[2026-04-07-price-alert-false-trigger|Fix price alert false trigger for USD assets (BTC alert fires at $68k when threshold is $100k)]]
 
 
 ## Review
 
+- [ ] [[2026-04-07-price-alert-symbol-mismatch|Fix price alert symbol/TypeCode mismatch (gold/silver alert creation & evaluation broken)]]
 
 
 ## Done
 
 **Complete**
+- [x] [[2026-04-07-price-alert-usd-display-bug|Fix price alert USD price display showing 100× wrong value]]
 - [x] [[2026-04-07-price-alert-filter-bug|Fix price alert status filter not working (Tất cả / Đang hoạt động / Đã kích hoạt)]]
 - [x] [[2026-04-06-fix-price-alert-cannot-use-home-page-prices|Fix price alert cannot use home page prices]]
 - [x] [[2026-04-07-fix-alert-auto-trigger-not-working|Fix alert auto-trigger not working]]
