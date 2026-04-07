@@ -1,6 +1,6 @@
 ---
 type: bug
-status: Not Started
+status: Review
 ---
 
 ## Overview
@@ -24,7 +24,7 @@ The price tables on the home page successfully display market prices (gold, silv
 
 | Artifact | File |
 | -------- | ---- |
-| Spec     | _(added after step 1)_ |
-| Plan     | _(added after step 2)_ |
-| Progress | _(added after step 3 starts)_ |
-| Report   | _(added after step 3 completes)_ |
+| Spec     | `docs/specs/2026-04-06-fix-price-alert-cannot-use-home-page-prices-spec.md` |
+| Plan     | `docs/plans/2026-04-06-fix-price-alert-cannot-use-home-page-prices-plan.md` |
+| Progress | `docs/reports/2026-04-06-fix-price-alert-cannot-use-home-page-prices-progress.md` |
+| Report   | `docs/reports/2026-04-06-fix-price-alert-cannot-use-home-page-prices-report.md` |
