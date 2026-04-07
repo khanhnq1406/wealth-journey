@@ -49,11 +49,12 @@ Routes: `/dashboard/home`, `/dashboard/transaction`, `/dashboard/wallets`, `/das
 ### Backgrounds
 | Token | Value | Use |
 |-------|-------|-----|
-| `bg-v2-bg-primary` | `#5F0202` | Page background |
-| `bg-v2-bg-surface` | `#580202` | Cards, modals |
+| `bg-v2-bg-primary` / `bg-v2-maroon-700` | `#5F0202` | Page background |
+| `bg-v2-bg-surface` / `bg-v2-maroon-800` | `#580202` | Cards, modals |
 | `bg-v2-bg-surface-tint` | `#5A0A0A` | Table headers, active row hover |
-| `bg-v2-bg-dark` | `#3A0101` | Inputs, dropdowns, skeletons |
+| `bg-v2-bg-dark` / `bg-v2-maroon-900` | `#3D0101` | Inputs, dropdowns, skeletons |
 | `bg-v2-maroon-600` | `#6B0303` | Hover state |
+| `bg-v2-cream-100` | `#FFF8EC` | Light cream highlight (rare) |
 
 ### Text
 | Token | Value | Use |
@@ -80,7 +81,7 @@ Routes: `/dashboard/home`, `/dashboard/transaction`, `/dashboard/wallets`, `/das
 
 ### Rules
 - **No `dark:` classes** — theme is permanent dark maroon
-- **No `bg-white`** except `bg-white/10` or `bg-white/20`
+- **No `bg-white`** except `bg-white/10` or `bg-white/20` (transparent overlays only)
 - **`v2-bg-deepest` does NOT exist** — don't use it
 - Active tab on gold bg → `text-v2-bg-dark` (dark maroon text, readable)
 - Min touch target: `min-h-[44px]`
@@ -89,6 +90,8 @@ Routes: `/dashboard/home`, `/dashboard/transaction`, `/dashboard/wallets`, `/das
 - Borders: `border-v2-border` (`#D78B1C`), `border-v2-border-light` (30% opacity)
 - Shadows: `shadow-card`, `shadow-modal`, `shadow-dropdown`
 - Font: Roboto only — `font-vietnam`/`font-jakarta`/`font-jetbrains` all resolve to Roboto
+- **`LoadingSpinner` must use `text-v2-gold-primary`** — NOT `text-primary-500` (red)
+- Auth layout background: `bg-v2-maroon-900`
 
 ## State Management
 
@@ -156,6 +159,26 @@ const [modalType, setModalType] = useState<string | null>(null);
 | 1–24h | `bg-orange-400` | Stale |
 | >24h | `bg-v2-red-negative` | Very stale |
 | null/0 | `bg-v2-text-tertiary` | Never updated |
+
+## Typography Utilities (Mihong V2)
+
+Use these classes from `globals.css` — do NOT use arbitrary font-size/weight:
+
+| Class | Use |
+|-------|-----|
+| `v2-heading-hero` | Hero/page titles (font-weight: 900) |
+| `v2-heading-lg` / `v2-heading-md` / `v2-heading-sm` | Section headings |
+| `v2-body` | Standard body text |
+| `v2-data-bold` / `v2-data-semibold` / `v2-data-medium` / `v2-data-regular` | Numeric/data display |
+
+## Decorative Components (Mihong Style)
+
+- `OrnateHeading` (`components/decorative/OrnateHeading.tsx`) — renders `——◆—— TEXT ——◆——` in mihong.vn "GIA VANG HIEN TAI" style; prop `size`: `sm` | `md` | `lg`
+- `OrnateDivider` (`components/decorative/OrnateDivider.tsx`) — gold horizontal divider; prop `variant`: `simple` (gradient line) | `diamond` (line-◆-line) | `ornate` (double diamond)
+
+## Chart Colors
+
+Use `chartColors` or `v2ChartColors` from `@/app/constants` — do NOT hardcode chart hex values inline.
 
 ## Testing
 
