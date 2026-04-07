@@ -33,11 +33,34 @@ export interface PriceAlertListProps {
 }
 
 // ---------------------------------------------------------------------------
+// Currency divisors — matches backend GetCurrencyDecimalPlaces
+// ---------------------------------------------------------------------------
+
+/** Maps currency to its decimal-place divisor. Default = 100 (2 decimals: USD, EUR, GBP, etc.) */
+const CURRENCY_DIVISORS: Record<string, number> = {
+  // 0 decimal places → divisor 1
+  VND: 1,
+  JPY: 1,
+  KRW: 1,
+  // 3 decimal places → divisor 1000
+  KWD: 1000,
+  BHD: 1000,
+  OMR: 1000,
+  // All others → 100 (2 decimal places)
+};
+
+function getCurrencyDivisor(currency: string): number {
+  return CURRENCY_DIVISORS[currency] ?? 100;
+}
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatPrice(price: number, currency: string): string {
-  if (!price) return "-";
+export function formatPrice(rawInt64: number, currency: string): string {
+  if (!rawInt64) return "-";
+  const divisor = getCurrencyDivisor(currency);
+  const price = rawInt64 / divisor;
   if (currency === "VND") {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -45,11 +68,13 @@ function formatPrice(price: number, currency: string): string {
       maximumFractionDigits: 0,
     }).format(price);
   }
+  // Use the currency's natural decimal places (ISO 4217) — e.g. KWD = 3, USD = 2
+  const decimalPlaces = divisor === 1 ? 0 : divisor === 1000 ? 3 : 2;
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: currency || "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: decimalPlaces,
+    maximumFractionDigits: decimalPlaces,
   }).format(price);
 }
 
