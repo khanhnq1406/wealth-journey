@@ -7,16 +7,16 @@
 - **Spec file:** docs/specs/2026-04-07-price-alert-filter-bug-spec.md
 - **Started:** 2026-04-07T00:00:00Z
 - **Last updated:** 2026-04-07T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 1
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | #   | Task Name                                              | Status      | Commit | Summary |
 | --- | ------------------------------------------------------ | ----------- | ------ | ------- |
-| 1   | Fix ListAlerts handler — manual status_filter binding  | in_progress | —      | —       |
-| 2   | Verify pagination binding + manual parsing if broken   | pending     | —      | —       |
-| 3   | Playwright E2E — verify filter tabs work end-to-end    | pending     | —      | —       |
+| 1   | Fix ListAlerts handler — manual status_filter binding  | done        | ececeeed | Manual c.Query parse for status_filter; 6 unit tests pass |
+| 2   | Verify pagination binding + manual parsing if broken   | done        | cdb51a54 | Manual pagination parse; pageSize clamped to [1,100] |
+| 3   | Playwright E2E — verify filter tabs work end-to-end    | done        | 1b301b97 | 2 E2E tests (desktop + mobile) verifying status_filter in requests |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
