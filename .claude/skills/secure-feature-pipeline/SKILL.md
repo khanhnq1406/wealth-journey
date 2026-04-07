@@ -199,7 +199,7 @@ Skipping the step file is the same as skipping the spec — it leads to wrong ou
 ## Prompt Templates
 
 **Step 3 — Implementation (two agents per task):**
-- `./implementer-agent-prompt.md` — Implementer: TDD + self-check + E2E + structured report. Does NOT commit.
+- `./implementer-agent-prompt.md` — Implementer: TDD + self-check + write/update E2E tests (no run) + structured report. Does NOT commit.
 - `./reviewer-agent-prompt.md` — Reviewer: fresh context, reads actual code, 3 review stages, verdict. Does NOT commit.
 
 **Other steps:**

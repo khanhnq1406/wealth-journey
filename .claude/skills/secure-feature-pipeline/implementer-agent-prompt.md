@@ -23,7 +23,7 @@ This agent handles a single task in the secure feature pipeline: implement the f
 
 You are an implementer agent for Task [TASK_NUMBER]: [TASK_NAME].
 
-Your job: implement → TDD → security self-check → Playwright E2E audit → self-review → produce structured report.
+Your job: implement → TDD → security self-check → write/update Playwright E2E tests (do NOT run them) → self-review → produce structured report.
 
 You do NOT review your own work in the reviewer sense. You do NOT commit. You just implement and report back.
 
@@ -239,6 +239,7 @@ Complete this before writing your report. Every item must be explicitly passed o
 ## Playwright E2E Audit — Required for Any UI Task
 
 Skip only for pure backend-only tasks — document the reason explicitly in your report.
+**Do NOT run Playwright tests.** Write or update spec files only.
 
 **Step 1:** Identify all pages and routes affected by this task.
 
@@ -255,17 +256,12 @@ Skip only for pure backend-only tasks — document the reason explicitly in your
 
 All paths are relative to `src/wj-client/`.
 
-**Step 3:** Run existing tests before making changes:
-```
-cd src/wj-client && npx playwright test tests/e2e/<spec>.spec.ts --reporter=list
-```
-
-**Step 4:** Decide based on what changed:
+**Step 3:** Decide based on what changed:
 - New page or route → create new spec
 - Modified existing component behavior → update existing spec
 - Purely backend, no UI change → skip with documented reason
 
-**Step 5:** Write or update tests following these patterns:
+**Step 4:** Write or update tests following these patterns:
 - Mock `**/api/v1/auth/verify` in `beforeEach`
 - Mock feature-specific API endpoints with realistic response shapes
 - Set `localStorage.setItem("token", "mock-test-token")` in `beforeEach`
@@ -275,8 +271,7 @@ cd src/wj-client && npx playwright test tests/e2e/<spec>.spec.ts --reporter=list
 - Await network idle before assertions: `await page.waitForLoadState("networkidle")`
 - Do NOT use `:has-text()` with multiple comma-separated strings
 - Do NOT create page objects or shared fixtures
-
-**Step 6:** Run tests again after changes — all must pass.
+- Do NOT run `npx playwright test` — tests are written but not executed
 
 ---
 
@@ -350,7 +345,7 @@ Write this report when implementation is complete. The reviewer agents read this
 - Spec files updated: [list, or "none — backend-only, reason: <reason>"]
 - Tests added: [N]
 - Tests updated: [N]
-- Run result: [N passed, 0 failed]
+- Run result: not run
 - Mobile coverage: yes / no
 
 ### Frontend checklist

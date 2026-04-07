@@ -241,7 +241,8 @@ Task tool (general-purpose):
 
     ## Playwright E2E Audit (REQUIRED for any UI task)
 
-    > **When to run this:** Any task that creates or modifies a page, component, modal, form, or route. Skip only for pure backend tasks with zero frontend changes — and explicitly document why you skipped.
+    > **When to apply:** Any task that creates or modifies a page, component, modal, form, or route. Skip only for pure backend tasks with zero frontend changes — and explicitly document why you skipped.
+    > **Do NOT run Playwright tests.** Write or update the spec files only.
 
     ### Step 1 — Identify affected pages
 
@@ -263,16 +264,7 @@ Task tool (general-purpose):
 
     All paths are relative to `src/wj-client/`.
 
-    ### Step 3 — Run existing tests first (verify nothing broken)
-
-    ```bash
-    cd src/wj-client
-    npx playwright test tests/e2e/<relevant-spec>.spec.ts --reporter=list
-    ```
-
-    Expected: all tests pass (or skip — skips are OK). Any failure means the existing code is already broken — fix that first.
-
-    ### Step 4 — Decide: update, add, or no-change
+    ### Step 3 — Decide: update, add, or no-change
 
     | Situation | Action |
     |---|---|
@@ -281,7 +273,7 @@ Task tool (general-purpose):
     | Added a new page/route | Add a new `test.describe()` block (or new spec file) |
     | Backend-only change OR pure CSS/style-only (no new elements, no new routes) | No change — document reason in report |
 
-    ### Step 5 — Write or update the test
+    ### Step 4 — Write or update the test
 
     Follow the existing patterns:
     - Mock `**/api/v1/auth/verify**` in `beforeEach`
@@ -296,17 +288,9 @@ Task tool (general-purpose):
     - Use `:has-text()` with multiple comma-separated strings (not valid Playwright CSS)
     - Create page objects or shared fixtures (project uses inline selectors)
     - Write tests that pass even when the feature is broken (weak assertions like `count >= 0`)
+    - Run `npx playwright test` — tests are written but not executed
 
-    ### Step 6 — Run tests again (verify green)
-
-    ```bash
-    cd src/wj-client
-    npx playwright test tests/e2e/<relevant-spec>.spec.ts --reporter=list
-    ```
-
-    All tests must pass before marking the task complete.
-
-    ### Step 7 — Include Playwright results in your report
+    ### Step 5 — Include E2E results in your report
 
     Add to your task report:
 
@@ -315,7 +299,7 @@ Task tool (general-purpose):
     - Spec file(s) updated: [list or "none — backend-only change"]
     - Tests added: N
     - Tests updated: N
-    - Run result: N passed, 0 failed
+    - Run result: not run
     - Mobile coverage: yes / no
     ```
 

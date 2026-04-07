@@ -81,7 +81,7 @@ To resume this implementation after context compaction or in a new session:
 
 **The model:**
 - The **coordinator** (you) holds only: progress file content + task list. Per task it dispatches ONE implementer agent, receives its structured report, dispatches ONE reviewer agent with that report, receives the verdict, then commits and loops.
-- The **implementer agent** starts fresh per task: implements with TDD, does a security self-check, Playwright E2E, and self-review, then reports back. It does NOT commit.
+- The **implementer agent** starts fresh per task: implements with TDD, does a security self-check, writes/updates Playwright E2E tests (does NOT run them), and self-review, then reports back. It does NOT commit.
 - The **reviewer agent** starts with a completely fresh context — no knowledge of implementation choices. It receives only the task spec + implementer report + file list, reads the actual code independently, and runs all 3 review stages. This fresh context is the quality guarantee: a separate agent can't be biased toward choices it never made.
 - The **coordinator commits** after the reviewer approves — updating the progress file and staging all files in one checkpoint.
 
