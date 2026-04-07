@@ -51,7 +51,21 @@ func (h *UserPriceAlertHandlers) ListAlerts(c *gin.Context) {
 		return
 	}
 
+	// Parse status_filter manually: ShouldBindQuery cannot bind proto enums
+	// because proto-generated structs have json:"" tags but NOT form:"" tags.
+	// Gin's query binding uses form tags; without them, the param is silently ignored.
 	var req v1.ListUserPriceAlertsRequest
+	if statusStr := c.Query("status_filter"); statusStr != "" {
+		if statusInt, err := strconv.Atoi(statusStr); err == nil {
+			req.StatusFilter = v1.AlertStatus(statusInt)
+		}
+		// On Atoi error (non-numeric): StatusFilter stays 0 (UNSPECIFIED = all). Safe.
+	}
+
+	// Bind remaining params (pagination) via ShouldBindQuery.
+	// Pagination sub-fields (pagination.page, pagination.page_size) use dot-notation
+	// which Gin does not support for nested proto structs without form tags.
+	// The service's buildListOptions falls back to defaults when Pagination is nil — safe.
 	if err := c.ShouldBindQuery(&req); err != nil {
 		handler.BadRequest(c, err)
 		return
