@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "d6c6b217169c0247",
+        "id": "dc999f9f3979f028",
         "type": "tabs",
         "children": [
           {
-            "id": "ac6f5885c440af8a",
+            "id": "53f8cb8fb2af1ed6",
             "type": "leaf",
             "state": {
               "type": "kanban",
@@ -193,14 +193,21 @@
       "obsidian-kanban:Create new board": false
     }
   },
-  "active": "ac6f5885c440af8a",
+  "active": "53f8cb8fb2af1ed6",
   "lastOpenFiles": [
+    "2026-04-07-price-alert-false-trigger.md",
+    "2026-04-07-fix-og-image-not-rendering-on-share.md",
+    "Kanban Board.md.tmp.41537.1775543618385",
+    "2026-04-07-price-alert-usd-display-bug.md",
+    "2026-04-07-price-alert-symbol-mismatch.md",
+    "2026-04-07-price-alert-filter-bug.md",
+    "2026-04-07-fix-alert-auto-trigger-not-working.md",
+    "Kanban Board.md",
     "2026-04-06-fix-price-alert-cannot-use-home-page-prices.md",
     "2026-04-06-price-alert-not-running-prod.md",
     "2026-04-06-share-pnl-via-picture-with-congdongvang-logo.md",
     "2026-04-06-fix-push-price-notification-auto-trigger.md",
     "2026-04-06-fix-asset-display-prices-same-value-bug.md",
-    "Kanban Board.md",
     "test-plans/manual-test-cases.csv",
     "test-plans",
     "2026-04-02-improve-mobile-tab-overflow.md",
@@ -217,12 +224,6 @@
     "2026-04-02-fix-admin-nav-items-not-showing.md",
     "2026-04-02-cancel-google-connection.md",
     "Improve all tab selection overload on mobile view.md",
-    "Terms & Privacy.md",
-    "2026-03-24-user-price-alerts.md",
-    "2026-04-02-table-ui-enhancements.md",
-    "2026-04-02-price-alert-bugs.md",
-    "Fix price alert symbol validation rejects Vietnamese gold asset names.md",
-    "Fix price alert notification shows wrong USD value.md",
     "pictures/price_alert.png",
     "pictures"
   ]
