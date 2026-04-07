@@ -232,52 +232,75 @@ tasks:
     cmds:
       - echo "=== Running all migrations ==="
       # Schema migrations (column additions, table creation)
-      - echo "[1/20] migrate-categories..."
+      - echo "[1/30] migrate-categories..."
       - go run ./cmd/migrate-default-categories
-      - echo "[2/20] migrate-category-idx..."
+      - echo "[2/30] migrate-category-idx..."
       - go run ./cmd/migrate-category-idx
-      - echo "[3/20] migrate-site-settings..."
+      - echo "[3/30] migrate-site-settings..."
       - go run cmd/migrate-site-settings/main.go
-      - echo "[4/20] migrate-sessions..."
+      - echo "[4/30] migrate-sessions..."
       - go run cmd/migrate-sessions/main.go
-      - echo "[5/20] migrate-add-is-custom..."
+      - echo "[5/30] migrate-add-is-custom..."
       - go run cmd/migrate-add-is-custom/main.go
-      - echo "[6/20] migrate-wallet-type..."
+      - echo "[6/30] migrate-wallet-type..."
       - go run cmd/migrate-wallet-type/main.go --dry-run=false
-      - echo "[7/20] migrate-gold-silver-types..."
+      - echo "[7/30] migrate-gold-silver-types..."
       - go run cmd/migrate-gold-silver-types/main.go
-      - echo "[8/20] migrate-i18n-language..."
+      - echo "[8/30] migrate-i18n-language..."
       - go run cmd/migrate-i18n-language/main.go
       # Community
-      - echo "[9/20] migrate-community..."
+      - echo "[9/30] migrate-community..."
       - go run cmd/migrate-community/main.go
-      - echo "[10/20] migrate-drop-topic..."
+      - echo "[10/30] migrate-drop-topic..."
       - go run cmd/migrate-drop-topic/main.go
-      - echo "[11/20] migrate-community-phase3..."
+      - echo "[11/30] migrate-community-phase3..."
       - go run cmd/migrate-community-phase3/main.go
-      - echo "[12/20] migrate-profile-url-size..."
+      - echo "[12/30] migrate-profile-url-size..."
       - go run cmd/migrate-profile-url-size/main.go
       # Gold & sentiment
-      - echo "[13/20] migrate-gold-sentiment..."
+      - echo "[13/30] migrate-gold-sentiment..."
       - go run cmd/migrate-gold-sentiment/main.go
       # Auth enhancements
-      - echo "[14/20] migrate-password-auth..."
+      - echo "[14/30] migrate-password-auth..."
       - go run cmd/migrate-password-auth/main.go
-      - echo "[15/20] migrate-email-nullable..."
+      - echo "[15/30] migrate-email-nullable..."
       - go run cmd/migrate-email-nullable/main.go
-      - echo "[16/20] migrate-admin..."
+      - echo "[16/30] migrate-admin..."
       - go run cmd/migrate-admin/main.go
       # Investment ownership
-      - echo "[17/20] migrate-investment-user-ownership..."
+      - echo "[17/30] migrate-investment-user-ownership..."
       - go run cmd/migrate-investment-user-ownership/main.go --dry-run=false
       # Feedback
-      - echo "[18/20] migrate-feedback..."
+      - echo "[18/30] migrate-feedback..."
       - go run cmd/migrate-feedback/main.go
-      - echo "[19/20] migrate-feedback-admin-note..."
+      - echo "[19/30] migrate-feedback-admin-note..."
       - go run cmd/migrate-feedback-admin-note/main.go
-      # Notifications
-      - echo "[20/20] migrate-price-alerts..."
+      # Notifications & watchlist
+      - echo "[20/30] migrate-price-alerts..."
       - go run cmd/migrate-price-alerts/main.go
+      - echo "[21/30] migrate-watchlist..."
+      - go run cmd/migrate-watchlist/main.go
+      - echo "[22/30] migrate-user-price-alerts..."
+      - go run cmd/migrate-user-price-alerts/main.go
+      # Asset price cache
+      - echo "[23/30] migrate-asset-prices..."
+      - go run cmd/migrate-asset-prices/main.go
+      - echo "[24/30] migrate-multi-source..."
+      - go run cmd/migrate-multi-source/main.go
+      # Asset display config
+      - echo "[25/30] migrate-gold-display-config..."
+      - go run cmd/migrate-gold-display-config/main.go
+      - echo "[26/30] migrate-asset-display-config..."
+      - go run cmd/migrate-asset-display-config/main.go
+      - echo "[27/30] migrate-asset-config-fetch-code..."
+      - go run cmd/migrate-asset-config-fetch-code/main.go
+      - echo "[28/30] migrate-vietcombank-currency..."
+      - go run cmd/migrate-vietcombank-currency/main.go
+      # Investment enhancements
+      - echo "[29/30] migrate-investment-price-updated-at..."
+      - go run cmd/migrate-investment-price-updated-at/main.go
+      - echo "[30/30] migrate-silver-show-in-investment..."
+      - go run cmd/migrate-silver-show-in-investment/main.go
       - echo "=== All migrations completed ==="
 
   backend:set-admin:

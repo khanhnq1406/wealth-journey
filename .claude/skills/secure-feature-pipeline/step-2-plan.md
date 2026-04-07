@@ -141,10 +141,9 @@ Save to: `docs/plans/YYYY-MM-DD-<feature>-plan.md`
 **Step N-1: Playwright E2E Audit** _(skip if backend-only task)_
 
 - Identify pages affected by this task
-- Run existing spec: `cd src/wj-client && npx playwright test tests/e2e/<spec>.spec.ts --reporter=list`
 - Update or add Playwright tests following patterns in `tests/e2e/`
-- Run again to confirm green
-- Document result in report under `## Playwright E2E Results`
+- Do NOT run the tests
+- Document new/updated spec files in report under `## Playwright E2E Results`
 
 See `./implementer-prompt.md` for the full Playwright audit protocol.
 
@@ -201,7 +200,7 @@ Glob("src/wj-client/features/<domain>/components/**/*.tsx")
 - Imports: Direct imports only (not barrel files)
 - Performance: No async waterfalls, dynamic import for heavy components
 
-**Step N-1: Playwright E2E Audit** [per implementer-prompt.md]
+**Step N-1: Playwright E2E Audit — write/update tests only, do NOT run** [per implementer-prompt.md]
 **Step N: Commit**
 ```
 
@@ -231,7 +230,7 @@ Each step is one action (2-5 minutes):
 - **Backend handler:** Integration test for HTTP request/response, auth, validation
 - **Frontend component:** Component test for rendering, user interaction, error states
 - **Proto changes:** Verify generated code compiles (`task proto:all && go build ./...`)
-- **Frontend UI changes:** E2E test updated/added in `tests/e2e/` using Playwright (see `./implementer-prompt.md`)
+- **Frontend UI changes:** E2E test written/updated in `tests/e2e/` using Playwright — do NOT run (see `./implementer-prompt.md`)
 
 **Red flags:**
 
