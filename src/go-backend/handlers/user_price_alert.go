@@ -62,10 +62,23 @@ func (h *UserPriceAlertHandlers) ListAlerts(c *gin.Context) {
 		// On Atoi error (non-numeric): StatusFilter stays 0 (UNSPECIFIED = all). Safe.
 	}
 
-	// Bind remaining params (pagination) via ShouldBindQuery.
-	// Pagination sub-fields (pagination.page, pagination.page_size) use dot-notation
-	// which Gin does not support for nested proto structs without form tags.
-	// The service's buildListOptions falls back to defaults when Pagination is nil — safe.
+	// Parse pagination manually: proto nested struct has no form: tags for ShouldBindQuery.
+	// Gin's query binding uses form tags; dot-notation params (pagination.page,
+	// pagination.page_size) are silently ignored without them.
+	page, _ := strconv.ParseInt(c.DefaultQuery("pagination.page", "1"), 10, 32)
+	pageSize, _ := strconv.ParseInt(c.DefaultQuery("pagination.page_size", "20"), 10, 32)
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 || pageSize > 100 {
+		pageSize = 20
+	}
+	req.Pagination = &v1.PaginationParams{
+		Page:     int32(page),
+		PageSize: int32(pageSize),
+	}
+
+	// ShouldBindQuery for any remaining flat query params (currently none for this endpoint).
 	if err := c.ShouldBindQuery(&req); err != nil {
 		handler.BadRequest(c, err)
 		return

@@ -156,6 +156,26 @@ func TestListAlerts_StatusFilter_Zero(t *testing.T) {
 		"status_filter=0 must be UNSPECIFIED (all alerts)")
 }
 
+// TestListAlerts_Pagination_PageSize verifies pagination.page_size is passed to service.
+func TestListAlerts_Pagination_PageSize(t *testing.T) {
+	var capturedPagination *v1.PaginationParams
+
+	svc := &mockUserPriceAlertService{
+		listAlertsFunc: func(_ context.Context, _ int32, req *v1.ListUserPriceAlertsRequest) (*v1.ListUserPriceAlertsResponse, error) {
+			capturedPagination = req.Pagination
+			return &v1.ListUserPriceAlertsResponse{Success: true, Alerts: nil}, nil
+		},
+	}
+
+	r := newAlertTestRouter(NewUserPriceAlertHandlers(svc))
+	w := doListAlertsRequest(t, r, "pagination.page=1&pagination.page_size=100")
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	require.NotNil(t, capturedPagination, "pagination must not be nil when sent in query")
+	assert.Equal(t, int32(1), capturedPagination.GetPage())
+	assert.Equal(t, int32(100), capturedPagination.GetPageSize())
+}
+
 // TestListAlerts_ResponseShape verifies the handler returns success=true JSON.
 func TestListAlerts_ResponseShape(t *testing.T) {
 	svc := &mockUserPriceAlertService{}
