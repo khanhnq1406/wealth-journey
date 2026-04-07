@@ -1,6 +1,6 @@
 ---
 type: bug
-status: Implement
+status: Review
 ---
 
 ## Overview
@@ -14,4 +14,4 @@ Price alerts for USD-denominated assets (BTC, stocks, gold USD) fire incorrectly
 | Spec     | `docs/specs/2026-04-07-price-alert-false-trigger-spec.md` |
 | Plan     | `docs/plans/2026-04-07-price-alert-false-trigger-plan.md` |
 | Progress | `docs/reports/2026-04-07-price-alert-false-trigger-progress.md` |
-| Report   | `docs/reports/2026-04-07-price-alert-false-trigger-report.md` _(added after step 3 completes)_ |
+| Report   | `docs/reports/2026-04-07-price-alert-false-trigger-report.md` |

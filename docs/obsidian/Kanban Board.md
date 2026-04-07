@@ -19,11 +19,11 @@ kanban-plugin: board
 
 ## Implement
 
-- [ ] [[2026-04-07-price-alert-false-trigger|Fix price alert false trigger for USD assets (BTC alert fires at $68k when threshold is $100k)]]
 
 
 ## Review
 
+- [ ] [[2026-04-07-price-alert-false-trigger|Fix price alert false trigger for USD assets (BTC alert fires at $68k when threshold is $100k)]]
 - [ ] [[2026-04-07-price-alert-symbol-mismatch|Fix price alert symbol/TypeCode mismatch (gold/silver alert creation & evaluation broken)]]
 
 

@@ -14,7 +14,7 @@
 
 | #   | Task Name                                                        | Status | Commit | Summary |
 | --- | ---------------------------------------------------------------- | ------ | ------ | ------- |
-| 1   | Fix EvaluateAlerts — normalize currentPrice before comparison    | done   | TBD    | Divide currentPrice by fx.GetDecimalMultiplier(currency) before comparison; 2 new tests added |
+| 1   | Fix EvaluateAlerts — normalize currentPrice before comparison    | done   | c42e44f3 | Divide currentPrice by fx.GetDecimalMultiplier(currency) before comparison; 2 new tests added |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
