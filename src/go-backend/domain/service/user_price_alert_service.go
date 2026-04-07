@@ -149,27 +149,26 @@ func (s *userPriceAlertService) CreateAlert(ctx context.Context, userID int32, r
 		return nil, apperrors.NewValidationError("Maximum of 30 alerts reached")
 	}
 
-	// For gold/silver, validate that symbol matches a known asset_price.type_code.
-	// This prevents alerts being created with display names (e.g. "Vàng nhẫn SJC") that
-	// can never match the internal fetch codes used by fetchPricesForAlerts at evaluation time.
-	// We reuse the lookup result as the creation-time price to avoid a second DB round-trip.
+	// For gold/silver, validate that symbol matches a known display config TypeCode
+	// and resolve current price via fetch-code bridge (AssetDisplayConfigService.ResolvePrice).
 	var currentPrice int64
 	if gold.IsGoldType(req.AssetType) || silver.IsSilverType(req.AssetType) {
+		assetTypeName := assetTypeToString(req.AssetType)
 		validateCtx, validateCancel := context.WithTimeout(ctx, alertPriceFetchTimeout)
-		dto, lookupErr := s.assetPriceSvc.GetPriceByTypeCode(validateCtx, symbol)
+		buy, sell, isStale, resolveErr := s.displayConfigSvc.ResolvePrice(validateCtx, symbol, assetTypeName)
 		validateCancel()
-		if lookupErr != nil || dto == nil {
+		if resolveErr != nil {
 			return nil, apperrors.NewValidationError(
-				fmt.Sprintf("symbol '%s' does not match any known price code — use the internal type code (e.g. SJ9999, DOHCML)", symbol),
+				fmt.Sprintf("asset type '%s' is not available or has no current price data", symbol),
 			)
 		}
-		if !dto.IsStale {
-			if priceSide == "sell" {
-				currentPrice = dto.Sell
-			} else {
-				currentPrice = dto.Buy
-			}
+		// Store current price even if stale (non-fatal; alert creation proceeds).
+		if priceSide == "sell" {
+			currentPrice = sell
+		} else {
+			currentPrice = buy
 		}
+		_ = isStale // stale is non-fatal for creation
 	} else {
 		// Market assets (stocks, crypto): fetch best-effort; failure does not block creation
 		currentPrice = s.fetchCurrentPrice(ctx, symbol, currency, req.AssetType, priceSide)
@@ -557,99 +556,67 @@ func (s *userPriceAlertService) fetchCurrentPrice(ctx context.Context, symbol, c
 	}
 }
 
-// fetchPricesForAlerts fetches current prices for a batch of alerts, grouped by asset type
-// to minimise external API calls. Returns a map keyed by "symbol|priceSide".
-// Stale prices are excluded from the map — callers treat missing entries as "price unavailable".
+// fetchPricesForAlerts fetches current prices for a batch of alerts.
+// Gold/silver prices are resolved per-alert via AssetDisplayConfigService.ResolvePrice,
+// which uses the display config fetch-code bridge to look up the best available DB price.
+// Market asset prices are fetched individually via MarketDataService.GetPrice (Yahoo Finance).
+// Returns a map keyed by "symbol|priceSide".
+// Stale prices and resolution failures are excluded — callers treat missing entries as "price unavailable".
 func (s *userPriceAlertService) fetchPricesForAlerts(ctx context.Context, alerts []*models.UserPriceAlert) map[string]int64 {
 	priceMap := make(map[string]int64)
 	if len(alerts) == 0 {
 		return priceMap
 	}
 
-	// Separate alerts by asset type category
-	var hasGold, hasSilver bool
-	marketAlerts := make([]*models.UserPriceAlert, 0)
-	for _, a := range alerts {
-		at := v1.InvestmentType(a.AssetType)
-		switch {
-		case gold.IsGoldType(at):
-			hasGold = true
-		case silver.IsSilverType(at):
-			hasSilver = true
-		default:
-			marketAlerts = append(marketAlerts, a)
-		}
-	}
-
 	// No inner timeout — caller (EvaluateAlerts) already wraps with a 30s context.
 	// Using the caller ctx directly gives the full budget to price fetches.
 
-	// Fetch gold prices from DB cache (non-stale only)
-	var goldByCode map[string]*AssetPriceDTO
-	if hasGold {
-		prices, err := s.assetPriceSvc.GetPricesByAssetType(ctx, "gold")
-		if err != nil {
-			log.Printf("Warning: DB gold prices unavailable for alerts: %v", err)
-		} else {
-			goldByCode = make(map[string]*AssetPriceDTO, len(prices))
-			for _, p := range prices {
-				if !p.IsStale {
-					goldByCode[p.TypeCode] = p
-				}
-			}
-		}
-	}
-
-	// Fetch silver prices from DB cache (non-stale only)
-	var silverByCode map[string]*AssetPriceDTO
-	if hasSilver {
-		prices, err := s.assetPriceSvc.GetPricesByAssetType(ctx, "silver")
-		if err != nil {
-			log.Printf("Warning: DB silver prices unavailable for alerts: %v", err)
-		} else {
-			silverByCode = make(map[string]*AssetPriceDTO, len(prices))
-			for _, p := range prices {
-				if !p.IsStale {
-					silverByCode[p.TypeCode] = p
-				}
-			}
-		}
-	}
-
-	// Populate price map for each alert
+	// Populate price map for each gold/silver alert via ResolvePrice (fetch-code bridge)
 	for _, a := range alerts {
 		key := a.Symbol + "|" + a.PriceSide
 		at := v1.InvestmentType(a.AssetType)
 
+		var assetTypeName string
 		switch {
 		case gold.IsGoldType(at):
-			if goldByCode != nil {
-				if gp, ok := goldByCode[a.Symbol]; ok {
-					if a.PriceSide == "sell" {
-						priceMap[key] = gp.Sell
-					} else {
-						priceMap[key] = gp.Buy
-					}
-				}
-			}
-
+			assetTypeName = "gold"
 		case silver.IsSilverType(at):
-			if silverByCode != nil {
-				if sp, ok := silverByCode[a.Symbol]; ok {
-					if a.PriceSide == "sell" {
-						priceMap[key] = sp.Sell
-					} else {
-						priceMap[key] = sp.Buy
-					}
-				}
-			}
+			assetTypeName = "silver"
+		default:
+			continue // market assets handled separately below
+		}
+
+		if s.displayConfigSvc == nil {
+			continue
+		}
+
+		resolveCtx, resolveCancel := context.WithTimeout(ctx, alertPriceFetchTimeout)
+		buy, sell, isStale, resolveErr := s.displayConfigSvc.ResolvePrice(resolveCtx, a.Symbol, assetTypeName)
+		resolveCancel()
+		if resolveErr != nil {
+			log.Printf("Warning: fetchPricesForAlerts: ResolvePrice failed for alert %d symbol=%s: %v", a.ID, a.Symbol, resolveErr)
+			continue
+		}
+		if isStale {
+			log.Printf("Warning: fetchPricesForAlerts: stale price for alert %d symbol=%s — skipping evaluation", a.ID, a.Symbol)
+			continue
+		}
+
+		if a.PriceSide == "sell" {
+			priceMap[key] = sell
+		} else {
+			priceMap[key] = buy
 		}
 	}
 
 	// Fetch market prices individually (Yahoo Finance — kept live, no DB cache for market data)
-	for _, a := range marketAlerts {
+	for _, a := range alerts {
+		at := v1.InvestmentType(a.AssetType)
+		if gold.IsGoldType(at) || silver.IsSilverType(at) {
+			continue // already handled above
+		}
 		key := a.Symbol + "|" + a.PriceSide
-		md, err := s.marketDataSvc.GetPrice(ctx, a.Symbol, a.Currency, v1.InvestmentType(a.AssetType), 15*time.Minute)
+		md, err := s.marketDataSvc.GetPrice(ctx, a.Symbol, a.Currency, at, 15*time.Minute)
 		if err != nil {
 			log.Printf("Warning: failed to fetch market price for alert (symbol=%s): %v", a.Symbol, err)
 			continue
@@ -731,4 +698,15 @@ func alertStatusToString(s v1.AlertStatus) string {
 	default:
 		return ""
 	}
+}
+
+// assetTypeToString returns the asset type name string used by AssetDisplayConfigService.ResolvePrice.
+func assetTypeToString(t v1.InvestmentType) string {
+	if gold.IsGoldType(t) {
+		return "gold"
+	}
+	if silver.IsSilverType(t) {
+		return "silver"
+	}
+	return ""
 }

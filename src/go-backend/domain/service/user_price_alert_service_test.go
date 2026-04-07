@@ -564,24 +564,18 @@ func TestUserPriceAlertService_CreateAlert_PriceFetchFails_StillCreates(t *testi
 	alertRepo.AssertExpectations(t)
 }
 
-// --- Tests: fetchCurrentPrice with DB-backed AssetPriceService ---
+// --- Tests: CreateAlert gold/silver price validation via AssetDisplayConfigService.ResolvePrice ---
 
 func TestUserPriceAlertService_CreateAlert_GoldPrice_NonStale_ReturnsBuy(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	assetPriceSvc := new(mockAlertAssetPriceSvc)
-	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	displayConfigSvc := new(mockAlertDisplayConfigSvc)
+	svc := newTestAlertServiceWithDisplayConfig(alertRepo, nil, nil, displayConfigSvc)
 	ctx := context.Background()
 
 	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
-	// DB returns a non-stale gold price
-	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "SJL1L10").
-		Return(&AssetPriceDTO{
-			TypeCode: "SJL1L10",
-			Name:     "SJC 1-10 Luong",
-			Buy:      9200000000,
-			Sell:     9300000000,
-			IsStale:  false,
-		}, nil)
+	// ResolvePrice returns non-stale buy/sell prices
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "SJL1L10", "gold").
+		Return(9200000000, 9300000000, false, nil)
 	alertRepo.On("Create", ctx, mock.AnythingOfType("*models.UserPriceAlert")).Return(nil)
 
 	resp, err := svc.CreateAlert(ctx, 1, validGoldCreateReq())
@@ -591,26 +585,21 @@ func TestUserPriceAlertService_CreateAlert_GoldPrice_NonStale_ReturnsBuy(t *test
 	// buy price should be set at creation time
 	assert.Equal(t, int64(9200000000), resp.Alert.CurrentPriceAtCreation)
 	alertRepo.AssertExpectations(t)
-	assetPriceSvc.AssertExpectations(t)
+	displayConfigSvc.AssertExpectations(t)
 }
 
 func TestUserPriceAlertService_CreateAlert_GoldPrice_SellSide(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	assetPriceSvc := new(mockAlertAssetPriceSvc)
-	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	displayConfigSvc := new(mockAlertDisplayConfigSvc)
+	svc := newTestAlertServiceWithDisplayConfig(alertRepo, nil, nil, displayConfigSvc)
 	ctx := context.Background()
 
 	req := validGoldCreateReq()
 	req.PriceSide = "sell"
 
 	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
-	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "SJL1L10").
-		Return(&AssetPriceDTO{
-			TypeCode: "SJL1L10",
-			Buy:      9200000000,
-			Sell:     9300000000,
-			IsStale:  false,
-		}, nil)
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "SJL1L10", "gold").
+		Return(9200000000, 9300000000, false, nil)
 	alertRepo.On("Create", ctx, mock.AnythingOfType("*models.UserPriceAlert")).Return(nil)
 
 	resp, err := svc.CreateAlert(ctx, 1, req)
@@ -621,45 +610,40 @@ func TestUserPriceAlertService_CreateAlert_GoldPrice_SellSide(t *testing.T) {
 	alertRepo.AssertExpectations(t)
 }
 
-func TestUserPriceAlertService_CreateAlert_GoldPrice_Stale_ReturnsZero(t *testing.T) {
+func TestUserPriceAlertService_CreateAlert_GoldPrice_Stale_StillCreatesWithPrice(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	assetPriceSvc := new(mockAlertAssetPriceSvc)
-	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	displayConfigSvc := new(mockAlertDisplayConfigSvc)
+	svc := newTestAlertServiceWithDisplayConfig(alertRepo, nil, nil, displayConfigSvc)
 	ctx := context.Background()
 
 	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
-	// DB returns a stale price — should return 0
-	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "SJL1L10").
-		Return(&AssetPriceDTO{
-			TypeCode: "SJL1L10",
-			Buy:      9200000000,
-			Sell:     9300000000,
-			IsStale:  true,
-		}, nil)
+	// ResolvePrice returns stale price — stale is non-fatal for creation (alert proceeds with stale price)
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "SJL1L10", "gold").
+		Return(9200000000, 9300000000, true, nil)
 	alertRepo.On("Create", ctx, mock.AnythingOfType("*models.UserPriceAlert")).Return(nil)
 
 	resp, err := svc.CreateAlert(ctx, 1, validGoldCreateReq())
 
 	assert.NoError(t, err)
-	// stale price → 0
-	assert.Equal(t, int64(0), resp.Alert.CurrentPriceAtCreation)
+	// stale price is non-fatal — buy price stored at creation
+	assert.Equal(t, int64(9200000000), resp.Alert.CurrentPriceAtCreation)
 	alertRepo.AssertExpectations(t)
 }
 
 func TestUserPriceAlertService_CreateAlert_GoldPrice_NotFound_RejectsCreation(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	assetPriceSvc := new(mockAlertAssetPriceSvc)
-	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	displayConfigSvc := new(mockAlertDisplayConfigSvc)
+	svc := newTestAlertServiceWithDisplayConfig(alertRepo, nil, nil, displayConfigSvc)
 	ctx := context.Background()
 
 	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
-	// DB returns nil (not found) — symbol does not match any known type code
-	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "SJL1L10").
-		Return(nil, nil)
+	// ResolvePrice returns error — symbol does not match any known display config TypeCode
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "SJL1L10", "gold").
+		Return(0, 0, false, apperrors.NewValidationError("no fetch codes found"))
 
 	resp, err := svc.CreateAlert(ctx, 1, validGoldCreateReq())
 
-	// Must reject: gold symbol must resolve to a known fetch code
+	// Must reject: gold symbol must resolve via fetch-code bridge
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 	alertRepo.AssertNotCalled(t, "Create")
@@ -667,18 +651,18 @@ func TestUserPriceAlertService_CreateAlert_GoldPrice_NotFound_RejectsCreation(t 
 
 func TestUserPriceAlertService_CreateAlert_GoldPrice_DBError_RejectsCreation(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	assetPriceSvc := new(mockAlertAssetPriceSvc)
-	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	displayConfigSvc := new(mockAlertDisplayConfigSvc)
+	svc := newTestAlertServiceWithDisplayConfig(alertRepo, nil, nil, displayConfigSvc)
 	ctx := context.Background()
 
 	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
-	// DB returns an error — symbol cannot be validated, reject creation
-	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "SJL1L10").
-		Return(nil, apperrors.NewValidationError("db error"))
+	// ResolvePrice returns error — price data unavailable
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "SJL1L10", "gold").
+		Return(0, 0, false, apperrors.NewValidationError("db error"))
 
 	resp, err := svc.CreateAlert(ctx, 1, validGoldCreateReq())
 
-	// Must reject: cannot verify gold symbol against known fetch codes
+	// Must reject: cannot verify gold symbol
 	assert.Error(t, err)
 	assert.Nil(t, resp)
 	alertRepo.AssertNotCalled(t, "Create")
@@ -686,18 +670,18 @@ func TestUserPriceAlertService_CreateAlert_GoldPrice_DBError_RejectsCreation(t *
 
 func TestUserPriceAlertService_CreateAlert_GoldDisplayName_RejectsCreation(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	assetPriceSvc := new(mockAlertAssetPriceSvc)
-	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	displayConfigSvc := new(mockAlertDisplayConfigSvc)
+	svc := newTestAlertServiceWithDisplayConfig(alertRepo, nil, nil, displayConfigSvc)
 	ctx := context.Background()
 
-	// Simulate the production bug: user submits a display name instead of a fetch code
+	// Simulate the production bug: user submits a display name instead of a TypeCode
 	req := validGoldCreateReq()
-	req.Symbol = "Vàng nhẫn SJC" // display name — not a valid asset_price.type_code
+	req.Symbol = "Vàng nhẫn SJC" // display name — not a valid display config TypeCode
 
 	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
-	// DB returns nil: "Vàng nhẫn SJC" does not exist in asset_price.type_code
-	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "Vàng nhẫn SJC").
-		Return(nil, nil)
+	// ResolvePrice returns error: "Vàng nhẫn SJC" is not a known TypeCode
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "Vàng nhẫn SJC", "gold").
+		Return(0, 0, false, apperrors.NewValidationError("no display config found for TypeCode"))
 
 	resp, err := svc.CreateAlert(ctx, 1, req)
 
@@ -708,18 +692,13 @@ func TestUserPriceAlertService_CreateAlert_GoldDisplayName_RejectsCreation(t *te
 
 func TestUserPriceAlertService_CreateAlert_SilverPrice_NonStale_ReturnsSell(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	assetPriceSvc := new(mockAlertAssetPriceSvc)
-	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	displayConfigSvc := new(mockAlertDisplayConfigSvc)
+	svc := newTestAlertServiceWithDisplayConfig(alertRepo, nil, nil, displayConfigSvc)
 	ctx := context.Background()
 
 	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
-	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "AG_VND").
-		Return(&AssetPriceDTO{
-			TypeCode: "AG_VND",
-			Buy:      1800000,
-			Sell:     1900000,
-			IsStale:  false,
-		}, nil)
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "AG_VND", "silver").
+		Return(1800000, 1900000, false, nil)
 	alertRepo.On("Create", ctx, mock.AnythingOfType("*models.UserPriceAlert")).Return(nil)
 
 	resp, err := svc.CreateAlert(ctx, 1, validSilverCreateReq())
@@ -730,26 +709,23 @@ func TestUserPriceAlertService_CreateAlert_SilverPrice_NonStale_ReturnsSell(t *t
 	alertRepo.AssertExpectations(t)
 }
 
-func TestUserPriceAlertService_CreateAlert_SilverPrice_Stale_ReturnsZero(t *testing.T) {
+func TestUserPriceAlertService_CreateAlert_SilverPrice_Stale_StillCreatesWithPrice(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	assetPriceSvc := new(mockAlertAssetPriceSvc)
-	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	displayConfigSvc := new(mockAlertDisplayConfigSvc)
+	svc := newTestAlertServiceWithDisplayConfig(alertRepo, nil, nil, displayConfigSvc)
 	ctx := context.Background()
 
 	alertRepo.On("CountActiveByUserID", ctx, int32(1)).Return(0, nil)
-	assetPriceSvc.On("GetPriceByTypeCode", mock.Anything, "AG_VND").
-		Return(&AssetPriceDTO{
-			TypeCode: "AG_VND",
-			Buy:      1800000,
-			Sell:     1900000,
-			IsStale:  true,
-		}, nil)
+	// Stale is non-fatal — alert created with stale sell price
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "AG_VND", "silver").
+		Return(1800000, 1900000, true, nil)
 	alertRepo.On("Create", ctx, mock.AnythingOfType("*models.UserPriceAlert")).Return(nil)
 
 	resp, err := svc.CreateAlert(ctx, 1, validSilverCreateReq())
 
 	assert.NoError(t, err)
-	assert.Equal(t, int64(0), resp.Alert.CurrentPriceAtCreation)
+	// stale is non-fatal — sell price stored
+	assert.Equal(t, int64(1900000), resp.Alert.CurrentPriceAtCreation)
 	alertRepo.AssertExpectations(t)
 }
 
@@ -818,8 +794,8 @@ func TestUserPriceAlertService_ListAlerts_WithStatusFilter(t *testing.T) {
 
 func TestUserPriceAlertService_ListAlerts_GoldPrices_FromDB_NonStale(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	assetPriceSvc := new(mockAlertAssetPriceSvc)
-	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	displayConfigSvc := new(mockAlertDisplayConfigSvc)
+	svc := newTestAlertServiceWithDisplayConfig(alertRepo, nil, nil, displayConfigSvc)
 	ctx := context.Background()
 
 	now := time.Now()
@@ -839,24 +815,22 @@ func TestUserPriceAlertService_ListAlerts_GoldPrices_FromDB_NonStale(t *testing.
 
 	alertRepo.On("ListByUserID", ctx, int32(1), "", mock.AnythingOfType("repository.ListOptions")).
 		Return(alerts, 1, nil)
-	// GetPricesByAssetType for gold returns non-stale data
-	assetPriceSvc.On("GetPricesByAssetType", mock.Anything, "gold").
-		Return([]*AssetPriceDTO{
-			{TypeCode: "SJL1L10", Buy: 9100000000, Sell: 9200000000, IsStale: false},
-		}, nil)
+	// ResolvePrice via display config bridge returns non-stale data
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "SJL1L10", "gold").
+		Return(9100000000, 9200000000, false, nil)
 
 	resp, err := svc.ListAlerts(ctx, 1, &v1.ListUserPriceAlertsRequest{})
 
 	assert.NoError(t, err)
 	assert.Len(t, resp.Alerts, 1)
 	assert.Equal(t, int64(9100000000), resp.Alerts[0].CurrentPrice)
-	assetPriceSvc.AssertExpectations(t)
+	displayConfigSvc.AssertExpectations(t)
 }
 
 func TestUserPriceAlertService_ListAlerts_GoldPrices_Stale_ExcludedFromPriceMap(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	assetPriceSvc := new(mockAlertAssetPriceSvc)
-	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	displayConfigSvc := new(mockAlertDisplayConfigSvc)
+	svc := newTestAlertServiceWithDisplayConfig(alertRepo, nil, nil, displayConfigSvc)
 	ctx := context.Background()
 
 	now := time.Now()
@@ -876,11 +850,9 @@ func TestUserPriceAlertService_ListAlerts_GoldPrices_Stale_ExcludedFromPriceMap(
 
 	alertRepo.On("ListByUserID", ctx, int32(1), "", mock.AnythingOfType("repository.ListOptions")).
 		Return(alerts, 1, nil)
-	// DB returns stale price — should NOT appear in price map
-	assetPriceSvc.On("GetPricesByAssetType", mock.Anything, "gold").
-		Return([]*AssetPriceDTO{
-			{TypeCode: "SJL1L10", Buy: 9100000000, Sell: 9200000000, IsStale: true},
-		}, nil)
+	// ResolvePrice returns isStale=true — should NOT appear in price map
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "SJL1L10", "gold").
+		Return(9100000000, 9200000000, true, nil)
 
 	resp, err := svc.ListAlerts(ctx, 1, &v1.ListUserPriceAlertsRequest{})
 
@@ -888,13 +860,13 @@ func TestUserPriceAlertService_ListAlerts_GoldPrices_Stale_ExcludedFromPriceMap(
 	assert.Len(t, resp.Alerts, 1)
 	// stale price excluded → CurrentPrice not populated
 	assert.Equal(t, int64(0), resp.Alerts[0].CurrentPrice)
-	assetPriceSvc.AssertExpectations(t)
+	displayConfigSvc.AssertExpectations(t)
 }
 
 func TestUserPriceAlertService_ListAlerts_SilverPrices_FromDB_NonStale(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	assetPriceSvc := new(mockAlertAssetPriceSvc)
-	svc := newTestAlertService(alertRepo, assetPriceSvc, nil)
+	displayConfigSvc := new(mockAlertDisplayConfigSvc)
+	svc := newTestAlertServiceWithDisplayConfig(alertRepo, nil, nil, displayConfigSvc)
 	ctx := context.Background()
 
 	now := time.Now()
@@ -914,10 +886,9 @@ func TestUserPriceAlertService_ListAlerts_SilverPrices_FromDB_NonStale(t *testin
 
 	alertRepo.On("ListByUserID", ctx, int32(1), "", mock.AnythingOfType("repository.ListOptions")).
 		Return(alerts, 1, nil)
-	assetPriceSvc.On("GetPricesByAssetType", mock.Anything, "silver").
-		Return([]*AssetPriceDTO{
-			{TypeCode: "AG_VND", Buy: 1800000, Sell: 1900000, IsStale: false},
-		}, nil)
+	// ResolvePrice via display config bridge for silver
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "AG_VND", "silver").
+		Return(1800000, 1900000, false, nil)
 
 	resp, err := svc.ListAlerts(ctx, 1, &v1.ListUserPriceAlertsRequest{})
 
@@ -925,7 +896,7 @@ func TestUserPriceAlertService_ListAlerts_SilverPrices_FromDB_NonStale(t *testin
 	assert.Len(t, resp.Alerts, 1)
 	// sell side price
 	assert.Equal(t, int64(1900000), resp.Alerts[0].CurrentPrice)
-	assetPriceSvc.AssertExpectations(t)
+	displayConfigSvc.AssertExpectations(t)
 }
 
 // --- Tests: UpdateAlert ---
@@ -1042,16 +1013,17 @@ func TestUserPriceAlertService_DeleteAlert_NotFound(t *testing.T) {
 
 func TestUserPriceAlertService_EvaluateAlerts_GoldAlert_TriggeredFromDB(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	displayConfigSvc := new(mockAlertDisplayConfigSvc)
 	notifRepo := new(mockAlertNotifRepo)
 	pushSvc := new(mockAlertPushSvc)
 	svc := &userPriceAlertService{
-		alertRepo:     alertRepo,
-		assetPriceSvc: assetPriceSvc,
-		marketDataSvc: &mockAlertMarketDataSvc{},
-		notifRepo:     notifRepo,
-		pushSvc:       pushSvc,
-		rdb:           nil,
+		alertRepo:        alertRepo,
+		assetPriceSvc:    &mockAlertAssetPriceSvc{},
+		marketDataSvc:    &mockAlertMarketDataSvc{},
+		displayConfigSvc: displayConfigSvc,
+		notifRepo:        notifRepo,
+		pushSvc:          pushSvc,
+		rdb:              nil,
 	}
 	ctx := context.Background()
 
@@ -1075,11 +1047,9 @@ func TestUserPriceAlertService_EvaluateAlerts_GoldAlert_TriggeredFromDB(t *testi
 	}
 
 	alertRepo.On("ListActive", ctx).Return(activeAlerts, nil)
-	// DB returns non-stale price above target → alert should trigger
-	assetPriceSvc.On("GetPricesByAssetType", mock.Anything, "gold").
-		Return([]*AssetPriceDTO{
-			{TypeCode: "SJL1L10", Buy: 9100000000, Sell: 9200000000, IsStale: false},
-		}, nil)
+	// ResolvePrice returns non-stale price above target → alert should trigger
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "SJL1L10", "gold").
+		Return(9100000000, 9200000000, false, nil)
 	notifRepo.On("Create", mock.Anything, mock.AnythingOfType("*models.Notification")).Return(nil)
 	pushSvc.On("SendToUser", mock.Anything, int32(1), mock.AnythingOfType("string"), mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(nil)
 	alertRepo.On("UpdateStatus", mock.Anything, int32(10), "triggered", mock.Anything, int32(1)).Return(nil)
@@ -1088,21 +1058,22 @@ func TestUserPriceAlertService_EvaluateAlerts_GoldAlert_TriggeredFromDB(t *testi
 
 	assert.NoError(t, err)
 	alertRepo.AssertExpectations(t)
-	assetPriceSvc.AssertExpectations(t)
+	displayConfigSvc.AssertExpectations(t)
 	notifRepo.AssertExpectations(t)
 	pushSvc.AssertExpectations(t)
 }
 
 func TestUserPriceAlertService_EvaluateAlerts_GoldAlert_StalePrice_NotTriggered(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	displayConfigSvc := new(mockAlertDisplayConfigSvc)
 	svc := &userPriceAlertService{
-		alertRepo:     alertRepo,
-		assetPriceSvc: assetPriceSvc,
-		marketDataSvc: &mockAlertMarketDataSvc{},
-		notifRepo:     &mockAlertNotifRepo{},
-		pushSvc:       &mockAlertPushSvc{},
-		rdb:           nil,
+		alertRepo:        alertRepo,
+		assetPriceSvc:    &mockAlertAssetPriceSvc{},
+		marketDataSvc:    &mockAlertMarketDataSvc{},
+		displayConfigSvc: displayConfigSvc,
+		notifRepo:        &mockAlertNotifRepo{},
+		pushSvc:          &mockAlertPushSvc{},
+		rdb:              nil,
 	}
 	ctx := context.Background()
 
@@ -1125,16 +1096,14 @@ func TestUserPriceAlertService_EvaluateAlerts_GoldAlert_StalePrice_NotTriggered(
 	}
 
 	alertRepo.On("ListActive", ctx).Return(activeAlerts, nil)
-	// DB returns stale price — should be excluded from price map, alert skipped
-	assetPriceSvc.On("GetPricesByAssetType", mock.Anything, "gold").
-		Return([]*AssetPriceDTO{
-			{TypeCode: "SJL1L10", Buy: 9100000000, Sell: 9200000000, IsStale: true},
-		}, nil)
+	// ResolvePrice returns isStale=true — should be excluded from price map, alert skipped
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "SJL1L10", "gold").
+		Return(9100000000, 9200000000, true, nil)
 
 	err := svc.EvaluateAlerts(ctx)
 
 	assert.NoError(t, err)
-	// No notification, no status update — alert skipped due to missing/stale price
+	// No notification, no status update — alert skipped due to stale price
 	alertRepo.AssertNotCalled(t, "UpdateStatus")
 }
 
@@ -1142,16 +1111,17 @@ func TestUserPriceAlertService_EvaluateAlerts_GoldAlert_StalePrice_NotTriggered(
 
 func TestEvaluateAlerts_UsesTemplateFromConfig(t *testing.T) {
 	alertRepo := new(mockUserPriceAlertRepo)
-	assetPriceSvc := new(mockAlertAssetPriceSvc)
+	displayConfigSvc := new(mockAlertDisplayConfigSvc)
 	notifRepo := new(mockAlertNotifRepo)
 	pushSvc := new(mockAlertPushSvc)
 	svc := &userPriceAlertService{
-		alertRepo:     alertRepo,
-		assetPriceSvc: assetPriceSvc,
-		marketDataSvc: &mockAlertMarketDataSvc{},
-		notifRepo:     notifRepo,
-		pushSvc:       pushSvc,
-		rdb:           nil, // nil rdb → LoadPriceAlertConfig returns defaults
+		alertRepo:        alertRepo,
+		assetPriceSvc:    &mockAlertAssetPriceSvc{},
+		marketDataSvc:    &mockAlertMarketDataSvc{},
+		displayConfigSvc: displayConfigSvc,
+		notifRepo:        notifRepo,
+		pushSvc:          pushSvc,
+		rdb:              nil, // nil rdb → LoadPriceAlertConfig returns defaults
 	}
 	ctx := context.Background()
 
@@ -1175,10 +1145,8 @@ func TestEvaluateAlerts_UsesTemplateFromConfig(t *testing.T) {
 	}
 
 	alertRepo.On("ListActive", ctx).Return(activeAlerts, nil)
-	assetPriceSvc.On("GetPricesByAssetType", mock.Anything, "gold").
-		Return([]*AssetPriceDTO{
-			{TypeCode: "SJL1L10", Buy: 9100000000, Sell: 9200000000, IsStale: false},
-		}, nil)
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "SJL1L10", "gold").
+		Return(9100000000, 9200000000, false, nil)
 	notifRepo.On("Create", mock.Anything, mock.AnythingOfType("*models.Notification")).Return(nil)
 	// Capture the title and body passed to SendToUser
 	var capturedTitle, capturedBody string
@@ -1373,4 +1341,89 @@ func TestCreateAlert_GoldWithDisplayConfig_Success(t *testing.T) {
 	assert.Equal(t, int64(9500000000), resp.Alert.CurrentPriceAtCreation,
 		"should use resolved buy price from ResolvePrice")
 	displayConfigSvc.AssertExpectations(t)
+}
+
+// TestFetchPricesForAlerts_GoldByDisplayConfig_Success verifies gold alerts with display TypeCode
+// get their price resolved via AssetDisplayConfigService.ResolvePrice.
+func TestFetchPricesForAlerts_GoldByDisplayConfig_Success(t *testing.T) {
+	repo := &mockUserPriceAlertRepo{}
+	displayConfigSvc := &mockAlertDisplayConfigSvc{}
+
+	alert := &models.UserPriceAlert{
+		ID:        1,
+		UserID:    1,
+		Symbol:    "SJC Tự Do",
+		AssetType: int32(v1.InvestmentType_INVESTMENT_TYPE_GOLD_VND),
+		PriceSide: "buy",
+		Status:    "active",
+	}
+
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "SJC Tự Do", "gold").
+		Return(8800000000, 8900000000, false, nil)
+
+	svc := newTestAlertServiceWithDisplayConfig(repo, nil, nil, displayConfigSvc).(*userPriceAlertService)
+	priceMap := svc.fetchPricesForAlerts(context.Background(), []*models.UserPriceAlert{alert})
+
+	key := "SJC Tự Do|buy"
+	price, ok := priceMap[key]
+	assert.True(t, ok, "price map should contain the alert symbol")
+	assert.Equal(t, int64(8800000000), price)
+	displayConfigSvc.AssertExpectations(t)
+}
+
+// TestFetchPricesForAlerts_GoldResolveFails_AlertSkipped verifies that when ResolvePrice fails,
+// the alert is absent from the price map (skipped) without aborting.
+func TestFetchPricesForAlerts_GoldResolveFails_AlertSkipped(t *testing.T) {
+	repo := &mockUserPriceAlertRepo{}
+	displayConfigSvc := &mockAlertDisplayConfigSvc{}
+
+	alert := &models.UserPriceAlert{
+		ID:        2,
+		UserID:    1,
+		Symbol:    "OLD_INTERNAL_CODE",
+		AssetType: int32(v1.InvestmentType_INVESTMENT_TYPE_GOLD_VND),
+		PriceSide: "sell",
+		Status:    "active",
+	}
+
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "OLD_INTERNAL_CODE", "gold").
+		Return(0, 0, false, apperrors.NewNotFoundError("no display config"))
+
+	svc := newTestAlertServiceWithDisplayConfig(repo, nil, nil, displayConfigSvc).(*userPriceAlertService)
+
+	var logBuf bytes.Buffer
+	log.SetOutput(&logBuf)
+	defer log.SetOutput(os.Stderr)
+
+	priceMap := svc.fetchPricesForAlerts(context.Background(), []*models.UserPriceAlert{alert})
+
+	_, ok := priceMap["OLD_INTERNAL_CODE|sell"]
+	assert.False(t, ok, "failed resolution should result in absent entry (alert skipped)")
+	assert.Contains(t, logBuf.String(), "OLD_INTERNAL_CODE", "should log the skipped symbol")
+}
+
+// TestFetchPricesForAlerts_SJCDirectMatch_NoRegression verifies existing alerts with symbol="SJC"
+// (which matches both display config TypeCode and asset_price.TypeCode) still work.
+func TestFetchPricesForAlerts_SJCDirectMatch_NoRegression(t *testing.T) {
+	repo := &mockUserPriceAlertRepo{}
+	displayConfigSvc := &mockAlertDisplayConfigSvc{}
+
+	alert := &models.UserPriceAlert{
+		ID:        3,
+		UserID:    1,
+		Symbol:    "SJC",
+		AssetType: int32(v1.InvestmentType_INVESTMENT_TYPE_GOLD_VND),
+		PriceSide: "buy",
+		Status:    "active",
+	}
+
+	displayConfigSvc.On("ResolvePrice", mock.Anything, "SJC", "gold").
+		Return(9200000000, 9300000000, false, nil)
+
+	svc := newTestAlertServiceWithDisplayConfig(repo, nil, nil, displayConfigSvc).(*userPriceAlertService)
+	priceMap := svc.fetchPricesForAlerts(context.Background(), []*models.UserPriceAlert{alert})
+
+	price, ok := priceMap["SJC|buy"]
+	assert.True(t, ok)
+	assert.Equal(t, int64(9200000000), price)
 }

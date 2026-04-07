@@ -6,20 +6,20 @@
 - **Plan file:** docs/plans/2026-04-07-price-alert-symbol-mismatch-plan.md
 - **Spec file:** docs/specs/2026-04-07-price-alert-symbol-mismatch-spec.md
 - **Started:** 2026-04-07T00:00:00Z
-- **Last updated:** 2026-04-07T00:00:00Z
+- **Last updated:** 2026-04-07T02:00:00Z
 - **Current state:** in_progress
-- **Current task:** 0
+- **Current task:** 4
 
 ## Task Progress
 
 | #   | Task Name                                        | Status      | Commit | Summary |
 | --- | ------------------------------------------------ | ----------- | ------ | ------- |
-| 0   | Update C4 Architecture Diagram                   | pending     | —      | —       |
-| 1   | Add displayConfigSvc to UserPriceAlertService    | pending     | —      | —       |
-| 2   | Fix Bug 1 — CreateAlert uses ResolvePrice        | pending     | —      | —       |
-| 3   | Fix Bug 2 — fetchPricesForAlerts uses ResolvePrice | pending   | —      | —       |
+| 0   | Update C4 Architecture Diagram                   | done        | d17284fa | Added UserPriceAlertService→AssetDisplayConfigService Rel |
+| 1   | Add displayConfigSvc to UserPriceAlertService    | done        | 17d7665b | Added field, constructor param, mock, test helper |
+| 2   | Fix Bug 1 — CreateAlert uses ResolvePrice        | done        | pending | CreateAlert calls ResolvePrice; stale non-fatal; assetTypeToString helper |
+| 3   | Fix Bug 2 — fetchPricesForAlerts uses ResolvePrice | done      | pending | Per-alert ResolvePrice loop; stale fatal in evaluation |
 | 4   | Wire AssetDisplayConfigService into DI           | pending     | —      | —       |
-| 5   | Update runtime flow diagram                      | pending     | —      | —       |
+| 5   | Update runtime flow diagram                      | skipped     | —      | No alert evaluation sequence in flow-investment.md |
 | 6   | Run full CI + E2E verification                   | pending     | —      | —       |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
