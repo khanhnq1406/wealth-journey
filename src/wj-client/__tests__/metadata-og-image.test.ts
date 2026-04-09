@@ -1,10 +1,12 @@
 /**
- * Unit tests verifying that the metadata constants/functions reference
- * the correct absolute PNG URL rather than the SVG path.
+ * Unit tests verifying metadata Phase 1 + Phase 2 state:
+ * - No SVG references remain in layout files
+ * - metadataBase is set in root layout
+ * - Phase 2: manual og-image.png arrays removed (handled by opengraph-image.tsx file convention)
  */
 
-describe("Landing FALLBACK_METADATA", () => {
-  it("should reference og-image.png (not .svg) in openGraph.images", async () => {
+describe("Landing layout metadata", () => {
+  it("should not reference /og-image.svg", async () => {
     const { readFileSync } = await import("fs");
     const { join } = await import("path");
     const source = readFileSync(
@@ -12,12 +14,21 @@ describe("Landing FALLBACK_METADATA", () => {
       "utf-8"
     );
     expect(source).not.toContain('"/og-image.svg"');
-    expect(source).toContain("https://www.congdongvang.com/og-image.png");
+  });
+
+  it("should not have manual og-image.png URL (Phase 2: file convention handles this)", async () => {
+    const { readFileSync } = await import("fs");
+    const { join } = await import("path");
+    const source = readFileSync(
+      join(process.cwd(), "app/[locale]/landing/layout.tsx"),
+      "utf-8"
+    );
+    expect(source).not.toContain("og-image.png");
   });
 });
 
 describe("Guide layout metadata", () => {
-  it("should reference og-image.png (not .svg) in openGraph.images", async () => {
+  it("should not reference /og-image.svg", async () => {
     const { readFileSync } = await import("fs");
     const { join } = await import("path");
     const source = readFileSync(
@@ -25,7 +36,16 @@ describe("Guide layout metadata", () => {
       "utf-8"
     );
     expect(source).not.toContain('"/og-image.svg"');
-    expect(source).toContain("https://www.congdongvang.com/og-image.png");
+  });
+
+  it("should not have manual og-image.png URL (Phase 2: file convention handles this)", async () => {
+    const { readFileSync } = await import("fs");
+    const { join } = await import("path");
+    const source = readFileSync(
+      join(process.cwd(), "app/[locale]/guide/layout.tsx"),
+      "utf-8"
+    );
+    expect(source).not.toContain("og-image.png");
   });
 });
 
