@@ -22,18 +22,19 @@ import (
 
 // investmentService implements InvestmentService.
 type investmentService struct {
-	investmentRepo       repository.InvestmentRepository
-	walletRepo           repository.WalletRepository
-	txRepo               repository.InvestmentTransactionRepository
-	marketDataService    MarketDataService
-	userRepo             repository.UserRepository
-	fxRateSvc            FXRateService
-	currencyCache        *cache.CurrencyCache
-	walletService        WalletService
-	portfolioHistoryRepo repository.PortfolioHistoryRepository
-	mapper               *InvestmentMapper
-	goldConverter        *gold.Converter
-	silverConverter      *silver.Converter
+	investmentRepo             repository.InvestmentRepository
+	walletRepo                 repository.WalletRepository
+	txRepo                     repository.InvestmentTransactionRepository
+	marketDataService          MarketDataService
+	userRepo                   repository.UserRepository
+	fxRateSvc                  FXRateService
+	currencyCache              *cache.CurrencyCache
+	walletService              WalletService
+	portfolioHistoryRepo       repository.PortfolioHistoryRepository
+	assetDisplayConfigService  AssetDisplayConfigService
+	mapper                     *InvestmentMapper
+	goldConverter              *gold.Converter
+	silverConverter            *silver.Converter
 }
 
 // NewInvestmentService creates a new InvestmentService.
@@ -47,20 +48,22 @@ func NewInvestmentService(
 	currencyCache *cache.CurrencyCache,
 	walletService WalletService,
 	portfolioHistoryRepo repository.PortfolioHistoryRepository,
+	assetDisplayConfigService AssetDisplayConfigService,
 ) InvestmentService {
 	return &investmentService{
-		investmentRepo:       investmentRepo,
-		walletRepo:           walletRepo,
-		txRepo:               txRepo,
-		marketDataService:    marketDataService,
-		userRepo:             userRepo,
-		fxRateSvc:            fxRateSvc,
-		currencyCache:        currencyCache,
-		walletService:        walletService,
-		portfolioHistoryRepo: portfolioHistoryRepo,
-		mapper:               NewInvestmentMapper(),
-		goldConverter:        gold.NewGoldConverter(fxRateSvc),
-		silverConverter:      silver.NewSilverConverter(fxRateSvc),
+		investmentRepo:            investmentRepo,
+		walletRepo:                walletRepo,
+		txRepo:                    txRepo,
+		marketDataService:         marketDataService,
+		userRepo:                  userRepo,
+		fxRateSvc:                 fxRateSvc,
+		currencyCache:             currencyCache,
+		walletService:             walletService,
+		portfolioHistoryRepo:      portfolioHistoryRepo,
+		assetDisplayConfigService: assetDisplayConfigService,
+		mapper:                    NewInvestmentMapper(),
+		goldConverter:             gold.NewGoldConverter(fxRateSvc),
+		silverConverter:           silver.NewSilverConverter(fxRateSvc),
 	}
 }
 
@@ -195,6 +198,26 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 			Data:      addResp.UpdatedInvestment,
 			Timestamp: time.Now().Format(time.RFC3339),
 		}, nil
+	}
+
+	// 4. For non-custom FOREIGN_CURRENCY investments, validate that the symbol is
+	// an enabled currency in asset_display_config (show_in_investment = true).
+	// This prevents orphaned investments that UpdatePrices would silently skip.
+	if req.Type == v1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY && !req.IsCustom {
+		configs, cfgErr := s.assetDisplayConfigService.ListForInvestment(ctx, "currency")
+		if cfgErr != nil {
+			return nil, fmt.Errorf("failed to validate currency symbol: %w", cfgErr)
+		}
+		validSymbol := false
+		for _, cfg := range configs {
+			if cfg.TypeCode == req.Symbol {
+				validSymbol = true
+				break
+			}
+		}
+		if !validSymbol {
+			return nil, apperrors.NewValidationError(fmt.Sprintf("currency %q is not available for investment", req.Symbol))
+		}
 	}
 
 	// 5. Calculate initial average cost using utility function
