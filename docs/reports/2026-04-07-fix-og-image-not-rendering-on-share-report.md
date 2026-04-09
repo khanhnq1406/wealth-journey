@@ -132,3 +132,21 @@ Changes are contained to:
 **Preconditions:** Dev server
 1. Navigate to `/vi/landing`, view source → Expected: exactly ONE `<meta property="og:image">` tag in `<head>`
 2. Same for `/vi/guide` → Expected: exactly ONE `<meta property="og:image">`
+
+## Fix History
+
+| Date       | Fix                                                                                          | Severity | Files Changed                                                                             |
+| ---------- | -------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------- |
+| 2026-04-09 | Await async `params` (Next.js 15); replace WOFF2 font with TTF via CSS API; add SSRF guard on extracted TTF URL | Minor    | `landing/opengraph-image.tsx`, `guide/opengraph-image.tsx`, `__tests__/landing-opengraph-image.test.ts`, `__tests__/guide-opengraph-image.test.ts` |
+
+### Fix Details (2026-04-09)
+
+**Root Cause 1 — Async params (HTTP 500):**
+Next.js 15 made dynamic route `params` a Promise. Both `opengraph-image.tsx` files accessed `params.locale` synchronously, causing a runtime error at line 31. Fix: type `params` as `Promise<{ locale: string }>` and add `const { locale: rawLocale } = await params;`.
+
+**Root Cause 2 — WOFF2 font (Satori error):**
+The Google Fonts CDN URL `KFOmCnqEu92Fr1Mu4mxK.woff2` serves WOFF2, but Satori (used by `next/og`'s `ImageResponse`) only accepts OTF/TTF. Fix: fetch Google Fonts CSS API with `User-Agent: Mozilla/4.0` (triggers TTF response), parse the `src: url(*.ttf)` from the CSS, then fetch the TTF.
+
+**Security hardening:** The extracted TTF URL is validated against `hostname === "fonts.gstatic.com" && protocol === "https:"` before fetching, preventing SSRF if the CSS response were tampered with.
+
+**Tests added:** 4 new source-level tests (2 per file) — async params pattern, no WOFF2, SSRF hostname guard. Total test count: 890 (was 888).
