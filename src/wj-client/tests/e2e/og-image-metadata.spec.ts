@@ -85,3 +85,19 @@ test.describe("Dynamic OG Image Route — Landing", () => {
     expect(response.status()).toBe(200);
   });
 });
+
+test.describe("OG Image Auto-Injection (Phase 2)", () => {
+  test("vi/landing og:image should point to /vi/landing/opengraph-image", async ({ page }) => {
+    await page.goto("/vi/landing");
+    const ogImage = page.locator('meta[property="og:image"]');
+    const content = await ogImage.getAttribute("content");
+    expect(content).toContain("/vi/landing/opengraph-image");
+  });
+
+  test("vi/guide og:image should point to /vi/guide/opengraph-image", async ({ page }) => {
+    await page.goto("/vi/guide");
+    const ogImage = page.locator('meta[property="og:image"]');
+    const content = await ogImage.getAttribute("content");
+    expect(content).toContain("/vi/guide/opengraph-image");
+  });
+});

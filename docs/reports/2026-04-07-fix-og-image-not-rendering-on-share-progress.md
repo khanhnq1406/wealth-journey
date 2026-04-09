@@ -7,8 +7,8 @@
 - **Spec file:** `docs/specs/2026-04-07-fix-og-image-not-rendering-on-share-spec.md`
 - **Started:** 2026-04-09T00:00:00Z
 - **Last updated:** 2026-04-09T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 5
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -19,7 +19,7 @@
 | 2   | Fix Metadata — metadataBase + Absolute PNG URLs | done        | da5e42f4 | Add metadataBase to root layout; replace SVG URLs with absolute PNG in landing+guide |
 | 3   | Create opengraph-image.tsx for Landing Page    | done        | 9df2475b | Add Edge route generating OG PNG with locale support, font fallback, 24h cache |
 | 4   | Create opengraph-image.tsx for Guide Page      | done        | 915b32a5 | Add Edge route for guide page, identical to landing version with different alt text |
-| 5   | Remove Manual OG Image Arrays from Layouts     | pending     | —      | —       |
+| 5   | Remove Manual OG Image Arrays from Layouts     | done        | e1c79803 | Remove openGraph.images + twitter.images from landing+guide layouts (file convention takes over) |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
