@@ -26,21 +26,12 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       url: "https://www.congdongvang.com/vi/guide",
       siteName: "congdongvang.com",
-      images: [
-        {
-          url: "/og-image.svg",
-          width: 1200,
-          height: 630,
-          alt: "Hướng dẫn sử dụng congdongvang.com",
-        },
-      ],
     },
     twitter: {
       card: "summary_large_image",
       title: "Hướng dẫn sử dụng | congdongvang.com",
       description:
         "Hướng dẫn sử dụng congdongvang.com: quản lý tài chính cá nhân, theo dõi danh mục đầu tư vàng, bạc, cổ phiếu, crypto và tham gia cộng đồng đầu tư.",
-      images: ["/og-image.svg"],
       creator: "@congdongvang",
     },
     robots: {
