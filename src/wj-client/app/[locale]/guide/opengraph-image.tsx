@@ -25,21 +25,32 @@ const TEXT = {
 export default async function Image({
   params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale: rawLocale } = await params;
   // Validate locale — never use it in file paths or external URLs
-  const locale: "vi" | "en" = VALID_LOCALES.includes(params.locale as "vi" | "en")
-    ? (params.locale as "vi" | "en")
+  const locale: "vi" | "en" = VALID_LOCALES.includes(rawLocale as "vi" | "en")
+    ? (rawLocale as "vi" | "en")
     : "vi";
 
   const text = TEXT[locale];
 
-  // Attempt to load Roboto font — fall back gracefully if unavailable
+  // Attempt to load Roboto Bold as TTF — Satori only supports OTF/TTF (not WOFF2).
+  // Use Google Fonts CSS API with a legacy user-agent to obtain a TTF src URL.
   let fontData: ArrayBuffer | null = null;
   try {
-    fontData = await fetch(
-      new URL("https://fonts.gstatic.com/s/roboto/v32/KFOmCnqEu92Fr1Mu4mxK.woff2")
-    ).then((res) => res.arrayBuffer());
+    const css = await fetch(
+      "https://fonts.googleapis.com/css2?family=Roboto:wght@700",
+      { headers: { "User-Agent": "Mozilla/4.0" } }
+    ).then((res) => res.text());
+    const ttfUrl = css.match(/src:\s*url\(([^)]+\.ttf)\)/)?.[1];
+    if (ttfUrl) {
+      // Guard: only fetch from Google's font CDN — prevents SSRF if CSS is tampered
+      const ttfParsed = new URL(ttfUrl);
+      if (ttfParsed.hostname === "fonts.gstatic.com" && ttfParsed.protocol === "https:") {
+        fontData = await fetch(ttfUrl).then((res) => res.arrayBuffer());
+      }
+    }
   } catch {
     // Font fetch failed — Satori will use system sans-serif
     fontData = null;
