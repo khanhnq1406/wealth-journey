@@ -86,6 +86,8 @@ func (s *marketDataService) GetPrice(ctx context.Context, symbol, currency strin
 		priceData, err = s.fetchGoldPriceFromDB(ctx, symbol, currency, investmentType)
 	} else if silver.IsSilverType(investmentType) {
 		priceData, err = s.fetchSilverPriceFromDB(ctx, symbol, currency, investmentType)
+	} else if investmentType == investmentv1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY {
+		priceData, err = s.fetchCurrencyPriceFromDB(ctx, symbol, currency)
 	} else {
 		priceData, err = s.fetchPriceFromAPI(ctx, symbol, currency)
 	}
@@ -381,6 +383,33 @@ func (s *marketDataService) fetchSilverPriceFromDB(ctx context.Context, symbol, 
 		Change24h: 0, // ancarat API doesn't provide change percent
 		Volume24h: 0,
 		Timestamp: price.UpdateTime,
+	}, nil
+}
+
+// fetchCurrencyPriceFromDB fetches the VCB buy rate for a FOREIGN_CURRENCY investment
+// from the AssetDisplayConfigService DB cache. This mirrors the scheduler path
+// (UpdatePricesForInvestments) so that the frontend GetPrice endpoint stays consistent.
+//
+// If isStale=true, the last known price is still returned with a warning log rather
+// than surfacing an error to the caller — stale data is better than no data for UI display.
+func (s *marketDataService) fetchCurrencyPriceFromDB(ctx context.Context, symbol, currency string) (*models.MarketData, error) {
+	if s.assetDisplayConfigService == nil {
+		return nil, fmt.Errorf("currency price unavailable for %s: asset display config service not initialized", symbol)
+	}
+	buy, _, isStale, err := s.assetDisplayConfigService.ResolvePrice(ctx, symbol, "currency")
+	if err != nil {
+		return nil, fmt.Errorf("currency price unavailable for %s: %w", symbol, err)
+	}
+	if isStale {
+		log.Printf("[marketDataService] stale VCB price for %s — using last known value %d", symbol, buy)
+	}
+	return &models.MarketData{
+		Symbol:    symbol,
+		Currency:  currency,
+		Price:     buy,
+		Change24h: 0,
+		Volume24h: 0,
+		Timestamp: time.Now(),
 	}, nil
 }
 

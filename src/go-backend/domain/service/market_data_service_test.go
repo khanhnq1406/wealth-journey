@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"wealthjourney/domain/models"
 	"wealthjourney/pkg/gold"
@@ -11,6 +12,7 @@ import (
 	investmentv1 "wealthjourney/protobuf/v1"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // TestUpdatePricesForInvestments_ForeignCurrency tests that FOREIGN_CURRENCY investments
@@ -119,4 +121,101 @@ func TestUpdatePricesForInvestments_ForeignCurrency_StalePrice(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, int64(25000000), updates[5], "stale buy price should still be used")
+}
+
+// ---------------------------------------------------------------------------
+// GetPrice — FOREIGN_CURRENCY routing tests (Task 1)
+// ---------------------------------------------------------------------------
+
+// TestGetPrice_ForeignCurrency_UsesResolvePrice verifies that GetPrice routes
+// FOREIGN_CURRENCY investments to AssetDisplayConfigService.ResolvePrice with
+// assetType="currency" and returns the buy price.
+func TestGetPrice_ForeignCurrency_UsesResolvePrice(t *testing.T) {
+	ctx := context.Background()
+
+	const expectedBuy = int64(25_500_000) // 25,500 VND per 1 USD unit (×1000)
+
+	adcSvc := &mdbAssetDisplayConfigService{
+		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
+			assert.Equal(t, "USD_VCB", typeCode, "symbol must be passed as typeCode")
+			assert.Equal(t, "currency", assetType, "assetType must be 'currency'")
+			return expectedBuy, int64(25_600_000), false, nil
+		},
+	}
+
+	mdRepo := &mdbMarketDataRepo{
+		// Cache miss — force service to fetch fresh price.
+		getBySymbolAndCurrencyFn: func(ctx context.Context, symbol, currency string) (*models.MarketData, error) {
+			return nil, errors.New("cache miss")
+		},
+	}
+
+	svc := newBridgeTestService(mdRepo, nil, nil, adcSvc)
+
+	priceData, err := svc.GetPrice(ctx, "USD_VCB", "VND", investmentv1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY, 15*time.Minute)
+
+	require.NoError(t, err)
+	require.NotNil(t, priceData)
+	assert.Equal(t, "USD_VCB", priceData.Symbol)
+	assert.Equal(t, "VND", priceData.Currency)
+	assert.Equal(t, expectedBuy, priceData.Price, "GetPrice should return the buy price from ResolvePrice")
+	assert.Equal(t, float64(0), priceData.Change24h, "Change24h should be 0 for currency prices")
+	assert.Equal(t, int64(0), priceData.Volume24h, "Volume24h should be 0 for currency prices")
+}
+
+// TestGetPrice_ForeignCurrency_StalePrice_ReturnedWithWarning verifies that when
+// ResolvePrice returns isStale=true, GetPrice still returns the price (not an error).
+func TestGetPrice_ForeignCurrency_StalePrice_ReturnedWithWarning(t *testing.T) {
+	ctx := context.Background()
+
+	const stalePrice = int64(25_000_000)
+
+	adcSvc := &mdbAssetDisplayConfigService{
+		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
+			// isStale=true: price data is old but still available
+			return stalePrice, int64(25_100_000), true, nil
+		},
+	}
+
+	mdRepo := &mdbMarketDataRepo{
+		getBySymbolAndCurrencyFn: func(ctx context.Context, symbol, currency string) (*models.MarketData, error) {
+			return nil, errors.New("cache miss")
+		},
+	}
+
+	svc := newBridgeTestService(mdRepo, nil, nil, adcSvc)
+
+	priceData, err := svc.GetPrice(ctx, "EUR_VCB", "VND", investmentv1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY, 15*time.Minute)
+
+	// Stale price must still be returned — not an error
+	require.NoError(t, err, "stale price should not result in an error")
+	require.NotNil(t, priceData)
+	assert.Equal(t, stalePrice, priceData.Price, "stale buy price should still be returned")
+}
+
+// TestGetPrice_ForeignCurrency_UnknownSymbol_ReturnsError verifies that when
+// ResolvePrice returns an error (unknown symbol / not configured), GetPrice
+// propagates the error.
+func TestGetPrice_ForeignCurrency_UnknownSymbol_ReturnsError(t *testing.T) {
+	ctx := context.Background()
+
+	adcSvc := &mdbAssetDisplayConfigService{
+		resolvePriceFn: func(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
+			return 0, 0, false, errors.New("symbol not configured")
+		},
+	}
+
+	mdRepo := &mdbMarketDataRepo{
+		// Cache miss — no fallback available
+		getBySymbolAndCurrencyFn: func(ctx context.Context, symbol, currency string) (*models.MarketData, error) {
+			return nil, errors.New("cache miss")
+		},
+	}
+
+	svc := newBridgeTestService(mdRepo, nil, nil, adcSvc)
+
+	priceData, err := svc.GetPrice(ctx, "UNKNOWN_VCB", "VND", investmentv1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY, 15*time.Minute)
+
+	assert.Error(t, err, "unknown symbol should result in an error")
+	assert.Nil(t, priceData, "no price data should be returned on error")
 }

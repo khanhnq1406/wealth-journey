@@ -246,9 +246,11 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
   );
 
   // Fetch market price for standard investments (stocks, crypto, ETF, etc.)
+  // FOREIGN_CURRENCY is excluded here — it has its own dedicated currencyPriceQuery below
   const isStandardWithSymbol =
     !isGoldInvestment &&
     !isSilverInvestment &&
+    !isForeignCurrencyInvestment &&
     !isCustomInvestment &&
     !!selectedSymbol &&
     selectedSymbol.length >= 2;
@@ -262,6 +264,20 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
       enabled: isStandardWithSymbol,
       refetchOnMount: "always",
       staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  );
+
+  // Dedicated currency price query — routes to VCB DB cache via investmentType=FOREIGN_CURRENCY
+  const currencyPriceQuery = useQueryGetMarketPrice(
+    {
+      symbol: selectedSymbol,
+      currency: "VND",
+      type: Number(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY) as InvestmentType,
+    },
+    {
+      enabled: isForeignCurrencyInvestment && !!selectedSymbol,
+      refetchOnMount: "always",
+      staleTime: 5 * 60 * 1000,
     },
   );
 
@@ -440,6 +456,13 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
     }
   }, [isStandardWithSymbol, standardPriceQuery.data, setValue]);
 
+  // Auto-fill price per unit from currency market price (VCB buy rate in VND)
+  useEffect(() => {
+    if (isForeignCurrencyInvestment && currencyPriceQuery.data?.data?.priceDecimal) {
+      setValue("pricePerUnit", currencyPriceQuery.data.data.priceDecimal);
+    }
+  }, [isForeignCurrencyInvestment, currencyPriceQuery.data, setValue]);
+
   // Compute total cost in real time
   const totalCost = useMemo(() => {
     if (watchedQuantity > 0 && pricePerUnit > 0) {
@@ -517,7 +540,8 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
   const isRefreshing =
     (isGoldInvestment && goldPriceQuery.isFetching) ||
     (isSilverInvestment && silverPriceQuery.isFetching) ||
-    (isStandardWithSymbol && standardPriceQuery.isFetching);
+    (isStandardWithSymbol && standardPriceQuery.isFetching) ||
+    (isForeignCurrencyInvestment && currencyPriceQuery.isFetching);
 
   const onSubmit = (data: CreateInvestmentFormInput) => {
     setErrorMessage(undefined);
@@ -683,6 +707,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
               value={watch("symbol")}
               onChange={(value) => {
                 setValue("symbol", value);
+                setSelectedSymbol(value);
                 // Auto-fill name from the selected currency's displayName
                 const selected = currencyDisplayPricesQuery.data?.prices?.find(
                   (p) => p.typeCode === value,
@@ -696,6 +721,17 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
               disabled={isSubmitting || currencyDisplayPricesQuery.isLoading}
               required
             />
+          )}
+          {/* Currency price loading/error state */}
+          {selectedSymbol && currencyPriceQuery.isLoading && (
+            <p className="text-xs text-v2-text-tertiary mt-2 ml-1">
+              {t("form.loadingPrice")}
+            </p>
+          )}
+          {selectedSymbol && currencyPriceQuery.isError && (
+            <p className="text-xs text-red-500 mt-2 ml-1">
+              {t("form.unableToFetchPrice")}
+            </p>
           )}
           {errors.symbol && (
             <ErrorMessage id="symbol-error">
@@ -1059,18 +1095,18 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
           <Label htmlFor="pricePerUnit" required>
             {pricePerUnitLabel}
           </Label>
-          {/* CurrencyBadge - hidden for custom investments (manual select above) */}
-          {!isCustomInvestment && (
+          {/* CurrencyBadge - hidden for custom investments and FOREIGN_CURRENCY */}
+          {!isCustomInvestment && !isForeignCurrencyInvestment && (
             <CurrencyBadge
               value={currency}
               onChange={(newCurrency) => setValue("currency", newCurrency)}
               disabled={isSubmitting || isGoldInvestment || isSilverInvestment || isSymbolSelected}
             />
           )}
-          {/* Display only badge for custom investments */}
-          {isCustomInvestment && (
+          {/* Display only badge for custom investments and FOREIGN_CURRENCY (always VND) */}
+          {(isCustomInvestment || isForeignCurrencyInvestment) && (
             <span className="px-2 py-1 text-xs font-medium bg-v2-maroon-900 text-v2-gold-accent rounded">
-              {currency || "USD"}
+              {isForeignCurrencyInvestment ? "VND" : (currency || "USD")}
             </span>
           )}
         </div>
@@ -1088,13 +1124,14 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
               showRecommendations={false}
             />
           </div>
-          {/* Refresh button - for gold/silver/standard investments with symbol */}
-          {(isGoldInvestment || isSilverInvestment || isStandardWithSymbol) && (
+          {/* Refresh button - for gold/silver/standard/foreign-currency investments with symbol */}
+          {(isGoldInvestment || isSilverInvestment || isStandardWithSymbol || (isForeignCurrencyInvestment && !!selectedSymbol)) && (
             <button
               type="button"
               onClick={() => {
                 if (isGoldInvestment) goldPriceQuery.refetch();
                 else if (isSilverInvestment) silverPriceQuery.refetch();
+                else if (isForeignCurrencyInvestment) currencyPriceQuery.refetch();
                 else if (isStandardWithSymbol) standardPriceQuery.refetch();
               }}
               disabled={isRefreshing}

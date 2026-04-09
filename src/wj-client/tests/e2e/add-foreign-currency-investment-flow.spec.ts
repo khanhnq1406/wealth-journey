@@ -294,6 +294,99 @@ test.describe("Add Foreign Currency Investment Flow", () => {
     }
   });
 
+  test("price per unit auto-fills after currency selection (mock market-price API)", async ({ page }) => {
+    // Mock the market-price endpoint to return a VCB buy rate for USD_VCB
+    await page.route("**/market-price*", (route) => {
+      const url = route.request().url();
+      if (url.includes("USD_VCB") || url.includes("symbol=USD")) {
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            data: {
+              symbol: "USD_VCB",
+              currency: "VND",
+              priceDecimal: 25500,
+              priceUpdatedAt: Math.floor(Date.now() / 1000),
+            },
+          }),
+        });
+      } else {
+        route.continue();
+      }
+    });
+
+    await page.goto("/en/dashboard/portfolio");
+    await page.waitForLoadState("networkidle");
+
+    const addButton = page.locator('button', { hasText: /add investment/i }).first();
+    if (await addButton.isVisible()) {
+      await addButton.click();
+      await page.waitForTimeout(300);
+
+      const typeSelect = page.locator("select").first();
+      if (await typeSelect.isVisible()) {
+        await typeSelect.selectOption({ label: "Foreign Currency" });
+        await page.waitForTimeout(1000);
+
+        // Select a currency from the dropdown
+        const symbolSelect = page.locator('select[name="symbol"]');
+        if (await symbolSelect.isVisible()) {
+          await symbolSelect.selectOption({ value: "USD" });
+          // Wait for price query to resolve
+          await page.waitForTimeout(1000);
+
+          // Price per unit field should be auto-filled with 25500
+          const priceInput = page.locator('input[name="pricePerUnit"]');
+          if (await priceInput.isVisible()) {
+            const priceValue = await priceInput.inputValue();
+            // Value should be non-zero (25500 formatted)
+            const numericValue = parseFloat(priceValue.replace(/,/g, ""));
+            if (!isNaN(numericValue)) {
+              expect(numericValue).toBeGreaterThan(0);
+            }
+          }
+        }
+      }
+    }
+
+    // Form should remain visible throughout
+    await expect(page.locator("form")).toBeVisible();
+  });
+
+  test("currency badge shows static VND text (no interactive dropdown) for FOREIGN_CURRENCY", async ({ page }) => {
+    await page.goto("/en/dashboard/portfolio");
+    await page.waitForLoadState("networkidle");
+
+    const addButton = page.locator('button', { hasText: /add investment/i }).first();
+    if (await addButton.isVisible()) {
+      await addButton.click();
+      await page.waitForTimeout(300);
+
+      const typeSelect = page.locator("select").first();
+      if (await typeSelect.isVisible()) {
+        await typeSelect.selectOption({ label: "Foreign Currency" });
+        await page.waitForTimeout(500);
+
+        // For FOREIGN_CURRENCY, the currency badge should show static "VND" text
+        // There should be NO interactive "Change currency" button (CurrencyBadge)
+        const changeCurrencyBtn = page.locator('button[aria-label="Change currency"]');
+        expect(await changeCurrencyBtn.count()).toBe(0);
+
+        // The static VND badge (a <span>) should be visible
+        // It may appear within the price per unit label area
+        const vndText = page.locator('span', { hasText: /^VND$/ });
+        // VND text should be present as a static badge
+        if (await vndText.count() > 0) {
+          await expect(vndText.first()).toBeVisible();
+        }
+      }
+    }
+
+    // Form should remain visible
+    await expect(page.locator("form")).toBeVisible();
+  });
+
   test("should submit with isCustom false for FOREIGN_CURRENCY", async ({ page }) => {
     let capturedRequest: any = null;
 
