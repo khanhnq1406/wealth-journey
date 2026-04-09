@@ -158,3 +158,26 @@ GitNexus not available — manual blast radius review performed:
 #### Scenario: Mobile viewport (375px)
 
 1. Open Add Investment form on 375px viewport → Expected: Currency dropdown renders correctly within form layout, no horizontal overflow
+
+## Fix History
+
+| Date       | Fix                                                                                 | Severity | Commit     |
+| ---------- | ----------------------------------------------------------------------------------- | -------- | ---------- |
+| 2026-04-09 | Auto-fill currency price on symbol select; lock price-per-unit currency to VND      | Major    | 73084789   |
+
+### Fix Detail: Currency Price Auto-Fill + VND Lock (2026-04-09)
+
+**Issues fixed:**
+1. Price per unit not auto-filled after currency selection — `setSelectedSymbol` was never called in the currency dropdown `onChange`, so `currencyPriceQuery` was always disabled.
+2. `CurrencyBadge` was interactive for FOREIGN_CURRENCY — user could change currency away from VND.
+
+**Root causes:**
+- Frontend: missing `setSelectedSymbol(value)` call in currency `onChange` handler; missing dedicated `currencyPriceQuery`; `isStandardWithSymbol` not excluding FOREIGN_CURRENCY.
+- Backend: `GetPrice` routed FOREIGN_CURRENCY to Yahoo Finance (`fetchPriceFromAPI`) instead of the VCB DB cache (`fetchCurrencyPriceFromDB` via `ResolvePrice`).
+
+**Changes:**
+- `market_data_service.go` — new `fetchCurrencyPriceFromDB` method; new routing branch in `GetPrice` for `INVESTMENT_TYPE_FOREIGN_CURRENCY`
+- `market_data_service_test.go` — 3 new tests for FOREIGN_CURRENCY GetPrice routing
+- `AddInvestmentForm.tsx` — 6 fixes (setSelectedSymbol, currencyPriceQuery, isStandardWithSymbol exclusion, auto-fill useEffect, loading/error states, refresh button)
+- `AddInvestmentForm.forex.test.tsx` — 5 new test cases (Fixes A–D)
+- `add-foreign-currency-investment-flow.spec.ts` — 2 new E2E scenarios
