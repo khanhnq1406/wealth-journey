@@ -6,10 +6,11 @@ kanban-plugin: board
 
 ## Not Started
 
-- [ ] [[2026-04-07-fix-og-image-not-rendering-on-share|Fix OG image not rendering on share]]
 
 
 ## Spec
+
+- [ ] [[2026-04-09-feat-investment-currency-assets-current-price|Add investment currency assets with current price]]
 
 
 
@@ -22,6 +23,8 @@ kanban-plugin: board
 
 
 ## Review
+
+- [ ] [[2026-04-07-fix-og-image-not-rendering-on-share|Fix OG image not rendering on share]]
 
 
 
