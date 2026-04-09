@@ -6,10 +6,11 @@ kanban-plugin: board
 
 ## Not Started
 
-- [ ] [[2026-04-09-fix-prices-tabs-asset-display-config|Fix gold/silver/currency tabs not respecting admin asset display config]]
 
 
 ## Spec
+
+- [ ] [[2026-04-09-fix-prices-tabs-asset-display-config|Fix gold/silver/currency tabs not respecting admin asset display config]]
 
 
 
