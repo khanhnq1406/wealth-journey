@@ -6,23 +6,23 @@
 - **Plan file:** `docs/plans/2026-04-09-feat-investment-currency-assets-current-price-plan.md`
 - **Spec file:** `docs/specs/2026-04-09-feat-investment-currency-assets-current-price-spec.md`
 - **Started:** 2026-04-09T00:00:00+07:00
-- **Last updated:** 2026-04-09T00:00:00+07:00
-- **Current state:** in_progress
-- **Current task:** 0
+- **Last updated:** 2026-04-09T11:30:00+07:00
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
-| #   | Task Name                                                     | Status      | Commit | Summary |
-| --- | ------------------------------------------------------------- | ----------- | ------ | ------- |
-| 0   | Update C4 Architecture Diagrams                               | pending     | —      | —       |
-| 1   | Backend — Route FOREIGN_CURRENCY in UpdatePricesForInvestments | pending     | —      | —       |
-| 2   | Backend — Stop Forcing isCustom=true for FOREIGN_CURRENCY     | pending     | —      | —       |
-| 3   | Backend — Server-side validation for FOREIGN_CURRENCY symbol  | pending     | —      | —       |
-| 4   | Frontend — Replace Free-Text Symbol with Currency Dropdown    | pending     | —      | —       |
-| 5   | Backend — Verify priceUpdatedAt is set for FOREIGN_CURRENCY   | pending     | —      | —       |
-| 6   | Update Runtime Flow Diagrams                                  | pending     | —      | —       |
-| 7   | Database Migration — Enable ShowInInvestment for Currency Configs | pending | —      | —       |
-| 8   | Verify Full Integration + CI                                  | pending     | —      | —       |
+| #   | Task Name                                                     | Status  | Commit     | Summary |
+| --- | ------------------------------------------------------------- | ------- | ---------- | ------- |
+| 0   | Update C4 Architecture Diagrams                               | done    | b4d74b50   | Updated backend + frontend C4 and flow-investment.md with currency price routing |
+| 1   | Backend — Route FOREIGN_CURRENCY in UpdatePricesForInvestments | done   | 39754d91   | Fourth routing branch in market_data_service.go; 4 new tests |
+| 2   | Backend — Stop Forcing isCustom=true for FOREIGN_CURRENCY     | done    | 39754d91   | Clarifying comment + test in investment_service.go |
+| 3   | Backend — Server-side validation for FOREIGN_CURRENCY symbol  | done    | 9cab3246   | ListForInvestment validation in CreateInvestment(); nil-guard removed after review |
+| 4   | Frontend — Replace Free-Text Symbol with Currency Dropdown    | done    | 7a79d829   | useQueryGetAssetDisplayPrices("currency") dropdown; isCustom=false |
+| 5   | Backend — Verify priceUpdatedAt is set for FOREIGN_CURRENCY   | done    | 8e652fad   | Confirmed already set; added documenting test |
+| 6   | Update Runtime Flow Diagrams                                  | done    | b4d74b50   | Section 12 sequence diagram in flow-investment.md |
+| 7   | Database Migration — Enable ShowInInvestment for Currency Configs | done | 29dcf573  | cmd/migrate-currency-investment/main.go + Taskfile task |
+| 8   | Verify Full Integration + CI                                  | done    | 1b06bb1f   | All CI checks pass; fixed E2E TypeScript error |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
@@ -34,28 +34,8 @@
 2. `.claude/skills/secure-feature-pipeline/implementer-agent-prompt.md` — implementer template (placeholders to fill)
 3. `.claude/skills/secure-feature-pipeline/reviewer-agent-prompt.md` — reviewer template (placeholders to fill)
 
-**After re-reading, verify you can answer:**
-- What are the two agents per task and what does each one do?
-- Which agent commits — the implementer, the reviewer, or the coordinator?
-- What is the next pending task?
-
-## Resume Instructions
-
-To resume this implementation after context compaction or in a new session:
-
-1. Read this progress file completely (including the Skill Recovery section above)
-2. **Re-read ALL skill files listed in Skill Recovery section above** — this is NON-NEGOTIABLE
-3. Read the plan file referenced in Metadata
-4. Read the spec file referenced in Metadata
-5. Check `git log --oneline -10` to verify last commit matches the last `done` task
-6. Check `git status` for any uncommitted work
-7. Cite the three-stage review order and checkpoint protocol (proves context is recovered)
-8. Continue from the next `pending` task using the same checkpoint protocol
-
 ## Notes
 
-- Plan dependency order: Tasks 1+2 (same file, parallel-safe), Task 0+6 (docs only), Task 4 (frontend only), Task 7 (migration)
-- Task 3 depends on Task 1 (needs new investmentService dep on assetDisplayConfigSvc)
-- Task 5 depends on Task 1
-- Task 8 last
-- Parallel-safe first batch: Tasks 0+6 (docs), Tasks 1+2 (same backend file — sequential), Task 4 (frontend), Task 7 (migration)
+- Implementation complete. All tasks done, all CI checks pass.
+- Key reviewer finding fixed: removed nil-guard from FOREIGN_CURRENCY validation in CreateInvestment() — validation must always run for security.
+- E2E Playwright TypeScript fix: Playwright selectOption requires string label, not RegExp.
