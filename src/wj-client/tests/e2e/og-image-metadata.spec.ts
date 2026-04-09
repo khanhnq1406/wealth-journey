@@ -49,3 +49,25 @@ test.describe("OG Image Static PNG", () => {
     expect(contentType).toContain("image/png");
   });
 });
+
+test.describe("Dynamic OG Image Route — Landing", () => {
+  test("GET /vi/landing/opengraph-image should return 200", async ({ request }) => {
+    const response = await request.get("/vi/landing/opengraph-image");
+    expect(response.status()).toBe(200);
+    const contentType = response.headers()["content-type"];
+    expect(contentType).toContain("image/png");
+  });
+
+  test("GET /en/landing/opengraph-image should return 200", async ({ request }) => {
+    const response = await request.get("/en/landing/opengraph-image");
+    expect(response.status()).toBe(200);
+    const contentType = response.headers()["content-type"];
+    expect(contentType).toContain("image/png");
+  });
+
+  test("Unknown locale on opengraph-image should return 200 (fallback to vi)", async ({ request }) => {
+    // Unknown locale should not crash — defaults to vi
+    const response = await request.get("/xx/landing/opengraph-image");
+    expect(response.status()).toBe(200);
+  });
+});
