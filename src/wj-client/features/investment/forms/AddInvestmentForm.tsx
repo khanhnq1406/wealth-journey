@@ -151,9 +151,11 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
   // Derived type flags
   const isGoldInvestment = selectedUIType === GOLD_UI_TYPE;
   const isSilverInvestment = selectedUIType === SILVER_UI_TYPE;
-  const isCashOrForeignCurrency =
-    selectedUIType === String(InvestmentType.INVESTMENT_TYPE_CASH) ||
+  const isCashInvestment =
+    selectedUIType === String(InvestmentType.INVESTMENT_TYPE_CASH);
+  const isForeignCurrencyInvestment =
     selectedUIType === String(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY);
+  const isCashOrForeignCurrency = isCashInvestment || isForeignCurrencyInvestment;
 
   const createInvestmentMutation = useMutationCreateInvestment({
     onSuccess: (data) => {
@@ -281,6 +283,15 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
     },
   );
 
+  // Fetch currency types from backend API (admin-managed list of foreign currencies)
+  const currencyDisplayPricesQuery = useQueryGetAssetDisplayPrices(
+    { assetType: "currency" },
+    {
+      enabled: isForeignCurrencyInvestment,
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
   // Build gold type options: VND from API (filtered by showInInvestment), USD stays hardcoded
   const goldTypeOptions = useMemo((): GoldTypeOption[] => {
     if (!isGoldInvestment) return [];
@@ -311,6 +322,14 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
         availableUnits: inferSilverUnits(p.typeCode),
       }));
   }, [isSilverInvestment, silverDisplayPricesQuery.data]);
+
+  // Build currency options: from API (filtered by showInInvestment)
+  const currencyOptions = useMemo((): { value: string; label: string }[] => {
+    if (!isForeignCurrencyInvestment) return [];
+    return (currencyDisplayPricesQuery.data?.prices ?? [])
+      .filter((p) => p.showInInvestment)
+      .map((p) => ({ value: p.typeCode, label: p.displayName }));
+  }, [isForeignCurrencyInvestment, currencyDisplayPricesQuery.data]);
 
   // Dynamic price per unit label: "Đơn giá (đ/chỉ)" for gold VND, etc.
   const pricePerUnitLabel = useMemo(() => {
@@ -383,13 +402,21 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
     }
   }, [isSilverInvestment, setValue, t]);
 
-  // Handle CASH/FOREIGN_CURRENCY: auto-enable custom mode
+  // Handle CASH: auto-enable custom mode
   useEffect(() => {
-    if (isCashOrForeignCurrency) {
+    if (isCashInvestment) {
       setIsCustomInvestment(true);
       setValue("type", Number(selectedUIType) as InvestmentType);
     }
-  }, [isCashOrForeignCurrency, selectedUIType, setValue]);
+  }, [isCashInvestment, selectedUIType, setValue]);
+
+  // Handle FOREIGN_CURRENCY: set type, but do NOT force custom mode (symbol from dropdown)
+  useEffect(() => {
+    if (isForeignCurrencyInvestment) {
+      setIsCustomInvestment(false);
+      setValue("type", Number(selectedUIType) as InvestmentType);
+    }
+  }, [isForeignCurrencyInvestment, selectedUIType, setValue]);
 
   // Auto-fill price per unit from gold market price (use priceDecimal for human-readable display)
   useEffect(() => {
@@ -441,13 +468,16 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
         // Silver: set a default type (SILVER_VND), will be overridden by brand selection
         setValue("type", InvestmentType.INVESTMENT_TYPE_SILVER_VND);
         setIsCustomInvestment(false);
-      } else if (
-        value === String(InvestmentType.INVESTMENT_TYPE_CASH) ||
-        value === String(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY)
-      ) {
-        // Cash/Foreign Currency: auto-enable custom mode
+      } else if (value === String(InvestmentType.INVESTMENT_TYPE_CASH)) {
+        // Cash: auto-enable custom mode (manual symbol entry)
         setValue("type", Number(value) as InvestmentType);
         setIsCustomInvestment(true);
+        setValue("symbol", "");
+        setValue("name", "");
+      } else if (value === String(InvestmentType.INVESTMENT_TYPE_FOREIGN_CURRENCY)) {
+        // Foreign Currency: symbol is selected from dropdown (not custom free-text)
+        setValue("type", Number(value) as InvestmentType);
+        setIsCustomInvestment(false);
         setValue("symbol", "");
         setValue("name", "");
       } else {
@@ -633,8 +663,50 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
         </div>
       )}
 
-      {/* Symbol - hidden for gold and silver investments (auto-populated from type) */}
-      {!isGoldInvestment && !isSilverInvestment && (
+      {/* FOREIGN_CURRENCY — currency selection from API dropdown */}
+      {isForeignCurrencyInvestment && (
+        <div className="mb-4">
+          {currencyDisplayPricesQuery.isLoading && (
+            <p className="text-sm text-v2-gold-accent">
+              {t("form.loadingCurrencies")}
+            </p>
+          )}
+          {!currencyDisplayPricesQuery.isLoading && currencyOptions.length === 0 && (
+            <p className="text-sm text-v2-red-negative">
+              {t("form.noCurrenciesConfigured")}
+            </p>
+          )}
+          {currencyOptions.length > 0 && (
+            <BasicFormSelect
+              label={t("form.selectCurrencyLabel")}
+              options={currencyOptions}
+              value={watch("symbol")}
+              onChange={(value) => {
+                setValue("symbol", value);
+                // Auto-fill name from the selected currency's displayName
+                const selected = currencyDisplayPricesQuery.data?.prices?.find(
+                  (p) => p.typeCode === value,
+                );
+                if (selected) {
+                  setValue("name", selected.displayName);
+                  setValue("currency", "VND");
+                }
+              }}
+              placeholder={t("form.selectCurrencyLabel")}
+              disabled={isSubmitting || currencyDisplayPricesQuery.isLoading}
+              required
+            />
+          )}
+          {errors.symbol && (
+            <ErrorMessage id="symbol-error">
+              {errors.symbol.message}
+            </ErrorMessage>
+          )}
+        </div>
+      )}
+
+      {/* Symbol - hidden for gold, silver, and foreign currency investments */}
+      {!isGoldInvestment && !isSilverInvestment && !isForeignCurrencyInvestment && (
         <div className="mb-4">
           <Label htmlFor="symbol" required>
             Symbol
@@ -666,7 +738,7 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
               )}
             </>
           ) : (
-            // Manual input for custom investments (including CASH/FOREIGN_CURRENCY)
+            // Manual input for custom investments (including CASH)
             <>
               <FormInput
                 name="symbol"
@@ -696,8 +768,8 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
         </div>
       )}
 
-      {/* Name - hidden for gold and silver investments (auto-populated from type) */}
-      {!isGoldInvestment && !isSilverInvestment && (
+      {/* Name - hidden for gold, silver, and foreign currency investments (auto-populated) */}
+      {!isGoldInvestment && !isSilverInvestment && !isForeignCurrencyInvestment && (
         <FormInput
           name="name"
           control={control}

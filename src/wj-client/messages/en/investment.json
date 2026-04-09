@@ -175,7 +175,10 @@
       "refreshingPrice": "Loading...",
       "totalCostSummary": "Total cost: {amount}",
       "totalCostConverted": "≈ {amount}",
-      "priceUnavailable": "Unable to fetch price"
+      "priceUnavailable": "Unable to fetch price",
+      "loadingCurrencies": "Loading currencies...",
+      "noCurrenciesConfigured": "No currencies available for investment",
+      "selectCurrencyLabel": "Currency"
     },
     "transactionTypes": {
       "buy": "Buy",
