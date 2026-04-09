@@ -1825,3 +1825,111 @@ func TestCreateInvestment_ForeignCurrency_ValidSymbol(t *testing.T) {
 	mockInvestmentRepo.AssertExpectations(t)
 	mockAssetDisplayConfigSvc.AssertExpectations(t)
 }
+
+// TestUpdatePrices_ForeignCurrency_SetsPriceUpdatedAt verifies that after
+// UpdatePricesForInvestments returns FOREIGN_CURRENCY prices, the investment
+// repository receives PriceUpdate structs with a non-zero Timestamp
+// (which the repository converts to price_updated_at in the DB).
+func TestUpdatePrices_ForeignCurrency_SetsPriceUpdatedAt(t *testing.T) {
+	ctx := context.Background()
+	userID := int32(1)
+	walletID := int32(2)
+	investmentID := int32(10)
+
+	mockWalletRepo := new(MockWalletRepository)
+	mockInvestmentRepo := new(MockInvestmentRepository)
+	mockTxRepo := new(MockInvestmentTransactionRepository)
+	mockMarketDataService := new(MockMarketDataService)
+	mockUserRepo := new(MockUserRepository)
+	mockFXRateSvc := new(MockFXRateService)
+
+	svc := NewInvestmentService(
+		mockInvestmentRepo,
+		mockWalletRepo,
+		mockTxRepo,
+		mockMarketDataService,
+		mockUserRepo,
+		mockFXRateSvc,
+		nil, // currencyCache not needed
+		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed
+		nil, // assetDisplayConfigService not needed
+	)
+
+	foreignCurrencyInvestment := &models.Investment{
+		ID:       investmentID,
+		WalletID: int32Ptr(walletID),
+		Symbol:   "USD",
+		Name:     "US Dollar",
+		Type:     int32(v1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY),
+		IsCustom: false,
+		Currency: "VND",
+		Quantity: 100000,
+	}
+
+	// The service lists all investments then filters non-custom ones.
+	mockInvestmentRepo.On(
+		"ListByUserID",
+		ctx,
+		userID,
+		repository.ListOptions{Limit: 10000},
+		v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED,
+	).Return([]*models.Investment{foreignCurrencyInvestment}, 1, nil)
+
+	// Market data service resolves FOREIGN_CURRENCY price via ResolvePrice.
+	mockMarketDataService.On(
+		"UpdatePricesForInvestments",
+		mock.Anything, // background context from goroutine
+		[]*models.Investment{foreignCurrencyInvestment},
+		false,
+	).Return(map[int32]int64{investmentID: 2570000}, nil)
+
+	// Capture the PriceUpdate structs passed to the repository.
+	var capturedUpdates []repository.PriceUpdate
+	done := make(chan struct{})
+
+	mockInvestmentRepo.On(
+		"UpdatePrices",
+		mock.Anything,
+		mock.MatchedBy(func(updates []repository.PriceUpdate) bool {
+			return len(updates) == 1
+		}),
+	).Return(nil).Run(func(args mock.Arguments) {
+		capturedUpdates = args.Get(1).([]repository.PriceUpdate)
+		close(done)
+	})
+
+	// GetByID is called per investment for cache invalidation after UpdatePrices.
+	mockInvestmentRepo.On("GetByID", mock.Anything, investmentID).Return(foreignCurrencyInvestment, nil)
+
+	beforeCall := time.Now().Unix()
+	req := &v1.UpdatePricesRequest{ForceRefresh: false}
+	resp, err := svc.UpdatePrices(ctx, userID, req)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.True(t, resp.Success)
+
+	// Wait for the background goroutine to call UpdatePrices.
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("timed out waiting for background UpdatePrices goroutine")
+	}
+
+	// Assert: one PriceUpdate for the FOREIGN_CURRENCY investment.
+	assert.Len(t, capturedUpdates, 1)
+	update := capturedUpdates[0]
+	assert.Equal(t, investmentID, update.InvestmentID)
+	assert.Equal(t, int64(2570000), update.Price)
+
+	// Core assertion: Timestamp must be set (non-zero, recent) so the
+	// repository can derive a valid price_updated_at for the DB row.
+	assert.Greater(t, update.Timestamp, beforeCall-1,
+		"PriceUpdate.Timestamp must be a recent Unix timestamp so price_updated_at is set in the DB")
+	assert.LessOrEqual(t, update.Timestamp, time.Now().Unix()+1,
+		"PriceUpdate.Timestamp must not be in the future")
+
+	mockInvestmentRepo.AssertExpectations(t)
+	mockMarketDataService.AssertExpectations(t)
+}
