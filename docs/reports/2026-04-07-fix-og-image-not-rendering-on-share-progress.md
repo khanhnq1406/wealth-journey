@@ -8,7 +8,7 @@
 - **Started:** 2026-04-09T00:00:00Z
 - **Last updated:** 2026-04-09T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 2
+- **Current task:** 3
 
 ## Task Progress
 
@@ -16,7 +16,7 @@
 | --- | ---------------------------------------------- | ----------- | ------ | ------- |
 | 0   | Update C4 Architecture Diagram                 | done        | bb45529a | Add landing_og_image and guide_og_image nodes to C4 frontend diagram |
 | 1   | Generate Static PNG OG Image                   | done        | b12968d5 | Generate og-image.png (78KB) from SVG via resvg-js; add Jest tests |
-| 2   | Fix Metadata — metadataBase + Absolute PNG URLs | pending     | —      | —       |
+| 2   | Fix Metadata — metadataBase + Absolute PNG URLs | done        | da5e42f4 | Add metadataBase to root layout; replace SVG URLs with absolute PNG in landing+guide |
 | 3   | Create opengraph-image.tsx for Landing Page    | pending     | —      | —       |
 | 4   | Create opengraph-image.tsx for Guide Page      | pending     | —      | —       |
 | 5   | Remove Manual OG Image Arrays from Layouts     | pending     | —      | —       |

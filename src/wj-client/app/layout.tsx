@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.congdongvang.com"),
   title: "congdongvang.com",
   description:
     "congdongvang.com - Theo dõi giá vàng & quản lý tài chính",

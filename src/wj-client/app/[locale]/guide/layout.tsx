@@ -28,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: "congdongvang.com",
       images: [
         {
-          url: "/og-image.svg",
+          url: "https://www.congdongvang.com/og-image.png",
           width: 1200,
           height: 630,
           alt: "Hướng dẫn sử dụng congdongvang.com",
@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: "Hướng dẫn sử dụng | congdongvang.com",
       description:
         "Hướng dẫn sử dụng congdongvang.com: quản lý tài chính cá nhân, theo dõi danh mục đầu tư vàng, bạc, cổ phiếu, crypto và tham gia cộng đồng đầu tư.",
-      images: ["/og-image.svg"],
+      images: ["https://www.congdongvang.com/og-image.png"],
       creator: "@congdongvang",
     },
     robots: {

@@ -46,7 +46,7 @@ const FALLBACK_METADATA: Metadata = {
     siteName: "congdongvang.com",
     images: [
       {
-        url: "/og-image.svg",
+        url: "https://www.congdongvang.com/og-image.png",
         width: 1200,
         height: 630,
         alt: "congdongvang.com - Sân chơi giao lưu, trao đổi, kiến thức về thị trường đầu tư tài chính.",
@@ -59,7 +59,7 @@ const FALLBACK_METADATA: Metadata = {
       "Giá Vàng Hôm Nay | congdongvang.com - Sân chơi giao lưu, trao đổi, kiến thức về thị trường đầu tư tài chính.",
     description:
       "Theo dõi giá vàng SJC, DOJI, giá bạc, ngoại tệ trực tiếp. Quản lý tài chính cá nhân, theo dõi danh mục đầu tư vàng, cổ phiếu, crypto miễn phí tại congdongvang.com",
-    images: ["/og-image.svg"],
+    images: ["https://www.congdongvang.com/og-image.png"],
     creator: "@congdongvang",
   },
   robots: {
@@ -144,7 +144,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: "congdongvang.com",
       images: [
         {
-          url: settings["seo.og_image"] || "/og-image.svg",
+          url: "https://www.congdongvang.com/og-image.png",
           width: 1200,
           height: 630,
           alt: "congdongvang.com Gold & Silver Price Dashboard",
@@ -163,7 +163,7 @@ export async function generateMetadata(): Promise<Metadata> {
         settings["seo.twitter_description"] ||
         settings["seo.description"] ||
         (FALLBACK_METADATA.twitter as any)?.description,
-      images: [settings["seo.og_image"] || "/og-image.svg"],
+      images: ["https://www.congdongvang.com/og-image.png"],
       creator: settings["seo.twitter_creator"] || "@congdongvang",
     },
     robots: {
