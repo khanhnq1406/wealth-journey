@@ -132,6 +132,7 @@ func (s *marketDataService) UpdatePricesForInvestments(ctx context.Context, inve
 	var regularInvestments []*models.Investment    // Stocks, ETFs, crypto via Yahoo Finance
 	var goldInvestments []*models.Investment       // Gold investments
 	var silverInvestments []*models.Investment     // Silver investments
+	var currencyInvestments []*models.Investment   // FOREIGN_CURRENCY investments
 
 	for _, inv := range investments {
 		invType := investmentv1.InvestmentType(inv.Type)
@@ -139,6 +140,8 @@ func (s *marketDataService) UpdatePricesForInvestments(ctx context.Context, inve
 			goldInvestments = append(goldInvestments, inv)
 		} else if silver.IsSilverType(invType) {
 			silverInvestments = append(silverInvestments, inv)
+		} else if invType == investmentv1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY {
+			currencyInvestments = append(currencyInvestments, inv)
 		} else {
 			regularInvestments = append(regularInvestments, inv)
 		}
@@ -202,6 +205,29 @@ func (s *marketDataService) UpdatePricesForInvestments(ctx context.Context, inve
 	// Process silver investments sequentially (specialized API)
 	for _, inv := range silverInvestments {
 		s.fetchAndUpdateSingle(ctx, inv, maxAge, updates)
+	}
+
+	// Process FOREIGN_CURRENCY investments — batch by symbol (one ResolvePrice call per unique symbol)
+	if len(currencyInvestments) > 0 {
+		// Group by symbol to avoid redundant API calls
+		bySymbol := make(map[string][]*models.Investment)
+		for _, inv := range currencyInvestments {
+			bySymbol[inv.Symbol] = append(bySymbol[inv.Symbol], inv)
+		}
+		// Resolve price once per unique symbol
+		for symbol, group := range bySymbol {
+			buy, _, isStale, err := s.assetDisplayConfigService.ResolvePrice(ctx, symbol, "currency")
+			if err != nil {
+				log.Printf("Warning: ResolvePrice failed for currency %s: %v — skipping %d investments", symbol, err, len(group))
+				continue
+			}
+			if isStale {
+				log.Printf("Warning: stale price for currency %s — using last known value %d", symbol, buy)
+			}
+			for _, inv := range group {
+				updates[inv.ID] = buy
+			}
+		}
 	}
 
 	return updates, nil

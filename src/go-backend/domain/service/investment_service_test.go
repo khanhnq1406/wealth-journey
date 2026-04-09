@@ -1483,3 +1483,79 @@ func TestCreateInvestment_DuplicateSymbol_SameCurrency(t *testing.T) {
 	mockInvestmentRepo.AssertExpectations(t)
 	mockTxRepo.AssertExpectations(t)
 }
+
+// TestCreateInvestment_ForeignCurrency_IsCustomFalse verifies that a FOREIGN_CURRENCY
+// investment is created with IsCustom=false when the caller specifies it, documenting
+// that the backend does NOT override IsCustom — it trusts the value from the request.
+// IsCustom=false enables auto-price-updates via AssetDisplayConfigService.ResolvePrice.
+func TestCreateInvestment_ForeignCurrency_IsCustomFalse(t *testing.T) {
+	ctx := context.Background()
+	userID := int32(1)
+	walletID := int32(2)
+
+	mockWalletRepo := new(MockWalletRepository)
+	mockInvestmentRepo := new(MockInvestmentRepository)
+	mockTxRepo := new(MockInvestmentTransactionRepository)
+	mockMarketDataService := new(MockMarketDataService)
+	mockUserRepo := new(MockUserRepository)
+	mockFXRateSvc := new(MockFXRateService)
+
+	service := NewInvestmentService(
+		mockInvestmentRepo,
+		mockWalletRepo,
+		mockTxRepo,
+		mockMarketDataService,
+		mockUserRepo,
+		mockFXRateSvc,
+		nil, // currencyCache not needed for this test
+		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
+	).(*investmentService)
+
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
+
+	req := &v1.CreateInvestmentRequest{
+		WalletId:        walletID,
+		Symbol:          "USD",
+		Name:            "US Dollar",
+		Type:            v1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY,
+		InitialQuantity: 100000, // 10 units (4 decimal places)
+		InitialCost:     255000, // 25500 VND per USD × 10
+		Currency:        "VND",
+		IsCustom:        false, // Caller requests auto-update (not custom)
+	}
+
+	// Capture the investment passed to Create to verify IsCustom
+	var capturedInvestment *models.Investment
+
+	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
+	mockInvestmentRepo.On("GetByUserAndSymbol", ctx, userID, "USD").Return(nil, nil)
+	mockInvestmentRepo.On("Create", ctx, mock.AnythingOfType("*models.Investment")).Return(nil).Run(
+		func(args mock.Arguments) {
+			capturedInvestment = args.Get(1).(*models.Investment)
+			capturedInvestment.ID = 10
+		},
+	)
+	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
+	mockTxRepo.On("CreateLot", ctx, mock.AnythingOfType("*models.InvestmentLot")).Return(nil)
+	mockTxRepo.On("Update", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
+	mockUserRepo.On("GetByID", ctx, userID).Return(&models.User{ID: userID, PreferredCurrency: "VND"}, nil)
+
+	response, err := service.CreateInvestment(ctx, userID, req)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, response)
+	assert.True(t, response.Success)
+
+	// Core assertion: IsCustom must reflect exactly what was in the request
+	assert.NotNil(t, capturedInvestment, "investment should have been passed to repo.Create")
+	assert.False(t, capturedInvestment.IsCustom, "IsCustom must be false — backend must NOT override the caller's value to true")
+
+	// FOREIGN_CURRENCY seeded with averageCost (not 0) so CurrentValue = TotalCost, UnrealizedPNL = 0
+	assert.Greater(t, capturedInvestment.CurrentPrice, int64(0), "FOREIGN_CURRENCY CurrentPrice should be seeded with averageCost")
+	assert.Equal(t, capturedInvestment.CurrentPrice, capturedInvestment.AverageCost, "FOREIGN_CURRENCY CurrentPrice should equal AverageCost at creation")
+
+	mockWalletRepo.AssertExpectations(t)
+	mockInvestmentRepo.AssertExpectations(t)
+	mockTxRepo.AssertExpectations(t)
+}

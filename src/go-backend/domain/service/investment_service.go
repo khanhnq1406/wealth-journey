@@ -242,7 +242,7 @@ func (s *investmentService) CreateInvestment(ctx context.Context, userID int32, 
 		CurrentPrice: currentPrice, // 0 for custom investments, averageCost for market-based
 		RealizedPNL:  0,
 		PurchaseUnit: req.PurchaseUnit, // Store user's purchase unit for display
-		IsCustom:     req.IsCustom,     // Store custom flag for filtering in auto-updates
+		IsCustom:     req.IsCustom,     // Store custom flag for filtering in auto-updates. For FOREIGN_CURRENCY: false = auto-updated via AssetDisplayConfigService; true = manual override (legacy)
 	}
 
 	// 7. Persist investment
