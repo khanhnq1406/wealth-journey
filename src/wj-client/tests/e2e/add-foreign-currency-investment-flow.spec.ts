@@ -136,7 +136,7 @@ test.describe("Add Foreign Currency Investment Flow", () => {
       // Find and change the investment type to FOREIGN_CURRENCY
       const typeSelect = page.locator("select").first();
       if (await typeSelect.isVisible()) {
-        await typeSelect.selectOption({ label: /foreign currency/i });
+        await typeSelect.selectOption({ label: "Foreign Currency" });
 
         // Verify that the currency dropdown (not free-text) appears
         // The dropdown should be a select or combobox for currency
@@ -167,7 +167,7 @@ test.describe("Add Foreign Currency Investment Flow", () => {
 
       const typeSelect = page.locator("select").first();
       if (await typeSelect.isVisible()) {
-        await typeSelect.selectOption({ label: /foreign currency/i });
+        await typeSelect.selectOption({ label: "Foreign Currency" });
         await page.waitForTimeout(1000);
 
         // USD Dollar should appear in dropdown options
@@ -198,7 +198,7 @@ test.describe("Add Foreign Currency Investment Flow", () => {
 
       const typeSelect = page.locator("select").first();
       if (await typeSelect.isVisible()) {
-        await typeSelect.selectOption({ label: /foreign currency/i });
+        await typeSelect.selectOption({ label: "Foreign Currency" });
         await page.waitForTimeout(500);
 
         // The "Custom Investment" checkbox toggle should NOT be visible for FOREIGN_CURRENCY
@@ -239,7 +239,7 @@ test.describe("Add Foreign Currency Investment Flow", () => {
 
       const typeSelect = page.locator("select").first();
       if (await typeSelect.isVisible()) {
-        await typeSelect.selectOption({ label: /foreign currency/i });
+        await typeSelect.selectOption({ label: "Foreign Currency" });
 
         // Immediately after selection, loading state may briefly appear
         // We just verify the form remains stable
@@ -280,7 +280,7 @@ test.describe("Add Foreign Currency Investment Flow", () => {
 
       const typeSelect = page.locator("select").first();
       if (await typeSelect.isVisible()) {
-        await typeSelect.selectOption({ label: /foreign currency/i });
+        await typeSelect.selectOption({ label: "Foreign Currency" });
         await page.waitForTimeout(500);
 
         // Empty state message should appear
@@ -329,7 +329,7 @@ test.describe("Add Foreign Currency Investment Flow", () => {
 
       const typeSelect = page.locator("select").first();
       if (await typeSelect.isVisible()) {
-        await typeSelect.selectOption({ label: /foreign currency/i });
+        await typeSelect.selectOption({ label: "Foreign Currency" });
         await page.waitForTimeout(1000);
 
         // Select USD from the currency dropdown
