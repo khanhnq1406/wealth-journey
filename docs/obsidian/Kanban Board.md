@@ -6,8 +6,6 @@ kanban-plugin: board
 
 ## Not Started
 
-- [ ] [[2026-04-10-fix-watchlist-missing-prices|Fix watchlist missing prices for some assets]]
-
 
 ## Spec
 
@@ -22,6 +20,8 @@ kanban-plugin: board
 
 
 ## Review
+
+- [ ] [[2026-04-10-fix-watchlist-missing-prices|Fix watchlist missing prices for some assets]]
 
 
 

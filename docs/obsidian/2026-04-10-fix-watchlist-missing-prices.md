@@ -1,6 +1,6 @@
 ---
 type: bug
-status: Not Started
+status: Review
 ---
 
 ## Overview
@@ -72,7 +72,7 @@ Some watchlist items show N/A for price despite being successfully added. The AP
 
 | Artifact | File                             |
 | -------- | -------------------------------- |
-| Spec     | _(added after step 1)_           |
-| Plan     | _(added after step 2)_           |
-| Progress | _(added after step 3 starts)_    |
-| Report   | _(added after step 3 completes)_ |
+| Spec     | `docs/specs/2026-04-10-fix-watchlist-missing-prices-spec.md` |
+| Plan     | `docs/plans/2026-04-10-fix-watchlist-missing-prices-plan.md` |
+| Progress | `docs/reports/2026-04-10-fix-watchlist-missing-prices-progress.md` |
+| Report   | `docs/reports/2026-04-10-fix-watchlist-missing-prices-report.md` |
