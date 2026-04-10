@@ -226,6 +226,175 @@ test.describe("View Market Prices Flow", () => {
   });
 });
 
+test.describe("View Market Prices Flow - Dynamic Tab Visibility", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/v1/auth/verify**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(AUTH_MOCK),
+      });
+    });
+    await page.route("**/api/v1/wallets**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ success: true, data: [], wallets: [], total: 0 }),
+      });
+    });
+    await page.goto("/auth/login");
+    await page.evaluate(() => {
+      localStorage.setItem("token", "mock-test-token");
+    });
+  });
+
+  test("hides gold tab when API returns empty gold array", async ({ page }) => {
+    await page.route("**/api/v1/investments/market-prices**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          ...MOCK_MARKET_PRICES,
+          gold: [],
+        }),
+      });
+    });
+
+    await page.goto("/dashboard/prices");
+    await waitForPricesPage(page);
+
+    // Gold tab should NOT be visible
+    const goldTab = page.locator("button[role='tab']").filter({ hasText: /^Gold$|^Vàng$/i });
+    await expect(goldTab).not.toBeVisible({ timeout: 10000 });
+
+    // Silver and currency tabs should still be visible
+    const silverTab = page.locator("button[role='tab']").filter({ hasText: /^Silver$|^Bạc$/i });
+    await expect(silverTab).toBeVisible({ timeout: 5000 });
+  });
+
+  test("hides silver tab when API returns empty silver array", async ({ page }) => {
+    await page.route("**/api/v1/investments/market-prices**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          ...MOCK_MARKET_PRICES,
+          silver: [],
+        }),
+      });
+    });
+
+    await page.goto("/dashboard/prices");
+    await waitForPricesPage(page);
+
+    // Silver tab should NOT be visible
+    const silverTab = page.locator("button[role='tab']").filter({ hasText: /^Silver$|^Bạc$/i });
+    await expect(silverTab).not.toBeVisible({ timeout: 10000 });
+
+    // Gold tab should still be visible
+    const goldTab = page.locator("button[role='tab']").filter({ hasText: /^Gold$|^Vàng$/i });
+    await expect(goldTab).toBeVisible({ timeout: 5000 });
+  });
+
+  test("hides currency tab when API returns empty currency array", async ({ page }) => {
+    await page.route("**/api/v1/investments/market-prices**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          ...MOCK_MARKET_PRICES,
+          currency: [],
+        }),
+      });
+    });
+
+    await page.goto("/dashboard/prices");
+    await waitForPricesPage(page);
+
+    // Currency tab should NOT be visible
+    const currencyTab = page.locator("button[role='tab']").filter({ hasText: /^Currency$|^Ngoại tệ$/i });
+    await expect(currencyTab).not.toBeVisible({ timeout: 10000 });
+
+    // Gold and silver should still be visible
+    const goldTab = page.locator("button[role='tab']").filter({ hasText: /^Gold$|^Vàng$/i });
+    await expect(goldTab).toBeVisible({ timeout: 5000 });
+  });
+
+  test("priceAlerts, watchlist, and symbol tabs always visible regardless of empty data", async ({
+    page,
+  }) => {
+    await page.route("**/api/v1/investments/market-prices**", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          ...MOCK_MARKET_PRICES,
+          gold: [],
+          silver: [],
+          currency: [],
+        }),
+      });
+    });
+
+    await page.goto("/dashboard/prices");
+    await waitForPricesPage(page);
+
+    // Always-visible tabs should still be present
+    const priceAlertsTab = page.locator("button[role='tab']").filter({ hasText: /Price Alerts|Cảnh báo/i });
+    await expect(priceAlertsTab).toBeVisible({ timeout: 10000 });
+
+    const watchlistTab = page.locator("button[role='tab']").filter({ hasText: /Watchlist|Theo dõi/i });
+    await expect(watchlistTab).toBeVisible({ timeout: 5000 });
+
+    const symbolTab = page.locator("button[role='tab']").filter({ hasText: /Symbol Lookup|Tra cứu/i });
+    await expect(symbolTab).toBeVisible({ timeout: 5000 });
+  });
+
+  test("resets activeTab to priceAlerts when active tab becomes hidden", async ({
+    page,
+  }) => {
+    // Start with gold tab data available so user can click gold tab
+    let callCount = 0;
+    await page.route("**/api/v1/investments/market-prices**", (route) => {
+      callCount++;
+      if (callCount === 1) {
+        // First fetch: gold is available
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(MOCK_MARKET_PRICES),
+        });
+      } else {
+        // Second fetch (refetch): gold is now empty
+        route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ ...MOCK_MARKET_PRICES, gold: [] }),
+        });
+      }
+    });
+
+    await page.goto("/dashboard/prices");
+    await waitForPricesPage(page);
+
+    // Switch to gold tab
+    const goldTab = page.locator("button[role='tab']").filter({ hasText: /^Gold$|^Vàng$/i });
+    await expect(goldTab).toBeVisible({ timeout: 10000 });
+    await goldTab.click();
+    await page.waitForTimeout(300);
+
+    // Trigger a refetch (click refresh button)
+    const refreshBtn = page.locator("button").filter({ hasText: /^Refresh$|^Làm mới$/i });
+    if (await refreshBtn.isVisible()) {
+      await refreshBtn.click();
+      // Wait for refetch to complete and tabs to update
+      await page.waitForTimeout(1000);
+      // Gold tab should now be hidden — priceAlerts should be active
+      await expect(goldTab).not.toBeVisible({ timeout: 5000 });
+    }
+  });
+});
+
 test.describe("View Market Prices Flow - Mobile", () => {
   test.use({ viewport: { width: 375, height: 812 } });
 

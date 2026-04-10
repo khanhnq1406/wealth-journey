@@ -32,3 +32,47 @@ export function formatChangeValue(
 }
 
 export type { PriceItem };
+
+// ─── Tab Visibility Logic ──────────────────────────────────────────────────────
+
+export type TabKey = "priceAlerts" | "watchlist" | "gold" | "silver" | "currency" | "symbol";
+
+export interface TabDef {
+  key: TabKey;
+  label: string;
+}
+
+export interface MarketPricesData {
+  gold?: PriceItem[];
+  silver?: PriceItem[];
+  currency?: PriceItem[];
+}
+
+/**
+ * Computes the list of visible tabs based on API data and fetch status.
+ *
+ * Rules:
+ * - priceAlerts, watchlist, symbol are always visible
+ * - gold/silver/currency are hidden only when isSuccess=true AND the array is empty
+ * - During loading (isSuccess=false), all tabs remain visible to avoid layout shifts
+ */
+export function computeVisibleTabs(
+  isSuccess: boolean,
+  data: MarketPricesData | null | undefined,
+  labels: Record<TabKey, string>,
+): TabDef[] {
+  const tabs: TabDef[] = [];
+  tabs.push({ key: "priceAlerts", label: labels.priceAlerts });
+  tabs.push({ key: "watchlist", label: labels.watchlist });
+  if (!isSuccess || (data?.gold ?? []).length > 0) {
+    tabs.push({ key: "gold", label: labels.gold });
+  }
+  if (!isSuccess || (data?.silver ?? []).length > 0) {
+    tabs.push({ key: "silver", label: labels.silver });
+  }
+  if (!isSuccess || (data?.currency ?? []).length > 0) {
+    tabs.push({ key: "currency", label: labels.currency });
+  }
+  tabs.push({ key: "symbol", label: labels.symbol });
+  return tabs;
+}
