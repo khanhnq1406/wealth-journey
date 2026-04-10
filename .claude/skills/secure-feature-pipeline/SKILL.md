@@ -163,7 +163,8 @@ status: <Not Started|Spec|Plan|Implement|Review|Done>
 ### Skip conditions
 
 - **Step 0 (Task):** Skip this pre-step — task creation is a lightweight bookmark and doesn't need architecture context.
-- **Steps 3-5 (Implement/Review/Fix):** The spec and plan already captured architecture context. Only re-present if the user explicitly requests it or if the spec references diagrams that should be reviewed.
+- **Steps 3-4 (Implement/Review):** The spec and plan already captured architecture context. Only re-present if the user explicitly requests it or if the spec references diagrams that should be reviewed.
+- **Step 5 (Fix):** Do NOT skip. The fix step **always** reads relevant C4 diagrams (L3 component, runtime flow, and L4 if available) as part of root cause analysis — see `step-5-fix.md` for details. Bugs often surface at component boundaries that weren't visible in the original spec context.
 
 ### Why this matters
 
@@ -216,6 +217,7 @@ Skipping the step file is the same as skipping the spec — it leads to wrong ou
 - Starting work on a step without citing the step file's process and output path (proof of reading)
 - Jumping into brainstorm or plan without first reviewing C4 architecture charts for the feature domain (skipping the pre-step)
 - Calling `EnterPlanMode` at any point during this skill's execution (use this skill's Step 2 instead)
+- Starting to code a fix without reading C4 diagrams for root cause analysis first (fix step always reads C4)
 - Starting to code a fix without classifying severity first (minor vs major)
 - Implementing a fix without TDD (even for "trivial" fixes)
 - Skipping the security reviewer dispatch during fix step ("it's just a small change")

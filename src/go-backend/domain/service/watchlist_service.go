@@ -21,9 +21,10 @@ const watchlistMaxItems = 50
 
 // watchlistService implements WatchlistService.
 type watchlistService struct {
-	watchlistRepo repository.WatchlistRepository
-	assetPriceSvc AssetPriceService
-	marketDataSvc MarketDataService
+	watchlistRepo  repository.WatchlistRepository
+	assetPriceSvc  AssetPriceService
+	marketDataSvc  MarketDataService
+	assetDisplaySvc AssetDisplayConfigService
 }
 
 // NewWatchlistService creates a new WatchlistService.
@@ -31,11 +32,13 @@ func NewWatchlistService(
 	watchlistRepo repository.WatchlistRepository,
 	assetPriceSvc AssetPriceService,
 	marketDataSvc MarketDataService,
+	assetDisplaySvc AssetDisplayConfigService,
 ) WatchlistService {
 	return &watchlistService{
-		watchlistRepo: watchlistRepo,
-		assetPriceSvc: assetPriceSvc,
-		marketDataSvc: marketDataSvc,
+		watchlistRepo:  watchlistRepo,
+		assetPriceSvc:  assetPriceSvc,
+		marketDataSvc:  marketDataSvc,
+		assetDisplaySvc: assetDisplaySvc,
 	}
 }
 
@@ -117,25 +120,6 @@ func (s *watchlistService) ListItems(ctx context.Context, userID int32) (*v1.Lis
 		return nil, err
 	}
 
-	// Group items by price source
-	var goldItems []*models.WatchlistItem
-	var silverItems []*models.WatchlistItem
-	var currencyItems []*models.WatchlistItem
-	var marketItems []*models.WatchlistItem
-
-	for _, item := range items {
-		assetType := v1.InvestmentType(item.AssetType)
-		if gold.IsGoldType(assetType) {
-			goldItems = append(goldItems, item)
-		} else if silver.IsSilverType(assetType) {
-			silverItems = append(silverItems, item)
-		} else if assetType == v1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY {
-			currencyItems = append(currencyItems, item)
-		} else {
-			marketItems = append(marketItems, item)
-		}
-	}
-
 	// Price maps keyed by symbol
 	type priceInfo struct {
 		currentPrice       int64
@@ -148,87 +132,77 @@ func (s *watchlistService) ListItems(ctx context.Context, userID int32) (*v1.Lis
 	var mu sync.Mutex
 	var wg sync.WaitGroup
 
-	// Fetch gold/silver/currency prices from DB cache in a single query.
-	allPrices, err := s.assetPriceSvc.GetAllPrices(ctx)
-	if err != nil {
-		log.Printf("Warning: failed to fetch asset prices from DB for watchlist: %v", err)
-		allPrices = &AllAssetPrices{
-			Gold:     []*AssetPriceDTO{},
-			Silver:   []*AssetPriceDTO{},
-			Currency: []*AssetPriceDTO{},
-		}
-	}
-
-	// Build lookup maps by TypeCode for O(1) access.
-	goldByCode := make(map[string]*AssetPriceDTO, len(allPrices.Gold))
-	for _, p := range allPrices.Gold {
-		goldByCode[p.TypeCode] = p
-	}
-
-	silverByCode := make(map[string]*AssetPriceDTO, len(allPrices.Silver))
-	for _, p := range allPrices.Silver {
-		silverByCode[p.TypeCode] = p
-	}
-
-	currencyByCode := make(map[string]*AssetPriceDTO, len(allPrices.Currency))
-	for _, p := range allPrices.Currency {
-		currencyByCode[p.TypeCode] = p
-	}
-
-	// Enrich gold items synchronously from the map.
-	for _, item := range goldItems {
-		if p, ok := goldByCode[item.Symbol]; ok {
-			priceMap[item.Symbol] = &priceInfo{
-				currentPrice: p.Buy,
-				buyPrice:     p.Buy,
-				sellPrice:    p.Sell,
-			}
-		}
-	}
-
-	// Enrich silver items synchronously from the map.
-	for _, item := range silverItems {
-		if p, ok := silverByCode[item.Symbol]; ok {
-			priceMap[item.Symbol] = &priceInfo{
-				currentPrice: p.Buy,
-				buyPrice:     p.Buy,
-				sellPrice:    p.Sell,
-			}
-		}
-	}
-
-	// Enrich currency items synchronously from the map.
-	for _, item := range currencyItems {
-		if p, ok := currencyByCode[item.Symbol]; ok {
-			priceMap[item.Symbol] = &priceInfo{
-				currentPrice: p.Buy,
-				buyPrice:     p.Buy,
-				sellPrice:    p.Sell,
-			}
-		}
-	}
-
-	// Fetch market (Yahoo Finance) prices — one goroutine per item for simplicity.
-	// Yahoo Finance items are kept live (not cached in asset_price table).
-	for _, item := range marketItems {
-		item := item // capture loop variable
+	// Fetch all item prices in parallel. One goroutine per item (50-item cap).
+	// - Gold / silver: call AssetDisplayConfigService.ResolvePrice() directly — returns raw
+	//   per-lượng (or per-unit) buy/sell prices stored in asset_price table. Bypasses
+	//   GetPrice() which applies ProcessMarketPrice() unit conversion causing wrong values.
+	// - Currency: also routed through ResolvePrice() for the same reason.
+	// - Everything else (market/stock/crypto): use MarketDataService.GetPrice() (Yahoo Finance).
+	for _, item := range items {
 		wg.Add(1)
-		go func() {
+		go func(it *models.WatchlistItem) {
 			defer wg.Done()
-			md, err := s.marketDataSvc.GetPrice(ctx, item.Symbol, item.Currency, v1.InvestmentType(item.AssetType), 15*time.Minute)
-			if err != nil {
-				log.Printf("Warning: failed to fetch market price for %s: %v", item.Symbol, err)
-				return
+			invType := v1.InvestmentType(it.AssetType)
+
+			switch {
+			case gold.IsGoldType(invType):
+				buy, sell, _, err := s.assetDisplaySvc.ResolvePrice(ctx, it.Symbol, "gold")
+				if err != nil {
+					log.Printf("Warning: failed to resolve gold price for watchlist item %s: %v", it.Symbol, err)
+					return
+				}
+				mu.Lock()
+				defer mu.Unlock()
+				priceMap[it.Symbol] = &priceInfo{
+					currentPrice: buy,
+					buyPrice:     buy,
+					sellPrice:    sell,
+				}
+
+			case silver.IsSilverType(invType):
+				buy, sell, _, err := s.assetDisplaySvc.ResolvePrice(ctx, it.Symbol, "silver")
+				if err != nil {
+					log.Printf("Warning: failed to resolve silver price for watchlist item %s: %v", it.Symbol, err)
+					return
+				}
+				mu.Lock()
+				defer mu.Unlock()
+				priceMap[it.Symbol] = &priceInfo{
+					currentPrice: buy,
+					buyPrice:     buy,
+					sellPrice:    sell,
+				}
+
+			case invType == v1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY:
+				buy, sell, _, err := s.assetDisplaySvc.ResolvePrice(ctx, it.Symbol, "currency")
+				if err != nil {
+					log.Printf("Warning: failed to resolve currency price for watchlist item %s: %v", it.Symbol, err)
+					return
+				}
+				mu.Lock()
+				defer mu.Unlock()
+				priceMap[it.Symbol] = &priceInfo{
+					currentPrice: buy,
+					buyPrice:     buy,
+					sellPrice:    sell,
+				}
+
+			default:
+				md, err := s.marketDataSvc.GetPrice(ctx, it.Symbol, it.Currency, invType, 15*time.Minute)
+				if err != nil {
+					log.Printf("Warning: failed to fetch price for watchlist item %s (type %d): %v", it.Symbol, it.AssetType, err)
+					return
+				}
+				mu.Lock()
+				defer mu.Unlock()
+				priceMap[it.Symbol] = &priceInfo{
+					currentPrice:       md.Price,
+					buyPrice:           md.Price,
+					sellPrice:          md.Price,
+					priceChangePercent: md.Change24h,
+				}
 			}
-			mu.Lock()
-			defer mu.Unlock()
-			priceMap[item.Symbol] = &priceInfo{
-				currentPrice:       md.Price,
-				buyPrice:           md.Price,
-				sellPrice:          md.Price,
-				priceChangePercent: md.Change24h,
-			}
-		}()
+		}(item)
 	}
 
 	wg.Wait()

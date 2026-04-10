@@ -6,7 +6,6 @@ kanban-plugin: board
 
 ## Not Started
 
-- [ ] [[2026-04-10-fix-watchlist-missing-prices|Fix watchlist missing prices for some assets]]
 
 
 ## Spec
@@ -28,6 +27,7 @@ kanban-plugin: board
 ## Done
 
 **Complete**
+- [x] [[2026-04-10-fix-watchlist-missing-prices|Fix watchlist missing prices for some assets]]
 - [x] [[2026-04-09-fix-prices-tabs-asset-display-config|Fix gold/silver/currency tabs not respecting admin asset display config]]
 - [x] [[2026-04-09-feat-investment-currency-assets-current-price|Add investment currency assets with current price]]
 - [x] [[2026-04-07-fix-og-image-not-rendering-on-share|Fix OG image not rendering on share]]

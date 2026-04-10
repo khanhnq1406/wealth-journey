@@ -81,9 +81,10 @@ sequenceDiagram
     participant H as WatchlistHandler
     participant WS as WatchlistService
     participant WR as WatchlistRepository
-    participant GPS as GoldPriceService
-    participant SPS as SilverPriceService
     participant MDS as MarketDataService
+    participant ADCS as AssetDisplayConfigService
+    participant DB as PostgreSQL
+    participant YF as YahooFinance
     participant R as Redis
 
     SPA->>H: GET /api/v1/watchlist<br/>Headers: Authorization: Bearer {jwt}
@@ -94,41 +95,33 @@ sequenceDiagram
     WS->>WR: ListByUserID(userID)
     WR-->>WS: []WatchlistItem (ordered by sort_order)
 
-    Note over WS: Group items by price source
-    WS->>WS: goldItems ← items where IsGoldType(assetType)
-    WS->>WS: silverItems ← items where IsSilverType(assetType)
-    WS->>WS: marketItems ← all other items
-
-    par Parallel price fetch (sync.WaitGroup)
-        alt len(goldItems) > 0
-            WS->>GPS: FetchAllPrices(ctx)
-            GPS->>R: GET gold_prices
-            alt Cache hit
-                R-->>GPS: []CachedGoldPrice
-            else Cache miss
-                GPS->>GPS: Fetch from vang.today API
-                GPS->>R: SET gold_prices (15m TTL)
-            end
-            GPS-->>WS: []CachedGoldPrice {TypeCode, Buy, Sell}
-            WS->>WS: Match item.Symbol → gp.TypeCode<br/>→ priceMap[symbol] = {buyPrice, sellPrice}
-        end
-        alt len(silverItems) > 0
-            WS->>SPS: FetchAllPrices(ctx)
-            SPS->>R: GET silver_prices
-            SPS-->>WS: []CachedSilverPrice {TypeCode, Buy, Sell}
-            WS->>WS: Match item.Symbol → sp.TypeCode<br/>→ priceMap[symbol] = {buyPrice, sellPrice}
-        end
-        loop Each marketItem
-            WS->>MDS: GetPrice(ctx, symbol, currency, assetType, 15m TTL)
+    Note over WS: Goroutine loop — split by asset type
+    loop Each item [parallel goroutine]
+        alt gold (GOLD_VND | GOLD_USD) or silver (SILVER_VND | SILVER_USD)
+            Note over WS: Direct ResolvePrice() — bypasses ProcessMarketPrice()<br/>conversion to preserve raw per-lượng market price
+            WS->>ADCS: ResolvePrice(ctx, symbol, "gold"|"silver")
+            ADCS->>DB: SELECT asset_price WHERE fetch_code matches (parameterized)
+            DB-->>ADCS: buy, sell int64
+            ADCS-->>WS: buy, sell, isStale
+            Note over WS: priceMap[symbol] = {buy, sell}<br/>isStale ignored (frontend shows whatever is available)
+        else currency (FOREIGN_CURRENCY)
+            WS->>ADCS: ResolvePrice(ctx, symbol, "currency")
+            ADCS->>DB: SELECT asset_price (parameterized)
+            DB-->>ADCS: buy, sell int64
+            ADCS-->>WS: buy, sell, isStale
+        else market/stock/crypto
+            WS->>MDS: GetPrice(ctx, symbol, currency, assetType, 15m)
             MDS->>R: GET market_data:{symbol}
             alt Cache hit
                 R-->>MDS: MarketData
             else Cache miss
-                MDS->>MDS: Yahoo Finance API
+                MDS->>YF: fetch live price
                 MDS->>R: SET market_data:{symbol} (15m TTL)
             end
             MDS-->>WS: MarketData {Price, Change24h}
-            WS->>WS: priceMap[symbol] = {currentPrice, priceChangePercent}
+        end
+        alt ResolvePrice or GetPrice error
+            WS->>WS: log warning, skip (zero prices)
         end
     end
 
@@ -137,7 +130,7 @@ sequenceDiagram
 
     H-->>SPA: 200 OK<br/>{success: true, items: [...], total: N, timestamp}
     Note over SPA: WatchlistTab renders:<br/>- Desktop: DraggableWatchlistTable<br/>- Mobile: MobileTable
-    Note over SPA: formatWatchlistPrice():<br/>Gold/Silver → buyPrice ÷ 1000 (VND)<br/>Other → currentPrice ÷ 100 (USD)
+    Note over SPA: formatWatchlistPrice():<br/>Gold/Silver/Currency VND → buyPrice as-is (no divisor)<br/>Gold/Silver USD → buyPrice ÷ 100 (cents→dollars)<br/>Other → currentPrice ÷ 100 (USD cents)
 ```
 
 ---
