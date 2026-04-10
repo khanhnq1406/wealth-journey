@@ -11,7 +11,7 @@ End-to-end feature delivery pipeline for the WealthJourney financial application
 
 **Core principle:** Financial applications demand defense-in-depth. Every step produces artifacts that feed the next step, and every step includes a dedicated security and risk assessment section.
 
-**Announce at start:** "I'm using the secure-feature-pipeline skill — step: `{step}`."
+**Announce at start:** "I'm using the secure-feature-pipeline skill — step: `{step}`." Then run the C4 Architecture Context pre-step (unless skipped per its skip conditions).
 
 ## CRITICAL: Do NOT Use Claude Code Plan Mode
 
@@ -119,6 +119,62 @@ status: <Not Started|Spec|Plan|Implement|Review|Done>
 
 ---
 
+## C4 Architecture Context (Pre-Step)
+
+**Before routing to any step, present the relevant C4 architecture charts** to establish the big picture of the feature's context, relationships, and boundaries.
+
+### Process
+
+1. **Identify the feature domain** — From the user's input (task description, spec, plan), determine which domain(s) the feature touches (e.g., investment, wallet, transaction, auth, prices).
+
+2. **Read the relevant C4 diagrams** — Load and present charts from `docs/architecture/` in order from broadest to most specific:
+
+   | Level | File | When to Show |
+   | ----- | ---- | ------------ |
+   | L2 Container | `c4-container.md` | Always — shows how runtime units connect |
+   | L3 Backend | `c4-component-backend.md` | When feature touches backend handlers/services/repos |
+   | L3 Frontend | `c4-component-frontend.md` | When feature touches frontend pages/components |
+   | L4 Code | `c4-code-<domain>.md` | When a domain-specific code diagram exists (e.g., `c4-code-investment.md`) |
+
+3. **Read the relevant flow diagrams** — Load runtime flow diagrams that show dynamic behavior for the affected domain:
+
+   | File | Domain |
+   | ---- | ------ |
+   | `flow-investment.md` | Investment, prices, portfolio, alerts |
+   | `flow-transaction.md` | Transactions, categories, import |
+   | `flow-wallet.md` | Wallets, transfers, balances |
+   | `flow-auth.md` | Authentication, sessions, JWT |
+   | `flow-cross-cutting.md` | FX rates, scheduler, currency conversion |
+   | `flow-community.md` | Community features |
+   | `flow-gold-sentiment.md` | Gold sentiment analysis |
+   | `flow-watchlist.md` | Watchlist features |
+   | `flow-user-price-alert.md` | User price alerts |
+   | `flow-admin.md` | Admin features |
+   | `flow-i18n.md` | Internationalization |
+
+4. **Present a summary to the user** — Show:
+   - Which containers/components are involved
+   - Key relationships and dependencies between components
+   - Existing data flows relevant to the feature
+   - Boundaries the feature crosses (trust boundaries, service boundaries)
+
+5. **Ask the user to confirm** before proceeding to the step — "Does this architecture context match your understanding? Anything missing?"
+
+### Skip conditions
+
+- **Step 0 (Task):** Skip this pre-step — task creation is a lightweight bookmark and doesn't need architecture context.
+- **Steps 3-5 (Implement/Review/Fix):** The spec and plan already captured architecture context. Only re-present if the user explicitly requests it or if the spec references diagrams that should be reviewed.
+
+### Why this matters
+
+Understanding the architecture before diving into brainstorming or planning prevents:
+- Missing dependencies between components
+- Proposing approaches that conflict with existing patterns
+- Overlooking trust boundaries in security analysis
+- Duplicating functionality that already exists in other components
+
+---
+
 ## Step Routing
 
 **Based on the command step, read the corresponding file for full instructions:**
@@ -158,7 +214,7 @@ Skipping the step file is the same as skipping the spec — it leads to wrong ou
 ## Red Flags — STOP and Reassess
 
 - Starting work on a step without citing the step file's process and output path (proof of reading)
-
+- Jumping into brainstorm or plan without first reviewing C4 architecture charts for the feature domain (skipping the pre-step)
 - Calling `EnterPlanMode` at any point during this skill's execution (use this skill's Step 2 instead)
 - Starting to code a fix without classifying severity first (minor vs major)
 - Implementing a fix without TDD (even for "trivial" fixes)
