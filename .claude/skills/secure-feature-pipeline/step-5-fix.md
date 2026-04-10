@@ -41,6 +41,21 @@ digraph fix_path {
 }
 ```
 
+### Before Any Fix: Read C4 Architecture
+
+Before choosing a fix path or touching any code, read the relevant C4 diagrams in `docs/architecture/`:
+
+- **L3 component diagrams** — understand which components are involved and their responsibilities
+- **Runtime flow diagrams** — trace the actual execution path where the bug occurs
+- **L4 code diagrams** (if the affected domain has one) — understand class/service relationships
+
+**Why:** Bugs often surface at component boundaries or data flow transitions. Reading C4 first prevents fixes that patch symptoms instead of root causes, and reveals whether a fix requires touching more files than initially apparent (which affects severity classification).
+
+**Red flags if you skip this:**
+- Classifying as "minor" a fix that actually crosses component boundaries
+- Patching at the wrong layer (e.g., frontend workaround for a backend contract mismatch)
+- Missing that the fix requires updating a flow diagram
+
 ### Minor Fix Path (Lightweight)
 
 Use when ALL of these are true:
@@ -52,7 +67,7 @@ Use when ALL of these are true:
 
 **Process:**
 
-1. **Parse the issue** — Understand exactly what's wrong. Read the relevant source files.
+1. **Parse the issue** — Understand exactly what's wrong. Read the relevant source files AND the relevant C4 diagrams (see above).
 2. **Implement the fix yourself (TDD still applies):**
    - Write a failing test FIRST that reproduces the issue
    - Implement the minimal fix to make the test pass
@@ -85,7 +100,7 @@ Use when ANY of these are true:
 
 **Process:**
 
-1. **Parse the issues** — Extract specific problems from the input
+1. **Parse the issues** — Extract specific problems from the input. Read the relevant C4 diagrams (L3 component, runtime flow, L4 if available) to understand the architecture before root cause analysis.
 2. **Invoke this skill's Step 1 (brainstorm)** with the fix as the "feature requirement"
    - The requirement is: "Fix these specific issues: [list]"
    - Context: reference the original spec, plan, and report
@@ -109,6 +124,7 @@ Use when ANY of these are true:
 | "I'll do the review myself instead of dispatching a subagent" | Self-review has blind spots. Dispatch the security reviewer subagent. |
 | "Let me just implement this and run the full pipeline after" | The pipeline IS the implementation process. Don't implement outside of it. |
 | "I already know what to do, no need to read source files first" | You must read the relevant files before fixing. Assumptions cause regressions. |
+| "I'll skip the C4 diagrams, I know the architecture" | C4 diagrams reveal component boundaries and data flow paths. Bugs at boundaries look local but aren't. Always read the relevant flow diagram first. |
 
 ### Fix Spec Template (for Major Fix Path)
 
