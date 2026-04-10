@@ -963,12 +963,8 @@ export default function PricesPage() {
     [isSuccess, data, t],
   );
 
-  useEffect(() => {
-    const isVisible = visibleTabs.some((tab) => tab.key === activeTab);
-    if (!isVisible) {
-      setActiveTab("priceAlerts");
-    }
-  }, [visibleTabs, activeTab]);
+  const isActiveTabVisible = visibleTabs.some((tab) => tab.key === activeTab);
+  const effectiveTab = isActiveTabVisible ? activeTab : "priceAlerts";
 
   const ts = data?.timestamp;
   const lastUpdated =
@@ -987,7 +983,7 @@ export default function PricesPage() {
             </p>
           )}
         </div>
-        {activeTab !== "symbol" && activeTab !== "watchlist" && activeTab !== "priceAlerts" && (
+        {effectiveTab !== "symbol" && effectiveTab !== "watchlist" && effectiveTab !== "priceAlerts" && (
           <Button
             type={ButtonType.PRIMARY}
             onClick={() => refetch()}
@@ -1019,12 +1015,12 @@ export default function PricesPage() {
         {/* Tab bar */}
         <TabBar
           tabs={visibleTabs.map((tab) => ({ id: tab.key, label: tab.label }))}
-          activeTab={activeTab}
+          activeTab={effectiveTab}
           onTabChange={setActiveTab}
         />
 
         <div className="p-4">
-          {activeTab === "priceAlerts" && (
+          {effectiveTab === "priceAlerts" && (
             <div className="space-y-4">
               {/* Header */}
               <div className="flex items-center justify-between gap-3">
@@ -1081,11 +1077,11 @@ export default function PricesPage() {
             </div>
           )}
 
-          {activeTab === "watchlist" && (
+          {effectiveTab === "watchlist" && (
             <WatchlistTab onAddClick={() => setModalType("add-watchlist")} />
           )}
 
-          {activeTab === "gold" && (
+          {effectiveTab === "gold" && (
             <>
               {isError && (
                 <p className="text-v2-red-negative text-sm text-center py-4">
@@ -1128,7 +1124,7 @@ export default function PricesPage() {
             </>
           )}
 
-          {activeTab === "silver" && (
+          {effectiveTab === "silver" && (
             <>
               {isError && (
                 <p className="text-v2-red-negative text-sm text-center py-4">
@@ -1171,7 +1167,7 @@ export default function PricesPage() {
             </>
           )}
 
-          {activeTab === "currency" && (
+          {effectiveTab === "currency" && (
             <>
               {isError && (
                 <p className="text-v2-red-negative text-sm text-center py-4">
@@ -1210,7 +1206,7 @@ export default function PricesPage() {
             </>
           )}
 
-          {activeTab === "symbol" && (
+          {effectiveTab === "symbol" && (
             <SymbolLookupTab
               symbolInput={symbolInput}
               onSymbolInputChange={(sym) => setSymbolInput(sym)}
