@@ -618,9 +618,14 @@ export function AddInvestmentForm({ onSuccess }: AddInvestmentFormProps) {
     } else {
       // Standard and custom investments (including CASH/FOREIGN_CURRENCY)
       const formData = form.getValues();
+      // FOREIGN_CURRENCY: preserve exact typeCode case — backend validates against DB record.
+      // Other types: uppercase the user-typed symbol for normalization.
+      const symbolValue = isForeignCurrencyInvestment
+        ? (formData.symbol || "")
+        : (formData.symbol || "").toUpperCase();
       createInvestmentMutation.mutate({
         walletId: 0,
-        symbol: (formData.symbol || "").toUpperCase(),
+        symbol: symbolValue,
         name: formData.name || "",
         type: formData.type,
         initialQuantityDecimal: data.initialQuantity,

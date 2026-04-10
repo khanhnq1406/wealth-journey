@@ -164,6 +164,21 @@ GitNexus not available — manual blast radius review performed:
 | Date       | Fix                                                                                 | Severity | Commit     |
 | ---------- | ----------------------------------------------------------------------------------- | -------- | ---------- |
 | 2026-04-09 | Auto-fill currency price on symbol select; lock price-per-unit currency to VND      | Major    | 73084789   |
+| 2026-04-10 | Preserve typeCode case for FOREIGN_CURRENCY symbol on submit (Fix E)                | Minor    | (pending)  |
+
+### Fix Detail: FOREIGN_CURRENCY Symbol Case Preservation (2026-04-10)
+
+**Issue fixed:**
+Submitting a FOREIGN_CURRENCY investment with a mixed-case `typeCode` (e.g., `"USD Internalbank"`) returned 400: `currency "USD INTERNALBANK" is not available for investment`.
+
+**Root cause:**
+`onSubmit` in `AddInvestmentForm.tsx` applied `.toUpperCase()` to all symbols. The backend validates FOREIGN_CURRENCY symbols via an exact-match `cfg.TypeCode == req.Symbol` check against the DB. `"USD Internalbank".toUpperCase()` → `"USD INTERNALBANK"` failed this match.
+
+**Changes:**
+- `AddInvestmentForm.tsx` — skip `.toUpperCase()` for `FOREIGN_CURRENCY` path; other types unchanged
+- `AddInvestmentForm.forex.test.tsx` — Fix E test: mixed-case typeCode submitted as-is
+
+---
 
 ### Fix Detail: Currency Price Auto-Fill + VND Lock (2026-04-09)
 
