@@ -8,15 +8,15 @@
 - **Started:** 2026-04-10T00:00:00Z
 - **Last updated:** 2026-04-10T00:00:00Z
 - **Current state:** in_progress
-- **Current task:** 1
+- **Current task:** 0
 
 ## Task Progress
 
 | #   | Task Name                                              | Status      | Commit | Summary |
 | --- | ------------------------------------------------------ | ----------- | ------ | ------- |
-| 1   | Rewrite ListItems() Price Enrichment Logic             | in_progress | —      | —       |
-| 2   | Update Existing Tests to Match New Architecture        | pending     | —      | —       |
-| 0   | Update Runtime Flow Diagram                            | pending     | —      | —       |
+| 1   | Rewrite ListItems() Price Enrichment Logic             | done        | 2e2be3c4 | Replaced TypeCode-keyed lookup with unified GetPrice() goroutine loop; 9/9 tests pass |
+| 2   | Update Existing Tests to Match New Architecture        | done        | 2e2be3c4 | Completed as part of Task 1 — existing tests already updated to use mktSvc |
+| 0   | Update Runtime Flow Diagram                            | in_progress | —      | —       |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
