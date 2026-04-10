@@ -120,3 +120,11 @@ Changed symbol: `WatchlistService.ListItems()` internal price enrichment logic. 
 
 1. Navigate to `/dashboard/watchlist`
 2. Expected: Both items show prices — gold from DB cache, stock from Yahoo Finance
+
+## Fix History
+
+| Date       | Fix                                                                                        | Severity | Commit   |
+| ---------- | ------------------------------------------------------------------------------------------ | -------- | -------- |
+| 2026-04-10 | Use ResolvePrice() for gold/silver to return per-lượng market price (was returning per-gram after ProcessMarketPrice conversion) | Major | 908e35b1 |
+
+See full report: `docs/reports/2026-04-10-fix-watchlist-gold-price-unit-report.md`
