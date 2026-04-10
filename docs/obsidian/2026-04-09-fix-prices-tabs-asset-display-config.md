@@ -1,6 +1,6 @@
 ---
 type: bug
-status: Spec
+status: Review
 ---
 
 ## Overview
@@ -12,6 +12,6 @@ The gold, silver, and currency tabs on the prices page always show regardless of
 | Artifact | File |
 | -------- | ---- |
 | Spec     | `docs/specs/2026-04-09-fix-prices-tabs-asset-display-config-spec.md` |
-| Plan     | _(added after step 2)_ |
-| Progress | _(added after step 3 starts)_ |
-| Report   | _(added after step 3 completes)_ |
+| Plan     | `docs/plans/2026-04-09-fix-prices-tabs-asset-display-config-plan.md` |
+| Progress | `docs/reports/2026-04-09-fix-prices-tabs-asset-display-config-progress.md` |
+| Report   | `docs/reports/2026-04-09-fix-prices-tabs-asset-display-config-report.md` |

@@ -178,6 +178,13 @@ classDiagram
     InvestmentTransactionRepository --> InvestmentTransaction : manages
     MarketDataService --> MarketData : caches
     PortfolioHistoryService --> PortfolioHistory : records
+
+    class MarketPricesHandler {
+        -assetDisplayConfigSvc AssetDisplayConfigService
+        +GetMarketPrices(ctx) error
+    }
+
+    MarketPricesHandler --> AssetDisplayConfigService : uses
 ```
 
 ## FIFO Cost Basis Algorithm

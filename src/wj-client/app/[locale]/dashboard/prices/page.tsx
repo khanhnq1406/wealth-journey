@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useQueryClient } from "@tanstack/react-query";
@@ -23,7 +23,7 @@ import {
 import { useNotification } from "@/contexts/NotificationContext";
 import { InvestmentType, SearchResult, AlertStatus } from "@/gen/protobuf/v1/investment";
 import { PriceAlertList } from "@/features/price-alert/components/PriceAlertList";
-import { formatPriceValue, formatChangeValue, PriceItem } from "./helpers";
+import { formatPriceValue, formatChangeValue, PriceItem, computeVisibleTabs } from "./helpers";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import {
   InlinePriceEdit,
@@ -917,15 +917,6 @@ export default function PricesPage() {
   const [symbolInput, setSymbolInput] = useState("");
   const [querySymbol, setQuerySymbol] = useState("");
 
-  const TABS: { key: Tab; label: string }[] = [
-    { key: "priceAlerts", label: t("tabs.priceAlerts") },
-    { key: "watchlist", label: t("tabs.watchlist") },
-    { key: "gold", label: t("tabs.gold") },
-    { key: "silver", label: t("tabs.silver") },
-    { key: "currency", label: t("tabs.currency") },
-    { key: "symbol", label: t("tabs.symbolLookup") },
-  ];
-
   const ALERT_FILTER_TABS = useMemo(
     () => [
       { id: AlertStatus.ALERT_STATUS_UNSPECIFIED, label: tAlerts("filterAll") },
@@ -950,7 +941,7 @@ export default function PricesPage() {
     handleCloseModal();
   };
 
-  const { data, isLoading, isError, refetch, isFetching } =
+  const { data, isLoading, isError, refetch, isFetching, isSuccess } =
     useQueryGetMarketPrices(
       {},
       {
@@ -958,6 +949,22 @@ export default function PricesPage() {
         refetchOnWindowFocus: false,
       },
     );
+
+  const visibleTabs = useMemo(
+    () =>
+      computeVisibleTabs(isSuccess, data, {
+        priceAlerts: t("tabs.priceAlerts"),
+        watchlist: t("tabs.watchlist"),
+        gold: t("tabs.gold"),
+        silver: t("tabs.silver"),
+        currency: t("tabs.currency"),
+        symbol: t("tabs.symbolLookup"),
+      }),
+    [isSuccess, data, t],
+  );
+
+  const isActiveTabVisible = visibleTabs.some((tab) => tab.key === activeTab);
+  const effectiveTab = isActiveTabVisible ? activeTab : "priceAlerts";
 
   const ts = data?.timestamp;
   const lastUpdated =
@@ -976,7 +983,7 @@ export default function PricesPage() {
             </p>
           )}
         </div>
-        {activeTab !== "symbol" && activeTab !== "watchlist" && activeTab !== "priceAlerts" && (
+        {effectiveTab !== "symbol" && effectiveTab !== "watchlist" && effectiveTab !== "priceAlerts" && (
           <Button
             type={ButtonType.PRIMARY}
             onClick={() => refetch()}
@@ -1007,13 +1014,13 @@ export default function PricesPage() {
       <BaseCard padding="none">
         {/* Tab bar */}
         <TabBar
-          tabs={TABS.map((tab) => ({ id: tab.key, label: tab.label }))}
-          activeTab={activeTab}
+          tabs={visibleTabs.map((tab) => ({ id: tab.key, label: tab.label }))}
+          activeTab={effectiveTab}
           onTabChange={setActiveTab}
         />
 
         <div className="p-4">
-          {activeTab === "priceAlerts" && (
+          {effectiveTab === "priceAlerts" && (
             <div className="space-y-4">
               {/* Header */}
               <div className="flex items-center justify-between gap-3">
@@ -1070,11 +1077,11 @@ export default function PricesPage() {
             </div>
           )}
 
-          {activeTab === "watchlist" && (
+          {effectiveTab === "watchlist" && (
             <WatchlistTab onAddClick={() => setModalType("add-watchlist")} />
           )}
 
-          {activeTab === "gold" && (
+          {effectiveTab === "gold" && (
             <>
               {isError && (
                 <p className="text-v2-red-negative text-sm text-center py-4">
@@ -1117,7 +1124,7 @@ export default function PricesPage() {
             </>
           )}
 
-          {activeTab === "silver" && (
+          {effectiveTab === "silver" && (
             <>
               {isError && (
                 <p className="text-v2-red-negative text-sm text-center py-4">
@@ -1160,7 +1167,7 @@ export default function PricesPage() {
             </>
           )}
 
-          {activeTab === "currency" && (
+          {effectiveTab === "currency" && (
             <>
               {isError && (
                 <p className="text-v2-red-negative text-sm text-center py-4">
@@ -1199,7 +1206,7 @@ export default function PricesPage() {
             </>
           )}
 
-          {activeTab === "symbol" && (
+          {effectiveTab === "symbol" && (
             <SymbolLookupTab
               symbolInput={symbolInput}
               onSymbolInputChange={(sym) => setSymbolInput(sym)}
