@@ -95,16 +95,22 @@ sequenceDiagram
     WS->>WR: ListByUserID(userID)
     WR-->>WS: []WatchlistItem (ordered by sort_order)
 
-    Note over WS: Single goroutine loop — all item types unified
-    loop Each item (gold + silver + currency + market) [parallel goroutine]
-        WS->>MDS: GetPrice(ctx, symbol, currency, assetType, 15m)
-        alt gold/silver/currency (GOLD_VND | GOLD_USD | SILVER_VND | FOREIGN_CURRENCY)
-            Note over MDS: MDS → AssetDisplayConfigService.ResolvePrice() for gold/silver/currency
-            MDS->>ADCS: ResolvePrice(ctx, symbol, assetType)
+    Note over WS: Goroutine loop — split by asset type
+    loop Each item [parallel goroutine]
+        alt gold (GOLD_VND | GOLD_USD) or silver (SILVER_VND | SILVER_USD)
+            Note over WS: Direct ResolvePrice() — bypasses ProcessMarketPrice()<br/>conversion to preserve raw per-lượng market price
+            WS->>ADCS: ResolvePrice(ctx, symbol, "gold"|"silver")
             ADCS->>DB: SELECT asset_price WHERE fetch_code matches (parameterized)
             DB-->>ADCS: buy, sell int64
-            ADCS-->>MDS: buy, sell, isStale
-        else market/stock
+            ADCS-->>WS: buy, sell, isStale
+            Note over WS: priceMap[symbol] = {buy, sell}<br/>isStale ignored (frontend shows whatever is available)
+        else currency (FOREIGN_CURRENCY)
+            WS->>ADCS: ResolvePrice(ctx, symbol, "currency")
+            ADCS->>DB: SELECT asset_price (parameterized)
+            DB-->>ADCS: buy, sell int64
+            ADCS-->>WS: buy, sell, isStale
+        else market/stock/crypto
+            WS->>MDS: GetPrice(ctx, symbol, currency, assetType, 15m)
             MDS->>R: GET market_data:{symbol}
             alt Cache hit
                 R-->>MDS: MarketData
@@ -112,9 +118,9 @@ sequenceDiagram
                 MDS->>YF: fetch live price
                 MDS->>R: SET market_data:{symbol} (15m TTL)
             end
+            MDS-->>WS: MarketData {Price, Change24h}
         end
-        MDS-->>WS: MarketData {Price, Change24h} or error
-        alt error
+        alt ResolvePrice or GetPrice error
             WS->>WS: log warning, skip (zero prices)
         end
     end
@@ -124,7 +130,7 @@ sequenceDiagram
 
     H-->>SPA: 200 OK<br/>{success: true, items: [...], total: N, timestamp}
     Note over SPA: WatchlistTab renders:<br/>- Desktop: DraggableWatchlistTable<br/>- Mobile: MobileTable
-    Note over SPA: formatWatchlistPrice():<br/>Gold/Silver → buyPrice ÷ 1000 (VND)<br/>Other → currentPrice ÷ 100 (USD)
+    Note over SPA: formatWatchlistPrice():<br/>Gold/Silver/Currency → buyPrice ÷ 1000 (VND)<br/>Other → currentPrice ÷ 100 (USD)
 ```
 
 ---

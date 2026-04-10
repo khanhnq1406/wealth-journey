@@ -7,15 +7,15 @@
 - **Spec file:** `docs/specs/2026-04-10-fix-watchlist-gold-price-unit-spec.md`
 - **Started:** 2026-04-10T00:00:00+07:00
 - **Last updated:** 2026-04-10T00:00:00+07:00
-- **Current state:** in_progress
-- **Current task:** 0 (flow diagram update)
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
 | #   | Task Name                                                                                          | Status      | Commit | Summary |
 | --- | -------------------------------------------------------------------------------------------------- | ----------- | ------ | ------- |
-| 1   | Wire AssetDisplayConfigService into WatchlistService and fix price enrichment                      | done        | TBD    | Added assetDisplaySvc field; ResolvePrice() for gold/silver/currency; GetPrice() for market; 12/12 tests |
-| 0   | Update Runtime Flow Diagram (flow-watchlist.md Section 2)                                          | in_progress | —      | —       |
+| 1   | Wire AssetDisplayConfigService into WatchlistService and fix price enrichment                      | done        | 908e35b1 | Added assetDisplaySvc field; ResolvePrice() for gold/silver/currency; GetPrice() for market; 12/12 tests |
+| 0   | Update Runtime Flow Diagram (flow-watchlist.md Section 2)                                          | done        | TBD    | Updated Section 2 to show direct ResolvePrice() split path |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
