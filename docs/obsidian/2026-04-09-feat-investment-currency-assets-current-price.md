@@ -1,6 +1,6 @@
 ---
 type: feature
-status: Spec
+status: Review
 ---
 
 ## Overview
@@ -12,6 +12,10 @@ Users need to track currency-based investment assets (e.g. USD, EUR) within thei
 | Artifact | File |
 | -------- | ---- |
 | Spec     | `docs/specs/2026-04-09-feat-investment-currency-assets-current-price-spec.md` |
-| Plan     | _(added after step 2)_ |
-| Progress | _(added after step 3 starts)_ |
-| Report   | _(added after step 3 completes)_ |
+| Plan     | `docs/plans/2026-04-09-feat-investment-currency-assets-current-price-plan.md` |
+| Progress | `docs/reports/2026-04-09-feat-investment-currency-assets-current-price-progress.md` |
+| Report   | `docs/reports/2026-04-09-feat-investment-currency-assets-current-price-report.md` |
+
+# Bugs
+1. In the add investment, the price of the currency is not fetched and filled automatically into the price per unit field
+2. the price per unit always is VND

@@ -251,7 +251,7 @@ This feature adds **no new external dependencies**. It reuses:
 
 ## Dependencies & Assumptions
 
-- The asset display config for `assetType="currency"` is already seeded (USD, EUR, GBP, JPY, etc.) from the Vietcombank currency migration — **but `ShowInInvestment = false` for all of them**. A new migration must set `ShowInInvestment = true` for the target currencies so they appear in the investment form dropdown.
+- The asset display config for `assetType="currency"` is already seeded (USD, EUR, GBP, JPY, etc.) from the Vietcombank currency migration. `ShowInInvestment` can be toggled per-currency via the existing admin UI — no new migration needed. The admin enables currencies for investment use before this feature goes live.
 - `AssetDisplayConfigService.ResolvePrice()` already handles priority-based source selection and staleness — no changes needed to that method
 - The background price refresh scheduler already runs every 15 minutes — FOREIGN_CURRENCY investments will be updated on the next cycle after the feature is deployed
 - `Investment.Recalculate()` already handles `divisor=10000` for all types — no changes needed

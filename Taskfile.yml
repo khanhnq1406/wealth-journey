@@ -226,6 +226,12 @@ tasks:
     cmds:
       - go run cmd/migrate-silver-show-in-investment/main.go
 
+  backend:migrate-currency-investment:
+    desc: "Enable show_in_investment for all enabled currency asset display configs"
+    dir: src/go-backend
+    cmds:
+      - go run cmd/migrate-currency-investment/main.go
+
   backend:migrate-all:
     desc: "Run all migrations in order (safe for fresh or existing databases)"
     dir: "{{.BACKEND_DIR}}"
@@ -299,8 +305,10 @@ tasks:
       # Investment enhancements
       - echo "[29/30] migrate-investment-price-updated-at..."
       - go run cmd/migrate-investment-price-updated-at/main.go
-      - echo "[30/30] migrate-silver-show-in-investment..."
+      - echo "[30/31] migrate-silver-show-in-investment..."
       - go run cmd/migrate-silver-show-in-investment/main.go
+      - echo "[31/31] migrate-currency-investment..."
+      - go run cmd/migrate-currency-investment/main.go
       - echo "=== All migrations completed ==="
 
   backend:set-admin:

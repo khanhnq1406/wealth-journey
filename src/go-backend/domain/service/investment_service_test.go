@@ -19,6 +19,106 @@ import (
 
 func int32Ptr(v int32) *int32 { return &v }
 
+// MockAssetDisplayConfigService mocks AssetDisplayConfigService for investment tests.
+type MockAssetDisplayConfigService struct {
+	mock.Mock
+}
+
+func (m *MockAssetDisplayConfigService) GetDisplayPrices(ctx context.Context, assetType string) ([]*AssetDisplayPriceDTO, error) {
+	args := m.Called(ctx, assetType)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*AssetDisplayPriceDTO), args.Error(1)
+}
+
+func (m *MockAssetDisplayConfigService) ListAll(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
+	args := m.Called(ctx, assetType)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*models.AssetDisplayConfig), args.Error(1)
+}
+
+func (m *MockAssetDisplayConfigService) Create(ctx context.Context, typeCode, displayName, assetType string, displayOrder int32, enabled, showInInvestment bool) (*models.AssetDisplayConfig, error) {
+	args := m.Called(ctx, typeCode, displayName, assetType, displayOrder, enabled, showInInvestment)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.AssetDisplayConfig), args.Error(1)
+}
+
+func (m *MockAssetDisplayConfigService) Update(ctx context.Context, id int32, displayName string, displayOrder int32, enabled, showInInvestment bool) (*models.AssetDisplayConfig, error) {
+	args := m.Called(ctx, id, displayName, displayOrder, enabled, showInInvestment)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.AssetDisplayConfig), args.Error(1)
+}
+
+func (m *MockAssetDisplayConfigService) Delete(ctx context.Context, id int32) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
+func (m *MockAssetDisplayConfigService) ResolvePrice(ctx context.Context, typeCode, assetType string) (int64, int64, bool, error) {
+	args := m.Called(ctx, typeCode, assetType)
+	return args.Get(0).(int64), args.Get(1).(int64), args.Get(2).(bool), args.Error(3)
+}
+
+func (m *MockAssetDisplayConfigService) ListFetchCodes(ctx context.Context, configID int32) ([]*models.AssetConfigFetchCode, error) {
+	args := m.Called(ctx, configID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*models.AssetConfigFetchCode), args.Error(1)
+}
+
+func (m *MockAssetDisplayConfigService) CreateFetchCode(ctx context.Context, configID int32, typeCode string, priority int32) (*models.AssetConfigFetchCode, error) {
+	args := m.Called(ctx, configID, typeCode, priority)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.AssetConfigFetchCode), args.Error(1)
+}
+
+func (m *MockAssetDisplayConfigService) UpdateFetchCode(ctx context.Context, id int32, priority int32) (*models.AssetConfigFetchCode, error) {
+	args := m.Called(ctx, id, priority)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.AssetConfigFetchCode), args.Error(1)
+}
+
+func (m *MockAssetDisplayConfigService) DeleteFetchCode(ctx context.Context, id int32) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}
+
+func (m *MockAssetDisplayConfigService) ListAvailableTypeCodes(ctx context.Context, assetType string) ([]string, error) {
+	args := m.Called(ctx, assetType)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]string), args.Error(1)
+}
+
+func (m *MockAssetDisplayConfigService) GetFetchCodesByAssetType(ctx context.Context, assetType string) (map[string]*models.AssetDisplayConfig, error) {
+	args := m.Called(ctx, assetType)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(map[string]*models.AssetDisplayConfig), args.Error(1)
+}
+
+func (m *MockAssetDisplayConfigService) ListForInvestment(ctx context.Context, assetType string) ([]*models.AssetDisplayConfig, error) {
+	args := m.Called(ctx, assetType)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]*models.AssetDisplayConfig), args.Error(1)
+}
+
 // Mock dependencies
 type MockWalletRepository struct {
 	mock.Mock
@@ -542,6 +642,7 @@ func TestInvestmentService_CreateInvestment_Success(t *testing.T) {
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
 		nil, // portfolioHistoryRepo not needed for this test
+		nil, // assetDisplayConfigService not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -606,6 +707,7 @@ func TestInvestmentService_CreateInvestment_NoWalletAssociation(t *testing.T) {
 		nil,
 		new(MockWalletService),
 		nil,
+		nil, // assetDisplayConfigService not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -669,6 +771,7 @@ func TestInvestmentService_CreateInvestment_NoWallet_Success(t *testing.T) {
 		nil,
 		new(MockWalletService),
 		nil,
+		nil, // assetDisplayConfigService not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -730,6 +833,7 @@ func TestInvestmentService_CreateInvestment_WalletNotFound(t *testing.T) {
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
 		nil, // portfolioHistoryRepo not needed for this test
+		nil, // assetDisplayConfigService not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -778,6 +882,7 @@ func TestInvestmentService_CreateInvestment_DuplicateSymbol(t *testing.T) {
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
 		nil, // portfolioHistoryRepo not needed for this test
+		nil, // assetDisplayConfigService not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -847,6 +952,7 @@ func TestInvestmentService_AddTransaction_BuyCreatesLot(t *testing.T) {
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
 		nil, // portfolioHistoryRepo not needed for this test
+		nil, // assetDisplayConfigService not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -906,6 +1012,7 @@ func TestInvestmentService_AddTransaction_SellConsumesOldestLot(t *testing.T) {
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
 		nil, // portfolioHistoryRepo not needed for this test
+		nil, // assetDisplayConfigService not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -990,6 +1097,7 @@ func TestInvestmentService_AddTransaction_SellConsumesMultipleLots(t *testing.T)
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
 		nil, // portfolioHistoryRepo not needed for this test
+		nil, // assetDisplayConfigService not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -1070,6 +1178,7 @@ func TestInvestmentService_AddTransaction_SellExceedsQuantity(t *testing.T) {
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
 		nil, // portfolioHistoryRepo not needed for this test
+		nil, // assetDisplayConfigService not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -1122,6 +1231,7 @@ func TestInvestmentService_GetPortfolioSummary_Success(t *testing.T) {
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
 		nil, // portfolioHistoryRepo not needed for this test
+		nil, // assetDisplayConfigService not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -1220,6 +1330,7 @@ func TestInvestmentService_UpdatePrices_Success(t *testing.T) {
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
 		nil, // portfolioHistoryRepo not needed for this test
+		nil, // assetDisplayConfigService not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -1279,6 +1390,7 @@ func TestInvestmentService_UpdatePrices_SkipsCustomInvestments(t *testing.T) {
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
 		nil, // portfolioHistoryRepo not needed for this test
+		nil, // assetDisplayConfigService not needed for this test
 	).(*investmentService)
 
 	// Create mixed investments (1 market-based, 1 custom) — fetched directly via user_id
@@ -1332,6 +1444,7 @@ func TestInvestmentService_DeleteInvestment_Success(t *testing.T) {
 		nil, // currencyCache not needed for this test
 		new(MockWalletService),
 		nil, // portfolioHistoryRepo not needed for this test
+		nil, // assetDisplayConfigService not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -1381,6 +1494,7 @@ func TestCreateInvestment_DuplicateSymbol_CurrencyMismatch(t *testing.T) {
 		nil,
 		new(MockWalletService),
 		nil,
+		nil, // assetDisplayConfigService not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -1435,6 +1549,7 @@ func TestCreateInvestment_DuplicateSymbol_SameCurrency(t *testing.T) {
 		nil,
 		new(MockWalletService),
 		nil,
+		nil, // assetDisplayConfigService not needed for this test
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -1482,4 +1597,339 @@ func TestCreateInvestment_DuplicateSymbol_SameCurrency(t *testing.T) {
 	mockWalletRepo.AssertExpectations(t)
 	mockInvestmentRepo.AssertExpectations(t)
 	mockTxRepo.AssertExpectations(t)
+}
+
+// TestCreateInvestment_ForeignCurrency_IsCustomFalse verifies that a FOREIGN_CURRENCY
+// investment is created with IsCustom=false when the caller specifies it, documenting
+// that the backend does NOT override IsCustom — it trusts the value from the request.
+// IsCustom=false enables auto-price-updates via AssetDisplayConfigService.ResolvePrice.
+func TestCreateInvestment_ForeignCurrency_IsCustomFalse(t *testing.T) {
+	ctx := context.Background()
+	userID := int32(1)
+	walletID := int32(2)
+
+	mockWalletRepo := new(MockWalletRepository)
+	mockInvestmentRepo := new(MockInvestmentRepository)
+	mockTxRepo := new(MockInvestmentTransactionRepository)
+	mockMarketDataService := new(MockMarketDataService)
+	mockUserRepo := new(MockUserRepository)
+	mockFXRateSvc := new(MockFXRateService)
+	mockAssetDisplayConfigSvc := new(MockAssetDisplayConfigService)
+
+	service := NewInvestmentService(
+		mockInvestmentRepo,
+		mockWalletRepo,
+		mockTxRepo,
+		mockMarketDataService,
+		mockUserRepo,
+		mockFXRateSvc,
+		nil, // currencyCache not needed for this test
+		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
+		mockAssetDisplayConfigSvc,
+	).(*investmentService)
+
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
+
+	req := &v1.CreateInvestmentRequest{
+		WalletId:        walletID,
+		Symbol:          "USD",
+		Name:            "US Dollar",
+		Type:            v1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY,
+		InitialQuantity: 100000, // 10 units (4 decimal places)
+		InitialCost:     255000, // 25500 VND per USD × 10
+		Currency:        "VND",
+		IsCustom:        false, // Caller requests auto-update (not custom)
+	}
+
+	// Capture the investment passed to Create to verify IsCustom
+	var capturedInvestment *models.Investment
+
+	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
+	mockInvestmentRepo.On("GetByUserAndSymbol", ctx, userID, "USD").Return(nil, nil)
+	mockInvestmentRepo.On("Create", ctx, mock.AnythingOfType("*models.Investment")).Return(nil).Run(
+		func(args mock.Arguments) {
+			capturedInvestment = args.Get(1).(*models.Investment)
+			capturedInvestment.ID = 10
+		},
+	)
+	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
+	mockTxRepo.On("CreateLot", ctx, mock.AnythingOfType("*models.InvestmentLot")).Return(nil)
+	mockTxRepo.On("Update", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
+	mockUserRepo.On("GetByID", ctx, userID).Return(&models.User{ID: userID, PreferredCurrency: "VND"}, nil)
+	// IsCustom=false + FOREIGN_CURRENCY triggers symbol validation — "USD" must be in the config
+	mockAssetDisplayConfigSvc.On("ListForInvestment", ctx, "currency").Return(
+		[]*models.AssetDisplayConfig{{TypeCode: "USD", ShowInInvestment: true}}, nil,
+	)
+
+	response, err := service.CreateInvestment(ctx, userID, req)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, response)
+	assert.True(t, response.Success)
+
+	// Core assertion: IsCustom must reflect exactly what was in the request
+	assert.NotNil(t, capturedInvestment, "investment should have been passed to repo.Create")
+	assert.False(t, capturedInvestment.IsCustom, "IsCustom must be false — backend must NOT override the caller's value to true")
+
+	// FOREIGN_CURRENCY seeded with averageCost (not 0) so CurrentValue = TotalCost, UnrealizedPNL = 0
+	assert.Greater(t, capturedInvestment.CurrentPrice, int64(0), "FOREIGN_CURRENCY CurrentPrice should be seeded with averageCost")
+	assert.Equal(t, capturedInvestment.CurrentPrice, capturedInvestment.AverageCost, "FOREIGN_CURRENCY CurrentPrice should equal AverageCost at creation")
+
+	mockWalletRepo.AssertExpectations(t)
+	mockInvestmentRepo.AssertExpectations(t)
+	mockTxRepo.AssertExpectations(t)
+	mockAssetDisplayConfigSvc.AssertExpectations(t)
+}
+
+// TestCreateInvestment_ForeignCurrency_InvalidSymbol verifies that creating a
+// non-custom FOREIGN_CURRENCY investment with a symbol not in the asset display
+// config returns a validation error and does NOT write to the DB.
+func TestCreateInvestment_ForeignCurrency_InvalidSymbol(t *testing.T) {
+	ctx := context.Background()
+	userID := int32(1)
+	walletID := int32(2)
+
+	mockWalletRepo := new(MockWalletRepository)
+	mockInvestmentRepo := new(MockInvestmentRepository)
+	mockTxRepo := new(MockInvestmentTransactionRepository)
+	mockMarketDataService := new(MockMarketDataService)
+	mockUserRepo := new(MockUserRepository)
+	mockFXRateSvc := new(MockFXRateService)
+	mockAssetDisplayConfigSvc := new(MockAssetDisplayConfigService)
+
+	service := NewInvestmentService(
+		mockInvestmentRepo,
+		mockWalletRepo,
+		mockTxRepo,
+		mockMarketDataService,
+		mockUserRepo,
+		mockFXRateSvc,
+		nil, // currencyCache not needed for this test
+		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed for this test
+		mockAssetDisplayConfigSvc,
+	).(*investmentService)
+
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
+
+	req := &v1.CreateInvestmentRequest{
+		WalletId:        walletID,
+		Symbol:          "XYZ", // Not in currency config
+		Name:            "Unknown Currency",
+		Type:            v1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY,
+		InitialQuantity: 100000,
+		InitialCost:     255000,
+		Currency:        "VND",
+		IsCustom:        false, // non-custom: must validate symbol
+	}
+
+	// Wallet check passes
+	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
+	// No existing investment for this symbol
+	mockInvestmentRepo.On("GetByUserAndSymbol", ctx, userID, "XYZ").Return(nil, nil)
+	// ListForInvestment returns only "USD" and "EUR" — "XYZ" is NOT present
+	mockAssetDisplayConfigSvc.On("ListForInvestment", ctx, "currency").Return([]*models.AssetDisplayConfig{
+		{TypeCode: "USD", DisplayName: "US Dollar", AssetType: "currency", Enabled: true, ShowInInvestment: true},
+		{TypeCode: "EUR", DisplayName: "Euro", AssetType: "currency", Enabled: true, ShowInInvestment: true},
+	}, nil)
+
+	// DB write must NOT happen
+	resp, err := service.CreateInvestment(ctx, userID, req)
+
+	assert.Error(t, err)
+	assert.Nil(t, resp)
+	assert.IsType(t, apperrors.ValidationError{}, err, "should return a ValidationError")
+	assert.Contains(t, err.Error(), "XYZ", "error message should contain the invalid symbol")
+
+	// No investment created
+	mockInvestmentRepo.AssertNotCalled(t, "Create", mock.Anything, mock.Anything)
+	mockWalletRepo.AssertExpectations(t)
+	mockAssetDisplayConfigSvc.AssertExpectations(t)
+}
+
+// TestCreateInvestment_ForeignCurrency_ValidSymbol verifies that creating a
+// non-custom FOREIGN_CURRENCY investment with a valid symbol succeeds and
+// preserves IsCustom=false so auto-price-updates will work.
+func TestCreateInvestment_ForeignCurrency_ValidSymbol(t *testing.T) {
+	ctx := context.Background()
+	userID := int32(1)
+	walletID := int32(2)
+
+	mockWalletRepo := new(MockWalletRepository)
+	mockInvestmentRepo := new(MockInvestmentRepository)
+	mockTxRepo := new(MockInvestmentTransactionRepository)
+	mockMarketDataService := new(MockMarketDataService)
+	mockUserRepo := new(MockUserRepository)
+	mockFXRateSvc := new(MockFXRateService)
+	mockAssetDisplayConfigSvc := new(MockAssetDisplayConfigService)
+
+	service := NewInvestmentService(
+		mockInvestmentRepo,
+		mockWalletRepo,
+		mockTxRepo,
+		mockMarketDataService,
+		mockUserRepo,
+		mockFXRateSvc,
+		nil, // currencyCache not needed
+		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed
+		mockAssetDisplayConfigSvc,
+	).(*investmentService)
+
+	wallet := createTestWallet(walletID, userID, v1.WalletType_BASIC)
+
+	req := &v1.CreateInvestmentRequest{
+		WalletId:        walletID,
+		Symbol:          "USD", // Valid symbol in currency config
+		Name:            "US Dollar",
+		Type:            v1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY,
+		InitialQuantity: 100000, // 10 units (4 decimal places)
+		InitialCost:     255000, // 25500 VND per USD × 10
+		Currency:        "VND",
+		IsCustom:        false, // non-custom: must validate and allow
+	}
+
+	var capturedInvestment *models.Investment
+
+	mockWalletRepo.On("GetByIDForUser", ctx, walletID, userID).Return(wallet, nil)
+	mockInvestmentRepo.On("GetByUserAndSymbol", ctx, userID, "USD").Return(nil, nil)
+	// ListForInvestment returns "USD" — valid symbol
+	mockAssetDisplayConfigSvc.On("ListForInvestment", ctx, "currency").Return([]*models.AssetDisplayConfig{
+		{TypeCode: "USD", DisplayName: "US Dollar", AssetType: "currency", Enabled: true, ShowInInvestment: true},
+		{TypeCode: "EUR", DisplayName: "Euro", AssetType: "currency", Enabled: true, ShowInInvestment: true},
+	}, nil)
+	mockInvestmentRepo.On("Create", ctx, mock.AnythingOfType("*models.Investment")).Return(nil).Run(
+		func(args mock.Arguments) {
+			capturedInvestment = args.Get(1).(*models.Investment)
+			capturedInvestment.ID = 42
+		},
+	)
+	mockTxRepo.On("Create", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
+	mockTxRepo.On("CreateLot", ctx, mock.AnythingOfType("*models.InvestmentLot")).Return(nil)
+	mockTxRepo.On("Update", ctx, mock.AnythingOfType("*models.InvestmentTransaction")).Return(nil)
+	mockUserRepo.On("GetByID", ctx, userID).Return(&models.User{ID: userID, PreferredCurrency: "VND"}, nil)
+
+	resp, err := service.CreateInvestment(ctx, userID, req)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.True(t, resp.Success)
+
+	// IsCustom=false preserved — enables auto-price-updates
+	assert.NotNil(t, capturedInvestment)
+	assert.False(t, capturedInvestment.IsCustom, "IsCustom must remain false for auto-price-update eligibility")
+	assert.Equal(t, "USD", capturedInvestment.Symbol)
+
+	mockWalletRepo.AssertExpectations(t)
+	mockInvestmentRepo.AssertExpectations(t)
+	mockAssetDisplayConfigSvc.AssertExpectations(t)
+}
+
+// TestUpdatePrices_ForeignCurrency_SetsPriceUpdatedAt verifies that after
+// UpdatePricesForInvestments returns FOREIGN_CURRENCY prices, the investment
+// repository receives PriceUpdate structs with a non-zero Timestamp
+// (which the repository converts to price_updated_at in the DB).
+func TestUpdatePrices_ForeignCurrency_SetsPriceUpdatedAt(t *testing.T) {
+	ctx := context.Background()
+	userID := int32(1)
+	walletID := int32(2)
+	investmentID := int32(10)
+
+	mockWalletRepo := new(MockWalletRepository)
+	mockInvestmentRepo := new(MockInvestmentRepository)
+	mockTxRepo := new(MockInvestmentTransactionRepository)
+	mockMarketDataService := new(MockMarketDataService)
+	mockUserRepo := new(MockUserRepository)
+	mockFXRateSvc := new(MockFXRateService)
+
+	svc := NewInvestmentService(
+		mockInvestmentRepo,
+		mockWalletRepo,
+		mockTxRepo,
+		mockMarketDataService,
+		mockUserRepo,
+		mockFXRateSvc,
+		nil, // currencyCache not needed
+		new(MockWalletService),
+		nil, // portfolioHistoryRepo not needed
+		nil, // assetDisplayConfigService not needed
+	)
+
+	foreignCurrencyInvestment := &models.Investment{
+		ID:       investmentID,
+		WalletID: int32Ptr(walletID),
+		Symbol:   "USD",
+		Name:     "US Dollar",
+		Type:     int32(v1.InvestmentType_INVESTMENT_TYPE_FOREIGN_CURRENCY),
+		IsCustom: false,
+		Currency: "VND",
+		Quantity: 100000,
+	}
+
+	// The service lists all investments then filters non-custom ones.
+	mockInvestmentRepo.On(
+		"ListByUserID",
+		ctx,
+		userID,
+		repository.ListOptions{Limit: 10000},
+		v1.InvestmentType_INVESTMENT_TYPE_UNSPECIFIED,
+	).Return([]*models.Investment{foreignCurrencyInvestment}, 1, nil)
+
+	// Market data service resolves FOREIGN_CURRENCY price via ResolvePrice.
+	mockMarketDataService.On(
+		"UpdatePricesForInvestments",
+		mock.Anything, // background context from goroutine
+		[]*models.Investment{foreignCurrencyInvestment},
+		false,
+	).Return(map[int32]int64{investmentID: 2570000}, nil)
+
+	// Capture the PriceUpdate structs passed to the repository.
+	var capturedUpdates []repository.PriceUpdate
+	done := make(chan struct{})
+
+	mockInvestmentRepo.On(
+		"UpdatePrices",
+		mock.Anything,
+		mock.MatchedBy(func(updates []repository.PriceUpdate) bool {
+			return len(updates) == 1
+		}),
+	).Return(nil).Run(func(args mock.Arguments) {
+		capturedUpdates = args.Get(1).([]repository.PriceUpdate)
+		close(done)
+	})
+
+	// GetByID is called per investment for cache invalidation after UpdatePrices.
+	mockInvestmentRepo.On("GetByID", mock.Anything, investmentID).Return(foreignCurrencyInvestment, nil)
+
+	beforeCall := time.Now().Unix()
+	req := &v1.UpdatePricesRequest{ForceRefresh: false}
+	resp, err := svc.UpdatePrices(ctx, userID, req)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, resp)
+	assert.True(t, resp.Success)
+
+	// Wait for the background goroutine to call UpdatePrices.
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("timed out waiting for background UpdatePrices goroutine")
+	}
+
+	// Assert: one PriceUpdate for the FOREIGN_CURRENCY investment.
+	assert.Len(t, capturedUpdates, 1)
+	update := capturedUpdates[0]
+	assert.Equal(t, investmentID, update.InvestmentID)
+	assert.Equal(t, int64(2570000), update.Price)
+
+	// Core assertion: Timestamp must be set (non-zero, recent) so the
+	// repository can derive a valid price_updated_at for the DB row.
+	assert.Greater(t, update.Timestamp, beforeCall-1,
+		"PriceUpdate.Timestamp must be a recent Unix timestamp so price_updated_at is set in the DB")
+	assert.LessOrEqual(t, update.Timestamp, time.Now().Unix()+1,
+		"PriceUpdate.Timestamp must not be in the future")
+
+	mockInvestmentRepo.AssertExpectations(t)
+	mockMarketDataService.AssertExpectations(t)
 }

@@ -33,6 +33,7 @@ func newTestInvestmentService() *investmentService {
 		nil,
 		new(MockWalletService),
 		nil,
+		nil, // assetDisplayConfigService not needed
 	).(*investmentService)
 }
 
@@ -65,6 +66,7 @@ func TestValidateBuyQuantityReduction_NothingSold(t *testing.T) {
 		nil,
 		new(MockWalletService),
 		nil,
+		nil, // assetDisplayConfigService not needed
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -104,6 +106,7 @@ func TestValidateBuyQuantityReduction_ReduceBelowSold(t *testing.T) {
 		nil,
 		new(MockWalletService),
 		nil,
+		nil, // assetDisplayConfigService not needed
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -146,6 +149,7 @@ func TestValidateBuyQuantityReduction_ReduceToExactSold(t *testing.T) {
 		nil,
 		new(MockWalletService),
 		nil,
+		nil, // assetDisplayConfigService not needed
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -185,6 +189,7 @@ func TestValidateBuyQuantityReduction_ReduceAboveSold(t *testing.T) {
 		nil,
 		new(MockWalletService),
 		nil,
+		nil, // assetDisplayConfigService not needed
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -223,6 +228,7 @@ func TestValidateBuyQuantityReduction_GetLotError(t *testing.T) {
 		nil,
 		new(MockWalletService),
 		nil,
+		nil, // assetDisplayConfigService not needed
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -258,6 +264,7 @@ func TestValidateBuyQuantityReduction_AllSoldReduceToZero(t *testing.T) {
 		nil,
 		new(MockWalletService),
 		nil,
+		nil, // assetDisplayConfigService not needed
 	).(*investmentService)
 
 	ctx := context.Background()
@@ -298,6 +305,7 @@ func TestValidateBuyQuantityReduction_NoSoldIncrease(t *testing.T) {
 		nil,
 		new(MockWalletService),
 		nil,
+		nil, // assetDisplayConfigService not needed
 	).(*investmentService)
 
 	ctx := context.Background()

@@ -175,7 +175,10 @@
       "refreshingPrice": "Đang tải...",
       "totalCostSummary": "Tổng chi phí: {amount}",
       "totalCostConverted": "≈ {amount}",
-      "priceUnavailable": "Không thể lấy giá"
+      "priceUnavailable": "Không thể lấy giá",
+      "loadingCurrencies": "Đang tải tiền tệ...",
+      "noCurrenciesConfigured": "Chưa có tiền tệ nào được cấu hình",
+      "selectCurrencyLabel": "Tiền tệ"
     },
     "transactionTypes": {
       "buy": "Mua",

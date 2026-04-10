@@ -43,6 +43,7 @@ func newEditTestService(t *testing.T) editTestDeps {
 		nil, // currencyCache — nil is safe for unit tests
 		mockWalletSvc,
 		nil, // portfolioHistoryRepo
+		nil, // assetDisplayConfigService not needed
 	).(*investmentService)
 
 	return editTestDeps{

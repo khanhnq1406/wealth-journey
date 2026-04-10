@@ -15,6 +15,7 @@ Investment portfolio management flows covering the most complex business logic i
 - [Edit Transaction (Delete-and-Recreate)](#9-edit-transaction-delete-and-recreate)
 - [Gold/Silver Price Resolution via Fetch Codes](#10-goldsilver-price-resolution-via-fetch-codes)
 - [Gold/Silver VND Investment Type Selection (Admin Config–Driven)](#11-goldsilver-vnd-investment-type-selection-admin-configdriven)
+- [Currency Investment Price Refresh](#12-currency-investment-price-refresh)
 
 ---
 
@@ -373,6 +374,12 @@ flowchart TD
     T --> S
     S --> L
 
+    H -- "FOREIGN_CURRENCY" --> V["fetchCurrencyPriceFromDB()\n→ AssetDisplayConfigService\n.ResolvePrice(symbol, 'currency')"]
+    V --> W{DB price\navailable?}
+    W -- "Yes" --> X["Return buy price in VND int64\n(no unit conversion needed)"]
+    W -- "No / error" --> Y["Log warning, skip investment\n(non-fatal — other types continue)"]
+    X --> L
+
     L --> U["investmentRepo.UpdatePrices()\nBatch SQL update:\ncurrent_price + price_updated_at"]
 
     subgraph CacheFallback["MarketData Cache Layer (stocks/ETFs/crypto only)"]
@@ -394,11 +401,12 @@ flowchart TD
 
 - Custom investments (`isCustom: true`) are excluded from automatic price updates — they use manual price via `UpdateInvestmentPriceForm`
 - Price update runs asynchronously to avoid HTTP timeouts; client is notified immediately
-- **Gold and silver prices are read from the `asset_price` DB table** (written by `PriceCacheJob` every 15 min), not from live APIs
-- Cold-start fallback: if `ResolvePrice` fails (DB empty, no fetch codes configured), `GoldPriceService`/`SilverPriceService` live APIs are called
-- `investmentRepo.UpdatePrices()` now also writes `price_updated_at` timestamp, enabling staleness indicators on the frontend
+- **Gold, silver, and FOREIGN_CURRENCY prices are read from the `asset_price` DB table** (written by `PriceCacheJob` every 15 min), not from live APIs
+- Cold-start fallback: if `ResolvePrice` fails (DB empty, no fetch codes configured), `GoldPriceService`/`SilverPriceService` live APIs are called — no equivalent fallback for FOREIGN_CURRENCY (error is non-fatal and logged)
+- `investmentRepo.UpdatePrices()` also writes `price_updated_at` timestamp for every successfully resolved price (including FOREIGN_CURRENCY), enabling staleness indicators on the frontend
 - Gold VND prices require lượng-to-gram normalization before storage (applied in both DB and live-fallback paths)
 - Silver USD normalization depends on the symbol: per-tael (`AG_VND_Tael`), per-kg (`AG_VND_Kg`), or pass-through (`XAG`)
+- FOREIGN_CURRENCY investments are grouped by symbol — price lookup is O(unique currencies), not O(investments)
 
 ### Price Sources by Type
 
@@ -407,6 +415,7 @@ flowchart TD
 | Stocks / ETFs / Crypto | Yahoo Finance (batch, 10/req) | Stale MarketData cache | Live API per request |
 | Gold (VND/USD) | `asset_price` DB via `ResolvePrice()` | Live `GoldPriceService` (cold start only) | DB written by `PriceCacheJob` |
 | Silver (VND/USD) | `asset_price` DB via `ResolvePrice()` | Live `SilverPriceService` (cold start only) | DB written by `PriceCacheJob` |
+| FOREIGN_CURRENCY | `asset_price` DB via `ResolvePrice(symbol, "currency")` | None — error logged and skipped | DB written by `CurrencyPriceService` via `PriceCacheJob` |
 | Custom | Manual only (`UpdateInvestmentPriceForm`) | N/A | Excluded from job |
 
 ---
@@ -946,3 +955,56 @@ sequenceDiagram
 | Unknown `currency` param (e.g. `EUR`) | `400 Bad Request` "invalid currency 'EUR': must be VND, USD, or omitted" | Frontend shows validation error |
 | `ListForInvestment` DB error | `500 Internal Server Error` | Frontend shows generic error state |
 | Admin config empty (no matching rows) | `200 OK — []` (empty array) | Dropdown shows no VND options; user can still select USD |
+
+---
+
+## 12. Currency Investment Price Refresh
+
+**Trigger:** Background scheduler every 15 minutes, or manual `PUT /api/v1/investments/market-price`
+**Source:** `domain/service/investment_service.go`, `domain/service/market_data_service.go`, `domain/service/asset_display_config_service.go`
+
+This flow documents how `FOREIGN_CURRENCY` investments receive automatic price updates — the same pipeline as gold/silver, using `AssetDisplayConfigService.ResolvePrice` with `assetType="currency"` to read buy prices from the `asset_price` DB table populated by `CurrencyPriceService`.
+
+```mermaid
+sequenceDiagram
+    participant Scheduler as Background Scheduler (15m)
+    participant InvSvc as InvestmentService
+    participant MktSvc as MarketDataService
+    participant AssetSvc as AssetDisplayConfigService
+    participant DB as PostgreSQL
+
+    Scheduler->>InvSvc: UpdatePrices(ctx, userID)
+    InvSvc->>DB: ListByUserID (filter isCustom=false)
+    DB-->>InvSvc: [investments incl. FOREIGN_CURRENCY]
+    InvSvc->>MktSvc: UpdatePricesForInvestments(investments)
+
+    Note over MktSvc: Group by type
+
+    loop per unique currency symbol
+        MktSvc->>AssetSvc: ResolvePrice(symbol, "currency")
+        AssetSvc->>DB: SELECT asset_price WHERE type_code=symbol AND asset_type="currency"
+        DB-->>AssetSvc: price rows ordered by priority
+        AssetSvc-->>MktSvc: (buy, sell, isStale, err)
+    end
+
+    MktSvc-->>InvSvc: map[investmentID]→buy price
+    InvSvc->>InvSvc: investment.Recalculate() per updated investment
+    InvSvc->>DB: UpdatePrices(PriceUpdate{CurrentPrice, priceUpdatedAt})
+```
+
+### Key Invariants
+
+- FOREIGN_CURRENCY investments are grouped by symbol — price lookup is O(unique currencies), not O(investments)
+- Error per symbol is non-fatal — logged and skipped; other investment types and other currency symbols continue unaffected
+- `isStale=true` prices are still stored (stale price > 0 is better than no update); staleness is surfaced to the frontend via the `priceUpdatedAt` timestamp
+- `priceUpdatedAt` is always written on successful price resolution — enables frontend staleness indicators
+
+### Price Data Path
+
+```
+CurrencyPriceService (3 parallel sources: vangsaigon.vn, vang.today, Vietcombank)
+    → asset_price table (upserted every 15 min by PriceCacheJob)
+    → AssetDisplayConfigService.ResolvePrice(symbol, "currency")
+    → MarketDataService.UpdatePricesForInvestments()
+    → investmentRepo.UpdatePrices() [current_price + price_updated_at]
+```
