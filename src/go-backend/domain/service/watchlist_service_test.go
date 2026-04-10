@@ -194,9 +194,80 @@ func emptyAllPrices() *AllAssetPrices {
 	}
 }
 
+// ---------------------------------------------------------------------------
+// Mock: AssetDisplayConfigService (for watchlist tests — gold/silver/currency)
+// ---------------------------------------------------------------------------
+
+type mockAssetDisplayConfigSvc struct {
+	// prices maps symbol → (buy, sell). If symbol not found and err == nil, returns "not found" error.
+	prices map[string][2]int64
+	err    error
+}
+
+func (m *mockAssetDisplayConfigSvc) ResolvePrice(_ context.Context, typeCode, _ string) (buy int64, sell int64, isStale bool, err error) {
+	if m.err != nil {
+		return 0, 0, false, m.err
+	}
+	if p, ok := m.prices[typeCode]; ok {
+		return p[0], p[1], false, nil
+	}
+	return 0, 0, false, errors.New("price not found")
+}
+
+func (m *mockAssetDisplayConfigSvc) GetDisplayPrices(_ context.Context, _ string) ([]*AssetDisplayPriceDTO, error) {
+	return nil, nil
+}
+
+func (m *mockAssetDisplayConfigSvc) ListAll(_ context.Context, _ string) ([]*models.AssetDisplayConfig, error) {
+	return nil, nil
+}
+
+func (m *mockAssetDisplayConfigSvc) Create(_ context.Context, _, _, _ string, _ int32, _, _ bool) (*models.AssetDisplayConfig, error) {
+	return nil, nil
+}
+
+func (m *mockAssetDisplayConfigSvc) Update(_ context.Context, _ int32, _ string, _ int32, _, _ bool) (*models.AssetDisplayConfig, error) {
+	return nil, nil
+}
+
+func (m *mockAssetDisplayConfigSvc) Delete(_ context.Context, _ int32) error {
+	return nil
+}
+
+func (m *mockAssetDisplayConfigSvc) ListFetchCodes(_ context.Context, _ int32) ([]*models.AssetConfigFetchCode, error) {
+	return nil, nil
+}
+
+func (m *mockAssetDisplayConfigSvc) CreateFetchCode(_ context.Context, _ int32, _ string, _ int32) (*models.AssetConfigFetchCode, error) {
+	return nil, nil
+}
+
+func (m *mockAssetDisplayConfigSvc) UpdateFetchCode(_ context.Context, _ int32, _ int32) (*models.AssetConfigFetchCode, error) {
+	return nil, nil
+}
+
+func (m *mockAssetDisplayConfigSvc) DeleteFetchCode(_ context.Context, _ int32) error {
+	return nil
+}
+
+func (m *mockAssetDisplayConfigSvc) ListAvailableTypeCodes(_ context.Context, _ string) ([]string, error) {
+	return nil, nil
+}
+
+func (m *mockAssetDisplayConfigSvc) GetFetchCodesByAssetType(_ context.Context, _ string) (map[string]*models.AssetDisplayConfig, error) {
+	return nil, nil
+}
+
+func (m *mockAssetDisplayConfigSvc) ListForInvestment(_ context.Context, _ string) ([]*models.AssetDisplayConfig, error) {
+	return nil, nil
+}
+
+// Compile-time check that mockAssetDisplayConfigSvc satisfies AssetDisplayConfigService.
+var _ AssetDisplayConfigService = (*mockAssetDisplayConfigSvc)(nil)
+
 // newWatchlistSvc is a test constructor convenience wrapper.
-func newWatchlistSvc(repo repository.WatchlistRepository, assetSvc AssetPriceService, mktSvc MarketDataService) WatchlistService {
-	return NewWatchlistService(repo, assetSvc, mktSvc)
+func newWatchlistSvc(repo repository.WatchlistRepository, assetSvc AssetPriceService, mktSvc MarketDataService, adcSvc AssetDisplayConfigService) WatchlistService {
+	return NewWatchlistService(repo, assetSvc, mktSvc, adcSvc)
 }
 
 // ---------------------------------------------------------------------------
@@ -204,20 +275,21 @@ func newWatchlistSvc(repo repository.WatchlistRepository, assetSvc AssetPriceSer
 // ---------------------------------------------------------------------------
 
 // TestWatchlistService_ListItems_GoldFromDB verifies that gold watchlist items
-// receive prices via MarketDataService.GetPrice() (which routes to DB cache internally).
+// receive prices via AssetDisplayConfigService.ResolvePrice() (raw per-lượng DB price).
 func TestWatchlistService_ListItems_GoldFromDB(t *testing.T) {
 	const symbol = "SJC_1L"
 	const wantPrice int64 = 8_500_000_000
 
 	repo := &mockWatchlistRepo{items: []*models.WatchlistItem{goldWatchlistItem(symbol)}}
 	assetSvc := &mockAssetPriceSvc{allPrices: emptyAllPrices()}
-	mktSvc := &mockWatchlistMarketDataSvc{
-		prices: map[string]*models.MarketData{
-			symbol: {Symbol: symbol, Price: wantPrice, Change24h: 0},
+	mktSvc := &mockWatchlistMarketDataSvc{}
+	adcSvc := &mockAssetDisplayConfigSvc{
+		prices: map[string][2]int64{
+			symbol: {wantPrice, wantPrice},
 		},
 	}
 
-	svc := newWatchlistSvc(repo, assetSvc, mktSvc)
+	svc := newWatchlistSvc(repo, assetSvc, mktSvc, adcSvc)
 
 	resp, err := svc.ListItems(context.Background(), 42)
 	if err != nil {
@@ -237,20 +309,21 @@ func TestWatchlistService_ListItems_GoldFromDB(t *testing.T) {
 }
 
 // TestWatchlistService_ListItems_SilverFromDB verifies that silver watchlist items
-// receive prices via MarketDataService.GetPrice() (which routes to DB cache internally).
+// receive prices via AssetDisplayConfigService.ResolvePrice() (raw per-lượng DB price).
 func TestWatchlistService_ListItems_SilverFromDB(t *testing.T) {
 	const symbol = "SILVER_VND_1"
 	const wantPrice int64 = 950_000
 
 	repo := &mockWatchlistRepo{items: []*models.WatchlistItem{silverWatchlistItem(symbol)}}
 	assetSvc := &mockAssetPriceSvc{allPrices: emptyAllPrices()}
-	mktSvc := &mockWatchlistMarketDataSvc{
-		prices: map[string]*models.MarketData{
-			symbol: {Symbol: symbol, Price: wantPrice, Change24h: 0},
+	mktSvc := &mockWatchlistMarketDataSvc{}
+	adcSvc := &mockAssetDisplayConfigSvc{
+		prices: map[string][2]int64{
+			symbol: {wantPrice, wantPrice},
 		},
 	}
 
-	svc := newWatchlistSvc(repo, assetSvc, mktSvc)
+	svc := newWatchlistSvc(repo, assetSvc, mktSvc, adcSvc)
 
 	resp, err := svc.ListItems(context.Background(), 42)
 	if err != nil {
@@ -267,20 +340,21 @@ func TestWatchlistService_ListItems_SilverFromDB(t *testing.T) {
 }
 
 // TestWatchlistService_ListItems_CurrencyFromDB verifies that foreign-currency watchlist
-// items receive prices via MarketDataService.GetPrice() (which routes to DB cache internally).
+// items receive prices via AssetDisplayConfigService.ResolvePrice() (raw DB price).
 func TestWatchlistService_ListItems_CurrencyFromDB(t *testing.T) {
 	const symbol = "USD"
 	const wantPrice int64 = 25_000_000
 
 	repo := &mockWatchlistRepo{items: []*models.WatchlistItem{currencyWatchlistItem(symbol)}}
 	assetSvc := &mockAssetPriceSvc{allPrices: emptyAllPrices()}
-	mktSvc := &mockWatchlistMarketDataSvc{
-		prices: map[string]*models.MarketData{
-			symbol: {Symbol: symbol, Price: wantPrice, Change24h: 0},
+	mktSvc := &mockWatchlistMarketDataSvc{}
+	adcSvc := &mockAssetDisplayConfigSvc{
+		prices: map[string][2]int64{
+			symbol: {wantPrice, wantPrice},
 		},
 	}
 
-	svc := newWatchlistSvc(repo, assetSvc, mktSvc)
+	svc := newWatchlistSvc(repo, assetSvc, mktSvc, adcSvc)
 
 	resp, err := svc.ListItems(context.Background(), 42)
 	if err != nil {
@@ -311,7 +385,7 @@ func TestWatchlistService_ListItems_MarketFromYahoo(t *testing.T) {
 		},
 	}
 
-	svc := newWatchlistSvc(repo, assetSvc, mktSvc)
+	svc := newWatchlistSvc(repo, assetSvc, mktSvc, &mockAssetDisplayConfigSvc{})
 
 	resp, err := svc.ListItems(context.Background(), 42)
 	if err != nil {
@@ -341,10 +415,11 @@ func TestWatchlistService_ListItems_DBEmptyReturnsZeroPrices(t *testing.T) {
 
 	repo := &mockWatchlistRepo{items: []*models.WatchlistItem{goldWatchlistItem(symbol)}}
 	assetSvc := &mockAssetPriceSvc{allPrices: emptyAllPrices()}
-	// mktSvc has no entry for symbol → GetPrice returns "price not found" error → zero prices.
 	mktSvc := &mockWatchlistMarketDataSvc{}
+	// adcSvc has no entry for symbol → ResolvePrice returns "price not found" error → zero prices.
+	adcSvc := &mockAssetDisplayConfigSvc{}
 
-	svc := newWatchlistSvc(repo, assetSvc, mktSvc)
+	svc := newWatchlistSvc(repo, assetSvc, mktSvc, adcSvc)
 
 	resp, err := svc.ListItems(context.Background(), 42)
 	if err != nil {
@@ -365,23 +440,21 @@ func TestWatchlistService_ListItems_DBEmptyReturnsZeroPrices(t *testing.T) {
 }
 
 // TestWatchlistService_ListItems_GoldViaGetPrice verifies that a gold watchlist item
-// with a symbol that does NOT match a TypeCode directly (e.g. "Eximbank") still
-// resolves prices through MarketDataService.GetPrice() rather than a direct TypeCode map.
+// resolves prices through AssetDisplayConfigService.ResolvePrice() (raw per-lượng price).
 func TestWatchlistService_ListItems_GoldViaGetPrice(t *testing.T) {
 	const symbol = "Eximbank"
 	const wantBuy int64 = 9_200_000_000
 
 	repo := &mockWatchlistRepo{items: []*models.WatchlistItem{goldWatchlistItem(symbol)}}
-	// Old path: assetSvc returns no entry for "Eximbank" TypeCode — this was the bug.
 	assetSvc := &mockAssetPriceSvc{allPrices: emptyAllPrices()}
-	// New path: marketDataSvc.GetPrice resolves via ResolvePrice.
-	mktSvc := &mockWatchlistMarketDataSvc{
-		prices: map[string]*models.MarketData{
-			symbol: {Symbol: symbol, Price: wantBuy, Change24h: 0},
+	mktSvc := &mockWatchlistMarketDataSvc{}
+	adcSvc := &mockAssetDisplayConfigSvc{
+		prices: map[string][2]int64{
+			symbol: {wantBuy, wantBuy},
 		},
 	}
 
-	svc := newWatchlistSvc(repo, assetSvc, mktSvc)
+	svc := newWatchlistSvc(repo, assetSvc, mktSvc, adcSvc)
 
 	resp, err := svc.ListItems(context.Background(), 42)
 	if err != nil {
@@ -397,20 +470,21 @@ func TestWatchlistService_ListItems_GoldViaGetPrice(t *testing.T) {
 }
 
 // TestWatchlistService_ListItems_CurrencyViaGetPrice verifies that a currency item
-// ("USD") resolves prices through MarketDataService.GetPrice() not a direct TypeCode map.
+// ("USD") resolves prices through AssetDisplayConfigService.ResolvePrice() (raw DB price).
 func TestWatchlistService_ListItems_CurrencyViaGetPrice(t *testing.T) {
 	const symbol = "USD"
 	const wantBuy int64 = 25_800_000
 
 	repo := &mockWatchlistRepo{items: []*models.WatchlistItem{currencyWatchlistItem(symbol)}}
 	assetSvc := &mockAssetPriceSvc{allPrices: emptyAllPrices()}
-	mktSvc := &mockWatchlistMarketDataSvc{
-		prices: map[string]*models.MarketData{
-			symbol: {Symbol: symbol, Price: wantBuy, Change24h: 0},
+	mktSvc := &mockWatchlistMarketDataSvc{}
+	adcSvc := &mockAssetDisplayConfigSvc{
+		prices: map[string][2]int64{
+			symbol: {wantBuy, wantBuy},
 		},
 	}
 
-	svc := newWatchlistSvc(repo, assetSvc, mktSvc)
+	svc := newWatchlistSvc(repo, assetSvc, mktSvc, adcSvc)
 
 	resp, err := svc.ListItems(context.Background(), 42)
 	if err != nil {
@@ -426,26 +500,27 @@ func TestWatchlistService_ListItems_CurrencyViaGetPrice(t *testing.T) {
 }
 
 // TestWatchlistService_ListItems_GetPriceFailureReturnsZeroPrices verifies that a
-// GetPrice() failure for one item does NOT return an error — it logs and returns zero prices.
+// ResolvePrice() failure for a gold item does NOT return an error — it logs and returns zero prices.
 func TestWatchlistService_ListItems_GetPriceFailureReturnsZeroPrices(t *testing.T) {
 	const symbol = "Eximbank"
 
 	repo := &mockWatchlistRepo{items: []*models.WatchlistItem{goldWatchlistItem(symbol)}}
 	assetSvc := &mockAssetPriceSvc{allPrices: emptyAllPrices()}
-	mktSvc := &mockWatchlistMarketDataSvc{err: errors.New("price service unavailable")}
+	mktSvc := &mockWatchlistMarketDataSvc{}
+	adcSvc := &mockAssetDisplayConfigSvc{err: errors.New("price service unavailable")}
 
-	svc := newWatchlistSvc(repo, assetSvc, mktSvc)
+	svc := newWatchlistSvc(repo, assetSvc, mktSvc, adcSvc)
 
 	resp, err := svc.ListItems(context.Background(), 42)
 	if err != nil {
-		t.Fatalf("ListItems must not return error when GetPrice fails: %v", err)
+		t.Fatalf("ListItems must not return error when ResolvePrice fails: %v", err)
 	}
 	if len(resp.Items) != 1 {
 		t.Fatalf("expected 1 item, got %d", len(resp.Items))
 	}
 	item := resp.Items[0]
 	if item.BuyPrice != 0 {
-		t.Errorf("BuyPrice: got %d, want 0 (GetPrice failed → zero)", item.BuyPrice)
+		t.Errorf("BuyPrice: got %d, want 0 (ResolvePrice failed → zero)", item.BuyPrice)
 	}
 }
 
@@ -474,18 +549,21 @@ func TestWatchlistService_ListItems_MixedAssetTypes(t *testing.T) {
 	repo := &mockWatchlistRepo{items: items}
 	assetSvc := &mockAssetPriceSvc{allPrices: emptyAllPrices()}
 
-	// All prices now served via mktSvc.GetPrice(), which routes gold/silver/currency
-	// to the DB cache and market/stock to Yahoo Finance.
+	// Gold/silver/currency served via adcSvc.ResolvePrice(); stock served via mktSvc.GetPrice().
 	mktSvc := &mockWatchlistMarketDataSvc{
 		prices: map[string]*models.MarketData{
-			goldSymbol:     {Symbol: goldSymbol, Price: 8_500_000_000, Change24h: 0},
-			silverSymbol:   {Symbol: silverSymbol, Price: 900_000, Change24h: 0},
-			currencySymbol: {Symbol: currencySymbol, Price: 25_000_000, Change24h: 0},
-			stockSymbol:    {Symbol: stockSymbol, Price: 55_000_00, Change24h: -0.5},
+			stockSymbol: {Symbol: stockSymbol, Price: 55_000_00, Change24h: -0.5},
+		},
+	}
+	adcSvc := &mockAssetDisplayConfigSvc{
+		prices: map[string][2]int64{
+			goldSymbol:     {8_500_000_000, 8_490_000_000},
+			silverSymbol:   {900_000, 895_000},
+			currencySymbol: {25_000_000, 24_900_000},
 		},
 	}
 
-	svc := newWatchlistSvc(repo, assetSvc, mktSvc)
+	svc := newWatchlistSvc(repo, assetSvc, mktSvc, adcSvc)
 
 	resp, err := svc.ListItems(context.Background(), 42)
 	if err != nil {
@@ -534,5 +612,129 @@ func TestWatchlistService_ListItems_MixedAssetTypes(t *testing.T) {
 	}
 	if stock.CurrentPrice != 55_000_00 {
 		t.Errorf("stock CurrentPrice: got %d, want 5500000", stock.CurrentPrice)
+	}
+}
+
+// TestWatchlistService_ListItems_GoldViaResolvePrice_RawMarketPrice verifies that a gold
+// watchlist item receives the raw per-lượng buy price from AssetDisplayConfigService.ResolvePrice()
+// WITHOUT any per-gram conversion — i.e. 171,000,000 VND is returned as-is.
+func TestWatchlistService_ListItems_GoldViaResolvePrice_RawMarketPrice(t *testing.T) {
+	const symbol = "Mihong_999"
+	const wantBuy int64 = 171_000_000 // per-lượng price stored in DB — must NOT be divided by 37.5
+
+	repo := &mockWatchlistRepo{items: []*models.WatchlistItem{goldWatchlistItem(symbol)}}
+	assetSvc := &mockAssetPriceSvc{allPrices: emptyAllPrices()}
+	mktSvc := &mockWatchlistMarketDataSvc{} // must NOT be called for gold
+	adcSvc := &mockAssetDisplayConfigSvc{
+		prices: map[string][2]int64{
+			symbol: {wantBuy, wantBuy - 500_000},
+		},
+	}
+
+	svc := newWatchlistSvc(repo, assetSvc, mktSvc, adcSvc)
+
+	resp, err := svc.ListItems(context.Background(), 42)
+	if err != nil {
+		t.Fatalf("ListItems returned unexpected error: %v", err)
+	}
+	if len(resp.Items) != 1 {
+		t.Fatalf("expected 1 item, got %d", len(resp.Items))
+	}
+	got := resp.Items[0]
+	if got.BuyPrice != wantBuy {
+		t.Errorf("BuyPrice: got %d, want %d (per-lượng raw price — must not be divided by 37.5)", got.BuyPrice, wantBuy)
+	}
+	if got.CurrentPrice != wantBuy {
+		t.Errorf("CurrentPrice: got %d, want %d", got.CurrentPrice, wantBuy)
+	}
+}
+
+// TestWatchlistService_ListItems_GoldResolvePriceError_ZeroPrices verifies that when
+// AssetDisplayConfigService.ResolvePrice() returns an error for a gold item, the service
+// returns zero prices (graceful degradation) without propagating the error.
+func TestWatchlistService_ListItems_GoldResolvePriceError_ZeroPrices(t *testing.T) {
+	const symbol = "Mihong_999"
+
+	repo := &mockWatchlistRepo{items: []*models.WatchlistItem{goldWatchlistItem(symbol)}}
+	assetSvc := &mockAssetPriceSvc{allPrices: emptyAllPrices()}
+	mktSvc := &mockWatchlistMarketDataSvc{}
+	adcSvc := &mockAssetDisplayConfigSvc{err: errors.New("asset price service error")}
+
+	svc := newWatchlistSvc(repo, assetSvc, mktSvc, adcSvc)
+
+	resp, err := svc.ListItems(context.Background(), 42)
+	if err != nil {
+		t.Fatalf("ListItems must not return error when ResolvePrice fails: %v", err)
+	}
+	if len(resp.Items) != 1 {
+		t.Fatalf("expected 1 item, got %d", len(resp.Items))
+	}
+	got := resp.Items[0]
+	if got.BuyPrice != 0 {
+		t.Errorf("BuyPrice: got %d, want 0 (ResolvePrice error → zero)", got.BuyPrice)
+	}
+	if got.SellPrice != 0 {
+		t.Errorf("SellPrice: got %d, want 0 (ResolvePrice error → zero)", got.SellPrice)
+	}
+}
+
+// TestWatchlistService_ListItems_MixedTypes_GoldFromResolve_StockFromGetPrice verifies that
+// in a mixed watchlist, gold uses AssetDisplayConfigService.ResolvePrice() and stock uses
+// MarketDataService.GetPrice(), with both prices correctly populated.
+func TestWatchlistService_ListItems_MixedTypes_GoldFromResolve_StockFromGetPrice(t *testing.T) {
+	const goldSymbol = "SJC_1L"
+	const stockSymbol = "VCB"
+	const wantGoldBuy int64 = 171_000_000
+	const wantStockPrice int64 = 90_000_00
+
+	items := []*models.WatchlistItem{
+		goldWatchlistItem(goldSymbol),
+		stockWatchlistItem(stockSymbol),
+	}
+	items[0].ID = 1
+	items[1].ID = 2
+
+	repo := &mockWatchlistRepo{items: items}
+	assetSvc := &mockAssetPriceSvc{allPrices: emptyAllPrices()}
+	mktSvc := &mockWatchlistMarketDataSvc{
+		prices: map[string]*models.MarketData{
+			stockSymbol: {Symbol: stockSymbol, Price: wantStockPrice, Change24h: 1.2},
+		},
+	}
+	adcSvc := &mockAssetDisplayConfigSvc{
+		prices: map[string][2]int64{
+			goldSymbol: {wantGoldBuy, wantGoldBuy - 1_000_000},
+		},
+	}
+
+	svc := newWatchlistSvc(repo, assetSvc, mktSvc, adcSvc)
+
+	resp, err := svc.ListItems(context.Background(), 42)
+	if err != nil {
+		t.Fatalf("ListItems returned unexpected error: %v", err)
+	}
+	if len(resp.Items) != 2 {
+		t.Fatalf("expected 2 items, got %d", len(resp.Items))
+	}
+
+	bySymbol := make(map[string]*v1.WatchlistItem, 2)
+	for _, pi := range resp.Items {
+		bySymbol[pi.Symbol] = pi
+	}
+
+	gold := bySymbol[goldSymbol]
+	if gold == nil {
+		t.Fatal("gold item missing from response")
+	}
+	if gold.BuyPrice != wantGoldBuy {
+		t.Errorf("gold BuyPrice: got %d, want %d (raw per-lượng from ResolvePrice)", gold.BuyPrice, wantGoldBuy)
+	}
+
+	stock := bySymbol[stockSymbol]
+	if stock == nil {
+		t.Fatal("stock item missing from response")
+	}
+	if stock.CurrentPrice != wantStockPrice {
+		t.Errorf("stock CurrentPrice: got %d, want %d (from GetPrice)", stock.CurrentPrice, wantStockPrice)
 	}
 }

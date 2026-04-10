@@ -128,7 +128,7 @@ func NewServices(repos *Repositories, redisClient *redis.Client, storageProvider
 	}
 
 	// Phase 1 (cont.): WatchlistService — reads from DB cache via AssetPriceService
-	watchlistSvc := NewWatchlistService(repos.Watchlist, assetPriceSvc, marketDataSvc)
+	watchlistSvc := NewWatchlistService(repos.Watchlist, assetPriceSvc, marketDataSvc, assetDisplayConfigSvc)
 
 	// Phase 1 (cont.): UserPriceAlertService — depends on alert repo, asset price DB cache, market data, notification repo, push service, Redis
 	var userPriceAlertSvc UserPriceAlertService
