@@ -130,7 +130,7 @@ sequenceDiagram
 
     H-->>SPA: 200 OK<br/>{success: true, items: [...], total: N, timestamp}
     Note over SPA: WatchlistTab renders:<br/>- Desktop: DraggableWatchlistTable<br/>- Mobile: MobileTable
-    Note over SPA: formatWatchlistPrice():<br/>Gold/Silver/Currency → buyPrice ÷ 1000 (VND)<br/>Other → currentPrice ÷ 100 (USD)
+    Note over SPA: formatWatchlistPrice():<br/>Gold/Silver/Currency VND → buyPrice as-is (no divisor)<br/>Gold/Silver USD → buyPrice ÷ 100 (cents→dollars)<br/>Other → currentPrice ÷ 100 (USD cents)
 ```
 
 ---

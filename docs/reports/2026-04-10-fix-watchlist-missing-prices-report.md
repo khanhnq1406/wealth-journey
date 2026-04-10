@@ -126,5 +126,6 @@ Changed symbol: `WatchlistService.ListItems()` internal price enrichment logic. 
 | Date       | Fix                                                                                        | Severity | Commit   |
 | ---------- | ------------------------------------------------------------------------------------------ | -------- | -------- |
 | 2026-04-10 | Use ResolvePrice() for gold/silver to return per-lượng market price (was returning per-gram after ProcessMarketPrice conversion) | Major | 908e35b1 |
+| 2026-04-10 | Remove incorrect ÷1000 divisor in formatWatchlistPrice() for gold/silver VND — raw int64 value is already full VND, no divisor needed | Minor | (pending) |
 
 See full report: `docs/reports/2026-04-10-fix-watchlist-gold-price-unit-report.md`

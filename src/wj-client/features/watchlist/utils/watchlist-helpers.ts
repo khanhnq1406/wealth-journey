@@ -37,9 +37,8 @@ export function getAssetTypeLabel(assetType: number): string {
 
 /**
  * Formats a watchlist item's price for display.
- * Gold/Silver: use buyPrice if available, else sellPrice, else "N/A".
- * Others: use currentPrice.
- * USD prices are stored as cents (×100), VND as ×1000.
+ * Gold/Silver/Currency VND: use raw int64 value (no divisor).
+ * USD: stored as cents (×100), divide by 100.
  */
 export function formatWatchlistPrice(item: WatchlistItem): string {
   const isGoldSilver = GOLD_SILVER_TYPES.includes(item.assetType);
@@ -57,18 +56,17 @@ export function formatWatchlistPrice(item: WatchlistItem): string {
   const currency = item.currency || "USD";
 
   if (isCurrency) {
-    // Currency prices from vangsaigon are raw VND — no divisor
+    // Currency prices are raw VND — no divisor
     return new Intl.NumberFormat("vi-VN", {
       maximumFractionDigits: 0,
     }).format(rawPrice);
   }
 
   if (currency === "VND") {
-    // VND stored × 1000
-    const display = rawPrice / 1000;
+    // Gold/silver VND prices are stored as raw int64 VND — display as-is
     return new Intl.NumberFormat("vi-VN", {
       maximumFractionDigits: 0,
-    }).format(display);
+    }).format(rawPrice);
   }
 
   // USD stored × 100 (cents)
