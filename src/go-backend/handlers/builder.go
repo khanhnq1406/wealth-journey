@@ -65,15 +65,16 @@ func NewHandlers(services *service.Services, repos *service.Repositories, deps *
 		adaptedQueue = jobs.NewImportQueueAdapter(redisQueue)
 	}
 
-	// Create market prices handler — reads from DB-backed cache via AssetPriceService.
+	// Create market prices handler — reads from AssetDisplayConfigService which applies
+	// admin display config (enabled filter, display names, fetch-code priority resolution).
 	// overrideCache is nil-safe: if Redis is unavailable the handler skips overrides gracefully.
 	var marketPricesHandler *MarketPricesHandler
-	if services.AssetPrice != nil {
+	if services.AssetDisplayConfig != nil {
 		var overrideCache *cache.PriceOverrideCache
 		if deps.RDB != nil {
 			overrideCache = cache.NewPriceOverrideCache(deps.RDB.GetClient())
 		}
-		marketPricesHandler = NewMarketPricesHandler(services.AssetPrice, overrideCache)
+		marketPricesHandler = NewMarketPricesHandler(services.AssetDisplayConfig, overrideCache)
 	}
 
 	// Create price override handler (requires Redis for override storage)

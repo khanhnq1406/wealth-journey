@@ -12,21 +12,21 @@ import (
 )
 
 // MarketPricesHandler handles the combined gold + silver + currency prices endpoint.
-// It reads from the DB-backed asset price cache via AssetPriceService instead of
-// calling live price APIs directly.
+// It reads from AssetDisplayConfigService.GetDisplayPrices() which applies the admin
+// display config (enabled filter, display names, fetch-code priority resolution, display order).
 type MarketPricesHandler struct {
-	assetPriceSvc service.AssetPriceService
-	overrideCache *cache.PriceOverrideCache
+	assetDisplayConfigSvc service.AssetDisplayConfigService
+	overrideCache         *cache.PriceOverrideCache
 }
 
 // NewMarketPricesHandler creates a new market prices handler.
 func NewMarketPricesHandler(
-	assetPriceSvc service.AssetPriceService,
+	assetDisplayConfigSvc service.AssetDisplayConfigService,
 	overrideCache *cache.PriceOverrideCache,
 ) *MarketPricesHandler {
 	return &MarketPricesHandler{
-		assetPriceSvc: assetPriceSvc,
-		overrideCache: overrideCache,
+		assetDisplayConfigSvc: assetDisplayConfigSvc,
+		overrideCache:         overrideCache,
 	}
 }
 
@@ -35,16 +35,28 @@ func NewMarketPricesHandler(
 func (h *MarketPricesHandler) GetMarketPrices(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	allPrices, err := h.assetPriceSvc.GetAllPrices(ctx)
+	goldDTOs, err := h.assetDisplayConfigSvc.GetDisplayPrices(ctx, "gold")
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	silverDTOs, err := h.assetDisplayConfigSvc.GetDisplayPrices(ctx, "silver")
+	if err != nil {
+		handler.HandleError(c, err)
+		return
+	}
+
+	currencyDTOs, err := h.assetDisplayConfigSvc.GetDisplayPrices(ctx, "currency")
 	if err != nil {
 		handler.HandleError(c, err)
 		return
 	}
 
 	// Convert DTOs to proto PriceItems
-	goldItems := convertToPriceItems(allPrices.Gold)
-	silverItems := convertToPriceItems(allPrices.Silver)
-	currencyItems := convertToPriceItems(allPrices.Currency)
+	goldItems := convertDisplayPricesToPriceItems(goldDTOs)
+	silverItems := convertDisplayPricesToPriceItems(silverDTOs)
+	currencyItems := convertDisplayPricesToPriceItems(currencyDTOs)
 
 	// Apply admin price overrides (graceful — skip if Redis fails)
 	if h.overrideCache != nil {
@@ -69,20 +81,17 @@ func (h *MarketPricesHandler) GetMarketPrices(c *gin.Context) {
 	})
 }
 
-// convertToPriceItems converts a slice of AssetPriceDTOs to proto PriceItems.
-func convertToPriceItems(dtos []*service.AssetPriceDTO) []*investmentv1.PriceItem {
+// convertDisplayPricesToPriceItems maps AssetDisplayPriceDTOs to proto PriceItems.
+func convertDisplayPricesToPriceItems(dtos []*service.AssetDisplayPriceDTO) []*investmentv1.PriceItem {
 	items := make([]*investmentv1.PriceItem, len(dtos))
 	for i, d := range dtos {
 		items[i] = &investmentv1.PriceItem{
-			TypeCode:   d.TypeCode,
-			Buy:        d.Buy,
-			Sell:       d.Sell,
-			ChangeBuy:  d.ChangeBuy,
-			ChangeSell: d.ChangeSell,
-			Currency:   d.Currency,
-			UpdatedAt:  d.FetchedAt.Unix(),
-			Name:       d.Name,
-			IsStale:    d.IsStale,
+			TypeCode: d.TypeCode,
+			Buy:      d.Buy,
+			Sell:     d.Sell,
+			Currency: "VND",
+			Name:     d.DisplayName,
+			IsStale:  d.IsStale,
 		}
 	}
 	return items
