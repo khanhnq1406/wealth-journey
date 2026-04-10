@@ -6,19 +6,19 @@
 - **Plan file:** `docs/plans/2026-04-09-fix-prices-tabs-asset-display-config-plan.md`
 - **Spec file:** `docs/specs/2026-04-09-fix-prices-tabs-asset-display-config-spec.md`
 - **Started:** 2026-04-10T00:00:00Z
-- **Last updated:** 2026-04-10T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 0
+- **Last updated:** 2026-04-10T01:00:00Z
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
-| #   | Task Name                                    | Status      | Commit | Summary |
-| --- | -------------------------------------------- | ----------- | ------ | ------- |
-| 0   | Update C4 Architecture Diagrams              | pending     | —      | —       |
-| 1   | Update Runtime Flow Diagram                  | pending     | —      | —       |
-| 2   | Rewrite MarketPricesHandler (Backend)        | pending     | —      | —       |
-| 3   | Frontend — Dynamic Tab Visibility            | pending     | —      | —       |
-| 4   | Kanban + Obsidian Task Update                | pending     | —      | —       |
+| #   | Task Name                                    | Status  | Commit     | Summary |
+| --- | -------------------------------------------- | ------- | ---------- | ------- |
+| 0   | Update C4 Architecture Diagrams              | done    | f90a11fd   | Updated c4-component-backend.md and c4-code-investment.md: MarketPricesHandler now depends on AssetDisplayConfigService |
+| 1   | Update Runtime Flow Diagram                  | done    | 5ab58d42   | Added Flow 13 to flow-investment.md: GetMarketPrices HTTP endpoint with 3 GetDisplayPrices calls |
+| 2   | Rewrite MarketPricesHandler (Backend)        | done    | 19186d39   | Handler rewritten to use AssetDisplayConfigService; 6 new tests; builder.go wiring updated |
+| 3   | Frontend — Dynamic Tab Visibility            | done    | ae5fe842   | computeVisibleTabs pure function; visibleTabs useMemo; useEffect tab reset; 18 unit tests |
+| 4   | Kanban + Obsidian Task Update                | done    | (next)     | Task note updated to Review; Kanban entry moved |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
