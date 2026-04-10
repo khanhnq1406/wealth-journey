@@ -16,6 +16,7 @@ Investment portfolio management flows covering the most complex business logic i
 - [Gold/Silver Price Resolution via Fetch Codes](#10-goldsilver-price-resolution-via-fetch-codes)
 - [Gold/Silver VND Investment Type Selection (Admin Config–Driven)](#11-goldsilver-vnd-investment-type-selection-admin-configdriven)
 - [Currency Investment Price Refresh](#12-currency-investment-price-refresh)
+- [Get Market Prices (Prices Page)](#13-get-market-prices-prices-page)
 
 ---
 
@@ -1007,4 +1008,124 @@ CurrencyPriceService (3 parallel sources: vangsaigon.vn, vang.today, Vietcombank
     → AssetDisplayConfigService.ResolvePrice(symbol, "currency")
     → MarketDataService.UpdatePricesForInvestments()
     → investmentRepo.UpdatePrices() [current_price + price_updated_at]
+```
+
+---
+
+## 13. Get Market Prices (Prices Page)
+
+**Trigger:** User opens `/dashboard/prices` — browser fetches `GET /api/v1/investments/market-prices`
+**Endpoint:** `GET /api/v1/investments/market-prices`
+**Source:** `handlers/market_prices.go`, `domain/service/asset_display_config_service.go`
+
+This flow documents how the Prices page fetches display prices for gold, silver, and currency tabs. `MarketPricesHandler` calls `AssetDisplayConfigService.GetDisplayPrices()` three times (once per asset type) and combines the results. Each call returns only enabled configs ordered by `display_order`, with prices resolved via the fetch-code priority chain from the `asset_price` DB table.
+
+```mermaid
+sequenceDiagram
+    participant Browser as Browser (Prices Page)
+    participant H as MarketPricesHandler
+    participant ADCS as AssetDisplayConfigService
+    participant ADCR as AssetDisplayConfigRepository<br/>(asset_display_config table)
+    participant APR as AssetPriceRepository<br/>(asset_price table)
+    participant Redis as Redis (overrideCache)
+
+    Browser->>H: GET /api/v1/investments/market-prices
+
+    Note over H: Call GetDisplayPrices for each asset type sequentially
+
+    H->>ADCS: GetDisplayPrices(ctx, "gold")
+    activate ADCS
+    ADCS->>ADCR: ListByAssetType(ctx, "gold")<br/>WHERE enabled=true ORDER BY display_order ASC
+    ADCR-->>ADCS: []AssetDisplayConfig (gold configs)
+    loop For each gold config
+        ADCS->>APR: ListByAssetType("gold")<br/>build priceMap[typeCode]→AssetPrice
+        APR-->>ADCS: []AssetPrice rows
+        ADCS->>ADCS: Iterate fetch codes (priority ASC)<br/>→ first non-stale hit wins<br/>→ stale fallback if all stale
+        ADCS->>ADCS: Assemble AssetDisplayPriceDTO{<br/>TypeCode, DisplayName, Buy, Sell,<br/>ChangeBuy, ChangeSell, Currency,<br/>UpdatedAt, IsStale}
+    end
+    ADCS-->>H: []*AssetDisplayPriceDTO (gold)
+    deactivate ADCS
+
+    H->>ADCS: GetDisplayPrices(ctx, "silver")
+    activate ADCS
+    ADCS->>ADCR: ListByAssetType(ctx, "silver")<br/>WHERE enabled=true ORDER BY display_order ASC
+    ADCR-->>ADCS: []AssetDisplayConfig (silver configs)
+    loop For each silver config
+        ADCS->>APR: ListByAssetType("silver")
+        APR-->>ADCS: []AssetPrice rows
+        ADCS->>ADCS: Resolve via fetch-code priority
+        ADCS->>ADCS: Assemble AssetDisplayPriceDTO
+    end
+    ADCS-->>H: []*AssetDisplayPriceDTO (silver)
+    deactivate ADCS
+
+    H->>ADCS: GetDisplayPrices(ctx, "currency")
+    activate ADCS
+    ADCS->>ADCR: ListByAssetType(ctx, "currency")<br/>WHERE enabled=true ORDER BY display_order ASC
+    ADCR-->>ADCS: []AssetDisplayConfig (currency configs)
+    loop For each currency config
+        ADCS->>APR: ListByAssetType("currency")
+        APR-->>ADCS: []AssetPrice rows
+        ADCS->>ADCS: Resolve via fetch-code priority
+        ADCS->>ADCS: Assemble AssetDisplayPriceDTO
+    end
+    ADCS-->>H: []*AssetDisplayPriceDTO (currency)
+    deactivate ADCS
+
+    Note over H: Map each AssetDisplayPriceDTO → PriceItem proto<br/>TypeCode→typeCode, DisplayName→name,<br/>Buy→buy, Sell→sell, Currency→currency,<br/>UpdatedAt.Unix()→updatedAt, IsStale→isStale
+
+    loop For each PriceItem (all asset types)
+        H->>Redis: overrideCache.Get(typeCode)
+        alt Override exists in Redis
+            Redis-->>H: overridden buy/sell prices
+            H->>H: Apply override: item.Buy=override.Buy<br/>item.Sell=override.Sell<br/>item.IsOverridden=true
+        else No override
+            Redis-->>H: cache miss
+        end
+    end
+
+    H-->>Browser: 200 OK<br/>{gold: [PriceItem,...], silver: [PriceItem,...],<br/>currency: [PriceItem,...], timestamp}
+```
+
+### Key Invariants
+
+- **Three sequential calls, not one**: `GetDisplayPrices()` is called separately for `"gold"`, `"silver"`, and `"currency"` — each returns only its own asset type's configs
+- **`enabled=true` filter**: only active configs are returned; if all gold configs are disabled, `gold: []` is returned and the frontend hides the gold tab
+- **`display_order` controls sort**: items within each asset type appear in `display_order ASC` sequence, matching admin configuration
+- **Fetch-code priority chain**: for each config, `ResolvePrice()` checks fetch codes in priority order — first non-stale match wins; freshest stale used as fallback if all stale
+- **`asset_price` table is pre-populated**: prices are read from the DB (written by `PriceCacheJob` every 15 min), never from live APIs at request time — no latency spike
+- **`overrideCache` preserved**: Redis admin price overrides are applied after DTO mapping, same as before the refactor
+- **No auth required**: endpoint is public; `assetType` values are internal constants, never user-supplied
+
+### Data Sources by Asset Type
+
+| Asset Type | Config Source | Price Source | Write Frequency |
+|------------|--------------|--------------|-----------------|
+| `"gold"` | `asset_display_config WHERE asset_type='gold' AND enabled=true` | `asset_price` via fetch-code priority | Every 15 min (PriceCacheJob → GoldPriceService) |
+| `"silver"` | `asset_display_config WHERE asset_type='silver' AND enabled=true` | `asset_price` via fetch-code priority | Every 15 min (PriceCacheJob → SilverPriceService) |
+| `"currency"` | `asset_display_config WHERE asset_type='currency' AND enabled=true` | `asset_price` via fetch-code priority | Every 15 min (PriceCacheJob → CurrencyPriceService) |
+
+### Field Mapping: AssetDisplayPriceDTO → PriceItem
+
+| `AssetDisplayPriceDTO` field | `PriceItem` proto field | Notes |
+|------------------------------|------------------------|-------|
+| `TypeCode` | `typeCode` | Config type_code, not fetch type_code |
+| `DisplayName` | `name` | Admin-controlled display name |
+| `Buy` | `buy` | int64, smallest currency unit |
+| `Sell` | `sell` | int64, smallest currency unit |
+| `ChangeBuy` | `changeBuy` | int64, price delta |
+| `ChangeSell` | `changeSell` | int64, price delta |
+| `Currency` | `currency` | ISO 4217 (e.g. `"VND"`, `"USD"`) |
+| `UpdatedAt.Unix()` | `updatedAt` | Unix timestamp (seconds) |
+| `IsStale` | `isStale` | True if all fetch codes returned stale prices |
+| Redis override | `isOverridden` | True if admin override applied from cache |
+
+### Frontend Tab Visibility (driven by this response)
+
+```
+isSuccess && data?.gold?.length === 0   → gold tab hidden
+isSuccess && data?.silver?.length === 0 → silver tab hidden
+isSuccess && data?.currency?.length === 0 → currency tab hidden
+isLoading || isError                    → all tabs shown (no flicker)
+activeTab no longer visible             → reset to first visible tab
 ```
