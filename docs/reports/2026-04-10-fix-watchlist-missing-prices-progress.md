@@ -7,8 +7,8 @@
 - **Spec file:** `docs/specs/2026-04-10-fix-watchlist-missing-prices-spec.md`
 - **Started:** 2026-04-10T00:00:00Z
 - **Last updated:** 2026-04-10T00:00:00Z
-- **Current state:** in_progress
-- **Current task:** 0
+- **Current state:** completed
+- **Current task:** done
 
 ## Task Progress
 
@@ -16,7 +16,7 @@
 | --- | ------------------------------------------------------ | ----------- | ------ | ------- |
 | 1   | Rewrite ListItems() Price Enrichment Logic             | done        | 2e2be3c4 | Replaced TypeCode-keyed lookup with unified GetPrice() goroutine loop; 9/9 tests pass |
 | 2   | Update Existing Tests to Match New Architecture        | done        | 2e2be3c4 | Completed as part of Task 1 — existing tests already updated to use mktSvc |
-| 0   | Update Runtime Flow Diagram                            | in_progress | —      | —       |
+| 0   | Update Runtime Flow Diagram                            | done        | 9274025e | Updated Section 2 to unified GetPrice() loop; removed GPS/SPS participants |
 
 **Status values:** `pending` | `in_progress` | `done` | `skipped`
 
