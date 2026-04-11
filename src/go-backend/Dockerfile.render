@@ -1,6 +1,5 @@
 # Build stage
-# Build context: repo root (Railway)
-# Note: Requires ENABLE_ALPINE_PRIVATE_NETWORKING=true on Railway (see docs/deployment/railway-env-vars.md)
+# Build context: src/go-backend/ (Render sets root directory to src/go-backend/)
 FROM golang:1.25-alpine AS builder
 
 # Install build dependencies
@@ -10,11 +9,11 @@ RUN apk add --no-cache git ca-certificates make bash
 WORKDIR /app
 
 # Copy go mod files
-COPY src/go-backend/go.mod src/go-backend/go.sum ./
+COPY go.mod go.sum ./
 RUN go mod download
 
 # Copy source code
-COPY src/go-backend/ ./
+COPY . ./
 
 # Build the application with size optimization
 # -ldflags="-s -w" strips debug info to reduce binary size
@@ -32,7 +31,7 @@ COPY --from=builder /app/bin/server /server
 # Use non-root user (distroless includes nonroot user)
 USER nonroot:nonroot
 
-# Expose port (Railway detects this automatically)
+# Expose port
 EXPOSE 8080
 
 # Run the binary
