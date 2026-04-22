@@ -6,6 +6,7 @@ kanban-plugin: board
 
 ## Not Started
 
+- [ ] [[2026-04-22-edit-investment|Edit investment core fields]]
 - [ ] [[2026-04-22-fix-investment-removal-wrong-pnl|Fix investment removal affecting PnL incorrectly]]
 
 
